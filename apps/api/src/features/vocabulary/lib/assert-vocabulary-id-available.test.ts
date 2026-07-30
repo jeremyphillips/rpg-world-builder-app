@@ -8,8 +8,7 @@ describe('assertVocabularyIdAvailable', () => {
     expect(() =>
       assertVocabularyIdAvailable({
         id: 'robot',
-        systemIds: new Set(['humanoid']),
-        campaignIds: new Set(),
+        reservedIds: new Set(['humanoid']),
       }),
     ).not.toThrow()
   })
@@ -19,8 +18,7 @@ describe('assertVocabularyIdAvailable', () => {
       () =>
         assertVocabularyIdAvailable({
           id: 'humanoid',
-          systemIds: new Set(['humanoid']),
-          campaignIds: new Set(),
+          reservedIds: new Set(['humanoid']),
         }),
       409,
     )
@@ -31,8 +29,18 @@ describe('assertVocabularyIdAvailable', () => {
       () =>
         assertVocabularyIdAvailable({
           id: 'robot',
-          systemIds: new Set(['humanoid']),
-          campaignIds: new Set(['robot']),
+          reservedIds: new Set(['humanoid', 'robot']),
+        }),
+      409,
+    )
+  })
+
+  it('rejects ids reserved by disabled system entries', () => {
+    expectHttpError(
+      () =>
+        assertVocabularyIdAvailable({
+          id: 'fey',
+          reservedIds: new Set(['humanoid', 'fey']),
         }),
       409,
     )

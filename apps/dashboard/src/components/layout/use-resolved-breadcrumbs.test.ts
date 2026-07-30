@@ -82,6 +82,37 @@ describe('useResolvedBreadcrumbs', () => {
     ])
   })
 
+  it('renders a three-level vocabulary trail with stable middle href', () => {
+    mockUseMatches.mockReturnValue([
+      makeMatch(
+        '/campaigns/c1/homebrew/vocabulary',
+        { campaignId: 'c1' },
+        {
+          crumb: (_params, data) => ({
+            label: 'Vocabulary',
+            href: data.isCollectionIndex ? undefined : '/campaigns/c1/homebrew/vocabulary',
+          }),
+        },
+      ),
+      makeMatch(
+        '/campaigns/c1/homebrew/vocabulary/creature-types',
+        { campaignId: 'c1', setId: 'creature-types' },
+        {
+          crumb: (_params, data) => ({
+            label: data.entityLabel ?? '…',
+          }),
+        },
+      ),
+    ])
+
+    const { result } = renderHook(() => useResolvedBreadcrumbs())
+
+    expect(result.current).toEqual([
+      { label: 'Vocabulary', href: '/campaigns/c1/homebrew/vocabulary' },
+      { label: 'Wizard' },
+    ])
+  })
+
   it('adds entity detail href when breadcrumbMode is edit', () => {
     mockUseMatches.mockReturnValue([
       makeMatch(

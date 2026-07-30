@@ -3,23 +3,14 @@ import { Button } from '@rpg/ui'
 import type { FilterFieldId } from '@rpg/ui/filters'
 
 import {
-  CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL,
-  CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL,
   CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL,
-  formatHiddenUnavailableNotice,
-  formatHideUnavailableAriaLabel,
-  formatNoAvailableMatchesLabel,
-  formatShowAllCampaignAvailabilityAriaLabel,
   formatShowUnavailableAriaLabel,
-  formatUnavailableItemsShownNotice,
-  formatUnavailableMatchesLine,
 } from '../campaign-access/campaign-access-table-labels'
-import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary.client'
+import { buildOverviewAvailabilitySupplement } from '@/lib/overview/overview-availability-supplement.client'
+import { resolveAvailabilityFilteredEmptyCopy } from '@/lib/overview/availability-empty-state-copy.lib'
+import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
 
-type AvailabilityScope = {
-  unavailableCount: number
-  visibleCount: number
-}
+type AvailabilityScope = CampaignAvailabilityScope
 
 type FilterNoticeActions<TFilters> = {
   setFilterValue: (
@@ -41,59 +32,12 @@ export function buildContentOverviewHiddenSupplement<TFilters>({
   campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
 }) {
-  if (scope.unavailableCount === 0 || campaignAvailability === 'unavailable') return null
-
-  if (campaignAvailability === 'available') {
-    return (
-      <>
-        <span>{formatHiddenUnavailableNotice(scope.unavailableCount)}</span>
-        <OverviewResultSummaryDotSeparator />
-        <Button
-          type="button"
-          variant="link"
-          size="sm"
-          className="h-auto px-0 text-xs"
-          aria-label={formatShowAllCampaignAvailabilityAriaLabel()}
-          onClick={() =>
-            actions.setFilterValue(
-              campaignAvailabilityFilterId,
-              'all' as TFilters[FilterFieldId<TFilters>],
-              { history: 'push' },
-            )
-          }
-        >
-          {CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL}
-        </Button>
-      </>
-    )
-  }
-
-  if (campaignAvailability === 'all') {
-    return (
-      <>
-        <span>{formatUnavailableItemsShownNotice(scope.unavailableCount)}</span>
-        <OverviewResultSummaryDotSeparator />
-        <Button
-          type="button"
-          variant="link"
-          size="sm"
-          className="h-auto px-0 text-xs"
-          aria-label={formatHideUnavailableAriaLabel()}
-          onClick={() =>
-            actions.setFilterValue(
-              campaignAvailabilityFilterId,
-              'available' as TFilters[FilterFieldId<TFilters>],
-              { history: 'push' },
-            )
-          }
-        >
-          {CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL}
-        </Button>
-      </>
-    )
-  }
-
-  return null
+  return buildOverviewAvailabilitySupplement({
+    scope,
+    campaignAvailability,
+    campaignAvailabilityFilterId,
+    actions,
+  })
 }
 
 export function buildContentOverviewEmptyState<TFilters>({
@@ -109,16 +53,19 @@ export function buildContentOverviewEmptyState<TFilters>({
   campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
 }) {
-  if (
-    campaignAvailability === 'available' &&
-    scope.unavailableCount > 0 &&
-    scope.visibleCount === 0
-  ) {
+  const copy = resolveAvailabilityFilteredEmptyCopy({
+    campaignAvailability,
+    unavailableCount: scope.unavailableCount,
+    visibleCount: scope.visibleCount,
+    pluralNoun,
+  })
+
+  if (copy.kind === 'hiddenUnavailable') {
     return (
       <div className="space-y-1 text-center">
-        <p>{formatNoAvailableMatchesLabel(pluralNoun)}</p>
+        <p>{copy.noMatchesLine}</p>
         <p className="text-muted-foreground">
-          {formatUnavailableMatchesLine(scope.unavailableCount, pluralNoun)}{' '}
+          {copy.unavailableLine}{' '}
           <Button
             type="button"
             variant="link"
@@ -137,6 +84,10 @@ export function buildContentOverviewEmptyState<TFilters>({
         </p>
       </div>
     )
+  }
+
+  if (copy.kind === 'generic') {
+    return <p>No results.</p>
   }
 
   return <p>No results.</p>

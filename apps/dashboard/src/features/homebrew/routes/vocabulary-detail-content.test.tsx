@@ -64,21 +64,32 @@ describe('VocabularyDetailContent', () => {
 
     expect(screen.getByRole('heading', { name: 'Damage Types' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Not available yet' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Rules vocabulary sets' })).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('shows an unknown fallback for invalid set ids', () => {
+    renderDetail('not-a-set')
+
+    expect(screen.getByRole('heading', { name: 'Vocabulary' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to Homebrew' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('navigation', { name: 'Rules vocabulary sets' }),
+    ).not.toBeInTheDocument()
   })
 
   it('opens the add sheet for managers', async () => {
     const user = userEvent.setup()
     renderDetail()
 
-    await user.click(screen.getByRole('button', { name: 'New' }))
-    expect(await screen.findByRole('dialog', { name: 'Add vocabulary entry' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'New creature type' }))
+    expect(await screen.findByRole('dialog', { name: 'New creature type' })).toBeInTheDocument()
   })
 
   it('hides manager actions for non-managers', () => {
     useCanManageCampaignMock.mockReturnValue(false)
     renderDetail()
 
-    expect(screen.queryByRole('button', { name: 'New' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'New creature type' })).not.toBeInTheDocument()
   })
 })

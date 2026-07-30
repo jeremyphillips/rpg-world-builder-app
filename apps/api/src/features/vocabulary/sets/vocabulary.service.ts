@@ -1,16 +1,16 @@
-import {
-  loadSeedVocabularyOptionSet,
-  listSeedVocabularySetIds,
-  seedVocabularyOptionIds,
-} from '@rpg/catalog/vocabulary'
+import { loadSeedVocabularyOptionSet, listSeedVocabularySetIds } from '@rpg/catalog/vocabulary'
 import type {
   CreateVocabularyCampaignEntryInput,
   ResolvedVocabularyOptionSet,
   SystemRulesetId,
   UpdateVocabularyEntryInput,
+  VocabularyDeleteAvailability,
+  VocabularyDisableAvailability,
+  VocabularyEntryUsage,
   VocabularyOptionSetId,
   VocabularyOptionSetPatch,
 } from '@rpg/contracts'
+import { getVocabularySetCapability, vocabularyEntryUsageSchema } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { assertVocabularyIdAvailable } from '../lib/assert-vocabulary-id-available'
@@ -22,6 +22,11 @@ import {
   type PatchDocument,
 } from '../lib/patch-document'
 import { resolveVocabularySet } from '../lib/resolve-vocabulary'
+import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
+import {
+  resolveVocabularyOptionUsage,
+  resolveVocabularyOptionUsageCountsBatch,
+} from '../lib/vocabulary-usage-resolvers'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -45,32 +50,86 @@ function getSetPatch(
   return { setId }
 }
 
-function campaignEntryIds(setPatch: VocabularyOptionSetPatch): ReadonlySet<string> {
-  const removed = new Set(setPatch.removedCampaignEntryIds ?? [])
-  return new Set(
-    (setPatch.campaignEntries ?? [])
-      .filter((entry) => !removed.has(entry.id))
-      .map((entry) => entry.id),
-  )
+function reservedVocabularyOptionIds(
+  options: ReturnType<typeof resolveVocabularySet>,
+): ReadonlySet<string> {
+  return new Set(options.map((option) => option.id))
 }
 
-/**
- * Usage count stub — always returns 0 until species/settings reference tracking
- * is wired for delete/disable validation.
- */
 export async function countVocabularyOptionUsage(
-  _campaignId: string,
-  _setId: VocabularyOptionSetId,
-  _entryId: string,
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
 ): Promise<number> {
-  return 0
+  const capability = getVocabularySetCapability(setId)
+  if (!capability.usageCounting) {
+    return 0
+  }
+
+  const { count } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  return count
 }
 
-function attachUsageCounts(
+async function resolveVocabularyDisableBlockers(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDisableAvailability> {
+  const capability = getVocabularySetCapability(setId)
+  if (!capability.disableGuard) {
+    return { status: 'allowed' }
+  }
+
+  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
+
+  return { status: 'allowed' }
+}
+
+async function resolveVocabularyDeleteBlockers(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDeleteAvailability> {
+  const capability = getVocabularySetCapability(setId)
+  if (!capability.deleteGuard) {
+    return { status: 'allowed' }
+  }
+
+  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
+
+  return { status: 'allowed' }
+}
+
+async function attachUsageCounts(
   campaignId: string,
   setId: VocabularyOptionSetId,
   options: ReturnType<typeof resolveVocabularySet>,
 ): Promise<ResolvedVocabularyOptionSet['options']> {
+  const capability = getVocabularySetCapability(setId)
+
+  if (!capability.usageCounting) {
+    return options.map((option) => ({ ...option, usedBy: 0 }))
+  }
+
+  if (capability.batchUsageCounting) {
+    const counts = await resolveVocabularyOptionUsageCountsBatch(
+      campaignId,
+      setId,
+      options.map((option) => option.id),
+    )
+
+    return options.map((option) => ({
+      ...option,
+      usedBy: counts.get(option.id) ?? 0,
+    }))
+  }
+
   return Promise.all(
     options.map(async (option) => ({
       ...option,
@@ -136,21 +195,22 @@ export async function createCampaignVocabularyEntry(
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, input.setId)
 
-  const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)
-  const setPatch = getSetPatch(patchDoc, input.setId)
+  const current = await resolveVocabularySetForCampaign(campaignId, input.setId)
 
   assertVocabularyIdAvailable({
     id: input.id,
-    systemIds: seedVocabularyOptionIds(rulesetId, input.setId),
-    campaignIds: campaignEntryIds(setPatch),
+    reservedIds: reservedVocabularyOptionIds(current.options),
   })
+
+  const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)
+  const setPatch = getSetPatch(patchDoc, input.setId)
 
   const campaignEntries = [...(setPatch.campaignEntries ?? [])]
   campaignEntries.push({
     id: input.id,
     label: input.label,
     description: input.description,
-    status: 'active',
+    status: input.status ?? 'active',
   })
 
   const removedCampaignEntryIds = (setPatch.removedCampaignEntryIds ?? []).filter(
@@ -233,17 +293,110 @@ function patchVocabularyEntry(
     : patchCampaignEntry(setPatch, entryId, input)
 }
 
+async function assertVocabularyEntryPatchAllowed(
+  _setId: VocabularyOptionSetId,
+  input: UpdateVocabularyEntryInput,
+): Promise<void> {
+  const hasLabelOrDescription = input.label !== undefined || input.description !== undefined
+  const hasStatus = input.status !== undefined
+
+  if (!hasLabelOrDescription && !hasStatus) {
+    throw new HttpError(400, 'bad_request', 'No supported vocabulary patch fields were provided.')
+  }
+}
+
+export async function getVocabularyDisableAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDisableAvailability> {
+  if (!getVocabularySetCapability(setId).disableGuard) {
+    throw new HttpError(
+      404,
+      'not_found',
+      `Disable preflight is not available for vocabulary set "${setId}".`,
+    )
+  }
+
+  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  findResolvedOption(current, entryId)
+
+  return resolveVocabularyDisableBlockers(campaignId, setId, entryId)
+}
+
+export async function getVocabularyEntryUsage(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyEntryUsage> {
+  if (!getVocabularySetCapability(setId).usageCounting) {
+    throw new HttpError(
+      404,
+      'not_found',
+      `Usage details are not available for vocabulary set "${setId}".`,
+    )
+  }
+
+  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  findResolvedOption(current, entryId)
+
+  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  return vocabularyEntryUsageSchema.parse(buildVocabularyEntryUsageFromBlockers(blockers))
+}
+
+export async function getVocabularyDeleteAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDeleteAvailability> {
+  if (!getVocabularySetCapability(setId).deleteGuard) {
+    throw new HttpError(
+      404,
+      'not_found',
+      `Delete preflight is not available for vocabulary set "${setId}".`,
+    )
+  }
+
+  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const existing = findResolvedOption(current, entryId)
+
+  if (existing.source === 'system') {
+    throw new HttpError(
+      403,
+      'forbidden',
+      'System vocabulary entries cannot be deleted. Disable them instead.',
+    )
+  }
+
+  return resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+}
+
 export async function updateVocabularyEntry(
   campaignId: string,
   setId: VocabularyOptionSetId,
   entryId: string,
   input: UpdateVocabularyEntryInput,
 ): Promise<ResolvedVocabularyOptionSet> {
+  await assertVocabularyEntryPatchAllowed(setId, input)
+
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, setId)
 
   const current = await resolveVocabularySetForCampaign(campaignId, setId)
   const existing = findResolvedOption(current, entryId)
+
+  if (input.status === 'disabled' && existing.status === 'active') {
+    const disableCheck = await resolveVocabularyDisableBlockers(campaignId, setId, entryId)
+    if (disableCheck.status === 'blocked') {
+      throw new HttpError(
+        409,
+        'in_use',
+        `Vocabulary entry "${entryId}" is referenced and cannot be disabled.`,
+        { blockers: disableCheck.blockers },
+      )
+    }
+  }
+
   const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)
   const setPatch = getSetPatch(patchDoc, setId)
 
@@ -275,13 +428,17 @@ export async function deleteCampaignVocabularyEntry(
     )
   }
 
-  const usedBy = await countVocabularyOptionUsage(campaignId, setId, entryId)
-  if (usedBy > 0) {
-    throw new HttpError(
-      409,
-      'in_use',
-      `Vocabulary entry "${entryId}" is referenced by ${usedBy} record(s) and cannot be deleted.`,
-    )
+  const capability = getVocabularySetCapability(setId)
+  if (capability.deleteGuard) {
+    const deleteCheck = await resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+    if (deleteCheck.status === 'blocked') {
+      throw new HttpError(
+        409,
+        'in_use',
+        `Vocabulary entry "${entryId}" is referenced by ${deleteCheck.blockers.length} record(s) and cannot be deleted.`,
+        { blockers: deleteCheck.blockers },
+      )
+    }
   }
 
   const patchDoc = await getOrCreatePatchDocument(campaignId, rulesetId)

@@ -92,23 +92,33 @@ describe('vocabulary write rules', () => {
     ).rejects.toMatchObject({ status: 409 })
   })
 
-  it('patches and disables system entries without deleting them', async () => {
+  it('patches and disables unreferenced system entries without deleting them', async () => {
     const campaign = await makeTestCampaign()
 
-    const patched = await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
-      label: 'People',
+    const patched = await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'beast', {
+      label: 'Wild beast',
       status: 'disabled',
     })
 
-    expect(patched.options.find((option) => option.id === 'humanoid')).toMatchObject({
-      label: 'People',
+    expect(patched.options.find((option) => option.id === 'beast')).toMatchObject({
+      label: 'Wild beast',
       status: 'disabled',
       source: 'system',
     })
 
     await expect(
-      deleteCampaignVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid'),
+      deleteCampaignVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'beast'),
     ).rejects.toMatchObject({ status: 403 })
+  })
+
+  it('blocks disabling referenced system entries', async () => {
+    const campaign = await makeTestCampaign()
+
+    await expect(
+      updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
+        status: 'disabled',
+      }),
+    ).rejects.toMatchObject({ status: 409 })
   })
 
   it('edits, disables, and deletes unused campaign entries', async () => {
@@ -134,11 +144,16 @@ describe('vocabulary write rules', () => {
     expect(deleted.options.some((option) => option.id === 'robot')).toBe(false)
   })
 
-  it('returns usage counts as zero from the stub', async () => {
+  it('attaches usage counts from registered resolvers', async () => {
     const campaign = await makeTestCampaign()
     const set = await resolveVocabularySetForCampaign(campaign.id, CREATURE_TYPE_SET_ID)
 
-    expect(set.options.every((option) => option.usedBy === 0)).toBe(true)
+    for (const option of set.options) {
+      expect(option.usedBy).toBeGreaterThanOrEqual(0)
+    }
+
+    const humanoid = set.options.find((option) => option.id === 'humanoid')
+    expect(humanoid?.usedBy).toBeGreaterThan(0)
   })
 
   it('allows delete while usage stub reports zero references', async () => {

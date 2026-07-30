@@ -36,6 +36,27 @@ vocabularyRouter.patch(
   controller.patchVocabularyEntry,
 )
 
+vocabularyRouter.get(
+  '/:setId/entries/:entryId/disable-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getVocabularyDisableAvailabilityHandler,
+)
+
+vocabularyRouter.get(
+  '/:setId/entries/:entryId/usage',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.getVocabularyEntryUsageHandler,
+)
+
+vocabularyRouter.get(
+  '/:setId/entries/:entryId/delete-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  controller.getVocabularyDeleteAvailabilityHandler,
+)
+
 vocabularyRouter.delete(
   '/:setId/entries/:entryId',
   requireAuth,

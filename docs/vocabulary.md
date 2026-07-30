@@ -69,14 +69,16 @@ The UI may render `source: 'campaign'` vocabulary rows as **Custom** in tables.
 
 Shared shapes live in `@rpg/contracts`:
 
-| Symbol                                    | Layer                             | Role                                                |
-| ----------------------------------------- | --------------------------------- | --------------------------------------------------- |
-| `VOCABULARY_OPTION_SET_IDS`               | `rpg/vocab/vocabulary.ts`         | Known set ids (not all implemented in UI yet)       |
-| `vocabularyOptionIdSchema`                | `rpg/vocab/`                      | Slug shape for stored ids — **not** a closed enum   |
-| `vocabularyOptionSetPatchSchema`          | `rpg/vocab/`                      | Per-set delta inside a patch document               |
-| `campaignRulesetPatchSchema`              | `rpg/campaign/patches/ruleset.ts` | Full patch document (+ `rulesetId` from primitives) |
-| `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                      | Validates a value against resolved **active** ids   |
-| `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                      | Active id set from a resolved option set            |
+| Symbol                                    | Layer                                      | Role                                                 |
+| ----------------------------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| `VOCABULARY_OPTION_SET_IDS`               | `rpg/vocab/vocabulary.ts`                  | Known set ids (not all implemented in UI yet)        |
+| `VOCABULARY_SET_CAPABILITIES`             | `rpg/vocab/vocabulary-set-capabilities.ts` | Exhaustive product capability matrix per set         |
+| `deriveVocabularyEntryId`                 | `rpg/vocab/vocabulary-entry-id.ts`         | Canonical slug derivation for create (API authority) |
+| `vocabularyOptionIdSchema`                | `rpg/vocab/`                               | Slug shape for stored ids — **not** a closed enum    |
+| `vocabularyOptionSetPatchSchema`          | `rpg/vocab/`                               | Per-set delta inside a patch document                |
+| `campaignRulesetPatchSchema`              | `rpg/campaign/patches/ruleset.ts`          | Full patch document (+ `rulesetId` from primitives)  |
+| `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                               | Validates a value against resolved **active** ids    |
+| `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                               | Active id set from a resolved option set             |
 
 **Closed reference vocab** (physical damage, weapon properties) remains in
 `rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Each closed
@@ -113,22 +115,64 @@ Detail: [apps/api/src/features/vocabulary/README.md](../apps/api/src/features/vo
 
 Routes (under `/api/campaigns/:campaignId`):
 
-| Method | Path                                  | Access           |
-| ------ | ------------------------------------- | ---------------- |
-| GET    | `/vocabulary`                         | member           |
-| GET    | `/vocabulary/:setId`                  | member           |
-| POST   | `/vocabulary/:setId/entries`          | owner / co-owner |
-| PATCH  | `/vocabulary/:setId/entries/:entryId` | owner / co-owner |
-| DELETE | `/vocabulary/:setId/entries/:entryId` | owner / co-owner |
-| GET    | `/ruleset-patch`                      | member           |
-| PATCH  | `/ruleset-patch/character-creation`   | owner / co-owner |
-| PATCH  | `/ruleset-patch/mechanics`            | owner / co-owner |
+| Method | Path                                                       | Access           |
+| ------ | ---------------------------------------------------------- | ---------------- |
+| GET    | `/vocabulary`                                              | member           |
+| GET    | `/vocabulary/:setId`                                       | member           |
+| POST   | `/vocabulary/:setId/entries`                               | owner / co-owner |
+| PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner / co-owner |
+| DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner / co-owner |
+| GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner / co-owner |
+| GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner / co-owner |
+| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member           |
+| GET    | `/ruleset-patch`                                           | member           |
+| PATCH  | `/ruleset-patch/character-creation`                        | owner / co-owner |
+| PATCH  | `/ruleset-patch/mechanics`                                 | owner / co-owner |
 
 Hub catalog counts (`GET /homebrew/summary`) live in the **content** feature —
 see [content README](../apps/api/src/features/content/README.md).
 
-Duplicate ids (shadowing seed or an existing campaign entry) return **409** via
-`assertVocabularyIdAvailable`.
+Duplicate ids (shadowing seed, disabled system rows, or existing campaign entries)
+return **409** via `assertVocabularyIdAvailable` against **all resolved option ids**.
+
+Mutating routes enforce `VOCABULARY_SET_CAPABILITIES` server-side:
+
+| Operation                            | Capability      | Failure        |
+| ------------------------------------ | --------------- | -------------- |
+| POST entry                           | `create`        | 403            |
+| PATCH label/description              | `edit`          | 403            |
+| PATCH status                         | `availability`  | 403            |
+| DELETE entry                         | `delete`        | 403            |
+| GET disable-availability             | `disableGuard`  | 404            |
+| GET delete-availability              | `deleteGuard`   | 404            |
+| GET usage                            | `usageCounting` | 404            |
+| PATCH status → disabled (referenced) | `disableGuard`  | 409 + blockers |
+
+Partial API registries (creature-types species resolver registered today):
+
+| Registry                         | Location                                         | Role                                         |
+| -------------------------------- | ------------------------------------------------ | -------------------------------------------- |
+| `VOCABULARY_USAGE_RESOLVERS`     | `apps/api/.../vocabulary-usage-resolvers.ts`     | Usage counts + `kind: 'content'` blockers    |
+| `VOCABULARY_VALIDATION_ADAPTERS` | `apps/api/.../vocabulary-validation-adapters.ts` | Optional validation beyond active membership |
+| `VOCABULARY_ENTRY_FORM_REGISTRY` | dashboard `vocabulary-entry-form-registry.ts`    | Create/edit form defs for enabled sets       |
+
+Shared dashboard extractions (dual consumers — content + vocabulary):
+
+| Module                      | Path                                                               |
+| --------------------------- | ------------------------------------------------------------------ |
+| Unavailable row chrome      | `@/lib/overview/overview-unavailable-chrome.ts`                    |
+| Availability filter field   | `@/lib/overview/create-campaign-availability-filter-field.ts`      |
+| Bulk actions menu shell     | `@/lib/overview/overview-bulk-actions-menu.client.tsx`             |
+| Usage blocked list          | `@/lib/usage-blocked/usage-blocked-list.client.tsx`                |
+| Campaign availability field | `@/lib/campaign-availability/campaign-availability-form-fields.ts` |
+| Usage reference primitives  | `@/lib/usage-references/*`                                         |
+
+### Phase 4 — entry sheet + Used by
+
+- **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
+- **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
+- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; HTTP responses are not reused across surfaces.
+- **UI:** informational `UsageReferencesSection` in the edit sheet; blocked dialogs use `UsageBlockedReferenceList` with the same reference row primitives.
 
 ---
 
@@ -147,9 +191,10 @@ registry fails CI.
 ### Vocabulary sets (hub + detail rail)
 
 `HOMEBREW_VOCABULARY_SETS` in `lib/hub/vocabulary-set-registry.ts` lists every
-`VOCABULARY_OPTION_SET_ID` with a label and `enabled` flag. Only enabled sets
-get hub cards and an active manager; disabled sets appear in the detail rail /
-mobile select as not-yet-implemented.
+`VOCABULARY_OPTION_SET_ID` with a label. **`enabled` is derived from
+`VOCABULARY_SET_CAPABILITIES.overview`** — do not maintain a parallel enable list.
+Only overview-capable sets get hub cards and an active manager; other sets appear
+in the detail rail / mobile select as not-yet-implemented.
 
 ### Rules configuration (hub)
 
@@ -204,10 +249,12 @@ Work through these layers once; reuse resolver, routes, and detail UI.
 
 ### 4. Dashboard
 
-1. Set `enabled: true` for the set in `HOMEBREW_VOCABULARY_SETS`.
-2. Add a consumption hook if forms or columns need labels/options (pattern:
-   `useCreatureTypeVocabulary`).
-3. Wire field options through the hook — do not import static seed constants in
+1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`overview`, `create`, …).
+2. Register a form def in `VOCABULARY_ENTRY_FORM_REGISTRY` when `create`/`edit` are true.
+3. Register an API usage resolver when `usageCounting` / `disableGuard` / `deleteGuard` need custom logic.
+4. Add a consumption hook if forms or columns need labels/options (pattern:
+   `useCreatureTypeVocabulary` or generic `useVocabularySetMaps`).
+5. Wire field options through the hook — do not import static seed constants in
    components.
 
 ### 5. Tests
@@ -252,11 +299,15 @@ patch routes).
 
 ### Shape vs membership
 
-| Check             | When                              | How                                                            |
-| ----------------- | --------------------------------- | -------------------------------------------------------------- |
-| Slug shape        | Parse stored fields / API input   | `vocabularyOptionIdSchema`                                     |
-| Active membership | Create/update content or settings | `createVocabularyMemberSchema(activeIds)` or API assert helper |
-| Id availability   | Create vocabulary entry           | `assertVocabularyIdAvailable` (no shadowing seed ids)          |
+| Check             | When                              | How                                                                                                                                                   |
+| ----------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Slug shape        | Parse stored fields / API input   | `vocabularyOptionIdSchema`                                                                                                                            |
+| Active membership | Create/update content or settings | `createVocabularyMemberSchema(activeIds)` or API assert helper                                                                                        |
+| Id availability   | Create vocabulary entry           | `assertVocabularyIdAvailable` — ids are **reserved within the set** regardless of `status` or `source` (system seed, disabled patch, or campaign row) |
+
+Create accepts an optional client-proposed id for preview; the API re-derives from
+`label` via `deriveVocabularyEntryId` and rejects a mismatch (**400**) or collision
+(**409**). Disabling an option does not free its id for reuse.
 
 Disabling a system option that is already referenced should be allowed in the
 first pass; enforcement of "cannot disable/delete while in use" is centralized in
@@ -264,17 +315,27 @@ usage counting (below).
 
 ### Usage counts (`usedBy`)
 
-`countVocabularyOptionUsage` in `vocabulary.service.ts` is the **single
-enforcement point** for delete (and future disable) guards. It currently returns
-`0` for all options until reference tracking is wired (species, campaign
-settings, monsters, etc.).
+`VOCABULARY_USAGE_RESOLVERS` in the API is the **single enforcement point** for
+delete and disable guards. Creature-types counts species references and returns
+`kind: 'content'` blockers for disable preflight and PATCH 409 races.
 
-- Resolved sets attach `usedBy` on every option for the management UI.
-- Delete campaign entries succeeds when `usedBy === 0`; otherwise **409 in_use**.
+- Resolved sets attach `usedBy` on every option when `usageCounting` is true.
+- Delete campaign entries succeeds when `usedBy === 0` (or `deleteGuard` is off); otherwise **409 in_use**.
+- Disable (status → disabled) runs preflight via `GET …/disable-availability`; PATCH returns **409** with blockers when referenced.
 - System entries cannot be deleted regardless of usage.
 
-When adding a referencing feature, increment the stub for matching
-`(campaignId, setId, entryId)` queries rather than adding ad-hoc delete checks.
+When adding a referencing feature, extend the set's usage resolver rather than adding ad-hoc delete checks.
+
+### Set capabilities registry
+
+`VOCABULARY_SET_CAPABILITIES` in `@rpg/contracts` is the **runtime SSOT** for which
+operations each set supports (overview, create, availability, usage guards, …).
+Dashboard and API registries derive **enabled subsets** from this map; drift tests
+assert every contract set id has an explicit row. Catalog seed presence is
+**ruleset-specific** (`@rpg/catalog`) — not stored in capabilities.
+
+Integration ownership notes live in
+[`tools/vocab/set-integration`](tools/vocab/set-integration/) (discoverability only).
 
 ---
 

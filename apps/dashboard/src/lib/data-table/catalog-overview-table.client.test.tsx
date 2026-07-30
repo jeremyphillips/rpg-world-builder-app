@@ -6,8 +6,9 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ColumnDef } from '@rpg/ui'
 import { SortableHeader } from '@rpg/ui'
-import { createEqualsFilter } from '@rpg/ui/filters'
+import { createEqualsFilter, createFilterSchema } from '@rpg/ui/filters'
 
+import { createCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
 import { CatalogOverviewTable } from './catalog-overview-table.client'
 import { catalogOverviewPreferencesKey } from './catalog-overview-preferences'
 
@@ -106,5 +107,53 @@ describe('CatalogOverviewTable', () => {
     ) as { columnVisibility?: Record<string, boolean> }
 
     expect(stored.columnVisibility?.role).toBe(false)
+  })
+
+  it('renders hidden unavailable supplement for non-content row shapes', () => {
+    type StatusRow = { id: string; status: 'active' | 'disabled' }
+
+    type StatusFilterState = {
+      campaignAvailability?: 'available' | 'unavailable' | 'all'
+    }
+
+    const rows: StatusRow[] = [
+      { id: '1', status: 'active' },
+      { id: '2', status: 'disabled' },
+    ]
+
+    const statusColumns: ColumnDef<StatusRow>[] = [
+      {
+        accessorKey: 'id',
+        header: 'Id',
+        meta: { label: 'Id', locked: true },
+      },
+    ]
+
+    const statusFilterSchema = createFilterSchema<StatusRow, StatusFilterState>(
+      [
+        createCampaignAvailabilityFilterField<StatusRow, StatusFilterState>(
+          (row) => row.status === 'active',
+        ),
+      ],
+      {
+        availability: { isAvailable: (row) => row.status === 'active' },
+      },
+    )
+
+    render(
+      <CatalogOverviewTable
+        tableKey="status-rows"
+        columns={statusColumns}
+        data={rows}
+        filterSchema={statusFilterSchema}
+        filterState={{ campaignAvailability: 'available' }}
+        onFilterChange={() => undefined}
+        onResetFilters={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText('1 result')).toBeInTheDocument()
+    expect(screen.getByText('1 hidden')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /show all/i })).toBeInTheDocument()
   })
 })

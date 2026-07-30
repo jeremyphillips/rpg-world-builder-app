@@ -1,5 +1,10 @@
 import type { VocabularyOptionSetId } from '@rpg/contracts'
-import { getVocabularyOptionSetTerm, VOCABULARY_OPTION_SET_IDS } from '@rpg/contracts'
+import {
+  getVocabularyOptionSetTerm,
+  getVocabularySetCapability,
+  VOCABULARY_OPTION_SET_IDS,
+  vocabularySetIdsWithOverview,
+} from '@rpg/contracts'
 
 import { vocabularyHubLabel } from '../vocabulary/term-labels'
 
@@ -10,14 +15,15 @@ export type HomebrewVocabularySetEntry = {
   enabled: boolean
 }
 
-const ENABLED_SETS = new Set<VocabularyOptionSetId>(['creature-types'])
+/** Runtime-enabled vocabulary sets derived from contract capabilities. */
+export const ENABLED_VOCABULARY_SET_IDS = vocabularySetIdsWithOverview()
 
-/** Rules vocabulary sets surfaced on the Homebrew hub — expand as managers ship. */
+/** Rules vocabulary sets surfaced on the Homebrew hub — expand via capabilities. */
 export const HOMEBREW_VOCABULARY_SETS: readonly HomebrewVocabularySetEntry[] =
   VOCABULARY_OPTION_SET_IDS.map((setId) => ({
     setId,
     label: vocabularyHubLabel(getVocabularyOptionSetTerm(setId)),
-    enabled: ENABLED_SETS.has(setId),
+    enabled: getVocabularySetCapability(setId).overview,
   }))
 
 export function findVocabularySetEntry(setId: string): HomebrewVocabularySetEntry | undefined {

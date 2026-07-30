@@ -149,8 +149,15 @@ export type FilterFieldDef<TData, TState extends Record<string, unknown>> =
   | ChipsFilterFieldDef<TData, TState, FilterFieldId<TState>>
   | PopoverFilterFieldDef<TData, TState, FilterFieldId<TState>>
 
+/** Explicit row availability predicate for overview hidden-count chrome. */
+export type FilterAvailabilityConfig<TData> = {
+  isAvailable: (row: TData) => boolean
+}
+
 export type FilterSchema<TData, TState extends Record<string, unknown>> = {
   fields: ReadonlyArray<FilterFieldDef<TData, TState>>
+  /** When set, catalog overview shells can derive hidden unavailable counts. */
+  availability?: FilterAvailabilityConfig<TData>
   sanitizeState?: (
     state: Partial<TState>,
     context?: FilterSanitizeContext<TData, TState>,
@@ -166,6 +173,7 @@ export type FilterCatalogLayoutConfig<TState extends Record<string, unknown>> = 
 }
 
 type CreateFilterSchemaOptions<TData, TState extends Record<string, unknown>> = {
+  availability?: FilterAvailabilityConfig<TData>
   sanitizeState?: FilterSchema<TData, TState>['sanitizeState']
   normalizeChange?: FilterSchema<TData, TState>['normalizeChange']
 }
@@ -177,6 +185,7 @@ export function createFilterSchema<TData, TState extends Record<string, unknown>
 ): FilterSchema<TData, TState> {
   return {
     fields,
+    availability: options?.availability,
     sanitizeState: options?.sanitizeState,
     normalizeChange: options?.normalizeChange,
   }

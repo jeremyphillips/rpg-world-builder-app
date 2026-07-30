@@ -539,12 +539,15 @@ describe('createHomebrewContent (species)', () => {
 
   it('rejects a disabled creature type', async () => {
     const campaign = await makeTestCampaign()
-    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'humanoid', {
+    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'beast', {
       status: 'disabled',
     })
 
     await expect(
-      createHomebrewContent(speciesWriteConfig, campaign.id, minimalSpeciesInput),
+      createHomebrewContent(speciesWriteConfig, campaign.id, {
+        ...minimalSpeciesInput,
+        creatureType: 'beast',
+      }),
     ).rejects.toMatchObject({
       status: 400,
       code: 'invalid_vocabulary',

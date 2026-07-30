@@ -2,6 +2,9 @@ import type {
   CreateVocabularyCampaignEntryInput,
   ResolvedVocabularyOptionSet,
   UpdateVocabularyEntryInput,
+  VocabularyDeleteAvailability,
+  VocabularyDisableAvailability,
+  VocabularyEntryUsage,
   VocabularyOptionSetId,
 } from '@rpg/contracts'
 
@@ -22,6 +25,48 @@ export async function getVocabularySet(
     'Could not load vocabulary set.',
   )
   return set
+}
+
+/** Advisory preflight for disabling a vocabulary entry. */
+export async function fetchVocabularyDisableAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDisableAvailability> {
+  const { availability } = await request<{ availability: VocabularyDisableAvailability }>(
+    `${vocabularySetPath(campaignId, setId)}/entries/${entryId}/disable-availability`,
+    undefined,
+    'Could not check vocabulary disable availability.',
+  )
+  return availability
+}
+
+/** Advisory preflight for deleting a vocabulary entry. */
+export async function fetchVocabularyDeleteAvailability(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDeleteAvailability> {
+  const { availability } = await request<{ availability: VocabularyDeleteAvailability }>(
+    `${vocabularySetPath(campaignId, setId)}/entries/${entryId}/delete-availability`,
+    undefined,
+    'Could not check vocabulary delete availability.',
+  )
+  return availability
+}
+
+/** Informational usage references for a vocabulary entry. */
+export async function fetchVocabularyEntryUsage(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyEntryUsage> {
+  const { usage } = await request<{ usage: VocabularyEntryUsage }>(
+    `${vocabularySetPath(campaignId, setId)}/entries/${entryId}/usage`,
+    undefined,
+    'Could not load vocabulary entry usage.',
+  )
+  return usage
 }
 
 /** Create a campaign vocabulary entry. */

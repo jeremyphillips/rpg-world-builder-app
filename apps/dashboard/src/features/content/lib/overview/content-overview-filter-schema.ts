@@ -1,5 +1,4 @@
 import {
-  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   type CampaignAvailabilityFilter,
   type ContentStatus,
   type WithCampaignAccess,
@@ -13,16 +12,11 @@ import {
   type FilterSchema,
 } from '@rpg/ui/filters'
 
-import {
-  CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
-  CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
-  CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
-  CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
-} from '../campaign-access/campaign-access-table-labels'
 import type { ContentBase } from './content-table-config'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { shouldPresentContentSource } from '../content-type-presentation'
+import { createCampaignAvailabilityFilterField as createSharedCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
 
 export type ContentOverviewBaseFilterState = {
   name?: string
@@ -86,27 +80,9 @@ export function createCampaignAvailabilityFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  return createEqualsFilter<
-    TData,
-    ContentOverviewBaseFilterState,
-    'campaignAvailability',
-    CampaignAvailabilityFilter
-  >({
-    id: 'campaignAvailability',
-    label: CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
-    placement: 'advanced',
-    width: 'lg',
-    defaultValue: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
-    showAllOption: false,
-    isValueConstraining: (value) => value !== 'all',
-    url: { key: 'availability' },
-    options: [
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE, value: 'available' },
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE, value: 'unavailable' },
-      { label: CAMPAIGN_ACCESS_TABLE_FILTER_ALL, value: 'all' },
-    ],
-    getValue: (row: TData) => (row.campaignAccess.available ? 'available' : 'unavailable'),
-  }) as unknown as FilterFieldDef<TData, TState>
+  return createSharedCampaignAvailabilityFilterField<TData, TState>(
+    (row) => row.campaignAccess.available,
+  )
 }
 
 /** Wraps content-specific fields with shared overview filters. */
@@ -117,15 +93,20 @@ export function buildContentFilterSchema<
   contentType: ContentTypeKey,
   contentFields: ReadonlyArray<FilterFieldDef<TData, TState>>,
 ): FilterSchema<TData, TState> {
-  return createFilterSchema([
-    createContentNameFilter<TData, TState>(),
-    ...contentFields,
-    ...(shouldPresentContentSource(contentType)
-      ? [createContentSourceFilter<TData, TState>()]
-      : []),
-    createContentStatusFilter<TData, TState>(),
-    createCampaignAvailabilityFilterField<TData, TState>(),
-  ])
+  return createFilterSchema(
+    [
+      createContentNameFilter<TData, TState>(),
+      ...contentFields,
+      ...(shouldPresentContentSource(contentType)
+        ? [createContentSourceFilter<TData, TState>()]
+        : []),
+      createContentStatusFilter<TData, TState>(),
+      createCampaignAvailabilityFilterField<TData, TState>(),
+    ],
+    {
+      availability: { isAvailable: (row) => row.campaignAccess.available },
+    },
+  )
 }
 
 /** Removes a field from a module-level schema constant. */

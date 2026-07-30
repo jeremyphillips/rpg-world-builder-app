@@ -1,6 +1,8 @@
 import { createElement } from 'react'
 import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { FormItem, GroupConfig } from '@rpg/ui/form'
+
+import { buildCampaignAvailabilityFields } from '@/lib/campaign-availability/campaign-availability-form-fields'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
 import {
@@ -11,16 +13,12 @@ import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,
   CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
-  CAMPAIGN_ACCESS_CHANGE_LABEL,
-  CAMPAIGN_ACCESS_DONE_LABEL,
   CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
   CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
   CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
-  CAMPAIGN_ACCESS_SECTION_LEGEND,
   CAMPAIGN_ACCESS_UNAVAILABLE_HINT,
-  CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
 } from './campaign-access-labels'
 import { buildCampaignAccessVisibilityOptions } from './campaign-access-options.lib'
 import { toCampaignAccessPatch } from './campaign-access-state'
@@ -66,45 +64,36 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
     ? CAMPAIGN_ACCESS_AVAILABLE_HINT
     : CAMPAIGN_ACCESS_UNAVAILABLE_HINT
 
+  const availabilityGroup = buildCampaignAvailabilityFields({
+    groupId: ctx.groupId,
+    pending: ctx.pending,
+    summaryDependsOn: ['available', 'visibilityMode', 'participantIds'],
+    resolveSummary: (values) =>
+      resolveCampaignAccessSummary(
+        toCampaignAccessPatch({
+          available: values.available as boolean,
+          visibilityMode: values.visibilityMode as ContentCampaignAccessPatch['visibilityMode'],
+          participantIds: (values.participantIds as string[] | undefined) ?? [],
+        }),
+      ),
+    availabilityField: {
+      kind: 'slot',
+      name: 'available',
+      separator: 'faint',
+      render: () =>
+        createElement(CampaignAccessAvailableSwitch, {
+          label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
+          hint: availableHint,
+          info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
+        }),
+    },
+  })[0] as GroupConfig
+
   return [
     {
-      kind: 'group',
-      id: ctx.groupId,
-      legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
-      legendSize: 'array',
-      chrome: { variant: 'inset' },
-      rhythm: 'compact',
-      disclosure: {
-        variant: 'summary',
-        defaultOpen: false,
-        panelDivider: false,
-        openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
-        closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
-        unsavedSuffix: CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
-        showDirtySuffix: true,
-        disabled: ctx.pending,
-        summaryDependsOn: ['available', 'visibilityMode', 'participantIds'],
-        resolveSummary: (values) =>
-          resolveCampaignAccessSummary(
-            toCampaignAccessPatch({
-              available: values.available as boolean,
-              visibilityMode: values.visibilityMode as ContentCampaignAccessPatch['visibilityMode'],
-              participantIds: (values.participantIds as string[] | undefined) ?? [],
-            }),
-          ),
-      },
+      ...availabilityGroup,
       fields: [
-        {
-          kind: 'slot',
-          name: 'available',
-          separator: 'faint',
-          render: () =>
-            createElement(CampaignAccessAvailableSwitch, {
-              label: CAMPAIGN_ACCESS_AVAILABLE_LABEL,
-              hint: availableHint,
-              info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
-            }),
-        },
+        ...(availabilityGroup.fields ?? []),
         {
           type: 'select',
           name: 'visibilityMode',

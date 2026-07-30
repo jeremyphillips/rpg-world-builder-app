@@ -4,12 +4,11 @@ import * as React from 'react'
 import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { Text } from '../../components/ui/text'
+import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
-import { FormItems } from '../containers/form-items.client'
-import { FormRhythmStack } from '../context/form-section.context'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
+import { FormFieldStack, FormFooterRegion } from './form-field-stack.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import type { ValidateSilently } from '../context/form-ui.context'
 import {
@@ -20,9 +19,6 @@ import {
   type FormValueSync,
 } from '../field-config'
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
-import { FormActionsBar } from '../chrome/form-actions-bar'
-import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
-import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormValidationPresentation } from '../context/form-ui.context'
 
 export interface FormProps<TFieldValues extends FieldValues> {
@@ -74,6 +70,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
+  /** Footer chrome variant — use `sheet` inside drawers with `p-0` bodies. */
+  footerVariant?: 'default' | 'sheet'
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -115,6 +113,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
+  footerVariant = 'default',
   rhythm,
   size,
   valueSyncs,
@@ -148,6 +147,7 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
+  const isSheetDockedFooter = stickyFooter && footerVariant === 'sheet'
 
   return (
     <SchemaFormShell
@@ -161,25 +161,24 @@ export function Form<TFieldValues extends FieldValues>({
       validationPresentation={validationPresentation}
       validateSilently={validateSilently}
       onSubmit={onSubmit}
-      className={className}
+      className={cn(isSheetDockedFooter && 'flex min-h-0 flex-1 flex-col', className)}
     >
-      <FormRhythmStack className={contentClassName}>
-        {!stickyFooter && formError ? (
-          <Text variant="destructive" role="alert">
-            {formError}
-          </Text>
-        ) : null}
-        {valueSyncs && valueSyncs.length > 0 ? (
-          <FormValueSyncEffects valueSyncs={valueSyncs} />
-        ) : null}
-        {resolvedHeader}
-        <FormItems items={fields} idPrefix={formId} />
-      </FormRhythmStack>
-      {stickyFooter ? (
-        <FormActionsBar formError={formError}>{resolvedFooter}</FormActionsBar>
-      ) : resolvedFooter ? (
-        <div className={formFooterSpacingClasses}>{resolvedFooter}</div>
-      ) : null}
+      <FormFieldStack
+        formId={formId}
+        fields={fields}
+        contentClassName={contentClassName}
+        isSheetDockedFooter={isSheetDockedFooter}
+        stickyFooter={stickyFooter}
+        formError={formError}
+        valueSyncs={valueSyncs}
+        header={resolvedHeader}
+      />
+      <FormFooterRegion
+        stickyFooter={stickyFooter}
+        formError={formError}
+        footerVariant={footerVariant}
+        footer={resolvedFooter}
+      />
     </SchemaFormShell>
   )
 }

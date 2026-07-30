@@ -54,5 +54,5 @@ export function useVocabularyMutations(campaignId: string, setId: VocabularyOpti
     onSuccess: invalidateSet,
   })
 
-  return { createEntry, patchEntry, deleteEntry }
+  return { createEntry, patchEntry, deleteEntry, invalidateSet }
 }

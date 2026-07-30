@@ -11,7 +11,10 @@ import {
   LANGUAGE_SET_ID,
   SENSE_SET_ID,
   SPELL_SCHOOL_SET_ID,
+  VOCABULARY_OPTION_SET_IDS,
+  vocabularySetIdsWithOverview,
 } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts/primitives'
 
 import {
   ATTACK_RESOLUTION_MODES,
@@ -314,5 +317,19 @@ describe('seeded vocabulary set registry', () => {
         SPELL_SCHOOL_SET_ID,
       ].sort(),
     )
+  })
+
+  it('keeps seeded set ids within the contract vocabulary set inventory', () => {
+    const contractIds = new Set(VOCABULARY_OPTION_SET_IDS)
+    for (const setId of listSeedVocabularySetIds(RULESET)) {
+      expect(contractIds.has(setId)).toBe(true)
+    }
+  })
+
+  it('seeds overview-capable sets for the default system ruleset', () => {
+    const seededIds = new Set(listSeedVocabularySetIds(DEFAULT_SYSTEM_RULESET_ID))
+    for (const setId of vocabularySetIdsWithOverview()) {
+      expect(seededIds.has(setId), `${setId} requires catalog seed for overview`).toBe(true)
+    }
   })
 })

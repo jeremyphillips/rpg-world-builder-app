@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import type { CampaignAvailabilityFilter } from '@rpg/contracts'
 import {
   DataTableFilterRegion,
   type ColumnDef,
@@ -34,6 +35,8 @@ import {
   applyOverviewAdvancedOpenPreferences,
   applyOverviewColumnChangePreferences,
 } from '@/lib/overview-preferences'
+import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
+import { useCatalogOverviewAvailability } from '@/lib/overview/use-catalog-overview-availability.client'
 import {
   buildCatalogOverviewSelectionFrameProps,
   type CatalogOverviewSelectionConfig,
@@ -42,6 +45,17 @@ import { OverviewResultSummary } from './overview-result-summary.client'
 import { OverviewTableFrame } from './overview-table-frame.client'
 
 export type { CatalogOverviewSelectionConfig } from './catalog-overview-selection.client'
+
+export type CatalogOverviewAvailabilityEmptyStateContext<TFilters extends Record<string, unknown>> =
+  {
+    scope: CampaignAvailabilityScope
+    campaignAvailability: CampaignAvailabilityFilter
+    setFilterValue: (
+      id: FilterFieldId<TFilters>,
+      value: TFilters[FilterFieldId<TFilters>] | undefined,
+      options?: { history?: 'push' },
+    ) => void
+  }
 
 type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   tableKey: string
@@ -55,6 +69,7 @@ type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filters?: ReactNode
   selection?: CatalogOverviewSelectionConfig<T>
+  resultSupplement?: ReactNode
 }
 
 type CatalogOverviewControlledFilterProps<T, TFilters extends Record<string, unknown>> = {
@@ -81,10 +96,17 @@ type CatalogOverviewNoFilterProps = {
   onResetFilters?: never
 }
 
+export type CatalogOverviewAvailabilityEmptyStateProps<TFilters extends Record<string, unknown>> = {
+  availabilityEmptyState?: (
+    context: CatalogOverviewAvailabilityEmptyStateContext<TFilters>,
+  ) => ReactNode
+}
+
 export type CatalogOverviewTableProps<
   T extends { id: string },
   TFilters extends Record<string, unknown> = Record<string, never>,
 > = CatalogOverviewTableCoreProps<T> &
+  CatalogOverviewAvailabilityEmptyStateProps<TFilters> &
   (
     | CatalogOverviewControlledFilterProps<T, TFilters>
     | CatalogOverviewInternalFilterProps<T, TFilters>
@@ -97,12 +119,14 @@ type CatalogOverviewTableBodyProps<T extends { id: string }> = {
   visibleRows: T[]
   resultCountLabel?: string
   emptyState?: ReactNode | ((context: DataTableEmptyStateContext<T>) => ReactNode)
+  availabilityEmptyState?: ReactNode
   caption?: string
   rowActions?: (row: T) => ReactNode
   getRowClassName?: DataTableProps<T>['getRowClassName']
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filterRegion?: ReactNode
   selection?: CatalogOverviewSelectionConfig<T>
+  resultSupplement?: ReactNode
 }
 
 const COLUMNS_ARIA_LABEL = 'Choose visible columns'
@@ -113,12 +137,14 @@ function CatalogOverviewTableBody<T extends { id: string }>({
   visibleRows,
   resultCountLabel,
   emptyState,
+  availabilityEmptyState,
   caption,
   rowActions,
   getRowClassName,
   getCellClassName,
   filterRegion,
   selection,
+  resultSupplement,
 }: CatalogOverviewTableBodyProps<T>) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
@@ -148,6 +174,13 @@ function CatalogOverviewTableBody<T extends { id: string }>({
 
   const selectionFrame = buildCatalogOverviewSelectionFrameProps(selection)
 
+  const resolvedEmptyState = useMemo(() => {
+    if (availabilityEmptyState && visibleRows.length === 0) {
+      return availabilityEmptyState
+    }
+    return emptyState
+  }, [availabilityEmptyState, emptyState, visibleRows.length])
+
   const renderUtilityActions = useCallback(
     (controls: DataTableUtilityControls<T>) => (
       <controls.ColumnVisibilityTrigger aria-label={COLUMNS_ARIA_LABEL} showLabel />
@@ -160,7 +193,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
       columns={columns}
       data={visibleRows}
       caption={caption}
-      emptyState={emptyState}
+      emptyState={resolvedEmptyState}
       rowActions={rowActions}
       getRowClassName={getRowClassName}
       getCellClassName={getCellClassName}
@@ -173,6 +206,7 @@ function CatalogOverviewTableBody<T extends { id: string }>({
         <OverviewResultSummary
           resultCount={visibleRows.length}
           resultLabel={resolvedResultCountLabel}
+          supplementalContent={resultSupplement}
         />
       }
       leadingActions={selectionFrame.renderLeadingActions}
@@ -263,9 +297,15 @@ function CatalogOverviewTableWithInternalFilters<
   filterSchema,
   filters,
   selection,
+  availabilityEmptyState: availabilityEmptyStateProp,
   ...bodyProps
 }: CatalogOverviewTableCoreProps<T> &
-  CatalogOverviewInternalFilterProps<T, TFilters> & { filterSchema: FilterSchema<T, TFilters> }) {
+  CatalogOverviewInternalFilterProps<T, TFilters> & {
+    filterSchema: FilterSchema<T, TFilters>
+    availabilityEmptyState?: (
+      context: CatalogOverviewAvailabilityEmptyStateContext<TFilters>,
+    ) => ReactNode
+  }) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
     [columns],
@@ -275,6 +315,35 @@ function CatalogOverviewTableWithInternalFilters<
   )
   const advancedOpen = preferences.advancedOpen ?? false
   const { state, setValue, reset } = useFilterState(filterSchema, { data })
+
+  const availability = useCatalogOverviewAvailability({
+    filterSchema,
+    data,
+    filterState: state,
+    onFilterChange: setValue,
+  })
+
+  const availabilityEmptyState = useMemo(() => {
+    if (
+      !availabilityEmptyStateProp ||
+      !availability.shouldUseAvailabilityEmptyState ||
+      !availability.scope
+    ) {
+      return undefined
+    }
+
+    return availabilityEmptyStateProp({
+      scope: availability.scope,
+      campaignAvailability: availability.campaignAvailability,
+      setFilterValue: setValue,
+    })
+  }, [
+    availability.campaignAvailability,
+    availability.scope,
+    availability.shouldUseAvailabilityEmptyState,
+    availabilityEmptyStateProp,
+    setValue,
+  ])
 
   const visibleRows = useMemo(
     () => applyFilterSchema(filterSchema, state, data),
@@ -312,6 +381,8 @@ function CatalogOverviewTableWithInternalFilters<
       visibleRows={visibleRows}
       filterRegion={filterChrome}
       selection={selection}
+      availabilityEmptyState={availabilityEmptyState}
+      resultSupplement={availability.resultSupplement ?? undefined}
       {...bodyProps}
     />
   )
@@ -330,8 +401,14 @@ function CatalogOverviewTableWithControlledFilters<
   onResetFilters,
   filters,
   selection,
+  availabilityEmptyState: availabilityEmptyStateProp,
   ...bodyProps
-}: CatalogOverviewTableCoreProps<T> & CatalogOverviewControlledFilterProps<T, TFilters>) {
+}: CatalogOverviewTableCoreProps<T> &
+  CatalogOverviewControlledFilterProps<T, TFilters> & {
+    availabilityEmptyState?: (
+      context: CatalogOverviewAvailabilityEmptyStateContext<TFilters>,
+    ) => ReactNode
+  }) {
   const columnSchema = useMemo(
     () => buildCatalogOverviewColumnSchema(columns as ColumnDef<unknown>[]),
     [columns],
@@ -340,6 +417,35 @@ function CatalogOverviewTableWithControlledFilters<
     hydrateCatalogOverviewPreferences(tableKey, columnSchema),
   )
   const advancedOpen = preferences.advancedOpen ?? false
+
+  const availability = useCatalogOverviewAvailability({
+    filterSchema,
+    data,
+    filterState,
+    onFilterChange,
+  })
+
+  const availabilityEmptyState = useMemo(() => {
+    if (
+      !availabilityEmptyStateProp ||
+      !availability.shouldUseAvailabilityEmptyState ||
+      !availability.scope
+    ) {
+      return undefined
+    }
+
+    return availabilityEmptyStateProp({
+      scope: availability.scope,
+      campaignAvailability: availability.campaignAvailability,
+      setFilterValue: onFilterChange,
+    })
+  }, [
+    availability.campaignAvailability,
+    availability.scope,
+    availability.shouldUseAvailabilityEmptyState,
+    availabilityEmptyStateProp,
+    onFilterChange,
+  ])
 
   const visibleRows = useMemo(
     () => applyFilterSchema(filterSchema, filterState, data),
@@ -377,6 +483,8 @@ function CatalogOverviewTableWithControlledFilters<
       visibleRows={visibleRows}
       filterRegion={filterChrome}
       selection={selection}
+      availabilityEmptyState={availabilityEmptyState}
+      resultSupplement={availability.resultSupplement ?? undefined}
       {...bodyProps}
     />
   )
@@ -397,6 +505,7 @@ export function CatalogOverviewTable<
     onResetFilters,
     filters,
     selection,
+    availabilityEmptyState,
     ...bodyProps
   } = props
 
@@ -413,6 +522,7 @@ export function CatalogOverviewTable<
           onResetFilters={onResetFilters}
           filters={filters}
           selection={selection}
+          availabilityEmptyState={availabilityEmptyState}
           {...bodyProps}
         />
       )
@@ -426,6 +536,7 @@ export function CatalogOverviewTable<
         filterSchema={filterSchema}
         filters={filters}
         selection={selection}
+        availabilityEmptyState={availabilityEmptyState}
         {...bodyProps}
       />
     )

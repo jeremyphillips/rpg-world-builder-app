@@ -7,13 +7,7 @@ import {
   type ContentTypeKey,
   type WithCampaignAccess,
 } from '@rpg/contracts'
-import {
-  dataTableRowUnavailableRailVariants,
-  dataTableRowUnavailableVariants,
-  type ColumnDef,
-  type ColumnChangeState,
-  type DataTableUtilityControls,
-} from '@rpg/ui'
+import { type ColumnDef, type ColumnChangeState, type DataTableUtilityControls } from '@rpg/ui'
 import {
   applyFilterSchema,
   getEffectiveFilterValue,
@@ -54,6 +48,10 @@ import type { ContentOverviewBaseFilterState } from './content-overview-filter-s
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
 import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table.client'
+import {
+  overviewUnavailableNameCellClassName,
+  overviewUnavailableRowClassName,
+} from '@/lib/overview/overview-unavailable-chrome'
 import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary.client'
 import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster.client'
 import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
@@ -156,14 +154,16 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
 
   const getRowClassName = useCallback(
     (row: { original: T }) =>
-      row.original.campaignAccess.available ? undefined : dataTableRowUnavailableVariants(),
+      overviewUnavailableRowClassName(row.original.campaignAccess.available),
     [],
   )
 
   const getCellClassName = useCallback((cell: { column: { id: string }; row: { original: T } }) => {
-    if (cell.row.original.campaignAccess.available) return undefined
-    if (cell.column.id !== OVERVIEW_NAME_COLUMN_ID) return undefined
-    return dataTableRowUnavailableRailVariants()
+    return overviewUnavailableNameCellClassName(
+      cell.row.original.campaignAccess.available,
+      cell.column.id,
+      OVERVIEW_NAME_COLUMN_ID,
+    )
   }, [])
 
   const resolvedEmptyState = useMemo(

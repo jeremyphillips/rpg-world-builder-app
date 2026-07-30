@@ -2,7 +2,12 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Text } from '../../components/ui/text'
-import { formStickyActionsBarClasses } from './form-chrome.variants'
+import {
+  formStickyActionsBarClasses,
+  formStickyActionsBarSheetClasses,
+} from './form-chrome.variants'
+
+export type FormActionsBarVariant = 'default' | 'sheet'
 
 export interface FormActionsBarProps {
   /** Form-level validation or server error shown above the actions row. */
@@ -11,6 +16,8 @@ export interface FormActionsBarProps {
   validationSummary?: ReactNode
   children?: ReactNode
   className?: string
+  /** `sheet` adds horizontal inset for drawer/sheet forms with `p-0` bodies. */
+  variant?: FormActionsBarVariant
 }
 
 /**
@@ -22,17 +29,17 @@ export function FormActionsBar({
   validationSummary,
   children,
   className,
+  variant = 'default',
 }: FormActionsBarProps) {
   if (!formError && !validationSummary && !children) {
     return null
   }
 
+  const variantClasses =
+    variant === 'sheet' ? formStickyActionsBarSheetClasses : formStickyActionsBarClasses
+
   return (
-    <div
-      role="toolbar"
-      aria-label="Form actions"
-      className={cn(formStickyActionsBarClasses, className)}
-    >
+    <div role="toolbar" aria-label="Form actions" className={cn(variantClasses, className)}>
       {formError ? (
         <Text variant="destructive" role="alert" className="mb-3">
           {formError}

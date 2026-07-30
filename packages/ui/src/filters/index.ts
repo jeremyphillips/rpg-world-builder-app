@@ -7,6 +7,7 @@ export type {
   FilterDensity,
   FilterFieldDef,
   FilterFieldId,
+  FilterAvailabilityConfig,
   FilterFieldOptionsContext,
   FilterFieldWidth,
   FilterMatchFn,

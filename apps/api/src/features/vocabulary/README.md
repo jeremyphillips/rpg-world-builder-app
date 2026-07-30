@@ -25,19 +25,29 @@ vocabulary/
 ## Resolve
 
 `resolveVocabularySet(seed, setPatch)` merges catalog seed with stored patches.
-`countVocabularyOptionUsage` is stubbed to `0` until reference tracking exists.
+
+Overview `usedBy` counts are capability-gated:
+
+- **`usageCounting`** — attach counts to resolved options.
+- **`batchUsageCounting`** — one set-level count resolver per overview load (creature-types: single species catalog read). Full blocker lists are **not** built during overview attach.
+- Disable/delete preflight and `GET .../usage` still resolve full blockers via per-entry usage resolvers.
 
 ## Routes
 
 Mounted under `/api/campaigns/:campaignId`.
 
-| Method | Path                                  | Role           | Description                                             |
-| ------ | ------------------------------------- | -------------- | ------------------------------------------------------- |
-| GET    | `/vocabulary`                         | member         | All resolved vocabulary sets for the campaign ruleset   |
-| GET    | `/vocabulary/:setId`                  | member         | One resolved set with `usedBy` counts                   |
-| POST   | `/vocabulary/:setId/entries`          | owner/co-owner | Create a campaign vocabulary entry                      |
-| PATCH  | `/vocabulary/:setId/entries/:entryId` | owner/co-owner | Patch system or campaign entry                          |
-| DELETE | `/vocabulary/:setId/entries/:entryId` | owner/co-owner | Delete campaign entry (stub allows when `usedBy === 0`) |
+| Method | Path                                                       | Role           | Description                                                           |
+| ------ | ---------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
+| GET    | `/vocabulary`                                              | member         | All resolved vocabulary sets for the campaign ruleset                 |
+| GET    | `/vocabulary/:setId`                                       | member         | One resolved set with `usedBy` counts                                 |
+| POST   | `/vocabulary/:setId/entries`                               | owner/co-owner | Create a campaign vocabulary entry (`create` capability)              |
+| PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Patch system or campaign entry (`edit` / `availability` capabilities) |
+| GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner/co-owner | Advisory preflight before disabling (`disableGuard`)                  |
+| GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner/co-owner | Advisory preflight before deleting (`deleteGuard`)                    |
+| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member         | Informational usage references (`usageCounting`)                      |
+| DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Delete campaign entry (`delete` capability)                           |
+
+Mutations assert the matching row in `VOCABULARY_SET_CAPABILITIES` (`@rpg/contracts`) and return `403` when the set does not support the operation.
 
 ## Ruleset patch
 
@@ -60,4 +70,5 @@ Homebrew hub catalog counts live in the **content** feature — see
 
 Ruleset-patch integration tests: `ruleset-patch/ruleset-patch.service.test.ts`
 (persist + resolve) and `ruleset-patch/ruleset-patch.routes.test.ts` (HTTP smoke).
+Vocabulary set routes: `sets/vocabulary.routes.test.ts`.
 Shared scaffold and catalog tier ids → [`../../docs/testing.md`](../../docs/testing.md).

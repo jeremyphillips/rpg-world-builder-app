@@ -1,51 +1,76 @@
 'use client'
 
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { buttonVariants, Heading, Text } from '@rpg/ui'
+import { useCallback, useState } from 'react'
 import {
+  deriveVocabularyEntryId,
+  getVocabularyOptionSetTerm,
   vocabularyOptionSetIdSchema,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
+import { buttonVariants } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
-import { ROUTES } from '@/app/routes'
+import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
-import { vocabularyColumns } from '../lib/vocabulary/vocabulary-overview-columns'
+import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog.client'
 import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
 } from '../components/vocabulary-entry-sheet.client'
-import { VocabularyRowActions } from '../components/vocabulary-row-actions.client'
 import { VocabularySetNav } from '../components/vocabulary-set-nav.client'
 import { useVocabularyMutations, useVocabularySet } from '../hooks/use-vocabulary-set'
+import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page.client'
+import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
+import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
+import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
+import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
 import {
   UNKNOWN_VOCABULARY_SET_MESSAGE,
   VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
 } from '../lib/vocabulary/labels'
-import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
+import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'
+import { buildVocabularyOverviewEmptyState } from '../lib/vocabulary/vocabulary-overview-availability-ui.lib'
+import { vocabularyFieldLabel } from '../lib/vocabulary/term-labels'
 
 type SheetState =
   | { mode: 'closed' }
   | { mode: 'create' }
   | { mode: 'edit'; entry: VocabularyOptionWithUsage }
 
-type VocabularySetManagerProps = {
+type VocabularyOverviewPageProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   setLabel: string
+  singularLabel: string
+  pluralLabel: string
 }
 
-function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetManagerProps) {
+function VocabularyOverviewPage({
+  campaignId,
+  setId,
+  setLabel,
+  singularLabel,
+  pluralLabel,
+}: VocabularyOverviewPageProps) {
   const canManage = useCanManageCampaign(campaignId)
-  const { data: vocabularySet, isPending, isError } = useVocabularySet(campaignId, setId)
+  const { isPending, isError } = useVocabularySet(campaignId, setId)
   const mutations = useVocabularyMutations(campaignId, setId)
   const [sheet, setSheet] = useState<SheetState>({ mode: 'closed' })
+
+  const handleEdit = useCallback((entry: VocabularyOptionWithUsage) => {
+    setSheet({ mode: 'edit', entry })
+  }, [])
+
+  const overview = useVocabularyOverviewPage({
+    campaignId,
+    setId,
+    canManage,
+    onEdit: handleEdit,
+  })
 
   const isSheetOpen = sheet.mode !== 'closed'
   const isMutating =
@@ -57,9 +82,10 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
     if (sheet.mode === 'create') {
       await mutations.createEntry.mutateAsync({
         setId,
-        id: values.id,
+        id: deriveVocabularyEntryId(values.label),
         label: values.label,
         description: values.description || undefined,
+        status: values.status,
       })
     } else if (sheet.mode === 'edit') {
       await mutations.patchEntry.mutateAsync({
@@ -75,47 +101,50 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
     setSheet({ mode: 'closed' })
   }
 
-  const newAction = canManage ? (
-    <button
-      type="button"
-      className={buttonVariants({ size: 'sm' })}
-      onClick={() => setSheet({ mode: 'create' })}
-    >
-      New
-    </button>
-  ) : undefined
+  const newAction =
+    canManage && overview.capabilities.create ? (
+      <button
+        type="button"
+        className={buttonVariants({ size: 'sm' })}
+        onClick={() => setSheet({ mode: 'create' })}
+      >
+        New {singularLabel.toLowerCase()}
+      </button>
+    ) : undefined
 
   return (
     <>
-      <PageHeader heading={setLabel} actions={newAction} />
-      <PageLoadState
-        isPending={isPending}
-        isError={isError}
-        defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
-      >
-        <CatalogOverviewTable
-          tableKey={`vocabulary-${setId}`}
-          columns={vocabularyColumns()}
-          data={vocabularySet?.options ?? []}
-          caption={`${setLabel} available in this campaign`}
-          rowActions={(row) => (
-            <VocabularyRowActions
-              entry={row}
-              canManage={canManage}
-              onEdit={(entry) => setSheet({ mode: 'edit', entry })}
-              onToggleStatus={(entry) => {
-                void mutations.patchEntry.mutateAsync({
-                  entryId: entry.id,
-                  input: { status: entry.status === 'active' ? 'disabled' : 'active' },
-                })
-              }}
-              onDelete={(entry) => {
-                void mutations.deleteEntry.mutateAsync(entry.id)
-              }}
-            />
-          )}
-        />
-      </PageLoadState>
+      <HomebrewDetailMain>
+        <PageHeader heading={setLabel} actions={newAction} />
+        <PageLoadState
+          isPending={isPending}
+          isError={isError}
+          defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
+        >
+          <CatalogOverviewTable
+            tableKey={`vocabulary-${setId}`}
+            columns={overview.columns}
+            data={overview.tableRows}
+            caption={`${setLabel} available in this campaign`}
+            filterSchema={VOCABULARY_OVERVIEW_FILTER_SCHEMA}
+            filterState={overview.filterState}
+            onFilterChange={overview.setFilterField}
+            onResetFilters={overview.resetFilters}
+            getRowClassName={overview.getRowClassName}
+            getCellClassName={overview.getCellClassName}
+            rowActions={overview.rowActions}
+            selection={overview.selectionConfig}
+            availabilityEmptyState={({ scope, campaignAvailability, setFilterValue }) =>
+              buildVocabularyOverviewEmptyState({
+                campaignAvailability,
+                scope,
+                pluralNoun: pluralLabel.toLowerCase(),
+                actions: { setFilterValue },
+              })
+            }
+          />
+        </PageLoadState>
+      </HomebrewDetailMain>
 
       <VocabularyEntrySheet
         open={isSheetOpen}
@@ -123,12 +152,29 @@ function VocabularySetManager({ campaignId, setId, setLabel }: VocabularySetMana
           if (!open) setSheet({ mode: 'closed' })
         }}
         mode={sheet.mode === 'edit' ? 'edit' : 'create'}
+        campaignId={campaignId}
+        setId={setId}
+        createHeadline={`New ${singularLabel.toLowerCase()}`}
         entry={sheet.mode === 'edit' ? sheet.entry : undefined}
         isPending={isMutating}
-        onSubmit={(values) => {
-          void handleSheetSubmit(values)
-        }}
+        onSubmit={(values) => handleSheetSubmit(values)}
       />
+
+      {overview.capabilities.bulkAvailability ? (
+        <BulkVocabularyAvailabilityDialog
+          open={overview.bulkOpen}
+          onOpenChange={overview.setBulkOpen}
+          campaignId={campaignId}
+          setId={setId}
+          selectedRows={overview.selectedRows}
+          onApplyComplete={(result) => {
+            overview.removeFromSelection(result.updatedIds)
+            if (result.updatedIds.length > 0) {
+              void overview.invalidateSet()
+            }
+          }}
+        />
+      ) : null}
     </>
   )
 }
@@ -147,16 +193,12 @@ export function VocabularyDetailContent({
 
   if (!parsedSetId.success) {
     return (
-      <WidePage spacing="relaxed">
-        <PageHeader heading="Vocabulary" />
-        <Text variant="muted">{UNKNOWN_VOCABULARY_SET_MESSAGE}</Text>
-        <Link
-          to={ROUTES.homebrew.hub(campaignId)}
-          className={buttonVariants({ variant: 'outline' })}
-        >
-          Back to Homebrew
-        </Link>
-      </WidePage>
+      <HomebrewDetailFallback
+        status="unknown"
+        heading="Vocabulary"
+        message={UNKNOWN_VOCABULARY_SET_MESSAGE}
+        campaignId={campaignId}
+      />
     )
   }
 
@@ -164,25 +206,29 @@ export function VocabularyDetailContent({
   const registryEntry = findVocabularySetEntry(setId)
   const setEnabled = registryEntry?.enabled ?? false
   const setLabel = registryEntry?.label ?? rawSetId
+  const setTerm = getVocabularyOptionSetTerm(setId)
+  const singularLabel = vocabularyFieldLabel(setTerm)
+  const pluralLabel = vocabularyFieldLabel(setTerm, { plural: true })
+
+  useSetBreadcrumbLabel(setLabel)
 
   return (
-    <WidePage spacing="list">
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <VocabularySetNav campaignId={campaignId} activeSetId={setId} />
-        <div className="mx-auto min-w-0 w-full max-w-xl flex-1">
-          {setEnabled ? (
-            <VocabularySetManager campaignId={campaignId} setId={setId} setLabel={setLabel} />
-          ) : (
-            <>
-              <PageHeader heading={setLabel} />
-              <Heading variant="section" as="h2">
-                Not available yet
-              </Heading>
-              <Text variant="muted">{VOCABULARY_NOT_IMPLEMENTED_MESSAGE}</Text>
-            </>
-          )}
-        </div>
-      </div>
-    </WidePage>
+    <HomebrewDetailShell nav={<VocabularySetNav campaignId={campaignId} activeSetId={setId} />}>
+      {setEnabled ? (
+        <VocabularyOverviewPage
+          campaignId={campaignId}
+          setId={setId}
+          setLabel={setLabel}
+          singularLabel={singularLabel}
+          pluralLabel={pluralLabel}
+        />
+      ) : (
+        <HomebrewDetailFallback
+          status="disabled"
+          heading={setLabel}
+          message={VOCABULARY_NOT_IMPLEMENTED_MESSAGE}
+        />
+      )}
+    </HomebrewDetailShell>
   )
 }
