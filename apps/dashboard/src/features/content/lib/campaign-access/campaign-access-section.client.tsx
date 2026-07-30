@@ -225,8 +225,9 @@ export function CampaignAccessSection({
         isPending: pending,
         save,
         reset,
+        readPendingAvailable: () => form.getValues().available,
       }),
-      [isDirty, pending, reset, save],
+      [form, isDirty, pending, reset, save],
     ),
   )
 

@@ -106,10 +106,10 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
   backHref,
   submitLabel,
   submitPending,
-  submitSuccess = false,
   onSaveDraft,
   saveDraftPending,
   publishSuccess,
+  onSaved,
 }: ContentSchemaFormShellProps<TFormValues>) {
   const handleSubmit = useContentSchemaSubmitHandler(onSubmit, beforeSubmit)
   const footerShellProps: ContentFormFooterShellProps<TFormValues> = {
@@ -117,11 +117,11 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
     backHref,
     submitLabel,
     submitPending,
-    submitSuccess,
     onSaveDraft,
     saveDraftPending,
     publishSuccess,
     onSubmit,
+    onSaved,
   }
   const publishFields = React.useMemo(
     () => (tabs ? tabs.flatMap((tab) => tab.fields) : (fields ?? [])),

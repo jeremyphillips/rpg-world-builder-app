@@ -23,6 +23,8 @@ export type CampaignAccessFormContextValue = {
   isPending: boolean
   save: () => Promise<CampaignAccessSaveResult>
   reset: () => void
+  /** Read pending availability before save(); undefined when unavailable. */
+  readPendingAvailable?: () => boolean | undefined
 }
 
 const defaultSave = async (): Promise<CampaignAccessSaveResult> => ({ status: 'skipped' })
@@ -55,6 +57,8 @@ const CampaignAccessAvailabilityContext =
 export function CampaignAccessFormProvider({ children }: { children: ReactNode }) {
   const saveRef = useRef(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT.save)
   const resetRef = useRef(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT.reset)
+  const readPendingAvailableRef =
+    useRef<CampaignAccessFormContextValue['readPendingAvailable']>(undefined)
   const [snapshot, setSnapshot] = useState<ParticipantSnapshot>({
     isDirty: false,
     isPending: false,
@@ -63,6 +67,7 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
   const registerParticipant = useCallback((bindings: CampaignAccessFormContextValue) => {
     saveRef.current = bindings.save
     resetRef.current = bindings.reset
+    readPendingAvailableRef.current = bindings.readPendingAvailable
     setSnapshot({ isDirty: bindings.isDirty, isPending: bindings.isPending })
   }, [])
 
@@ -71,6 +76,7 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
       ...snapshot,
       save: () => saveRef.current(),
       reset: () => resetRef.current(),
+      readPendingAvailable: () => readPendingAvailableRef.current?.(),
     }),
     [snapshot],
   )
@@ -102,6 +108,7 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
       isPending: bindings.isPending,
       save: () => bindingsRef.current.save(),
       reset: () => bindingsRef.current.reset(),
+      readPendingAvailable: () => bindingsRef.current.readPendingAvailable?.(),
     })
     return () => register(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT)
   }, [bindings.isDirty, bindings.isPending, register])

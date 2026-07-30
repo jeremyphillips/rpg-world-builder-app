@@ -23,15 +23,43 @@ reversible undo actions.
 **Inline:** form validation, blocking load failures, permission failures, dialog-owned
 errors (e.g. delete confirmation), and sustained builder warnings.
 
-## Follow-up integrations
+## Domain helpers
 
-Remaining `TODO(toast)` sites:
+| Helper                                | Use                                                               |
+| ------------------------------------- | ----------------------------------------------------------------- |
+| `notifyContentDeleted`                | Delete success after navigate to overview                         |
+| `notifyContentCreated`                | Create success after navigate to edit                             |
+| `notifyDuplicateContentCreated`       | Duplicate dialog success                                          |
+| `notifySaveSuccess`                   | Form PATCH success when body surface saved in coordinated session |
+| `notifyCoordinatedContentSaveSuccess` | Edit save session — one toast from `onSaved` callback             |
+| `notifyCampaignAccessUpdated`         | Overview row availability toggle                                  |
+| `notifyCampaignAccessUpdateFailed`    | Row toggle network failure with Retry                             |
+| `notifyBulkCampaignAccessResult`      | Bulk availability modal apply result                              |
 
-1. [`content-create-shell.tsx`](../src/features/content/lib/forms/shells/content-create-shell.tsx) — create success before navigate
-2. [`duplicate-content-dialog.client.tsx`](../src/features/content/lib/duplication/duplicate-content-dialog.client.tsx) — draft copy created
-3. [`use-bulk-update-campaign-access.ts`](../src/features/content/lib/campaign-access/bulk/use-bulk-update-campaign-access.ts) — bulk result toast
-4. [`content-edit-shell.tsx`](../src/features/content/lib/forms/shells/content-edit-shell.tsx) — save toast; remove inline `"Changes saved."` from [`content-form-footer.lib.ts`](../src/features/content/lib/forms/shells/content-form-footer.lib.ts)
-5. Destructive retry elsewhere (stable ID + `{ label: 'Retry', onClick }`) — not delete flow; delete errors stay in the dialog
+Do not re-export `toast` from `notify.ts`.
 
-**Deferred infrastructure:** extract `--topbar-height` once dashboard offset classes are
-validated; tab-inactive pause only if Radix gap is confirmed.
+## Destructive retry pattern
+
+For mutation failures **outside** dialog-owned recovery (where inline `formError` already
+owns the UX), emit a destructive toast with a stable ID and optional Retry action:
+
+```ts
+toast({
+  id: `campaign-access:${entityId}`,
+  title: 'Could not make available.',
+  description: getErrorMessage(err, fallback),
+  tone: 'destructive',
+  action: { label: 'Retry', onClick: retry },
+})
+```
+
+**Wired:** overview row campaign availability toggle
+([`use-content-campaign-availability-toggle.client.ts`](../src/features/content/lib/overview/use-content-campaign-availability-toggle.client.ts)).
+
+**Not toast:** delete confirm errors (dialog owns recovery), edit-save `formError` (inline header).
+
+## Deferred infrastructure
+
+- Extract `--topbar-height` once dashboard offset classes are validated
+- Tab-inactive pause only if Radix gap is confirmed
+- Broader catalog (clipboard, invites, undo) — per feature when touched

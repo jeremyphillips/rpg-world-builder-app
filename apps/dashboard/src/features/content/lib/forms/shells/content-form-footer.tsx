@@ -73,7 +73,6 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
   submitLabel: string
   pendingLabel?: string
   pending: boolean
-  isSuccess?: boolean
   onSaveDraft?: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>
   saveDraftPending?: boolean
   publishSuccess?: boolean
@@ -90,7 +89,6 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   submitLabel,
   pendingLabel = mode === 'create' ? 'Publishing…' : SAVING_LABEL,
   pending,
-  isSuccess = false,
   onSaveDraft,
   saveDraftPending = false,
   publishSuccess = false,
@@ -104,7 +102,6 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
     mode,
     submitLabel,
     pendingLabel,
-    isSuccess,
     publishSuccess,
   })
 

@@ -19,6 +19,7 @@ import {
   ContentFormShellResolver,
 } from './content-form-shell-resolver'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
+import type { CoordinatedSaveSavedEvent } from './use-content-save-session'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
 
 export function ContentFormComingSoon() {
@@ -51,7 +52,6 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   backHref?: string
   submitLabel: string
   submitPending: boolean
-  submitSuccess?: boolean
   formError: string | null
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
@@ -64,6 +64,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   campaignAccess?: ResolvedContentCampaignAccess
   onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
   onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
+  onSaved?: (event: CoordinatedSaveSavedEvent) => void
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -77,7 +78,6 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   backHref,
   submitLabel,
   submitPending,
-  submitSuccess,
   formError,
   onSubmit,
   onSaveDraft,
@@ -90,6 +90,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   campaignAccess,
   onCampaignAccessDraftChange,
   onCampaignAccessPersisted,
+  onSaved,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -123,12 +124,12 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
       backHref={backHref}
       submitLabel={submitLabel}
       submitPending={submitPending}
-      submitSuccess={submitSuccess}
       formError={formError}
       onSubmit={resolvedOnSubmit}
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
       publishSuccess={publishSuccess}
+      onSaved={onSaved}
       publishSchema={publishSchema}
       onPublish={onPublish}
       valueSyncs={valueSyncs}

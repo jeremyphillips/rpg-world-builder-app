@@ -142,6 +142,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
         campaignId={campaignId}
         contentTypeKey={contentTypeKey}
         entityId={row.id}
+        entityName={row.name}
         itemLabel={itemLabel}
         campaignAccess={row.campaignAccess}
         campaignAvailabilityFilter={campaignAvailability}

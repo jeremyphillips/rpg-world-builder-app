@@ -15,6 +15,7 @@ export interface ContentOverviewRowActionsProps {
   campaignId: string
   contentTypeKey: ContentTypeKey
   entityId: string
+  entityName: string
   itemLabel: string
   campaignAccess: ResolvedContentCampaignAccess
   campaignAvailabilityFilter: CampaignAvailabilityFilter
@@ -28,6 +29,7 @@ export function ContentOverviewRowActions({
   campaignId,
   contentTypeKey,
   entityId,
+  entityName,
   itemLabel,
   campaignAccess,
   campaignAvailabilityFilter,
@@ -40,6 +42,7 @@ export function ContentOverviewRowActions({
       campaignId,
       contentTypeKey,
       entityId,
+      entityName,
       campaignAccess,
       campaignAvailabilityFilter,
       onRowRemoved,

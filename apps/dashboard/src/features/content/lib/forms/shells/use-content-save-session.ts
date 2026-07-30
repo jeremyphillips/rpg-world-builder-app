@@ -6,15 +6,14 @@ import { useSchemaFormSubmit } from '@rpg/ui/form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
+import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
 import {
-  useCampaignAccessForm,
-  type CampaignAccessSaveResult,
-} from '../../campaign-access/campaign-access-form-context.client'
-import {
-  mapCampaignAccessSaveResult,
-  runContentSaveSession,
+  runCoordinatedContentSave,
+  type CoordinatedSaveSavedEvent,
   type SaveResult,
 } from './content-save-session.lib'
+
+export type { CoordinatedSaveSavedEvent } from './content-save-session.lib'
 
 export type ContentSaveActionState = {
   hasUnsavedEdits: boolean
@@ -30,10 +29,8 @@ export interface UseContentSaveSessionOptions<TFieldValues extends FieldValues> 
   readOnly?: boolean
   form: UseFormReturn<TFieldValues>
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => Promise<void>
-}
-
-function mapAccessSaveResult(result: CampaignAccessSaveResult): SaveResult {
-  return mapCampaignAccessSaveResult(result)
+  /** Called once after the full coordinated save session succeeds. */
+  onSaved?: (event: CoordinatedSaveSavedEvent) => void
 }
 
 export function useContentSaveSession<TFieldValues extends FieldValues>({
@@ -42,12 +39,15 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
   readOnly = false,
   form,
   onSubmit,
+  onSaved,
 }: UseContentSaveSessionOptions<TFieldValues>): ContentSaveActionState {
   const campaignAccess = useCampaignAccessForm()
   const { dirtyFields, isSubmitting } = useFormState({ control: form.control })
   const bodyDirty = hasDirtyFields(dirtyFields)
   const schemaFormSubmit = useSchemaFormSubmit<TFieldValues>()
   const inFlightRef = useRef(false)
+  const onSavedRef = useRef(onSaved)
+  onSavedRef.current = onSaved
 
   const hasUnsavedEdits =
     mode === 'edit' ? bodyDirty || campaignAccess.isDirty : campaignAccess.isDirty
@@ -67,21 +67,25 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
       return
     }
 
+    const accessWasDirty = campaignAccess.isDirty
+    const bodyWasDirty = bodyDirty
+
     inFlightRef.current = true
     try {
-      await runContentSaveSession(
-        {
-          dirty: campaignAccess.isDirty,
-          save: async () => mapAccessSaveResult(await campaignAccess.save()),
+      const result = await runCoordinatedContentSave({
+        accessWasDirty,
+        bodyWasDirty,
+        readPendingAvailable: campaignAccess.readPendingAvailable,
+        access: {
+          save: () => campaignAccess.save(),
         },
-        {
-          dirty: bodyDirty,
+        body: {
           save: async () => {
             if (!schemaFormSubmit) {
               return {
                 status: 'failed',
                 error: new Error('Form submit context is unavailable.'),
-              }
+              } satisfies SaveResult
             }
 
             return new Promise<SaveResult>((resolve) => {
@@ -99,7 +103,11 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
             })
           },
         },
-      )
+      })
+
+      if (result.status === 'saved') {
+        onSavedRef.current?.(result.saved)
+      }
     } finally {
       inFlightRef.current = false
     }

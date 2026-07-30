@@ -7,7 +7,7 @@ import type {
 import { FormItems } from '@rpg/ui/form'
 
 import { CampaignAccessSection } from '../../campaign-access/campaign-access-section.client'
-import { useContentSaveSession } from './use-content-save-session'
+import { useContentSaveSession, type CoordinatedSaveSavedEvent } from './use-content-save-session'
 import { ContentFormFooter } from './content-form-footer'
 import type { AnyContentFormDef, ContentFormCtx } from '../content-form-registry'
 
@@ -56,11 +56,11 @@ export interface ContentFormFooterShellProps<TFormValues extends FieldValues = F
   backHref?: string
   submitLabel: string
   submitPending: boolean
-  submitSuccess?: boolean
   onSaveDraft?: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
   saveDraftPending?: boolean
   publishSuccess?: boolean
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
+  onSaved?: (event: CoordinatedSaveSavedEvent) => void
 }
 
 export function ContentFormSaveFooter<TFormValues extends FieldValues>({
@@ -69,17 +69,18 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
   backHref,
   submitLabel,
   submitPending,
-  submitSuccess = false,
   onSaveDraft,
   saveDraftPending,
   publishSuccess,
   onSubmit,
+  onSaved,
 }: ContentFormFooterShellProps<TFormValues> & { form: UseFormReturn<TFormValues> }) {
   const actionState = useContentSaveSession({
     mode: formMode,
     pending: submitPending,
     form,
     onSubmit,
+    onSaved,
   })
 
   return (
@@ -89,7 +90,6 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
       backHref={backHref}
       submitLabel={submitLabel}
       pending={submitPending || form.formState.isSubmitting}
-      isSuccess={submitSuccess}
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
       publishSuccess={publishSuccess}

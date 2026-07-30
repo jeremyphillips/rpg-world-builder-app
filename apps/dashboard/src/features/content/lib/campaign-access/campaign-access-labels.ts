@@ -154,3 +154,50 @@ export const CONTENT_BULK_ACTIONS_MENU_LABEL = 'Bulk actions'
 
 /** Bulk actions menu item for campaign access. */
 export const CONTENT_BULK_ACTION_EDIT_CAMPAIGN_ACCESS_LABEL = 'Edit campaign availability'
+
+/** Availability toast tail — available. */
+export const CAMPAIGN_ACCESS_NOW_AVAILABLE_TAIL = 'now available in this campaign.'
+
+/** Availability toast tail — unavailable. */
+export const CAMPAIGN_ACCESS_NO_LONGER_AVAILABLE_TAIL = 'no longer available in this campaign.'
+
+export type CampaignAccessAvailabilityToastInput = {
+  available: boolean
+  count: number
+  /** When count is 1, use the quoted entity name instead of "1 item". */
+  name?: string
+}
+
+/** Toast copy for availability changes — one named item or a count of items. */
+export function formatCampaignAccessAvailabilityToast(
+  input: CampaignAccessAvailabilityToastInput,
+): string {
+  const tail = input.available
+    ? CAMPAIGN_ACCESS_NOW_AVAILABLE_TAIL
+    : CAMPAIGN_ACCESS_NO_LONGER_AVAILABLE_TAIL
+
+  if (input.count === 1 && input.name) {
+    const quoted = `"${input.name.trim() || 'This item'}"`
+    return `${quoted} is ${tail}`
+  }
+
+  const noun = input.count === 1 ? 'item' : 'items'
+  const verb = input.count === 1 ? 'is' : 'are'
+  return `${input.count} ${noun} ${verb} ${tail}`
+}
+
+/** Row-toggle toast when availability is turned on. */
+export function formatCampaignAccessNowAvailableMessage(name: string): string {
+  return formatCampaignAccessAvailabilityToast({ count: 1, name, available: true })
+}
+
+/** Row-toggle toast when availability is turned off. */
+export function formatCampaignAccessNoLongerAvailableMessage(name: string): string {
+  return formatCampaignAccessAvailabilityToast({ count: 1, name, available: false })
+}
+
+/** Row-toggle failure toast title when turning availability on fails. */
+export const CAMPAIGN_ACCESS_MAKE_AVAILABLE_FAILED_TITLE = 'Could not make available.'
+
+/** Row-toggle failure toast title when turning availability off fails. */
+export const CAMPAIGN_ACCESS_MARK_UNAVAILABLE_FAILED_TITLE = 'Could not mark unavailable.'

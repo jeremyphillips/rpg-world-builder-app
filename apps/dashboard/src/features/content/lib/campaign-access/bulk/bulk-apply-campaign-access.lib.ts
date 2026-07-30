@@ -11,8 +11,9 @@ import {
 
 import { updateRouteContentCampaignAccess } from '../campaign-access-api'
 import {
-  formatBulkCampaignAccessFullSuccess,
   formatBulkCampaignAccessPartialSuccess,
+  formatCampaignAccessAvailabilityToast,
+  formatBulkCampaignAccessFullSuccess,
 } from '../campaign-access-labels'
 import type { ContentBase } from '../../overview/content-table-config'
 
@@ -95,7 +96,30 @@ async function applyRowsWithConcurrency(
   return outcomes
 }
 
-function aggregateBulkApplyOutcomes(outcomes: BulkApplyOutcome[]) {
+function resolveBulkAvailabilityTarget(
+  formValues: BulkCampaignAccessFormValues,
+): boolean | undefined {
+  if (formValues.available.kind === 'set') {
+    return formValues.available.value
+  }
+  return undefined
+}
+
+function formatBulkFullSuccessSummary(
+  updatedCount: number,
+  formValues: BulkCampaignAccessFormValues,
+): string {
+  const available = resolveBulkAvailabilityTarget(formValues)
+  if (available != null) {
+    return formatCampaignAccessAvailabilityToast({ count: updatedCount, available })
+  }
+  return formatBulkCampaignAccessFullSuccess(updatedCount)
+}
+
+function aggregateBulkApplyOutcomes(
+  outcomes: BulkApplyOutcome[],
+  formValues: BulkCampaignAccessFormValues,
+) {
   const updatedIds: string[] = []
   const blockedIds: string[] = []
   const failedIds: string[] = []
@@ -124,7 +148,7 @@ function aggregateBulkApplyOutcomes(outcomes: BulkApplyOutcome[]) {
           failedIds.length,
         )
       : updatedIds.length > 0
-        ? formatBulkCampaignAccessFullSuccess(updatedIds.length)
+        ? formatBulkFullSuccessSummary(updatedIds.length, formValues)
         : null
 
   return {
@@ -152,7 +176,7 @@ export async function executeBulkCampaignAccessApply(
     contentTypeKey,
     csrfToken,
   )
-  const aggregated = aggregateBulkApplyOutcomes(outcomes)
+  const aggregated = aggregateBulkApplyOutcomes(outcomes, formValues)
 
   return {
     ...aggregated,

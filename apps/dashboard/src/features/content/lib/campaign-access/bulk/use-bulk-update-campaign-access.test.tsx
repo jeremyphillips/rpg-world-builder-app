@@ -151,7 +151,7 @@ describe('useBulkUpdateCampaignAccess', () => {
       blockedIds: [],
       failedIds: [],
       fullSuccess: true,
-      summary: 'Updated 3 items.',
+      summary: '3 items are now available in this campaign.',
     })
     expect(updateRouteContentCampaignAccess).toHaveBeenCalledTimes(3)
   })

@@ -7,11 +7,10 @@ import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 
 type RulesConfigSaveFooterProps = {
   pending: boolean
-  isSuccess: boolean
 }
 
 /** Shared save footer for Homebrew rules configuration forms. */
-export function createRulesConfigSaveFooter({ pending, isSuccess }: RulesConfigSaveFooterProps) {
+export function createRulesConfigSaveFooter({ pending }: RulesConfigSaveFooterProps) {
   return function RulesConfigSaveFooter<TFieldValues extends FieldValues>(
     form: UseFormReturn<TFieldValues>,
   ) {
@@ -20,9 +19,7 @@ export function createRulesConfigSaveFooter({ pending, isSuccess }: RulesConfigS
         <FormUnsavedChangesGuard />
         <FormSaveFooter
           pending={pending || form.formState.isSubmitting}
-          isSuccess={isSuccess}
           submitLabel="Save changes"
-          successMessage="Changes saved."
         />
       </>
     )

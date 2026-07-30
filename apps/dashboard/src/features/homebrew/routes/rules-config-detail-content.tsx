@@ -11,6 +11,7 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { ROUTES } from '@/app/routes'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { notifySaveSuccess } from '@/lib/notify'
 import {
   buildCharacterCreationPatchInput,
   buildMechanicsConfigFields,
@@ -86,11 +87,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
     isPending: isLanguageVocabularyPending,
     isError: isLanguageVocabularyError,
   } = useLanguageVocabulary(campaignId)
-  const {
-    mutateAsync,
-    isPending: isSaving,
-    isSuccess,
-  } = usePatchCharacterCreationMutation(campaignId)
+  const { mutateAsync, isPending: isSaving } = usePatchCharacterCreationMutation(campaignId)
 
   const schema = useMemo(
     () =>
@@ -125,12 +122,10 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
       }),
     )
     form.reset(values)
+    notifySaveSuccess()
   }, 'Could not save character configuration.')
 
-  const saveFooter = useMemo(
-    () => createRulesConfigSaveFooter({ pending: isSaving, isSuccess }),
-    [isSaving, isSuccess],
-  )
+  const saveFooter = useMemo(() => createRulesConfigSaveFooter({ pending: isSaving }), [isSaving])
 
   return (
     <PageLoadState
@@ -172,7 +167,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
     isPending: isAttackResolutionPending,
     isError: isAttackResolutionError,
   } = useAttackResolutionModeVocabulary(campaignId)
-  const { mutateAsync, isPending: isSaving, isSuccess } = usePatchMechanicsMutation(campaignId)
+  const { mutateAsync, isPending: isSaving } = usePatchMechanicsMutation(campaignId)
 
   const fields = useMemo(() => {
     return disableFormItems(
@@ -194,12 +189,10 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
   const { onSubmit, formError } = useSubmitHandler<MechanicsValues>(async (values, form) => {
     await mutateAsync(buildMechanicsPatchInput(values))
     form.reset(values)
+    notifySaveSuccess()
   }, 'Could not save mechanics configuration.')
 
-  const saveFooter = useMemo(
-    () => createRulesConfigSaveFooter({ pending: isSaving, isSuccess }),
-    [isSaving, isSuccess],
-  )
+  const saveFooter = useMemo(() => createRulesConfigSaveFooter({ pending: isSaving }), [isSaving])
 
   return (
     <PageLoadState

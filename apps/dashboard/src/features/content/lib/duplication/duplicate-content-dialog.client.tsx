@@ -8,6 +8,7 @@ import { Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { notifyDuplicateContentCreated } from '@/lib/notify'
 
 import { resolveContentPostCreateEditHref } from '../forms/shells/content-form-navigation'
 import {
@@ -54,11 +55,7 @@ export function DuplicateContentDialog({
     idempotencyKeyRef.current = crypto.randomUUID()
   }, [source.id])
 
-  const { mutateAsync, isPending, isSuccess } = useDuplicateContent(
-    campaignId,
-    contentTypeKey,
-    queryKeyFn,
-  )
+  const { mutateAsync, isPending } = useDuplicateContent(campaignId, contentTypeKey, queryKeyFn)
 
   const { onSubmit, formError } = useSubmitHandler<DuplicateContentFormValues>({
     submit: async (values, form) => {
@@ -69,13 +66,13 @@ export function DuplicateContentDialog({
       })
       form.reset(buildDuplicateContentDefaultValues(source.name))
       setOpen(false)
-      // TODO: Draft copy created toast
       void navigate(
         resolveContentPostCreateEditHref({ routeKey: contentTypeKey }, campaignId, {
           id: (saved as { id: string }).id,
           kind: (saved as { kind?: unknown }).kind ?? source.kind,
         }),
       )
+      notifyDuplicateContentCreated()
     },
     fallbackMessage: DUPLICATE_CONTENT_FALLBACK_ERROR,
   })
@@ -104,7 +101,6 @@ export function DuplicateContentDialog({
               footer={(form) => (
                 <FormSaveFooter
                   pending={isPending || form.formState.isSubmitting}
-                  isSuccess={isSuccess}
                   submitLabel={formatDuplicateContentSubmitLabel(contentTypeKey)}
                 />
               )}

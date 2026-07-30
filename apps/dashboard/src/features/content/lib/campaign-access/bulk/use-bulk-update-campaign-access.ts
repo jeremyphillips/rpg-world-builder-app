@@ -15,6 +15,7 @@ import {
   type BulkCampaignAccessApplyResult,
   type BulkUpdateRow,
 } from './bulk-apply-campaign-access.lib'
+import { notifyBulkCampaignAccessResult } from '@/lib/notify'
 
 function contentListQueryKey(campaignId: string, contentTypeKey: ContentTypeKey) {
   return ['campaigns', campaignId, 'content', contentTypeKey] as const
@@ -44,7 +45,6 @@ export function useBulkUpdateCampaignAccess({
 }: UseBulkUpdateCampaignAccessOptions) {
   const queryClient = useQueryClient()
   const [pending, setPending] = useState(false)
-  const [resultSummary, setResultSummary] = useState<string | null>(null)
   const [blockedOpen, setBlockedOpen] = useState(false)
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const pendingRef = useRef(false)
@@ -73,7 +73,6 @@ export function useBulkUpdateCampaignAccess({
 
       pendingRef.current = true
       setPending(true)
-      setResultSummary(null)
 
       try {
         const result = await executeBulkCampaignAccessApply(
@@ -87,8 +86,7 @@ export function useBulkUpdateCampaignAccess({
           updateCachedAccess(update.rowId, update.campaignAccess)
         })
 
-        // TODO: Show bulk campaign-access result toast when shared toast UI is available.
-        setResultSummary(result.summary)
+        notifyBulkCampaignAccessResult(result)
 
         if (result.firstBlockedBlockers) {
           setBlockers(result.firstBlockedBlockers)
@@ -98,12 +96,13 @@ export function useBulkUpdateCampaignAccess({
         return result
       } catch (err) {
         const message = getErrorMessage(err, 'Could not update campaign access.')
-        setResultSummary(message)
-        return {
+        const failureResult = {
           ...createSkippedApplyResult(rows),
           failedIds: rows.map((row) => row.id),
           summary: message,
         }
+        notifyBulkCampaignAccessResult(failureResult)
+        return failureResult
       } finally {
         pendingRef.current = false
         setPending(false)
@@ -115,7 +114,6 @@ export function useBulkUpdateCampaignAccess({
   return {
     apply,
     pending,
-    resultSummary,
     blockedOpen,
     blockers,
     setBlockedOpen,

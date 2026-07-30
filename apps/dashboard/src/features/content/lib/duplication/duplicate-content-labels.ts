@@ -23,3 +23,6 @@ export function formatDuplicateContentDefaultName(sourceName: string): string {
 }
 
 export const DUPLICATE_CONTENT_FALLBACK_ERROR = 'Could not duplicate content.'
+
+/** Duplicate success toast message. */
+export const DUPLICATE_CONTENT_CREATED_MESSAGE = 'Draft copy created.'

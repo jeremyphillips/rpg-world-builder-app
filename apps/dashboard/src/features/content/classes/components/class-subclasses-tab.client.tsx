@@ -27,10 +27,8 @@ import {
   useCampaignAccessForm,
 } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
-import {
-  mapCampaignAccessSaveResult,
-  runContentSaveSession,
-} from '../../lib/forms/shells/content-save-session.lib'
+import { runCoordinatedContentSave } from '../../lib/forms/shells/content-save-session.lib'
+import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import {
   SubclassChoiceLevelGate,
   SubclassCreateGate,
@@ -97,6 +95,104 @@ function SubclassesDisabledAlert({
 
 type SubclassEditorState = ReturnType<typeof useSubclassEditorState>
 
+type SubclassTabSaveMutations = {
+  createMutation: ReturnType<typeof useCreateSubclass>
+  updateMutation: ReturnType<typeof useUpdateSubclass>
+}
+
+async function saveDraftSubclass(args: {
+  campaignId: string
+  classId: string
+  selectedId: string
+  values: SubclassFormValues
+  editor: SubclassEditorState
+  pendingAccess: ContentCampaignAccessPatch | null | undefined
+  mutations: SubclassTabSaveMutations
+  onDeferredError: (message: string) => void
+}): Promise<void> {
+  const {
+    campaignId,
+    classId,
+    selectedId,
+    values,
+    editor,
+    pendingAccess,
+    mutations,
+    onDeferredError,
+  } = args
+  const input = subclassFormDef.toInput(
+    values,
+    classId,
+    editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+  )
+  const saved = await mutations.createMutation.mutateAsync(input)
+  await persistSubclassCampaignAccess({
+    campaignId,
+    classId,
+    subclassId: saved.id,
+    pendingAccess,
+    onDeferredError,
+  })
+  editor.commitDraftHandoff(selectedId, saved)
+}
+
+async function saveExistingSubclass(args: {
+  selectedId: string
+  values: SubclassFormValues
+  classId: string
+  editor: SubclassEditorState
+  accessOnly?: boolean
+  campaignAccessForm: ReturnType<typeof useCampaignAccessForm>
+  updateMutation: ReturnType<typeof useUpdateSubclass>
+}) {
+  const { selectedId, values, classId, editor, accessOnly, campaignAccessForm, updateMutation } =
+    args
+
+  return runCoordinatedContentSave({
+    accessWasDirty: campaignAccessForm.isDirty,
+    bodyWasDirty: !accessOnly && editor.modifiedIds.has(selectedId),
+    readPendingAvailable: campaignAccessForm.readPendingAvailable,
+    access: {
+      save: () => campaignAccessForm.save(),
+    },
+    body: {
+      save: async () => {
+        const input = subclassFormDef.toInput(
+          values,
+          classId,
+          editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
+        )
+        await updateMutation.mutateAsync({
+          subclassId: selectedId,
+          input,
+        })
+        editor.clearEditsFor(selectedId)
+        return { status: 'saved' as const }
+      },
+    },
+  })
+}
+
+function reportSubclassSaveResult(
+  result: Awaited<ReturnType<typeof runCoordinatedContentSave>>,
+  entityName: string,
+  setSaveError: (message: string | null) => void,
+): void {
+  if (result.status === 'saved') {
+    notifyCoordinatedContentSaveSuccess(result.saved, entityName)
+    return
+  }
+
+  if (result.status === 'body_failed') {
+    setSaveError(getErrorMessage(result.error, 'Could not save subclass.'))
+    return
+  }
+
+  if (result.status === 'access_invalid' || result.status === 'body_invalid') {
+    setSaveError('Could not save subclass campaign access.')
+  }
+}
+
 async function persistSubclassCampaignAccess(args: {
   campaignId: string
   classId: string
@@ -142,52 +238,29 @@ function useSubclassTabSave(args: {
     editor.setSavePending(true)
     try {
       if (isDraftSubclassId(selectedId)) {
-        const input = subclassFormDef.toInput(
-          values,
-          classId,
-          editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
-        )
-        const saved = await createMutation.mutateAsync(input)
-        await persistSubclassCampaignAccess({
+        await saveDraftSubclass({
           campaignId,
           classId,
-          subclassId: saved.id,
+          selectedId,
+          values,
+          editor,
           pendingAccess: options?.campaignAccessDraft,
+          mutations: { createMutation, updateMutation },
           onDeferredError: setCampaignAccessDeferredError,
         })
-        editor.commitDraftHandoff(selectedId, saved)
         return
       }
 
-      const bodyDirty = !options?.accessOnly && editor.modifiedIds.has(selectedId)
-      const outcome = await runContentSaveSession(
-        {
-          dirty: campaignAccessForm.isDirty,
-          save: async () => mapCampaignAccessSaveResult(await campaignAccessForm.save()),
-        },
-        {
-          dirty: bodyDirty,
-          save: async () => {
-            const input = subclassFormDef.toInput(
-              values,
-              classId,
-              editor.selectedEntity ? { entity: editor.selectedEntity } : undefined,
-            )
-            await updateMutation.mutateAsync({
-              subclassId: selectedId,
-              input,
-            })
-            editor.clearEditsFor(selectedId)
-            return { status: 'saved' as const }
-          },
-        },
-      )
-
-      if (outcome.status === 'body_failed') {
-        setSaveError(getErrorMessage(outcome.error, 'Could not save subclass.'))
-      } else if (outcome.status === 'access_invalid' || outcome.status === 'body_invalid') {
-        setSaveError('Could not save subclass campaign access.')
-      }
+      const result = await saveExistingSubclass({
+        selectedId,
+        values,
+        classId,
+        editor,
+        accessOnly: options?.accessOnly,
+        campaignAccessForm,
+        updateMutation,
+      })
+      reportSubclassSaveResult(result, editor.selectedEntity?.name ?? 'Subclass', setSaveError)
     } catch (err) {
       setSaveError(getErrorMessage(err, 'Could not save subclass.'))
     } finally {
