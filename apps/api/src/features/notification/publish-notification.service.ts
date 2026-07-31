@@ -1,6 +1,11 @@
 import type { Notification, NotificationType } from '@rpg/contracts'
 
-import { previewMateriallyChanged, upsertNotificationRecord } from './notification.repository'
+import { deliverNotificationUpserted } from '../../realtime'
+import {
+  countUnreadNotifications,
+  previewMateriallyChanged,
+  upsertNotificationRecord,
+} from './notification.repository'
 import { NotificationModel } from './notification.model'
 import type { PublishNotificationInput } from './publish-notification.types'
 import { formatNotificationPreview, resolveNotificationAction } from './notification.registry'
@@ -47,6 +52,17 @@ export async function publishNotification<T extends NotificationType>(
     })
 
     results.push(notification)
+
+    try {
+      const unreadCount = await countUnreadNotifications(recipientUserId)
+      deliverNotificationUpserted({
+        userId: recipientUserId,
+        notification,
+        unreadCount,
+      })
+    } catch (error) {
+      console.error('Failed to deliver notification upsert over realtime.', error)
+    }
   }
 
   return results

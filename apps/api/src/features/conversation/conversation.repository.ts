@@ -110,6 +110,34 @@ async function countUnreadMessagesForParticipant({
   })
 }
 
+async function incrementParticipantStateVersions(
+  conversationId: string,
+  participantUserIds: string[],
+): Promise<void> {
+  await ConversationParticipantStateModel.updateMany(
+    { conversationId, userId: { $in: participantUserIds } },
+    { $inc: { version: 1 }, $set: { updatedAt: new Date() } },
+  )
+}
+
+export async function buildConversationForParticipant({
+  conversationId,
+  viewerUserId,
+  peer,
+}: {
+  conversationId: string
+  viewerUserId: string
+  peer: { userId: string; displayName: string }
+}): Promise<Conversation | null> {
+  const conversation = await ConversationModel.findOne({
+    _id: conversationId,
+    participantUserIds: viewerUserId,
+  }).lean<ConversationRecord | null>()
+
+  if (!conversation) return null
+  return buildConversationDto(conversation, viewerUserId, peer)
+}
+
 async function buildConversationDto(
   doc: ConversationRecord,
   viewerUserId: string,
@@ -119,8 +147,8 @@ async function buildConversationDto(
     conversationId: String(doc._id),
     userId: viewerUserId,
   })
-    .select('lastReadMessageId')
-    .lean<{ lastReadMessageId?: string | null } | null>()
+    .select('lastReadMessageId version')
+    .lean<{ lastReadMessageId?: string | null; version: number } | null>()
 
   const unreadCount = await countUnreadMessagesForParticipant({
     conversationId: String(doc._id),
@@ -128,7 +156,11 @@ async function buildConversationDto(
     lastReadMessageId: participantState?.lastReadMessageId,
   })
 
-  return toConversation(doc, { peer, unreadCount })
+  return toConversation(doc, {
+    peer,
+    unreadCount,
+    version: participantState?.version ?? 1,
+  })
 }
 
 export async function findOrCreateDirectConversation({
@@ -389,6 +421,8 @@ export async function sendDirectMessage({
     },
   )
 
+  await incrementParticipantStateVersions(conversationId, conversation.participantUserIds)
+
   const recipientUserId =
     conversation.participantUserIds.find((userId) => userId !== senderUserId) ?? ''
 
@@ -465,6 +499,7 @@ export async function markConversationRead({
         lastReadAt: readMessage.createdAt,
         updatedAt: new Date(),
       },
+      $inc: { version: 1 },
       $setOnInsert: {
         conversationId,
         userId: viewerUserId,

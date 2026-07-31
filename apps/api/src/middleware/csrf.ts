@@ -17,7 +17,7 @@ export function verifyCsrf(req: Request, _res: Response, next: NextFunction): vo
     return
   }
 
-  if (req.path.startsWith('/api/bench')) {
+  if (req.path.startsWith('/api/bench') || req.originalUrl.startsWith('/api/socket.io')) {
     next()
     return
   }

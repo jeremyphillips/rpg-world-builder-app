@@ -128,6 +128,31 @@ Details: [public auth forms](../apps/public/docs/auth-forms.md),
 [dashboard auth guard](../apps/dashboard/docs/auth-guard.md),
 and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
 
+## Realtime (Socket.IO)
+
+The API attaches Socket.IO to the same HTTP server as Express (`path:
+/api/socket.io`). The dev proxy forwards WebSocket upgrades for `/api*`.
+
+- **Auth:** handshake reads the `rpg_session` cookie, verifies the JWT, confirms
+  the user exists, and joins `user:{userId}` only.
+- **Delivery boundary:** post-persistence helpers in `apps/api/src/realtime/`
+  (`deliverToUser`, `deliverNotificationUpserted`, `deliverNotificationRead`,
+  `deliverConversationActivity`). Domain services never call `io.to(...).emit`
+  directly.
+- **Events:** transport-focused DTO envelopes with monotonic `version` fields —
+  see [apps/api/docs/notifications.md](../apps/api/docs/notifications.md).
+- **Single instance:** the default in-memory adapter fans out within one API
+  process. Set `REDIS_URL` on the API to enable the Redis adapter before running
+  multiple replicas; sticky sessions alone are insufficient for room fanout.
+- **Dashboard client:** `RealtimeProvider` under `AuthGuard` patches feature-local
+  TanStack Query caches (bell first page, conversation list/thread, inbox invalidation).
+  Slow polling stays enabled while connected; reconnect refetch is scoped to active
+  surfaces only.
+
+Event catalog and version rules →
+[apps/api/docs/notifications.md](../apps/api/docs/notifications.md).
+Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/README.md).
+
 ## Shared contracts & UI
 
 - **`@rpg/contracts`** is the single source of truth for domain/DTO shapes:

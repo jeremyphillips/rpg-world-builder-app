@@ -24,6 +24,7 @@ export function toNotification(doc: NotificationRecord): Notification {
     archivedAt: doc.archivedAt ? doc.archivedAt.toISOString() : null,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
+    version: doc.version,
     payload: doc.payload as Notification['payload'],
   } as Notification
 }

@@ -27,6 +27,7 @@ vi.mock('./use-notifications', () => ({
           title: 'Campaign invitation',
           createdAt: '2026-01-01T12:00:00.000Z',
           updatedAt: '2026-01-01T12:00:00.000Z',
+          version: 1,
           seenAt: null,
           readAt: null,
           payload: {

@@ -12,6 +12,9 @@ export const ROUTES = {
   },
   account: '/account',
   nameGenerator: '/name-generator',
+  notifications: {
+    list: '/notifications',
+  },
   messages: {
     list: '/messages',
     new: '/messages/new',

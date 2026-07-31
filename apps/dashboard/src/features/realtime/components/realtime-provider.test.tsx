@@ -1,0 +1,189 @@
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SOCKET_IO_PATH } from '@rpg/contracts'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ReactNode } from 'react'
+
+const socketHandlers = vi.hoisted(() => ({
+  connect: [] as Array<() => void>,
+  notificationUpserted: [] as Array<(payload: unknown) => void>,
+  conversationActivity: [] as Array<(payload: unknown) => void>,
+}))
+
+const disconnect = vi.hoisted(() => vi.fn())
+const ioMock = vi.hoisted(() =>
+  vi.fn(() => ({
+    on: vi.fn((event: string, handler: (payload: unknown) => void) => {
+      if (event === 'connect') socketHandlers.connect.push(handler as () => void)
+      if (event === 'notification.upserted') {
+        socketHandlers.notificationUpserted.push(handler)
+      }
+      if (event === 'conversation.activity') {
+        socketHandlers.conversationActivity.push(handler)
+      }
+    }),
+    off: vi.fn(),
+    disconnect,
+  })),
+)
+
+vi.mock('socket.io-client', () => ({
+  io: ioMock,
+}))
+
+import { RealtimeProvider } from './realtime-provider.client'
+import { useRealtimeStatus } from '../context/realtime-context'
+import {
+  applyConversationEnvelopeToList,
+  conversationsListQueryKey,
+  CONVERSATION_LIST_LIMIT,
+  conversationMessagesQueryKey,
+} from '@/features/message'
+import {
+  applyNotificationUpserted,
+  notificationsListQueryKey,
+  NOTIFICATION_LIST_LIMIT,
+} from '@/features/notification'
+import { makeConversation } from '@/test/fixtures/conversations'
+import { makeDirectMessage } from '@/test/fixtures/messages'
+import { makeNotification } from '@/test/fixtures/notifications'
+
+function createWrapper(queryClient: QueryClient) {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <RealtimeProvider userId="user-1">{children}</RealtimeProvider>
+      </QueryClientProvider>
+    )
+  }
+}
+
+describe('RealtimeProvider', () => {
+  beforeEach(() => {
+    ioMock.mockClear()
+    disconnect.mockClear()
+    socketHandlers.connect.length = 0
+    socketHandlers.notificationUpserted.length = 0
+    socketHandlers.conversationActivity.length = 0
+  })
+
+  it('connects with credentials and exposes connection status', async () => {
+    const queryClient = new QueryClient()
+    const { result } = renderHook(() => useRealtimeStatus(), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    expect(ioMock).toHaveBeenCalledWith({
+      path: SOCKET_IO_PATH,
+      withCredentials: true,
+    })
+    expect(result.current.isConnected).toBe(false)
+
+    socketHandlers.connect[0]?.()
+    await waitFor(() => {
+      expect(result.current.isConnected).toBe(true)
+    })
+  })
+
+  it('patches the bell cache from notification socket events', async () => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(notificationsListQueryKey(NOTIFICATION_LIST_LIMIT), {
+      items: [],
+      unreadCount: 0,
+      nextCursor: null,
+    })
+
+    renderHook(() => useRealtimeStatus(), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    const notification = makeNotification({ id: 'notification-live' })
+    socketHandlers.notificationUpserted[0]?.({
+      notification,
+      unreadCount: 1,
+      version: 1,
+    })
+
+    await waitFor(() => {
+      expect(queryClient.getQueryData(notificationsListQueryKey(NOTIFICATION_LIST_LIMIT))).toEqual(
+        applyNotificationUpserted(
+          { items: [], unreadCount: 0, nextCursor: null },
+          { notification, unreadCount: 1, version: 1 },
+        ),
+      )
+    })
+  })
+
+  it('patches conversation list and active thread caches from conversation.activity', async () => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(conversationsListQueryKey(CONVERSATION_LIST_LIMIT), {
+      items: [],
+      nextCursor: null,
+    })
+    queryClient.setQueryData(conversationMessagesQueryKey('conversation-1'), {
+      pages: [{ items: [], nextCursor: null }],
+      pageParams: [undefined],
+    })
+
+    renderHook(() => useRealtimeStatus(), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    const conversation = makeConversation({ id: 'conversation-1', version: 2 })
+    const message = makeDirectMessage({ id: 'message-live' })
+    socketHandlers.conversationActivity[0]?.({
+      conversation,
+      message,
+      version: 2,
+    })
+
+    await waitFor(() => {
+      expect(queryClient.getQueryData(conversationsListQueryKey(CONVERSATION_LIST_LIMIT))).toEqual(
+        applyConversationEnvelopeToList(
+          { items: [], nextCursor: null },
+          { conversation, message, version: 2 },
+        ),
+      )
+      expect(queryClient.getQueryData(conversationMessagesQueryKey('conversation-1'))).toEqual({
+        pages: [{ items: [message], nextCursor: null }],
+        pageParams: [undefined],
+      })
+    })
+  })
+
+  it('scopes reconnect invalidation to bell, list, and active thread only', async () => {
+    const queryClient = new QueryClient()
+    const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries')
+    const { result } = renderHook(() => useRealtimeStatus(), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    act(() => {
+      result.current.setActiveConversationId('conversation-active')
+    })
+
+    socketHandlers.connect[0]?.()
+
+    await waitFor(() => {
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
+      })
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
+      })
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: conversationMessagesQueryKey('conversation-active'),
+      })
+    })
+  })
+
+  it('disconnects on unmount', () => {
+    const queryClient = new QueryClient()
+    const { unmount } = renderHook(() => useRealtimeStatus(), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    unmount()
+    expect(disconnect).toHaveBeenCalled()
+  })
+})

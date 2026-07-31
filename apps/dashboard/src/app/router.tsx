@@ -60,6 +60,7 @@ import {
   MessageThreadRoute,
   MessagesListRoute,
   NameGeneratorRoute,
+  NotificationsListRoute,
   NewMessageRoute,
   RulesConfigDetailRoute,
   VocabularyLandingRoute,
@@ -126,6 +127,11 @@ const router = createBrowserRouter(
               path: 'name-generator',
               element: <NameGeneratorRoute />,
               handle: { crumb: () => ({ label: 'Name Generator' }) } satisfies CrumbHandle,
+            },
+            {
+              path: 'notifications',
+              element: <NotificationsListRoute />,
+              handle: { crumb: () => ({ label: 'Notifications' }) } satisfies CrumbHandle,
             },
             {
               path: 'messages',

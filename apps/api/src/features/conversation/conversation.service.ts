@@ -7,9 +7,12 @@ import type {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
+import { deliverConversationActivity, deliverNotificationRead } from '../../realtime'
 import { findSessionUserById } from '../user'
 import { directMessageDedupeKey, markNotificationReadByDedupeKey } from '../notification'
+import { getUnreadNotificationCount } from '../notification/notification.service'
 import {
+  buildConversationForParticipant,
   decodeConversationCursor,
   decodeMessageCursor,
   findOrCreateDirectConversation,
@@ -37,6 +40,32 @@ async function loadPeerForConversation(
     userId: peerUserId,
     displayName: peer?.displayName?.trim() || 'Unknown user',
   }
+}
+
+async function deliverConversationActivityToParticipants(input: {
+  conversationId: string
+  participantUserIds: string[]
+  message?: DirectMessage
+}): Promise<void> {
+  await Promise.all(
+    input.participantUserIds.map(async (userId) => {
+      const peer = await loadPeerForConversation(input.conversationId, userId)
+      if (!peer) return
+
+      const conversation = await buildConversationForParticipant({
+        conversationId: input.conversationId,
+        viewerUserId: userId,
+        peer,
+      })
+      if (!conversation) return
+
+      deliverConversationActivity({
+        userId,
+        conversation,
+        message: input.message,
+      })
+    }),
+  )
 }
 
 export async function getDirectMessageRecipients(
@@ -156,6 +185,18 @@ export async function sendConversationMessage(
     }
   }
 
+  if (result.isNew) {
+    try {
+      await deliverConversationActivityToParticipants({
+        conversationId,
+        participantUserIds: [viewerUserId, result.recipientUserId].filter(Boolean),
+        message: result.message,
+      })
+    } catch (error) {
+      console.error('Failed to deliver conversation activity over realtime.', error)
+    }
+  }
+
   return result.message
 }
 
@@ -181,12 +222,30 @@ export async function markConversationRead(
   }
 
   try {
-    await markNotificationReadByDedupeKey({
+    const syncedNotification = await markNotificationReadByDedupeKey({
       recipientUserId: viewerUserId,
       dedupeKey: directMessageDedupeKey(conversationId),
     })
+    if (syncedNotification) {
+      const unreadCount = await getUnreadNotificationCount(viewerUserId)
+      deliverNotificationRead({
+        userId: viewerUserId,
+        notification: syncedNotification,
+        unreadCount,
+        version: syncedNotification.version,
+      })
+    }
   } catch (error) {
     console.error('Failed to sync direct message notification read state.', error)
+  }
+
+  try {
+    await deliverConversationActivity({
+      userId: viewerUserId,
+      conversation,
+    })
+  } catch (error) {
+    console.error('Failed to deliver conversation read activity over realtime.', error)
   }
 
   return conversation
