@@ -1,12 +1,14 @@
 'use client'
 
 import { Link, useParams } from 'react-router-dom'
+import * as React from 'react'
 import { Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSession } from '@/features/auth'
+import { useRealtimeStatus } from '@/features/realtime'
 
 import { MessageThreadBody } from '../components/message-thread-body.client'
 import { useConversationActions } from '../hooks/use-conversation-actions'
@@ -18,6 +20,7 @@ import { flattenConversationMessages } from '../lib/sort-messages-chronologicall
 export function MessageThread() {
   const { conversationId } = useParams<{ conversationId: string }>()
   const { data: session } = useSession()
+  const { setActiveConversationId } = useRealtimeStatus()
   const { data: conversationsData } = useConversations()
   const {
     data: messagesData,
@@ -41,6 +44,12 @@ export function MessageThread() {
     latestMessageId,
     markRead,
   })
+
+  React.useEffect(() => {
+    if (!conversationId) return
+    setActiveConversationId(conversationId)
+    return () => setActiveConversationId(null)
+  }, [conversationId, setActiveConversationId])
 
   return (
     <NarrowPage spacing="relaxed">

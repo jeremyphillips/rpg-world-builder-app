@@ -10,7 +10,11 @@ import {
   applyNotificationMarkAllRead,
   applyNotificationMarkedRead,
 } from '../lib/notification-cache'
-import { NOTIFICATION_LIST_LIMIT, notificationsListQueryKey } from '../lib/notification-query-keys'
+import {
+  NOTIFICATION_LIST_LIMIT,
+  notificationsInboxQueryKey,
+  notificationsListQueryKey,
+} from '../lib/notification-query-keys'
 
 function updateListCache(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -25,6 +29,11 @@ function updateListCache(
   )
 }
 
+function invalidateInboxCache(queryClient: ReturnType<typeof useQueryClient>): void {
+  if (queryClient.getQueryData(notificationsInboxQueryKey) === undefined) return
+  void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
+}
+
 export function useNotificationActions() {
   const queryClient = useQueryClient()
 
@@ -32,6 +41,7 @@ export function useNotificationActions() {
     mutationFn: markNotificationRead,
     onSuccess: ({ notification }) => {
       updateListCache(queryClient, (current) => applyNotificationMarkedRead(current, notification)!)
+      invalidateInboxCache(queryClient)
     },
   })
 
@@ -42,6 +52,7 @@ export function useNotificationActions() {
         queryClient,
         (current) => applyNotificationMarkAllRead(current, { unreadCount: 0 })!,
       )
+      invalidateInboxCache(queryClient)
     },
   })
 

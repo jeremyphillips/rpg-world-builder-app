@@ -1,13 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ConversationListResponse } from '@rpg/contracts'
 
-import { notificationsListQueryKey, NOTIFICATION_LIST_LIMIT } from '@/features/notification'
+import {
+  notificationsInboxQueryKey,
+  notificationsListQueryKey,
+  NOTIFICATION_LIST_LIMIT,
+} from '@/features/notification'
 
 import {
   createDirectConversation,
   markConversationRead,
   sendConversationMessage,
 } from '../api/conversations'
+import { applyConversationEnvelopeToList } from '../lib/conversation-cache'
 import {
   conversationMessagesQueryKey,
   conversationsListQueryKey,
@@ -29,6 +34,7 @@ export function useConversationActions(conversationId?: string) {
     void queryClient.invalidateQueries({
       queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
     })
+    void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
   }
 
   const createConversation = useMutation({
@@ -54,17 +60,16 @@ export function useConversationActions(conversationId?: string) {
     onSuccess: ({ conversation }) => {
       queryClient.setQueryData(
         conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
-        (current: ConversationListResponse | undefined) => {
-          if (!current) return current
-          return {
-            ...current,
-            items: current.items.map((item) => (item.id === conversation.id ? conversation : item)),
-          }
-        },
+        (current: ConversationListResponse | undefined) =>
+          applyConversationEnvelopeToList(current, {
+            conversation,
+            version: conversation.version,
+          }),
       )
       void queryClient.invalidateQueries({
         queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
       })
+      void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
     },
   })
 

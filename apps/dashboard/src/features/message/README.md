@@ -1,7 +1,7 @@
 # message (dashboard feature)
 
-Direct one-to-one conversations with campaign-member recipient discovery. Phase 1
-uses TanStack Query polling; Socket.IO can update the same caches later.
+Direct one-to-one conversations with campaign-member recipient discovery. TanStack
+Query polling plus Socket.IO cache patches keep list and active thread fresh.
 
 ## Layout
 
@@ -13,6 +13,7 @@ uses TanStack Query polling; Socket.IO can update the same caches later.
 | `hooks/use-conversation-recipients.ts` | Active campaign-member picker data              |
 | `hooks/use-conversation-actions.ts`    | Create, send, mark-read mutations               |
 | `lib/conversation-query-keys.ts`       | Shared query keys                               |
+| `lib/conversation-cache.ts`            | List/thread cache helpers + version guards      |
 | `lib/sort-messages-chronologically.ts` | Newest-first API pages → chronological render   |
 | `routes/messages-list.tsx`             | Conversation index                              |
 | `routes/new-message.tsx`               | Recipient picker + create/find                  |
@@ -22,6 +23,7 @@ uses TanStack Query polling; Socket.IO can update the same caches later.
 
 - List and thread queries run only when a session user exists.
 - `refetchInterval` is active while `document.visibilityState === 'visible'`.
+- Fast poll while disconnected; slow poll (90s list / 60s thread) while socket-connected.
 - `refetchOnWindowFocus: true` recovers after backgrounding.
 
 ## Conversation list pagination (deferred)

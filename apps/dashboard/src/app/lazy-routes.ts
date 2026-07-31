@@ -39,6 +39,9 @@ export const NameGeneratorRoute = withRouteSuspense(
     'NameGeneratorRoute',
   ),
 )
+export const NotificationsListRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/notification/routes/notifications-list'), 'NotificationsList'),
+)
 export const MessagesListRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/message/routes/messages-list'), 'MessagesList'),
 )

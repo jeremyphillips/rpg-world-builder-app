@@ -4,6 +4,7 @@ export {
   NOTIFICATION_POLL_INTERVAL_MS,
   NOTIFICATION_SLOW_POLL_INTERVAL_MS,
 } from './hooks/use-notifications'
+export { useNotificationInbox } from './hooks/use-notification-inbox'
 export {
   applyNotificationMarkedRead,
   applyNotificationMarkAllRead,
@@ -13,7 +14,9 @@ export {
   type NotificationUpsertedPayload,
 } from './lib/notification-cache'
 export {
+  NOTIFICATION_INBOX_PAGE_LIMIT,
   NOTIFICATION_LIST_LIMIT,
+  notificationsInboxQueryKey,
   notificationsListQueryKey,
   notificationsQueryKey,
 } from './lib/notification-query-keys'
