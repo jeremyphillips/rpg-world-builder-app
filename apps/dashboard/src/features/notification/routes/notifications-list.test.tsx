@@ -14,7 +14,6 @@ vi.mock('../hooks/use-notification-inbox-page', () => ({
     filters: {},
     setFilterValue: vi.fn(),
     resetFilters: vi.fn(),
-    clearFilterField: vi.fn(),
     invalidScopeNotice: {
       show: false,
       dismiss: vi.fn(),

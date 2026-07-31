@@ -31,7 +31,7 @@ export function createCampaignScopeFilterField<TData, TState extends CampaignSco
     id: CAMPAIGN_SCOPE_FILTER_ID as FilterFieldId<TState>,
     label: 'Campaign',
     placement: 'primary',
-    layout: 'inline',
+    layout: 'stacked',
     width: 'lg',
     showAllOption: true,
     allOptionLabel: 'All campaigns',

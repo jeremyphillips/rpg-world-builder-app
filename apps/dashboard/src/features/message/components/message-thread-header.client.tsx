@@ -17,7 +17,7 @@ export function MessageThreadHeader({
 }: MessageThreadHeaderProps) {
   return (
     <header className={messagesWorkspaceThreadHeaderClasses}>
-      <Text as="h2" variant="lead">
+      <Text as="h2" className="text-lg text-foreground-subtle">
         {peerDisplayName ?? 'Conversation'}
       </Text>
       <MessageThreadSharedCampaigns sharedCampaigns={sharedCampaigns} />

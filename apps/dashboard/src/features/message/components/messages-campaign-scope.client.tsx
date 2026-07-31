@@ -99,12 +99,7 @@ export function MessagesCampaignScopeChrome({
       ) : null}
 
       {hasFilters ? (
-        <FilterBar
-          schema={schema}
-          state={filters}
-          orientation="vertical"
-          onValueChange={onFilterChange}
-        />
+        <FilterBar schema={schema} state={filters} onValueChange={onFilterChange} />
       ) : null}
 
       {hasScopeSummary ? (

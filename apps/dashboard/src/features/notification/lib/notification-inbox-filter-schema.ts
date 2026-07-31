@@ -47,7 +47,7 @@ export function createNotificationInboxFilterSchema(
       id: NOTIFICATION_INBOX_TYPE_FILTER_ID,
       label: 'Type',
       placement: 'primary',
-      layout: 'inline',
+      layout: 'stacked',
       width: 'md',
       showAllOption: true,
       allOptionLabel: 'All notifications',

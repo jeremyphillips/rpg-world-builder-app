@@ -1,6 +1,7 @@
 'use client'
 
 import { Link } from 'react-router-dom'
+import { Text } from '@rpg/ui'
 
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 
@@ -23,10 +24,14 @@ export function MessagesMobileBackLink({ to, label }: { to: string; label: strin
 export function MessagesDirectEmptyRightPane(_props: { campaignId?: string }) {
   return (
     <div className={messagesWorkspaceEmptyStateClasses}>
-      <IndexPageEmptyState
-        heading={MESSAGES_EMPTY_COPY.selectConversationHeading}
-        body={MESSAGES_EMPTY_COPY.selectConversationBody}
-      />
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <Text className="text-foreground-subtle">
+            {MESSAGES_EMPTY_COPY.selectConversationHeading}
+          </Text>
+          <Text variant="muted">{MESSAGES_EMPTY_COPY.selectConversationBody}</Text>
+        </div>
+      </div>
     </div>
   )
 }

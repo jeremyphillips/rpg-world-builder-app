@@ -46,7 +46,7 @@ export function NotificationInboxBody({
     <div className="space-y-3">
       <NotificationPreviewList
         items={previewItems}
-        className="max-h-none overflow-visible rounded-md border border-border"
+        className="max-h-none overflow-visible border-y border-border"
       />
       {hasNextPage ? (
         <Button type="button" variant="outline" onClick={onLoadMore} disabled={isFetchingNextPage}>

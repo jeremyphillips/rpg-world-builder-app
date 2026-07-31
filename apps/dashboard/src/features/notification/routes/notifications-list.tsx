@@ -16,7 +16,6 @@ export function NotificationsList() {
     filters,
     setFilterValue,
     resetFilters,
-    clearFilterField,
     invalidScopeNotice,
     isPending,
     isError,
@@ -54,7 +53,6 @@ export function NotificationsList() {
         schema={schema}
         filters={filters}
         onFilterChange={setFilterValue}
-        onClearFilterField={clearFilterField}
         onResetFilters={resetFilters}
         invalidScopeNotice={invalidScopeNotice}
       />
