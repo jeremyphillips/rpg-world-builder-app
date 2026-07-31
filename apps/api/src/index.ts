@@ -4,6 +4,7 @@ import { createApp } from './app'
 import { loadEnv } from './env'
 import { connectDb, disconnectDb } from './lib/db'
 import { attachRealtimeServer } from './realtime'
+import { closeSocketIoAdapter } from './realtime/redis-adapter'
 
 async function main(): Promise<void> {
   const env = loadEnv()
@@ -11,7 +12,7 @@ async function main(): Promise<void> {
 
   const app = createApp()
   const httpServer = createServer(app)
-  attachRealtimeServer(httpServer)
+  await attachRealtimeServer(httpServer)
 
   httpServer.listen(env.PORT, () => {
     console.log(`[api] listening on http://localhost:${env.PORT} (mounted at /api)`)
@@ -20,7 +21,9 @@ async function main(): Promise<void> {
   const shutdown = (signal: string) => {
     console.log(`[api] ${signal} received, shutting down`)
     httpServer.close(() => {
-      void disconnectDb().finally(() => process.exit(0))
+      void closeSocketIoAdapter()
+        .then(() => disconnectDb())
+        .finally(() => process.exit(0))
     })
   }
 

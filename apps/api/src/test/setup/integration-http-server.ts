@@ -16,7 +16,7 @@ export type IntegrationHttpServer = {
 export async function createIntegrationHttpServer(): Promise<IntegrationHttpServer> {
   const app = createApp()
   const httpServer = createServer(app)
-  attachRealtimeServer(httpServer)
+  await attachRealtimeServer(httpServer)
 
   await new Promise<void>((resolve) => {
     httpServer.listen(0, resolve)

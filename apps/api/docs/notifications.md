@@ -103,9 +103,10 @@ Rules:
 - Handshake auth reuses the `rpg_session` cookie; connections join `user:{userId}` only.
 
 **Single-instance warning:** the default in-memory Socket.IO adapter serves one API
-process only. Multi-instance horizontal scale requires a shared adapter (for example
-Redis) before running multiple API replicas; sticky sessions alone are insufficient
-for room fanout.
+process only. Set `REDIS_URL` to enable the Redis adapter before running multiple API
+replicas; sticky sessions alone are insufficient for room fanout.
 
-Polling remains authoritative after reconnect until the dashboard provider lands
-(Phase 2).
+The dashboard `RealtimeProvider` patches the bell first-page cache directly, invalidates
+the separate inbox infinite query when mounted, and keeps slow polling enabled while
+connected. Reconnect refetch is scoped to the bell first page, conversation list, active
+thread, and mounted inbox — not every cached historical page.

@@ -4,6 +4,8 @@ import { Server } from 'socket.io'
 
 import { authenticateSocket } from './auth'
 import { registerRealtimeServer } from './delivery'
+import { logRealtimeAuthFailure } from './logging'
+import { configureSocketIoAdapter } from './redis-adapter'
 import { userRoom } from './rooms'
 
 const SOCKET_IO_PATH = '/api/socket.io'
@@ -11,19 +13,22 @@ const SOCKET_IO_PATH = '/api/socket.io'
 /**
  * Attaches Socket.IO to the API HTTP server.
  *
- * Uses the default in-memory adapter — room fanout is limited to a single API
- * process. Horizontal scale requires a shared adapter (for example Redis) before
- * running multiple instances; sticky sessions alone are insufficient.
+ * Uses the default in-memory adapter unless `REDIS_URL` is set — room fanout is
+ * limited to a single API process without a shared adapter. Sticky sessions alone
+ * are insufficient for multi-instance delivery.
  */
-export function attachRealtimeServer(httpServer: HttpServer): Server {
+export async function attachRealtimeServer(httpServer: HttpServer): Promise<Server> {
   const io = new Server(httpServer, {
     path: SOCKET_IO_PATH,
   })
+
+  await configureSocketIoAdapter(io)
 
   io.use(async (socket, next) => {
     try {
       const auth = await authenticateSocket(socket)
       if (!auth) {
+        logRealtimeAuthFailure('missing or invalid session')
         next(new Error('Unauthorized'))
         return
       }
@@ -32,6 +37,7 @@ export function attachRealtimeServer(httpServer: HttpServer): Server {
       await socket.join(userRoom(auth.userId))
       next()
     } catch (error) {
+      logRealtimeAuthFailure('handshake error', error)
       next(error instanceof Error ? error : new Error('Unauthorized'))
     }
   })

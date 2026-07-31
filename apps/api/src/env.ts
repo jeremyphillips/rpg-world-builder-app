@@ -33,6 +33,8 @@ const envSchema = z.object({
   SMTP_USER: z.string().min(1).optional(),
   SMTP_PASS: z.string().min(1).optional(),
   SMTP_FROM_ADDRESS: z.string().email().optional(),
+  /** Optional Redis URL for Socket.IO multi-instance fanout (`@socket.io/redis-adapter`). */
+  REDIS_URL: z.string().url().optional(),
 })
 
 export type EmailProviderName = 'ethereal' | 'smtp' | 'fake'
@@ -50,6 +52,7 @@ export type Env = z.infer<typeof envSchema> & {
   smtpUser: string
   smtpPass: string
   smtpFromAddress: string
+  redisUrl?: string
 }
 
 function resolveDevBenchEnabled(
@@ -171,6 +174,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     SMTP_USER: source.SMTP_USER,
     SMTP_PASS: source.SMTP_PASS,
     SMTP_FROM_ADDRESS: source.SMTP_FROM_ADDRESS,
+    REDIS_URL: source.REDIS_URL,
   })
 
   if (!parsed.success) {
@@ -195,6 +199,7 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     emailProvider,
     mongoTransactionMode: parsed.data.MONGO_TRANSACTION_MODE,
     appBaseUrl: parsed.data.APP_BASE_URL,
+    redisUrl: parsed.data.REDIS_URL,
     ...smtpConfig,
   }
   return cached

@@ -142,11 +142,16 @@ The API attaches Socket.IO to the same HTTP server as Express (`path:
 - **Events:** transport-focused DTO envelopes with monotonic `version` fields —
   see [apps/api/docs/notifications.md](../apps/api/docs/notifications.md).
 - **Single instance:** the default in-memory adapter fans out within one API
-  process. Horizontal scale requires a shared Socket.IO adapter (for example
-  Redis) before running multiple API replicas.
+  process. Set `REDIS_URL` on the API to enable the Redis adapter before running
+  multiple replicas; sticky sessions alone are insufficient for room fanout.
+- **Dashboard client:** `RealtimeProvider` under `AuthGuard` patches feature-local
+  TanStack Query caches (bell first page, conversation list/thread, inbox invalidation).
+  Slow polling stays enabled while connected; reconnect refetch is scoped to active
+  surfaces only.
 
-Dashboard client wiring (provider, cache helpers, slow poll fallback) is tracked
-separately in the realtime initiative plan.
+Event catalog and version rules →
+[apps/api/docs/notifications.md](../apps/api/docs/notifications.md).
+Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/README.md).
 
 ## Shared contracts & UI
 

@@ -8,6 +8,7 @@ import {
   type NotificationReadPayload,
   type NotificationUpsertedPayload,
 } from './events'
+import { logRealtimeDeliveryFailure } from './logging'
 import { userRoom } from './rooms'
 
 let io: Server | null = null
@@ -24,7 +25,12 @@ export function resetRealtimeServerForTests(): void {
 /** Sole emit path — domain code must call delivery helpers instead of `io.to`. */
 export function deliverToUser(userId: string, event: string, payload: unknown): void {
   if (!io) return
-  io.to(userRoom(userId)).emit(event, payload)
+
+  try {
+    io.to(userRoom(userId)).emit(event, payload)
+  } catch (error) {
+    logRealtimeDeliveryFailure({ userId, event }, error)
+  }
 }
 
 export function deliverNotificationUpserted(input: {
