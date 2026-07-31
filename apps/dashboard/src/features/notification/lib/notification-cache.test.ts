@@ -33,6 +33,20 @@ function makeNotification(
 }
 
 describe('applyNotificationUpserted', () => {
+  it('seeds the bell cache when query data is uninitialized', () => {
+    const result = applyNotificationUpserted(undefined, {
+      notification: makeNotification({ id: 'a' }),
+      unreadCount: 1,
+      version: 1,
+    })
+
+    expect(result).toEqual({
+      items: [makeNotification({ id: 'a' })],
+      unreadCount: 1,
+      nextCursor: null,
+    })
+  })
+
   it('upserts a notification and applies authoritative unreadCount', () => {
     const result = applyNotificationUpserted(
       {

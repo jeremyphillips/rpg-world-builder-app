@@ -3,7 +3,12 @@
 import * as React from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { io, type Socket } from 'socket.io-client'
-import type { ConversationListResponse, NotificationListResponse } from '@rpg/contracts'
+import {
+  REALTIME_EVENTS,
+  SOCKET_IO_PATH,
+  type ConversationListResponse,
+  type NotificationListResponse,
+} from '@rpg/contracts'
 
 import {
   applyConversationEnvelopeToList,
@@ -24,7 +29,6 @@ import {
 } from '@/features/notification'
 
 import { RealtimeContextProvider } from '../context/realtime-context'
-import { REALTIME_EVENTS, SOCKET_IO_PATH } from '../lib/realtime-events'
 
 type RealtimeProviderProps = {
   userId: string

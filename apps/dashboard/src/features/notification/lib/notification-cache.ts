@@ -1,24 +1,13 @@
-import type { Notification, NotificationListResponse } from '@rpg/contracts'
+import type {
+  Notification,
+  NotificationListResponse,
+  NotificationReadPayload,
+  NotificationUpsertedPayload,
+} from '@rpg/contracts'
 
 import { NOTIFICATION_LIST_LIMIT } from './notification-query-keys'
 
-export type NotificationUpsertedPayload = {
-  notification: Notification
-  unreadCount: number
-  version: number
-}
-
-export type NotificationReadPayload =
-  | {
-      notification: Notification
-      unreadCount: number
-      version: number
-    }
-  | {
-      notificationIds: string[]
-      unreadCount: number
-      version: number
-    }
+export type { NotificationReadPayload, NotificationUpsertedPayload }
 
 function compareNotificationsNewestFirst(left: Notification, right: Notification): number {
   const createdAtCompare = right.createdAt.localeCompare(left.createdAt)
@@ -83,7 +72,17 @@ export function applyNotificationRead(
   current: NotificationListResponse | undefined,
   payload: NotificationReadPayload,
 ): NotificationListResponse | undefined {
-  if (!current) return current
+  if (!current) {
+    if ('notificationIds' in payload) {
+      return { items: [], unreadCount: payload.unreadCount, nextCursor: null }
+    }
+
+    return {
+      items: [payload.notification],
+      unreadCount: payload.unreadCount,
+      nextCursor: null,
+    }
+  }
 
   if ('notificationIds' in payload) {
     return applyNotificationMarkAllRead(current, { unreadCount: payload.unreadCount })
@@ -103,7 +102,13 @@ export function applyNotificationUpserted(
   payload: NotificationUpsertedPayload,
   limit = NOTIFICATION_LIST_LIMIT,
 ): NotificationListResponse | undefined {
-  if (!current) return current
+  if (!current) {
+    return {
+      items: [payload.notification].slice(0, limit),
+      unreadCount: payload.unreadCount,
+      nextCursor: null,
+    }
+  }
 
   const existing = current.items.find((item) => item.id === payload.notification.id)
   if (!shouldApplyNotificationVersion(existing, payload.version)) {

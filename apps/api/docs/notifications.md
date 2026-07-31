@@ -64,11 +64,11 @@ All routes require auth and are recipient-scoped.
 - `POST /api/notifications/mark-all-read`
 - `POST /api/notifications/mark-seen` — body `{ ids: string[] }` for rendered rows only
 
-## Phase 1 deferred gaps
+## Deferred gaps
 
 | Gap                                | Status                                                                                                                              |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `nextCursor` pagination            | List endpoint returns `nextCursor`; dashboard polls only the first page.                                                            |
+| Dashboard inbox pagination         | Bell uses a finite first page; `/notifications` uses cursor pages via `useNotificationInbox`.                                       |
 | `message.direct.received` producer | Published on direct message send with dedupe key `message-direct:${conversationId}`; conversation mark-read clears the deduped row. |
 | `archivedAt` / pruning             | Field is stored and excluded from active queries; no archive API or pruning job yet.                                                |
 
@@ -101,6 +101,9 @@ Rules:
 - No emit on mark-seen / `seenAt`-only writes.
 - Every payload includes monotonic `version` for cache guards (row revision on notifications; per-participant projection revision on conversations).
 - Handshake auth reuses the `rpg_session` cookie; connections join `user:{userId}` only.
+- **Conversation send:** realtime emits only for newly persisted messages. Idempotent
+  `clientMessageId` retries return the existing row without re-emitting; clients
+  recover via polling, focus refetch, or reconnect sync.
 
 **Single-instance warning:** the default in-memory Socket.IO adapter serves one API
 process only. Set `REDIS_URL` to enable the Redis adapter before running multiple API

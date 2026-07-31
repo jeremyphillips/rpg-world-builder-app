@@ -20,6 +20,19 @@ function makeMessage(overrides: Partial<DirectMessage> = {}): DirectMessage {
 }
 
 describe('applyConversationEnvelopeToList', () => {
+  it('seeds the list cache when query data is uninitialized', () => {
+    const conversation = makeConversation({ id: 'conversation-1' })
+    const result = applyConversationEnvelopeToList(undefined, {
+      conversation,
+      version: 1,
+    })
+
+    expect(result).toEqual({
+      items: [conversation],
+      nextCursor: null,
+    })
+  })
+
   it('upserts a conversation and reorders by latest activity', () => {
     const result = applyConversationEnvelopeToList(
       {
@@ -72,6 +85,16 @@ describe('applyConversationEnvelopeToList', () => {
 })
 
 describe('applyConversationEnvelopeToThread', () => {
+  it('seeds the thread cache when query data is uninitialized', () => {
+    const result = applyConversationEnvelopeToThread(undefined, {
+      conversation: makeConversation(),
+      message: makeMessage({ id: 'message-new' }),
+      version: 1,
+    })
+
+    expect(result?.pages[0]?.items.map((item) => item.id)).toEqual(['message-new'])
+  })
+
   it('prepends a new message to the first page', () => {
     const result = applyConversationEnvelopeToThread(
       {

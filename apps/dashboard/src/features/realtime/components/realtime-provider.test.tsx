@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SOCKET_IO_PATH } from '@rpg/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ReactNode } from 'react'
 
@@ -73,7 +74,7 @@ describe('RealtimeProvider', () => {
     })
 
     expect(ioMock).toHaveBeenCalledWith({
-      path: '/api/socket.io',
+      path: SOCKET_IO_PATH,
       withCredentials: true,
     })
     expect(result.current.isConnected).toBe(false)

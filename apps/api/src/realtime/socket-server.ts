@@ -2,13 +2,13 @@ import type { Server as HttpServer } from 'node:http'
 
 import { Server } from 'socket.io'
 
+import { SOCKET_IO_PATH } from '@rpg/contracts'
+
 import { authenticateSocket } from './auth'
 import { registerRealtimeServer } from './delivery'
 import { logRealtimeAuthFailure } from './logging'
 import { configureSocketIoAdapter } from './redis-adapter'
 import { userRoom } from './rooms'
-
-const SOCKET_IO_PATH = '/api/socket.io'
 
 /**
  * Attaches Socket.IO to the API HTTP server.
@@ -52,4 +52,4 @@ export async function attachRealtimeServer(httpServer: HttpServer): Promise<Serv
   return io
 }
 
-export { SOCKET_IO_PATH }
+export { SOCKET_IO_PATH } from '@rpg/contracts'

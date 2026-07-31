@@ -6,11 +6,11 @@ remains a slow fallback while connected.
 
 ## Layout
 
-| Path                                      | Responsibility                                              |
-| ----------------------------------------- | ----------------------------------------------------------- |
-| `components/realtime-provider.client.tsx` | Connects after auth, dispatches socket events to features   |
-| `context/realtime-context.tsx`            | Exposes `isConnected` + active thread id for scoped refetch |
-| `lib/realtime-events.ts`                  | Event names + socket path (must match API)                  |
+| Path                                                   | Responsibility                                              |
+| ------------------------------------------------------ | ----------------------------------------------------------- |
+| `components/realtime-provider.client.tsx`              | Connects after auth, dispatches socket events to features   |
+| `context/realtime-context.tsx`                         | Exposes `isConnected` + active thread id for scoped refetch |
+| `@rpg/contracts` (`REALTIME_EVENTS`, `SOCKET_IO_PATH`) | Transport event catalog shared with the API                 |
 
 ## Rules
 

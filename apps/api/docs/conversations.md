@@ -73,5 +73,10 @@ realtime delivery boundary (`apps/api/src/realtime/`):
 - **Mark read:** `conversation.activity` to the reader without `message`; synced
   notification read also emits `notification.read`.
 
+**Delivery guarantee:** Realtime delivery is best-effort and occurs only when a message
+is newly persisted. Idempotent retries (`clientMessageId` dedupe) return the existing
+message without re-emitting socket events; clients recover missed delivery through
+polling, focus refetch, or reconnect synchronization.
+
 See [`notifications.md`](./notifications.md) for the full event catalog, version rules,
 and the single-instance adapter warning.

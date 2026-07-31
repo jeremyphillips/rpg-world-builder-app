@@ -1,18 +1,17 @@
 import type { InfiniteData } from '@tanstack/react-query'
 import type {
-  Conversation,
+  ConversationActivityPayload,
   ConversationListResponse,
   DirectMessage,
   MessageListResponse,
 } from '@rpg/contracts'
 
-export type ConversationActivityPayload = {
-  conversation: Conversation
-  message?: DirectMessage
-  version: number
-}
+export type { ConversationActivityPayload }
 
-function compareConversationsNewestFirst(left: Conversation, right: Conversation): number {
+function compareConversationsNewestFirst(
+  left: ConversationActivityPayload['conversation'],
+  right: ConversationActivityPayload['conversation'],
+): number {
   const leftSortAt = left.latestMessage?.createdAt ?? left.updatedAt
   const rightSortAt = right.latestMessage?.createdAt ?? right.updatedAt
   const createdAtCompare = rightSortAt.localeCompare(leftSortAt)
@@ -21,7 +20,7 @@ function compareConversationsNewestFirst(left: Conversation, right: Conversation
 }
 
 function shouldApplyConversationVersion(
-  cached: Conversation | undefined,
+  cached: ConversationActivityPayload['conversation'] | undefined,
   incomingVersion: number,
 ): boolean {
   if (!cached) return true
@@ -41,7 +40,12 @@ export function applyConversationEnvelopeToList(
   current: ConversationListResponse | undefined,
   payload: ConversationActivityPayload,
 ): ConversationListResponse | undefined {
-  if (!current) return current
+  if (!current) {
+    return {
+      items: [payload.conversation],
+      nextCursor: null,
+    }
+  }
 
   const existing = current.items.find((item) => item.id === payload.conversation.id)
   if (!shouldApplyConversationVersion(existing, payload.version)) {
@@ -62,7 +66,14 @@ export function applyConversationEnvelopeToThread(
   current: InfiniteData<MessageListResponse> | undefined,
   payload: ConversationActivityPayload,
 ): InfiniteData<MessageListResponse> | undefined {
-  if (!current || !payload.message) return current
+  if (!payload.message) return current
+
+  if (!current) {
+    return {
+      pages: [{ items: [payload.message], nextCursor: null }],
+      pageParams: [undefined],
+    }
+  }
 
   const pages = current.pages.map((page, pageIndex) => {
     if (messageExistsInPage(page.items, payload.message!)) {
