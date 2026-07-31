@@ -34,8 +34,11 @@ export type DirectListScopeHintInput = {
   scopedCount: number
 }
 
-export function resolveDirectListScopeHint(
-  input: DirectListScopeHintInput | null,
-): DirectListScopeHintInput | null {
-  return input
+/** Scope utility counts come from API metadata, not the loaded page length. */
+export function usesFullDatasetScopeCounts(input: {
+  scopedCount: number
+  hiddenCount: number
+  loadedCount: number
+}): boolean {
+  return input.scopedCount !== input.loadedCount || input.hiddenCount > 0
 }

@@ -1,19 +1,19 @@
 import { ROUTES } from '@/app/routes'
 
-import { getMessagesFromConversationId } from './messages-workspace-routing.lib'
+import { getMessagesFromConversationId, isMessagesNewRoute } from './messages-workspace-routing.lib'
 
 export function resolveMessagesClearScopePath(input: { pathname: string; search: string }): string {
+  if (isMessagesNewRoute(input.pathname)) {
+    const from = getMessagesFromConversationId(input.search)
+    return ROUTES.messages.new(from ? { from } : undefined)
+  }
+
   const isThreadRoute = /^\/messages\/[^/]+$/.test(input.pathname)
   if (isThreadRoute) {
     const conversationId = input.pathname.split('/').pop()
     if (conversationId) {
       return ROUTES.messages.detail(conversationId)
     }
-  }
-
-  if (input.pathname.endsWith('/new')) {
-    const from = getMessagesFromConversationId(input.search)
-    return ROUTES.messages.new(from ? { from } : undefined)
   }
 
   return ROUTES.messages.list

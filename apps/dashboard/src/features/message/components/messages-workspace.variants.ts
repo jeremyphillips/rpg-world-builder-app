@@ -39,7 +39,11 @@ export const messagesWorkspaceEmptyStateClasses =
 export const messagesWorkspaceScopeUtilityClasses =
   'flex flex-wrap items-center justify-between gap-2 text-muted-foreground'
 
-export const messagesWorkspaceMobileBackClasses = 'mb-3 md:hidden'
+export const messagesWorkspaceMobileBackClasses = 'mb-3 px-4 pt-4 md:hidden'
+
+export const messagesWorkspaceHeaderActionsMobileHiddenOnNewClasses = 'hidden md:flex'
+
+export const messagesWorkspaceScopeChromeMobileHiddenOnNewClasses = 'hidden md:contents'
 
 export const messagesWorkspaceLeftPaneMobileHiddenClasses = 'hidden md:block'
 

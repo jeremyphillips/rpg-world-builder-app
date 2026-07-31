@@ -9,11 +9,13 @@ import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'
 import {
   messagesWorkspaceBodyClasses,
   messagesWorkspaceHeaderActionsClasses,
+  messagesWorkspaceHeaderActionsMobileHiddenOnNewClasses,
   messagesWorkspaceHeaderClasses,
   messagesWorkspaceLeftPaneClasses,
   messagesWorkspaceLeftPaneMobileHiddenClasses,
   messagesWorkspaceLeftPaneMobileVisibleClasses,
   messagesWorkspaceRootClasses,
+  messagesWorkspaceScopeChromeMobileHiddenOnNewClasses,
 } from './messages-workspace.variants'
 import {
   MessagesDirectListPane,
@@ -24,6 +26,7 @@ import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-
 import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
 import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import { isMessagesNewRoute } from '../lib/messages-workspace-routing.lib'
+import { resolveMessagesWorkspaceChromeVisibility } from '../lib/messages-workspace-chrome.lib'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
 export function MessagesWorkspaceShell() {
@@ -41,6 +44,20 @@ export function MessagesWorkspaceShell() {
   })
 
   const campaignScope = useMessagesCampaignScopeEffects(routeState)
+  const chromeVisibility = resolveMessagesWorkspaceChromeVisibility(routeState)
+
+  const headerActionsClasses = [
+    messagesWorkspaceHeaderActionsClasses,
+    chromeVisibility.hideNewMessageActionOnMobile
+      ? messagesWorkspaceHeaderActionsMobileHiddenOnNewClasses
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const scopeChromeClasses = chromeVisibility.hideScopeChromeOnMobile
+    ? messagesWorkspaceScopeChromeMobileHiddenOnNewClasses
+    : undefined
 
   const leftPaneClasses = [
     messagesWorkspaceLeftPaneClasses,
@@ -62,20 +79,22 @@ export function MessagesWorkspaceShell() {
     <div className={messagesWorkspaceRootClasses}>
       <div className={messagesWorkspaceHeaderClasses}>
         <div className="hidden md:block" aria-hidden="true" />
-        <div className={messagesWorkspaceHeaderActionsClasses}>
+        <div className={headerActionsClasses}>
           <Button type="button" onClick={handleNewMessage}>
             {MESSAGES_ACTION_COPY.newMessage}
           </Button>
         </div>
       </div>
 
-      <MessagesCampaignScopeChrome
-        scope={campaignScope.scope}
-        scopedCount={campaignScope.scopedCount}
-        hiddenCount={campaignScope.hiddenCount}
-        showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
-        onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
-      />
+      <div className={scopeChromeClasses}>
+        <MessagesCampaignScopeChrome
+          scope={campaignScope.scope}
+          scopedCount={campaignScope.scopedCount}
+          hiddenCount={campaignScope.hiddenCount}
+          showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
+          onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+        />
+      </div>
 
       <div className={messagesWorkspaceBodyClasses}>
         <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>

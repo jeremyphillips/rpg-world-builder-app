@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveDirectListVisibility,
   shouldShowLoadedScopeHint,
+  usesFullDatasetScopeCounts,
 } from './messages-direct-list-presentation.lib'
 
 describe('messages-direct-list-presentation', () => {
@@ -44,5 +45,24 @@ describe('messages-direct-list-presentation', () => {
         hasOutOfScopeConversation: true,
       }),
     ).toEqual({ showEmptyState: false, showConversationList: true })
+  })
+
+  it('treats hidden counts as full-dataset metadata independent of loaded page size', () => {
+    expect(
+      usesFullDatasetScopeCounts({
+        scopedCount: 42,
+        hiddenCount: 8,
+        loadedCount: 20,
+      }),
+    ).toBe(true)
+
+    expect(
+      shouldShowLoadedScopeHint({
+        scope: { campaignId: 'camp-1', campaignName: 'Stormwatch' },
+        hasMoreConversations: true,
+        scopedCount: 42,
+        loadedCount: 20,
+      }),
+    ).toBe(true)
   })
 })

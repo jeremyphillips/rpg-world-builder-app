@@ -18,6 +18,7 @@ export function useMessagesCampaignScopeEffects(
   const { data } = useConversations(routeState.campaignId)
   const [showInvalidScopeNotice, setShowInvalidScopeNotice] = React.useState(false)
   const strippedScopeRef = React.useRef<string | null>(null)
+  const previousCampaignIdRef = React.useRef(routeState.campaignId)
 
   React.useEffect(() => {
     if (!routeState.campaignId || !data?.scopeInvalid) return
@@ -45,6 +46,8 @@ export function useMessagesCampaignScopeEffects(
   ])
 
   React.useEffect(() => {
+    if (previousCampaignIdRef.current === routeState.campaignId) return
+    previousCampaignIdRef.current = routeState.campaignId
     strippedScopeRef.current = null
     setShowInvalidScopeNotice(false)
   }, [routeState.campaignId])

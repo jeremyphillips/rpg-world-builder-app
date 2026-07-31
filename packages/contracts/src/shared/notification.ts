@@ -22,6 +22,7 @@ export const notificationActionSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('conversation_detail'),
     conversationId: z.string(),
+    campaignId: z.string().optional(),
   }),
 ])
 

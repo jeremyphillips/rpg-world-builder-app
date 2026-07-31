@@ -11,6 +11,9 @@ export function resolveNotificationActionPath(
     case 'campaign_detail':
       return crossAppCampaignDetailPath(action.campaignId)
     case 'conversation_detail':
-      return ROUTES.messages.detail(action.conversationId)
+      return ROUTES.messages.detail(
+        action.conversationId,
+        action.campaignId ? { campaignId: action.campaignId } : undefined,
+      )
   }
 }
