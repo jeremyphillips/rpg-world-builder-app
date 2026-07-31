@@ -1,7 +1,7 @@
 'use client'
 
 import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
-import { Button, Tabs, TabsList, TabsTrigger } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
@@ -21,6 +21,7 @@ import {
 } from './messages-workspace-panes.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
 import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
+import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
 import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
@@ -29,6 +30,8 @@ export function MessagesWorkspaceShell() {
   const navigate = useNavigate()
   const newRouteMatch = useMatch({ path: 'new', end: true })
   const threadRouteMatch = useMatch({ path: ':conversationId', end: true })
+
+  useStripLegacyMessagesMode()
 
   const routeState = resolveMessagesWorkspaceRouteState({
     search: location.search,
@@ -45,10 +48,6 @@ export function MessagesWorkspaceShell() {
       : messagesWorkspaceLeftPaneMobileHiddenClasses,
   ].join(' ')
 
-  const handleModeChange = (mode: 'direct' | 'campaigns') => {
-    navigate(mode === 'campaigns' ? ROUTES.messages.campaigns : ROUTES.messages.list)
-  }
-
   const handleNewMessage = () => {
     navigate(
       ROUTES.messages.new({
@@ -61,38 +60,24 @@ export function MessagesWorkspaceShell() {
   return (
     <div className={messagesWorkspaceRootClasses}>
       <div className={messagesWorkspaceHeaderClasses}>
-        <Tabs
-          value={routeState.isCampaignsMode ? 'campaigns' : 'direct'}
-          onValueChange={(value) => handleModeChange(value as 'direct' | 'campaigns')}
-        >
-          <TabsList aria-label={MESSAGES_A11Y_COPY.messageMode}>
-            <TabsTrigger value="direct">{MESSAGES_ACTION_COPY.directTab}</TabsTrigger>
-            <TabsTrigger value="campaigns">{MESSAGES_ACTION_COPY.campaignsTab}</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        {!routeState.isCampaignsMode ? (
-          <div className={messagesWorkspaceHeaderActionsClasses}>
-            <Button type="button" onClick={handleNewMessage}>
-              {MESSAGES_ACTION_COPY.newMessage}
-            </Button>
-          </div>
-        ) : null}
+        <div className={messagesWorkspaceHeaderActionsClasses}>
+          <Button type="button" onClick={handleNewMessage}>
+            {MESSAGES_ACTION_COPY.newMessage}
+          </Button>
+        </div>
       </div>
 
-      {!routeState.isCampaignsMode ? (
-        <MessagesCampaignScopeChrome
-          scope={campaignScope.scope}
-          scopedCount={campaignScope.scopedCount}
-          hiddenCount={campaignScope.hiddenCount}
-          showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
-          onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
-        />
-      ) : null}
+      <MessagesCampaignScopeChrome
+        scope={campaignScope.scope}
+        scopedCount={campaignScope.scopedCount}
+        hiddenCount={campaignScope.hiddenCount}
+        showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
+        onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+      />
 
       <div className={messagesWorkspaceBodyClasses}>
         <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>
-          {routeState.isCampaignsMode ? null : routeState.isNewRoute ? (
+          {routeState.isNewRoute ? (
             <MessagesRecipientPickerPane campaignId={routeState.campaignId} />
           ) : (
             <MessagesDirectListPane

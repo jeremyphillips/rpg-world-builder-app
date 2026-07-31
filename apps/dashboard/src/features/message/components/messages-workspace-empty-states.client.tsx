@@ -43,14 +43,3 @@ export function MessagesNewNeutralRightPane() {
     </div>
   )
 }
-
-export function MessagesCampaignsPlaceholder() {
-  return (
-    <div className={messagesWorkspaceEmptyStateClasses}>
-      <IndexPageEmptyState
-        heading={MESSAGES_EMPTY_COPY.campaignsPlaceholderHeading}
-        body={MESSAGES_EMPTY_COPY.campaignsPlaceholderBody}
-      />
-    </div>
-  )
-}

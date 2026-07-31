@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -51,6 +52,32 @@ describe('NotificationBellMenuBody', () => {
       />,
     )
     expect(screen.getByRole('button', { name: 'Unread: Campaign invitation' })).toBeTruthy()
+  })
+
+  it('renders message footer links when provided', () => {
+    render(
+      <MemoryRouter>
+        <NotificationBellMenuBody
+          isLoading={false}
+          isError={false}
+          itemCount={0}
+          previewItems={[]}
+          messagesFooter={{
+            viewForCampaignHref: '/messages?campaignId=camp_1',
+            viewAllMessagesHref: '/messages',
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'View messages for this campaign' })).toHaveAttribute(
+      'href',
+      '/messages?campaignId=camp_1',
+    )
+    expect(screen.getByRole('link', { name: 'View all messages' })).toHaveAttribute(
+      'href',
+      '/messages',
+    )
   })
 
   it('calls retry from the error state', async () => {

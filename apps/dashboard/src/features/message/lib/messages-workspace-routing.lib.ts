@@ -1,11 +1,19 @@
-export const MESSAGES_MODE_QUERY = 'mode'
-export const MESSAGES_MODE_CAMPAIGNS = 'campaigns'
 export const MESSAGES_FROM_QUERY = 'from'
 export const MESSAGES_CAMPAIGN_ID_QUERY = 'campaignId'
 
-export function isMessagesCampaignsMode(search: string): boolean {
+const LEGACY_MESSAGES_MODE_QUERY = 'mode'
+const LEGACY_MESSAGES_MODE_CAMPAIGNS = 'campaigns'
+
+/** Strip retired `?mode=campaigns` query params; returns next search or null when unchanged. */
+export function stripLegacyMessagesCampaignsModeSearch(search: string): string | null {
   const params = new URLSearchParams(search)
-  return params.get(MESSAGES_MODE_QUERY) === MESSAGES_MODE_CAMPAIGNS
+  if (params.get(LEGACY_MESSAGES_MODE_QUERY) !== LEGACY_MESSAGES_MODE_CAMPAIGNS) {
+    return null
+  }
+
+  params.delete(LEGACY_MESSAGES_MODE_QUERY)
+  const query = params.toString()
+  return query ? `?${query}` : ''
 }
 
 export function getMessagesCampaignId(search: string): string | undefined {

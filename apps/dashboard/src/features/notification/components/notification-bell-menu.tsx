@@ -3,11 +3,13 @@
 import { NotificationBell, NotificationPopover, NotificationPopoverHeader } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
+import { useActiveCampaignId } from '@/features/campaign'
 
 import { NotificationBellMenuBody } from './notification-bell-menu-body'
 import { useNotificationBellMenu } from '../hooks/use-notification-bell-menu'
 
 export function NotificationBellMenu() {
+  const activeCampaignId = useActiveCampaignId()
   const {
     open,
     setOpen,
@@ -38,7 +40,13 @@ export function NotificationBellMenu() {
         isError={isError}
         itemCount={items.length}
         previewItems={previewItems}
-        viewAllHref={ROUTES.notifications.list}
+        notificationsViewAllHref={ROUTES.notifications.list}
+        messagesFooter={{
+          viewForCampaignHref: activeCampaignId
+            ? ROUTES.messages.listScoped(activeCampaignId)
+            : undefined,
+          viewAllMessagesHref: ROUTES.messages.list,
+        }}
         onRetry={() => {
           void refetch()
         }}

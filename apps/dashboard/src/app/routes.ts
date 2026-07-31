@@ -29,7 +29,6 @@ export const ROUTES = {
       if (!options?.campaignId) return `/messages/${conversationId}`
       return `/messages/${conversationId}?campaignId=${encodeURIComponent(options.campaignId)}`
     },
-    campaigns: '/messages?mode=campaigns',
   },
   campaign: {
     list: '/campaigns',

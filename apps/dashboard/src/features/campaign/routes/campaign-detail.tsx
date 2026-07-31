@@ -4,6 +4,7 @@ import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageLoadState } from '@/components/layout/page-load-state'
 
 import { CampaignDisplayName } from '../components/campaign-display-name'
+import { MessagesOverviewEntryActions } from '@/features/message'
 import { CampaignOverviewInvitationsSection } from '../components/campaign-overview-invitations-section'
 import { CampaignOverviewMembersSection } from '../components/campaign-overview-members-section'
 import { CampaignOverviewPartySection } from '../components/campaign-overview-party-section'
@@ -36,7 +37,10 @@ export function CampaignDetail() {
     <NarrowPage spacing="list">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <CampaignDisplayName display={display} surface="page" />
-        {canManage && campaignId ? <InviteMemberDialog campaignId={campaignId} /> : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {campaignId ? <MessagesOverviewEntryActions campaignId={campaignId} /> : null}
+          {canManage && campaignId ? <InviteMemberDialog campaignId={campaignId} /> : null}
+        </div>
       </div>
 
       <PageLoadState

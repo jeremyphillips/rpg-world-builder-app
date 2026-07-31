@@ -3,6 +3,16 @@
 Direct one-to-one conversations with campaign-member recipient discovery. TanStack
 Query polling plus Socket.IO cache patches keep list and active thread fresh.
 
+## Ownership vs campaign context
+
+Direct messaging is **globally owned** by the user workspace — not by a campaign.
+Optional `campaignId` on `/messages` URLs narrows discovery and presentation only;
+it never changes conversation identity, authz, or routes under `/campaigns/...`.
+
+Campaign-owned channels and a Direct | Campaigns mode switch are reserved for a
+future phase when the API can create and return `kind: 'campaign'` conversations.
+Until then, legacy `?mode=campaigns` URLs redirect to the unscoped workspace.
+
 ## Layout
 
 | Path                                   | Responsibility                                  |

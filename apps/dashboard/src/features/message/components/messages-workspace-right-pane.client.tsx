@@ -3,7 +3,6 @@
 import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import type { MessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 import {
-  MessagesCampaignsPlaceholder,
   MessagesDirectEmptyRightPane,
   MessagesNewNeutralRightPane,
 } from './messages-workspace-empty-states.client'
@@ -19,7 +18,6 @@ import {
 
 type MessagesWorkspaceRightPaneProps = Pick<
   MessagesWorkspaceRouteState,
-  | 'isCampaignsMode'
   | 'isNewRoute'
   | 'isThreadRoute'
   | 'routeConversationId'
@@ -65,8 +63,6 @@ export function MessagesWorkspaceRightPane(props: MessagesWorkspaceRightPaneProp
           <MessagesDirectEmptyRightPane />
         </div>
       ) : null}
-
-      {props.isCampaignsMode ? <MessagesCampaignsPlaceholder /> : null}
     </section>
   )
 }

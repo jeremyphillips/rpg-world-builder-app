@@ -20,16 +20,11 @@ export const MESSAGES_EMPTY_COPY = {
   selectConversationBody: 'Choose a conversation from the list or start a new message.',
   chooseRecipientHeading: 'Choose a recipient',
   chooseRecipientBody: 'Select someone from the list to start a direct message.',
-  campaignsPlaceholderHeading: 'Campaign channels coming soon',
-  campaignsPlaceholderBody:
-    'Campaign-wide messaging will live here. Direct messages are available in the Direct tab.',
 } as const
 
 export const MESSAGES_ACTION_COPY = {
   newMessage: 'New message',
   backToMessages: 'Back to messages',
-  directTab: 'Direct',
-  campaignsTab: 'Campaigns',
   startConversation: 'Start conversation',
   cancel: 'Cancel',
   send: 'Send',
@@ -64,7 +59,6 @@ export const MESSAGES_ERROR_COPY = {
 } as const
 
 export const MESSAGES_A11Y_COPY = {
-  messageMode: 'Message mode',
   conversations: 'Conversations',
   conversation: 'Conversation',
   messages: 'Messages',

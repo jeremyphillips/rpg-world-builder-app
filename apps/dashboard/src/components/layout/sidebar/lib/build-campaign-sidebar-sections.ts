@@ -52,6 +52,11 @@ function buildCampaignSectionItems(
       label: 'Sessions',
       href: ROUTES.campaign.sessions(campaignId),
     }),
+    sidebarNavItem({
+      id: 'messages',
+      label: 'Messages',
+      href: ROUTES.messages.listScoped(campaignId),
+    }),
   )
 
   return items

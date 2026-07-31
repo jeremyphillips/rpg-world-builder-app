@@ -39,10 +39,18 @@ describe('buildCampaignSidebarSections', () => {
     expect(sections.map((section) => section.id)).toEqual(['campaign', 'world', 'gameLibrary'])
 
     const campaignItems = sections.find((section) => section.id === 'campaign')!.items
-    expect(campaignItems.map((item) => item.label)).toEqual(['Overview', 'Characters', 'Sessions'])
+    expect(campaignItems.map((item) => item.label)).toEqual([
+      'Overview',
+      'Characters',
+      'Sessions',
+      'Messages',
+    ])
     expect(campaignItems[0]).toMatchObject({
       href: ROUTES.campaign.detail(campaignId),
       end: true,
+    })
+    expect(campaignItems.at(-1)).toMatchObject({
+      href: ROUTES.messages.listScoped(campaignId),
     })
 
     const worldItems = sections.find((section) => section.id === 'world')!.items
@@ -75,7 +83,7 @@ describe('buildCampaignSidebarSections', () => {
       .find((section) => section.id === 'campaign')!
       .items.map((item) => item.label)
 
-    expect(campaignItems).toEqual(['Overview', 'Sessions'])
+    expect(campaignItems).toEqual(['Overview', 'Sessions', 'Messages'])
   })
 
   it('includes Manage only when the viewer can manage the campaign', () => {
