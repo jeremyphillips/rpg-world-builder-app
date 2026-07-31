@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Text } from './text'
+import { notificationPreviewItemVariants } from './notification-preview-item.variants'
 
 export type NotificationPreviewItemProps = {
   title: React.ReactNode
@@ -11,7 +12,6 @@ export type NotificationPreviewItemProps = {
   timestamp: React.ReactNode
   unread?: boolean
   icon?: React.ReactNode
-  actionLabel?: string
   onActivate?: () => void
   className?: string
 }
@@ -22,7 +22,6 @@ export function NotificationPreviewItem({
   timestamp,
   unread = false,
   icon,
-  actionLabel,
   onActivate,
   className,
 }: NotificationPreviewItemProps) {
@@ -48,13 +47,8 @@ export function NotificationPreviewItem({
           </Text>
         </div>
         {description ? (
-          <Text as="p" variant="muted" className="text-sm">
+          <Text as="p" variant="muted" className="line-clamp-2 text-sm">
             {description}
-          </Text>
-        ) : null}
-        {actionLabel ? (
-          <Text as="p" variant="muted" className="text-xs font-body-emphasis">
-            {actionLabel}
           </Text>
         ) : null}
       </div>
@@ -77,11 +71,7 @@ export function NotificationPreviewItem({
       type="button"
       onClick={onActivate}
       aria-label={activateLabel}
-      className={cn(
-        'w-full px-3 py-2.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        unread ? 'bg-muted' : 'bg-background',
-        className,
-      )}
+      className={cn(notificationPreviewItemVariants({ unread }), className)}
     >
       {content}
     </button>

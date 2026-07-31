@@ -93,9 +93,9 @@ is present, navigation returns to that conversation with `campaignId` preserved.
 
 ### Thread header shared campaigns
 
-Peer name is the primary heading. Shared campaigns render as inline links (1–2) or
-first-two links plus a **+N more** overflow trigger (3+). Overflow uses a plain-text
-tooltip (no links inside tooltips); convert to Popover when available.
+Peer name is the primary heading. Shared campaigns render via `CampaignDisplayNameList`
+(`surface="inlineMuted"`) — one campaign icon with comma-separated linked names built
+from `buildMessageThreadSharedCampaignDisplay`.
 
 Draft threads derive shared campaigns via `resolveRecipientSharedCampaigns` from the
 recipients response — do not filter `data.campaigns` ad hoc in pane components.
@@ -204,8 +204,9 @@ navigation (`resolve-notification-action.ts`). An optional `campaignId` on the
 action preserves active scope when known. Cross-app paths remain in
 `crossAppConversationPath` for public/email links.
 
-Bell **footer/chrome** surfaces campaign/global message entry links
-(`MessagesCampaignEntryLinks`, `MessagesGlobalEntryLink`). Per-notification rows
+Bell **footer/chrome** may surface a campaign-scoped message link when the viewer
+is on a campaign route (`/campaigns/:campaignId/...`). Global message shortcuts are
+not duplicated in the bell — sidebar nav owns `/messages`. Per-notification rows
 do not duplicate those actions.
 
 Folder layout and the feature-boundary rule are documented in

@@ -5,15 +5,19 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
-import { resolveNotificationActionPath } from '../lib/resolve-notification-action'
+import { activateNotification } from '../lib/activate-notification'
+import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import { useNotificationActions } from './use-notification-actions'
 import { useNotificationInbox } from './use-notification-inbox'
 
 const NOTIFICATION_ACTION_FAILED_MESSAGE = 'Could not update notification.'
 
+export type NotificationInboxFilter = 'all' | 'unread'
+
 export function useNotificationInboxPage() {
   const navigate = useNavigate()
+  const [filter, setFilter] = React.useState<NotificationInboxFilter>('all')
   const {
     data,
     isPending,
@@ -32,17 +36,24 @@ export function useNotificationInboxPage() {
   )
   const unreadCount = data?.pages[0]?.unreadCount ?? 0
 
+  const filteredItems = React.useMemo(() => {
+    if (filter === 'unread') {
+      return items.filter((item) => !item.readAt)
+    }
+    return items
+  }, [filter, items])
+
   const handleActivate = React.useCallback(
     (notification: Notification) => {
-      void markRead.mutateAsync(notification.id).catch(() => {
-        toast.error(NOTIFICATION_ACTION_FAILED_MESSAGE)
-        void refetch()
+      activateNotification({
+        notification,
+        markRead,
+        navigate,
+        onFailure: () => {
+          toast.error(NOTIFICATION_ACTION_FAILED_MESSAGE)
+          void refetch()
+        },
       })
-
-      const path = resolveNotificationActionPath(notification.action)
-      if (!path) return
-
-      navigate(path)
     },
     [markRead, navigate, refetch],
   )
@@ -55,8 +66,8 @@ export function useNotificationInboxPage() {
   }, [markAllRead, refetch])
 
   const previewItems = React.useMemo(
-    () => mapNotificationsToPreviewItems(items, handleActivate),
-    [handleActivate, items],
+    () => mapNotificationsToPreviewItems(filteredItems, handleActivate),
+    [filteredItems, handleActivate],
   )
 
   const handleLoadMore = React.useCallback(() => {
@@ -66,11 +77,14 @@ export function useNotificationInboxPage() {
   }, [fetchNextPage])
 
   return {
+    filter,
+    setFilter,
     isPending,
     isError,
     refetch,
     previewItems,
-    itemCount: items.length,
+    itemCount: filteredItems.length,
+    totalItemCount: items.length,
     unreadCount,
     handleMarkAllRead,
     markAllReadPending: markAllRead.isPending,
@@ -78,5 +92,6 @@ export function useNotificationInboxPage() {
     isFetchingNextPage,
     isFetchNextPageError,
     handleLoadMore,
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
   }
 }

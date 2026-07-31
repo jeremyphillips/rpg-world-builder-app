@@ -19,7 +19,28 @@ a fallback while connected.
 | `lib/resolve-notification-action.ts`    | Maps persisted action kinds to app paths    |
 
 Presentation primitives (`NotificationBell`, popover, preview list/item, empty/loading)
-live in `@rpg/ui` and stay domain-agnostic.
+live in `@rpg/ui` and stay domain-agnostic. Rows are whole-row click targets — no
+separate Open action. Unread rows use selected-row chrome; read rows use hover
+surface tokens.
+
+## Bell footer
+
+The bell footer always exposes **View all notifications**. When the current URL
+includes a campaign route param (`/campaigns/:campaignId/...`), a small contextual
+**Messages** section appears above the footer with **View messages for this
+campaign** only. Global message shortcuts are intentionally omitted — sidebar nav
+owns `/messages`.
+
+Row click marks read (fire-and-forget) and navigates when the notification action
+resolves to a path (`conversation_detail`, `campaign_detail`, etc.).
+
+## Inbox page (`/notifications`)
+
+Uses the same compact preview list as the bell (wider column, bordered list,
+subtle dividers). Header matches bell chrome: title + mark-all, description copy,
+and an All / Unread segmented filter (client-side on loaded pages). Empty filtered
+state: **You're all caught up.** Pagination uses **Load more** — no cards or
+archive controls.
 
 ## Polling rules
 

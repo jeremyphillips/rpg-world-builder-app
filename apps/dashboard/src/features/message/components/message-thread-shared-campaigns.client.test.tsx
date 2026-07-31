@@ -9,8 +9,8 @@ import { MessageThreadSharedCampaigns } from './message-thread-shared-campaigns.
 import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 
 describe('MessageThreadSharedCampaigns', () => {
-  it('renders inline linked campaign names for one or two campaigns', () => {
-    renderWithProviders(
+  it('renders a campaign icon and comma-separated linked campaign names', () => {
+    const { container } = renderWithProviders(
       <MessageThreadSharedCampaigns
         sharedCampaigns={[
           { campaignId: 'camp_1', campaignName: 'Curse of Strahd' },
@@ -19,6 +19,7 @@ describe('MessageThreadSharedCampaigns', () => {
       />,
     )
 
+    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Curse of Strahd' })).toHaveAttribute(
       'href',
       ROUTES.campaign.detail('camp_1'),
@@ -27,6 +28,7 @@ describe('MessageThreadSharedCampaigns', () => {
       'href',
       ROUTES.campaign.detail('camp_2'),
     )
+    expect(container.textContent).toContain('Curse of Strahd, Lost Mine')
   })
 
   it('renders an overflow trigger with a plain-text tooltip for three or more campaigns', () => {

@@ -1,15 +1,15 @@
 'use client'
 
-import { Button } from '@rpg/ui'
-
-import { IndexPageIntro } from '@/components/layout/index-page-intro'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
+import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
 import { useNotificationInboxPage } from '../hooks/use-notification-inbox-page'
 
 export function NotificationsList() {
   const {
+    filter,
+    setFilter,
     isPending,
     isError,
     refetch,
@@ -22,24 +22,17 @@ export function NotificationsList() {
     isFetchingNextPage,
     isFetchNextPageError,
     handleLoadMore,
+    emptyTitle,
   } = useNotificationInboxPage()
 
   return (
-    <NarrowPage spacing="relaxed">
-      <IndexPageIntro
-        title="Notifications"
-        description="Your notification history beyond the latest bell preview."
-        actions={
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleMarkAllRead}
-            disabled={unreadCount === 0 || markAllReadPending}
-          >
-            Mark all as read
-          </Button>
-        }
-        showActionsInHeader={itemCount > 0}
+    <NarrowPage spacing="compact">
+      <NotificationInboxHeader
+        unreadCount={unreadCount}
+        filter={filter}
+        onFilterChange={setFilter}
+        onMarkAllRead={handleMarkAllRead}
+        markAllReadPending={markAllReadPending}
       />
 
       <NotificationInboxBody
@@ -47,6 +40,7 @@ export function NotificationsList() {
         isError={isError}
         itemCount={itemCount}
         previewItems={previewItems}
+        emptyTitle={emptyTitle}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         isFetchNextPageError={isFetchNextPageError}

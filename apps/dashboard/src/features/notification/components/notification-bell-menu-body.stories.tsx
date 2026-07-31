@@ -5,20 +5,18 @@ import { NotificationBellMenuBody } from './notification-bell-menu-body'
 const previewItems = [
   {
     id: 'notification-1',
-    title: 'Campaign invitation',
-    description: 'Ava invited you to join Stormwatch. Open the invite email to accept.',
-    timestamp: '2 minutes ago',
+    title: 'New message',
+    description: 'Bobby V: blah',
+    timestamp: '1 hour ago',
     unread: true,
-    actionLabel: undefined,
     onActivate: () => undefined,
   },
   {
     id: 'notification-2',
     title: 'Invitation accepted',
     description: 'Blake accepted your invitation to Harbor.',
-    timestamp: '1 hour ago',
+    timestamp: '2 hours ago',
     unread: false,
-    actionLabel: 'Open',
     onActivate: () => undefined,
   },
 ] as const
@@ -46,6 +44,7 @@ export const Loading: Story = {
     isError: false,
     itemCount: 0,
     previewItems: [],
+    notificationsViewAllHref: '/notifications',
   },
 }
 
@@ -55,6 +54,7 @@ export const Error: Story = {
     isError: true,
     itemCount: 0,
     previewItems: [],
+    notificationsViewAllHref: '/notifications',
     onRetry: () => undefined,
   },
 }
@@ -65,6 +65,7 @@ export const Empty: Story = {
     isError: false,
     itemCount: 0,
     previewItems: [],
+    notificationsViewAllHref: '/notifications',
   },
 }
 
@@ -74,5 +75,17 @@ export const WithItems: Story = {
     isError: false,
     itemCount: previewItems.length,
     previewItems: [...previewItems],
+    notificationsViewAllHref: '/notifications',
+  },
+}
+
+export const WithCampaignMessagesSection: Story = {
+  args: {
+    isLoading: false,
+    isError: false,
+    itemCount: previewItems.length,
+    previewItems: [...previewItems],
+    notificationsViewAllHref: '/notifications',
+    campaignMessagesHref: '/messages?campaignId=camp_1',
   },
 }

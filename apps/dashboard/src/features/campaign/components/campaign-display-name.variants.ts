@@ -57,3 +57,33 @@ export const campaignDisplayNameIconVariants = cva('shrink-0', {
 })
 
 export type CampaignDisplayNameVariantProps = VariantProps<typeof campaignDisplayNameVariants>
+
+/** One leading icon with comma-separated linked names (e.g. thread header shared campaigns). */
+export const campaignDisplayNameListVariants = cva('inline-flex min-w-0 items-center gap-2', {
+  variants: {
+    surface: {
+      inlineMuted: 'text-sm text-muted-foreground',
+    },
+  },
+  defaultVariants: {
+    surface: 'inlineMuted',
+  },
+})
+
+export const campaignDisplayNameListLinkVariants = cva(
+  'inline text-primary underline-offset-4 hover:underline',
+  {
+    variants: {
+      surface: {
+        inlineMuted: '',
+      },
+    },
+    defaultVariants: {
+      surface: 'inlineMuted',
+    },
+  },
+)
+
+export type CampaignDisplayListSurface = NonNullable<
+  VariantProps<typeof campaignDisplayNameListVariants>['surface']
+>

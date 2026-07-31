@@ -1,10 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildMessageThreadSharedCampaignDisplay,
   formatMessageThreadSharedCampaignOverflowTooltip,
   formatMessageThreadSharedCampaignOverflowTriggerLabel,
   resolveMessageThreadSharedCampaignsPresentation,
 } from './message-thread-shared-campaigns-presentation.lib'
+
+describe('buildMessageThreadSharedCampaignDisplay', () => {
+  it('maps conversation shared campaigns to the campaign display VM', () => {
+    expect(
+      buildMessageThreadSharedCampaignDisplay({
+        campaignId: 'camp_1',
+        campaignName: '  Curse of Strahd  ',
+      }),
+    ).toEqual({
+      id: 'camp_1',
+      name: 'Curse of Strahd',
+      imageUrl: null,
+    })
+  })
+})
 
 describe('resolveMessageThreadSharedCampaignsPresentation', () => {
   const campaigns = [

@@ -6,63 +6,55 @@ import {
   NotificationErrorState,
   NotificationLoadingState,
   NotificationPreviewList,
+  Text,
   buttonVariants,
 } from '@rpg/ui'
 
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
+import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
-type NotificationBellMessagesFooterProps = {
-  viewForCampaignHref?: string
-  viewAllMessagesHref: string
+type NotificationBellCampaignMessagesSectionProps = {
+  viewForCampaignHref: string
 }
 
-function NotificationBellMessagesFooter({
+function NotificationBellCampaignMessagesSection({
   viewForCampaignHref,
-  viewAllMessagesHref,
-}: NotificationBellMessagesFooterProps) {
+}: NotificationBellCampaignMessagesSectionProps) {
   const linkClassName = `${buttonVariants({ variant: 'ghost', size: 'sm' })} w-full justify-start`
 
   return (
-    <div className="flex flex-col gap-1">
-      {viewForCampaignHref ? (
-        <Link to={viewForCampaignHref} className={linkClassName}>
-          {MESSAGES_ACTION_COPY.viewForCampaign}
-        </Link>
-      ) : null}
-      <Link to={viewAllMessagesHref} className={linkClassName}>
-        {MESSAGES_ACTION_COPY.viewAll}
+    <div className="space-y-1">
+      <Text as="p" variant="caption" className="px-2 uppercase tracking-wide">
+        {NOTIFICATION_COPY.messagesSectionHeading}
+      </Text>
+      <Link to={viewForCampaignHref} className={linkClassName}>
+        {MESSAGES_ACTION_COPY.viewForCampaign}
       </Link>
     </div>
   )
 }
 
 type NotificationBellMenuFooterProps = {
-  itemCount: number
-  notificationsViewAllHref?: string
-  messagesFooter?: NotificationBellMessagesFooterProps
+  notificationsViewAllHref: string
+  campaignMessagesHref?: string
 }
 
 function NotificationBellMenuFooter({
-  itemCount,
   notificationsViewAllHref,
-  messagesFooter,
+  campaignMessagesHref,
 }: NotificationBellMenuFooterProps) {
-  if (!messagesFooter && !(notificationsViewAllHref && itemCount > 0)) {
-    return null
-  }
-
   const linkClassName = `${buttonVariants({ variant: 'ghost', size: 'sm' })} w-full justify-start`
 
   return (
     <div className="space-y-2 border-t border-border p-2">
-      {messagesFooter ? <NotificationBellMessagesFooter {...messagesFooter} /> : null}
-      {notificationsViewAllHref && itemCount > 0 ? (
-        <Link to={notificationsViewAllHref} className={linkClassName}>
-          View all
-        </Link>
+      {campaignMessagesHref ? (
+        <NotificationBellCampaignMessagesSection viewForCampaignHref={campaignMessagesHref} />
       ) : null}
+      <Link to={notificationsViewAllHref} className={linkClassName}>
+        {NOTIFICATION_COPY.viewAllNotifications}
+      </Link>
     </div>
   )
 }
@@ -72,8 +64,8 @@ type NotificationBellMenuBodyProps = {
   isError: boolean
   itemCount: number
   previewItems: ReturnType<typeof mapNotificationsToPreviewItems>
-  notificationsViewAllHref?: string
-  messagesFooter?: NotificationBellMessagesFooterProps
+  notificationsViewAllHref: string
+  campaignMessagesHref?: string
   onRetry?: () => void
 }
 
@@ -83,14 +75,13 @@ export function NotificationBellMenuBody({
   itemCount,
   previewItems,
   notificationsViewAllHref,
-  messagesFooter,
+  campaignMessagesHref,
   onRetry,
 }: NotificationBellMenuBodyProps) {
   const footer = (
     <NotificationBellMenuFooter
-      itemCount={itemCount}
       notificationsViewAllHref={notificationsViewAllHref}
-      messagesFooter={messagesFooter}
+      campaignMessagesHref={campaignMessagesHref}
     />
   )
 
@@ -106,7 +97,7 @@ export function NotificationBellMenuBody({
   if (itemCount === 0) {
     return (
       <>
-        <NotificationEmptyState />
+        <NotificationEmptyState title={NOTIFICATION_COPY.caughtUpTitle} description="" />
         {footer}
       </>
     )

@@ -1,6 +1,7 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
 export { CampaignDisplayName } from './components/campaign-display-name'
+export { CampaignDisplayNameList } from './components/campaign-display-name-list.client'
 export {
   CampaignTopbarTitle,
   CampaignTopbarTitleError,

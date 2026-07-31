@@ -25,12 +25,12 @@ export const messagesWorkspacePreviewEyebrowClasses = 'px-4 pt-3'
 
 export const messagesWorkspaceListChromeInsetClasses = 'px-3'
 
-export const messagesWorkspaceMessageGroupClasses = 'flex flex-col gap-1'
+export const messagesWorkspaceMessageGroupClasses = 'flex max-w-[85%] flex-col gap-1'
 
 export const messagesWorkspaceMessageThreadClasses = 'flex flex-col gap-6'
 
 export const messagesWorkspaceMessageBubbleClasses =
-  'inline-block max-w-[85%] rounded-lg bg-muted px-3 py-2 text-left'
+  'inline-block rounded-lg bg-muted px-3 py-2 text-left'
 
 export const messagesWorkspaceMetadataClasses = 'text-xs text-muted-foreground'
 

@@ -1,9 +1,20 @@
 import type { ConversationSharedCampaign } from '@rpg/contracts'
 
+import { buildCampaignDisplay, type CampaignDisplayVM } from '@/features/campaign'
+
 export type MessageThreadSharedCampaignsPresentation = {
   visible: ConversationSharedCampaign[]
   overflow: ConversationSharedCampaign[]
   overflowCount: number
+}
+
+export function buildMessageThreadSharedCampaignDisplay(
+  campaign: ConversationSharedCampaign,
+): CampaignDisplayVM {
+  return buildCampaignDisplay({
+    id: campaign.campaignId,
+    name: campaign.campaignName,
+  })
 }
 
 export function resolveMessageThreadSharedCampaignsPresentation(
@@ -29,5 +40,7 @@ export function formatMessageThreadSharedCampaignOverflowTriggerLabel(
 export function formatMessageThreadSharedCampaignOverflowTooltip(
   overflow: ConversationSharedCampaign[],
 ): string {
-  return overflow.map((campaign) => campaign.campaignName).join('\n')
+  return overflow
+    .map((campaign) => buildMessageThreadSharedCampaignDisplay(campaign).name)
+    .join('\n')
 }
