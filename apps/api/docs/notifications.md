@@ -58,19 +58,43 @@ Dedupe keys use `campaignInviteDedupeKey(inviteId, phase)` from
 
 All routes require auth and are recipient-scoped.
 
-- `GET /api/notifications?limit=&cursor=` — recent list + `unreadCount`
+- `GET /api/notifications?limit=&cursor=&unread=&category=&campaignId=` — filtered
+  recent list + **global** `unreadCount`
 - `GET /api/notifications/unread-count` — lightweight count (not used by topbar)
 - `PATCH /api/notifications/:notificationId/read`
-- `POST /api/notifications/mark-all-read`
+- `POST /api/notifications/mark-all-read` — marks **all** unread for the recipient
+  (not scoped to list filters)
 - `POST /api/notifications/mark-seen` — body `{ ids: string[] }` for rendered rows only
+
+### List query filters
+
+Optional query params on `GET /api/notifications` (`notificationListQuerySchema`):
+
+| Param        | Effect                                                                                        |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| `unread`     | When `true`, only rows with `readAt` unset                                                    |
+| `category`   | `campaign` \| `message` — matches types via classification vocabulary                         |
+| `campaignId` | Keep only notifications that carry that id on `action.campaignId` **or** `payload.campaignId` |
+
+**Campaign exclusion:** when `campaignId` is set, notifications **without** that
+campaign id (missing or different) are excluded. Do not treat “no campaign” rows as
+in-scope for a scoped inbox.
+
+**`unreadCount`:** always the recipient’s global unread total. List filters change
+`items` / `nextCursor` only — they do not change `unreadCount`.
+
+Dashboard inbox wires these through URL-synced filters; do **not** client-filter
+cursor pages on the client.
 
 ## Deferred gaps
 
-| Gap                                | Status                                                                                                                              |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Dashboard inbox pagination         | Bell uses a finite first page; `/notifications` uses cursor pages via `useNotificationInbox`.                                       |
-| `message.direct.received` producer | Published on direct message send with dedupe key `message-direct:${conversationId}`; conversation mark-read clears the deduped row. |
-| `archivedAt` / pruning             | Field is stored and excluded from active queries; no archive API or pruning job yet.                                                |
+| Gap                    | Status                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `archivedAt` / pruning | Field is stored and excluded from active queries; no archive API or pruning job yet. |
+
+Shipped (not deferred): dashboard inbox cursor pagination; `message.direct.received`
+producer (`message-direct:${conversationId}` dedupe; conversation mark-read clears the
+row); list filters above.
 
 ## Retention
 

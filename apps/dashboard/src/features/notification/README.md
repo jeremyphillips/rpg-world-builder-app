@@ -4,19 +4,28 @@ In-app notifications surfaced in the topbar bell menu and `/notifications` inbox
 TanStack Query polling plus Socket.IO cache patches keep data fresh; polling remains
 a fallback while connected.
 
+API publish/list contracts (including list filters) live in
+[`apps/api/docs/notifications.md`](../../../../api/docs/notifications.md).
+
 ## Layout
 
-| Path                                    | Responsibility                              |
-| --------------------------------------- | ------------------------------------------- |
-| `api/notifications.ts`                  | Same-origin notification API client         |
-| `hooks/use-notifications.ts`            | Bell list query (`unreadCount` included)    |
-| `hooks/use-notification-inbox.ts`       | Infinite inbox query (separate cache shape) |
-| `hooks/use-notification-actions.ts`     | Mark read / all read / seen mutations       |
-| `components/notification-bell-menu.tsx` | Wires `@rpg/ui` primitives + navigation     |
-| `routes/notifications-list.tsx`         | Paginated notification history              |
-| `lib/notification-query-keys.ts`        | Bell + inbox query keys                     |
-| `lib/notification-cache.ts`             | Bell cache helpers + version guards         |
-| `lib/resolve-notification-action.ts`    | Maps persisted action kinds to app paths    |
+| Path                                              | Responsibility                                                |
+| ------------------------------------------------- | ------------------------------------------------------------- |
+| `api/notifications.ts`                            | Same-origin notification API client                           |
+| `hooks/use-notifications.ts`                      | Bell list query (`unreadCount` included)                      |
+| `hooks/use-notification-inbox.ts`                 | Infinite inbox query (filter-keyed cache)                     |
+| `hooks/use-notification-inbox-page.ts`            | Inbox page state: filters, mark-all, load more                |
+| `hooks/use-notification-actions.ts`               | Mark read / all read / seen mutations                         |
+| `hooks/use-notification-bell-menu.ts`             | Bell open/seen + mark-all wiring                              |
+| `components/notification-bell-menu.tsx`           | Wires `@rpg/ui` primitives + navigation                       |
+| `components/notification-inbox-header.client.tsx` | Description + `PrimaryFilterPanel` (Unread / Campaign / Type) |
+| `components/notification-inbox-body.client.tsx`   | Preview list + load more                                      |
+| `routes/notifications-list.tsx`                   | Paginated notification history                                |
+| `lib/notification-inbox-filter-schema.ts`         | Inbox `FilterSchema` (URL-synced server filters)              |
+| `lib/notification-query-keys.ts`                  | Bell + inbox query keys                                       |
+| `lib/notification-cache.ts`                       | Bell cache helpers + version guards                           |
+| `lib/resolve-notification-action.ts`              | Maps persisted action kinds to app paths                      |
+| `lib/notification-copy.ts`                        | User-facing copy                                              |
 
 Presentation primitives (`NotificationBell`, popover, preview list/item, empty/loading)
 live in `@rpg/ui` and stay domain-agnostic. Rows are whole-row click targets — no
@@ -37,10 +46,25 @@ resolves to a path (`conversation_detail`, `campaign_detail`, etc.).
 ## Inbox page (`/notifications`)
 
 Uses the same compact preview list as the bell (wider column, bordered list,
-subtle dividers). Page header holds title + mark-all; description and a compact
-compact inline `FilterBar` (Unread only, Campaign, Type) drive URL-synced server filters.
-Optional active chips summarize modified filters. Empty filtered state: **You're all
-caught up.** Pagination uses **Load more** — no cards or archive controls.
+subtle dividers). Page header holds title + **Mark all as read**; description and a
+`PrimaryFilterPanel` (Unread only, Campaign, Type) drive URL-synced **server**
+filters via `GET /api/notifications` (`unread`, `category`, `campaignId`). Optional
+active chips summarize modified filters. Type options use existing notification
+category vocab (`campaign` | `message`) — no dashboard-local option copy. Empty
+filtered state: **You're all caught up.** Pagination uses **Load more**.
+
+Do **not** client-filter cursor pages — incomplete loaded sets produce misleading
+empties.
+
+Invalid `campaignId` uses the shared `useInvalidCampaignScopeNotice` /
+`INVALID_CAMPAIGN_SCOPE_COPY` path (same quiet notice as Messages).
+
+### Global vs filtered
+
+- List **`unreadCount`** in responses is always **recipient-global** — it ignores
+  active inbox filters.
+- **Mark all as read** marks every unread notification for the recipient — it is
+  not scoped to the current Unread / Campaign / Type filters.
 
 ## Polling rules
 
@@ -53,10 +77,10 @@ caught up.** Pagination uses **Load more** — no cards or archive controls.
 
 ## Bell vs inbox
 
-| Surface                | Query key                       | Shape                 |
-| ---------------------- | ------------------------------- | --------------------- |
-| Bell popover           | `notificationsListQueryKey(10)` | Finite first page     |
-| `/notifications` inbox | `notificationsInboxQueryKey`    | Infinite cursor pages |
+| Surface                | Query key                             | Shape                 |
+| ---------------------- | ------------------------------------- | --------------------- |
+| Bell popover           | `notificationsListQueryKey(10)`       | Finite first page     |
+| `/notifications` inbox | `notificationsInboxQueryKey(filters)` | Infinite cursor pages |
 
 Socket upserts patch the bell directly; the inbox is invalidated when mounted.
 Mutations patch the bell and invalidate the inbox when cached.
@@ -69,10 +93,12 @@ requests retry on the next effect pass; closing the popover clears the tracked I
 
 ## Deferred gaps
 
-| Gap                                | Status                                                                             |
-| ---------------------------------- | ---------------------------------------------------------------------------------- |
-| `message.direct.received` producer | Published on direct message send; conversation mark-read clears the deduped row.   |
-| `archivedAt` / archive controls    | Field is stored and filtered from queries; no archive endpoint or pruning job yet. |
+| Gap                             | Status                                                                             |
+| ------------------------------- | ---------------------------------------------------------------------------------- |
+| `archivedAt` / archive controls | Field is stored and filtered from queries; no archive endpoint or pruning job yet. |
+
+Shipped (not deferred): `message.direct.received` producer; inbox cursor pagination +
+Load more; list filters (`unread` / `category` / `campaignId`).
 
 ## Adding a notification type
 
@@ -82,6 +108,9 @@ requests retry on the next effect pass; closing the popover clears the tracked I
    commits (best-effort).
 4. If the type needs navigation, add a contracts action kind and map it in
    `resolve-notification-action.ts`.
+5. If it needs a new high-level Type filter bucket, extend
+   `NOTIFICATION_CATEGORIES` / entries and classification — do not invent dashboard-only
+   category labels.
 
 Folder layout and the feature-boundary rule are documented in
 [feature-conventions](../../../docs/feature-conventions.md).
