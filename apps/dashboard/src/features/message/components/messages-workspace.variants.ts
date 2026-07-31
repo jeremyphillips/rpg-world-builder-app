@@ -4,7 +4,7 @@ export const messagesWorkspaceRootClasses = 'flex min-h-0 flex-1 flex-col gap-4'
 export const messagesWorkspaceHeaderClasses =
   'grid shrink-0 grid-cols-1 gap-3 md:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] md:gap-0'
 
-export const messagesWorkspaceHeaderActionsClasses = 'flex items-center justify-center gap-2'
+export const messagesWorkspaceHeaderActionsClasses = 'flex items-center justify-end gap-2'
 
 export const messagesWorkspaceBodyClasses =
   'grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] md:gap-0 md:rounded-lg md:border md:border-border'

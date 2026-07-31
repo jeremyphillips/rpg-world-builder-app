@@ -1,5 +1,7 @@
 export const MESSAGES_FROM_QUERY = 'from'
 export const MESSAGES_CAMPAIGN_ID_QUERY = 'campaignId'
+export const MESSAGES_NEW_ROUTE_SEGMENT = 'new'
+export const MESSAGES_ROUTE_SEGMENT = 'messages'
 
 const LEGACY_MESSAGES_MODE_QUERY = 'mode'
 const LEGACY_MESSAGES_MODE_CAMPAIGNS = 'campaigns'
@@ -14,6 +16,18 @@ export function stripLegacyMessagesCampaignsModeSearch(search: string): string |
   params.delete(LEGACY_MESSAGES_MODE_QUERY)
   const query = params.toString()
   return query ? `?${query}` : ''
+}
+
+/** True when the active child route is `/messages/new` (basename-safe). */
+export function isMessagesNewRoute(pathname: string): boolean {
+  const segments = pathname.split('/').filter(Boolean)
+  const messagesIndex = segments.lastIndexOf(MESSAGES_ROUTE_SEGMENT)
+
+  return (
+    messagesIndex !== -1 &&
+    segments[messagesIndex + 1] === MESSAGES_NEW_ROUTE_SEGMENT &&
+    segments.length === messagesIndex + 2
+  )
 }
 
 export function getMessagesCampaignId(search: string): string | undefined {

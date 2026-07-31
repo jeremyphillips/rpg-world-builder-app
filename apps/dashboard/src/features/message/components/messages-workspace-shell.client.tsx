@@ -1,6 +1,6 @@
 'use client'
 
-import { Outlet, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -23,13 +23,14 @@ import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.clie
 import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
 import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
 import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import { isMessagesNewRoute } from '../lib/messages-workspace-routing.lib'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
 export function MessagesWorkspaceShell() {
   const location = useLocation()
   const navigate = useNavigate()
   const { conversationId } = useParams<{ conversationId?: string }>()
-  const isNewRoute = useMatch({ path: 'new', end: true }) !== null
+  const isNewRoute = isMessagesNewRoute(location.pathname)
 
   useStripLegacyMessagesMode()
 
