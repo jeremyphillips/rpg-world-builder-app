@@ -60,7 +60,7 @@ export function MessagesWorkspaceRightPane(props: MessagesWorkspaceRightPaneProp
 
       {props.showDirectEmptyRight ? (
         <div className="hidden md:flex md:flex-1 md:flex-col">
-          <MessagesDirectEmptyRightPane />
+          <MessagesDirectEmptyRightPane campaignId={props.campaignId} />
         </div>
       ) : null}
     </section>

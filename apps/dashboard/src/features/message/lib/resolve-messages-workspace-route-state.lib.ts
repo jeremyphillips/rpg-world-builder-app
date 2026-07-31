@@ -18,11 +18,12 @@ export type MessagesWorkspaceRouteState = {
 
 export function resolveMessagesWorkspaceRouteState(input: {
   search: string
-  newRouteMatch: unknown
-  threadRouteMatch: { params: { conversationId?: string } } | null
+  isNewRoute: boolean
+  /** Child `:conversationId` param — only set when the thread child route is active. */
+  conversationId?: string
 }): MessagesWorkspaceRouteState {
-  const isNewRoute = Boolean(input.newRouteMatch)
-  const routeConversationId = input.threadRouteMatch?.params.conversationId
+  const isNewRoute = input.isNewRoute
+  const routeConversationId = isNewRoute ? undefined : input.conversationId
   const isThreadRoute = Boolean(routeConversationId)
   const fromConversationId = getMessagesFromConversationId(input.search)
   const activeConversationId = routeConversationId ?? fromConversationId

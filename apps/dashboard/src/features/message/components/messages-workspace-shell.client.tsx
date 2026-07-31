@@ -1,6 +1,6 @@
 'use client'
 
-import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -28,15 +28,15 @@ import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-work
 export function MessagesWorkspaceShell() {
   const location = useLocation()
   const navigate = useNavigate()
-  const newRouteMatch = useMatch({ path: 'new', end: true })
-  const threadRouteMatch = useMatch({ path: ':conversationId', end: true })
+  const { conversationId } = useParams<{ conversationId?: string }>()
+  const isNewRoute = useMatch({ path: 'new', end: true }) !== null
 
   useStripLegacyMessagesMode()
 
   const routeState = resolveMessagesWorkspaceRouteState({
     search: location.search,
-    newRouteMatch,
-    threadRouteMatch,
+    isNewRoute,
+    conversationId,
   })
 
   const campaignScope = useMessagesCampaignScopeEffects(routeState)
@@ -60,6 +60,7 @@ export function MessagesWorkspaceShell() {
   return (
     <div className={messagesWorkspaceRootClasses}>
       <div className={messagesWorkspaceHeaderClasses}>
+        <div className="hidden md:block" aria-hidden="true" />
         <div className={messagesWorkspaceHeaderActionsClasses}>
           <Button type="button" onClick={handleNewMessage}>
             {MESSAGES_ACTION_COPY.newMessage}

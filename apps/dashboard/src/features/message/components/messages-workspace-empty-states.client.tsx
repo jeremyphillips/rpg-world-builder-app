@@ -21,13 +21,17 @@ export function MessagesMobileBackLink({ to, label }: { to: string; label: strin
   )
 }
 
-export function MessagesDirectEmptyRightPane() {
+export function MessagesDirectEmptyRightPane({ campaignId }: { campaignId?: string }) {
   return (
     <div className={messagesWorkspaceEmptyStateClasses}>
       <IndexPageEmptyState
         heading={MESSAGES_EMPTY_COPY.selectConversationHeading}
         body={MESSAGES_EMPTY_COPY.selectConversationBody}
-        actions={<NewMessageLink />}
+        actions={
+          <div className="flex w-full justify-center">
+            <NewMessageLink campaignId={campaignId} />
+          </div>
+        }
       />
     </div>
   )
