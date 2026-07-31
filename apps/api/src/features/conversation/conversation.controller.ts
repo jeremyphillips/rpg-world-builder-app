@@ -4,6 +4,7 @@ import { isValidObjectId } from 'mongoose'
 import {
   conversationListQuerySchema,
   createDirectConversationInputSchema,
+  directConversationRecipientsQuerySchema,
   markConversationReadInputSchema,
   messageListQuerySchema,
   sendDirectMessageInputSchema,
@@ -20,7 +21,19 @@ import {
 } from './conversation.service'
 
 export async function listRecipients(req: Request, res: Response): Promise<void> {
-  const result = await getDirectMessageRecipients(req.user!.id)
+  const parsed = directConversationRecipientsQuerySchema.safeParse(req.query)
+  if (!parsed.success) {
+    throw HttpError.badRequest('Validation failed', {
+      issues: parsed.error.issues.map((issue) => ({
+        path: issue.path.join('.'),
+        message: issue.message,
+      })),
+    })
+  }
+
+  const result = await getDirectMessageRecipients(req.user!.id, {
+    campaignId: parsed.data.campaignId,
+  })
   res.status(200).json(result)
 }
 
@@ -53,6 +66,7 @@ export async function list(req: Request, res: Response): Promise<void> {
   const result = await listConversations(req.user!.id, {
     limit: parsed.data.limit,
     cursor: parsed.data.cursor,
+    campaignId: parsed.data.campaignId,
   })
   res.status(200).json(result)
 }

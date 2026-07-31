@@ -12,9 +12,19 @@ import { patchJson, postJson, request } from '@/lib/api-client'
 
 const CONVERSATIONS_API_PATH = '/api/conversations'
 
-export async function listConversationRecipients(): Promise<DirectConversationRecipientsResponse> {
+export async function listConversationRecipients(
+  options: { campaignId?: string } = {},
+): Promise<DirectConversationRecipientsResponse> {
+  const params = new URLSearchParams()
+  if (options.campaignId) params.set('campaignId', options.campaignId)
+
+  const query = params.toString()
+  const path = query
+    ? `${CONVERSATIONS_API_PATH}/direct/recipients?${query}`
+    : `${CONVERSATIONS_API_PATH}/direct/recipients`
+
   return request<DirectConversationRecipientsResponse>(
-    `${CONVERSATIONS_API_PATH}/direct/recipients`,
+    path,
     undefined,
     'Could not load message recipients.',
   )
@@ -31,11 +41,12 @@ export async function createDirectConversation(
 }
 
 export async function listConversations(
-  options: { limit?: number; cursor?: string } = {},
+  options: { limit?: number; cursor?: string; campaignId?: string } = {},
 ): Promise<ConversationListResponse> {
   const params = new URLSearchParams()
   if (options.limit) params.set('limit', String(options.limit))
   if (options.cursor) params.set('cursor', options.cursor)
+  if (options.campaignId) params.set('campaignId', options.campaignId)
 
   const query = params.toString()
   const path = query ? `${CONVERSATIONS_API_PATH}?${query}` : CONVERSATIONS_API_PATH

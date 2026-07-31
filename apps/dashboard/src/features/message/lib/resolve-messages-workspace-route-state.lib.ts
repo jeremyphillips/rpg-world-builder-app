@@ -1,4 +1,5 @@
 import {
+  getMessagesCampaignId,
   getMessagesFromConversationId,
   isMessagesCampaignsMode,
 } from './messages-workspace-routing.lib'
@@ -10,6 +11,7 @@ export type MessagesWorkspaceRouteState = {
   isThreadRoute: boolean
   fromConversationId?: string
   activeConversationId?: string
+  campaignId?: string
   showLeftOnMobile: boolean
   showRightOnMobile: boolean
   showNewNeutralRight: boolean
@@ -27,6 +29,7 @@ export function resolveMessagesWorkspaceRouteState(input: {
   const isThreadRoute = Boolean(routeConversationId)
   const fromConversationId = getMessagesFromConversationId(input.search)
   const activeConversationId = routeConversationId ?? fromConversationId
+  const campaignId = getMessagesCampaignId(input.search)
 
   return {
     isCampaignsMode,
@@ -35,6 +38,7 @@ export function resolveMessagesWorkspaceRouteState(input: {
     isThreadRoute,
     fromConversationId,
     activeConversationId,
+    campaignId,
     showLeftOnMobile: isCampaignsMode ? false : isNewRoute || !isThreadRoute,
     showRightOnMobile: isCampaignsMode || isThreadRoute,
     showNewNeutralRight: isNewRoute && !fromConversationId,

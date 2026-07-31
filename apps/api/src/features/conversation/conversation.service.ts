@@ -17,11 +17,17 @@ import {
   decodeMessageCursor,
   findOrCreateDirectConversation,
   getOtherParticipantUserId,
+  listAllConversationRecordsForUser,
   listConversationsForUser,
+  listConversationsPageFromRecords,
   listMessagesForConversation,
   markConversationRead as markConversationReadRecord,
   sendDirectMessage,
 } from './conversation.repository'
+import {
+  isPeerEligibleInCampaignScope,
+  resolveConversationCampaignScope,
+} from './conversation-campaign-scope.lib'
 import { publishDirectMessageReceivedNotification } from './direct-message-notification.lib'
 import {
   isEligibleDirectMessageRecipient,
@@ -70,8 +76,9 @@ async function deliverConversationActivityToParticipants(input: {
 
 export async function getDirectMessageRecipients(
   callerUserId: string,
+  options: { campaignId?: string } = {},
 ): Promise<DirectConversationRecipientsResponse> {
-  return listDirectMessageRecipients(callerUserId)
+  return listDirectMessageRecipients(callerUserId, options)
 }
 
 export async function createDirectConversation(
@@ -97,7 +104,7 @@ export async function createDirectConversation(
 
 export async function listConversations(
   viewerUserId: string,
-  options: { limit: number; cursor?: string },
+  options: { limit: number; cursor?: string; campaignId?: string },
 ): Promise<ConversationListResponse> {
   if (options.cursor) {
     const decoded = decodeConversationCursor(options.cursor)
@@ -108,12 +115,53 @@ export async function listConversations(
     }
   }
 
-  return listConversationsForUser({
+  if (!options.campaignId) {
+    return listConversationsForUser({
+      viewerUserId,
+      limit: options.limit,
+      cursor: options.cursor,
+      peerByUserId: new Map(),
+    })
+  }
+
+  const resolvedScope = await resolveConversationCampaignScope(viewerUserId, options.campaignId)
+
+  if (resolvedScope.scopeInvalid) {
+    const unscoped = await listConversationsForUser({
+      viewerUserId,
+      limit: options.limit,
+      cursor: options.cursor,
+      peerByUserId: new Map(),
+    })
+    return {
+      ...unscoped,
+      scopeInvalid: true,
+    }
+  }
+
+  const allRecords = await listAllConversationRecordsForUser(viewerUserId)
+  const totalCount = allRecords.length
+  const scopedRecords = allRecords.filter((record) =>
+    isPeerEligibleInCampaignScope(resolvedScope.bundle!, record.peerUserId),
+  )
+  const scopedCount = scopedRecords.length
+  const hiddenCount = totalCount - scopedCount
+
+  const page = await listConversationsPageFromRecords({
     viewerUserId,
+    records: scopedRecords,
     limit: options.limit,
     cursor: options.cursor,
     peerByUserId: new Map(),
   })
+
+  return {
+    ...page,
+    totalCount,
+    scopedCount,
+    hiddenCount,
+    scope: resolvedScope.scope ?? undefined,
+  }
 }
 
 export async function listConversationMessages(

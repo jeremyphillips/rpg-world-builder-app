@@ -5,6 +5,7 @@ import { Button, Tabs, TabsList, TabsTrigger } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
+import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'
 import {
   messagesWorkspaceBodyClasses,
   messagesWorkspaceHeaderActionsClasses,
@@ -19,6 +20,7 @@ import {
   MessagesRecipientPickerPane,
 } from './messages-workspace-panes.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
+import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
 export function MessagesWorkspaceShell() {
@@ -33,6 +35,8 @@ export function MessagesWorkspaceShell() {
     threadRouteMatch,
   })
 
+  const campaignScope = useMessagesCampaignScopeEffects(routeState)
+
   const leftPaneClasses = [
     messagesWorkspaceLeftPaneClasses,
     routeState.showLeftOnMobile
@@ -46,9 +50,10 @@ export function MessagesWorkspaceShell() {
 
   const handleNewMessage = () => {
     navigate(
-      routeState.routeConversationId
-        ? ROUTES.messages.new({ from: routeState.routeConversationId })
-        : ROUTES.messages.new(),
+      ROUTES.messages.new({
+        from: routeState.routeConversationId,
+        campaignId: routeState.campaignId,
+      }),
     )
   }
 
@@ -74,12 +79,26 @@ export function MessagesWorkspaceShell() {
         ) : null}
       </div>
 
+      {!routeState.isCampaignsMode ? (
+        <MessagesCampaignScopeChrome
+          scope={campaignScope.scope}
+          scopedCount={campaignScope.scopedCount}
+          hiddenCount={campaignScope.hiddenCount}
+          showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
+          onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+        />
+      ) : null}
+
       <div className={messagesWorkspaceBodyClasses}>
         <aside className={leftPaneClasses} aria-label="Conversations">
           {routeState.isCampaignsMode ? null : routeState.isNewRoute ? (
-            <MessagesRecipientPickerPane />
+            <MessagesRecipientPickerPane campaignId={routeState.campaignId} />
           ) : (
-            <MessagesDirectListPane activeConversationId={routeState.activeConversationId} />
+            <MessagesDirectListPane
+              activeConversationId={routeState.activeConversationId}
+              campaignId={routeState.campaignId}
+              scope={campaignScope.scope}
+            />
           )}
         </aside>
 

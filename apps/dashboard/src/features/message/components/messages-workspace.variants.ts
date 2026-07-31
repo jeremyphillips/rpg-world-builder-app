@@ -23,6 +23,9 @@ export const messagesWorkspaceRightFooterClasses = 'shrink-0 border-t border-bor
 export const messagesWorkspaceEmptyStateClasses =
   'flex min-h-0 flex-1 flex-col items-center justify-center p-6 text-center'
 
+export const messagesWorkspaceScopeUtilityClasses =
+  'flex flex-wrap items-center justify-between gap-2 text-muted-foreground'
+
 export const messagesWorkspaceMobileBackClasses = 'mb-3 md:hidden'
 
 export const messagesWorkspaceLeftPaneMobileHiddenClasses = 'hidden md:block'

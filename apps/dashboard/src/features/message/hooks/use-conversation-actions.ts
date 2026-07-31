@@ -23,11 +23,7 @@ import {
   applyConversationEnvelopeToList,
   applyConversationEnvelopeToThread,
 } from '../lib/conversation-cache'
-import {
-  conversationMessagesQueryKey,
-  conversationsListQueryKey,
-} from '../lib/conversation-query-keys'
-import { CONVERSATION_LIST_LIMIT } from './use-conversations'
+import { conversationMessagesQueryKey, conversationsQueryKey } from '../lib/conversation-query-keys'
 
 function buildMessagePreview(text: string): string {
   const normalized = text.trim().replace(/\s+/g, ' ')
@@ -67,7 +63,7 @@ export function useConversationActions(conversationId?: string) {
 
   const invalidateConversationQueries = () => {
     void queryClient.invalidateQueries({
-      queryKey: conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
+      queryKey: conversationsQueryKey,
     })
     if (conversationId) {
       void queryClient.invalidateQueries({
@@ -90,10 +86,12 @@ export function useConversationActions(conversationId?: string) {
     onSuccess: ({ message }) => {
       if (!conversationId) return
 
-      const listData = queryClient.getQueryData<ConversationListResponse>(
-        conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
-      )
-      const cachedConversation = listData?.items.find((item) => item.id === conversationId)
+      const listData = queryClient.getQueriesData<ConversationListResponse>({
+        queryKey: conversationsQueryKey,
+      })
+      const cachedConversation = listData
+        .flatMap(([, data]) => data?.items ?? [])
+        .find((item) => item.id === conversationId)
       const envelope = cachedConversation
         ? buildSentMessageListEnvelope(cachedConversation, message)
         : {
@@ -118,10 +116,9 @@ export function useConversationActions(conversationId?: string) {
       )
 
       if (cachedConversation) {
-        queryClient.setQueryData(
-          conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
-          (current: ConversationListResponse | undefined) =>
-            applyConversationEnvelopeToList(current, envelope),
+        queryClient.setQueriesData<ConversationListResponse>(
+          { queryKey: conversationsQueryKey },
+          (current) => applyConversationEnvelopeToList(current, envelope),
         )
       }
 
@@ -135,9 +132,9 @@ export function useConversationActions(conversationId?: string) {
         ...(lastReadMessageId ? { lastReadMessageId } : {}),
       }),
     onSuccess: ({ conversation }) => {
-      queryClient.setQueryData(
-        conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
-        (current: ConversationListResponse | undefined) =>
+      queryClient.setQueriesData<ConversationListResponse>(
+        { queryKey: conversationsQueryKey },
+        (current) =>
           applyConversationEnvelopeToList(current, {
             conversation,
             version: conversation.version,

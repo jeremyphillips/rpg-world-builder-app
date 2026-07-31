@@ -10,9 +10,14 @@ import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 type ConversationListProps = {
   conversations: Conversation[]
   activeConversationId?: string
+  campaignId?: string
 }
 
-export function ConversationList({ conversations, activeConversationId }: ConversationListProps) {
+export function ConversationList({
+  conversations,
+  activeConversationId,
+  campaignId,
+}: ConversationListProps) {
   return (
     <ul className="divide-y divide-border">
       {conversations.map((conversation) => {
@@ -20,7 +25,7 @@ export function ConversationList({ conversations, activeConversationId }: Conver
         return (
           <li key={conversation.id}>
             <Link
-              to={ROUTES.messages.detail(conversation.id)}
+              to={ROUTES.messages.detail(conversation.id, { campaignId })}
               className={`flex items-start gap-3 px-1 py-3 hover:bg-muted ${isActive ? 'bg-row-selected' : ''}`}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -56,9 +61,12 @@ export function ConversationList({ conversations, activeConversationId }: Conver
   )
 }
 
-export function NewMessageLink() {
+export function NewMessageLink({ campaignId }: { campaignId?: string }) {
   return (
-    <Link to={ROUTES.messages.new()} className={buttonVariants({ variant: 'default' })}>
+    <Link
+      to={ROUTES.messages.new({ campaignId })}
+      className={buttonVariants({ variant: 'default' })}
+    >
       New message
     </Link>
   )

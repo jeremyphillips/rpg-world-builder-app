@@ -5,6 +5,7 @@ import {
   isEligibleDirectMessagePeerInCampaignBundle,
   loadDirectMessageCampaignBundles,
 } from './direct-message-campaign-context.lib'
+import { filterBundlesForCampaignScope } from './conversation-campaign-scope.lib'
 import { ConversationModel } from './conversation.model'
 import { buildDirectConversationParticipantKey } from './conversation-participant-key.lib'
 
@@ -22,8 +23,22 @@ export async function isEligibleDirectMessageRecipient(
 
 export async function listDirectMessageRecipients(
   callerUserId: string,
+  options: { campaignId?: string } = {},
 ): Promise<DirectConversationRecipientsResponse> {
-  const bundles = await loadDirectMessageCampaignBundles(callerUserId)
+  const loadedBundles = await loadDirectMessageCampaignBundles(callerUserId)
+  const { bundles, scope, scopeInvalid } = filterBundlesForCampaignScope(
+    loadedBundles,
+    options.campaignId,
+  )
+
+  if (scopeInvalid) {
+    return {
+      recipientsByUserId: {},
+      campaigns: [],
+      existingDirectByUserId: {},
+      scopeInvalid: true,
+    }
+  }
 
   const recipientUserIds = new Set<string>()
   const campaigns = bundles
@@ -49,6 +64,7 @@ export async function listDirectMessageRecipients(
       recipientsByUserId: {},
       campaigns: [],
       existingDirectByUserId: {},
+      scope: scope ?? undefined,
     }
   }
 
@@ -85,5 +101,6 @@ export async function listDirectMessageRecipients(
     recipientsByUserId,
     campaigns,
     existingDirectByUserId,
+    scope: scope ?? undefined,
   }
 }

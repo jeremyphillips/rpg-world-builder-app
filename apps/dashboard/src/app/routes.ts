@@ -17,11 +17,18 @@ export const ROUTES = {
   },
   messages: {
     list: '/messages',
-    new: (options?: { from?: string }) => {
-      if (!options?.from) return '/messages/new'
-      return `/messages/new?from=${encodeURIComponent(options.from)}`
+    listScoped: (campaignId: string) => `/messages?campaignId=${encodeURIComponent(campaignId)}`,
+    new: (options?: { from?: string; campaignId?: string }) => {
+      const params = new URLSearchParams()
+      if (options?.from) params.set('from', options.from)
+      if (options?.campaignId) params.set('campaignId', options.campaignId)
+      const query = params.toString()
+      return query ? `/messages/new?${query}` : '/messages/new'
     },
-    detail: (conversationId: string) => `/messages/${conversationId}`,
+    detail: (conversationId: string, options?: { campaignId?: string }) => {
+      if (!options?.campaignId) return `/messages/${conversationId}`
+      return `/messages/${conversationId}?campaignId=${encodeURIComponent(options.campaignId)}`
+    },
     campaigns: '/messages?mode=campaigns',
   },
   campaign: {

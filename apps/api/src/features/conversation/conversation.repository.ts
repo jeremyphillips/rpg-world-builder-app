@@ -205,6 +205,103 @@ export async function findOrCreateDirectConversation({
   return buildConversationDto(doc, callerUserId, peer)
 }
 
+export async function listAllConversationRecordsForUser(viewerUserId: string): Promise<
+  Array<{
+    doc: ConversationRecord
+    peerUserId: string
+    sortAt: Date
+  }>
+> {
+  const docs = await ConversationModel.aggregate<ConversationRecord>([
+    { $match: { participantUserIds: viewerUserId } },
+    {
+      $addFields: {
+        sortAt: { $ifNull: ['$latestMessage.createdAt', '$createdAt'] },
+      },
+    },
+    { $sort: { sortAt: -1, _id: -1 } },
+  ])
+
+  return docs.flatMap((doc) => {
+    const peerUserId = doc.participantUserIds.find((userId) => userId !== viewerUserId)
+    if (!peerUserId) return []
+    return [
+      {
+        doc,
+        peerUserId,
+        sortAt: doc.latestMessage?.createdAt ?? doc.createdAt,
+      },
+    ]
+  })
+}
+
+function paginateConversationRecords<T extends { sortAt: Date; doc: ConversationRecord }>(
+  records: T[],
+  limit: number,
+  cursor?: string,
+): { page: T[]; hasMore: boolean } {
+  const decodedCursor = cursor ? decodeConversationCursor(cursor) : null
+  const filtered = decodedCursor
+    ? records.filter((record) => {
+        const sortAtTime = record.sortAt.getTime()
+        const cursorTime = decodedCursor.sortAt.getTime()
+        if (sortAtTime < cursorTime) return true
+        if (sortAtTime > cursorTime) return false
+        return String(record.doc._id) < decodedCursor.id
+      })
+    : records
+
+  const hasMore = filtered.length > limit
+  const page = hasMore ? filtered.slice(0, limit) : filtered
+  return { page, hasMore }
+}
+
+export async function listConversationsPageFromRecords({
+  viewerUserId,
+  records,
+  limit,
+  cursor,
+  peerByUserId,
+}: {
+  viewerUserId: string
+  records: Array<{ doc: ConversationRecord; peerUserId: string; sortAt: Date }>
+  limit: number
+  cursor?: string
+  peerByUserId: Map<string, { userId: string; displayName: string }>
+}): Promise<{ items: Conversation[]; nextCursor: string | null }> {
+  const { page, hasMore } = paginateConversationRecords(records, limit, cursor)
+  const last = page.at(-1)
+
+  const peerUserIdsToLoad = page
+    .map((record) => record.peerUserId)
+    .filter((userId) => Boolean(userId && !peerByUserId.has(userId)))
+
+  if (peerUserIdsToLoad.length > 0) {
+    const users = await findUsersByIds(peerUserIdsToLoad)
+    for (const user of users) {
+      peerByUserId.set(user.id, { userId: user.id, displayName: user.displayName })
+    }
+  }
+
+  const baseItems = await Promise.all(
+    page.map(async (record) => {
+      const peer = peerByUserId.get(record.peerUserId) ?? {
+        userId: record.peerUserId,
+        displayName: 'Unknown user',
+      }
+      return buildBaseConversationDto(record.doc, viewerUserId, peer)
+    }),
+  )
+
+  const items = await assembleConversationResponses(viewerUserId, baseItems)
+
+  return {
+    items,
+    nextCursor:
+      hasMore && last ? encodeConversationCursor(last.sortAt, String(last.doc._id)) : null,
+  }
+}
+
 export async function listConversationsForUser({
   viewerUserId,
   limit,

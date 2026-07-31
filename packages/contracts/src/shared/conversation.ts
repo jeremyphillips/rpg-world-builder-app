@@ -77,10 +77,19 @@ export type DirectConversationRecipientCampaignGroup = z.infer<
   typeof directConversationRecipientCampaignGroupSchema
 >
 
+export const conversationListScopeSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+})
+
+export type ConversationListScope = z.infer<typeof conversationListScopeSchema>
+
 export const directConversationRecipientsResponseSchema = z.object({
   recipientsByUserId: z.record(z.string(), directConversationRecipientSchema),
   campaigns: z.array(directConversationRecipientCampaignGroupSchema),
   existingDirectByUserId: z.record(z.string(), z.string()),
+  scope: conversationListScopeSchema.optional(),
+  scopeInvalid: z.boolean().optional(),
 })
 
 export type DirectConversationRecipientsResponse = z.infer<
@@ -90,6 +99,7 @@ export type DirectConversationRecipientsResponse = z.infer<
 export const conversationListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
   cursor: z.string().trim().optional(),
+  campaignId: z.string().trim().optional(),
 })
 
 export type ConversationListQuery = z.infer<typeof conversationListQuerySchema>
@@ -97,9 +107,27 @@ export type ConversationListQuery = z.infer<typeof conversationListQuerySchema>
 export const conversationListResponseSchema = z.object({
   items: z.array(conversationListItemSchema),
   nextCursor: z.string().nullable(),
+  /** Full-dataset direct count — present when `campaignId` is requested. */
+  totalCount: z.number().int().nonnegative().optional(),
+  /** Conversations matching campaign eligibility — present when scope is active. */
+  scopedCount: z.number().int().nonnegative().optional(),
+  /** Conversations outside the active campaign scope — present when scope is active. */
+  hiddenCount: z.number().int().nonnegative().optional(),
+  /** Active campaign discovery scope — omitted when unscoped or invalid. */
+  scope: conversationListScopeSchema.optional(),
+  /** When true, `campaignId` was invalid/inaccessible; items are unscoped. */
+  scopeInvalid: z.boolean().optional(),
 })
 
 export type ConversationListResponse = z.infer<typeof conversationListResponseSchema>
+
+export const directConversationRecipientsQuerySchema = z.object({
+  campaignId: z.string().trim().optional(),
+})
+
+export type DirectConversationRecipientsQuery = z.infer<
+  typeof directConversationRecipientsQuerySchema
+>
 
 export const messageListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
