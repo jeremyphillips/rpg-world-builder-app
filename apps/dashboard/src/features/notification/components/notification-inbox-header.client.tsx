@@ -1,8 +1,10 @@
 'use client'
 
 import { Alert, Button } from '@rpg/ui'
-import { FilterBar, type FilterSchema } from '@rpg/ui/filters'
 import type { Notification } from '@rpg/contracts'
+import type { FilterSchema } from '@rpg/ui/filters'
+
+import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
 
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import type { NotificationInboxFilterState } from '../lib/notification-inbox-filter-schema'
@@ -34,7 +36,7 @@ export function NotificationInboxHeader({
   invalidScopeNotice,
 }: NotificationInboxHeaderProps) {
   return (
-    <div className="space-y-3 border-b border-border pb-4">
+    <div className="space-y-3">
       <p className="text-sm text-muted-foreground">{NOTIFICATION_COPY.inboxDescription}</p>
 
       {invalidScopeNotice?.show ? (
@@ -50,9 +52,9 @@ export function NotificationInboxHeader({
         />
       ) : null}
 
-      <FilterBar
-        schema={schema}
-        state={filters}
+      <PrimaryFilterBarRegion
+        filterSchema={schema}
+        filterState={filters}
         onValueChange={onFilterChange}
         onReset={onResetFilters}
         resetLabel="Clear all"

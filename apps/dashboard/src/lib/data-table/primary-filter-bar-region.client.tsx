@@ -16,6 +16,7 @@ type PrimaryFilterBarRegionProps<T, TFilters extends Record<string, unknown>> = 
     value: TFilters[FilterFieldId<TFilters>] | undefined,
   ) => void
   onReset: () => void
+  resetLabel?: string
 }
 
 /** Primary-only filter chrome for catalog lists without advanced filter panels. */
@@ -24,6 +25,7 @@ export function PrimaryFilterBarRegion<T, TFilters extends Record<string, unknow
   filterState,
   onValueChange,
   onReset,
+  resetLabel,
 }: PrimaryFilterBarRegionProps<T, TFilters>) {
   return (
     <FilterChromeProvider>
@@ -34,6 +36,7 @@ export function PrimaryFilterBarRegion<T, TFilters extends Record<string, unknow
             state={filterState}
             onValueChange={onValueChange}
             onReset={onReset}
+            resetLabel={resetLabel}
           />
         }
         additionalFiltersOpen={false}

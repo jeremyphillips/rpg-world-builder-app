@@ -136,6 +136,10 @@
   --color-drop-target: var(--drop-target-bg);
   --color-drop-target-border: var(--drop-target-border);
   --color-segmented-track: var(--segmented-track-bg);
+  --color-message-bubble-self: var(--message-bubble-self-bg);
+  --color-message-bubble-self-foreground: var(--message-bubble-self-fg);
+  --color-message-bubble-peer: var(--message-bubble-peer-bg);
+  --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
   --color-outline-control-border: var(--outline-control-border);
   --color-outline-button-border: var(--outline-button-border);
   --color-outline-button-hover: var(--outline-button-hover-bg);

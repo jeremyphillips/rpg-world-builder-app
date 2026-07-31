@@ -102,6 +102,10 @@ recipients response — do not filter `data.campaigns` ad hoc in pane components
 
 ### Thread group timestamps
 
+Message bubbles use `messageBubbleVariants({ sender: 'self' | 'peer' })` — self fills
+map to `--message-bubble-self-*` (info + on-solid foreground); peer fills map to
+`--message-bubble-peer-*` (muted wash + default foreground).
+
 Message groups use semantic list markup (`ul > li` per segment/group; bubbles as
 `<div>` children). Each group shows exactly one `MessagesMetadataTime` under the
 final bubble; date separators render one `<time>` each. `group.timestamp` is the

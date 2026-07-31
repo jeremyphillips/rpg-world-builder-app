@@ -1,9 +1,13 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '@rpg/ui'
+
+import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
+
 /** Full-height workspace root — fills the app-shell main column. */
 export const messagesWorkspaceRootClasses = 'flex min-h-0 flex-1 flex-col gap-4'
 
-export const messagesWorkspaceHeaderSectionClasses = 'flex shrink-0 flex-col gap-2'
+export const messagesWorkspaceHeaderSectionClasses = cn(pageHeaderSectionGapClasses, 'shrink-0')
 
 export const messagesWorkspaceBodyClasses =
   'grid min-h-0 flex-1 grid-cols-1 overflow-hidden md:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)] md:gap-0 md:rounded-lg md:border md:border-border'
@@ -29,8 +33,17 @@ export const messagesWorkspaceMessageGroupClasses = 'flex max-w-[85%] flex-col g
 
 export const messagesWorkspaceMessageThreadClasses = 'flex flex-col gap-6'
 
-export const messagesWorkspaceMessageBubbleClasses =
-  'inline-block rounded-lg bg-muted px-3 py-2 text-left'
+export const messageBubbleVariants = cva('inline-block rounded-lg px-3 py-2 text-left', {
+  variants: {
+    sender: {
+      self: 'bg-message-bubble-self text-message-bubble-self-foreground',
+      peer: 'bg-message-bubble-peer text-message-bubble-peer-foreground',
+    },
+  },
+  defaultVariants: {
+    sender: 'peer',
+  },
+})
 
 export const messagesWorkspaceMetadataClasses = 'text-xs text-muted-foreground'
 

@@ -4,6 +4,7 @@ import { Button } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageHeader } from '@/components/layout/page-header'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
 import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
@@ -34,28 +35,30 @@ export function NotificationsList() {
 
   return (
     <NarrowPage spacing="compact">
-      <PageHeader
-        heading={NOTIFICATION_COPY.title}
-        actions={
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            density="compact"
-            onClick={handleMarkAllRead}
-            disabled={unreadCount === 0 || markAllReadPending}
-          >
-            {NOTIFICATION_COPY.markAllAsRead}
-          </Button>
-        }
-      />
-      <NotificationInboxHeader
-        schema={schema}
-        filters={filters}
-        onFilterChange={setFilterValue}
-        onResetFilters={resetFilters}
-        invalidScopeNotice={invalidScopeNotice}
-      />
+      <div className={pageHeaderSectionGapClasses}>
+        <PageHeader
+          heading={NOTIFICATION_COPY.title}
+          actions={
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              density="compact"
+              onClick={handleMarkAllRead}
+              disabled={unreadCount === 0 || markAllReadPending}
+            >
+              {NOTIFICATION_COPY.markAllAsRead}
+            </Button>
+          }
+        />
+        <NotificationInboxHeader
+          schema={schema}
+          filters={filters}
+          onFilterChange={setFilterValue}
+          onResetFilters={resetFilters}
+          invalidScopeNotice={invalidScopeNotice}
+        />
+      </div>
 
       <NotificationInboxBody
         isPending={isPending}

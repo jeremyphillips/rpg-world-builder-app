@@ -24,8 +24,8 @@ import {
 import { MessageComposer } from './message-composer.client'
 import { MessagesMetadataTime } from './messages-metadata.client'
 import {
+  messageBubbleVariants,
   messagesWorkspaceDateSeparatorClasses,
-  messagesWorkspaceMessageBubbleClasses,
   messagesWorkspaceMessageGroupClasses,
   messagesWorkspaceMessageGroupTimestampClasses,
   messagesWorkspaceMessageThreadClasses,
@@ -171,8 +171,8 @@ export function MessageThreadBody({
                     key={message.id}
                     aria-label={formatMessageBubbleAriaLabel(isOwn, peerDisplayName)}
                   >
-                    <div className={messagesWorkspaceMessageBubbleClasses}>
-                      <Text>{message.content.text}</Text>
+                    <div className={messageBubbleVariants({ sender: isOwn ? 'self' : 'peer' })}>
+                      <Text className="text-inherit">{message.content.text}</Text>
                     </div>
                   </div>
                 ))}

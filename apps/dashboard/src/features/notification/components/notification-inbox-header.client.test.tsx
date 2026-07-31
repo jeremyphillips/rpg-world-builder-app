@@ -31,6 +31,7 @@ describe('NotificationInboxHeader', () => {
     expect(screen.getByRole('combobox', { name: 'Campaign' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Type' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Clear campaign filter/i })).not.toBeInTheDocument()
+    expect(document.querySelector('.bg-surface-subtle')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

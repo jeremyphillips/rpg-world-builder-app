@@ -3,6 +3,7 @@ import { Button } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageHeader } from '@/components/layout/page-header'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
 import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
@@ -36,20 +37,22 @@ const previewItems = [
 function NotificationsListPagePreview() {
   return (
     <NarrowPage spacing="compact">
-      <PageHeader
-        heading={NOTIFICATION_COPY.title}
-        actions={
-          <Button type="button" variant="ghost" size="sm" density="compact">
-            {NOTIFICATION_COPY.markAllAsRead}
-          </Button>
-        }
-      />
-      <NotificationInboxHeader
-        schema={schema}
-        filters={{ unread: true, category: 'message' }}
-        onFilterChange={() => undefined}
-        onResetFilters={() => undefined}
-      />
+      <div className={pageHeaderSectionGapClasses}>
+        <PageHeader
+          heading={NOTIFICATION_COPY.title}
+          actions={
+            <Button type="button" variant="ghost" size="sm" density="compact">
+              {NOTIFICATION_COPY.markAllAsRead}
+            </Button>
+          }
+        />
+        <NotificationInboxHeader
+          schema={schema}
+          filters={{ unread: true, category: 'message' }}
+          onFilterChange={() => undefined}
+          onResetFilters={() => undefined}
+        />
+      </div>
       <NotificationInboxBody
         isPending={false}
         isError={false}
