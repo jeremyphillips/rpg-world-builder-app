@@ -5,7 +5,7 @@ import { ROUTES } from '@/app/routes'
 import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
 
 import { MessagesMobileBackLink } from './messages-workspace-empty-states.client'
-import { MessagesThreadPane } from './messages-workspace-panes.client'
+import { MessagesDraftThreadPane, MessagesThreadPane } from './messages-workspace-panes.client'
 
 export function MessagesWorkspaceActiveThread({
   conversationId,
@@ -21,6 +21,24 @@ export function MessagesWorkspaceActiveThread({
         label={MESSAGES_ACTION_COPY.backToMessages}
       />
       <MessagesThreadPane conversationId={conversationId} campaignId={campaignId} />
+    </>
+  )
+}
+
+export function MessagesWorkspaceDraftThread({
+  toRecipientUserId,
+  campaignId,
+}: {
+  toRecipientUserId: string
+  campaignId?: string
+}) {
+  return (
+    <>
+      <MessagesMobileBackLink
+        to={campaignId ? ROUTES.messages.listScoped(campaignId) : ROUTES.messages.list}
+        label={MESSAGES_ACTION_COPY.backToMessages}
+      />
+      <MessagesDraftThreadPane toRecipientUserId={toRecipientUserId} campaignId={campaignId} />
     </>
   )
 }

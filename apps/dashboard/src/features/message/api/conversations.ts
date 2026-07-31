@@ -1,11 +1,12 @@
 import type {
-  Conversation,
   ConversationListResponse,
   DirectConversationRecipientsResponse,
   MarkConversationReadResponse,
   MessageListResponse,
   SendDirectMessageInput,
   SendDirectMessageResponse,
+  SendFirstDirectMessageInput,
+  SendFirstDirectMessageResponse,
 } from '@rpg/contracts'
 
 import { patchJson, postJson, request } from '@/lib/api-client'
@@ -32,13 +33,13 @@ export async function listConversationRecipients(
   )
 }
 
-export async function createDirectConversation(
-  recipientUserId: string,
-): Promise<{ conversation: Conversation }> {
-  return postJson<{ conversation: Conversation }>(
-    `${CONVERSATIONS_API_PATH}/direct`,
-    { recipientUserId },
-    MESSAGES_ERROR_COPY.startConversation,
+export async function sendFirstDirectMessage(
+  input: SendFirstDirectMessageInput,
+): Promise<SendFirstDirectMessageResponse> {
+  return postJson<SendFirstDirectMessageResponse>(
+    `${CONVERSATIONS_API_PATH}/direct/messages`,
+    input,
+    MESSAGES_ERROR_COPY.sendMessage,
   )
 }
 

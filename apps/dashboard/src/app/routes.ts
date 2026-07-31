@@ -18,9 +18,10 @@ export const ROUTES = {
   messages: {
     list: '/messages',
     listScoped: (campaignId: string) => `/messages?campaignId=${encodeURIComponent(campaignId)}`,
-    new: (options?: { from?: string; campaignId?: string }) => {
+    new: (options?: { from?: string; to?: string; campaignId?: string }) => {
       const params = new URLSearchParams()
       if (options?.from) params.set('from', options.from)
+      if (options?.to) params.set('to', options.to)
       if (options?.campaignId) params.set('campaignId', options.campaignId)
       const query = params.toString()
       return query ? `/messages/new?${query}` : '/messages/new'

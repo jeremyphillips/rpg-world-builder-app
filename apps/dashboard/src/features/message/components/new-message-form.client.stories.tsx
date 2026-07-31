@@ -20,16 +20,13 @@ export const Default: Story = {
     ],
     recipientUserId: '',
     onRecipientChange: () => undefined,
-    onSubmit: (event) => event.preventDefault(),
     onCancel: () => undefined,
-    isSubmitting: false,
   },
 }
 
-export const Submitting: Story = {
+export const SelectedRecipient: Story = {
   args: {
     ...Default.args,
     recipientUserId: 'user-2',
-    isSubmitting: true,
   },
 }

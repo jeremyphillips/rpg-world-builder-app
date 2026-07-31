@@ -7,32 +7,18 @@ import { renderWithProviders } from '@/test/render'
 import { NewMessageForm } from './new-message-form.client'
 
 describe('NewMessageForm', () => {
-  it('disables submit until a recipient is selected', () => {
-    const { rerender } = renderWithProviders(
-      <NewMessageForm
-        recipients={[{ userId: 'user-2', displayName: 'Campaign Member' }]}
-        recipientUserId=""
-        onRecipientChange={() => undefined}
-        onSubmit={(event) => event.preventDefault()}
-        onCancel={() => undefined}
-        isSubmitting={false}
-      />,
-    )
-
-    expect(screen.getByRole('button', { name: 'Start conversation' })).toBeDisabled()
-
-    rerender(
+  it('renders a recipient combobox without a submit button', () => {
+    renderWithProviders(
       <NewMessageForm
         recipients={[{ userId: 'user-2', displayName: 'Campaign Member' }]}
         recipientUserId="user-2"
         onRecipientChange={() => undefined}
-        onSubmit={(event) => event.preventDefault()}
         onCancel={() => undefined}
-        isSubmitting={false}
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Start conversation' })).toBeEnabled()
+    expect(screen.getByRole('combobox')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Start conversation' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
@@ -41,9 +27,7 @@ describe('NewMessageForm', () => {
         recipients={[{ userId: 'user-2', displayName: 'Campaign Member' }]}
         recipientUserId="user-2"
         onRecipientChange={() => undefined}
-        onSubmit={(event) => event.preventDefault()}
         onCancel={() => undefined}
-        isSubmitting={false}
       />,
     )
 

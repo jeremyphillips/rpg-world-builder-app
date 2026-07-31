@@ -3,9 +3,9 @@ import { Router } from 'express'
 import { requireAuth } from '../../middleware/require-auth'
 import { validate } from '../../middleware/validate'
 import {
-  createDirectConversationInputSchema,
   markConversationReadInputSchema,
   sendDirectMessageInputSchema,
+  sendFirstDirectMessageInputSchema,
 } from '@rpg/contracts'
 
 import * as controller from './conversation.controller'
@@ -14,10 +14,10 @@ export const conversationRouter: Router = Router()
 
 conversationRouter.get('/direct/recipients', requireAuth, controller.listRecipients)
 conversationRouter.post(
-  '/direct',
+  '/direct/messages',
   requireAuth,
-  validate(createDirectConversationInputSchema),
-  controller.createDirect,
+  validate(sendFirstDirectMessageInputSchema),
+  controller.sendFirstDirect,
 )
 conversationRouter.get('/', requireAuth, controller.list)
 conversationRouter.get('/:conversationId/messages', requireAuth, controller.listMessages)

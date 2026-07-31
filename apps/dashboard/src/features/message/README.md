@@ -59,11 +59,12 @@ query and stays on list/new.
 
 Routes mount a single workspace shell:
 
-| Route                       | Shell behavior                                                                  |
-| --------------------------- | ------------------------------------------------------------------------------- |
-| `/messages`                 | List + desktop empty right pane                                                 |
-| `/messages/new`             | Recipient picker; mobile is full-screen (scope chrome and header action hidden) |
-| `/messages/:conversationId` | Thread; mobile shows thread only with back link to scoped or global list        |
+| Route                       | Shell behavior                                                                      |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| `/messages`                 | List + desktop empty right pane                                                     |
+| `/messages/new`             | Recipient picker; selecting someone navigates to `?to=` draft or an existing thread |
+| `/messages/new?to=:userId`  | Draft thread (composer only); first send creates the conversation                   |
+| `/messages/:conversationId` | Thread; mobile shows thread only with back link to scoped or global list            |
 
 `md+` uses a fixed two-column grid. Mobile shows one pane at a time via route
 state in `resolve-messages-workspace-route-state.lib.ts`. Back links derive their
@@ -82,7 +83,7 @@ target from the current URL's `campaignId`, not browser history.
 | `hooks/use-conversations.ts`                     | Conversation list query with poll-while-visible       |
 | `hooks/use-conversation-messages.ts`             | Infinite message pages for a thread                   |
 | `hooks/use-conversation-recipients.ts`           | Active campaign-member picker data                    |
-| `hooks/use-conversation-actions.ts`              | Create, send, mark-read mutations                     |
+| `hooks/use-conversation-actions.ts`              | First send, send, mark-read mutations                 |
 | `hooks/use-messages-campaign-scope-effects.ts`   | Invalid scope strip + notice                          |
 | `lib/messages-copy.ts`                           | User-facing copy constants and formatters             |
 | `lib/messages-campaign-scope-navigation.lib.ts`  | Clear scope + invalid-scope redirect paths            |
@@ -111,6 +112,21 @@ The thread route marks the conversation read when it is open and the latest
 rendered message changes. Sending a message does **not** mark read for the sender.
 After mark-read succeeds, the notification list query is invalidated so the bell
 badge clears.
+
+## First message (lazy create)
+
+Selecting a recipient navigates immediately — there is no separate Start/Continue
+action and no API call until the user sends from the draft thread.
+
+- New peer without an active thread → `/messages/new?to=:userId` (optional
+  `campaignId`, `from` preview preserved).
+- Existing active thread → `/messages/:conversationId`.
+- First send calls `POST /api/conversations/direct/messages` (transactional
+  find-or-create + message insert). Success replaces the URL to
+  `/messages/:conversationId` so Back does not return to the sent draft.
+- Deep links to `?to=` resolve the peer via an independent recipients fetch;
+  stale or ineligible `to` values show recovery copy with a link back to the
+  picker.
 
 ## Composer idempotency
 

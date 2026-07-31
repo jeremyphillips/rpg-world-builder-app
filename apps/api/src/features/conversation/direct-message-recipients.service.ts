@@ -86,6 +86,7 @@ export async function listDirectMessageRecipients(
   )
   const existingConversations = await ConversationModel.find({
     participantKey: { $in: participantKeys },
+    latestMessage: { $ne: null },
   })
     .select('_id participantUserIds')
     .lean<{ _id: unknown; participantUserIds: string[] }[]>()

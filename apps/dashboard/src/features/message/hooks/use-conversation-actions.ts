@@ -15,9 +15,9 @@ import {
 } from '@/features/notification'
 
 import {
-  createDirectConversation,
   markConversationRead,
   sendConversationMessage,
+  sendFirstDirectMessage,
 } from '../api/conversations'
 import {
   applyConversationEnvelopeToList,
@@ -61,22 +61,19 @@ export function useConversationActions(conversationId?: string) {
     void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
   }
 
-  const invalidateConversationQueries = () => {
-    void queryClient.invalidateQueries({
-      queryKey: conversationsQueryKey,
-    })
-    if (conversationId) {
-      void queryClient.invalidateQueries({
-        queryKey: conversationMessagesQueryKey(conversationId),
-      })
-    }
-    invalidateNotificationQueries()
-  }
-
-  const createConversation = useMutation({
-    mutationFn: createDirectConversation,
-    onSuccess: () => {
-      invalidateConversationQueries()
+  const sendFirstMessage = useMutation({
+    mutationFn: sendFirstDirectMessage,
+    onSuccess: ({ conversation, message }) => {
+      const envelope = buildSentMessageListEnvelope(conversation, message)
+      queryClient.setQueriesData<ConversationListResponse>(
+        { queryKey: conversationsQueryKey },
+        (current) => applyConversationEnvelopeToList(current, envelope),
+      )
+      queryClient.setQueryData<InfiniteData<MessageListResponse>>(
+        conversationMessagesQueryKey(conversation.id),
+        (current) => applyConversationEnvelopeToThread(current, envelope),
+      )
+      invalidateNotificationQueries()
     },
   })
 
@@ -145,7 +142,7 @@ export function useConversationActions(conversationId?: string) {
   })
 
   return {
-    createConversation,
+    sendFirstMessage,
     sendMessage,
     markRead,
   }

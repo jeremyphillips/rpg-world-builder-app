@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getMessagesToRecipientUserId,
   isMessagesNewRoute,
   stripLegacyMessagesCampaignsModeSearch,
 } from './messages-workspace-routing.lib'
+
+describe('getMessagesToRecipientUserId', () => {
+  it('reads the draft recipient user id from search params', () => {
+    expect(getMessagesToRecipientUserId('?to=user_2&campaignId=camp_1')).toBe('user_2')
+    expect(getMessagesToRecipientUserId('')).toBeUndefined()
+  })
+})
 
 describe('isMessagesNewRoute', () => {
   it('detects the new-message child route', () => {

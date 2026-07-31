@@ -1,4 +1,5 @@
 export const MESSAGES_FROM_QUERY = 'from'
+export const MESSAGES_TO_QUERY = 'to'
 export const MESSAGES_CAMPAIGN_ID_QUERY = 'campaignId'
 export const MESSAGES_NEW_ROUTE_SEGMENT = 'new'
 export const MESSAGES_ROUTE_SEGMENT = 'messages'
@@ -42,13 +43,21 @@ export function getMessagesFromConversationId(search: string): string | undefine
   return from || undefined
 }
 
+export function getMessagesToRecipientUserId(search: string): string | undefined {
+  const params = new URLSearchParams(search)
+  const to = params.get(MESSAGES_TO_QUERY)?.trim()
+  return to || undefined
+}
+
 export function buildMessagesSearchParams(input: {
   campaignId?: string
   from?: string
+  to?: string
 }): URLSearchParams {
   const params = new URLSearchParams()
   if (input.campaignId) params.set(MESSAGES_CAMPAIGN_ID_QUERY, input.campaignId)
   if (input.from) params.set(MESSAGES_FROM_QUERY, input.from)
+  if (input.to) params.set(MESSAGES_TO_QUERY, input.to)
   return params
 }
 

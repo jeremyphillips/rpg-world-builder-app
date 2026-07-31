@@ -18,13 +18,13 @@ describe('messages-campaign-scope-navigation', () => {
       ).toBe(ROUTES.messages.detail('conv_1'))
     })
 
-    it('preserves from when clearing scope from the new-message route', () => {
+    it('preserves from and to when clearing scope from the new-message route', () => {
       expect(
         resolveMessagesClearScopePath({
           pathname: '/messages/new',
-          search: '?from=conv_2&campaignId=camp_1',
+          search: '?from=conv_2&to=user_3&campaignId=camp_1',
         }),
-      ).toBe(ROUTES.messages.new({ from: 'conv_2' }))
+      ).toBe(ROUTES.messages.new({ from: 'conv_2', to: 'user_3' }))
     })
 
     it('returns the global list when clearing scope from the list route', () => {

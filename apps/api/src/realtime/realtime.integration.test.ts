@@ -260,13 +260,6 @@ describe('realtime socket server', () => {
       campaignRole: 'observer',
     })
 
-    const created = await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: member.userId })
-      .expect(201)
-    const conversationId = created.body.conversation.id as string
-
     const senderSocket = await connectSocket(
       serverBundle.baseUrl,
       buildSessionCookieHeader(owner.userId),
@@ -287,11 +280,16 @@ describe('realtime socket server', () => {
       version: number
     }>(recipientSocket, REALTIME_EVENTS.conversationActivity)
 
-    await owner.agent
-      .post(`/api/conversations/${conversationId}/messages`)
+    const created = await owner.agent
+      .post('/api/conversations/direct/messages')
       .set(CSRF_HEADER, owner.csrfToken)
-      .send({ content: { kind: 'text', text: 'Hello over socket' } })
+      .send({
+        recipientUserId: member.userId,
+        content: { kind: 'text', text: 'Hello over socket' },
+      })
       .expect(201)
+
+    expect(created.body.conversation.id).toBeTruthy()
 
     const [senderPayload, recipientPayload] = await Promise.all([
       senderActivityPromise,

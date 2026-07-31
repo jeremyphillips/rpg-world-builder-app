@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import {
   DIRECT_MESSAGE_PREVIEW_MAX_LENGTH,
+  directMessageContentSchema,
   directMessageSchema,
   sendDirectMessageInputSchema,
 } from './direct-message'
@@ -57,11 +58,20 @@ export const conversationListItemSchema = conversationSchema
 
 export type ConversationListItem = z.infer<typeof conversationListItemSchema>
 
-export const createDirectConversationInputSchema = z.object({
+export const sendFirstDirectMessageInputSchema = z.object({
   recipientUserId: z.string(),
+  content: directMessageContentSchema,
+  clientMessageId: z.string().trim().min(1).optional(),
 })
 
-export type CreateDirectConversationInput = z.infer<typeof createDirectConversationInputSchema>
+export type SendFirstDirectMessageInput = z.infer<typeof sendFirstDirectMessageInputSchema>
+
+export const sendFirstDirectMessageResponseSchema = z.object({
+  conversation: conversationSchema,
+  message: directMessageSchema,
+})
+
+export type SendFirstDirectMessageResponse = z.infer<typeof sendFirstDirectMessageResponseSchema>
 
 export const directConversationRecipientSchema = conversationPeerSchema
 

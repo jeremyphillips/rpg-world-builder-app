@@ -1,5 +1,5 @@
 import type { Conversation, DirectMessage } from '@rpg/contracts'
-import { isValidObjectId, Types } from 'mongoose'
+import { isValidObjectId, Types, type ClientSession } from 'mongoose'
 
 import { buildMessagePreview } from './build-message-preview.lib'
 import {
@@ -17,6 +17,7 @@ import {
   assembleConversationResponses,
 } from './assemble-conversation-response.lib'
 import type { BaseConversation } from './to-conversation'
+import { areMongoTransactionsEnabled, runInTransaction } from '../../lib/mongo-transaction'
 
 type ConversationRecord = Parameters<typeof toConversation>[0]
 type MessageRecord = Parameters<typeof toMessage>[0]
@@ -57,7 +58,11 @@ export function decodeConversationCursor(cursor: string): { sortAt: Date; id: st
   return { sortAt, id }
 }
 
-async function ensureParticipantStates(conversationId: string, participantUserIds: string[]) {
+async function ensureParticipantStates(
+  conversationId: string,
+  participantUserIds: string[],
+  session?: ClientSession,
+) {
   await Promise.all(
     participantUserIds.map((userId) =>
       ConversationParticipantStateModel.updateOne(
@@ -70,7 +75,7 @@ async function ensureParticipantStates(conversationId: string, participantUserId
             lastReadAt: null,
           },
         },
-        { upsert: true },
+        { upsert: true, session: session ?? undefined },
       ),
     ),
   )
@@ -80,10 +85,12 @@ async function countUnreadMessagesForParticipant({
   conversationId,
   viewerUserId,
   lastReadMessageId,
+  session,
 }: {
   conversationId: string
   viewerUserId: string
   lastReadMessageId?: string | null
+  session?: ClientSession
 }): Promise<number> {
   const baseFilter = {
     conversationId,
@@ -92,15 +99,16 @@ async function countUnreadMessagesForParticipant({
   }
 
   if (!lastReadMessageId || !isValidObjectId(lastReadMessageId)) {
-    return MessageModel.countDocuments(baseFilter)
+    return MessageModel.countDocuments(baseFilter).session(session ?? null)
   }
 
   const lastRead = await MessageModel.findById(lastReadMessageId)
     .select('createdAt')
+    .session(session ?? null)
     .lean<{ createdAt: Date; _id: Types.ObjectId } | null>()
 
   if (!lastRead) {
-    return MessageModel.countDocuments(baseFilter)
+    return MessageModel.countDocuments(baseFilter).session(session ?? null)
   }
 
   return MessageModel.countDocuments({
@@ -112,16 +120,18 @@ async function countUnreadMessagesForParticipant({
         _id: { $gt: lastRead._id },
       },
     ],
-  })
+  }).session(session ?? null)
 }
 
 async function incrementParticipantStateVersions(
   conversationId: string,
   participantUserIds: string[],
+  session?: ClientSession,
 ): Promise<void> {
   await ConversationParticipantStateModel.updateMany(
     { conversationId, userId: { $in: participantUserIds } },
     { $inc: { version: 1 }, $set: { updatedAt: new Date() } },
+    { session: session ?? undefined },
   )
 }
 
@@ -559,6 +569,320 @@ export async function sendDirectMessage({
     recipientUserId,
     unreadMessageCount,
     isNew: true,
+  }
+}
+
+type FirstDirectMessageWriteResult = {
+  conversation: Conversation
+  message: DirectMessage
+  recipientUserId: string
+  unreadMessageCount: number
+  isNew: boolean
+}
+
+async function loadRecipientUnreadCount(
+  conversationId: string,
+  recipientUserId: string,
+  session?: ClientSession,
+): Promise<number> {
+  const participantState = await ConversationParticipantStateModel.findOne({
+    conversationId,
+    userId: recipientUserId,
+  })
+    .select('lastReadMessageId')
+    .session(session ?? null)
+    .lean<{ lastReadMessageId?: string | null } | null>()
+
+  return countUnreadMessagesForParticipant({
+    conversationId,
+    viewerUserId: recipientUserId,
+    lastReadMessageId: participantState?.lastReadMessageId,
+    session,
+  })
+}
+
+async function findExistingFirstDirectMessageRecord({
+  callerUserId,
+  recipientUserId,
+  clientMessageId,
+  peer,
+  session,
+}: {
+  callerUserId: string
+  recipientUserId: string
+  clientMessageId: string
+  peer: { userId: string; displayName: string }
+  session?: ClientSession
+}): Promise<FirstDirectMessageWriteResult | null> {
+  const participantKey = buildDirectConversationParticipantKey(callerUserId, recipientUserId)
+  const conversation = await ConversationModel.findOne({ participantKey })
+    .session(session ?? null)
+    .lean<ConversationRecord | null>()
+
+  if (!conversation) return null
+
+  const existing = await MessageModel.findOne({
+    conversationId: String(conversation._id),
+    senderUserId: callerUserId,
+    clientMessageId,
+  })
+    .session(session ?? null)
+    .lean<MessageRecord | null>()
+
+  if (!existing) return null
+
+  const conversationDto = await buildConversationDto(conversation, callerUserId, peer)
+
+  return {
+    conversation: conversationDto,
+    message: toMessage(existing),
+    recipientUserId,
+    unreadMessageCount: await loadRecipientUnreadCount(
+      String(conversation._id),
+      recipientUserId,
+      session,
+    ),
+    isNew: false,
+  }
+}
+
+async function findOrCreateDirectConversationDoc({
+  participantKey,
+  participantUserIds,
+  session,
+}: {
+  participantKey: string
+  participantUserIds: string[]
+  session?: ClientSession
+}): Promise<ConversationRecord> {
+  const existing = await ConversationModel.findOne({ participantKey })
+    .session(session ?? null)
+    .lean<ConversationRecord | null>()
+
+  if (existing) return existing
+
+  const payload = {
+    kind: 'direct' as const,
+    participantKey,
+    participantUserIds,
+    latestMessage: null,
+  }
+
+  const created = session
+    ? await ConversationModel.create([payload], { session })
+    : await ConversationModel.create(payload)
+
+  const createdDoc = Array.isArray(created) ? created[0] : created
+  if (!createdDoc) {
+    throw new Error('Failed to create direct conversation.')
+  }
+
+  return createdDoc.toObject() as ConversationRecord
+}
+
+async function createDirectMessageDocument({
+  conversationId,
+  senderUserId,
+  content,
+  clientMessageId,
+  session,
+}: {
+  conversationId: string
+  senderUserId: string
+  content: { kind: 'text'; text: string }
+  clientMessageId?: string
+  session?: ClientSession
+}): Promise<MessageRecord> {
+  const payload = {
+    conversationId,
+    senderUserId,
+    content,
+    clientMessageId: clientMessageId ?? null,
+    editedAt: null,
+    deletedAt: null,
+  }
+
+  const created = session
+    ? await MessageModel.create([payload], { session })
+    : await MessageModel.create(payload)
+
+  const messageDoc = Array.isArray(created) ? created[0] : created
+  if (!messageDoc) {
+    throw new Error('Failed to create first direct message.')
+  }
+
+  return messageDoc.toObject() as MessageRecord
+}
+
+async function casUpdateConversationLatestMessage({
+  conversationId,
+  messageDoc,
+  senderUserId,
+  preview,
+  session,
+}: {
+  conversationId: string
+  messageDoc: MessageRecord
+  senderUserId: string
+  preview: string
+  session?: ClientSession
+}): Promise<void> {
+  await ConversationModel.findOneAndUpdate(
+    {
+      _id: conversationId,
+      $or: [
+        { latestMessage: null },
+        { latestMessage: { $exists: false } },
+        { 'latestMessage.createdAt': { $lt: messageDoc.createdAt } },
+        {
+          'latestMessage.createdAt': messageDoc.createdAt,
+          'latestMessage.messageId': { $lt: String(messageDoc._id) },
+        },
+      ],
+    },
+    {
+      $set: {
+        latestMessage: {
+          messageId: String(messageDoc._id),
+          senderUserId,
+          preview,
+          createdAt: messageDoc.createdAt,
+        },
+        updatedAt: new Date(),
+      },
+    },
+    { session: session ?? undefined },
+  )
+}
+
+async function executeFirstDirectMessageWrites({
+  callerUserId,
+  recipientUserId,
+  content,
+  clientMessageId,
+  peer,
+  session,
+}: {
+  callerUserId: string
+  recipientUserId: string
+  content: { kind: 'text'; text: string }
+  clientMessageId?: string
+  peer: { userId: string; displayName: string }
+  session?: ClientSession
+}): Promise<FirstDirectMessageWriteResult> {
+  const participantKey = buildDirectConversationParticipantKey(callerUserId, recipientUserId)
+  const participantUserIds = buildDirectConversationParticipantIds(callerUserId, recipientUserId)
+
+  const doc = await findOrCreateDirectConversationDoc({
+    participantKey,
+    participantUserIds,
+    session,
+  })
+
+  const conversationId = String(doc._id)
+  await ensureParticipantStates(conversationId, participantUserIds, session)
+
+  const messageDoc = await createDirectMessageDocument({
+    conversationId,
+    senderUserId: callerUserId,
+    content,
+    clientMessageId,
+    session,
+  })
+
+  await casUpdateConversationLatestMessage({
+    conversationId,
+    messageDoc,
+    senderUserId: callerUserId,
+    preview: buildMessagePreview(content.text),
+    session,
+  })
+
+  await incrementParticipantStateVersions(conversationId, participantUserIds, session)
+
+  const updatedConversation = await ConversationModel.findById(conversationId)
+    .session(session ?? null)
+    .lean<ConversationRecord | null>()
+
+  if (!updatedConversation) {
+    throw new Error('Conversation missing after first direct message write.')
+  }
+
+  const conversationDto = await buildConversationDto(updatedConversation, callerUserId, peer)
+
+  return {
+    conversation: conversationDto,
+    message: toMessage(messageDoc),
+    recipientUserId,
+    unreadMessageCount: await loadRecipientUnreadCount(conversationId, recipientUserId, session),
+    isNew: true,
+  }
+}
+
+/** Removes a conversation row left empty after a failed non-transactional first send. */
+export async function compensateEmptyDirectConversation(conversationId: string): Promise<void> {
+  const conversation = await ConversationModel.findById(conversationId)
+    .select('latestMessage')
+    .lean<{ latestMessage?: ConversationRecord['latestMessage'] } | null>()
+
+  if (!conversation || conversation.latestMessage) return
+
+  const messageExists = await MessageModel.exists({ conversationId })
+  if (messageExists) return
+
+  await ConversationParticipantStateModel.deleteMany({ conversationId })
+  await ConversationModel.deleteOne({ _id: conversationId })
+}
+
+export async function sendFirstDirectMessageRecord({
+  callerUserId,
+  recipientUserId,
+  content,
+  clientMessageId,
+  peer,
+}: {
+  callerUserId: string
+  recipientUserId: string
+  content: { kind: 'text'; text: string }
+  clientMessageId?: string
+  peer: { userId: string; displayName: string }
+}): Promise<FirstDirectMessageWriteResult> {
+  const write = async (session?: ClientSession) => {
+    if (clientMessageId) {
+      const existing = await findExistingFirstDirectMessageRecord({
+        callerUserId,
+        recipientUserId,
+        clientMessageId,
+        peer,
+        session,
+      })
+      if (existing) return existing
+    }
+
+    return executeFirstDirectMessageWrites({
+      callerUserId,
+      recipientUserId,
+      content,
+      clientMessageId,
+      peer,
+      session,
+    })
+  }
+
+  if (areMongoTransactionsEnabled()) {
+    return runInTransaction((session) => write(session))
+  }
+
+  const participantKey = buildDirectConversationParticipantKey(callerUserId, recipientUserId)
+
+  try {
+    return await write()
+  } catch (error) {
+    const conversation = await ConversationModel.findOne({ participantKey }).select('_id').lean()
+    if (conversation) {
+      await compensateEmptyDirectConversation(String(conversation._id))
+    }
+    throw error
   }
 }
 

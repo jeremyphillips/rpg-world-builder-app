@@ -3,21 +3,21 @@ import { isValidObjectId } from 'mongoose'
 
 import {
   conversationListQuerySchema,
-  createDirectConversationInputSchema,
   directConversationRecipientsQuerySchema,
   markConversationReadInputSchema,
   messageListQuerySchema,
   sendDirectMessageInputSchema,
+  sendFirstDirectMessageInputSchema,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import {
-  createDirectConversation,
   getDirectMessageRecipients,
   listConversationMessages,
   listConversations,
   markConversationRead,
   sendConversationMessage,
+  sendFirstDirectMessage,
 } from './conversation.service'
 
 export async function listRecipients(req: Request, res: Response): Promise<void> {
@@ -37,8 +37,8 @@ export async function listRecipients(req: Request, res: Response): Promise<void>
   res.status(200).json(result)
 }
 
-export async function createDirect(req: Request, res: Response): Promise<void> {
-  const parsed = createDirectConversationInputSchema.safeParse(req.body)
+export async function sendFirstDirect(req: Request, res: Response): Promise<void> {
+  const parsed = sendFirstDirectMessageInputSchema.safeParse(req.body)
   if (!parsed.success) {
     throw HttpError.badRequest('Validation failed', {
       issues: parsed.error.issues.map((issue) => ({
@@ -48,8 +48,8 @@ export async function createDirect(req: Request, res: Response): Promise<void> {
     })
   }
 
-  const conversation = await createDirectConversation(req.user!.id, parsed.data.recipientUserId)
-  res.status(201).json({ conversation })
+  const result = await sendFirstDirectMessage(req.user!.id, parsed.data)
+  res.status(201).json(result)
 }
 
 export async function list(req: Request, res: Response): Promise<void> {

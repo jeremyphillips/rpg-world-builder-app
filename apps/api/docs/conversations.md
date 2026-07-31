@@ -7,7 +7,7 @@ conversations are reserved for a future slice.
 ## Endpoints
 
 ```text
-POST   /api/conversations/direct
+POST   /api/conversations/direct/messages
 GET    /api/conversations/direct/recipients
 GET    /api/conversations
 GET    /api/conversations/:conversationId/messages
@@ -28,8 +28,44 @@ Recipients are resolved from **current** shared campaign membership:
   PC↔PC pairs require active open participation (or completed onboarding membership)
   so inactive or historical relationships are excluded.
 
-The same rules apply to `GET /direct/recipients`, `POST /direct`, and
+The same rules apply to `GET /direct/recipients`, `POST /direct/messages`, and
 `POST /:conversationId/messages` (existing threads re-check eligibility on send).
+
+## First message orchestration
+
+`POST /direct/messages` atomically find-or-creates the direct conversation, inserts
+the first message, and updates `latestMessage` in one Mongo transaction when
+transactions are enabled (`MONGO_TRANSACTION_MODE=auto|required`). When
+transactions are unavailable, a compensating delete removes any empty conversation
+row if message persistence fails.
+
+Request body:
+
+```ts
+{
+  recipientUserId: string
+  content: { kind: 'text'; text: string }
+  clientMessageId?: string
+}
+```
+
+Response:
+
+```ts
+{
+  conversation: Conversation
+  message: DirectMessage
+}
+```
+
+- Eligibility is re-checked immediately before persistence.
+- `clientMessageId` idempotency returns the original `{ conversation, message }`
+  without notification or realtime side effects.
+- Empty conversations (no `latestMessage`) are invalid state after this ships.
+  Legacy rows can be removed with
+  `pnpm exec tsx tools/migrations/delete-empty-direct-conversations.ts`.
+- `existingDirectByUserId` in recipients maps only conversations with activity
+  (`latestMessage != null`).
 
 ## Shared campaigns (resolved live)
 

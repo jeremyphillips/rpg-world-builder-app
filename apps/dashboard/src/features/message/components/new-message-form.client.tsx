@@ -1,8 +1,7 @@
 'use client'
 
-import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, ComboboxField, Text } from '@rpg/ui'
+import { ComboboxField, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
@@ -21,21 +20,17 @@ type NewMessageFormProps = {
   recipients: DirectConversationRecipient[]
   recipientUserId: string
   onRecipientChange: (value: string) => void
-  onSubmit: (event: FormEvent) => void
   onCancel: () => void
-  isSubmitting: boolean
 }
 
 export function NewMessageForm({
   recipients,
   recipientUserId,
   onRecipientChange,
-  onSubmit,
   onCancel,
-  isSubmitting,
 }: NewMessageFormProps) {
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <ComboboxField
         id="recipient"
         label={MESSAGES_FORM_COPY.recipientLabel}
@@ -48,15 +43,14 @@ export function NewMessageForm({
           label: recipient.displayName,
         }))}
       />
-      <div className="flex gap-2">
-        <Button type="submit" disabled={!recipientUserId || isSubmitting}>
-          {MESSAGES_ACTION_COPY.startConversation}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          {MESSAGES_ACTION_COPY.cancel}
-        </Button>
-      </div>
-    </form>
+      <button
+        type="button"
+        className="self-start text-sm text-muted-foreground hover:text-foreground"
+        onClick={onCancel}
+      >
+        {MESSAGES_ACTION_COPY.cancel}
+      </button>
+    </div>
   )
 }
 

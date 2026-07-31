@@ -1,7 +1,9 @@
 import request from 'supertest'
-import { describe, expect, it } from 'vitest'
+import type { Agent } from 'supertest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CSRF_HEADER } from '../../lib/cookies'
+import * as mongoTransaction from '../../lib/mongo-transaction'
 import {
   createTestCampaign,
   registerAndLoginTestUser,
@@ -11,6 +13,8 @@ import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { clearTestDb } from '../../test/db'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { useIntegrationApp } from '../../test/setup/integration-app'
+import { ConversationModel } from './conversation.model'
+import { MessageModel } from './message.model'
 import { NotificationModel } from '../notification/notification.model'
 import { directMessageDedupeKey } from '../notification/notification-dedupe-keys'
 
@@ -18,13 +22,35 @@ const getApp = useIntegrationApp()
 
 useIntegrationDb()
 
+afterEach(() => {
+  vi.restoreAllMocks()
+})
+
+async function sendFirstDirectMessage(
+  agent: Agent,
+  csrfToken: string,
+  recipientUserId: string,
+  text: string,
+  clientMessageId?: string,
+) {
+  return agent
+    .post('/api/conversations/direct/messages')
+    .set(CSRF_HEADER, csrfToken)
+    .send({
+      recipientUserId,
+      content: { kind: 'text', text },
+      ...(clientMessageId ? { clientMessageId } : {}),
+    })
+    .expect(201)
+}
+
 describe('conversation routes', () => {
   it('requires authentication', async () => {
     await clearTestDb()
     await request(getApp()).get('/api/conversations').expect(401)
   })
 
-  it('creates a conversation, sends messages, dedupes notifications, and marks read', async () => {
+  it('creates a conversation on first send, dedupes notifications, and marks read', async () => {
     await clearTestDb()
 
     const owner = await registerAndLoginTestUser(getApp(), {
@@ -40,6 +66,14 @@ describe('conversation routes', () => {
       displayName: 'Campaign Member',
       campaignRole: 'observer',
     })
+
+    const recipientsBeforeSend = await owner.agent
+      .get('/api/conversations/direct/recipients')
+      .expect(200)
+    expect(recipientsBeforeSend.body.existingDirectByUserId).toEqual({})
+
+    const listedBeforeSend = await owner.agent.get('/api/conversations').expect(200)
+    expect(listedBeforeSend.body.items).toHaveLength(0)
 
     const recipients = await owner.agent.get('/api/conversations/direct/recipients').expect(200)
     expect(recipients.body.recipientsByUserId).toEqual(
@@ -57,23 +91,25 @@ describe('conversation routes', () => {
       }),
     ])
 
-    const created = await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: member.userId })
-      .expect(201)
+    const created = await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      member.userId,
+      'Hello there',
+      'draft-1',
+    )
 
     const conversationId = created.body.conversation.id as string
     expect(created.body.conversation.peer.displayName).toBe('Campaign Member')
     expect(created.body.conversation.sharedCampaigns).toEqual([
       expect.objectContaining({ campaignName: 'Stormwatch' }),
     ])
+    expect(created.body.message.content.text).toBe('Hello there')
 
-    const firstSend = await owner.agent
-      .post(`/api/conversations/${conversationId}/messages`)
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ content: { kind: 'text', text: 'Hello there' }, clientMessageId: 'draft-1' })
-      .expect(201)
+    const recipientsAfterSend = await owner.agent
+      .get('/api/conversations/direct/recipients')
+      .expect(200)
+    expect(recipientsAfterSend.body.existingDirectByUserId[member.userId]).toBe(conversationId)
 
     const secondSend = await owner.agent
       .post(`/api/conversations/${conversationId}/messages`)
@@ -81,7 +117,7 @@ describe('conversation routes', () => {
       .send({ content: { kind: 'text', text: 'Second ping' }, clientMessageId: 'draft-2' })
       .expect(201)
 
-    expect(firstSend.body.message.id).not.toBe(secondSend.body.message.id)
+    expect(created.body.message.id).not.toBe(secondSend.body.message.id)
 
     const notification = await NotificationModel.findOne({
       recipientUserId: member.userId,
@@ -95,6 +131,9 @@ describe('conversation routes', () => {
 
     const listedForMember = await member.agent.get('/api/conversations').expect(200)
     expect(listedForMember.body.items[0].unreadCount).toBe(2)
+    expect(
+      listedForMember.body.items.every((item: { latestMessage?: unknown }) => item.latestMessage),
+    ).toBe(true)
 
     const messages = await member.agent
       .get(`/api/conversations/${conversationId}/messages?limit=10`)
@@ -119,10 +158,53 @@ describe('conversation routes', () => {
       .send({ content: { kind: 'text', text: 'Hello there' }, clientMessageId: 'draft-1' })
       .expect(201)
 
-    expect(retry.body.message.id).toBe(firstSend.body.message.id)
+    expect(retry.body.message.id).toBe(created.body.message.id)
   })
 
-  it('rejects ineligible recipients', async () => {
+  it('dedupes first-send retries by clientMessageId without duplicate notifications', async () => {
+    await clearTestDb()
+
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'owner-first-idempotent@example.com',
+      password: 'supersecret',
+      displayName: 'Campaign Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Idempotent Harbor')
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'member-first-idempotent@example.com',
+      displayName: 'Campaign Member',
+      campaignRole: 'observer',
+    })
+
+    const first = await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      member.userId,
+      'First message',
+      'first-send-1',
+    )
+
+    const conversationId = first.body.conversation.id as string
+
+    await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      member.userId,
+      'First message',
+      'first-send-1',
+    )
+
+    const notifications = await NotificationModel.find({
+      recipientUserId: member.userId,
+      dedupeKey: directMessageDedupeKey(conversationId),
+    }).lean()
+
+    expect(notifications).toHaveLength(1)
+  })
+
+  it('rejects ineligible recipients on first send', async () => {
     await clearTestDb()
 
     const owner = await registerAndLoginTestUser(getApp(), {
@@ -137,10 +219,16 @@ describe('conversation routes', () => {
     })
 
     await owner.agent
-      .post('/api/conversations/direct')
+      .post('/api/conversations/direct/messages')
       .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: outsider.userId })
+      .send({
+        recipientUserId: outsider.userId,
+        content: { kind: 'text', text: 'Hello outsider' },
+      })
       .expect(403)
+
+    const conversations = await ConversationModel.find().lean()
+    expect(conversations).toHaveLength(0)
   })
 
   it('returns 404 when a non-participant lists messages', async () => {
@@ -166,11 +254,12 @@ describe('conversation routes', () => {
       displayName: 'Outsider',
     })
 
-    const created = await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: member.userId })
-      .expect(201)
+    const created = await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      member.userId,
+      'Hello member',
+    )
 
     const conversationId = created.body.conversation.id as string
 
@@ -201,16 +290,13 @@ describe('conversation routes', () => {
       campaignRole: 'observer',
     })
 
-    const createdA = await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: memberA.userId })
-      .expect(201)
-    await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: memberB.userId })
-      .expect(201)
+    const createdA = await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      memberA.userId,
+      'Hello Alpha',
+    )
+    await sendFirstDirectMessage(owner.agent, owner.csrfToken, memberB.userId, 'Hello Beta')
 
     const scoped = await owner.agent
       .get(`/api/conversations?campaignId=${campaignA}&limit=1`)
@@ -245,11 +331,7 @@ describe('conversation routes', () => {
       campaignRole: 'observer',
     })
 
-    await owner.agent
-      .post('/api/conversations/direct')
-      .set(CSRF_HEADER, owner.csrfToken)
-      .send({ recipientUserId: member.userId })
-      .expect(201)
+    await sendFirstDirectMessage(owner.agent, owner.csrfToken, member.userId, 'Hello member')
 
     const invalid = await owner.agent
       .get('/api/conversations?campaignId=507f1f77bcf86cd799439011')
@@ -296,5 +378,39 @@ describe('conversation routes', () => {
         campaignName: 'Recipients Alpha',
       }),
     )
+  })
+
+  it('does not leave an empty conversation after a failed first send without transactions', async () => {
+    await clearTestDb()
+    vi.spyOn(mongoTransaction, 'areMongoTransactionsEnabled').mockReturnValue(false)
+    vi.spyOn(MessageModel, 'create').mockRejectedValueOnce(
+      new Error('Simulated message persist failure'),
+    )
+
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'owner-failed-first@example.com',
+      password: 'supersecret',
+      displayName: 'Failed First Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Failure Harbor')
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'member-failed-first@example.com',
+      displayName: 'Campaign Member',
+      campaignRole: 'observer',
+    })
+
+    await owner.agent
+      .post('/api/conversations/direct/messages')
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        recipientUserId: member.userId,
+        content: { kind: 'text', text: 'This should fail' },
+      })
+      .expect(500)
+
+    const conversations = await ConversationModel.find().lean()
+    expect(conversations).toHaveLength(0)
   })
 })

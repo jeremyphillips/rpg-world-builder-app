@@ -45,8 +45,25 @@ describe('resolveMessagesWorkspaceRouteState', () => {
       campaignId: 'camp_1',
       showDirectEmptyRight: false,
       showNewNeutralRight: true,
+      showDraftThreadRight: false,
       showRightOnMobile: false,
       showLeftOnMobile: true,
+    })
+  })
+
+  it('treats the new route with to as a draft thread on mobile', () => {
+    const state = resolveMessagesWorkspaceRouteState({
+      search: '?to=user_2&campaignId=camp_1',
+      isNewRoute: true,
+    })
+
+    expect(state).toMatchObject({
+      isNewRoute: true,
+      toRecipientUserId: 'user_2',
+      showDraftThreadRight: true,
+      showNewNeutralRight: false,
+      showRightOnMobile: true,
+      showLeftOnMobile: false,
     })
   })
 

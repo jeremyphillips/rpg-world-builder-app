@@ -1,11 +1,23 @@
 import { ROUTES } from '@/app/routes'
 
-import { getMessagesFromConversationId, isMessagesNewRoute } from './messages-workspace-routing.lib'
+import {
+  getMessagesFromConversationId,
+  getMessagesToRecipientUserId,
+  isMessagesNewRoute,
+} from './messages-workspace-routing.lib'
+
+function buildNewMessagePath(search: string): string {
+  const from = getMessagesFromConversationId(search)
+  const to = getMessagesToRecipientUserId(search)
+  return ROUTES.messages.new({
+    ...(from ? { from } : {}),
+    ...(to ? { to } : {}),
+  })
+}
 
 export function resolveMessagesClearScopePath(input: { pathname: string; search: string }): string {
   if (isMessagesNewRoute(input.pathname)) {
-    const from = getMessagesFromConversationId(input.search)
-    return ROUTES.messages.new(from ? { from } : undefined)
+    return buildNewMessagePath(input.search)
   }
 
   const isThreadRoute = /^\/messages\/[^/]+$/.test(input.pathname)
@@ -30,8 +42,7 @@ export function resolveInvalidScopeRedirectPath(input: {
   }
 
   if (input.isNewRoute) {
-    const from = getMessagesFromConversationId(input.search)
-    return ROUTES.messages.new(from ? { from } : undefined)
+    return buildNewMessagePath(input.search)
   }
 
   return ROUTES.messages.list

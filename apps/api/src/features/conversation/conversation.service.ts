@@ -4,6 +4,7 @@ import type {
   DirectConversationRecipientsResponse,
   DirectMessage,
   MessageListResponse,
+  SendFirstDirectMessageInput,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
@@ -15,7 +16,6 @@ import {
   buildConversationForParticipant,
   decodeConversationCursor,
   decodeMessageCursor,
-  findOrCreateDirectConversation,
   getOtherParticipantUserId,
   listAllConversationRecordsForUser,
   listConversationsForUser,
@@ -23,6 +23,7 @@ import {
   listMessagesForConversation,
   markConversationRead as markConversationReadRecord,
   sendDirectMessage,
+  sendFirstDirectMessageRecord,
 } from './conversation.repository'
 import {
   isPeerEligibleInCampaignScope,
@@ -81,25 +82,59 @@ export async function getDirectMessageRecipients(
   return listDirectMessageRecipients(callerUserId, options)
 }
 
-export async function createDirectConversation(
+export async function sendFirstDirectMessage(
   callerUserId: string,
-  recipientUserId: string,
-): Promise<Conversation> {
-  const eligible = await isEligibleDirectMessageRecipient(callerUserId, recipientUserId)
+  input: SendFirstDirectMessageInput,
+): Promise<{ conversation: Conversation; message: DirectMessage }> {
+  const eligible = await isEligibleDirectMessageRecipient(callerUserId, input.recipientUserId)
   if (!eligible) {
     throw HttpError.forbidden('Recipient is not eligible for direct messages.')
   }
 
-  const recipient = await findSessionUserById(recipientUserId)
+  const recipient = await findSessionUserById(input.recipientUserId)
   if (!recipient) {
     throw new HttpError(404, 'not_found', 'Recipient not found.')
   }
 
-  return findOrCreateDirectConversation({
+  const result = await sendFirstDirectMessageRecord({
     callerUserId,
-    recipientUserId,
-    peer: { userId: recipientUserId, displayName: recipient.displayName },
+    recipientUserId: input.recipientUserId,
+    content: input.content,
+    clientMessageId: input.clientMessageId,
+    peer: { userId: input.recipientUserId, displayName: recipient.displayName },
   })
+
+  if (result.isNew && result.recipientUserId && result.unreadMessageCount > 0) {
+    try {
+      await publishDirectMessageReceivedNotification({
+        conversationId: result.conversation.id,
+        recipientUserId: result.recipientUserId,
+        messageId: result.message.id,
+        senderUserId: callerUserId,
+        text: input.content.text,
+        unreadMessageCount: result.unreadMessageCount,
+      })
+    } catch (error) {
+      console.error('Failed to publish direct message notification.', error)
+    }
+  }
+
+  if (result.isNew) {
+    try {
+      await deliverConversationActivityToParticipants({
+        conversationId: result.conversation.id,
+        participantUserIds: [callerUserId, result.recipientUserId].filter(Boolean),
+        message: result.message,
+      })
+    } catch (error) {
+      console.error('Failed to deliver conversation activity over realtime.', error)
+    }
+  }
+
+  return {
+    conversation: result.conversation,
+    message: result.message,
+  }
 }
 
 export async function listConversations(

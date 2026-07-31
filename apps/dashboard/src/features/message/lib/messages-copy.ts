@@ -47,6 +47,11 @@ export const MESSAGES_STATUS_COPY = {
   noMessagesYet: 'No messages yet',
 } as const
 
+export const MESSAGES_STALE_RECIPIENT_COPY = {
+  heading: 'This person is no longer available to message.',
+  action: 'Choose another recipient',
+} as const
+
 export const MESSAGES_ERROR_COPY = {
   loadConversations: 'Could not load conversations.',
   loadMessages: 'Could not load messages.',
