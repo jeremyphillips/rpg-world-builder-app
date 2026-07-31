@@ -59,38 +59,86 @@ query and stays on list/new.
 
 Routes mount a single workspace shell:
 
-| Route                       | Shell behavior                                                                      |
-| --------------------------- | ----------------------------------------------------------------------------------- |
-| `/messages`                 | List + desktop empty right pane                                                     |
-| `/messages/new`             | Recipient picker; selecting someone navigates to `?to=` draft or an existing thread |
-| `/messages/new?to=:userId`  | Draft thread (composer only); first send creates the conversation                   |
-| `/messages/:conversationId` | Thread; mobile shows thread only with back link to scoped or global list            |
+| Route                       | Shell behavior                                                                |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| `/messages`                 | PageHeader + list; empty list shows mobile-only Start a conversation fallback |
+| `/messages/new`             | PageHeader Cancel + recipient picker; scope chip hidden on mobile             |
+| `/messages/new?from=:id`    | Desktop: recipient picker + read-only preview thread; mobile: picker only     |
+| `/messages/new?to=:userId`  | Draft thread; header Cancel on mobile                                         |
+| `/messages/:conversationId` | Thread; mobile shows thread only with back link to scoped or global list      |
+
+The workspace owns one page-level **New message** action in the PageHeader. Pane-level
+links are reserved for contextual recovery (mobile empty-list fallback), not duplicated
+primary creation paths.
 
 `md+` uses a fixed two-column grid. Mobile shows one pane at a time via route
 state in `resolve-messages-workspace-route-state.lib.ts`. Back links derive their
 target from the current URL's `campaignId`, not browser history.
 
+### Preview thread (`threadMode`)
+
+`MessagesThreadPane` accepts `threadMode: 'active' | 'preview'` (default
+`'active'`). `resolveMessagesThreadModeBehavior` is the single source of truth for
+composer visibility, mark-read eligibility, and preview chrome.
+
+- **Active:** composer shown; mark-read runs when eligible.
+- **Preview:** composer hidden; mark-read disabled; preview eyebrow copy above the
+  thread header on desktop. History remains interactive — scroll, text selection, and
+  inline shared-campaign links work normally (no `pointer-events-none`).
+- **Mobile `/messages/new?from=`:** picker only; `from` is the Cancel/back target, not
+  a visible preview pane (`showRightOnMobile` stays false).
+
+Cancel on the new-message route uses `resolveMessagesNewCancelTarget` — when `from`
+is present, navigation returns to that conversation with `campaignId` preserved.
+
+### Thread header shared campaigns
+
+Peer name is the primary heading. Shared campaigns render as inline links (1–2) or
+first-two links plus a **+N more** overflow trigger (3+). Overflow uses a plain-text
+tooltip (no links inside tooltips); convert to Popover when available.
+
+Draft threads derive shared campaigns via `resolveRecipientSharedCampaigns` from the
+recipients response — do not filter `data.campaigns` ad hoc in pane components.
+
+### Thread group timestamps
+
+Message groups use semantic list markup (`ul > li` per segment/group; bubbles as
+`<div>` children). Each group shows exactly one `MessagesMetadataTime` under the
+final bubble; date separators render one `<time>` each. `group.timestamp` is the
+final message in the group.
+
+### Conversation list inset
+
+The direct list pane is edge-to-edge. Loading, error, empty, scope hint, and
+out-of-scope pin chrome use deliberate horizontal inset (`px-3`); conversation rows
+keep edge-to-edge backgrounds via row CVA padding.
+
 ## Layout
 
-| Path                                             | Responsibility                                        |
-| ------------------------------------------------ | ----------------------------------------------------- |
-| `routes/messages-workspace.tsx`                  | Unified workspace shell export                        |
-| `components/messages-workspace-shell.client.tsx` | Header, scope chrome, pane orchestration              |
-| `components/messages-workspace-panes.client.tsx` | List, thread, and recipient picker panes              |
-| `components/messages-campaign-scope.client.tsx`  | Scope chip, utility, invalid notice, out-of-scope pin |
-| `components/messages-entry-links.client.tsx`     | Campaign/global entry links for nav and overview      |
-| `api/conversations.ts`                           | Same-origin conversation API client                   |
-| `hooks/use-conversations.ts`                     | Conversation list query with poll-while-visible       |
-| `hooks/use-conversation-messages.ts`             | Infinite message pages for a thread                   |
-| `hooks/use-conversation-recipients.ts`           | Active campaign-member picker data                    |
-| `hooks/use-conversation-actions.ts`              | First send, send, mark-read mutations                 |
-| `hooks/use-messages-campaign-scope-effects.ts`   | Invalid scope strip + notice                          |
-| `lib/messages-copy.ts`                           | User-facing copy constants and formatters             |
-| `lib/messages-campaign-scope-navigation.lib.ts`  | Clear scope + invalid-scope redirect paths            |
-| `lib/conversation-query-keys.ts`                 | Shared query keys                                     |
-| `lib/conversation-cache.ts`                      | List/thread cache helpers + version guards            |
-| `lib/sort-messages-chronologically.ts`           | Newest-first API pages → chronological render         |
-| `lib/group-messages-by-time.lib.ts`              | Five-minute consecutive message groups                |
+| Path                                                      | Responsibility                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `routes/messages-workspace.tsx`                           | Unified workspace shell export                                            |
+| `components/messages-workspace-shell.client.tsx`          | PageHeader, scope chrome, pane orchestration                              |
+| `components/messages-workspace-header.client.tsx`         | Messages H1 + primary New message / recipient Cancel                      |
+| `components/messages-workspace-panes.client.tsx`          | List, thread, and recipient picker panes                                  |
+| `components/messages-campaign-scope.client.tsx`           | Scope chip, utility, invalid notice, out-of-scope pin                     |
+| `components/messages-entry-links.client.tsx`              | Campaign/global entry links for nav and overview                          |
+| `api/conversations.ts`                                    | Same-origin conversation API client                                       |
+| `hooks/use-conversations.ts`                              | Conversation list query with poll-while-visible                           |
+| `hooks/use-conversation-messages.ts`                      | Infinite message pages for a thread                                       |
+| `hooks/use-conversation-recipients.ts`                    | Active campaign-member picker data                                        |
+| `hooks/use-conversation-actions.ts`                       | First send, send, mark-read mutations                                     |
+| `hooks/use-messages-campaign-scope-effects.ts`            | Invalid scope strip + notice                                              |
+| `lib/messages-copy.ts`                                    | User-facing copy constants and formatters                                 |
+| `lib/messages-campaign-scope-navigation.lib.ts`           | Clear scope + invalid-scope redirect paths                                |
+| `lib/conversation-query-keys.ts`                          | Shared query keys                                                         |
+| `lib/conversation-cache.ts`                               | List/thread cache helpers + version guards                                |
+| `lib/sort-messages-chronologically.ts`                    | Newest-first API pages → chronological render                             |
+| `lib/group-messages-by-time.lib.ts`                       | Consecutive same-sender groups within five minutes and the same local day |
+| `lib/build-message-thread-segments.lib.ts`                | Ordered date separators + message groups for thread render                |
+| `lib/messages-thread-mode.lib.ts`                         | `threadMode` behavior resolver (composer, mark-read, preview chrome)      |
+| `lib/resolve-recipient-shared-campaigns.lib.ts`           | Draft-thread shared campaign derivation from recipients response          |
+| `lib/message-thread-shared-campaigns-presentation.lib.ts` | Inline vs overflow shared campaign presentation rules                     |
 
 ## Polling rules
 
@@ -106,12 +154,27 @@ The API returns `nextCursor` for conversation lists and the client accepts a
 `use-conversations.ts`. Conversations beyond that page are not shown until
 load-more or infinite-scroll UI is wired.
 
+## Conversation list unread indicator
+
+- `unreadCount === 1` → `StatusDot` (`info`) only
+- `unreadCount >= 2` → count badge only
+- Never dot and badge together; unread title weight lives on the peer name, not the row CVA
+
 ## Mark-read contract
 
-The thread route marks the conversation read when it is open and the latest
-rendered message changes. Sending a message does **not** mark read for the sender.
-After mark-read succeeds, the notification list query is invalidated so the bell
-badge clears.
+Selection alone does **not** mark a conversation read. Active threads pass
+`isAttentionEligible` from `resolveMessagesThreadModeBehavior('active')` into
+`useMessageThreadMarkRead`:
+
+- Canonical active thread route with a visible pane (preview threads and CSS-hidden
+  mobile panes are ineligible via `threadMode: 'preview'`)
+- Thread load success (not pending/error)
+- Latest rendered message is an **incoming** unread message (`senderUserId !== viewer`)
+- Initial explicit open: `document.visibilityState === 'visible'` is sufficient
+- New inbound while already open: requires visible **and** focused document
+
+Sending a message does **not** mark read for the sender. After mark-read succeeds,
+the notification list query is invalidated so the bell badge clears.
 
 ## First message (lazy create)
 

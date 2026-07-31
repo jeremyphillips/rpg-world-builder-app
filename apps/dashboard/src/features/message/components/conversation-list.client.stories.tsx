@@ -14,6 +14,16 @@ export default meta
 
 type Story = StoryObj<typeof ConversationList>
 
+export const SingleUnreadDot: Story = {
+  args: {
+    conversations: [
+      makeConversation({
+        unreadCount: 1,
+      }),
+    ],
+  },
+}
+
 export const WithUnread: Story = {
   args: {
     conversations: [

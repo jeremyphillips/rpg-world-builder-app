@@ -7,18 +7,18 @@ import { renderWithProviders } from '@/test/render'
 import { NewMessageForm } from './new-message-form.client'
 
 describe('NewMessageForm', () => {
-  it('renders a recipient combobox without a submit button', () => {
+  it('renders a recipient combobox without duplicate creation actions', () => {
     renderWithProviders(
       <NewMessageForm
         recipients={[{ userId: 'user-2', displayName: 'Campaign Member' }]}
         recipientUserId="user-2"
         onRecipientChange={() => undefined}
-        onCancel={() => undefined}
       />,
     )
 
     expect(screen.getByRole('combobox')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Start conversation' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'New message' })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
@@ -27,7 +27,6 @@ describe('NewMessageForm', () => {
         recipients={[{ userId: 'user-2', displayName: 'Campaign Member' }]}
         recipientUserId="user-2"
         onRecipientChange={() => undefined}
-        onCancel={() => undefined}
       />,
     )
 

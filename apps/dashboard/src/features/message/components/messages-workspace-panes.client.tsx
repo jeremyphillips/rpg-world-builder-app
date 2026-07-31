@@ -8,13 +8,13 @@ import type { ConversationListScope } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { useSession } from '@/features/auth'
-import { useRealtimeStatus } from '@/features/realtime'
 
 import { MessagesDirectListContent } from './messages-direct-list-content.client'
 import { MessageThreadBody } from './message-thread-body.client'
 import { MessageComposer } from './message-composer.client'
 import { MessageThreadHeader } from './message-thread-header.client'
+import { MessagesMetadata } from './messages-metadata.client'
+import { MessagesThreadPreviewChrome } from './messages-thread-preview-chrome.client'
 import { MessagesMobileBackLink } from './messages-workspace-empty-states.client'
 import {
   messagesWorkspaceRightFooterClasses,
@@ -23,68 +23,57 @@ import {
 } from './messages-workspace.variants'
 import { NewMessageRecipientsBody } from './new-message-form.client'
 import { useConversationActions } from '../hooks/use-conversation-actions'
-import { useConversationMessages } from '../hooks/use-conversation-messages'
 import { useConversationRecipients } from '../hooks/use-conversation-recipients'
 import { useConversations } from '../hooks/use-conversations'
-import { useMessageThreadMarkRead } from '../hooks/use-message-thread-mark-read'
+import { useMessagesThreadPane } from '../hooks/use-messages-thread-pane'
 import {
   MESSAGES_ACTION_COPY,
   MESSAGES_EMPTY_COPY,
   MESSAGES_ERROR_COPY,
+  MESSAGES_PREVIEW_COPY,
   MESSAGES_STALE_RECIPIENT_COPY,
   MESSAGES_STATUS_COPY,
 } from '../lib/messages-copy'
+import type { MessagesThreadMode } from '../lib/messages-thread-mode.lib'
+import { resolveMessagesThreadModeBehavior } from '../lib/messages-thread-mode.lib'
 import {
   flattenDirectConversationRecipients,
   getMessagesFromConversationId,
+  resolveMessagesNewCancelTarget,
 } from '../lib/messages-workspace-routing.lib'
-import { flattenConversationMessages } from '../lib/sort-messages-chronologically'
+import { resolveRecipientSharedCampaigns } from '../lib/resolve-recipient-shared-campaigns.lib'
 
 export function MessagesThreadPane({
   conversationId,
   campaignId,
+  threadMode = 'active',
+  isPaneVisible = true,
 }: {
   conversationId: string
   campaignId?: string
+  threadMode?: MessagesThreadMode
+  isPaneVisible?: boolean
 }) {
-  const { data: session } = useSession()
-  const { setActiveConversationId } = useRealtimeStatus()
-  const { data: conversationsData } = useConversations(campaignId)
-  const conversationInScopedList = conversationsData?.items.some(
-    (item) => item.id === conversationId,
-  )
-  const { data: unscopedConversationsData } = useConversations(undefined, {
-    enabled: Boolean(campaignId && conversationsData && !conversationInScopedList),
-  })
+  const { showComposer, isAttentionEligible, showPreviewChrome } =
+    resolveMessagesThreadModeBehavior(threadMode)
   const {
-    data: messagesData,
+    session,
+    conversation,
+    peerDisplayName,
+    messages,
+    sendMessage,
     isPending,
     isError,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
     isFetchNextPageError,
-  } = useConversationMessages(conversationId)
-  const { sendMessage, markRead } = useConversationActions(conversationId)
-
-  const conversation =
-    conversationsData?.items.find((item) => item.id === conversationId) ??
-    unscopedConversationsData?.items.find((item) => item.id === conversationId)
-  const peerDisplayName = conversation?.peer.displayName
-  useSetBreadcrumbLabel(peerDisplayName)
-  const messages = flattenConversationMessages(messagesData?.pages)
-  const latestMessageId = messages.at(-1)?.id
-
-  useMessageThreadMarkRead({
+  } = useMessagesThreadPane({
     conversationId,
-    latestMessageId,
-    markRead,
+    campaignId,
+    isAttentionEligible,
+    isPaneVisible,
   })
-
-  React.useEffect(() => {
-    setActiveConversationId(conversationId)
-    return () => setActiveConversationId(null)
-  }, [conversationId, setActiveConversationId])
 
   if (isPending) {
     return (
@@ -106,9 +95,10 @@ export function MessagesThreadPane({
 
   return (
     <div className={`${messagesWorkspaceRightPaneClasses} min-h-0 flex-1`}>
+      {showPreviewChrome ? <MessagesThreadPreviewChrome /> : null}
       <MessageThreadHeader
         peerDisplayName={peerDisplayName}
-        sharedCampaignCount={conversation?.sharedCampaigns.length ?? 0}
+        sharedCampaigns={conversation?.sharedCampaigns ?? []}
       />
       <MessageThreadBody
         currentUserId={session?.user?.id}
@@ -120,6 +110,7 @@ export function MessagesThreadPane({
         fetchNextPage={fetchNextPage}
         sendMessage={sendMessage}
         layout="workspace"
+        showComposer={showComposer}
       />
     </div>
   )
@@ -134,6 +125,10 @@ export function MessagesRecipientPickerPane({ campaignId }: { campaignId?: strin
   const recipients = flattenDirectConversationRecipients(data?.recipientsByUserId ?? {})
   const isScopedEmpty = Boolean(campaignId && !isPending && !isError && recipients.length === 0)
   const fromConversationId = getMessagesFromConversationId(searchParams.toString())
+  const cancelTarget = resolveMessagesNewCancelTarget({
+    fromConversationId,
+    campaignId,
+  })
 
   const handleRecipientChange = (nextRecipientUserId: string) => {
     setRecipientUserId(nextRecipientUserId)
@@ -156,13 +151,12 @@ export function MessagesRecipientPickerPane({ campaignId }: { campaignId?: strin
 
   return (
     <div className="p-4">
-      <MessagesMobileBackLink
-        to={campaignId ? ROUTES.messages.listScoped(campaignId) : ROUTES.messages.list}
-        label={MESSAGES_ACTION_COPY.backToMessages}
-      />
-      <Text as="h2" variant="lead" className="mb-4">
-        {MESSAGES_ACTION_COPY.newMessage}
-      </Text>
+      <MessagesMobileBackLink to={cancelTarget} label={MESSAGES_ACTION_COPY.backToMessages} />
+      {fromConversationId ? (
+        <MessagesMetadata className="mb-3">
+          {MESSAGES_PREVIEW_COPY.selectRecipientBody}
+        </MessagesMetadata>
+      ) : null}
       {isScopedEmpty ? (
         <IndexPageEmptyState
           heading={MESSAGES_EMPTY_COPY.scopedRecipientHeading}
@@ -176,8 +170,6 @@ export function MessagesRecipientPickerPane({ campaignId }: { campaignId?: strin
           formProps={{
             recipientUserId,
             onRecipientChange: handleRecipientChange,
-            onCancel: () =>
-              navigate(campaignId ? ROUTES.messages.listScoped(campaignId) : ROUTES.messages.list),
           }}
         />
       )}
@@ -201,8 +193,7 @@ export function MessagesDraftThreadPane({
   const clientMessageIdRef = React.useRef<string | null>(null)
 
   const peer = data?.recipientsByUserId[toRecipientUserId]
-  const sharedCampaignCount =
-    data?.campaigns.filter((campaign) => campaign.userIds.includes(toRecipientUserId)).length ?? 0
+  const sharedCampaigns = resolveRecipientSharedCampaigns(data, toRecipientUserId)
 
   useSetBreadcrumbLabel(peer?.displayName)
 
@@ -272,10 +263,7 @@ export function MessagesDraftThreadPane({
 
   return (
     <div className={`${messagesWorkspaceRightPaneClasses} min-h-0 flex-1`}>
-      <MessageThreadHeader
-        peerDisplayName={peer.displayName}
-        sharedCampaignCount={sharedCampaignCount}
-      />
+      <MessageThreadHeader peerDisplayName={peer.displayName} sharedCampaigns={sharedCampaigns} />
       <div className={messagesWorkspaceRightFooterClasses}>
         <MessageComposer
           draft={draft}
@@ -310,19 +298,17 @@ export function MessagesDirectListPane({
   })
 
   return (
-    <div className="p-4">
-      <MessagesDirectListContent
-        activeConversationId={activeConversationId}
-        campaignId={campaignId}
-        scope={scope}
-        conversations={data?.items ?? []}
-        unscopedConversations={unscopedData?.items}
-        isPending={isPending}
-        isError={isError}
-        loadedCount={loadedCount}
-        scopedCount={scopedCount ?? data?.scopedCount}
-        hasMoreConversations={hasMoreConversations}
-      />
-    </div>
+    <MessagesDirectListContent
+      activeConversationId={activeConversationId}
+      campaignId={campaignId}
+      scope={scope}
+      conversations={data?.items ?? []}
+      unscopedConversations={unscopedData?.items}
+      isPending={isPending}
+      isError={isError}
+      loadedCount={loadedCount}
+      scopedCount={scopedCount ?? data?.scopedCount}
+      hasMoreConversations={hasMoreConversations}
+    />
   )
 }

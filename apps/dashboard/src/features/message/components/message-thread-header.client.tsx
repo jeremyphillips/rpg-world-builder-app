@@ -1,27 +1,26 @@
 'use client'
 
 import { Text } from '@rpg/ui'
+import type { ConversationSharedCampaign } from '@rpg/contracts'
 
-import { formatMessagesSharedCampaignCount } from '../lib/messages-copy'
+import { MessageThreadSharedCampaigns } from './message-thread-shared-campaigns.client'
 import { messagesWorkspaceThreadHeaderClasses } from './messages-workspace.variants'
 
 type MessageThreadHeaderProps = {
   peerDisplayName: string | undefined
-  sharedCampaignCount: number
+  sharedCampaigns: ConversationSharedCampaign[]
 }
 
 export function MessageThreadHeader({
   peerDisplayName,
-  sharedCampaignCount,
+  sharedCampaigns,
 }: MessageThreadHeaderProps) {
   return (
     <header className={messagesWorkspaceThreadHeaderClasses}>
       <Text as="h2" variant="lead">
         {peerDisplayName ?? 'Conversation'}
       </Text>
-      {sharedCampaignCount > 0 ? (
-        <Text variant="small">{formatMessagesSharedCampaignCount(sharedCampaignCount)}</Text>
-      ) : null}
+      <MessageThreadSharedCampaigns sharedCampaigns={sharedCampaigns} />
     </header>
   )
 }

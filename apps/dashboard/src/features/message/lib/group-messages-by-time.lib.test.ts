@@ -49,6 +49,23 @@ describe('groupMessagesByTime', () => {
     expect(groups[1]?.messages).toHaveLength(1)
   })
 
+  it('starts a new group when the calendar day changes', () => {
+    const groups = groupMessagesByTime([
+      makeDirectMessage({
+        id: 'm1',
+        senderUserId: 'user-2',
+        createdAt: '2026-07-29T12:00:00.000Z',
+      }),
+      makeDirectMessage({
+        id: 'm2',
+        senderUserId: 'user-2',
+        createdAt: '2026-07-30T12:00:00.000Z',
+      }),
+    ])
+
+    expect(groups).toHaveLength(2)
+  })
+
   it('starts a new group when the sender changes', () => {
     const groups = groupMessagesByTime([
       makeDirectMessage({

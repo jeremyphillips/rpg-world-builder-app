@@ -1,15 +1,12 @@
 'use client'
 
-import { Link } from 'react-router-dom'
 import { ComboboxField, Text } from '@rpg/ui'
 
-import { ROUTES } from '@/app/routes'
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 
 import type { DirectConversationRecipient } from '@rpg/contracts'
 
 import {
-  MESSAGES_ACTION_COPY,
   MESSAGES_EMPTY_COPY,
   MESSAGES_ERROR_COPY,
   MESSAGES_FORM_COPY,
@@ -20,37 +17,26 @@ type NewMessageFormProps = {
   recipients: DirectConversationRecipient[]
   recipientUserId: string
   onRecipientChange: (value: string) => void
-  onCancel: () => void
 }
 
 export function NewMessageForm({
   recipients,
   recipientUserId,
   onRecipientChange,
-  onCancel,
 }: NewMessageFormProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <ComboboxField
-        id="recipient"
-        label={MESSAGES_FORM_COPY.recipientLabel}
-        multiple={false}
-        placeholder={MESSAGES_FORM_COPY.recipientPlaceholder}
-        value={recipientUserId}
-        onChange={(value) => onRecipientChange(typeof value === 'string' ? value : '')}
-        options={recipients.map((recipient) => ({
-          value: recipient.userId,
-          label: recipient.displayName,
-        }))}
-      />
-      <button
-        type="button"
-        className="self-start text-sm text-muted-foreground hover:text-foreground"
-        onClick={onCancel}
-      >
-        {MESSAGES_ACTION_COPY.cancel}
-      </button>
-    </div>
+    <ComboboxField
+      id="recipient"
+      label={MESSAGES_FORM_COPY.recipientLabel}
+      multiple={false}
+      placeholder={MESSAGES_FORM_COPY.recipientPlaceholder}
+      value={recipientUserId}
+      onChange={(value) => onRecipientChange(typeof value === 'string' ? value : '')}
+      options={recipients.map((recipient) => ({
+        value: recipient.userId,
+        label: recipient.displayName,
+      }))}
+    />
   )
 }
 
@@ -86,12 +72,4 @@ export function NewMessageRecipientsBody({
   }
 
   return <NewMessageForm recipients={recipients} {...formProps} />
-}
-
-export function NewMessageCancelLink() {
-  return (
-    <Link to={ROUTES.messages.list} className="text-sm text-muted-foreground hover:text-foreground">
-      {MESSAGES_ACTION_COPY.backToMessages}
-    </Link>
-  )
 }

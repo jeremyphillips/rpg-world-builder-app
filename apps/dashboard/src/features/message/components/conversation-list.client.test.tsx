@@ -9,6 +9,24 @@ import { MESSAGES_STATUS_COPY } from '../lib/messages-copy'
 import { ConversationList } from './conversation-list.client'
 
 describe('ConversationList', () => {
+  it('shows a count badge only when unread count is two or more', () => {
+    renderWithProviders(
+      <ConversationList
+        conversations={[
+          makeConversation({ unreadCount: 2 }),
+          makeConversation({
+            id: 'conversation-2',
+            peer: { userId: 'user-3', displayName: 'Quiet Peer' },
+            unreadCount: 1,
+          }),
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.queryByText('1')).not.toBeInTheDocument()
+  })
+
   it('renders peer names, previews, and unread badges', () => {
     renderWithProviders(
       <ConversationList

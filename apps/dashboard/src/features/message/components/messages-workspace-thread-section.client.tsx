@@ -10,9 +10,11 @@ import { MessagesDraftThreadPane, MessagesThreadPane } from './messages-workspac
 export function MessagesWorkspaceActiveThread({
   conversationId,
   campaignId,
+  isPaneVisible = true,
 }: {
   conversationId: string
   campaignId?: string
+  isPaneVisible?: boolean
 }) {
   return (
     <>
@@ -20,7 +22,11 @@ export function MessagesWorkspaceActiveThread({
         to={campaignId ? ROUTES.messages.listScoped(campaignId) : ROUTES.messages.list}
         label={MESSAGES_ACTION_COPY.backToMessages}
       />
-      <MessagesThreadPane conversationId={conversationId} campaignId={campaignId} />
+      <MessagesThreadPane
+        conversationId={conversationId}
+        campaignId={campaignId}
+        isPaneVisible={isPaneVisible}
+      />
     </>
   )
 }
@@ -52,7 +58,11 @@ export function MessagesWorkspacePreviewThread({
 }) {
   return (
     <div className="hidden md:contents">
-      <MessagesThreadPane conversationId={conversationId} campaignId={campaignId} />
+      <MessagesThreadPane
+        conversationId={conversationId}
+        campaignId={campaignId}
+        threadMode="preview"
+      />
     </div>
   )
 }

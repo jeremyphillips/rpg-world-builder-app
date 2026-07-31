@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getMessagesToRecipientUserId,
   isMessagesNewRoute,
+  resolveMessagesNewCancelTarget,
   stripLegacyMessagesCampaignsModeSearch,
 } from './messages-workspace-routing.lib'
 
@@ -37,5 +38,26 @@ describe('stripLegacyMessagesCampaignsModeSearch', () => {
     expect(stripLegacyMessagesCampaignsModeSearch('?mode=campaigns&campaignId=camp_1')).toBe(
       '?campaignId=camp_1',
     )
+  })
+})
+
+describe('resolveMessagesNewCancelTarget', () => {
+  it('returns the prior conversation when from is present', () => {
+    expect(
+      resolveMessagesNewCancelTarget({
+        fromConversationId: 'conv_1',
+        campaignId: 'camp_1',
+      }),
+    ).toBe('/messages/conv_1?campaignId=camp_1')
+  })
+
+  it('returns the scoped list when only campaignId is present', () => {
+    expect(resolveMessagesNewCancelTarget({ campaignId: 'camp_1' })).toBe(
+      '/messages?campaignId=camp_1',
+    )
+  })
+
+  it('returns the global list when no context is present', () => {
+    expect(resolveMessagesNewCancelTarget({})).toBe('/messages')
   })
 })

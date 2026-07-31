@@ -1,3 +1,5 @@
+import { ROUTES } from '@/app/routes'
+
 export const MESSAGES_FROM_QUERY = 'from'
 export const MESSAGES_TO_QUERY = 'to'
 export const MESSAGES_CAMPAIGN_ID_QUERY = 'campaignId'
@@ -73,4 +75,15 @@ export function flattenDirectConversationRecipients(
   return Object.values(recipientsByUserId).sort((left, right) =>
     left.displayName.localeCompare(right.displayName),
   )
+}
+
+export function resolveMessagesNewCancelTarget(input: {
+  fromConversationId?: string
+  campaignId?: string
+}): string {
+  if (input.fromConversationId) {
+    return ROUTES.messages.detail(input.fromConversationId, { campaignId: input.campaignId })
+  }
+
+  return input.campaignId ? ROUTES.messages.listScoped(input.campaignId) : ROUTES.messages.list
 }

@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 
-import { NewMessageLink } from './conversation-list.client'
 import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
 import {
   messagesWorkspaceEmptyStateClasses,
@@ -21,17 +20,12 @@ export function MessagesMobileBackLink({ to, label }: { to: string; label: strin
   )
 }
 
-export function MessagesDirectEmptyRightPane({ campaignId }: { campaignId?: string }) {
+export function MessagesDirectEmptyRightPane(_props: { campaignId?: string }) {
   return (
     <div className={messagesWorkspaceEmptyStateClasses}>
       <IndexPageEmptyState
         heading={MESSAGES_EMPTY_COPY.selectConversationHeading}
         body={MESSAGES_EMPTY_COPY.selectConversationBody}
-        actions={
-          <div className="flex w-full justify-center">
-            <NewMessageLink campaignId={campaignId} />
-          </div>
-        }
       />
     </div>
   )

@@ -1,16 +1,13 @@
 'use client'
 
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Button } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
 import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'
 import {
   messagesWorkspaceBodyClasses,
-  messagesWorkspaceHeaderActionsClasses,
-  messagesWorkspaceHeaderActionsMobileHiddenOnNewClasses,
-  messagesWorkspaceHeaderClasses,
+  messagesWorkspaceHeaderSectionClasses,
   messagesWorkspaceLeftPaneClasses,
   messagesWorkspaceLeftPaneMobileHiddenClasses,
   messagesWorkspaceLeftPaneMobileVisibleClasses,
@@ -21,11 +18,15 @@ import {
   MessagesDirectListPane,
   MessagesRecipientPickerPane,
 } from './messages-workspace-panes.client'
+import { MessagesWorkspaceHeader } from './messages-workspace-header.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
 import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
 import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
-import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
-import { isMessagesNewRoute } from '../lib/messages-workspace-routing.lib'
+import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import {
+  isMessagesNewRoute,
+  resolveMessagesNewCancelTarget,
+} from '../lib/messages-workspace-routing.lib'
 import { resolveMessagesWorkspaceChromeVisibility } from '../lib/messages-workspace-chrome.lib'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
@@ -45,15 +46,6 @@ export function MessagesWorkspaceShell() {
 
   const campaignScope = useMessagesCampaignScopeEffects(routeState)
   const chromeVisibility = resolveMessagesWorkspaceChromeVisibility(routeState)
-
-  const headerActionsClasses = [
-    messagesWorkspaceHeaderActionsClasses,
-    chromeVisibility.hideNewMessageActionOnMobile
-      ? messagesWorkspaceHeaderActionsMobileHiddenOnNewClasses
-      : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
 
   const scopeChromeClasses = chromeVisibility.hideScopeChromeOnMobile
     ? messagesWorkspaceScopeChromeMobileHiddenOnNewClasses
@@ -75,25 +67,33 @@ export function MessagesWorkspaceShell() {
     )
   }
 
+  const handleCancelNewMessage = () => {
+    navigate(
+      resolveMessagesNewCancelTarget({
+        fromConversationId: routeState.fromConversationId,
+        campaignId: routeState.campaignId,
+      }),
+    )
+  }
+
   return (
     <div className={messagesWorkspaceRootClasses}>
-      <div className={messagesWorkspaceHeaderClasses}>
-        <div className="hidden md:block" aria-hidden="true" />
-        <div className={headerActionsClasses}>
-          <Button type="button" onClick={handleNewMessage}>
-            {MESSAGES_ACTION_COPY.newMessage}
-          </Button>
-        </div>
-      </div>
-
-      <div className={scopeChromeClasses}>
-        <MessagesCampaignScopeChrome
-          scope={campaignScope.scope}
-          scopedCount={campaignScope.scopedCount}
-          hiddenCount={campaignScope.hiddenCount}
-          showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
-          onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+      <div className={messagesWorkspaceHeaderSectionClasses}>
+        <MessagesWorkspaceHeader
+          isNewRoute={routeState.isNewRoute}
+          onNewMessage={handleNewMessage}
+          onCancel={handleCancelNewMessage}
         />
+
+        <div className={scopeChromeClasses}>
+          <MessagesCampaignScopeChrome
+            scope={campaignScope.scope}
+            scopedCount={campaignScope.scopedCount}
+            hiddenCount={campaignScope.hiddenCount}
+            showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
+            onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+          />
+        </div>
       </div>
 
       <div className={messagesWorkspaceBodyClasses}>

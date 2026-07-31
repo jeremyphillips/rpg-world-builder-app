@@ -25,9 +25,10 @@ export const MESSAGES_EMPTY_COPY = {
 export const MESSAGES_ACTION_COPY = {
   newMessage: 'New message',
   backToMessages: 'Back to messages',
-  startConversation: 'Start conversation',
+  startConversation: 'Start a conversation',
   cancel: 'Cancel',
   send: 'Send',
+  sendMessageTooltip: 'Send message',
   loadOlderMessages: 'Load older messages',
   viewForCampaign: 'View messages for this campaign',
   viewAll: 'View all messages',
@@ -68,6 +69,12 @@ export const MESSAGES_A11Y_COPY = {
   conversation: 'Conversation',
   messages: 'Messages',
   yourMessage: 'Your message',
+  showMoreSharedCampaigns: (count: number) => `Show ${count} more shared campaigns`,
+} as const
+
+export const MESSAGES_PREVIEW_COPY = {
+  previousConversationEyebrow: 'Previous conversation',
+  selectRecipientBody: 'Select a recipient to start a new message.',
 } as const
 
 export function formatMessagesScopeChipLabel(campaignName: string): string {
@@ -114,4 +121,13 @@ export function formatMessageBubbleAriaLabel(
 ): string {
   if (isOwn) return MESSAGES_A11Y_COPY.yourMessage
   return `Message from ${peerDisplayName ?? 'peer'}`
+}
+
+export function formatMessageGroupAriaLabel(
+  isOwn: boolean,
+  peerDisplayName: string | undefined,
+  timestamp: string,
+): string {
+  const senderLabel = isOwn ? 'You' : (peerDisplayName ?? 'Peer')
+  return `Messages from ${senderLabel} at ${timestamp}`
 }

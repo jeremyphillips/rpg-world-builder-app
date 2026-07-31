@@ -1,24 +1,38 @@
 'use client'
 
 import { Link } from 'react-router-dom'
-import { Badge, Text, buttonVariants } from '@rpg/ui'
+import { Badge, StatusDot, Text } from '@rpg/ui'
 import type { Conversation } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
 import {
-  MESSAGES_ACTION_COPY,
   MESSAGES_STATUS_COPY,
   formatMessagesScopedListFilterLabel,
   formatMessagesUnreadBadge,
 } from '../lib/messages-copy'
+import { MessagesMetadata } from './messages-metadata.client'
+import {
+  conversationListRowVariants,
+  conversationListTitleUnreadClasses,
+} from './messages-workspace.variants'
 
 type ConversationListProps = {
   conversations: Conversation[]
   activeConversationId?: string
   campaignId?: string
   scope?: { campaignId: string; campaignName: string }
+}
+
+function ConversationUnreadIndicator({ unreadCount }: { unreadCount: number }) {
+  if (unreadCount <= 0) return null
+  if (unreadCount === 1) return <StatusDot tone="info" className="mt-1.5 shrink-0" />
+  return (
+    <Badge tone="info" className="shrink-0">
+      {formatMessagesUnreadBadge(unreadCount)}
+    </Badge>
+  )
 }
 
 export function ConversationList({
@@ -33,52 +47,47 @@ export function ConversationList({
     <ul className="divide-y divide-border" aria-label={listLabel}>
       {conversations.map((conversation) => {
         const isActive = conversation.id === activeConversationId
+        const hasUnread = conversation.unreadCount > 0
+
         return (
           <li key={conversation.id}>
             <Link
               to={ROUTES.messages.detail(conversation.id, { campaignId })}
-              className={`flex items-start gap-3 px-1 py-3 hover:bg-muted ${isActive ? 'bg-row-selected' : ''}`}
+              className={conversationListRowVariants({ selected: isActive })}
               aria-current={isActive ? 'page' : undefined}
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <Text variant="emphasis" className="truncate">
+                  <Text
+                    variant="emphasis"
+                    className={[
+                      hasUnread ? conversationListTitleUnreadClasses : undefined,
+                      'truncate',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
                     {conversation.peer.displayName}
                   </Text>
                   {conversation.latestMessage ? (
-                    <Text variant="small" className="shrink-0">
+                    <MessagesMetadata className="shrink-0">
                       {formatRelativeRecency(conversation.latestMessage.createdAt)}
-                    </Text>
+                    </MessagesMetadata>
                   ) : null}
                 </div>
                 {conversation.latestMessage ? (
-                  <Text variant="small" className="truncate">
+                  <MessagesMetadata className="truncate">
                     {conversation.latestMessage.preview}
-                  </Text>
+                  </MessagesMetadata>
                 ) : (
-                  <Text variant="small">{MESSAGES_STATUS_COPY.noMessagesYet}</Text>
+                  <MessagesMetadata>{MESSAGES_STATUS_COPY.noMessagesYet}</MessagesMetadata>
                 )}
               </div>
-              {conversation.unreadCount > 0 ? (
-                <Badge tone="info" className="shrink-0">
-                  {formatMessagesUnreadBadge(conversation.unreadCount)}
-                </Badge>
-              ) : null}
+              <ConversationUnreadIndicator unreadCount={conversation.unreadCount} />
             </Link>
           </li>
         )
       })}
     </ul>
-  )
-}
-
-export function NewMessageLink({ campaignId }: { campaignId?: string }) {
-  return (
-    <Link
-      to={ROUTES.messages.new({ campaignId })}
-      className={buttonVariants({ variant: 'default' })}
-    >
-      {MESSAGES_ACTION_COPY.newMessage}
-    </Link>
   )
 }

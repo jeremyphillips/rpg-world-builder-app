@@ -18,6 +18,7 @@ const RIGHT_PANE_VARIANT_RENDERERS = {
       <MessagesWorkspaceActiveThread
         conversationId={props.routeConversationId}
         campaignId={props.campaignId}
+        isPaneVisible={props.showRightOnMobile}
       />
     ) : null,
   'draft-thread': (props: MessagesWorkspaceRightPaneProps) =>

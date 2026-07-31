@@ -3,7 +3,11 @@ import { screen } from '@testing-library/react'
 
 import { ROUTES } from '@/app/routes'
 import { renderWithProviders } from '@/test/render'
-import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
+import {
+  MESSAGES_ACTION_COPY,
+  MESSAGES_EMPTY_COPY,
+  MESSAGES_PREVIEW_COPY,
+} from '../lib/messages-copy'
 
 import { MessagesRecipientPickerPane } from './messages-workspace-panes.client'
 
@@ -33,5 +37,17 @@ describe('MessagesRecipientPickerPane', () => {
 
     expect(screen.getByText(MESSAGES_EMPTY_COPY.scopedRecipientHeading)).toBeInTheDocument()
     expect(screen.getByText(MESSAGES_EMPTY_COPY.scopedRecipientBody)).toBeInTheDocument()
+  })
+
+  it('links back to the prior conversation when from is present', () => {
+    renderWithProviders(<MessagesRecipientPickerPane campaignId="camp_1" />, {
+      initialEntries: [ROUTES.messages.new({ from: 'conv_1', campaignId: 'camp_1' })],
+    })
+
+    expect(screen.getByRole('link', { name: MESSAGES_ACTION_COPY.backToMessages })).toHaveAttribute(
+      'href',
+      ROUTES.messages.detail('conv_1', { campaignId: 'camp_1' }),
+    )
+    expect(screen.getByText(MESSAGES_PREVIEW_COPY.selectRecipientBody)).toBeInTheDocument()
   })
 })

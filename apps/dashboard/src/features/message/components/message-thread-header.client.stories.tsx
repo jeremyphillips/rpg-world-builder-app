@@ -15,20 +15,24 @@ type Story = StoryObj<typeof MessageThreadHeader>
 export const SingleSharedCampaign: Story = {
   args: {
     peerDisplayName: 'Campaign Member',
-    sharedCampaignCount: 1,
+    sharedCampaigns: [{ campaignId: 'camp_1', campaignName: 'Curse of Strahd' }],
   },
 }
 
 export const MultipleSharedCampaigns: Story = {
   args: {
     peerDisplayName: 'Dungeon Master',
-    sharedCampaignCount: 3,
+    sharedCampaigns: [
+      { campaignId: 'camp_1', campaignName: 'Curse of Strahd' },
+      { campaignId: 'camp_2', campaignName: 'Lost Mine' },
+      { campaignId: 'camp_3', campaignName: 'Storm King' },
+    ],
   },
 }
 
 export const NoSharedCampaigns: Story = {
   args: {
     peerDisplayName: 'Quiet Peer',
-    sharedCampaignCount: 0,
+    sharedCampaigns: [],
   },
 }

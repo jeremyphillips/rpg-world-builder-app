@@ -1,7 +1,15 @@
 'use client'
 
 import * as React from 'react'
-import { Button, TextareaField } from '@rpg/ui'
+import { Send } from 'lucide-react'
+import {
+  Button,
+  TextareaField,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@rpg/ui'
 
 import { MESSAGES_ACTION_COPY, MESSAGES_FORM_COPY } from '../lib/messages-copy'
 import { messagesWorkspaceComposerTextareaClasses } from './messages-workspace.variants'
@@ -45,21 +53,38 @@ export function MessageComposer({
     onSubmit()
   }
 
+  const isDisabled = !draft.trim() || isSubmitting
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <TextareaField
-        ref={textareaRef}
-        id="message-draft"
-        label={MESSAGES_FORM_COPY.messageLabel}
-        value={draft}
-        onChange={(event) => onDraftChange(event.target.value)}
-        onKeyDown={handleKeyDown}
-        rows={1}
-        className={messagesWorkspaceComposerTextareaClasses}
-      />
-      <Button type="submit" disabled={!draft.trim() || isSubmitting}>
-        {MESSAGES_ACTION_COPY.send}
-      </Button>
+    <form onSubmit={handleSubmit} className="flex items-end gap-2">
+      <div className="min-w-0 flex-1">
+        <TextareaField
+          ref={textareaRef}
+          id="message-draft"
+          label=""
+          aria-label={MESSAGES_FORM_COPY.messageLabel}
+          value={draft}
+          onChange={(event) => onDraftChange(event.target.value)}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          className={messagesWorkspaceComposerTextareaClasses}
+        />
+      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="submit"
+              size="icon"
+              aria-label={MESSAGES_ACTION_COPY.send}
+              disabled={isDisabled}
+            >
+              <Send />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{MESSAGES_ACTION_COPY.sendMessageTooltip}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </form>
   )
 }

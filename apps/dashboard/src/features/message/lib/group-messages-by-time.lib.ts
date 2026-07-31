@@ -14,6 +14,16 @@ function messageTimestampMs(message: DirectMessage): number {
   return new Date(message.createdAt).getTime()
 }
 
+function isSameLocalCalendarDay(left: string, right: string): boolean {
+  const leftDate = new Date(left)
+  const rightDate = new Date(right)
+  return (
+    leftDate.getFullYear() === rightDate.getFullYear() &&
+    leftDate.getMonth() === rightDate.getMonth() &&
+    leftDate.getDate() === rightDate.getDate()
+  )
+}
+
 export function groupMessagesByTime(messages: DirectMessage[]): MessageTimeGroup[] {
   const groups: MessageTimeGroup[] = []
 
@@ -24,6 +34,7 @@ export function groupMessagesByTime(messages: DirectMessage[]): MessageTimeGroup
       previousGroup !== undefined &&
       previousMessage !== undefined &&
       previousGroup.senderUserId === message.senderUserId &&
+      isSameLocalCalendarDay(message.createdAt, previousMessage.createdAt) &&
       messageTimestampMs(message) - messageTimestampMs(previousMessage) <= MESSAGE_GROUP_MAX_GAP_MS
 
     if (canJoinGroup && previousGroup) {

@@ -13,7 +13,10 @@ import {
   formatMessagesScopeChipLabel,
   formatMessagesScopeSummary,
 } from '../lib/messages-copy'
-import { messagesWorkspaceScopeUtilityClasses } from './messages-workspace.variants'
+import {
+  messagesWorkspaceListChromeInsetClasses,
+  messagesWorkspaceScopeUtilityClasses,
+} from './messages-workspace.variants'
 
 type MessagesCampaignScopeChromeProps = {
   scope?: ConversationListResponse['scope']
@@ -113,7 +116,7 @@ export function MessagesOutOfScopePin({
   campaignId,
 }: MessagesOutOfScopePinProps) {
   return (
-    <div className="border-b border-border px-1 py-3">
+    <div className={`border-b border-border py-3 ${messagesWorkspaceListChromeInsetClasses}`}>
       <Text variant="small" className="uppercase tracking-wide">
         {MESSAGES_SCOPE_COPY.outOfScopeEyebrow}
       </Text>

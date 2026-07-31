@@ -115,6 +115,8 @@ describe('resolveMessagesWorkspaceRouteState', () => {
       activeConversationId: 'conv_2',
       showNewNeutralRight: false,
       showDirectEmptyRight: false,
+      showRightOnMobile: false,
+      showLeftOnMobile: true,
     })
   })
 })

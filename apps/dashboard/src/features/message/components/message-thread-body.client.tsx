@@ -4,22 +4,31 @@ import * as React from 'react'
 import type { DirectMessage } from '@rpg/contracts'
 import { Button, Text, toast } from '@rpg/ui'
 
-import { formatDateTime, formatRelativeRecency } from '@/lib/datetime/format-datetime'
+import {
+  formatConversationDateSeparator,
+  formatFullDateTime,
+  formatMessageGroupTime,
+} from '@/lib/datetime/format-datetime'
+import { useRelativeTimeNow } from '@/lib/react/use-relative-time-now'
 
 import type { useConversationActions } from '../hooks/use-conversation-actions'
-import { groupMessagesByTime } from '../lib/group-messages-by-time.lib'
+import { buildMessageThreadSegments } from '../lib/build-message-thread-segments.lib'
 import {
   MESSAGES_ACTION_COPY,
   MESSAGES_A11Y_COPY,
   MESSAGES_ERROR_COPY,
   MESSAGES_STATUS_COPY,
   formatMessageBubbleAriaLabel,
+  formatMessageGroupAriaLabel,
 } from '../lib/messages-copy'
 import { MessageComposer } from './message-composer.client'
+import { MessagesMetadataTime } from './messages-metadata.client'
 import {
+  messagesWorkspaceDateSeparatorClasses,
   messagesWorkspaceMessageBubbleClasses,
   messagesWorkspaceMessageGroupClasses,
   messagesWorkspaceMessageGroupTimestampClasses,
+  messagesWorkspaceMessageThreadClasses,
   messagesWorkspaceRightFooterClasses,
   messagesWorkspaceRightScrollClasses,
 } from './messages-workspace.variants'
@@ -34,19 +43,29 @@ type MessageThreadBodyProps = {
   fetchNextPage: () => Promise<unknown>
   sendMessage: ReturnType<typeof useConversationActions>['sendMessage']
   layout?: 'page' | 'workspace'
+  showComposer?: boolean
 }
 
-function MessageGroupTimestamp({ timestamp }: { timestamp: string }) {
+function MessageGroupTimestamp({
+  timestamp,
+  isOwn,
+  now,
+}: {
+  timestamp: string
+  isOwn: boolean
+  now: Date
+}) {
   return (
-    <Text
-      variant="small"
-      as="time"
+    <MessagesMetadataTime
       dateTime={timestamp}
-      className={messagesWorkspaceMessageGroupTimestampClasses}
+      title={formatFullDateTime(timestamp)}
+      className={[
+        messagesWorkspaceMessageGroupTimestampClasses,
+        isOwn ? 'text-right' : 'text-left',
+      ].join(' ')}
     >
-      <span>{formatDateTime(timestamp)}</span>
-      <span className="text-muted-foreground">{formatRelativeRecency(timestamp)}</span>
-    </Text>
+      {formatMessageGroupTime(timestamp, now)}
+    </MessagesMetadataTime>
   )
 }
 
@@ -60,10 +79,12 @@ export function MessageThreadBody({
   fetchNextPage,
   sendMessage,
   layout = 'workspace',
+  showComposer = true,
 }: MessageThreadBodyProps) {
   const [draft, setDraft] = React.useState('')
   const clientMessageIdRef = React.useRef<string | null>(null)
-  const messageGroups = React.useMemo(() => groupMessagesByTime(messages), [messages])
+  const now = useRelativeTimeNow()
+  const threadSegments = React.useMemo(() => buildMessageThreadSegments(messages), [messages])
 
   const handleLoadOlderMessages = () => {
     void fetchNextPage().catch(() => {
@@ -114,31 +135,49 @@ export function MessageThreadBody({
       ) : null}
 
       <ul
-        className="flex flex-col gap-4"
+        className={messagesWorkspaceMessageThreadClasses}
         aria-label={MESSAGES_A11Y_COPY.messages}
         aria-live="polite"
         aria-relevant="additions"
       >
-        {messageGroups.map((group) => {
+        {threadSegments.map((segment, index) => {
+          if (segment.type === 'date-separator') {
+            return (
+              <li
+                key={`date-${segment.timestamp}-${index}`}
+                className={messagesWorkspaceDateSeparatorClasses}
+              >
+                <MessagesMetadataTime
+                  dateTime={segment.timestamp}
+                  title={formatFullDateTime(segment.timestamp)}
+                >
+                  {formatConversationDateSeparator(segment.timestamp, now)}
+                </MessagesMetadataTime>
+              </li>
+            )
+          }
+
+          const { group } = segment
           const isOwn = group.senderUserId === currentUserId
           return (
             <li
               key={group.messages[0]?.id}
               className={isOwn ? 'self-end text-right' : 'self-start text-left'}
+              aria-label={formatMessageGroupAriaLabel(isOwn, peerDisplayName, group.timestamp)}
             >
-              <ul className={messagesWorkspaceMessageGroupClasses}>
+              <div className={messagesWorkspaceMessageGroupClasses}>
                 {group.messages.map((message) => (
-                  <li
+                  <div
                     key={message.id}
                     aria-label={formatMessageBubbleAriaLabel(isOwn, peerDisplayName)}
                   >
                     <div className={messagesWorkspaceMessageBubbleClasses}>
                       <Text>{message.content.text}</Text>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
-              <MessageGroupTimestamp timestamp={group.timestamp} />
+              </div>
+              <MessageGroupTimestamp timestamp={group.timestamp} isOwn={isOwn} now={now} />
             </li>
           )
         })}
@@ -146,14 +185,14 @@ export function MessageThreadBody({
     </>
   )
 
-  const composer = (
+  const composer = showComposer ? (
     <MessageComposer
       draft={draft}
       onDraftChange={setDraft}
       onSubmit={handleSend}
       isSubmitting={sendMessage.isPending}
     />
-  )
+  ) : null
 
   if (layout === 'page') {
     return (
@@ -167,7 +206,7 @@ export function MessageThreadBody({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className={messagesWorkspaceRightScrollClasses}>{history}</div>
-      <div className={messagesWorkspaceRightFooterClasses}>{composer}</div>
+      {composer ? <div className={messagesWorkspaceRightFooterClasses}>{composer}</div> : null}
     </div>
   )
 }

@@ -16,6 +16,7 @@ import {
   shouldShowLoadedScopeHint,
 } from '../lib/messages-direct-list-presentation.lib'
 import { formatMessagesLoadedScopeHint } from '../lib/messages-copy'
+import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.variants'
 
 type MessagesDirectListContentProps = {
   activeConversationId?: string
@@ -38,7 +39,10 @@ function MessagesLoadedScopeHint({
   scopedCount: number
 }) {
   return (
-    <Text variant="small" className="mb-2 text-muted-foreground">
+    <Text
+      variant="small"
+      className={`mb-2 text-muted-foreground ${messagesWorkspaceListChromeInsetClasses}`}
+    >
       {formatMessagesLoadedScopeHint(loadedCount, scopedCount)}
     </Text>
   )

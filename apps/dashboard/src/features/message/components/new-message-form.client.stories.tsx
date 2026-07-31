@@ -20,7 +20,6 @@ export const Default: Story = {
     ],
     recipientUserId: '',
     onRecipientChange: () => undefined,
-    onCancel: () => undefined,
   },
 }
 
