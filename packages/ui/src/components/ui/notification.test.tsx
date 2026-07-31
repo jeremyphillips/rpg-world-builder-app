@@ -27,6 +27,11 @@ describe('NotificationUnreadBadge', () => {
     rerender(<NotificationUnreadBadge count={120} />)
     expect(queryByText('99+')).toBeTruthy()
   })
+
+  it('uses solid destructive alert styling', () => {
+    const { container } = render(<NotificationUnreadBadge count={3} />)
+    expect(container.firstChild).toHaveClass('bg-destructive', 'text-destructive-foreground')
+  })
 })
 
 describe('NotificationPreviewItem', () => {

@@ -28,10 +28,10 @@ export const NotificationBell = React.forwardRef<HTMLButtonElement, Notification
           variant="ghost"
           size="icon"
           aria-label={resolvedAriaLabel}
-          className="shrink-0"
+          className="shrink-0 hover:bg-transparent hover:text-foreground active:bg-transparent [&_svg]:size-5"
           {...props}
         >
-          <Bell className="size-4" />
+          <Bell />
         </Button>
         <NotificationUnreadBadge count={unreadCount} />
       </div>
