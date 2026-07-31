@@ -52,14 +52,26 @@ const registry = {
       campaignId: payload.campaignId,
     }),
   },
-  // Phase 1: registry formatter only — publish via publishNotification when DM lands.
   'message.direct.received': {
-    formatPreview: (payload) => ({
-      title: 'New message',
-      description: `${payload.senderDisplayName}: ${payload.preview}`,
-      actorLabel: payload.senderDisplayName,
+    formatPreview: (payload) => {
+      if (payload.unreadMessageCount === 1) {
+        return {
+          title: 'New message',
+          description: `${payload.senderDisplayName}: ${payload.preview}`,
+          actorLabel: payload.senderDisplayName,
+        }
+      }
+
+      return {
+        title: `${payload.unreadMessageCount} new messages`,
+        description: `${payload.senderDisplayName}: ${payload.preview}`,
+        actorLabel: payload.senderDisplayName,
+      }
+    },
+    resolveAction: (payload) => ({
+      kind: 'conversation_detail',
+      conversationId: payload.conversationId,
     }),
-    resolveAction: () => undefined,
   },
 } as const satisfies {
   [K in NotificationType]: NotificationRegistryDefinition<K>

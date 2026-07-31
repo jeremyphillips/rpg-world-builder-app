@@ -26,9 +26,11 @@ export const campaignInviteCompletedPayloadSchema = z.object({
 })
 
 export const messageDirectReceivedPayloadSchema = z.object({
+  conversationId: z.string(),
   messageId: z.string(),
   senderDisplayName: z.string(),
   preview: z.string(),
+  unreadMessageCount: z.number().int().positive(),
 })
 
 export const NOTIFICATION_PAYLOAD_SCHEMAS = {

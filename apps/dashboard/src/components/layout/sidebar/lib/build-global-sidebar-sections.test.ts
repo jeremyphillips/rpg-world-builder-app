@@ -16,8 +16,9 @@ describe('buildGlobalSidebarSections', () => {
     expect(mainItems[1]).toMatchObject({ href: ROUTES.campaign.list })
 
     const personalItems = sections.find((section) => section.id === 'personal')!.items
-    expect(personalItems.map((item) => item.label)).toEqual(['Characters'])
+    expect(personalItems.map((item) => item.label)).toEqual(['Characters', 'Messages'])
     expect(personalItems[0]).toMatchObject({ href: ROUTES.characters.list })
+    expect(personalItems[1]).toMatchObject({ href: ROUTES.messages.list })
 
     const toolsItems = sections.find((section) => section.id === 'tools')!.items
     expect(toolsItems.map((item) => item.label)).toEqual(['Name Generator'])

@@ -8,3 +8,7 @@ export function campaignInviteDedupeKey(
 ): string {
   return `campaign-invite:${inviteId}:${phase}`
 }
+
+export function directMessageDedupeKey(conversationId: string): string {
+  return `message-direct:${conversationId}`
+}

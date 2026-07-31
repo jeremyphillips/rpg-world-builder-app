@@ -12,6 +12,11 @@ export const ROUTES = {
   },
   account: '/account',
   nameGenerator: '/name-generator',
+  messages: {
+    list: '/messages',
+    new: '/messages/new',
+    detail: (conversationId: string) => `/messages/${conversationId}`,
+  },
   campaign: {
     list: '/campaigns',
     create: '/campaigns/new',

@@ -68,13 +68,33 @@ describe('notification registry', () => {
     })
   })
 
-  it('formats direct message previews without an action', () => {
-    expect(
-      resolveNotificationAction('message.direct.received', {
-        messageId: 'message-1',
-        senderDisplayName: 'Ava',
-        preview: 'Ready for tonight?',
-      }),
-    ).toBeUndefined()
+  it('formats direct message previews with conversation detail actions', () => {
+    const payload = {
+      conversationId: 'conversation-1',
+      messageId: 'message-1',
+      senderDisplayName: 'Ava',
+      preview: 'Ready for tonight?',
+      unreadMessageCount: 1,
+    }
+
+    expect(resolveNotificationAction('message.direct.received', payload)).toEqual({
+      kind: 'conversation_detail',
+      conversationId: 'conversation-1',
+    })
+
+    expect(formatNotificationPreview('message.direct.received', payload).title).toBe('New message')
+  })
+
+  it('uses count copy for multiple unread direct messages', () => {
+    const preview = formatNotificationPreview('message.direct.received', {
+      conversationId: 'conversation-1',
+      messageId: 'message-3',
+      senderDisplayName: 'Ava',
+      preview: 'Latest line',
+      unreadMessageCount: 3,
+    })
+
+    expect(preview.title).toBe('3 new messages')
+    expect(preview.description).toContain('Latest line')
   })
 })

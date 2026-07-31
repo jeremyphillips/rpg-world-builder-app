@@ -1,4 +1,8 @@
-import { crossAppCampaignDetailPath, type NotificationAction } from '@rpg/contracts'
+import {
+  crossAppCampaignDetailPath,
+  crossAppConversationPath,
+  type NotificationAction,
+} from '@rpg/contracts'
 
 export function resolveNotificationActionPath(
   action: NotificationAction | undefined,
@@ -8,5 +12,7 @@ export function resolveNotificationActionPath(
   switch (action.kind) {
     case 'campaign_detail':
       return crossAppCampaignDetailPath(action.campaignId)
+    case 'conversation_detail':
+      return crossAppConversationPath(action.conversationId)
   }
 }

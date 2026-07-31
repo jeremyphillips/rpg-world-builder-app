@@ -1,3 +1,4 @@
-// fallow-ignore-file unused-file
-// `message` feature — scaffold only. Export the public surface here as it's built.
-export {}
+export { useConversations } from './hooks/use-conversations'
+export { useConversationMessages } from './hooks/use-conversation-messages'
+export { useConversationRecipients } from './hooks/use-conversation-recipients'
+export { useConversationActions } from './hooks/use-conversation-actions'

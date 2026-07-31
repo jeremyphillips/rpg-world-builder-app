@@ -66,11 +66,11 @@ All routes require auth and are recipient-scoped.
 
 ## Phase 1 deferred gaps
 
-| Gap                                | Status                                                                               |
-| ---------------------------------- | ------------------------------------------------------------------------------------ |
-| `nextCursor` pagination            | List endpoint returns `nextCursor`; dashboard polls only the first page.             |
-| `message.direct.received` producer | Registry + payload schemas exist; no producer until DM persistence lands.            |
-| `archivedAt` / pruning             | Field is stored and excluded from active queries; no archive API or pruning job yet. |
+| Gap                                | Status                                                                                                                              |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `nextCursor` pagination            | List endpoint returns `nextCursor`; dashboard polls only the first page.                                                            |
+| `message.direct.received` producer | Published on direct message send with dedupe key `message-direct:${conversationId}`; conversation mark-read clears the deduped row. |
+| `archivedAt` / pruning             | Field is stored and excluded from active queries; no archive API or pruning job yet.                                                |
 
 ## Retention
 
