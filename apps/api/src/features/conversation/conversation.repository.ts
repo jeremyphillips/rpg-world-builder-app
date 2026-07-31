@@ -12,6 +12,11 @@ import { MessageModel } from './message.model'
 import { findUsersByIds } from '../user'
 import { toConversation } from './to-conversation'
 import { toMessage } from './to-message'
+import {
+  assembleConversationResponse,
+  assembleConversationResponses,
+} from './assemble-conversation-response.lib'
+import type { BaseConversation } from './to-conversation'
 
 type ConversationRecord = Parameters<typeof toConversation>[0]
 type MessageRecord = Parameters<typeof toMessage>[0]
@@ -138,11 +143,11 @@ export async function buildConversationForParticipant({
   return buildConversationDto(conversation, viewerUserId, peer)
 }
 
-async function buildConversationDto(
+async function buildBaseConversationDto(
   doc: ConversationRecord,
   viewerUserId: string,
   peer: { userId: string; displayName: string },
-): Promise<Conversation> {
+): Promise<BaseConversation> {
   const participantState = await ConversationParticipantStateModel.findOne({
     conversationId: String(doc._id),
     userId: viewerUserId,
@@ -161,6 +166,15 @@ async function buildConversationDto(
     unreadCount,
     version: participantState?.version ?? 1,
   })
+}
+
+async function buildConversationDto(
+  doc: ConversationRecord,
+  viewerUserId: string,
+  peer: { userId: string; displayName: string },
+): Promise<Conversation> {
+  const base = await buildBaseConversationDto(doc, viewerUserId, peer)
+  return assembleConversationResponse(viewerUserId, base)
 }
 
 export async function findOrCreateDirectConversation({
@@ -253,15 +267,17 @@ export async function listConversationsForUser({
     }
   }
 
-  const items = await Promise.all(
+  const baseItems = await Promise.all(
     page.map(async (doc) => {
       const peerUserId = doc.participantUserIds.find((userId) => userId !== viewerUserId)
       const peer = peerUserId
         ? (peerByUserId.get(peerUserId) ?? { userId: peerUserId, displayName: 'Unknown user' })
         : { userId: '', displayName: 'Unknown user' }
-      return buildConversationDto(doc, viewerUserId, peer)
+      return buildBaseConversationDto(doc, viewerUserId, peer)
     }),
   )
+
+  const items = await assembleConversationResponses(viewerUserId, baseItems)
 
   return {
     items,

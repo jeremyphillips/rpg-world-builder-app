@@ -1,7 +1,8 @@
 # Conversations (API)
 
 Direct one-to-one conversations between users who share current campaign
-membership.
+membership. `ConversationKind` is `direct` only today; `campaign` channel
+conversations are reserved for a future slice.
 
 ## Endpoints
 
@@ -29,6 +30,28 @@ Recipients are resolved from **current** shared campaign membership:
 
 The same rules apply to `GET /direct/recipients`, `POST /direct`, and
 `POST /:conversationId/messages` (existing threads re-check eligibility on send).
+
+## Shared campaigns (resolved live)
+
+List and detail conversation responses include `sharedCampaigns`:
+`Array<{ campaignId, campaignName }>`. This is **not persisted** — the list/detail
+assembler batches viewer+peer memberships and attaches only campaigns the viewer
+is permitted to know about (same visibility rules as recipient eligibility).
+
+## Recipients response
+
+`GET /direct/recipients` returns a normalized SSOT shape:
+
+```ts
+{
+  recipientsByUserId: Record<string, { userId; displayName }>
+  campaigns: Array<{ campaignId; campaignName; userIds: string[] }>
+  existingDirectByUserId: Record<string, string> // peer userId → conversationId
+}
+```
+
+Campaign groups reference `recipientsByUserId` by id — user objects are not
+duplicated inside each group.
 
 ## Unread state
 

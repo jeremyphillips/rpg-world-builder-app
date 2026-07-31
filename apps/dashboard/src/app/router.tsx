@@ -57,11 +57,9 @@ import {
   SkillProficiencyDetailRoute,
   SkillProficiencyEditRoute,
   HomebrewHubRoute,
-  MessageThreadRoute,
-  MessagesListRoute,
+  MessagesWorkspaceRoute,
   NameGeneratorRoute,
   NotificationsListRoute,
-  NewMessageRoute,
   RulesConfigDetailRoute,
   VocabularyLandingRoute,
   VocabularyDetailRoute,
@@ -135,7 +133,7 @@ const router = createBrowserRouter(
             },
             {
               path: 'messages',
-              element: <Outlet />,
+              element: <MessagesWorkspaceRoute />,
               handle: {
                 crumb: (_params, data) => ({
                   label: 'Messages',
@@ -143,15 +141,15 @@ const router = createBrowserRouter(
                 }),
               } satisfies CrumbHandle,
               children: [
-                { index: true, element: <MessagesListRoute /> },
+                { index: true, element: null },
                 {
                   path: 'new',
-                  element: <NewMessageRoute />,
+                  element: null,
                   handle: { crumb: () => ({ label: 'New message' }) } satisfies CrumbHandle,
                 },
                 {
                   path: ':conversationId',
-                  element: <MessageThreadRoute />,
+                  element: null,
                   handle: {
                     crumb: (_params, { entityLabel }) => ({
                       label: entityLabel ?? 'Conversation',

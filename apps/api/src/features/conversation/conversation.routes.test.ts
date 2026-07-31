@@ -42,8 +42,19 @@ describe('conversation routes', () => {
     })
 
     const recipients = await owner.agent.get('/api/conversations/direct/recipients').expect(200)
-    expect(recipients.body.items).toEqual([
-      expect.objectContaining({ userId: member.userId, displayName: 'Campaign Member' }),
+    expect(recipients.body.recipientsByUserId).toEqual(
+      expect.objectContaining({
+        [member.userId]: expect.objectContaining({
+          userId: member.userId,
+          displayName: 'Campaign Member',
+        }),
+      }),
+    )
+    expect(recipients.body.campaigns).toEqual([
+      expect.objectContaining({
+        campaignName: 'Stormwatch',
+        userIds: [member.userId],
+      }),
     ])
 
     const created = await owner.agent
@@ -54,6 +65,9 @@ describe('conversation routes', () => {
 
     const conversationId = created.body.conversation.id as string
     expect(created.body.conversation.peer.displayName).toBe('Campaign Member')
+    expect(created.body.conversation.sharedCampaigns).toEqual([
+      expect.objectContaining({ campaignName: 'Stormwatch' }),
+    ])
 
     const firstSend = await owner.agent
       .post(`/api/conversations/${conversationId}/messages`)

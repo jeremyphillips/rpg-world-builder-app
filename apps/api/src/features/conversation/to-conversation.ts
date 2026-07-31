@@ -14,6 +14,8 @@ type ConversationRecord = ConversationSchemaType & {
   } | null
 }
 
+export type BaseConversation = Omit<Conversation, 'sharedCampaigns'>
+
 export function toConversation(
   doc: ConversationRecord,
   {
@@ -25,7 +27,7 @@ export function toConversation(
     unreadCount: number
     version: number
   },
-): Conversation {
+): BaseConversation {
   return {
     id: String(doc._id),
     kind: 'direct',

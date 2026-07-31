@@ -102,6 +102,7 @@ export function useConversationActions(conversationId?: string) {
               kind: 'direct' as const,
               participantUserIds: [message.senderUserId, ''] as [string, string],
               peer: { userId: '', displayName: '' },
+              sharedCampaigns: [],
               unreadCount: 0,
               createdAt: message.createdAt,
               updatedAt: message.createdAt,

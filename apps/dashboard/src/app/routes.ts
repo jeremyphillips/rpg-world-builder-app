@@ -17,8 +17,12 @@ export const ROUTES = {
   },
   messages: {
     list: '/messages',
-    new: '/messages/new',
+    new: (options?: { from?: string }) => {
+      if (!options?.from) return '/messages/new'
+      return `/messages/new?from=${encodeURIComponent(options.from)}`
+    },
     detail: (conversationId: string) => `/messages/${conversationId}`,
+    campaigns: '/messages?mode=campaigns',
   },
   campaign: {
     list: '/campaigns',

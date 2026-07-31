@@ -7,6 +7,10 @@ import { Button, Text, TextareaField, toast } from '@rpg/ui'
 import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
 import type { useConversationActions } from '../hooks/use-conversation-actions'
+import {
+  messagesWorkspaceRightFooterClasses,
+  messagesWorkspaceRightScrollClasses,
+} from './messages-workspace.variants'
 
 type MessageThreadBodyProps = {
   currentUserId: string | undefined
@@ -17,6 +21,7 @@ type MessageThreadBodyProps = {
   isFetchNextPageError: boolean
   fetchNextPage: () => Promise<unknown>
   sendMessage: ReturnType<typeof useConversationActions>['sendMessage']
+  layout?: 'page' | 'workspace'
 }
 
 export function MessageThreadBody({
@@ -28,6 +33,7 @@ export function MessageThreadBody({
   isFetchNextPageError,
   fetchNextPage,
   sendMessage,
+  layout = 'workspace',
 }: MessageThreadBodyProps) {
   const [draft, setDraft] = React.useState('')
   const clientMessageIdRef = React.useRef<string | null>(null)
@@ -61,8 +67,8 @@ export function MessageThreadBody({
       })
   }
 
-  return (
-    <div className="flex flex-col gap-4">
+  const history = (
+    <>
       {hasNextPage ? (
         <Button
           type="button"
@@ -103,19 +109,37 @@ export function MessageThreadBody({
           )
         })}
       </ul>
+    </>
+  )
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <TextareaField
-          id="message-draft"
-          label="Message"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          rows={3}
-        />
-        <Button type="submit" disabled={!draft.trim() || sendMessage.isPending}>
-          Send
-        </Button>
-      </form>
+  const composer = (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <TextareaField
+        id="message-draft"
+        label="Message"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        rows={3}
+      />
+      <Button type="submit" disabled={!draft.trim() || sendMessage.isPending}>
+        Send
+      </Button>
+    </form>
+  )
+
+  if (layout === 'page') {
+    return (
+      <div className="flex flex-col gap-4">
+        {history}
+        {composer}
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className={messagesWorkspaceRightScrollClasses}>{history}</div>
+      <div className={messagesWorkspaceRightFooterClasses}>{composer}</div>
     </div>
   )
 }

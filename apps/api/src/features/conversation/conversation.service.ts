@@ -71,8 +71,7 @@ async function deliverConversationActivityToParticipants(input: {
 export async function getDirectMessageRecipients(
   callerUserId: string,
 ): Promise<DirectConversationRecipientsResponse> {
-  const items = await listDirectMessageRecipients(callerUserId)
-  return { items }
+  return listDirectMessageRecipients(callerUserId)
 }
 
 export async function createDirectConversation(

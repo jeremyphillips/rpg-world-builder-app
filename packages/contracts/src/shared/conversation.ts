@@ -6,6 +6,7 @@ import {
   sendDirectMessageInputSchema,
 } from './direct-message'
 
+/** Direct-only today; reserve `campaign` for future campaign-channel conversations. */
 export const CONVERSATION_KINDS = ['direct'] as const
 
 export const conversationKindSchema = z.enum(CONVERSATION_KINDS)
@@ -28,11 +29,20 @@ export const conversationLatestMessageSchema = z.object({
 
 export type ConversationLatestMessage = z.infer<typeof conversationLatestMessageSchema>
 
+export const conversationSharedCampaignSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+})
+
+export type ConversationSharedCampaign = z.infer<typeof conversationSharedCampaignSchema>
+
 export const conversationSchema = z.object({
   id: z.string(),
   kind: conversationKindSchema,
   participantUserIds: z.tuple([z.string(), z.string()]),
   peer: conversationPeerSchema,
+  /** Resolved live on list/detail — not persisted. Viewer-visible shared campaigns only. */
+  sharedCampaigns: z.array(conversationSharedCampaignSchema),
   latestMessage: conversationLatestMessageSchema.optional(),
   unreadCount: z.number().int().nonnegative(),
   createdAt: z.iso.datetime(),
@@ -57,8 +67,20 @@ export const directConversationRecipientSchema = conversationPeerSchema
 
 export type DirectConversationRecipient = z.infer<typeof directConversationRecipientSchema>
 
+export const directConversationRecipientCampaignGroupSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+  userIds: z.array(z.string()),
+})
+
+export type DirectConversationRecipientCampaignGroup = z.infer<
+  typeof directConversationRecipientCampaignGroupSchema
+>
+
 export const directConversationRecipientsResponseSchema = z.object({
-  items: z.array(directConversationRecipientSchema),
+  recipientsByUserId: z.record(z.string(), directConversationRecipientSchema),
+  campaigns: z.array(directConversationRecipientCampaignGroupSchema),
+  existingDirectByUserId: z.record(z.string(), z.string()),
 })
 
 export type DirectConversationRecipientsResponse = z.infer<
