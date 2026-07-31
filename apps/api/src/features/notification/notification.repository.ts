@@ -121,11 +121,12 @@ export async function listNotificationsForRecipient({
 }> {
   const filter: Record<string, unknown> = {
     recipientUserId,
+    // Phase 1: archived rows are excluded; nothing writes archivedAt yet.
     archivedAt: null,
   }
 
   const decodedCursor = cursor ? decodeNotificationCursor(cursor) : null
-  if (decodedCursor && isValidObjectId(decodedCursor.id)) {
+  if (decodedCursor) {
     filter.$or = [
       { createdAt: { $lt: decodedCursor.createdAt } },
       {
@@ -146,6 +147,7 @@ export async function listNotificationsForRecipient({
 
   return {
     items: page.map(toNotification),
+    // Phase 1: returned for API consumers; dashboard polls only the first page.
     nextCursor: hasMore && last ? encodeNotificationCursor(last.createdAt, String(last._id)) : null,
   }
 }
@@ -165,6 +167,8 @@ export async function markNotificationRead({
   recipientUserId: string
   notificationId: string
 }): Promise<ReturnType<typeof toNotification> | null> {
+  if (!isValidObjectId(notificationId)) return null
+
   const now = new Date()
   const doc = await NotificationModel.findOneAndUpdate(
     {
@@ -213,10 +217,13 @@ export async function markNotificationsSeen({
   recipientUserId: string
   ids: string[]
 }): Promise<number> {
+  const validIds = ids.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return 0
+
   const now = new Date()
   const result = await NotificationModel.updateMany(
     {
-      _id: { $in: ids },
+      _id: { $in: validIds },
       recipientUserId,
       archivedAt: null,
       seenAt: null,

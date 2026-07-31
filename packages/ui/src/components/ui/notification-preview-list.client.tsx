@@ -28,7 +28,7 @@ export function NotificationPreviewList({
   footerSlot,
 }: NotificationPreviewListProps) {
   return (
-    <div className={cn('divide-y divide-border', className)}>
+    <div className={cn('max-h-96 overflow-y-auto divide-y divide-border', className)}>
       {items.map((item) => (
         <NotificationPreviewItem
           key={item.id}

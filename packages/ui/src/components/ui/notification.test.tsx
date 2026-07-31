@@ -5,6 +5,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { NotificationBell } from './notification-bell.client'
 import { NotificationEmptyState } from './notification-empty-state'
+import { NotificationErrorState } from './notification-error-state'
 import { NotificationLoadingState } from './notification-loading-state'
 import { NotificationPreviewItem } from './notification-preview-item.client'
 import { NotificationUnreadBadge } from './notification-unread-badge'
@@ -59,6 +60,13 @@ describe('NotificationEmptyState', () => {
 describe('NotificationLoadingState', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<NotificationLoadingState />)
+    await expectNoAxeViolations(container)
+  })
+})
+
+describe('NotificationErrorState', () => {
+  it('has no accessibility violations', async () => {
+    const { container } = render(<NotificationErrorState onRetry={() => undefined} />)
     await expectNoAxeViolations(container)
   })
 })

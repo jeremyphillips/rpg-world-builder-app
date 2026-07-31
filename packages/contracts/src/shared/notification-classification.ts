@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { NOTIFICATION_TYPES, type NotificationType } from './notification-types'
+
 export const NOTIFICATION_CATEGORIES = ['campaign', 'message'] as const
 
 export const notificationCategorySchema = z.enum(NOTIFICATION_CATEGORIES)
@@ -102,3 +104,47 @@ export const NOTIFICATION_PRIORITY_ENTRIES = {
   NotificationPriority,
   { label: string; description: string; sentence: { singular: string; plural: string } }
 >
+
+export const NOTIFICATION_CLASSIFICATION_BY_TYPE = {
+  'campaign.invite.received': {
+    category: 'campaign',
+    topic: 'campaign_invites',
+    priority: 'normal',
+  },
+  'campaign.invite.accepted': {
+    category: 'campaign',
+    topic: 'campaign_invites',
+    priority: 'normal',
+  },
+  'campaign.invite.completed': {
+    category: 'campaign',
+    topic: 'campaign_invites',
+    priority: 'normal',
+  },
+  'message.direct.received': {
+    category: 'message',
+    topic: 'direct_messages',
+    priority: 'normal',
+  },
+} as const satisfies Record<
+  NotificationType,
+  {
+    category: NotificationCategory
+    topic: NotificationTopic
+    priority: NotificationPriority
+  }
+>
+
+export function getNotificationClassification(type: NotificationType): {
+  category: NotificationCategory
+  topic: NotificationTopic
+  priority: NotificationPriority
+} {
+  return NOTIFICATION_CLASSIFICATION_BY_TYPE[type]
+}
+
+for (const type of NOTIFICATION_TYPES) {
+  if (!NOTIFICATION_CLASSIFICATION_BY_TYPE[type]) {
+    throw new Error(`Missing notification classification for type: ${type}`)
+  }
+}

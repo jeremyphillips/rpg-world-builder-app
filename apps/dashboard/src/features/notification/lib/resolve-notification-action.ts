@@ -5,9 +5,8 @@ export function resolveNotificationActionPath(
 ): string | undefined {
   if (!action) return undefined
 
-  if (action.kind === 'campaign_detail') {
-    return crossAppCampaignDetailPath(action.campaignId)
+  switch (action.kind) {
+    case 'campaign_detail':
+      return crossAppCampaignDetailPath(action.campaignId)
   }
-
-  return undefined
 }

@@ -5,19 +5,8 @@ import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { findInviteById } from '../campaign-invite/campaign-invite.repository'
 import { findSessionUserById } from '../user'
+import { campaignInviteDedupeKey } from './notification-dedupe-keys'
 import { publishNotification } from './publish-notification.service'
-
-function campaignInviteReceivedDedupeKey(inviteId: string): string {
-  return `campaign-invite:${inviteId}:received`
-}
-
-function campaignInviteAcceptedDedupeKey(inviteId: string): string {
-  return `campaign-invite:${inviteId}:accepted`
-}
-
-function campaignInviteCompletedDedupeKey(inviteId: string): string {
-  return `campaign-invite:${inviteId}:completed`
-}
 
 async function loadCampaignName(campaignId: string): Promise<string> {
   const campaign = await findCampaignById(campaignId)
@@ -58,7 +47,7 @@ export async function publishCampaignInviteReceivedNotification(input: {
   await publishNotification({
     type: 'campaign.invite.received',
     recipientUserIds: [input.inviteeUserId],
-    dedupeKey: campaignInviteReceivedDedupeKey(input.invite.id),
+    dedupeKey: campaignInviteDedupeKey(input.invite.id, 'received'),
     payload: {
       inviteId: input.invite.id,
       campaignId: input.invite.campaignId,
@@ -83,7 +72,7 @@ export async function publishCampaignInviteAcceptedNotification(input: {
   await publishNotification({
     type: 'campaign.invite.accepted',
     recipientUserIds,
-    dedupeKey: campaignInviteAcceptedDedupeKey(input.invite.id),
+    dedupeKey: campaignInviteDedupeKey(input.invite.id, 'accepted'),
     payload: {
       inviteId: input.invite.id,
       campaignId: input.invite.campaignId,
@@ -112,7 +101,7 @@ export async function publishCampaignInviteCompletedNotification(input: {
   await publishNotification({
     type: 'campaign.invite.completed',
     recipientUserIds,
-    dedupeKey: campaignInviteCompletedDedupeKey(invite.id),
+    dedupeKey: campaignInviteDedupeKey(invite.id, 'completed'),
     payload: {
       inviteId: invite.id,
       campaignId: invite.campaignId,

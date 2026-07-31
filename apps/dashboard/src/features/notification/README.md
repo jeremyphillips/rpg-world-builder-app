@@ -27,7 +27,16 @@ live in `@rpg/ui` and stay domain-agnostic.
 ## Mark-seen contract
 
 When the popover opens, call mark-seen with only the notification IDs currently
-rendered in the list (not the full cursor page beyond the UI cap).
+rendered in the list (not the full cursor page beyond the UI cap). Failed mark-seen
+requests retry on the next effect pass; closing the popover clears the tracked IDs.
+
+## Phase 1 deferred gaps
+
+| Gap                                | Status                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| `nextCursor` pagination            | API returns cursors; dashboard fetches only the first page (limit 10). No load-more UI yet. |
+| `message.direct.received` producer | Contracts + registry exist; no domain producer until DM persistence lands.                  |
+| `archivedAt` / archive controls    | Field is stored and filtered from queries; no archive endpoint or pruning job yet.          |
 
 ## Adding a notification type
 

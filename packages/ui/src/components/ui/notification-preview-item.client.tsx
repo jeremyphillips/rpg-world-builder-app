@@ -26,6 +26,9 @@ export function NotificationPreviewItem({
   onActivate,
   className,
 }: NotificationPreviewItemProps) {
+  const titleText = typeof title === 'string' ? title : 'Notification'
+  const activateLabel = unread ? `Unread: ${titleText}` : titleText
+
   const content = (
     <div className="flex min-w-0 items-start gap-3">
       {icon ? <div className="mt-0.5 shrink-0 text-muted-foreground">{icon}</div> : null}
@@ -73,6 +76,7 @@ export function NotificationPreviewItem({
     <button
       type="button"
       onClick={onActivate}
+      aria-label={activateLabel}
       className={cn(
         'w-full px-3 py-2.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
         unread ? 'bg-muted' : 'bg-background',

@@ -5,11 +5,13 @@ Internal publish API and persistence for durable in-app notifications.
 ## Architecture
 
 - **Contracts** (`@rpg/contracts/shared/notification*`) own type inventory, classification
-  vocab, typed payloads, and public DTO/API shapes.
+  vocab (`NOTIFICATION_CLASSIFICATION_BY_TYPE`), typed payloads, and public DTO/API shapes.
 - **Publish intent** stays API-internal (`publish-notification.types.ts`) and is not
   exported from contracts.
 - Domain features call `publishNotification` (or the invite helpers) from
   `apps/api/src/features/notification/index.ts` only — never the repository directly.
+- Registry formatters import classification defaults from contracts via
+  `getNotificationClassification`.
 
 ## Publishing
 
@@ -20,7 +22,7 @@ snapshots through `notification.registry.ts`, and persists rows per recipient.
 await publishNotification({
   type: 'campaign.invite.accepted',
   recipientUserIds: managerUserIds,
-  dedupeKey: `campaign-invite:${inviteId}:accepted`,
+  dedupeKey: campaignInviteDedupeKey(inviteId, 'accepted'),
   payload: {
     inviteId,
     campaignId,
@@ -43,11 +45,14 @@ partial index on `{ recipientUserId, dedupeKey }`.
 
 ## Campaign invite producers
 
-| Type                        | Recipients                                 | Dedupe key                             | Action                      |
-| --------------------------- | ------------------------------------------ | -------------------------------------- | --------------------------- |
-| `campaign.invite.received`  | Invitee user when email matches an account | `campaign-invite:{inviteId}:received`  | None — copy points to email |
-| `campaign.invite.accepted`  | Campaign owner + co-owner, excluding actor | `campaign-invite:{inviteId}:accepted`  | `campaign_detail`           |
-| `campaign.invite.completed` | Campaign owner + co-owner, excluding actor | `campaign-invite:{inviteId}:completed` | `campaign_detail`           |
+Dedupe keys use `campaignInviteDedupeKey(inviteId, phase)` from
+`notification-dedupe-keys.ts`.
+
+| Type                        | Recipients                                 | Dedupe phase | Action                      |
+| --------------------------- | ------------------------------------------ | ------------ | --------------------------- |
+| `campaign.invite.received`  | Invitee user when email matches an account | `received`   | None — copy points to email |
+| `campaign.invite.accepted`  | Campaign owner + co-owner, excluding actor | `accepted`   | `campaign_detail`           |
+| `campaign.invite.completed` | Campaign owner + co-owner, excluding actor | `completed`  | `campaign_detail`           |
 
 ## HTTP endpoints
 
@@ -58,6 +63,14 @@ All routes require auth and are recipient-scoped.
 - `PATCH /api/notifications/:notificationId/read`
 - `POST /api/notifications/mark-all-read`
 - `POST /api/notifications/mark-seen` — body `{ ids: string[] }` for rendered rows only
+
+## Phase 1 deferred gaps
+
+| Gap                                | Status                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------ |
+| `nextCursor` pagination            | List endpoint returns `nextCursor`; dashboard polls only the first page.             |
+| `message.direct.received` producer | Registry + payload schemas exist; no producer until DM persistence lands.            |
+| `archivedAt` / pruning             | Field is stored and excluded from active queries; no archive API or pruning job yet. |
 
 ## Retention
 

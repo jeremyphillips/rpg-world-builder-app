@@ -33,6 +33,7 @@ export function useNotifications() {
 
   return useQuery({
     queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
+    // Phase 1: first page only — ignore list response nextCursor until load-more UI exists.
     queryFn: () => listNotifications({ limit: NOTIFICATION_LIST_LIMIT }),
     enabled: isAuthenticated,
     refetchInterval: isAuthenticated && isDocumentVisible ? NOTIFICATION_POLL_INTERVAL_MS : false,

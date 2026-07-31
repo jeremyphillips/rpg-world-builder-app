@@ -16,6 +16,7 @@ export function NotificationBellMenu() {
     previewItems,
     handleMarkAllRead,
     markAllReadPending,
+    refetch,
   } = useNotificationBellMenu()
 
   return (
@@ -35,6 +36,9 @@ export function NotificationBellMenu() {
         isError={isError}
         itemCount={items.length}
         previewItems={previewItems}
+        onRetry={() => {
+          void refetch()
+        }}
       />
     </NotificationPopover>
   )

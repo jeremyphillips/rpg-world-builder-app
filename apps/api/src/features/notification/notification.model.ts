@@ -13,7 +13,7 @@ import {
 const notificationActionSchema = new Schema(
   {
     kind: { type: String, enum: NOTIFICATION_ACTION_KINDS, required: true },
-    campaignId: { type: String },
+    campaignId: { type: String, required: true },
   },
   { _id: false },
 )
@@ -31,6 +31,7 @@ const notificationSchema = new Schema(
     dedupeKey: { type: String, default: null },
     seenAt: { type: Date, default: null },
     readAt: { type: Date, default: null },
+    // Phase 1: stored and indexed for future pruning; no archive API sets this yet.
     archivedAt: { type: Date, default: null },
   },
   { timestamps: true },

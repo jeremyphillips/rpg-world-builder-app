@@ -392,6 +392,10 @@ export {
   type NotificationLoadingStateProps,
 } from './components/ui/notification-loading-state'
 export {
+  NotificationErrorState,
+  type NotificationErrorStateProps,
+} from './components/ui/notification-error-state'
+export {
   ButtonDropdown,
   type ButtonDropdownGroup,
   type ButtonDropdownItem,

@@ -3,7 +3,7 @@ import type {
   NotificationPayloadByType,
   NotificationType,
 } from '@rpg/contracts'
-import { notificationPayloadSchemaForType } from '@rpg/contracts'
+import { getNotificationClassification, notificationPayloadSchemaForType } from '@rpg/contracts'
 
 export type NotificationPreviewSnapshot = {
   title: string
@@ -52,6 +52,7 @@ const registry = {
       campaignId: payload.campaignId,
     }),
   },
+  // Phase 1: registry formatter only — publish via publishNotification when DM lands.
   'message.direct.received': {
     formatPreview: (payload) => ({
       title: 'New message',
@@ -93,3 +94,5 @@ export function resolveNotificationAction<T extends NotificationType>(
 }
 
 export const notificationRegistryTypes = Object.keys(registry) as NotificationType[]
+
+export { getNotificationClassification }

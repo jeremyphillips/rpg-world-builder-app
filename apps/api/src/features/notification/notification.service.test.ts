@@ -4,11 +4,13 @@ import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { publishNotification } from './publish-notification.service'
+import { campaignInviteDedupeKey } from './notification-dedupe-keys'
 import {
   countUnreadNotifications,
   findNotificationByDedupeKey,
   markAllNotificationsRead,
   markNotificationRead,
+  markNotificationsSeen,
 } from './notification.repository'
 import { listNotifications } from './notification.service'
 
@@ -21,7 +23,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -32,7 +34,7 @@ describe('notification service', () => {
 
     const first = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
     })
     expect(first).toBeTruthy()
 
@@ -44,7 +46,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -55,14 +57,14 @@ describe('notification service', () => {
 
     const unchangedResend = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
     })
     expect(unchangedResend?.readAt).toBeTruthy()
 
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -73,7 +75,7 @@ describe('notification service', () => {
 
     const changedResend = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: 'campaign-invite:invite-1:received',
+      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
     })
     expect(changedResend?.readAt).toBeNull()
   })
@@ -85,7 +87,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.accepted',
       recipientUserIds: [recipient.id],
-      dedupeKey: 'campaign-invite:invite-2:accepted',
+      dedupeKey: campaignInviteDedupeKey('invite-2', 'accepted'),
       payload: {
         inviteId: 'invite-2',
         campaignId,
@@ -104,5 +106,39 @@ describe('notification service', () => {
 
     const secondPass = await markAllNotificationsRead(recipient.id)
     expect(secondPass).toBe(0)
+  })
+
+  it('marks only valid unseen notification ids as seen', async () => {
+    const recipient = await makeTestUser({ email: 'notify-seen@example.com' })
+
+    await publishNotification({
+      type: 'campaign.invite.received',
+      recipientUserIds: [recipient.id],
+      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+      payload: {
+        inviteId: 'invite-seen',
+        campaignId: 'campaign-1',
+        campaignName: 'Stormwatch',
+        inviterDisplayName: 'Ava',
+      },
+    })
+
+    const notification = await findNotificationByDedupeKey({
+      recipientUserId: recipient.id,
+      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+    })
+    expect(notification).toBeTruthy()
+
+    const updatedCount = await markNotificationsSeen({
+      recipientUserId: recipient.id,
+      ids: [notification!.id, 'not-an-object-id'],
+    })
+    expect(updatedCount).toBe(1)
+
+    const afterSeen = await findNotificationByDedupeKey({
+      recipientUserId: recipient.id,
+      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+    })
+    expect(afterSeen?.seenAt).toBeTruthy()
   })
 })

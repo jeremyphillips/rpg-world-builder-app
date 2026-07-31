@@ -7,6 +7,7 @@ import { clearTestDb } from '../../test/db'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 import { publishNotification } from './publish-notification.service'
+import { campaignInviteDedupeKey } from './notification-dedupe-keys'
 
 const getApp = useIntegrationApp()
 
@@ -54,5 +55,135 @@ describe('notification routes', () => {
 
     const afterRead = await agent.get('/api/notifications?limit=10').expect(200)
     expect(afterRead.body.unreadCount).toBe(0)
+  })
+
+  it('returns unread count for the signed-in recipient', async () => {
+    await clearTestDb()
+
+    const { agent } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-count@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Count User',
+    })
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    const userId = meRes.body.user.id as string
+
+    await publishNotification({
+      type: 'message.direct.received',
+      recipientUserIds: [userId],
+      payload: {
+        messageId: 'message-2',
+        senderDisplayName: 'Blake',
+        preview: 'Hello',
+      },
+    })
+
+    const response = await agent.get('/api/notifications/unread-count').expect(200)
+    expect(response.body.unreadCount).toBe(1)
+  })
+
+  it('marks a single notification as read', async () => {
+    await clearTestDb()
+
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-read@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Read User',
+    })
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    const userId = meRes.body.user.id as string
+
+    await publishNotification({
+      type: 'message.direct.received',
+      recipientUserIds: [userId],
+      payload: {
+        messageId: 'message-3',
+        senderDisplayName: 'Casey',
+        preview: 'Ping',
+      },
+    })
+
+    const listed = await agent.get('/api/notifications?limit=10').expect(200)
+    const notificationId = listed.body.items[0].id as string
+
+    const response = await agent
+      .patch(`/api/notifications/${notificationId}/read`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(response.body.notification.readAt).toBeTruthy()
+  })
+
+  it('returns 404 for invalid or foreign notification ids on mark-read', async () => {
+    await clearTestDb()
+
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-read-404@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Read 404 User',
+    })
+
+    await agent
+      .patch('/api/notifications/not-an-object-id/read')
+      .set(CSRF_HEADER, csrfToken)
+      .expect(404)
+
+    await agent
+      .patch('/api/notifications/674f2f2f2f2f2f2f2f2f2f2f/read')
+      .set(CSRF_HEADER, csrfToken)
+      .expect(404)
+  })
+
+  it('marks rendered notifications as seen', async () => {
+    await clearTestDb()
+
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-seen@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Seen User',
+    })
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    const userId = meRes.body.user.id as string
+
+    await publishNotification({
+      type: 'campaign.invite.received',
+      recipientUserIds: [userId],
+      dedupeKey: campaignInviteDedupeKey('invite-seen-1', 'received'),
+      payload: {
+        inviteId: 'invite-seen-1',
+        campaignId: 'campaign-1',
+        campaignName: 'Stormwatch',
+        inviterDisplayName: 'Ava',
+      },
+    })
+
+    const listed = await agent.get('/api/notifications?limit=10').expect(200)
+    const notificationId = listed.body.items[0].id as string
+
+    const response = await agent
+      .post('/api/notifications/mark-seen')
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ids: [notificationId] })
+      .expect(200)
+
+    expect(response.body.updatedCount).toBe(1)
+
+    const afterSeen = await agent.get('/api/notifications?limit=10').expect(200)
+    expect(afterSeen.body.items[0].seenAt).toBeTruthy()
+  })
+
+  it('rejects invalid pagination cursors', async () => {
+    await clearTestDb()
+
+    const { agent } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-cursor@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Cursor User',
+    })
+
+    await agent.get('/api/notifications?limit=10&cursor=not-a-valid-cursor').expect(400)
   })
 })

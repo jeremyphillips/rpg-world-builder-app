@@ -12,6 +12,7 @@ const NOTIFICATIONS_API_PATH = '/api/notifications'
 export async function listNotifications(
   options: { limit?: number; cursor?: string } = {},
 ): Promise<NotificationListResponse> {
+  // Phase 1: cursor is supported for future load-more; callers pass limit only today.
   const params = new URLSearchParams()
   if (options.limit) params.set('limit', String(options.limit))
   if (options.cursor) params.set('cursor', options.cursor)
