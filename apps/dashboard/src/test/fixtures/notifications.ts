@@ -13,6 +13,7 @@ export function makeNotification(
       senderDisplayName: 'Ava',
       preview: 'Hello',
       unreadMessageCount: 1,
+      campaignIds: [],
     },
     seenAt: null,
     readAt: null,

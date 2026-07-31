@@ -41,6 +41,7 @@ describe('notification routes', () => {
         senderDisplayName: 'Ava',
         preview: 'Ready for tonight?',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
 
@@ -80,6 +81,7 @@ describe('notification routes', () => {
         senderDisplayName: 'Blake',
         preview: 'Hello',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
 
@@ -108,6 +110,7 @@ describe('notification routes', () => {
         senderDisplayName: 'Casey',
         preview: 'Ping',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
 
@@ -214,6 +217,7 @@ describe('notification routes', () => {
         senderDisplayName: 'Ava',
         preview: 'Hello',
         unreadMessageCount: 1,
+        campaignIds: ['campaign-filter-1'],
       },
     })
 
@@ -240,8 +244,11 @@ describe('notification routes', () => {
     const campaignScope = await agent
       .get('/api/notifications?limit=10&campaignId=campaign-filter-1')
       .expect(200)
-    expect(campaignScope.body.items).toHaveLength(1)
-    expect(campaignScope.body.items[0].type).toBe('campaign.invite.accepted')
+    expect(campaignScope.body.items).toHaveLength(2)
+    expect(campaignScope.body.items.map((item: { type: string }) => item.type).sort()).toEqual([
+      'campaign.invite.accepted',
+      'message.direct.received',
+    ])
 
     const missingCampaignScope = await agent
       .get('/api/notifications?limit=10&campaignId=missing-campaign')

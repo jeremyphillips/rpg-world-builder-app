@@ -6,9 +6,11 @@ import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.va
 export function MessagesDirectListStatus({
   isPending,
   isError,
+  isConversationLookupError = false,
 }: {
   isPending: boolean
   isError: boolean
+  isConversationLookupError?: boolean
 }) {
   if (isPending) {
     return (
@@ -18,7 +20,7 @@ export function MessagesDirectListStatus({
     )
   }
 
-  if (isError) {
+  if (isError || isConversationLookupError) {
     return (
       <Text variant="destructive" role="alert" className={messagesWorkspaceListChromeInsetClasses}>
         {MESSAGES_ERROR_COPY.loadConversations}

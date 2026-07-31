@@ -20,6 +20,7 @@ conversationRouter.post(
   controller.sendFirstDirect,
 )
 conversationRouter.get('/', requireAuth, controller.list)
+conversationRouter.get('/:conversationId', requireAuth, controller.getOne)
 conversationRouter.get('/:conversationId/messages', requireAuth, controller.listMessages)
 conversationRouter.post(
   '/:conversationId/messages',

@@ -8,6 +8,8 @@ export type ActivateNotificationInput = {
   navigate: (path: string) => void
   onFailure: () => void
   onBeforeNavigate?: () => void
+  /** Current inbox/page campaign filter — appended to conversation navigation when present. */
+  campaignId?: string
 }
 
 export function activateNotification({
@@ -16,10 +18,11 @@ export function activateNotification({
   navigate,
   onFailure,
   onBeforeNavigate,
+  campaignId,
 }: ActivateNotificationInput): void {
   void markRead.mutateAsync(notification.id).catch(onFailure)
 
-  const path = resolveNotificationActionPath(notification.action)
+  const path = resolveNotificationActionPath(notification.action, campaignId)
   if (!path) return
 
   onBeforeNavigate?.()

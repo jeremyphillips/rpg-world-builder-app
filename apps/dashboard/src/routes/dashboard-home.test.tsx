@@ -120,6 +120,25 @@ describe('DashboardHome', () => {
     renderHome()
 
     expect(await screen.findByRole('alert')).toHaveTextContent(CAMPAIGNS_QUERY_ERROR_MESSAGE)
+    expect(
+      screen.getByRole('heading', {
+        name: resolveDashboardWelcomeCopy({
+          hasCampaigns: false,
+          hasCharacters: false,
+          displayName,
+          inventoryUnavailable: true,
+        }).title,
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        resolveDashboardWelcomeCopy({
+          hasCampaigns: false,
+          hasCharacters: false,
+          inventoryUnavailable: false,
+        }).body,
+      ),
+    ).not.toBeInTheDocument()
     expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
     expect(screen.queryByText('Resume setup')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()

@@ -22,6 +22,15 @@ import { areMongoTransactionsEnabled, runInTransaction } from '../../lib/mongo-t
 type ConversationRecord = Parameters<typeof toConversation>[0]
 type MessageRecord = Parameters<typeof toMessage>[0]
 
+function isMongoDuplicateKeyError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code: number }).code === 11000
+  )
+}
+
 export function encodeMessageCursor(createdAt: Date, id: string): string {
   return `${createdAt.toISOString()}|${id}`
 }
@@ -223,7 +232,12 @@ export async function listAllConversationRecordsForUser(viewerUserId: string): P
   }>
 > {
   const docs = await ConversationModel.aggregate<ConversationRecord>([
-    { $match: { participantUserIds: viewerUserId } },
+    {
+      $match: {
+        participantUserIds: viewerUserId,
+        latestMessage: { $ne: null },
+      },
+    },
     {
       $addFields: {
         sortAt: { $ifNull: ['$latestMessage.createdAt', '$createdAt'] },
@@ -325,6 +339,7 @@ export async function listConversationsForUser({
 }): Promise<{ items: Conversation[]; nextCursor: string | null }> {
   const filter: Record<string, unknown> = {
     participantUserIds: viewerUserId,
+    latestMessage: { $ne: null },
   }
 
   const decodedCursor = cursor ? decodeConversationCursor(cursor) : null
@@ -668,16 +683,27 @@ async function findOrCreateDirectConversationDoc({
     latestMessage: null,
   }
 
-  const created = session
-    ? await ConversationModel.create([payload], { session })
-    : await ConversationModel.create(payload)
+  try {
+    const created = session
+      ? await ConversationModel.create([payload], { session })
+      : await ConversationModel.create(payload)
 
-  const createdDoc = Array.isArray(created) ? created[0] : created
-  if (!createdDoc) {
-    throw new Error('Failed to create direct conversation.')
+    const createdDoc = Array.isArray(created) ? created[0] : created
+    if (!createdDoc) {
+      throw new Error('Failed to create direct conversation.')
+    }
+
+    return createdDoc.toObject() as ConversationRecord
+  } catch (error) {
+    if (!isMongoDuplicateKeyError(error)) throw error
+
+    const raced = await ConversationModel.findOne({ participantKey })
+      .session(session ?? null)
+      .lean<ConversationRecord | null>()
+
+    if (!raced) throw error
+    return raced
   }
-
-  return createdDoc.toObject() as ConversationRecord
 }
 
 async function createDirectMessageDocument({
@@ -878,6 +904,14 @@ export async function sendFirstDirectMessageRecord({
   try {
     return await write()
   } catch (error) {
+    if (isMongoDuplicateKeyError(error)) {
+      try {
+        return await write()
+      } catch (retryError) {
+        error = retryError
+      }
+    }
+
     const conversation = await ConversationModel.findOne({ participantKey }).select('_id').lean()
     if (conversation) {
       await compensateEmptyDirectConversation(String(conversation._id))

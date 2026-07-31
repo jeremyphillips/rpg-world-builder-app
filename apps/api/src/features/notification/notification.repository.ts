@@ -142,7 +142,11 @@ export async function listNotificationsForRecipient({
   }
 
   if (campaignId) {
-    filter.$or = [{ 'action.campaignId': campaignId }, { 'payload.campaignId': campaignId }]
+    filter.$or = [
+      { 'action.campaignId': campaignId },
+      { 'payload.campaignId': campaignId },
+      { 'payload.campaignIds': campaignId },
+    ]
   }
 
   const decodedCursor = cursor ? decodeNotificationCursor(cursor) : null

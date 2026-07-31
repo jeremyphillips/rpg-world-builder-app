@@ -13,6 +13,7 @@ import {
 import { HttpError } from '../../lib/http-error'
 import {
   getDirectMessageRecipients,
+  getConversation,
   listConversationMessages,
   listConversations,
   markConversationRead,
@@ -69,6 +70,16 @@ export async function list(req: Request, res: Response): Promise<void> {
     campaignId: parsed.data.campaignId,
   })
   res.status(200).json(result)
+}
+
+export async function getOne(req: Request, res: Response): Promise<void> {
+  const conversationId = String(req.params.conversationId)
+  if (!isValidObjectId(conversationId)) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  const conversation = await getConversation(req.user!.id, conversationId)
+  res.status(200).json({ conversation })
 }
 
 export async function listMessages(req: Request, res: Response): Promise<void> {

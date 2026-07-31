@@ -32,6 +32,8 @@ export const messageDirectReceivedPayloadSchema = z.object({
   senderDisplayName: z.string(),
   preview: z.string().max(DIRECT_MESSAGE_PREVIEW_MAX_LENGTH),
   unreadMessageCount: z.number().int().positive(),
+  /** Recipient-visible shared campaigns with the sender at publish time. */
+  campaignIds: z.array(z.string()),
 })
 
 export const NOTIFICATION_PAYLOAD_SCHEMAS = {

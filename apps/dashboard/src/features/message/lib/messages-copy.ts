@@ -1,9 +1,6 @@
 export const MESSAGES_SCOPE_COPY = {
   chipRemoveLabel: 'Clear campaign filter',
   showAllLabel: 'Show all',
-  invalidHeading: 'This campaign filter is no longer available.',
-  invalidBody: 'Showing all messages instead.',
-  invalidDismissLabel: 'Dismiss',
   outOfScopeEyebrow: 'Current conversation',
 } as const
 

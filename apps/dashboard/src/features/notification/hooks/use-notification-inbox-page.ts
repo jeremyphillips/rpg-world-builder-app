@@ -1,13 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
 import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
 import {
   INVALID_CAMPAIGN_SCOPE_COPY,
+  parseCampaignIdFromSearch,
   useFilterUrlState,
   useInvalidCampaignScopeNotice,
 } from '@/lib/filters'
@@ -26,7 +27,13 @@ const NOTIFICATION_ACTION_FAILED_MESSAGE = 'Could not update notification.'
 
 export function useNotificationInboxPage() {
   const navigate = useNavigate()
-  const { data: campaigns = [] } = useCampaigns()
+  const location = useLocation()
+  const { data: campaigns = [], isPending: campaignsPending } = useCampaigns()
+  const campaignsSettled = !campaignsPending
+  const rawCampaignId = React.useMemo(
+    () => parseCampaignIdFromSearch(location.search),
+    [location.search],
+  )
 
   const campaignOptions = React.useMemo(
     () => campaigns.map((campaign) => ({ value: campaign.id, label: campaign.identity.name })),
@@ -47,7 +54,9 @@ export function useNotificationInboxPage() {
     [campaigns],
   )
 
-  const invalidScope = useInvalidCampaignScopeNotice(filters.campaignId, accessibleCampaignIds)
+  const invalidScope = useInvalidCampaignScopeNotice(rawCampaignId, accessibleCampaignIds, {
+    campaignsSettled,
+  })
 
   const listFilters = React.useMemo(() => toNotificationListQueryFilters(filters), [filters])
 
@@ -60,7 +69,9 @@ export function useNotificationInboxPage() {
     fetchNextPage,
     isFetchingNextPage,
     isFetchNextPageError,
-  } = useNotificationInbox(listFilters)
+  } = useNotificationInbox(listFilters, {
+    enabled: campaignsSettled || !rawCampaignId,
+  })
   const { markRead, markAllRead } = useNotificationActions()
 
   const items = React.useMemo(
@@ -75,13 +86,14 @@ export function useNotificationInboxPage() {
         notification,
         markRead,
         navigate,
+        campaignId: filters.campaignId,
         onFailure: () => {
           toast.error(NOTIFICATION_ACTION_FAILED_MESSAGE)
           void refetch()
         },
       })
     },
-    [markRead, navigate, refetch],
+    [filters.campaignId, markRead, navigate, refetch],
   )
 
   const handleMarkAllRead = React.useCallback(() => {
@@ -114,12 +126,11 @@ export function useNotificationInboxPage() {
       dismiss: invalidScope.dismissInvalidScopeNotice,
       copy: INVALID_CAMPAIGN_SCOPE_COPY,
     },
-    isPending,
+    isPending: isPending || (Boolean(rawCampaignId) && !campaignsSettled),
     isError,
     refetch,
     previewItems,
     itemCount: items.length,
-    unreadCountForLabel: unreadCount,
     handleMarkAllRead,
     markAllReadPending: markAllRead.isPending,
     hasNextPage: Boolean(hasNextPage),

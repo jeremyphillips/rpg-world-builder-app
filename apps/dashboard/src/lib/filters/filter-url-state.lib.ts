@@ -37,6 +37,12 @@ export function mergeFilterSearchParams<TData, TFilters extends Record<string, u
   return next
 }
 
+/** Reads raw campaign scope from a search string without hydrating filter options. */
+export function parseCampaignIdFromSearch(search: string): string | undefined {
+  const value = new URLSearchParams(search).get(CAMPAIGN_SCOPE_FILTER_URL_KEY)?.trim()
+  return value || undefined
+}
+
 /** Removes campaign scope from a search string while preserving unrelated params. */
 export function stripCampaignIdFromSearch(search: string): string {
   const params = new URLSearchParams(search)

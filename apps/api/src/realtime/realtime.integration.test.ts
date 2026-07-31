@@ -131,6 +131,7 @@ describe('realtime socket server', () => {
         senderDisplayName: 'Ava',
         preview: 'Ping',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
     expect(notification).toBeDefined()
@@ -175,6 +176,7 @@ describe('realtime socket server', () => {
         senderDisplayName: 'Blake',
         preview: 'Read me',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
     expect(notification).toBeDefined()
@@ -215,6 +217,7 @@ describe('realtime socket server', () => {
         senderDisplayName: 'Ava',
         preview: 'Seen only',
         unreadMessageCount: 1,
+        campaignIds: [],
       },
     })
     expect(notification).toBeDefined()

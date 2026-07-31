@@ -17,3 +17,6 @@ export const conversationRecipientsQueryKey = (options: ConversationRecipientsQu
 
 export const conversationMessagesQueryKey = (conversationId: string) =>
   ['conversations', conversationId, 'messages'] as const
+
+export const conversationDetailQueryKey = (conversationId: string) =>
+  ['conversations', conversationId, 'detail'] as const

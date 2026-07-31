@@ -24,7 +24,7 @@ import {
 import { NewMessageRecipientsBody } from './new-message-form.client'
 import { useConversationActions } from '../hooks/use-conversation-actions'
 import { useConversationRecipients } from '../hooks/use-conversation-recipients'
-import { useConversations } from '../hooks/use-conversations'
+import { useOutOfScopeConversationLookup } from '../hooks/use-out-of-scope-conversation-lookup'
 import { useMessagesThreadPane } from '../hooks/use-messages-thread-pane'
 import {
   MESSAGES_ACTION_COPY,
@@ -291,11 +291,14 @@ export function MessagesDirectListPane({
   scopedCount?: number
   hasMoreConversations: boolean
 }) {
-  const { data, isPending, isError } = useConversations(campaignId)
-  const conversationInScopedList = data?.items.some((item) => item.id === activeConversationId)
-  const { data: unscopedData } = useConversations(undefined, {
-    enabled: Boolean(campaignId && activeConversationId && data && !conversationInScopedList),
-  })
+  const {
+    data,
+    isPending,
+    isError,
+    unscopedData,
+    lookedUpConversation,
+    isConversationLookupError,
+  } = useOutOfScopeConversationLookup(activeConversationId, campaignId)
 
   return (
     <MessagesDirectListContent
@@ -304,6 +307,8 @@ export function MessagesDirectListPane({
       scope={scope}
       conversations={data?.items ?? []}
       unscopedConversations={unscopedData?.items}
+      lookedUpConversation={lookedUpConversation}
+      isConversationLookupError={isConversationLookupError}
       isPending={isPending}
       isError={isError}
       loadedCount={loadedCount}

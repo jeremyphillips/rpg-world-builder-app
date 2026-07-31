@@ -165,6 +165,12 @@ export const markConversationReadResponseSchema = z.object({
 
 export type MarkConversationReadResponse = z.infer<typeof markConversationReadResponseSchema>
 
+export const getConversationResponseSchema = z.object({
+  conversation: conversationSchema,
+})
+
+export type GetConversationResponse = z.infer<typeof getConversationResponseSchema>
+
 export const sendDirectMessageResponseSchema = z.object({
   message: directMessageSchema,
 })

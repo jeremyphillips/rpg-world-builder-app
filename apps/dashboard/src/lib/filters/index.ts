@@ -9,6 +9,7 @@ export {
   INVALID_CAMPAIGN_SCOPE_COPY,
   isCampaignIdAccessible,
   mergeFilterSearchParams,
+  parseCampaignIdFromSearch,
   stripCampaignIdFromSearch,
 } from './filter-url-state.lib'
 

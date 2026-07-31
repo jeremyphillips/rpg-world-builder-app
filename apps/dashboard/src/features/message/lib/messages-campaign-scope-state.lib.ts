@@ -6,6 +6,7 @@ export function resolveOutOfScopeConversation(input: {
   activeConversationId?: string
   scopedConversations: Conversation[]
   unscopedConversations?: Conversation[]
+  lookedUpConversation?: Conversation | null
 }): Conversation | null {
   if (!input.campaignId || !input.scope || !input.activeConversationId) {
     return null
@@ -18,7 +19,11 @@ export function resolveOutOfScopeConversation(input: {
     return null
   }
 
-  return input.unscopedConversations?.find((item) => item.id === input.activeConversationId) ?? null
+  return (
+    input.unscopedConversations?.find((item) => item.id === input.activeConversationId) ??
+    input.lookedUpConversation ??
+    null
+  )
 }
 
 export function isScopedConversationListEmpty(input: {

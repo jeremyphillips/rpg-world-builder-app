@@ -29,6 +29,32 @@ describe('useMessagesCampaignScopeEffects', () => {
     })
   })
 
+  it('defers client invalid scope stripping until campaigns have settled', async () => {
+    useConversations.mockReturnValue({
+      data: {
+        items: [],
+        nextCursor: null,
+      },
+    })
+
+    const { result } = renderHook(() =>
+      useMessagesCampaignScopeEffects({
+        campaignId: 'camp_missing',
+        isNewRoute: false,
+        isThreadRoute: false,
+        routeConversationId: undefined,
+        accessibleCampaignIds: [],
+        campaignsSettled: false,
+      }),
+    )
+
+    await waitFor(() => {
+      expect(navigate).not.toHaveBeenCalled()
+    })
+
+    expect(result.current.showInvalidScopeNotice).toBe(false)
+  })
+
   it('strips invalid campaign scope and surfaces the quiet notice', async () => {
     const { result } = renderHook(() =>
       useMessagesCampaignScopeEffects({
@@ -37,6 +63,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isThreadRoute: false,
         routeConversationId: undefined,
         accessibleCampaignIds: ['camp_1'],
+        campaignsSettled: true,
       }),
     )
 
@@ -63,6 +90,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isThreadRoute: true,
         routeConversationId: 'conv_1',
         accessibleCampaignIds: ['camp_1'],
+        campaignsSettled: true,
       }),
     )
 
@@ -80,6 +108,7 @@ describe('useMessagesCampaignScopeEffects', () => {
           isThreadRoute: false,
           routeConversationId: undefined,
           accessibleCampaignIds: ['camp_1', 'camp_2'],
+          campaignsSettled: true,
         }),
       { initialProps: 'camp_1' as string | undefined },
     )
@@ -113,6 +142,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isThreadRoute: false,
         routeConversationId: undefined,
         accessibleCampaignIds: ['camp_1'],
+        campaignsSettled: true,
       }),
     )
 

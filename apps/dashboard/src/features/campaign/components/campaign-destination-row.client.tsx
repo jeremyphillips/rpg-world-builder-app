@@ -13,9 +13,9 @@ import {
 import { buildCampaignDisplay } from '../lib/campaign-display'
 import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
 import {
-  resolveCampaignPickerRowDestination,
+  resolveCampaignDestination,
   shouldRunCampaignSelectionSideEffect,
-} from '../lib/campaign-picker-row.lib'
+} from '../lib/campaign-destination.lib'
 
 type CampaignDestinationRowProps = {
   campaign: CampaignListItem
@@ -26,7 +26,7 @@ export function CampaignDestinationRow({
   campaign,
   onPersistSelection,
 }: CampaignDestinationRowProps) {
-  const destination = resolveCampaignPickerRowDestination(campaign)
+  const destination = resolveCampaignDestination(campaign)
   const display = buildCampaignDisplay(campaign)
 
   return (
@@ -52,9 +52,7 @@ export function CampaignDestinationRow({
           ) : null}
         </div>
         {destination.supportingCopy ? (
-          <Text variant="small" className="text-muted-foreground">
-            {destination.supportingCopy}
-          </Text>
+          <Text variant="small">{destination.supportingCopy}</Text>
         ) : null}
       </div>
       <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />

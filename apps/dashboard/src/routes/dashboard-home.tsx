@@ -15,19 +15,25 @@ export function DashboardHome() {
   const { data: session, isPending: sessionPending } = useSession()
   const user = session?.user
   const { data: campaigns, isPending: campaignsPending, isError: campaignsError } = useCampaigns()
-  const { data: characters, isPending: charactersPending } = useCharacters()
+  const {
+    data: characters,
+    isPending: charactersPending,
+    isError: charactersError,
+  } = useCharacters()
 
   if (sessionPending || campaignsPending || charactersPending) {
     return <Spinner />
   }
 
+  const inventoryUnavailable = campaignsError || charactersError
   const promotions = resolveDashboardHomeCampaignPromotions(campaigns, campaignsError, user)
-  const campaignRowsPresent = hasCampaignRows(campaigns)
-  const hasCharacters = Boolean(characters?.length)
+  const campaignRowsPresent = inventoryUnavailable ? false : hasCampaignRows(campaigns)
+  const hasCharacters = inventoryUnavailable ? false : Boolean(characters?.length)
   const welcome = resolveDashboardWelcomeCopy({
     hasCampaigns: campaignRowsPresent,
     hasCharacters,
     displayName: user?.displayName,
+    inventoryUnavailable,
   })
 
   return (
@@ -36,7 +42,7 @@ export function DashboardHome() {
         <Heading variant="page" as="h1">
           {welcome.title}
         </Heading>
-        <Text variant="muted">{welcome.body}</Text>
+        {welcome.body ? <Text variant="muted">{welcome.body}</Text> : null}
       </div>
 
       <DashboardHomeCampaignSection campaignsError={campaignsError} {...promotions} />

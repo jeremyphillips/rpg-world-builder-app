@@ -58,7 +58,8 @@ Invalid or inaccessible `campaignId` is handled on two paths that share
 `Showing all results instead.`):
 
 1. **Client** — `useInvalidCampaignScopeNotice` against the caller's accessible
-   campaign ids (strips the param before/without waiting on the list response).
+   campaign ids once campaign options have settled (strips the param without
+   treating a still-loading campaigns query as an empty inventory).
 2. **API** — list responses may set `scopeInvalid`; `useMessagesCampaignScopeEffects`
    redirects via `resolveInvalidScopeRedirectPath` and shows the same quiet notice.
 

@@ -4,6 +4,7 @@ import { ROUTES } from '@/app/routes'
 
 export function resolveNotificationActionPath(
   action: NotificationAction | undefined,
+  scopeCampaignId?: string,
 ): string | undefined {
   if (!action) return undefined
 
@@ -13,7 +14,7 @@ export function resolveNotificationActionPath(
     case 'conversation_detail':
       return ROUTES.messages.detail(
         action.conversationId,
-        action.campaignId ? { campaignId: action.campaignId } : undefined,
+        scopeCampaignId ? { campaignId: scopeCampaignId } : undefined,
       )
   }
 }

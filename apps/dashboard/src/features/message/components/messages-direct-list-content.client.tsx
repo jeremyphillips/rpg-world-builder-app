@@ -24,6 +24,8 @@ type MessagesDirectListContentProps = {
   scope?: ConversationListScope
   conversations: Conversation[]
   unscopedConversations?: Conversation[]
+  lookedUpConversation?: Conversation | null
+  isConversationLookupError?: boolean
   isPending: boolean
   isError: boolean
   loadedCount: number
@@ -55,6 +57,7 @@ export function MessagesDirectListContent(props: MessagesDirectListContentProps)
     activeConversationId: props.activeConversationId,
     scopedConversations: props.conversations,
     unscopedConversations: props.unscopedConversations,
+    lookedUpConversation: props.lookedUpConversation,
   })
 
   const isScopedEmpty = isScopedConversationListEmpty({
@@ -88,7 +91,11 @@ export function MessagesDirectListContent(props: MessagesDirectListContentProps)
         />
       ) : null}
 
-      <MessagesDirectListStatus isPending={props.isPending} isError={props.isError} />
+      <MessagesDirectListStatus
+        isPending={props.isPending}
+        isError={props.isError}
+        isConversationLookupError={props.isConversationLookupError}
+      />
 
       {showEmptyState ? (
         <MessagesDirectListEmptyState campaignId={props.campaignId} isScopedEmpty={isScopedEmpty} />

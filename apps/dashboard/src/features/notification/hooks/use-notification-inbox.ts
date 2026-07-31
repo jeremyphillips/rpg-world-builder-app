@@ -15,11 +15,15 @@ import {
   NOTIFICATION_SLOW_POLL_INTERVAL_MS,
 } from './use-notifications'
 
-export function useNotificationInbox(filters: NotificationInboxQueryFilters = {}) {
+export function useNotificationInbox(
+  filters: NotificationInboxQueryFilters = {},
+  options: { enabled?: boolean } = {},
+) {
   const { data: session } = useSession()
   const { isConnected: isRealtimeConnected } = useRealtimeStatus()
   const isDocumentVisible = useDocumentVisible()
   const isAuthenticated = Boolean(session?.user)
+  const queryEnabled = isAuthenticated && (options.enabled ?? true)
 
   const pollIntervalMs = isRealtimeConnected
     ? NOTIFICATION_SLOW_POLL_INTERVAL_MS
@@ -35,8 +39,8 @@ export function useNotificationInbox(filters: NotificationInboxQueryFilters = {}
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    enabled: isAuthenticated,
-    refetchInterval: isAuthenticated && isDocumentVisible ? pollIntervalMs : false,
+    enabled: queryEnabled,
+    refetchInterval: queryEnabled && isDocumentVisible ? pollIntervalMs : false,
     refetchOnWindowFocus: true,
   })
 }

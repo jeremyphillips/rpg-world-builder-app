@@ -16,6 +16,7 @@ export { useConversationRecipients } from './hooks/use-conversation-recipients'
 export { useConversationActions } from './hooks/use-conversation-actions'
 export {
   MessagesCampaignEntryLinks,
+  MessagesEntryLinks,
   MessagesGlobalEntryLink,
   MessagesOverviewEntryActions,
 } from './components/messages-entry-links.client'

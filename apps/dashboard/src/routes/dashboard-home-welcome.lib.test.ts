@@ -73,6 +73,20 @@ describe('resolveDashboardWelcomeCopy', () => {
     })
   })
 
+  it('returns neutral copy when inventory is unavailable', () => {
+    expect(
+      resolveDashboardWelcomeCopy({
+        hasCampaigns: false,
+        hasCharacters: false,
+        displayName: 'kidradio',
+        inventoryUnavailable: true,
+      }),
+    ).toEqual({
+      title: 'Welcome back, kidradio',
+      body: '',
+    })
+  })
+
   it('omits the display name when it is missing', () => {
     expect(
       resolveDashboardWelcomeCopy({

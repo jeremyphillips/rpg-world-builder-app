@@ -1,6 +1,15 @@
-export type DashboardWelcomeState = 'empty' | 'campaigns_only' | 'characters_only' | 'active'
+export type DashboardWelcomeState =
+  | 'empty'
+  | 'campaigns_only'
+  | 'characters_only'
+  | 'active'
+  | 'neutral'
 
 const DASHBOARD_WELCOME_COPY = {
+  neutral: {
+    titlePrefix: 'Welcome back',
+    body: '',
+  },
   empty: {
     titlePrefix: 'Welcome',
     body: 'Start by creating a campaign or building a character of your own.',
@@ -22,7 +31,9 @@ const DASHBOARD_WELCOME_COPY = {
 export function resolveDashboardWelcomeState(input: {
   hasCampaigns: boolean
   hasCharacters: boolean
+  inventoryUnavailable?: boolean
 }): DashboardWelcomeState {
+  if (input.inventoryUnavailable) return 'neutral'
   if (!input.hasCampaigns && !input.hasCharacters) return 'empty'
   if (input.hasCampaigns && !input.hasCharacters) return 'campaigns_only'
   if (!input.hasCampaigns && input.hasCharacters) return 'characters_only'
@@ -33,6 +44,7 @@ export function resolveDashboardWelcomeCopy(input: {
   hasCampaigns: boolean
   hasCharacters: boolean
   displayName?: string | null
+  inventoryUnavailable?: boolean
 }): { title: string; body: string } {
   const state = resolveDashboardWelcomeState(input)
   const copy = DASHBOARD_WELCOME_COPY[state]

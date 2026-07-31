@@ -75,6 +75,7 @@ describe('notification registry', () => {
       senderDisplayName: 'Ava',
       preview: 'Ready for tonight?',
       unreadMessageCount: 1,
+      campaignIds: [],
     }
 
     expect(resolveNotificationAction('message.direct.received', payload)).toEqual({
@@ -92,6 +93,7 @@ describe('notification registry', () => {
       senderDisplayName: 'Ava',
       preview: 'Latest line',
       unreadMessageCount: 3,
+      campaignIds: [],
     })
 
     expect(preview.title).toBe('3 new messages')

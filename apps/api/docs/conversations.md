@@ -10,6 +10,7 @@ conversations are reserved for a future slice.
 POST   /api/conversations/direct/messages
 GET    /api/conversations/direct/recipients
 GET    /api/conversations
+GET    /api/conversations/:conversationId
 GET    /api/conversations/:conversationId/messages
 POST   /api/conversations/:conversationId/messages
 PATCH  /api/conversations/:conversationId/read
@@ -36,8 +37,8 @@ The same rules apply to `GET /direct/recipients`, `POST /direct/messages`, and
 `POST /direct/messages` atomically find-or-creates the direct conversation, inserts
 the first message, and updates `latestMessage` in one Mongo transaction when
 transactions are enabled (`MONGO_TRANSACTION_MODE=auto|required`). When
-transactions are unavailable, a compensating delete removes any empty conversation
-row if message persistence fails.
+transactions are unavailable, find-or-create retries duplicate-key races before
+compensating delete removes any empty conversation row if message persistence fails.
 
 Request body:
 
@@ -61,8 +62,8 @@ Response:
 - Eligibility is re-checked immediately before persistence.
 - `clientMessageId` idempotency returns the original `{ conversation, message }`
   without notification or realtime side effects.
-- Empty conversations (no `latestMessage`) are invalid state after this ships.
-  Legacy rows can be removed with
+- Empty conversations (no `latestMessage`) are excluded from list responses and
+  scoped counts. Legacy rows can be removed with
   `pnpm exec tsx tools/migrations/delete-empty-direct-conversations.ts`.
 - `existingDirectByUserId` in recipients maps only conversations with activity
   (`latestMessage != null`).

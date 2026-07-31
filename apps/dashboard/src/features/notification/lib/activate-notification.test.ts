@@ -20,6 +20,7 @@ describe('activateNotification', () => {
           senderDisplayName: 'Bobby',
           preview: 'blah',
           unreadMessageCount: 1,
+          campaignIds: [],
         },
       }),
       markRead,
@@ -31,6 +32,23 @@ describe('activateNotification', () => {
     expect(markRead.mutateAsync).toHaveBeenCalledWith('notification-1')
     expect(onBeforeNavigate).toHaveBeenCalledTimes(1)
     expect(navigate).toHaveBeenCalledWith('/messages/conv_1')
+  })
+
+  it('preserves scoped inbox campaignId when activating a conversation notification', () => {
+    const markRead = { mutateAsync: vi.fn().mockResolvedValue(undefined) }
+    const navigate = vi.fn()
+
+    activateNotification({
+      notification: makeNotification({
+        action: { kind: 'conversation_detail', conversationId: 'conv_1' },
+      }),
+      markRead,
+      navigate,
+      onFailure: vi.fn(),
+      campaignId: 'camp_1',
+    })
+
+    expect(navigate).toHaveBeenCalledWith('/messages/conv_1?campaignId=camp_1')
   })
 
   it('marks read without navigating when no action path exists', () => {

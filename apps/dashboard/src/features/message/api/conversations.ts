@@ -1,6 +1,7 @@
 import type {
   ConversationListResponse,
   DirectConversationRecipientsResponse,
+  GetConversationResponse,
   MarkConversationReadResponse,
   MessageListResponse,
   SendDirectMessageInput,
@@ -55,6 +56,14 @@ export async function listConversations(
   const path = query ? `${CONVERSATIONS_API_PATH}?${query}` : CONVERSATIONS_API_PATH
 
   return request<ConversationListResponse>(path, undefined, MESSAGES_ERROR_COPY.loadConversations)
+}
+
+export async function getConversation(conversationId: string): Promise<GetConversationResponse> {
+  return request<GetConversationResponse>(
+    `${CONVERSATIONS_API_PATH}/${conversationId}`,
+    undefined,
+    MESSAGES_ERROR_COPY.loadConversations,
+  )
 }
 
 export async function listConversationMessages(

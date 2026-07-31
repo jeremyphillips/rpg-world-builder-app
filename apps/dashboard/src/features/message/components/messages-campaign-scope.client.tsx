@@ -3,7 +3,6 @@
 import { Link } from 'react-router-dom'
 import { Alert, Button, Text, buttonVariants } from '@rpg/ui'
 import type { FilterSchema } from '@rpg/ui/filters'
-import type { Notification } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 import { CAMPAIGN_SCOPE_FILTER_ID, INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
@@ -20,7 +19,7 @@ import {
 } from './messages-workspace.variants'
 
 type MessagesCampaignScopeChromeProps = {
-  schema: FilterSchema<Notification, MessagesFilterState>
+  schema: FilterSchema<unknown, MessagesFilterState>
   filters: MessagesFilterState
   onFilterChange: (
     id: keyof MessagesFilterState,

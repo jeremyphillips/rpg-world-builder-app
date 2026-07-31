@@ -1,4 +1,3 @@
-import type { Notification } from '@rpg/contracts'
 import { createFilterSchema } from '@rpg/ui/filters'
 
 import {
@@ -10,14 +9,14 @@ import {
 export type MessagesFilterState = CampaignScopeFilterState
 
 export function createMessagesFilterSchema(campaignOptions: readonly CampaignScopeFilterOption[]) {
-  const campaignField = createCampaignScopeFilterField<Notification, MessagesFilterState>({
+  const campaignField = createCampaignScopeFilterField<unknown, MessagesFilterState>({
     options: campaignOptions,
     includeActiveChip: false,
   })
 
   if (!campaignField) {
-    return createFilterSchema<Notification, MessagesFilterState>([])
+    return createFilterSchema<unknown, MessagesFilterState>([])
   }
 
-  return createFilterSchema<Notification, MessagesFilterState>([campaignField])
+  return createFilterSchema<unknown, MessagesFilterState>([campaignField])
 }

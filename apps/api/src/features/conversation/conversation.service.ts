@@ -82,6 +82,28 @@ export async function getDirectMessageRecipients(
   return listDirectMessageRecipients(callerUserId, options)
 }
 
+export async function getConversation(
+  viewerUserId: string,
+  conversationId: string,
+): Promise<Conversation> {
+  const peer = await loadPeerForConversation(conversationId, viewerUserId)
+  if (!peer) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  const conversation = await buildConversationForParticipant({
+    conversationId,
+    viewerUserId,
+    peer,
+  })
+
+  if (!conversation) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  return conversation
+}
+
 export async function sendFirstDirectMessage(
   callerUserId: string,
   input: SendFirstDirectMessageInput,

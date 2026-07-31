@@ -57,7 +57,14 @@ Do **not** client-filter cursor pages — incomplete loaded sets produce mislead
 empties.
 
 Invalid `campaignId` uses the shared `useInvalidCampaignScopeNotice` /
-`INVALID_CAMPAIGN_SCOPE_COPY` path (same quiet notice as Messages).
+`INVALID_CAMPAIGN_SCOPE_COPY` path (same quiet notice as Messages). The inbox reads
+the raw `?campaignId=` search param (not only hydrated filter values) and defers
+scoped fetches until campaign options have settled.
+
+Direct-message notifications persist `payload.campaignIds` (recipient-visible shared
+campaigns at publish time). Inbox `?campaignId=` matches when that id is in
+`payload.campaignIds`. Activating a row under a scoped inbox preserves the page
+filter's `campaignId` on conversation navigation; the global bell omits it.
 
 ### Global vs filtered
 

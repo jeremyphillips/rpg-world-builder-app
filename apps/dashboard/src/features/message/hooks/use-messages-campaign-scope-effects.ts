@@ -15,6 +15,7 @@ export function useMessagesCampaignScopeEffects(
     'campaignId' | 'isNewRoute' | 'isThreadRoute' | 'routeConversationId'
   > & {
     accessibleCampaignIds: readonly string[]
+    campaignsSettled: boolean
   },
 ) {
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ export function useMessagesCampaignScopeEffects(
   const clientInvalidScope = useInvalidCampaignScopeNotice(
     routeState.campaignId,
     routeState.accessibleCampaignIds,
+    { campaignsSettled: routeState.campaignsSettled },
   )
   const [showApiInvalidScopeNotice, setShowApiInvalidScopeNotice] = React.useState(false)
   const strippedScopeRef = React.useRef<string | null>(null)

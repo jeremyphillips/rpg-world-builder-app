@@ -39,7 +39,7 @@ export function MessagesWorkspaceShell() {
   const navigate = useNavigate()
   const { conversationId } = useParams<{ conversationId?: string }>()
   const isNewRoute = isMessagesNewRoute(location.pathname)
-  const { data: campaigns = [] } = useCampaigns()
+  const { data: campaigns = [], isPending: campaignsPending } = useCampaigns()
 
   useStripLegacyMessagesMode()
 
@@ -61,6 +61,7 @@ export function MessagesWorkspaceShell() {
   const campaignScope = useMessagesCampaignScopeEffects({
     ...routeState,
     accessibleCampaignIds: campaigns.map((campaign) => campaign.id),
+    campaignsSettled: !campaignsPending,
   })
   const chromeVisibility = resolveMessagesWorkspaceChromeVisibility(routeState)
 

@@ -413,4 +413,75 @@ describe('conversation routes', () => {
     const conversations = await ConversationModel.find().lean()
     expect(conversations).toHaveLength(0)
   })
+
+  it('excludes empty conversations from list and scoped counts', async () => {
+    await clearTestDb()
+
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'owner-empty-list@example.com',
+      password: 'supersecret',
+      displayName: 'Empty List Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Empty List')
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'member-empty-list@example.com',
+      displayName: 'Campaign Member',
+      campaignRole: 'observer',
+    })
+
+    await owner.agent
+      .post('/api/conversations/direct/messages')
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        recipientUserId: member.userId,
+        content: { kind: 'text', text: 'Hello member' },
+      })
+      .expect(201)
+
+    await ConversationModel.updateMany({}, { $set: { latestMessage: null } })
+
+    const list = await owner.agent.get('/api/conversations?limit=10').expect(200)
+    expect(list.body.items).toHaveLength(0)
+
+    const scoped = await owner.agent
+      .get(`/api/conversations?campaignId=${campaignId}&limit=10`)
+      .expect(200)
+    expect(scoped.body.items).toHaveLength(0)
+    expect(scoped.body.totalCount).toBe(0)
+    expect(scoped.body.scopedCount).toBe(0)
+  })
+
+  it('returns a conversation by id for pin and thread chrome', async () => {
+    await clearTestDb()
+
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'owner-get-one@example.com',
+      password: 'supersecret',
+      displayName: 'Get One Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Get One')
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'member-get-one@example.com',
+      displayName: 'Campaign Member',
+      campaignRole: 'observer',
+    })
+
+    const created = await sendFirstDirectMessage(
+      owner.agent,
+      owner.csrfToken,
+      member.userId,
+      'Hello member',
+    )
+
+    const conversationId = created.body.conversation.id as string
+
+    const response = await owner.agent.get(`/api/conversations/${conversationId}`).expect(200)
+
+    expect(response.body.conversation.id).toBe(conversationId)
+    expect(response.body.conversation.peer.displayName).toBe('Campaign Member')
+  })
 })

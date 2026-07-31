@@ -7,7 +7,7 @@ import { buildCampaignDisplay } from './campaign-display'
 import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from './campaign-onboarding-copy'
 import { isCampaignMembershipOnboardingIncomplete } from './campaign-membership-onboarding'
 
-export type CampaignPickerRowDestination = {
+export type CampaignDestination = {
   href: string
   ariaLabel: string
   showSetupBadge: boolean
@@ -15,9 +15,10 @@ export type CampaignPickerRowDestination = {
   shouldPersistSelection: boolean
 }
 
-export function resolveCampaignPickerRowDestination(
-  campaign: CampaignListItem,
-): CampaignPickerRowDestination {
+/** @deprecated Use `CampaignDestination`. */
+export type CampaignPickerRowDestination = CampaignDestination
+
+export function resolveCampaignDestination(campaign: CampaignListItem): CampaignDestination {
   const display = buildCampaignDisplay(campaign)
   const name = display.name || display.id
   const incomplete = isCampaignMembershipOnboardingIncomplete(campaign)
@@ -40,6 +41,9 @@ export function resolveCampaignPickerRowDestination(
     shouldPersistSelection: true,
   }
 }
+
+/** @deprecated Use `resolveCampaignDestination`. */
+export const resolveCampaignPickerRowDestination = resolveCampaignDestination
 
 /** Runs preference persistence only on unmodified primary link activation. */
 export function shouldRunCampaignSelectionSideEffect(

@@ -5,11 +5,11 @@ import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from './campaign-onboarding-copy'
 import {
-  resolveCampaignPickerRowDestination,
+  resolveCampaignDestination,
   shouldRunCampaignSelectionSideEffect,
-} from './campaign-picker-row.lib'
+} from './campaign-destination.lib'
 
-describe('resolveCampaignPickerRowDestination', () => {
+describe('resolveCampaignDestination', () => {
   it('returns campaign detail destination for complete memberships', () => {
     const campaign = makeCampaignListItem({
       id: 'camp_1',
@@ -17,7 +17,7 @@ describe('resolveCampaignPickerRowDestination', () => {
       viewerOnboardingState: 'complete',
     })
 
-    expect(resolveCampaignPickerRowDestination(campaign)).toEqual({
+    expect(resolveCampaignDestination(campaign)).toEqual({
       href: ROUTES.campaign.detail('camp_1'),
       ariaLabel: 'Open The Argent Road',
       showSetupBadge: false,
@@ -35,7 +35,7 @@ describe('resolveCampaignPickerRowDestination', () => {
       viewerOnboardingState: 'incomplete',
     })
 
-    expect(resolveCampaignPickerRowDestination(campaign)).toEqual({
+    expect(resolveCampaignDestination(campaign)).toEqual({
       href: ROUTES.campaign.onboarding('camp_2'),
       ariaLabel: 'Continue setup for Stormwatch',
       showSetupBadge: true,
