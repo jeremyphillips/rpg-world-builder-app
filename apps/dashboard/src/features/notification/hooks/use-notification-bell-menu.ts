@@ -5,25 +5,39 @@ import { useNavigate } from 'react-router-dom'
 
 import type { Notification } from '@rpg/contracts'
 
-import { useNotificationActions } from './use-notification-actions'
-import { useNotifications } from './use-notifications'
+import { listUnseenNotificationIds } from '../lib/unseen-notification-ids'
 import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
 import { resolveNotificationActionPath } from '../lib/resolve-notification-action'
+import { useNotificationActions } from './use-notification-actions'
+import { useNotifications } from './use-notifications'
 
 export function useNotificationBellMenu() {
   const navigate = useNavigate()
   const [open, setOpen] = React.useState(false)
+  const markedSeenForOpenRef = React.useRef(false)
   const { data, isLoading, isError, refetch } = useNotifications()
   const { markRead, markAllRead, markSeen } = useNotificationActions()
+  const { mutate: markSeenMutate } = markSeen
 
   const items = data?.items ?? []
   const unreadCount = data?.unreadCount ?? 0
-  const renderedIds = React.useMemo(() => items.map((item) => item.id), [items])
+
+  const handleOpenChange = React.useCallback((nextOpen: boolean) => {
+    if (!nextOpen) {
+      markedSeenForOpenRef.current = false
+    }
+    setOpen(nextOpen)
+  }, [])
 
   React.useEffect(() => {
-    if (!open || renderedIds.length === 0) return
-    markSeen.mutate(renderedIds)
-  }, [open, renderedIds, markSeen])
+    if (!open || markedSeenForOpenRef.current) return
+
+    const unseenIds = listUnseenNotificationIds(items)
+    if (unseenIds.length === 0) return
+
+    markedSeenForOpenRef.current = true
+    markSeenMutate(unseenIds)
+  }, [items, markSeenMutate, open])
 
   const handleActivate = React.useCallback(
     (notification: Notification) => {
@@ -35,6 +49,7 @@ export function useNotificationBellMenu() {
       if (!path) return
 
       setOpen(false)
+      markedSeenForOpenRef.current = false
       navigate(path)
     },
     [markRead, navigate, refetch],
@@ -53,7 +68,7 @@ export function useNotificationBellMenu() {
 
   return {
     open,
-    setOpen,
+    setOpen: handleOpenChange,
     unreadCount,
     isLoading,
     isError,

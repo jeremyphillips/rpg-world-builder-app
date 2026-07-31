@@ -1,40 +1,42 @@
 'use client'
 
 import { Bell } from 'lucide-react'
+import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Button } from './button.client'
+import { Button, type ButtonProps } from './button.client'
 import { NotificationUnreadBadge } from './notification-unread-badge'
 
-export type NotificationBellProps = {
+export type NotificationBellProps = Omit<ButtonProps, 'children' | 'size' | 'variant'> & {
   unreadCount?: number
   ariaLabel?: string
-  className?: string
-  onClick?: () => void
 }
 
-export function NotificationBell({
-  unreadCount = 0,
-  ariaLabel,
-  className,
-  onClick,
-}: NotificationBellProps) {
-  const resolvedAriaLabel =
-    ariaLabel ?? (unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications')
+export const NotificationBell = React.forwardRef<HTMLButtonElement, NotificationBellProps>(
+  function NotificationBell(
+    { unreadCount = 0, ariaLabel, className, type = 'button', ...props },
+    ref,
+  ) {
+    const resolvedAriaLabel =
+      ariaLabel ?? (unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications')
 
-  return (
-    <div className={cn('relative inline-flex', className)}>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        aria-label={resolvedAriaLabel}
-        onClick={onClick}
-        className="shrink-0"
-      >
-        <Bell className="size-4" />
-      </Button>
-      <NotificationUnreadBadge count={unreadCount} />
-    </div>
-  )
-}
+    return (
+      <div className={cn('relative inline-flex', className)}>
+        <Button
+          ref={ref}
+          type={type}
+          variant="ghost"
+          size="icon"
+          aria-label={resolvedAriaLabel}
+          className="shrink-0"
+          {...props}
+        >
+          <Bell className="size-4" />
+        </Button>
+        <NotificationUnreadBadge count={unreadCount} />
+      </div>
+    )
+  },
+)
+
+NotificationBell.displayName = 'NotificationBell'
