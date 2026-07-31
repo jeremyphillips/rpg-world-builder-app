@@ -1,5 +1,7 @@
 import { Text } from '@rpg/ui'
 
+import { MESSAGES_ERROR_COPY, MESSAGES_STATUS_COPY } from '../lib/messages-copy'
+
 export function MessagesDirectListStatus({
   isPending,
   isError,
@@ -8,13 +10,13 @@ export function MessagesDirectListStatus({
   isError: boolean
 }) {
   if (isPending) {
-    return <Text variant="muted">Loading conversations…</Text>
+    return <Text variant="muted">{MESSAGES_STATUS_COPY.loadingConversations}</Text>
   }
 
   if (isError) {
     return (
       <Text variant="destructive" role="alert">
-        Could not load conversations.
+        {MESSAGES_ERROR_COPY.loadConversations}
       </Text>
     )
   }

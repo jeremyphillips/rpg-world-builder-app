@@ -2,6 +2,7 @@ import * as React from 'react'
 import { toast } from '@rpg/ui'
 
 import type { useConversationActions } from './use-conversation-actions'
+import { MESSAGES_ERROR_COPY } from '../lib/messages-copy'
 
 export function useMessageThreadMarkRead({
   conversationId,
@@ -21,7 +22,7 @@ export function useMessageThreadMarkRead({
     lastMarkedReadMessageIdRef.current = latestMessageId
     void markRead.mutateAsync(latestMessageId).catch(() => {
       lastMarkedReadMessageIdRef.current = null
-      toast.error('Could not mark conversation as read.')
+      toast.error(MESSAGES_ERROR_COPY.markConversationRead)
     })
   }, [conversationId, latestMessageId, markRead])
 }

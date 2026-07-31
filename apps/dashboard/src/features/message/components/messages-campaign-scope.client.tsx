@@ -8,11 +8,11 @@ import { ROUTES } from '@/app/routes'
 
 import { resolveMessagesClearScopePath } from '../lib/messages-campaign-scope-navigation.lib'
 import {
-  MESSAGES_SCOPE_CHIP_REMOVE_LABEL,
-  MESSAGES_SCOPE_INVALID_BODY,
-  MESSAGES_SCOPE_INVALID_HEADING,
-  MESSAGES_SCOPE_SHOW_ALL_LABEL,
-} from '../lib/messages-workspace-routing.lib'
+  MESSAGES_SCOPE_COPY,
+  formatMessagesOutOfScopeSupporting,
+  formatMessagesScopeChipLabel,
+  formatMessagesScopeSummary,
+} from '../lib/messages-copy'
 import { messagesWorkspaceScopeUtilityClasses } from './messages-workspace.variants'
 
 type MessagesCampaignScopeChromeProps = {
@@ -36,13 +36,9 @@ function MessagesCampaignScopeUtility({
 
   return (
     <div className={messagesWorkspaceScopeUtilityClasses}>
-      <Text variant="small">
-        {scopedCount ?? 0} {scopedCount === 1 ? 'conversation shown' : 'conversations shown'} ·{' '}
-        {hiddenCount}{' '}
-        {hiddenCount === 1 ? 'outside this campaign hidden' : 'outside this campaign hidden'}
-      </Text>
+      <Text variant="small">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
       <Link to={ROUTES.messages.list} className={buttonVariants({ variant: 'link', size: 'sm' })}>
-        {MESSAGES_SCOPE_SHOW_ALL_LABEL}
+        {MESSAGES_SCOPE_COPY.showAllLabel}
       </Link>
     </div>
   )
@@ -71,11 +67,11 @@ export function MessagesCampaignScopeChrome({
       {showInvalidScopeNotice ? (
         <Alert
           variant="warning"
-          title={MESSAGES_SCOPE_INVALID_HEADING}
-          description={MESSAGES_SCOPE_INVALID_BODY}
+          title={MESSAGES_SCOPE_COPY.invalidHeading}
+          description={MESSAGES_SCOPE_COPY.invalidBody}
           actions={
             <Button type="button" variant="ghost" size="sm" onClick={onDismissInvalidScopeNotice}>
-              Dismiss
+              {MESSAGES_SCOPE_COPY.invalidDismissLabel}
             </Button>
           }
         />
@@ -86,10 +82,10 @@ export function MessagesCampaignScopeChrome({
           <Chip
             mode="removable"
             size="md"
-            removeLabel={MESSAGES_SCOPE_CHIP_REMOVE_LABEL}
+            removeLabel={MESSAGES_SCOPE_COPY.chipRemoveLabel}
             onRemove={clearCampaignScope}
           >
-            Campaign: {scope.campaignName}
+            {formatMessagesScopeChipLabel(scope.campaignName)}
           </Chip>
         </div>
       ) : null}
@@ -119,7 +115,7 @@ export function MessagesOutOfScopePin({
   return (
     <div className="border-b border-border px-1 py-3">
       <Text variant="small" className="uppercase tracking-wide">
-        Current conversation
+        {MESSAGES_SCOPE_COPY.outOfScopeEyebrow}
       </Text>
       <Link
         to={ROUTES.messages.detail(conversationId, { campaignId })}
@@ -127,7 +123,7 @@ export function MessagesOutOfScopePin({
         aria-current={isActive ? 'page' : undefined}
       >
         <Text variant="emphasis">{peerDisplayName}</Text>
-        <Text variant="small">Not included in the {campaignName} filter.</Text>
+        <Text variant="small">{formatMessagesOutOfScopeSupporting(campaignName)}</Text>
       </Link>
     </div>
   )

@@ -4,6 +4,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 import { makeConversation } from '@/test/fixtures/conversations'
+import { MESSAGES_STATUS_COPY } from '../lib/messages-copy'
 
 import { ConversationList } from './conversation-list.client'
 
@@ -29,7 +30,7 @@ describe('ConversationList', () => {
     )
     expect(screen.getByText('Hello there')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('No messages yet')).toBeInTheDocument()
+    expect(screen.getByText(MESSAGES_STATUS_COPY.noMessagesYet)).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

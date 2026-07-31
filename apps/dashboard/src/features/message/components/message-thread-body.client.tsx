@@ -8,6 +8,14 @@ import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
 import type { useConversationActions } from '../hooks/use-conversation-actions'
 import {
+  MESSAGES_ACTION_COPY,
+  MESSAGES_A11Y_COPY,
+  MESSAGES_ERROR_COPY,
+  MESSAGES_FORM_COPY,
+  MESSAGES_STATUS_COPY,
+  formatMessageBubbleAriaLabel,
+} from '../lib/messages-copy'
+import {
   messagesWorkspaceRightFooterClasses,
   messagesWorkspaceRightScrollClasses,
 } from './messages-workspace.variants'
@@ -40,7 +48,7 @@ export function MessageThreadBody({
 
   const handleLoadOlderMessages = () => {
     void fetchNextPage().catch(() => {
-      toast.error('Could not load older messages.')
+      toast.error(MESSAGES_ERROR_COPY.loadOlderMessages)
     })
   }
 
@@ -63,7 +71,7 @@ export function MessageThreadBody({
         clientMessageIdRef.current = null
       })
       .catch(() => {
-        toast.error('Could not send message.')
+        toast.error(MESSAGES_ERROR_COPY.sendMessage)
       })
   }
 
@@ -76,18 +84,20 @@ export function MessageThreadBody({
           onClick={handleLoadOlderMessages}
           disabled={isFetchingNextPage}
         >
-          {isFetchingNextPage ? 'Loading older messages…' : 'Load older messages'}
+          {isFetchingNextPage
+            ? MESSAGES_STATUS_COPY.loadingOlderMessages
+            : MESSAGES_ACTION_COPY.loadOlderMessages}
         </Button>
       ) : null}
       {isFetchNextPageError ? (
         <Text variant="destructive" role="alert">
-          Could not load older messages.
+          {MESSAGES_ERROR_COPY.loadOlderMessages}
         </Text>
       ) : null}
 
       <ul
         className="flex flex-col gap-3"
-        aria-label="Messages"
+        aria-label={MESSAGES_A11Y_COPY.messages}
         aria-live="polite"
         aria-relevant="additions"
       >
@@ -97,7 +107,7 @@ export function MessageThreadBody({
             <li
               key={message.id}
               className={isOwn ? 'self-end text-right' : 'self-start text-left'}
-              aria-label={isOwn ? 'Your message' : `Message from ${peerDisplayName ?? 'peer'}`}
+              aria-label={formatMessageBubbleAriaLabel(isOwn, peerDisplayName)}
             >
               <div className="inline-block max-w-[85%] rounded-lg bg-muted px-3 py-2 text-left">
                 <Text>{message.content.text}</Text>
@@ -116,13 +126,13 @@ export function MessageThreadBody({
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <TextareaField
         id="message-draft"
-        label="Message"
+        label={MESSAGES_FORM_COPY.messageLabel}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         rows={3}
       />
       <Button type="submit" disabled={!draft.trim() || sendMessage.isPending}>
-        Send
+        {MESSAGES_ACTION_COPY.send}
       </Button>
     </form>
   )

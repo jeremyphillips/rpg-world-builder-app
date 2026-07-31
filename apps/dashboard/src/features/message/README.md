@@ -12,6 +12,7 @@ Query polling plus Socket.IO cache patches keep list and active thread fresh.
 | `hooks/use-conversation-messages.ts`   | Infinite message pages for a thread             |
 | `hooks/use-conversation-recipients.ts` | Active campaign-member picker data              |
 | `hooks/use-conversation-actions.ts`    | Create, send, mark-read mutations               |
+| `lib/messages-copy.ts`                 | User-facing copy constants and formatters       |
 | `lib/conversation-query-keys.ts`       | Shared query keys                               |
 | `lib/conversation-cache.ts`            | List/thread cache helpers + version guards      |
 | `lib/sort-messages-chronologically.ts` | Newest-first API pages → chronological render   |

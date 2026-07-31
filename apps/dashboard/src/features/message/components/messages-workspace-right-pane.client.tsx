@@ -1,5 +1,6 @@
 'use client'
 
+import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import type { MessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 import {
   MessagesCampaignsPlaceholder,
@@ -38,7 +39,7 @@ export function MessagesWorkspaceRightPane(props: MessagesWorkspaceRightPaneProp
   ].join(' ')
 
   return (
-    <section className={rightPaneClasses} aria-label="Conversation">
+    <section className={rightPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversation}>
       {props.isThreadRoute && props.routeConversationId ? (
         <MessagesWorkspaceActiveThread
           conversationId={props.routeConversationId}

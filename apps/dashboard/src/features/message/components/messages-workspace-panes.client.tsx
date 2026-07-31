@@ -25,10 +25,12 @@ import { useConversationRecipients } from '../hooks/use-conversation-recipients'
 import { useConversations } from '../hooks/use-conversations'
 import { useMessageThreadMarkRead } from '../hooks/use-message-thread-mark-read'
 import {
-  MESSAGES_SCOPED_RECIPIENT_EMPTY_BODY,
-  MESSAGES_SCOPED_RECIPIENT_EMPTY_HEADING,
-  flattenDirectConversationRecipients,
-} from '../lib/messages-workspace-routing.lib'
+  MESSAGES_ACTION_COPY,
+  MESSAGES_EMPTY_COPY,
+  MESSAGES_ERROR_COPY,
+  MESSAGES_STATUS_COPY,
+} from '../lib/messages-copy'
+import { flattenDirectConversationRecipients } from '../lib/messages-workspace-routing.lib'
 import { flattenConversationMessages } from '../lib/sort-messages-chronologically'
 
 export function MessagesThreadPane({
@@ -80,7 +82,7 @@ export function MessagesThreadPane({
   if (isPending) {
     return (
       <div className={messagesWorkspaceRightScrollClasses}>
-        <Text variant="muted">Loading messages…</Text>
+        <Text variant="muted">{MESSAGES_STATUS_COPY.loadingMessages}</Text>
       </div>
     )
   }
@@ -89,7 +91,7 @@ export function MessagesThreadPane({
     return (
       <div className={messagesWorkspaceRightScrollClasses}>
         <Text variant="destructive" role="alert">
-          Could not load messages.
+          {MESSAGES_ERROR_COPY.loadMessages}
         </Text>
       </div>
     )
@@ -137,7 +139,7 @@ export function MessagesRecipientPickerPane({ campaignId }: { campaignId?: strin
         navigate(ROUTES.messages.detail(conversation.id, { campaignId }))
       })
       .catch(() => {
-        toast.error('Could not start conversation.')
+        toast.error(MESSAGES_ERROR_COPY.startConversation)
       })
   }
 
@@ -145,15 +147,15 @@ export function MessagesRecipientPickerPane({ campaignId }: { campaignId?: strin
     <div className="p-4">
       <MessagesMobileBackLink
         to={campaignId ? ROUTES.messages.listScoped(campaignId) : ROUTES.messages.list}
-        label="Back to messages"
+        label={MESSAGES_ACTION_COPY.backToMessages}
       />
       <Text as="h2" variant="lead" className="mb-4">
-        New message
+        {MESSAGES_ACTION_COPY.newMessage}
       </Text>
       {isScopedEmpty ? (
         <IndexPageEmptyState
-          heading={MESSAGES_SCOPED_RECIPIENT_EMPTY_HEADING}
-          body={MESSAGES_SCOPED_RECIPIENT_EMPTY_BODY}
+          heading={MESSAGES_EMPTY_COPY.scopedRecipientHeading}
+          body={MESSAGES_EMPTY_COPY.scopedRecipientBody}
         />
       ) : (
         <NewMessageRecipientsBody

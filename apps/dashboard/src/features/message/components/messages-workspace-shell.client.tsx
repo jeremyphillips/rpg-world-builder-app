@@ -21,6 +21,7 @@ import {
 } from './messages-workspace-panes.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
 import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
+import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
 
 export function MessagesWorkspaceShell() {
@@ -64,16 +65,16 @@ export function MessagesWorkspaceShell() {
           value={routeState.isCampaignsMode ? 'campaigns' : 'direct'}
           onValueChange={(value) => handleModeChange(value as 'direct' | 'campaigns')}
         >
-          <TabsList aria-label="Message mode">
-            <TabsTrigger value="direct">Direct</TabsTrigger>
-            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+          <TabsList aria-label={MESSAGES_A11Y_COPY.messageMode}>
+            <TabsTrigger value="direct">{MESSAGES_ACTION_COPY.directTab}</TabsTrigger>
+            <TabsTrigger value="campaigns">{MESSAGES_ACTION_COPY.campaignsTab}</TabsTrigger>
           </TabsList>
         </Tabs>
 
         {!routeState.isCampaignsMode ? (
           <div className={messagesWorkspaceHeaderActionsClasses}>
             <Button type="button" onClick={handleNewMessage}>
-              New message
+              {MESSAGES_ACTION_COPY.newMessage}
             </Button>
           </div>
         ) : null}
@@ -90,7 +91,7 @@ export function MessagesWorkspaceShell() {
       ) : null}
 
       <div className={messagesWorkspaceBodyClasses}>
-        <aside className={leftPaneClasses} aria-label="Conversations">
+        <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>
           {routeState.isCampaignsMode ? null : routeState.isNewRoute ? (
             <MessagesRecipientPickerPane campaignId={routeState.campaignId} />
           ) : (

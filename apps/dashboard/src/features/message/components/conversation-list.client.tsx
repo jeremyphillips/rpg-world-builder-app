@@ -7,6 +7,12 @@ import type { Conversation } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
+import {
+  MESSAGES_ACTION_COPY,
+  MESSAGES_STATUS_COPY,
+  formatMessagesUnreadBadge,
+} from '../lib/messages-copy'
+
 type ConversationListProps = {
   conversations: Conversation[]
   activeConversationId?: string
@@ -45,12 +51,12 @@ export function ConversationList({
                     {conversation.latestMessage.preview}
                   </Text>
                 ) : (
-                  <Text variant="small">No messages yet</Text>
+                  <Text variant="small">{MESSAGES_STATUS_COPY.noMessagesYet}</Text>
                 )}
               </div>
               {conversation.unreadCount > 0 ? (
                 <Badge tone="info" className="shrink-0">
-                  {conversation.unreadCount > 99 ? '99+' : conversation.unreadCount}
+                  {formatMessagesUnreadBadge(conversation.unreadCount)}
                 </Badge>
               ) : null}
             </Link>
@@ -67,7 +73,7 @@ export function NewMessageLink({ campaignId }: { campaignId?: string }) {
       to={ROUTES.messages.new({ campaignId })}
       className={buttonVariants({ variant: 'default' })}
     >
-      New message
+      {MESSAGES_ACTION_COPY.newMessage}
     </Link>
   )
 }

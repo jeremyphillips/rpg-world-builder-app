@@ -1,10 +1,7 @@
 import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 
 import { NewMessageLink } from './conversation-list.client'
-import {
-  MESSAGES_SCOPED_EMPTY_BODY,
-  MESSAGES_SCOPED_EMPTY_HEADING,
-} from '../lib/messages-workspace-routing.lib'
+import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
 
 export function MessagesDirectListEmptyState({
   campaignId,
@@ -16,8 +13,8 @@ export function MessagesDirectListEmptyState({
   if (isScopedEmpty) {
     return (
       <IndexPageEmptyState
-        heading={MESSAGES_SCOPED_EMPTY_HEADING}
-        body={MESSAGES_SCOPED_EMPTY_BODY}
+        heading={MESSAGES_EMPTY_COPY.scopedListHeading}
+        body={MESSAGES_EMPTY_COPY.scopedListBody}
         actions={<NewMessageLink campaignId={campaignId} />}
       />
     )
@@ -25,8 +22,8 @@ export function MessagesDirectListEmptyState({
 
   return (
     <IndexPageEmptyState
-      heading="No conversations yet"
-      body="Start a direct message with someone from your campaigns."
+      heading={MESSAGES_EMPTY_COPY.globalListHeading}
+      body={MESSAGES_EMPTY_COPY.globalListBody}
       actions={<NewMessageLink campaignId={campaignId} />}
     />
   )

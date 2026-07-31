@@ -9,6 +9,14 @@ import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
 
 import type { DirectConversationRecipient } from '@rpg/contracts'
 
+import {
+  MESSAGES_ACTION_COPY,
+  MESSAGES_EMPTY_COPY,
+  MESSAGES_ERROR_COPY,
+  MESSAGES_FORM_COPY,
+  MESSAGES_STATUS_COPY,
+} from '../lib/messages-copy'
+
 type NewMessageFormProps = {
   recipients: DirectConversationRecipient[]
   recipientUserId: string
@@ -30,9 +38,9 @@ export function NewMessageForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <ComboboxField
         id="recipient"
-        label="Recipient"
+        label={MESSAGES_FORM_COPY.recipientLabel}
         multiple={false}
-        placeholder="Search campaign members"
+        placeholder={MESSAGES_FORM_COPY.recipientPlaceholder}
         value={recipientUserId}
         onChange={(value) => onRecipientChange(typeof value === 'string' ? value : '')}
         options={recipients.map((recipient) => ({
@@ -42,10 +50,10 @@ export function NewMessageForm({
       />
       <div className="flex gap-2">
         <Button type="submit" disabled={!recipientUserId || isSubmitting}>
-          Start conversation
+          {MESSAGES_ACTION_COPY.startConversation}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {MESSAGES_ACTION_COPY.cancel}
         </Button>
       </div>
     </form>
@@ -65,11 +73,11 @@ export function NewMessageRecipientsBody({
   recipients,
   formProps,
 }: NewMessageRecipientsBodyProps) {
-  if (isPending) return <Text variant="muted">Loading recipients…</Text>
+  if (isPending) return <Text variant="muted">{MESSAGES_STATUS_COPY.loadingRecipients}</Text>
   if (isError) {
     return (
       <Text variant="destructive" role="alert">
-        Could not load recipients.
+        {MESSAGES_ERROR_COPY.loadRecipients}
       </Text>
     )
   }
@@ -77,8 +85,8 @@ export function NewMessageRecipientsBody({
   if (recipients.length === 0) {
     return (
       <IndexPageEmptyState
-        heading="No eligible recipients"
-        body="You can message people who share a current campaign membership with you."
+        heading={MESSAGES_EMPTY_COPY.globalRecipientHeading}
+        body={MESSAGES_EMPTY_COPY.globalRecipientBody}
       />
     )
   }
@@ -89,7 +97,7 @@ export function NewMessageRecipientsBody({
 export function NewMessageCancelLink() {
   return (
     <Link to={ROUTES.messages.list} className="text-sm text-muted-foreground hover:text-foreground">
-      Back to messages
+      {MESSAGES_ACTION_COPY.backToMessages}
     </Link>
   )
 }

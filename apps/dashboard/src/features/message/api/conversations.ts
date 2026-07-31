@@ -10,6 +10,8 @@ import type {
 
 import { patchJson, postJson, request } from '@/lib/api-client'
 
+import { MESSAGES_ERROR_COPY } from '../lib/messages-copy'
+
 const CONVERSATIONS_API_PATH = '/api/conversations'
 
 export async function listConversationRecipients(
@@ -26,7 +28,7 @@ export async function listConversationRecipients(
   return request<DirectConversationRecipientsResponse>(
     path,
     undefined,
-    'Could not load message recipients.',
+    MESSAGES_ERROR_COPY.loadMessageRecipients,
   )
 }
 
@@ -36,7 +38,7 @@ export async function createDirectConversation(
   return postJson<{ conversation: Conversation }>(
     `${CONVERSATIONS_API_PATH}/direct`,
     { recipientUserId },
-    'Could not start conversation.',
+    MESSAGES_ERROR_COPY.startConversation,
   )
 }
 
@@ -51,7 +53,7 @@ export async function listConversations(
   const query = params.toString()
   const path = query ? `${CONVERSATIONS_API_PATH}?${query}` : CONVERSATIONS_API_PATH
 
-  return request<ConversationListResponse>(path, undefined, 'Could not load conversations.')
+  return request<ConversationListResponse>(path, undefined, MESSAGES_ERROR_COPY.loadConversations)
 }
 
 export async function listConversationMessages(
@@ -67,7 +69,7 @@ export async function listConversationMessages(
     ? `${CONVERSATIONS_API_PATH}/${conversationId}/messages?${query}`
     : `${CONVERSATIONS_API_PATH}/${conversationId}/messages`
 
-  return request<MessageListResponse>(path, undefined, 'Could not load messages.')
+  return request<MessageListResponse>(path, undefined, MESSAGES_ERROR_COPY.loadMessages)
 }
 
 export async function sendConversationMessage(
@@ -77,7 +79,7 @@ export async function sendConversationMessage(
   return postJson<SendDirectMessageResponse>(
     `${CONVERSATIONS_API_PATH}/${conversationId}/messages`,
     input,
-    'Could not send message.',
+    MESSAGES_ERROR_COPY.sendMessage,
   )
 }
 
@@ -88,6 +90,6 @@ export async function markConversationRead(
   return patchJson<MarkConversationReadResponse>(
     `${CONVERSATIONS_API_PATH}/${conversationId}/read`,
     input,
-    'Could not mark conversation as read.',
+    MESSAGES_ERROR_COPY.markConversationRead,
   )
 }
