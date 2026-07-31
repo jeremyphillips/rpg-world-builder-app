@@ -34,6 +34,7 @@ const notificationSchema = new Schema(
     readAt: { type: Date, default: null },
     // Phase 1: stored and indexed for future pruning; no archive API sets this yet.
     archivedAt: { type: Date, default: null },
+    version: { type: Number, default: 1, required: true },
   },
   { timestamps: true },
 )

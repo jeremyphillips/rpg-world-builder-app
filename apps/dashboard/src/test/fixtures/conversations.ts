@@ -17,6 +17,7 @@ export function makeConversation(overrides: Partial<Conversation> = {}): Convers
     unreadCount: 2,
     createdAt: now,
     updatedAt: now,
+    version: 1,
     ...overrides,
   }
 }

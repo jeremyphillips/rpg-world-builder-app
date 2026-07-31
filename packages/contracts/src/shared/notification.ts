@@ -33,6 +33,8 @@ const notificationTimestampFields = {
   archivedAt: z.iso.datetime().nullable().optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  /** Monotonic row revision for HTTP/socket cache guards. */
+  version: z.number().int().positive(),
 } as const
 
 const notificationPreviewFields = {

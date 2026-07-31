@@ -74,6 +74,7 @@ export async function upsertNotificationRecord(
     updatedAt: now,
     ...(input.resetReadState ? { readAt: null, seenAt: null } : {}),
   }
+  const versionIncrement = { $inc: { version: 1 } }
 
   if (input.dedupeKey) {
     const existing = await NotificationModel.findOne({
@@ -84,7 +85,7 @@ export async function upsertNotificationRecord(
     if (existing) {
       const doc = await NotificationModel.findOneAndUpdate(
         { _id: existing._id },
-        { $set: baseUpdate },
+        { $set: baseUpdate, ...versionIncrement },
         { new: true, returnDocument: 'after' },
       ).lean<NotificationRecord | null>()
 
@@ -182,6 +183,7 @@ export async function markNotificationRead({
         seenAt: now,
         updatedAt: now,
       },
+      $inc: { version: 1 },
     },
     { new: true, returnDocument: 'after' },
   ).lean<NotificationRecord | null>()
@@ -190,7 +192,21 @@ export async function markNotificationRead({
   return toNotification(doc)
 }
 
-export async function markAllNotificationsRead(recipientUserId: string): Promise<number> {
+export async function markAllNotificationsRead(recipientUserId: string): Promise<{
+  updatedCount: number
+  notificationIds: string[]
+  version: number
+}> {
+  const unreadDocs = await NotificationModel.find({
+    recipientUserId,
+    archivedAt: null,
+    readAt: null,
+  })
+    .select('_id')
+    .lean<Array<{ _id: unknown }>>()
+
+  const notificationIds = unreadDocs.map((doc) => String(doc._id))
+  const version = Date.now()
   const now = new Date()
   const result = await NotificationModel.updateMany(
     {
@@ -204,10 +220,15 @@ export async function markAllNotificationsRead(recipientUserId: string): Promise
         seenAt: now,
         updatedAt: now,
       },
+      $inc: { version: 1 },
     },
   )
 
-  return result.modifiedCount
+  return {
+    updatedCount: result.modifiedCount,
+    notificationIds,
+    version,
+  }
 }
 
 export async function markNotificationsSeen({
@@ -261,9 +282,9 @@ export async function markNotificationReadByDedupeKey({
 }: {
   recipientUserId: string
   dedupeKey: string
-}): Promise<void> {
+}): Promise<ReturnType<typeof toNotification> | null> {
   const now = new Date()
-  await NotificationModel.updateOne(
+  const doc = await NotificationModel.findOneAndUpdate(
     {
       recipientUserId,
       dedupeKey,
@@ -276,6 +297,11 @@ export async function markNotificationReadByDedupeKey({
         seenAt: now,
         updatedAt: now,
       },
+      $inc: { version: 1 },
     },
-  )
+    { new: true, returnDocument: 'after' },
+  ).lean<NotificationRecord | null>()
+
+  if (!doc) return null
+  return toNotification(doc)
 }

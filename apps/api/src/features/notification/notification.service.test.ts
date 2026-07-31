@@ -6,13 +6,12 @@ import { useIntegrationDb } from '../../test/setup/integration-db'
 import { publishNotification } from './publish-notification.service'
 import { campaignInviteDedupeKey } from './notification-dedupe-keys'
 import {
-  countUnreadNotifications,
   findNotificationByDedupeKey,
-  markAllNotificationsRead,
-  markNotificationRead,
   markNotificationsSeen,
+  markNotificationRead as markNotificationReadRecord,
 } from './notification.repository'
-import { listNotifications } from './notification.service'
+import { listNotifications, markAllNotificationsRead } from './notification.service'
+import { countUnreadNotifications } from './notification.repository'
 
 useIntegrationDb()
 
@@ -38,7 +37,7 @@ describe('notification service', () => {
     })
     expect(first).toBeTruthy()
 
-    await markNotificationRead({
+    await markNotificationReadRecord({
       recipientUserId: recipient.id,
       notificationId: first!.id,
     })
@@ -101,11 +100,11 @@ describe('notification service', () => {
     expect(listed.unreadCount).toBe(1)
 
     const updated = await markAllNotificationsRead(recipient.id)
-    expect(updated).toBe(1)
+    expect(updated.updatedCount).toBe(1)
     expect(await countUnreadNotifications(recipient.id)).toBe(0)
 
     const secondPass = await markAllNotificationsRead(recipient.id)
-    expect(secondPass).toBe(0)
+    expect(secondPass.updatedCount).toBe(0)
   })
 
   it('marks only valid unseen notification ids as seen', async () => {

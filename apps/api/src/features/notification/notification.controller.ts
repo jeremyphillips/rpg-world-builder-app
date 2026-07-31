@@ -77,7 +77,7 @@ export async function markRead(req: Request, res: Response): Promise<void> {
 
 export async function markAllRead(req: Request, res: Response): Promise<void> {
   const recipientUserId = req.user!.id
-  const updatedCount = await markAllNotificationsRead(recipientUserId)
+  const { updatedCount } = await markAllNotificationsRead(recipientUserId)
   res.status(200).json({ updatedCount })
 }
 

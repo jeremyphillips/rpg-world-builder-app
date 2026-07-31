@@ -19,9 +19,11 @@ export function toConversation(
   {
     peer,
     unreadCount,
+    version,
   }: {
     peer: { userId: string; displayName: string }
     unreadCount: number
+    version: number
   },
 ): Conversation {
   return {
@@ -42,5 +44,6 @@ export function toConversation(
     unreadCount,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
+    version,
   }
 }

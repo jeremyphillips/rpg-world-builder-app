@@ -37,6 +37,8 @@ export const conversationSchema = z.object({
   unreadCount: z.number().int().nonnegative(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
+  /** Monotonic per-participant projection revision for HTTP/socket cache guards. */
+  version: z.number().int().positive(),
 })
 
 export type Conversation = z.infer<typeof conversationSchema>

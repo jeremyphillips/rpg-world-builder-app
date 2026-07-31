@@ -128,6 +128,26 @@ Details: [public auth forms](../apps/public/docs/auth-forms.md),
 [dashboard auth guard](../apps/dashboard/docs/auth-guard.md),
 and the API's cookie/CSRF model in [apps/api/README.md](../apps/api/README.md).
 
+## Realtime (Socket.IO)
+
+The API attaches Socket.IO to the same HTTP server as Express (`path:
+/api/socket.io`). The dev proxy forwards WebSocket upgrades for `/api*`.
+
+- **Auth:** handshake reads the `rpg_session` cookie, verifies the JWT, confirms
+  the user exists, and joins `user:{userId}` only.
+- **Delivery boundary:** post-persistence helpers in `apps/api/src/realtime/`
+  (`deliverToUser`, `deliverNotificationUpserted`, `deliverNotificationRead`,
+  `deliverConversationActivity`). Domain services never call `io.to(...).emit`
+  directly.
+- **Events:** transport-focused DTO envelopes with monotonic `version` fields —
+  see [apps/api/docs/notifications.md](../apps/api/docs/notifications.md).
+- **Single instance:** the default in-memory adapter fans out within one API
+  process. Horizontal scale requires a shared Socket.IO adapter (for example
+  Redis) before running multiple API replicas.
+
+Dashboard client wiring (provider, cache helpers, slow poll fallback) is tracked
+separately in the realtime initiative plan.
+
 ## Shared contracts & UI
 
 - **`@rpg/contracts`** is the single source of truth for domain/DTO shapes:

@@ -62,7 +62,16 @@ Producer failures are logged and do not fail the message send.
 - Archive endpoint/UI (`archivedAt` on participant state)
 - Message edit/delete HTTP
 - `mutedAt` / mute suppression
-- Socket.IO delivery
 
-See also: [`notifications.md`](./notifications.md) for registry copy and dedupe
-policy details.
+## Realtime delivery
+
+After persistence, the API emits recipient-scoped Socket.IO envelopes through the
+realtime delivery boundary (`apps/api/src/realtime/`):
+
+- **Send:** `conversation.activity` to each participant with that user's list projection
+  and the new `message` (sender unread typically unchanged; recipient unread increments).
+- **Mark read:** `conversation.activity` to the reader without `message`; synced
+  notification read also emits `notification.read`.
+
+See [`notifications.md`](./notifications.md) for the full event catalog, version rules,
+and the single-instance adapter warning.

@@ -8,6 +8,7 @@ const conversationParticipantStateSchema = new Schema(
     userId: { type: String, required: true },
     lastReadMessageId: { type: String, default: null },
     lastReadAt: { type: Date, default: null },
+    version: { type: Number, default: 1, required: true },
   },
   { timestamps: true },
 )
