@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const DIRECT_MESSAGE_TEXT_MAX_LENGTH = 4000
+export const DIRECT_MESSAGE_PREVIEW_MAX_LENGTH = 120
 
 export const directMessageContentSchema = z.object({
   kind: z.literal('text'),

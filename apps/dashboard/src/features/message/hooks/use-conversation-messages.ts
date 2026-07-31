@@ -1,30 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
-import * as React from 'react'
 
 import { useSession } from '@/features/auth'
+import { useDocumentVisible } from '@/lib/react/use-document-visible'
 
 import { listConversationMessages } from '../api/conversations'
 import { conversationMessagesQueryKey } from '../lib/conversation-query-keys'
 
 export const CONVERSATION_MESSAGE_PAGE_LIMIT = 50
 export const CONVERSATION_MESSAGE_POLL_INTERVAL_MS = 15_000
-
-function useDocumentVisible(): boolean {
-  const [visible, setVisible] = React.useState(
-    () => typeof document !== 'undefined' && document.visibilityState === 'visible',
-  )
-
-  React.useEffect(() => {
-    const handleVisibilityChange = () => {
-      setVisible(document.visibilityState === 'visible')
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [])
-
-  return visible
-}
 
 export function useConversationMessages(conversationId: string | undefined) {
   const { data: session } = useSession()

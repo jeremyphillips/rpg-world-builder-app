@@ -1,4 +1,4 @@
-export const DIRECT_MESSAGE_PREVIEW_MAX_LENGTH = 120
+import { DIRECT_MESSAGE_PREVIEW_MAX_LENGTH } from '@rpg/contracts'
 
 /** Normalizes whitespace and truncates message text for list/notification previews. */
 export function buildMessagePreview(text: string): string {

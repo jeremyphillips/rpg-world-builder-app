@@ -22,7 +22,7 @@ export function MessagesList() {
 
       {isPending ? <Text variant="muted">Loading conversations…</Text> : null}
       {isError ? (
-        <Text variant="muted" role="alert">
+        <Text variant="destructive" role="alert">
           Could not load conversations.
         </Text>
       ) : null}

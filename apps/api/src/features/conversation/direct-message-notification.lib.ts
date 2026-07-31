@@ -11,7 +11,7 @@ export async function publishDirectMessageReceivedNotification(input: {
   unreadMessageCount: number
 }): Promise<void> {
   const sender = await findSessionUserById(input.senderUserId)
-  const senderDisplayName = sender?.displayName?.trim() || 'Someone'
+  const senderDisplayName = sender?.displayName?.trim() || 'Unknown user'
 
   await publishNotification({
     type: 'message.direct.received',

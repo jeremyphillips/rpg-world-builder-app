@@ -128,4 +128,38 @@ describe('conversation routes', () => {
       .send({ recipientUserId: outsider.userId })
       .expect(403)
   })
+
+  it('returns 404 when a non-participant lists messages', async () => {
+    await clearTestDb()
+
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'owner-list@example.com',
+      password: 'supersecret',
+      displayName: 'Campaign Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'List Gate')
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'member-list@example.com',
+      displayName: 'Campaign Member',
+      campaignRole: 'observer',
+    })
+
+    const outsider = await registerAndLoginTestUser(getApp(), {
+      email: 'outsider-list@example.com',
+      password: 'supersecret',
+      displayName: 'Outsider',
+    })
+
+    const created = await owner.agent
+      .post('/api/conversations/direct')
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ recipientUserId: member.userId })
+      .expect(201)
+
+    const conversationId = created.body.conversation.id as string
+
+    await outsider.agent.get(`/api/conversations/${conversationId}/messages?limit=10`).expect(404)
+  })
 })

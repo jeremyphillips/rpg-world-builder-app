@@ -7,7 +7,10 @@ import { Text, toast } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
-import { NewMessageRecipientsBody } from '../components/new-message-form.client'
+import {
+  NewMessageRecipientsBody,
+  NewMessageCancelLink,
+} from '../components/new-message-form.client'
 import { useConversationActions } from '../hooks/use-conversation-actions'
 import { useConversationRecipients } from '../hooks/use-conversation-recipients'
 
@@ -33,9 +36,12 @@ export function NewMessagePage() {
 
   return (
     <NarrowPage spacing="relaxed">
-      <Text as="h1" variant="lead">
-        New message
-      </Text>
+      <div className="flex items-center gap-3">
+        <NewMessageCancelLink />
+        <Text as="h1" variant="lead">
+          New message
+        </Text>
+      </div>
 
       <NewMessageRecipientsBody
         isPending={isPending}

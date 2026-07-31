@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ConversationListResponse } from '@rpg/contracts'
 
-import { notificationsListQueryKey } from '@/features/notification/lib/notification-query-keys'
-import { NOTIFICATION_LIST_LIMIT } from '@/features/notification/hooks/use-notifications'
+import { notificationsListQueryKey, NOTIFICATION_LIST_LIMIT } from '@/features/notification'
 
 import {
   createDirectConversation,

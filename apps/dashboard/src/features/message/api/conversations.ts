@@ -4,6 +4,7 @@ import type {
   DirectConversationRecipientsResponse,
   MarkConversationReadResponse,
   MessageListResponse,
+  SendDirectMessageInput,
   SendDirectMessageResponse,
 } from '@rpg/contracts'
 
@@ -60,7 +61,7 @@ export async function listConversationMessages(
 
 export async function sendConversationMessage(
   conversationId: string,
-  input: { content: { kind: 'text'; text: string }; clientMessageId?: string },
+  input: SendDirectMessageInput,
 ): Promise<SendDirectMessageResponse> {
   return postJson<SendDirectMessageResponse>(
     `${CONVERSATIONS_API_PATH}/${conversationId}/messages`,

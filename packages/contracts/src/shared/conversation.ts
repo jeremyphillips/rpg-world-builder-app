@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { directMessageSchema, sendDirectMessageInputSchema } from './direct-message'
+import {
+  DIRECT_MESSAGE_PREVIEW_MAX_LENGTH,
+  directMessageSchema,
+  sendDirectMessageInputSchema,
+} from './direct-message'
 
 export const CONVERSATION_KINDS = ['direct'] as const
 
@@ -18,7 +22,7 @@ export type ConversationPeer = z.infer<typeof conversationPeerSchema>
 export const conversationLatestMessageSchema = z.object({
   messageId: z.string(),
   senderUserId: z.string(),
-  preview: z.string(),
+  preview: z.string().max(DIRECT_MESSAGE_PREVIEW_MAX_LENGTH),
   createdAt: z.iso.datetime(),
 })
 
@@ -47,10 +51,7 @@ export const createDirectConversationInputSchema = z.object({
 
 export type CreateDirectConversationInput = z.infer<typeof createDirectConversationInputSchema>
 
-export const directConversationRecipientSchema = z.object({
-  userId: z.string(),
-  displayName: z.string(),
-})
+export const directConversationRecipientSchema = conversationPeerSchema
 
 export type DirectConversationRecipient = z.infer<typeof directConversationRecipientSchema>
 

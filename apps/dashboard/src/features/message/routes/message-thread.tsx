@@ -1,17 +1,18 @@
 'use client'
 
-import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Button, Text, TextareaField, toast } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSession } from '@/features/auth'
-import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
+import { MessageThreadBody } from '../components/message-thread-body.client'
 import { useConversationActions } from '../hooks/use-conversation-actions'
 import { useConversationMessages } from '../hooks/use-conversation-messages'
 import { useConversations } from '../hooks/use-conversations'
+import { useMessageThreadMarkRead } from '../hooks/use-message-thread-mark-read'
 import { flattenConversationMessages } from '../lib/sort-messages-chronologically'
 
 export function MessageThread() {
@@ -25,48 +26,21 @@ export function MessageThread() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    isFetchNextPageError,
   } = useConversationMessages(conversationId)
   const { sendMessage, markRead } = useConversationActions(conversationId)
-  const [draft, setDraft] = React.useState('')
-  const clientMessageIdRef = React.useRef<string | null>(null)
 
   const conversation = conversationsData?.items.find((item) => item.id === conversationId)
+  const peerDisplayName = conversation?.peer.displayName
+  useSetBreadcrumbLabel(peerDisplayName)
   const messages = flattenConversationMessages(messagesData?.pages)
   const latestMessageId = messages.at(-1)?.id
-  const lastMarkedReadMessageIdRef = React.useRef<string | null>(null)
 
-  React.useEffect(() => {
-    if (!conversationId || !latestMessageId) return
-    if (lastMarkedReadMessageIdRef.current === latestMessageId) return
-
-    lastMarkedReadMessageIdRef.current = latestMessageId
-    void markRead.mutateAsync(latestMessageId).catch(() => {
-      lastMarkedReadMessageIdRef.current = null
-    })
-  }, [conversationId, latestMessageId, markRead])
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    const text = draft.trim()
-    if (!text || !conversationId) return
-
-    if (!clientMessageIdRef.current) {
-      clientMessageIdRef.current = crypto.randomUUID()
-    }
-
-    void sendMessage
-      .mutateAsync({
-        content: { kind: 'text', text },
-        clientMessageId: clientMessageIdRef.current,
-      })
-      .then(() => {
-        setDraft('')
-        clientMessageIdRef.current = null
-      })
-      .catch(() => {
-        toast.error('Could not send message.')
-      })
-  }
+  useMessageThreadMarkRead({
+    conversationId,
+    latestMessageId,
+    markRead,
+  })
 
   return (
     <NarrowPage spacing="relaxed">
@@ -74,66 +48,33 @@ export function MessageThread() {
         <Link
           to={ROUTES.messages.list}
           className="text-sm text-muted-foreground hover:text-foreground"
+          aria-label="Back to messages"
         >
           Back
         </Link>
         <Text as="h1" variant="lead">
-          {conversation?.peer.displayName ?? 'Conversation'}
+          {peerDisplayName ?? 'Conversation'}
         </Text>
       </div>
 
       {isPending ? <Text variant="muted">Loading messages…</Text> : null}
       {isError ? (
-        <Text variant="muted" role="alert">
+        <Text variant="destructive" role="alert">
           Could not load messages.
         </Text>
       ) : null}
 
-      {!isPending && !isError ? (
-        <div className="flex flex-col gap-4">
-          {hasNextPage ? (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                void fetchNextPage()
-              }}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? 'Loading older messages…' : 'Load older messages'}
-            </Button>
-          ) : null}
-
-          <ul className="flex flex-col gap-3">
-            {messages.map((message) => {
-              const isOwn = message.senderUserId === session?.user?.id
-              return (
-                <li
-                  key={message.id}
-                  className={isOwn ? 'self-end text-right' : 'self-start text-left'}
-                >
-                  <div className="inline-block max-w-[85%] rounded-lg bg-muted px-3 py-2 text-left">
-                    <Text>{message.content.text}</Text>
-                    <Text variant="small">{formatRelativeRecency(message.createdAt)}</Text>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-            <TextareaField
-              id="message-draft"
-              label="Message"
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              rows={3}
-            />
-            <Button type="submit" disabled={!draft.trim() || sendMessage.isPending}>
-              Send
-            </Button>
-          </form>
-        </div>
+      {!isPending && !isError && conversationId ? (
+        <MessageThreadBody
+          currentUserId={session?.user?.id}
+          peerDisplayName={peerDisplayName}
+          messages={messages}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          isFetchNextPageError={isFetchNextPageError}
+          fetchNextPage={fetchNextPage}
+          sendMessage={sendMessage}
+        />
       ) : null}
     </NarrowPage>
   )

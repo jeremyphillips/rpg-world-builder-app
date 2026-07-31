@@ -24,6 +24,13 @@ uses TanStack Query polling; Socket.IO can update the same caches later.
 - `refetchInterval` is active while `document.visibilityState === 'visible'`.
 - `refetchOnWindowFocus: true` recovers after backgrounding.
 
+## Conversation list pagination (deferred)
+
+The API returns `nextCursor` for conversation lists and the client accepts a
+`cursor` parameter, but Phase 1 only fetches the first page (`limit: 20`) in
+`use-conversations.ts`. Conversations beyond that page are not shown until
+load-more or infinite-scroll UI is wired.
+
 ## Mark-read contract
 
 The thread route marks the conversation read when it is open and the latest
@@ -39,8 +46,9 @@ draft.
 
 ## Notification navigation
 
-`conversation_detail` actions resolve through `crossAppConversationPath` in
-`resolve-notification-action.ts`.
+`conversation_detail` actions resolve to `ROUTES.messages.detail` for in-dashboard
+navigation (`resolve-notification-action.ts`). Cross-app paths remain in
+`crossAppConversationPath` for public/email links.
 
 Folder layout and the feature-boundary rule are documented in
 [feature-conventions](../../../docs/feature-conventions.md).

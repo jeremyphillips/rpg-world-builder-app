@@ -4,6 +4,7 @@ import {
   CROSS_APP_PATHS,
   crossAppCampaignDetailPath,
   crossAppCampaignOnboardingPath,
+  crossAppConversationPath,
 } from './routes'
 
 describe('CROSS_APP_PATHS', () => {
@@ -25,5 +26,9 @@ describe('CROSS_APP_PATHS', () => {
   it('builds campaign detail paths under the dashboard SPA', () => {
     expect(crossAppCampaignDetailPath('c_abc')).toBe('/app/campaigns/c_abc')
     expect(crossAppCampaignOnboardingPath('c_abc')).toBe('/app/campaigns/c_abc/onboarding')
+  })
+
+  it('builds conversation detail paths under the dashboard SPA', () => {
+    expect(crossAppConversationPath('conversation-1')).toBe('/app/messages/conversation-1')
   })
 })

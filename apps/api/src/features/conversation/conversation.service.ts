@@ -120,6 +120,16 @@ export async function sendConversationMessage(
   conversationId: string,
   input: { content: { kind: 'text'; text: string }; clientMessageId?: string },
 ): Promise<DirectMessage> {
+  const peerUserId = await getOtherParticipantUserId(conversationId, viewerUserId)
+  if (!peerUserId) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  const eligible = await isEligibleDirectMessageRecipient(viewerUserId, peerUserId)
+  if (!eligible) {
+    throw HttpError.forbidden('Recipient is not eligible for direct messages.')
+  }
+
   const result = await sendDirectMessage({
     conversationId,
     senderUserId: viewerUserId,

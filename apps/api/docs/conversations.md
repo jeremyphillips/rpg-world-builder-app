@@ -27,7 +27,8 @@ Recipients are resolved from **current** shared campaign membership:
   PC↔PC pairs require active open participation (or completed onboarding membership)
   so inactive or historical relationships are excluded.
 
-The same rules apply to `GET /direct/recipients` and `POST /direct`.
+The same rules apply to `GET /direct/recipients`, `POST /direct`, and
+`POST /:conversationId/messages` (existing threads re-check eligibility on send).
 
 ## Unread state
 
@@ -57,6 +58,7 @@ Producer failures are logged and do not fail the message send.
 
 ## Deferred
 
+- Conversation list pagination in dashboard (API `nextCursor` exists; UI fetches first page only)
 - Archive endpoint/UI (`archivedAt` on participant state)
 - Message edit/delete HTTP
 - `mutedAt` / mute suppression

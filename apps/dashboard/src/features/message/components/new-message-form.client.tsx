@@ -68,7 +68,7 @@ export function NewMessageRecipientsBody({
   if (isPending) return <Text variant="muted">Loading recipients…</Text>
   if (isError) {
     return (
-      <Text variant="muted" role="alert">
+      <Text variant="destructive" role="alert">
         Could not load recipients.
       </Text>
     )

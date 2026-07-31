@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { crossAppCampaignDetailPath, crossAppConversationPath } from '@rpg/contracts'
+import { crossAppCampaignDetailPath } from '@rpg/contracts'
+
+import { ROUTES } from '@/app/routes'
 
 import { resolveNotificationActionPath } from './resolve-notification-action'
 
@@ -14,13 +16,13 @@ describe('resolveNotificationActionPath', () => {
     ).toBe(crossAppCampaignDetailPath('campaign-123'))
   })
 
-  it('maps conversation detail actions to cross-app paths', () => {
+  it('maps conversation detail actions to dashboard SPA routes', () => {
     expect(
       resolveNotificationActionPath({
         kind: 'conversation_detail',
         conversationId: 'conversation-123',
       }),
-    ).toBe(crossAppConversationPath('conversation-123'))
+    ).toBe(ROUTES.messages.detail('conversation-123'))
   })
 
   it('returns undefined when no action exists', () => {

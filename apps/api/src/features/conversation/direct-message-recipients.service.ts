@@ -1,22 +1,20 @@
-import type { CampaignRole, CampaignViewerParticipationState } from '@rpg/contracts'
-import { isCampaignManager, resolveCampaignViewerParticipation } from '@rpg/contracts'
+import type { CampaignRole } from '@rpg/contracts'
+import { resolveCampaignViewerParticipation } from '@rpg/contracts'
 
 import { findPcOwnerIdsByCharacterIds } from '../character'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { listOpenParticipationsForCampaign } from '../campaign/participation/campaign-character-participation.repository'
 import { resolveMemberOpenParticipatingCharacterIds } from '../campaign/participation/resolve-member-open-participating-character-ids.lib'
 import { findUsersByIds } from '../user'
-
-type MembershipContext = {
-  userId: string
-  role: CampaignRole
-  participationState: CampaignViewerParticipationState
-}
+import {
+  isEligibleDirectMessagePeerInSharedCampaign,
+  type DirectMessageMembershipContext,
+} from './direct-message-peer-eligibility.lib'
 
 async function loadMembershipContextForCampaign(
   campaignId: string,
   userId: string,
-): Promise<MembershipContext | null> {
+): Promise<DirectMessageMembershipContext | null> {
   const membership = await CampaignMembershipModel.findOne({ campaignId, userId })
     .select('userId campaignRole controlledCharacterIds')
     .lean<{
@@ -54,21 +52,6 @@ async function loadMembershipContextForCampaign(
   }
 }
 
-function isEligiblePeerInSharedCampaign(
-  caller: MembershipContext,
-  candidate: MembershipContext,
-): boolean {
-  if (isCampaignManager(caller.role)) return true
-
-  if (candidate.participationState === 'staff') return true
-  if (candidate.participationState === 'observer') return true
-  if (candidate.participationState === 'active') {
-    return caller.participationState === 'active' || caller.participationState === 'staff'
-  }
-
-  return false
-}
-
 export async function isEligibleDirectMessageRecipient(
   callerUserId: string,
   recipientUserId: string,
@@ -90,7 +73,7 @@ export async function isEligibleDirectMessageRecipient(
     ])
 
     if (!callerContext || !candidateContext) continue
-    if (isEligiblePeerInSharedCampaign(callerContext, candidateContext)) {
+    if (isEligibleDirectMessagePeerInSharedCampaign(callerContext, candidateContext)) {
       return true
     }
   }
@@ -149,7 +132,7 @@ export async function listDirectMessageRecipients(
         openParticipationCharacterIds,
         characterOwnerById,
       })
-      const candidateContext: MembershipContext = {
+      const candidateContext: DirectMessageMembershipContext = {
         userId: membership.userId,
         role,
         participationState: resolveCampaignViewerParticipation({
@@ -159,7 +142,7 @@ export async function listDirectMessageRecipients(
         }),
       }
 
-      if (!isEligiblePeerInSharedCampaign(callerContext, candidateContext)) continue
+      if (!isEligibleDirectMessagePeerInSharedCampaign(callerContext, candidateContext)) continue
       recipientsByUserId.set(membership.userId, {
         userId: membership.userId,
         displayName: '',

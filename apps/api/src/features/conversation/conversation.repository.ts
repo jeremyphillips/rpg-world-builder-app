@@ -131,26 +131,6 @@ async function buildConversationDto(
   return toConversation(doc, { peer, unreadCount })
 }
 
-export async function findConversationByIdForParticipant({
-  conversationId,
-  viewerUserId,
-  peer,
-}: {
-  conversationId: string
-  viewerUserId: string
-  peer: { userId: string; displayName: string }
-}): Promise<Conversation | null> {
-  if (!isValidObjectId(conversationId)) return null
-
-  const doc = await ConversationModel.findOne({
-    _id: conversationId,
-    participantUserIds: viewerUserId,
-  }).lean<ConversationRecord | null>()
-
-  if (!doc) return null
-  return buildConversationDto(doc, viewerUserId, peer)
-}
-
 export async function findOrCreateDirectConversation({
   callerUserId,
   recipientUserId,
@@ -505,7 +485,10 @@ export async function getOtherParticipantUserId(
   conversationId: string,
   viewerUserId: string,
 ): Promise<string | null> {
-  const conversation = await ConversationModel.findById(conversationId)
+  const conversation = await ConversationModel.findOne({
+    _id: conversationId,
+    participantUserIds: viewerUserId,
+  })
     .select('participantUserIds')
     .lean<{ participantUserIds: string[] } | null>()
 
