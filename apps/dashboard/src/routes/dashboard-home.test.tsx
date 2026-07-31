@@ -45,10 +45,9 @@ describe('DashboardHome', () => {
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.campaign.title)).toBeInTheDocument()
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.character.title)).toBeInTheDocument()
     expect(screen.getByText(DASHBOARD_HOME_COPY.invitationHeading)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'New campaign' })).toHaveAttribute(
-      'href',
-      '/campaigns/new',
-    )
+    const newCampaignLink = screen.getByRole('link', { name: 'New campaign' })
+    expect(newCampaignLink).toHaveAttribute('href', '/campaigns/new')
+    expect(newCampaignLink).not.toHaveClass('border-outline-button-border')
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
   })
 
@@ -84,6 +83,38 @@ describe('DashboardHome', () => {
     )
   })
 
+  it('demotes the starter-card new campaign action when campaign rows exist', async () => {
+    listCampaigns.mockResolvedValue([campaign('a', 'Arden')])
+
+    renderHome()
+
+    expect(await screen.findByRole('link', { name: 'New campaign' })).toHaveClass(
+      'border-outline-button-border',
+    )
+  })
+
+  it('demotes the starter-card new campaign action when only incomplete rows exist', async () => {
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({
+        id: 'camp_incomplete',
+        identity: { name: 'Incomplete Campaign' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
+      }),
+    ])
+    localStorage.setItem('rpg.selectedCampaignId', 'camp_incomplete')
+
+    renderHome()
+
+    expect(await screen.findByRole('link', { name: 'New campaign' })).toHaveClass(
+      'border-outline-button-border',
+    )
+    expect(
+      await screen.findByRole('link', { name: 'Continue setup for Incomplete Campaign' }),
+    ).toBeInTheDocument()
+  })
+
   it('shows a continue card for a remembered campaign with completed onboarding', async () => {
     listCampaigns.mockResolvedValue([
       campaign('camp_active', 'Active Campaign'),
@@ -93,9 +124,13 @@ describe('DashboardHome', () => {
 
     renderHome()
 
-    expect(await screen.findByText('Continue campaign')).toBeInTheDocument()
-    expect(screen.getByText('Active Campaign')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Continue campaign' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open Active Campaign' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_active',
+    )
   })
 
   it('shows a resume setup card for a remembered incomplete campaign', async () => {
@@ -117,12 +152,12 @@ describe('DashboardHome', () => {
 
     renderHome()
 
-    expect(await screen.findByRole('heading', { name: 'Resume setup' })).toBeInTheDocument()
-    expect(screen.getByText('Incomplete Campaign')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Resume setup' })).toHaveAttribute(
-      'href',
-      '/campaigns/camp_incomplete/onboarding',
-    )
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Resume setup' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Continue setup for Incomplete Campaign' }),
+    ).toHaveAttribute('href', '/campaigns/camp_incomplete/onboarding')
     expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
   })
 })

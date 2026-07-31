@@ -38,7 +38,7 @@ export function useNotificationInboxPage() {
     [campaignOptions],
   )
 
-  const { filters, setFilterValue, resetFilters } = useFilterUrlState({
+  const { filters, setFilterValue, resetFilters, clearFilterField } = useFilterUrlState({
     schema,
   })
 
@@ -107,6 +107,7 @@ export function useNotificationInboxPage() {
     filters,
     setFilterValue,
     resetFilters,
+    clearFilterField,
     unreadCount,
     invalidScopeNotice: {
       show: invalidScope.showInvalidScopeNotice,

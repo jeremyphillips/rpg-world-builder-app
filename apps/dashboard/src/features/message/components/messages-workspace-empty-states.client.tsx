@@ -9,6 +9,7 @@ import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
 import {
   messagesWorkspaceEmptyStateClasses,
   messagesWorkspaceMobileBackClasses,
+  messagesWorkspaceSelectConversationHeadingClasses,
 } from './messages-workspace.variants'
 
 export function MessagesMobileBackLink({ to, label }: { to: string; label: string }) {
@@ -26,7 +27,7 @@ export function MessagesDirectEmptyRightPane(_props: { campaignId?: string }) {
     <div className={messagesWorkspaceEmptyStateClasses}>
       <div className="space-y-4">
         <div className="space-y-1">
-          <Text className="text-foreground-subtle">
+          <Text className={messagesWorkspaceSelectConversationHeadingClasses}>
             {MESSAGES_EMPTY_COPY.selectConversationHeading}
           </Text>
           <Text variant="muted">{MESSAGES_EMPTY_COPY.selectConversationBody}</Text>

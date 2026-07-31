@@ -10,7 +10,8 @@ import { resolveTargetPathOnSwitch } from '../lib/navigation/campaign-selection'
 import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
 import { useCampaignStore } from '../store/campaign-store'
 
-function usePersistCampaignSelection() {
+/** Persists the user's campaign selection preference without navigating. */
+export function usePersistCampaignSelection() {
   const queryClient = useQueryClient()
   const setPreferredCampaignId = useCampaignStore((state) => state.setPreferredCampaignId)
 

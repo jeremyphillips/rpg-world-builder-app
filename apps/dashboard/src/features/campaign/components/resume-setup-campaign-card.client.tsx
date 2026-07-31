@@ -1,11 +1,9 @@
-import { Link } from 'react-router-dom'
+'use client'
+
 import type { CampaignListItem } from '@rpg/contracts'
-import { Text, buttonVariants } from '@rpg/ui'
 
-import { ROUTES } from '@/app/routes'
-
-import { CampaignDisplayName } from './campaign-display-name'
-import { buildCampaignDisplay } from '../lib/campaign-display'
+import { CAMPAIGN_DESTINATION_COPY } from '../lib/campaign-destination-copy'
+import { CampaignDestinationSection } from './campaign-destination-section.client'
 
 interface ResumeSetupCampaignCardProps {
   campaign: CampaignListItem
@@ -14,21 +12,10 @@ interface ResumeSetupCampaignCardProps {
 /** Prompts the user to finish onboarding for a remembered incomplete campaign. */
 export function ResumeSetupCampaignCard({ campaign }: ResumeSetupCampaignCardProps) {
   return (
-    <section className="rounded-lg border border-border bg-card px-4 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <Text variant="small" as="h2">
-            Resume setup
-          </Text>
-          <CampaignDisplayName display={buildCampaignDisplay(campaign)} surface="card" />
-        </div>
-        <Link
-          to={ROUTES.campaign.onboarding(campaign.id)}
-          className={buttonVariants({ size: 'sm', className: 'shrink-0' })}
-        >
-          Resume setup
-        </Link>
-      </div>
-    </section>
+    <CampaignDestinationSection
+      eyebrow={CAMPAIGN_DESTINATION_COPY.resumeSetupEyebrow}
+      eyebrowAs="h2"
+      campaigns={[campaign]}
+    />
   )
 }

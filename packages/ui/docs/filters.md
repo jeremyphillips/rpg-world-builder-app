@@ -425,6 +425,29 @@ or behavior.
 - `resolveFilterFieldWidthClasses` is separate from density — width is layout
   allocation only.
 
+### Active chips in feature pages
+
+Dashboard list surfaces compose `PrimaryFilterPanel` from
+`apps/dashboard/src/lib/data-table/primary-filter-bar-region.client.tsx`:
+
+```tsx
+<PrimaryFilterPanel
+  filterSchema={schema}
+  filterState={filters}
+  onValueChange={setFilterValue}
+  clearFilterField={clearFilterField}
+  resetFilters={resetFilters}
+  orientation="vertical" // optional; default horizontal (inline) for notifications
+/>
+```
+
+The panel wraps `DataTableFilterRegion` + `FilterBar` and mounts
+`ActiveFilterChips` below when filters are modified. Chip remove calls
+`clearFilterField(fieldId)`; **Clear all** (shown when 2+ chips) calls
+`resetFilters`. Omit `FilterBar` `onReset` when chips are shown — the chip row
+owns clear semantics. Campaign scope fields may set `activeChip: { include: false }`
+when the select already communicates scope (Messages workspace).
+
 ### Shared field-row SSOT
 
 Filter bars share control-band + control-edge alignment with forms. Ownership lives in

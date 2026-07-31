@@ -50,7 +50,8 @@ function NotificationsListPagePreview() {
           schema={schema}
           filters={{ unread: true, category: 'message' }}
           onFilterChange={() => undefined}
-          onResetFilters={() => undefined}
+          clearFilterField={() => undefined}
+          resetFilters={() => undefined}
         />
       </div>
       <NotificationInboxBody

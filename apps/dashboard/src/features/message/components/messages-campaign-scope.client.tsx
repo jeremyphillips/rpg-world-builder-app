@@ -1,14 +1,13 @@
 'use client'
 
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Alert, Button, Text, buttonVariants } from '@rpg/ui'
-import { FilterBar, type FilterSchema } from '@rpg/ui/filters'
+import type { FilterSchema } from '@rpg/ui/filters'
 import type { Notification } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
-
-import { resolveMessagesClearScopePath } from '../lib/messages-campaign-scope-navigation.lib'
+import { CAMPAIGN_SCOPE_FILTER_ID, INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
+import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region.client'
 import {
   MESSAGES_SCOPE_COPY,
   formatMessagesOutOfScopeSupporting,
@@ -27,6 +26,8 @@ type MessagesCampaignScopeChromeProps = {
     id: keyof MessagesFilterState,
     value: MessagesFilterState[keyof MessagesFilterState] | undefined,
   ) => void
+  clearFilterField: (id: keyof MessagesFilterState) => void
+  resetFilters: () => void
   scopedCount?: number
   hiddenCount?: number
   showInvalidScopeNotice: boolean
@@ -64,16 +65,15 @@ export function MessagesCampaignScopeChrome({
   schema,
   filters,
   onFilterChange,
+  clearFilterField,
+  resetFilters,
   scopedCount,
   hiddenCount,
   showInvalidScopeNotice,
   onDismissInvalidScopeNotice,
 }: MessagesCampaignScopeChromeProps) {
-  const navigate = useNavigate()
-  const location = useLocation()
-
   const clearCampaignScope = () => {
-    navigate(resolveMessagesClearScopePath(location))
+    clearFilterField(CAMPAIGN_SCOPE_FILTER_ID)
   }
 
   const hasScopeSummary = (hiddenCount ?? 0) > 0
@@ -99,7 +99,13 @@ export function MessagesCampaignScopeChrome({
       ) : null}
 
       {hasFilters ? (
-        <FilterBar schema={schema} state={filters} onValueChange={onFilterChange} />
+        <PrimaryFilterPanel
+          filterSchema={schema}
+          filterState={filters}
+          onValueChange={onFilterChange}
+          clearFilterField={clearFilterField}
+          resetFilters={resetFilters}
+        />
       ) : null}
 
       {hasScopeSummary ? (

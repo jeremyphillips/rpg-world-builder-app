@@ -56,7 +56,7 @@ export function MessagesWorkspaceShell() {
 
   const schema = React.useMemo(() => createMessagesFilterSchema(campaignOptions), [campaignOptions])
 
-  const { filters, setFilterValue } = useFilterUrlState({ schema })
+  const { filters, setFilterValue, clearFilterField, resetFilters } = useFilterUrlState({ schema })
 
   const campaignScope = useMessagesCampaignScopeEffects({
     ...routeState,
@@ -109,6 +109,8 @@ export function MessagesWorkspaceShell() {
             schema={schema}
             filters={filters}
             onFilterChange={setFilterValue}
+            clearFilterField={clearFilterField}
+            resetFilters={resetFilters}
             scopedCount={campaignScope.scopedCount}
             hiddenCount={campaignScope.hiddenCount}
             showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}

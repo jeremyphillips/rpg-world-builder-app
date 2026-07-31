@@ -53,7 +53,9 @@ or thread.
 
 Clearing scope from an open conversation navigates to `/messages/:conversationId`
 (dropping only `campaignId`). Clearing scope from list or new routes drops the
-query and stays on list/new.
+query and stays on list/new. **Show all** and active chip clears both route
+through `clearFilterField('campaignId')` on `useFilterUrlState`, preserving
+unrelated query params such as `from` / `to` on `/messages/new`.
 
 ## Responsive workspace
 
@@ -125,7 +127,7 @@ keep edge-to-edge backgrounds via row CVA padding.
 | `components/messages-workspace-shell.client.tsx`          | PageHeader, scope chrome, pane orchestration                              |
 | `components/messages-workspace-header.client.tsx`         | Messages H1 + primary New message / recipient Cancel                      |
 | `components/messages-workspace-panes.client.tsx`          | List, thread, and recipient picker panes                                  |
-| `components/messages-campaign-scope.client.tsx`           | Scope chip, utility, invalid notice, out-of-scope pin                     |
+| `components/messages-campaign-scope.client.tsx`           | Scope panel, utility, invalid notice, out-of-scope pin                    |
 | `components/messages-entry-links.client.tsx`              | Campaign/global entry links for nav and overview                          |
 | `api/conversations.ts`                                    | Same-origin conversation API client                                       |
 | `hooks/use-conversations.ts`                              | Conversation list query with poll-while-visible                           |

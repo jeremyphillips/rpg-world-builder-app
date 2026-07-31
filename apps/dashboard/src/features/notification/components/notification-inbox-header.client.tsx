@@ -4,7 +4,7 @@ import { Alert, Button } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 import type { FilterSchema } from '@rpg/ui/filters'
 
-import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
+import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region.client'
 
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import type { NotificationInboxFilterState } from '../lib/notification-inbox-filter-schema'
@@ -16,7 +16,8 @@ type NotificationInboxHeaderProps = {
     id: keyof NotificationInboxFilterState,
     value: NotificationInboxFilterState[keyof NotificationInboxFilterState] | undefined,
   ) => void
-  onResetFilters: () => void
+  clearFilterField: (id: keyof NotificationInboxFilterState) => void
+  resetFilters: () => void
   invalidScopeNotice?: {
     show: boolean
     dismiss: () => void
@@ -32,7 +33,8 @@ export function NotificationInboxHeader({
   schema,
   filters,
   onFilterChange,
-  onResetFilters,
+  clearFilterField,
+  resetFilters,
   invalidScopeNotice,
 }: NotificationInboxHeaderProps) {
   return (
@@ -52,12 +54,12 @@ export function NotificationInboxHeader({
         />
       ) : null}
 
-      <PrimaryFilterBarRegion
+      <PrimaryFilterPanel
         filterSchema={schema}
         filterState={filters}
         onValueChange={onFilterChange}
-        onReset={onResetFilters}
-        resetLabel="Clear all"
+        clearFilterField={clearFilterField}
+        resetFilters={resetFilters}
       />
     </div>
   )

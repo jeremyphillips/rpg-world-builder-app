@@ -2,7 +2,7 @@ import { Heading, Spinner, Text } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { useSession } from '@/features/auth'
-import { useCampaigns, useOpenCampaign } from '@/features/campaign'
+import { useCampaigns, hasCampaignRows } from '@/features/campaign'
 
 import { DashboardHomeCampaignSection } from './dashboard-home-campaign-section'
 import { resolveDashboardHomeCampaignPromotions } from './dashboard-home-campaign-promotions'
@@ -13,13 +13,13 @@ export function DashboardHome() {
   const { data: session, isPending: sessionPending } = useSession()
   const user = session?.user
   const { data: campaigns, isPending: campaignsPending, isError: campaignsError } = useCampaigns()
-  const openCampaign = useOpenCampaign()
 
   if (sessionPending || campaignsPending) {
     return <Spinner />
   }
 
   const promotions = resolveDashboardHomeCampaignPromotions(campaigns, campaignsError, user)
+  const campaignRowsPresent = hasCampaignRows(campaigns)
 
   return (
     <NarrowPage spacing="relaxed">
@@ -30,13 +30,9 @@ export function DashboardHome() {
         <Text variant="muted">{DASHBOARD_HOME_COPY.subtitle}</Text>
       </div>
 
-      <DashboardHomeCampaignSection
-        campaignsError={campaignsError}
-        onContinue={openCampaign}
-        {...promotions}
-      />
+      <DashboardHomeCampaignSection campaignsError={campaignsError} {...promotions} />
 
-      <DashboardHomeStarterCards />
+      <DashboardHomeStarterCards hasCampaignRows={campaignRowsPresent} />
 
       <div className="space-y-1">
         <Text>{DASHBOARD_HOME_COPY.invitationHeading}</Text>

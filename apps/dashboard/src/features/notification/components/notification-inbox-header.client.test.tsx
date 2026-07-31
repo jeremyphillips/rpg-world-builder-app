@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
@@ -20,7 +21,8 @@ describe('NotificationInboxHeader', () => {
         schema={schema}
         filters={{}}
         onFilterChange={vi.fn()}
-        onResetFilters={vi.fn()}
+        clearFilterField={vi.fn()}
+        resetFilters={vi.fn()}
       />,
     )
 
@@ -34,13 +36,36 @@ describe('NotificationInboxHeader', () => {
     expect(document.querySelector('.bg-surface-subtle')).toBeInTheDocument()
   })
 
+  it('renders active chips and clear-all when multiple filters are active', async () => {
+    const user = userEvent.setup()
+    const clearFilterField = vi.fn()
+
+    renderWithProviders(
+      <NotificationInboxHeader
+        schema={schema}
+        filters={{ unread: true, category: 'message' }}
+        onFilterChange={vi.fn()}
+        clearFilterField={clearFilterField}
+        resetFilters={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Clear unread only filter' })).toBeInTheDocument()
+    expect(screen.getByText('Type: Message')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clear all' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear unread only filter' }))
+    expect(clearFilterField).toHaveBeenCalledWith('unread')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <NotificationInboxHeader
         schema={schema}
         filters={{ unread: true }}
         onFilterChange={vi.fn()}
-        onResetFilters={vi.fn()}
+        clearFilterField={vi.fn()}
+        resetFilters={vi.fn()}
       />,
     )
 
