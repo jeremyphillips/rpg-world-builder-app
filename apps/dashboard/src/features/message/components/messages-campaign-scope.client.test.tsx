@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
+import { INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
 import { renderWithProviders } from '@/test/render'
+import { createMessagesFilterSchema } from '../lib/messages-filter-schema'
 import { MESSAGES_SCOPE_COPY, formatMessagesOutOfScopeSupporting } from '../lib/messages-copy'
 
 import {
@@ -11,11 +13,15 @@ import {
   MessagesOutOfScopePin,
 } from './messages-campaign-scope.client'
 
+const schema = createMessagesFilterSchema([{ value: 'camp-1', label: 'Stormwatch' }])!
+
 describe('MessagesCampaignScopeChrome', () => {
   it('omits the hidden utility when hiddenCount is zero', () => {
     renderWithProviders(
       <MessagesCampaignScopeChrome
-        scope={{ campaignId: 'camp-1', campaignName: 'Stormwatch' }}
+        schema={schema}
+        filters={{ campaignId: 'camp-1' }}
+        onFilterChange={vi.fn()}
         scopedCount={5}
         hiddenCount={0}
         showInvalidScopeNotice={false}
@@ -29,7 +35,9 @@ describe('MessagesCampaignScopeChrome', () => {
   it('shows full-dataset scope counts independent of the loaded page', () => {
     renderWithProviders(
       <MessagesCampaignScopeChrome
-        scope={{ campaignId: 'camp-1', campaignName: 'Stormwatch' }}
+        schema={schema}
+        filters={{ campaignId: 'camp-1' }}
+        onFilterChange={vi.fn()}
         scopedCount={42}
         hiddenCount={8}
         showInvalidScopeNotice={false}
@@ -41,28 +49,32 @@ describe('MessagesCampaignScopeChrome', () => {
     expect(
       screen.getByText('42 conversations shown · 8 conversations outside this campaign hidden'),
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: MESSAGES_SCOPE_COPY.showAllLabel })).toHaveAttribute(
-      'href',
-      ROUTES.messages.list,
-    )
+    expect(
+      screen.getByRole('button', { name: MESSAGES_SCOPE_COPY.showAllLabel }),
+    ).toBeInTheDocument()
   })
 
   it('shows the invalid scope notice', () => {
     renderWithProviders(
       <MessagesCampaignScopeChrome
+        schema={schema}
+        filters={{}}
+        onFilterChange={vi.fn()}
         showInvalidScopeNotice
         onDismissInvalidScopeNotice={() => undefined}
       />,
     )
 
-    expect(screen.getByText(MESSAGES_SCOPE_COPY.invalidHeading)).toBeInTheDocument()
-    expect(screen.getByText(MESSAGES_SCOPE_COPY.invalidBody)).toBeInTheDocument()
+    expect(screen.getByText(INVALID_CAMPAIGN_SCOPE_COPY.invalidHeading)).toBeInTheDocument()
+    expect(screen.getByText(INVALID_CAMPAIGN_SCOPE_COPY.invalidBody)).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <MessagesCampaignScopeChrome
-        scope={{ campaignId: 'camp-1', campaignName: 'Stormwatch' }}
+        schema={schema}
+        filters={{ campaignId: 'camp-1' }}
+        onFilterChange={vi.fn()}
         scopedCount={10}
         hiddenCount={2}
         showInvalidScopeNotice={false}

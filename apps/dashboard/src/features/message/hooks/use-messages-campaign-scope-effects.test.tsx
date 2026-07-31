@@ -36,6 +36,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isNewRoute: false,
         isThreadRoute: false,
         routeConversationId: undefined,
+        accessibleCampaignIds: ['camp_1'],
       }),
     )
 
@@ -61,6 +62,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isNewRoute: false,
         isThreadRoute: true,
         routeConversationId: 'conv_1',
+        accessibleCampaignIds: ['camp_1'],
       }),
     )
 
@@ -77,6 +79,7 @@ describe('useMessagesCampaignScopeEffects', () => {
           isNewRoute: false,
           isThreadRoute: false,
           routeConversationId: undefined,
+          accessibleCampaignIds: ['camp_1', 'camp_2'],
         }),
       { initialProps: 'camp_1' as string | undefined },
     )
@@ -109,6 +112,7 @@ describe('useMessagesCampaignScopeEffects', () => {
         isNewRoute: false,
         isThreadRoute: false,
         routeConversationId: undefined,
+        accessibleCampaignIds: ['camp_1'],
       }),
     )
 

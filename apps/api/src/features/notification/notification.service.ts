@@ -1,4 +1,4 @@
-import type { NotificationListResponse } from '@rpg/contracts'
+import type { NotificationCategory, NotificationListResponse } from '@rpg/contracts'
 
 import { deliverNotificationRead } from '../../realtime'
 import {
@@ -11,13 +11,22 @@ import {
 
 export async function listNotifications(
   recipientUserId: string,
-  options: { limit: number; cursor?: string },
+  options: {
+    limit: number
+    cursor?: string
+    unread?: boolean
+    category?: NotificationCategory
+    campaignId?: string
+  },
 ): Promise<NotificationListResponse> {
   const [{ items, nextCursor }, unreadCount] = await Promise.all([
     listNotificationsForRecipient({
       recipientUserId,
       limit: options.limit,
       cursor: options.cursor,
+      unread: options.unread,
+      category: options.category,
+      campaignId: options.campaignId,
     }),
     countUnreadNotifications(recipientUserId),
   ])

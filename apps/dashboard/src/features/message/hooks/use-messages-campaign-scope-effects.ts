@@ -3,6 +3,8 @@
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+import { useInvalidCampaignScopeNotice } from '@/lib/filters'
+
 import { useConversations } from '../hooks/use-conversations'
 import { resolveInvalidScopeRedirectPath } from '../lib/messages-campaign-scope-navigation.lib'
 import type { MessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
@@ -11,12 +13,18 @@ export function useMessagesCampaignScopeEffects(
   routeState: Pick<
     MessagesWorkspaceRouteState,
     'campaignId' | 'isNewRoute' | 'isThreadRoute' | 'routeConversationId'
-  >,
+  > & {
+    accessibleCampaignIds: readonly string[]
+  },
 ) {
   const navigate = useNavigate()
   const location = useLocation()
   const { data } = useConversations(routeState.campaignId)
-  const [showInvalidScopeNotice, setShowInvalidScopeNotice] = React.useState(false)
+  const clientInvalidScope = useInvalidCampaignScopeNotice(
+    routeState.campaignId,
+    routeState.accessibleCampaignIds,
+  )
+  const [showApiInvalidScopeNotice, setShowApiInvalidScopeNotice] = React.useState(false)
   const strippedScopeRef = React.useRef<string | null>(null)
   const previousCampaignIdRef = React.useRef(routeState.campaignId)
 
@@ -24,7 +32,7 @@ export function useMessagesCampaignScopeEffects(
     if (!routeState.campaignId || !data?.scopeInvalid) return
     if (strippedScopeRef.current === routeState.campaignId) return
     strippedScopeRef.current = routeState.campaignId
-    setShowInvalidScopeNotice(true)
+    setShowApiInvalidScopeNotice(true)
 
     navigate(
       resolveInvalidScopeRedirectPath({
@@ -49,7 +57,7 @@ export function useMessagesCampaignScopeEffects(
     if (previousCampaignIdRef.current === routeState.campaignId) return
     previousCampaignIdRef.current = routeState.campaignId
     strippedScopeRef.current = null
-    setShowInvalidScopeNotice(false)
+    setShowApiInvalidScopeNotice(false)
   }, [routeState.campaignId])
 
   return {
@@ -58,7 +66,10 @@ export function useMessagesCampaignScopeEffects(
     hiddenCount: data?.hiddenCount,
     loadedCount: data?.items.length ?? 0,
     hasMoreConversations: Boolean(data?.nextCursor),
-    showInvalidScopeNotice,
-    dismissInvalidScopeNotice: () => setShowInvalidScopeNotice(false),
+    showInvalidScopeNotice: clientInvalidScope.showInvalidScopeNotice || showApiInvalidScopeNotice,
+    dismissInvalidScopeNotice: () => {
+      clientInvalidScope.dismissInvalidScopeNotice()
+      setShowApiInvalidScopeNotice(false)
+    },
   }
 }

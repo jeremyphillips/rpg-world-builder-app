@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -5,34 +8,37 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { renderWithProviders } from '@/test/render'
 
 import { NotificationInboxHeader } from './notification-inbox-header.client'
+import { createNotificationInboxFilterSchema } from '../lib/notification-inbox-filter-schema'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
+const schema = createNotificationInboxFilterSchema([{ value: 'campaign-1', label: 'Stormwatch' }])
+
 describe('NotificationInboxHeader', () => {
-  it('renders the inbox header, description, and filter control', () => {
+  it('renders the inbox description and vertical filter controls', () => {
     renderWithProviders(
       <NotificationInboxHeader
-        unreadCount={2}
-        filter="all"
+        schema={schema}
+        filters={{}}
         onFilterChange={vi.fn()}
-        onMarkAllRead={vi.fn()}
-        markAllReadPending={false}
+        onClearFilterField={vi.fn()}
+        onResetFilters={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole('heading', { name: NOTIFICATION_COPY.title })).toBeInTheDocument()
     expect(screen.getByText(NOTIFICATION_COPY.inboxDescription)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: NOTIFICATION_COPY.filterAll })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: NOTIFICATION_COPY.filterUnread })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Unread only' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Campaign' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Type' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <NotificationInboxHeader
-        unreadCount={0}
-        filter="unread"
+        schema={schema}
+        filters={{ unread: true }}
         onFilterChange={vi.fn()}
-        onMarkAllRead={vi.fn()}
-        markAllReadPending={false}
+        onClearFilterField={vi.fn()}
+        onResetFilters={vi.fn()}
       />,
     )
 

@@ -1,25 +1,32 @@
 'use client'
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Alert, Button, Chip, Text, buttonVariants } from '@rpg/ui'
-import type { ConversationListResponse } from '@rpg/contracts'
+import { Alert, Button, Text, buttonVariants } from '@rpg/ui'
+import { FilterBar, type FilterSchema } from '@rpg/ui/filters'
+import type { Notification } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
 
 import { resolveMessagesClearScopePath } from '../lib/messages-campaign-scope-navigation.lib'
 import {
   MESSAGES_SCOPE_COPY,
   formatMessagesOutOfScopeSupporting,
-  formatMessagesScopeChipLabel,
   formatMessagesScopeSummary,
 } from '../lib/messages-copy'
+import type { MessagesFilterState } from '../lib/messages-filter-schema'
 import {
   messagesWorkspaceListChromeInsetClasses,
   messagesWorkspaceScopeUtilityClasses,
 } from './messages-workspace.variants'
 
 type MessagesCampaignScopeChromeProps = {
-  scope?: ConversationListResponse['scope']
+  schema: FilterSchema<Notification, MessagesFilterState>
+  filters: MessagesFilterState
+  onFilterChange: (
+    id: keyof MessagesFilterState,
+    value: MessagesFilterState[keyof MessagesFilterState] | undefined,
+  ) => void
   scopedCount?: number
   hiddenCount?: number
   showInvalidScopeNotice: boolean
@@ -29,9 +36,11 @@ type MessagesCampaignScopeChromeProps = {
 function MessagesCampaignScopeUtility({
   scopedCount,
   hiddenCount,
+  onShowAll,
 }: {
   scopedCount?: number
   hiddenCount?: number
+  onShowAll: () => void
 }) {
   if (hiddenCount === undefined || hiddenCount <= 0) {
     return null
@@ -40,15 +49,21 @@ function MessagesCampaignScopeUtility({
   return (
     <div className={messagesWorkspaceScopeUtilityClasses}>
       <Text variant="small">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
-      <Link to={ROUTES.messages.list} className={buttonVariants({ variant: 'link', size: 'sm' })}>
+      <button
+        type="button"
+        className={buttonVariants({ variant: 'link', size: 'sm' })}
+        onClick={onShowAll}
+      >
         {MESSAGES_SCOPE_COPY.showAllLabel}
-      </Link>
+      </button>
     </div>
   )
 }
 
 export function MessagesCampaignScopeChrome({
-  scope,
+  schema,
+  filters,
+  onFilterChange,
   scopedCount,
   hiddenCount,
   showInvalidScopeNotice,
@@ -61,7 +76,10 @@ export function MessagesCampaignScopeChrome({
     navigate(resolveMessagesClearScopePath(location))
   }
 
-  if (!scope && !showInvalidScopeNotice && (hiddenCount ?? 0) === 0) {
+  const hasScopeSummary = (hiddenCount ?? 0) > 0
+  const hasFilters = schema.fields.length > 0
+
+  if (!hasFilters && !showInvalidScopeNotice && !hasScopeSummary) {
     return null
   }
 
@@ -70,31 +88,31 @@ export function MessagesCampaignScopeChrome({
       {showInvalidScopeNotice ? (
         <Alert
           variant="warning"
-          title={MESSAGES_SCOPE_COPY.invalidHeading}
-          description={MESSAGES_SCOPE_COPY.invalidBody}
+          title={INVALID_CAMPAIGN_SCOPE_COPY.invalidHeading}
+          description={INVALID_CAMPAIGN_SCOPE_COPY.invalidBody}
           actions={
             <Button type="button" variant="ghost" size="sm" onClick={onDismissInvalidScopeNotice}>
-              {MESSAGES_SCOPE_COPY.invalidDismissLabel}
+              {INVALID_CAMPAIGN_SCOPE_COPY.invalidDismissLabel}
             </Button>
           }
         />
       ) : null}
 
-      {scope ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <Chip
-            mode="removable"
-            size="md"
-            removeLabel={MESSAGES_SCOPE_COPY.chipRemoveLabel}
-            onRemove={clearCampaignScope}
-          >
-            {formatMessagesScopeChipLabel(scope.campaignName)}
-          </Chip>
-        </div>
+      {hasFilters ? (
+        <FilterBar
+          schema={schema}
+          state={filters}
+          orientation="vertical"
+          onValueChange={onFilterChange}
+        />
       ) : null}
 
-      {scope ? (
-        <MessagesCampaignScopeUtility scopedCount={scopedCount} hiddenCount={hiddenCount} />
+      {hasScopeSummary ? (
+        <MessagesCampaignScopeUtility
+          scopedCount={scopedCount}
+          hiddenCount={hiddenCount}
+          onShowAll={clearCampaignScope}
+        />
       ) : null}
     </div>
   )

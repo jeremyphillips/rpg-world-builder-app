@@ -21,7 +21,7 @@ import {
   applyNotificationRead,
   applyNotificationUpserted,
   NOTIFICATION_LIST_LIMIT,
-  notificationsInboxQueryKey,
+  notificationsInboxRootQueryKey,
   notificationsListQueryKey,
   type NotificationReadPayload,
   type NotificationUpsertedPayload,
@@ -50,8 +50,10 @@ export function RealtimeProvider({ userId, children }: RealtimeProviderProps) {
     })
 
     const invalidateInboxIfCached = () => {
-      if (queryClient.getQueryData(notificationsInboxQueryKey) === undefined) return
-      void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
+      if (queryClient.getQueriesData({ queryKey: notificationsInboxRootQueryKey }).length === 0) {
+        return
+      }
+      void queryClient.invalidateQueries({ queryKey: notificationsInboxRootQueryKey })
     }
 
     const handleConnect = () => {

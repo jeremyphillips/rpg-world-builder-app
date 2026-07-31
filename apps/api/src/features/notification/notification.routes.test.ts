@@ -192,4 +192,60 @@ describe('notification routes', () => {
 
     await agent.get('/api/notifications?limit=10&cursor=not-a-valid-cursor').expect(400)
   })
+
+  it('filters notifications by unread, category, and campaign scope', async () => {
+    await clearTestDb()
+
+    const { agent } = await registerAndLoginTestUser(getApp(), {
+      email: 'notify-filters@example.com',
+      password: 'supersecret',
+      displayName: 'Notify Filters User',
+    })
+
+    const meRes = await agent.get('/api/auth/me').expect(200)
+    const userId = meRes.body.user.id as string
+
+    await publishNotification({
+      type: 'message.direct.received',
+      recipientUserIds: [userId],
+      payload: {
+        conversationId: 'conversation-filter-1',
+        messageId: 'message-filter-1',
+        senderDisplayName: 'Ava',
+        preview: 'Hello',
+        unreadMessageCount: 1,
+      },
+    })
+
+    await publishNotification({
+      type: 'campaign.invite.accepted',
+      recipientUserIds: [userId],
+      payload: {
+        inviteId: 'invite-filter-1',
+        campaignId: 'campaign-filter-1',
+        campaignName: 'Stormwatch',
+        acceptedByDisplayName: 'Blake',
+      },
+    })
+
+    const unreadOnly = await agent.get('/api/notifications?limit=10&unread=true').expect(200)
+    expect(unreadOnly.body.items).toHaveLength(2)
+
+    const messageCategory = await agent
+      .get('/api/notifications?limit=10&category=message')
+      .expect(200)
+    expect(messageCategory.body.items).toHaveLength(1)
+    expect(messageCategory.body.items[0].type).toBe('message.direct.received')
+
+    const campaignScope = await agent
+      .get('/api/notifications?limit=10&campaignId=campaign-filter-1')
+      .expect(200)
+    expect(campaignScope.body.items).toHaveLength(1)
+    expect(campaignScope.body.items[0].type).toBe('campaign.invite.accepted')
+
+    const missingCampaignScope = await agent
+      .get('/api/notifications?limit=10&campaignId=missing-campaign')
+      .expect(200)
+    expect(missingCampaignScope.body.items).toHaveLength(0)
+  })
 })

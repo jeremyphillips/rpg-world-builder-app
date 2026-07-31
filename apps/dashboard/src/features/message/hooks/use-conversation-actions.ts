@@ -9,7 +9,7 @@ import type {
 import { DIRECT_MESSAGE_PREVIEW_MAX_LENGTH } from '@rpg/contracts'
 
 import {
-  notificationsInboxQueryKey,
+  notificationsInboxRootQueryKey,
   notificationsListQueryKey,
   NOTIFICATION_LIST_LIMIT,
 } from '@/features/notification'
@@ -58,7 +58,7 @@ export function useConversationActions(conversationId?: string) {
     void queryClient.invalidateQueries({
       queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
     })
-    void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
+    void queryClient.invalidateQueries({ queryKey: notificationsInboxRootQueryKey })
   }
 
   const sendFirstMessage = useMutation({

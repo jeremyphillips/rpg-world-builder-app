@@ -37,10 +37,10 @@ resolves to a path (`conversation_detail`, `campaign_detail`, etc.).
 ## Inbox page (`/notifications`)
 
 Uses the same compact preview list as the bell (wider column, bordered list,
-subtle dividers). Header matches bell chrome: title + mark-all, description copy,
-and an All / Unread segmented filter (client-side on loaded pages). Empty filtered
-state: **You're all caught up.** Pagination uses **Load more** — no cards or
-archive controls.
+subtle dividers). Page header holds title + mark-all; description and a compact
+vertical `FilterBar` (Unread only, Campaign, Type) drive URL-synced server filters.
+Optional active chips summarize modified filters. Empty filtered state: **You're all
+caught up.** Pagination uses **Load more** — no cards or archive controls.
 
 ## Polling rules
 

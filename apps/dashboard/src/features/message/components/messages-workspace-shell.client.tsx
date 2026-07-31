@@ -1,8 +1,11 @@
 'use client'
 
+import * as React from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useFilterUrlState } from '@/lib/filters'
 
 import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'
 import {
@@ -22,6 +25,7 @@ import { MessagesWorkspaceHeader } from './messages-workspace-header.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
 import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
 import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
+import { createMessagesFilterSchema } from '../lib/messages-filter-schema'
 import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
 import {
   isMessagesNewRoute,
@@ -35,6 +39,7 @@ export function MessagesWorkspaceShell() {
   const navigate = useNavigate()
   const { conversationId } = useParams<{ conversationId?: string }>()
   const isNewRoute = isMessagesNewRoute(location.pathname)
+  const { data: campaigns = [] } = useCampaigns()
 
   useStripLegacyMessagesMode()
 
@@ -44,7 +49,19 @@ export function MessagesWorkspaceShell() {
     conversationId,
   })
 
-  const campaignScope = useMessagesCampaignScopeEffects(routeState)
+  const campaignOptions = React.useMemo(
+    () => campaigns.map((campaign) => ({ value: campaign.id, label: campaign.identity.name })),
+    [campaigns],
+  )
+
+  const schema = React.useMemo(() => createMessagesFilterSchema(campaignOptions), [campaignOptions])
+
+  const { filters, setFilterValue } = useFilterUrlState({ schema })
+
+  const campaignScope = useMessagesCampaignScopeEffects({
+    ...routeState,
+    accessibleCampaignIds: campaigns.map((campaign) => campaign.id),
+  })
   const chromeVisibility = resolveMessagesWorkspaceChromeVisibility(routeState)
 
   const scopeChromeClasses = chromeVisibility.hideScopeChromeOnMobile
@@ -62,7 +79,7 @@ export function MessagesWorkspaceShell() {
     navigate(
       ROUTES.messages.new({
         from: routeState.routeConversationId,
-        campaignId: routeState.campaignId,
+        campaignId: filters.campaignId ?? routeState.campaignId,
       }),
     )
   }
@@ -71,10 +88,12 @@ export function MessagesWorkspaceShell() {
     navigate(
       resolveMessagesNewCancelTarget({
         fromConversationId: routeState.fromConversationId,
-        campaignId: routeState.campaignId,
+        campaignId: filters.campaignId ?? routeState.campaignId,
       }),
     )
   }
+
+  const activeCampaignId = filters.campaignId ?? routeState.campaignId
 
   return (
     <div className={messagesWorkspaceRootClasses}>
@@ -87,7 +106,9 @@ export function MessagesWorkspaceShell() {
 
         <div className={scopeChromeClasses}>
           <MessagesCampaignScopeChrome
-            scope={campaignScope.scope}
+            schema={schema}
+            filters={filters}
+            onFilterChange={setFilterValue}
             scopedCount={campaignScope.scopedCount}
             hiddenCount={campaignScope.hiddenCount}
             showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
@@ -99,11 +120,11 @@ export function MessagesWorkspaceShell() {
       <div className={messagesWorkspaceBodyClasses}>
         <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>
           {routeState.isNewRoute ? (
-            <MessagesRecipientPickerPane campaignId={routeState.campaignId} />
+            <MessagesRecipientPickerPane campaignId={activeCampaignId} />
           ) : (
             <MessagesDirectListPane
               activeConversationId={routeState.activeConversationId}
-              campaignId={routeState.campaignId}
+              campaignId={activeCampaignId}
               scope={campaignScope.scope}
               loadedCount={campaignScope.loadedCount}
               scopedCount={campaignScope.scopedCount}
@@ -112,7 +133,7 @@ export function MessagesWorkspaceShell() {
           )}
         </aside>
 
-        <MessagesWorkspaceRightPane {...routeState} />
+        <MessagesWorkspaceRightPane {...routeState} campaignId={activeCampaignId} />
       </div>
       <Outlet />
     </div>

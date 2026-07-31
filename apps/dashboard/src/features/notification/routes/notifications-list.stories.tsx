@@ -1,10 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { NotificationPopoverHeader, SegmentedControl, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageHeader } from '@/components/layout/page-header'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
+import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
+import { createNotificationInboxFilterSchema } from '../lib/notification-inbox-filter-schema'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
+
+const schema = createNotificationInboxFilterSchema([
+  { value: 'campaign-1', label: 'Stormwatch' },
+  { value: 'campaign-2', label: 'Harbor' },
+])
 
 const previewItems = [
   {
@@ -28,27 +36,21 @@ const previewItems = [
 function NotificationsListPagePreview() {
   return (
     <NarrowPage spacing="compact">
-      <div className="space-y-3 border-b border-border pb-4">
-        <NotificationPopoverHeader
-          title={NOTIFICATION_COPY.title}
-          actionLabel={NOTIFICATION_COPY.markAllAsRead}
-          onAction={() => undefined}
-        />
-        <Text as="p" variant="muted" className="px-3 text-sm">
-          {NOTIFICATION_COPY.inboxDescription}
-        </Text>
-        <div className="px-3">
-          <SegmentedControl
-            value="all"
-            onValueChange={() => undefined}
-            options={[
-              { value: 'all', label: NOTIFICATION_COPY.filterAll },
-              { value: 'unread', label: NOTIFICATION_COPY.filterUnread },
-            ]}
-            fullWidth
-          />
-        </div>
-      </div>
+      <PageHeader
+        heading={NOTIFICATION_COPY.title}
+        actions={
+          <Button type="button" variant="ghost" size="sm" density="compact">
+            {NOTIFICATION_COPY.markAllAsRead}
+          </Button>
+        }
+      />
+      <NotificationInboxHeader
+        schema={schema}
+        filters={{ unread: true, category: 'message' }}
+        onFilterChange={() => undefined}
+        onClearFilterField={() => undefined}
+        onResetFilters={() => undefined}
+      />
       <NotificationInboxBody
         isPending={false}
         isError={false}

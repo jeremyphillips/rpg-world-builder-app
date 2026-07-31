@@ -33,6 +33,26 @@ export type FilterChangeContext<TState extends Record<string, unknown>> = {
   previous: TState
 }
 
+export type ActiveFilterChip = {
+  fieldId: string
+  label: string
+  valueLabel: string
+}
+
+export type ActiveChipSummaryContext<TData, TState extends Record<string, unknown>> = {
+  field: FilterFieldDef<TData, TState>
+  value: unknown
+  state: TState
+  data?: readonly TData[]
+}
+
+export type FilterActiveChipConfig<TData, TState extends Record<string, unknown>> = {
+  /** When false, never emit a chip for this field (e.g. visible select value). */
+  include?: boolean
+  /** Override default chip resolution; return null to omit. */
+  resolveSummary?: (context: ActiveChipSummaryContext<TData, TState>) => ActiveFilterChip | null
+}
+
 export type FilterSanitizeContext<TData, TState extends Record<string, unknown>> = {
   data?: readonly TData[]
   state: TState
@@ -64,6 +84,9 @@ type BaseFilterFieldDef<
     parse?: (raw: string) => unknown
     serialize?: (value: unknown) => string | undefined
   }
+
+  /** Optional active-filter chip summary — chips are never mandatory. */
+  activeChip?: FilterActiveChipConfig<TData, TState>
 }
 
 export type SelectFilterLayout = 'stacked' | 'inline'

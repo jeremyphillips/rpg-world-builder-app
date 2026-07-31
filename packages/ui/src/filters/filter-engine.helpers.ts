@@ -128,6 +128,8 @@ type EqualsFilterConfig<
   isValueConstraining?: SelectFilterFieldDef<TData, TState, TId>['isValueConstraining']
   isValueEqual?: SelectFilterFieldDef<TData, TState, TId>['isValueEqual']
   url?: SelectFilterFieldDef<TData, TState, TId>['url']
+  activeChip?: SelectFilterFieldDef<TData, TState, TId>['activeChip']
+  matches?: SelectFilterFieldDef<TData, TState, TId>['matches']
 }
 
 export function createEqualsFilter<
@@ -154,7 +156,8 @@ export function createEqualsFilter<
     isValueConstraining: config.isValueConstraining,
     isValueEqual: config.isValueEqual,
     url: config.url,
-    matches: (row, value) => config.getValue(row) === value,
+    activeChip: config.activeChip,
+    matches: config.matches ?? ((row, value) => config.getValue(row) === value),
   } satisfies FilterFieldDef<TData, TState>
 }
 
@@ -172,6 +175,7 @@ type BooleanFilterConfig<
   disabled?: (state: TState) => boolean
   hiddenCount?: BooleanFilterFieldDef<TData, TState, TId>['hiddenCount']
   url?: BooleanFilterFieldDef<TData, TState, TId>['url']
+  matches?: BooleanFilterFieldDef<TData, TState, TId>['matches']
 }
 
 export function createBooleanFilter<
@@ -189,7 +193,7 @@ export function createBooleanFilter<
     disabled: config.disabled,
     hiddenCount: config.hiddenCount,
     url: config.url,
-    matches: (row, value) => config.getValue(row) === value,
+    matches: config.matches ?? ((row, value) => config.getValue(row) === value),
   } satisfies FilterFieldDef<TData, TState>
 }
 

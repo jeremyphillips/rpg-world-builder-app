@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
+import { createMessagesFilterSchema } from '../lib/messages-filter-schema'
+
 import {
   MessagesCampaignScopeChrome,
   MessagesOutOfScopePin,
 } from './messages-campaign-scope.client'
+
+const schema = createMessagesFilterSchema([{ value: 'camp-1', label: 'Ashes of Winter' }])!
 
 const meta = {
   title: 'Message/MessagesCampaignScope',
@@ -18,7 +22,9 @@ type Story = StoryObj<typeof MessagesCampaignScopeChrome>
 
 export const ScopedWithHidden: Story = {
   args: {
-    scope: { campaignId: 'camp-1', campaignName: 'Ashes of Winter' },
+    schema,
+    filters: { campaignId: 'camp-1' },
+    onFilterChange: fn(),
     scopedCount: 10,
     hiddenCount: 2,
     showInvalidScopeNotice: false,
@@ -28,7 +34,9 @@ export const ScopedWithHidden: Story = {
 
 export const ScopedWithoutHidden: Story = {
   args: {
-    scope: { campaignId: 'camp-1', campaignName: 'Ashes of Winter' },
+    schema,
+    filters: { campaignId: 'camp-1' },
+    onFilterChange: fn(),
     scopedCount: 4,
     hiddenCount: 0,
     showInvalidScopeNotice: false,
@@ -38,6 +46,9 @@ export const ScopedWithoutHidden: Story = {
 
 export const InvalidScopeNotice: Story = {
   args: {
+    schema,
+    filters: {},
+    onFilterChange: fn(),
     showInvalidScopeNotice: true,
     onDismissInvalidScopeNotice: fn(),
   },

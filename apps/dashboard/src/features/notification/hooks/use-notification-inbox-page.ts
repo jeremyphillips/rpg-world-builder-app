@@ -5,19 +5,52 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
+import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import {
+  INVALID_CAMPAIGN_SCOPE_COPY,
+  useFilterUrlState,
+  useInvalidCampaignScopeNotice,
+} from '@/lib/filters'
+
 import { activateNotification } from '../lib/activate-notification'
 import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import {
+  createNotificationInboxFilterSchema,
+  toNotificationListQueryFilters,
+} from '../lib/notification-inbox-filter-schema'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import { useNotificationActions } from './use-notification-actions'
 import { useNotificationInbox } from './use-notification-inbox'
 
 const NOTIFICATION_ACTION_FAILED_MESSAGE = 'Could not update notification.'
 
-export type NotificationInboxFilter = 'all' | 'unread'
-
 export function useNotificationInboxPage() {
   const navigate = useNavigate()
-  const [filter, setFilter] = React.useState<NotificationInboxFilter>('all')
+  const { data: campaigns = [] } = useCampaigns()
+
+  const campaignOptions = React.useMemo(
+    () => campaigns.map((campaign) => ({ value: campaign.id, label: campaign.identity.name })),
+    [campaigns],
+  )
+
+  const schema = React.useMemo(
+    () => createNotificationInboxFilterSchema(campaignOptions),
+    [campaignOptions],
+  )
+
+  const { filters, setFilterValue, resetFilters, clearFilterField } = useFilterUrlState({
+    schema,
+  })
+
+  const accessibleCampaignIds = React.useMemo(
+    () => campaigns.map((campaign) => campaign.id),
+    [campaigns],
+  )
+
+  const invalidScope = useInvalidCampaignScopeNotice(filters.campaignId, accessibleCampaignIds)
+
+  const listFilters = React.useMemo(() => toNotificationListQueryFilters(filters), [filters])
+
   const {
     data,
     isPending,
@@ -27,7 +60,7 @@ export function useNotificationInboxPage() {
     fetchNextPage,
     isFetchingNextPage,
     isFetchNextPageError,
-  } = useNotificationInbox()
+  } = useNotificationInbox(listFilters)
   const { markRead, markAllRead } = useNotificationActions()
 
   const items = React.useMemo(
@@ -35,13 +68,6 @@ export function useNotificationInboxPage() {
     [data?.pages],
   )
   const unreadCount = data?.pages[0]?.unreadCount ?? 0
-
-  const filteredItems = React.useMemo(() => {
-    if (filter === 'unread') {
-      return items.filter((item) => !item.readAt)
-    }
-    return items
-  }, [filter, items])
 
   const handleActivate = React.useCallback(
     (notification: Notification) => {
@@ -66,8 +92,8 @@ export function useNotificationInboxPage() {
   }, [markAllRead, refetch])
 
   const previewItems = React.useMemo(
-    () => mapNotificationsToPreviewItems(filteredItems, handleActivate),
-    [filteredItems, handleActivate],
+    () => mapNotificationsToPreviewItems(items, handleActivate),
+    [items, handleActivate],
   )
 
   const handleLoadMore = React.useCallback(() => {
@@ -77,15 +103,23 @@ export function useNotificationInboxPage() {
   }, [fetchNextPage])
 
   return {
-    filter,
-    setFilter,
+    schema,
+    filters,
+    setFilterValue,
+    resetFilters,
+    clearFilterField,
+    unreadCount,
+    invalidScopeNotice: {
+      show: invalidScope.showInvalidScopeNotice,
+      dismiss: invalidScope.dismissInvalidScopeNotice,
+      copy: INVALID_CAMPAIGN_SCOPE_COPY,
+    },
     isPending,
     isError,
     refetch,
     previewItems,
-    itemCount: filteredItems.length,
-    totalItemCount: items.length,
-    unreadCount,
+    itemCount: items.length,
+    unreadCountForLabel: unreadCount,
     handleMarkAllRead,
     markAllReadPending: markAllRead.isPending,
     hasNextPage: Boolean(hasNextPage),

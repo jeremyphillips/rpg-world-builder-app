@@ -42,6 +42,9 @@ export async function list(req: Request, res: Response): Promise<void> {
   const result = await listNotifications(recipientUserId, {
     limit: parsed.data.limit,
     cursor: parsed.data.cursor,
+    unread: parsed.data.unread,
+    category: parsed.data.category,
+    campaignId: parsed.data.campaignId,
   })
   res.status(200).json(result)
 }

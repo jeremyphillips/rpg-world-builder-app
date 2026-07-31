@@ -17,6 +17,7 @@ export {
   NOTIFICATION_INBOX_PAGE_LIMIT,
   NOTIFICATION_LIST_LIMIT,
   notificationsInboxQueryKey,
+  notificationsInboxRootQueryKey,
   notificationsListQueryKey,
   notificationsQueryKey,
 } from './lib/notification-query-keys'

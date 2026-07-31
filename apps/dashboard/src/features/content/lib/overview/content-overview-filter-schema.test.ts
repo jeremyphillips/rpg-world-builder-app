@@ -55,7 +55,7 @@ describe('content-overview-filter-schema', () => {
         hitDie: 10,
         campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
       },
-    ])
+    ] satisfies Row[])
 
     expect(filtered.map((row) => row.name)).toEqual(['Wizard'])
   })
