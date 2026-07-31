@@ -1,13 +1,13 @@
 'use client'
 
+import { MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   NotificationEmptyState,
   NotificationErrorState,
   NotificationLoadingState,
   NotificationPreviewList,
-  Text,
-  buttonVariants,
+  cn,
 } from '@rpg/ui'
 
 import { MESSAGES_ACTION_COPY } from '@/features/message'
@@ -15,26 +15,8 @@ import { MESSAGES_ACTION_COPY } from '@/features/message'
 import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
-type NotificationBellCampaignMessagesSectionProps = {
-  viewForCampaignHref: string
-}
-
-function NotificationBellCampaignMessagesSection({
-  viewForCampaignHref,
-}: NotificationBellCampaignMessagesSectionProps) {
-  const linkClassName = `${buttonVariants({ variant: 'ghost', size: 'sm' })} w-full justify-start`
-
-  return (
-    <div className="space-y-1">
-      <Text as="p" variant="caption" className="px-2 uppercase tracking-wide">
-        {NOTIFICATION_COPY.messagesSectionHeading}
-      </Text>
-      <Link to={viewForCampaignHref} className={linkClassName}>
-        {MESSAGES_ACTION_COPY.viewForCampaign}
-      </Link>
-    </div>
-  )
-}
+const notificationBellMenuRowLinkClassName =
+  'relative flex w-full select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0'
 
 type NotificationBellMenuFooterProps = {
   notificationsViewAllHref: string
@@ -45,16 +27,24 @@ function NotificationBellMenuFooter({
   notificationsViewAllHref,
   campaignMessagesHref,
 }: NotificationBellMenuFooterProps) {
-  const linkClassName = `${buttonVariants({ variant: 'ghost', size: 'sm' })} w-full justify-start`
-
   return (
-    <div className="space-y-2 border-t border-border p-2">
+    <div>
       {campaignMessagesHref ? (
-        <NotificationBellCampaignMessagesSection viewForCampaignHref={campaignMessagesHref} />
+        <div className="p-1">
+          <Link to={campaignMessagesHref} className={notificationBellMenuRowLinkClassName}>
+            <MessageSquare aria-hidden />
+            {MESSAGES_ACTION_COPY.viewForCampaign}
+          </Link>
+        </div>
       ) : null}
-      <Link to={notificationsViewAllHref} className={linkClassName}>
-        {NOTIFICATION_COPY.viewAllNotifications}
-      </Link>
+      <div className="border-t border-border bg-muted p-1">
+        <Link
+          to={notificationsViewAllHref}
+          className={cn(notificationBellMenuRowLinkClassName, 'font-body-emphasis')}
+        >
+          {NOTIFICATION_COPY.viewAllNotifications}
+        </Link>
+      </div>
     </div>
   )
 }

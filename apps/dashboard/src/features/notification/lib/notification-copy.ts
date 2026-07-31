@@ -4,7 +4,6 @@ export const NOTIFICATION_COPY = {
   viewAllNotifications: 'View all notifications',
   inboxDescription: 'Updates from campaigns, messages, and characters.',
   caughtUpTitle: "You're all caught up.",
-  messagesSectionHeading: 'Messages',
   loadMore: 'Load more',
   loadingMore: 'Loading more…',
   filterAll: 'All',

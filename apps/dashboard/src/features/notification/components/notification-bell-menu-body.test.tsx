@@ -81,7 +81,7 @@ describe('NotificationBellMenuBody', () => {
       { initialEntries: ['/campaigns/camp_1'] },
     )
 
-    expect(screen.getByText(NOTIFICATION_COPY.messagesSectionHeading)).toBeInTheDocument()
+    expect(screen.queryByText('Messages')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View messages for this campaign' })).toHaveAttribute(
       'href',
       '/messages?campaignId=camp_1',

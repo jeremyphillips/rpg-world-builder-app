@@ -25,11 +25,11 @@ surface tokens.
 
 ## Bell footer
 
-The bell footer always exposes **View all notifications**. When the current URL
-includes a campaign route param (`/campaigns/:campaignId/...`), a small contextual
-**Messages** section appears above the footer with **View messages for this
-campaign** only. Global message shortcuts are intentionally omitted — sidebar nav
-owns `/messages`.
+The bell footer always exposes **View all notifications** in a dedicated muted
+footer row. When the current URL includes a campaign route param
+(`/campaigns/:campaignId/...`), a contextual **View messages for this campaign**
+menu row (with message icon) appears above that footer. Global message shortcuts
+are intentionally omitted — sidebar nav owns `/messages`.
 
 Row click marks read (fire-and-forget) and navigates when the notification action
 resolves to a path (`conversation_detail`, `campaign_detail`, etc.).
