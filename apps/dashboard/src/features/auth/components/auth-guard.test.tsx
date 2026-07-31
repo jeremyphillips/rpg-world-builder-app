@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import type { ReactNode } from 'react'
 import { screen, waitFor } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
 
 vi.mock('../api/auth-client')
+vi.mock('@/features/realtime', () => ({
+  RealtimeProvider: ({ children }: { children: ReactNode }) => children,
+}))
 
 import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 import { renderWithProviders } from '@/test/render'

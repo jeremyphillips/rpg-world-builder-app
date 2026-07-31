@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Spinner, Text } from '@rpg/ui'
 
+import { RealtimeProvider } from '@/features/realtime'
 import { LOGIN_PATH } from '../api/auth-client'
 import { useSession } from '../hooks/use-session'
 
@@ -40,5 +41,9 @@ export function AuthGuard() {
     )
   }
 
-  return <Outlet />
+  return (
+    <RealtimeProvider userId={user.id}>
+      <Outlet />
+    </RealtimeProvider>
+  )
 }

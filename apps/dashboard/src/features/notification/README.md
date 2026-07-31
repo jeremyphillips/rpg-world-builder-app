@@ -1,18 +1,19 @@
 # notification (dashboard feature)
 
-In-app notifications surfaced in the topbar bell menu. Phase 1 uses TanStack Query
-polling; Socket.IO can update the same cache later without changing feature wiring.
+In-app notifications surfaced in the topbar bell menu. TanStack Query polling plus
+Socket.IO cache patches keep the bell fresh; polling remains a fallback while connected.
 
 ## Layout
 
-| Path                                    | Responsibility                                  |
-| --------------------------------------- | ----------------------------------------------- |
-| `api/notifications.ts`                  | Same-origin notification API client             |
-| `hooks/use-notifications.ts`            | Single list query (`unreadCount` included)      |
-| `hooks/use-notification-actions.ts`     | Mark read / all read / seen mutations           |
-| `components/notification-bell-menu.tsx` | Wires `@rpg/ui` primitives + navigation         |
-| `lib/notification-query-keys.ts`        | Query keys shared with future realtime provider |
-| `lib/resolve-notification-action.ts`    | Maps persisted action kinds to app paths        |
+| Path                                    | Responsibility                               |
+| --------------------------------------- | -------------------------------------------- |
+| `api/notifications.ts`                  | Same-origin notification API client          |
+| `hooks/use-notifications.ts`            | Bell list query (`unreadCount` included)     |
+| `hooks/use-notification-actions.ts`     | Mark read / all read / seen mutations        |
+| `components/notification-bell-menu.tsx` | Wires `@rpg/ui` primitives + navigation      |
+| `lib/notification-query-keys.ts`        | Bell query keys (separate from future inbox) |
+| `lib/notification-cache.ts`             | Bell cache helpers + version guards          |
+| `lib/resolve-notification-action.ts`    | Maps persisted action kinds to app paths     |
 
 Presentation primitives (`NotificationBell`, popover, preview list/item, empty/loading)
 live in `@rpg/ui` and stay domain-agnostic.
@@ -20,7 +21,9 @@ live in `@rpg/ui` and stay domain-agnostic.
 ## Polling rules
 
 - Query runs only when a session user exists.
-- `refetchInterval` is active while `document.visibilityState === 'visible'`.
+- `refetchInterval` stays enabled while `document.visibilityState === 'visible'`.
+- Fast poll (30s) while the realtime socket is disconnected or handshaking; slow poll
+  (90s) while connected.
 - `refetchOnWindowFocus: true` recovers after backgrounding.
 - Do **not** add a second unread-count poll — the list response already includes it.
 

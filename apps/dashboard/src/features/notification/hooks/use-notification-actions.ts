@@ -6,8 +6,11 @@ import {
   markNotificationRead,
   markNotificationsSeen,
 } from '../api/notifications'
-import { notificationsListQueryKey } from '../lib/notification-query-keys'
-import { NOTIFICATION_LIST_LIMIT } from './use-notifications'
+import {
+  applyNotificationMarkAllRead,
+  applyNotificationMarkedRead,
+} from '../lib/notification-cache'
+import { NOTIFICATION_LIST_LIMIT, notificationsListQueryKey } from '../lib/notification-query-keys'
 
 function updateListCache(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -28,31 +31,17 @@ export function useNotificationActions() {
   const markRead = useMutation({
     mutationFn: markNotificationRead,
     onSuccess: ({ notification }) => {
-      updateListCache(queryClient, (current) => {
-        const previous = current.items.find((item) => item.id === notification.id)
-        const wasUnread = Boolean(previous && !previous.readAt && notification.readAt)
-
-        return {
-          ...current,
-          unreadCount: wasUnread ? Math.max(0, current.unreadCount - 1) : current.unreadCount,
-          items: current.items.map((item) => (item.id === notification.id ? notification : item)),
-        }
-      })
+      updateListCache(queryClient, (current) => applyNotificationMarkedRead(current, notification)!)
     },
   })
 
   const markAllRead = useMutation({
     mutationFn: markAllNotificationsRead,
     onSuccess: () => {
-      updateListCache(queryClient, (current) => ({
-        ...current,
-        unreadCount: 0,
-        items: current.items.map((item) => ({
-          ...item,
-          readAt: item.readAt ?? new Date().toISOString(),
-          seenAt: item.seenAt ?? new Date().toISOString(),
-        })),
-      }))
+      updateListCache(
+        queryClient,
+        (current) => applyNotificationMarkAllRead(current, { unreadCount: 0 })!,
+      )
     },
   })
 
