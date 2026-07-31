@@ -1,6 +1,7 @@
 import { SidebarTrigger, cn } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
+import { NotificationBellMenu } from '@/features/notification'
 
 import { appShellHorizontalPaddingClasses } from './app-shell.variants'
 import { TopbarTitleSlot } from './topbar-title-slot'
@@ -32,6 +33,7 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        {user ? <NotificationBellMenu /> : null}
         {user ? <TopbarUserMenu user={user} /> : null}
       </div>
     </header>

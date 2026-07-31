@@ -44,7 +44,7 @@ export async function completeCampaignOnboardingWithCharacter(input: {
       input.characterSource.kind === 'new'
         ? { kind: 'new', characterInput: input.characterSource.character }
         : { kind: 'existing', characterId: input.characterSource.characterId },
-    invitePolicy: { linkedInviteId: linkedInvite?.id },
+    invitePolicy: { linkedInviteId: linkedInvite?.id, completedByUserId: input.userId },
   })
 }
 

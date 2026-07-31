@@ -2,6 +2,7 @@ import type { CampaignInvite, CampaignInvitePublicResolution } from '@rpg/contra
 
 import { HttpError } from '../../lib/http-error'
 import { createOrConfirmPlayerMembership } from '../campaign'
+import { publishCampaignInviteAcceptedNotification } from '../notification'
 import { maskInvitedEmail, normalizeInviteEmail } from './campaign-invite.lib'
 import { markInviteAccepted } from './campaign-invite.repository'
 import {
@@ -101,6 +102,13 @@ export async function acceptCampaignInvite(
   if (!accepted) {
     throw new HttpError(500, 'internal_error', 'Failed to accept invitation.')
   }
+
+  void publishCampaignInviteAcceptedNotification({
+    invite: accepted,
+    acceptedByUserId: input.userId,
+  }).catch((error) => {
+    console.error('Failed to publish campaign invite accepted notification.', error)
+  })
 
   return { inviteId: accepted.id, campaignId: accepted.campaignId }
 }

@@ -5,6 +5,7 @@ import { areMongoTransactionsEnabled, runInTransaction } from '../../../../lib/m
 import { CampaignMembershipModel } from '../../campaign-membership.model'
 import { warnCampaignOnboardingInviteAuditFailed } from '../../campaign-onboarding-observability.lib'
 import { markInviteCompleted } from '../../../campaign-invite'
+import { publishCampaignInviteCompletedNotification } from '../../../notification'
 import { createPcRecord, deletePcForUser } from '../../../character'
 import { assignControlledPcToCampaignMember } from '../assign-controlled-pc.service'
 import {
@@ -15,6 +16,19 @@ import type { CharacterAssignmentWriteReceipt } from './character-assignment-wri
 
 export type CampaignCharacterCompletionInvitePolicy = {
   linkedInviteId?: string | null
+  completedByUserId?: string
+}
+
+async function notifyInviteCompletedBestEffort(input: {
+  inviteId: string
+  completedByUserId: string
+  characterId: string
+}): Promise<void> {
+  try {
+    await publishCampaignInviteCompletedNotification(input)
+  } catch (error) {
+    console.error('Failed to publish campaign invite completed notification.', error)
+  }
 }
 
 export async function compensateCharacterCompletionFromReceipt({
@@ -78,6 +92,15 @@ async function executeCharacterCompletionWrites({
     warnCampaignOnboardingInviteAuditFailed({
       campaignId,
       linkedInviteId: invitePolicy.linkedInviteId,
+      characterId,
+    })
+    return
+  }
+
+  if (invitePolicy.completedByUserId) {
+    void notifyInviteCompletedBestEffort({
+      inviteId: invitePolicy.linkedInviteId,
+      completedByUserId: invitePolicy.completedByUserId,
       characterId,
     })
   }
