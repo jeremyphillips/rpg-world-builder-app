@@ -1,22 +1,60 @@
 'use client'
 
+import { MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   NotificationEmptyState,
   NotificationErrorState,
   NotificationLoadingState,
   NotificationPreviewList,
-  buttonVariants,
+  cn,
+  notificationMenuFooterLinkVariants,
+  notificationMenuRowLinkVariants,
 } from '@rpg/ui'
 
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
+import { MESSAGES_ACTION_COPY } from '@/features/message'
+
+import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
+
+type NotificationBellMenuFooterProps = {
+  notificationsViewAllHref: string
+  campaignMessagesHref?: string
+}
+
+function NotificationBellMenuFooter({
+  notificationsViewAllHref,
+  campaignMessagesHref,
+}: NotificationBellMenuFooterProps) {
+  return (
+    <div>
+      {campaignMessagesHref ? (
+        <div className="p-1">
+          <Link to={campaignMessagesHref} className={notificationMenuRowLinkVariants()}>
+            <MessageSquare aria-hidden />
+            {MESSAGES_ACTION_COPY.viewForCampaign}
+          </Link>
+        </div>
+      ) : null}
+      <div className="border-t border-border bg-muted p-1">
+        <Link
+          to={notificationsViewAllHref}
+          className={cn(notificationMenuFooterLinkVariants({ emphasis: 'strong' }))}
+        >
+          {NOTIFICATION_COPY.viewAllNotifications}
+        </Link>
+      </div>
+    </div>
+  )
+}
 
 type NotificationBellMenuBodyProps = {
   isLoading: boolean
   isError: boolean
   itemCount: number
   previewItems: ReturnType<typeof mapNotificationsToPreviewItems>
-  viewAllHref?: string
+  notificationsViewAllHref: string
+  campaignMessagesHref?: string
   onRetry?: () => void
 }
 
@@ -25,24 +63,34 @@ export function NotificationBellMenuBody({
   isError,
   itemCount,
   previewItems,
-  viewAllHref,
+  notificationsViewAllHref,
+  campaignMessagesHref,
   onRetry,
 }: NotificationBellMenuBodyProps) {
-  if (isLoading) return <NotificationLoadingState />
-  if (isError) return <NotificationErrorState onRetry={onRetry} />
-  if (itemCount === 0) return <NotificationEmptyState />
-  return (
-    <NotificationPreviewList
-      items={previewItems}
-      footerSlot={
-        viewAllHref ? (
-          <div className="border-t border-border p-2">
-            <Link to={viewAllHref} className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
-              View all
-            </Link>
-          </div>
-        ) : undefined
-      }
+  const footer = (
+    <NotificationBellMenuFooter
+      notificationsViewAllHref={notificationsViewAllHref}
+      campaignMessagesHref={campaignMessagesHref}
     />
   )
+
+  if (isLoading) return <NotificationLoadingState />
+  if (isError) {
+    return (
+      <>
+        <NotificationErrorState onRetry={onRetry} />
+        {footer}
+      </>
+    )
+  }
+  if (itemCount === 0) {
+    return (
+      <>
+        <NotificationEmptyState title={NOTIFICATION_COPY.caughtUpTitle} description="" />
+        {footer}
+      </>
+    )
+  }
+
+  return <NotificationPreviewList items={previewItems} footerSlot={footer} />
 }

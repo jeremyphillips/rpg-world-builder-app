@@ -6,8 +6,20 @@ export const FILTER_SELECT_ALL_VALUE = '__all__'
 
 export const FILTER_DENSITY_DEFAULT: FilterDensity = 'compact'
 
+export type FilterBarOrientation = 'horizontal' | 'vertical'
+
 /** Primary filter bar row — single flex row; `min-w-0 w-full` for grid column shrink. */
-export const filterBarVariants = cva('flex min-w-0 w-full flex-wrap items-end gap-3')
+export const filterBarVariants = cva('flex min-w-0 w-full', {
+  variants: {
+    orientation: {
+      horizontal: 'flex-wrap items-end gap-3',
+      vertical: 'flex-col items-start gap-2',
+    },
+  },
+  defaultVariants: {
+    orientation: 'horizontal',
+  },
+})
 
 /** @deprecated Merged into {@link filterBarVariants} — kept for callers that still reference it. */
 export const filterBarFieldGroupVariants = cva('contents')

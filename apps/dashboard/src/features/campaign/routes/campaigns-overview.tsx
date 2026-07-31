@@ -1,11 +1,9 @@
-import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
-
 import { IndexPageIntro } from '@/components/layout/index-page-intro'
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { ROUTES } from '@/app/routes'
-import { useCampaigns, useOpenCampaign } from '@/features/campaign'
+import { useCampaigns } from '@/features/campaign'
 
+import { NewCampaignLink } from '../components/new-campaign-link.client'
+import { hasCampaignRows } from '../lib/campaign-list-view.lib'
 import {
   resolveCampaignsOverviewDescription,
   resolveCampaignsOverviewViewState,
@@ -16,15 +14,13 @@ import { CampaignsOverviewBody } from './campaigns-overview-body'
 /** Global campaigns index — list, select, and resume campaigns. */
 export function CampaignsOverview() {
   const { data: campaigns, isPending, isError } = useCampaigns()
-  const openCampaign = useOpenCampaign()
 
   const viewState = resolveCampaignsOverviewViewState({ isPending, isError, campaigns })
   const description = resolveCampaignsOverviewDescription(viewState, CAMPAIGNS_OVERVIEW_COPY)
+  const campaignRowsPresent = hasCampaignRows(campaigns)
 
   const newCampaignAction = (
-    <Link to={ROUTES.campaign.create} className={buttonVariants({ variant: 'default' })}>
-      {CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel}
-    </Link>
+    <NewCampaignLink variant={campaignRowsPresent ? 'outline' : 'default'} />
   )
 
   return (
@@ -40,7 +36,6 @@ export function CampaignsOverview() {
         viewState={viewState}
         campaigns={campaigns}
         newCampaignAction={newCampaignAction}
-        onSelect={openCampaign}
       />
     </NarrowPage>
   )

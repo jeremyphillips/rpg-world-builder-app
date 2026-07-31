@@ -1,5 +1,4 @@
 export const DASHBOARD_HOME_COPY = {
-  subtitle: 'Start by creating a campaign or building a character of your own.',
   invitationHeading: 'Have a campaign invitation?',
   invitationBody: 'Open the invitation link from your email to join.',
   starterCards: {

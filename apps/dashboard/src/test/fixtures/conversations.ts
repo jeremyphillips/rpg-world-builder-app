@@ -14,6 +14,7 @@ export function makeConversation(overrides: Partial<Conversation> = {}): Convers
       preview: 'Hello there',
       createdAt: now,
     },
+    sharedCampaigns: [],
     unreadCount: 2,
     createdAt: now,
     updatedAt: now,

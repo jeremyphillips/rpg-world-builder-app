@@ -6,6 +6,7 @@ import {
   campaignInviteReceivedPayloadSchema,
   messageDirectReceivedPayloadSchema,
 } from './notification-payloads'
+import { notificationCategorySchema } from './notification-classification'
 import { notificationTypeSchema } from './notification-types'
 
 export const NOTIFICATION_ACTION_KINDS = ['campaign_detail', 'conversation_detail'] as const
@@ -22,6 +23,7 @@ export const notificationActionSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('conversation_detail'),
     conversationId: z.string(),
+    campaignId: z.string().optional(),
   }),
 ])
 
@@ -79,6 +81,12 @@ export type Notification = z.infer<typeof notificationSchema>
 export const notificationListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
   cursor: z.string().trim().optional(),
+  unread: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : value === 'true')),
+  category: notificationCategorySchema.optional(),
+  campaignId: z.string().trim().optional(),
 })
 
 export type NotificationListQuery = z.infer<typeof notificationListQuerySchema>

@@ -25,6 +25,18 @@ describe('resolveNotificationActionPath', () => {
     ).toBe(ROUTES.messages.detail('conversation-123'))
   })
 
+  it('preserves optional campaign scope on conversation deep links', () => {
+    expect(
+      resolveNotificationActionPath(
+        {
+          kind: 'conversation_detail',
+          conversationId: 'conversation-123',
+        },
+        'campaign-456',
+      ),
+    ).toBe(ROUTES.messages.detail('conversation-123', { campaignId: 'campaign-456' }))
+  })
+
   it('returns undefined when no action exists', () => {
     expect(resolveNotificationActionPath(undefined)).toBeUndefined()
   })

@@ -397,7 +397,9 @@ Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the 
 Import from `@rpg/ui/filters`:
 
 - `useFilterState` — local filter state with `setValue` and `reset` (clear filters)
-- `FilterBar` — `placement: 'primary'` fields and optional **Clear filters** (advanced toggle owned by `DataTableFilterRegion`)
+- `FilterBar` — `placement: 'primary'` fields and optional **Clear filters** (advanced toggle owned by `DataTableFilterRegion`); `orientation: 'vertical'` stacks compact field rows without full-width controls by default
+- `ActiveFilterChips` — data-only chip summaries with central `onClear(fieldId)` / optional `onClearAll` (shown when 2+ chips)
+- `resolveActiveFilterChips(schema, state)` — derives chips from modified fields; boolean chips use natural copy (`Unread only`, not `Unread only: Yes`)
 - `FilterAdvancedPanel` — configurable header for `placement: 'advanced'` fields; overview shells pass field content only — `DataTableFilterRegion` owns trigger, panel id, reset, and collapse
 - `FilterInlineControl` — shared inline boolean shell (checkbox/switch) using outline row chrome to match adjacent selects and More filters
 - `DataTableFilterRegion` — primary field row, full-height **More filters** trigger rail, and region-owned additional-filters panel
@@ -422,6 +424,29 @@ or behavior.
   Leaves receive resolved `presentation` props — they do not call `useFilterChrome()`.
 - `resolveFilterFieldWidthClasses` is separate from density — width is layout
   allocation only.
+
+### Active chips in feature pages
+
+Dashboard list surfaces compose `PrimaryFilterPanel` from
+`apps/dashboard/src/lib/data-table/primary-filter-bar-region.client.tsx`:
+
+```tsx
+<PrimaryFilterPanel
+  filterSchema={schema}
+  filterState={filters}
+  onValueChange={setFilterValue}
+  clearFilterField={clearFilterField}
+  resetFilters={resetFilters}
+  orientation="vertical" // optional; default horizontal (inline) for notifications
+/>
+```
+
+The panel wraps `DataTableFilterRegion` + `FilterBar` and mounts
+`ActiveFilterChips` below when filters are modified. Chip remove calls
+`clearFilterField(fieldId)`; **Clear all** (shown when 2+ chips) calls
+`resetFilters`. Omit `FilterBar` `onReset` when chips are shown — the chip row
+owns clear semantics. Campaign scope fields may set `activeChip: { include: false }`
+when the select already communicates scope (Messages workspace).
 
 ### Shared field-row SSOT
 

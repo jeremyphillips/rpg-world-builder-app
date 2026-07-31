@@ -13,8 +13,7 @@ import {
 import {
   applyConversationEnvelopeToList,
   applyConversationEnvelopeToThread,
-  CONVERSATION_LIST_LIMIT,
-  conversationsListQueryKey,
+  conversationsQueryKey,
   conversationMessagesQueryKey,
   type ConversationActivityPayload,
 } from '@/features/message'
@@ -22,7 +21,7 @@ import {
   applyNotificationRead,
   applyNotificationUpserted,
   NOTIFICATION_LIST_LIMIT,
-  notificationsInboxQueryKey,
+  notificationsInboxRootQueryKey,
   notificationsListQueryKey,
   type NotificationReadPayload,
   type NotificationUpsertedPayload,
@@ -51,8 +50,10 @@ export function RealtimeProvider({ userId, children }: RealtimeProviderProps) {
     })
 
     const invalidateInboxIfCached = () => {
-      if (queryClient.getQueryData(notificationsInboxQueryKey) === undefined) return
-      void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
+      if (queryClient.getQueriesData({ queryKey: notificationsInboxRootQueryKey }).length === 0) {
+        return
+      }
+      void queryClient.invalidateQueries({ queryKey: notificationsInboxRootQueryKey })
     }
 
     const handleConnect = () => {
@@ -61,7 +62,7 @@ export function RealtimeProvider({ userId, children }: RealtimeProviderProps) {
         queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
       })
       void queryClient.invalidateQueries({
-        queryKey: conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
+        queryKey: conversationsQueryKey,
       })
 
       const activeConversationId = activeConversationIdRef.current
@@ -95,8 +96,8 @@ export function RealtimeProvider({ userId, children }: RealtimeProviderProps) {
     }
 
     const handleConversationActivity = (payload: ConversationActivityPayload) => {
-      queryClient.setQueryData<ConversationListResponse>(
-        conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
+      queryClient.setQueriesData<ConversationListResponse>(
+        { queryKey: conversationsQueryKey },
         (current) => applyConversationEnvelopeToList(current, payload),
       )
 

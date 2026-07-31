@@ -12,14 +12,12 @@ type CampaignsOverviewBodyProps = {
   viewState: CampaignsOverviewViewState
   campaigns: CampaignListItem[] | undefined
   newCampaignAction: ReactNode
-  onSelect: (campaignId: string) => void
 }
 
 export function CampaignsOverviewBody({
   viewState,
   campaigns,
   newCampaignAction,
-  onSelect,
 }: CampaignsOverviewBodyProps) {
   switch (viewState) {
     case 'pending':
@@ -39,6 +37,6 @@ export function CampaignsOverviewBody({
         />
       )
     case 'populated':
-      return <CampaignPicker campaigns={campaigns!} onSelect={onSelect} />
+      return <CampaignPicker campaigns={campaigns!} />
   }
 }

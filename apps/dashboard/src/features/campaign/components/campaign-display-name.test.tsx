@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CampaignDisplayName } from './campaign-display-name'
+import { CampaignDisplayNameList } from './campaign-display-name-list.client'
 
 describe('CampaignDisplayName', () => {
   it('renders a linked topbar identity', () => {
@@ -51,5 +52,31 @@ describe('CampaignDisplayName', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+})
+
+describe('CampaignDisplayNameList', () => {
+  it('renders one icon with comma-separated linked campaign names', () => {
+    render(
+      <MemoryRouter>
+        <CampaignDisplayNameList
+          surface="inlineMuted"
+          displays={[
+            { id: 'camp_1', name: 'Curse of Strahd', imageUrl: null },
+            { id: 'camp_2', name: 'Lost Mine', imageUrl: null },
+          ]}
+          getHref={(display) => `/campaigns/${display.id}`}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Curse of Strahd' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_1',
+    )
+    expect(screen.getByRole('link', { name: 'Lost Mine' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_2',
+    )
   })
 })

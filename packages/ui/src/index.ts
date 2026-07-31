@@ -396,6 +396,10 @@ export {
   type NotificationErrorStateProps,
 } from './components/ui/notification-error-state'
 export {
+  notificationMenuFooterLinkVariants,
+  notificationMenuRowLinkVariants,
+} from './components/ui/notification-menu-row.variants'
+export {
   ButtonDropdown,
   type ButtonDropdownGroup,
   type ButtonDropdownItem,
@@ -625,6 +629,8 @@ export {
 export { ChipGroup, type ChipGroupProps } from './components/ui/chip-group.client'
 export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
+export { StatusDot, type StatusDotProps } from './components/ui/status-dot'
+export { statusDotVariants, type StatusDotVariantProps } from './components/ui/status-dot.variants'
 export {
   Collapsible,
   CollapsibleTrigger,

@@ -1,56 +1,13 @@
-import type { CampaignRole } from '@rpg/contracts'
-import { resolveCampaignViewerParticipation } from '@rpg/contracts'
+import type { DirectConversationRecipientsResponse } from '@rpg/contracts'
 
-import { findPcOwnerIdsByCharacterIds } from '../character'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { listOpenParticipationsForCampaign } from '../campaign/participation/campaign-character-participation.repository'
-import { resolveMemberOpenParticipatingCharacterIds } from '../campaign/participation/resolve-member-open-participating-character-ids.lib'
 import { findUsersByIds } from '../user'
 import {
-  isEligibleDirectMessagePeerInSharedCampaign,
-  type DirectMessageMembershipContext,
-} from './direct-message-peer-eligibility.lib'
-
-async function loadMembershipContextForCampaign(
-  campaignId: string,
-  userId: string,
-): Promise<DirectMessageMembershipContext | null> {
-  const membership = await CampaignMembershipModel.findOne({ campaignId, userId })
-    .select('userId campaignRole controlledCharacterIds')
-    .lean<{
-      userId: string
-      campaignRole: string
-      controlledCharacterIds?: string[]
-    } | null>()
-
-  if (!membership) return null
-
-  const role = membership.campaignRole as CampaignRole
-  const controlledCharacterIds = membership.controlledCharacterIds ?? []
-  const openParticipations = await listOpenParticipationsForCampaign(campaignId)
-  const openParticipationCharacterIds = openParticipations.map(
-    (participation) => participation.characterId,
-  )
-  const characterOwnerById = await findPcOwnerIdsByCharacterIds([
-    ...new Set([...openParticipationCharacterIds, ...controlledCharacterIds]),
-  ])
-  const openParticipatingCharacterIds = resolveMemberOpenParticipatingCharacterIds({
-    userId,
-    controlledCharacterIds,
-    openParticipationCharacterIds,
-    characterOwnerById,
-  })
-
-  return {
-    userId,
-    role,
-    participationState: resolveCampaignViewerParticipation({
-      role,
-      controlledCharacterIds,
-      openParticipatingCharacterIds,
-    }),
-  }
-}
+  isEligibleDirectMessagePeerInCampaignBundle,
+  loadDirectMessageCampaignBundles,
+} from './direct-message-campaign-context.lib'
+import { filterBundlesForCampaignScope } from './conversation-campaign-scope.lib'
+import { ConversationModel } from './conversation.model'
+import { buildDirectConversationParticipantKey } from './conversation-participant-key.lib'
 
 export async function isEligibleDirectMessageRecipient(
   callerUserId: string,
@@ -58,107 +15,93 @@ export async function isEligibleDirectMessageRecipient(
 ): Promise<boolean> {
   if (callerUserId === recipientUserId) return false
 
-  const callerMemberships = await CampaignMembershipModel.find({ userId: callerUserId })
-    .select('campaignId')
-    .lean<{ campaignId: string }[]>()
-
-  if (callerMemberships.length === 0) return false
-
-  const sharedCampaignIds = callerMemberships.map((membership) => membership.campaignId)
-
-  for (const campaignId of sharedCampaignIds) {
-    const [callerContext, candidateContext] = await Promise.all([
-      loadMembershipContextForCampaign(campaignId, callerUserId),
-      loadMembershipContextForCampaign(campaignId, recipientUserId),
-    ])
-
-    if (!callerContext || !candidateContext) continue
-    if (isEligibleDirectMessagePeerInSharedCampaign(callerContext, candidateContext)) {
-      return true
-    }
-  }
-
-  return false
+  const bundles = await loadDirectMessageCampaignBundles(callerUserId)
+  return bundles.some((bundle) =>
+    isEligibleDirectMessagePeerInCampaignBundle(bundle, recipientUserId),
+  )
 }
 
 export async function listDirectMessageRecipients(
   callerUserId: string,
-): Promise<Array<{ userId: string; displayName: string }>> {
-  const callerMemberships = await CampaignMembershipModel.find({ userId: callerUserId })
-    .select('campaignId')
-    .lean<{ campaignId: string }[]>()
+  options: { campaignId?: string } = {},
+): Promise<DirectConversationRecipientsResponse> {
+  const loadedBundles = await loadDirectMessageCampaignBundles(callerUserId)
+  const { bundles, scope, scopeInvalid } = filterBundlesForCampaignScope(
+    loadedBundles,
+    options.campaignId,
+  )
 
-  if (callerMemberships.length === 0) return []
-
-  const recipientsByUserId = new Map<string, { userId: string; displayName: string }>()
-
-  for (const { campaignId } of callerMemberships) {
-    const memberships = await CampaignMembershipModel.find({ campaignId })
-      .select('userId campaignRole controlledCharacterIds')
-      .lean<
-        {
-          userId: string
-          campaignRole: string
-          controlledCharacterIds?: string[]
-        }[]
-      >()
-
-    const callerMembership = memberships.find((membership) => membership.userId === callerUserId)
-    if (!callerMembership) continue
-
-    const callerContext = await loadMembershipContextForCampaign(campaignId, callerUserId)
-    if (!callerContext) continue
-
-    const openParticipations = await listOpenParticipationsForCampaign(campaignId)
-    const openParticipationCharacterIds = openParticipations.map(
-      (participation) => participation.characterId,
-    )
-    const relevantCharacterIds = [
-      ...new Set([
-        ...openParticipationCharacterIds,
-        ...memberships.flatMap((membership) => membership.controlledCharacterIds ?? []),
-      ]),
-    ]
-    const characterOwnerById = await findPcOwnerIdsByCharacterIds(relevantCharacterIds)
-
-    for (const membership of memberships) {
-      if (membership.userId === callerUserId) continue
-
-      const role = membership.campaignRole as CampaignRole
-      const controlledCharacterIds = membership.controlledCharacterIds ?? []
-      const openParticipatingCharacterIds = resolveMemberOpenParticipatingCharacterIds({
-        userId: membership.userId,
-        controlledCharacterIds,
-        openParticipationCharacterIds,
-        characterOwnerById,
-      })
-      const candidateContext: DirectMessageMembershipContext = {
-        userId: membership.userId,
-        role,
-        participationState: resolveCampaignViewerParticipation({
-          role,
-          controlledCharacterIds,
-          openParticipatingCharacterIds,
-        }),
-      }
-
-      if (!isEligibleDirectMessagePeerInSharedCampaign(callerContext, candidateContext)) continue
-      recipientsByUserId.set(membership.userId, {
-        userId: membership.userId,
-        displayName: '',
-      })
+  if (scopeInvalid) {
+    return {
+      recipientsByUserId: {},
+      campaigns: [],
+      existingDirectByUserId: {},
+      scopeInvalid: true,
     }
   }
 
-  if (recipientsByUserId.size === 0) return []
+  const recipientUserIds = new Set<string>()
+  const campaigns = bundles
+    .map((bundle) => {
+      const userIds = [...bundle.membershipContextsByUserId.keys()].filter((userId) => {
+        if (userId === callerUserId) return false
+        if (!isEligibleDirectMessagePeerInCampaignBundle(bundle, userId)) return false
+        recipientUserIds.add(userId)
+        return true
+      })
 
-  const users = await findUsersByIds([...recipientsByUserId.keys()])
+      return {
+        campaignId: bundle.campaignId,
+        campaignName: bundle.campaignName,
+        userIds: userIds.sort((left, right) => left.localeCompare(right)),
+      }
+    })
+    .filter((campaign) => campaign.userIds.length > 0)
+    .sort((left, right) => left.campaignName.localeCompare(right.campaignName))
+
+  if (recipientUserIds.size === 0) {
+    return {
+      recipientsByUserId: {},
+      campaigns: [],
+      existingDirectByUserId: {},
+      scope: scope ?? undefined,
+    }
+  }
+
+  const users = await findUsersByIds([...recipientUserIds])
   const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
 
-  return [...recipientsByUserId.values()]
-    .map((recipient) => ({
-      userId: recipient.userId,
-      displayName: displayNameByUserId.get(recipient.userId) ?? 'Unknown user',
-    }))
-    .sort((left, right) => left.displayName.localeCompare(right.displayName))
+  const recipientsByUserId = Object.fromEntries(
+    [...recipientUserIds].map((userId) => [
+      userId,
+      {
+        userId,
+        displayName: displayNameByUserId.get(userId) ?? 'Unknown user',
+      },
+    ]),
+  )
+
+  const participantKeys = [...recipientUserIds].map((recipientUserId) =>
+    buildDirectConversationParticipantKey(callerUserId, recipientUserId),
+  )
+  const existingConversations = await ConversationModel.find({
+    participantKey: { $in: participantKeys },
+    latestMessage: { $ne: null },
+  })
+    .select('_id participantUserIds')
+    .lean<{ _id: unknown; participantUserIds: string[] }[]>()
+
+  const existingDirectByUserId = Object.fromEntries(
+    existingConversations.flatMap((conversation) => {
+      const peerUserId = conversation.participantUserIds.find((userId) => userId !== callerUserId)
+      return peerUserId ? [[peerUserId, String(conversation._id)]] : []
+    }),
+  )
+
+  return {
+    recipientsByUserId,
+    campaigns,
+    existingDirectByUserId,
+    scope: scope ?? undefined,
+  }
 }

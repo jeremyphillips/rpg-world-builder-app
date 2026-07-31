@@ -68,10 +68,10 @@ const SelectTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         grouped
-          ? 'inline-flex items-center justify-between gap-1.5 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1'
+          ? 'inline-flex items-center justify-between gap-1.5 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0'
           : cn(
               fieldControlVariants({ size }),
-              'items-center justify-between gap-2 data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1',
+              'items-center justify-between gap-2 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
             ),
         className,
       )}

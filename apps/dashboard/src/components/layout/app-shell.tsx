@@ -32,7 +32,7 @@ export function AppShell() {
     <BreadcrumbLabelProvider>
       <div className="flex min-h-dvh bg-background">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex min-w-0 flex-1 flex-col bg-background">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
           <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
           <AppShellBreadcrumbRail />
           <main className={appShellMainClasses}>

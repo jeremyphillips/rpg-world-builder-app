@@ -1,6 +1,7 @@
 import { isValidObjectId, Types } from 'mongoose'
 
-import type { NotificationAction, NotificationType } from '@rpg/contracts'
+import type { NotificationAction, NotificationCategory, NotificationType } from '@rpg/contracts'
+import { getNotificationTypesForCategory } from '@rpg/contracts'
 
 import { NotificationModel } from './notification.model'
 import { toNotification } from './to-notification'
@@ -112,10 +113,16 @@ export async function listNotificationsForRecipient({
   recipientUserId,
   limit,
   cursor,
+  unread,
+  category,
+  campaignId,
 }: {
   recipientUserId: string
   limit: number
   cursor?: string
+  unread?: boolean
+  category?: NotificationCategory
+  campaignId?: string
 }): Promise<{
   items: ReturnType<typeof toNotification>[]
   nextCursor: string | null
@@ -126,15 +133,40 @@ export async function listNotificationsForRecipient({
     archivedAt: null,
   }
 
+  if (unread === true) {
+    filter.readAt = null
+  }
+
+  if (category) {
+    filter.type = { $in: getNotificationTypesForCategory(category) }
+  }
+
+  if (campaignId) {
+    filter.$or = [
+      { 'action.campaignId': campaignId },
+      { 'payload.campaignId': campaignId },
+      { 'payload.campaignIds': campaignId },
+    ]
+  }
+
   const decodedCursor = cursor ? decodeNotificationCursor(cursor) : null
   if (decodedCursor) {
-    filter.$or = [
-      { createdAt: { $lt: decodedCursor.createdAt } },
-      {
-        createdAt: decodedCursor.createdAt,
-        _id: { $lt: new Types.ObjectId(decodedCursor.id) },
-      },
-    ]
+    const cursorClause = {
+      $or: [
+        { createdAt: { $lt: decodedCursor.createdAt } },
+        {
+          createdAt: decodedCursor.createdAt,
+          _id: { $lt: new Types.ObjectId(decodedCursor.id) },
+        },
+      ],
+    }
+
+    if (filter.$or) {
+      filter.$and = [{ $or: filter.$or }, cursorClause]
+      delete filter.$or
+    } else {
+      Object.assign(filter, cursorClause)
+    }
   }
 
   const docs = await NotificationModel.find(filter)

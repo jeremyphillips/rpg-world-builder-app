@@ -1,24 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { NotificationInboxBody } from './notification-inbox-body.client'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
 const previewItems = [
   {
     id: 'notification-1',
     title: 'New message',
-    description: 'Ava sent you a message in Harbor.',
-    timestamp: '2 minutes ago',
+    description: 'Bobby V: blah',
+    timestamp: '1 hour ago',
     unread: true,
-    actionLabel: 'Open',
     onActivate: () => undefined,
   },
   {
     id: 'notification-2',
     title: 'Campaign invitation',
     description: 'Blake invited you to join Stormwatch.',
-    timestamp: '1 hour ago',
+    timestamp: '2 hours ago',
     unread: false,
-    actionLabel: undefined,
     onActivate: () => undefined,
   },
 ] as const
@@ -46,6 +45,7 @@ export const Loading: Story = {
     isError: false,
     itemCount: 0,
     previewItems: [],
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
     hasNextPage: false,
     isFetchingNextPage: false,
     isFetchNextPageError: false,
@@ -59,6 +59,7 @@ export const Error: Story = {
     isError: true,
     itemCount: 0,
     previewItems: [],
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
     hasNextPage: false,
     isFetchingNextPage: false,
     isFetchNextPageError: false,
@@ -73,6 +74,7 @@ export const Empty: Story = {
     isError: false,
     itemCount: 0,
     previewItems: [],
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
     hasNextPage: false,
     isFetchingNextPage: false,
     isFetchNextPageError: false,
@@ -86,6 +88,7 @@ export const WithItems: Story = {
     isError: false,
     itemCount: previewItems.length,
     previewItems: [...previewItems],
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
     hasNextPage: true,
     isFetchingNextPage: false,
     isFetchNextPageError: false,
@@ -99,6 +102,7 @@ export const LoadMoreError: Story = {
     isError: false,
     itemCount: previewItems.length,
     previewItems: [...previewItems],
+    emptyTitle: NOTIFICATION_COPY.caughtUpTitle,
     hasNextPage: true,
     isFetchingNextPage: false,
     isFetchNextPageError: true,

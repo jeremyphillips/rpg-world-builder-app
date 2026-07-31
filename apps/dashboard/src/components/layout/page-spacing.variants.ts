@@ -6,4 +6,7 @@ export const pageSpacingClasses = {
   loose: 'space-y-10',
 } as const
 
+/** Stack spacing between `PageHeader` and the section directly below it. */
+export const pageHeaderSectionGapClasses = 'flex flex-col gap-4'
+
 export type PageSpacing = keyof typeof pageSpacingClasses

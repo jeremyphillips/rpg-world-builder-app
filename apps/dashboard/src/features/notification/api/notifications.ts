@@ -2,6 +2,7 @@ import type {
   MarkAllNotificationsReadResponse,
   MarkNotificationReadResponse,
   MarkNotificationsSeenResponse,
+  NotificationListQuery,
   NotificationListResponse,
 } from '@rpg/contracts'
 
@@ -10,12 +11,16 @@ import { patchJson, postJson, request } from '@/lib/api-client'
 const NOTIFICATIONS_API_PATH = '/api/notifications'
 
 export async function listNotifications(
-  options: { limit?: number; cursor?: string } = {},
+  options: Partial<
+    Pick<NotificationListQuery, 'limit' | 'cursor' | 'unread' | 'category' | 'campaignId'>
+  > = {},
 ): Promise<NotificationListResponse> {
-  // Phase 1: cursor is supported for future load-more; callers pass limit only today.
   const params = new URLSearchParams()
   if (options.limit) params.set('limit', String(options.limit))
   if (options.cursor) params.set('cursor', options.cursor)
+  if (options.unread === true) params.set('unread', 'true')
+  if (options.category) params.set('category', options.category)
+  if (options.campaignId) params.set('campaignId', options.campaignId)
 
   const query = params.toString()
   const path = query ? `${NOTIFICATIONS_API_PATH}?${query}` : NOTIFICATIONS_API_PATH

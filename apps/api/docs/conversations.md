@@ -1,14 +1,16 @@
 # Conversations (API)
 
 Direct one-to-one conversations between users who share current campaign
-membership.
+membership. `ConversationKind` is `direct` only today; `campaign` channel
+conversations are reserved for a future slice.
 
 ## Endpoints
 
 ```text
-POST   /api/conversations/direct
+POST   /api/conversations/direct/messages
 GET    /api/conversations/direct/recipients
 GET    /api/conversations
+GET    /api/conversations/:conversationId
 GET    /api/conversations/:conversationId/messages
 POST   /api/conversations/:conversationId/messages
 PATCH  /api/conversations/:conversationId/read
@@ -27,8 +29,66 @@ Recipients are resolved from **current** shared campaign membership:
   PC↔PC pairs require active open participation (or completed onboarding membership)
   so inactive or historical relationships are excluded.
 
-The same rules apply to `GET /direct/recipients`, `POST /direct`, and
+The same rules apply to `GET /direct/recipients`, `POST /direct/messages`, and
 `POST /:conversationId/messages` (existing threads re-check eligibility on send).
+
+## First message orchestration
+
+`POST /direct/messages` atomically find-or-creates the direct conversation, inserts
+the first message, and updates `latestMessage` in one Mongo transaction when
+transactions are enabled (`MONGO_TRANSACTION_MODE=auto|required`). When
+transactions are unavailable, find-or-create retries duplicate-key races before
+compensating delete removes any empty conversation row if message persistence fails.
+
+Request body:
+
+```ts
+{
+  recipientUserId: string
+  content: { kind: 'text'; text: string }
+  clientMessageId?: string
+}
+```
+
+Response:
+
+```ts
+{
+  conversation: Conversation
+  message: DirectMessage
+}
+```
+
+- Eligibility is re-checked immediately before persistence.
+- `clientMessageId` idempotency returns the original `{ conversation, message }`
+  without notification or realtime side effects.
+- Empty conversations (no `latestMessage`) are excluded from list responses and
+  scoped counts. Legacy rows can be removed with
+  `pnpm exec tsx tools/migrations/delete-empty-direct-conversations.ts`.
+- `existingDirectByUserId` in recipients maps only conversations with activity
+  (`latestMessage != null`).
+
+## Shared campaigns (resolved live)
+
+List and detail conversation responses include `sharedCampaigns`:
+`Array<{ campaignId, campaignName }>`. This is **not persisted** — the list/detail
+assembler batches viewer+peer memberships and attaches only campaigns the viewer
+is permitted to know about (same visibility rules as recipient eligibility).
+
+## Recipients response
+
+`GET /direct/recipients` returns a normalized SSOT shape:
+
+```ts
+{
+  recipientsByUserId: Record<string, { userId; displayName }>
+  campaigns: Array<{ campaignId; campaignName; userIds: string[] }>
+  existingDirectByUserId: Record<string, string> // peer userId → conversationId
+}
+```
+
+Campaign groups reference `recipientsByUserId` by id — user objects are not
+duplicated inside each group.
 
 ## Unread state
 

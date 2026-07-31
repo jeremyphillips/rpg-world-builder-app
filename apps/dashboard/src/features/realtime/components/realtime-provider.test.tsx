@@ -36,6 +36,7 @@ import { useRealtimeStatus } from '../context/realtime-context'
 import {
   applyConversationEnvelopeToList,
   conversationsListQueryKey,
+  conversationsQueryKey,
   CONVERSATION_LIST_LIMIT,
   conversationMessagesQueryKey,
 } from '@/features/message'
@@ -116,7 +117,7 @@ describe('RealtimeProvider', () => {
 
   it('patches conversation list and active thread caches from conversation.activity', async () => {
     const queryClient = new QueryClient()
-    queryClient.setQueryData(conversationsListQueryKey(CONVERSATION_LIST_LIMIT), {
+    queryClient.setQueryData(conversationsListQueryKey({ limit: CONVERSATION_LIST_LIMIT }), {
       items: [],
       nextCursor: null,
     })
@@ -138,7 +139,9 @@ describe('RealtimeProvider', () => {
     })
 
     await waitFor(() => {
-      expect(queryClient.getQueryData(conversationsListQueryKey(CONVERSATION_LIST_LIMIT))).toEqual(
+      expect(
+        queryClient.getQueryData(conversationsListQueryKey({ limit: CONVERSATION_LIST_LIMIT })),
+      ).toEqual(
         applyConversationEnvelopeToList(
           { items: [], nextCursor: null },
           { conversation, message, version: 2 },
@@ -169,7 +172,7 @@ describe('RealtimeProvider', () => {
         queryKey: notificationsListQueryKey(NOTIFICATION_LIST_LIMIT),
       })
       expect(invalidateQueries).toHaveBeenCalledWith({
-        queryKey: conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
+        queryKey: conversationsQueryKey,
       })
       expect(invalidateQueries).toHaveBeenCalledWith({
         queryKey: conversationMessagesQueryKey('conversation-active'),

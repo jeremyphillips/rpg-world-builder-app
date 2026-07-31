@@ -11,7 +11,7 @@ export const CONVERSATION_LIST_LIMIT = 20
 export const CONVERSATION_POLL_INTERVAL_MS = 30_000
 export const CONVERSATION_SLOW_POLL_INTERVAL_MS = 90_000
 
-export function useConversations() {
+export function useConversations(campaignId?: string, options: { enabled?: boolean } = {}) {
   const { data: session } = useSession()
   const { isConnected: isRealtimeConnected } = useRealtimeStatus()
   const isDocumentVisible = useDocumentVisible()
@@ -21,11 +21,14 @@ export function useConversations() {
     ? CONVERSATION_SLOW_POLL_INTERVAL_MS
     : CONVERSATION_POLL_INTERVAL_MS
 
+  const queryOptions = { limit: CONVERSATION_LIST_LIMIT, campaignId }
+
   return useQuery({
-    queryKey: conversationsListQueryKey(CONVERSATION_LIST_LIMIT),
-    queryFn: () => listConversations({ limit: CONVERSATION_LIST_LIMIT }),
-    enabled: isAuthenticated,
-    refetchInterval: isAuthenticated && isDocumentVisible ? pollIntervalMs : false,
+    queryKey: conversationsListQueryKey(queryOptions),
+    queryFn: () => listConversations(queryOptions),
+    enabled: isAuthenticated && (options.enabled ?? true),
+    refetchInterval:
+      isAuthenticated && isDocumentVisible && (options.enabled ?? true) ? pollIntervalMs : false,
     refetchOnWindowFocus: true,
   })
 }

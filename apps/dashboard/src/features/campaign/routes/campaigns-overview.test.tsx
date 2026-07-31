@@ -50,11 +50,45 @@ describe('CampaignsOverview', () => {
 
     renderWithProviders(<CampaignsOverview />)
 
-    expect(await screen.findByText('Your campaigns')).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { level: 3, name: 'Your campaigns' }),
+    ).toBeInTheDocument()
     expect(screen.getByText(CAMPAIGNS_OVERVIEW_COPY.hasCampaignsDescription)).toBeInTheDocument()
     expect(screen.queryByText(CAMPAIGNS_OVERVIEW_COPY.empty.heading)).not.toBeInTheDocument()
     expect(
       screen.getAllByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
     ).toHaveLength(1)
+    expect(
+      screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
+    ).toHaveClass('border-outline-button-border')
+  })
+
+  it('uses the primary new-campaign variant when no campaign rows exist', async () => {
+    listCampaigns.mockResolvedValue([])
+
+    renderWithProviders(<CampaignsOverview />)
+
+    const link = await screen.findByRole('link', {
+      name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel,
+    })
+    expect(link).not.toHaveClass('border-outline-button-border')
+  })
+
+  it('demotes new campaign when only incomplete campaign rows exist', async () => {
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({
+        id: 'camp_incomplete',
+        identity: { name: 'Incomplete Campaign' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
+      }),
+    ])
+
+    renderWithProviders(<CampaignsOverview />)
+
+    expect(
+      await screen.findByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
+    ).toHaveClass('border-outline-button-border')
   })
 })

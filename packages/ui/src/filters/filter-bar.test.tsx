@@ -236,4 +236,19 @@ describe('FilterBar', () => {
     )
     expect(checkboxShell).not.toHaveClass('bg-input')
   })
+
+  it('stacks primary fields vertically without forcing full-width controls', () => {
+    const { container } = render(
+      <FilterBar
+        schema={mixedPrimarySchema}
+        state={{}}
+        orientation="vertical"
+        onValueChange={() => undefined}
+      />,
+    )
+
+    expect(container.firstChild).toHaveClass('flex-col', 'items-start')
+    const searchControl = screen.getByLabelText('Search').closest('[class*="flex-[0_1"]')
+    expect(searchControl).toBeTruthy()
+  })
 })

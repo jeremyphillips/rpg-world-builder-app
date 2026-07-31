@@ -157,6 +157,14 @@
   --drop-target-border: var(--primary);
   --segmented-track-bg: var(--surface-strong);
 
+  /*
+   * Message bubbles — direct-message thread fills (dashboard messaging workspace).
+   */
+  --message-bubble-self-bg: var(--info);
+  --message-bubble-self-fg: var(--info-foreground);
+  --message-bubble-peer-bg: var(--muted);
+  --message-bubble-peer-fg: var(--foreground);
+
   /* Component recipes — one-off surfaces not covered by roles above */
   --catalog-picker-row-surface: var(--card);
   --surface-raised-shadow:

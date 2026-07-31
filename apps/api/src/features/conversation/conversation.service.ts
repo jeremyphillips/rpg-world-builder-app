@@ -4,6 +4,7 @@ import type {
   DirectConversationRecipientsResponse,
   DirectMessage,
   MessageListResponse,
+  SendFirstDirectMessageInput,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
@@ -15,13 +16,19 @@ import {
   buildConversationForParticipant,
   decodeConversationCursor,
   decodeMessageCursor,
-  findOrCreateDirectConversation,
   getOtherParticipantUserId,
+  listAllConversationRecordsForUser,
   listConversationsForUser,
+  listConversationsPageFromRecords,
   listMessagesForConversation,
   markConversationRead as markConversationReadRecord,
   sendDirectMessage,
+  sendFirstDirectMessageRecord,
 } from './conversation.repository'
+import {
+  isPeerEligibleInCampaignScope,
+  resolveConversationCampaignScope,
+} from './conversation-campaign-scope.lib'
 import { publishDirectMessageReceivedNotification } from './direct-message-notification.lib'
 import {
   isEligibleDirectMessageRecipient,
@@ -70,35 +77,91 @@ async function deliverConversationActivityToParticipants(input: {
 
 export async function getDirectMessageRecipients(
   callerUserId: string,
+  options: { campaignId?: string } = {},
 ): Promise<DirectConversationRecipientsResponse> {
-  const items = await listDirectMessageRecipients(callerUserId)
-  return { items }
+  return listDirectMessageRecipients(callerUserId, options)
 }
 
-export async function createDirectConversation(
-  callerUserId: string,
-  recipientUserId: string,
+export async function getConversation(
+  viewerUserId: string,
+  conversationId: string,
 ): Promise<Conversation> {
-  const eligible = await isEligibleDirectMessageRecipient(callerUserId, recipientUserId)
+  const peer = await loadPeerForConversation(conversationId, viewerUserId)
+  if (!peer) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  const conversation = await buildConversationForParticipant({
+    conversationId,
+    viewerUserId,
+    peer,
+  })
+
+  if (!conversation) {
+    throw new HttpError(404, 'not_found', 'Conversation not found.')
+  }
+
+  return conversation
+}
+
+export async function sendFirstDirectMessage(
+  callerUserId: string,
+  input: SendFirstDirectMessageInput,
+): Promise<{ conversation: Conversation; message: DirectMessage }> {
+  const eligible = await isEligibleDirectMessageRecipient(callerUserId, input.recipientUserId)
   if (!eligible) {
     throw HttpError.forbidden('Recipient is not eligible for direct messages.')
   }
 
-  const recipient = await findSessionUserById(recipientUserId)
+  const recipient = await findSessionUserById(input.recipientUserId)
   if (!recipient) {
     throw new HttpError(404, 'not_found', 'Recipient not found.')
   }
 
-  return findOrCreateDirectConversation({
+  const result = await sendFirstDirectMessageRecord({
     callerUserId,
-    recipientUserId,
-    peer: { userId: recipientUserId, displayName: recipient.displayName },
+    recipientUserId: input.recipientUserId,
+    content: input.content,
+    clientMessageId: input.clientMessageId,
+    peer: { userId: input.recipientUserId, displayName: recipient.displayName },
   })
+
+  if (result.isNew && result.recipientUserId && result.unreadMessageCount > 0) {
+    try {
+      await publishDirectMessageReceivedNotification({
+        conversationId: result.conversation.id,
+        recipientUserId: result.recipientUserId,
+        messageId: result.message.id,
+        senderUserId: callerUserId,
+        text: input.content.text,
+        unreadMessageCount: result.unreadMessageCount,
+      })
+    } catch (error) {
+      console.error('Failed to publish direct message notification.', error)
+    }
+  }
+
+  if (result.isNew) {
+    try {
+      await deliverConversationActivityToParticipants({
+        conversationId: result.conversation.id,
+        participantUserIds: [callerUserId, result.recipientUserId].filter(Boolean),
+        message: result.message,
+      })
+    } catch (error) {
+      console.error('Failed to deliver conversation activity over realtime.', error)
+    }
+  }
+
+  return {
+    conversation: result.conversation,
+    message: result.message,
+  }
 }
 
 export async function listConversations(
   viewerUserId: string,
-  options: { limit: number; cursor?: string },
+  options: { limit: number; cursor?: string; campaignId?: string },
 ): Promise<ConversationListResponse> {
   if (options.cursor) {
     const decoded = decodeConversationCursor(options.cursor)
@@ -109,12 +172,53 @@ export async function listConversations(
     }
   }
 
-  return listConversationsForUser({
+  if (!options.campaignId) {
+    return listConversationsForUser({
+      viewerUserId,
+      limit: options.limit,
+      cursor: options.cursor,
+      peerByUserId: new Map(),
+    })
+  }
+
+  const resolvedScope = await resolveConversationCampaignScope(viewerUserId, options.campaignId)
+
+  if (resolvedScope.scopeInvalid) {
+    const unscoped = await listConversationsForUser({
+      viewerUserId,
+      limit: options.limit,
+      cursor: options.cursor,
+      peerByUserId: new Map(),
+    })
+    return {
+      ...unscoped,
+      scopeInvalid: true,
+    }
+  }
+
+  const allRecords = await listAllConversationRecordsForUser(viewerUserId)
+  const totalCount = allRecords.length
+  const scopedRecords = allRecords.filter((record) =>
+    isPeerEligibleInCampaignScope(resolvedScope.bundle!, record.peerUserId),
+  )
+  const scopedCount = scopedRecords.length
+  const hiddenCount = totalCount - scopedCount
+
+  const page = await listConversationsPageFromRecords({
     viewerUserId,
+    records: scopedRecords,
     limit: options.limit,
     cursor: options.cursor,
     peerByUserId: new Map(),
   })
+
+  return {
+    ...page,
+    totalCount,
+    scopedCount,
+    hiddenCount,
+    scope: resolvedScope.scope ?? undefined,
+  }
 }
 
 export async function listConversationMessages(

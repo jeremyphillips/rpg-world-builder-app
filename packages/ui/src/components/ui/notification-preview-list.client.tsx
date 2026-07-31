@@ -37,7 +37,6 @@ export function NotificationPreviewList({
           timestamp={item.timestamp}
           unread={item.unread}
           icon={item.icon}
-          actionLabel={item.actionLabel}
           onActivate={item.onActivate}
         />
       ))}

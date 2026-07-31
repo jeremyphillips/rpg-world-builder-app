@@ -143,6 +143,15 @@ export function getNotificationClassification(type: NotificationType): {
   return NOTIFICATION_CLASSIFICATION_BY_TYPE[type]
 }
 
+/** Notification types belonging to a category — for list filtering. */
+export function getNotificationTypesForCategory(
+  category: NotificationCategory,
+): NotificationType[] {
+  return NOTIFICATION_TYPES.filter(
+    (type) => NOTIFICATION_CLASSIFICATION_BY_TYPE[type].category === category,
+  )
+}
+
 for (const type of NOTIFICATION_TYPES) {
   if (!NOTIFICATION_CLASSIFICATION_BY_TYPE[type]) {
     throw new Error(`Missing notification classification for type: ${type}`)

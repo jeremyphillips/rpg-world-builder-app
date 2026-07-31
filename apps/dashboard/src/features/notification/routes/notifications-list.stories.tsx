@@ -1,50 +1,65 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '@rpg/ui'
 
-import { IndexPageIntro } from '@/components/layout/index-page-intro'
 import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageHeader } from '@/components/layout/page-header'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
+import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
+import { createNotificationInboxFilterSchema } from '../lib/notification-inbox-filter-schema'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
+
+const schema = createNotificationInboxFilterSchema([
+  { value: 'campaign-1', label: 'Stormwatch' },
+  { value: 'campaign-2', label: 'Harbor' },
+])
 
 const previewItems = [
   {
     id: 'notification-1',
-    title: 'Invitation accepted',
-    description: 'Blake accepted your invitation to Harbor.',
-    timestamp: '5 minutes ago',
-    unread: false,
-    actionLabel: 'Open',
+    title: 'New message',
+    description: 'Bobby V: blah',
+    timestamp: '1 hour ago',
+    unread: true,
     onActivate: () => undefined,
   },
   {
     id: 'notification-2',
-    title: 'New message',
-    description: 'Ava sent you a message.',
-    timestamp: '1 hour ago',
-    unread: true,
-    actionLabel: 'Open',
+    title: 'Invitation accepted',
+    description: 'Blake accepted your invitation to Harbor.',
+    timestamp: '2 hours ago',
+    unread: false,
     onActivate: () => undefined,
   },
 ] as const
 
 function NotificationsListPagePreview() {
   return (
-    <NarrowPage spacing="relaxed">
-      <IndexPageIntro
-        title="Notifications"
-        description="Your notification history beyond the latest bell preview."
-        actions={
-          <Button type="button" variant="outline">
-            Mark all as read
-          </Button>
-        }
-        showActionsInHeader
-      />
+    <NarrowPage spacing="compact">
+      <div className={pageHeaderSectionGapClasses}>
+        <PageHeader
+          heading={NOTIFICATION_COPY.title}
+          actions={
+            <Button type="button" variant="ghost" size="sm" density="compact">
+              {NOTIFICATION_COPY.markAllAsRead}
+            </Button>
+          }
+        />
+        <NotificationInboxHeader
+          schema={schema}
+          filters={{ unread: true, category: 'message' }}
+          onFilterChange={() => undefined}
+          clearFilterField={() => undefined}
+          resetFilters={() => undefined}
+        />
+      </div>
       <NotificationInboxBody
         isPending={false}
         isError={false}
         itemCount={previewItems.length}
         previewItems={[...previewItems]}
+        emptyTitle={NOTIFICATION_COPY.caughtUpTitle}
         hasNextPage
         isFetchingNextPage={false}
         isFetchNextPageError={false}

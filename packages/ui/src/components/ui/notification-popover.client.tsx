@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import { Eyebrow } from './eyebrow'
 
 export type NotificationPopoverProps = {
   trigger: React.ReactNode
@@ -56,13 +57,16 @@ export function NotificationPopoverHeader({
   actionDisabled = false,
 }: NotificationPopoverHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2.5">
-      <h2 className="text-sm font-body-emphasis text-foreground">{title}</h2>
+    <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-1">
+      <Eyebrow as="h2" size="sm">
+        {title}
+      </Eyebrow>
       {actionLabel && onAction ? (
         <Button
           type="button"
           variant="ghost"
           size="sm"
+          density="compact"
           onClick={onAction}
           disabled={actionDisabled}
         >

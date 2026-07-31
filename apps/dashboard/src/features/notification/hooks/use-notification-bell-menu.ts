@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
+import { activateNotification } from '../lib/activate-notification'
+import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
 import { listUnseenNotificationIds } from '../lib/unseen-notification-ids'
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
-import { resolveNotificationActionPath } from '../lib/resolve-notification-action'
 import { useNotificationActions } from './use-notification-actions'
 import { useNotifications } from './use-notifications'
 
@@ -59,18 +59,20 @@ export function useNotificationBellMenu() {
 
   const handleActivate = React.useCallback(
     (notification: Notification) => {
-      void markRead.mutateAsync(notification.id).catch(() => {
-        toast.error(NOTIFICATION_ACTION_FAILED_MESSAGE)
-        void refetch()
+      activateNotification({
+        notification,
+        markRead,
+        navigate,
+        onFailure: () => {
+          toast.error(NOTIFICATION_ACTION_FAILED_MESSAGE)
+          void refetch()
+        },
+        onBeforeNavigate: () => {
+          setOpen(false)
+          markedSeenIdsRef.current.clear()
+          markSeenInFlightRef.current = false
+        },
       })
-
-      const path = resolveNotificationActionPath(notification.action)
-      if (!path) return
-
-      setOpen(false)
-      markedSeenIdsRef.current.clear()
-      markSeenInFlightRef.current = false
-      navigate(path)
     },
     [markRead, navigate, refetch],
   )

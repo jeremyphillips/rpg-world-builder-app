@@ -12,7 +12,6 @@ import type { DashboardHomeCampaignPromotions } from './dashboard-home-campaign-
 
 type DashboardHomeCampaignSectionProps = DashboardHomeCampaignPromotions & {
   campaignsError: boolean
-  onContinue: (campaignId: string) => void
 }
 
 export function DashboardHomeCampaignSection({
@@ -20,7 +19,6 @@ export function DashboardHomeCampaignSection({
   continueCampaign,
   resumeSetupCampaign,
   showAllCampaignsLink,
-  onContinue,
 }: DashboardHomeCampaignSectionProps) {
   return (
     <>
@@ -30,9 +28,7 @@ export function DashboardHomeCampaignSection({
         </Text>
       ) : null}
 
-      {continueCampaign ? (
-        <ContinueCampaignCard campaign={continueCampaign} onContinue={onContinue} />
-      ) : null}
+      {continueCampaign ? <ContinueCampaignCard campaign={continueCampaign} /> : null}
 
       {resumeSetupCampaign ? <ResumeSetupCampaignCard campaign={resumeSetupCampaign} /> : null}
 

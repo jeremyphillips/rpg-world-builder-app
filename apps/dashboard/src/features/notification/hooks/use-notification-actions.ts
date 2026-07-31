@@ -12,7 +12,7 @@ import {
 } from '../lib/notification-cache'
 import {
   NOTIFICATION_LIST_LIMIT,
-  notificationsInboxQueryKey,
+  notificationsInboxRootQueryKey,
   notificationsListQueryKey,
 } from '../lib/notification-query-keys'
 
@@ -30,8 +30,8 @@ function updateListCache(
 }
 
 function invalidateInboxCache(queryClient: ReturnType<typeof useQueryClient>): void {
-  if (queryClient.getQueryData(notificationsInboxQueryKey) === undefined) return
-  void queryClient.invalidateQueries({ queryKey: notificationsInboxQueryKey })
+  if (queryClient.getQueriesData({ queryKey: notificationsInboxRootQueryKey }).length === 0) return
+  void queryClient.invalidateQueries({ queryKey: notificationsInboxRootQueryKey })
 }
 
 export function useNotificationActions() {

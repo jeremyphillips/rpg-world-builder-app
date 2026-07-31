@@ -17,7 +17,6 @@ type Story = StoryObj<typeof CampaignPicker>
 export const ActiveCampaign: Story = {
   args: {
     campaigns: [makeCampaignListItem({ identity: { name: 'The Argent Road' } })],
-    onSelect: () => undefined,
   },
 }
 
@@ -29,8 +28,23 @@ export const IncompleteOnboarding: Story = {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
       }),
     ],
-    onSelect: () => undefined,
+  },
+}
+
+export const MultipleCampaigns: Story = {
+  args: {
+    campaigns: [
+      makeCampaignListItem({ id: 'camp_1', identity: { name: 'The Argent Road' } }),
+      makeCampaignListItem({
+        id: 'camp_2',
+        identity: { name: 'Stormwatch' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
+      }),
+    ],
   },
 }

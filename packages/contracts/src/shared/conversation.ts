@@ -2,10 +2,12 @@ import { z } from 'zod'
 
 import {
   DIRECT_MESSAGE_PREVIEW_MAX_LENGTH,
+  directMessageContentSchema,
   directMessageSchema,
   sendDirectMessageInputSchema,
 } from './direct-message'
 
+/** Direct-only today; reserve `campaign` for future campaign-channel conversations. */
 export const CONVERSATION_KINDS = ['direct'] as const
 
 export const conversationKindSchema = z.enum(CONVERSATION_KINDS)
@@ -28,11 +30,20 @@ export const conversationLatestMessageSchema = z.object({
 
 export type ConversationLatestMessage = z.infer<typeof conversationLatestMessageSchema>
 
+export const conversationSharedCampaignSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+})
+
+export type ConversationSharedCampaign = z.infer<typeof conversationSharedCampaignSchema>
+
 export const conversationSchema = z.object({
   id: z.string(),
   kind: conversationKindSchema,
   participantUserIds: z.tuple([z.string(), z.string()]),
   peer: conversationPeerSchema,
+  /** Resolved live on list/detail — not persisted. Viewer-visible shared campaigns only. */
+  sharedCampaigns: z.array(conversationSharedCampaignSchema),
   latestMessage: conversationLatestMessageSchema.optional(),
   unreadCount: z.number().int().nonnegative(),
   createdAt: z.iso.datetime(),
@@ -47,18 +58,48 @@ export const conversationListItemSchema = conversationSchema
 
 export type ConversationListItem = z.infer<typeof conversationListItemSchema>
 
-export const createDirectConversationInputSchema = z.object({
+export const sendFirstDirectMessageInputSchema = z.object({
   recipientUserId: z.string(),
+  content: directMessageContentSchema,
+  clientMessageId: z.string().trim().min(1).optional(),
 })
 
-export type CreateDirectConversationInput = z.infer<typeof createDirectConversationInputSchema>
+export type SendFirstDirectMessageInput = z.infer<typeof sendFirstDirectMessageInputSchema>
+
+export const sendFirstDirectMessageResponseSchema = z.object({
+  conversation: conversationSchema,
+  message: directMessageSchema,
+})
+
+export type SendFirstDirectMessageResponse = z.infer<typeof sendFirstDirectMessageResponseSchema>
 
 export const directConversationRecipientSchema = conversationPeerSchema
 
 export type DirectConversationRecipient = z.infer<typeof directConversationRecipientSchema>
 
+export const directConversationRecipientCampaignGroupSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+  userIds: z.array(z.string()),
+})
+
+export type DirectConversationRecipientCampaignGroup = z.infer<
+  typeof directConversationRecipientCampaignGroupSchema
+>
+
+export const conversationListScopeSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+})
+
+export type ConversationListScope = z.infer<typeof conversationListScopeSchema>
+
 export const directConversationRecipientsResponseSchema = z.object({
-  items: z.array(directConversationRecipientSchema),
+  recipientsByUserId: z.record(z.string(), directConversationRecipientSchema),
+  campaigns: z.array(directConversationRecipientCampaignGroupSchema),
+  existingDirectByUserId: z.record(z.string(), z.string()),
+  scope: conversationListScopeSchema.optional(),
+  scopeInvalid: z.boolean().optional(),
 })
 
 export type DirectConversationRecipientsResponse = z.infer<
@@ -68,6 +109,7 @@ export type DirectConversationRecipientsResponse = z.infer<
 export const conversationListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
   cursor: z.string().trim().optional(),
+  campaignId: z.string().trim().optional(),
 })
 
 export type ConversationListQuery = z.infer<typeof conversationListQuerySchema>
@@ -75,9 +117,27 @@ export type ConversationListQuery = z.infer<typeof conversationListQuerySchema>
 export const conversationListResponseSchema = z.object({
   items: z.array(conversationListItemSchema),
   nextCursor: z.string().nullable(),
+  /** Full-dataset direct count — present when `campaignId` is requested. */
+  totalCount: z.number().int().nonnegative().optional(),
+  /** Conversations matching campaign eligibility — present when scope is active. */
+  scopedCount: z.number().int().nonnegative().optional(),
+  /** Conversations outside the active campaign scope — present when scope is active. */
+  hiddenCount: z.number().int().nonnegative().optional(),
+  /** Active campaign discovery scope — omitted when unscoped or invalid. */
+  scope: conversationListScopeSchema.optional(),
+  /** When true, `campaignId` was invalid/inaccessible; items are unscoped. */
+  scopeInvalid: z.boolean().optional(),
 })
 
 export type ConversationListResponse = z.infer<typeof conversationListResponseSchema>
+
+export const directConversationRecipientsQuerySchema = z.object({
+  campaignId: z.string().trim().optional(),
+})
+
+export type DirectConversationRecipientsQuery = z.infer<
+  typeof directConversationRecipientsQuerySchema
+>
 
 export const messageListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -104,6 +164,12 @@ export const markConversationReadResponseSchema = z.object({
 })
 
 export type MarkConversationReadResponse = z.infer<typeof markConversationReadResponseSchema>
+
+export const getConversationResponseSchema = z.object({
+  conversation: conversationSchema,
+})
+
+export type GetConversationResponse = z.infer<typeof getConversationResponseSchema>
 
 export const sendDirectMessageResponseSchema = z.object({
   message: directMessageSchema,

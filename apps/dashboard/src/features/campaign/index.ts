@@ -1,6 +1,7 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
 export { CampaignDisplayName } from './components/campaign-display-name'
+export { CampaignDisplayNameList } from './components/campaign-display-name-list.client'
 export {
   CampaignTopbarTitle,
   CampaignTopbarTitleError,
@@ -62,7 +63,12 @@ export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
 export { useActiveCampaignId } from './hooks/use-active-campaign-id'
-export { useOpenCampaign, useSwitchCampaign } from './hooks/use-select-campaign'
+export { hasCampaignRows } from './lib/campaign-list-view.lib'
+export {
+  useOpenCampaign,
+  usePersistCampaignSelection,
+  useSwitchCampaign,
+} from './hooks/use-select-campaign'
 export { useSyncActiveCampaign } from './hooks/use-sync-active-campaign'
 export { useCanManageCampaign } from './hooks/use-can-manage-campaign'
 export { useUpdateCampaign } from './hooks/use-update-campaign'

@@ -1,13 +1,16 @@
 'use client'
 
 import { NotificationBell, NotificationPopover, NotificationPopoverHeader } from '@rpg/ui'
+import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import { NotificationBellMenuBody } from './notification-bell-menu-body'
 import { useNotificationBellMenu } from '../hooks/use-notification-bell-menu'
 
 export function NotificationBellMenu() {
+  const { campaignId: routeCampaignId } = useParams<{ campaignId?: string }>()
   const {
     open,
     setOpen,
@@ -28,8 +31,8 @@ export function NotificationBellMenu() {
       trigger={<NotificationBell unreadCount={unreadCount} />}
     >
       <NotificationPopoverHeader
-        title="Notifications"
-        actionLabel="Mark all as read"
+        title={NOTIFICATION_COPY.title}
+        actionLabel={NOTIFICATION_COPY.markAllAsRead}
         onAction={handleMarkAllRead}
         actionDisabled={unreadCount === 0 || markAllReadPending}
       />
@@ -38,7 +41,10 @@ export function NotificationBellMenu() {
         isError={isError}
         itemCount={items.length}
         previewItems={previewItems}
-        viewAllHref={ROUTES.notifications.list}
+        notificationsViewAllHref={ROUTES.notifications.list}
+        campaignMessagesHref={
+          routeCampaignId ? ROUTES.messages.listScoped(routeCampaignId) : undefined
+        }
         onRetry={() => {
           void refetch()
         }}

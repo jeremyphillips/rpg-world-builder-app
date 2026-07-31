@@ -10,10 +10,9 @@ const previewItems = [
   {
     id: 'notification-1',
     title: 'New message',
-    description: 'Ava sent you a message.',
+    description: 'Bobby V: blah',
     timestamp: '2 minutes ago',
     unread: true,
-    actionLabel: 'Open',
     onActivate: vi.fn(),
   },
 ]
@@ -26,6 +25,7 @@ describe('NotificationInboxBody', () => {
         isError={false}
         itemCount={1}
         previewItems={previewItems}
+        emptyTitle="You're all caught up."
         hasNextPage
         isFetchingNextPage={false}
         isFetchNextPageError={false}
@@ -35,6 +35,7 @@ describe('NotificationInboxBody', () => {
 
     expect(screen.getByRole('button', { name: 'Load more' })).toBeInTheDocument()
     expect(screen.getByText('New message')).toBeInTheDocument()
+    expect(screen.queryByText('Open')).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
@@ -44,6 +45,7 @@ describe('NotificationInboxBody', () => {
         isError={false}
         itemCount={1}
         previewItems={previewItems}
+        emptyTitle="You're all caught up."
         hasNextPage
         isFetchingNextPage={false}
         isFetchNextPageError={false}

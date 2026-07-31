@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
@@ -7,6 +7,7 @@ import { NotificationBell } from './notification-bell.client'
 import { NotificationEmptyState } from './notification-empty-state'
 import { NotificationErrorState } from './notification-error-state'
 import { NotificationLoadingState } from './notification-loading-state'
+import { NotificationPopoverHeader } from './notification-popover.client'
 import { NotificationPreviewItem } from './notification-preview-item.client'
 import { NotificationUnreadBadge } from './notification-unread-badge'
 
@@ -32,6 +33,25 @@ describe('NotificationUnreadBadge', () => {
   it('uses solid destructive alert styling', () => {
     const { container } = render(<NotificationUnreadBadge count={3} />)
     expect(container.firstChild).toHaveClass('bg-destructive', 'text-destructive-foreground')
+  })
+})
+
+describe('NotificationPopoverHeader', () => {
+  it('renders an eyebrow title and compact mark-all action', () => {
+    const { container } = render(
+      <NotificationPopoverHeader
+        title="Notifications"
+        actionLabel="Mark all as read"
+        onAction={() => undefined}
+      />,
+    )
+
+    const heading = screen.getByRole('heading', { name: 'Notifications' })
+    expect(heading).toHaveClass('eyebrow-style-sm', 'text-muted-foreground')
+
+    const action = screen.getByRole('button', { name: 'Mark all as read' })
+    expect(action).toHaveClass('h-6')
+    expect(container.firstChild).toHaveClass('py-1')
   })
 })
 

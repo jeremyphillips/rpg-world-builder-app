@@ -4,6 +4,9 @@ export type {
   ChipsSelectionMode,
   FilterCatalogLayoutConfig,
   FilterChangeContext,
+  ActiveFilterChip,
+  ActiveChipSummaryContext,
+  FilterActiveChipConfig,
   FilterDensity,
   FilterFieldDef,
   FilterFieldId,
@@ -54,6 +57,7 @@ export {
 } from './filter-engine.helpers'
 
 export { FILTER_DENSITY_DEFAULT, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
+export type { FilterBarOrientation } from './filter-bar.variants'
 export {
   getSchemaFieldsByPlacement,
   isFilterFieldDisabled,
@@ -78,6 +82,8 @@ export {
   type FilterChromeContextValue,
 } from './filter-chrome.context'
 export { FilterBar, type FilterBarProps } from './filter-bar.client'
+export { ActiveFilterChips, type ActiveFilterChipsProps } from './active-filter-chips.client'
+export { resolveActiveFilterChips } from './filter-active-chips.lib'
 export {
   FilterAdvancedPanel,
   type FilterAdvancedPanelHeaderProps,

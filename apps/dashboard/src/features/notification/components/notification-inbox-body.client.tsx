@@ -8,13 +8,15 @@ import {
   NotificationPreviewList,
 } from '@rpg/ui'
 
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
+import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
 type NotificationInboxBodyProps = {
   isPending: boolean
   isError: boolean
   itemCount: number
   previewItems: ReturnType<typeof mapNotificationsToPreviewItems>
+  emptyTitle: string
   hasNextPage: boolean
   isFetchingNextPage: boolean
   isFetchNextPageError: boolean
@@ -27,6 +29,7 @@ export function NotificationInboxBody({
   isError,
   itemCount,
   previewItems,
+  emptyTitle,
   hasNextPage,
   isFetchingNextPage,
   isFetchNextPageError,
@@ -35,14 +38,19 @@ export function NotificationInboxBody({
 }: NotificationInboxBodyProps) {
   if (isPending) return <NotificationLoadingState />
   if (isError) return <NotificationErrorState onRetry={onRetry} />
-  if (itemCount === 0) return <NotificationEmptyState />
+  if (itemCount === 0) {
+    return <NotificationEmptyState title={emptyTitle} description="" />
+  }
 
   return (
     <div className="space-y-3">
-      <NotificationPreviewList items={previewItems} className="max-h-none overflow-visible" />
+      <NotificationPreviewList
+        items={previewItems}
+        className="max-h-none overflow-visible border-y border-border"
+      />
       {hasNextPage ? (
         <Button type="button" variant="outline" onClick={onLoadMore} disabled={isFetchingNextPage}>
-          {isFetchingNextPage ? 'Loading more…' : 'Load more'}
+          {isFetchingNextPage ? NOTIFICATION_COPY.loadingMore : NOTIFICATION_COPY.loadMore}
         </Button>
       ) : null}
       {isFetchNextPageError ? <NotificationErrorState onRetry={onLoadMore} /> : null}
