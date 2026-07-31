@@ -86,6 +86,9 @@ export function MessagesWorkspaceShell() {
               activeConversationId={routeState.activeConversationId}
               campaignId={routeState.campaignId}
               scope={campaignScope.scope}
+              loadedCount={campaignScope.loadedCount}
+              scopedCount={campaignScope.scopedCount}
+              hasMoreConversations={campaignScope.hasMoreConversations}
             />
           )}
         </aside>

@@ -10,6 +10,7 @@ import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
 import {
   MESSAGES_ACTION_COPY,
   MESSAGES_STATUS_COPY,
+  formatMessagesScopedListFilterLabel,
   formatMessagesUnreadBadge,
 } from '../lib/messages-copy'
 
@@ -17,15 +18,19 @@ type ConversationListProps = {
   conversations: Conversation[]
   activeConversationId?: string
   campaignId?: string
+  scope?: { campaignId: string; campaignName: string }
 }
 
 export function ConversationList({
   conversations,
   activeConversationId,
   campaignId,
+  scope,
 }: ConversationListProps) {
+  const listLabel = scope ? formatMessagesScopedListFilterLabel(scope.campaignName) : undefined
+
   return (
-    <ul className="divide-y divide-border">
+    <ul className="divide-y divide-border" aria-label={listLabel}>
       {conversations.map((conversation) => {
         const isActive = conversation.id === activeConversationId
         return (

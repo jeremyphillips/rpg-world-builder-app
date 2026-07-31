@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatMessageBubbleAriaLabel,
+  formatMessagesLoadedScopeHint,
   formatMessagesOutOfScopeSupporting,
   formatMessagesScopeChipLabel,
   formatMessagesScopeSummary,
+  formatMessagesScopedListFilterLabel,
   formatMessagesSharedCampaignCount,
   formatMessagesUnreadBadge,
 } from './messages-copy'
@@ -32,6 +34,21 @@ describe('messages-copy', () => {
   it('formats shared campaign counts', () => {
     expect(formatMessagesSharedCampaignCount(1)).toBe('1 shared campaign')
     expect(formatMessagesSharedCampaignCount(3)).toBe('3 shared campaigns')
+  })
+
+  it('formats scoped list filter labels', () => {
+    expect(formatMessagesScopedListFilterLabel('Ashes of Winter')).toBe(
+      'Conversations in Ashes of Winter',
+    )
+  })
+
+  it('formats loaded scope hints', () => {
+    expect(formatMessagesLoadedScopeHint(1, 1)).toBe(
+      '1 conversation loaded · 1 conversation in this campaign',
+    )
+    expect(formatMessagesLoadedScopeHint(20, 42)).toBe(
+      '20 conversations loaded · 42 conversations in this campaign',
+    )
   })
 
   it('formats unread badges', () => {

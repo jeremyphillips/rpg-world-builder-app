@@ -20,6 +20,19 @@ export const messagesWorkspaceRightScrollClasses =
 
 export const messagesWorkspaceRightFooterClasses = 'shrink-0 border-t border-border p-4'
 
+export const messagesWorkspaceThreadHeaderClasses = 'shrink-0 border-b border-border px-4 py-3'
+
+export const messagesWorkspaceMessageGroupClasses = 'flex flex-col gap-1'
+
+export const messagesWorkspaceMessageBubbleClasses =
+  'inline-block max-w-[85%] rounded-lg bg-muted px-3 py-2 text-left'
+
+export const messagesWorkspaceMessageGroupTimestampClasses =
+  'mt-1 flex flex-wrap items-baseline gap-x-2'
+
+export const messagesWorkspaceComposerTextareaClasses =
+  'min-h-[2.5rem] max-h-40 resize-none overflow-y-auto'
+
 export const messagesWorkspaceEmptyStateClasses =
   'flex min-h-0 flex-1 flex-col items-center justify-center p-6 text-center'
 

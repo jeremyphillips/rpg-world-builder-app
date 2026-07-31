@@ -2,20 +2,24 @@
 
 import * as React from 'react'
 import type { DirectMessage } from '@rpg/contracts'
-import { Button, Text, TextareaField, toast } from '@rpg/ui'
+import { Button, Text, toast } from '@rpg/ui'
 
-import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
+import { formatDateTime, formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
 import type { useConversationActions } from '../hooks/use-conversation-actions'
+import { groupMessagesByTime } from '../lib/group-messages-by-time.lib'
 import {
   MESSAGES_ACTION_COPY,
   MESSAGES_A11Y_COPY,
   MESSAGES_ERROR_COPY,
-  MESSAGES_FORM_COPY,
   MESSAGES_STATUS_COPY,
   formatMessageBubbleAriaLabel,
 } from '../lib/messages-copy'
+import { MessageComposer } from './message-composer.client'
 import {
+  messagesWorkspaceMessageBubbleClasses,
+  messagesWorkspaceMessageGroupClasses,
+  messagesWorkspaceMessageGroupTimestampClasses,
   messagesWorkspaceRightFooterClasses,
   messagesWorkspaceRightScrollClasses,
 } from './messages-workspace.variants'
@@ -32,6 +36,20 @@ type MessageThreadBodyProps = {
   layout?: 'page' | 'workspace'
 }
 
+function MessageGroupTimestamp({ timestamp }: { timestamp: string }) {
+  return (
+    <Text
+      variant="small"
+      as="time"
+      dateTime={timestamp}
+      className={messagesWorkspaceMessageGroupTimestampClasses}
+    >
+      <span>{formatDateTime(timestamp)}</span>
+      <span className="text-muted-foreground">{formatRelativeRecency(timestamp)}</span>
+    </Text>
+  )
+}
+
 export function MessageThreadBody({
   currentUserId,
   peerDisplayName,
@@ -45,6 +63,7 @@ export function MessageThreadBody({
 }: MessageThreadBodyProps) {
   const [draft, setDraft] = React.useState('')
   const clientMessageIdRef = React.useRef<string | null>(null)
+  const messageGroups = React.useMemo(() => groupMessagesByTime(messages), [messages])
 
   const handleLoadOlderMessages = () => {
     void fetchNextPage().catch(() => {
@@ -52,8 +71,7 @@ export function MessageThreadBody({
     })
   }
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
+  const handleSend = () => {
     const text = draft.trim()
     if (!text) return
 
@@ -96,25 +114,31 @@ export function MessageThreadBody({
       ) : null}
 
       <ul
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-4"
         aria-label={MESSAGES_A11Y_COPY.messages}
         aria-live="polite"
         aria-relevant="additions"
       >
-        {messages.map((message) => {
-          const isOwn = message.senderUserId === currentUserId
+        {messageGroups.map((group) => {
+          const isOwn = group.senderUserId === currentUserId
           return (
             <li
-              key={message.id}
+              key={group.messages[0]?.id}
               className={isOwn ? 'self-end text-right' : 'self-start text-left'}
-              aria-label={formatMessageBubbleAriaLabel(isOwn, peerDisplayName)}
             >
-              <div className="inline-block max-w-[85%] rounded-lg bg-muted px-3 py-2 text-left">
-                <Text>{message.content.text}</Text>
-                <Text variant="small" as="time" dateTime={message.createdAt}>
-                  {formatRelativeRecency(message.createdAt)}
-                </Text>
-              </div>
+              <ul className={messagesWorkspaceMessageGroupClasses}>
+                {group.messages.map((message) => (
+                  <li
+                    key={message.id}
+                    aria-label={formatMessageBubbleAriaLabel(isOwn, peerDisplayName)}
+                  >
+                    <div className={messagesWorkspaceMessageBubbleClasses}>
+                      <Text>{message.content.text}</Text>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <MessageGroupTimestamp timestamp={group.timestamp} />
             </li>
           )
         })}
@@ -123,18 +147,12 @@ export function MessageThreadBody({
   )
 
   const composer = (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <TextareaField
-        id="message-draft"
-        label={MESSAGES_FORM_COPY.messageLabel}
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        rows={3}
-      />
-      <Button type="submit" disabled={!draft.trim() || sendMessage.isPending}>
-        {MESSAGES_ACTION_COPY.send}
-      </Button>
-    </form>
+    <MessageComposer
+      draft={draft}
+      onDraftChange={setDraft}
+      onSubmit={handleSend}
+      isSubmitting={sendMessage.isPending}
+    />
   )
 
   if (layout === 'page') {

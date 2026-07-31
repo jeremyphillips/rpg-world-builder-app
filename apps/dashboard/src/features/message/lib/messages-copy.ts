@@ -87,6 +87,18 @@ export function formatMessagesSharedCampaignCount(count: number): string {
   return count === 1 ? '1 shared campaign' : `${count} shared campaigns`
 }
 
+export function formatMessagesScopedListFilterLabel(campaignName: string): string {
+  return `Conversations in ${campaignName}`
+}
+
+export function formatMessagesLoadedScopeHint(loadedCount: number, scopedCount: number): string {
+  const loadedLabel = loadedCount === 1 ? 'conversation loaded' : 'conversations loaded'
+  const scopedLabel =
+    scopedCount === 1 ? 'conversation in this campaign' : 'conversations in this campaign'
+
+  return `${loadedCount} ${loadedLabel} · ${scopedCount} ${scopedLabel}`
+}
+
 export function formatMessagesUnreadBadge(count: number): string {
   return count > 99 ? '99+' : String(count)
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import type { Conversation, ConversationListScope } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 
 import { ConversationList } from './conversation-list.client'
 import { MessagesDirectListEmptyState } from './messages-direct-list-empty-state.client'
@@ -10,6 +11,11 @@ import {
   isScopedConversationListEmpty,
   resolveOutOfScopeConversation,
 } from '../lib/messages-campaign-scope-state.lib'
+import {
+  resolveDirectListVisibility,
+  shouldShowLoadedScopeHint,
+} from '../lib/messages-direct-list-presentation.lib'
+import { formatMessagesLoadedScopeHint } from '../lib/messages-copy'
 
 type MessagesDirectListContentProps = {
   activeConversationId?: string
@@ -19,6 +25,23 @@ type MessagesDirectListContentProps = {
   unscopedConversations?: Conversation[]
   isPending: boolean
   isError: boolean
+  loadedCount: number
+  scopedCount?: number
+  hasMoreConversations: boolean
+}
+
+function MessagesLoadedScopeHint({
+  loadedCount,
+  scopedCount,
+}: {
+  loadedCount: number
+  scopedCount: number
+}) {
+  return (
+    <Text variant="small" className="mb-2 text-muted-foreground">
+      {formatMessagesLoadedScopeHint(loadedCount, scopedCount)}
+    </Text>
+  )
 }
 
 export function MessagesDirectListContent(props: MessagesDirectListContentProps) {
@@ -37,11 +60,17 @@ export function MessagesDirectListContent(props: MessagesDirectListContentProps)
     conversationCount: props.conversations.length,
   })
 
-  const showEmptyState =
-    !props.isPending &&
-    !props.isError &&
-    props.conversations.length === 0 &&
-    !outOfScopeConversation
+  const { showEmptyState, showConversationList } = resolveDirectListVisibility({
+    isPending: props.isPending,
+    isError: props.isError,
+    conversationCount: props.conversations.length,
+    hasOutOfScopeConversation: Boolean(outOfScopeConversation),
+  })
+
+  const scopeHint =
+    shouldShowLoadedScopeHint(props) && props.scopedCount !== undefined
+      ? { loadedCount: props.loadedCount, scopedCount: props.scopedCount }
+      : null
 
   return (
     <>
@@ -61,11 +90,19 @@ export function MessagesDirectListContent(props: MessagesDirectListContentProps)
         <MessagesDirectListEmptyState campaignId={props.campaignId} isScopedEmpty={isScopedEmpty} />
       ) : null}
 
-      {!props.isPending && !props.isError && props.conversations.length > 0 ? (
+      {scopeHint ? (
+        <MessagesLoadedScopeHint
+          loadedCount={scopeHint.loadedCount}
+          scopedCount={scopeHint.scopedCount}
+        />
+      ) : null}
+
+      {showConversationList ? (
         <ConversationList
           conversations={props.conversations}
           activeConversationId={props.activeConversationId}
           campaignId={props.campaignId}
+          scope={props.scope}
         />
       ) : null}
     </>

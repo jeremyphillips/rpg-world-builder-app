@@ -53,6 +53,8 @@ export function useMessagesCampaignScopeEffects(
     scope: data?.scope,
     scopedCount: data?.scopedCount,
     hiddenCount: data?.hiddenCount,
+    loadedCount: data?.items.length ?? 0,
+    hasMoreConversations: Boolean(data?.nextCursor),
     showInvalidScopeNotice,
     dismissInvalidScopeNotice: () => setShowInvalidScopeNotice(false),
   }

@@ -13,6 +13,7 @@ import { useRealtimeStatus } from '@/features/realtime'
 
 import { MessagesDirectListContent } from './messages-direct-list-content.client'
 import { MessageThreadBody } from './message-thread-body.client'
+import { MessageThreadHeader } from './message-thread-header.client'
 import { MessagesMobileBackLink } from './messages-workspace-empty-states.client'
 import {
   messagesWorkspaceRightPaneClasses,
@@ -99,6 +100,10 @@ export function MessagesThreadPane({
 
   return (
     <div className={`${messagesWorkspaceRightPaneClasses} min-h-0 flex-1`}>
+      <MessageThreadHeader
+        peerDisplayName={peerDisplayName}
+        sharedCampaignCount={conversation?.sharedCampaigns.length ?? 0}
+      />
       <MessageThreadBody
         currentUserId={session?.user?.id}
         peerDisplayName={peerDisplayName}
@@ -180,10 +185,16 @@ export function MessagesDirectListPane({
   activeConversationId,
   campaignId,
   scope,
+  loadedCount,
+  scopedCount,
+  hasMoreConversations,
 }: {
   activeConversationId?: string
   campaignId?: string
   scope?: ConversationListScope
+  loadedCount: number
+  scopedCount?: number
+  hasMoreConversations: boolean
 }) {
   const { data, isPending, isError } = useConversations(campaignId)
   const conversationInScopedList = data?.items.some((item) => item.id === activeConversationId)
@@ -201,6 +212,9 @@ export function MessagesDirectListPane({
         unscopedConversations={unscopedData?.items}
         isPending={isPending}
         isError={isError}
+        loadedCount={loadedCount}
+        scopedCount={scopedCount ?? data?.scopedCount}
+        hasMoreConversations={hasMoreConversations}
       />
     </div>
   )
