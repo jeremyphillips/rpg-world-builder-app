@@ -8,6 +8,7 @@ import {
   Drama,
   FlaskConical,
   Landmark,
+  MessageSquare,
   LayoutDashboard,
   ListChecks,
   Medal,
@@ -24,6 +25,7 @@ import type { SidebarNavItem } from './sidebar-nav-model'
 export const SIDEBAR_NAV_ICONS = {
   dashboard: LayoutDashboard,
   campaigns: Castle,
+  messages: MessageSquare,
   characters: UserRound,
   'name-generator': Dices,
   overview: LayoutDashboard,

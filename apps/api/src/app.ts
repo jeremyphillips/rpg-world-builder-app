@@ -21,6 +21,7 @@ import {
 import { userRouter } from './features/user'
 import { adminRouter } from './features/admin'
 import { notificationRouter } from './features/notification'
+import { conversationRouter } from './features/conversation'
 
 /**
  * Build the Express application. All routes are mounted under `/api` because
@@ -60,6 +61,7 @@ export function createApp(): Express {
   api.use('/uploads', uploadsRouter)
   api.use('/users', userRouter)
   api.use('/notifications', notificationRouter)
+  api.use('/conversations', conversationRouter)
   api.use('/admin', adminRouter)
   if (devBenchEnabled) {
     api.use('/bench', benchRouter)

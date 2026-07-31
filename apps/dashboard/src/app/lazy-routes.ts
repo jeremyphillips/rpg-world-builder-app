@@ -39,6 +39,15 @@ export const NameGeneratorRoute = withRouteSuspense(
     'NameGeneratorRoute',
   ),
 )
+export const MessagesListRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/message/routes/messages-list'), 'MessagesList'),
+)
+export const NewMessageRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/message/routes/new-message'), 'NewMessagePage'),
+)
+export const MessageThreadRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/message/routes/message-thread'), 'MessageThread'),
+)
 export const AdminUsersRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/admin/routes/admin-users'), 'AdminUsers'),
 )

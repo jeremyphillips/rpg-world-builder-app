@@ -8,7 +8,7 @@ import {
 } from './notification-payloads'
 import { notificationTypeSchema } from './notification-types'
 
-export const NOTIFICATION_ACTION_KINDS = ['campaign_detail'] as const
+export const NOTIFICATION_ACTION_KINDS = ['campaign_detail', 'conversation_detail'] as const
 
 export const notificationActionKindSchema = z.enum(NOTIFICATION_ACTION_KINDS)
 
@@ -18,6 +18,10 @@ export const notificationActionSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('campaign_detail'),
     campaignId: z.string(),
+  }),
+  z.object({
+    kind: z.literal('conversation_detail'),
+    conversationId: z.string(),
   }),
 ])
 

@@ -35,7 +35,7 @@ requests retry on the next effect pass; closing the popover clears the tracked I
 | Gap                                | Status                                                                                      |
 | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | `nextCursor` pagination            | API returns cursors; dashboard fetches only the first page (limit 10). No load-more UI yet. |
-| `message.direct.received` producer | Contracts + registry exist; no domain producer until DM persistence lands.                  |
+| `message.direct.received` producer | Published on direct message send; conversation mark-read clears the deduped row.            |
 | `archivedAt` / archive controls    | Field is stored and filtered from queries; no archive endpoint or pruning job yet.          |
 
 ## Adding a notification type

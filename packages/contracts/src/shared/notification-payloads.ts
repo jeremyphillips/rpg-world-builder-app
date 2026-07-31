@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { NotificationType } from './notification-types'
 import { NOTIFICATION_TYPES } from './notification-types'
+import { DIRECT_MESSAGE_PREVIEW_MAX_LENGTH } from './direct-message'
 
 export const campaignInviteReceivedPayloadSchema = z.object({
   inviteId: z.string(),
@@ -26,9 +27,11 @@ export const campaignInviteCompletedPayloadSchema = z.object({
 })
 
 export const messageDirectReceivedPayloadSchema = z.object({
+  conversationId: z.string(),
   messageId: z.string(),
   senderDisplayName: z.string(),
-  preview: z.string(),
+  preview: z.string().max(DIRECT_MESSAGE_PREVIEW_MAX_LENGTH),
+  unreadMessageCount: z.number().int().positive(),
 })
 
 export const NOTIFICATION_PAYLOAD_SCHEMAS = {

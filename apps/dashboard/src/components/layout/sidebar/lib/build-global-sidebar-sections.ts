@@ -28,6 +28,7 @@ export function buildGlobalSidebarSections(
       collapsible: false,
       items: [
         sidebarNavItem({ id: 'characters', label: 'Characters', href: ROUTES.characters.list }),
+        sidebarNavItem({ id: 'messages', label: 'Messages', href: ROUTES.messages.list }),
       ],
     },
     {

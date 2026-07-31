@@ -57,7 +57,10 @@ import {
   SkillProficiencyDetailRoute,
   SkillProficiencyEditRoute,
   HomebrewHubRoute,
+  MessageThreadRoute,
+  MessagesListRoute,
   NameGeneratorRoute,
+  NewMessageRoute,
   RulesConfigDetailRoute,
   VocabularyLandingRoute,
   VocabularyDetailRoute,
@@ -123,6 +126,33 @@ const router = createBrowserRouter(
               path: 'name-generator',
               element: <NameGeneratorRoute />,
               handle: { crumb: () => ({ label: 'Name Generator' }) } satisfies CrumbHandle,
+            },
+            {
+              path: 'messages',
+              element: <Outlet />,
+              handle: {
+                crumb: (_params, data) => ({
+                  label: 'Messages',
+                  href: collectionCrumbHref(ROUTES.messages.list, data),
+                }),
+              } satisfies CrumbHandle,
+              children: [
+                { index: true, element: <MessagesListRoute /> },
+                {
+                  path: 'new',
+                  element: <NewMessageRoute />,
+                  handle: { crumb: () => ({ label: 'New message' }) } satisfies CrumbHandle,
+                },
+                {
+                  path: ':conversationId',
+                  element: <MessageThreadRoute />,
+                  handle: {
+                    crumb: (_params, { entityLabel }) => ({
+                      label: entityLabel ?? 'Conversation',
+                    }),
+                  } satisfies CrumbHandle,
+                },
+              ],
             },
             {
               path: 'admin',

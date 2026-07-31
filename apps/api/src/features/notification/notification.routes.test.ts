@@ -36,9 +36,11 @@ describe('notification routes', () => {
       type: 'message.direct.received',
       recipientUserIds: [userId],
       payload: {
+        conversationId: 'conversation-1',
         messageId: 'message-1',
         senderDisplayName: 'Ava',
         preview: 'Ready for tonight?',
+        unreadMessageCount: 1,
       },
     })
 
@@ -73,9 +75,11 @@ describe('notification routes', () => {
       type: 'message.direct.received',
       recipientUserIds: [userId],
       payload: {
+        conversationId: 'conversation-2',
         messageId: 'message-2',
         senderDisplayName: 'Blake',
         preview: 'Hello',
+        unreadMessageCount: 1,
       },
     })
 
@@ -99,9 +103,11 @@ describe('notification routes', () => {
       type: 'message.direct.received',
       recipientUserIds: [userId],
       payload: {
+        conversationId: 'conversation-3',
         messageId: 'message-3',
         senderDisplayName: 'Casey',
         preview: 'Ping',
+        unreadMessageCount: 1,
       },
     })
 

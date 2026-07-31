@@ -254,3 +254,28 @@ export async function findNotificationByDedupeKey({
   if (!doc) return null
   return toNotification(doc)
 }
+
+export async function markNotificationReadByDedupeKey({
+  recipientUserId,
+  dedupeKey,
+}: {
+  recipientUserId: string
+  dedupeKey: string
+}): Promise<void> {
+  const now = new Date()
+  await NotificationModel.updateOne(
+    {
+      recipientUserId,
+      dedupeKey,
+      archivedAt: null,
+      readAt: null,
+    },
+    {
+      $set: {
+        readAt: now,
+        seenAt: now,
+        updatedAt: now,
+      },
+    },
+  )
+}
