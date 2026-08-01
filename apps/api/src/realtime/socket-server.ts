@@ -38,7 +38,7 @@ export async function attachRealtimeServer(httpServer: HttpServer): Promise<Serv
       next()
     } catch (error) {
       logRealtimeAuthFailure('handshake error', error)
-      next(error instanceof Error ? error : new Error('Unauthorized'))
+      next(new Error('Unauthorized'))
     }
   })
 

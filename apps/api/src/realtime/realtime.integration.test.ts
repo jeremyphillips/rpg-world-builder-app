@@ -5,19 +5,21 @@ import { CSRF_HEADER } from '../lib/cookies'
 import { publishNotification } from '../features/notification/publish-notification.service'
 import { createTestCampaign, registerAndLoginTestUser } from '../test/auth-agent'
 import { registerCampaignMember } from '../test/helpers/campaign-membership'
-import { clearTestDb } from '../test/db'
 import { useIntegrationDb } from '../test/setup/integration-db'
 import {
   closeIntegrationHttpServer,
   createIntegrationHttpServer,
   type IntegrationHttpServer,
 } from '../test/setup/integration-http-server'
-import { buildSessionCookieHeader } from '../test/session-cookie'
+import { getSessionCookieHeaderFromAgent } from '../test/session-cookie'
 import { REALTIME_EVENTS } from './events'
 import { SOCKET_IO_PATH } from './socket-server'
 import { deliverToUser, resetRealtimeServerForTests } from './delivery'
 
 useIntegrationDb()
+
+const CONNECT_MAX_ATTEMPTS = 3
+const CONNECT_RETRY_DELAY_MS = 50
 
 function waitForSocketEvent<T>(socket: Socket, event: string): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -32,7 +34,7 @@ function waitForSocketEvent<T>(socket: Socket, event: string): Promise<T> {
   })
 }
 
-function connectSocket(baseUrl: string, cookieHeader: string): Promise<Socket> {
+function connectSocketOnce(baseUrl: string, cookieHeader: string): Promise<Socket> {
   const socket = createClient(baseUrl, {
     path: SOCKET_IO_PATH,
     transports: ['polling', 'websocket'],
@@ -43,9 +45,42 @@ function connectSocket(baseUrl: string, cookieHeader: string): Promise<Socket> {
   })
 
   return new Promise((resolve, reject) => {
-    socket.on('connect', () => resolve(socket))
-    socket.on('connect_error', reject)
+    const cleanup = () => {
+      socket.off('connect', onConnect)
+      socket.off('connect_error', onConnectError)
+    }
+
+    const onConnect = () => {
+      cleanup()
+      resolve(socket)
+    }
+
+    const onConnectError = (error: Error) => {
+      cleanup()
+      socket.disconnect()
+      reject(error)
+    }
+
+    socket.on('connect', onConnect)
+    socket.on('connect_error', onConnectError)
   })
+}
+
+async function connectSocket(baseUrl: string, cookieHeader: string): Promise<Socket> {
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= CONNECT_MAX_ATTEMPTS; attempt++) {
+    try {
+      return await connectSocketOnce(baseUrl, cookieHeader)
+    } catch (error) {
+      lastError = error
+      if (attempt < CONNECT_MAX_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, CONNECT_RETRY_DELAY_MS * attempt))
+      }
+    }
+  }
+
+  throw lastError
 }
 
 describe('realtime delivery boundary', () => {
@@ -70,8 +105,6 @@ describe('realtime socket server', () => {
   })
 
   it('rejects unauthenticated socket handshakes', async () => {
-    await clearTestDb()
-
     const socket = createClient(serverBundle.baseUrl, {
       path: SOCKET_IO_PATH,
       transports: ['websocket'],
@@ -90,8 +123,6 @@ describe('realtime socket server', () => {
   })
 
   it('joins user rooms after cookie auth and isolates delivery', async () => {
-    await clearTestDb()
-
     const recipient = await registerAndLoginTestUser(serverBundle.app, {
       email: 'socket-recipient@example.com',
       password: 'supersecret',
@@ -105,11 +136,11 @@ describe('realtime socket server', () => {
 
     const recipientSocket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(recipient.userId),
+      getSessionCookieHeaderFromAgent(recipient.agent, serverBundle.baseUrl),
     )
     const otherSocket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(other.userId),
+      getSessionCookieHeaderFromAgent(other.agent, serverBundle.baseUrl),
     )
 
     const upsertPromise = waitForSocketEvent<{
@@ -149,8 +180,6 @@ describe('realtime socket server', () => {
   })
 
   it('delivers notification.read through the delivery boundary only', async () => {
-    await clearTestDb()
-
     const recipient = await registerAndLoginTestUser(serverBundle.app, {
       email: 'socket-read@example.com',
       password: 'supersecret',
@@ -159,7 +188,7 @@ describe('realtime socket server', () => {
 
     const socket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(recipient.userId),
+      getSessionCookieHeaderFromAgent(recipient.agent, serverBundle.baseUrl),
     )
 
     const readPromise = waitForSocketEvent<{
@@ -195,8 +224,6 @@ describe('realtime socket server', () => {
   })
 
   it('does not emit on mark-seen', async () => {
-    await clearTestDb()
-
     const recipient = await registerAndLoginTestUser(serverBundle.app, {
       email: 'socket-seen@example.com',
       password: 'supersecret',
@@ -205,7 +232,7 @@ describe('realtime socket server', () => {
 
     const socket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(recipient.userId),
+      getSessionCookieHeaderFromAgent(recipient.agent, serverBundle.baseUrl),
     )
 
     const [notification] = await publishNotification({
@@ -247,8 +274,6 @@ describe('realtime socket server', () => {
   })
 
   it('delivers recipient-specific conversation.activity envelopes on send', async () => {
-    await clearTestDb()
-
     const owner = await registerAndLoginTestUser(serverBundle.app, {
       email: 'socket-sender@example.com',
       password: 'supersecret',
@@ -265,11 +290,11 @@ describe('realtime socket server', () => {
 
     const senderSocket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(owner.userId),
+      getSessionCookieHeaderFromAgent(owner.agent, serverBundle.baseUrl),
     )
     const recipientSocket = await connectSocket(
       serverBundle.baseUrl,
-      buildSessionCookieHeader(member.userId),
+      getSessionCookieHeaderFromAgent(member.agent, serverBundle.baseUrl),
     )
 
     const senderActivityPromise = waitForSocketEvent<{
