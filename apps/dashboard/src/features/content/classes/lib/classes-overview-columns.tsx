@@ -90,7 +90,7 @@ export const classFilterSchema = buildContentFilterSchema<ClassRow, ClassesOverv
     }),
     createBooleanFilter<ClassRow, ClassesOverviewFilterState, 'spellcasting'>({
       id: 'spellcasting',
-      label: 'Has Spellcasting',
+      label: 'Has spellcasting',
       placement: 'primary',
       getValue: (row) => row.spellcasting !== undefined,
     }),
