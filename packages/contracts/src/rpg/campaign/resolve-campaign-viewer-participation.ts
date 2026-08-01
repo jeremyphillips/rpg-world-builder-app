@@ -104,12 +104,12 @@ export const campaignViewerStateOnboardingIncompleteSchema = z.object({
 
 export const campaignViewerStateParticipationMissingSchema = z.object({
   kind: z.literal('participation_missing'),
-  characterId: z.string().min(1).optional(),
+  characterId: z.string().min(1),
 })
 
 export const campaignViewerStateControlStaleSchema = z.object({
   kind: z.literal('control_stale'),
-  characterId: z.string().min(1).optional(),
+  characterId: z.string().min(1),
 })
 
 export const campaignViewerStateMembershipInvalidSchema = z.object({
@@ -185,7 +185,7 @@ export function resolveCampaignViewerState(
     return {
       viewerState: {
         kind: 'control_stale',
-        characterId: controlledCharacterIds[0],
+        characterId: controlledCharacterIds[0]!,
       },
       recoveryReason: 'controlled_character_without_open_participation',
     }
@@ -199,7 +199,7 @@ export function resolveCampaignViewerState(
     return {
       viewerState: {
         kind: 'participation_missing',
-        characterId: openWithoutControl[0],
+        characterId: openWithoutControl[0]!,
       },
       recoveryReason: 'open_participation_without_control',
     }

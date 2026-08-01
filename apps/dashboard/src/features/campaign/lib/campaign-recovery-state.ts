@@ -3,8 +3,8 @@ import type { CampaignListItem, CampaignViewerState } from '@rpg/contracts'
 export type CampaignRecoveryState =
   | { kind: 'ready' }
   | { kind: 'onboarding_incomplete' }
-  | { kind: 'control_stale'; characterId?: string }
-  | { kind: 'participation_missing'; characterId?: string }
+  | { kind: 'control_stale'; characterId: string }
+  | { kind: 'participation_missing'; characterId: string }
   | { kind: 'membership_invalid' }
 
 export function resolveCampaignRecoveryState(
@@ -71,6 +71,13 @@ export function resolveRecoveryCharacterId(state: CampaignRecoveryState): string
 }
 
 export function viewerStateFromRecoveryKind(
+  kind: 'control_stale' | 'participation_missing',
+  characterId: string,
+): CampaignViewerState
+export function viewerStateFromRecoveryKind(
+  kind: Exclude<CampaignRecoveryState['kind'], 'control_stale' | 'participation_missing'>,
+): CampaignViewerState
+export function viewerStateFromRecoveryKind(
   kind: CampaignRecoveryState['kind'],
   characterId?: string,
 ): CampaignViewerState {
@@ -78,9 +85,9 @@ export function viewerStateFromRecoveryKind(
     case 'onboarding_incomplete':
       return { kind: 'onboarding_incomplete' }
     case 'control_stale':
-      return { kind: 'control_stale', characterId }
+      return { kind: 'control_stale', characterId: characterId! }
     case 'participation_missing':
-      return { kind: 'participation_missing', characterId }
+      return { kind: 'participation_missing', characterId: characterId! }
     case 'membership_invalid':
       return { kind: 'membership_invalid' }
     default:

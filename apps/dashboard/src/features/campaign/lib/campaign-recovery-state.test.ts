@@ -34,11 +34,13 @@ describe('resolveCampaignRecoveryState', () => {
 describe('recovery predicates', () => {
   it('treats self-recoverable states as recoverable but not membership_invalid', () => {
     expect(isCampaignSelfRecoverable({ kind: 'onboarding_incomplete' })).toBe(true)
-    expect(isCampaignSelfRecoverable({ kind: 'control_stale' })).toBe(true)
+    expect(isCampaignSelfRecoverable({ kind: 'control_stale', characterId: 'char_1' })).toBe(true)
     expect(isCampaignSelfRecoverable({ kind: 'membership_invalid' })).toBe(false)
     expect(isCampaignRecoveryRequired({ kind: 'membership_invalid' })).toBe(true)
     expect(isCampaignMembershipInvalid({ kind: 'membership_invalid' })).toBe(true)
-    expect(isCampaignReconnectRequired({ kind: 'control_stale' })).toBe(true)
-    expect(isCampaignOnboardingIncomplete({ kind: 'participation_missing' })).toBe(false)
+    expect(isCampaignReconnectRequired({ kind: 'control_stale', characterId: 'char_1' })).toBe(true)
+    expect(
+      isCampaignOnboardingIncomplete({ kind: 'participation_missing', characterId: 'char_1' }),
+    ).toBe(false)
   })
 })
