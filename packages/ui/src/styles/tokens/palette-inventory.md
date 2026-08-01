@@ -19,7 +19,12 @@ tests + Storybook).
 | **Authored anchors** | `surface-base`, `surface-panel`, `fg-default`, `primary`, `neutral-contrast` | Independent oklch identity — not derived from the wash ladder                      |
 | **Mix ingredient**   | `neutral-contrast`                                                           | Gold wash ingredient per mode (chromatic — not achromatic neutral)                 |
 | **Derived surfaces** | `surface-field`, `surface-subtle`, `surface-muted`, …                        | `color-mix` from anchors — field lifts canvas toward white (light) or panel (dark) |
-| **Semantic aliases** | `field-placeholder` → `fg-muted`, `field-bg` → `surface-field`               | Preserve component intent even when values match                                   |
+| **Semantic aliases** | `field-placeholder`, `field-fg-disabled`, `field-bg` → `surface-field`       | Preserve component intent; field plane separate from surface-relative chrome       |
+
+Surface-relative neutral chrome (`--muted-foreground`, `--border-*`, `--foreground-disabled`)
+lives at **Layer 2** as `color-mix` toward inherited `--surface-current`. Theme-local mix
+weights (`--mix-fg-muted`, `--mix-border-subtle`, …) tune light/dark without changing
+formula shape. Establish vs inherit ownership: Storybook **Design tokens → Surface Chrome**.
 
 Interaction recipes (`control-hover`, `row-hover`, …) live at **Layer 2** only — not in this inventory.
 
@@ -101,16 +106,18 @@ Focus and invalid states alias Layer 2 roles (`--primary`, `--ring`, `--destruct
 | Token                    | Layer 2 mapping (examples)                                      |
 | ------------------------ | --------------------------------------------------------------- |
 | `--palette-fg-default`   | `--foreground`, `--secondary-foreground`, `--accent-foreground` |
-| `--palette-fg-subtle`    | `--foreground-subtle` (between default and muted)               |
-| `--palette-fg-muted`     | `--muted-foreground` (derived toward canvas)                    |
-| `--palette-fg-disabled`  | `--field-control-fg-disabled` (stronger derived mix)            |
 | `--palette-fg-on-solid`  | `--primary-foreground`, destructive/info/success fg (light)     |
 | `--palette-fg-on-status` | Status badge fg (dark); `--warning-foreground` (light)          |
 
+Muted/subtle/disabled **surface** chrome and generic borders are Layer 2 formulas toward
+`--surface-current` — not palette steps. Field-disabled stays on the field plane
+(`--palette-field-fg-disabled` → `--field-control-fg-disabled`). Generic UI disabled copy
+uses `--foreground-disabled` (surface-relative, distinct from field-disabled).
+
 ## Chrome, brand, status
 
-Chrome borders: derived `color-mix(fg-default → surface-base)` at `--palette-border-*` →
-Layer 2 `--border*`. Overlay: `--palette-overlay` (documented alpha exception).
+Overlay: `--palette-overlay` (documented alpha exception). Generic borders are Layer 2
+`color-mix(foreground → --surface-current)` at `--border-*`.
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.
 

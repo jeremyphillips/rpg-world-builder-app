@@ -5,6 +5,10 @@ import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 import { Heading } from '../../components/ui/heading'
 import { Text } from '../../components/ui/text'
+import {
+  establishSurfaceCurrent,
+  type SurfaceCurrentPlane,
+} from '../../components/ui/surface-current.lib'
 import { useTheme } from '../../providers/theme-provider.client'
 import {
   COLOR_TOKEN_GROUPS,
@@ -206,6 +210,8 @@ export function ColorPaletteCatalog() {
 }
 
 function SurfacePanel({ surface, children }: { surface: SurfaceBackground; children: ReactNode }) {
+  const establishPlane = SURFACE_ESTABLISH_PLANE[surface.id]
+
   return (
     <section
       className={colorPaletteSurfaceSectionClasses}
@@ -218,13 +224,25 @@ function SurfacePanel({ surface, children }: { surface: SurfaceBackground; child
         <p className="font-mono text-sm text-muted-foreground">{surface.cssVar}</p>
       </div>
       <div
-        className={cn(colorPaletteSurfacePanelClasses, surface.tailwind)}
+        className={cn(
+          colorPaletteSurfacePanelClasses,
+          surface.tailwind,
+          establishPlane ? establishSurfaceCurrent(establishPlane) : undefined,
+        )}
         style={{ backgroundColor: `var(${surface.cssVar})` }}
       >
         {children}
       </div>
     </section>
   )
+}
+
+const SURFACE_ESTABLISH_PLANE: Partial<Record<string, SurfaceCurrentPlane>> = {
+  background: 'background',
+  sunken: 'sunken',
+  card: 'card',
+  'surface-muted': 'surface-muted',
+  sidebar: 'sidebar',
 }
 
 function OnSurfaceSwatch({ token }: { token: ColorToken }) {

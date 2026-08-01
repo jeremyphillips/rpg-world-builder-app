@@ -38,23 +38,9 @@ export const PALETTE_SWITCH_STEPS = [
 
 export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as const
 
-export const PALETTE_FG_STEPS = [
-  'fg-default',
-  'fg-subtle',
-  'fg-muted',
-  'fg-disabled',
-  'fg-on-solid',
-  'fg-on-status',
-] as const
+export const PALETTE_FG_STEPS = ['fg-default', 'fg-on-solid', 'fg-on-status'] as const
 
-export const PALETTE_CHROME_STEPS = [
-  'border-faint',
-  'border-default',
-  'border-subtle',
-  'border-strong',
-  'border-selected',
-  'overlay',
-] as const
+export const PALETTE_CHROME_STEPS = ['overlay'] as const
 
 export const PALETTE_BRAND_STEPS = ['primary', 'primary-foreground', 'on-solid'] as const
 
@@ -75,7 +61,6 @@ export const PALETTE_STATUS_STEPS = [
 ] as const
 
 export const PALETTE_SEMANTIC_TEXT_STEPS = [
-  'semantic-neutral',
   'semantic-info',
   'semantic-info-muted',
   'semantic-success',
@@ -107,6 +92,15 @@ export const PALETTE_PRIMITIVE_VARS: readonly string[] = PALETTE_PRIMITIVE_STEPS
 export const DEPRECATED_PALETTE_TOKENS = [
   '--palette-surface-raised',
   '--palette-fg-secondary',
+  '--palette-fg-subtle',
+  '--palette-fg-muted',
+  '--palette-fg-disabled',
+  '--palette-border-faint',
+  '--palette-border-subtle',
+  '--palette-border-default',
+  '--palette-border-strong',
+  '--palette-border-selected',
+  '--palette-semantic-neutral',
   '--palette-control-hover-bg',
   '--palette-control-selected-bg',
   '--palette-row-hover-bg',
@@ -161,12 +155,14 @@ export const PALETTE_PRIMITIVE_GROUPS: PalettePrimitiveGroup[] = [
   {
     id: 'foreground',
     label: 'Foreground',
-    description: 'Text roles — fg-subtle/muted/disabled derived from fg-default toward canvas.',
+    description:
+      'Authored ink anchors — muted/subtle/disabled chrome lives at Layer 2 toward `--surface-current`.',
     steps: PALETTE_FG_STEPS,
   },
   {
     id: 'chrome',
     label: 'Chrome',
+    description: 'Overlay scrim — generic borders live at Layer 2 toward `--surface-current`.',
     steps: PALETTE_CHROME_STEPS,
   },
   {
@@ -225,9 +221,30 @@ export const FIELD_CONTROL_SEMANTIC_ROLES = [
 /** Layer 2 choice-indicator roles composed in semantic-*.css (not field-input chrome). */
 export const CHOICE_CONTROL_SEMANTIC_ROLES = ['--choice-control-border'] as const
 
+/** Layer 2 surface-relative neutral chrome — color-mix toward `--surface-current`. */
+export const SURFACE_RELATIVE_CHROME_ROLES = [
+  '--surface-current',
+  '--mix-fg-subtle',
+  '--mix-fg-muted',
+  '--mix-fg-disabled',
+  '--mix-border-faint',
+  '--mix-border-subtle',
+  '--mix-border-default',
+  '--mix-border-strong',
+  '--mix-border-selected',
+  '--muted-foreground',
+  '--foreground-subtle',
+  '--foreground-disabled',
+  '--border-faint',
+  '--border-subtle',
+  '--border-default',
+  '--border-strong',
+  '--border',
+  '--card-selected-border',
+] as const
+
 /** Layer 2 outline button recipe roles composed in semantic-*.css. */
 export const OUTLINE_BUTTON_SEMANTIC_ROLES = [
-  '--outline-control-border',
   '--outline-button-border',
   '--outline-button-hover-bg',
   '--outline-button-active-bg',

@@ -6,6 +6,8 @@ import * as React from 'react'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { Text } from './text'
+import { cn } from '../../lib/utils'
+import { portalPopoverSurfaceClasses } from './surface-current.lib'
 
 export type FilterPopoverGroup = {
   id: string
@@ -37,7 +39,10 @@ export function FilterPopover({
   groups,
   triggerSize = 'sm',
   disabled = false,
-  contentClassName = 'z-50 w-[min(100vw-2rem,28rem)] rounded-md border border-border bg-popover p-4 shadow-md outline-none',
+  contentClassName = cn(
+    'z-50 w-[min(100vw-2rem,28rem)] rounded-md border border-border bg-popover p-4 shadow-md outline-none',
+    portalPopoverSurfaceClasses,
+  ),
   gridClassName = 'grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]',
   primaryColumnClassName = 'min-w-0',
   secondaryColumnClassName = 'min-w-0 space-y-4',

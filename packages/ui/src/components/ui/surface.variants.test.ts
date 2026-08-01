@@ -17,6 +17,12 @@ const APPROVED_SURFACE_TOKENS = [
   'bg-sunken',
   'shadow-surface-raised',
   'shadow-surface-sunken',
+  '[--surface-current:var(--background)]',
+  '[--surface-current:var(--card)]',
+  '[--surface-current:var(--sunken)]',
+  '[--surface-current:var(--surface-subtle)]',
+  '[--surface-current:var(--surface-muted)]',
+  '[--surface-current:var(--surface-strong)]',
 ]
 
 const APPROVED_STATUS_TOKENS = [
@@ -47,6 +53,7 @@ describe('resolveSurfaceClasses', () => {
   it('uses approved tokens for raised array item surface', () => {
     const classes = resolveSurfaceClasses(DEFAULT_ARRAY_ITEM_SURFACE)
     expect(classes).toContain('bg-card')
+    expect(classes).toContain('[--surface-current:var(--card)]')
     expect(classes).toContain('shadow-surface-raised')
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })

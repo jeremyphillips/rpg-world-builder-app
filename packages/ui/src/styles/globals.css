@@ -54,6 +54,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-foreground-subtle: var(--foreground-subtle);
+  --color-foreground-disabled: var(--foreground-disabled);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -140,7 +141,6 @@
   --color-message-bubble-self-foreground: var(--message-bubble-self-fg);
   --color-message-bubble-peer: var(--message-bubble-peer-bg);
   --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
-  --color-outline-control-border: var(--outline-control-border);
   --color-outline-button-border: var(--outline-button-border);
   --color-outline-button-hover: var(--outline-button-hover-bg);
   --color-outline-button-active: var(--outline-button-active-bg);

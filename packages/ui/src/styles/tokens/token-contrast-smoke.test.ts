@@ -73,12 +73,13 @@ describe('token contrast smoke checks', () => {
     }
   })
 
-  it('keeps placeholder text derived from muted foreground toward field plane', () => {
+  it('keeps placeholder text derived toward field plane', () => {
     for (const css of [lightCss, darkCss]) {
       const placeholder = resolvePaletteVar(css, '--palette-field-placeholder') ?? ''
       const fieldBg = resolvePaletteVar(css, '--palette-field-bg') ?? ''
       expect(placeholder).toContain('color-mix')
       expect(placeholder).toContain('var(--palette-fg-default)')
+      expect(placeholder).toContain('var(--palette-surface-field)')
       expect(fieldBg).toContain('color-mix')
       expect(fieldBg).toContain('var(--palette-surface-base)')
     }
@@ -94,32 +95,14 @@ describe('token contrast smoke checks', () => {
     expect(contrastRatio(darkFg!, darkBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
   })
 
-  it('derives muted foreground from fg-default toward canvas (light + dark)', () => {
-    for (const css of [lightCss, darkCss]) {
-      const raw = readPaletteVar(css, '--palette-fg-muted') ?? ''
-      expect(raw).toContain('color-mix')
-      expect(raw).toContain('var(--palette-fg-default)')
-      expect(raw).toContain('var(--palette-surface-base)')
-    }
-  })
-
-  it('derives subtle foreground between default and muted (light + dark)', () => {
-    for (const css of [lightCss, darkCss]) {
-      const raw = readPaletteVar(css, '--palette-fg-subtle') ?? ''
-      expect(raw).toContain('color-mix')
-      expect(raw).toContain('var(--palette-fg-default)')
-      expect(raw).toContain('var(--palette-surface-base)')
-    }
-  })
-
-  it('aliases on-muted field fill to surface-subtle in both semantic themes', () => {
+  it('aliases outline button border to border-subtle in both semantic themes', () => {
     const semanticLight = readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8')
     const semanticDark = readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8')
 
     for (const css of [semanticLight, semanticDark]) {
       expect(readPaletteVar(css, '--field-control-bg-on-muted')).toBe('var(--surface-subtle)')
       expect(readPaletteVar(css, '--field-control-bg-default')).toBe('var(--palette-field-bg)')
-      expect(readPaletteVar(css, '--outline-control-border')).toBe('var(--border-subtle)')
+      expect(readPaletteVar(css, '--outline-button-border')).toBe('var(--border-subtle)')
     }
   })
 })

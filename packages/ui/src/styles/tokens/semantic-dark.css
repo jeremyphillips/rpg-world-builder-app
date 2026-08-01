@@ -3,6 +3,20 @@
  * Structure mirrors semantic-light.css; palette refs target palette-dark.css.
  */
 .dark {
+  /*
+   * Surface-relative neutral chrome — formulas mix toward inherited `--surface-current`.
+   * Shells rebind the plane via `establishSurfaceCurrent`; default is page canvas.
+   */
+  --surface-current: var(--background);
+  --mix-fg-subtle: 86%;
+  --mix-fg-muted: 72%;
+  --mix-fg-disabled: 55%;
+  --mix-border-faint: 2%;
+  --mix-border-subtle: 8%;
+  --mix-border-default: 12%;
+  --mix-border-strong: 24%;
+  --mix-border-selected: 30%;
+
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);
   --card: var(--palette-surface-panel);
@@ -17,13 +31,26 @@
   --surface-strong: var(--palette-surface-strong);
   --muted: var(--surface-muted);
   --sunken: var(--palette-surface-sunken);
-  --muted-foreground: var(--palette-fg-muted);
+  --muted-foreground: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-fg-muted),
+    var(--surface-current)
+  );
   --accent: var(--palette-surface-accent);
   --accent-foreground: var(--foreground);
 
   /* Text — default body copy (`text-foreground`, `text-muted-foreground`, …) */
   --foreground: var(--palette-fg-default);
-  --foreground-subtle: var(--palette-fg-subtle);
+  --foreground-subtle: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-fg-subtle),
+    var(--surface-current)
+  );
+  --foreground-disabled: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-fg-disabled),
+    var(--surface-current)
+  );
 
   /* Typography — theme-scoped weight roles (`eyebrow-style-*` composites) */
   --font-weight-eyebrow: var(--font-weight-light);
@@ -52,12 +79,32 @@
   --warning-faint: var(--palette-warning-faint);
 
   /* Chrome — generic borders, selection, overlay, sidebar (`border-border`, `bg-overlay`, `bg-sidebar`, …) */
-  --border-default: var(--palette-border-default);
-  --border-faint: var(--palette-border-faint);
-  --border-subtle: var(--palette-border-subtle);
-  --border-strong: var(--palette-border-strong);
+  --border-faint: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-faint),
+    var(--surface-current)
+  );
+  --border-subtle: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-subtle),
+    var(--surface-current)
+  );
+  --border-default: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-default),
+    var(--surface-current)
+  );
+  --border-strong: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-strong),
+    var(--surface-current)
+  );
   --border: var(--border-default);
-  --card-selected-border: var(--palette-border-selected);
+  --card-selected-border: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-selected),
+    var(--surface-current)
+  );
   --ring: var(--palette-primary);
   --overlay: var(--palette-overlay);
   --sidebar: var(--palette-sidebar-surface);
@@ -105,7 +152,7 @@
    * Semantic inline text (`--semantic-*`) vs status chrome (`--info-*`, …).
    * Text roles are tuned for readability; status roles are for fills/borders/badges.
    */
-  --semantic-neutral: var(--palette-semantic-neutral);
+  --semantic-neutral: var(--muted-foreground);
   --semantic-info: var(--palette-semantic-info);
   --semantic-info-muted: var(--palette-semantic-info-muted);
   --semantic-success: var(--palette-semantic-success);
@@ -130,10 +177,9 @@
   --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
 
   /*
-   * Outline control — quiet border ladder stroke, transparent fill, neutral hover wash.
+   * Outline button chrome — quiet border ladder stroke, transparent fill, neutral hover wash.
    */
-  --outline-control-border: var(--border-subtle);
-  --outline-button-border: var(--outline-control-border);
+  --outline-button-border: var(--border-subtle);
   --outline-button-hover-bg: var(--surface-subtle);
   --outline-button-active-bg: var(--surface-muted);
 

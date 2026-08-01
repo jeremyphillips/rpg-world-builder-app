@@ -1,5 +1,8 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { portalPopoverSurfaceClasses } from './surface-current.lib'
+
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
 export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
 
@@ -164,7 +167,10 @@ export const dataTableNameLinkCellVariants = cva(
 
 /** Popover panel for the column visibility / order editor. */
 export const dataTableColumnPanelVariants = cva(
-  'z-50 w-[240px] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-md',
+  cn(
+    'z-50 w-[240px] overflow-hidden rounded-md border border-border bg-popover p-0 shadow-md',
+    portalPopoverSurfaceClasses,
+  ),
 )
 
 /** A single row inside the column panel list. */

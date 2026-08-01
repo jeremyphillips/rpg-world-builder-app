@@ -245,6 +245,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'text',
       },
       {
+        name: 'foreground-disabled',
+        cssVar: '--foreground-disabled',
+        tailwind: 'text-foreground-disabled',
+        usage: 'text',
+      },
+      {
         name: 'muted-foreground',
         cssVar: '--muted-foreground',
         tailwind: 'text-muted-foreground',

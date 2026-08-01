@@ -4,6 +4,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Button } from './button.client'
 import { Eyebrow } from './eyebrow'
 
@@ -33,6 +34,7 @@ export function NotificationPopover({
           sideOffset={8}
           className={cn(
             'z-50 w-[min(100vw-2rem,24rem)] rounded-md border border-border bg-popover shadow-md outline-none',
+            portalPopoverSurfaceClasses,
             contentClassName,
           )}
         >

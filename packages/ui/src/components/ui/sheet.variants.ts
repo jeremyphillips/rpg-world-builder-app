@@ -1,11 +1,17 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { establishSurfaceCurrent } from './surface-current.lib'
+
 /**
  * Side panel built on Radix Dialog — reuses the modal overlay token and applies
  * edge-anchored slide animations instead of a centered panel.
  */
 export const sheetContentVariants = cva(
-  'fixed z-50 flex h-full flex-col overflow-hidden bg-card text-card-foreground shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+  cn(
+    'fixed z-50 flex h-full flex-col overflow-hidden bg-card text-card-foreground shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    establishSurfaceCurrent('card'),
+  ),
   {
     variants: {
       side: {

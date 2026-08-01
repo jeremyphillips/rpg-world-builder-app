@@ -12,6 +12,12 @@ const APPROVED_SURFACE_TOKENS = [
   'bg-surface-muted',
   'bg-surface-strong',
   'shadow-surface-raised',
+  '[--surface-current:var(--background)]',
+  '[--surface-current:var(--card)]',
+  '[--surface-current:var(--sunken)]',
+  '[--surface-current:var(--surface-subtle)]',
+  '[--surface-current:var(--surface-muted)]',
+  '[--surface-current:var(--surface-strong)]',
 ]
 
 const APPROVED_STATUS_TOKENS = [
