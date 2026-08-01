@@ -622,8 +622,9 @@
 }
 
 @layer base {
+  /* Structural default only — semantic shells must set an explicit border role utility. */
   * {
-    border-color: var(--color-border);
+    border-color: var(--border);
     outline-color: color-mix(in oklab, var(--color-ring) 50%, transparent);
   }
 

@@ -45,6 +45,15 @@ describe('surface-relative chrome utilities', () => {
     },
   )
 
+  it('uses live var(--border) in the base safety-net rule without --color-border', () => {
+    const baseRule = globalsCss.match(
+      /@layer base\s*\{[\s\S]*?\*[\s\S]*?border-color:\s*([^;]+);/,
+    )?.[1]
+    expect(baseRule?.trim()).toBe('var(--border)')
+    expect(globalsCss).not.toMatch(/--color-border:/)
+    expect(globalsCss).not.toMatch(/border-color:\s*var\(--color-border\)/)
+  })
+
   it('does not bridge surface-relative chrome through @theme --color-* aliases', () => {
     expect(globalsCss).not.toMatch(/--color-muted-foreground:/)
     expect(globalsCss).not.toMatch(/--color-foreground-subtle:/)

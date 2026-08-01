@@ -6,11 +6,11 @@ const COMPACT_COL = 'w-[70px] max-w-[70px]'
 export const editableGridTableVariants = cva('table-fixed w-auto caption-bottom text-sm')
 
 export const editableGridStickyHeaderVariants = cva(
-  `sticky left-0 z-20 ${COMPACT_COL} bg-background px-2 text-center font-semibold text-foreground shadow-[1px_0_0_0_hsl(var(--border))]`,
+  `sticky left-0 z-20 ${COMPACT_COL} bg-background px-2 text-center font-semibold text-foreground shadow-[1px_0_0_0_var(--border)]`,
 )
 
 export const editableGridStickyCellVariants = cva(
-  `sticky left-0 z-10 ${COMPACT_COL} bg-background px-2 text-center font-medium text-foreground shadow-[1px_0_0_0_hsl(var(--border))] group-hover:bg-row-hover`,
+  `sticky left-0 z-10 ${COMPACT_COL} bg-background px-2 text-center font-medium text-foreground shadow-[1px_0_0_0_var(--border)] group-hover:bg-row-hover`,
 )
 
 export const editableGridDataCellVariants = cva(`${COMPACT_COL} p-2 text-center`)
