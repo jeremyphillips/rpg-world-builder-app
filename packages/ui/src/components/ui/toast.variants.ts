@@ -1,22 +1,27 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { establishSurfaceCurrent } from './surface-current.lib'
 import { TOAST_TONES } from './toast.constants'
 
 export { TOAST_TONES }
 
 export const toastVariants = cva(
-  [
-    'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4 shadow-lg',
-    'transition-all',
-    'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none',
-    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
-    'data-[state=closed]:fade-out-80 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full',
-  ].join(' '),
+  cn(
+    [
+      'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4 shadow-lg',
+      'transition-all',
+      'data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out',
+      'data-[state=closed]:fade-out-80 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full',
+    ].join(' '),
+    establishSurfaceCurrent('card'),
+  ),
   {
     variants: {
       tone: {
         // Opaque panel fill — status *-subtle washes are translucent and show content behind floating toasts.
-        default: 'border-border bg-card text-foreground',
+        default: 'border-card-border bg-card text-foreground',
         success: 'border-success-muted bg-card text-foreground',
         warning: 'border-warning-muted bg-card text-foreground',
         destructive: 'border-destructive-muted bg-card text-foreground',

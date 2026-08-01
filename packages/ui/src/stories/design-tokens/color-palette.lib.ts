@@ -245,6 +245,12 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'text',
       },
       {
+        name: 'foreground-disabled',
+        cssVar: '--foreground-disabled',
+        tailwind: 'text-foreground-disabled',
+        usage: 'text',
+      },
+      {
         name: 'muted-foreground',
         cssVar: '--muted-foreground',
         tailwind: 'text-muted-foreground',
@@ -581,7 +587,8 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
   {
     id: 'interaction-recipes',
     label: 'Interaction recipes',
-    description: 'Shared hover/selected/drag/track chrome — tune per theme at Layer 1.',
+    description:
+      'Shared hover/selected/drag/track chrome — tune per theme at Layer 2 toward --surface-current.',
     tokens: [
       {
         name: 'control-hover-bg',

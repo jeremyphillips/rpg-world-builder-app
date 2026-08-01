@@ -5,6 +5,8 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { Search, X } from 'lucide-react'
 
 import { Button } from './button.client'
+import { cn } from '../../lib/utils'
+import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
 import { RichTextLinkPreviewCard } from './rich-text-link-preview-card.client'
@@ -338,7 +340,10 @@ export function RichTextLinkPicker({
           sideOffset={8}
           align="end"
           aria-labelledby={open ? headingId : undefined}
-          className="z-50 w-[28rem] rounded-md border border-border bg-popover p-3 text-popover-foreground shadow-md outline-none"
+          className={cn(
+            'z-50 w-[28rem] rounded-md border border-border bg-popover p-3 text-popover-foreground shadow-md outline-none',
+            portalPopoverSurfaceClasses,
+          )}
         >
           {open ? (
             <RichTextLinkPickerForm

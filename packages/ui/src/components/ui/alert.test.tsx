@@ -37,6 +37,7 @@ describe('Alert', () => {
     const alert = screen.getByRole('alert')
     if (variant === 'default') {
       expect(alert).toHaveClass('border-border', 'bg-surface-muted')
+      expect(alert).toHaveClass('[--surface-current:var(--surface-muted)]')
       return
     }
     expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)

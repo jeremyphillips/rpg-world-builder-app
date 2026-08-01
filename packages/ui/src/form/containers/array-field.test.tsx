@@ -212,7 +212,7 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
-    expect(addButton).toHaveClass('border-outline-button-border')
+    expect(addButton).toHaveClass('border-interactive-outline')
     expect(addButton).not.toHaveClass('bg-primary')
     expect(addButton).not.toHaveClass('bg-secondary')
   })
@@ -329,7 +329,7 @@ describe('ArrayFieldRenderer', () => {
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
     expect(addButton).toHaveClass('bg-secondary')
-    expect(addButton).not.toHaveClass('border-outline-button-border')
+    expect(addButton).not.toHaveClass('border-interactive-outline')
   })
 
   it('applies addActionVariant on addActionMenu dropdown triggers', async () => {
@@ -373,7 +373,7 @@ describe('ArrayFieldRenderer', () => {
 
     const addButton = screen.getByRole('button', { name: 'Add grant' })
     expect(addButton).toHaveClass('bg-primary')
-    expect(addButton).not.toHaveClass('border-outline-button-border')
+    expect(addButton).not.toHaveClass('border-interactive-outline')
 
     await user.click(addButton)
     expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
@@ -431,7 +431,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
       'rounded-md',
       'border',
-      'border-border',
+      'border-card-border',
       'bg-card',
       'shadow-surface-raised',
       'pl-2',

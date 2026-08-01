@@ -20,23 +20,6 @@
   --palette-surface-secondary: var(--palette-surface-panel);
   --palette-surface-accent: var(--palette-neutral-contrast);
 
-  /* Derived foreground scale */
-  --palette-fg-subtle: color-mix(
-    in oklch,
-    var(--palette-fg-default) 72%,
-    var(--palette-surface-base)
-  );
-  --palette-fg-muted: color-mix(
-    in oklch,
-    var(--palette-fg-default) 58%,
-    var(--palette-surface-base)
-  );
-  --palette-fg-disabled: color-mix(
-    in oklch,
-    var(--palette-fg-default) 42%,
-    var(--palette-surface-base)
-  );
-
   /* Derived wash ladder */
   --palette-surface-faint: color-mix(
     in oklch,
@@ -61,33 +44,6 @@
   --palette-surface-sunken: color-mix(
     in oklch,
     var(--palette-neutral-contrast) 32%,
-    var(--palette-surface-base)
-  );
-
-  /* Derived generic borders — canvas hierarchy */
-  --palette-border-faint: color-mix(
-    in oklch,
-    var(--palette-fg-default) 5%,
-    var(--palette-surface-base)
-  );
-  --palette-border-subtle: color-mix(
-    in oklch,
-    var(--palette-fg-default) 14%,
-    var(--palette-surface-base)
-  );
-  --palette-border-default: color-mix(
-    in oklch,
-    var(--palette-fg-default) 24%,
-    var(--palette-surface-base)
-  );
-  --palette-border-strong: color-mix(
-    in oklch,
-    var(--palette-fg-default) 34%,
-    var(--palette-surface-base)
-  );
-  --palette-border-selected: color-mix(
-    in oklch,
-    var(--palette-fg-default) 20%,
     var(--palette-surface-base)
   );
 
@@ -132,8 +88,16 @@
     var(--palette-field-border) 40%,
     var(--palette-field-bg-disabled)
   );
-  --palette-field-placeholder: var(--palette-fg-muted);
-  --palette-field-fg-disabled: var(--palette-fg-disabled);
+  --palette-field-placeholder: color-mix(
+    in oklch,
+    var(--palette-fg-default) 58%,
+    var(--palette-surface-field)
+  );
+  --palette-field-fg-disabled: color-mix(
+    in oklch,
+    var(--palette-fg-default) 42%,
+    var(--palette-surface-field)
+  );
 
   /* Switch track — distinct from field border ownership */
   --palette-switch-track: oklch(0.86 0.035 82 / 80%);
@@ -154,7 +118,6 @@
   --palette-warning-subtle: oklch(0.62 0.14 55 / 14%);
   --palette-warning-faint: oklch(0.62 0.14 55 / 8%);
 
-  --palette-semantic-neutral: var(--palette-fg-muted);
   --palette-semantic-info: oklch(0.48 0.13 250);
   --palette-semantic-info-muted: oklch(0.42 0.07 250);
   --palette-semantic-success: oklch(0.48 0.13 145);

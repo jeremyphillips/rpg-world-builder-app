@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { cn, establishSurfaceCurrent } from '@rpg/ui'
+
 export const sidebarOverlayVariants = cva(
   'fixed inset-0 z-40 bg-overlay transition-opacity md:hidden',
   {
@@ -16,7 +18,10 @@ export const sidebarOverlayVariants = cva(
 )
 
 export const sidebarAsideVariants = cva(
-  'fixed inset-y-0 left-0 z-50 flex w-sidebar shrink-0 flex-col border-r border-border bg-sidebar transition-transform md:static md:translate-x-0',
+  cn(
+    'fixed inset-y-0 left-0 z-50 flex w-sidebar shrink-0 flex-col border-r border-border bg-sidebar transition-transform md:static md:translate-x-0',
+    establishSurfaceCurrent('sidebar'),
+  ),
   {
     variants: {
       open: {

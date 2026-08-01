@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import { establishSurfaceCurrent } from '../surface-current.lib'
 import {
   resolveCollapsibleListItemLeadingChrome,
   type CollapsibleListItemLeadingChromeOptions,
@@ -50,8 +51,10 @@ export const collapsibleListItemCatalogChromeClasses = 'border-border bg-catalog
  * Expanded catalog panel wash — bleeds to shell edges; inner details restore copy
  * alignment with the header.
  */
-export const collapsibleListItemCatalogBodyClasses =
-  'border-t border-border-subtle bg-surface-muted -ml-2 -mr-3 pb-3 pt-0'
+export const collapsibleListItemCatalogBodyClasses = cn(
+  'border-t border-border-subtle bg-surface-muted -ml-2 -mr-3 pb-3 pt-0',
+  establishSurfaceCurrent('surface-muted'),
+)
 
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
 export const collapsibleListItemShellVariants = cva(cn('relative rounded-md border'), {

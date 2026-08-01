@@ -98,6 +98,6 @@ describe('CatalogPickerSelectionActions', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-outline-button-border')
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-interactive-outline')
   })
 })

@@ -1,0 +1,293 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { describe, expect, it } from 'vitest'
+
+import {
+  FIELD_CONTROL_SEMANTIC_ROLES,
+  INTERACTIVE_OUTLINE_MIX_WEIGHTS,
+  SURFACE_RELATIVE_CHROME_ROLES,
+  SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES,
+  SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
+} from './palette-inventory'
+
+const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
+
+function extractRoleValue(css: string, role: string): string | undefined {
+  const match = css.match(
+    new RegExp(`${role.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*:\\s*([^;]+);`),
+  )
+  return match?.[1]?.trim()
+}
+
+function readThemeCss(): { light: string; dark: string } {
+  return {
+    light: readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8'),
+    dark: readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8'),
+  }
+}
+
+const SURFACE_RELATIVE_FORMULA_ROLES = [
+  '--muted-foreground',
+  '--foreground-subtle',
+  '--foreground-disabled',
+  '--border-faint',
+  '--border-subtle',
+  '--border-default',
+  '--border-strong',
+  '--card-selected-border',
+] as const
+
+const CARD_BORDER_FORMULA_ROLES = ['--card-border'] as const
+
+const MIX_WEIGHT_ROLES = [
+  '--mix-fg-subtle',
+  '--mix-fg-muted',
+  '--mix-fg-disabled',
+  '--mix-border-faint',
+  '--mix-border-subtle',
+  '--mix-border-default',
+  '--mix-border-strong',
+  '--mix-border-selected',
+  '--mix-card-border',
+  '--mix-sidebar-nav-item-fg',
+  ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
+  ...INTERACTIVE_OUTLINE_MIX_WEIGHTS,
+] as const
+
+/** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
+const MIN_MUTED_ON_CARD_CONTRAST = 2.0
+const MIN_BORDER_CONTRAST = 1.15
+
+function oklchLightness(value: string): number | undefined {
+  const match = value.match(/oklch\(\s*([\d.]+)/)
+  return match ? Number(match[1]) : undefined
+}
+
+function contrastRatio(l1: number, l2: number): number {
+  const lighter = Math.max(l1, l2)
+  const darker = Math.min(l1, l2)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+describe('surface-relative chrome formulas', () => {
+  const { light, dark } = readThemeCss()
+
+  it('declares surface-relative chrome roles in both themes', () => {
+    for (const role of SURFACE_RELATIVE_CHROME_ROLES) {
+      expect(extractRoleValue(light, role), `${role} in semantic-light.css`).toBeTruthy()
+      expect(extractRoleValue(dark, role), `${role} in semantic-dark.css`).toBeTruthy()
+    }
+  })
+
+  it('defaults --surface-current to page canvas', () => {
+    expect(extractRoleValue(light, '--surface-current')).toBe('var(--background)')
+    expect(extractRoleValue(dark, '--surface-current')).toBe('var(--background)')
+  })
+
+  it('mirrors formula shape for neutral chrome roles across themes', () => {
+    for (const role of SURFACE_RELATIVE_FORMULA_ROLES) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--foreground)')
+      expect(darkValue).toContain('var(--foreground)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+    }
+  })
+
+  it('declares theme-local mix weights with identical role names', () => {
+    const percentWeight = /^\d+%$/
+    const sidebarNavMix = /^var\(--mix-(fg-subtle|fg-muted)\)$/
+
+    for (const role of MIX_WEIGHT_ROLES) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      if (role === '--mix-sidebar-nav-item-fg') {
+        expect(lightValue, `${role} in light`).toMatch(sidebarNavMix)
+        expect(darkValue, `${role} in dark`).toMatch(sidebarNavMix)
+        continue
+      }
+
+      expect(lightValue, `${role} in light`).toMatch(percentWeight)
+      expect(darkValue, `${role} in dark`).toMatch(percentWeight)
+    }
+  })
+
+  it('defines warm card border toward surface-current with primary mix', () => {
+    for (const role of CARD_BORDER_FORMULA_ROLES) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--primary)')
+      expect(darkValue).toContain('var(--primary)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).toContain('var(--mix-card-border)')
+      expect(darkValue).toContain('var(--mix-card-border)')
+    }
+  })
+
+  it('defines interactive outline border separately from border-subtle', () => {
+    for (const css of [light, dark]) {
+      const interactive = extractRoleValue(css, '--interactive-outline-border') ?? ''
+      const subtle = extractRoleValue(css, '--border-subtle') ?? ''
+
+      expect(interactive).toContain('color-mix')
+      expect(interactive).toContain('var(--mix-interactive-outline-border)')
+      expect(interactive).toContain('var(--surface-current)')
+      expect(interactive).not.toBe('var(--border-subtle)')
+      expect(subtle).toContain('var(--mix-border-subtle)')
+    }
+  })
+
+  it('keeps field-disabled separate from surface-disabled', () => {
+    expect(extractRoleValue(light, '--field-control-fg-disabled')).toBe(
+      'var(--palette-field-fg-disabled)',
+    )
+    expect(extractRoleValue(dark, '--field-control-fg-disabled')).toBe(
+      'var(--palette-field-fg-disabled)',
+    )
+    expect(FIELD_CONTROL_SEMANTIC_ROLES).toContain('--field-control-fg-disabled')
+    expect(SURFACE_RELATIVE_CHROME_ROLES).toContain('--foreground-disabled')
+    expect(SURFACE_RELATIVE_CHROME_ROLES).not.toContain('--field-control-fg-disabled')
+  })
+
+  it('derives field placeholder and field-disabled toward field plane, not surface-current', () => {
+    const paletteLight = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
+    const paletteDark = readFileSync(join(tokensDir, 'palette-dark.css'), 'utf8')
+
+    for (const css of [paletteLight, paletteDark]) {
+      const placeholder = extractRoleValue(css, '--palette-field-placeholder') ?? ''
+      const fieldDisabled = extractRoleValue(css, '--palette-field-fg-disabled') ?? ''
+
+      expect(placeholder).toContain('color-mix')
+      expect(placeholder).toContain('var(--palette-surface-field)')
+      expect(placeholder).not.toContain('surface-current')
+
+      expect(fieldDisabled).toContain('color-mix')
+      expect(fieldDisabled).toContain('var(--palette-surface-field)')
+      expect(fieldDisabled).not.toContain('surface-current')
+    }
+  })
+
+  it('holds minimum contrast floors for muted text on card plane (light + dark)', () => {
+    const paletteLight = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
+    const paletteDark = readFileSync(join(tokensDir, 'palette-dark.css'), 'utf8')
+    const { light: semanticLight, dark: semanticDark } = readThemeCss()
+
+    for (const [paletteCss, semanticCss, theme] of [
+      [paletteLight, semanticLight, 'light'],
+      [paletteDark, semanticDark, 'dark'],
+    ] as const) {
+      const fg = oklchLightness(extractRoleValue(paletteCss, '--palette-fg-default') ?? '')
+      const card = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-panel') ?? '')
+      const mixWeight = parseFloat(extractRoleValue(semanticCss, '--mix-fg-muted') ?? '70') / 100
+
+      expect(fg, `${theme} fg L`).toBeDefined()
+      expect(card, `${theme} card L`).toBeDefined()
+
+      const mutedL = fg! * mixWeight + card! * (1 - mixWeight)
+      expect(
+        contrastRatio(Math.max(mutedL, card!), Math.min(mutedL, card!)),
+      ).toBeGreaterThanOrEqual(MIN_MUTED_ON_CARD_CONTRAST)
+    }
+  })
+
+  it('holds minimum contrast floors on popover plane for border-subtle mix weights', () => {
+    const paletteLight = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
+    const paletteDark = readFileSync(join(tokensDir, 'palette-dark.css'), 'utf8')
+    const { light: semanticLight, dark: semanticDark } = readThemeCss()
+
+    for (const [paletteCss, semanticCss, theme] of [
+      [paletteLight, semanticLight, 'light'],
+      [paletteDark, semanticDark, 'dark'],
+    ] as const) {
+      const fg = oklchLightness(extractRoleValue(paletteCss, '--palette-fg-default') ?? '')
+      const panel = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-panel') ?? '')
+      const mixWeight = extractRoleValue(semanticCss, '--mix-border-subtle') ?? '14%'
+
+      expect(fg, `${theme} fg L`).toBeDefined()
+      expect(panel, `${theme} panel L`).toBeDefined()
+
+      const blended =
+        (fg! * parseFloat(mixWeight)) / 100 + (panel! * (100 - parseFloat(mixWeight))) / 100
+      expect(contrastRatio(fg!, blended)).toBeGreaterThanOrEqual(MIN_BORDER_CONTRAST)
+    }
+  })
+})
+
+describe('surface-relative interaction recipes (Phase 2)', () => {
+  const { light, dark } = readThemeCss()
+
+  it('declares interaction formula roles in both themes', () => {
+    for (const role of SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES) {
+      expect(extractRoleValue(light, role), `${role} in semantic-light.css`).toBeTruthy()
+      expect(extractRoleValue(dark, role), `${role} in semantic-dark.css`).toBeTruthy()
+    }
+  })
+
+  it('mirrors formula shape for accent-tinted interaction roles across themes', () => {
+    for (const role of [
+      '--control-hover-bg',
+      '--control-selected-bg',
+      '--drop-target-bg',
+    ] as const) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--accent)')
+      expect(darkValue).toContain('var(--accent)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).not.toContain('var(--background)')
+      expect(darkValue).not.toContain('var(--background)')
+    }
+  })
+
+  it('mirrors formula shape for warm interactive outline hover/active washes across themes', () => {
+    for (const role of [
+      '--interactive-outline-hover-bg',
+      '--interactive-outline-active-bg',
+    ] as const) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--primary)')
+      expect(darkValue).toContain('var(--primary)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).not.toContain('var(--surface-subtle)')
+      expect(darkValue).not.toContain('var(--surface-subtle)')
+      expect(lightValue).not.toContain('var(--surface-muted)')
+      expect(darkValue).not.toContain('var(--surface-muted)')
+    }
+  })
+
+  it('mixes choice-control border toward surface-current, not card', () => {
+    for (const css of [light, dark]) {
+      const value = extractRoleValue(css, '--choice-control-border') ?? ''
+      expect(value).toContain('color-mix')
+      expect(value).toContain('var(--foreground)')
+      expect(value).toContain('var(--surface-current)')
+      expect(value).not.toContain('var(--card)')
+    }
+  })
+
+  it('retargets dark raised shadow drop toward surface-current', () => {
+    const shadow = extractRoleValue(dark, '--surface-raised-shadow') ?? ''
+    expect(shadow).toContain('var(--surface-current)')
+    expect(shadow).not.toContain('var(--background)')
+  })
+})

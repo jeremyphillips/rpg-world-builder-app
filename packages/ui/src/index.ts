@@ -282,6 +282,12 @@ export {
   resolveChromeShellClasses,
   isSupportedSemanticChrome,
 } from './components/ui/chrome.variants'
+export {
+  establishSurfaceCurrent,
+  portalPopoverSurfaceClasses,
+  SURFACE_CURRENT_PLANES,
+  type SurfaceCurrentPlane,
+} from './components/ui/surface-current.lib'
 export { resolveSurfaceClasses } from './components/ui/surface.variants'
 export type {
   ChromeBorderAccent,

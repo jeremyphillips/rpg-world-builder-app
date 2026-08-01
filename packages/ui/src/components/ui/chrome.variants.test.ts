@@ -17,6 +17,7 @@ const APPROVED_CHROME_SHELL_TOKENS = [
   'bg-warning-faint',
   'bg-warning-subtle',
   'bg-surface-muted',
+  '[--surface-current:var(--surface-muted)]',
 ] as const
 
 const APPROVED_CHROME_ACCENT_TOKENS = [
@@ -70,6 +71,7 @@ describe('chrome.variants', () => {
   it('resolves neutral subtle shell without accent rail', () => {
     const classes = resolveChromeShellClasses({ tone: 'neutral', emphasis: 'subtle' })
     expect(classes).toContain('bg-surface-muted')
+    expect(classes).toContain('[--surface-current:var(--surface-muted)]')
     expect(resolveChromeAccentClasses({ tone: 'neutral', emphasis: 'subtle' })).toBe('')
   })
 

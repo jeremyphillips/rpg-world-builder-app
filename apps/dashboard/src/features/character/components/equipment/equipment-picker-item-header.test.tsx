@@ -37,7 +37,7 @@ describe('EquipmentPickerItemHeader', () => {
     expect(screen.getByText('Weapon')).toBeInTheDocument()
     expect(screen.getByText('2 GP')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-outline-button-border')
+    expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-interactive-outline')
   })
 
   it('renders owned quantity badge and Add in the title row', () => {

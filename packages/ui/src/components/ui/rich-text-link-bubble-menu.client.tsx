@@ -4,6 +4,7 @@ import * as React from 'react'
 import type { Editor } from '@tiptap/react'
 
 import { cn } from '../../lib/utils'
+import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Button } from './button.client'
 import { findLinkAnchorFromDom, resolveLinkBubblePosition } from './rich-text-editor-link.lib'
 
@@ -73,6 +74,7 @@ export function RichTextLinkBubbleMenu({
       aria-label="Link options"
       className={cn(
         'absolute z-10 flex items-center gap-1 rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md',
+        portalPopoverSurfaceClasses,
         className,
       )}
       style={{ top: `${position.top}px`, left: `${position.left}px` }}

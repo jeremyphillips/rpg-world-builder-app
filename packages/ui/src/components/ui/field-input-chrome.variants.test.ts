@@ -43,8 +43,8 @@ const APPROVED_INPUT_CHROME_TOKENS = [
   'disabled:bg-input-disabled',
   'disabled:border-input-disabled',
   'disabled:text-input-disabled',
-  'read-only:bg-input-readonly',
-  'read-only:border-input-readonly',
+  '[readonly]:bg-input-readonly',
+  '[readonly]:border-input-readonly',
   '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_var(--field-control-bg)]',
   '[&:-webkit-autofill]:[-webkit-text-fill-color:var(--field-control-fg)]',
 ]

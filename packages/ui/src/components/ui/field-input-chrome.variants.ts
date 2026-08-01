@@ -30,7 +30,7 @@ export const fieldInputDisabledClasses =
   'disabled:cursor-not-allowed disabled:bg-input-disabled disabled:border-input-disabled disabled:text-input-disabled'
 
 export const fieldInputReadonlyClasses =
-  'read-only:bg-input-readonly read-only:border-input-readonly'
+  '[readonly]:bg-input-readonly [readonly]:border-input-readonly'
 
 export const fieldInputPlaceholderClasses = 'placeholder:text-muted-foreground'
 

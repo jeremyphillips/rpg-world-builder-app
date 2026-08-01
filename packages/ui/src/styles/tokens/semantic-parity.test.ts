@@ -8,7 +8,8 @@ import {
   FIELD_CONTROL_SEMANTIC_ROLES,
   INTERACTION_SEMANTIC_ROLES,
   CHOICE_CONTROL_SEMANTIC_ROLES,
-  OUTLINE_BUTTON_SEMANTIC_ROLES,
+  INTERACTIVE_OUTLINE_SEMANTIC_ROLES,
+  SURFACE_RELATIVE_CHROME_ROLES,
 } from './palette-inventory'
 
 const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
@@ -21,7 +22,8 @@ const RECIPE_SEMANTIC_ROLES = new Set([
   '--catalog-picker-row-surface',
   '--surface-raised-shadow',
   '--surface-sunken-shadow',
-  ...OUTLINE_BUTTON_SEMANTIC_ROLES,
+  ...SURFACE_RELATIVE_CHROME_ROLES,
+  ...INTERACTIVE_OUTLINE_SEMANTIC_ROLES,
   ...INTERACTION_SEMANTIC_ROLES,
   ...CHOICE_CONTROL_SEMANTIC_ROLES,
 ])
