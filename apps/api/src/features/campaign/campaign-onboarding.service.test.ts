@@ -16,8 +16,10 @@ import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
+import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
 import * as assignControlledPc from './participation/assign-controlled-pc.service'
 import * as onboardingObservability from './campaign-onboarding-observability.lib'
+import { listCampaignsForUser } from './campaign.service'
 import {
   completeCampaignOnboardingForUser,
   getCampaignOnboardingContext,
@@ -582,5 +584,151 @@ describe('campaign onboarding service', () => {
       characterId: character.id,
     }).lean()
     expect(participation).toBeNull()
+  })
+
+  it('forbids onboarding context for staff memberships', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign({ name: 'Staff Gate Campaign' })
+
+    await expect(
+      getCampaignOnboardingContext({
+        campaignId,
+        userId: owner.id,
+      }),
+    ).rejects.toMatchObject({
+      status: 403,
+      code: 'forbidden',
+    })
+  })
+
+  it('returns reconnect context for control_stale memberships and converges to ready on completion', async () => {
+    const owner = await makeTestUser({ email: 'reconnect-stale-owner@example.com' })
+    const player = await makeTestUser({ email: 'reconnect-stale-player@example.com' })
+    const { id: campaignId } = await makeTestCampaign({
+      name: 'Reconnect Stale Campaign',
+      owner,
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId,
+      userId: player.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.id,
+      controlledCharacterIds: [character.id],
+    })
+
+    await CampaignCharacterParticipationModel.updateOne(
+      { campaignId, characterId: character.id },
+      { $set: { leftAt: new Date() } },
+    )
+    await CampaignMembershipModel.updateOne(
+      { campaignId, userId: player.id },
+      { $set: { controlledCharacterIds: [character.id] } },
+    )
+
+    const reconnectContext = await getCampaignOnboardingContext({
+      campaignId,
+      userId: player.id,
+    })
+    expect(reconnectContext).toMatchObject({
+      status: 'onboarding_incomplete',
+      mode: 'reconnect',
+      staleCharacterId: character.id,
+    })
+
+    const completed = await completeCampaignOnboardingForUser({
+      campaignId,
+      userId: player.id,
+      userEmail: player.email,
+      source: 'existing',
+      characterId: character.id,
+    })
+    expect(completed).toMatchObject({ campaignId, characterId: character.id })
+
+    const idempotent = await completeCampaignOnboardingForUser({
+      campaignId,
+      userId: player.id,
+      userEmail: player.email,
+      source: 'existing',
+      characterId: character.id,
+    })
+    expect(idempotent).toEqual(completed)
+
+    const completeContext = await getCampaignOnboardingContext({
+      campaignId,
+      userId: player.id,
+    })
+    expect(completeContext).toMatchObject({
+      status: 'complete',
+      campaignId,
+      characterId: character.id,
+    })
+
+    const campaigns = await listCampaignsForUser(player.id)
+    expect(campaigns[0]).toMatchObject({
+      viewerState: { kind: 'ready' },
+      openControlledCharacterIds: [character.id],
+    })
+  })
+
+  it('returns reconnect context for participation_missing and completes idempotently', async () => {
+    const { id: campaignId, owner } = await makeTestCampaign({ name: 'Reconnect Missing Campaign' })
+    const player = await makeTestUser({ email: 'reconnect-missing-player@example.com' })
+    const rawToken = generateInviteToken()
+
+    await createInviteRecord({
+      campaignId,
+      email: player.email,
+      normalizedEmail: player.email,
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: owner.id,
+    })
+
+    await acceptCampaignInvite({
+      rawToken,
+      userId: player.id,
+      userEmail: player.email,
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+    await completeCampaignOnboardingForUser({
+      campaignId,
+      userId: player.id,
+      userEmail: player.email,
+      source: 'existing',
+      characterId: character.id,
+    })
+
+    await CampaignMembershipModel.updateOne(
+      { campaignId, userId: player.id },
+      { $set: { controlledCharacterIds: [] } },
+    )
+
+    const reconnectContext = await getCampaignOnboardingContext({
+      campaignId,
+      userId: player.id,
+    })
+    expect(reconnectContext).toMatchObject({
+      status: 'onboarding_incomplete',
+      mode: 'reconnect',
+      staleCharacterId: character.id,
+    })
+
+    const completed = await completeCampaignOnboardingForUser({
+      campaignId,
+      userId: player.id,
+      userEmail: player.email,
+      source: 'existing',
+      characterId: character.id,
+    })
+    expect(completed).toMatchObject({ campaignId, characterId: character.id })
   })
 })

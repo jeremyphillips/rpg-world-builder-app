@@ -165,4 +165,13 @@ describe('campaign onboarding routes', () => {
 
     expect(response.body.error).toMatchObject({ code: 'not_found' })
   })
+
+  it('forbids onboarding context for campaign staff', async () => {
+    const { agent, csrfToken } = await registerOwner('onboarding-staff-owner@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'Staff Onboarding Campaign')
+
+    const response = await agent.get(`/api/campaigns/${campaignId}/onboarding-context`).expect(403)
+
+    expect(response.body.error).toMatchObject({ code: 'forbidden' })
+  })
 })

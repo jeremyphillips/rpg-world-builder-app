@@ -10,7 +10,8 @@ import { listEligibleCharactersForCampaign } from './participation/character-ass
 import { findCampaignById } from './find-campaign-by-id'
 import { getRulesetPatchRead } from '../vocabulary'
 import { completeCampaignOnboarding } from './complete-campaign-onboarding-character.lib'
-import { loadCampaignViewerParticipationContext } from './resolve-campaign-viewer-participation-context.lib'
+import { loadCampaignOnboardingGate } from './load-campaign-onboarding-gate.lib'
+import { throwFromCampaignOnboardingGate } from './map-campaign-onboarding-gate-error.lib'
 
 async function loadCampaignStartingLevel(campaignId: string): Promise<number> {
   const patch = await getRulesetPatchRead(campaignId)
@@ -24,26 +25,28 @@ export async function getCampaignOnboardingContext({
   campaignId: string
   userId: string
 }): Promise<CampaignOnboardingContext> {
+  const gate = await loadCampaignOnboardingGate({ campaignId, userId })
+
+  if (gate.kind === 'complete') {
+    return {
+      status: 'complete',
+      campaignId,
+      characterId: gate.characterId,
+    }
+  }
+
+  if (gate.kind === 'not_found' || gate.kind === 'forbidden' || gate.kind === 'integrity_error') {
+    throwFromCampaignOnboardingGate(gate)
+  }
+
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
-  const participation = await loadCampaignViewerParticipationContext({ campaignId, userId })
-  if (!participation) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
+  const startingLevel = await loadCampaignStartingLevel(campaignId)
 
-  if (participation.viewerState.kind === 'ready') {
-    return {
-      status: 'complete',
-      campaignId,
-      characterId: participation.activeCharacterIds[0],
-    }
-  }
-
-  if (participation.viewerState.kind === 'onboarding_incomplete') {
-    const startingLevel = await loadCampaignStartingLevel(campaignId)
+  if (gate.mode === 'initial') {
     return {
       status: 'onboarding_incomplete',
       mode: 'initial',
@@ -56,44 +59,17 @@ export async function getCampaignOnboardingContext({
     }
   }
 
-  if (
-    participation.viewerState.kind === 'control_stale' ||
-    participation.viewerState.kind === 'participation_missing'
-  ) {
-    const startingLevel = await loadCampaignStartingLevel(campaignId)
-    return {
-      status: 'onboarding_incomplete',
-      mode: 'reconnect',
-      staleCharacterId: participation.viewerState.characterId,
-      campaignId,
-      campaign: {
-        id: campaign.id,
-        name: campaign.identity.name,
-      },
-      startingLevel,
-    }
+  return {
+    status: 'onboarding_incomplete',
+    mode: 'reconnect',
+    staleCharacterId: gate.characterId,
+    campaignId,
+    campaign: {
+      id: campaign.id,
+      name: campaign.identity.name,
+    },
+    startingLevel,
   }
-
-  if (participation.viewerState.kind === 'membership_invalid') {
-    throw new HttpError(
-      403,
-      'forbidden',
-      'Campaign onboarding is not available for this membership.',
-    )
-  }
-
-  if (
-    participation.participationState === 'staff' ||
-    participation.participationState === 'observer'
-  ) {
-    throw new HttpError(
-      403,
-      'forbidden',
-      'Campaign onboarding is only available to player members.',
-    )
-  }
-
-  throw new HttpError(404, 'not_found', 'Campaign not found.')
 }
 
 export async function listEligibleCharactersForCampaignOnboarding({
@@ -103,9 +79,14 @@ export async function listEligibleCharactersForCampaignOnboarding({
   campaignId: string
   userId: string
 }): Promise<CampaignOnboardingEligibleCharacter[]> {
-  const context = await getCampaignOnboardingContext({ campaignId, userId })
-  if (context.status !== 'onboarding_incomplete') {
+  const gate = await loadCampaignOnboardingGate({ campaignId, userId })
+
+  if (gate.kind === 'complete') {
     throw new HttpError(409, 'conflict', 'Campaign onboarding is already complete.')
+  }
+
+  if (gate.kind === 'not_found' || gate.kind === 'forbidden' || gate.kind === 'integrity_error') {
+    throwFromCampaignOnboardingGate(gate)
   }
 
   return listEligibleCharactersForCampaign({ campaignId, userId })
