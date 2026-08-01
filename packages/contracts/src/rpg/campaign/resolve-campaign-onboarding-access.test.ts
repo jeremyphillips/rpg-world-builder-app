@@ -6,7 +6,7 @@ import {
   isCampaignViewerSelfRecoverable,
   resolveCampaignOnboardingAccess,
 } from './resolve-campaign-onboarding-access'
-import { resolveCampaignViewerState } from './resolve-campaign-viewer-participation'
+import { resolveCampaignViewerState } from './resolve-campaign-viewer-state'
 
 describe('resolveCampaignOnboardingAccess', () => {
   it('returns forbidden for staff and observer roles regardless of viewer state', () => {

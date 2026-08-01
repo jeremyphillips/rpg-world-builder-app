@@ -7,7 +7,7 @@ import { campaignInviteEmailsInputSchema } from './campaign-invite'
 import {
   campaignRecoveryReasonSchema,
   campaignViewerStateSchema,
-} from './resolve-campaign-viewer-participation'
+} from './resolve-campaign-viewer-state'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,

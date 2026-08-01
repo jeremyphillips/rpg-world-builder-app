@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import type { CampaignRole } from '../../shared/roles'
-import type { CampaignViewerState } from './resolve-campaign-viewer-participation'
+import { isCampaignManager } from './is-campaign-manager'
+import type { CampaignViewerState } from './resolve-campaign-viewer-state'
 
 // ---------------------------------------------------------------------------
 // Campaign onboarding access — role-first gate classification for GET/POST.
@@ -79,8 +80,6 @@ export type CampaignOnboardingAccessInput = {
   activeCharacterIds: readonly string[]
 }
 
-const STAFF_ROLES = new Set<CampaignRole>(['owner', 'co-owner'])
-
 /**
  * Classifies whether a campaign member may use onboarding GET/POST flows.
  * Role is evaluated before viewer state; forbidden and integrity outcomes are
@@ -91,7 +90,7 @@ export function resolveCampaignOnboardingAccess(
 ): CampaignOnboardingAccessResult {
   const { role, viewerState, activeCharacterIds } = input
 
-  if (STAFF_ROLES.has(role) || role === 'observer') {
+  if (isCampaignManager(role) || role === 'observer') {
     return { kind: 'forbidden', reason: 'not_player' }
   }
 
