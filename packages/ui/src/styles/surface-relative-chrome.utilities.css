@@ -1,0 +1,105 @@
+/*
+ * Surface-relative neutral chrome utilities — formulas evaluate on the element so
+ * inherited `--surface-current` rebinds from establishing shells apply at use time.
+ *
+ * Layer 2 `--muted-foreground` / `--border-*` roles remain for var() consumers
+ * (Storybook probes, inline styles); Tailwind utilities must use these @utility defs.
+ */
+
+@utility text-muted-foreground {
+  color: color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current));
+}
+
+@utility text-foreground-subtle {
+  color: color-mix(in oklch, var(--foreground) var(--mix-fg-subtle), var(--surface-current));
+}
+
+@utility text-foreground-disabled {
+  color: color-mix(in oklch, var(--foreground) var(--mix-fg-disabled), var(--surface-current));
+}
+
+@utility text-semantic-neutral {
+  color: color-mix(in oklch, var(--foreground) var(--mix-fg-muted), var(--surface-current));
+}
+
+@utility text-sidebar-nav-item-fg {
+  color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-sidebar-nav-item-fg),
+    var(--surface-current)
+  );
+}
+
+@utility border-border {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-default),
+    var(--surface-current)
+  );
+}
+
+@utility border-border-faint {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-faint),
+    var(--surface-current)
+  );
+}
+
+@utility border-border-subtle {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-subtle),
+    var(--surface-current)
+  );
+}
+
+@utility border-border-strong {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-strong),
+    var(--surface-current)
+  );
+}
+
+@utility border-card-selected-border {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-selected),
+    var(--surface-current)
+  );
+}
+
+@utility border-outline-button-border {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-subtle),
+    var(--surface-current)
+  );
+}
+
+@utility border-semantic-neutral-border {
+  border-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-default),
+    var(--surface-current)
+  );
+}
+
+@utility bg-border {
+  background-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-default),
+    var(--surface-current)
+  );
+}
+
+@utility divide-border {
+  & > :not(:last-child) {
+    border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-default),
+      var(--surface-current)
+    );
+  }
+}

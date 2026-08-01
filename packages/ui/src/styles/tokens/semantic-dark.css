@@ -16,6 +16,7 @@
   --mix-border-default: 12%;
   --mix-border-strong: 24%;
   --mix-border-selected: 30%;
+  --mix-sidebar-nav-item-fg: var(--mix-fg-muted);
 
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);

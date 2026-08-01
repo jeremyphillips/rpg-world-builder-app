@@ -54,6 +54,12 @@ Descendants consume semantic chrome tokens only (`text-muted-foreground`,
 `border-border-subtle`, …); they never need to know which parent surface variant they
 sit on.
 
+Tailwind utilities for surface-relative chrome (`text-muted-foreground`, `border-border`,
+etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.css` so
+`color-mix(… var(--surface-current))` evaluates on the element. Layer 2 `--muted-foreground`
+/ `--border-*` roles remain for `var()` probes; do not bridge them through `@theme inline`
+`--color-*` aliases.
+
 | Role        | Utility                 | Meaning                                                             |
 | ----------- | ----------------------- | ------------------------------------------------------------------- |
 | Base        | `bg-background`         | Page canvas                                                         |

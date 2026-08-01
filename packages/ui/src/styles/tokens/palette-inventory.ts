@@ -232,6 +232,7 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--mix-border-default',
   '--mix-border-strong',
   '--mix-border-selected',
+  '--mix-sidebar-nav-item-fg',
   '--muted-foreground',
   '--foreground-subtle',
   '--foreground-disabled',

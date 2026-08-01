@@ -42,6 +42,7 @@ const MIX_WEIGHT_ROLES = [
   '--mix-border-default',
   '--mix-border-strong',
   '--mix-border-selected',
+  '--mix-sidebar-nav-item-fg',
 ] as const
 
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
@@ -89,9 +90,21 @@ describe('surface-relative chrome formulas', () => {
   })
 
   it('declares theme-local mix weights with identical role names', () => {
+    const percentWeight = /^\d+%$/
+    const sidebarNavMix = /^var\(--mix-(fg-subtle|fg-muted)\)$/
+
     for (const role of MIX_WEIGHT_ROLES) {
-      expect(extractRoleValue(light, role), `${role} in light`).toMatch(/^\d+%$/)
-      expect(extractRoleValue(dark, role), `${role} in dark`).toMatch(/^\d+%$/)
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      if (role === '--mix-sidebar-nav-item-fg') {
+        expect(lightValue, `${role} in light`).toMatch(sidebarNavMix)
+        expect(darkValue, `${role} in dark`).toMatch(sidebarNavMix)
+        continue
+      }
+
+      expect(lightValue, `${role} in light`).toMatch(percentWeight)
+      expect(darkValue, `${role} in dark`).toMatch(percentWeight)
     }
   })
 
