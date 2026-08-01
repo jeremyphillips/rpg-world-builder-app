@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterRosterStatusSchema } from '../vocab/character-roster-status'
+import { characterRosterStatusSchema } from '../../vocab/character-roster-status'
 
 export const characterRosterStateSchema = z.object({
   status: characterRosterStatusSchema,

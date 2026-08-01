@@ -1,5 +1,5 @@
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
-import type { CharacterCampaignBlockingIssue } from '../../campaign/character-eligibility-contracts'
+import type { CharacterCampaignBlockingIssue } from '../../campaign/character/eligibility-contracts'
 
 export type ResolveCharacterParticipationEligibilityInput = {
   subject: CharacterEligibilitySubject

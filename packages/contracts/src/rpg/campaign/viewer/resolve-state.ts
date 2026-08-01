@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { isCampaignManager } from './is-campaign-manager'
-import type { CampaignViewerParticipationInput } from './resolve-campaign-viewer-participation'
+import { isCampaignManager } from '../is-campaign-manager'
+import type { CampaignViewerParticipationInput } from './resolve-participation'
 
 // ---------------------------------------------------------------------------
 // Campaign viewer state — actionable recovery model for list rows and nav.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { ApiError, isApiError } from '../../shared/errors'
+import { ApiError, isApiError } from '../../../shared/errors'
 import {
   CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
   isCampaignCharacterAssignmentErrorCode,
@@ -8,7 +8,7 @@ import {
   LEGACY_CAMPAIGN_INVITE_INELIGIBLE_CODE,
   parseCampaignCharacterAssignmentErrorDetails,
   resolveCampaignCharacterAssignmentError,
-} from './campaign-character-assignment-errors'
+} from './assignment-errors'
 
 describe('parseCampaignCharacterAssignmentErrorDetails', () => {
   it('parses campaign_ineligible details', () => {

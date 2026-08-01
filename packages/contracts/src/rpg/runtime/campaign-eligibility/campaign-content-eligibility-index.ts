@@ -1,5 +1,5 @@
 import type { ResolvedContentCampaignAccess } from '../../content/lib/campaign-access'
-import type { CharacterCampaignContentReferenceType } from '../../campaign/character-eligibility-contracts'
+import type { CharacterCampaignContentReferenceType } from '../../campaign/character/eligibility-contracts'
 
 export type CampaignContentEligibilityEntry = {
   access: ResolvedContentCampaignAccess

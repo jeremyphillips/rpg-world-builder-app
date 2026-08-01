@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { isApiError } from '../../shared/errors'
-import { characterBuildValidationIssueSchema } from '../character-builder'
+import { isApiError } from '../../../shared/errors'
+import { characterBuildValidationIssueSchema } from '../../character-builder'
 import {
   characterCampaignBlockingIssueSchema,
   characterCampaignWarningSchema,
-} from './character-eligibility-contracts'
+} from './eligibility-contracts'
 
 // ---------------------------------------------------------------------------
 // Campaign character assignment error wire schema — serialized in API `error.details`.

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
-import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
-import { type campaignRoleSchema } from '../../shared/roles'
+import { campaignInviteDeliveryStatusSchema } from '../../vocab/campaign-invite-delivery-status'
+import { campaignInviteStatusSchema } from '../../vocab/campaign-invite-status'
+import { type campaignRoleSchema } from '../../../shared/roles'
 
 // ---------------------------------------------------------------------------
 // Campaign invite DTOs — client-facing shapes; never expose persistence fields.

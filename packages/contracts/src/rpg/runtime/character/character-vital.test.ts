@@ -11,8 +11,8 @@ import {
   applyCharacterVitalTransitionMetadata,
   mergeCharacterVitalPatch,
 } from './update-character-vital'
-import { createDefaultCampaignRosterState } from '../../campaign/campaign-character-participation'
-import { applyCampaignRosterTransitionMetadata } from '../../campaign/update-campaign-roster'
+import { createDefaultCampaignRosterState } from '../../campaign/character/participation'
+import { applyCampaignRosterTransitionMetadata } from '../../campaign/character/update-roster'
 
 const TIMESTAMP = '2026-03-01T12:00:00.000Z'
 const EARLIER_TIMESTAMP = '2026-02-01T12:00:00.000Z'

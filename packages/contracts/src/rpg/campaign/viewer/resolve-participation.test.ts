@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveCampaignOverviewMemberOnboardingState,
   resolveCampaignViewerParticipation,
-} from './resolve-campaign-viewer-participation'
+} from './resolve-participation'
 
 describe('resolveCampaignViewerParticipation', () => {
   it('returns none when the viewer has no membership', () => {

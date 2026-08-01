@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import type { CampaignRole } from '../../shared/roles'
-import { isCampaignManager } from './is-campaign-manager'
-import type { CampaignViewerState } from './resolve-campaign-viewer-state'
+import type { CampaignRole } from '../../../shared/roles'
+import { isCampaignManager } from '../is-campaign-manager'
+import type { CampaignViewerState } from '../viewer/resolve-state'
 
 // ---------------------------------------------------------------------------
 // Campaign onboarding access — role-first gate classification for GET/POST.

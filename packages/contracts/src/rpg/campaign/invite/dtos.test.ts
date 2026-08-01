@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   campaignInviteInviteeListItemSchema,
   campaignInviteInviteeListResponseSchema,
-} from './campaign-invite-dtos'
+} from './dtos'
 
 describe('campaignInviteInviteeListItemSchema', () => {
   it('parses pending invite list items for the invitee dashboard', () => {

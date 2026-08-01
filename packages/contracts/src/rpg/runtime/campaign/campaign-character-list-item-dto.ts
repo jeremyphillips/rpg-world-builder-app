@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterRosterStateSchema } from '../../campaign/character-roster-state'
+import { characterRosterStateSchema } from '../../campaign/character/roster-state'
 import { characterCardViewModelSchema } from '../character/character-card-dtos'
 
 // ---------------------------------------------------------------------------

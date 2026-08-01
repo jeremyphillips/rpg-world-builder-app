@@ -7,7 +7,7 @@ import type { Organization } from '../../../content/organization'
 import type { CharacterBuildContext } from '../context'
 import type { ResolvedContentCampaignAccess } from '../../../content/lib/campaign-access'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '../../../content/lib/campaign-access'
-import type { ContentViewer } from '../../../campaign/lib/campaign-content-viewer'
+import type { ContentViewer } from '../../../campaign/campaign-content-viewer'
 import { isContentDiscoverableForViewer } from '../../campaign/content-viewer-discovery'
 
 // ---------------------------------------------------------------------------

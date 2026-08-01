@@ -1,6 +1,6 @@
-import { defineMessage, formatFieldMessage } from '../../validation/define-message'
+import { defineMessage, formatFieldMessage } from '../../../validation/define-message'
 
-import type { CampaignInviteUnavailableReason } from './campaign-character-assignment-errors'
+import type { CampaignInviteUnavailableReason } from '../character/assignment-errors'
 
 export const campaignInviteUnavailableMessages = {
   expired: defineMessage(

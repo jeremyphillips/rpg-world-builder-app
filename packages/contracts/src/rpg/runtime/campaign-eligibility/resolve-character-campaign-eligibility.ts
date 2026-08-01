@@ -1,10 +1,10 @@
-import type { CampaignCharacterParticipation } from '../../campaign/campaign-character-participation'
+import type { CampaignCharacterParticipation } from '../../campaign/character/participation'
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
-import type { ContentViewer } from '../../campaign/lib/campaign-content-viewer'
+import type { ContentViewer } from '../../campaign/campaign-content-viewer'
 import {
   sortBlockingIssuesByPriority,
   type CharacterCampaignEligibility,
-} from '../../campaign/character-eligibility-contracts'
+} from '../../campaign/character/eligibility-contracts'
 import type { CampaignContentEligibilityIndex } from './campaign-content-eligibility-index'
 import { resolveCharacterContentEligibility } from './resolve-character-content-eligibility'
 import { resolveCharacterParticipationEligibility } from './resolve-character-participation-eligibility'

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { type CharacterRosterStatus } from '../vocab/character-roster-status'
-import { characterRosterStateSchema, type CharacterRosterState } from './character-roster-state'
+import { type CharacterRosterStatus } from '../../vocab/character-roster-status'
+import { characterRosterStateSchema, type CharacterRosterState } from './roster-state'
 
 // ---------------------------------------------------------------------------
 // Campaign character participation — canonical character↔campaign association.

@@ -1,4 +1,4 @@
-import { CAMPAIGN_MANAGE_ROLES, type CampaignManageRole } from '../../../shared/roles'
+import { CAMPAIGN_MANAGE_ROLES, type CampaignManageRole } from '../../shared/roles'
 
 /**
  * Campaign authorization context for content discovery and saved-reference reads.

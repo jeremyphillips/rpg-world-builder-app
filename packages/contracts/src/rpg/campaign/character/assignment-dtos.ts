@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterCampaignEligibilitySchema } from './character-eligibility-contracts'
+import { characterCampaignEligibilitySchema } from './eligibility-contracts'
 
 // ---------------------------------------------------------------------------
 // Shared campaign character assignment DTOs — used by invite and membership flows.

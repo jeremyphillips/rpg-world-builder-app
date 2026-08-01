@@ -3,11 +3,8 @@ import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
-import { campaignInviteEmailsInputSchema } from './campaign-invite'
-import {
-  campaignRecoveryReasonSchema,
-  campaignViewerStateSchema,
-} from './resolve-campaign-viewer-state'
+import { campaignInviteEmailsInputSchema } from './invite/invite'
+import { campaignRecoveryReasonSchema, campaignViewerStateSchema } from './viewer/resolve-state'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,

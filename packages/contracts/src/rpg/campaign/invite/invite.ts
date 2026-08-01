@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { campaignInviteDeliveryStatusSchema } from '../vocab/campaign-invite-delivery-status'
-import { campaignInviteStatusSchema } from '../vocab/campaign-invite-status'
+import { campaignInviteDeliveryStatusSchema } from '../../vocab/campaign-invite-delivery-status'
+import { campaignInviteStatusSchema } from '../../vocab/campaign-invite-status'
 
 // ---------------------------------------------------------------------------
 // Campaign invite — persistence shape for player onboarding invitations.

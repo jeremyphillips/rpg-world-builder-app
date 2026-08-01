@@ -1,10 +1,7 @@
 import { z } from 'zod'
 
-import { characterRosterStatusSchema } from '../vocab/character-roster-status'
-import {
-  characterRosterStateSchema,
-  type CharacterRosterState,
-} from '../campaign/character-roster-state'
+import { characterRosterStatusSchema } from '../../vocab/character-roster-status'
+import { characterRosterStateSchema, type CharacterRosterState } from './roster-state'
 
 // ---------------------------------------------------------------------------
 // Roster patch — client-writable status and note on participation.roster.

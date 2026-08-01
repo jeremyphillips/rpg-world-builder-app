@@ -1,6 +1,6 @@
 import { createCharacterInputSchema } from '../character/create-input'
 import type { CharacterEligibilitySubject } from './character-eligibility-subject'
-import type { CharacterCampaignBlockingIssue } from '../../campaign/character-eligibility-contracts'
+import type { CharacterCampaignBlockingIssue } from '../../campaign/character/eligibility-contracts'
 
 export type ResolveCharacterStructuralEligibilityInput = {
   subject: CharacterEligibilitySubject

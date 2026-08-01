@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   filterViewerOpenParticipatingCharacterIds,
   resolveCampaignViewerState,
-} from './resolve-campaign-viewer-state'
+} from './resolve-state'
 
 describe('filterViewerOpenParticipatingCharacterIds', () => {
   it('keeps controlled and user-owned open participations only', () => {

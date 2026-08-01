@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import type { CampaignRole } from '../../shared/roles'
-import type { CampaignOverviewMemberOnboardingState } from './campaign-overview-dtos'
-import { isCampaignManager } from './is-campaign-manager'
+import type { CampaignRole } from '../../../shared/roles'
+import type { CampaignOverviewMemberOnboardingState } from '../campaign-overview-dtos'
+import { isCampaignManager } from '../is-campaign-manager'
 
 // ---------------------------------------------------------------------------
 // Campaign viewer participation — coarse resolver for membership + open roster.

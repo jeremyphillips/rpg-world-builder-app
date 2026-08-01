@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { campaignCharacterCapabilitiesSchema } from '../../campaign/campaign-character-access-dtos'
-import { characterRosterStateSchema } from '../../campaign/character-roster-state'
+import { campaignCharacterCapabilitiesSchema } from '../../campaign/character/access-dtos'
+import { characterRosterStateSchema } from '../../campaign/character/roster-state'
 import { pcCharacterSchema } from '../character/sheet'
 
 export const campaignCharacterGetResponseSchema = z.object({

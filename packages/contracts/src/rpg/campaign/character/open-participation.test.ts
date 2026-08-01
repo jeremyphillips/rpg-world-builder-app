@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CampaignCharacterParticipation } from './campaign-character-participation'
+import type { CampaignCharacterParticipation } from './participation'
 import { isOpenParticipation } from './open-participation'
 
 describe('isOpenParticipation', () => {

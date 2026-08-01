@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  CAMPAIGN_CHARACTER_ERROR_CODES,
-  resolveCampaignCharacterAccess,
-} from './campaign-character-access'
+import { CAMPAIGN_CHARACTER_ERROR_CODES, resolveCampaignCharacterAccess } from './access'
 
 describe('CAMPAIGN_CHARACTER_ERROR_CODES', () => {
   it('exports stable client-inspectable codes', () => {

@@ -66,7 +66,7 @@ character in that campaign.
 ## Contracts
 
 - Vital: `packages/contracts/src/rpg/runtime/character/character-vital.ts`
-- Roster: `packages/contracts/src/rpg/campaign/character-roster-state.ts`
+- Roster: `packages/contracts/src/rpg/campaign/character/roster-state.ts`
 - Participation: `packages/contracts/src/rpg/campaign/campaign-character-participation.ts`
-- Patch helpers: `update-character-vital.ts`, `update-campaign-roster.ts`
+- Patch helpers: `update-character-vital.ts`, `character/update-roster.ts`
 - Bulk roster: `character-bulk-roster.ts` using neutral `BulkFieldOperation<T>`

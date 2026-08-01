@@ -5,7 +5,7 @@ import {
   campaignEligibleCharactersResponseSchema,
   type CampaignEligibleCharacter,
   type CampaignEligibleCharactersResponse,
-} from './campaign-character-assignment-dtos'
+} from '../character/assignment-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign onboarding DTOs — membership-scoped continuation (no invite coupling).

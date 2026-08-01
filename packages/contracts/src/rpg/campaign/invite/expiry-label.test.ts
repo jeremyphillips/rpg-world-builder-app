@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveCampaignInviteExpiryLabel } from './campaign-invite-expiry-label'
+import { resolveCampaignInviteExpiryLabel } from './expiry-label'
 
 describe('resolveCampaignInviteExpiryLabel', () => {
   it('uses relative copy when the deadline is near', () => {

@@ -1,4 +1,4 @@
-import type { CampaignCharacterParticipation } from './campaign-character-participation'
+import type { CampaignCharacterParticipation } from './participation'
 
 /** Open participation = participation record with no leftAt. */
 export function isOpenParticipation(

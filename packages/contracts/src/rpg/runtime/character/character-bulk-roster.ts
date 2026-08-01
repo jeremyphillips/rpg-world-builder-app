@@ -1,9 +1,9 @@
 import type { BulkFieldOperation } from '../../../lib/bulk-field-operation'
 import type { CharacterRosterStatus } from '../../vocab/character-roster-status'
-import type { CharacterRosterState } from '../../campaign/character-roster-state'
-import { createDefaultCampaignRosterState } from '../../campaign/campaign-character-participation'
-import { type CampaignRosterPatch } from '../../campaign/update-campaign-roster'
-import { mergeCampaignRosterPatch } from '../../campaign/update-campaign-roster'
+import type { CharacterRosterState } from '../../campaign/character/roster-state'
+import { createDefaultCampaignRosterState } from '../../campaign/character/participation'
+import { type CampaignRosterPatch } from '../../campaign/character/update-roster'
+import { mergeCampaignRosterPatch } from '../../campaign/character/update-roster'
 
 export type CharacterBulkRosterFormValues = {
   rosterStatus: BulkFieldOperation<CharacterRosterStatus>
