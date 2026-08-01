@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { portalPopoverSurfaceClasses } from './surface-current.lib'
+import { establishSurfaceCurrent, portalPopoverSurfaceClasses } from './surface-current.lib'
 
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
 export const dataTableRootVariants = cva('flex flex-col gap-3 w-full')
@@ -28,7 +28,10 @@ export const dataTableFilterControlVariants = cva('', {
 
 /** Collapsible advanced-filters panel border + padding. */
 export const dataTableAdvancedPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border bg-surface-muted',
+  cn(
+    'overflow-hidden rounded-md border border-border bg-surface-muted',
+    establishSurfaceCurrent('surface-muted'),
+  ),
 )
 
 /** Inner grid for secondary filter controls. */

@@ -41,6 +41,14 @@ const OWNERSHIP_ROWS = [
     plane: '--surface-subtle',
   },
   { shell: 'Advanced filter panel', ownership: 'establishes', plane: '--surface-muted' },
+  { shell: 'RadioCard outer card / shell', ownership: 'establishes', plane: '--card' },
+  {
+    shell: 'RadioCard embedded muted panel',
+    ownership: 'establishes',
+    plane: '--surface-muted',
+  },
+  { shell: 'Neutral Alert (default variant)', ownership: 'establishes', plane: '--surface-muted' },
+  { shell: 'DataTable utility bar rows', ownership: 'establishes', plane: '--surface-subtle' },
   { shell: 'Modal / Sheet / Toast', ownership: 'establishes', plane: '--card' },
   { shell: 'Sidebar shell', ownership: 'establishes', plane: '--sidebar' },
   {

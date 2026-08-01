@@ -6,6 +6,7 @@ import {
   fieldShellLayoutClasses,
   resolveOutlineBorderClasses,
 } from './field-surface.variants'
+import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   DEFAULT_PANEL_SURFACE,
   resolveSurfaceClasses,
@@ -23,7 +24,10 @@ const CHROME_ACCENT_RAIL_LAYOUT_CLASSES =
 const CHROME_SHELL_RECIPE: Record<SupportedChromeKey, string> = {
   'warning:faint': 'border border-border-subtle bg-warning-faint',
   'warning:subtle': 'border border-warning-muted bg-warning-subtle',
-  'neutral:subtle': 'border border-border-subtle bg-surface-muted',
+  'neutral:subtle': cn(
+    'border border-border-subtle bg-surface-muted',
+    establishSurfaceCurrent('surface-muted'),
+  ),
 }
 
 const CHROME_ACCENT_RECIPE: Partial<Record<SupportedChromeKey, string>> = {
@@ -32,7 +36,10 @@ const CHROME_ACCENT_RECIPE: Partial<Record<SupportedChromeKey, string>> = {
 }
 
 const CALLOUT_ALERT_SURFACE: Record<AlertVariant, string> = {
-  default: 'border-border bg-surface-muted text-foreground',
+  default: cn(
+    'border-border bg-surface-muted text-foreground',
+    establishSurfaceCurrent('surface-muted'),
+  ),
   info: 'border-info-muted bg-info-subtle text-foreground',
   success: 'border-success-muted bg-success-subtle text-foreground',
   warning: 'border-warning-muted bg-warning-subtle text-foreground',

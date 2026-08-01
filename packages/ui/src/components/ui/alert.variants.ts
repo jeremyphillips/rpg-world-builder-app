@@ -1,5 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { establishSurfaceCurrent } from './surface-current.lib'
+
 export const ALERT_VARIANTS = ['default', 'info', 'success', 'warning', 'destructive'] as const
 
 export type AlertVariant = (typeof ALERT_VARIANTS)[number]
@@ -9,7 +12,10 @@ export const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-border bg-surface-muted text-foreground',
+        default: cn(
+          'border-border bg-surface-muted text-foreground',
+          establishSurfaceCurrent('surface-muted'),
+        ),
         info: 'border-info-muted bg-info-subtle text-foreground',
         success: 'border-success-muted bg-success-subtle text-foreground',
         warning: 'border-warning-muted bg-warning-subtle text-foreground',
