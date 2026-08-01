@@ -4,9 +4,9 @@ import { characterClassEntrySchema, characterSpeciesSchema } from '../character/
 import { characterVitalStateSchema } from '../character/character-vital'
 import { characterVitalPatchSchema } from '../character/update-character-vital'
 import { npcCharacterSchema } from '../character/sheet'
-import { campaignCharacterParticipationSchema } from '../../campaign/campaign-character-participation'
-import { characterRosterStateSchema } from '../../campaign/character-roster-state'
-import { campaignRosterPatchSchema } from '../../campaign/update-campaign-roster'
+import { campaignCharacterParticipationSchema } from '../../campaign/character/participation'
+import { characterRosterStateSchema } from '../../campaign/character/roster-state'
+import { campaignRosterPatchSchema } from '../../campaign/character/update-roster'
 
 // ---------------------------------------------------------------------------
 // Campaign NPC DTOs — composed list, detail, and patch wire shapes.

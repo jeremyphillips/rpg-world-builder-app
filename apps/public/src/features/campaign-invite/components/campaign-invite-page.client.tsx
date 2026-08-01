@@ -1,21 +1,28 @@
 'use client'
 
-import { useEffect, useRef, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { ApiError, crossAppCampaignOnboardingPath } from '@rpg/contracts'
+import { persistCampaignSelectionBestEffort } from '@rpg/api-client'
+import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campaign-invite'
 
+import { ROUTES } from '@/lib/routes'
 import { useSession } from '@/features/auth/hooks/use-session'
+import { logout } from '@/features/auth/api/auth-client'
 
-import { acceptCampaignInvite } from '../api/campaign-invite-client'
+import {
+  acceptCampaignInviteByToken,
+  invalidateCampaignInviteAcceptQueries,
+} from '../api/campaign-invite-client'
 import { useCampaignInviteResolution } from '../hooks/use-campaign-invite-resolution'
-import { resolveInviteViewState, shouldAutoAcceptInvite } from '../lib/campaign-invite-page.lib'
-import { renderInviteViewState } from '../lib/campaign-invite-page-view.client'
 
 type CampaignInvitePageProps = {
   token: string
 }
 
 export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
+  const queryClient = useQueryClient()
   const { data: session, isPending: isSessionPending } = useSession()
   const {
     data: resolution,
@@ -25,7 +32,6 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
   } = useCampaignInviteResolution(token)
   const [acceptError, setAcceptError] = useState<string | null>(null)
   const [isAccepting, setIsAccepting] = useState(false)
-  const acceptStartedRef = useRef(false)
 
   const returnTo = `/campaign-invites/${token}`
   const resolutionErrorMessage =
@@ -55,17 +61,15 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
     ],
   )
 
-  useEffect(() => {
-    if (!shouldAutoAcceptInvite(viewState) || acceptStartedRef.current) {
-      return
-    }
-
-    acceptStartedRef.current = true
+  const handleAccept = useCallback(() => {
     setIsAccepting(true)
     setAcceptError(null)
 
-    void acceptCampaignInvite(token)
-      .then((result) => {
+    void acceptCampaignInviteByToken(token)
+      .then(async (result) => {
+        await persistCampaignSelectionBestEffort(result.campaignId)
+        await invalidateCampaignInviteAcceptQueries(queryClient)
+        // Invite handoff — plain onboarding entry, not recovery routing.
         window.location.assign(crossAppCampaignOnboardingPath(result.campaignId))
       })
       .catch((error: unknown) => {
@@ -74,7 +78,30 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
           error instanceof ApiError ? error.message : 'Could not accept this invitation.',
         )
       })
-  }, [token, viewState])
+  }, [queryClient, token])
 
-  return renderInviteViewState(viewState, { returnTo, acceptError })
+  const handleContinue = useCallback((campaignId: string) => {
+    void persistCampaignSelectionBestEffort(campaignId).then(() => {
+      // Invite handoff — plain onboarding entry, not recovery routing.
+      window.location.assign(crossAppCampaignOnboardingPath(campaignId))
+    })
+  }, [])
+
+  return (
+    <CampaignInviteReviewContent
+      viewState={viewState}
+      returnTo={returnTo}
+      acceptError={acceptError}
+      onAccept={handleAccept}
+      onContinue={handleContinue}
+      navigation={{
+        homeHref: ROUTES.home,
+        onUseAnotherAccount: (loginHref) => {
+          void logout().then(() => {
+            window.location.assign(loginHref)
+          })
+        },
+      }}
+    />
+  )
 }

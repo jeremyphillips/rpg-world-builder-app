@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { completeCampaignCharacterAssignmentResultSchema } from '../campaign/campaign-character-assignment-dtos'
+import { completeCampaignCharacterAssignmentResultSchema } from '../campaign/character/assignment-dtos'
 import { createCharacterInputSchema } from './character/create-input'
 
 // ---------------------------------------------------------------------------

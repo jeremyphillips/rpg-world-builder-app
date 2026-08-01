@@ -274,6 +274,9 @@ importers:
       '@rpg/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@rpg/campaign-invite':
+        specifier: workspace:*
+        version: link:../../packages/campaign-invite
       '@rpg/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
@@ -422,6 +425,9 @@ importers:
       '@rpg/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@rpg/campaign-invite':
+        specifier: workspace:*
+        version: link:../../packages/campaign-invite
       '@rpg/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -508,6 +514,46 @@ importers:
       eslint:
         specifier: ^10.4.1
         version: 10.4.1(jiti@2.6.1)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/campaign-invite:
+    dependencies:
+      '@rpg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@rpg/ui':
+        specifier: workspace:*
+        version: link:../ui
+    devDependencies:
+      '@rpg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@testing-library/jest-dom':
+        specifier: ^6.9.0
+        version: 6.9.1
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@types/react':
+        specifier: ^19.2.0
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.2.0
+        version: 19.2.3(@types/react@19.2.17)
+      eslint:
+        specifier: ^10.4.1
+        version: 10.4.1(jiti@2.6.1)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.7(react@19.2.7)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -11200,7 +11246,7 @@ snapshots:
       obug: 2.1.2
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+      vitest: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
 
   '@vitest/expect@3.2.4':
     dependencies:

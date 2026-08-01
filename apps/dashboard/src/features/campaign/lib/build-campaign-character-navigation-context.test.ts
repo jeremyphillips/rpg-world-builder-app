@@ -17,7 +17,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
         campaignId: CAMPAIGN_ID,
         role: 'observer',
         openControlledCharacterIds: [],
-        onboardingIncomplete: false,
+        viewerState: { kind: 'ready' },
       }),
     ).toEqual({
       nav: { showCharactersNav: false },
@@ -33,7 +33,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
         campaignId: CAMPAIGN_ID,
         role: 'owner',
         openControlledCharacterIds: [CHARACTER_ID],
-        onboardingIncomplete: false,
+        viewerState: { kind: 'ready' },
       }),
     ).toEqual({
       nav: {
@@ -56,7 +56,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
         campaignId: CAMPAIGN_ID,
         role: 'pc',
         openControlledCharacterIds: [CHARACTER_ID],
-        onboardingIncomplete: false,
+        viewerState: { kind: 'ready' },
       }),
     ).toEqual({
       nav: {
@@ -78,7 +78,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
         campaignId: CAMPAIGN_ID,
         role: 'pc',
         openControlledCharacterIds: ['char_1', 'char_2'],
-        onboardingIncomplete: false,
+        viewerState: { kind: 'ready' },
       }),
     ).toEqual({
       nav: {
@@ -100,7 +100,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
         campaignId: CAMPAIGN_ID,
         role: 'pc',
         openControlledCharacterIds: [CHARACTER_ID],
-        onboardingIncomplete: true,
+        viewerState: { kind: 'onboarding_incomplete' },
       }).nav,
     ).toMatchObject({
       mode: 'detail',
@@ -108,13 +108,13 @@ describe('buildCampaignCharacterNavigationContext', () => {
     })
   })
 
-  it('routes onboarding PCs with zero open control to onboarding', () => {
+  it('routes onboarding PCs with zero open control to the recovery destination', () => {
     expect(
       buildCampaignCharacterNavigationContext({
         campaignId: CAMPAIGN_ID,
         role: 'pc',
         openControlledCharacterIds: [],
-        onboardingIncomplete: true,
+        viewerState: { kind: 'onboarding_incomplete' },
       }),
     ).toEqual({
       nav: {
@@ -130,13 +130,28 @@ describe('buildCampaignCharacterNavigationContext', () => {
     })
   })
 
+  it('routes reconnect PCs with zero open control to the reconnect destination', () => {
+    expect(
+      buildCampaignCharacterNavigationContext({
+        campaignId: CAMPAIGN_ID,
+        role: 'pc',
+        openControlledCharacterIds: [],
+        viewerState: { kind: 'control_stale', characterId: CHARACTER_ID },
+      }).nav,
+    ).toMatchObject({
+      href: ROUTES.campaign.onboardingReconnect(CAMPAIGN_ID, { characterId: CHARACTER_ID }),
+      mode: 'onboarding',
+      activeSection: 'onboarding',
+    })
+  })
+
   it('routes post-onboarding PCs with zero open control to the list empty state', () => {
     expect(
       buildCampaignCharacterNavigationContext({
         campaignId: CAMPAIGN_ID,
         role: 'pc',
         openControlledCharacterIds: [],
-        onboardingIncomplete: false,
+        viewerState: { kind: 'ready' },
       }),
     ).toEqual({
       nav: {
@@ -158,7 +173,7 @@ describe('buildCampaignCharacterNavigationContext', () => {
       campaignId: CAMPAIGN_ID,
       role: 'pc',
       openControlledCharacterIds: [CHARACTER_ID, CHARACTER_ID],
-      onboardingIncomplete: false,
+      viewerState: { kind: 'ready' },
     })
 
     expect(context.nav).toMatchObject({

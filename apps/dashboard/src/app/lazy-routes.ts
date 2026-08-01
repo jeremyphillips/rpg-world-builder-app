@@ -42,6 +42,12 @@ export const NameGeneratorRoute = withRouteSuspense(
 export const NotificationsListRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/notification/routes/notifications-list'), 'NotificationsList'),
 )
+export const CampaignInviteReviewRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/campaign-invite/routes/campaign-invite-review'),
+    'CampaignInviteReviewRoute',
+  ),
+)
 export const MessagesWorkspaceRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/message/routes/messages-workspace'), 'MessagesWorkspace'),
 )

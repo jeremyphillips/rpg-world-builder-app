@@ -2,14 +2,20 @@ import { z } from 'zod'
 
 import {
   campaignInviteAcceptedPayloadSchema,
+  campaignInviteCancelledPayloadSchema,
   campaignInviteCompletedPayloadSchema,
   campaignInviteReceivedPayloadSchema,
+  campaignMemberRemovedPayloadSchema,
   messageDirectReceivedPayloadSchema,
 } from './notification-payloads'
 import { notificationCategorySchema } from './notification-classification'
 import { notificationTypeSchema } from './notification-types'
 
-export const NOTIFICATION_ACTION_KINDS = ['campaign_detail', 'conversation_detail'] as const
+export const NOTIFICATION_ACTION_KINDS = [
+  'campaign_detail',
+  'campaign_invite_review',
+  'conversation_detail',
+] as const
 
 export const notificationActionKindSchema = z.enum(NOTIFICATION_ACTION_KINDS)
 
@@ -19,6 +25,10 @@ export const notificationActionSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('campaign_detail'),
     campaignId: z.string(),
+  }),
+  z.object({
+    kind: z.literal('campaign_invite_review'),
+    inviteId: z.string(),
   }),
   z.object({
     kind: z.literal('conversation_detail'),
@@ -59,6 +69,12 @@ export const notificationSchema = z.discriminatedUnion('type', [
   z.object({
     ...notificationPreviewFields,
     ...notificationTimestampFields,
+    type: z.literal('campaign.invite.cancelled'),
+    payload: campaignInviteCancelledPayloadSchema,
+  }),
+  z.object({
+    ...notificationPreviewFields,
+    ...notificationTimestampFields,
     type: z.literal('campaign.invite.accepted'),
     payload: campaignInviteAcceptedPayloadSchema,
   }),
@@ -67,6 +83,12 @@ export const notificationSchema = z.discriminatedUnion('type', [
     ...notificationTimestampFields,
     type: z.literal('campaign.invite.completed'),
     payload: campaignInviteCompletedPayloadSchema,
+  }),
+  z.object({
+    ...notificationPreviewFields,
+    ...notificationTimestampFields,
+    type: z.literal('campaign.member.removed'),
+    payload: campaignMemberRemovedPayloadSchema,
   }),
   z.object({
     ...notificationPreviewFields,

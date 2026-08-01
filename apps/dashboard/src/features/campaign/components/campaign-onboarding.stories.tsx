@@ -6,6 +6,7 @@ import { CampaignOnboardingClient } from './campaign-onboarding.client'
 
 const incompleteContext: CampaignOnboardingIncompleteContext = {
   status: 'onboarding_incomplete',
+  mode: 'initial',
   campaignId: 'camp_1',
   campaign: { id: 'camp_1', name: 'The Argent Road' },
   startingLevel: 1,

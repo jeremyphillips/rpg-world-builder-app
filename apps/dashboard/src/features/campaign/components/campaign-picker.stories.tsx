@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { CampaignPicker } from './campaign-picker'
 
@@ -28,7 +28,7 @@ export const IncompleteOnboarding: Story = {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ],
   },
@@ -43,7 +43,7 @@ export const MultipleCampaigns: Story = {
         identity: { name: 'Stormwatch' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ],
   },

@@ -47,9 +47,11 @@ function resolveExistingCharacterSubmitError(
 export function CampaignOnboardingExistingCharacterPanel({
   campaignId,
   onBack,
+  initialCharacterId,
 }: {
   campaignId: string
   onBack: () => void
+  initialCharacterId?: string
 }) {
   const navigate = useNavigate()
   const {
@@ -60,7 +62,7 @@ export function CampaignOnboardingExistingCharacterPanel({
     refetch,
   } = useCampaignOnboardingEligibleCharacters(campaignId)
   const completeOnboarding = useCompleteCampaignOnboarding(campaignId)
-  const [selectedCharacterId, setSelectedCharacterId] = useState('')
+  const [selectedCharacterId, setSelectedCharacterId] = useState(initialCharacterId ?? '')
   const [formError, setFormError] = useState<string | null>(null)
   const [eligibilityError, setEligibilityError] = useState<{
     blockingIssues: CharacterCampaignBlockingIssue[]

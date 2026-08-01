@@ -6,7 +6,7 @@ vi.mock('@/features/campaign/api/campaign-client')
 import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE } from '@/features/campaign'
 import { CAMPAIGNS_OVERVIEW_COPY } from '@/features/campaign/lib/campaigns-overview-copy'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { renderWithProviders } from '@/test/render'
 import { CampaignsOverview } from './campaigns-overview'
 
@@ -81,7 +81,7 @@ describe('CampaignsOverview', () => {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ])
 

@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { resolveCampaignInvite } from '../api/campaign-invite-client'
+import { resolveCampaignInviteByToken } from '../api/campaign-invite-client'
 
 export const campaignInviteResolutionQueryKey = (token: string) =>
-  ['campaign-invite', 'resolution', token] as const
+  ['campaign-invite', 'resolution', 'token', token] as const
 
-export function useCampaignInviteResolution(token: string | undefined) {
+export function useCampaignInviteResolution(token: string | null) {
   return useQuery({
-    queryKey: campaignInviteResolutionQueryKey(token ?? ''),
-    queryFn: () => resolveCampaignInvite(token!),
+    queryKey: token
+      ? campaignInviteResolutionQueryKey(token)
+      : (['campaign-invite', 'resolution', 'disabled'] as const),
+    queryFn: () => resolveCampaignInviteByToken(token!),
     enabled: Boolean(token),
     retry: false,
   })

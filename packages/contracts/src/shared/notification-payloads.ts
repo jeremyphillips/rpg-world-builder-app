@@ -26,6 +26,20 @@ export const campaignInviteCompletedPayloadSchema = z.object({
   characterId: z.string().optional(),
 })
 
+export const campaignInviteCancelledPayloadSchema = z.object({
+  inviteId: z.string(),
+  campaignId: z.string(),
+  campaignName: z.string(),
+  cancelledByDisplayName: z.string(),
+})
+
+export const campaignMemberRemovedPayloadSchema = z.object({
+  campaignId: z.string(),
+  campaignName: z.string(),
+  removedByDisplayName: z.string(),
+  membershipId: z.string(),
+})
+
 export const messageDirectReceivedPayloadSchema = z.object({
   conversationId: z.string(),
   messageId: z.string(),
@@ -38,8 +52,10 @@ export const messageDirectReceivedPayloadSchema = z.object({
 
 export const NOTIFICATION_PAYLOAD_SCHEMAS = {
   'campaign.invite.received': campaignInviteReceivedPayloadSchema,
+  'campaign.invite.cancelled': campaignInviteCancelledPayloadSchema,
   'campaign.invite.accepted': campaignInviteAcceptedPayloadSchema,
   'campaign.invite.completed': campaignInviteCompletedPayloadSchema,
+  'campaign.member.removed': campaignMemberRemovedPayloadSchema,
   'message.direct.received': messageDirectReceivedPayloadSchema,
 } as const satisfies Record<NotificationType, z.ZodType>
 

@@ -4,7 +4,10 @@ import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { publishNotification } from './publish-notification.service'
-import { campaignInviteDedupeKey } from './notification-dedupe-keys'
+import {
+  campaignInviteDedupeKey,
+  campaignInviteInviteeLifecycleDedupeKey,
+} from './notification-dedupe-keys'
 import {
   findNotificationByDedupeKey,
   markNotificationsSeen,
@@ -22,7 +25,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -33,7 +36,7 @@ describe('notification service', () => {
 
     const first = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
     })
     expect(first).toBeTruthy()
 
@@ -45,7 +48,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -56,14 +59,14 @@ describe('notification service', () => {
 
     const unchangedResend = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
     })
     expect(unchangedResend?.readAt).toBeTruthy()
 
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
       payload: {
         inviteId: 'invite-1',
         campaignId: 'campaign-1',
@@ -74,7 +77,7 @@ describe('notification service', () => {
 
     const changedResend = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: campaignInviteDedupeKey('invite-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-1'),
     })
     expect(changedResend?.readAt).toBeNull()
   })
@@ -113,7 +116,7 @@ describe('notification service', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [recipient.id],
-      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-seen'),
       payload: {
         inviteId: 'invite-seen',
         campaignId: 'campaign-1',
@@ -124,7 +127,7 @@ describe('notification service', () => {
 
     const notification = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-seen'),
     })
     expect(notification).toBeTruthy()
 
@@ -136,7 +139,7 @@ describe('notification service', () => {
 
     const afterSeen = await findNotificationByDedupeKey({
       recipientUserId: recipient.id,
-      dedupeKey: campaignInviteDedupeKey('invite-seen', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-seen'),
     })
     expect(afterSeen?.seenAt).toBeTruthy()
   })

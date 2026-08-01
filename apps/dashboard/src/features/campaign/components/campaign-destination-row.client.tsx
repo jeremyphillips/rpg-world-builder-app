@@ -11,9 +11,10 @@ import {
   campaignDestinationRowVariants,
 } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../lib/campaign-display'
-import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
 import {
-  resolveCampaignDestination,
+  resolveCampaignEntryDestination,
+  resolveEntryBadgeLabel,
+  resolveEntryBadgeTone,
   shouldRunCampaignSelectionSideEffect,
 } from '../lib/campaign-destination.lib'
 
@@ -26,8 +27,10 @@ export function CampaignDestinationRow({
   campaign,
   onPersistSelection,
 }: CampaignDestinationRowProps) {
-  const destination = resolveCampaignDestination(campaign)
+  const destination = resolveCampaignEntryDestination(campaign)
   const display = buildCampaignDisplay(campaign)
+  const badgeLabel = resolveEntryBadgeLabel(campaign)
+  const badgeTone = resolveEntryBadgeTone(campaign)
 
   return (
     <Link
@@ -45,9 +48,9 @@ export function CampaignDestinationRow({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex min-w-0 items-center gap-2">
           <CampaignDisplayName display={display} surface="row" />
-          {destination.showSetupBadge ? (
-            <Badge appearance="outline" tone="warning" size="sm">
-              {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.label}
+          {badgeLabel && badgeTone ? (
+            <Badge appearance="outline" tone={badgeTone} size="sm">
+              {badgeLabel}
             </Badge>
           ) : null}
         </div>

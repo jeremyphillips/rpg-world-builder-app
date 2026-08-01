@@ -8,8 +8,11 @@ import type {
   CreateCampaignResult,
   UpdateCampaignInput,
 } from '@rpg/contracts'
+import {
+  filterViewerOpenParticipatingCharacterIds,
+  resolveCampaignViewerState,
+} from '@rpg/contracts'
 import { loadCampaignTemplates } from '@rpg/catalog/presets'
-import { resolveCampaignViewerOnboardingState } from '@rpg/contracts'
 
 import { CampaignModel, type CampaignSchemaType } from './campaign.model'
 import { CampaignMembershipModel } from './campaign-membership.model'
@@ -19,6 +22,7 @@ import {
   assertValidInitialCampaignInviteRecipients,
 } from './create-campaign-invites.lib'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
+import { listCharactersForUser } from '../character'
 import {
   listOpenPcParticipationCharacterIdsForCampaign,
   resolveOpenControlledPcCharacterIds,
@@ -76,28 +80,37 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   if (campaignIds.length === 0) return []
 
   const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
+  const userCharacters = await listCharactersForUser(userId)
+  const userCharacterIds = userCharacters.map((character) => character.id)
+
   const campaigns = await Promise.all(
     docs.map(async (doc) => {
       const campaign = toCampaign(doc)
       const membership = membershipByCampaignId.get(campaign.id)
       const controlledCharacterIds = membership?.controlledCharacterIds ?? []
-      const openParticipatingCharacterIds = await listOpenPcParticipationCharacterIdsForCampaign(
-        campaign.id,
-      )
+      const campaignWideOpenParticipatingCharacterIds =
+        await listOpenPcParticipationCharacterIdsForCampaign(campaign.id)
+      const openParticipatingCharacterIds = filterViewerOpenParticipatingCharacterIds({
+        controlledCharacterIds,
+        openParticipatingCharacterIds: campaignWideOpenParticipatingCharacterIds,
+        userCharacterIds,
+      })
       const openControlledCharacterIds = dedupeCharacterIds(
         await resolveOpenControlledPcCharacterIds(campaign.id, controlledCharacterIds),
       )
       const campaignRole = membership?.campaignRole as CampaignRole
+      const { viewerState, recoveryReason } = resolveCampaignViewerState({
+        role: campaignRole,
+        controlledCharacterIds,
+        openParticipatingCharacterIds,
+      })
       return {
         ...campaign,
         campaignRole,
         controlledCharacterIds,
         openControlledCharacterIds,
-        viewerOnboardingState: resolveCampaignViewerOnboardingState({
-          role: campaignRole,
-          controlledCharacterIds,
-          openParticipatingCharacterIds,
-        }),
+        viewerState,
+        recoveryReason,
       }
     }),
   )

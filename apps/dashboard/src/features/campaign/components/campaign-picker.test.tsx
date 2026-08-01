@@ -8,29 +8,33 @@ import { Route, Routes } from 'react-router-dom'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
-import { rememberSelectedCampaign } from '@/features/campaign/api/campaign-client'
+import { persistCampaignSelectionRemote } from '@rpg/api-client'
 import { renderWithProviders } from '@/test/render'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { makeSessionUser } from '@/test/fixtures/session'
 
-import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
+import { CAMPAIGN_ONBOARDING_INDEX_ROW_BODY } from '../lib/campaign-onboarding-copy'
 import { CampaignPicker } from './campaign-picker'
 
-vi.mock('@/features/campaign/api/campaign-client', () => ({
-  rememberSelectedCampaign: vi.fn(),
-}))
+vi.mock('@rpg/api-client', async () => {
+  const actual = await vi.importActual<typeof import('@rpg/api-client')>('@rpg/api-client')
+  return {
+    ...actual,
+    persistCampaignSelectionRemote: vi.fn(),
+  }
+})
 
 vi.mock('@/features/campaign/store/campaign-store', () => ({
   useCampaignStore: (selector: (state: { setPreferredCampaignId: () => void }) => unknown) =>
     selector({ setPreferredCampaignId: vi.fn() }),
 }))
 
-const rememberSelectedCampaignMock = vi.mocked(rememberSelectedCampaign)
+const persistCampaignSelectionRemoteMock = vi.mocked(persistCampaignSelectionRemote)
 
 describe('CampaignPicker', () => {
   beforeEach(() => {
-    rememberSelectedCampaignMock.mockReset()
-    rememberSelectedCampaignMock.mockResolvedValue(
+    persistCampaignSelectionRemoteMock.mockReset()
+    persistCampaignSelectionRemoteMock.mockResolvedValue(
       makeSessionUser({ lastSelectedCampaignId: 'camp_1' }),
     )
   })
@@ -51,7 +55,7 @@ describe('CampaignPicker', () => {
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
   })
 
-  it('renders onboarding destination links with inline supporting copy for incomplete memberships', () => {
+  it('renders entry destination links with inline supporting copy for incomplete memberships', () => {
     renderWithProviders(
       <CampaignPicker
         campaigns={[
@@ -60,23 +64,25 @@ describe('CampaignPicker', () => {
             identity: { name: 'Incomplete Campaign' },
             campaignRole: 'pc',
             controlledCharacterIds: [],
-            viewerOnboardingState: 'incomplete',
+            viewerState: VIEWER_STATE.onboardingIncomplete,
           }),
         ]}
       />,
     )
 
-    const rowLink = screen.getByRole('link', { name: 'Continue setup for Incomplete Campaign' })
+    const rowLink = screen.getByRole('link', {
+      name: 'Open Incomplete Campaign — setup incomplete',
+    })
 
-    expect(rowLink).toHaveAttribute('href', ROUTES.campaign.onboarding('camp_1'))
-    expect(screen.getByText(CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message)).toBeInTheDocument()
-    expect(rowLink).toContainElement(screen.getByText(CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message))
+    expect(rowLink).toHaveAttribute('href', ROUTES.campaign.detail('camp_1'))
+    expect(screen.getByText(CAMPAIGN_ONBOARDING_INDEX_ROW_BODY)).toBeInTheDocument()
+    expect(rowLink).toContainElement(screen.getByText(CAMPAIGN_ONBOARDING_INDEX_ROW_BODY))
     expect(screen.queryByRole('button', { name: 'Continue setup' })).not.toBeInTheDocument()
   })
 
   it('persists selection on primary row click and still navigates when persistence fails', async () => {
     const user = userEvent.setup()
-    rememberSelectedCampaignMock.mockRejectedValue(new Error('network'))
+    persistCampaignSelectionRemoteMock.mockRejectedValue(new Error('network'))
 
     renderWithProviders(
       <Routes>
@@ -97,7 +103,7 @@ describe('CampaignPicker', () => {
 
     await user.click(screen.getByRole('link', { name: 'Open Active Campaign' }))
 
-    expect(rememberSelectedCampaignMock).toHaveBeenCalledWith('camp_1', expect.anything())
+    expect(persistCampaignSelectionRemoteMock).toHaveBeenCalledWith('camp_1', expect.anything())
     expect(await screen.findByText('Campaign opened')).toBeInTheDocument()
   })
 
@@ -112,7 +118,7 @@ describe('CampaignPicker', () => {
       metaKey: true,
     })
 
-    expect(rememberSelectedCampaignMock).not.toHaveBeenCalled()
+    expect(persistCampaignSelectionRemoteMock).not.toHaveBeenCalled()
   })
 
   it('has no axe accessibility violations', async () => {

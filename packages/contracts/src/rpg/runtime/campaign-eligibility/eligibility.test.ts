@@ -10,7 +10,7 @@ import {
 import {
   primaryBlockingIssue,
   sortBlockingIssuesByPriority,
-} from '../../campaign/character-eligibility-contracts'
+} from '../../campaign/character/eligibility-contracts'
 import { resolveCharacterCampaignEligibility } from './resolve-character-campaign-eligibility'
 import { resolveCharacterContentEligibility } from './resolve-character-content-eligibility'
 import { resolveCharacterParticipationEligibility } from './resolve-character-participation-eligibility'

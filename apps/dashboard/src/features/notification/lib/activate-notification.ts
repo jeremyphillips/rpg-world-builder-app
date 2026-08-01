@@ -12,6 +12,15 @@ export type ActivateNotificationInput = {
   campaignId?: string
 }
 
+function navigateToActionPath(path: string, navigate: (path: string) => void): void {
+  if (path.startsWith('/app/')) {
+    navigate(path.slice('/app'.length) || '/')
+    return
+  }
+
+  navigate(path)
+}
+
 export function activateNotification({
   notification,
   markRead,
@@ -22,9 +31,9 @@ export function activateNotification({
 }: ActivateNotificationInput): void {
   void markRead.mutateAsync(notification.id).catch(onFailure)
 
-  const path = resolveNotificationActionPath(notification.action, campaignId)
+  const path = resolveNotificationActionPath(notification, campaignId)
   if (!path) return
 
   onBeforeNavigate?.()
-  navigate(path)
+  navigateToActionPath(path, navigate)
 }

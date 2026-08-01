@@ -10,11 +10,11 @@ via the public app, then completes character onboarding in the dashboard. The
 flow reuses existing membership, participation, and control primitives — no
 parallel invite-specific character association.
 
-| App       | Responsibility                                                         |
-| --------- | ---------------------------------------------------------------------- |
-| Public    | `/campaign-invites/[token]` — resolve, auth continuation, accept       |
-| Dashboard | `/campaigns/:id/onboarding` — character choice and builder (canonical) |
-| API       | Invite lifecycle + membership-scoped onboarding completion             |
+| App       | Responsibility                                                                                              |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| Public    | `/campaign-invites/[token]` — token resolve, auth continuation, accept                                      |
+| Dashboard | `/app/campaign-invites/:inviteId` — notification/card review; `/campaigns/:id/onboarding` — character setup |
+| API       | Invite lifecycle + membership-scoped onboarding completion                                                  |
 
 After accept, the public app redirects to dashboard onboarding. The raw invite
 token never crosses into the dashboard. The dashboard does **not** pass
@@ -95,17 +95,59 @@ invite (server-side; never trust client-supplied email).
   `sourceInviteId` (the accepted invite). Re-accept on recovery updates
   `sourceInviteId` to the newly accepted invite.
 
+### Review surfaces
+
+| Entry                         | Route                             | App       | Auth                     |
+| ----------------------------- | --------------------------------- | --------- | ------------------------ |
+| Email token                   | `/campaign-invites/:token`        | Public    | Continuation when needed |
+| Notification / dashboard card | `/app/campaign-invites/:inviteId` | Dashboard | Session gate             |
+
+The public route accepts **64-char invite tokens only**
+(`parseCampaignInviteTokenSegment` in `@rpg/contracts`). Invalid segments render
+unavailable UI without an API call.
+
+| Segment   | Resolve                                     | Accept                          | Email mismatch                                        |
+| --------- | ------------------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| Token     | `GET /api/campaign-invites/:token`          | `POST …/accept`                 | 403 on accept; masked-email sign-in prompt on resolve |
+| Invite id | `GET /api/campaign-invites/by-id/:inviteId` | `POST …/by-id/:inviteId/accept` | **404** on resolve/accept (anti-probing)              |
+
+Both review flows use the same explicit UX via `@rpg/campaign-invite` — no
+auto-accept on mount:
+
+- **Pending** → review context + **Accept invitation**
+- **Accepted** (same user) → **Continue to character setup** (onboarding)
+- **Completed** → **Open campaign** (`crossAppCampaignDetailPath`)
+- **Revoked / expired** → unavailable copy
+
+Notification clicks navigate to the dashboard invite-id review route
+(`dashboardCampaignInviteReviewPath`); membership changes happen on the explicit
+accept button.
+
+### Invitee dashboard cards (Phase 2)
+
+`GET /api/campaign-invites/mine` returns pending invites for the authenticated
+user's email. The dashboard home and campaigns index render **Review invitation**
+cards (`PendingCampaignInvitation`) that link to
+`/app/campaign-invites/:inviteId`. Accepted-but-incomplete memberships render
+**Finish joining** / **Continue setup** cards from the campaigns list — never
+mixed with pending invite review CTAs.
+
 ## Onboarding completion
 
 ### Canonical path (membership-scoped)
 
-The dashboard uses campaign-scoped endpoints. `completeCampaignOnboarding` resolves
-membership context, links an accepted invite for audit, and delegates to
-`completeCampaignCharacterAssignment` in
+The dashboard uses campaign-scoped endpoints. `loadCampaignOnboardingGate` is the sole
+eligibility classifier for GET context and POST completion — both map only from its
+result arms (`not_found`, `forbidden`, `integrity_error`, `complete`, `eligible`).
+Shared classification lives in `@rpg/contracts` (`resolveCampaignOnboardingAccess`).
+
+`completeCampaignOnboarding` resolves membership context from the gate, links an accepted
+invite for audit, and delegates to `completeCampaignCharacterAssignment` in
 `campaign/participation/character-assignment/`.
 
 | Step         | Service / route                                                 |
 | ------------ | --------------------------------------------------------------- |
+| Gate         | `loadCampaignOnboardingGate` (internal — GET/POST consume only) |
 | Context      | `GET /api/campaigns/:campaignId/onboarding-context`             |
 | Eligible PCs | `GET /api/campaigns/:campaignId/onboarding/eligible-characters` |
 | Complete     | `POST /api/campaigns/:campaignId/onboarding/complete`           |
@@ -160,14 +202,19 @@ step-rail build issues, and invite terminal states.
 
 ## Derived onboarding state (overview)
 
-Do **not** persist onboarding state on membership. Derive it at read time:
+Do **not** persist onboarding state on membership. Derive it at read time for the
+**overview roster** only:
 
 ```ts
-// pc role only
+// pc role only — coarse overview labels; not used for recovery or onboarding HTTP
 controlledCharacterIds.length > 0 ? 'character_added' : 'onboarding_incomplete'
 ```
 
 Implemented in `campaign-overview.service.ts` (`resolveMemberOnboardingState`).
+The coarse `participationState.invalid` resolver output is **not** used for onboarding
+GET/POST errors, navigation, or recovery CTAs — those use `viewerState` and
+`loadCampaignOnboardingGate`.
+
 Party list includes only PCs with open participation **and** a controlling
 member (`controlledCharacterIds`).
 
@@ -190,6 +237,9 @@ Overview display rules:
 | POST   | `/api/campaigns/:campaignId/invites/:inviteId/revoke`       | owner/co-owner        |
 | GET    | `/api/campaign-invites/:token`                              | public                |
 | POST   | `/api/campaign-invites/:token/accept`                       | authenticated invitee |
+| GET    | `/api/campaign-invites/by-id/:inviteId`                     | authenticated invitee |
+| POST   | `/api/campaign-invites/by-id/:inviteId/accept`              | authenticated invitee |
+| GET    | `/api/campaign-invites/mine`                                | authenticated invitee |
 | GET    | `/api/campaigns/:campaignId/onboarding-context`             | authenticated member  |
 | GET    | `/api/campaigns/:campaignId/onboarding/eligible-characters` | authenticated member  |
 | POST   | `/api/campaigns/:campaignId/onboarding/complete`            | authenticated member  |

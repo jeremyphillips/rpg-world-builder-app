@@ -10,14 +10,19 @@ import {
 import { setEmailProviderForTests } from '../../services/email/email.service'
 import {
   acceptCampaignInvite,
+  revokeCampaignInvite,
   sendCampaignInvite,
 } from '../campaign-invite/campaign-invite.service'
 import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
 import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
 import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
 import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
-import { campaignInviteDedupeKey } from './notification-dedupe-keys'
+import {
+  campaignInviteDedupeKey,
+  campaignInviteInviteeLifecycleDedupeKey,
+} from './notification-dedupe-keys'
 import { findNotificationByDedupeKey } from './notification.repository'
+import { NotificationModel } from './notification.model'
 import { publishCampaignInviteAcceptedNotification } from './campaign-invite-notification.lib'
 
 useIntegrationDb()
@@ -51,13 +56,13 @@ describe('campaign invite notification integration', () => {
     await vi.waitFor(async () => {
       const notification = await findNotificationByDedupeKey({
         recipientUserId: player.id,
-        dedupeKey: campaignInviteDedupeKey(invite!.id, 'received'),
+        dedupeKey: campaignInviteInviteeLifecycleDedupeKey(invite!.id),
       })
       expect(notification).toMatchObject({
         type: 'campaign.invite.received',
         title: 'Campaign invitation',
+        action: { kind: 'campaign_invite_review', inviteId: invite!.id },
       })
-      expect(notification?.action).toBeUndefined()
     })
   })
 
@@ -75,7 +80,7 @@ describe('campaign invite notification integration', () => {
 
     const notification = await findNotificationByDedupeKey({
       recipientUserId: owner.id,
-      dedupeKey: campaignInviteDedupeKey(result.invite.id, 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey(result.invite.id),
     })
     expect(notification).toBeNull()
   })
@@ -145,6 +150,59 @@ describe('campaign invite notification integration', () => {
     expect(notification?.action).toEqual({
       kind: 'campaign_detail',
       campaignId,
+    })
+  })
+
+  it('supersedes received notifications with cancelled copy and clears read state', async () => {
+    const provider = createFakeEmailProvider()
+    setEmailProviderForTests(provider)
+    const player = await makeTestUser({ email: 'cancel-player@example.com' })
+    const { id: campaignId, owner } = await makeTestCampaign({ name: 'Cancel Notify Campaign' })
+
+    const sendResult = await sendCampaignInvite({
+      campaignId,
+      email: 'cancel-player@example.com',
+      invitedByUserId: owner.id,
+      provider,
+    })
+
+    await vi.waitFor(async () => {
+      const received = await findNotificationByDedupeKey({
+        recipientUserId: player.id,
+        dedupeKey: campaignInviteInviteeLifecycleDedupeKey(sendResult.invite.id),
+      })
+      expect(received?.type).toBe('campaign.invite.received')
+    })
+
+    const received = await findNotificationByDedupeKey({
+      recipientUserId: player.id,
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey(sendResult.invite.id),
+    })
+    expect(received).toBeTruthy()
+
+    await NotificationModel.updateOne(
+      { _id: received!.id },
+      { $set: { readAt: new Date(), seenAt: new Date() } },
+    )
+
+    await revokeCampaignInvite({
+      campaignId,
+      inviteId: sendResult.invite.id,
+      revokedByUserId: owner.id,
+    })
+
+    await vi.waitFor(async () => {
+      const cancelled = await findNotificationByDedupeKey({
+        recipientUserId: player.id,
+        dedupeKey: campaignInviteInviteeLifecycleDedupeKey(sendResult.invite.id),
+      })
+      expect(cancelled).toMatchObject({
+        type: 'campaign.invite.cancelled',
+        title: 'Invitation cancelled',
+        readAt: null,
+        seenAt: null,
+      })
+      expect(cancelled?.action).toBeUndefined()
     })
   })
 })

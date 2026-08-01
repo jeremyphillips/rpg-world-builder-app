@@ -49,7 +49,7 @@ function Badge({
     appearance,
     tone,
     filled: compactLabelFilledFromAppearance(appearance),
-    className,
+    className: cn('border-[1.5px]', className),
   })
 
   if (asChild) {

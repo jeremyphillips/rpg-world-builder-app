@@ -87,7 +87,7 @@ export async function upsertNotificationRecord(
       const doc = await NotificationModel.findOneAndUpdate(
         { _id: existing._id },
         { $set: baseUpdate, ...versionIncrement },
-        { new: true, returnDocument: 'after' },
+        { returnDocument: 'after' },
       ).lean<NotificationRecord | null>()
 
       if (!doc) {
@@ -217,7 +217,7 @@ export async function markNotificationRead({
       },
       $inc: { version: 1 },
     },
-    { new: true, returnDocument: 'after' },
+    { returnDocument: 'after' },
   ).lean<NotificationRecord | null>()
 
   if (!doc) return null
@@ -331,7 +331,7 @@ export async function markNotificationReadByDedupeKey({
       },
       $inc: { version: 1 },
     },
-    { new: true, returnDocument: 'after' },
+    { returnDocument: 'after' },
   ).lean<NotificationRecord | null>()
 
   if (!doc) return null

@@ -24,7 +24,7 @@ describe('notification registry', () => {
     }
   })
 
-  it('formats invite received without an action', () => {
+  it('formats invite received with review action', () => {
     const preview = formatNotificationPreview('campaign.invite.received', {
       inviteId: 'invite-1',
       campaignId: 'campaign-1',
@@ -33,7 +33,7 @@ describe('notification registry', () => {
     })
 
     expect(preview.title).toBe('Campaign invitation')
-    expect(preview.description).toContain('invite email')
+    expect(preview.description).toBe('Ava invited you to join Stormwatch.')
     expect(
       resolveNotificationAction('campaign.invite.received', {
         inviteId: 'invite-1',
@@ -41,7 +41,10 @@ describe('notification registry', () => {
         campaignName: 'Stormwatch',
         inviterDisplayName: 'Ava',
       }),
-    ).toBeUndefined()
+    ).toEqual({
+      kind: 'campaign_invite_review',
+      inviteId: 'invite-1',
+    })
   })
 
   it('resolves manager invite actions to campaign detail', () => {

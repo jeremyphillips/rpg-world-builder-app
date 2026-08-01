@@ -1,22 +1,25 @@
 import { useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { persistCampaignSelectionLocal, persistCampaignSelectionRemote } from '@rpg/api-client'
 
 import { ROUTES } from '@/app/routes'
 import { sessionQueryKey } from '@/features/auth'
 
-import { rememberSelectedCampaign } from '../api/campaign-client'
-import { resolveTargetPathOnSwitch } from '../lib/navigation/campaign-selection'
-import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-storage'
+import {
+  resolveCampaignEntryDestination,
+  resolveSwitchCampaignPath,
+} from '../lib/campaign-destination.lib'
 import { useCampaignStore } from '../store/campaign-store'
+import { useCampaigns } from './use-campaigns'
 
 /** Persists the user's campaign selection preference without navigating. */
 export function usePersistCampaignSelection() {
   const queryClient = useQueryClient()
   const setPreferredCampaignId = useCampaignStore((state) => state.setPreferredCampaignId)
 
-  const { mutate } = useMutation({
-    mutationFn: rememberSelectedCampaign,
+  const { mutateAsync } = useMutation({
+    mutationFn: persistCampaignSelectionRemote,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: sessionQueryKey })
     },
@@ -24,25 +27,32 @@ export function usePersistCampaignSelection() {
 
   return useCallback(
     (campaignId: string) => {
-      writeStoredCampaignId(campaignId)
-      mutate(campaignId)
+      persistCampaignSelectionLocal(campaignId)
       setPreferredCampaignId(campaignId)
+      void mutateAsync(campaignId).catch(() => {
+        // Recovery UI works from local storage; server sync is best-effort.
+      })
     },
-    [mutate, setPreferredCampaignId],
+    [mutateAsync, setPreferredCampaignId],
   )
 }
 
-/** Opens a campaign at Overview and persists the user's selection preference. */
+/** Opens a campaign and persists the user's selection preference. */
 export function useOpenCampaign() {
   const navigate = useNavigate()
   const persistSelection = usePersistCampaignSelection()
+  const { data: campaigns } = useCampaigns()
 
   return useCallback(
     (campaignId: string) => {
       persistSelection(campaignId)
-      navigate(ROUTES.campaign.detail(campaignId))
+      const campaign = campaigns?.find((item) => item.id === campaignId)
+      const href = campaign
+        ? resolveCampaignEntryDestination(campaign).href
+        : ROUTES.campaign.detail(campaignId)
+      navigate(href)
     },
-    [navigate, persistSelection],
+    [campaigns, navigate, persistSelection],
   )
 }
 
@@ -52,18 +62,23 @@ export function useSwitchCampaign() {
   const { pathname } = useLocation()
   const { campaignId: currentCampaignId } = useParams<{ campaignId?: string }>()
   const persistSelection = usePersistCampaignSelection()
+  const { data: campaigns } = useCampaigns()
 
   return useCallback(
     (campaignId: string) => {
       persistSelection(campaignId)
 
-      if (currentCampaignId) {
-        navigate(resolveTargetPathOnSwitch(pathname, currentCampaignId, campaignId))
+      const campaign = campaigns?.find((item) => item.id === campaignId)
+      if (currentCampaignId && campaign) {
+        navigate(resolveSwitchCampaignPath(pathname, currentCampaignId, campaign))
         return
       }
 
-      navigate(ROUTES.campaign.detail(campaignId))
+      const href = campaign
+        ? resolveCampaignEntryDestination(campaign).href
+        : ROUTES.campaign.detail(campaignId)
+      navigate(href)
     },
-    [currentCampaignId, navigate, pathname, persistSelection],
+    [campaigns, currentCampaignId, navigate, pathname, persistSelection],
   )
 }

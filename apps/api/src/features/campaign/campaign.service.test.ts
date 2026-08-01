@@ -312,10 +312,14 @@ describe('listCampaignsForUser', () => {
     const campaigns = await listCampaignsForUser(player.id)
     expect(campaigns[0]?.controlledCharacterIds).toEqual([character.id])
     expect(campaigns[0]?.openControlledCharacterIds).toEqual([])
-    expect(campaigns[0]?.viewerOnboardingState).toBe('invalid')
+    expect(campaigns[0]?.viewerState).toEqual({
+      kind: 'control_stale',
+      characterId: character.id,
+    })
+    expect(campaigns[0]?.recoveryReason).toBe('controlled_character_without_open_participation')
   })
 
-  it('derives viewerOnboardingState for PC onboarding and active control', async () => {
+  it('derives viewerState for PC onboarding and active control', async () => {
     const owner = await makeTestUser({ email: 'viewer-onboarding-owner@example.com' })
     const onboardingPlayer = await makeTestUser({ email: 'viewer-onboarding-pc@example.com' })
     const activePlayer = await makeTestUser({ email: 'viewer-active-pc@example.com' })
@@ -355,10 +359,47 @@ describe('listCampaignsForUser', () => {
     })
 
     const onboardingCampaigns = await listCampaignsForUser(onboardingPlayer.id)
-    expect(onboardingCampaigns[0]?.viewerOnboardingState).toBe('incomplete')
+    expect(onboardingCampaigns[0]?.viewerState).toEqual({ kind: 'onboarding_incomplete' })
+    expect(onboardingCampaigns[0]?.recoveryReason).toBe('no_controlled_character')
 
     const activeCampaigns = await listCampaignsForUser(activePlayer.id)
-    expect(activeCampaigns[0]?.viewerOnboardingState).toBe('complete')
+    expect(activeCampaigns[0]?.viewerState).toEqual({ kind: 'ready' })
+  })
+
+  it('returns onboarding_incomplete when a fresh invite joins a campaign with existing active PCs', async () => {
+    const owner = await makeTestUser({ email: 'populated-owner@example.com' })
+    const existingPlayer = await makeTestUser({ email: 'populated-existing@example.com' })
+    const freshPlayer = await makeTestUser({ email: 'populated-fresh@example.com' })
+    const { campaign } = await createCampaign({ name: 'Populated Campaign', createdBy: owner.id })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: existingPlayer.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const existingCharacter = await createPcRecord(minimalStandalonePcInput, existingPlayer.id)
+    await setMembershipControlledPcs({
+      campaignId: campaign.id,
+      userId: existingPlayer.id,
+      controlledCharacterIds: [existingCharacter.id],
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: freshPlayer.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const freshCampaigns = await listCampaignsForUser(freshPlayer.id)
+    expect(freshCampaigns[0]?.viewerState).toEqual({ kind: 'onboarding_incomplete' })
+    expect(freshCampaigns[0]?.recoveryReason).toBe('no_controlled_character')
   })
 })
 

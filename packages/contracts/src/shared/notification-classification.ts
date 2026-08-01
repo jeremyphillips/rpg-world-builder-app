@@ -111,12 +111,22 @@ export const NOTIFICATION_CLASSIFICATION_BY_TYPE = {
     topic: 'campaign_invites',
     priority: 'normal',
   },
+  'campaign.invite.cancelled': {
+    category: 'campaign',
+    topic: 'campaign_invites',
+    priority: 'normal',
+  },
   'campaign.invite.accepted': {
     category: 'campaign',
     topic: 'campaign_invites',
     priority: 'normal',
   },
   'campaign.invite.completed': {
+    category: 'campaign',
+    topic: 'campaign_invites',
+    priority: 'normal',
+  },
+  'campaign.member.removed': {
     category: 'campaign',
     topic: 'campaign_invites',
     priority: 'normal',

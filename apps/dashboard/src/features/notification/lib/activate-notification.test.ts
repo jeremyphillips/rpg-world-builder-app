@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { dashboardCampaignInviteReviewPath } from '@rpg/contracts'
+
 import { makeNotification } from '@/test/fixtures/notifications'
 
 import { activateNotification } from './activate-notification'
@@ -66,7 +68,7 @@ describe('activateNotification', () => {
         payload: {
           campaignId: 'camp_1',
           campaignName: 'Stormwatch',
-          inviteId: 'invite_1',
+          inviteId: 'a'.repeat(24),
           inviterDisplayName: 'Alex',
         },
       },
@@ -77,5 +79,37 @@ describe('activateNotification', () => {
 
     expect(markRead.mutateAsync).toHaveBeenCalledWith('notification-2')
     expect(navigate).not.toHaveBeenCalled()
+  })
+
+  it('navigates within the dashboard SPA for invite review notifications', () => {
+    const inviteId = 'a'.repeat(24)
+    const markRead = { mutateAsync: vi.fn().mockResolvedValue(undefined) }
+    const navigate = vi.fn()
+
+    activateNotification({
+      notification: {
+        id: 'notification-3',
+        type: 'campaign.invite.received',
+        title: 'Campaign invitation',
+        createdAt: '2026-07-30T12:00:00.000Z',
+        updatedAt: '2026-07-30T12:00:00.000Z',
+        version: 1,
+        action: { kind: 'campaign_invite_review', inviteId },
+        payload: {
+          campaignId: 'camp_1',
+          campaignName: 'Stormwatch',
+          inviteId,
+          inviterDisplayName: 'Alex',
+        },
+      },
+      markRead,
+      navigate,
+      onFailure: vi.fn(),
+    })
+
+    expect(markRead.mutateAsync).toHaveBeenCalledWith('notification-3')
+    expect(navigate).toHaveBeenCalledWith(
+      dashboardCampaignInviteReviewPath(inviteId).slice('/app'.length),
+    )
   })
 })

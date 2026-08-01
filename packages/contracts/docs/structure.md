@@ -85,8 +85,12 @@ flowchart BT
 | Composed campaign-character wire DTOs (not campaign rules)                               | `rpg/runtime/campaign/`             | `npc-dtos.ts`, `pc-list-item-dto.ts`, `party-pc-list-item-dto.ts`                                                            |
 | Campaign eligibility resolver orchestration                                              | `rpg/runtime/campaign-eligibility/` | `resolve-character-campaign-eligibility.ts`                                                                                  |
 | RPG character list-card view models                                                      | `rpg/runtime/character/`            | `character-card-dtos.ts`                                                                                                     |
-| Campaign content viewer authorization model                                              | `rpg/campaign/lib/`                 | `campaign-content-viewer.ts`                                                                                                 |
-| Campaign eligibility wire contracts (issues/warnings only)                               | `rpg/campaign/`                     | `character-eligibility-contracts.ts`                                                                                         |
+| Campaign content viewer authorization model                                              | `rpg/campaign/`                     | `campaign-content-viewer.ts`                                                                                                 |
+| Campaign eligibility wire contracts (issues/warnings only)                               | `rpg/campaign/character/`           | `eligibility-contracts.ts`                                                                                                   |
+| Campaign invite schemas and DTOs                                                         | `rpg/campaign/invite/`              | `invite.ts`, `dtos.ts`, `expiry-label.ts`, `unavailable-messages.ts`                                                         |
+| Campaign onboarding wire DTOs and access gate                                            | `rpg/campaign/onboarding/`          | `dtos.ts`, `resolve-access.ts`                                                                                               |
+| Viewer participation/state resolvers (recovery classification)                           | `rpg/campaign/viewer/`              | `resolve-participation.ts`, `resolve-state.ts`                                                                               |
+| Character participation, roster, assignment, eligibility                                 | `rpg/campaign/character/`           | `participation.ts`, `roster-state.ts`, `assignment-dtos.ts`, …                                                               |
 | Serializable character-builder wire contracts (step ids, validation issues, acquisition) | `rpg/character-builder/`            | `rpg/character-builder/step-ids.ts` — import via `@rpg/contracts/rpg/character-builder`                                      |
 | Campaign identity, templates, membership, ruleset patches                                | `rpg/campaign/`                     | `rpg/campaign/campaign.ts`, `rpg/campaign/campaign-template.ts`, `rpg/campaign/patches/`                                     |
 | Campaign rule bodies (not catalog content types)                                         | `rpg/campaign/rules/`               | `rpg/campaign/rules/starting-wealth.ts`                                                                                      |
@@ -97,6 +101,30 @@ flowchart BT
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
 for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
+
+### `rpg/campaign/` folder ownership
+
+Root keeps core identity (`campaign.ts`), templates, selection, overview DTOs,
+resolved-rules facade (`campaign-rules.ts`), content discovery authz
+(`campaign-content-viewer.ts`), and `is-campaign-manager.ts`. Domain subfolders
+meet the 2–3 module threshold; do not add `lib/`, `utils/`, or `helpers/`.
+
+| Folder        | Owns                                                                                                                                                                                 | Not allowed                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invite/`     | Invite entity schemas, invitee/admin DTOs, expiry labels, unavailable messages                                                                                                       | Shared id/token primitives (`shared/campaign-invite-id`); onboarding access; viewer recovery; character assignment                                 |
+| `viewer/`     | Coarse `participationState` resolver; actionable `viewerState` / recovery reasons; open-roster filter for viewer resolution                                                          | Content discovery authz (`ContentViewer`); overview roster labels; onboarding GET/POST access gate; character assignment/eligibility; invite flows |
+| `onboarding/` | Onboarding wire DTOs; `resolveCampaignOnboardingAccess` + access result schemas                                                                                                      | Viewer state derivation; invite accept DTOs; character eligibility issue unions; overview member badges                                            |
+| `character/`  | Character participation records; open-participation predicate; assignment DTOs/errors; eligibility wire contracts; character access DTOs/helpers; roster state; update-roster inputs | Campaign identity; invite lifecycle; viewerState derivation; content `ContentViewer`; onboarding access gate                                       |
+| `patches/`    | Authoring patch schemas (unchanged)                                                                                                                                                  | Resolved runtime rules facade                                                                                                                      |
+| `rules/`      | Constituent rule modules e.g. starting-wealth (unchanged)                                                                                                                            | Composed `campaign-rules.ts` facade — stays at root                                                                                                |
+
+**Hard rule:** `viewer/` is membership + open roster → viewer classification, not
+“anything a human viewer sees.” `campaign-content-viewer.ts` stays at root because
+content discovery authz is a separate concept from recovery `viewerState`.
+
+Domain-local short names inside folders (e.g. `character/eligibility-contracts.ts`);
+the `campaign/index.ts` barrel preserves external symbol names for
+`@rpg/contracts` consumers.
 
 Named authored RPG records share `authoredContentBodySchema` from
 `rpg/primitives/authored-content.ts` (`name`, optional rich-text `description`,

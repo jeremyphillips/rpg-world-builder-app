@@ -26,6 +26,7 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@hookform/resolvers": "^5.4.0",
     "@rpg/api-client": "workspace:*",
+    "@rpg/campaign-invite": "workspace:*",
     "@rpg/catalog": "workspace:*",
     "@rpg/contracts": "workspace:*",
     "@rpg/name-generator-core": "workspace:*",

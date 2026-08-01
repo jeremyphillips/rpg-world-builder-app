@@ -22,8 +22,20 @@ const registry = {
   'campaign.invite.received': {
     formatPreview: (payload) => ({
       title: 'Campaign invitation',
-      description: `${payload.inviterDisplayName} invited you to join ${payload.campaignName}. Open the invite email to accept.`,
+      description: `${payload.inviterDisplayName} invited you to join ${payload.campaignName}.`,
       actorLabel: payload.inviterDisplayName,
+      subjectLabel: payload.campaignName,
+    }),
+    resolveAction: (payload) => ({
+      kind: 'campaign_invite_review',
+      inviteId: payload.inviteId,
+    }),
+  },
+  'campaign.invite.cancelled': {
+    formatPreview: (payload) => ({
+      title: 'Invitation cancelled',
+      description: `${payload.cancelledByDisplayName} cancelled your invitation to ${payload.campaignName}.`,
+      actorLabel: payload.cancelledByDisplayName,
       subjectLabel: payload.campaignName,
     }),
     resolveAction: () => undefined,
@@ -51,6 +63,15 @@ const registry = {
       kind: 'campaign_detail',
       campaignId: payload.campaignId,
     }),
+  },
+  'campaign.member.removed': {
+    formatPreview: (payload) => ({
+      title: 'Removed from campaign',
+      description: `${payload.removedByDisplayName} removed you from ${payload.campaignName}.`,
+      actorLabel: payload.removedByDisplayName,
+      subjectLabel: payload.campaignName,
+    }),
+    resolveAction: () => undefined,
   },
   'message.direct.received': {
     formatPreview: (payload) => {

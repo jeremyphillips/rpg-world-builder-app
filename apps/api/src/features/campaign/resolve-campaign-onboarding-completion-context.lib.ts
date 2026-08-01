@@ -1,10 +1,8 @@
 import type { CompleteCampaignOnboardingResult } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import {
-  loadCampaignViewerParticipationContext,
-  type CampaignViewerParticipationContext,
-} from './resolve-campaign-viewer-participation-context.lib'
+import { loadCampaignOnboardingGate } from './load-campaign-onboarding-gate.lib'
+import { throwFromCampaignOnboardingGate } from './map-campaign-onboarding-gate-error.lib'
 
 export type CampaignOnboardingCharacterSource =
   | { kind: 'new' }
@@ -13,7 +11,6 @@ export type CampaignOnboardingCharacterSource =
 export type CampaignOnboardingCompletionContext = {
   campaignId: string
   membershipId: string
-  participation: CampaignViewerParticipationContext
 }
 
 export type CampaignOnboardingCompletionContextResult =
@@ -22,7 +19,7 @@ export type CampaignOnboardingCompletionContextResult =
 
 function resolveIdempotentCompleteResult(
   campaignId: string,
-  activeCharacterIds: string[],
+  activeCharacterIds: readonly string[],
   characterSource: CampaignOnboardingCharacterSource,
 ): CompleteCampaignOnboardingResult | null {
   if (activeCharacterIds.length === 0) return null
@@ -51,51 +48,33 @@ export async function resolveCampaignOnboardingCompletionContext({
   userId: string
   characterSource: CampaignOnboardingCharacterSource
 }): Promise<CampaignOnboardingCompletionContextResult> {
-  const participation = await loadCampaignViewerParticipationContext({ campaignId, userId })
-  if (!participation) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
+  const gate = await loadCampaignOnboardingGate({ campaignId, userId })
 
-  if (participation.participationState === 'active') {
+  if (gate.kind === 'complete') {
     const idempotentResult = resolveIdempotentCompleteResult(
       campaignId,
-      participation.activeCharacterIds,
+      gate.activeCharacterIds,
       characterSource,
     )
     if (idempotentResult) {
       return { kind: 'idempotent', result: idempotentResult }
     }
+
+    throwFromCampaignOnboardingGate({
+      kind: 'integrity_error',
+      reason: 'ready_pc_without_active_character',
+    })
   }
 
-  if (participation.participationState === 'onboarding_incomplete') {
-    return {
-      kind: 'ready',
-      context: {
-        campaignId,
-        membershipId: participation.membershipId,
-        participation,
-      },
-    }
+  if (gate.kind === 'not_found' || gate.kind === 'forbidden' || gate.kind === 'integrity_error') {
+    throwFromCampaignOnboardingGate(gate)
   }
 
-  if (
-    participation.participationState === 'staff' ||
-    participation.participationState === 'observer'
-  ) {
-    throw new HttpError(
-      403,
-      'forbidden',
-      'Campaign onboarding is only available to player members.',
-    )
+  return {
+    kind: 'ready',
+    context: {
+      campaignId,
+      membershipId: gate.membershipId,
+    },
   }
-
-  if (participation.participationState === 'invalid') {
-    throw new HttpError(
-      500,
-      'integrity_error',
-      'Campaign membership is in an inconsistent onboarding state.',
-    )
-  }
-
-  throw new HttpError(404, 'not_found', 'Campaign not found.')
 }

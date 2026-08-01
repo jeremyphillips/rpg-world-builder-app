@@ -1,4 +1,18 @@
-import type { CampaignListItem } from '@rpg/contracts'
+import type { CampaignListItem, CampaignViewerState } from '@rpg/contracts'
+
+export const VIEWER_STATE = {
+  ready: { kind: 'ready' } satisfies CampaignViewerState,
+  onboardingIncomplete: { kind: 'onboarding_incomplete' } satisfies CampaignViewerState,
+  controlStale: (characterId = 'char_1'): CampaignViewerState => ({
+    kind: 'control_stale',
+    characterId,
+  }),
+  participationMissing: (characterId = 'char_1'): CampaignViewerState => ({
+    kind: 'participation_missing',
+    characterId,
+  }),
+  membershipInvalid: { kind: 'membership_invalid' } satisfies CampaignViewerState,
+} as const
 
 export function makeCampaignListItem(overrides: Partial<CampaignListItem> = {}): CampaignListItem {
   return {
@@ -12,7 +26,7 @@ export function makeCampaignListItem(overrides: Partial<CampaignListItem> = {}):
     campaignRole: 'owner',
     controlledCharacterIds: [],
     openControlledCharacterIds: [],
-    viewerOnboardingState: 'complete',
+    viewerState: VIEWER_STATE.ready,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,

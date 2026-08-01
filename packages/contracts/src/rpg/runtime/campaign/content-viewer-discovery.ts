@@ -1,5 +1,5 @@
 import type { ResolvedContentCampaignAccess } from '../../content/lib/campaign-access'
-import type { ContentViewer } from '../../campaign/lib/campaign-content-viewer'
+import type { ContentViewer } from '../../campaign/campaign-content-viewer'
 
 /** Structured player-facing visibility facts for overview metadata. */
 export type PlayerContentVisibility =

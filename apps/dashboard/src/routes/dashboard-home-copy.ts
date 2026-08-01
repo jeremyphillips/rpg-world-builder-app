@@ -1,6 +1,4 @@
 export const DASHBOARD_HOME_COPY = {
-  invitationHeading: 'Have a campaign invitation?',
-  invitationBody: 'Open the invitation link from your email to join.',
   starterCards: {
     campaign: {
       title: 'Create a campaign',

@@ -3,6 +3,7 @@ import type { CampaignInvite, CampaignInviteAdminListItem } from '@rpg/contracts
 import { HttpError } from '../../lib/http-error'
 import type { EmailProvider } from '../../services/email/email.types'
 import { buildCampaignInviteUrl } from '../../services/email/email.service'
+import { publishCampaignInviteCancelledNotification } from '../notification'
 import { CAMPAIGN_INVITE_ROTATION_COOLDOWN_MS, computeInviteExpiresAt } from './campaign-invite.lib'
 import {
   listPendingInvitesByCampaign,
@@ -109,4 +110,11 @@ export async function revokeCampaignInvite(input: RevokeCampaignInviteInput): Pr
   if (!revoked) {
     throw new HttpError(409, 'conflict', 'Invitation cannot be revoked in its current state.')
   }
+
+  void publishCampaignInviteCancelledNotification({
+    invite: revoked,
+    cancelledByUserId: input.revokedByUserId,
+  }).catch((error) => {
+    console.error('Failed to publish campaign invite cancelled notification.', error)
+  })
 }

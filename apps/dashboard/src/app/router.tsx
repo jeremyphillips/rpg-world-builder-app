@@ -60,6 +60,7 @@ import {
   MessagesWorkspaceRoute,
   NameGeneratorRoute,
   NotificationsListRoute,
+  CampaignInviteReviewRoute,
   RulesConfigDetailRoute,
   VocabularyLandingRoute,
   VocabularyDetailRoute,
@@ -130,6 +131,11 @@ const router = createBrowserRouter(
               path: 'notifications',
               element: <NotificationsListRoute />,
               handle: { crumb: () => ({ label: 'Notifications' }) } satisfies CrumbHandle,
+            },
+            {
+              path: 'campaign-invites/:inviteId',
+              element: <CampaignInviteReviewRoute />,
+              handle: { crumb: () => ({ label: 'Campaign invitation' }) } satisfies CrumbHandle,
             },
             {
               path: 'messages',
