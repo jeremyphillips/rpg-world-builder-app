@@ -37,7 +37,7 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   conditions: {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Catalog seed mirrors contract condition entries for Game Terms browse.',
   },
   languages: {
     owner: 'shared',
@@ -49,7 +49,7 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   sizes: {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Catalog seed mirrors contract creature size entries for Game Terms browse.',
   },
   'spell-schools': {
     owner: 'catalog',
@@ -57,11 +57,11 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   'weapon-properties': {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Catalog seed mirrors contract weapon property entries for Game Terms browse.',
   },
   'equipment-categories': {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Catalog seed mirrors equipment kind taxonomy for Game Terms browse.',
   },
   'edition-presets': {
     owner: 'dashboard',

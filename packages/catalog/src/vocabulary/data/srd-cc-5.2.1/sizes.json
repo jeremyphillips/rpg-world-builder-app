@@ -1,0 +1,32 @@
+[
+  {
+    "id": "tiny",
+    "label": "Tiny",
+    "description": "A Tiny creature occupies a space 2½ feet on a side (e.g. a sprite, a cat)."
+  },
+  {
+    "id": "small",
+    "label": "Small",
+    "description": "A Small creature occupies a space 5 feet on a side (e.g. a halfling, a goblin)."
+  },
+  {
+    "id": "medium",
+    "label": "Medium",
+    "description": "A Medium creature occupies a space 5 feet on a side (e.g. a human, an orc)."
+  },
+  {
+    "id": "large",
+    "label": "Large",
+    "description": "A Large creature occupies a space 10 feet on a side (e.g. an ogre, a horse)."
+  },
+  {
+    "id": "huge",
+    "label": "Huge",
+    "description": "A Huge creature occupies a space 15 feet on a side (e.g. a fire giant, a treant)."
+  },
+  {
+    "id": "gargantuan",
+    "label": "Gargantuan",
+    "description": "A Gargantuan creature occupies a space 20 feet on a side or larger (e.g. a kraken, an ancient dragon)."
+  }
+]

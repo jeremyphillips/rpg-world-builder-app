@@ -1,12 +1,16 @@
 import { z } from 'zod'
 import {
   ATTACK_RESOLUTION_MODE_SET_ID,
+  CONDITION_SET_ID,
+  CREATURE_SIZE_SET_ID,
   CREATURE_TYPE_SET_ID,
   DAMAGE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
+  EQUIPMENT_CATEGORY_SET_ID,
   LANGUAGE_SET_ID,
   SENSE_SET_ID,
   SPELL_SCHOOL_SET_ID,
+  WEAPON_PROPERTY_SET_ID,
   languageSeedOptionSchema,
   vocabularySeedOptionSchema,
 } from '@rpg/contracts'
@@ -22,12 +26,16 @@ import type {
 
 import { getById } from '../lib/get-by-id'
 import attackResolutionModesRaw from './data/srd-cc-5.2.1/attack-resolution-modes.json'
+import conditionsRaw from './data/srd-cc-5.2.1/conditions.json'
 import creatureTypesRaw from './data/srd-cc-5.2.1/creature-types.json'
 import damageTypesRaw from './data/srd-cc-5.2.1/damage-types.json'
 import editionPresetsRaw from './data/srd-cc-5.2.1/edition-presets.json'
+import equipmentCategoriesRaw from './data/srd-cc-5.2.1/equipment-categories.json'
 import languagesRaw from './data/srd-cc-5.2.1/languages.json'
 import sensesRaw from './data/srd-cc-5.2.1/senses.json'
+import sizesRaw from './data/srd-cc-5.2.1/sizes.json'
 import spellSchoolsRaw from './data/srd-cc-5.2.1/spell-schools.json'
+import weaponPropertiesRaw from './data/srd-cc-5.2.1/weapon-properties.json'
 
 function assertUniqueOptionIds(options: readonly VocabularySeedOption[], label: string): void {
   const ids = options.map((option) => option.id)
@@ -52,9 +60,16 @@ function parseLanguageSeedOptions(raw: unknown, label: string): LanguageSeedOpti
 // seed data fails fast (and in CI) rather than at request time.
 const SRD_521_CREATURE_TYPES = parseSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
 const SRD_521_DAMAGE_TYPES = parseSeedOptions(damageTypesRaw, DAMAGE_TYPE_SET_ID)
+const SRD_521_CONDITIONS = parseSeedOptions(conditionsRaw, CONDITION_SET_ID)
+const SRD_521_SIZES = parseSeedOptions(sizesRaw, CREATURE_SIZE_SET_ID)
 const SRD_521_SENSES = parseSeedOptions(sensesRaw, SENSE_SET_ID)
 const SRD_521_LANGUAGES = parseLanguageSeedOptions(languagesRaw, LANGUAGE_SET_ID)
 const SRD_521_SPELL_SCHOOLS = parseSeedOptions(spellSchoolsRaw, SPELL_SCHOOL_SET_ID)
+const SRD_521_WEAPON_PROPERTIES = parseSeedOptions(weaponPropertiesRaw, WEAPON_PROPERTY_SET_ID)
+const SRD_521_EQUIPMENT_CATEGORIES = parseSeedOptions(
+  equipmentCategoriesRaw,
+  EQUIPMENT_CATEGORY_SET_ID,
+)
 const SRD_521_EDITION_PRESETS = parseSeedOptions(editionPresetsRaw, EDITION_PRESET_SET_ID)
 const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
   attackResolutionModesRaw,
@@ -65,9 +80,13 @@ const SEED_SETS_BY_RULESET = {
   'srd-cc-5.2.1': {
     [CREATURE_TYPE_SET_ID]: SRD_521_CREATURE_TYPES,
     [DAMAGE_TYPE_SET_ID]: SRD_521_DAMAGE_TYPES,
+    [CONDITION_SET_ID]: SRD_521_CONDITIONS,
+    [CREATURE_SIZE_SET_ID]: SRD_521_SIZES,
     [SENSE_SET_ID]: SRD_521_SENSES,
     [LANGUAGE_SET_ID]: SRD_521_LANGUAGES,
     [SPELL_SCHOOL_SET_ID]: SRD_521_SPELL_SCHOOLS,
+    [WEAPON_PROPERTY_SET_ID]: SRD_521_WEAPON_PROPERTIES,
+    [EQUIPMENT_CATEGORY_SET_ID]: SRD_521_EQUIPMENT_CATEGORIES,
     [EDITION_PRESET_SET_ID]: SRD_521_EDITION_PRESETS,
     [ATTACK_RESOLUTION_MODE_SET_ID]: SRD_521_ATTACK_RESOLUTION_MODES,
   },
@@ -437,6 +456,166 @@ export function getSeedAttackResolutionModeEntry(
       ATTACK_RESOLUTION_MODE_SET_ID,
       id,
       'Attack resolution mode',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Conditions — closed SRD condition set with catalog seed
+// ---------------------------------------------------------------------------
+
+export const CONDITIONS = SRD_521_CONDITIONS.map((option) => option.id) as [
+  (typeof SRD_521_CONDITIONS)[number]['id'],
+  ...(typeof SRD_521_CONDITIONS)[number]['id'][],
+]
+
+export type SeedCondition = (typeof CONDITIONS)[number]
+
+export function loadSeedConditions(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, CONDITION_SET_ID)
+}
+
+export function seedConditionIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, CONDITION_SET_ID)
+}
+
+export function getSeedConditionLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, CONDITION_SET_ID, id)
+}
+
+export function getSeedConditionEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, CONDITION_SET_ID),
+      rulesetId,
+      CONDITION_SET_ID,
+      id,
+      'Condition',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Creature sizes — closed SRD size categories with catalog seed
+// ---------------------------------------------------------------------------
+
+export const SIZES = SRD_521_SIZES.map((option) => option.id) as [
+  (typeof SRD_521_SIZES)[number]['id'],
+  ...(typeof SRD_521_SIZES)[number]['id'][],
+]
+
+export type SeedCreatureSize = (typeof SIZES)[number]
+
+export function loadSeedSizes(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, CREATURE_SIZE_SET_ID)
+}
+
+export function seedSizeIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, CREATURE_SIZE_SET_ID)
+}
+
+export function getSeedSizeLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, CREATURE_SIZE_SET_ID, id)
+}
+
+export function getSeedSizeEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, CREATURE_SIZE_SET_ID),
+      rulesetId,
+      CREATURE_SIZE_SET_ID,
+      id,
+      'Size',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Weapon properties — closed SRD property set with catalog seed
+// ---------------------------------------------------------------------------
+
+export const WEAPON_PROPERTIES = SRD_521_WEAPON_PROPERTIES.map((option) => option.id) as [
+  (typeof SRD_521_WEAPON_PROPERTIES)[number]['id'],
+  ...(typeof SRD_521_WEAPON_PROPERTIES)[number]['id'][],
+]
+
+export type SeedWeaponProperty = (typeof WEAPON_PROPERTIES)[number]
+
+export function loadSeedWeaponProperties(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, WEAPON_PROPERTY_SET_ID)
+}
+
+export function seedWeaponPropertyIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, WEAPON_PROPERTY_SET_ID)
+}
+
+export function getSeedWeaponPropertyLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, WEAPON_PROPERTY_SET_ID, id)
+}
+
+export function getSeedWeaponPropertyEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, WEAPON_PROPERTY_SET_ID),
+      rulesetId,
+      WEAPON_PROPERTY_SET_ID,
+      id,
+      'Weapon property',
+    )
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Equipment categories — equipment kind taxonomy with catalog seed
+// ---------------------------------------------------------------------------
+
+export const EQUIPMENT_CATEGORIES = SRD_521_EQUIPMENT_CATEGORIES.map((option) => option.id) as [
+  (typeof SRD_521_EQUIPMENT_CATEGORIES)[number]['id'],
+  ...(typeof SRD_521_EQUIPMENT_CATEGORIES)[number]['id'][],
+]
+
+export type SeedEquipmentCategory = (typeof EQUIPMENT_CATEGORIES)[number]
+
+export function loadSeedEquipmentCategories(rulesetId: SystemRulesetId): VocabularyOptionSet {
+  return loadSeedVocabularyOptionSet(rulesetId, EQUIPMENT_CATEGORY_SET_ID)
+}
+
+export function seedEquipmentCategoryIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
+  return seedVocabularyOptionIds(rulesetId, EQUIPMENT_CATEGORY_SET_ID)
+}
+
+export function getSeedEquipmentCategoryLabel(rulesetId: SystemRulesetId, id: string): string {
+  return getSeedVocabularyOptionLabel(rulesetId, EQUIPMENT_CATEGORY_SET_ID, id)
+}
+
+export function getSeedEquipmentCategoryEntry(
+  rulesetId: SystemRulesetId,
+  id: string,
+): VocabularySeedOption | undefined {
+  try {
+    return getById(
+      loadSeedOptions(rulesetId, EQUIPMENT_CATEGORY_SET_ID),
+      rulesetId,
+      EQUIPMENT_CATEGORY_SET_ID,
+      id,
+      'Equipment category',
     )
   } catch {
     return undefined

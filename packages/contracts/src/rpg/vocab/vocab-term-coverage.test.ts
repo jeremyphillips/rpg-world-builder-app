@@ -20,6 +20,7 @@ import { ARMOR_MATERIAL_TERM } from './armor/material'
 import { CREATURE_SIZE_TERM } from './creature-size'
 import { CREATURE_TYPE_TERM } from './creature-type'
 import { DAMAGE_TYPE_TERM } from './damage/vocabulary'
+import { EQUIPMENT_CATEGORY_TERM } from './equipment/equipment-category'
 import { PHYSICAL_DAMAGE_TYPE_TERM } from './damage/physical'
 import { CONDITION_TERM } from './effect-condition'
 import { EQUIPMENT_KIND_TERM } from './equipment/kind'
@@ -107,6 +108,10 @@ const RPG_VOCAB_OPEN_TERMS = [
   LANGUAGE_TERM,
   SENSE_TERM,
   SPELL_SCHOOL_TERM,
+  CONDITION_TERM,
+  CREATURE_SIZE_TERM,
+  WEAPON_PROPERTY_TERM,
+  EQUIPMENT_CATEGORY_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 const NAME_GENERATOR_TERMS = [
@@ -146,7 +151,7 @@ describe('rpg/vocab term coverage', () => {
   })
 
   it('defines open vocab terms for every *_SET_ID module', () => {
-    expect(RPG_VOCAB_OPEN_TERMS).toHaveLength(5)
+    expect(RPG_VOCAB_OPEN_TERMS).toHaveLength(9)
     for (const term of RPG_VOCAB_OPEN_TERMS) {
       expectVocabularyTerm(term)
     }

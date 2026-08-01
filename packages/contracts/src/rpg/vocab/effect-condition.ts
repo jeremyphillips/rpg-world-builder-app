@@ -1,5 +1,6 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import type { GameTermEntry, VocabularyTerm } from './types'
+import type { VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
 // Effect conditions — the closed SRD 5.2.1 condition set. Used by spell tags
@@ -14,6 +15,8 @@ export const CONDITION_TERM = {
     plural: 'conditions',
   },
 } as const satisfies VocabularyTerm
+
+export const CONDITION_SET_ID = 'conditions' as const satisfies VocabularyOptionSetId
 
 export const EFFECT_CONDITION_ENTRIES = {
   blinded: {

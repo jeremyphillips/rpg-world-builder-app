@@ -1,0 +1,72 @@
+[
+  {
+    "id": "blinded",
+    "label": "Blinded",
+    "description": "A blinded creature can't see and automatically fails ability checks that require sight. Attack rolls against the creature have advantage, and the creature's attack rolls have disadvantage."
+  },
+  {
+    "id": "charmed",
+    "label": "Charmed",
+    "description": "A charmed creature can't attack the charmer or target the charmer with harmful abilities. The charmer has advantage on social checks against the creature."
+  },
+  {
+    "id": "deafened",
+    "label": "Deafened",
+    "description": "A deafened creature can't hear and automatically fails ability checks that require hearing."
+  },
+  {
+    "id": "frightened",
+    "label": "Frightened",
+    "description": "A frightened creature has disadvantage on ability checks and attack rolls while the source of fear is in line of sight. The creature cannot willingly move closer to that source."
+  },
+  {
+    "id": "grappled",
+    "label": "Grappled",
+    "description": "A grappled creature's speed becomes 0, and it can't benefit from any bonus to speed. The condition ends if the grappler is incapacitated or if an effect removes the grappled creature from the grappler's reach."
+  },
+  {
+    "id": "incapacitated",
+    "label": "Incapacitated",
+    "description": "An incapacitated creature can't take actions or reactions."
+  },
+  {
+    "id": "invisible",
+    "label": "Invisible",
+    "description": "An invisible creature is impossible to see without special senses; attack rolls against it have disadvantage, and its attack rolls have advantage. It is still revealed by noise, tracks, etc."
+  },
+  {
+    "id": "paralyzed",
+    "label": "Paralyzed",
+    "description": "A paralyzed creature is incapacitated and can't move or speak. It automatically fails Strength and Dexterity saving throws. Attack rolls against it have advantage; melee hits from 5 feet are critical hits."
+  },
+  {
+    "id": "petrified",
+    "label": "Petrified",
+    "description": "A petrified creature is transformed to stone, weighs 10× as much, and is incapacitated. It has resistance to all damage and immunity to poison and disease. Attack rolls against it have advantage."
+  },
+  {
+    "id": "poisoned",
+    "label": "Poisoned",
+    "description": "A poisoned creature has disadvantage on attack rolls and ability checks."
+  },
+  {
+    "id": "prone",
+    "label": "Prone",
+    "description": "A prone creature can only crawl unless it stands, ending the condition. Melee attacks against it have advantage; ranged attacks have disadvantage. Its own attacks have disadvantage unless it stands."
+  },
+  {
+    "id": "restrained",
+    "label": "Restrained",
+    "description": "A restrained creature's speed is 0; attack rolls against it have advantage, and it has disadvantage on Dexterity saving throws."
+  },
+  {
+    "id": "stunned",
+    "label": "Stunned",
+    "description": "A stunned creature is incapacitated, can't move, and can speak only falteringly. It automatically fails Strength and Dexterity saving throws; attack rolls against it have advantage."
+  },
+  {
+    "id": "unconscious",
+    "label": "Unconscious",
+    "description": "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings. It drops what it's holding and falls prone. Attack rolls against it have advantage; hits from 5 feet are critical hits."
+  }
+]

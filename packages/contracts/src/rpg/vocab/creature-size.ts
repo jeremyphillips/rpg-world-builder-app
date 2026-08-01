@@ -1,6 +1,7 @@
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
 import type { GameTermEntry, VocabularyTerm } from './types'
+import type { VocabularyOptionSetId } from './vocabulary'
 
 // ---------------------------------------------------------------------------
 // Creature sizes — the closed SRD 5.2.1 size categories, shared by species,
@@ -16,6 +17,8 @@ export const CREATURE_SIZE_TERM = {
     plural: 'size categories',
   },
 } as const satisfies VocabularyTerm
+
+export const CREATURE_SIZE_SET_ID = 'sizes' as const satisfies VocabularyOptionSetId
 
 export const CREATURE_SIZE_ENTRIES = {
   tiny: {

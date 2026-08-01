@@ -1,0 +1,42 @@
+[
+  {
+    "id": "weapon",
+    "label": "Weapon",
+    "description": "A weapon item such as a sword, bow, or thrown weapon."
+  },
+  {
+    "id": "armor",
+    "label": "Armor",
+    "description": "Armor or a shield used for protection."
+  },
+  {
+    "id": "adventuring_gear",
+    "label": "Adventuring Gear",
+    "description": "General equipment used while adventuring."
+  },
+  {
+    "id": "tool",
+    "label": "Tool",
+    "description": "A tool set, kit, game set, or musical instrument."
+  },
+  {
+    "id": "mount",
+    "label": "Mount",
+    "description": "A rideable animal or similar mount."
+  },
+  {
+    "id": "vehicle",
+    "label": "Vehicle",
+    "description": "A land or water vehicle."
+  },
+  {
+    "id": "service",
+    "label": "Service",
+    "description": "A purchasable service."
+  },
+  {
+    "id": "magic_item",
+    "label": "Magic Item",
+    "description": "A magical item such as a potion, scroll, or wondrous item."
+  }
+]

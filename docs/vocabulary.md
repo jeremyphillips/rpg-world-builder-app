@@ -80,12 +80,14 @@ Shared shapes live in `@rpg/contracts`:
 | `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                               | Validates a value against resolved **active** ids    |
 | `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                               | Active id set from a resolved option set             |
 
-**Closed reference vocab** (physical damage, weapon properties) remains in
-`rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Each closed
+**Closed reference vocab** (physical damage, armor categories, magic item rarity) remains in
+`rpg/vocab/*_ENTRIES` maps when the set is not in `VOCABULARY_OPTION_SET_IDS`. Each closed
 map also exports a sibling `*_TERM` describing the set concept (label,
-description, counted `sentence` forms). Open sets (damage types, senses, languages,
-spell schools, creature types) export `*_TERM` plus `*_SET_ID` and use catalog seed
-JSON + campaign patch instead.
+description, counted `sentence` forms). **Open sets** (creature types, damage types,
+conditions, sizes, senses, languages, spell schools, weapon properties,
+equipment categories) export `*_TERM` plus `*_SET_ID` and use catalog seed
+JSON; browsable sets resolve through the vocabulary API (browse-only or full
+management per `VOCABULARY_SET_CAPABILITIES`).
 
 **Campaign-customizable sets** (creature types first) use catalog seed JSON +
 patch merge instead of expanding a compile-time enum. Primitive shape validation
@@ -374,10 +376,10 @@ apply product casing conventions.
 
 ### Campaign vocab vs closed reference sets
 
-| Source                                                    | Examples                                               | Consumption                                                                                                                                             |
-| --------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Campaign vocab** (`VOCABULARY_OPTION_SET_IDS`)          | Creature types, damage types, languages                | Resolve per campaign via vocabulary API; build label maps from the resolved set (see [Adding the next vocabulary set](#adding-the-next-vocabulary-set)) |
-| **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Weapon properties, armor categories, magic item rarity | Import label helpers from `rpg/vocab/*`; no campaign patch merge                                                                                        |
+| Source                                                    | Examples                                                                                                                   | Consumption                                                                                                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Campaign vocab** (`VOCABULARY_OPTION_SET_IDS`)          | Creature types, damage types, conditions, sizes, languages, senses, spell schools, weapon properties, equipment categories | Resolve per campaign via vocabulary API; build label maps from the resolved set (see [Adding the next vocabulary set](#adding-the-next-vocabulary-set)) |
+| **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Physical damage, armor categories, magic item rarity                                                                       | Import label helpers from `rpg/vocab/*`; no vocabulary set id or catalog seed                                                                           |
 
 Catalog **content types** (classes, species, equipment, …) are separate — see
 [content-types.md](./content-types.md). The shared `pnpm vocab:audit` policy and
