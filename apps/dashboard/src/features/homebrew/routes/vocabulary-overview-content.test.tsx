@@ -9,8 +9,9 @@ vi.mock('@/features/campaign', () => ({
 
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { ROUTES } from '@/app/routes'
 import { makeTestQueryClient, renderWithProviders } from '@/test/render'
-import { VocabularyDetailContent } from './vocabulary-detail-content'
+import { VocabularyOverviewContent } from './vocabulary-overview-content'
 
 const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 
@@ -35,52 +36,64 @@ const mockSet: ResolvedVocabularyOptionSet = {
   ],
 }
 
-function renderDetail(setId = 'creature-types', campaignId = 'camp_1') {
+function renderOverview(setId = 'creature-types', campaignId = 'camp_1') {
   const queryClient = makeTestQueryClient()
   queryClient.setQueryData(['campaigns', campaignId, 'vocabulary', setId], mockSet)
 
-  return renderWithProviders(<VocabularyDetailContent campaignId={campaignId} setId={setId} />, {
+  return renderWithProviders(<VocabularyOverviewContent campaignId={campaignId} setId={setId} />, {
     queryClient,
   })
 }
 
-describe('VocabularyDetailContent', () => {
+describe('VocabularyOverviewContent', () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
   })
 
   it('renders the set table with source and usage columns', () => {
-    renderDetail()
+    renderOverview()
 
     expect(screen.getByRole('heading', { name: 'Creature Types' })).toBeInTheDocument()
-    expect(screen.getByRole('navigation', { name: 'Rules vocabulary sets' })).toBeInTheDocument()
-    expect(screen.getByText('Aberration')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Aberration' })).toHaveAttribute(
+      'href',
+      ROUTES.gameTerms.detail('camp_1', 'creature-types', 'aberration'),
+    )
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
   })
 
-  it('shows a not-implemented state for disabled sets', () => {
-    renderDetail('damage-types')
+  it('shows browse-only overview for sets without management capabilities', () => {
+    const queryClient = makeTestQueryClient()
+    queryClient.setQueryData(['campaigns', 'camp_1', 'vocabulary', 'damage-types'], {
+      id: 'damage-types',
+      options: [],
+    })
+
+    renderWithProviders(<VocabularyOverviewContent campaignId="camp_1" setId="damage-types" />, {
+      queryClient,
+    })
 
     expect(screen.getByRole('heading', { name: 'Damage Types' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Not available yet' })).toBeInTheDocument()
-    expect(screen.getByRole('navigation', { name: 'Rules vocabulary sets' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'New damage type' })).not.toBeInTheDocument()
+  })
+
+  it('shows a not-found state for internal-only set ids', () => {
+    renderOverview('edition-presets')
+
+    expect(screen.getByRole('heading', { name: 'Not found' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to Game Terms' })).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
-  it('shows an unknown fallback for invalid set ids', () => {
-    renderDetail('not-a-set')
+  it('shows a not-found fallback for invalid set ids', () => {
+    renderOverview('not-a-set')
 
-    expect(screen.getByRole('heading', { name: 'Vocabulary' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Back to Homebrew' })).toBeInTheDocument()
-    expect(
-      screen.queryByRole('navigation', { name: 'Rules vocabulary sets' }),
-    ).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to Game Terms' })).toBeInTheDocument()
   })
 
-  it('opens the add sheet for managers', async () => {
+  it('opens the add sheet for managers on managed sets', async () => {
     const user = userEvent.setup()
-    renderDetail()
+    renderOverview()
 
     await user.click(screen.getByRole('button', { name: 'New creature type' }))
     expect(await screen.findByRole('dialog', { name: 'New creature type' })).toBeInTheDocument()
@@ -88,8 +101,9 @@ describe('VocabularyDetailContent', () => {
 
   it('hides manager actions for non-managers', () => {
     useCanManageCampaignMock.mockReturnValue(false)
-    renderDetail()
+    renderOverview()
 
     expect(screen.queryByRole('button', { name: 'New creature type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument()
   })
 })

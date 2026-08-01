@@ -4,7 +4,7 @@ import type { ResolvedVocabularyOptionSet } from '@rpg/contracts'
 
 import { withDashboardProviders } from '../../../../.storybook/decorators'
 
-import { VocabularyDetailContent } from './vocabulary-detail-content'
+import { VocabularyOverviewContent } from './vocabulary-overview-content'
 
 const STORY_CAMPAIGN_ID = 'camp_1'
 
@@ -30,8 +30,8 @@ const mockSet: ResolvedVocabularyOptionSet = {
 }
 
 const meta = {
-  title: 'Layout/Homebrew/VocabularyDetail',
-  component: VocabularyDetailContent,
+  title: 'Layout/Game Terms/VocabularyOverview',
+  component: VocabularyOverviewContent,
   parameters: { layout: 'padded' },
   decorators: [
     withDashboardProviders,
@@ -48,15 +48,15 @@ const meta = {
       )
     },
   ],
-} satisfies Meta<typeof VocabularyDetailContent>
+} satisfies Meta<typeof VocabularyOverviewContent>
 
 export default meta
 type Story = StoryObj
 
 export const CreatureTypes: Story = {
-  render: () => <VocabularyDetailContent campaignId={STORY_CAMPAIGN_ID} setId="creature-types" />,
+  render: () => <VocabularyOverviewContent campaignId={STORY_CAMPAIGN_ID} setId="creature-types" />,
 }
 
-export const NotImplemented: Story = {
-  render: () => <VocabularyDetailContent campaignId={STORY_CAMPAIGN_ID} setId="damage-types" />,
+export const BrowseOnly: Story = {
+  render: () => <VocabularyOverviewContent campaignId={STORY_CAMPAIGN_ID} setId="damage-types" />,
 }

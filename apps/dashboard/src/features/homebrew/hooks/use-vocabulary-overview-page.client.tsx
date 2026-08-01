@@ -8,6 +8,7 @@ import {
 } from '@rpg/contracts'
 import { useFilterState } from '@rpg/ui/filters'
 
+import { ROUTES } from '@/app/routes'
 import { useOverviewSelection } from '@/lib/data-table/use-overview-selection'
 import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-menu.client'
 import {
@@ -70,12 +71,16 @@ export function useVocabularyOverviewPage({
     selectionLimit: VOCABULARY_BULK_SELECTION_LIMIT,
   })
 
+  const showEdit = canManage && capabilities.edit
+
   const columns = useMemo(
     () =>
       vocabularyColumns({
-        onNameClick: canManage && capabilities.edit ? onEdit : undefined,
+        nameHref: (entry) => ROUTES.gameTerms.detail(campaignId, setId, entry.id),
+        onEdit: showEdit ? onEdit : undefined,
+        canEdit: showEdit,
       }),
-    [canManage, capabilities.edit, onEdit],
+    [campaignId, onEdit, setId, showEdit],
   )
 
   const getRowClassName = useCallback(
@@ -90,8 +95,7 @@ export function useVocabularyOverviewPage({
     [],
   )
 
-  const showRowActions =
-    canManage && (capabilities.edit || capabilities.delete || capabilities.availability)
+  const showRowActions = canManage && (capabilities.delete || capabilities.availability)
 
   const rowActions = useCallback(
     (row: VocabularyOptionWithUsage) => (
@@ -100,13 +104,12 @@ export function useVocabularyOverviewPage({
         setId={setId}
         entry={row}
         canManage={showRowActions}
-        onEdit={onEdit}
         onDelete={(entry) => {
           void mutations.deleteEntry.mutateAsync(entry.id)
         }}
       />
     ),
-    [campaignId, mutations.deleteEntry, onEdit, setId, showRowActions],
+    [campaignId, mutations.deleteEntry, setId, showRowActions],
   )
 
   const selectionConfig =
@@ -152,7 +155,7 @@ export function useVocabularyOverviewPage({
     resetFilters,
     getRowClassName,
     getCellClassName,
-    rowActions,
+    rowActions: showRowActions ? rowActions : undefined,
     selectionConfig,
     bulkOpen,
     setBulkOpen,

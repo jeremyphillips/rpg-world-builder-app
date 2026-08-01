@@ -2,8 +2,8 @@
 
 Cross-cutting guide to **rules vocabulary** — closed option sets (creature types,
 damage types, conditions, …) that a campaign can customize without creating
-first-class catalog content. The dashboard surfaces this under **Homebrew**;
-persistence and API contracts use neutral names (`campaign`, ruleset patch).
+first-class catalog content. The dashboard surfaces this under **Game Library →
+Game Terms**; persistence and API contracts use neutral names (`campaign`, ruleset patch).
 
 For catalog **content types** (classes, species, spells, …), see
 [content-types.md](./content-types.md). For contracts layer rules, see
@@ -19,7 +19,7 @@ flowchart LR
   patch["CampaignRulesetPatch\nMongoDB per campaign + ruleset"]
   resolver["resolveVocabularySet()"]
   api["GET /api/campaigns/:id/vocabulary/:setId"]
-  ui["Dashboard Homebrew\nvocabulary detail"]
+  ui["Dashboard Game Terms\nhub / overview / detail"]
 
   catalog --> resolver
   patch --> resolver
@@ -178,25 +178,30 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 ## Dashboard registries
 
-The Homebrew feature (`apps/dashboard/src/features/homebrew/`) uses hub registries
-under `lib/hub/` kept in sync with contracts via drift tests.
+Vocabulary UI lives in `apps/dashboard/src/features/homebrew/` (feature-folder
+move is tracked as follow-up debt). Category metadata SSOT is in
+`@rpg/contracts` (`VOCABULARY_CATEGORIES`, `BROWSABLE_VOCABULARY_CATEGORIES`);
+the dashboard registry is a thin projection.
 
-### Content cards (sidebar + hub)
+### Content cards (Homebrew hub)
 
 `VISIBLE_SIDEBAR_CONTENT` in `lib/hub/content-registry.ts` must match
-`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts — same types, same order. The hub
-maps this array to cards; adding a summary content type without updating the
-registry fails CI.
+`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts — same types, same order. The
+Homebrew hub maps this array to cards; adding a summary content type without
+updating the registry fails CI.
 
-### Vocabulary sets (hub + detail rail)
+### Game Terms categories (hub + routes)
 
-`HOMEBREW_VOCABULARY_SETS` in `lib/hub/vocabulary-set-registry.ts` lists every
-`VOCABULARY_OPTION_SET_ID` with a label. **`enabled` is derived from
-`VOCABULARY_SET_CAPABILITIES.overview`** — do not maintain a parallel enable list.
-Only overview-capable sets get hub cards and an active manager; other sets appear
-in the detail rail / mobile select as not-yet-implemented.
+`GAME_TERMS_VOCABULARY_CATEGORIES` in `lib/hub/vocabulary-set-registry.ts`
+projects `BROWSABLE_VOCABULARY_CATEGORIES` from contracts — label, description,
+order, and browse visibility come from the SSOT; do not maintain parallel maps.
 
-### Rules configuration (hub)
+**Browse vs manage:** `VOCABULARY_SET_CAPABILITIES.browse` controls hub listing
+and read routes. Management flags (`create`, `edit`, `delete`, `availability`, …)
+are independent; when false, UI omits controls rather than rendering disabled
+stubs.
+
+### Rules configuration (Homebrew hub)
 
 `HOMEBREW_RULES_CONFIGS` in `lib/hub/rules-config-registry.ts` lists rules
 configuration pages on the hub. In-page section anchors for character
@@ -204,13 +209,17 @@ configuration are derived from the campaign field registry
 (`CHARACTER_CONFIGURATION_SECTIONS` in
 `features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts`).
 
-Shared UI for all sets:
+Shared UI for browsable sets:
 
-- Route: `/campaigns/:campaignId/homebrew/vocabulary/:setId`
-- `VocabularySetNav` — desktop rail + mobile `Select`
-- `VocabularyDetailContent` — table + `VocabularyEntrySheet` (Sheet primitive)
-- `useVocabularySet` / `useVocabularyMutations` — TanStack Query against
-  vocabulary API
+- Routes: `/campaigns/:campaignId/game-terms`, `…/game-terms/:setId`,
+  `…/game-terms/:setId/:termId`
+- `VocabularyHubContent` — full-row category list with counts
+- `VocabularyOverviewContent` — table + local `VocabularyEntrySheet` state
+- `VocabularyTermDetailContent` — canonical read URL; Edit opens the same sheet
+- `useVocabularySet` / `useVocabularyMutations` / `useVocabularySets` — TanStack
+  Query against vocabulary API
+
+Legacy `/homebrew/vocabulary` paths redirect to Game Terms.
 
 Per-set consumption (forms, columns, settings) should use a thin hook that
 loads the resolved set and builds label/active-id maps — see
@@ -249,7 +258,7 @@ Work through these layers once; reuse resolver, routes, and detail UI.
 
 ### 4. Dashboard
 
-1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`overview`, `create`, …).
+1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`browse`, `create`, …).
 2. Register a form def in `VOCABULARY_ENTRY_FORM_REGISTRY` when `create`/`edit` are true.
 3. Register an API usage resolver when `usageCounting` / `disableGuard` / `deleteGuard` need custom logic.
 4. Add a consumption hook if forms or columns need labels/options (pattern:
@@ -263,8 +272,8 @@ Work through these layers once; reuse resolver, routes, and detail UI.
   differs (usually shared tests suffice).
 - Registry drift: `vocabulary-set-registry.test.ts` covers all
   `VOCABULARY_OPTION_SET_IDS`.
-- Dashboard detail: extend `vocabulary-detail-content.test.tsx` or add set-specific
-  assertions only when behavior differs from creature types.
+- Dashboard overview: extend `vocabulary-overview-content.test.tsx` or add
+  set-specific assertions only when behavior differs from creature types.
 
 Do **not** duplicate merge logic, patch persistence, or the vocabulary detail
 shell per set.
@@ -274,9 +283,9 @@ shell per set.
 ## Internal-only vocabulary sets
 
 Some sets are seeded in catalog and resolved through the vocabulary API for form
-labels, but **not** exposed on the Homebrew hub (`enabled: false` in
-`vocabulary-set-registry.ts`). Campaign managers cannot create or edit these rows
-in the vocabulary UI.
+labels, but **not** exposed on Game Terms (`internalOnly: true` in category
+SSOT; `browse: false` in capabilities). Guessed URLs return not-found even though
+the API can resolve them for other consumers.
 
 | Set id                    | Used by                                     |
 | ------------------------- | ------------------------------------------- |

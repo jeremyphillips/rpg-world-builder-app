@@ -12,6 +12,7 @@ import { buttonVariants } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
+import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
@@ -21,17 +22,11 @@ import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
 } from '../components/vocabulary-entry-sheet.client'
-import { VocabularySetNav } from '../components/vocabulary-set-nav.client'
 import { useVocabularyMutations, useVocabularySet } from '../hooks/use-vocabulary-set'
 import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page.client'
-import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
-import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
-import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
-import { findVocabularySetEntry } from '../lib/hub/vocabulary-set-registry'
-import {
-  UNKNOWN_VOCABULARY_SET_MESSAGE,
-  VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
-} from '../lib/vocabulary/labels'
+import { GameTermsFallback } from '../lib/detail/game-terms-fallback'
+import { findGameTermsCategory } from '../lib/hub/vocabulary-set-registry'
+import { UNKNOWN_VOCABULARY_SET_MESSAGE } from '../lib/vocabulary/labels'
 import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'
 import { buildVocabularyOverviewEmptyState } from '../lib/vocabulary/vocabulary-overview-availability-ui.lib'
 import { vocabularyFieldLabel } from '../lib/vocabulary/term-labels'
@@ -114,7 +109,7 @@ function VocabularyOverviewPage({
 
   return (
     <>
-      <HomebrewDetailMain>
+      <WidePage spacing="relaxed">
         <PageHeader heading={setLabel} actions={newAction} />
         <PageLoadState
           isPending={isPending}
@@ -144,7 +139,7 @@ function VocabularyOverviewPage({
             }
           />
         </PageLoadState>
-      </HomebrewDetailMain>
+      </WidePage>
 
       <VocabularyEntrySheet
         open={isSheetOpen}
@@ -179,56 +174,42 @@ function VocabularyOverviewPage({
   )
 }
 
-export type VocabularyDetailContentProps = {
+export type VocabularyOverviewContentProps = {
   campaignId: string
   setId: string
 }
 
-/** Shared vocabulary set manager — rail/select nav, table, and entry sheet. */
-export function VocabularyDetailContent({
+/** Game Terms set overview — table and entry sheet authoring. */
+export function VocabularyOverviewContent({
   campaignId,
   setId: rawSetId,
-}: VocabularyDetailContentProps) {
+}: VocabularyOverviewContentProps) {
   const parsedSetId = vocabularyOptionSetIdSchema.safeParse(rawSetId)
 
   if (!parsedSetId.success) {
-    return (
-      <HomebrewDetailFallback
-        status="unknown"
-        heading="Vocabulary"
-        message={UNKNOWN_VOCABULARY_SET_MESSAGE}
-        campaignId={campaignId}
-      />
-    )
+    return <GameTermsFallback campaignId={campaignId} message={UNKNOWN_VOCABULARY_SET_MESSAGE} />
   }
 
-  const setId = parsedSetId.data
-  const registryEntry = findVocabularySetEntry(setId)
-  const setEnabled = registryEntry?.enabled ?? false
-  const setLabel = registryEntry?.label ?? rawSetId
+  const category = findGameTermsCategory(parsedSetId.data)
+
+  if (!category) {
+    return <GameTermsFallback campaignId={campaignId} message={UNKNOWN_VOCABULARY_SET_MESSAGE} />
+  }
+
+  const setId = category.setId
   const setTerm = getVocabularyOptionSetTerm(setId)
   const singularLabel = vocabularyFieldLabel(setTerm)
   const pluralLabel = vocabularyFieldLabel(setTerm, { plural: true })
 
-  useSetBreadcrumbLabel(setLabel)
+  useSetBreadcrumbLabel(category.label)
 
   return (
-    <HomebrewDetailShell nav={<VocabularySetNav campaignId={campaignId} activeSetId={setId} />}>
-      {setEnabled ? (
-        <VocabularyOverviewPage
-          campaignId={campaignId}
-          setId={setId}
-          setLabel={setLabel}
-          singularLabel={singularLabel}
-          pluralLabel={pluralLabel}
-        />
-      ) : (
-        <HomebrewDetailFallback
-          status="disabled"
-          heading={setLabel}
-          message={VOCABULARY_NOT_IMPLEMENTED_MESSAGE}
-        />
-      )}
-    </HomebrewDetailShell>
+    <VocabularyOverviewPage
+      campaignId={campaignId}
+      setId={setId}
+      setLabel={category.label}
+      singularLabel={singularLabel}
+      pluralLabel={pluralLabel}
+    />
   )
 }

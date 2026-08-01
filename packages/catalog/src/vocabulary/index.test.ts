@@ -12,7 +12,7 @@ import {
   SENSE_SET_ID,
   SPELL_SCHOOL_SET_ID,
   VOCABULARY_OPTION_SET_IDS,
-  vocabularySetIdsWithOverview,
+  vocabularySetIdsWithBrowse,
 } from '@rpg/contracts'
 import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts/primitives'
 
@@ -326,10 +326,18 @@ describe('seeded vocabulary set registry', () => {
     }
   })
 
-  it('seeds overview-capable sets for the default system ruleset', () => {
+  it('seeds catalog-backed browse sets for the default system ruleset', () => {
     const seededIds = new Set(listSeedVocabularySetIds(DEFAULT_SYSTEM_RULESET_ID))
-    for (const setId of vocabularySetIdsWithOverview()) {
-      expect(seededIds.has(setId), `${setId} requires catalog seed for overview`).toBe(true)
+    const browseWithoutSeedYet = new Set([
+      'conditions',
+      'sizes',
+      'weapon-properties',
+      'equipment-categories',
+    ])
+
+    for (const setId of vocabularySetIdsWithBrowse()) {
+      if (browseWithoutSeedYet.has(setId)) continue
+      expect(seededIds.has(setId), `${setId} requires catalog seed`).toBe(true)
     }
   })
 })

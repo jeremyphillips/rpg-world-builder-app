@@ -64,6 +64,7 @@ describe('buildCampaignSidebarSections', () => {
       ...VISIBLE_SIDEBAR_CONTENT.filter((entry) => entry.contentType !== 'organizations').map(
         (entry) => entry.label,
       ),
+      'Game Terms',
       'Homebrew',
     ]
     expect(gameLibraryLabels).toEqual(expectedGameLibraryLabels)

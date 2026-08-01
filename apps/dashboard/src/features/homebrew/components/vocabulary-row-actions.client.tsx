@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import type {
   ContentUsageBlocker,
   VocabularyOptionSetId,
@@ -25,17 +25,15 @@ type VocabularyRowActionsProps = {
   setId: VocabularyOptionSetId
   entry: VocabularyOptionWithUsage
   canManage: boolean
-  onEdit: (entry: VocabularyOptionWithUsage) => void
   onDelete: (entry: VocabularyOptionWithUsage) => void
 }
 
-/** Row actions for vocabulary table — edit, availability toggle, delete custom entries. */
+/** Row actions for vocabulary table — availability toggle and delete custom entries. */
 export function VocabularyRowActions({
   campaignId,
   setId,
   entry,
   canManage,
-  onEdit,
   onDelete,
 }: VocabularyRowActionsProps) {
   const capabilities = getVocabularySetCapability(setId)
@@ -49,10 +47,9 @@ export function VocabularyRowActions({
       entry,
     })
 
-  const canEdit = capabilities.edit
   const canDeleteEntry = capabilities.delete && entry.source === 'campaign'
   const canToggleAvailability = capabilities.availability
-  const hasMenuActions = canEdit || canDeleteEntry || canToggleAvailability
+  const hasMenuActions = canDeleteEntry || canToggleAvailability
 
   if (!canManage || !hasMenuActions) return null
 
@@ -71,32 +68,18 @@ export function VocabularyRowActions({
     setConfirmDeleteOpen(false)
   }
 
-  const menuItems = [
-    ...(canEdit
-      ? [
-          {
-            kind: 'action' as const,
-            id: 'edit',
-            label: 'Edit',
-            icon: <Pencil />,
-            onSelect: () => onEdit(entry),
-          },
-        ]
-      : []),
-    ...(canDeleteEntry
-      ? [
-          {
-            kind: 'action' as const,
-            id: 'delete',
-            label: 'Delete',
-            icon: <Trash2 />,
-            destructive: true,
-            separatorBefore: canEdit,
-            onSelect: () => setConfirmDeleteOpen(true),
-          },
-        ]
-      : []),
-  ]
+  const menuItems = canDeleteEntry
+    ? [
+        {
+          kind: 'action' as const,
+          id: 'delete',
+          label: 'Delete',
+          icon: <Trash2 />,
+          destructive: true,
+          onSelect: () => setConfirmDeleteOpen(true),
+        },
+      ]
+    : []
 
   return (
     <>

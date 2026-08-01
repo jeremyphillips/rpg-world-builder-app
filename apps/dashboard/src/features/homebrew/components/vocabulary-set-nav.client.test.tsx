@@ -29,34 +29,32 @@ beforeAll(() => {
 })
 
 describe('VocabularySetNav', () => {
-  it('lists every vocabulary set in the desktop rail', () => {
+  it('lists browsable categories in the desktop rail', () => {
     render(
       <MemoryRouter>
         <VocabularySetNav campaignId="camp_1" activeSetId="creature-types" />
       </MemoryRouter>,
     )
 
-    const rail = screen.getByRole('navigation', { name: 'Rules vocabulary sets' })
+    const rail = screen.getByRole('navigation', { name: 'Game Terms categories' })
     expect(rail).toHaveTextContent('Creature Types')
     expect(rail).toHaveTextContent('Damage Types')
     expect(rail).toHaveTextContent('Equipment Categories')
+    expect(rail).not.toHaveTextContent('Edition Presets')
   })
 
-  it('shows the active set in the mobile select and lists disabled sets in the menu', async () => {
+  it('shows the active set in the mobile select', async () => {
     const user = userEvent.setup()
     render(
-      <MemoryRouter initialEntries={[ROUTES.homebrew.vocabulary('camp_1', 'creature-types')]}>
+      <MemoryRouter initialEntries={[ROUTES.gameTerms.overview('camp_1', 'creature-types')]}>
         <VocabularySetNav campaignId="camp_1" activeSetId="creature-types" />
       </MemoryRouter>,
     )
 
-    const select = screen.getByRole('combobox', { name: 'Rules vocabulary set' })
+    const select = screen.getByRole('combobox', { name: 'Game Terms category' })
     expect(select).toHaveTextContent('Creature Types')
 
     await user.click(select)
-    expect(await screen.findByRole('option', { name: 'Damage Types' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
+    expect(await screen.findByRole('option', { name: 'Damage Types' })).toBeInTheDocument()
   })
 })

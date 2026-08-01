@@ -92,6 +92,11 @@ function buildGameLibrarySectionItems(campaignId: string): SidebarNavItem[] {
 
   items.push(
     sidebarNavItem({
+      id: 'game-terms',
+      label: 'Game Terms',
+      href: ROUTES.gameTerms.hub(campaignId),
+    }),
+    sidebarNavItem({
       id: 'homebrew',
       label: 'Homebrew',
       href: ROUTES.homebrew.hub(campaignId),

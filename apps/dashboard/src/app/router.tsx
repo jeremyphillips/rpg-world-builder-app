@@ -62,7 +62,10 @@ import {
   NotificationsListRoute,
   CampaignInviteReviewRoute,
   RulesConfigDetailRoute,
+  VocabularyHubRoute,
   VocabularyLandingRoute,
+  VocabularyOverviewRoute,
+  VocabularyTermDetailRoute,
   VocabularyDetailRoute,
   SpeciesCreateRoute,
   SpeciesDetailRoute,
@@ -618,6 +621,40 @@ const router = createBrowserRouter(
                           path: 'edit',
                           element: <SkillProficiencyEditRoute />,
                           handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  path: 'game-terms',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params, data) => ({
+                      label: 'Game Terms',
+                      href: collectionCrumbHref(ROUTES.gameTerms.hub(params.campaignId!), data),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <VocabularyHubRoute /> },
+                    {
+                      path: ':setId',
+                      element: <Outlet />,
+                      handle: {
+                        crumb: (_params, { entityLabel }) => ({
+                          label: entityLabel ?? '…',
+                        }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <VocabularyOverviewRoute /> },
+                        {
+                          path: ':termId',
+                          element: <VocabularyTermDetailRoute />,
+                          handle: {
+                            crumb: (_params, { entityLabel }) => ({
+                              label: entityLabel ?? '…',
+                            }),
+                          } satisfies CrumbHandle,
                         },
                       ],
                     },

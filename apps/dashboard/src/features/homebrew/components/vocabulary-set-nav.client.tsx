@@ -7,21 +7,19 @@ import type { VocabularyOptionSetId } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import { HOMEBREW_VOCABULARY_SETS } from '../lib/hub/vocabulary-set-registry'
+import { GAME_TERMS_VOCABULARY_CATEGORIES } from '../lib/hub/vocabulary-set-registry'
 
 type VocabularySetNavProps = {
   campaignId: string
   activeSetId: VocabularyOptionSetId
 }
 
-function navLinkClass(isActive: boolean, enabled: boolean) {
+function navLinkClass(isActive: boolean) {
   return cn(
     'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
-    enabled
-      ? isActive
-        ? 'bg-accent text-accent-foreground'
-        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-      : 'cursor-not-allowed text-muted-foreground/60',
+    isActive
+      ? 'bg-accent text-accent-foreground'
+      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
   )
 }
 
@@ -31,25 +29,19 @@ export function VocabularySetNav({ campaignId, activeSetId }: VocabularySetNavPr
 
   return (
     <>
-      <nav className="hidden w-56 shrink-0 lg:block" aria-label="Rules vocabulary sets">
+      <nav className="hidden w-56 shrink-0 lg:block" aria-label="Game Terms categories">
         <Eyebrow size="sm" className="mb-2 px-3">
-          Rules vocabulary
+          Game Terms
         </Eyebrow>
         <ul className="space-y-1">
-          {HOMEBREW_VOCABULARY_SETS.map((entry) => (
+          {GAME_TERMS_VOCABULARY_CATEGORIES.map((entry) => (
             <li key={entry.setId}>
-              {entry.enabled ? (
-                <NavLink
-                  to={ROUTES.homebrew.vocabulary(campaignId, entry.setId)}
-                  className={({ isActive }) => navLinkClass(isActive, true)}
-                >
-                  {entry.label}
-                </NavLink>
-              ) : (
-                <span className={navLinkClass(false, false)} aria-disabled="true">
-                  {entry.label}
-                </span>
-              )}
+              <NavLink
+                to={ROUTES.gameTerms.overview(campaignId, entry.setId)}
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                {entry.label}
+              </NavLink>
             </li>
           ))}
         </ul>
@@ -58,14 +50,14 @@ export function VocabularySetNav({ campaignId, activeSetId }: VocabularySetNavPr
       <div className="lg:hidden">
         <Select
           value={activeSetId}
-          onValueChange={(nextSetId) => navigate(ROUTES.homebrew.vocabulary(campaignId, nextSetId))}
+          onValueChange={(nextSetId) => navigate(ROUTES.gameTerms.overview(campaignId, nextSetId))}
         >
-          <SelectTrigger aria-label="Rules vocabulary set">
+          <SelectTrigger aria-label="Game Terms category">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {HOMEBREW_VOCABULARY_SETS.map((entry) => (
-              <SelectItem key={entry.setId} value={entry.setId} disabled={!entry.enabled}>
+            {GAME_TERMS_VOCABULARY_CATEGORIES.map((entry) => (
+              <SelectItem key={entry.setId} value={entry.setId}>
                 {entry.label}
               </SelectItem>
             ))}

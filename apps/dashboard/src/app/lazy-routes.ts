@@ -253,6 +253,18 @@ export const SkillProficiencyEditRoute = withRouteSuspense(
 export const HomebrewHubRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/homebrew-hub'), 'HomebrewHub'),
 )
+export const VocabularyHubRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/homebrew/routes/vocabulary-hub'), 'VocabularyHub'),
+)
+export const VocabularyOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/homebrew/routes/vocabulary-overview'), 'VocabularyOverview'),
+)
+export const VocabularyTermDetailRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/homebrew/routes/vocabulary-term-detail'),
+    'VocabularyTermDetail',
+  ),
+)
 export const VocabularyLandingRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/vocabulary-landing'), 'VocabularyLanding'),
 )

@@ -14,6 +14,18 @@ function vocabularySetPath(campaignId: string, setId: VocabularyOptionSetId) {
   return `/api/campaigns/${campaignId}/vocabulary/${setId}`
 }
 
+/** Load all resolved vocabulary sets for a campaign. */
+export async function listVocabularySets(
+  campaignId: string,
+): Promise<ResolvedVocabularyOptionSet[]> {
+  const { sets } = await request<{ sets: ResolvedVocabularyOptionSet[] }>(
+    `/api/campaigns/${campaignId}/vocabulary`,
+    undefined,
+    'Could not load vocabulary sets.',
+  )
+  return sets
+}
+
 /** Load one resolved vocabulary set for a campaign. */
 export async function getVocabularySet(
   campaignId: string,

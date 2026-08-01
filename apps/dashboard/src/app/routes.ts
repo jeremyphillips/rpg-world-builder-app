@@ -1,5 +1,6 @@
 import { ADMIN_ROUTES } from './admin-routes'
 import { CONTENT_ROUTES } from './content-routes'
+import { GAME_TERMS_ROUTES } from './game-terms-routes'
 import { HOMEBREW_ROUTES } from './homebrew-routes'
 
 export const ROUTES = {
@@ -62,5 +63,6 @@ export const ROUTES = {
   },
   admin: ADMIN_ROUTES,
   content: CONTENT_ROUTES,
+  gameTerms: GAME_TERMS_ROUTES,
   homebrew: HOMEBREW_ROUTES,
 } as const

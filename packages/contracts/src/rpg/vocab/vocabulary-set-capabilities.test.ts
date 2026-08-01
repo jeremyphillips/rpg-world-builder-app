@@ -8,9 +8,9 @@ import {
   vocabularySetIdsRequiringFormDefinition,
   vocabularySetIdsRequiringBatchCountResolver,
   vocabularySetIdsRequiringUsageResolver,
-  vocabularySetIdsWithHubCard,
-  vocabularySetIdsWithOverview,
+  vocabularySetIdsWithBrowse,
 } from './vocabulary-set-capabilities'
+import { VOCABULARY_INTERNAL_ONLY_SET_IDS } from './vocabulary-category-registry'
 
 describe('VOCABULARY_SET_CAPABILITIES', () => {
   it('defines capabilities for every contract vocabulary set id', () => {
@@ -28,9 +28,18 @@ describe('VOCABULARY_SET_CAPABILITIES', () => {
     }
   })
 
-  it('enables only creature-types for overview in this phase', () => {
-    expect(vocabularySetIdsWithOverview()).toEqual(['creature-types'])
-    expect(vocabularySetIdsWithHubCard()).toEqual(['creature-types'])
+  it('enables management only for creature-types in this phase', () => {
+    expect(vocabularySetIdsRequiringFormDefinition()).toEqual(['creature-types'])
+  })
+
+  it('enables browse for every public set and excludes internal-only sets', () => {
+    const browsable = vocabularySetIdsWithBrowse()
+    expect(browsable).not.toEqual(expect.arrayContaining([...VOCABULARY_INTERNAL_ONLY_SET_IDS]))
+    expect(browsable).toContain('creature-types')
+    expect(browsable).toContain('damage-types')
+    expect(browsable.length).toBe(
+      VOCABULARY_OPTION_SET_IDS.length - VOCABULARY_INTERNAL_ONLY_SET_IDS.length,
+    )
   })
 
   it('requires usage resolver registration for creature-types only', () => {
@@ -49,8 +58,7 @@ describe('VOCABULARY_SET_CAPABILITIES', () => {
 describe('validateVocabularySetCapabilityImplications', () => {
   it('flags bulkAvailability without availability', () => {
     const cap: VocabularySetCapability = {
-      hubCard: true,
-      overview: true,
+      browse: true,
       create: false,
       edit: false,
       delete: false,
@@ -65,6 +73,24 @@ describe('validateVocabularySetCapabilityImplications', () => {
       'bulkAvailability requires availability',
     )
   })
+
+  it('flags management capabilities without browse', () => {
+    const cap: VocabularySetCapability = {
+      browse: false,
+      create: true,
+      edit: false,
+      delete: false,
+      availability: false,
+      bulkAvailability: false,
+      usageCounting: false,
+      batchUsageCounting: false,
+      disableGuard: false,
+      deleteGuard: false,
+    }
+    expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
+      'create requires browse',
+    )
+  })
 })
 
 describe('capability derivation fixture', () => {
@@ -72,8 +98,7 @@ describe('capability derivation fixture', () => {
     const fixtureCapabilities = {
       ...VOCABULARY_SET_CAPABILITIES,
       'damage-types': {
-        hubCard: true,
-        overview: true,
+        browse: true,
         create: true,
         edit: true,
         delete: true,
@@ -89,8 +114,8 @@ describe('capability derivation fixture', () => {
     expect(
       validateVocabularySetCapabilityImplications(fixtureCapabilities['damage-types']),
     ).toEqual([])
-    expect(vocabularySetIdsWithOverview(fixtureCapabilities).sort()).toEqual(
-      ['creature-types', 'damage-types'].sort(),
+    expect(vocabularySetIdsWithBrowse(fixtureCapabilities).sort()).toEqual(
+      expect.arrayContaining(['creature-types', 'damage-types']),
     )
     expect(vocabularySetIdsRequiringFormDefinition(fixtureCapabilities).sort()).toEqual(
       ['creature-types', 'damage-types'].sort(),
