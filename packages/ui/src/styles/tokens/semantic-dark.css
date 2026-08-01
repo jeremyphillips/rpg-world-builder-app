@@ -16,11 +16,12 @@
   --mix-border-default: 12%;
   --mix-border-strong: 24%;
   --mix-border-selected: 30%;
+  --mix-card-border: 8%;
   --mix-sidebar-nav-item-fg: var(--mix-fg-muted);
   --mix-control-hover: 35%;
   --mix-control-selected: 22%;
   --mix-drop-target: 35%;
-  --mix-interactive-outline-border: 12%;
+  --mix-interactive-outline-border: 18%;
   --mix-interactive-outline-hover: 4%;
   --mix-interactive-outline-active: 8%;
   --mix-choice-control-border: 32%;
@@ -108,6 +109,7 @@
     var(--surface-current)
   );
   --border: var(--border-default);
+  --card-border: color-mix(in oklch, var(--primary) var(--mix-card-border), var(--surface-current));
   --card-selected-border: color-mix(
     in oklch,
     var(--foreground) var(--mix-border-selected),
@@ -190,7 +192,8 @@
 
   /*
    * Interactive outline chrome — shared by outline Button, FilterInlineControl, and similar shells.
-   * Border weight is distinct from structural `--border-subtle` separators.
+   * Border uses foreground mix; hover/active washes use primary for warmth on inherited plane.
+   * Tailwind bg utilities are @utility defs in surface-relative-chrome.utilities.css.
    */
   --interactive-outline-border: color-mix(
     in oklch,
@@ -199,12 +202,12 @@
   );
   --interactive-outline-hover-bg: color-mix(
     in oklch,
-    var(--foreground) var(--mix-interactive-outline-hover),
+    var(--primary) var(--mix-interactive-outline-hover),
     var(--surface-current)
   );
   --interactive-outline-active-bg: color-mix(
     in oklch,
-    var(--foreground) var(--mix-interactive-outline-active),
+    var(--primary) var(--mix-interactive-outline-active),
     var(--surface-current)
   );
 

@@ -70,6 +70,10 @@
   );
 }
 
+@utility border-card-border {
+  border-color: color-mix(in oklch, var(--primary) var(--mix-card-border), var(--surface-current));
+}
+
 @utility border-interactive-outline {
   border-color: color-mix(
     in oklch,
@@ -90,6 +94,22 @@
   background-color: color-mix(
     in oklch,
     var(--foreground) var(--mix-border-default),
+    var(--surface-current)
+  );
+}
+
+@utility bg-interactive-outline-hover {
+  background-color: color-mix(
+    in oklch,
+    var(--primary) var(--mix-interactive-outline-hover),
+    var(--surface-current)
+  );
+}
+
+@utility bg-interactive-outline-active {
+  background-color: color-mix(
+    in oklch,
+    var(--primary) var(--mix-interactive-outline-active),
     var(--surface-current)
   );
 }

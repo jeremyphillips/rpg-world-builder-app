@@ -87,6 +87,7 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 | Faint   | `border-border-faint`  | Extra-quiet separators and decorative shells                                            |
 | Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells (default for field separators and outline chrome) |
 | Default | `border-border`        | Normal component structure                                                              |
+| Card    | `border-card-border`   | Warm primary-tinted panel stroke (softer than `--border` on `--card`)                   |
 | Strong  | `border-border-strong` | Selected or emphasized structure                                                        |
 
 Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
@@ -108,8 +109,8 @@ Shared recipes (Layer 2 → Tailwind). Tinted washes mix toward inherited `--sur
 | `--drop-target-border`            | `border-drop-target-border`            | `--primary`                                                                   |
 | `--segmented-track-bg`            | `bg-segmented-track`                   | `--surface-strong` (canvas wash ladder)                                       |
 | `--interactive-outline-border`    | `border-interactive-outline`           | `color-mix(foreground → --surface-current)` — distinct from `--border-subtle` |
-| `--interactive-outline-hover-bg`  | `hover:bg-interactive-outline-hover`   | `color-mix(foreground → --surface-current)`                                   |
-| `--interactive-outline-active-bg` | `active:bg-interactive-outline-active` | `color-mix(foreground → --surface-current)`                                   |
+| `--interactive-outline-hover-bg`  | `hover:bg-interactive-outline-hover`   | `color-mix(primary → --surface-current)` via `@utility`                       |
+| `--interactive-outline-active-bg` | `active:bg-interactive-outline-active` | `color-mix(primary → --surface-current)` via `@utility`                       |
 | `--field-control-bg-default`      | inherited default field fill           | `--palette-field-bg`                                                          |
 | `--field-control-bg-on-muted`     | fill on `bg-surface-muted` panels      | `--surface-subtle` (one-step lift)                                            |
 

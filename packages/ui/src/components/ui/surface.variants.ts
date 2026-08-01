@@ -34,7 +34,7 @@ function resolveNeutralSurfaceClasses(config: SurfaceConfig): string {
 
   if (elevation === 'raised') {
     return cn(
-      'border-border bg-card',
+      'border-card-border bg-card',
       establishSurfaceCurrent('card'),
       fieldSurfaceRaisedShadowClasses,
     )

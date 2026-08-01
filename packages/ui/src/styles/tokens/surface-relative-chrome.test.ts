@@ -39,6 +39,8 @@ const SURFACE_RELATIVE_FORMULA_ROLES = [
   '--card-selected-border',
 ] as const
 
+const CARD_BORDER_FORMULA_ROLES = ['--card-border'] as const
+
 const MIX_WEIGHT_ROLES = [
   '--mix-fg-subtle',
   '--mix-fg-muted',
@@ -48,6 +50,7 @@ const MIX_WEIGHT_ROLES = [
   '--mix-border-default',
   '--mix-border-strong',
   '--mix-border-selected',
+  '--mix-card-border',
   '--mix-sidebar-nav-item-fg',
   ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
   ...INTERACTIVE_OUTLINE_MIX_WEIGHTS,
@@ -113,6 +116,22 @@ describe('surface-relative chrome formulas', () => {
 
       expect(lightValue, `${role} in light`).toMatch(percentWeight)
       expect(darkValue, `${role} in dark`).toMatch(percentWeight)
+    }
+  })
+
+  it('defines warm card border toward surface-current with primary mix', () => {
+    for (const role of CARD_BORDER_FORMULA_ROLES) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--primary)')
+      expect(darkValue).toContain('var(--primary)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).toContain('var(--mix-card-border)')
+      expect(darkValue).toContain('var(--mix-card-border)')
     }
   })
 
@@ -235,7 +254,7 @@ describe('surface-relative interaction recipes (Phase 2)', () => {
     }
   })
 
-  it('mirrors formula shape for neutral interactive outline hover/active washes across themes', () => {
+  it('mirrors formula shape for warm interactive outline hover/active washes across themes', () => {
     for (const role of [
       '--interactive-outline-hover-bg',
       '--interactive-outline-active-bg',
@@ -245,8 +264,8 @@ describe('surface-relative interaction recipes (Phase 2)', () => {
 
       expect(lightValue).toContain('color-mix')
       expect(darkValue).toContain('color-mix')
-      expect(lightValue).toContain('var(--foreground)')
-      expect(darkValue).toContain('var(--foreground)')
+      expect(lightValue).toContain('var(--primary)')
+      expect(darkValue).toContain('var(--primary)')
       expect(lightValue).toContain('var(--surface-current)')
       expect(darkValue).toContain('var(--surface-current)')
       expect(lightValue).not.toContain('var(--surface-subtle)')

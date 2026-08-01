@@ -9,6 +9,7 @@ import {
 
 const APPROVED_SURFACE_TOKENS = [
   'border-border',
+  'border-card-border',
   'bg-background',
   'bg-card',
   'bg-surface-subtle',

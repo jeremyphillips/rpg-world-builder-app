@@ -431,7 +431,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
       'rounded-md',
       'border',
-      'border-border',
+      'border-card-border',
       'bg-card',
       'shadow-surface-raised',
       'pl-2',

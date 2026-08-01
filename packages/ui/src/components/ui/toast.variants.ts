@@ -21,7 +21,7 @@ export const toastVariants = cva(
     variants: {
       tone: {
         // Opaque panel fill — status *-subtle washes are translucent and show content behind floating toasts.
-        default: 'border-border bg-card text-foreground',
+        default: 'border-card-border bg-card text-foreground',
         success: 'border-success-muted bg-card text-foreground',
         warning: 'border-warning-muted bg-card text-foreground',
         destructive: 'border-destructive-muted bg-card text-foreground',
