@@ -14,9 +14,9 @@
    * Shells rebind the plane via `establishSurfaceCurrent`; default is page canvas.
    */
   --surface-current: var(--background);
-  --mix-fg-subtle: 72%;
-  --mix-fg-muted: 58%;
-  --mix-fg-disabled: 42%;
+  --mix-fg-subtle: 86%;
+  --mix-fg-muted: 76%;
+  --mix-fg-disabled: 56%;
   --mix-border-faint: 5%;
   --mix-border-subtle: 14%;
   --mix-border-default: 24%;

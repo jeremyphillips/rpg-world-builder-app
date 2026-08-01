@@ -46,7 +46,7 @@ const MIX_WEIGHT_ROLES = [
 ] as const
 
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
-const MIN_MUTED_CONTRAST = 2.0
+const MIN_MUTED_ON_CARD_CONTRAST = 2.0
 const MIN_BORDER_CONTRAST = 1.15
 
 function oklchLightness(value: string): number | undefined {
@@ -143,20 +143,26 @@ describe('surface-relative chrome formulas', () => {
     }
   })
 
-  it('holds minimum contrast floors on card plane for muted ink (light + dark)', () => {
+  it('holds minimum contrast floors for muted text on card plane (light + dark)', () => {
     const paletteLight = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
     const paletteDark = readFileSync(join(tokensDir, 'palette-dark.css'), 'utf8')
+    const { light: semanticLight, dark: semanticDark } = readThemeCss()
 
-    for (const [css, theme] of [
-      [paletteLight, 'light'],
-      [paletteDark, 'dark'],
+    for (const [paletteCss, semanticCss, theme] of [
+      [paletteLight, semanticLight, 'light'],
+      [paletteDark, semanticDark, 'dark'],
     ] as const) {
-      const fg = oklchLightness(extractRoleValue(css, '--palette-fg-default') ?? '')
-      const card = oklchLightness(extractRoleValue(css, '--palette-surface-panel') ?? '')
+      const fg = oklchLightness(extractRoleValue(paletteCss, '--palette-fg-default') ?? '')
+      const card = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-panel') ?? '')
+      const mixWeight = parseFloat(extractRoleValue(semanticCss, '--mix-fg-muted') ?? '70') / 100
 
       expect(fg, `${theme} fg L`).toBeDefined()
       expect(card, `${theme} card L`).toBeDefined()
-      expect(contrastRatio(fg!, card!)).toBeGreaterThanOrEqual(MIN_MUTED_CONTRAST)
+
+      const mutedL = fg! * mixWeight + card! * (1 - mixWeight)
+      expect(
+        contrastRatio(Math.max(mutedL, card!), Math.min(mutedL, card!)),
+      ).toBeGreaterThanOrEqual(MIN_MUTED_ON_CARD_CONTRAST)
     }
   })
 
