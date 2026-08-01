@@ -33,7 +33,24 @@ acquisition model (axes, ownership, build/import finalization).
   accept stores `sourceInviteId` on membership; completion marks the linked
   invite when possible (audit-only after membership is established).
 - **Recovery:** Membership survives invite expiry; players can return to
-  onboarding without an `inviteId` query param.
+  onboarding without an `inviteId` query param. Recovery prompts are split by
+  surface — layout alert (in-campaign), home promotion cards (`PromotionCard`),
+  and campaigns index rows (`CampaignDestinationRow`). See
+  [availability.md](../../../docs/availability.md#onboarding-recovery-surfaces).
+
+## Component map (onboarding recovery)
+
+| Component                            | Location                                                                  | Surface                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `PromotionCard`                      | `components/layout/promotion-card.tsx`                                    | Shared home promotion chrome                                |
+| `CampaignRecoveryState`              | `lib/campaign-recovery-state.ts`                                          | Canonical recovery derivation                               |
+| `resolveCampaignRecoveryPromotions`  | `lib/campaign-recovery-promotions.lib.ts`                                 | Home promotion ranking (preference ranks, never suppresses) |
+| `CampaignRecoveryPromotionCard`      | `components/campaign-recovery-promotion-card.client.tsx`                  | Home recovery promotion                                     |
+| `CampaignInvitationCard`             | `features/campaign-invite/components/campaign-invitation-card.client.tsx` | Home pending invite promotion                               |
+| `CampaignLayoutRecoveryChrome`       | `components/campaign-layout-recovery-chrome.client.tsx`                   | Layout loading/error/recovery shell                         |
+| `CampaignOnboardingIncompleteAlert`  | `components/campaign-onboarding-incomplete-alert.client.tsx`              | Campaign layout warning                                     |
+| `CampaignDestinationRow`             | `components/campaign-destination-row.client.tsx`                          | Campaigns index rows                                        |
+| `persistCampaignSelectionBestEffort` | `@rpg/api-client`                                                         | Accept handoff (local + server)                             |
 
 ## Campaign template pipeline
 

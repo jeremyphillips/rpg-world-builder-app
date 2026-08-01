@@ -63,6 +63,16 @@ and the campaigns index. Cards link to `/app/campaign-invites/:inviteId` via
 `dashboardCampaignInviteReviewPath`. Invites for campaigns the user already belongs
 to are excluded server-side and again client-side before render.
 
+### Onboarding recovery surfaces
+
+| Surface         | Component                                                            | Role                                                                                                                       |
+| --------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Campaign layout | `CampaignLayoutRecoveryChrome` + `CampaignOnboardingIncompleteAlert` | Persistent recovery inside `/campaigns/:id/*` (hidden on `/onboarding`); loading/error chrome when campaign row unresolved |
+| Dashboard home  | `CampaignRecoveryPromotionCard`, `CampaignInvitationCard`            | Highest-priority recovery promotion + pending invites                                                                      |
+| Campaigns index | `CampaignDestinationRow`                                             | Every campaign status row                                                                                                  |
+
+Recovery derives from `resolveCampaignRecoveryState` (`ready` | `onboarding_incomplete` | `participation_invalid`). Preferences rank promotions via `resolveCampaignRecoveryPromotions` but never suppress recoverable campaigns. Accept flows call `persistCampaignSelectionBestEffort` (local + best-effort server) from `@rpg/api-client`.
+
 ### Settings (`campaign-settings-registry.ts`)
 
 Maps `CampaignSettingId` → rules-config location, built on the routes SSOT:

@@ -6,7 +6,10 @@ import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 import { filterPendingInvitesForMembership } from '@/features/campaign/lib/filter-pending-invites-for-membership'
 
-import { resolveDashboardHomeSections } from './dashboard-home-sections.lib'
+import {
+  resolveDashboardHomeSections,
+  resolveDashboardHomeShowAllCampaignsLink,
+} from './dashboard-home-sections.lib'
 
 const invite = (campaignId: string): CampaignInviteInviteeListItem => ({
   inviteId: 'a'.repeat(24),
@@ -28,7 +31,7 @@ describe('filterPendingInvitesForMembership', () => {
 })
 
 describe('resolveDashboardHomeSections', () => {
-  it('orders finish joining before pending invitations and continue campaign', () => {
+  it('orders recovery before pending invitations and continue campaign', () => {
     const incomplete = makeCampaignListItem({
       id: 'camp_incomplete',
       viewerOnboardingState: 'incomplete',
@@ -43,13 +46,37 @@ describe('resolveDashboardHomeSections', () => {
     })
 
     expect(sections.map((section) => section.kind)).toEqual([
-      'finishJoining',
+      'campaignRecovery',
       'pendingInvitations',
       'starterCards',
     ])
   })
 
-  it('dedupes continue when finish joining targets the same campaign', () => {
+  it('shows recovery and continue when preference is complete but another campaign needs recovery', () => {
+    const completeA = makeCampaignListItem({
+      id: 'camp_a',
+      viewerOnboardingState: 'complete',
+    })
+    const incompleteB = makeCampaignListItem({
+      id: 'camp_b',
+      viewerOnboardingState: 'incomplete',
+    })
+
+    const sections = resolveDashboardHomeSections({
+      campaigns: [completeA, incompleteB],
+      pendingInvites: [],
+      campaignsError: false,
+      user: { lastSelectedCampaignId: 'camp_a' },
+    })
+
+    expect(sections.map((section) => section.kind)).toEqual([
+      'campaignRecovery',
+      'continueCampaign',
+      'starterCards',
+    ])
+  })
+
+  it('dedupes continue when recovery targets the same campaign', () => {
     const incomplete = makeCampaignListItem({
       id: 'camp_shared',
       viewerOnboardingState: 'incomplete',
@@ -62,7 +89,7 @@ describe('resolveDashboardHomeSections', () => {
       user: { lastSelectedCampaignId: 'camp_shared' },
     })
 
-    expect(sections.map((section) => section.kind)).toEqual(['finishJoining', 'starterCards'])
+    expect(sections.map((section) => section.kind)).toEqual(['campaignRecovery', 'starterCards'])
   })
 
   it('includes continue campaign when onboarding is complete', () => {
@@ -76,5 +103,48 @@ describe('resolveDashboardHomeSections', () => {
     })
 
     expect(sections.map((section) => section.kind)).toEqual(['continueCampaign', 'starterCards'])
+  })
+
+  it('does not show pending invites and recovery for the same accepted membership', () => {
+    const incomplete = makeCampaignListItem({
+      id: 'camp_member',
+      viewerOnboardingState: 'incomplete',
+    })
+
+    const sections = resolveDashboardHomeSections({
+      campaigns: [incomplete],
+      pendingInvites: [invite('camp_member')],
+      campaignsError: false,
+      user: null,
+    })
+
+    expect(sections.map((section) => section.kind)).toEqual(['campaignRecovery', 'starterCards'])
+  })
+})
+
+describe('resolveDashboardHomeShowAllCampaignsLink', () => {
+  it('shows the link when multiple recoverable campaigns exist', () => {
+    const sections = resolveDashboardHomeSections({
+      campaigns: [
+        makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'incomplete' }),
+        makeCampaignListItem({ id: 'camp_b', viewerOnboardingState: 'incomplete' }),
+      ],
+      pendingInvites: [],
+      campaignsError: false,
+      user: null,
+    })
+
+    expect(resolveDashboardHomeShowAllCampaignsLink(sections)).toBe(true)
+  })
+
+  it('hides the link for a single recoverable campaign', () => {
+    const sections = resolveDashboardHomeSections({
+      campaigns: [makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'incomplete' })],
+      pendingInvites: [],
+      campaignsError: false,
+      user: null,
+    })
+
+    expect(resolveDashboardHomeShowAllCampaignsLink(sections)).toBe(false)
   })
 })

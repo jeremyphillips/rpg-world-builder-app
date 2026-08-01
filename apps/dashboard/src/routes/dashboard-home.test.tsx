@@ -164,8 +164,23 @@ describe('DashboardHome', () => {
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
   })
 
-  it('links to the campaigns index when the user has several campaigns', async () => {
-    listCampaigns.mockResolvedValue([campaign('a', 'Arden'), campaign('b', 'Baldur')])
+  it('links to the campaigns index when multiple incomplete campaigns are promoted', async () => {
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({
+        id: 'camp_a',
+        identity: { name: 'Arden' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
+      }),
+      makeCampaignListItem({
+        id: 'camp_b',
+        identity: { name: 'Baldur' },
+        campaignRole: 'pc',
+        controlledCharacterIds: [],
+        viewerOnboardingState: 'incomplete',
+      }),
+    ])
 
     renderHome()
 

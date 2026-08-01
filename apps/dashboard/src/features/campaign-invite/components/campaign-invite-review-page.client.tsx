@@ -9,6 +9,7 @@ import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campai
 
 import { ROUTES } from '@/app/routes'
 import { useSession } from '@/features/auth/hooks/use-session'
+import { usePersistCampaignSelection } from '@/features/campaign'
 
 import {
   acceptCampaignInviteById,
@@ -23,6 +24,7 @@ type CampaignInviteReviewPageProps = {
 export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageProps) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const persistCampaignSelection = usePersistCampaignSelection()
   const { data: session, isPending: isSessionPending } = useSession()
   const {
     data: resolution,
@@ -67,6 +69,7 @@ export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageP
 
     void acceptCampaignInviteById(inviteId)
       .then(async (result) => {
+        persistCampaignSelection(result.campaignId)
         await invalidateCampaignInviteAcceptQueries(queryClient, result.campaignId)
         navigate(ROUTES.campaign.onboarding(result.campaignId))
       })
@@ -76,7 +79,7 @@ export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageP
           error instanceof ApiError ? error.message : 'Could not accept this invitation.',
         )
       })
-  }, [inviteId, navigate, queryClient])
+  }, [inviteId, navigate, persistCampaignSelection, queryClient])
 
   const handleContinue = useCallback(
     (campaignId: string) => {

@@ -9,10 +9,12 @@ export {
   CampaignTopbarTitleSkeleton,
 } from './components/campaign-topbar-title'
 export { ContinueCampaignCard } from './components/continue-campaign-card.client'
-export { FinishJoiningCampaignCard } from './components/finish-joining-campaign-card.client'
+export {
+  CampaignRecoveryPromotionCard,
+  FinishJoiningCampaignCard,
+} from './components/campaign-recovery-promotion-card.client'
 export { PendingCampaignInvitation } from './components/pending-campaign-invitation.client'
 export { PendingCampaignInvitationsSection } from './components/pending-campaign-invitations-section.client'
-export { ResumeSetupCampaignCard } from './components/resume-setup-campaign-card.client'
 export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
 export {
@@ -68,6 +70,32 @@ export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-cam
 export { useActiveCampaignId } from './hooks/use-active-campaign-id'
 export { hasCampaignRows } from './lib/campaign-list-view.lib'
 export { filterPendingInvitesForMembership } from './lib/filter-pending-invites-for-membership'
+export {
+  isCampaignMembershipOnboardingIncomplete,
+  isCampaignOnboardingIncomplete,
+  isCampaignParticipationInvalid,
+  isCampaignRecoveryRequired,
+  resolveCampaignRecoveryState,
+  type CampaignRecoveryState,
+} from './lib/campaign-recovery-state'
+export {
+  listRecoverableCampaigns,
+  resolveCampaignRecoveryPromotions,
+  resolvePromotedRecoveryCampaign,
+  toPendingInvitePromotion,
+  toRecoveryPromotion,
+  type CampaignRecoveryPromotion,
+  type CampaignSetupPromotion,
+  toFinishJoiningPromotion,
+  resolvePromotedFinishJoining,
+  countIncompleteCampaigns,
+} from './lib/campaign-recovery-promotions.lib'
+export {
+  resolveCampaignDestination,
+  resolveSwitchCampaignPath,
+  shouldRunCampaignSelectionSideEffect,
+  type CampaignDestination,
+} from './lib/campaign-destination.lib'
 export {
   useOpenCampaign,
   usePersistCampaignSelection,

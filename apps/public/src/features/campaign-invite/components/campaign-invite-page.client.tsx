@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { ApiError, crossAppCampaignOnboardingPath } from '@rpg/contracts'
+import { persistCampaignSelectionBestEffort } from '@rpg/api-client'
 import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campaign-invite'
 
 import { ROUTES } from '@/lib/routes'
@@ -66,6 +67,7 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
 
     void acceptCampaignInviteByToken(token)
       .then(async (result) => {
+        await persistCampaignSelectionBestEffort(result.campaignId)
         await invalidateCampaignInviteAcceptQueries(queryClient)
         window.location.assign(crossAppCampaignOnboardingPath(result.campaignId))
       })

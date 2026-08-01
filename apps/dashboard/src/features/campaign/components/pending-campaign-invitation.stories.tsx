@@ -20,16 +20,8 @@ export default meta
 
 type Story = StoryObj<typeof PendingCampaignInvitation>
 
-export const Card: Story = {
-  args: {
-    invite,
-    variant: 'card',
-  },
-}
-
 export const CompactList: Story = {
   args: {
     invite,
-    variant: 'compactList',
   },
 }

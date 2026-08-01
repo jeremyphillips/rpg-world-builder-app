@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { ROUTES } from '@/app/routes'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
-import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from './campaign-onboarding-copy'
+import {
+  CAMPAIGN_ONBOARDING_INDEX_ROW_BODY,
+  CAMPAIGN_PARTICIPATION_INVALID_INDEX_ROW_BODY,
+} from './campaign-onboarding-copy'
 import {
   resolveCampaignDestination,
   shouldRunCampaignSelectionSideEffect,
@@ -39,7 +42,23 @@ describe('resolveCampaignDestination', () => {
       href: ROUTES.campaign.onboarding('camp_2'),
       ariaLabel: 'Continue setup for Stormwatch',
       showSetupBadge: true,
-      supportingCopy: CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message,
+      supportingCopy: CAMPAIGN_ONBOARDING_INDEX_ROW_BODY,
+      shouldPersistSelection: true,
+    })
+  })
+
+  it('returns campaign detail with invalid-participation copy instead of onboarding', () => {
+    const campaign = makeCampaignListItem({
+      id: 'camp_3',
+      identity: { name: 'Stormwatch' },
+      viewerOnboardingState: 'invalid',
+    })
+
+    expect(resolveCampaignDestination(campaign)).toEqual({
+      href: ROUTES.campaign.detail('camp_3'),
+      ariaLabel: 'Open Stormwatch — character connection needs attention',
+      showSetupBadge: true,
+      supportingCopy: CAMPAIGN_PARTICIPATION_INVALID_INDEX_ROW_BODY,
       shouldPersistSelection: true,
     })
   })

@@ -3,7 +3,9 @@
 import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
 import { Eyebrow } from '@rpg/ui'
 
-import { CAMPAIGN_INVITATION_COPY } from '../lib/campaign-invitation-copy'
+import { CampaignInvitationCard } from '@/features/campaign-invite'
+import { toPendingInvitePromotion } from '../lib/campaign-recovery-promotions.lib'
+import { CAMPAIGN_INVITATION_COPY } from '../lib/campaign-onboarding-copy'
 import { campaignDestinationListVariants } from './campaign-destination.variants'
 import { PendingCampaignInvitation } from './pending-campaign-invitation.client'
 
@@ -25,8 +27,6 @@ export function PendingCampaignInvitationsSection({
         : null
       : CAMPAIGN_INVITATION_COPY.indexSectionHeading
 
-  const variant = surface === 'home' ? 'card' : 'compactList'
-
   return (
     <section className="space-y-2">
       {heading ? (
@@ -38,17 +38,20 @@ export function PendingCampaignInvitationsSection({
           {heading}
         </Eyebrow>
       ) : null}
-      {variant === 'card' ? (
+      {surface === 'home' ? (
         <div className="space-y-3">
           {invites.map((invite) => (
-            <PendingCampaignInvitation key={invite.inviteId} invite={invite} variant="card" />
+            <CampaignInvitationCard
+              key={invite.inviteId}
+              promotion={toPendingInvitePromotion(invite)}
+            />
           ))}
         </div>
       ) : (
         <ul className={campaignDestinationListVariants()}>
           {invites.map((invite) => (
             <li key={invite.inviteId}>
-              <PendingCampaignInvitation invite={invite} variant="compactList" />
+              <PendingCampaignInvitation invite={invite} />
             </li>
           ))}
         </ul>

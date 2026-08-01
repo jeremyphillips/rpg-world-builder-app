@@ -12,7 +12,6 @@ import { InviteMemberDialog } from '../components/invite-member-dialog.client'
 import { useCampaignOverviewData } from '../hooks/use-campaign-overview-data'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useCanManageCampaign } from '../hooks/use-can-manage-campaign'
-import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 import { buildCampaignDisplay, CAMPAIGN_UNKNOWN_NAME } from '../lib/campaign-display'
 
 /** Campaign overview — members, invitations, and party sections. */
@@ -21,8 +20,6 @@ export function CampaignDetail() {
   const { data: campaigns } = useCampaigns()
   const canManage = useCanManageCampaign(campaignId)
   const overview = useCampaignOverviewData(campaignId, canManage)
-
-  usePersistViewedCampaign(campaignId)
 
   const campaign = campaigns?.find((item) => item.id === campaignId)
   const display = campaign

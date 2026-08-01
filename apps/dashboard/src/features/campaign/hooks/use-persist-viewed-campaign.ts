@@ -7,10 +7,15 @@ import { writeStoredCampaignId } from '../lib/navigation/selected-campaign-stora
  * become the user's "last selected" for the next landing redirect. Only writes
  * localStorage; the server preference is updated only on an explicit select.
  */
-export function usePersistViewedCampaign(campaignId: string | undefined): void {
+export function usePersistViewedCampaign(
+  campaignId: string | undefined,
+  shouldPersist = true,
+): void {
   useEffect(() => {
-    if (campaignId) {
-      writeStoredCampaignId(campaignId)
+    if (!campaignId || !shouldPersist || document.visibilityState === 'hidden') {
+      return
     }
-  }, [campaignId])
+
+    writeStoredCampaignId(campaignId)
+  }, [campaignId, shouldPersist])
 }

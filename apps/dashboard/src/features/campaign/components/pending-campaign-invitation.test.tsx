@@ -12,17 +12,8 @@ const invite = {
 }
 
 describe('PendingCampaignInvitation', () => {
-  it('uses an anchor review CTA on the card variant', () => {
-    render(<PendingCampaignInvitation invite={invite} variant="card" />)
-
-    expect(screen.getByRole('link', { name: 'Review invitation' })).toHaveAttribute(
-      'href',
-      `/app/campaign-invites/${invite.inviteId}`,
-    )
-  })
-
   it('uses an anchor row on the compact list variant', () => {
-    render(<PendingCampaignInvitation invite={invite} variant="compactList" />)
+    render(<PendingCampaignInvitation invite={invite} />)
 
     expect(
       screen.getByRole('link', { name: 'Review invitation to The Shattered Vale' }),

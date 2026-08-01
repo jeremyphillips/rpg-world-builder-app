@@ -11,7 +11,14 @@ import {
   campaignDestinationRowVariants,
 } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../lib/campaign-display'
-import { CAMPAIGN_ONBOARDING_INCOMPLETE_COPY } from '../lib/campaign-onboarding-copy'
+import {
+  CAMPAIGN_ONBOARDING_INCOMPLETE_COPY,
+  CAMPAIGN_PARTICIPATION_INVALID_BADGE,
+} from '../lib/campaign-onboarding-copy'
+import {
+  isCampaignParticipationInvalid,
+  resolveCampaignRecoveryState,
+} from '../lib/campaign-recovery-state'
 import {
   resolveCampaignDestination,
   shouldRunCampaignSelectionSideEffect,
@@ -28,6 +35,10 @@ export function CampaignDestinationRow({
 }: CampaignDestinationRowProps) {
   const destination = resolveCampaignDestination(campaign)
   const display = buildCampaignDisplay(campaign)
+  const recovery = resolveCampaignRecoveryState(campaign)
+  const badgeLabel = isCampaignParticipationInvalid(recovery)
+    ? CAMPAIGN_PARTICIPATION_INVALID_BADGE
+    : CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.badge
 
   return (
     <Link
@@ -46,8 +57,12 @@ export function CampaignDestinationRow({
         <div className="flex min-w-0 items-center gap-2">
           <CampaignDisplayName display={display} surface="row" />
           {destination.showSetupBadge ? (
-            <Badge appearance="outline" tone="warning" size="sm">
-              {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.badge}
+            <Badge
+              appearance="outline"
+              tone={isCampaignParticipationInvalid(recovery) ? 'destructive' : 'warning'}
+              size="sm"
+            >
+              {badgeLabel}
             </Badge>
           ) : null}
         </div>

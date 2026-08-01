@@ -8,7 +8,11 @@ import type { CampaignListItem } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE, CAMPAIGN_UNKNOWN_NAME } from '../campaign-display'
-import { isCampaignMembershipOnboardingIncomplete } from '../campaign-membership-onboarding'
+import {
+  isCampaignOnboardingIncomplete,
+  isCampaignRecoveryRequired,
+  resolveCampaignRecoveryState,
+} from '../campaign-recovery-state'
 import type { CampaignsQueryState } from '../resolve-campaign-topbar-title-state'
 import { resolveCampaignTopbarTitleState } from '../resolve-campaign-topbar-title-state'
 import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
@@ -34,7 +38,7 @@ export function resolveContinueCampaign(
   if (!id) return null
 
   const campaign = campaigns.find((item) => item.id === id)
-  if (!campaign || isCampaignMembershipOnboardingIncomplete(campaign)) {
+  if (!campaign || isCampaignRecoveryRequired(resolveCampaignRecoveryState(campaign))) {
     return null
   }
 
@@ -44,6 +48,7 @@ export function resolveContinueCampaign(
 /**
  * Resolve a campaign the Dashboard should prompt to finish onboarding.
  * The candidate must exist and have incomplete viewer onboarding.
+ * @deprecated Prefer {@link resolveCampaignRecoveryPromotions} for home promotion.
  */
 export function resolveResumeSetupCampaign(
   campaigns: readonly CampaignListItem[],
@@ -54,7 +59,7 @@ export function resolveResumeSetupCampaign(
   if (!id) return null
 
   const campaign = campaigns.find((item) => item.id === id)
-  if (!campaign || !isCampaignMembershipOnboardingIncomplete(campaign)) {
+  if (!campaign || !isCampaignOnboardingIncomplete(resolveCampaignRecoveryState(campaign))) {
     return null
   }
 

@@ -45,7 +45,7 @@ export function useDashboardHomeViewModel() {
     }),
     sections,
     campaignsError,
-    showAllCampaignsLink: resolveDashboardHomeShowAllCampaignsLink(campaigns, campaignsError),
+    showAllCampaignsLink: resolveDashboardHomeShowAllCampaignsLink(sections),
     campaignRowsPresent,
   }
 }

@@ -4,8 +4,8 @@ import { buttonVariants, Text } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import {
   CAMPAIGNS_QUERY_ERROR_MESSAGE,
+  CampaignRecoveryPromotionCard,
   ContinueCampaignCard,
-  FinishJoiningCampaignCard,
   PendingCampaignInvitationsSection,
 } from '@/features/campaign'
 import type { DashboardHomeSection } from './dashboard-home-sections.lib'
@@ -31,8 +31,13 @@ export function DashboardHomeSections({
 
       {sections.map((section) => {
         switch (section.kind) {
-          case 'finishJoining':
-            return <FinishJoiningCampaignCard key="finish-joining" campaign={section.campaign} />
+          case 'campaignRecovery':
+            return (
+              <CampaignRecoveryPromotionCard
+                key="campaign-recovery"
+                promotion={section.promotion}
+              />
+            )
           case 'pendingInvitations':
             return (
               <PendingCampaignInvitationsSection

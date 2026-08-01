@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -17,6 +20,18 @@ const { useCampaignInviteResolution } = vi.hoisted(() => ({
 const { acceptCampaignInviteByToken } = vi.hoisted(() => ({
   acceptCampaignInviteByToken: vi.fn(),
 }))
+
+const { persistCampaignSelectionBestEffort } = vi.hoisted(() => ({
+  persistCampaignSelectionBestEffort: vi.fn(),
+}))
+
+vi.mock('@rpg/api-client', async () => {
+  const actual = await vi.importActual<typeof import('@rpg/api-client')>('@rpg/api-client')
+  return {
+    ...actual,
+    persistCampaignSelectionBestEffort,
+  }
+})
 
 vi.mock('@/features/auth/hooks/use-session', () => ({
   useSession,
@@ -48,6 +63,8 @@ function renderInvitePage() {
 describe('CampaignInvitePage', () => {
   beforeEach(() => {
     vi.stubGlobal('location', { assign: vi.fn() })
+    localStorage.clear()
+    persistCampaignSelectionBestEffort.mockResolvedValue(undefined)
     useSession.mockReturnValue({ isPending: false, data: undefined })
     acceptCampaignInviteByToken.mockReset()
   })
@@ -141,6 +158,9 @@ describe('CampaignInvitePage', () => {
 
     await waitFor(() => {
       expect(acceptCampaignInviteByToken).toHaveBeenCalledWith(inviteToken)
+    })
+    await waitFor(() => {
+      expect(persistCampaignSelectionBestEffort).toHaveBeenCalledWith('camp_1')
     })
     await waitFor(() => {
       expect(window.location.assign).toHaveBeenCalledWith('/app/campaigns/camp_1/onboarding')

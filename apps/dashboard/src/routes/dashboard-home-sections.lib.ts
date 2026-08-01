@@ -1,10 +1,11 @@
 import type { CampaignInviteInviteeListItem, CampaignListItem } from '@rpg/contracts'
 
+import { readStoredCampaignId } from '@/features/campaign/lib/navigation/selected-campaign-storage'
+import { resolveContinueCampaign } from '@/features/campaign/lib/navigation/campaign-selection'
 import {
-  readStoredCampaignId,
-  resolveContinueCampaign,
-  resolveResumeSetupCampaign,
-} from '@/features/campaign'
+  resolveCampaignRecoveryPromotions,
+  type CampaignRecoveryPromotion,
+} from '@/features/campaign/lib/campaign-recovery-promotions.lib'
 import { filterPendingInvitesForMembership } from '@/features/campaign/lib/filter-pending-invites-for-membership'
 
 type CampaignPreferenceUser =
@@ -15,7 +16,7 @@ type CampaignPreferenceUser =
   | undefined
 
 export type DashboardHomeSection =
-  | { kind: 'finishJoining'; campaign: CampaignListItem }
+  | { kind: 'campaignRecovery'; promotion: CampaignRecoveryPromotion; recoverableCount: number }
   | { kind: 'pendingInvitations'; invites: CampaignInviteInviteeListItem[] }
   | { kind: 'continueCampaign'; campaign: CampaignListItem }
   | { kind: 'starterCards' }
@@ -35,13 +36,21 @@ export function resolveDashboardHomeSections({
 
   if (!campaignsError && campaigns !== undefined) {
     const storedId = readStoredCampaignId()
+    const { promotion: recoveryPromotion, recoverableCount } = resolveCampaignRecoveryPromotions(
+      campaigns,
+      {
+        storedCampaignId: storedId,
+        lastSelectedCampaignId: user?.lastSelectedCampaignId,
+      },
+    )
     const continueCampaign = resolveContinueCampaign(campaigns, user, storedId)
-    const finishJoiningCampaign = continueCampaign
-      ? null
-      : resolveResumeSetupCampaign(campaigns, user, storedId)
 
-    if (finishJoiningCampaign) {
-      sections.push({ kind: 'finishJoining', campaign: finishJoiningCampaign })
+    if (recoveryPromotion) {
+      sections.push({
+        kind: 'campaignRecovery',
+        promotion: recoveryPromotion,
+        recoverableCount,
+      })
     }
 
     const visibleInvites = filterPendingInvitesForMembership(pendingInvites, campaigns)
@@ -49,7 +58,7 @@ export function resolveDashboardHomeSections({
       sections.push({ kind: 'pendingInvitations', invites: visibleInvites })
     }
 
-    if (continueCampaign && continueCampaign.id !== finishJoiningCampaign?.id) {
+    if (continueCampaign && continueCampaign.id !== recoveryPromotion?.campaignId) {
       sections.push({ kind: 'continueCampaign', campaign: continueCampaign })
     }
   }
@@ -59,8 +68,11 @@ export function resolveDashboardHomeSections({
 }
 
 export function resolveDashboardHomeShowAllCampaignsLink(
-  campaigns: CampaignListItem[] | undefined,
-  campaignsError: boolean,
+  sections: DashboardHomeSection[],
 ): boolean {
-  return !campaignsError && campaigns !== undefined && campaigns.length > 1
+  const recovery = sections.find((section) => section.kind === 'campaignRecovery')
+  return recovery?.kind === 'campaignRecovery' && recovery.recoverableCount > 1
 }
+
+/** @deprecated Use {@link DashboardHomeSection} campaignRecovery kind. */
+export type { CampaignRecoveryPromotion as CampaignSetupPromotion }

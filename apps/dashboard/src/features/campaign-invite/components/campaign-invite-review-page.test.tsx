@@ -21,6 +21,12 @@ const { acceptCampaignInviteById } = vi.hoisted(() => ({
   acceptCampaignInviteById: vi.fn(),
 }))
 
+const persistCampaignSelection = vi.hoisted(() => vi.fn())
+
+vi.mock('@/features/campaign', () => ({
+  usePersistCampaignSelection: () => persistCampaignSelection,
+}))
+
 const navigate = vi.fn()
 
 vi.mock('react-router-dom', async () => {
@@ -68,6 +74,7 @@ function renderInviteReviewPage() {
 describe('CampaignInviteReviewPage', () => {
   beforeEach(() => {
     navigate.mockReset()
+    persistCampaignSelection.mockReset()
     useSession.mockReturnValue({
       isPending: false,
       data: {
@@ -109,6 +116,9 @@ describe('CampaignInviteReviewPage', () => {
 
     await waitFor(() => {
       expect(acceptCampaignInviteById).toHaveBeenCalledWith(inviteId)
+    })
+    await waitFor(() => {
+      expect(persistCampaignSelection).toHaveBeenCalledWith('camp_1')
     })
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith('/campaigns/camp_1/onboarding')

@@ -17,7 +17,6 @@ import {
   type CampaignSettingsValues,
 } from '../lib/campaign-settings-form-values'
 import { useCampaigns } from '../hooks/use-campaigns'
-import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 import { useUpdateCampaign } from '../hooks/use-update-campaign'
 
 function CampaignSettingsHeading() {
@@ -32,8 +31,6 @@ export function CampaignSettings() {
   const { campaignId } = useParams<{ campaignId: string }>()
   const { data: campaigns, isPending: isLoadingCampaigns, isError } = useCampaigns()
   const campaign = campaigns?.find((c) => c.id === campaignId)
-
-  usePersistViewedCampaign(campaignId)
 
   const { mutateAsync, isPending } = useUpdateCampaign(campaignId ?? '')
 
