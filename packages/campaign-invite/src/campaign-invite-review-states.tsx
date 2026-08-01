@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 import {
   buildAuthContinuationUrl,
   crossAppCampaignDetailPath,
@@ -8,47 +6,50 @@ import {
 } from '@rpg/contracts'
 import { Button, buttonVariants } from '@rpg/ui'
 
-import { ROUTES } from '@/lib/routes'
-import { logout } from '@/features/auth/api/auth-client'
-
-import { InviteMessageCard } from '../components/invite-message-card.client'
+import { INVITE_REVIEW_COPY } from './campaign-invite-review-copy'
+import { InviteMessageCard } from './invite-message-card'
 import {
   isPublicInviteResolution,
   resolveInviteMaskedEmail,
   type CampaignInviteResolution,
-} from './campaign-invite-page.lib'
+} from './resolve-invite-review-state'
 
-export function InviteHomeAction() {
+export type CampaignInviteReviewNavigation = {
+  homeHref: string
+  onUseAnotherAccount?: (loginHref: string) => void
+}
+
+export function InviteHomeAction({ homeHref }: { homeHref: string }) {
   return (
-    <Link href={ROUTES.home} className={buttonVariants({ variant: 'outline' })}>
-      Return home
-    </Link>
+    <a href={homeHref} className={buttonVariants({ variant: 'outline' })}>
+      {INVITE_REVIEW_COPY.home}
+    </a>
   )
 }
 
-export function InviteRevokedState() {
+export function InviteRevokedState({ navigation }: { navigation: CampaignInviteReviewNavigation }) {
   return (
     <InviteMessageCard
-      title="This invitation is no longer available"
-      body="The campaign owner revoked this invitation. Ask them to send a new one if you still need access."
+      title={INVITE_REVIEW_COPY.revoked.title}
+      body={INVITE_REVIEW_COPY.revoked.body}
       action={
-        <Link href={ROUTES.home} className={buttonVariants()}>
-          Return home
-        </Link>
+        <a href={navigation.homeHref} className={buttonVariants()}>
+          {INVITE_REVIEW_COPY.revoked.action}
+        </a>
       }
     />
   )
 }
 
-export function InviteExpiredState() {
+export function InviteExpiredState({ navigation }: { navigation: CampaignInviteReviewNavigation }) {
   return (
     <InviteMessageCard
-      title="This invitation has expired"
-      body="Ask the campaign owner to send a new invitation."
+      title={INVITE_REVIEW_COPY.expired.title}
+      body={INVITE_REVIEW_COPY.expired.body}
       action={
-        <Link href={ROUTES.home} className={buttonVariants()}>
-          Return home
-        </Link>
+        <a href={navigation.homeHref} className={buttonVariants()}>
+          {INVITE_REVIEW_COPY.expired.action}
+        </a>
       }
     />
   )
@@ -65,21 +66,21 @@ export function InviteCompletedState({
 }) {
   return (
     <InviteMessageCard
-      title="This invitation has already been completed."
+      title={INVITE_REVIEW_COPY.completed.title}
       body={
         canOpenCampaign
-          ? 'Your campaign character is ready in the dashboard.'
-          : 'Sign in with the invited account to open your campaign character.'
+          ? INVITE_REVIEW_COPY.completed.bodyWithSession
+          : INVITE_REVIEW_COPY.completed.bodyWithoutSession
       }
       action={
         canOpenCampaign ? (
           <a href={crossAppCampaignDetailPath(campaignId)} className={buttonVariants()}>
-            Open campaign
+            {INVITE_REVIEW_COPY.completed.openCampaign}
           </a>
         ) : (
-          <Link href={buildAuthContinuationUrl('/login', returnTo)} className={buttonVariants()}>
-            Sign in
-          </Link>
+          <a href={buildAuthContinuationUrl('/login', returnTo)} className={buttonVariants()}>
+            {INVITE_REVIEW_COPY.completed.signIn}
+          </a>
         )
       }
     />
@@ -106,11 +107,11 @@ export function InvitePendingReviewState({
       action={
         mode === 'continue' ? (
           <Button type="button" onClick={onContinue}>
-            Continue to character setup
+            {INVITE_REVIEW_COPY.pendingReview.continue}
           </Button>
         ) : (
           <Button type="button" onClick={onAccept}>
-            Accept invitation
+            {INVITE_REVIEW_COPY.pendingReview.accept}
           </Button>
         )
       }
@@ -121,28 +122,29 @@ export function InvitePendingReviewState({
 export function InviteEmailMismatchState({
   resolution,
   returnTo,
+  navigation,
 }: {
   resolution: CampaignInvitePublicResolution
   returnTo: string
+  navigation: CampaignInviteReviewNavigation
 }) {
   const maskedEmail = resolveInviteMaskedEmail(resolution)
+  const loginHref = buildAuthContinuationUrl('/login', returnTo)
 
   return (
     <InviteMessageCard
-      title="Use the invited account"
+      title={INVITE_REVIEW_COPY.emailMismatch.title}
       body={`This invitation was sent to ${maskedEmail}. Sign in with that email address to continue.`}
       action={
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            void logout().then(() => {
-              window.location.assign(buildAuthContinuationUrl('/login', returnTo))
-            })
-          }}
-        >
-          Use another account
-        </Button>
+        navigation.onUseAnotherAccount ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigation.onUseAnotherAccount?.(loginHref)}
+          >
+            {INVITE_REVIEW_COPY.emailMismatch.action}
+          </Button>
+        ) : null
       }
     />
   )
@@ -160,33 +162,37 @@ export function InviteUnauthenticatedState({
   return (
     <InviteMessageCard
       title={`You're invited to join ${resolution.campaignName}`}
-      body={`${resolution.inviterDisplayName} invited you to join this campaign. Sign in or create an account to continue.`}
+      body={`${resolution.inviterDisplayName} invited you to join this campaign. ${INVITE_REVIEW_COPY.unauthenticated.bodySuffix}`}
       action={
         <>
-          <Link
+          <a
             href={buildAuthContinuationUrl('/login', returnTo, email ? { email } : undefined)}
             className={buttonVariants()}
           >
-            Sign in
-          </Link>
-          <Link
+            {INVITE_REVIEW_COPY.unauthenticated.signIn}
+          </a>
+          <a
             href={buildAuthContinuationUrl('/signup', returnTo, email ? { email } : undefined)}
             className={buttonVariants({ variant: 'outline' })}
           >
-            Create account
-          </Link>
+            {INVITE_REVIEW_COPY.unauthenticated.createAccount}
+          </a>
         </>
       }
     />
   )
 }
 
-export function InviteInvalidSegmentState() {
+export function InviteInvalidSegmentState({
+  navigation,
+}: {
+  navigation: CampaignInviteReviewNavigation
+}) {
   return (
     <InviteMessageCard
-      title="Invitation unavailable"
+      title={INVITE_REVIEW_COPY.unavailable.title}
       body="This invitation link is invalid or no longer available."
-      action={<InviteHomeAction />}
+      action={<InviteHomeAction homeHref={navigation.homeHref} />}
     />
   )
 }

@@ -1,26 +1,27 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { ApiError, crossAppCampaignOnboardingPath } from '@rpg/contracts'
+import { ApiError } from '@rpg/contracts'
 import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campaign-invite'
 
-import { ROUTES } from '@/lib/routes'
+import { ROUTES } from '@/app/routes'
 import { useSession } from '@/features/auth/hooks/use-session'
-import { logout } from '@/features/auth/api/auth-client'
 
 import {
-  acceptCampaignInviteByToken,
+  acceptCampaignInviteById,
   invalidateCampaignInviteAcceptQueries,
 } from '../api/campaign-invite-client'
 import { useCampaignInviteResolution } from '../hooks/use-campaign-invite-resolution'
 
-type CampaignInvitePageProps = {
-  token: string
+type CampaignInviteReviewPageProps = {
+  inviteId: string
 }
 
-export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
+export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageProps) {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: session, isPending: isSessionPending } = useSession()
   const {
@@ -28,11 +29,11 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
     isPending: isResolutionPending,
     isError: isResolutionError,
     error: resolutionError,
-  } = useCampaignInviteResolution(token)
+  } = useCampaignInviteResolution(inviteId)
   const [acceptError, setAcceptError] = useState<string | null>(null)
   const [isAccepting, setIsAccepting] = useState(false)
 
-  const returnTo = `/campaign-invites/${token}`
+  const returnTo = ROUTES.campaignInvites.detail(inviteId)
   const resolutionErrorMessage =
     resolutionError instanceof ApiError
       ? resolutionError.message
@@ -64,10 +65,10 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
     setIsAccepting(true)
     setAcceptError(null)
 
-    void acceptCampaignInviteByToken(token)
+    void acceptCampaignInviteById(inviteId)
       .then(async (result) => {
-        await invalidateCampaignInviteAcceptQueries(queryClient)
-        window.location.assign(crossAppCampaignOnboardingPath(result.campaignId))
+        await invalidateCampaignInviteAcceptQueries(queryClient, result.campaignId)
+        navigate(ROUTES.campaign.onboarding(result.campaignId))
       })
       .catch((error: unknown) => {
         setIsAccepting(false)
@@ -75,11 +76,14 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
           error instanceof ApiError ? error.message : 'Could not accept this invitation.',
         )
       })
-  }, [queryClient, token])
+  }, [inviteId, navigate, queryClient])
 
-  const handleContinue = useCallback((campaignId: string) => {
-    window.location.assign(crossAppCampaignOnboardingPath(campaignId))
-  }, [])
+  const handleContinue = useCallback(
+    (campaignId: string) => {
+      navigate(ROUTES.campaign.onboarding(campaignId))
+    },
+    [navigate],
+  )
 
   return (
     <CampaignInviteReviewContent
@@ -88,14 +92,7 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
       acceptError={acceptError}
       onAccept={handleAccept}
       onContinue={handleContinue}
-      navigation={{
-        homeHref: ROUTES.home,
-        onUseAnotherAccount: (loginHref) => {
-          void logout().then(() => {
-            window.location.assign(loginHref)
-          })
-        },
-      }}
+      navigation={{ homeHref: ROUTES.home }}
     />
   )
 }

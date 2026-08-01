@@ -2,43 +2,32 @@ import { postJson, request } from '@rpg/api-client'
 import type {
   AcceptCampaignInviteResult,
   CampaignInviteAuthenticatedResolution,
-  CampaignInvitePublicResolution,
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
+
+import { campaignOnboardingContextQueryKey } from '@/features/campaign/hooks/use-campaign-onboarding-context'
+import { campaignsQueryKey } from '@/features/campaign/hooks/use-campaigns'
+import {
+  notificationsInboxRootQueryKey,
+  notificationsQueryKey,
+} from '@/features/notification/lib/notification-query-keys'
 
 const RESOLVE_INVITE_ERROR = 'Could not load this invitation.'
 const ACCEPT_INVITE_ERROR = 'Could not accept this invitation.'
 
 export const campaignInvitesMineQueryKey = ['campaign-invites', 'mine'] as const
-export const campaignsListQueryKey = ['campaigns', 'list'] as const
 
 export async function invalidateCampaignInviteAcceptQueries(
   queryClient: QueryClient,
-  campaignId?: string,
+  campaignId: string,
 ): Promise<void> {
   await Promise.all([
     queryClient.invalidateQueries({ queryKey: campaignInvitesMineQueryKey }),
-    queryClient.invalidateQueries({ queryKey: campaignsListQueryKey }),
-    queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-    ...(campaignId
-      ? [
-          queryClient.invalidateQueries({
-            queryKey: ['campaigns', campaignId, 'onboarding-context'],
-          }),
-        ]
-      : []),
+    queryClient.invalidateQueries({ queryKey: campaignsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: notificationsQueryKey }),
+    queryClient.invalidateQueries({ queryKey: notificationsInboxRootQueryKey }),
+    queryClient.invalidateQueries({ queryKey: campaignOnboardingContextQueryKey(campaignId) }),
   ])
-}
-
-export async function resolveCampaignInviteByToken(
-  token: string,
-): Promise<CampaignInvitePublicResolution> {
-  const { resolution } = await request<{ resolution: CampaignInvitePublicResolution }>(
-    `/api/campaign-invites/${encodeURIComponent(token)}`,
-    undefined,
-    RESOLVE_INVITE_ERROR,
-  )
-  return resolution
 }
 
 export async function resolveCampaignInviteById(
@@ -50,16 +39,6 @@ export async function resolveCampaignInviteById(
     RESOLVE_INVITE_ERROR,
   )
   return resolution
-}
-
-export async function acceptCampaignInviteByToken(
-  token: string,
-): Promise<AcceptCampaignInviteResult> {
-  return postJson<AcceptCampaignInviteResult>(
-    `/api/campaign-invites/${encodeURIComponent(token)}/accept`,
-    {},
-    ACCEPT_INVITE_ERROR,
-  )
 }
 
 export async function acceptCampaignInviteById(

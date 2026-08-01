@@ -34,13 +34,13 @@ vi.mock('../api/campaign-invite-client', () => ({
   invalidateCampaignInviteAcceptQueries: vi.fn(),
 }))
 
-const tokenSegment = { kind: 'token' as const, value: 'invite-token' }
+const inviteToken = 'a'.repeat(64)
 
 function renderInvitePage() {
   const queryClient = new QueryClient()
   return render(
     <QueryClientProvider client={queryClient}>
-      <CampaignInvitePage segment={tokenSegment} />
+      <CampaignInvitePage token={inviteToken} />
     </QueryClientProvider>,
   )
 }
@@ -74,11 +74,11 @@ describe('CampaignInvitePage', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute(
       'href',
-      '/login?returnTo=%2Fcampaign-invites%2Finvite-token&email=player%40example.com',
+      `/login?returnTo=%2Fcampaign-invites%2F${inviteToken}&email=player%40example.com`,
     )
     expect(screen.getByRole('link', { name: /create account/i })).toHaveAttribute(
       'href',
-      '/signup?returnTo=%2Fcampaign-invites%2Finvite-token&email=player%40example.com',
+      `/signup?returnTo=%2Fcampaign-invites%2F${inviteToken}&email=player%40example.com`,
     )
   })
 
@@ -140,7 +140,7 @@ describe('CampaignInvitePage', () => {
     await user.click(await screen.findByRole('button', { name: /accept invitation/i }))
 
     await waitFor(() => {
-      expect(acceptCampaignInviteByToken).toHaveBeenCalledWith('invite-token')
+      expect(acceptCampaignInviteByToken).toHaveBeenCalledWith(inviteToken)
     })
     await waitFor(() => {
       expect(window.location.assign).toHaveBeenCalledWith('/app/campaigns/camp_1/onboarding')
@@ -165,7 +165,7 @@ describe('CampaignInvitePage', () => {
         invitedEmail: 'player@example.com',
         invitedEmailMasked: 'p***@example.com',
         status: 'pending',
-        expiresAt: '2026-01-08T00:00:000Z',
+        expiresAt: '2026-01-01T00:00:000Z',
       },
     })
 
@@ -203,6 +203,34 @@ describe('CampaignInvitePage', () => {
       'href',
       '/app/campaigns/camp_1',
     )
+  })
+
+  it('shows continue setup for accepted invites', async () => {
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'player@example.com', displayName: 'Player', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignId: 'camp_1',
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'accepted',
+        expiresAt: '2026-01-08T00:00:00.000Z',
+      },
+    })
+
+    renderInvitePage()
+
+    expect(
+      await screen.findByRole('button', { name: /continue to character setup/i }),
+    ).toBeInTheDocument()
   })
 
   it('shows an error and does not retry when acceptance fails', async () => {
@@ -258,5 +286,24 @@ describe('CampaignInvitePage', () => {
 
     expect(await screen.findByText(/this invitation has expired/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /return home/i })).toBeInTheDocument()
+  })
+
+  it('shows the revoked terminal state', async () => {
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignId: 'camp_1',
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'revoked',
+        expiresAt: '2026-01-01T00:00:00.000Z',
+      },
+    })
+
+    renderInvitePage()
+
+    expect(await screen.findByText(/no longer available/i)).toBeInTheDocument()
   })
 })

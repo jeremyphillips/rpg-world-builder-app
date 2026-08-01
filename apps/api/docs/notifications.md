@@ -49,13 +49,13 @@ Invitee lifecycle notifications (`received`, `cancelled`) share
 `campaignInviteInviteeLifecycleDedupeKey(inviteId)` — one slot per invitee per
 invite. Manager notifications still use `campaignInviteDedupeKey(inviteId, phase)`.
 
-| Type                        | Recipients                                 | Dedupe key / phase | Action                   |
-| --------------------------- | ------------------------------------------ | ------------------ | ------------------------ |
-| `campaign.invite.received`  | Invitee user when email matches an account | invitee lifecycle  | `campaign_invite_review` |
-| `campaign.invite.cancelled` | Invitee user when a pending invite revoked | invitee lifecycle  | None                     |
-| `campaign.invite.accepted`  | Campaign owner + co-owner, excluding actor | `accepted`         | `campaign_detail`        |
-| `campaign.invite.completed` | Campaign owner + co-owner, excluding actor | `completed`        | `campaign_detail`        |
-| `campaign.member.removed`   | Removed player                             | per membership id  | None                     |
+| Type                        | Recipients                                 | Dedupe key / phase | Action                                                       |
+| --------------------------- | ------------------------------------------ | ------------------ | ------------------------------------------------------------ |
+| `campaign.invite.received`  | Invitee user when email matches an account | invitee lifecycle  | `campaign_invite_review` → `/app/campaign-invites/:inviteId` |
+| `campaign.invite.cancelled` | Invitee user when a pending invite revoked | invitee lifecycle  | None                                                         |
+| `campaign.invite.accepted`  | Campaign owner + co-owner, excluding actor | `accepted`         | `campaign_detail`                                            |
+| `campaign.invite.completed` | Campaign owner + co-owner, excluding actor | `completed`        | `campaign_detail`                                            |
+| `campaign.member.removed`   | Removed player                             | per membership id  | None                                                         |
 
 **Cancellation supersede:** revoking a pending invite upserts the lifecycle row to
 `campaign.invite.cancelled`, clears the action, refreshes preview copy, and resets
@@ -148,3 +148,23 @@ The dashboard `RealtimeProvider` patches the bell first-page cache directly, inv
 the separate inbox infinite query when mounted, and keeps slow polling enabled while
 connected. Reconnect refetch is scoped to the bell first page, conversation list, active
 thread, and mounted inbox — not every cached historical page.
+
+## Campaign invite review actions
+
+`campaign.invite.received` persists `action: { kind: 'campaign_invite_review', inviteId }`.
+Navigation uses **`action.inviteId`** as the SSOT; payload `inviteId` is display-only.
+
+Dashboard activation resolves `dashboardCampaignInviteReviewPath(inviteId)` and navigates
+within the SPA (no cross-app assign).
+
+### Temporary payload fallback
+
+`resolveNotificationActionPath` falls back to `payload.inviteId` when a stale
+`campaign_invite_review` action is missing a valid `inviteId`. Remove when **all** are
+true:
+
+1. Persistence schema with `action.inviteId` deployed everywhere.
+2. Stale rows cleaned or naturally expired in dev/shared environments.
+3. Tests confirm all **new** `campaign.invite.received` actions contain `inviteId`.
+
+Malformed or missing ids mark read only — never navigate to `/undefined`.

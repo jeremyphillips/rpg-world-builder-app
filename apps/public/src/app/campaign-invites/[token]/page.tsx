@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { APP_NAME, parseCampaignInviteRouteSegment } from '@rpg/contracts'
+import { APP_NAME, parseCampaignInviteTokenSegment } from '@rpg/contracts'
+import { InviteInvalidSegmentState } from '@rpg/campaign-invite'
 
 import { SiteHeader } from '@/components/site-header'
 import { CampaignInvitePage } from '@/features/campaign-invite'
-import { InviteInvalidSegmentState } from '@/features/campaign-invite/lib/campaign-invite-page-states.client'
+import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = {
   title: `Campaign invitation - ${APP_NAME}`,
@@ -15,13 +16,17 @@ type CampaignInviteRouteProps = {
 
 export default async function CampaignInviteRoute({ params }: CampaignInviteRouteProps) {
   const { token } = await params
-  const segment = parseCampaignInviteRouteSegment(token)
+  const parsedToken = parseCampaignInviteTokenSegment(token)
 
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
       <main className="flex flex-1 flex-col">
-        {segment ? <CampaignInvitePage segment={segment} /> : <InviteInvalidSegmentState />}
+        {parsedToken ? (
+          <CampaignInvitePage token={parsedToken} />
+        ) : (
+          <InviteInvalidSegmentState navigation={{ homeHref: ROUTES.home }} />
+        )}
       </main>
     </div>
   )

@@ -1,7 +1,6 @@
 import type {
   CampaignInviteAuthenticatedResolution,
   CampaignInvitePublicResolution,
-  CampaignInviteRouteSegment,
   SessionUser,
 } from '@rpg/contracts'
 
@@ -123,8 +122,4 @@ export function resolveInviteViewState({
   }
 
   return resolveAuthenticatedInviteState(resolution, sessionUser, isAccepting)
-}
-
-export function buildCampaignInviteReturnTo(segment: CampaignInviteRouteSegment): string {
-  return `/campaign-invites/${segment.value}`
 }

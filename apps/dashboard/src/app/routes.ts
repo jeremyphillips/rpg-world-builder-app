@@ -15,6 +15,9 @@ export const ROUTES = {
   notifications: {
     list: '/notifications',
   },
+  campaignInvites: {
+    detail: (inviteId: string) => `/campaign-invites/${inviteId}`,
+  },
   messages: {
     list: '/messages',
     listScoped: (campaignId: string) => `/messages?campaignId=${encodeURIComponent(campaignId)}`,

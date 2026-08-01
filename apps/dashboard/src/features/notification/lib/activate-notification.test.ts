@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { dashboardCampaignInviteReviewPath } from '@rpg/contracts'
+
 import { makeNotification } from '@/test/fixtures/notifications'
 
 import { activateNotification } from './activate-notification'
@@ -66,7 +68,7 @@ describe('activateNotification', () => {
         payload: {
           campaignId: 'camp_1',
           campaignName: 'Stormwatch',
-          inviteId: 'invite_1',
+          inviteId: 'a'.repeat(24),
           inviterDisplayName: 'Alex',
         },
       },
@@ -79,10 +81,8 @@ describe('activateNotification', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('uses window.location.assign for cross-app invite review navigation', () => {
-    const assign = vi.fn()
-    vi.stubGlobal('window', { location: { assign } })
-
+  it('navigates within the dashboard SPA for invite review notifications', () => {
+    const inviteId = 'a'.repeat(24)
     const markRead = { mutateAsync: vi.fn().mockResolvedValue(undefined) }
     const navigate = vi.fn()
 
@@ -94,11 +94,11 @@ describe('activateNotification', () => {
         createdAt: '2026-07-30T12:00:00.000Z',
         updatedAt: '2026-07-30T12:00:00.000Z',
         version: 1,
-        action: { kind: 'campaign_invite_review', inviteId: 'invite_1' },
+        action: { kind: 'campaign_invite_review', inviteId },
         payload: {
           campaignId: 'camp_1',
           campaignName: 'Stormwatch',
-          inviteId: 'invite_1',
+          inviteId,
           inviterDisplayName: 'Alex',
         },
       },
@@ -108,7 +108,8 @@ describe('activateNotification', () => {
     })
 
     expect(markRead.mutateAsync).toHaveBeenCalledWith('notification-3')
-    expect(assign).toHaveBeenCalledWith('/campaign-invites/invite_1')
-    expect(navigate).not.toHaveBeenCalled()
+    expect(navigate).toHaveBeenCalledWith(
+      dashboardCampaignInviteReviewPath(inviteId).slice('/app'.length),
+    )
   })
 })

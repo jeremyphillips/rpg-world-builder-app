@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { CampaignInvitePublicResolution } from '@rpg/contracts'
 
-import { resolveInviteViewState } from './campaign-invite-page.lib'
+import { resolveInviteViewState } from './resolve-invite-review-state'
 
 const baseResolution: CampaignInvitePublicResolution = {
   campaignId: 'camp_1',
