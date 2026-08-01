@@ -41,7 +41,7 @@ export const compactLabelVariants = cva(
       },
       filled: {
         true: 'font-medium',
-        false: 'font-light',
+        false: 'font-medium', // was 'font-light'
       },
       selected: {
         true: 'border-selected-control-border bg-selected-control text-selected-control-foreground',

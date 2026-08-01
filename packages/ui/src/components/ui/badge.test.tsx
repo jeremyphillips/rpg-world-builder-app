@@ -21,7 +21,12 @@ describe('Badge', () => {
       </Badge>,
     )
     const el = screen.getByText('Stale')
-    expect(el).toHaveClass('text-foreground', 'border-semantic-warning-border', 'font-light')
+    expect(el).toHaveClass(
+      'text-foreground',
+      'border-semantic-warning-border',
+      'border-[1.5px]',
+      'font-medium',
+    )
     expect(el).toHaveClass('text-xs-meta', 'rounded-full')
   })
 
