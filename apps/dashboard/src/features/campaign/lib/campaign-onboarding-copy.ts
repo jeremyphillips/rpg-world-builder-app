@@ -90,3 +90,15 @@ export const CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY = {
     action: 'Go to campaign',
   },
 } as const
+
+/** Recovery / onboarding CTAs that render as primary actions (not outline). */
+export const CAMPAIGN_ONBOARDING_PRIMARY_ACTION_LABELS = [
+  CAMPAIGN_INVITATION_COPY.action,
+  FINISH_JOINING_CAMPAIGN_ACTION,
+  CAMPAIGN_CONNECTION_RESTORE_ACTION,
+  CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.complete.action,
+] as const
+
+export function isCampaignOnboardingPrimaryAction(actionLabel: string): boolean {
+  return (CAMPAIGN_ONBOARDING_PRIMARY_ACTION_LABELS as readonly string[]).includes(actionLabel)
+}

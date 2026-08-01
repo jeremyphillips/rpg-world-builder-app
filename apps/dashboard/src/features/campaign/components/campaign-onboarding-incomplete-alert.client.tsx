@@ -44,10 +44,7 @@ export function CampaignOnboardingIncompleteAlert({ campaign }: { campaign: Camp
         title={campaignConnectionRestoreTitle(campaignName)}
         description={CAMPAIGN_CONNECTION_RESTORE_BODY}
         actions={
-          <Link
-            to={destination.href}
-            className={buttonVariants({ variant: 'outline', size: 'sm' })}
-          >
+          <Link to={destination.href} className={buttonVariants({ size: 'sm' })}>
             {CAMPAIGN_CONNECTION_RESTORE_ACTION}
           </Link>
         }
@@ -65,7 +62,7 @@ export function CampaignOnboardingIncompleteAlert({ campaign }: { campaign: Camp
       title={finishJoiningCampaignTitle(campaignName)}
       description={CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message}
       actions={
-        <Link to={destination.href} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+        <Link to={destination.href} className={buttonVariants({ size: 'sm' })}>
           {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.action}
         </Link>
       }

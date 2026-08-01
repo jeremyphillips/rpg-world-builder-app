@@ -42,10 +42,7 @@ export function CampaignOnboarding() {
           <Text variant="muted" role="status">
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.message}
           </Text>
-          <Link
-            to={ROUTES.campaign.detail(context.campaignId)}
-            className={buttonVariants({ variant: 'outline' })}
-          >
+          <Link to={ROUTES.campaign.detail(context.campaignId)} className={buttonVariants()}>
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.action}
           </Link>
         </div>

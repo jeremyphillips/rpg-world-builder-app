@@ -6,16 +6,20 @@ import { buttonVariants } from '@rpg/ui'
 import { PromotionCard } from '@/components/layout/promotion-card'
 
 import type { CampaignRecoveryPromotion } from '../lib/campaign-recovery-promotions.lib'
+import { isCampaignOnboardingPrimaryAction } from '../lib/campaign-onboarding-copy'
 
 type CampaignRecoveryPromotionCardProps = {
   promotion: CampaignRecoveryPromotion
 }
 
 export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPromotionCardProps) {
-  const actionClassName =
-    promotion.kind === 'pending_invite'
-      ? buttonVariants({ size: 'sm' })
-      : buttonVariants({ variant: 'outline', size: 'sm' })
+  const actionClassName = buttonVariants({
+    variant:
+      promotion.actionLabel && isCampaignOnboardingPrimaryAction(promotion.actionLabel)
+        ? 'default'
+        : 'outline',
+    size: 'sm',
+  })
 
   const action =
     promotion.href && promotion.actionLabel ? (
