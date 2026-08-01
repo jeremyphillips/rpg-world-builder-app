@@ -253,6 +253,40 @@ describe('CampaignInvitePage', () => {
     ).toBeInTheDocument()
   })
 
+  it('persists campaign selection and redirects when continuing setup', async () => {
+    const user = userEvent.setup()
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'player@example.com', displayName: 'Player', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignId: 'camp_1',
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'accepted',
+        expiresAt: '2026-01-08T00:00:00.000Z',
+      },
+    })
+
+    renderInvitePage()
+
+    await user.click(await screen.findByRole('button', { name: /continue to character setup/i }))
+
+    await waitFor(() => {
+      expect(persistCampaignSelectionBestEffort).toHaveBeenCalledWith('camp_1')
+    })
+    await waitFor(() => {
+      expect(window.location.assign).toHaveBeenCalledWith('/app/campaigns/camp_1/onboarding')
+    })
+  })
+
   it('shows an error and does not retry when acceptance fails', async () => {
     const user = userEvent.setup()
     useSession.mockReturnValue({

@@ -50,14 +50,43 @@ See `apps/api/docs/campaign-invites.md` and `campaign-overview.service.ts`.
 
 - `ready` — staff/observer or PC with open controlled character(s)
 - `onboarding_incomplete` — PC with no control and no viewer-relevant open participation
-- `control_stale` / `participation_missing` — repairable connection gaps (reconnect via onboarding)
+- `control_stale` / `participation_missing` — repairable connection gaps (reconnect via onboarding; required `characterId`)
 - `membership_invalid` — unsupported role; alert-only (no recovery CTA)
 
 List API scopes open participations to controlled ∪ user-owned characters so fresh invites
 into populated campaigns are not misclassified. Dashboard navigation splits **entry**
 (`resolveCampaignEntryDestination` → campaign shell) from **recovery**
-(`resolveCampaignRecoveryDestination` → onboarding / reconnect). See
-[Character sheet routing](./character-sheet-routing.md).
+(`resolveCampaignRecoveryDestination` → onboarding / reconnect). Recovery hrefs derive
+from `viewerState` via contracts capability helpers — not from `participationState`.
+See [Character sheet routing](./character-sheet-routing.md).
+
+### Onboarding gate (API GET/POST)
+
+`loadCampaignOnboardingGate` is the sole API owner of onboarding eligibility
+classification. GET `/onboarding-context` and POST `/onboarding/complete` map only
+from its normalized arms:
+
+| Arm               | HTTP mapping (typical)                      |
+| ----------------- | ------------------------------------------- |
+| `not_found`       | 404                                         |
+| `forbidden`       | 403                                         |
+| `integrity_error` | 500                                         |
+| `complete`        | GET → complete context                      |
+| `eligible`        | GET → incomplete context; POST → write path |
+
+Classification lives in `@rpg/contracts` (`resolveCampaignOnboardingAccess`). The gate
+loader must not throw for `integrity_error` — it returns that arm for transport mapping.
+
+**Do not** branch onboarding HTTP status or navigation on `participationState.invalid`.
+That coarse resolver output remains for overview roster projection and DM eligibility
+only — a separate concern from viewer recovery.
+
+### Invite handoff (not recovery routing)
+
+Accept and continue on invite review surfaces navigate to plain
+`/campaigns/:id/onboarding` (or `crossAppCampaignOnboardingPath`). That path is **invite
+handoff**, not `resolveCampaignRecoveryDestination`. Both accept and continue persist
+campaign selection before navigating.
 
 ### Pending invitations (dashboard cards)
 
@@ -74,10 +103,10 @@ to are excluded server-side and again client-side before render.
 | Dashboard home  | `CampaignRecoveryPromotionCard`, `CampaignInvitationCard`            | Highest-priority recovery promotion + pending invites                                                                      |
 | Campaigns index | `CampaignDestinationRow`                                             | Every campaign status row                                                                                                  |
 
-Recovery derives from `campaign.viewerState` via `resolveCampaignRecoveryState`
-(`ready` | `onboarding_incomplete` | `control_stale` | `participation_missing` | `membership_invalid`).
+Recovery derives from `campaign.viewerState` via contracts capability helpers
+(`isCampaignViewerSelfRecoverable`, `isCampaignViewerReconnectRequired`, …).
 Preferences rank promotions via `resolveCampaignRecoveryPromotions` but never suppress self-recoverable campaigns.
-Accept flows call `persistCampaignSelectionBestEffort` (local + best-effort server) from `@rpg/api-client`.
+Accept and continue invite flows call campaign selection persistence before plain onboarding handoff.
 Onboarding supports `mode: 'initial' | 'reconnect'` for setup and connection repair.
 
 ### Settings (`campaign-settings-registry.ts`)

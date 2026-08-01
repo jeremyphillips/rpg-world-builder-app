@@ -84,10 +84,11 @@ export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageP
 
   const handleContinue = useCallback(
     (campaignId: string) => {
+      persistCampaignSelection(campaignId)
       // Invite handoff — plain onboarding entry, not recovery routing.
       navigate(ROUTES.campaign.onboarding(campaignId))
     },
-    [navigate],
+    [navigate, persistCampaignSelection],
   )
 
   return (

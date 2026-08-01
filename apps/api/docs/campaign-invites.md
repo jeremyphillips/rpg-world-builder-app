@@ -136,13 +136,18 @@ mixed with pending invite review CTAs.
 
 ### Canonical path (membership-scoped)
 
-The dashboard uses campaign-scoped endpoints. `completeCampaignOnboarding` resolves
-membership context, links an accepted invite for audit, and delegates to
-`completeCampaignCharacterAssignment` in
+The dashboard uses campaign-scoped endpoints. `loadCampaignOnboardingGate` is the sole
+eligibility classifier for GET context and POST completion — both map only from its
+result arms (`not_found`, `forbidden`, `integrity_error`, `complete`, `eligible`).
+Shared classification lives in `@rpg/contracts` (`resolveCampaignOnboardingAccess`).
+
+`completeCampaignOnboarding` resolves membership context from the gate, links an accepted
+invite for audit, and delegates to `completeCampaignCharacterAssignment` in
 `campaign/participation/character-assignment/`.
 
 | Step         | Service / route                                                 |
 | ------------ | --------------------------------------------------------------- |
+| Gate         | `loadCampaignOnboardingGate` (internal — GET/POST consume only) |
 | Context      | `GET /api/campaigns/:campaignId/onboarding-context`             |
 | Eligible PCs | `GET /api/campaigns/:campaignId/onboarding/eligible-characters` |
 | Complete     | `POST /api/campaigns/:campaignId/onboarding/complete`           |
@@ -197,14 +202,19 @@ step-rail build issues, and invite terminal states.
 
 ## Derived onboarding state (overview)
 
-Do **not** persist onboarding state on membership. Derive it at read time:
+Do **not** persist onboarding state on membership. Derive it at read time for the
+**overview roster** only:
 
 ```ts
-// pc role only
+// pc role only — coarse overview labels; not used for recovery or onboarding HTTP
 controlledCharacterIds.length > 0 ? 'character_added' : 'onboarding_incomplete'
 ```
 
 Implemented in `campaign-overview.service.ts` (`resolveMemberOnboardingState`).
+The coarse `participationState.invalid` resolver output is **not** used for onboarding
+GET/POST errors, navigation, or recovery CTAs — those use `viewerState` and
+`loadCampaignOnboardingGate`.
+
 Party list includes only PCs with open participation **and** a controlling
 member (`controlledCharacterIds`).
 

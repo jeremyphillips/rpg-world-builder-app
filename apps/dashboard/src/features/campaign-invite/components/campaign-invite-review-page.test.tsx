@@ -139,6 +139,22 @@ describe('CampaignInviteReviewPage', () => {
     ).toBeInTheDocument()
   })
 
+  it('persists campaign selection and navigates to onboarding when continuing setup', async () => {
+    const user = userEvent.setup()
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: { ...authenticatedResolution, status: 'accepted' },
+    })
+
+    renderInviteReviewPage()
+
+    await user.click(await screen.findByRole('button', { name: /continue to character setup/i }))
+
+    expect(persistCampaignSelection).toHaveBeenCalledWith('camp_1')
+    expect(navigate).toHaveBeenCalledWith('/campaigns/camp_1/onboarding')
+  })
+
   it('links completed invites to the campaign detail page', async () => {
     useCampaignInviteResolution.mockReturnValue({
       isPending: false,

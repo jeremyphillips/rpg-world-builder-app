@@ -81,8 +81,10 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
   }, [queryClient, token])
 
   const handleContinue = useCallback((campaignId: string) => {
-    // Invite handoff — plain onboarding entry, not recovery routing.
-    window.location.assign(crossAppCampaignOnboardingPath(campaignId))
+    void persistCampaignSelectionBestEffort(campaignId).then(() => {
+      // Invite handoff — plain onboarding entry, not recovery routing.
+      window.location.assign(crossAppCampaignOnboardingPath(campaignId))
+    })
   }, [])
 
   return (
