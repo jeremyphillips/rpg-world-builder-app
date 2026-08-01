@@ -10,11 +10,11 @@ via the public app, then completes character onboarding in the dashboard. The
 flow reuses existing membership, participation, and control primitives — no
 parallel invite-specific character association.
 
-| App       | Responsibility                                                         |
-| --------- | ---------------------------------------------------------------------- |
-| Public    | `/campaign-invites/[token]` — resolve, auth continuation, accept       |
-| Dashboard | `/campaigns/:id/onboarding` — character choice and builder (canonical) |
-| API       | Invite lifecycle + membership-scoped onboarding completion             |
+| App       | Responsibility                                                              |
+| --------- | --------------------------------------------------------------------------- |
+| Public    | `/campaign-invites/[segment]` — resolve, auth continuation, explicit accept |
+| Dashboard | `/campaigns/:id/onboarding` — character choice and builder (canonical)      |
+| API       | Invite lifecycle + membership-scoped onboarding completion                  |
 
 After accept, the public app redirects to dashboard onboarding. The raw invite
 token never crosses into the dashboard. The dashboard does **not** pass
@@ -94,6 +94,27 @@ invite (server-side; never trust client-supplied email).
   with empty `controlledCharacterIds`, sets `joinedAt`, and records
   `sourceInviteId` (the accepted invite). Re-accept on recovery updates
   `sourceInviteId` to the newly accepted invite.
+
+### Review surfaces (token + invite id)
+
+The public route accepts either a **64-char invite token** or a **24-char invite
+id** (`parseCampaignInviteRouteSegment` in `@rpg/contracts`). Invalid segments
+render unavailable UI without an API call.
+
+| Segment   | Resolve                                     | Accept                          | Email mismatch                                        |
+| --------- | ------------------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| Token     | `GET /api/campaign-invites/:token`          | `POST …/accept`                 | 403 on accept; masked-email sign-in prompt on resolve |
+| Invite id | `GET /api/campaign-invites/by-id/:inviteId` | `POST …/by-id/:inviteId/accept` | **404** on resolve/accept (anti-probing)              |
+
+Both flows use the same explicit review UX — no auto-accept on mount:
+
+- **Pending** → review context + **Accept invitation**
+- **Accepted** (same user) → **Continue to character setup** (onboarding)
+- **Completed** → **Open campaign** (`crossAppCampaignDetailPath`)
+- **Revoked / expired** → unavailable copy
+
+Notification clicks navigate to the invite-id review URL only; membership changes
+happen on the explicit accept button.
 
 ## Onboarding completion
 
@@ -190,6 +211,8 @@ Overview display rules:
 | POST   | `/api/campaigns/:campaignId/invites/:inviteId/revoke`       | owner/co-owner        |
 | GET    | `/api/campaign-invites/:token`                              | public                |
 | POST   | `/api/campaign-invites/:token/accept`                       | authenticated invitee |
+| GET    | `/api/campaign-invites/by-id/:inviteId`                     | authenticated invitee |
+| POST   | `/api/campaign-invites/by-id/:inviteId/accept`              | authenticated invitee |
 | GET    | `/api/campaigns/:campaignId/onboarding-context`             | authenticated member  |
 | GET    | `/api/campaigns/:campaignId/onboarding/eligible-characters` | authenticated member  |
 | POST   | `/api/campaigns/:campaignId/onboarding/complete`            | authenticated member  |

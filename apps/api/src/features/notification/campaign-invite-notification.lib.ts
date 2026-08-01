@@ -4,8 +4,12 @@ import { CAMPAIGN_MANAGE_ROLES } from '@rpg/contracts'
 import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
 import { findCampaignById } from '../campaign/find-campaign-by-id'
 import { findInviteById } from '../campaign-invite/campaign-invite.repository'
-import { findSessionUserById } from '../user'
-import { campaignInviteDedupeKey } from './notification-dedupe-keys'
+import { findSessionUserById, findUserByEmail } from '../user'
+import {
+  campaignInviteDedupeKey,
+  campaignInviteInviteeLifecycleDedupeKey,
+  campaignMemberRemovedDedupeKey,
+} from './notification-dedupe-keys'
 import { publishNotification } from './publish-notification.service'
 
 async function loadCampaignName(campaignId: string): Promise<string> {
@@ -47,12 +51,61 @@ export async function publishCampaignInviteReceivedNotification(input: {
   await publishNotification({
     type: 'campaign.invite.received',
     recipientUserIds: [input.inviteeUserId],
-    dedupeKey: campaignInviteDedupeKey(input.invite.id, 'received'),
+    dedupeKey: campaignInviteInviteeLifecycleDedupeKey(input.invite.id),
     payload: {
       inviteId: input.invite.id,
       campaignId: input.invite.campaignId,
       campaignName,
       inviterDisplayName,
+    },
+  })
+}
+
+export async function publishCampaignInviteCancelledNotification(input: {
+  invite: CampaignInvite
+  cancelledByUserId: string
+}): Promise<void> {
+  const invitedUser = await findUserByEmail(input.invite.normalizedEmail)
+  if (!invitedUser) return
+
+  const [campaignName, cancelledByDisplayName] = await Promise.all([
+    loadCampaignName(input.invite.campaignId),
+    loadDisplayName(input.cancelledByUserId, 'A campaign owner'),
+  ])
+
+  await publishNotification({
+    type: 'campaign.invite.cancelled',
+    recipientUserIds: [invitedUser.id],
+    dedupeKey: campaignInviteInviteeLifecycleDedupeKey(input.invite.id),
+    payload: {
+      inviteId: input.invite.id,
+      campaignId: input.invite.campaignId,
+      campaignName,
+      cancelledByDisplayName,
+    },
+  })
+}
+
+export async function publishCampaignMemberRemovedNotification(input: {
+  campaignId: string
+  membershipId: string
+  removedUserId: string
+  removedByUserId: string
+}): Promise<void> {
+  const [campaignName, removedByDisplayName] = await Promise.all([
+    loadCampaignName(input.campaignId),
+    loadDisplayName(input.removedByUserId, 'A campaign owner'),
+  ])
+
+  await publishNotification({
+    type: 'campaign.member.removed',
+    recipientUserIds: [input.removedUserId],
+    dedupeKey: campaignMemberRemovedDedupeKey(input.membershipId),
+    payload: {
+      campaignId: input.campaignId,
+      campaignName,
+      removedByDisplayName,
+      membershipId: input.membershipId,
     },
   })
 }

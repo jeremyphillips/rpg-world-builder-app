@@ -31,6 +31,11 @@ export function crossAppCampaignCharacterDetailPath(
   return `/app/campaigns/${campaignId}/characters/${characterId}`
 }
 
+/** Public app invite review — invite id in the URL segment (authenticated resolve). */
+export function crossAppCampaignInviteReviewPath(inviteId: string): string {
+  return `/campaign-invites/${inviteId}`
+}
+
 /** Dashboard SPA direct message thread. */
 export function crossAppConversationPath(conversationId: string): string {
   return `/app/messages/${conversationId}`

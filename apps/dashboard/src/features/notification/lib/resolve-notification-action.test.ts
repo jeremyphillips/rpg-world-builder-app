@@ -40,4 +40,13 @@ describe('resolveNotificationActionPath', () => {
   it('returns undefined when no action exists', () => {
     expect(resolveNotificationActionPath(undefined)).toBeUndefined()
   })
+
+  it('maps invite review actions to the public review path', () => {
+    expect(
+      resolveNotificationActionPath({
+        kind: 'campaign_invite_review',
+        inviteId: 'invite-123',
+      }),
+    ).toBe('/campaign-invites/invite-123')
+  })
 })

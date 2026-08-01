@@ -5,7 +5,7 @@ import type { EmailProvider } from '../../services/email/email.types'
 import { findCampaignById } from '../campaign'
 import { findSessionUserById } from '../user'
 import { deliverCampaignInviteEmail } from './campaign-invite-delivery'
-import { expireInviteIfNeeded } from './campaign-invite.lib'
+import { expireInviteIfNeeded, normalizeInviteEmail } from './campaign-invite.lib'
 import { findInviteById, findInviteByTokenHash } from './campaign-invite.repository'
 import { hashInviteToken } from './campaign-invite-token'
 
@@ -83,5 +83,22 @@ export async function loadManagedInvite(
   if (!invite || invite.campaignId !== campaignId) {
     throw new HttpError(404, 'not_found', 'Invitation not found.')
   }
+  return expireInviteIfNeeded(invite)
+}
+
+export async function loadInviteForAuthenticatedAction(
+  inviteId: string,
+  userEmail: string,
+): Promise<CampaignInvite> {
+  const invite = await findInviteById(inviteId)
+  if (!invite) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+
+  const { normalizedEmail } = normalizeInviteEmail(userEmail)
+  if (normalizedEmail !== invite.normalizedEmail) {
+    throw new HttpError(404, 'not_found', 'Invitation not found.')
+  }
+
   return expireInviteIfNeeded(invite)
 }

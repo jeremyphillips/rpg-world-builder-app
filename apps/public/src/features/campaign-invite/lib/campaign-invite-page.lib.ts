@@ -1,14 +1,30 @@
-import type { CampaignInvitePublicResolution, SessionUser } from '@rpg/contracts'
+import type {
+  CampaignInviteAuthenticatedResolution,
+  CampaignInvitePublicResolution,
+  CampaignInviteRouteSegment,
+  SessionUser,
+} from '@rpg/contracts'
+
+export type CampaignInviteResolution =
+  | CampaignInvitePublicResolution
+  | CampaignInviteAuthenticatedResolution
+
+export function isPublicInviteResolution(
+  resolution: CampaignInviteResolution,
+): resolution is CampaignInvitePublicResolution {
+  return 'invitedEmail' in resolution
+}
 
 export type InviteViewState =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
   | { kind: 'terminal'; reason: 'expired' | 'revoked' }
-  | { kind: 'unauthenticated'; resolution: CampaignInvitePublicResolution }
+  | { kind: 'unauthenticated'; resolution: CampaignInviteResolution }
   | { kind: 'email_mismatch'; resolution: CampaignInvitePublicResolution }
   | { kind: 'accepting' }
-  | { kind: 'completed'; resolution: CampaignInvitePublicResolution; canOpenCampaign: boolean }
-  | { kind: 'ready_to_accept' }
+  | { kind: 'completed'; campaignId: string; canOpenCampaign: boolean }
+  | { kind: 'pending_review'; resolution: CampaignInviteResolution }
+  | { kind: 'accepted_continue'; resolution: CampaignInviteResolution }
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase()
@@ -23,7 +39,7 @@ export function resolveInviteMaskedEmail(resolution: CampaignInvitePublicResolut
 }
 
 function resolveResolutionStatusState(
-  resolution: CampaignInvitePublicResolution,
+  resolution: CampaignInviteResolution,
   sessionUser: SessionUser | undefined,
 ): InviteViewState | null {
   if (resolution.status === 'expired') {
@@ -37,7 +53,7 @@ function resolveResolutionStatusState(
   if (resolution.status === 'completed') {
     return {
       kind: 'completed',
-      resolution,
+      campaignId: resolution.campaignId,
       canOpenCampaign: Boolean(sessionUser),
     }
   }
@@ -46,11 +62,14 @@ function resolveResolutionStatusState(
 }
 
 function resolveAuthenticatedInviteState(
-  resolution: CampaignInvitePublicResolution,
+  resolution: CampaignInviteResolution,
   sessionUser: SessionUser,
   isAccepting: boolean,
 ): InviteViewState {
-  if (!emailsMatch(sessionUser.email, resolution.invitedEmail)) {
+  if (
+    isPublicInviteResolution(resolution) &&
+    !emailsMatch(sessionUser.email, resolution.invitedEmail)
+  ) {
     return { kind: 'email_mismatch', resolution }
   }
 
@@ -58,8 +77,12 @@ function resolveAuthenticatedInviteState(
     return { kind: 'accepting' }
   }
 
-  if (resolution.status === 'pending' || resolution.status === 'accepted') {
-    return { kind: 'ready_to_accept' }
+  if (resolution.status === 'pending') {
+    return { kind: 'pending_review', resolution }
+  }
+
+  if (resolution.status === 'accepted') {
+    return { kind: 'accepted_continue', resolution }
   }
 
   return { kind: 'loading' }
@@ -78,7 +101,7 @@ export function resolveInviteViewState({
   isResolutionPending: boolean
   isResolutionError: boolean
   resolutionErrorMessage: string
-  resolution: CampaignInvitePublicResolution | undefined
+  resolution: CampaignInviteResolution | undefined
   sessionUser: SessionUser | undefined
   isAccepting: boolean
 }): InviteViewState {
@@ -102,6 +125,6 @@ export function resolveInviteViewState({
   return resolveAuthenticatedInviteState(resolution, sessionUser, isAccepting)
 }
 
-export function shouldAutoAcceptInvite(viewState: InviteViewState): boolean {
-  return viewState.kind === 'ready_to_accept'
+export function buildCampaignInviteReturnTo(segment: CampaignInviteRouteSegment): string {
+  return `/campaign-invites/${segment.value}`
 }

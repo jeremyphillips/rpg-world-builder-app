@@ -1,15 +1,30 @@
 import { useQuery } from '@tanstack/react-query'
+import type { CampaignInviteRouteSegment } from '@rpg/contracts'
 
-import { resolveCampaignInvite } from '../api/campaign-invite-client'
+import {
+  resolveCampaignInviteById,
+  resolveCampaignInviteByToken,
+} from '../api/campaign-invite-client'
+import type { CampaignInviteResolution } from '../lib/campaign-invite-page.lib'
 
-export const campaignInviteResolutionQueryKey = (token: string) =>
-  ['campaign-invite', 'resolution', token] as const
+export const campaignInviteResolutionQueryKey = (segment: CampaignInviteRouteSegment) =>
+  ['campaign-invite', 'resolution', segment.kind, segment.value] as const
 
-export function useCampaignInviteResolution(token: string | undefined) {
+async function resolveCampaignInviteSegment(
+  segment: CampaignInviteRouteSegment,
+): Promise<CampaignInviteResolution> {
+  return segment.kind === 'token'
+    ? resolveCampaignInviteByToken(segment.value)
+    : resolveCampaignInviteById(segment.value)
+}
+
+export function useCampaignInviteResolution(segment: CampaignInviteRouteSegment | null) {
   return useQuery({
-    queryKey: campaignInviteResolutionQueryKey(token ?? ''),
-    queryFn: () => resolveCampaignInvite(token!),
-    enabled: Boolean(token),
+    queryKey: segment
+      ? campaignInviteResolutionQueryKey(segment)
+      : (['campaign-invite', 'resolution', 'disabled'] as const),
+    queryFn: () => resolveCampaignInviteSegment(segment!),
+    enabled: Boolean(segment),
     retry: false,
   })
 }

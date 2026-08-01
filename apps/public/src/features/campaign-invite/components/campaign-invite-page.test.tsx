@@ -1,6 +1,7 @@
 import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { CampaignInvitePage } from './campaign-invite-page.client'
@@ -13,8 +14,8 @@ const { useCampaignInviteResolution } = vi.hoisted(() => ({
   useCampaignInviteResolution: vi.fn(),
 }))
 
-const { acceptCampaignInvite } = vi.hoisted(() => ({
-  acceptCampaignInvite: vi.fn(),
+const { acceptCampaignInviteByToken } = vi.hoisted(() => ({
+  acceptCampaignInviteByToken: vi.fn(),
 }))
 
 vi.mock('@/features/auth/hooks/use-session', () => ({
@@ -26,15 +27,20 @@ vi.mock('../hooks/use-campaign-invite-resolution', () => ({
 }))
 
 vi.mock('../api/campaign-invite-client', () => ({
-  acceptCampaignInvite,
-  resolveCampaignInvite: vi.fn(),
+  acceptCampaignInviteByToken: acceptCampaignInviteByToken,
+  acceptCampaignInviteById: vi.fn(),
+  resolveCampaignInviteByToken: vi.fn(),
+  resolveCampaignInviteById: vi.fn(),
+  invalidateCampaignInviteAcceptQueries: vi.fn(),
 }))
+
+const tokenSegment = { kind: 'token' as const, value: 'invite-token' }
 
 function renderInvitePage() {
   const queryClient = new QueryClient()
   return render(
     <QueryClientProvider client={queryClient}>
-      <CampaignInvitePage token="invite-token" />
+      <CampaignInvitePage segment={tokenSegment} />
     </QueryClientProvider>,
   )
 }
@@ -43,7 +49,7 @@ describe('CampaignInvitePage', () => {
   beforeEach(() => {
     vi.stubGlobal('location', { assign: vi.fn() })
     useSession.mockReturnValue({ isPending: false, data: undefined })
-    acceptCampaignInvite.mockReset()
+    acceptCampaignInviteByToken.mockReset()
   })
 
   it('shows sign-in and sign-up links for unauthenticated pending invites', async () => {
@@ -51,6 +57,7 @@ describe('CampaignInvitePage', () => {
       isPending: false,
       isError: false,
       data: {
+        campaignId: 'camp_1',
         campaignName: 'The Shattered Vale',
         inviterDisplayName: 'Avery',
         invitedEmail: 'player@example.com',
@@ -75,7 +82,7 @@ describe('CampaignInvitePage', () => {
     )
   })
 
-  it('accepts and redirects when the signed-in email matches', async () => {
+  it('shows an explicit accept button instead of auto-accepting', async () => {
     useSession.mockReturnValue({
       isPending: false,
       data: {
@@ -87,6 +94,7 @@ describe('CampaignInvitePage', () => {
       isPending: false,
       isError: false,
       data: {
+        campaignId: 'camp_1',
         campaignName: 'The Shattered Vale',
         inviterDisplayName: 'Avery',
         invitedEmail: 'player@example.com',
@@ -94,15 +102,45 @@ describe('CampaignInvitePage', () => {
         expiresAt: '2026-01-08T00:00:00.000Z',
       },
     })
-    acceptCampaignInvite.mockResolvedValueOnce({
+
+    renderInvitePage()
+
+    expect(await screen.findByRole('button', { name: /accept invitation/i })).toBeInTheDocument()
+    expect(acceptCampaignInviteByToken).not.toHaveBeenCalled()
+  })
+
+  it('accepts and redirects when the user clicks accept', async () => {
+    const user = userEvent.setup()
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'player@example.com', displayName: 'Player', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignId: 'camp_1',
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'pending',
+        expiresAt: '2026-01-08T00:00:00.000Z',
+      },
+    })
+    acceptCampaignInviteByToken.mockResolvedValueOnce({
       inviteId: 'invite_1',
       campaignId: 'camp_1',
     })
 
     renderInvitePage()
 
+    await user.click(await screen.findByRole('button', { name: /accept invitation/i }))
+
     await waitFor(() => {
-      expect(acceptCampaignInvite).toHaveBeenCalledWith('invite-token')
+      expect(acceptCampaignInviteByToken).toHaveBeenCalledWith('invite-token')
     })
     await waitFor(() => {
       expect(window.location.assign).toHaveBeenCalledWith('/app/campaigns/camp_1/onboarding')
@@ -121,6 +159,7 @@ describe('CampaignInvitePage', () => {
       isPending: false,
       isError: false,
       data: {
+        campaignId: 'camp_1',
         campaignName: 'The Shattered Vale',
         inviterDisplayName: 'Avery',
         invitedEmail: 'player@example.com',
@@ -134,10 +173,10 @@ describe('CampaignInvitePage', () => {
 
     expect(await screen.findByText(/use the invited account/i)).toBeInTheDocument()
     expect(screen.getByText(/p\*\*\*@example.com/i)).toBeInTheDocument()
-    expect(acceptCampaignInvite).not.toHaveBeenCalled()
+    expect(acceptCampaignInviteByToken).not.toHaveBeenCalled()
   })
 
-  it('shows an error and does not retry when acceptance fails', async () => {
+  it('links completed invites to the campaign detail page', async () => {
     useSession.mockReturnValue({
       isPending: false,
       data: {
@@ -149,6 +188,37 @@ describe('CampaignInvitePage', () => {
       isPending: false,
       isError: false,
       data: {
+        campaignId: 'camp_1',
+        campaignName: 'The Shattered Vale',
+        inviterDisplayName: 'Avery',
+        invitedEmail: 'player@example.com',
+        status: 'completed',
+        expiresAt: '2026-01-01T00:00:00.000Z',
+      },
+    })
+
+    renderInvitePage()
+
+    expect(await screen.findByRole('link', { name: /open campaign/i })).toHaveAttribute(
+      'href',
+      '/app/campaigns/camp_1',
+    )
+  })
+
+  it('shows an error and does not retry when acceptance fails', async () => {
+    const user = userEvent.setup()
+    useSession.mockReturnValue({
+      isPending: false,
+      data: {
+        user: { id: 'u1', email: 'player@example.com', displayName: 'Player', role: 'user' },
+        activeCampaign: null,
+      },
+    })
+    useCampaignInviteResolution.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        campaignId: 'camp_1',
         campaignName: 'The Shattered Vale',
         inviterDisplayName: 'Avery',
         invitedEmail: 'player@example.com',
@@ -156,15 +226,17 @@ describe('CampaignInvitePage', () => {
         expiresAt: '2026-01-08T00:00:00.000Z',
       },
     })
-    acceptCampaignInvite.mockRejectedValueOnce(
+    acceptCampaignInviteByToken.mockRejectedValueOnce(
       new ApiError(403, 'forbidden', 'Invalid or missing CSRF token'),
     )
 
     renderInvitePage()
 
+    await user.click(await screen.findByRole('button', { name: /accept invitation/i }))
+
     expect(await screen.findByText(/invalid or missing csrf token/i)).toBeInTheDocument()
     await waitFor(() => {
-      expect(acceptCampaignInvite).toHaveBeenCalledTimes(1)
+      expect(acceptCampaignInviteByToken).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -173,6 +245,7 @@ describe('CampaignInvitePage', () => {
       isPending: false,
       isError: false,
       data: {
+        campaignId: 'camp_1',
         campaignName: 'The Shattered Vale',
         inviterDisplayName: 'Avery',
         invitedEmail: 'player@example.com',

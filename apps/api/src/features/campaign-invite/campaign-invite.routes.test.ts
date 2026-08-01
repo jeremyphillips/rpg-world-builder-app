@@ -123,4 +123,98 @@ describe('campaign invite routes', () => {
 
     expect(acceptResponse.body).toMatchObject({ campaignId })
   })
+
+  it('resolves invites by id for the matching authenticated user', async () => {
+    const { agent, csrfToken } = await registerOwner('invite-by-id-owner@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'By Id Resolve Campaign')
+    const rawToken = generateInviteToken()
+
+    const ownerSession = await agent.get('/api/auth/me')
+    const ownerId = ownerSession.body.user.id as string
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'invite-by-id-player@example.com',
+      normalizedEmail: 'invite-by-id-player@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: ownerId,
+    })
+
+    const player = await registerAndLoginTestUser(getApp(), {
+      email: 'invite-by-id-player@example.com',
+      password: TEST_PASSWORD,
+      displayName: 'Invite Player',
+    })
+
+    const response = await player.agent.get(`/api/campaign-invites/by-id/${invite.id}`).expect(200)
+
+    expect(response.body.resolution).toMatchObject({
+      inviteId: invite.id,
+      campaignId,
+      campaignName: 'By Id Resolve Campaign',
+      status: 'pending',
+    })
+  })
+
+  it('returns 404 for by-id resolve when the session email does not match', async () => {
+    const { agent, csrfToken } = await registerOwner('invite-by-id-mismatch@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'By Id Mismatch Campaign')
+    const rawToken = generateInviteToken()
+
+    const ownerSession = await agent.get('/api/auth/me')
+    const ownerId = ownerSession.body.user.id as string
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'invite-by-id-target@example.com',
+      normalizedEmail: 'invite-by-id-target@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: ownerId,
+    })
+
+    const otherUser = await registerAndLoginTestUser(getApp(), {
+      email: 'other-by-id-user@example.com',
+      password: TEST_PASSWORD,
+      displayName: 'Other User',
+    })
+
+    const response = await otherUser.agent
+      .get(`/api/campaign-invites/by-id/${invite.id}`)
+      .expect(404)
+
+    expect(response.body.error).toMatchObject({ code: 'not_found' })
+  })
+
+  it('accepts invites by id for the matching authenticated user', async () => {
+    const { agent, csrfToken } = await registerOwner('invite-by-id-accept-owner@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'By Id Accept Campaign')
+    const rawToken = generateInviteToken()
+
+    const ownerSession = await agent.get('/api/auth/me')
+    const ownerId = ownerSession.body.user.id as string
+
+    const invite = await createInviteRecord({
+      campaignId,
+      email: 'invite-by-id-accept-player@example.com',
+      normalizedEmail: 'invite-by-id-accept-player@example.com',
+      tokenHash: hashInviteToken(rawToken),
+      expiresAt: computeInviteExpiresAt(),
+      invitedByUserId: ownerId,
+    })
+
+    const player = await registerAndLoginTestUser(getApp(), {
+      email: 'invite-by-id-accept-player@example.com',
+      password: TEST_PASSWORD,
+      displayName: 'Invite Player',
+    })
+
+    const acceptResponse = await player.agent
+      .post(`/api/campaign-invites/by-id/${invite.id}/accept`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .expect(200)
+
+    expect(acceptResponse.body).toMatchObject({ inviteId: invite.id, campaignId })
+  })
 })

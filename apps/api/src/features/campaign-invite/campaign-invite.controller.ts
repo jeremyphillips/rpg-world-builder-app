@@ -3,8 +3,10 @@ import type { CampaignInviteRecipientInput } from '@rpg/contracts'
 
 import {
   acceptCampaignInvite,
+  acceptCampaignInviteById,
   listCampaignInvitesForOverview,
   resolveCampaignInviteByToken,
+  resolveCampaignInviteById,
   revokeCampaignInvite,
   sendCampaignInvite,
   shareCampaignInviteLink,
@@ -33,10 +35,26 @@ export async function resolveByToken(req: Request, res: Response): Promise<void>
   res.status(200).json({ resolution })
 }
 
+export async function resolveById(req: Request, res: Response): Promise<void> {
+  const { inviteId } = req.params as { inviteId: string }
+  const resolution = await resolveCampaignInviteById(inviteId, req.user!.email)
+  res.status(200).json({ resolution })
+}
+
 export async function acceptByToken(req: Request, res: Response): Promise<void> {
   const { token } = req.params as { token: string }
   const result = await acceptCampaignInvite({
     rawToken: token,
+    userId: req.user!.id,
+    userEmail: req.user!.email,
+  })
+  res.status(200).json(result)
+}
+
+export async function acceptById(req: Request, res: Response): Promise<void> {
+  const { inviteId } = req.params as { inviteId: string }
+  const result = await acceptCampaignInviteById({
+    inviteId,
     userId: req.user!.id,
     userEmail: req.user!.email,
   })

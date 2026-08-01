@@ -15,6 +15,7 @@ const notificationActionSchema = new Schema(
     kind: { type: String, enum: NOTIFICATION_ACTION_KINDS, required: true },
     campaignId: { type: String },
     conversationId: { type: String },
+    inviteId: { type: String },
   },
   { _id: false },
 )

@@ -2,8 +2,11 @@ export { CAMPAIGN_INVITE_EXPIRY_DAYS } from '@rpg/contracts'
 
 export {
   acceptCampaignInvite,
+  acceptCampaignInviteById,
   resolveCampaignInviteByToken,
+  resolveCampaignInviteById,
   type AcceptCampaignInviteInput,
+  type AcceptCampaignInviteByIdInput,
   type AcceptCampaignInviteResult,
 } from './accept-campaign-invite.service'
 export {

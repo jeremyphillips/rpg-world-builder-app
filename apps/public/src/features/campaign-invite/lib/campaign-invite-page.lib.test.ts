@@ -2,13 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import type { CampaignInvitePublicResolution } from '@rpg/contracts'
 
-import {
-  emailsMatch,
-  resolveInviteViewState,
-  shouldAutoAcceptInvite,
-} from './campaign-invite-page.lib'
+import { resolveInviteViewState } from './campaign-invite-page.lib'
 
 const baseResolution: CampaignInvitePublicResolution = {
+  campaignId: 'camp_1',
   campaignName: 'The Shattered Vale',
   inviterDisplayName: 'Avery',
   invitedEmail: 'player@example.com',
@@ -65,7 +62,7 @@ describe('resolveInviteViewState', () => {
     ).toBe('email_mismatch')
   })
 
-  it('returns ready_to_accept for matching authenticated users', () => {
+  it('returns pending_review for matching authenticated users with pending invites', () => {
     expect(
       resolveInviteViewState({
         isSessionPending: false,
@@ -82,19 +79,26 @@ describe('resolveInviteViewState', () => {
         },
         isAccepting: false,
       }).kind,
-    ).toBe('ready_to_accept')
+    ).toBe('pending_review')
   })
-})
 
-describe('emailsMatch', () => {
-  it('compares normalized addresses', () => {
-    expect(emailsMatch('Player@Example.com', 'player@example.com')).toBe(true)
-  })
-})
-
-describe('shouldAutoAcceptInvite', () => {
-  it('is true only for ready_to_accept', () => {
-    expect(shouldAutoAcceptInvite({ kind: 'ready_to_accept' })).toBe(true)
-    expect(shouldAutoAcceptInvite({ kind: 'loading' })).toBe(false)
+  it('returns accepted_continue for already accepted invites', () => {
+    expect(
+      resolveInviteViewState({
+        isSessionPending: false,
+        isResolutionPending: false,
+        isResolutionError: false,
+        resolutionErrorMessage: '',
+        resolution: { ...baseResolution, status: 'accepted' },
+        sessionUser: {
+          id: 'u1',
+          email: 'player@example.com',
+          displayName: 'Player',
+          role: 'user',
+          lastSelectedCampaignId: null,
+        },
+        isAccepting: false,
+      }).kind,
+    ).toBe('accepted_continue')
   })
 })

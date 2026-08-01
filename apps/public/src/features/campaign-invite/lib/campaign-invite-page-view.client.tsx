@@ -6,6 +6,7 @@ import {
   InviteEmailMismatchState,
   InviteExpiredState,
   InviteHomeAction,
+  InvitePendingReviewState,
   InviteRevokedState,
   InviteUnauthenticatedState,
 } from './campaign-invite-page-states.client'
@@ -13,7 +14,7 @@ import { InviteMessageCard } from '../components/invite-message-card.client'
 
 function renderInviteLoadingState(viewState: InviteViewState) {
   const body =
-    viewState.kind === 'accepting' || viewState.kind === 'ready_to_accept'
+    viewState.kind === 'accepting'
       ? 'Accepting your invitation…'
       : 'Checking your invitation status…'
 
@@ -39,20 +40,20 @@ export function renderInviteViewState(
   {
     returnTo,
     acceptError,
+    onAccept,
+    onContinue,
   }: {
     returnTo: string
     acceptError: string | null
+    onAccept: () => void
+    onContinue: (campaignId: string) => void
   },
 ) {
   if (acceptError) {
     return renderInviteUnavailableState(acceptError)
   }
 
-  if (
-    viewState.kind === 'loading' ||
-    viewState.kind === 'accepting' ||
-    viewState.kind === 'ready_to_accept'
-  ) {
+  if (viewState.kind === 'loading' || viewState.kind === 'accepting') {
     return renderInviteLoadingState(viewState)
   }
 
@@ -65,11 +66,31 @@ export function renderInviteViewState(
   }
 
   if (viewState.kind === 'completed') {
-    return <InviteCompletedState canOpenCampaign={viewState.canOpenCampaign} returnTo={returnTo} />
+    return (
+      <InviteCompletedState
+        campaignId={viewState.campaignId}
+        canOpenCampaign={viewState.canOpenCampaign}
+        returnTo={returnTo}
+      />
+    )
   }
 
   if (viewState.kind === 'email_mismatch') {
     return <InviteEmailMismatchState resolution={viewState.resolution} returnTo={returnTo} />
+  }
+
+  if (viewState.kind === 'pending_review') {
+    return <InvitePendingReviewState resolution={viewState.resolution} onAccept={onAccept} />
+  }
+
+  if (viewState.kind === 'accepted_continue') {
+    return (
+      <InvitePendingReviewState
+        resolution={viewState.resolution}
+        mode="continue"
+        onContinue={() => onContinue(viewState.resolution.campaignId)}
+      />
+    )
   }
 
   return <InviteUnauthenticatedState resolution={viewState.resolution} returnTo={returnTo} />

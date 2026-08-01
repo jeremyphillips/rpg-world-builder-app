@@ -5,6 +5,7 @@ import { campaignInvitePublicResolutionSchema } from './campaign-invite-dtos'
 describe('campaignInvitePublicResolutionSchema', () => {
   it('parses public resolve payload without internal ids', () => {
     const parsed = campaignInvitePublicResolutionSchema.parse({
+      campaignId: 'camp_1',
       campaignName: 'The Shattered Vale',
       inviterDisplayName: 'A campaign owner',
       invitedEmail: 'player@example.com',

@@ -1,4 +1,9 @@
-import type { CampaignInvite, CampaignInvitePublicResolution } from '@rpg/contracts'
+import type {
+  AcceptCampaignInviteResult,
+  CampaignInvite,
+  CampaignInviteAuthenticatedResolution,
+  CampaignInvitePublicResolution,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
 import { createOrConfirmPlayerMembership } from '../campaign'
@@ -7,6 +12,7 @@ import { maskInvitedEmail, normalizeInviteEmail } from './campaign-invite.lib'
 import { markInviteAccepted } from './campaign-invite.repository'
 import {
   loadCampaignName,
+  loadInviteForAuthenticatedAction,
   loadInviteForTokenAction,
   loadInviterDisplayName,
 } from './campaign-invite-service.lib'
@@ -17,10 +23,13 @@ export type AcceptCampaignInviteInput = {
   userEmail: string
 }
 
-export type AcceptCampaignInviteResult = {
+export type AcceptCampaignInviteByIdInput = {
   inviteId: string
-  campaignId: string
+  userId: string
+  userEmail: string
 }
+
+export type { AcceptCampaignInviteResult }
 
 function assertInviteAcceptable(currentInvite: CampaignInvite): void {
   if (currentInvite.status === 'completed') {
@@ -58,31 +67,10 @@ function assertInviteAcceptedByUser(currentInvite: CampaignInvite, userId: strin
   }
 }
 
-export async function resolveCampaignInviteByToken(
-  rawToken: string,
-): Promise<CampaignInvitePublicResolution> {
-  const currentInvite = await loadInviteForTokenAction(rawToken)
-  const [campaignName, inviterName] = await Promise.all([
-    loadCampaignName(currentInvite.campaignId),
-    loadInviterDisplayName(currentInvite.invitedByUserId),
-  ])
-
-  return {
-    campaignName,
-    inviterDisplayName: inviterName,
-    invitedEmail: currentInvite.email,
-    invitedEmailMasked: maskInvitedEmail(currentInvite.email),
-    status: currentInvite.status,
-    expiresAt: currentInvite.expiresAt,
-  }
-}
-
-export async function acceptCampaignInvite(
-  input: AcceptCampaignInviteInput,
+export async function acceptCampaignInviteForUser(
+  currentInvite: CampaignInvite,
+  input: { userId: string; userEmail: string },
 ): Promise<AcceptCampaignInviteResult> {
-  const currentInvite = await loadInviteForTokenAction(input.rawToken)
-  assertInviteAcceptable(currentInvite)
-  assertInviteEmailMatches(currentInvite, input.userEmail)
   assertInviteAcceptedByUser(currentInvite, input.userId)
 
   const acceptedAt = currentInvite.acceptedAt ? new Date(currentInvite.acceptedAt) : new Date()
@@ -111,4 +99,67 @@ export async function acceptCampaignInvite(
   })
 
   return { inviteId: accepted.id, campaignId: accepted.campaignId }
+}
+
+export async function resolveCampaignInviteByToken(
+  rawToken: string,
+): Promise<CampaignInvitePublicResolution> {
+  const currentInvite = await loadInviteForTokenAction(rawToken)
+  const [campaignName, inviterName] = await Promise.all([
+    loadCampaignName(currentInvite.campaignId),
+    loadInviterDisplayName(currentInvite.invitedByUserId),
+  ])
+
+  return {
+    campaignId: currentInvite.campaignId,
+    campaignName,
+    inviterDisplayName: inviterName,
+    invitedEmail: currentInvite.email,
+    invitedEmailMasked: maskInvitedEmail(currentInvite.email),
+    status: currentInvite.status,
+    expiresAt: currentInvite.expiresAt,
+  }
+}
+
+export async function resolveCampaignInviteById(
+  inviteId: string,
+  userEmail: string,
+): Promise<CampaignInviteAuthenticatedResolution> {
+  const currentInvite = await loadInviteForAuthenticatedAction(inviteId, userEmail)
+  const [campaignName, inviterName] = await Promise.all([
+    loadCampaignName(currentInvite.campaignId),
+    loadInviterDisplayName(currentInvite.invitedByUserId),
+  ])
+
+  return {
+    inviteId: currentInvite.id,
+    campaignId: currentInvite.campaignId,
+    campaignName,
+    inviterDisplayName: inviterName,
+    status: currentInvite.status,
+    expiresAt: currentInvite.expiresAt,
+  }
+}
+
+export async function acceptCampaignInvite(
+  input: AcceptCampaignInviteInput,
+): Promise<AcceptCampaignInviteResult> {
+  const currentInvite = await loadInviteForTokenAction(input.rawToken)
+  assertInviteAcceptable(currentInvite)
+  assertInviteEmailMatches(currentInvite, input.userEmail)
+  return acceptCampaignInviteForUser(currentInvite, {
+    userId: input.userId,
+    userEmail: input.userEmail,
+  })
+}
+
+export async function acceptCampaignInviteById(
+  input: AcceptCampaignInviteByIdInput,
+): Promise<AcceptCampaignInviteResult> {
+  const currentInvite = await loadInviteForAuthenticatedAction(input.inviteId, input.userEmail)
+  assertInviteAcceptable(currentInvite)
+  return acceptCampaignInviteForUser(currentInvite, {
+    userId: input.userId,
+    userEmail: input.userEmail,
+  })
 }

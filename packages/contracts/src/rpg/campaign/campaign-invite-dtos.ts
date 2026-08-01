@@ -9,6 +9,7 @@ import { type campaignRoleSchema } from '../../shared/roles'
 // ---------------------------------------------------------------------------
 
 export const campaignInvitePublicResolutionSchema = z.object({
+  campaignId: z.string().min(1),
   campaignName: z.string().min(1),
   inviterDisplayName: z.string().min(1),
   /** Full invited address — only returned to callers that already hold the invite token. */
@@ -19,6 +20,27 @@ export const campaignInvitePublicResolutionSchema = z.object({
 })
 
 export type CampaignInvitePublicResolution = z.infer<typeof campaignInvitePublicResolutionSchema>
+
+/** Authenticated invite-by-id resolve — no full invited email (anti-probing). */
+export const campaignInviteAuthenticatedResolutionSchema = z.object({
+  inviteId: z.string().min(1),
+  campaignId: z.string().min(1),
+  campaignName: z.string().min(1),
+  inviterDisplayName: z.string().min(1),
+  status: campaignInviteStatusSchema,
+  expiresAt: z.iso.datetime(),
+})
+
+export type CampaignInviteAuthenticatedResolution = z.infer<
+  typeof campaignInviteAuthenticatedResolutionSchema
+>
+
+export const acceptCampaignInviteResultSchema = z.object({
+  inviteId: z.string().min(1),
+  campaignId: z.string().min(1),
+})
+
+export type AcceptCampaignInviteResult = z.infer<typeof acceptCampaignInviteResultSchema>
 
 export const campaignInviteAdminListItemSchema = z.object({
   id: z.string().min(1),

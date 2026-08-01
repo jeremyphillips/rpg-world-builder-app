@@ -7,6 +7,7 @@ import {
 } from '../campaign-invite'
 import { findPcOwnerIdsByCharacterIds } from '../character'
 import { HttpError } from '../../lib/http-error'
+import { publishCampaignMemberRemovedNotification } from '../notification'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { listOpenParticipationsForCampaign } from './participation/campaign-character-participation.repository'
 import { resolveCampaignMemberOnboardingState } from './participation/resolve-member-open-participating-character-ids.lib'
@@ -90,4 +91,13 @@ export async function removeIncompleteCampaignMember(input: {
   if (deleted.deletedCount === 0) {
     throw new HttpError(404, 'not_found', 'Member not found.')
   }
+
+  void publishCampaignMemberRemovedNotification({
+    campaignId: input.campaignId,
+    membershipId: input.membershipId,
+    removedUserId: membership.userId,
+    removedByUserId: input.removedByUserId,
+  }).catch((error) => {
+    console.error('Failed to publish campaign member removed notification.', error)
+  })
 }

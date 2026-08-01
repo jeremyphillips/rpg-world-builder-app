@@ -2,7 +2,8 @@ import Link from 'next/link'
 
 import {
   buildAuthContinuationUrl,
-  CROSS_APP_PATHS,
+  crossAppCampaignDetailPath,
+  resolveCampaignInviteExpiryLabel,
   type CampaignInvitePublicResolution,
 } from '@rpg/contracts'
 import { Button, buttonVariants } from '@rpg/ui'
@@ -11,7 +12,11 @@ import { ROUTES } from '@/lib/routes'
 import { logout } from '@/features/auth/api/auth-client'
 
 import { InviteMessageCard } from '../components/invite-message-card.client'
-import { resolveInviteMaskedEmail } from './campaign-invite-page.lib'
+import {
+  isPublicInviteResolution,
+  resolveInviteMaskedEmail,
+  type CampaignInviteResolution,
+} from './campaign-invite-page.lib'
 
 export function InviteHomeAction() {
   return (
@@ -50,9 +55,11 @@ export function InviteExpiredState() {
 }
 
 export function InviteCompletedState({
+  campaignId,
   canOpenCampaign,
   returnTo,
 }: {
+  campaignId: string
   canOpenCampaign: boolean
   returnTo: string
 }) {
@@ -66,13 +73,45 @@ export function InviteCompletedState({
       }
       action={
         canOpenCampaign ? (
-          <a href={CROSS_APP_PATHS.dashboard} className={buttonVariants()}>
+          <a href={crossAppCampaignDetailPath(campaignId)} className={buttonVariants()}>
             Open campaign
           </a>
         ) : (
           <Link href={buildAuthContinuationUrl('/login', returnTo)} className={buttonVariants()}>
             Sign in
           </Link>
+        )
+      }
+    />
+  )
+}
+
+export function InvitePendingReviewState({
+  resolution,
+  mode = 'accept',
+  onAccept,
+  onContinue,
+}: {
+  resolution: CampaignInviteResolution
+  mode?: 'accept' | 'continue'
+  onAccept?: () => void
+  onContinue?: () => void
+}) {
+  const expiryLabel = resolveCampaignInviteExpiryLabel(resolution.expiresAt)
+
+  return (
+    <InviteMessageCard
+      title={`You're invited to join ${resolution.campaignName}`}
+      body={`${resolution.inviterDisplayName} invited you to join this campaign. ${expiryLabel}.`}
+      action={
+        mode === 'continue' ? (
+          <Button type="button" onClick={onContinue}>
+            Continue to character setup
+          </Button>
+        ) : (
+          <Button type="button" onClick={onAccept}>
+            Accept invitation
+          </Button>
         )
       }
     />
@@ -113,9 +152,11 @@ export function InviteUnauthenticatedState({
   resolution,
   returnTo,
 }: {
-  resolution: CampaignInvitePublicResolution
+  resolution: CampaignInviteResolution
   returnTo: string
 }) {
+  const email = isPublicInviteResolution(resolution) ? resolution.invitedEmail : undefined
+
   return (
     <InviteMessageCard
       title={`You're invited to join ${resolution.campaignName}`}
@@ -123,19 +164,29 @@ export function InviteUnauthenticatedState({
       action={
         <>
           <Link
-            href={buildAuthContinuationUrl('/login', returnTo, { email: resolution.invitedEmail })}
+            href={buildAuthContinuationUrl('/login', returnTo, email ? { email } : undefined)}
             className={buttonVariants()}
           >
             Sign in
           </Link>
           <Link
-            href={buildAuthContinuationUrl('/signup', returnTo, { email: resolution.invitedEmail })}
+            href={buildAuthContinuationUrl('/signup', returnTo, email ? { email } : undefined)}
             className={buttonVariants({ variant: 'outline' })}
           >
             Create account
           </Link>
         </>
       }
+    />
+  )
+}
+
+export function InviteInvalidSegmentState() {
+  return (
+    <InviteMessageCard
+      title="Invitation unavailable"
+      body="This invitation link is invalid or no longer available."
+      action={<InviteHomeAction />}
     />
   )
 }

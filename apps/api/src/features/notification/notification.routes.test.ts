@@ -7,7 +7,7 @@ import { clearTestDb } from '../../test/db'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 import { publishNotification } from './publish-notification.service'
-import { campaignInviteDedupeKey } from './notification-dedupe-keys'
+import { campaignInviteInviteeLifecycleDedupeKey } from './notification-dedupe-keys'
 
 const getApp = useIntegrationApp()
 
@@ -160,7 +160,7 @@ describe('notification routes', () => {
     await publishNotification({
       type: 'campaign.invite.received',
       recipientUserIds: [userId],
-      dedupeKey: campaignInviteDedupeKey('invite-seen-1', 'received'),
+      dedupeKey: campaignInviteInviteeLifecycleDedupeKey('invite-seen-1'),
       payload: {
         inviteId: 'invite-seen-1',
         campaignId: 'campaign-1',

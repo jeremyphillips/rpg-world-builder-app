@@ -9,6 +9,15 @@ export function campaignInviteDedupeKey(
   return `campaign-invite:${inviteId}:${phase}`
 }
 
+/** Shared invitee lifecycle slot — received and cancelled supersede on the same key. */
+export function campaignInviteInviteeLifecycleDedupeKey(inviteId: string): string {
+  return `campaign-invite:${inviteId}:invitee`
+}
+
+export function campaignMemberRemovedDedupeKey(membershipId: string): string {
+  return `campaign-member-removed:${membershipId}`
+}
+
 export function directMessageDedupeKey(conversationId: string): string {
   return `message-direct:${conversationId}`
 }
