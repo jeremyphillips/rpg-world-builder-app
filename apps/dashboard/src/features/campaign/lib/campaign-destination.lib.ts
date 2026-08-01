@@ -1,4 +1,9 @@
-import type { CampaignListItem } from '@rpg/contracts'
+import type { CampaignListItem, CampaignViewerState } from '@rpg/contracts'
+import {
+  isCampaignViewerOnboardingIncomplete,
+  isCampaignViewerReconnectRequired,
+  isCampaignViewerSelfRecoverable,
+} from '@rpg/contracts'
 import type { MouseEvent } from 'react'
 
 import { ROUTES } from '@/app/routes'
@@ -14,15 +19,6 @@ import {
   CAMPAIGN_MEMBERSHIP_INVALID_BADGE,
   FINISH_JOINING_CAMPAIGN_ACTION,
 } from './campaign-onboarding-copy'
-import {
-  isCampaignMembershipInvalid,
-  isCampaignOnboardingIncomplete,
-  isCampaignReconnectRequired,
-  isCampaignRecoveryRequired,
-  isCampaignSelfRecoverable,
-  resolveCampaignRecoveryState,
-  resolveRecoveryCharacterId,
-} from './campaign-recovery-state'
 
 export type CampaignDestination = {
   href: string
@@ -37,15 +33,30 @@ export type CampaignRecoveryDestination = {
   actionLabel: string | null
 }
 
+export type CampaignRecoveryDestinationInput =
+  | CampaignListItem
+  | { campaignId: string; viewerState: CampaignViewerState }
+
 /** @deprecated Use `CampaignDestination`. */
 export type CampaignPickerRowDestination = CampaignDestination
+
+function resolveCampaignRecoveryDestinationInput(input: CampaignRecoveryDestinationInput): {
+  campaignId: string
+  viewerState: CampaignViewerState
+} {
+  if ('identity' in input) {
+    return { campaignId: input.id, viewerState: input.viewerState }
+  }
+
+  return input
+}
 
 export function resolveCampaignEntryDestination(campaign: CampaignListItem): CampaignDestination {
   const display = buildCampaignDisplay(campaign)
   const name = display.name || display.id
-  const recovery = resolveCampaignRecoveryState(campaign)
+  const { viewerState } = campaign
 
-  if (isCampaignOnboardingIncomplete(recovery)) {
+  if (isCampaignViewerOnboardingIncomplete(viewerState)) {
     return {
       href: ROUTES.campaign.detail(campaign.id),
       ariaLabel: `Open ${name} — setup incomplete`,
@@ -55,7 +66,7 @@ export function resolveCampaignEntryDestination(campaign: CampaignListItem): Cam
     }
   }
 
-  if (isCampaignReconnectRequired(recovery)) {
+  if (isCampaignViewerReconnectRequired(viewerState)) {
     return {
       href: ROUTES.campaign.detail(campaign.id),
       ariaLabel: `Open ${name} — character connection needs attention`,
@@ -65,7 +76,7 @@ export function resolveCampaignEntryDestination(campaign: CampaignListItem): Cam
     }
   }
 
-  if (isCampaignMembershipInvalid(recovery)) {
+  if (viewerState.kind === 'membership_invalid') {
     return {
       href: ROUTES.campaign.detail(campaign.id),
       ariaLabel: `Open ${name} — membership needs attention`,
@@ -85,26 +96,27 @@ export function resolveCampaignEntryDestination(campaign: CampaignListItem): Cam
 }
 
 export function resolveCampaignRecoveryDestination(
-  campaign: CampaignListItem,
+  input: CampaignRecoveryDestinationInput,
 ): CampaignRecoveryDestination {
-  const recovery = resolveCampaignRecoveryState(campaign)
+  const { campaignId, viewerState } = resolveCampaignRecoveryDestinationInput(input)
 
-  if (isCampaignOnboardingIncomplete(recovery)) {
+  if (isCampaignViewerOnboardingIncomplete(viewerState)) {
     return {
-      href: ROUTES.campaign.onboarding(campaign.id),
+      href: ROUTES.campaign.onboarding(campaignId),
       actionLabel: FINISH_JOINING_CAMPAIGN_ACTION,
     }
   }
 
-  if (isCampaignReconnectRequired(recovery)) {
-    const characterId = resolveRecoveryCharacterId(recovery)
+  if (viewerState.kind === 'control_stale' || viewerState.kind === 'participation_missing') {
     return {
-      href: ROUTES.campaign.onboardingReconnect(campaign.id, { characterId }),
+      href: ROUTES.campaign.onboardingReconnect(campaignId, {
+        characterId: viewerState.characterId,
+      }),
       actionLabel: CAMPAIGN_CONNECTION_RESTORE_ACTION,
     }
   }
 
-  if (isCampaignMembershipInvalid(recovery)) {
+  if (viewerState.kind === 'membership_invalid') {
     return { href: null, actionLabel: null }
   }
 
@@ -120,20 +132,24 @@ export function resolveCampaignDestination(campaign: CampaignListItem): Campaign
 export const resolveCampaignPickerRowDestination = resolveCampaignEntryDestination
 
 export function resolveEntryBadgeLabel(campaign: CampaignListItem): string | null {
-  const recovery = resolveCampaignRecoveryState(campaign)
-  if (!isCampaignRecoveryRequired(recovery)) return null
-  if (isCampaignOnboardingIncomplete(recovery)) return CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE
-  if (isCampaignReconnectRequired(recovery)) return CAMPAIGN_CONNECTION_RESTORE_BADGE
-  if (isCampaignMembershipInvalid(recovery)) return CAMPAIGN_MEMBERSHIP_INVALID_BADGE
+  const { viewerState } = campaign
+  if (!isCampaignViewerSelfRecoverable(viewerState) && viewerState.kind !== 'membership_invalid') {
+    return null
+  }
+  if (isCampaignViewerOnboardingIncomplete(viewerState)) return CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE
+  if (isCampaignViewerReconnectRequired(viewerState)) return CAMPAIGN_CONNECTION_RESTORE_BADGE
+  if (viewerState.kind === 'membership_invalid') return CAMPAIGN_MEMBERSHIP_INVALID_BADGE
   return null
 }
 
 export function resolveEntryBadgeTone(
   campaign: CampaignListItem,
 ): 'warning' | 'destructive' | null {
-  const recovery = resolveCampaignRecoveryState(campaign)
-  if (!isCampaignRecoveryRequired(recovery)) return null
-  if (isCampaignMembershipInvalid(recovery)) return 'destructive'
+  const { viewerState } = campaign
+  if (!isCampaignViewerSelfRecoverable(viewerState) && viewerState.kind !== 'membership_invalid') {
+    return null
+  }
+  if (viewerState.kind === 'membership_invalid') return 'destructive'
   return 'warning'
 }
 
@@ -173,13 +189,5 @@ export function shouldRunCampaignSelectionSideEffect(
     !event.ctrlKey &&
     !event.shiftKey &&
     !event.altKey
-  )
-}
-
-export function listRecoverableCampaignsForHome(
-  campaigns: readonly CampaignListItem[],
-): CampaignListItem[] {
-  return campaigns.filter((campaign) =>
-    isCampaignSelfRecoverable(resolveCampaignRecoveryState(campaign)),
   )
 }

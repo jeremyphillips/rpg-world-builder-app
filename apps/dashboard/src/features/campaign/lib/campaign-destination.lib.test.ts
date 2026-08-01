@@ -78,13 +78,13 @@ describe('resolveCampaignRecoveryDestination', () => {
     })
   })
 
-  it('returns reconnect onboarding href for stale control', () => {
-    const campaign = makeCampaignListItem({
-      id: 'camp_3',
-      viewerState: VIEWER_STATE.controlStale('char_1'),
-    })
-
-    expect(resolveCampaignRecoveryDestination(campaign)).toEqual({
+  it('returns reconnect onboarding href for stale control via viewerState input', () => {
+    expect(
+      resolveCampaignRecoveryDestination({
+        campaignId: 'camp_3',
+        viewerState: VIEWER_STATE.controlStale('char_1'),
+      }),
+    ).toEqual({
       href: ROUTES.campaign.onboardingReconnect('camp_3', { characterId: 'char_1' }),
       actionLabel: 'Reconnect character',
     })

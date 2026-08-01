@@ -1,7 +1,9 @@
-import type { CampaignRole } from '@rpg/contracts'
-import { isCampaignManager } from '@rpg/contracts'
+import type { CampaignRole, CampaignViewerState } from '@rpg/contracts'
+import { isCampaignManager, isCampaignViewerSelfRecoverable } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+
+import { resolveCampaignRecoveryDestination } from './campaign-destination.lib'
 
 export const CAMPAIGN_CHARACTER_NAV_LABELS = {
   characters: 'Characters',
@@ -39,13 +41,13 @@ type ResolvedViewerState =
   | { kind: 'manager' }
   | { kind: 'single_controlled'; characterId: string }
   | { kind: 'multi_controlled' }
-  | { kind: 'onboarding' }
+  | { kind: 'recovery' }
   | { kind: 'empty_controlled' }
 
 function resolveCampaignCharacterViewerState(input: {
   role: CampaignRole
   openControlledCharacterIds: readonly string[]
-  onboardingIncomplete: boolean
+  viewerState: CampaignViewerState
 }): ResolvedViewerState {
   if (input.role === 'observer') {
     return { kind: 'hidden' }
@@ -66,8 +68,8 @@ function resolveCampaignCharacterViewerState(input: {
     return { kind: 'multi_controlled' }
   }
 
-  if (input.onboardingIncomplete) {
-    return { kind: 'onboarding' }
+  if (isCampaignViewerSelfRecoverable(input.viewerState)) {
+    return { kind: 'recovery' }
   }
 
   return { kind: 'empty_controlled' }
@@ -78,10 +80,14 @@ export function buildCampaignCharacterNavigationContext(input: {
   campaignId: string
   role: CampaignRole
   openControlledCharacterIds: readonly string[]
-  onboardingIncomplete: boolean
+  viewerState: CampaignViewerState
 }): CampaignCharacterNavigationContext {
   const state = resolveCampaignCharacterViewerState(input)
   const { campaignId } = input
+  const recoveryDestination = resolveCampaignRecoveryDestination({
+    campaignId,
+    viewerState: input.viewerState,
+  })
 
   switch (state.kind) {
     case 'hidden':
@@ -131,12 +137,12 @@ export function buildCampaignCharacterNavigationContext(input: {
           pageTitle: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacters,
         },
       }
-    case 'onboarding':
+    case 'recovery':
       return {
         nav: {
           showCharactersNav: true,
           label: CAMPAIGN_CHARACTER_NAV_LABELS.myCharacter,
-          href: ROUTES.campaign.onboarding(campaignId),
+          href: recoveryDestination.href ?? ROUTES.campaign.onboarding(campaignId),
           mode: 'onboarding',
           activeSection: 'onboarding',
         },

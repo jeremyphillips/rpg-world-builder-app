@@ -71,6 +71,7 @@ export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageP
       .then(async (result) => {
         persistCampaignSelection(result.campaignId)
         await invalidateCampaignInviteAcceptQueries(queryClient, result.campaignId)
+        // Invite handoff — plain onboarding entry, not recovery routing.
         navigate(ROUTES.campaign.onboarding(result.campaignId))
       })
       .catch((error: unknown) => {
@@ -83,6 +84,7 @@ export function CampaignInviteReviewPage({ inviteId }: CampaignInviteReviewPageP
 
   const handleContinue = useCallback(
     (campaignId: string) => {
+      // Invite handoff — plain onboarding entry, not recovery routing.
       navigate(ROUTES.campaign.onboarding(campaignId))
     },
     [navigate],

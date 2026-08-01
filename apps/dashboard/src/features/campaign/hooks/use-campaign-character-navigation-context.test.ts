@@ -35,7 +35,7 @@ describe('useCampaignCharacterNavigationContext', () => {
         campaignId: 'camp_1',
         role: 'pc',
         openControlledCharacterIds: ['char_1'],
-        onboardingIncomplete: false,
+        viewerState: campaign.viewerState,
       }),
     )
   })

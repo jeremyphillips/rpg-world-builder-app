@@ -69,6 +69,7 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
       .then(async (result) => {
         await persistCampaignSelectionBestEffort(result.campaignId)
         await invalidateCampaignInviteAcceptQueries(queryClient)
+        // Invite handoff — plain onboarding entry, not recovery routing.
         window.location.assign(crossAppCampaignOnboardingPath(result.campaignId))
       })
       .catch((error: unknown) => {
@@ -80,6 +81,7 @@ export function CampaignInvitePage({ token }: CampaignInvitePageProps) {
   }, [queryClient, token])
 
   const handleContinue = useCallback((campaignId: string) => {
+    // Invite handoff — plain onboarding entry, not recovery routing.
     window.location.assign(crossAppCampaignOnboardingPath(campaignId))
   }, [])
 

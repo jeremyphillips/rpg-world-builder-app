@@ -14,7 +14,7 @@ describe('isCampaignCharactersNavActive', () => {
       campaignId: CAMPAIGN_ID,
       role: 'pc',
       openControlledCharacterIds: [CHARACTER_ID],
-      onboardingIncomplete: false,
+      viewerState: { kind: 'ready' },
     }).nav
 
     expect(nav.showCharactersNav).toBe(true)
@@ -37,7 +37,7 @@ describe('isCampaignCharactersNavActive', () => {
       campaignId: CAMPAIGN_ID,
       role: 'pc',
       openControlledCharacterIds: [],
-      onboardingIncomplete: true,
+      viewerState: { kind: 'onboarding_incomplete' },
     }).nav
 
     expect(nav.showCharactersNav).toBe(true)
