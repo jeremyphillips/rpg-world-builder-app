@@ -86,12 +86,16 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 | ------- | ---------------------- | --------------------------------------------------------------------------------------- |
 | Faint   | `border-border-faint`  | Extra-quiet separators and decorative shells                                            |
 | Subtle  | `border-border-subtle` | Quiet separators, low-emphasis shells (default for field separators and outline chrome) |
-| Default | `border-border`        | Normal component structure                                                              |
-| Card    | `border-card-border`   | Warm primary-tinted panel stroke (softer than `--border` on `--card`)                   |
+| Default | `border-border`        | Normal component structure — also the inherited `*` safety-net via `var(--border)`      |
+| Card    | `border-card-border`   | Raised containing-surface stroke (Card, Modal, Sheet edge, Toast, elevated panels)      |
 | Strong  | `border-border-strong` | Selected or emphasized structure                                                        |
 
 Status borders stay status-specific (`border-destructive-muted`, …). Recipe borders (e.g.
 `border-row-selected-border`) may alias `--border-strong` or a brand/status role.
+
+The base `*` rule sets `border-color: var(--border)` as a **structural safety net** only.
+Components with semantic border ownership must set an explicit role utility — do not rely
+on the fallback as SSOT.
 
 ## Interaction recipes
 

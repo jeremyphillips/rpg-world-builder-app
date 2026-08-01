@@ -16,8 +16,8 @@ export const sheetContentVariants = cva(
     variants: {
       side: {
         right:
-          'inset-y-0 right-0 w-full max-w-md border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-        left: 'inset-y-0 left-0 w-full max-w-md border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+          'inset-y-0 right-0 w-full max-w-md border-l border-card-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+        left: 'inset-y-0 left-0 w-full max-w-md border-r border-card-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
       },
     },
     defaultVariants: {
