@@ -4,6 +4,10 @@ import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
 import { campaignInviteEmailsInputSchema } from './campaign-invite'
+import {
+  campaignRecoveryReasonSchema,
+  campaignViewerStateSchema,
+} from './resolve-campaign-viewer-participation'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
@@ -157,8 +161,10 @@ export const campaignListItemSchema = campaignSchema.extend({
   controlledCharacterIds: z.array(z.string()),
   /** Controlled PC ids with open participation — source of truth for navigation. */
   openControlledCharacterIds: z.array(z.string()),
-  /** Server-derived PC onboarding state for the list row viewer. */
-  viewerOnboardingState: z.enum(['incomplete', 'complete', 'invalid']).optional(),
+  /** Server-derived viewer participation state for list rows and recovery UI. */
+  viewerState: campaignViewerStateSchema,
+  /** Diagnostic reason when viewerState is recoverable or invalid. */
+  recoveryReason: campaignRecoveryReasonSchema.optional(),
 })
 
 export type CampaignListItem = z.infer<typeof campaignListItemSchema>

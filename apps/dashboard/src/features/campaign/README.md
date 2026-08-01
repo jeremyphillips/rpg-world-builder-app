@@ -43,7 +43,9 @@ acquisition model (axes, ownership, build/import finalization).
 | Component                            | Location                                                                  | Surface                                                     |
 | ------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `PromotionCard`                      | `components/layout/promotion-card.tsx`                                    | Shared home promotion chrome                                |
-| `CampaignRecoveryState`              | `lib/campaign-recovery-state.ts`                                          | Canonical recovery derivation                               |
+| `CampaignRecoveryState`              | `lib/campaign-recovery-state.ts`                                          | Dashboard wrapper over `campaign.viewerState`               |
+| `resolveCampaignEntryDestination`    | `lib/campaign-destination.lib.ts`                                         | Index/switcher/continue → campaign shell                    |
+| `resolveCampaignRecoveryDestination` | `lib/campaign-destination.lib.ts`                                         | Home/alert CTA → onboarding or reconnect                    |
 | `resolveCampaignRecoveryPromotions`  | `lib/campaign-recovery-promotions.lib.ts`                                 | Home promotion ranking (preference ranks, never suppresses) |
 | `CampaignRecoveryPromotionCard`      | `components/campaign-recovery-promotion-card.client.tsx`                  | Home recovery promotion                                     |
 | `CampaignInvitationCard`             | `features/campaign-invite/components/campaign-invitation-card.client.tsx` | Home pending invite promotion                               |

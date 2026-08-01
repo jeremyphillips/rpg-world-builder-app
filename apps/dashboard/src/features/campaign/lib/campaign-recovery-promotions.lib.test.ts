@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import {
   listRecoverableCampaigns,
@@ -14,7 +14,7 @@ describe('campaign-recovery-promotions', () => {
     const campaign = makeCampaignListItem({
       id: 'camp_incomplete',
       identity: { name: 'Stormwatch' },
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
 
     expect(toRecoveryPromotion(campaign)).toMatchObject({
@@ -26,27 +26,28 @@ describe('campaign-recovery-promotions', () => {
     })
   })
 
-  it('maps invalid participation to a non-onboarding promotion', () => {
+  it('maps stale control to reconnect promotions', () => {
     expect(
       toRecoveryPromotion(
         makeCampaignListItem({
           id: 'camp_invalid',
           identity: { name: 'Stormwatch' },
-          viewerOnboardingState: 'invalid',
+          viewerState: VIEWER_STATE.controlStale('char_1'),
         }),
       ),
     ).toMatchObject({
-      kind: 'participation_invalid',
-      href: '/campaigns/camp_invalid',
-      tone: 'destructive',
+      kind: 'reconnect_character',
+      href: '/campaigns/camp_invalid/onboarding?mode=reconnect&characterId=char_1',
+      actionLabel: 'Reconnect character',
+      tone: 'warning',
     })
   })
 
-  it('lists every recoverable campaign regardless of preference', () => {
+  it('lists every self-recoverable campaign regardless of preference', () => {
     const campaigns = [
-      makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'complete' }),
-      makeCampaignListItem({ id: 'camp_b', viewerOnboardingState: 'incomplete' }),
-      makeCampaignListItem({ id: 'camp_c', viewerOnboardingState: 'invalid' }),
+      makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.ready }),
+      makeCampaignListItem({ id: 'camp_b', viewerState: VIEWER_STATE.onboardingIncomplete }),
+      makeCampaignListItem({ id: 'camp_c', viewerState: VIEWER_STATE.controlStale('char_1') }),
     ]
 
     expect(listRecoverableCampaigns(campaigns).map((campaign) => campaign.id)).toEqual([
@@ -58,10 +59,10 @@ describe('campaign-recovery-promotions', () => {
   it('promotes preferred recoverable campaign when preference points at it', () => {
     const incompleteB = makeCampaignListItem({
       id: 'camp_b',
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
     const campaigns = [
-      makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'complete' }),
+      makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.ready }),
       incompleteB,
     ]
 
@@ -75,8 +76,8 @@ describe('campaign-recovery-promotions', () => {
 
   it('falls back to the first recoverable campaign when preference is complete', () => {
     const campaigns = [
-      makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'complete' }),
-      makeCampaignListItem({ id: 'camp_b', viewerOnboardingState: 'incomplete' }),
+      makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.ready }),
+      makeCampaignListItem({ id: 'camp_b', viewerState: VIEWER_STATE.onboardingIncomplete }),
     ]
 
     expect(
@@ -89,8 +90,8 @@ describe('campaign-recovery-promotions', () => {
 
   it('always returns a promotion when any recoverable campaign exists', () => {
     const campaigns = [
-      makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'complete' }),
-      makeCampaignListItem({ id: 'camp_b', viewerOnboardingState: 'incomplete' }),
+      makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.ready }),
+      makeCampaignListItem({ id: 'camp_b', viewerState: VIEWER_STATE.onboardingIncomplete }),
     ]
 
     const { promotion, recoverableCount } = resolveCampaignRecoveryPromotions(campaigns, {

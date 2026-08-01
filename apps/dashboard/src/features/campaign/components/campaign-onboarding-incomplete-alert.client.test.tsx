@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { CampaignOnboardingIncompleteAlert } from './campaign-onboarding-incomplete-alert.client'
 
@@ -21,7 +21,7 @@ const incompleteCampaign = makeCampaignListItem({
   identity: { name: 'Stormwatch' },
   campaignRole: 'pc',
   controlledCharacterIds: [],
-  viewerOnboardingState: 'incomplete',
+  viewerState: VIEWER_STATE.onboardingIncomplete,
 })
 
 describe('CampaignOnboardingIncompleteAlert', () => {

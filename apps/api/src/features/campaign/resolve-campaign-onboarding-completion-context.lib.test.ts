@@ -17,6 +17,7 @@ describe('resolveCampaignOnboardingCompletionContext', () => {
       role: 'pc',
       controlledCharacterIds: ['char_primary', 'char_other'],
       participationState: 'active',
+      viewerState: { kind: 'ready' },
       activeCharacterIds: ['char_primary', 'char_other'],
     })
 
@@ -38,6 +39,7 @@ describe('resolveCampaignOnboardingCompletionContext', () => {
       role: 'pc',
       controlledCharacterIds: ['char_primary', 'char_other'],
       participationState: 'active',
+      viewerState: { kind: 'ready' },
       activeCharacterIds: ['char_primary', 'char_other'],
     })
 

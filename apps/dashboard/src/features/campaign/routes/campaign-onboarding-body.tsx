@@ -12,9 +12,11 @@ import { CampaignOnboardingClient } from '../components/campaign-onboarding.clie
 export function CampaignOnboardingBody({
   context,
   campaignId,
+  initialCharacterId,
 }: {
   context: CampaignOnboardingContext
   campaignId: string
+  initialCharacterId?: string
 }) {
   if (context.status === 'complete') {
     return (
@@ -44,5 +46,11 @@ export function CampaignOnboardingBody({
     )
   }
 
-  return <CampaignOnboardingClient context={context} campaignId={campaignId} />
+  return (
+    <CampaignOnboardingClient
+      context={context}
+      campaignId={campaignId}
+      initialCharacterId={initialCharacterId}
+    />
+  )
 }

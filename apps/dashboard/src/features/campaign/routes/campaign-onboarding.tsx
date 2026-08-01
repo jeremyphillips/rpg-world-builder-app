@@ -1,4 +1,4 @@
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 
 import { buttonVariants, Text } from '@rpg/ui'
 
@@ -12,6 +12,8 @@ import { CampaignOnboardingBody } from './campaign-onboarding-body'
 
 export function CampaignOnboarding() {
   const { campaignId } = useParams<{ campaignId: string }>()
+  const [searchParams] = useSearchParams()
+  const initialCharacterId = searchParams.get('characterId') ?? undefined
   const { data: context, isPending, isError, error } = useCampaignOnboardingContext(campaignId)
 
   if (!campaignId) {
@@ -58,7 +60,13 @@ export function CampaignOnboarding() {
       errorLabel={error?.message}
       defaultErrorLabel="Could not load campaign onboarding."
     >
-      {context ? <CampaignOnboardingBody context={context} campaignId={campaignId} /> : null}
+      {context ? (
+        <CampaignOnboardingBody
+          context={context}
+          campaignId={campaignId}
+          initialCharacterId={initialCharacterId}
+        />
+      ) : null}
     </PageLoadState>
   )
 }

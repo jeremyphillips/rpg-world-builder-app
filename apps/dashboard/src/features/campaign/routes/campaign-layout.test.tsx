@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 const { useCampaigns } = vi.hoisted(() => ({
   useCampaigns: vi.fn(),
@@ -20,7 +20,7 @@ import { CampaignLayout } from './campaign-layout'
 const incompleteCampaign = makeCampaignListItem({
   id: 'camp_1',
   identity: { name: 'Stormwatch' },
-  viewerOnboardingState: 'incomplete',
+  viewerState: VIEWER_STATE.onboardingIncomplete,
 })
 
 describe('CampaignLayout', () => {

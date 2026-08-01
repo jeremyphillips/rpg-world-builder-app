@@ -5,13 +5,23 @@ import { ROUTES } from '@/app/routes'
 
 import { buildCampaignDisplay } from './campaign-display'
 import {
+  CAMPAIGN_CONNECTION_RESTORE_ACTION,
+  CAMPAIGN_CONNECTION_RESTORE_INDEX_ROW_BODY,
+  CAMPAIGN_MEMBERSHIP_INVALID_INDEX_ROW_BODY,
   CAMPAIGN_ONBOARDING_INDEX_ROW_BODY,
-  CAMPAIGN_PARTICIPATION_INVALID_INDEX_ROW_BODY,
+  CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE,
+  CAMPAIGN_CONNECTION_RESTORE_BADGE,
+  CAMPAIGN_MEMBERSHIP_INVALID_BADGE,
+  FINISH_JOINING_CAMPAIGN_ACTION,
 } from './campaign-onboarding-copy'
 import {
+  isCampaignMembershipInvalid,
   isCampaignOnboardingIncomplete,
+  isCampaignReconnectRequired,
   isCampaignRecoveryRequired,
+  isCampaignSelfRecoverable,
   resolveCampaignRecoveryState,
+  resolveRecoveryCharacterId,
 } from './campaign-recovery-state'
 
 export type CampaignDestination = {
@@ -22,30 +32,45 @@ export type CampaignDestination = {
   shouldPersistSelection: boolean
 }
 
+export type CampaignRecoveryDestination = {
+  href: string | null
+  actionLabel: string | null
+}
+
 /** @deprecated Use `CampaignDestination`. */
 export type CampaignPickerRowDestination = CampaignDestination
 
-export function resolveCampaignDestination(campaign: CampaignListItem): CampaignDestination {
+export function resolveCampaignEntryDestination(campaign: CampaignListItem): CampaignDestination {
   const display = buildCampaignDisplay(campaign)
   const name = display.name || display.id
   const recovery = resolveCampaignRecoveryState(campaign)
 
   if (isCampaignOnboardingIncomplete(recovery)) {
     return {
-      href: ROUTES.campaign.onboarding(campaign.id),
-      ariaLabel: `Continue setup for ${name}`,
+      href: ROUTES.campaign.detail(campaign.id),
+      ariaLabel: `Open ${name} — setup incomplete`,
       showSetupBadge: true,
       supportingCopy: CAMPAIGN_ONBOARDING_INDEX_ROW_BODY,
       shouldPersistSelection: true,
     }
   }
 
-  if (isCampaignRecoveryRequired(recovery)) {
+  if (isCampaignReconnectRequired(recovery)) {
     return {
       href: ROUTES.campaign.detail(campaign.id),
       ariaLabel: `Open ${name} — character connection needs attention`,
       showSetupBadge: true,
-      supportingCopy: CAMPAIGN_PARTICIPATION_INVALID_INDEX_ROW_BODY,
+      supportingCopy: CAMPAIGN_CONNECTION_RESTORE_INDEX_ROW_BODY,
+      shouldPersistSelection: true,
+    }
+  }
+
+  if (isCampaignMembershipInvalid(recovery)) {
+    return {
+      href: ROUTES.campaign.detail(campaign.id),
+      ariaLabel: `Open ${name} — membership needs attention`,
+      showSetupBadge: true,
+      supportingCopy: CAMPAIGN_MEMBERSHIP_INVALID_INDEX_ROW_BODY,
       shouldPersistSelection: true,
     }
   }
@@ -59,15 +84,65 @@ export function resolveCampaignDestination(campaign: CampaignListItem): Campaign
   }
 }
 
+export function resolveCampaignRecoveryDestination(
+  campaign: CampaignListItem,
+): CampaignRecoveryDestination {
+  const recovery = resolveCampaignRecoveryState(campaign)
+
+  if (isCampaignOnboardingIncomplete(recovery)) {
+    return {
+      href: ROUTES.campaign.onboarding(campaign.id),
+      actionLabel: FINISH_JOINING_CAMPAIGN_ACTION,
+    }
+  }
+
+  if (isCampaignReconnectRequired(recovery)) {
+    const characterId = resolveRecoveryCharacterId(recovery)
+    return {
+      href: ROUTES.campaign.onboardingReconnect(campaign.id, { characterId }),
+      actionLabel: CAMPAIGN_CONNECTION_RESTORE_ACTION,
+    }
+  }
+
+  if (isCampaignMembershipInvalid(recovery)) {
+    return { href: null, actionLabel: null }
+  }
+
+  return { href: null, actionLabel: null }
+}
+
+/** @deprecated Use {@link resolveCampaignEntryDestination}. */
+export function resolveCampaignDestination(campaign: CampaignListItem): CampaignDestination {
+  return resolveCampaignEntryDestination(campaign)
+}
+
 /** @deprecated Use `resolveCampaignDestination`. */
-export const resolveCampaignPickerRowDestination = resolveCampaignDestination
+export const resolveCampaignPickerRowDestination = resolveCampaignEntryDestination
+
+export function resolveEntryBadgeLabel(campaign: CampaignListItem): string | null {
+  const recovery = resolveCampaignRecoveryState(campaign)
+  if (!isCampaignRecoveryRequired(recovery)) return null
+  if (isCampaignOnboardingIncomplete(recovery)) return CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE
+  if (isCampaignReconnectRequired(recovery)) return CAMPAIGN_CONNECTION_RESTORE_BADGE
+  if (isCampaignMembershipInvalid(recovery)) return CAMPAIGN_MEMBERSHIP_INVALID_BADGE
+  return null
+}
+
+export function resolveEntryBadgeTone(
+  campaign: CampaignListItem,
+): 'warning' | 'destructive' | null {
+  const recovery = resolveCampaignRecoveryState(campaign)
+  if (!isCampaignRecoveryRequired(recovery)) return null
+  if (isCampaignMembershipInvalid(recovery)) return 'destructive'
+  return 'warning'
+}
 
 export function resolveSwitchCampaignPath(
   pathname: string,
   fromId: string,
   toCampaign: CampaignListItem,
 ): string {
-  const destination = resolveCampaignDestination(toCampaign)
+  const destination = resolveCampaignEntryDestination(toCampaign)
   const prefix = `/campaigns/${fromId}`
 
   if (!pathname.startsWith(prefix)) {
@@ -76,10 +151,6 @@ export function resolveSwitchCampaignPath(
 
   const segments = pathname.slice(prefix.length).split('/').filter(Boolean)
   const section = segments[0] ? `/${segments[0]}` : ''
-
-  if (isCampaignRecoveryRequired(resolveCampaignRecoveryState(toCampaign)) && !section) {
-    return destination.href
-  }
 
   if (!section) {
     return destination.href
@@ -102,5 +173,13 @@ export function shouldRunCampaignSelectionSideEffect(
     !event.ctrlKey &&
     !event.shiftKey &&
     !event.altKey
+  )
+}
+
+export function listRecoverableCampaignsForHome(
+  campaigns: readonly CampaignListItem[],
+): CampaignListItem[] {
+  return campaigns.filter((campaign) =>
+    isCampaignSelfRecoverable(resolveCampaignRecoveryState(campaign)),
   )
 }

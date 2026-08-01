@@ -10,7 +10,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { ROUTES } from '@/app/routes'
 import { persistCampaignSelectionRemote } from '@rpg/api-client'
 import { renderWithProviders } from '@/test/render'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { makeSessionUser } from '@/test/fixtures/session'
 
 import { CAMPAIGN_ONBOARDING_INDEX_ROW_BODY } from '../lib/campaign-onboarding-copy'
@@ -55,7 +55,7 @@ describe('CampaignPicker', () => {
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
   })
 
-  it('renders onboarding destination links with inline supporting copy for incomplete memberships', () => {
+  it('renders entry destination links with inline supporting copy for incomplete memberships', () => {
     renderWithProviders(
       <CampaignPicker
         campaigns={[
@@ -64,15 +64,17 @@ describe('CampaignPicker', () => {
             identity: { name: 'Incomplete Campaign' },
             campaignRole: 'pc',
             controlledCharacterIds: [],
-            viewerOnboardingState: 'incomplete',
+            viewerState: VIEWER_STATE.onboardingIncomplete,
           }),
         ]}
       />,
     )
 
-    const rowLink = screen.getByRole('link', { name: 'Continue setup for Incomplete Campaign' })
+    const rowLink = screen.getByRole('link', {
+      name: 'Open Incomplete Campaign — setup incomplete',
+    })
 
-    expect(rowLink).toHaveAttribute('href', ROUTES.campaign.onboarding('camp_1'))
+    expect(rowLink).toHaveAttribute('href', ROUTES.campaign.detail('camp_1'))
     expect(screen.getByText(CAMPAIGN_ONBOARDING_INDEX_ROW_BODY)).toBeInTheDocument()
     expect(rowLink).toContainElement(screen.getByText(CAMPAIGN_ONBOARDING_INDEX_ROW_BODY))
     expect(screen.queryByRole('button', { name: 'Continue setup' })).not.toBeInTheDocument()

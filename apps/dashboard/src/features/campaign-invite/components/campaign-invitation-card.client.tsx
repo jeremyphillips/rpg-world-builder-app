@@ -18,9 +18,11 @@ export function CampaignInvitationCard({ promotion }: CampaignInvitationCardProp
       description={promotion.body}
       meta={promotion.meta}
       actions={
-        <a href={promotion.href} className={buttonVariants({ size: 'sm' })}>
-          {promotion.actionLabel}
-        </a>
+        promotion.href && promotion.actionLabel ? (
+          <a href={promotion.href} className={buttonVariants({ size: 'sm' })}>
+            {promotion.actionLabel}
+          </a>
+        ) : null
       }
     />
   )

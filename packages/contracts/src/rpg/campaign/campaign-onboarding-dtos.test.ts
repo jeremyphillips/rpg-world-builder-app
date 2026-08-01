@@ -27,6 +27,7 @@ describe('campaignOnboardingContextSchema', () => {
   it('parses incomplete onboarding context without invite or membership ids', () => {
     const parsed = campaignOnboardingContextSchema.parse({
       status: 'onboarding_incomplete',
+      mode: 'initial',
       campaignId: 'camp_1',
       campaign: { id: 'camp_1', name: 'The Shattered Vale' },
       startingLevel: 3,
@@ -34,9 +35,27 @@ describe('campaignOnboardingContextSchema', () => {
 
     expect(parsed.status).toBe('onboarding_incomplete')
     if (parsed.status === 'onboarding_incomplete') {
+      expect(parsed.mode).toBe('initial')
       expect(parsed.campaignId).toBe('camp_1')
       expect(parsed.startingLevel).toBe(3)
     }
+  })
+
+  it('parses reconnect onboarding context with stale character id', () => {
+    const parsed = campaignOnboardingContextSchema.parse({
+      status: 'onboarding_incomplete',
+      mode: 'reconnect',
+      staleCharacterId: 'char_stale',
+      campaignId: 'camp_1',
+      campaign: { id: 'camp_1', name: 'The Shattered Vale' },
+      startingLevel: 3,
+    })
+
+    expect(parsed).toMatchObject({
+      status: 'onboarding_incomplete',
+      mode: 'reconnect',
+      staleCharacterId: 'char_stale',
+    })
   })
 
   it('parses complete onboarding context with optional character id', () => {

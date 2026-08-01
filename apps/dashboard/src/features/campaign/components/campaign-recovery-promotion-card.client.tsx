@@ -18,15 +18,17 @@ export function CampaignRecoveryPromotionCard({ promotion }: CampaignRecoveryPro
       : buttonVariants({ variant: 'outline', size: 'sm' })
 
   const action =
-    promotion.kind === 'pending_invite' ? (
-      <a href={promotion.href} className={actionClassName}>
-        {promotion.actionLabel}
-      </a>
-    ) : (
-      <Link to={promotion.href} className={actionClassName}>
-        {promotion.actionLabel}
-      </Link>
-    )
+    promotion.href && promotion.actionLabel ? (
+      promotion.kind === 'pending_invite' ? (
+        <a href={promotion.href} className={actionClassName}>
+          {promotion.actionLabel}
+        </a>
+      ) : (
+        <Link to={promotion.href} className={actionClassName}>
+          {promotion.actionLabel}
+        </Link>
+      )
+    ) : null
 
   return (
     <PromotionCard

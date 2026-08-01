@@ -92,6 +92,8 @@ export {
 } from './lib/campaign-recovery-promotions.lib'
 export {
   resolveCampaignDestination,
+  resolveCampaignEntryDestination,
+  resolveCampaignRecoveryDestination,
   resolveSwitchCampaignPath,
   shouldRunCampaignSelectionSideEffect,
   type CampaignDestination,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { hasCampaignRows } from './campaign-list-view.lib'
 
@@ -14,7 +14,7 @@ describe('hasCampaignRows', () => {
     expect(
       hasCampaignRows([
         makeCampaignListItem({
-          viewerOnboardingState: 'incomplete',
+          viewerState: VIEWER_STATE.onboardingIncomplete,
           campaignRole: 'pc',
           controlledCharacterIds: [],
         }),

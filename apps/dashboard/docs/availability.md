@@ -43,18 +43,21 @@ field:
 
 See `apps/api/docs/campaign-invites.md` and `campaign-overview.service.ts`.
 
-### Viewer onboarding (campaign list / switcher)
+### Viewer state (campaign list / switcher)
 
-`GET /api/campaigns` includes `viewerOnboardingState` on each
-`CampaignListItem` — a three-value server projection for the **current viewer**:
+`GET /api/campaigns` includes `viewerState` and optional `recoveryReason` on each
+`CampaignListItem` — an actionable server projection for the **current viewer**:
 
-- `incomplete` — PC with no open control and no open participation (onboarding path)
-- `complete` — PC with open controlled character(s), or staff/observer roles
-- `invalid` — stale control without matching open participation
+- `ready` — staff/observer or PC with open controlled character(s)
+- `onboarding_incomplete` — PC with no control and no viewer-relevant open participation
+- `control_stale` / `participation_missing` — repairable connection gaps (reconnect via onboarding)
+- `membership_invalid` — unsupported role; alert-only (no recovery CTA)
 
-Dashboard nav, layout alerts, and the campaign picker use
-`viewerOnboardingState === 'incomplete'` — not the overview member labels above.
-See [Character sheet routing](./character-sheet-routing.md).
+List API scopes open participations to controlled ∪ user-owned characters so fresh invites
+into populated campaigns are not misclassified. Dashboard navigation splits **entry**
+(`resolveCampaignEntryDestination` → campaign shell) from **recovery**
+(`resolveCampaignRecoveryDestination` → onboarding / reconnect). See
+[Character sheet routing](./character-sheet-routing.md).
 
 ### Pending invitations (dashboard cards)
 
@@ -71,7 +74,11 @@ to are excluded server-side and again client-side before render.
 | Dashboard home  | `CampaignRecoveryPromotionCard`, `CampaignInvitationCard`            | Highest-priority recovery promotion + pending invites                                                                      |
 | Campaigns index | `CampaignDestinationRow`                                             | Every campaign status row                                                                                                  |
 
-Recovery derives from `resolveCampaignRecoveryState` (`ready` | `onboarding_incomplete` | `participation_invalid`). Preferences rank promotions via `resolveCampaignRecoveryPromotions` but never suppress recoverable campaigns. Accept flows call `persistCampaignSelectionBestEffort` (local + best-effort server) from `@rpg/api-client`.
+Recovery derives from `campaign.viewerState` via `resolveCampaignRecoveryState`
+(`ready` | `onboarding_incomplete` | `control_stale` | `participation_missing` | `membership_invalid`).
+Preferences rank promotions via `resolveCampaignRecoveryPromotions` but never suppress self-recoverable campaigns.
+Accept flows call `persistCampaignSelectionBestEffort` (local + best-effort server) from `@rpg/api-client`.
+Onboarding supports `mode: 'initial' | 'reconnect'` for setup and connection repair.
 
 ### Settings (`campaign-settings-registry.ts`)
 

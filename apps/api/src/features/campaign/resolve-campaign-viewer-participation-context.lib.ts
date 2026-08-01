@@ -1,5 +1,13 @@
-import type { CampaignRole, CampaignViewerParticipationState } from '@rpg/contracts'
-import { resolveCampaignViewerParticipation } from '@rpg/contracts'
+import type {
+  CampaignRole,
+  CampaignViewerParticipationState,
+  CampaignViewerState,
+} from '@rpg/contracts'
+import {
+  filterViewerOpenParticipatingCharacterIds,
+  resolveCampaignViewerParticipation,
+  resolveCampaignViewerState,
+} from '@rpg/contracts'
 
 import { listCharactersForUser } from '../character'
 import { findCampaignMembershipByCampaignAndUser } from './participation/create-or-confirm-player-membership'
@@ -10,6 +18,7 @@ export type CampaignViewerParticipationContext = {
   role: CampaignRole
   controlledCharacterIds: string[]
   participationState: CampaignViewerParticipationState
+  viewerState: CampaignViewerState
   activeCharacterIds: string[]
 }
 
@@ -29,15 +38,21 @@ export async function loadCampaignViewerParticipationContext({
     listCharactersForUser(userId),
   ])
 
-  const userCharacterIds = new Set(userCharacters.map((character) => character.id))
-  const openParticipatingCharacterIds = openParticipations
-    .map((participation) => participation.characterId)
-    .filter(
-      (characterId) =>
-        controlledCharacterIds.includes(characterId) || userCharacterIds.has(characterId),
-    )
+  const userCharacterIds = userCharacters.map((character) => character.id)
+  const openParticipatingCharacterIds = filterViewerOpenParticipatingCharacterIds({
+    controlledCharacterIds,
+    openParticipatingCharacterIds: openParticipations.map(
+      (participation) => participation.characterId,
+    ),
+    userCharacterIds,
+  })
 
   const participationState = resolveCampaignViewerParticipation({
+    role: membership.campaignRole as CampaignRole,
+    controlledCharacterIds,
+    openParticipatingCharacterIds,
+  })
+  const { viewerState } = resolveCampaignViewerState({
     role: membership.campaignRole as CampaignRole,
     controlledCharacterIds,
     openParticipatingCharacterIds,
@@ -53,6 +68,7 @@ export async function loadCampaignViewerParticipationContext({
     role: membership.campaignRole as CampaignRole,
     controlledCharacterIds,
     participationState,
+    viewerState,
     activeCharacterIds,
   }
 }

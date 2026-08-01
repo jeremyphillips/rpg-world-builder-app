@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { filterPendingInvitesForMembership } from '@/features/campaign/lib/filter-pending-invites-for-membership'
 
@@ -34,7 +34,7 @@ describe('resolveDashboardHomeSections', () => {
   it('orders recovery before pending invitations and continue campaign', () => {
     const incomplete = makeCampaignListItem({
       id: 'camp_incomplete',
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
     const active = makeCampaignListItem({ id: 'camp_active' })
 
@@ -55,11 +55,11 @@ describe('resolveDashboardHomeSections', () => {
   it('shows recovery and continue when preference is complete but another campaign needs recovery', () => {
     const completeA = makeCampaignListItem({
       id: 'camp_a',
-      viewerOnboardingState: 'complete',
+      viewerState: VIEWER_STATE.ready,
     })
     const incompleteB = makeCampaignListItem({
       id: 'camp_b',
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
 
     const sections = resolveDashboardHomeSections({
@@ -79,7 +79,7 @@ describe('resolveDashboardHomeSections', () => {
   it('dedupes continue when recovery targets the same campaign', () => {
     const incomplete = makeCampaignListItem({
       id: 'camp_shared',
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
 
     const sections = resolveDashboardHomeSections({
@@ -108,7 +108,7 @@ describe('resolveDashboardHomeSections', () => {
   it('does not show pending invites and recovery for the same accepted membership', () => {
     const incomplete = makeCampaignListItem({
       id: 'camp_member',
-      viewerOnboardingState: 'incomplete',
+      viewerState: VIEWER_STATE.onboardingIncomplete,
     })
 
     const sections = resolveDashboardHomeSections({
@@ -126,8 +126,8 @@ describe('resolveDashboardHomeShowAllCampaignsLink', () => {
   it('shows the link when multiple recoverable campaigns exist', () => {
     const sections = resolveDashboardHomeSections({
       campaigns: [
-        makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'incomplete' }),
-        makeCampaignListItem({ id: 'camp_b', viewerOnboardingState: 'incomplete' }),
+        makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.onboardingIncomplete }),
+        makeCampaignListItem({ id: 'camp_b', viewerState: VIEWER_STATE.onboardingIncomplete }),
       ],
       pendingInvites: [],
       campaignsError: false,
@@ -139,7 +139,9 @@ describe('resolveDashboardHomeShowAllCampaignsLink', () => {
 
   it('hides the link for a single recoverable campaign', () => {
     const sections = resolveDashboardHomeSections({
-      campaigns: [makeCampaignListItem({ id: 'camp_a', viewerOnboardingState: 'incomplete' })],
+      campaigns: [
+        makeCampaignListItem({ id: 'camp_a', viewerState: VIEWER_STATE.onboardingIncomplete }),
+      ],
       pendingInvites: [],
       campaignsError: false,
       user: null,

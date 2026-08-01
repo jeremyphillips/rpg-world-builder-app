@@ -11,8 +11,16 @@ import {
 // Campaign onboarding DTOs — membership-scoped continuation (no invite coupling).
 // ---------------------------------------------------------------------------
 
+export const CAMPAIGN_ONBOARDING_MODES = ['initial', 'reconnect'] as const
+
+export const campaignOnboardingModeSchema = z.enum(CAMPAIGN_ONBOARDING_MODES)
+
+export type CampaignOnboardingMode = z.infer<typeof campaignOnboardingModeSchema>
+
 export const campaignOnboardingIncompleteContextSchema = z.object({
   status: z.literal('onboarding_incomplete'),
+  mode: campaignOnboardingModeSchema,
+  staleCharacterId: z.string().min(1).optional(),
   campaignId: z.string().min(1),
   campaign: z.object({
     id: z.string().min(1),

@@ -7,7 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { sessionQueryKey } from '@/features/auth'
 
 import {
-  resolveCampaignDestination,
+  resolveCampaignEntryDestination,
   resolveSwitchCampaignPath,
 } from '../lib/campaign-destination.lib'
 import { useCampaignStore } from '../store/campaign-store'
@@ -48,7 +48,7 @@ export function useOpenCampaign() {
       persistSelection(campaignId)
       const campaign = campaigns?.find((item) => item.id === campaignId)
       const href = campaign
-        ? resolveCampaignDestination(campaign).href
+        ? resolveCampaignEntryDestination(campaign).href
         : ROUTES.campaign.detail(campaignId)
       navigate(href)
     },
@@ -75,7 +75,7 @@ export function useSwitchCampaign() {
       }
 
       const href = campaign
-        ? resolveCampaignDestination(campaign).href
+        ? resolveCampaignEntryDestination(campaign).href
         : ROUTES.campaign.detail(campaignId)
       navigate(href)
     },

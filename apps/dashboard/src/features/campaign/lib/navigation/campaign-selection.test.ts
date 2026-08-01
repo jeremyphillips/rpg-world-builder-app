@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { CampaignListItem } from '@rpg/contracts'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from '../campaign-display'
 import {
@@ -17,9 +17,9 @@ import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
 
 const campaignListItems = [
-  { id: 'a', viewerOnboardingState: 'complete', identity: { name: 'A' } },
-  { id: 'b', viewerOnboardingState: 'complete', identity: { name: 'B' } },
-  { id: 'c', viewerOnboardingState: 'incomplete', identity: { name: 'C' } },
+  { id: 'a', viewerState: VIEWER_STATE.ready, identity: { name: 'A' } },
+  { id: 'b', viewerState: VIEWER_STATE.ready, identity: { name: 'B' } },
+  { id: 'c', viewerState: VIEWER_STATE.onboardingIncomplete, identity: { name: 'C' } },
 ] as CampaignListItem[]
 
 describe('resolvePreferredCampaignId', () => {
@@ -69,7 +69,7 @@ describe('resolveContinueCampaign', () => {
         [
           {
             id: 'solo',
-            viewerOnboardingState: 'complete',
+            viewerState: VIEWER_STATE.ready,
             identity: { name: 'Solo' },
           } as CampaignListItem,
         ],

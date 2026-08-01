@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { isCampaignMembershipOnboardingIncomplete } from './campaign-membership-onboarding'
 
 describe('isCampaignMembershipOnboardingIncomplete', () => {
-  it('returns true when viewerOnboardingState is incomplete', () => {
+  it('returns true when viewerState is onboarding_incomplete', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ viewerOnboardingState: 'incomplete' }),
+        makeCampaignListItem({ viewerState: VIEWER_STATE.onboardingIncomplete }),
       ),
     ).toBe(true)
   })
@@ -16,17 +16,17 @@ describe('isCampaignMembershipOnboardingIncomplete', () => {
   it('returns false for complete, invalid, and staff onboarding states', () => {
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ viewerOnboardingState: 'complete' }),
+        makeCampaignListItem({ viewerState: VIEWER_STATE.ready }),
       ),
     ).toBe(false)
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ viewerOnboardingState: 'invalid' }),
+        makeCampaignListItem({ viewerState: VIEWER_STATE.controlStale('char_1') }),
       ),
     ).toBe(false)
     expect(
       isCampaignMembershipOnboardingIncomplete(
-        makeCampaignListItem({ campaignRole: 'owner', viewerOnboardingState: 'complete' }),
+        makeCampaignListItem({ campaignRole: 'owner', viewerState: VIEWER_STATE.ready }),
       ),
     ).toBe(false)
   })

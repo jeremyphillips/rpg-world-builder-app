@@ -8,6 +8,10 @@ import { Heading, RadioCard, Text } from '@rpg/ui'
 import { NarrowPage } from '@/components/layout/narrow-page'
 
 import {
+  CAMPAIGN_ONBOARDING_RECONNECT_BODY,
+  CAMPAIGN_ONBOARDING_RECONNECT_HEADING,
+} from '../lib/campaign-onboarding-copy'
+import {
   ONBOARDING_CHOICE_EXISTING,
   ONBOARDING_CHOICE_NEW,
   type OnboardingBranch,
@@ -60,18 +64,31 @@ function OnboardingChoicePanel({
 export function CampaignOnboardingClient({
   context,
   campaignId,
+  initialCharacterId,
 }: {
   context: CampaignOnboardingIncompleteContext
   campaignId: string
+  initialCharacterId?: string
 }) {
-  const [branch, setBranch] = useState<OnboardingBranch>('choice')
+  const isReconnect = context.mode === 'reconnect'
+  const preselectedCharacterId = initialCharacterId ?? context.staleCharacterId
+  const [branch, setBranch] = useState<OnboardingBranch>(isReconnect ? 'existing' : 'choice')
 
   if (branch === 'existing') {
     return (
       <NarrowPage>
+        {isReconnect ? (
+          <div className="mb-6 flex flex-col gap-2">
+            <Heading variant="page" as="h1">
+              {CAMPAIGN_ONBOARDING_RECONNECT_HEADING}
+            </Heading>
+            <Text variant="muted">{CAMPAIGN_ONBOARDING_RECONNECT_BODY}</Text>
+          </div>
+        ) : null}
         <CampaignOnboardingExistingCharacterPanel
           campaignId={campaignId}
-          onBack={() => setBranch('choice')}
+          initialCharacterId={preselectedCharacterId}
+          onBack={() => setBranch(isReconnect ? 'existing' : 'choice')}
         />
       </NarrowPage>
     )

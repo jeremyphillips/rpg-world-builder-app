@@ -85,6 +85,7 @@ describe('campaign onboarding service', () => {
 
     expect(context).toMatchObject({
       status: 'onboarding_incomplete',
+      mode: 'initial',
       campaignId,
       campaign: { id: campaignId, name: 'Service Context Campaign' },
     })

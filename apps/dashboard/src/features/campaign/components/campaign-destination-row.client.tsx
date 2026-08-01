@@ -12,15 +12,9 @@ import {
 } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../lib/campaign-display'
 import {
-  CAMPAIGN_ONBOARDING_INCOMPLETE_COPY,
-  CAMPAIGN_PARTICIPATION_INVALID_BADGE,
-} from '../lib/campaign-onboarding-copy'
-import {
-  isCampaignParticipationInvalid,
-  resolveCampaignRecoveryState,
-} from '../lib/campaign-recovery-state'
-import {
-  resolveCampaignDestination,
+  resolveCampaignEntryDestination,
+  resolveEntryBadgeLabel,
+  resolveEntryBadgeTone,
   shouldRunCampaignSelectionSideEffect,
 } from '../lib/campaign-destination.lib'
 
@@ -33,12 +27,10 @@ export function CampaignDestinationRow({
   campaign,
   onPersistSelection,
 }: CampaignDestinationRowProps) {
-  const destination = resolveCampaignDestination(campaign)
+  const destination = resolveCampaignEntryDestination(campaign)
   const display = buildCampaignDisplay(campaign)
-  const recovery = resolveCampaignRecoveryState(campaign)
-  const badgeLabel = isCampaignParticipationInvalid(recovery)
-    ? CAMPAIGN_PARTICIPATION_INVALID_BADGE
-    : CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.badge
+  const badgeLabel = resolveEntryBadgeLabel(campaign)
+  const badgeTone = resolveEntryBadgeTone(campaign)
 
   return (
     <Link
@@ -56,12 +48,8 @@ export function CampaignDestinationRow({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex min-w-0 items-center gap-2">
           <CampaignDisplayName display={display} surface="row" />
-          {destination.showSetupBadge ? (
-            <Badge
-              appearance="outline"
-              tone={isCampaignParticipationInvalid(recovery) ? 'destructive' : 'warning'}
-              size="sm"
-            >
+          {badgeLabel && badgeTone ? (
+            <Badge appearance="outline" tone={badgeTone} size="sm">
               {badgeLabel}
             </Badge>
           ) : null}

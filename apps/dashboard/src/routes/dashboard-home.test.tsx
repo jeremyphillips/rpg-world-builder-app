@@ -12,7 +12,7 @@ import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campai
 import { listPendingCampaignInvitesMine as listPendingCampaignInvitesMineFn } from '@/features/campaign-invite/api/campaign-invite-client'
 import { listCharacters as listCharactersFn } from '@/features/character/api/character-client'
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE } from '@/features/campaign'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { makeAuthMe } from '@/test/fixtures/session'
 import { renderWithProviders } from '@/test/render'
 import { DashboardHome } from './dashboard-home'
@@ -171,14 +171,14 @@ describe('DashboardHome', () => {
         identity: { name: 'Arden' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
       makeCampaignListItem({
         id: 'camp_b',
         identity: { name: 'Baldur' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ])
 
@@ -207,7 +207,7 @@ describe('DashboardHome', () => {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ])
     localStorage.setItem('rpg.selectedCampaignId', 'camp_incomplete')
@@ -245,7 +245,7 @@ describe('DashboardHome', () => {
         identity: { name: 'Incomplete Campaign' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
       makeCampaignListItem({
         id: 'camp_active',

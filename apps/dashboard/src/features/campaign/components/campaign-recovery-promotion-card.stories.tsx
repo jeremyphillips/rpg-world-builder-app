@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { toRecoveryPromotion } from '../lib/campaign-recovery-promotions.lib'
 import { CampaignRecoveryPromotionCard } from './campaign-recovery-promotion-card.client'
@@ -23,7 +23,7 @@ export const FinishJoining: Story = {
         identity: { name: 'Stormwatch' },
         campaignRole: 'pc',
         controlledCharacterIds: [],
-        viewerOnboardingState: 'incomplete',
+        viewerState: VIEWER_STATE.onboardingIncomplete,
       }),
     ),
   },
@@ -37,7 +37,7 @@ export const ParticipationInvalid: Story = {
         identity: { name: 'Stormwatch' },
         campaignRole: 'pc',
         controlledCharacterIds: ['char_stale'],
-        viewerOnboardingState: 'invalid',
+        viewerState: VIEWER_STATE.controlStale('char_1'),
       }),
     ),
   },

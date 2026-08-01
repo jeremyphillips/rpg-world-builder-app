@@ -34,7 +34,7 @@ export async function getCampaignOnboardingContext({
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
-  if (participation.participationState === 'active') {
+  if (participation.viewerState.kind === 'ready') {
     return {
       status: 'complete',
       campaignId,
@@ -42,10 +42,11 @@ export async function getCampaignOnboardingContext({
     }
   }
 
-  if (participation.participationState === 'onboarding_incomplete') {
+  if (participation.viewerState.kind === 'onboarding_incomplete') {
     const startingLevel = await loadCampaignStartingLevel(campaignId)
     return {
       status: 'onboarding_incomplete',
+      mode: 'initial',
       campaignId,
       campaign: {
         id: campaign.id,
@@ -56,6 +57,32 @@ export async function getCampaignOnboardingContext({
   }
 
   if (
+    participation.viewerState.kind === 'control_stale' ||
+    participation.viewerState.kind === 'participation_missing'
+  ) {
+    const startingLevel = await loadCampaignStartingLevel(campaignId)
+    return {
+      status: 'onboarding_incomplete',
+      mode: 'reconnect',
+      staleCharacterId: participation.viewerState.characterId,
+      campaignId,
+      campaign: {
+        id: campaign.id,
+        name: campaign.identity.name,
+      },
+      startingLevel,
+    }
+  }
+
+  if (participation.viewerState.kind === 'membership_invalid') {
+    throw new HttpError(
+      403,
+      'forbidden',
+      'Campaign onboarding is not available for this membership.',
+    )
+  }
+
+  if (
     participation.participationState === 'staff' ||
     participation.participationState === 'observer'
   ) {
@@ -63,14 +90,6 @@ export async function getCampaignOnboardingContext({
       403,
       'forbidden',
       'Campaign onboarding is only available to player members.',
-    )
-  }
-
-  if (participation.participationState === 'invalid') {
-    throw new HttpError(
-      500,
-      'integrity_error',
-      'Campaign membership is in an inconsistent onboarding state.',
     )
   }
 

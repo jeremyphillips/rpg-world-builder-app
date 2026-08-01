@@ -41,6 +41,13 @@ export const ROUTES = {
     sessions: (id: string) => `/campaigns/${id}/sessions`,
     settings: (id: string) => `/campaigns/${id}/settings`,
     onboarding: (id: string) => `/campaigns/${id}/onboarding`,
+    onboardingReconnect: (id: string, options?: { characterId?: string }) => {
+      const params = new URLSearchParams({ mode: 'reconnect' })
+      if (options?.characterId) {
+        params.set('characterId', options.characterId)
+      }
+      return `/campaigns/${id}/onboarding?${params.toString()}`
+    },
     characters: {
       list: (campaignId: string) => `/campaigns/${campaignId}/characters`,
       detail: (campaignId: string, characterId: string) =>

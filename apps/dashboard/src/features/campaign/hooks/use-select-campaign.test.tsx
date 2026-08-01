@@ -9,7 +9,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { makeTestQueryClient } from '@/test/render'
 
 vi.mock('@rpg/api-client', () => ({
@@ -91,8 +91,11 @@ describe('useOpenCampaign', () => {
     vi.clearAllMocks()
     useCampaigns.mockReturnValue({
       data: [
-        makeCampaignListItem({ id: 'camp_2', viewerOnboardingState: 'complete' }),
-        makeCampaignListItem({ id: 'camp_incomplete', viewerOnboardingState: 'incomplete' }),
+        makeCampaignListItem({ id: 'camp_2', viewerState: VIEWER_STATE.ready }),
+        makeCampaignListItem({
+          id: 'camp_incomplete',
+          viewerState: VIEWER_STATE.onboardingIncomplete,
+        }),
       ],
     })
   })
@@ -106,9 +109,11 @@ describe('useOpenCampaign', () => {
     expect(screen.getByTestId('pathname')).toHaveTextContent('/campaigns/camp_2')
   })
 
-  it('navigates to onboarding for incomplete campaigns', async () => {
+  it('navigates to campaign detail for incomplete campaigns via entry destination', async () => {
     useCampaigns.mockReturnValue({
-      data: [makeCampaignListItem({ id: 'camp_2', viewerOnboardingState: 'incomplete' })],
+      data: [
+        makeCampaignListItem({ id: 'camp_2', viewerState: VIEWER_STATE.onboardingIncomplete }),
+      ],
     })
 
     const user = userEvent.setup()
@@ -116,7 +121,7 @@ describe('useOpenCampaign', () => {
 
     await user.click(screen.getByRole('button', { name: 'Open campaign' }))
 
-    expect(screen.getByTestId('pathname')).toHaveTextContent(ROUTES.campaign.onboarding('camp_2'))
+    expect(screen.getByTestId('pathname')).toHaveTextContent(ROUTES.campaign.detail('camp_2'))
   })
 })
 
@@ -125,8 +130,8 @@ describe('useSwitchCampaign', () => {
     vi.clearAllMocks()
     useCampaigns.mockReturnValue({
       data: [
-        makeCampaignListItem({ id: 'camp_1', viewerOnboardingState: 'complete' }),
-        makeCampaignListItem({ id: 'camp_2', viewerOnboardingState: 'complete' }),
+        makeCampaignListItem({ id: 'camp_1', viewerState: VIEWER_STATE.ready }),
+        makeCampaignListItem({ id: 'camp_2', viewerState: VIEWER_STATE.ready }),
       ],
     })
   })
@@ -140,11 +145,27 @@ describe('useSwitchCampaign', () => {
     expect(screen.getByTestId('pathname')).toHaveTextContent('/campaigns/camp_2/spells')
   })
 
-  it('routes incomplete campaigns to onboarding when switching from overview', async () => {
+  it('preserves section when switching to incomplete campaign from a section route', async () => {
     useCampaigns.mockReturnValue({
       data: [
-        makeCampaignListItem({ id: 'camp_1', viewerOnboardingState: 'complete' }),
-        makeCampaignListItem({ id: 'camp_2', viewerOnboardingState: 'incomplete' }),
+        makeCampaignListItem({ id: 'camp_1', viewerState: VIEWER_STATE.ready }),
+        makeCampaignListItem({ id: 'camp_2', viewerState: VIEWER_STATE.onboardingIncomplete }),
+      ],
+    })
+
+    const user = userEvent.setup()
+    renderCampaignSelectionHarness(<SwitchCampaignButton />, ['/campaigns/camp_1/spells'])
+
+    await user.click(screen.getByRole('button', { name: 'Switch campaign' }))
+
+    expect(screen.getByTestId('pathname')).toHaveTextContent('/campaigns/camp_2/spells')
+  })
+
+  it('routes incomplete campaigns to campaign detail when switching from overview', async () => {
+    useCampaigns.mockReturnValue({
+      data: [
+        makeCampaignListItem({ id: 'camp_1', viewerState: VIEWER_STATE.ready }),
+        makeCampaignListItem({ id: 'camp_2', viewerState: VIEWER_STATE.onboardingIncomplete }),
       ],
     })
 
@@ -153,7 +174,7 @@ describe('useSwitchCampaign', () => {
 
     await user.click(screen.getByRole('button', { name: 'Switch campaign' }))
 
-    expect(screen.getByTestId('pathname')).toHaveTextContent(ROUTES.campaign.onboarding('camp_2'))
+    expect(screen.getByTestId('pathname')).toHaveTextContent(ROUTES.campaign.detail('camp_2'))
   })
 
   it('falls back to overview when switching from a non-campaign route', async () => {

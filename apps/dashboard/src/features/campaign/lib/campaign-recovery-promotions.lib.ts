@@ -1,28 +1,30 @@
 import type { CampaignInviteInviteeListItem, CampaignListItem } from '@rpg/contracts'
 import { dashboardCampaignInviteReviewPath, resolveCampaignInviteExpiryLabel } from '@rpg/contracts'
 
-import { ROUTES } from '@/app/routes'
-
 import { buildCampaignDisplay } from './campaign-display'
 import {
   CAMPAIGN_INVITATION_COPY,
-  CAMPAIGN_PARTICIPATION_INVALID_ACTION,
-  CAMPAIGN_PARTICIPATION_INVALID_BODY,
-  campaignParticipationInvalidTitle,
-  FINISH_JOINING_CAMPAIGN_ACTION,
+  CAMPAIGN_CONNECTION_RESTORE_BODY,
+  CAMPAIGN_MEMBERSHIP_INVALID_BODY,
+  campaignConnectionRestoreTitle,
   FINISH_JOINING_CAMPAIGN_BODY,
   finishJoiningCampaignTitle,
+  campaignMembershipInvalidTitle,
 } from './campaign-onboarding-copy'
+import { resolveCampaignRecoveryDestination } from './campaign-destination.lib'
 import {
+  isCampaignMembershipInvalid,
   isCampaignOnboardingIncomplete,
-  isCampaignRecoveryRequired,
+  isCampaignReconnectRequired,
+  isCampaignSelfRecoverable,
   resolveCampaignRecoveryState,
 } from './campaign-recovery-state'
 import { resolvePreferredCampaignId } from './navigation/resolve-preferred-campaign-id'
 
 export type CampaignRecoveryPromotionKind =
   | 'finish_joining'
-  | 'participation_invalid'
+  | 'reconnect_character'
+  | 'membership_invalid'
   | 'pending_invite'
 
 export type CampaignRecoveryPromotion = {
@@ -31,8 +33,8 @@ export type CampaignRecoveryPromotion = {
   title: string
   body: string
   meta?: string
-  href: string
-  actionLabel: string
+  href: string | null
+  actionLabel: string | null
   tone: 'default' | 'warning' | 'destructive'
 }
 
@@ -45,8 +47,17 @@ export function listRecoverableCampaigns(
   campaigns: readonly CampaignListItem[],
 ): CampaignListItem[] {
   return campaigns.filter((campaign) =>
-    isCampaignRecoveryRequired(resolveCampaignRecoveryState(campaign)),
+    isCampaignSelfRecoverable(resolveCampaignRecoveryState(campaign)),
   )
+}
+
+export function listRecoveryAttentionCampaigns(
+  campaigns: readonly CampaignListItem[],
+): CampaignListItem[] {
+  return campaigns.filter((campaign) => {
+    const recovery = resolveCampaignRecoveryState(campaign)
+    return isCampaignSelfRecoverable(recovery) || isCampaignMembershipInvalid(recovery)
+  })
 }
 
 export function resolvePromotedRecoveryCampaign(
@@ -73,6 +84,7 @@ export function resolvePromotedRecoveryCampaign(
 export function toRecoveryPromotion(campaign: CampaignListItem): CampaignRecoveryPromotion {
   const campaignName = buildCampaignDisplay(campaign).name
   const recovery = resolveCampaignRecoveryState(campaign)
+  const destination = resolveCampaignRecoveryDestination(campaign)
 
   if (isCampaignOnboardingIncomplete(recovery)) {
     return {
@@ -80,19 +92,31 @@ export function toRecoveryPromotion(campaign: CampaignListItem): CampaignRecover
       campaignId: campaign.id,
       title: finishJoiningCampaignTitle(campaignName),
       body: FINISH_JOINING_CAMPAIGN_BODY,
-      href: ROUTES.campaign.onboarding(campaign.id),
-      actionLabel: FINISH_JOINING_CAMPAIGN_ACTION,
+      href: destination.href,
+      actionLabel: destination.actionLabel,
+      tone: 'warning',
+    }
+  }
+
+  if (isCampaignReconnectRequired(recovery)) {
+    return {
+      kind: 'reconnect_character',
+      campaignId: campaign.id,
+      title: campaignConnectionRestoreTitle(campaignName),
+      body: CAMPAIGN_CONNECTION_RESTORE_BODY,
+      href: destination.href,
+      actionLabel: destination.actionLabel,
       tone: 'warning',
     }
   }
 
   return {
-    kind: 'participation_invalid',
+    kind: 'membership_invalid',
     campaignId: campaign.id,
-    title: campaignParticipationInvalidTitle(campaignName),
-    body: CAMPAIGN_PARTICIPATION_INVALID_BODY,
-    href: ROUTES.campaign.detail(campaign.id),
-    actionLabel: CAMPAIGN_PARTICIPATION_INVALID_ACTION,
+    title: campaignMembershipInvalidTitle(campaignName),
+    body: CAMPAIGN_MEMBERSHIP_INVALID_BODY,
+    href: destination.href,
+    actionLabel: destination.actionLabel,
     tone: 'destructive',
   }
 }
