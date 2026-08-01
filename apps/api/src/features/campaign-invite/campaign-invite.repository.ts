@@ -104,6 +104,15 @@ export async function listPendingInvitesByCampaign(campaignId: string): Promise<
   return docs.map(toCampaignInvite)
 }
 
+export async function listPendingInvitesByNormalizedEmail(
+  normalizedEmail: string,
+): Promise<CampaignInvite[]> {
+  const docs = await CampaignInviteModel.find({ normalizedEmail, status: 'pending' })
+    .sort({ createdAt: -1 })
+    .lean<CampaignInviteRecord[]>()
+  return docs.map(toCampaignInvite)
+}
+
 export async function rotateInviteToken(
   inviteId: string,
   tokenHash: string,

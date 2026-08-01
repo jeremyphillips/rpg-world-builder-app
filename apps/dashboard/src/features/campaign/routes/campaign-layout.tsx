@@ -19,7 +19,7 @@ export function CampaignLayout() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      {showOnboardingAlert ? <CampaignOnboardingIncompleteAlert campaignId={campaignId!} /> : null}
+      {showOnboardingAlert ? <CampaignOnboardingIncompleteAlert campaign={campaign!} /> : null}
       <Outlet />
     </div>
   )

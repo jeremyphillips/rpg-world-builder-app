@@ -2,6 +2,7 @@ import { postJson, request } from '@rpg/api-client'
 import type {
   AcceptCampaignInviteResult,
   CampaignInviteAuthenticatedResolution,
+  CampaignInviteInviteeListResponse,
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -16,6 +17,17 @@ const RESOLVE_INVITE_ERROR = 'Could not load this invitation.'
 const ACCEPT_INVITE_ERROR = 'Could not accept this invitation.'
 
 export const campaignInvitesMineQueryKey = ['campaign-invites', 'mine'] as const
+
+export async function listPendingCampaignInvitesMine(): Promise<
+  CampaignInviteInviteeListResponse['invites']
+> {
+  const { invites } = await request<CampaignInviteInviteeListResponse>(
+    '/api/campaign-invites/mine',
+    undefined,
+    'Could not load your campaign invitations.',
+  )
+  return invites
+}
 
 export async function invalidateCampaignInviteAcceptQueries(
   queryClient: QueryClient,

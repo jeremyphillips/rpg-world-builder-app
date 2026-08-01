@@ -47,7 +47,7 @@ export function CampaignDestinationRow({
           <CampaignDisplayName display={display} surface="row" />
           {destination.showSetupBadge ? (
             <Badge appearance="outline" tone="warning" size="sm">
-              {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.label}
+              {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.badge}
             </Badge>
           ) : null}
         </div>

@@ -1,7 +1,16 @@
+import {
+  CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE,
+  FINISH_JOINING_CAMPAIGN_ACTION,
+  FINISH_JOINING_CAMPAIGN_BODY,
+  finishJoiningCampaignTitle,
+} from './campaign-invitation-copy'
+
+export { finishJoiningCampaignTitle, FINISH_JOINING_CAMPAIGN_BODY, FINISH_JOINING_CAMPAIGN_ACTION }
+
 export const CAMPAIGN_ONBOARDING_INCOMPLETE_COPY = {
-  label: 'Character setup incomplete',
-  message: 'Complete your character setup to finish joining this campaign.',
-  action: 'Continue setup',
+  badge: CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE,
+  message: FINISH_JOINING_CAMPAIGN_BODY,
+  action: FINISH_JOINING_CAMPAIGN_ACTION,
 } as const
 
 export const CAMPAIGN_ONBOARDING_EXISTING_CHARACTER_SUBMIT_ERROR =

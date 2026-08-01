@@ -4,10 +4,12 @@ import type { CampaignListItem, PcCharacterListItem } from '@rpg/contracts'
 
 vi.mock('@/features/auth/api/auth-client')
 vi.mock('@/features/campaign/api/campaign-client')
+vi.mock('@/features/campaign-invite/api/campaign-invite-client')
 vi.mock('@/features/character/api/character-client')
 
 import { fetchSession as fetchSessionFn } from '@/features/auth/api/auth-client'
 import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
+import { listPendingCampaignInvitesMine as listPendingCampaignInvitesMineFn } from '@/features/campaign-invite/api/campaign-invite-client'
 import { listCharacters as listCharactersFn } from '@/features/character/api/character-client'
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE } from '@/features/campaign'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
@@ -19,6 +21,7 @@ import { resolveDashboardWelcomeCopy } from './dashboard-home-welcome.lib'
 
 const fetchSession = vi.mocked(fetchSessionFn)
 const listCampaigns = vi.mocked(listCampaignsFn)
+const listPendingCampaignInvitesMine = vi.mocked(listPendingCampaignInvitesMineFn)
 const listCharacters = vi.mocked(listCharactersFn)
 
 const authSession = makeAuthMe()
@@ -43,13 +46,15 @@ describe('DashboardHome', () => {
   beforeEach(() => {
     fetchSession.mockReset()
     listCampaigns.mockReset()
+    listPendingCampaignInvitesMine.mockReset()
     listCharacters.mockReset()
     localStorage.clear()
     fetchSession.mockResolvedValue(authSession)
     listCharacters.mockResolvedValue([])
+    listPendingCampaignInvitesMine.mockResolvedValue([])
   })
 
-  it('renders the welcome header, starter cards, and invitation copy', async () => {
+  it('renders the welcome header and starter cards', async () => {
     listCampaigns.mockResolvedValue([])
 
     renderHome()
@@ -63,7 +68,6 @@ describe('DashboardHome', () => {
     expect(screen.getByText(welcome.body)).toBeInTheDocument()
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.campaign.title)).toBeInTheDocument()
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.character.title)).toBeInTheDocument()
-    expect(screen.getByText(DASHBOARD_HOME_COPY.invitationHeading)).toBeInTheDocument()
     const newCampaignLink = screen.getByRole('link', { name: 'New campaign' })
     expect(newCampaignLink).toHaveAttribute('href', '/campaigns/new')
     expect(newCampaignLink).not.toHaveClass('border-outline-button-border')
@@ -140,7 +144,7 @@ describe('DashboardHome', () => {
       ),
     ).not.toBeInTheDocument()
     expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
-    expect(screen.queryByText('Resume setup')).not.toBeInTheDocument()
+    expect(screen.queryByText(/finish joining/i)).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View all campaigns' })).not.toBeInTheDocument()
     expect(screen.getByText(DASHBOARD_HOME_COPY.starterCards.campaign.title)).toBeInTheDocument()
   })
@@ -198,9 +202,7 @@ describe('DashboardHome', () => {
     expect(await screen.findByRole('link', { name: 'New campaign' })).toHaveClass(
       'border-outline-button-border',
     )
-    expect(
-      await screen.findByRole('link', { name: 'Continue setup for Incomplete Campaign' }),
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Continue setup' })).toBeInTheDocument()
   })
 
   it('shows a continue card for a remembered campaign with completed onboarding', async () => {
@@ -221,7 +223,7 @@ describe('DashboardHome', () => {
     )
   })
 
-  it('shows a resume setup card for a remembered incomplete campaign', async () => {
+  it('shows a finish joining card for a remembered incomplete campaign', async () => {
     listCampaigns.mockResolvedValue([
       makeCampaignListItem({
         id: 'camp_incomplete',
@@ -240,12 +242,33 @@ describe('DashboardHome', () => {
 
     renderHome()
 
-    expect(
-      await screen.findByRole('heading', { level: 2, name: 'Resume setup' }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('link', { name: 'Continue setup for Incomplete Campaign' }),
-    ).toHaveAttribute('href', '/campaigns/camp_incomplete/onboarding')
+    expect(await screen.findByText('Finish joining Incomplete Campaign')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue setup' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp_incomplete/onboarding',
+    )
     expect(screen.queryByText('Continue campaign')).not.toBeInTheDocument()
+  })
+
+  it('shows pending invitation cards from the mine endpoint', async () => {
+    listCampaigns.mockResolvedValue([])
+    listPendingCampaignInvitesMine.mockResolvedValue([
+      {
+        inviteId: 'b'.repeat(24),
+        campaignId: 'camp_pending',
+        campaignName: 'Stormwatch',
+        inviterDisplayName: 'Avery',
+        expiresAt: '2026-01-08T00:00:00.000Z',
+      },
+    ])
+
+    renderHome()
+
+    expect(await screen.findByText(/Stormwatch/)).toBeInTheDocument()
+    expect(screen.getByText('Campaign invitation')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Review invitation' })).toHaveAttribute(
+      'href',
+      `/app/campaign-invites/${'b'.repeat(24)}`,
+    )
   })
 })

@@ -123,6 +123,15 @@ Notification clicks navigate to the dashboard invite-id review route
 (`dashboardCampaignInviteReviewPath`); membership changes happen on the explicit
 accept button.
 
+### Invitee dashboard cards (Phase 2)
+
+`GET /api/campaign-invites/mine` returns pending invites for the authenticated
+user's email. The dashboard home and campaigns index render **Review invitation**
+cards (`PendingCampaignInvitation`) that link to
+`/app/campaign-invites/:inviteId`. Accepted-but-incomplete memberships render
+**Finish joining** / **Continue setup** cards from the campaigns list — never
+mixed with pending invite review CTAs.
+
 ## Onboarding completion
 
 ### Canonical path (membership-scoped)
@@ -220,6 +229,7 @@ Overview display rules:
 | POST   | `/api/campaign-invites/:token/accept`                       | authenticated invitee |
 | GET    | `/api/campaign-invites/by-id/:inviteId`                     | authenticated invitee |
 | POST   | `/api/campaign-invites/by-id/:inviteId/accept`              | authenticated invitee |
+| GET    | `/api/campaign-invites/mine`                                | authenticated invitee |
 | GET    | `/api/campaigns/:campaignId/onboarding-context`             | authenticated member  |
 | GET    | `/api/campaigns/:campaignId/onboarding/eligible-characters` | authenticated member  |
 | POST   | `/api/campaigns/:campaignId/onboarding/complete`            | authenticated member  |

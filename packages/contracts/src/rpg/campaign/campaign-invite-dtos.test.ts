@@ -1,20 +1,27 @@
 import { describe, expect, it } from 'vitest'
 
-import { campaignInvitePublicResolutionSchema } from './campaign-invite-dtos'
+import {
+  campaignInviteInviteeListItemSchema,
+  campaignInviteInviteeListResponseSchema,
+} from './campaign-invite-dtos'
 
-describe('campaignInvitePublicResolutionSchema', () => {
-  it('parses public resolve payload without internal ids', () => {
-    const parsed = campaignInvitePublicResolutionSchema.parse({
+describe('campaignInviteInviteeListItemSchema', () => {
+  it('parses pending invite list items for the invitee dashboard', () => {
+    const parsed = campaignInviteInviteeListItemSchema.parse({
+      inviteId: 'invite_1',
       campaignId: 'camp_1',
       campaignName: 'The Shattered Vale',
-      inviterDisplayName: 'A campaign owner',
-      invitedEmail: 'player@example.com',
-      invitedEmailMasked: 'p***@example.com',
-      status: 'pending',
+      inviterDisplayName: 'Avery',
       expiresAt: '2026-01-08T00:00:00.000Z',
     })
 
-    expect(parsed.invitedEmail).toBe('player@example.com')
-    expect(parsed.invitedEmailMasked).toBe('p***@example.com')
+    expect(parsed.campaignName).toBe('The Shattered Vale')
+  })
+})
+
+describe('campaignInviteInviteeListResponseSchema', () => {
+  it('wraps invite list items', () => {
+    const parsed = campaignInviteInviteeListResponseSchema.parse({ invites: [] })
+    expect(parsed.invites).toEqual([])
   })
 })

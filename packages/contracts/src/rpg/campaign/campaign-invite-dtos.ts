@@ -61,6 +61,24 @@ export const campaignInviteShareLinkResultSchema = z.object({
 
 export type CampaignInviteShareLinkResult = z.infer<typeof campaignInviteShareLinkResultSchema>
 
+export const campaignInviteInviteeListItemSchema = z.object({
+  inviteId: z.string().min(1),
+  campaignId: z.string().min(1),
+  campaignName: z.string().min(1),
+  inviterDisplayName: z.string().min(1),
+  expiresAt: z.iso.datetime(),
+})
+
+export type CampaignInviteInviteeListItem = z.infer<typeof campaignInviteInviteeListItemSchema>
+
+export const campaignInviteInviteeListResponseSchema = z.object({
+  invites: z.array(campaignInviteInviteeListItemSchema),
+})
+
+export type CampaignInviteInviteeListResponse = z.infer<
+  typeof campaignInviteInviteeListResponseSchema
+>
+
 /** Onboarding membership role is always `pc` for campaign invites. */
 export const CAMPAIGN_INVITE_MEMBERSHIP_ROLE = 'pc' as const satisfies z.infer<
   typeof campaignRoleSchema

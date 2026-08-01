@@ -22,3 +22,4 @@ export {
   type SendCampaignInviteInput,
   type SendCampaignInviteResult,
 } from './send-campaign-invite.service'
+export { listPendingCampaignInvitesForUser } from './list-pending-campaign-invites.service'

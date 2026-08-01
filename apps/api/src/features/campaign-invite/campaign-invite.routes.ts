@@ -34,6 +34,7 @@ campaignInviteCampaignRouter.post(
 
 export const campaignInvitePublicRouter: Router = Router()
 
+campaignInvitePublicRouter.get('/mine', requireAuth, controller.listMine)
 campaignInvitePublicRouter.get('/by-id/:inviteId', requireAuth, controller.resolveById)
 campaignInvitePublicRouter.post('/by-id/:inviteId/accept', requireAuth, controller.acceptById)
 campaignInvitePublicRouter.post('/:token/accept', requireAuth, controller.acceptByToken)

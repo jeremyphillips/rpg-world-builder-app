@@ -1,31 +1,36 @@
 'use client'
 
 import type { CampaignListItem } from '@rpg/contracts'
-import { Link } from 'react-router-dom'
 import { Alert, buttonVariants } from '@rpg/ui'
+import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
-import { buildCampaignDisplay } from '../lib/campaign-display'
 import {
-  CAMPAIGN_ONBOARDING_INCOMPLETE_COPY,
+  FINISH_JOINING_CAMPAIGN_ACTION,
+  FINISH_JOINING_CAMPAIGN_BODY,
   finishJoiningCampaignTitle,
-} from '../lib/campaign-onboarding-copy'
+} from '../lib/campaign-invitation-copy'
+import { buildCampaignDisplay } from '../lib/campaign-display'
 
-export function CampaignOnboardingIncompleteAlert({ campaign }: { campaign: CampaignListItem }) {
+type FinishJoiningCampaignCardProps = {
+  campaign: CampaignListItem
+}
+
+export function FinishJoiningCampaignCard({ campaign }: FinishJoiningCampaignCardProps) {
   const campaignName = buildCampaignDisplay(campaign).name
 
   return (
     <Alert
       variant="warning"
       title={finishJoiningCampaignTitle(campaignName)}
-      description={CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.message}
+      description={FINISH_JOINING_CAMPAIGN_BODY}
       actions={
         <Link
           to={ROUTES.campaign.onboarding(campaign.id)}
           className={buttonVariants({ variant: 'outline', size: 'sm' })}
         >
-          {CAMPAIGN_ONBOARDING_INCOMPLETE_COPY.action}
+          {FINISH_JOINING_CAMPAIGN_ACTION}
         </Link>
       }
     />

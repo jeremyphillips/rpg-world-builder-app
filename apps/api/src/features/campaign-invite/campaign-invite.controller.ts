@@ -10,6 +10,7 @@ import {
   revokeCampaignInvite,
   sendCampaignInvite,
   shareCampaignInviteLink,
+  listPendingCampaignInvitesForUser,
 } from './campaign-invite.service'
 
 export async function send(req: Request, res: Response): Promise<void> {
@@ -79,4 +80,9 @@ export async function revoke(req: Request, res: Response): Promise<void> {
     revokedByUserId: req.user!.id,
   })
   res.status(204).send()
+}
+
+export async function listMine(req: Request, res: Response): Promise<void> {
+  const invites = await listPendingCampaignInvitesForUser(req.user!.id, req.user!.email)
+  res.status(200).json({ invites })
 }

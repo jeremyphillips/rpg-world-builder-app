@@ -56,6 +56,13 @@ Dashboard nav, layout alerts, and the campaign picker use
 `viewerOnboardingState === 'incomplete'` — not the overview member labels above.
 See [Character sheet routing](./character-sheet-routing.md).
 
+### Pending invitations (dashboard cards)
+
+`GET /api/campaign-invites/mine` feeds pending invitation cards on dashboard home
+and the campaigns index. Cards link to `/app/campaign-invites/:inviteId` via
+`dashboardCampaignInviteReviewPath`. Invites for campaigns the user already belongs
+to are excluded server-side and again client-side before render.
+
 ### Settings (`campaign-settings-registry.ts`)
 
 Maps `CampaignSettingId` → rules-config location, built on the routes SSOT:

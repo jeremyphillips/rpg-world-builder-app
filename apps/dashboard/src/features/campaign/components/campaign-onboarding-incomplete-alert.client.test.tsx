@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
+
 import { CampaignOnboardingIncompleteAlert } from './campaign-onboarding-incomplete-alert.client'
 
 vi.mock('react-router-dom', async () => {
@@ -14,13 +16,21 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-describe('CampaignOnboardingIncompleteAlert', () => {
-  it('renders warning copy and onboarding CTA', () => {
-    render(<CampaignOnboardingIncompleteAlert campaignId="camp_1" />)
+const incompleteCampaign = makeCampaignListItem({
+  id: 'camp_1',
+  identity: { name: 'Stormwatch' },
+  campaignRole: 'pc',
+  controlledCharacterIds: [],
+  viewerOnboardingState: 'incomplete',
+})
 
-    expect(screen.getByText('Character setup incomplete')).toBeInTheDocument()
+describe('CampaignOnboardingIncompleteAlert', () => {
+  it('renders finish joining copy and onboarding CTA', () => {
+    render(<CampaignOnboardingIncompleteAlert campaign={incompleteCampaign} />)
+
+    expect(screen.getByText('Finish joining Stormwatch')).toBeInTheDocument()
     expect(
-      screen.getByText('Complete your character setup to finish joining this campaign.'),
+      screen.getByText('Create or connect a character to complete your campaign setup.'),
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Continue setup' })).toHaveAttribute(
       'href',
@@ -29,7 +39,9 @@ describe('CampaignOnboardingIncompleteAlert', () => {
   })
 
   it('has no axe accessibility violations', async () => {
-    const { container } = render(<CampaignOnboardingIncompleteAlert campaignId="camp_1" />)
+    const { container } = render(
+      <CampaignOnboardingIncompleteAlert campaign={incompleteCampaign} />,
+    )
 
     await expectNoAxeViolations(container)
   })

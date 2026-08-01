@@ -217,4 +217,34 @@ describe('campaign invite routes', () => {
 
     expect(acceptResponse.body).toMatchObject({ inviteId: invite.id, campaignId })
   })
+
+  it('lists pending invites for the authenticated invitee', async () => {
+    const { agent, csrfToken } = await registerOwner('mine-route-owner@example.com')
+    const campaignId = await createTestCampaign(agent, csrfToken, 'Mine Route Campaign')
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/invites`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ email: 'mine-route-player@example.com' })
+      .expect(201)
+
+    const player = await registerAndLoginTestUser(getApp(), {
+      email: 'mine-route-player@example.com',
+      password: TEST_PASSWORD,
+      displayName: 'Mine Player',
+    })
+
+    const response = await player.agent.get('/api/campaign-invites/mine').expect(200)
+
+    expect(response.body.invites).toHaveLength(1)
+    expect(response.body.invites[0]).toMatchObject({
+      campaignId,
+      campaignName: 'Mine Route Campaign',
+      inviterDisplayName: 'Campaign Owner',
+    })
+  })
+
+  it('requires authentication for invitee pending list', async () => {
+    await request(getApp()).get('/api/campaign-invites/mine').expect(401)
+  })
 })
