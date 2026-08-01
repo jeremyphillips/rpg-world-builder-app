@@ -17,7 +17,7 @@ const SURFACE_RELATIVE_UTILITY_NAMES = [
   'border-border-subtle',
   'border-border-strong',
   'border-card-selected-border',
-  'border-outline-button-border',
+  'border-interactive-outline',
   'border-semantic-neutral-border',
   'bg-border',
   'divide-border',
@@ -46,7 +46,7 @@ describe('surface-relative chrome utilities', () => {
     expect(globalsCss).not.toMatch(/--color-muted-foreground:/)
     expect(globalsCss).not.toMatch(/--color-foreground-subtle:/)
     expect(globalsCss).not.toMatch(/--color-border-subtle:/)
-    expect(globalsCss).not.toMatch(/--color-outline-button-border:/)
+    expect(globalsCss).not.toMatch(/--color-interactive-outline-border:/)
   })
 
   it('imports surface-relative utility definitions after semantic tokens', () => {

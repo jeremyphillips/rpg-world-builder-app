@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   FIELD_CONTROL_SEMANTIC_ROLES,
+  INTERACTIVE_OUTLINE_MIX_WEIGHTS,
   SURFACE_RELATIVE_CHROME_ROLES,
   SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES,
   SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
@@ -49,6 +50,7 @@ const MIX_WEIGHT_ROLES = [
   '--mix-border-selected',
   '--mix-sidebar-nav-item-fg',
   ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
+  ...INTERACTIVE_OUTLINE_MIX_WEIGHTS,
 ] as const
 
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
@@ -114,9 +116,17 @@ describe('surface-relative chrome formulas', () => {
     }
   })
 
-  it('aliases outline button border directly to border-subtle', () => {
-    expect(extractRoleValue(light, '--outline-button-border')).toBe('var(--border-subtle)')
-    expect(extractRoleValue(dark, '--outline-button-border')).toBe('var(--border-subtle)')
+  it('defines interactive outline border separately from border-subtle', () => {
+    for (const css of [light, dark]) {
+      const interactive = extractRoleValue(css, '--interactive-outline-border') ?? ''
+      const subtle = extractRoleValue(css, '--border-subtle') ?? ''
+
+      expect(interactive).toContain('color-mix')
+      expect(interactive).toContain('var(--mix-interactive-outline-border)')
+      expect(interactive).toContain('var(--surface-current)')
+      expect(interactive).not.toBe('var(--border-subtle)')
+      expect(subtle).toContain('var(--mix-border-subtle)')
+    }
   })
 
   it('keeps field-disabled separate from surface-disabled', () => {
@@ -225,8 +235,11 @@ describe('surface-relative interaction recipes (Phase 2)', () => {
     }
   })
 
-  it('mirrors formula shape for neutral outline hover/active washes across themes', () => {
-    for (const role of ['--outline-button-hover-bg', '--outline-button-active-bg'] as const) {
+  it('mirrors formula shape for neutral interactive outline hover/active washes across themes', () => {
+    for (const role of [
+      '--interactive-outline-hover-bg',
+      '--interactive-outline-active-bg',
+    ] as const) {
       const lightValue = extractRoleValue(light, role) ?? ''
       const darkValue = extractRoleValue(dark, role) ?? ''
 

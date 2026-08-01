@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../lib/utils'
+import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
@@ -74,7 +76,10 @@ export const filterStackedFieldGroupVariants = cva('flex flex-col', {
 
 /** Collapsible advanced-filters panel shell. */
 export const filterAdvancedPanelVariants = cva(
-  'overflow-hidden rounded-md border border-border bg-surface-muted [--field-control-bg:var(--field-control-bg-on-muted)]',
+  cn(
+    'overflow-hidden rounded-md border border-border bg-surface-muted [--field-control-bg:var(--field-control-bg-on-muted)]',
+    establishSurfaceCurrent('surface-muted'),
+  ),
 )
 
 /** Optional eyebrow header row inside the advanced panel. */

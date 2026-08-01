@@ -35,6 +35,12 @@ const OWNERSHIP_ROWS = [
     ownership: 'establishes',
     plane: '--popover',
   },
+  {
+    shell: 'Primary filter region (DataTable)',
+    ownership: 'establishes',
+    plane: '--surface-subtle',
+  },
+  { shell: 'Advanced filter panel', ownership: 'establishes', plane: '--surface-muted' },
   { shell: 'Modal / Sheet / Toast', ownership: 'establishes', plane: '--card' },
   { shell: 'Sidebar shell', ownership: 'establishes', plane: '--sidebar' },
   {
@@ -62,14 +68,14 @@ const INTERACTION_SAMPLES = [
       'rounded-md border border-drop-target-border bg-drop-target px-3 py-2 text-sm text-primary',
   },
   {
-    label: 'outline-hover',
+    label: 'interactive-outline hover',
     className:
-      'rounded-md border border-outline-button-border bg-outline-button-hover px-3 py-2 text-sm',
+      'rounded-md border border-interactive-outline bg-interactive-outline-hover px-3 py-2 text-sm',
   },
   {
-    label: 'outline-active',
+    label: 'interactive-outline active',
     className:
-      'rounded-md border border-outline-button-border bg-outline-button-active px-3 py-2 text-sm',
+      'rounded-md border border-interactive-outline bg-interactive-outline-active px-3 py-2 text-sm',
   },
   {
     label: 'choice-control ring',

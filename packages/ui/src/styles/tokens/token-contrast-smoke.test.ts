@@ -42,6 +42,42 @@ function resolvePaletteVar(css: string, name: string): string | undefined {
 
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
 const MIN_SOLID_CONTRAST = 2.3
+/** Minimum fill separation for default field plane vs card / subtle wash backgrounds. */
+const MIN_FIELD_FILL_SURFACE_CONTRAST = 1.02
+
+function blendedLightness(fgL: number, bgL: number, fgWeightPercent: number): number {
+  const weight = fgWeightPercent / 100
+  return fgL * weight + bgL * (1 - weight)
+}
+
+function subtleWashMixWeight(paletteCss: string): number {
+  const subtle = readPaletteVar(paletteCss, '--palette-surface-subtle') ?? ''
+  const match = subtle.match(/neutral-contrast\)\s*([\d.]+)%/)
+  return match ? Number(match[1]) : 8
+}
+
+function fieldFillContrastChecks(paletteCss: string): {
+  fieldVsCard: number
+  fieldVsSubtle: number
+} {
+  const baseL = oklchLightness(resolvePaletteVar(paletteCss, '--palette-surface-base') ?? '')!
+  const panelL = oklchLightness(resolvePaletteVar(paletteCss, '--palette-surface-panel') ?? '')!
+  const contrastL = oklchLightness(
+    resolvePaletteVar(paletteCss, '--palette-neutral-contrast') ?? '',
+  )!
+
+  const fieldRaw = resolvePaletteVar(paletteCss, '--palette-surface-field') ?? ''
+  const fieldL = fieldRaw.includes('white')
+    ? blendedLightness(baseL, 1, 50)
+    : blendedLightness(baseL, panelL, 30)
+
+  const subtleL = blendedLightness(contrastL, baseL, subtleWashMixWeight(paletteCss))
+
+  return {
+    fieldVsCard: contrastRatio(fieldL, panelL),
+    fieldVsSubtle: contrastRatio(fieldL, subtleL),
+  }
+}
 
 describe('token contrast smoke checks', () => {
   const lightCss = readFileSync(join(tokensDir, 'palette-light.css'), 'utf8')
@@ -95,14 +131,33 @@ describe('token contrast smoke checks', () => {
     expect(contrastRatio(darkFg!, darkBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
   })
 
-  it('aliases outline button border to border-subtle in both semantic themes', () => {
+  it('keeps interactive outline border distinct from border-subtle in both semantic themes', () => {
     const semanticLight = readFileSync(join(tokensDir, 'semantic-light.css'), 'utf8')
     const semanticDark = readFileSync(join(tokensDir, 'semantic-dark.css'), 'utf8')
 
     for (const css of [semanticLight, semanticDark]) {
       expect(readPaletteVar(css, '--field-control-bg-on-muted')).toBe('var(--surface-subtle)')
       expect(readPaletteVar(css, '--field-control-bg-default')).toBe('var(--palette-field-bg)')
-      expect(readPaletteVar(css, '--outline-button-border')).toBe('var(--border-subtle)')
+
+      const interactive = readPaletteVar(css, '--interactive-outline-border') ?? ''
+      expect(interactive).toContain('color-mix')
+      expect(interactive).toContain('var(--mix-interactive-outline-border)')
+      expect(interactive).not.toBe('var(--border-subtle)')
+    }
+  })
+
+  it('keeps default field fill separated from card and surface-subtle planes (light + dark)', () => {
+    for (const [paletteCss, theme] of [
+      [lightCss, 'light'],
+      [darkCss, 'dark'],
+    ] as const) {
+      const { fieldVsCard, fieldVsSubtle } = fieldFillContrastChecks(paletteCss)
+      expect(fieldVsCard, `${theme} field vs card`).toBeGreaterThanOrEqual(
+        MIN_FIELD_FILL_SURFACE_CONTRAST,
+      )
+      expect(fieldVsSubtle, `${theme} field vs subtle`).toBeGreaterThanOrEqual(
+        MIN_FIELD_FILL_SURFACE_CONTRAST,
+      )
     }
   })
 })

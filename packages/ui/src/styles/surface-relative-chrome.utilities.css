@@ -70,10 +70,10 @@
   );
 }
 
-@utility border-outline-button-border {
+@utility border-interactive-outline {
   border-color: color-mix(
     in oklch,
-    var(--foreground) var(--mix-border-subtle),
+    var(--foreground) var(--mix-interactive-outline-border),
     var(--surface-current)
   );
 }

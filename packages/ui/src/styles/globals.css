@@ -131,8 +131,8 @@
   --color-message-bubble-self-foreground: var(--message-bubble-self-fg);
   --color-message-bubble-peer: var(--message-bubble-peer-bg);
   --color-message-bubble-peer-foreground: var(--message-bubble-peer-fg);
-  --color-outline-button-hover: var(--outline-button-hover-bg);
-  --color-outline-button-active: var(--outline-button-active-bg);
+  --color-interactive-outline-hover: var(--interactive-outline-hover-bg);
+  --color-interactive-outline-active: var(--interactive-outline-active-bg);
 
   --shadow-surface-raised: var(--surface-raised-shadow);
   --shadow-surface-sunken: var(--surface-sunken-shadow);

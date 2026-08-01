@@ -19,7 +19,7 @@ describe('NewCampaignLink', () => {
     const link = screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel })
     expect(link).toHaveAttribute('href', '/campaigns/new')
     expect(link).toHaveClass('h-8')
-    expect(link).not.toHaveClass('border-outline-button-border')
+    expect(link).not.toHaveClass('border-interactive-outline')
 
     rerender(
       <MemoryRouter>
@@ -29,6 +29,6 @@ describe('NewCampaignLink', () => {
 
     expect(
       screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
-    ).toHaveClass('border-outline-button-border')
+    ).toHaveClass('border-interactive-outline')
   })
 })

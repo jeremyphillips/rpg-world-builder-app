@@ -60,7 +60,7 @@ describe('CampaignsOverview', () => {
     ).toHaveLength(1)
     expect(
       screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
-    ).toHaveClass('border-outline-button-border')
+    ).toHaveClass('border-interactive-outline')
   })
 
   it('uses the primary new-campaign variant when no campaign rows exist', async () => {
@@ -71,7 +71,7 @@ describe('CampaignsOverview', () => {
     const link = await screen.findByRole('link', {
       name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel,
     })
-    expect(link).not.toHaveClass('border-outline-button-border')
+    expect(link).not.toHaveClass('border-interactive-outline')
   })
 
   it('demotes new campaign when only incomplete campaign rows exist', async () => {
@@ -89,6 +89,6 @@ describe('CampaignsOverview', () => {
 
     expect(
       await screen.findByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
-    ).toHaveClass('border-outline-button-border')
+    ).toHaveClass('border-interactive-outline')
   })
 })

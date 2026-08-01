@@ -1,11 +1,17 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import { establishSurfaceCurrent } from './surface-current.lib'
+
 /** Filter region layout — primary panel row and optional additional panel row. */
 export const dataTableFilterRegionVariants = cva('grid w-full gap-y-3')
 
 /** Primary filter panel shell — subtle background wrapping fields and optional trigger. */
 export const dataTableFilterRegionPrimaryVariants = cva(
-  'min-w-0 rounded-md border border-border bg-surface-subtle p-3',
+  cn(
+    'min-w-0 rounded-md border border-border bg-surface-subtle p-3',
+    establishSurfaceCurrent('surface-subtle'),
+  ),
 )
 
 /** Inner layout — grid pins More filters top-right; flex-only when no trigger. */

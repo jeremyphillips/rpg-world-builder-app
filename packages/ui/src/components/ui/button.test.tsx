@@ -55,8 +55,8 @@ describe('Button', () => {
   it('applies outline button chrome from token recipes', () => {
     render(<Button variant="outline">Cancel</Button>)
     const button = screen.getByRole('button', { name: 'Cancel' })
-    expect(button).toHaveClass('border-outline-button-border')
-    expect(button).toHaveClass('hover:bg-outline-button-hover')
+    expect(button).toHaveClass('border-interactive-outline')
+    expect(button).toHaveClass('hover:bg-interactive-outline-hover')
     expect(button).not.toHaveClass('shadow-sm')
     expect(button).not.toHaveClass('border-input')
   })
@@ -69,7 +69,7 @@ describe('Button', () => {
     )
     const button = screen.getByRole('button', { name: 'More filters' })
     expect(button).toHaveClass('aria-expanded:border-border')
-    expect(button).toHaveClass('aria-expanded:bg-outline-button-active')
+    expect(button).toHaveClass('aria-expanded:bg-interactive-outline-active')
   })
 
   it('fires onClick when pressed', async () => {

@@ -20,8 +20,9 @@
   --mix-control-hover: 35%;
   --mix-control-selected: 22%;
   --mix-drop-target: 35%;
-  --mix-outline-hover: 4%;
-  --mix-outline-active: 8%;
+  --mix-interactive-outline-border: 12%;
+  --mix-interactive-outline-hover: 4%;
+  --mix-interactive-outline-active: 8%;
   --mix-choice-control-border: 32%;
 
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
@@ -188,17 +189,22 @@
   );
 
   /*
-   * Outline button chrome — quiet border ladder stroke, transparent fill, neutral hover wash.
+   * Interactive outline chrome — shared by outline Button, FilterInlineControl, and similar shells.
+   * Border weight is distinct from structural `--border-subtle` separators.
    */
-  --outline-button-border: var(--border-subtle);
-  --outline-button-hover-bg: color-mix(
+  --interactive-outline-border: color-mix(
     in oklch,
-    var(--foreground) var(--mix-outline-hover),
+    var(--foreground) var(--mix-interactive-outline-border),
     var(--surface-current)
   );
-  --outline-button-active-bg: color-mix(
+  --interactive-outline-hover-bg: color-mix(
     in oklch,
-    var(--foreground) var(--mix-outline-active),
+    var(--foreground) var(--mix-interactive-outline-hover),
+    var(--surface-current)
+  );
+  --interactive-outline-active-bg: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-interactive-outline-active),
     var(--surface-current)
   );
 
