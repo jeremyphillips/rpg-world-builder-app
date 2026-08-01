@@ -145,5 +145,7 @@ Structure is identical across themes; only `var(--palette-…)` targets differ.
 Field control API: `--field-control-*` matrix + public utilities `border-input` /
 `bg-input` (and state variants) in `globals.css`. Switch: `--switch-track*`.
 
-Interaction recipes: composed in `semantic-*.css` — e.g.
-`color-mix(in oklch, var(--accent) 35%, var(--background))` for control hover.
+Interaction recipes: composed in `semantic-*.css` — accent-tinted washes mix toward
+`--surface-current` (e.g. `color-mix(in oklch, var(--accent) var(--mix-control-hover), var(--surface-current))`
+for control hover). Outline hover/active and choice-control border use neutral
+`color-mix(foreground → --surface-current)` with theme-local weights.

@@ -4,7 +4,12 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { FIELD_CONTROL_SEMANTIC_ROLES, SURFACE_RELATIVE_CHROME_ROLES } from './palette-inventory'
+import {
+  FIELD_CONTROL_SEMANTIC_ROLES,
+  SURFACE_RELATIVE_CHROME_ROLES,
+  SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES,
+  SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
+} from './palette-inventory'
 
 const tokensDir = join(dirname(fileURLToPath(import.meta.url)), '.')
 
@@ -43,6 +48,7 @@ const MIX_WEIGHT_ROLES = [
   '--mix-border-strong',
   '--mix-border-selected',
   '--mix-sidebar-nav-item-fg',
+  ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
 ] as const
 
 /** Minimum contrast ratio for smoke checks — oklch-L approximation, not full WCAG. */
@@ -186,5 +192,70 @@ describe('surface-relative chrome formulas', () => {
         (fg! * parseFloat(mixWeight)) / 100 + (panel! * (100 - parseFloat(mixWeight))) / 100
       expect(contrastRatio(fg!, blended)).toBeGreaterThanOrEqual(MIN_BORDER_CONTRAST)
     }
+  })
+})
+
+describe('surface-relative interaction recipes (Phase 2)', () => {
+  const { light, dark } = readThemeCss()
+
+  it('declares interaction formula roles in both themes', () => {
+    for (const role of SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES) {
+      expect(extractRoleValue(light, role), `${role} in semantic-light.css`).toBeTruthy()
+      expect(extractRoleValue(dark, role), `${role} in semantic-dark.css`).toBeTruthy()
+    }
+  })
+
+  it('mirrors formula shape for accent-tinted interaction roles across themes', () => {
+    for (const role of [
+      '--control-hover-bg',
+      '--control-selected-bg',
+      '--drop-target-bg',
+    ] as const) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--accent)')
+      expect(darkValue).toContain('var(--accent)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).not.toContain('var(--background)')
+      expect(darkValue).not.toContain('var(--background)')
+    }
+  })
+
+  it('mirrors formula shape for neutral outline hover/active washes across themes', () => {
+    for (const role of ['--outline-button-hover-bg', '--outline-button-active-bg'] as const) {
+      const lightValue = extractRoleValue(light, role) ?? ''
+      const darkValue = extractRoleValue(dark, role) ?? ''
+
+      expect(lightValue).toContain('color-mix')
+      expect(darkValue).toContain('color-mix')
+      expect(lightValue).toContain('var(--foreground)')
+      expect(darkValue).toContain('var(--foreground)')
+      expect(lightValue).toContain('var(--surface-current)')
+      expect(darkValue).toContain('var(--surface-current)')
+      expect(lightValue).not.toContain('var(--surface-subtle)')
+      expect(darkValue).not.toContain('var(--surface-subtle)')
+      expect(lightValue).not.toContain('var(--surface-muted)')
+      expect(darkValue).not.toContain('var(--surface-muted)')
+    }
+  })
+
+  it('mixes choice-control border toward surface-current, not card', () => {
+    for (const css of [light, dark]) {
+      const value = extractRoleValue(css, '--choice-control-border') ?? ''
+      expect(value).toContain('color-mix')
+      expect(value).toContain('var(--foreground)')
+      expect(value).toContain('var(--surface-current)')
+      expect(value).not.toContain('var(--card)')
+    }
+  })
+
+  it('retargets dark raised shadow drop toward surface-current', () => {
+    const shadow = extractRoleValue(dark, '--surface-raised-shadow') ?? ''
+    expect(shadow).toContain('var(--surface-current)')
+    expect(shadow).not.toContain('var(--background)')
   })
 })

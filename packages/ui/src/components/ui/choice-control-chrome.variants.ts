@@ -1,6 +1,6 @@
 /**
  * Shared chrome for radio/checkbox choice indicators on panel surfaces.
- * Uses `--choice-control-border` (mixed toward `--card`), not field-input chrome.
+ * Uses `--choice-control-border` (mixed toward `--surface-current`), not field-input chrome.
  */
 export const choiceControlIndicatorShellClasses =
   'border border-choice-control shadow-sm transition-colors'

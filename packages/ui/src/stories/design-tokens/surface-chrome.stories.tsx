@@ -3,10 +3,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { cn } from '../../lib/utils'
+import { Button } from '../../components/ui/button.client'
 import { Card } from '../../components/ui/card'
 import { Heading } from '../../components/ui/heading'
 import { Text } from '../../components/ui/text'
 import { cardSurfaceClasses } from '../../components/ui/card.variants'
+import { choiceControlIndicatorShellClasses } from '../../components/ui/choice-control-chrome.variants'
 import { resolveSurfaceClasses } from '../../components/ui/surface.variants'
 import { establishSurfaceCurrent } from '../../components/ui/surface-current.lib'
 import {
@@ -44,6 +46,55 @@ const OWNERSHIP_ROWS = [
   { shell: 'Segmented selected pill', ownership: 'inherits', plane: '—' },
   { shell: 'Field input chrome', ownership: 'field plane', plane: '--palette-surface-field' },
 ] as const
+
+const INTERACTION_SAMPLES = [
+  {
+    label: 'control-hover',
+    className: 'rounded-md bg-control-hover px-3 py-2 text-sm text-foreground',
+  },
+  {
+    label: 'control-selected',
+    className: 'rounded-md bg-control-selected px-3 py-2 text-sm text-foreground',
+  },
+  {
+    label: 'drop-target',
+    className:
+      'rounded-md border border-drop-target-border bg-drop-target px-3 py-2 text-sm text-primary',
+  },
+  {
+    label: 'outline-hover',
+    className:
+      'rounded-md border border-outline-button-border bg-outline-button-hover px-3 py-2 text-sm',
+  },
+  {
+    label: 'outline-active',
+    className:
+      'rounded-md border border-outline-button-border bg-outline-button-active px-3 py-2 text-sm',
+  },
+  {
+    label: 'choice-control ring',
+    className: cn('size-5 rounded-full', choiceControlIndicatorShellClasses),
+  },
+] as const
+
+function InteractionSampleGrid({ title }: { title?: string }) {
+  return (
+    <div className="space-y-3">
+      {title ? (
+        <Text variant="muted" className="text-sm">
+          {title}
+        </Text>
+      ) : null}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        {INTERACTION_SAMPLES.map((sample) => (
+          <div key={sample.label} className={sample.className}>
+            {sample.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function ChromeSampleGrid({ title }: { title?: string }) {
   return (
@@ -163,6 +214,41 @@ function SurfaceChromeMatrix() {
         </div>
       </section>
 
+      <section className={colorPaletteGroupSectionClasses} aria-labelledby="interaction-recipes">
+        <div className={colorPaletteGroupHeaderClasses}>
+          <Heading variant="section" as="h2" id="interaction-recipes">
+            Interaction recipes (Phase 2)
+          </Heading>
+          <Text variant="muted">
+            Accent-tinted and neutral outline washes mix toward inherited{' '}
+            <code className="font-mono text-sm">--surface-current</code>. Compare page canvas vs
+            card plane.
+          </Text>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="space-y-4">
+            <Heading variant="subsection" as="h3">
+              Page canvas
+            </Heading>
+            <InteractionSampleGrid />
+            <Button variant="outline" size="sm">
+              Outline button (hover me)
+            </Button>
+          </div>
+
+          <Card className="space-y-4 p-6">
+            <Heading variant="subsection" as="h3">
+              Card plane
+            </Heading>
+            <InteractionSampleGrid title="Recipes inherit card --surface-current" />
+            <Button variant="outline" size="sm">
+              Outline button on card
+            </Button>
+          </Card>
+        </div>
+      </section>
+
       <section className={colorPaletteGroupSectionClasses} aria-labelledby="ownership-table">
         <div className={colorPaletteGroupHeaderClasses}>
           <Heading variant="section" as="h2" id="ownership-table">
@@ -207,7 +293,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Surface-relative neutral chrome matrix, nested acceptance cases, and establish vs inherit ownership table.',
+          'Surface-relative neutral chrome matrix, nested acceptance cases, interaction recipe samples, and establish vs inherit ownership table.',
       },
     },
   },

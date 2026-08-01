@@ -17,6 +17,12 @@
   --mix-border-strong: 24%;
   --mix-border-selected: 30%;
   --mix-sidebar-nav-item-fg: var(--mix-fg-muted);
+  --mix-control-hover: 35%;
+  --mix-control-selected: 22%;
+  --mix-drop-target: 35%;
+  --mix-outline-hover: 4%;
+  --mix-outline-active: 8%;
+  --mix-choice-control-border: 32%;
 
   /* Surfaces — page canvas, cards, popovers (`bg-background`, `bg-card`, `bg-popover`, …) */
   --background: var(--palette-surface-base);
@@ -175,25 +181,49 @@
   /*
    * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
    */
-  --choice-control-border: color-mix(in oklch, var(--foreground) 32%, var(--card));
+  --choice-control-border: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-choice-control-border),
+    var(--surface-current)
+  );
 
   /*
    * Outline button chrome — quiet border ladder stroke, transparent fill, neutral hover wash.
    */
   --outline-button-border: var(--border-subtle);
-  --outline-button-hover-bg: var(--surface-subtle);
-  --outline-button-active-bg: var(--surface-muted);
+  --outline-button-hover-bg: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-outline-hover),
+    var(--surface-current)
+  );
+  --outline-button-active-bg: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-outline-active),
+    var(--surface-current)
+  );
 
   /*
    * Shared interaction recipes — public contract for hover/selected/drag/track chrome.
-   * Composed at Layer 2 toward concrete surfaces (no transparent washes).
+   * Tinted washes mix toward inherited `--surface-current` (no transparent washes).
    */
-  --control-hover-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
-  --control-selected-bg: color-mix(in oklch, var(--accent) 22%, var(--background));
+  --control-hover-bg: color-mix(
+    in oklch,
+    var(--accent) var(--mix-control-hover),
+    var(--surface-current)
+  );
+  --control-selected-bg: color-mix(
+    in oklch,
+    var(--accent) var(--mix-control-selected),
+    var(--surface-current)
+  );
   --row-hover-bg: var(--surface-subtle);
   --row-selected-bg: var(--surface-strong);
   --row-selected-border: var(--border-strong);
-  --drop-target-bg: color-mix(in oklch, var(--accent) 35%, var(--background));
+  --drop-target-bg: color-mix(
+    in oklch,
+    var(--accent) var(--mix-drop-target),
+    var(--surface-current)
+  );
   --drop-target-border: var(--primary);
   --segmented-track-bg: var(--surface-strong);
 
@@ -209,7 +239,7 @@
   --catalog-picker-row-surface: var(--card);
   --surface-raised-shadow:
     inset 0 1px 0 0 color-mix(in oklab, var(--foreground) 6%, transparent),
-    0 1px 3px 0 color-mix(in oklab, var(--background) 55%, black);
+    0 1px 3px 0 color-mix(in oklab, var(--surface-current) 55%, black);
   --surface-sunken-shadow:
     inset 0 1px 3px 0 color-mix(in oklab, var(--background) 65%, black),
     inset 0 0 0 1px color-mix(in oklab, var(--foreground) 5%, transparent);

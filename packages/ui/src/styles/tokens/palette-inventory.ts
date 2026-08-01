@@ -221,6 +221,26 @@ export const FIELD_CONTROL_SEMANTIC_ROLES = [
 /** Layer 2 choice-indicator roles composed in semantic-*.css (not field-input chrome). */
 export const CHOICE_CONTROL_SEMANTIC_ROLES = ['--choice-control-border'] as const
 
+/** Theme-local mix weights for surface-relative interaction and outline recipes. */
+export const SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS = [
+  '--mix-control-hover',
+  '--mix-control-selected',
+  '--mix-drop-target',
+  '--mix-outline-hover',
+  '--mix-outline-active',
+  '--mix-choice-control-border',
+] as const
+
+/** Layer 2 interaction recipes that color-mix toward `--surface-current`. */
+export const SURFACE_RELATIVE_INTERACTION_FORMULA_ROLES = [
+  '--control-hover-bg',
+  '--control-selected-bg',
+  '--drop-target-bg',
+  '--outline-button-hover-bg',
+  '--outline-button-active-bg',
+  '--choice-control-border',
+] as const
+
 /** Layer 2 surface-relative neutral chrome — color-mix toward `--surface-current`. */
 export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--surface-current',
@@ -233,6 +253,7 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--mix-border-strong',
   '--mix-border-selected',
   '--mix-sidebar-nav-item-fg',
+  ...SURFACE_RELATIVE_INTERACTION_MIX_WEIGHTS,
   '--muted-foreground',
   '--foreground-subtle',
   '--foreground-disabled',
