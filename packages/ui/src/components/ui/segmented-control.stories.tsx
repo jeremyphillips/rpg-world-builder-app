@@ -31,6 +31,25 @@ export const AutoWidthSegments: Story = {
   },
 }
 
+export const SearchFilterCounts: Story = {
+  args: {
+    'aria-label': 'Filter results by type',
+    value: 'content',
+    segmentWidth: 'auto',
+    options: [
+      { value: 'all', label: 'All', metadata: '24' },
+      { value: 'characters', label: 'Characters', metadata: '3' },
+      { value: 'content', label: 'Content', metadata: '14' },
+      { value: 'game-terms', label: 'Game Terms', metadata: '7' },
+    ],
+    onValueChange: () => undefined,
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <SegmentedControl {...args} value={value} onValueChange={(next) => setValue(next)} />
+  },
+}
+
 export const TwoSegments: Story = {
   args: {
     'aria-label': 'Spell picker mode',

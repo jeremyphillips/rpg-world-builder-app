@@ -8,10 +8,14 @@ import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 
 import {
   searchResultRowHeaderVariants,
+  searchResultRowInsetContentVariants,
   searchResultRowTitleRowVariants,
+  searchResultRowTitleVariants,
   searchResultRowTypeLabelVariants,
   searchResultRowVariants,
 } from './search-result-row.variants'
+
+export type SearchResultRowInset = 'panel'
 
 export type SearchResultRowProps = {
   title: string
@@ -20,6 +24,7 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
+  inset?: SearchResultRowInset
   className?: string
 }
 
@@ -30,6 +35,7 @@ export function SearchResultRow({
   href,
   campaignUnavailable = false,
   onActivate,
+  inset,
   className,
 }: SearchResultRowProps) {
   const accessibleName = campaignUnavailable
@@ -37,10 +43,10 @@ export function SearchResultRow({
     : `${title}, ${typeLabel}`
 
   const content = (
-    <>
+    <div className={searchResultRowInsetContentVariants({ inset: inset ?? 'none' })}>
       <div className={searchResultRowHeaderVariants()}>
         <span className={searchResultRowTitleRowVariants()}>
-          <Text as="span" className="min-w-0 truncate text-sm text-foreground">
+          <Text as="span" className={searchResultRowTitleVariants()}>
             {title}
           </Text>
           {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
@@ -54,7 +60,7 @@ export function SearchResultRow({
           {secondary}
         </Text>
       ) : null}
-    </>
+    </div>
   )
 
   return (

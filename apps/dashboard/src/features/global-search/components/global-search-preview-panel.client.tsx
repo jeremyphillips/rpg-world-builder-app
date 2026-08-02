@@ -6,6 +6,11 @@ import type { GlobalSearchDocument } from '@rpg/contracts'
 import { cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import {
+  globalSearchPreviewBodyClasses,
+  globalSearchPreviewFooterClasses,
+  globalSearchPreviewInsetClasses,
+} from '../lib/global-search-preview.variants'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import { GlobalSearchGroupedResults } from './global-search-results.client'
@@ -29,7 +34,12 @@ function GlobalSearchPreviewStatus({
 }: GlobalSearchPreviewStatusProps) {
   if (isPending) {
     return (
-      <p className="py-3 text-center text-sm text-muted-foreground">
+      <p
+        className={cn(
+          'py-3 text-center text-sm text-muted-foreground',
+          globalSearchPreviewInsetClasses,
+        )}
+      >
         {GLOBAL_SEARCH_COPY.loadingCatalog}
       </p>
     )
@@ -37,7 +47,7 @@ function GlobalSearchPreviewStatus({
 
   if (isError) {
     return (
-      <div className="space-y-3 py-3 text-center">
+      <div className={cn('space-y-3 py-3 text-center', globalSearchPreviewInsetClasses)}>
         <p className="text-sm text-muted-foreground" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
         </p>
@@ -53,19 +63,42 @@ function GlobalSearchPreviewStatus({
   }
 
   if (!hasQuery) {
-    return <GlobalSearchEmptyPrompt />
+    return <GlobalSearchEmptyPrompt className={globalSearchPreviewInsetClasses} />
   }
 
   if (groupedSections.length === 0) {
     return (
       <GlobalSearchEmptyPrompt
+        className={globalSearchPreviewInsetClasses}
         title={GLOBAL_SEARCH_COPY.noResultsTitle}
-        description={GLOBAL_SEARCH_COPY.noResultsDescription(query.trim())}
+        description={GLOBAL_SEARCH_COPY.noResultsDescription(query.trim(), 'all')}
       />
     )
   }
 
   return null
+}
+
+type GlobalSearchPreviewFooterProps = {
+  viewAllHref: string
+  onClose: () => void
+}
+
+function GlobalSearchPreviewFooter({ viewAllHref, onClose }: GlobalSearchPreviewFooterProps) {
+  return (
+    <footer className={globalSearchPreviewFooterClasses}>
+      <Link
+        to={viewAllHref}
+        className={cn(
+          notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
+          globalSearchPreviewInsetClasses,
+        )}
+        onClick={onClose}
+      >
+        {GLOBAL_SEARCH_COPY.viewAllResults}
+      </Link>
+    </footer>
+  )
 }
 
 export type GlobalSearchPreviewPanelProps = {
@@ -100,39 +133,33 @@ export function GlobalSearchPreviewPanel({
   className,
 }: GlobalSearchPreviewPanelProps) {
   const showResults = !isPending && !isError && hasQuery && groupedSections.length > 0
+  const showFooter = hasQuery && resultCount > 0
 
   return (
     <div id={id} role="region" aria-label={GLOBAL_SEARCH_COPY.pageTitle} className={className}>
-      <GlobalSearchPreviewStatus
-        isPending={isPending}
-        isError={isError}
-        hasQuery={hasQuery}
-        groupedSections={groupedSections}
-        query={query}
-        onRetry={onRetry}
-      />
+      <div className={globalSearchPreviewBodyClasses}>
+        <GlobalSearchPreviewStatus
+          isPending={isPending}
+          isError={isError}
+          hasQuery={hasQuery}
+          groupedSections={groupedSections}
+          query={query}
+          onRetry={onRetry}
+        />
 
-      {showResults ? (
-        <div>
+        {showResults ? (
           <GlobalSearchGroupedResults
             sections={groupedSections}
             resolveHref={resolveHref}
             onResultActivate={onClose}
             showAllHref={showAllHref}
+            inset="panel"
           />
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
-      {hasQuery && resultCount > 0 ? (
-        <div className={cn('border-t border-border bg-muted p-1')}>
-          <Link
-            to={viewAllHref}
-            className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
-            onClick={onClose}
-          >
-            {GLOBAL_SEARCH_COPY.viewAllResults}
-          </Link>
-        </div>
+      {showFooter ? (
+        <GlobalSearchPreviewFooter viewAllHref={viewAllHref} onClose={onClose} />
       ) : null}
     </div>
   )

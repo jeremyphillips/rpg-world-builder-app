@@ -2,15 +2,17 @@
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
+import { Eyebrow, cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
-import { Heading, notificationMenuFooterLinkVariants } from '@rpg/ui'
-
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { globalSearchPreviewInsetClasses } from '../lib/global-search-preview.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
-import { SearchResultRow } from './search-result-row.client'
+import { SearchResultRow, type SearchResultRowInset } from './search-result-row.client'
+
+export type GlobalSearchResultsInset = SearchResultRowInset
 
 export type GlobalSearchGroupedResultsProps = {
   sections: readonly GlobalSearchGroupSection[]
@@ -18,6 +20,7 @@ export type GlobalSearchGroupedResultsProps = {
   onResultActivate?: () => void
   onShowAll?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => void
   showAllHref?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => string
+  inset?: GlobalSearchResultsInset
 }
 
 export function GlobalSearchGroupedResults({
@@ -26,10 +29,13 @@ export function GlobalSearchGroupedResults({
   onResultActivate,
   onShowAll,
   showAllHref,
+  inset,
 }: GlobalSearchGroupedResultsProps) {
   if (sections.length === 0) {
     return null
   }
+
+  const insetClasses = inset === 'panel' ? globalSearchPreviewInsetClasses : undefined
 
   return (
     <div className="space-y-6">
@@ -40,9 +46,9 @@ export function GlobalSearchGroupedResults({
 
         return (
           <section key={section.filterGroup} aria-label={groupLabel}>
-            <Heading as="h2" variant="group" className="mb-2">
+            <Eyebrow size="sm" className={cn('mb-2', insetClasses)}>
               {groupLabel}
-            </Heading>
+            </Eyebrow>
             <div>
               {section.items.map((document) => (
                 <SearchResultRow
@@ -53,6 +59,7 @@ export function GlobalSearchGroupedResults({
                   href={resolveHref(document)}
                   campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
                   onActivate={onResultActivate}
+                  inset={inset}
                 />
               ))}
             </div>
@@ -60,7 +67,10 @@ export function GlobalSearchGroupedResults({
               onShowAll ? (
                 <button
                   type="button"
-                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
+                  className={cn(
+                    notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
+                    insetClasses,
+                  )}
                   onClick={() => onShowAll(section.filterGroup)}
                 >
                   {GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →
@@ -68,7 +78,10 @@ export function GlobalSearchGroupedResults({
               ) : (
                 <Link
                   to={showAllTarget}
-                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
+                  className={cn(
+                    notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
+                    insetClasses,
+                  )}
                 >
                   {GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →
                 </Link>
@@ -86,6 +99,7 @@ export type GlobalSearchFlatResultsProps = {
   resolveHref: (document: GlobalSearchDocument) => string
   onResultActivate?: () => void
   emptyDescription?: string
+  inset?: GlobalSearchResultsInset
 }
 
 export function GlobalSearchFlatResults({
@@ -93,6 +107,7 @@ export function GlobalSearchFlatResults({
   resolveHref,
   onResultActivate,
   emptyDescription,
+  inset,
 }: GlobalSearchFlatResultsProps) {
   if (results.length === 0) {
     return (
@@ -114,6 +129,7 @@ export function GlobalSearchFlatResults({
           href={resolveHref(document)}
           campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}
+          inset={inset}
         />
       ))}
     </div>

@@ -1,7 +1,12 @@
 import { z } from 'zod'
 
 import { keysFromEntries, vocabEnumFromEntries } from '../../vocab/enum-schema'
-import { getTermCompactLabel, type GameTermEntry, type VocabularyTerm } from '../../vocab/types'
+import {
+  getTermCompactLabel,
+  getTermSentenceForm,
+  type GameTermEntry,
+  type VocabularyTerm,
+} from '../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Global search filter groups — URL `?group=` segments and row grouping.
@@ -60,6 +65,14 @@ export function getGlobalSearchFilterGroupLabel(group: GlobalSearchFilterGroup):
 /** Fine row type label for filter-group-scoped docs (e.g. Character, Game Term). */
 export function getGlobalSearchFilterGroupTypeLabel(group: GlobalSearchFilterGroup): string {
   return getTermCompactLabel(GLOBAL_SEARCH_FILTER_GROUP_ENTRIES[group])
+}
+
+/** Counted noun phrase for typed filter groups in generated search copy. */
+export function getGlobalSearchFilterGroupSentenceForm(
+  group: GlobalSearchFilterGroup,
+  count: number,
+): string {
+  return getTermSentenceForm(GLOBAL_SEARCH_FILTER_GROUP_ENTRIES[group], count)
 }
 
 /** URL segment values including the aggregate "all" filter. */

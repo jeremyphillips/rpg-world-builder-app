@@ -8,4 +8,20 @@ export const searchResultRowHeaderVariants = cva('flex items-start justify-betwe
 
 export const searchResultRowTitleRowVariants = cva('flex min-w-0 flex-1 items-center gap-2')
 
+export const searchResultRowTitleVariants = cva(
+  'min-w-0 truncate text-sm font-semibold text-foreground',
+)
+
 export const searchResultRowTypeLabelVariants = cva('shrink-0 text-xs text-muted-foreground')
+
+export const searchResultRowInsetContentVariants = cva('', {
+  variants: {
+    inset: {
+      panel: 'px-3',
+      none: '',
+    },
+  },
+  defaultVariants: {
+    inset: 'none',
+  },
+})

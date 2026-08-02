@@ -23,6 +23,7 @@ describe('SearchResultRow', () => {
     expect(link).toHaveAttribute('href', '/campaigns/c1/spells/fireball')
     expect(screen.getByText('3rd-level evocation')).toBeInTheDocument()
     expect(screen.getByText('Spell')).toBeInTheDocument()
+    expect(screen.getByText('Fireball')).toHaveClass('font-semibold')
   })
 
   it('calls onActivate when clicked', async () => {
