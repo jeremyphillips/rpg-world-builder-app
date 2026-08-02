@@ -6,6 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
+import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
 import { SearchResultRow } from './search-result-row.client'
 
 describe('SearchResultRow', () => {
@@ -63,21 +64,50 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
-  it('uses compact truncated secondary copy in preview panel rows', () => {
+  it('uses text-xs secondary copy by default with roomier vertical rhythm', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Fireball"
+        secondary="3rd-level evocation · Instantaneous"
+        typeLabel="Spell"
+        href="/campaigns/c1/spells/fireball"
+        borderless
+      />,
+    )
+
+    const secondary = screen.getByText('3rd-level evocation · Instantaneous')
+    const link = screen.getByRole('link', { name: 'Fireball, Spell' })
+
+    expect(secondary).toHaveClass('text-xs')
+    expect(secondary).not.toHaveClass('truncate')
+    expect(secondary).not.toHaveClass('mt-1')
+    expect(link).toHaveClass(
+      'py-3',
+      globalSearchGroupContentInsetClasses,
+      'hover:bg-surface-subtle',
+    )
+  })
+
+  it('uses compact density for tighter py and truncated secondary copy', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
         secondary="3rd-level evocation · Instantaneous · Extra detail"
         typeLabel="Spell"
         href="/campaigns/c1/spells/fireball"
-        inset="panel"
+        density="compact"
         borderless
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
     expect(secondary).toHaveClass('text-xs', 'truncate')
-    expect(screen.getByRole('link', { name: 'Fireball, Spell' })).toHaveClass('border-b-0')
+    expect(screen.getByRole('link', { name: 'Fireball, Spell' })).toHaveClass(
+      'py-2',
+      'border-b-0',
+      globalSearchGroupContentInsetClasses,
+      'hover:bg-surface-subtle',
+    )
   })
 
   it('removes row borders when borderless for parent-owned list separators', () => {

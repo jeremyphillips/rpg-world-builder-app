@@ -11,16 +11,17 @@ import {
   deriveGlobalSearchPreviewGroupState,
 } from '../lib/global-search-preview-group'
 import {
+  globalSearchGroupContentInsetClasses,
   globalSearchGroupHeadingCountClasses,
   globalSearchGroupHeadingVariants,
   globalSearchGroupSectionVariants,
   globalSearchGroupShowAllLinkVariants,
   globalSearchResultListClasses,
+  type GlobalSearchSurfaceContext,
 } from '../lib/global-search-group.variants'
-import { globalSearchPreviewInsetClasses } from '../lib/global-search-preview.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
-import { SearchResultRow } from './search-result-row.client'
+import { SearchResultRow, type SearchResultRowDensity } from './search-result-row.client'
 
 export type GlobalSearchGroupSectionProps = {
   section: GlobalSearchGroupSectionModel
@@ -30,8 +31,8 @@ export type GlobalSearchGroupSectionProps = {
   onResultActivate?: () => void
   onShowAll?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => void
   showAllHref?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => string
-  /** Preview panel horizontal inset — page uses default full-width layout. */
-  inset?: 'panel'
+  rowDensity?: SearchResultRowDensity
+  surfaceContext?: GlobalSearchSurfaceContext
 }
 
 export function GlobalSearchGroupSection({
@@ -42,7 +43,8 @@ export function GlobalSearchGroupSection({
   onResultActivate,
   onShowAll,
   showAllHref,
-  inset,
+  rowDensity = 'default',
+  surfaceContext = 'page',
 }: GlobalSearchGroupSectionProps) {
   const groupLabel = getGlobalSearchFilterGroupLabel(section.filterGroup)
   const state = deriveGlobalSearchPreviewGroupState(section)
@@ -50,8 +52,10 @@ export function GlobalSearchGroupSection({
   const showGroupAction = state === 'truncated'
   const showAllTarget = showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
   const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
-  const insetClasses = inset === 'panel' ? globalSearchPreviewInsetClasses : undefined
-  const showAllClassName = cn(globalSearchGroupShowAllLinkVariants(), insetClasses)
+  const showAllClassName = cn(
+    globalSearchGroupShowAllLinkVariants(),
+    globalSearchGroupContentInsetClasses,
+  )
 
   return (
     <section
@@ -59,12 +63,16 @@ export function GlobalSearchGroupSection({
       className={globalSearchGroupSectionVariants({ state })}
     >
       <div
-        className={globalSearchGroupHeadingVariants({
-          panelFirst: inset === 'panel' && sectionIndex === 0,
-          follows,
-        })}
+        className={cn(
+          globalSearchGroupHeadingVariants({
+            surfaceContext,
+            first: sectionIndex === 0,
+            follows,
+          }),
+          globalSearchGroupContentInsetClasses,
+        )}
       >
-        <Eyebrow size="sm" className={insetClasses}>
+        <Eyebrow size="sm">
           {groupLabel}
           <span className={globalSearchGroupHeadingCountClasses}>
             {' · '}
@@ -84,7 +92,8 @@ export function GlobalSearchGroupSection({
             campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
             onActivate={onResultActivate}
             borderless
-            inset={inset}
+            density={rowDensity}
+            surfaceContext={surfaceContext}
           />
         ))}
       </div>

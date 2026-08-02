@@ -1,7 +1,9 @@
 import { cva } from 'class-variance-authority'
 
-/** Shared horizontal inset for preview panel list chrome (eyebrows, rows, show-all). */
-export const globalSearchPreviewInsetClasses = 'px-3'
+import { globalSearchGroupContentInsetClasses } from './global-search-group.variants'
+
+/** Shared horizontal inset for preview panel status/empty chrome outside group sections. */
+export const globalSearchPreviewInsetClasses = globalSearchGroupContentInsetClasses
 
 export const globalSearchPreviewBodyClasses = 'min-h-0 flex-1 overflow-y-auto'
 

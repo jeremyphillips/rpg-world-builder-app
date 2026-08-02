@@ -6,17 +6,18 @@ import { InlineInactiveStatus, Text, cn } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 
+import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 import {
   searchResultRowHeaderVariants,
-  searchResultRowInsetContentVariants,
   searchResultRowSecondaryVariants,
   searchResultRowTitleRowVariants,
   searchResultRowTitleVariants,
   searchResultRowTypeLabelVariants,
   searchResultRowVariants,
+  type SearchResultRowDensity,
 } from './search-result-row.variants'
 
-export type SearchResultRowInset = 'panel'
+export type { SearchResultRowDensity }
 
 export type SearchResultRowProps = {
   title: string
@@ -25,8 +26,8 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
-  /** Preview panel horizontal inset only — does not imply row borders. */
-  inset?: SearchResultRowInset
+  density?: SearchResultRowDensity
+  surfaceContext?: GlobalSearchSurfaceContext
   /** Parent list owns separators; rows inside shared result lists must set this. */
   borderless?: boolean
   className?: string
@@ -39,7 +40,8 @@ export function SearchResultRow({
   href,
   campaignUnavailable = false,
   onActivate,
-  inset,
+  density = 'default',
+  surfaceContext = 'page',
   borderless = false,
   className,
 }: SearchResultRowProps) {
@@ -48,7 +50,7 @@ export function SearchResultRow({
     : `${title}, ${typeLabel}`
 
   const content = (
-    <div className={searchResultRowInsetContentVariants({ inset: inset ?? 'none' })}>
+    <>
       <div className={searchResultRowHeaderVariants()}>
         <span className={searchResultRowTitleRowVariants()}>
           <Text as="span" className={searchResultRowTitleVariants()}>
@@ -61,21 +63,17 @@ export function SearchResultRow({
         </Text>
       </div>
       {secondary ? (
-        <Text
-          as="p"
-          variant="muted"
-          className={searchResultRowSecondaryVariants({ inset: inset ?? 'none' })}
-        >
+        <Text as="p" variant="muted" className={searchResultRowSecondaryVariants({ density })}>
           {secondary}
         </Text>
       ) : null}
-    </div>
+    </>
   )
 
   return (
     <Link
       to={href}
-      className={cn(searchResultRowVariants({ borderless }), className)}
+      className={cn(searchResultRowVariants({ borderless, density, surfaceContext }), className)}
       onClick={onActivate}
       aria-label={accessibleName}
     >

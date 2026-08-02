@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { establishSurfaceCurrent } from '@rpg/ui'
 
+import { globalSearchPageResultsShellClasses } from '../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
 import { GlobalSearchGroupSection } from './global-search-group-section.client'
 
@@ -55,8 +57,10 @@ type Story = StoryObj<typeof meta>
 export const PageContext: Story = {
   decorators: [
     (Story) => (
-      <div className="mx-auto max-w-4xl space-y-6">
-        <Story />
+      <div className="mx-auto max-w-4xl">
+        <div className={globalSearchPageResultsShellClasses}>
+          <Story />
+        </div>
       </div>
     ),
   ],
@@ -72,14 +76,17 @@ export const PageContext: Story = {
 export const PanelContext: Story = {
   decorators: [
     (Story) => (
-      <div className="w-96 border border-border bg-surface-subtle">
+      <div
+        className={`w-96 border border-border bg-surface-subtle ${establishSurfaceCurrent('surface-subtle')}`}
+      >
         <Story />
       </div>
     ),
   ],
   args: {
     ...PageContext.args,
-    inset: 'panel',
+    rowDensity: 'compact',
+    surfaceContext: 'preview',
   },
 }
 
@@ -91,6 +98,7 @@ export const CompleteAfterTruncated: Story = {
     sections: [truncatedSection, completeSection],
     resolveHref: () => '/campaigns/demo/game-terms/darkvision',
     showAllHref: () => '/campaigns/demo/search?group=game-terms',
-    inset: 'panel',
+    rowDensity: 'compact',
+    surfaceContext: 'preview',
   },
 }

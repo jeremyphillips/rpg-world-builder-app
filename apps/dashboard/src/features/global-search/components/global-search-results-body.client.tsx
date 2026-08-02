@@ -10,6 +10,7 @@ import {
 } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { globalSearchPageResultsShellClasses } from '../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import { GlobalSearchFlatResults, GlobalSearchGroupedResults } from './global-search-results.client'
@@ -81,6 +82,30 @@ export function GlobalSearchResultsBody({
   const noResultsDescription = GLOBAL_SEARCH_COPY.noResultsDescription(trimmedQuery, group)
   const activeResultCount = deriveActiveResultCount(group, flatResults, groupedSections)
 
+  const resultsContent =
+    group === 'all' && groupedSections ? (
+      groupedSections.length > 0 ? (
+        <GlobalSearchGroupedResults
+          sections={groupedSections}
+          resolveHref={resolveHref}
+          onResultActivate={onResultActivate}
+          showAllHref={showAllHref}
+        />
+      ) : (
+        <GlobalSearchEmptyPrompt
+          title={GLOBAL_SEARCH_COPY.noResultsTitle}
+          description={noResultsDescription}
+        />
+      )
+    ) : (
+      <GlobalSearchFlatResults
+        results={flatResults}
+        resolveHref={resolveHref}
+        onResultActivate={onResultActivate}
+        emptyDescription={noResultsDescription}
+      />
+    )
+
   return (
     <div className="space-y-4">
       {showFilter ? (
@@ -98,28 +123,7 @@ export function GlobalSearchResultsBody({
         </>
       ) : null}
 
-      {group === 'all' && groupedSections ? (
-        groupedSections.length > 0 ? (
-          <GlobalSearchGroupedResults
-            sections={groupedSections}
-            resolveHref={resolveHref}
-            onResultActivate={onResultActivate}
-            showAllHref={showAllHref}
-          />
-        ) : (
-          <GlobalSearchEmptyPrompt
-            title={GLOBAL_SEARCH_COPY.noResultsTitle}
-            description={noResultsDescription}
-          />
-        )
-      ) : (
-        <GlobalSearchFlatResults
-          results={flatResults}
-          resolveHref={resolveHref}
-          onResultActivate={onResultActivate}
-          emptyDescription={noResultsDescription}
-        />
-      )}
+      <div className={globalSearchPageResultsShellClasses}>{resultsContent}</div>
     </div>
   )
 }

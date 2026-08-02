@@ -3,6 +3,7 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import type { GlobalSearchSurfaceContext } from '../lib/global-search-group.variants'
 import { globalSearchResultListClasses } from '../lib/global-search-group.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
@@ -31,6 +32,9 @@ export function GlobalSearchGroupedResults({
     return null
   }
 
+  const surfaceContext: GlobalSearchSurfaceContext = inset === 'panel' ? 'preview' : 'page'
+  const rowDensity = inset === 'panel' ? 'compact' : 'default'
+
   const sectionElements = sections.map((section, sectionIndex) => (
     <GlobalSearchGroupSection
       key={section.filterGroup}
@@ -41,15 +45,12 @@ export function GlobalSearchGroupedResults({
       onResultActivate={onResultActivate}
       onShowAll={onShowAll}
       showAllHref={showAllHref}
-      inset={inset}
+      rowDensity={rowDensity}
+      surfaceContext={surfaceContext}
     />
   ))
 
-  if (inset === 'panel') {
-    return <>{sectionElements}</>
-  }
-
-  return <div className="space-y-6">{sectionElements}</div>
+  return <>{sectionElements}</>
 }
 
 export type GlobalSearchFlatResultsProps = {
@@ -86,6 +87,7 @@ export function GlobalSearchFlatResults({
           campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}
           borderless
+          surfaceContext="page"
         />
       ))}
     </div>
