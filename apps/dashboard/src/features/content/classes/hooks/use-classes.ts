@@ -16,6 +16,7 @@ export const classesQueryKey = classesContentList.queryKey
 
 /** Load all classes available in the given campaign (system seed + homebrew). */
 export const useClasses = classesContentList.useQuery
+export const useClassesUsageMeta = classesContentList.useUsageMeta
 
 export const { useCreateContent: useCreateClass, useUpdateContent: useUpdateClass } =
   createContentMutationHooks('classes', classesQueryKey)

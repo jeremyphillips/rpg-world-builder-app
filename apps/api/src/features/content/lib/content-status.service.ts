@@ -7,7 +7,10 @@ import { ZodError } from 'zod'
 
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from './content-write-config'
-import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
+import {
+  contentUsageSurfaceKeyForWriteConfig,
+  resolveAuthoritativeContentUsageBlockers,
+} from './content-usage/content-usage-resolvers'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 import { resolveContentEntityForWrite } from './content-write.service'
 
@@ -25,9 +28,11 @@ async function evaluateContentDemotionBlockers<T extends WriteEntityBase>(
   const characterBlockers =
     config.characterUsageBlocksDemotion === false
       ? []
-      : config.resolveCharacterUsageBlockers
-        ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
-        : await resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
+      : await resolveAuthoritativeContentUsageBlockers(
+          campaignId,
+          contentUsageSurfaceKeyForWriteConfig(config),
+          entity,
+        )
 
   const hookBlockers = config.resolveDemoteBlockers
     ? await config.resolveDemoteBlockers({ campaignId, entity })

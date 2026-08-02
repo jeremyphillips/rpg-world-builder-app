@@ -1,4 +1,5 @@
 import { formatMass, type MountEquipment, type WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 import { SortableHeader } from '@rpg/ui'
 
@@ -32,8 +33,15 @@ export const mountFilterSchema = buildContentFilterSchema<MountRow, MountOvervie
 )
 
 /** Mount column definitions with the name cell linked to the detail page. */
-export function mountColumns(campaignId: string) {
+export function mountColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<MountEquipment>(MOUNT_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'mounts', row.id),
   })

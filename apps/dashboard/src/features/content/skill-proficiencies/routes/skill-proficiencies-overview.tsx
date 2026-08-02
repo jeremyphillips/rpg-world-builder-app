@@ -8,7 +8,10 @@ import {
   getContentTypeCollectionLabel,
   getContentTypeSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
+import {
+  useSkillProficiencies,
+  useSkillProficienciesUsageMeta,
+} from '../hooks/use-skill-proficiencies'
 import {
   skillProficienciesColumns,
   skillProficienciesFilterSchema,
@@ -19,6 +22,9 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table.
 export function SkillProficienciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: skillProficiencies = [], isPending, isError } = useSkillProficiencies(campaignId)
+  const { data: usageMeta } = useSkillProficienciesUsageMeta(campaignId)
+  const usageSummaryLabels = usageMeta?.usageSummaryLabels
+  const overviewUsageScope = usageMeta?.overviewUsageScope
 
   return (
     <ContentOverviewShell
@@ -33,10 +39,10 @@ export function SkillProficienciesOverview() {
         contentTypeKey="skill-proficiencies"
         campaignId={campaignId}
         columns={
-          skillProficienciesColumns(campaignId) as ColumnDef<
-            WithCampaignAccess<SkillProficiency>,
-            unknown
-          >[]
+          skillProficienciesColumns(campaignId, {
+            usageSummaryLabels,
+            overviewUsageScope,
+          }) as ColumnDef<WithCampaignAccess<SkillProficiency>, unknown>[]
         }
         filterSchema={skillProficienciesFilterSchema}
         data={skillProficiencies as WithCampaignAccess<SkillProficiency>[]}

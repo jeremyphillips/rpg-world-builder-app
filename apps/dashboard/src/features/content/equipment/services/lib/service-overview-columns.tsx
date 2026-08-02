@@ -1,4 +1,5 @@
 import type { ServiceEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { SERVICE_CATEGORIES, formatServiceDuration, getServiceCategoryLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -53,8 +54,15 @@ export const serviceFilterSchema = buildContentFilterSchema<ServiceRow, ServiceO
 )
 
 /** Service column definitions with the name cell linked to the detail page. */
-export function serviceColumns(campaignId: string) {
+export function serviceColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<ServiceEquipment>(SERVICE_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'services', row.id),
   })

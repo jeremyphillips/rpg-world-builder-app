@@ -1,4 +1,5 @@
 import type { Equipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { EQUIPMENT_KIND_LABELS, getEquipmentKindLabel } from '@rpg/contracts'
 import { SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -42,8 +43,15 @@ export const equipmentFilterSchema = buildContentFilterSchema<
 ])
 
 /** Equipment column definitions with the name cell linked to the detail page. */
-export function equipmentColumns(campaignId: string) {
+export function equipmentColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<Equipment>(EQUIPMENT_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) =>
       ROUTES.content.equipment.detail(campaignId, equipmentKindToFamilyPath(row.kind), row.id),

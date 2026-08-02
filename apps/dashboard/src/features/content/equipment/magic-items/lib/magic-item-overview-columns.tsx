@@ -1,4 +1,5 @@
 import type { MagicItemEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import {
   MAGIC_ITEM_CATEGORIES,
   MAGIC_ITEM_RARITIES,
@@ -83,8 +84,15 @@ export const magicItemFilterSchema = buildContentFilterSchema<
 ])
 
 /** Magic item column definitions with the name cell linked to the detail page. */
-export function magicItemColumns(campaignId: string) {
+export function magicItemColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<MagicItemEquipment>(MAGIC_ITEM_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'magic-items', row.id),
   })

@@ -21,7 +21,11 @@ describe('createContentListApi', () => {
   })
 
   it('requests the correct URL and extracts the response key', async () => {
-    mockRequest.mockResolvedValue({ equipment: [{ id: 'w1' }] })
+    mockRequest.mockResolvedValue({
+      equipment: [{ id: 'w1' }],
+      usageSummaryLabels: { singular: 'character', plural: 'characters' },
+      overviewUsageScope: 'characters',
+    })
 
     const listEquipment = createContentListApi<{ id: string }>({
       routeKey: 'equipment',
@@ -36,7 +40,11 @@ describe('createContentListApi', () => {
       undefined,
       formatContentListLoadErrorMessage('equipment'),
     )
-    expect(result).toEqual([{ id: 'w1' }])
+    expect(result).toEqual({
+      items: [{ id: 'w1' }],
+      usageSummaryLabels: { singular: 'character', plural: 'characters' },
+      overviewUsageScope: 'characters',
+    })
   })
 })
 

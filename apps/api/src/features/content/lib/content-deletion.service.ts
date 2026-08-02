@@ -5,8 +5,11 @@ import type {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
 import { deleteContentCampaignAccess } from './content-campaign-access.service'
+import {
+  contentUsageSurfaceKeyForWriteConfig,
+  resolveAuthoritativeContentUsageBlockers,
+} from './content-usage/content-usage-resolvers'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 import { resolveContentEntityForWrite } from './content-write.service'
 
@@ -21,9 +24,11 @@ async function evaluateContentDeletionBlockers<T extends WriteEntityBase>(
     throw new HttpError(403, 'forbidden', 'System content cannot be deleted.')
   }
 
-  const characterBlockers = config.resolveCharacterUsageBlockers
-    ? await config.resolveCharacterUsageBlockers({ campaignId, entity })
-    : await resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
+  const characterBlockers = await resolveAuthoritativeContentUsageBlockers(
+    campaignId,
+    contentUsageSurfaceKeyForWriteConfig(config),
+    entity,
+  )
 
   const hookBlockers = config.resolveDeleteBlockers
     ? await config.resolveDeleteBlockers({ campaignId, entity })

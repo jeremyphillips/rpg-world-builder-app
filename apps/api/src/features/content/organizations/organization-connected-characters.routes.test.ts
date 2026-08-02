@@ -13,7 +13,7 @@ import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { CampaignCharacterParticipationModel } from '../../campaign/participation/campaign-character-participation.model'
 import { CharacterModel, createPcRecord } from '../../character'
-import { getContentCharacterUsageMatcher } from '../lib/content-character-usage/content-character-usage-matchers'
+import { characterContentReferenceMatch, ORGANIZATION_CHARACTER_REFERENCE } from '@rpg/contracts'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
 import { resolveOrganizationConnectedCharacters } from './resolve-organization-connected-characters'
@@ -236,9 +236,11 @@ describe('resolveOrganizationConnectedCharacters', () => {
     })
   })
 
-  it('matches the organization usage matcher fragment', async () => {
+  it('matches the organization character reference descriptor', () => {
     const organizationId = '000000000000000000000001'
-    expect(getContentCharacterUsageMatcher('organizations', organizationId, 'ignored')).toEqual({
+    expect(
+      characterContentReferenceMatch(ORGANIZATION_CHARACTER_REFERENCE, organizationId),
+    ).toEqual({
       'connections.organizations.organizationId': organizationId,
     })
   })

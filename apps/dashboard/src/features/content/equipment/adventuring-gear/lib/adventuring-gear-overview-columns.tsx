@@ -1,4 +1,5 @@
 import type { AdventuringGearEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import {
   GEAR_KINDS,
   formatWeight,
@@ -63,8 +64,15 @@ export const adventuringGearFilterSchema = buildContentFilterSchema<
 ])
 
 /** Adventuring gear column definitions with the name cell linked to the detail page. */
-export function adventuringGearColumns(campaignId: string) {
+export function adventuringGearColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<AdventuringGearEquipment>(ADVENTURING_GEAR_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'adventuring-gear', row.id),
   })

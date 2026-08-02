@@ -1,4 +1,5 @@
 import type { Feat, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { FEAT_CATEGORY_IDS, getFeatCategoryLabel } from '@rpg/contracts'
 import { BooleanCell, dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -60,8 +61,15 @@ export const featsFilterSchema = buildContentFilterSchema<FeatRow, FeatsOverview
 )
 
 /** Feat column definitions with the name cell linked to the detail page. */
-export function featsColumns(campaignId: string) {
+export function featsColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<Feat>(FEATS_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'feats',
     nameHref: (row) => ROUTES.content.feats.detail(campaignId, row.id),
   })

@@ -78,6 +78,13 @@ contentRouter.get(
   subclassController.getSubclassDeletionAvailabilityHandler,
 )
 
+contentRouter.get(
+  '/classes/:classId/subclasses/:subclassId/usage',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  subclassController.getSubclassUsageHandler,
+)
+
 contentRouter.delete(
   '/classes/:classId/subclasses/:subclassId',
   requireAuth,
@@ -123,6 +130,13 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.getContentDeletionAvailabilityHandler,
+)
+
+contentRouter.get(
+  '/:contentType/:entityId/usage',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.getContentUsageHandler,
 )
 
 contentRouter.delete(

@@ -30,7 +30,7 @@ describe('useFamilyTableConfig', () => {
       expect(result.current.tableConfig).toEqual(mockConfig)
     })
 
-    expect(loadFamilyTableConfig).toHaveBeenCalledWith('campaign-1', 'weapons')
+    expect(loadFamilyTableConfig).toHaveBeenCalledWith('campaign-1', 'weapons', undefined)
     expect(result.current.isPending).toBe(false)
     expect(result.current.isError).toBe(false)
   })

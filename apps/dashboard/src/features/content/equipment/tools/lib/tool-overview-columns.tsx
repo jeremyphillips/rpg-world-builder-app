@@ -1,4 +1,5 @@
 import type { ToolEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { TOOL_CATEGORIES, getToolCategoryLabel } from '@rpg/contracts'
 import { dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -53,8 +54,15 @@ export const toolFilterSchema = buildContentFilterSchema<ToolRow, ToolOverviewFi
 )
 
 /** Tool column definitions with the name cell linked to the detail page. */
-export function toolColumns(campaignId: string) {
+export function toolColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<ToolEquipment>(TOOL_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'tools', row.id),
   })

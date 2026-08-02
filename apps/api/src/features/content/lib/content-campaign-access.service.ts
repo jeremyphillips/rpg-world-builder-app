@@ -9,7 +9,10 @@ import type {
 import { contentCampaignAccessPatchSchema, resolveContentCampaignAccess } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveContentUsageBlockers } from './content-character-usage/resolve-content-usage-blockers'
+import {
+  contentUsageSurfaceKeyForWriteConfig,
+  resolveAuthoritativeContentUsageBlockers,
+} from './content-usage/content-usage-resolvers'
 import { loadValidCampaignParticipantIds } from './campaign-access-participants.service'
 import { ContentCampaignAccessModel } from './content-campaign-access.model'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
@@ -95,11 +98,11 @@ async function evaluateCampaignAccessOffBlockers<T extends WriteEntityBase>(
 ): Promise<ContentUsageBlocker[]> {
   const { entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
 
-  if (config.resolveCharacterUsageBlockers) {
-    return config.resolveCharacterUsageBlockers({ campaignId, entity })
-  }
-
-  return resolveContentUsageBlockers(campaignId, config.typeName, entityId, entity.slug)
+  return resolveAuthoritativeContentUsageBlockers(
+    campaignId,
+    contentUsageSurfaceKeyForWriteConfig(config),
+    entity,
+  )
 }
 
 /** Advisory preflight for availability-off UX — always re-validated on PATCH. */

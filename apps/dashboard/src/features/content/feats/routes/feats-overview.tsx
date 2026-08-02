@@ -8,7 +8,7 @@ import {
   formatContentCreateHeading,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useFeats } from '../hooks/use-feats'
+import { useFeats, useFeatsUsageMeta } from '../hooks/use-feats'
 import { featsColumns, featsFilterSchema } from '../lib/feats-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
@@ -16,6 +16,9 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table.
 export function FeatsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: feats = [], isPending, isError } = useFeats(campaignId)
+  const { data: usageMeta } = useFeatsUsageMeta(campaignId)
+  const usageSummaryLabels = usageMeta?.usageSummaryLabels
+  const overviewUsageScope = usageMeta?.overviewUsageScope
 
   return (
     <ContentOverviewShell
@@ -29,7 +32,12 @@ export function FeatsOverview() {
       <ContentOverviewTable<WithCampaignAccess<Feat>>
         contentTypeKey="feats"
         campaignId={campaignId}
-        columns={featsColumns(campaignId) as ColumnDef<WithCampaignAccess<Feat>, unknown>[]}
+        columns={
+          featsColumns(campaignId, { usageSummaryLabels, overviewUsageScope }) as ColumnDef<
+            WithCampaignAccess<Feat>,
+            unknown
+          >[]
+        }
         filterSchema={featsFilterSchema}
         data={feats as WithCampaignAccess<Feat>[]}
         caption={formatContentCollectionAvailabilityCaption('feats')}

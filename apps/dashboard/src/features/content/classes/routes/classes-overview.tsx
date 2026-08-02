@@ -8,7 +8,7 @@ import {
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useClasses } from '../hooks/use-classes'
+import { useClasses, useClassesUsageMeta } from '../hooks/use-classes'
 import { classColumns, classFilterSchema } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
@@ -16,6 +16,9 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table.
 export function ClassesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: classes = [], isPending, isError } = useClasses(campaignId)
+  const { data: usageMeta } = useClassesUsageMeta(campaignId)
+  const usageSummaryLabels = usageMeta?.usageSummaryLabels
+  const overviewUsageScope = usageMeta?.overviewUsageScope
 
   return (
     <ContentOverviewShell
@@ -30,7 +33,10 @@ export function ClassesOverview() {
         contentTypeKey="classes"
         campaignId={campaignId}
         columns={
-          classColumns(campaignId) as ColumnDef<WithCampaignAccess<ClassListItem>, unknown>[]
+          classColumns(campaignId, { usageSummaryLabels, overviewUsageScope }) as ColumnDef<
+            WithCampaignAccess<ClassListItem>,
+            unknown
+          >[]
         }
         filterSchema={classFilterSchema}
         data={classes as WithCampaignAccess<ClassListItem>[]}

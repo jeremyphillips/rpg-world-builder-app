@@ -16,6 +16,7 @@ export const featsQueryKey = featsContentList.queryKey
 
 /** Load all feats available in the given campaign (system seed + homebrew). */
 export const useFeats = featsContentList.useQuery
+export const useFeatsUsageMeta = featsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateFeat, useUpdateContent: useUpdateFeat } =
   createContentMutationHooks('feats', featsQueryKey)

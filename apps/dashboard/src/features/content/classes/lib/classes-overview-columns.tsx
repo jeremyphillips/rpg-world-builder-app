@@ -1,4 +1,5 @@
 import type { ClassListItem, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { BooleanCell, dataTableColumnChromeMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
@@ -98,8 +99,15 @@ export const classFilterSchema = buildContentFilterSchema<ClassRow, ClassesOverv
 )
 
 /** Class column definitions with the name cell linked to the class detail page. */
-export function classColumns(campaignId: string) {
+export function classColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<ClassListItem>(CLASS_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'classes',
     nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
   })
