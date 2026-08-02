@@ -123,7 +123,7 @@ describe('SortableHeader', () => {
     } as unknown as Column<Item, unknown>
   }
 
-  it('renders label and info inline before the sort direction control', () => {
+  it('renders label, sort icon, and info inline', () => {
     render(
       <SortableHeader
         column={createSortableColumnMock()}
@@ -137,11 +137,11 @@ describe('SortableHeader', () => {
     expect(screen.getByRole('button', { name: 'Sort by My characters' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'About My characters' })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: 'Change sort direction for My characters' }),
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: 'Change sort direction for My characters' }),
+    ).not.toBeInTheDocument()
   })
 
-  it('sorts when the label or sort direction control is clicked', async () => {
+  it('sorts when the sort control is clicked', async () => {
     const user = userEvent.setup()
     const toggleSorting = vi.fn()
     const column = {
@@ -157,11 +157,6 @@ describe('SortableHeader', () => {
 
     await user.click(screen.getByRole('button', { name: 'Sort by My characters' }))
     expect(toggleSorting).toHaveBeenCalledTimes(1)
-
-    await user.click(
-      screen.getByRole('button', { name: 'Change sort direction for My characters' }),
-    )
-    expect(toggleSorting).toHaveBeenCalledTimes(2)
   })
 
   it('has no axe accessibility violations with info', async () => {

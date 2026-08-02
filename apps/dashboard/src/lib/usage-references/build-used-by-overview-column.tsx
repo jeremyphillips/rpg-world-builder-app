@@ -14,11 +14,16 @@ export type UsedByOverviewSummaryLabels = {
   plural: string
 }
 
+export type UsedByOverviewColumnMeta = {
+  overviewCharactersUsageScope?: true
+}
+
 export type BuildUsedByOverviewColumnOptions = {
   usageSummaryLabels: UsedByOverviewSummaryLabels
   columnLabel: string
   scopeTooltip?: string
   width?: DataTableColumnWidth
+  overviewCharactersUsageScope?: true
 }
 
 function mapUsedBySummaryToCollectionItems(
@@ -34,7 +39,8 @@ function mapUsedBySummaryToCollectionItems(
 export function buildUsedByOverviewColumn<TRow extends UsedByOverviewRow>(
   options: BuildUsedByOverviewColumnOptions,
 ): ColumnDef<TRow> {
-  const { usageSummaryLabels, columnLabel, scopeTooltip, width } = options
+  const { usageSummaryLabels, columnLabel, scopeTooltip, width, overviewCharactersUsageScope } =
+    options
 
   const column = buildCollectionCountColumn({
     id: 'usedBy',
@@ -56,6 +62,7 @@ export function buildUsedByOverviewColumn<TRow extends UsedByOverviewRow>(
     meta: {
       ...column.meta,
       label: columnLabel,
+      ...(overviewCharactersUsageScope ? { overviewCharactersUsageScope: true } : {}),
     },
   } as ColumnDef<TRow>
 }

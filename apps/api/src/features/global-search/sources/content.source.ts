@@ -19,10 +19,12 @@ export const contentSearchSource: SearchSource = {
       pcCharacterIds: [...ctx.viewerControlledCharacterIds],
     }
 
+    const controlledCharacterHitCache = new Map()
     const usageCtx = buildContentUsageResolverContext({
       campaignId: ctx.campaignId,
+      controlledCharacterHitCache,
       viewer: {
-        userId: 'search-catalog',
+        userId: ctx.viewerUserId,
         role: ctx.viewerRole,
         controlledCharacterIds: ctx.viewerControlledCharacterIds,
       },

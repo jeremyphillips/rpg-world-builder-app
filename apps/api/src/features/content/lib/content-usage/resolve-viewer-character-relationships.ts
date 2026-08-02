@@ -1,4 +1,5 @@
 import {
+  CHARACTER_RELATIONSHIP_KIND_ORDER,
   CONTENT_USAGE_SUMMARY_LIMIT,
   viewerCharacterRelationshipsSchema,
   type CharacterRelationship,
@@ -16,16 +17,6 @@ import {
   relationshipsForContentEntry,
 } from './reference-sources/characters-extract'
 import { loadControlledCharacterHits } from './reference-sources/characters'
-
-const CHARACTER_RELATIONSHIP_KIND_ORDER: Record<CharacterRelationshipKind, number> = {
-  prepared: 0,
-  knows: 1,
-  class: 2,
-  has: 3,
-  member: 4,
-  owns: 5,
-  species: 6,
-}
 
 function sortRelationships(
   relationships: readonly CharacterRelationship[],
@@ -108,11 +99,19 @@ async function buildRelationshipIndex(
   const characterReference = batchCharacterReferenceFromRegistration(contentType)
 
   if (strategy.strategy === 'spell-selection') {
-    const hits = await loadControlledCharacterHits(controlledCharacterIds, characterReference)
+    const hits = await loadControlledCharacterHits(
+      controlledCharacterIds,
+      characterReference,
+      ctx.controlledCharacterHitCache,
+    )
     return indexSpellRelationshipsByContentId(hits)
   }
 
-  const hits = await loadControlledCharacterHits(controlledCharacterIds, characterReference)
+  const hits = await loadControlledCharacterHits(
+    controlledCharacterIds,
+    characterReference,
+    ctx.controlledCharacterHitCache,
+  )
   return indexFixedRelationshipsByContentId({
     hits,
     descriptor: characterReference,

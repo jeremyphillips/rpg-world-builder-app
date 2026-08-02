@@ -353,17 +353,9 @@ export function SortableHeader<TData, TValue>({
           aria-label={ariaLabel}
         >
           {children}
-        </Button>
-        <InfoTooltip aria-label={`About ${headerLabel}`}>{info}</InfoTooltip>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-1 data-[state=open]:bg-accent"
-          onClick={toggleSort}
-          aria-label={`Change sort direction for ${headerLabel}`}
-        >
           {sortIcon}
         </Button>
+        <InfoTooltip aria-label={`About ${headerLabel}`}>{info}</InfoTooltip>
       </span>
     )
   }

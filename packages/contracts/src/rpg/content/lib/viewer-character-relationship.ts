@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-/** Per-group preview bound — keep aligned with CONTENT_USAGE_SUMMARY_LIMIT in content-usage.ts */
-const VIEWER_CHARACTER_RELATIONSHIP_PREVIEW_LIMIT = 4
+import { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
 
 export const CHARACTER_RELATIONSHIP_KINDS = [
   'class',
+  'subclass',
   'species',
   'owns',
   'knows',
@@ -17,6 +17,17 @@ export const characterRelationshipKindSchema = z.enum(CHARACTER_RELATIONSHIP_KIN
 
 export type CharacterRelationshipKind = z.infer<typeof characterRelationshipKindSchema>
 
+export const CHARACTER_RELATIONSHIP_KIND_ORDER: Record<CharacterRelationshipKind, number> = {
+  prepared: 0,
+  knows: 1,
+  class: 2,
+  subclass: 3,
+  has: 4,
+  member: 5,
+  owns: 6,
+  species: 7,
+}
+
 export const characterRelationshipSchema = z.object({
   kind: characterRelationshipKindSchema,
   characterId: z.string().min(1),
@@ -28,10 +39,7 @@ export type CharacterRelationship = z.infer<typeof characterRelationshipSchema>
 export const viewerCharacterRelationshipGroupSchema = z.object({
   kind: characterRelationshipKindSchema,
   count: z.number().int().min(1),
-  relationships: z
-    .array(characterRelationshipSchema)
-    .min(1)
-    .max(VIEWER_CHARACTER_RELATIONSHIP_PREVIEW_LIMIT),
+  relationships: z.array(characterRelationshipSchema).min(1).max(CONTENT_USAGE_SUMMARY_LIMIT),
 })
 
 export type ViewerCharacterRelationshipGroup = z.infer<

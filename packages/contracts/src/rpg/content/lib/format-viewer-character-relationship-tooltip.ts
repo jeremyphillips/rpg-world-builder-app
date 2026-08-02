@@ -1,24 +1,16 @@
 import { joinNaturalList } from '../../primitives/prose'
 
 import { CLASS_CONTENT_TYPE_TERM, SPECIES_CONTENT_TYPE_TERM } from './content-type-terms'
-import type {
-  CharacterRelationshipKind,
-  ViewerCharacterRelationshipGroup,
-  ViewerCharacterRelationships,
+import {
+  CHARACTER_RELATIONSHIP_KIND_ORDER,
+  type CharacterRelationshipKind,
+  type ViewerCharacterRelationshipGroup,
+  type ViewerCharacterRelationships,
 } from './viewer-character-relationship'
-
-const CHARACTER_RELATIONSHIP_KIND_ORDER: Record<CharacterRelationshipKind, number> = {
-  prepared: 0,
-  knows: 1,
-  class: 2,
-  has: 3,
-  member: 4,
-  owns: 5,
-  species: 6,
-}
 
 const PREFIX_GROUP_LABELS: Record<Exclude<CharacterRelationshipKind, 'has' | 'member'>, string> = {
   class: `${CLASS_CONTENT_TYPE_TERM.label} of`,
+  subclass: 'Subclass of',
   species: `${SPECIES_CONTENT_TYPE_TERM.label} of`,
   owns: 'Owned by',
   knows: 'Known by',

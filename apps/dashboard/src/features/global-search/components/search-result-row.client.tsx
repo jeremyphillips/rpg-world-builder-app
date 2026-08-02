@@ -64,42 +64,43 @@ export function SearchResultRow({
       ? `${title}, ${relationshipLabel}, ${typeLabel}`
       : `${title}, ${typeLabel}`
 
-  const content = (
-    <>
-      <div className={searchResultRowHeaderVariants()}>
-        <span className={searchResultRowTitleRowVariants()}>
-          <Text as="span" className={searchResultRowTitleVariants()}>
-            {title}
-          </Text>
-          {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
-          <CharacterRelationshipIndicator
-            viewerCharacterRelationships={viewerCharacterRelationships}
-          />
-        </span>
-        <Text as="span" className={searchResultRowTypeLabelVariants()}>
-          {typeLabel}
-        </Text>
-      </div>
-      {secondary ? (
-        <Text as="p" variant="muted" className={searchResultRowSecondaryVariants({ density })}>
-          {secondary}
-        </Text>
-      ) : null}
-    </>
-  )
-
   return (
-    <Link
-      to={href}
+    <div
       className={cn(
-        'group',
+        'group relative',
         searchResultRowVariants({ borderless, density, surfaceContext }),
         className,
       )}
-      onClick={onActivate}
-      aria-label={accessibleName}
     >
-      {content}
-    </Link>
+      <Link
+        to={href}
+        className="absolute inset-0 rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        onClick={onActivate}
+        aria-label={accessibleName}
+      />
+      <div className="pointer-events-none relative">
+        <div className={searchResultRowHeaderVariants()}>
+          <span className={searchResultRowTitleRowVariants()}>
+            <Text as="span" className={searchResultRowTitleVariants()}>
+              {title}
+            </Text>
+            {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
+            <span className="pointer-events-auto relative z-10">
+              <CharacterRelationshipIndicator
+                viewerCharacterRelationships={viewerCharacterRelationships}
+              />
+            </span>
+          </span>
+          <Text as="span" className={searchResultRowTypeLabelVariants()}>
+            {typeLabel}
+          </Text>
+        </div>
+        {secondary ? (
+          <Text as="p" variant="muted" className={searchResultRowSecondaryVariants({ density })}>
+            {secondary}
+          </Text>
+        ) : null}
+      </div>
+    </div>
   )
 }

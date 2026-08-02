@@ -24,6 +24,18 @@ export type ContentUsageViewerContext = {
   controlledCharacterIds: readonly string[]
 }
 
+export type ControlledCharacterHitCache = Map<string, Promise<CharacterContentUsageHit[]>>
+
+function cacheKeyForDescriptor(
+  descriptor: CharacterContentReferenceDescriptor | 'equipment',
+): string {
+  if (descriptor === 'equipment') {
+    return 'equipment'
+  }
+
+  return `${descriptor.path}:${descriptor.matchKey}`
+}
+
 const CHARACTER_USAGE_BASE_PROJECTION = {
   _id: 1,
   name: 1,
@@ -62,10 +74,24 @@ async function loadCharacterHits(
 export async function loadControlledCharacterHits(
   controlledCharacterIds: readonly string[],
   descriptor: CharacterContentReferenceDescriptor | 'equipment',
+  cache?: ControlledCharacterHitCache,
 ): Promise<CharacterContentUsageHit[]> {
   const validCharacterIds = controlledCharacterIds.filter((characterId) =>
     Types.ObjectId.isValid(characterId),
   )
+
+  if (cache) {
+    const cacheKey = cacheKeyForDescriptor(descriptor)
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      return cached
+    }
+
+    const pending = loadCharacterHits(validCharacterIds, descriptor)
+    cache.set(cacheKey, pending)
+    return pending
+  }
+
   return loadCharacterHits(validCharacterIds, descriptor)
 }
 

@@ -32,6 +32,23 @@ describe('formatViewerCharacterRelationshipTooltip', () => {
     ).toBe('Class of Aric')
   })
 
+  it('formats single-character subclass copy', () => {
+    expect(
+      formatViewerCharacterRelationshipTooltip(
+        envelope({
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }),
+      ),
+    ).toBe('Subclass of Aric')
+  })
+
   it('formats class overflow from group count', () => {
     expect(
       formatViewerCharacterRelationshipTooltip(

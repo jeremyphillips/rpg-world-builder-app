@@ -13,6 +13,10 @@ import {
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
 import { GlobalSearchGroupSection } from './global-search-group-section.client'
 
+function rowShell(link: HTMLElement): HTMLElement {
+  return link.parentElement!
+}
+
 function document(
   id: string,
   filterGroup: GlobalSearchGroupSectionModel['filterGroup'] = 'content',
@@ -65,8 +69,12 @@ describe('GlobalSearchGroupSection', () => {
     expect(screen.queryByRole('link', { name: /Show all/i })).not.toBeInTheDocument()
     expect(container.querySelector('section')).not.toHaveClass('pb-4')
     expect(container.querySelector('[class*="border-border-faint"]')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Result 1, Spell' })).toHaveClass('border-b-0')
-    expect(screen.getByRole('link', { name: 'Result 2, Spell' })).toHaveClass('border-b-0')
+    expect(rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))).toHaveClass(
+      'border-b-0',
+    )
+    expect(rowShell(screen.getByRole('link', { name: 'Result 2, Spell' }))).toHaveClass(
+      'border-b-0',
+    )
   })
 
   it('co-locates content inset with heading chrome and list row hover shells on page', () => {
@@ -81,7 +89,7 @@ describe('GlobalSearchGroupSection', () => {
     const { container } = renderSection(sections[0]!, 0, sections, { surfaceContext: 'page' })
     const heading = container.querySelector('section > div')
     const list = container.querySelector('[class*="border-border-faint"]')
-    const row = screen.getByRole('link', { name: 'Result 1, Spell' })
+    const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
     expect(heading).toHaveClass(resolveGlobalSearchHeadingSurfaceClasses('page'))
     expect(heading?.className).toContain('border-border-subtle')
@@ -102,7 +110,7 @@ describe('GlobalSearchGroupSection', () => {
 
     const { container } = renderSection(sections[0]!, 0, sections, { surfaceContext: 'preview' })
     const heading = container.querySelector('section > div')
-    const row = screen.getByRole('link', { name: 'Result 1, Spell' })
+    const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
     expect(heading).toHaveClass(resolveGlobalSearchHeadingSurfaceClasses('preview'))
     expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('preview'))

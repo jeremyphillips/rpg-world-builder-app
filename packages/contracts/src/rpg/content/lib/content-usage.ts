@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 import { vocabularyUsageReferenceSchema } from '../../vocab/vocabulary-usage'
 import { viewerCharacterRelationshipsSchema } from './viewer-character-relationship'
+import { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
+
+export { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
 
 /** Display labels for overview Used by summary tooltips — API-owned. */
 export const contentUsageSummaryLabelsSchema = z.object({
@@ -21,9 +24,6 @@ export const CONTENT_OVERVIEW_USAGE_SCOPES = ['complete', 'characters'] as const
 export const contentOverviewUsageScopeSchema = z.enum(CONTENT_OVERVIEW_USAGE_SCOPES)
 
 export type ContentOverviewUsageScope = z.infer<typeof contentOverviewUsageScopeSchema>
-
-/** Max items in overview usedBySummary — API payload bound for list responses. */
-export const CONTENT_USAGE_SUMMARY_LIMIT = 4
 
 /**
  * Informational content usage reference — same identity shape as vocabulary so

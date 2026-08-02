@@ -29,7 +29,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     sources: [{ source: characterSubclassSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
-    viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'subclass' },
   }),
   defineContentUsage({
     contentType: 'species',
