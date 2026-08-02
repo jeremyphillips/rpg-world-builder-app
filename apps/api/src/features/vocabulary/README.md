@@ -36,9 +36,11 @@ Pure reference extraction lives in `lib/reference-sources/` — field-path SSOT 
 
 Set-level discovery is registered via `defineVocabularyUsage` in
 `lib/vocabulary-usage-registrations.ts` — each registration declares sources with
-explicit `entry` / `batch` participation and derives entry/batch resolvers plus
+explicit `entry` / `batch` participation, optional `overviewUsageScope` when entry
+sources exceed batch (`content_only`), and derives entry/batch resolvers plus
 summary labels. Product capabilities (`usageResolution`, `deleteGuard`, …) remain
-independent in `@rpg/contracts`.
+independent in `@rpg/contracts`. `overviewUsageScope` is descriptive metadata on
+the resolved set DTO — it never influences source selection, counts, or guards.
 
 ## Routes
 

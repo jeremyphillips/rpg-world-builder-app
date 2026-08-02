@@ -24,11 +24,11 @@ import {
 import { resolveVocabularySet } from '../lib/resolve-vocabulary'
 import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
 import {
-  getVocabularyUsageSummaryLabels,
   resolveVocabularyOptionUsage,
   resolveVocabularyOptionUsageBatch,
   type VocabularyUsageResolverContext,
 } from '../lib/vocabulary-usage-resolvers'
+import { getVocabularyUsageRegistration } from '../lib/vocabulary-usage-registrations'
 import {
   buildVocabularyUsageResolverContext,
   withAuthoritativeGuardPurpose,
@@ -170,14 +170,19 @@ export async function resolveVocabularySetForCampaign(
   const setPatch = patchDoc ? getSetPatch(patchDoc, setId) : undefined
   const capability = getVocabularySetCapability(setId)
   const options = resolveVocabularySet(seed, setPatch)
-  const usageSummaryLabels = capability.batchUsageCounting
-    ? getVocabularyUsageSummaryLabels(setId)
+  const usageRegistration = capability.batchUsageCounting
+    ? getVocabularyUsageRegistration(setId)
     : undefined
 
   return {
     id: setId,
     options: await attachUsageCounts(ctx, setId, options),
-    ...(usageSummaryLabels ? { usageSummaryLabels } : {}),
+    ...(usageRegistration
+      ? {
+          usageSummaryLabels: usageRegistration.summaryLabels,
+          overviewUsageScope: usageRegistration.overviewUsageScope,
+        }
+      : {}),
   }
 }
 

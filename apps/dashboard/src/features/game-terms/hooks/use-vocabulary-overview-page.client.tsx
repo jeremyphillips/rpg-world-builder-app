@@ -81,6 +81,9 @@ export function useVocabularyOverviewPage({
         usageSummaryLabels: capabilities.batchUsageCounting
           ? vocabularySet?.usageSummaryLabels
           : undefined,
+        overviewUsageScope: capabilities.batchUsageCounting
+          ? vocabularySet?.overviewUsageScope
+          : undefined,
       }),
     [
       campaignId,
@@ -88,6 +91,7 @@ export function useVocabularyOverviewPage({
       onEdit,
       setId,
       showEdit,
+      vocabularySet?.overviewUsageScope,
       vocabularySet?.usageSummaryLabels,
     ],
   )

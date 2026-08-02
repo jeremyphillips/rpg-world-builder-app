@@ -7,7 +7,7 @@ import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-me
 import {
   VOCABULARY_BULK_ACTIONS_MENU_LABEL,
   VOCABULARY_BULK_ACTION_EDIT_AVAILABILITY_LABEL,
-} from '@/features/vocabulary'
+} from '../lib/labels'
 
 import { VocabularyRowActions } from '../components/vocabulary-row-actions.client'
 

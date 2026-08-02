@@ -12,11 +12,12 @@ import { getVocabularySetCapability } from '@rpg/contracts'
 
 import { ContentCampaignAvailabilityAction } from '@/features/content/lib/overview/content-campaign-availability-action.client'
 
+import { fetchVocabularyDeleteAvailability } from '@/features/vocabulary'
+
 import {
-  fetchVocabularyDeleteAvailability,
   VOCABULARY_DELETE_BLOCKED_DESCRIPTION,
   VOCABULARY_DELETE_BLOCKED_HEADLINE,
-} from '@/features/vocabulary'
+} from '../lib/labels'
 
 import { useVocabularyAvailabilityToggle } from '../hooks/use-vocabulary-availability-toggle.client'
 import { VocabularyAvailabilityBlockedDialog } from './vocabulary-availability-blocked-dialog.client'

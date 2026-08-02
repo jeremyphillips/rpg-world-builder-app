@@ -4,7 +4,12 @@ export * from './lib/resolve-vocabulary'
 export * from './lib/assert-campaign-creature-types'
 export * from './lib/assert-campaign-damage-types'
 export * from './lib/assert-campaign-languages-spell-schools'
-export * from './lib/collect-content-vocabulary-ids'
+export {
+  extractSpeciesDamageTypeIds,
+  extractSpeciesLanguageIds,
+  extractSpeciesSenseTypeIds,
+} from './lib/reference-sources/species'
+export { extractSpellDamageTypeIds, extractSpellSchoolId } from './lib/reference-sources/spells'
 export * from './lib/assert-vocabulary-id-available'
 export * from './ruleset-patch/ruleset-patch.service'
 export * from './sets/vocabulary.service'

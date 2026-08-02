@@ -10,8 +10,8 @@ import {
   VOCABULARY_BULK_BLOCKED_DIALOG_HEADLINE,
   VOCABULARY_DISABLE_BLOCKED_DESCRIPTION,
   VOCABULARY_DISABLE_BLOCKED_HEADLINE,
-  VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT,
-} from '@/features/vocabulary'
+} from '../lib/labels'
+import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/vocabulary'
 
 export type VocabularyAvailabilityBlockedRow = {
   rowId: string

@@ -74,6 +74,7 @@ const VOCABULARY_USAGE_REGISTRATIONS_LIST = [
       { source: characterLanguageSource, entry: true, batch: false },
     ],
     summaryLabels: { singular: 'reference', plural: 'references' },
+    overviewUsageScope: 'content_only',
   }),
   defineVocabularyUsage({
     setId: SENSE_SET_ID,

@@ -175,21 +175,24 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 - **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
 - **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
-- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max `VOCABULARY_USAGE_SUMMARY_LIMIT` from contracts). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned, presentational only) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms.
+- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max `VOCABULARY_USAGE_SUMMARY_LIMIT` from contracts). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned, presentational only) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms. When batch sources are a strict subset of entry sources, registration must declare `overviewUsageScope: 'content_only'`; the resolved set exposes this metadata and the dashboard renders **Used by content** with scope copy — **metadata only**, never affecting resolver topology or guards.
+- **Three resolution scopes** — overview list counts use batch sources only (role-independent); detail `GET …/usage` uses entry sources with `viewer_display`; disable/delete guards use entry sources with `authoritative_guard`. `overviewUsageScope` describes batch completeness for column copy only.
 - **Capability split** — `usageResolution` enables counts and usage GET; `disableGuard` / `deleteGuard` are independent guard flags; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support (`batchUsageCounting` requires `usageResolution`).
-- **Registration vs capability** — `defineVocabularyUsage({ setId, sources[], summaryLabels })` owns discovery topology (which sources participate in entry vs batch resolution). `VOCABULARY_SET_CAPABILITIES` owns product behavior (which surfaces are on). Neither duplicates the other.
+- **Registration vs capability** — `defineVocabularyUsage({ setId, sources[], summaryLabels, overviewUsageScope? })` owns discovery topology (which sources participate in entry vs batch resolution). `VOCABULARY_SET_CAPABILITIES` owns product behavior (which surfaces are on). Neither duplicates the other.
 - **Purpose orchestration** — resolver context carries `purpose: 'viewer_display' | 'authoritative_guard'`. Overview attach and usage GET use `viewer_display`; disable/delete preflight and PATCH/DELETE 409 recompute `authoritative_guard` even if preflight just ran. Character language refs are viewer-scoped for display but campaign-wide for guards.
 - **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; batch overview loads use `resolveVocabularyOptionUsageBatch`. Reference discovery logic lives in the API (`apps/api/.../vocabulary/lib/`); contracts own neutral DTOs only.
-- **UI:** informational `UsageReferencesSection` on detail; overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
+- **UI:** informational `UsageReferencesSection` on detail (assembled in `game-terms`); overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
 
 ---
 
 ## Dashboard registries
 
 Vocabulary consumption (API clients, hooks, option maps, field factories, entry
-form model) lives in `apps/dashboard/src/features/vocabulary/`. Game Terms
-authoring UI (hub, overview, detail, sheets, bulk availability) lives in
-`apps/dashboard/src/features/game-terms/` and depends on `vocabulary` only.
+form model) lives in `apps/dashboard/src/features/vocabulary/` — JSX-light, reusable
+field components only. Game Terms authoring UI (hub, overview, detail, sheets,
+bulk availability, blocked-dialog copy, and sheet field-item assembly for usage
+references) lives in `apps/dashboard/src/features/game-terms/` and depends on
+`vocabulary` only.
 The Homebrew hub and ruleset patch hooks remain in `features/homebrew/` —
 ruleset patch is unrelated debt; do not route new vocabulary consumption through
 homebrew.

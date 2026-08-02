@@ -65,9 +65,6 @@ export const VOCABULARY_BATCH_USAGE_RESOLVERS: Partial<
   listRegistrations().map((registration) => [registration.setId, registration.batchResolver]),
 )
 
-/** @deprecated Use {@link VOCABULARY_BATCH_USAGE_RESOLVERS}. */
-export const VOCABULARY_BATCH_COUNT_RESOLVERS = VOCABULARY_BATCH_USAGE_RESOLVERS
-
 export function getVocabularyUsageResolver(setId: VocabularyOptionSetId): VocabularyUsageResolver {
   return VOCABULARY_USAGE_RESOLVERS[setId] ?? defaultUsageResolver
 }
@@ -76,13 +73,6 @@ export function getVocabularyBatchUsageResolver(
   setId: VocabularyOptionSetId,
 ): VocabularySetBatchUsageResolver | undefined {
   return VOCABULARY_BATCH_USAGE_RESOLVERS[setId]
-}
-
-/** @deprecated Use {@link getVocabularyBatchUsageResolver}. */
-export function getVocabularyBatchCountResolver(
-  setId: VocabularyOptionSetId,
-): VocabularySetBatchUsageResolver | undefined {
-  return getVocabularyBatchUsageResolver(setId)
 }
 
 /** Asserts every guard/usage-resolution-enabled set has a usage registration with entry sources. */
@@ -129,16 +119,6 @@ export async function resolveVocabularyOptionUsageBatch(
   }
 
   return resolver(ctx, entryIds)
-}
-
-/** @deprecated Use {@link resolveVocabularyOptionUsageBatch}. */
-export async function resolveVocabularyOptionUsageCountsBatch(
-  ctx: VocabularyUsageResolverContext,
-  setId: VocabularyOptionSetId,
-  entryIds: readonly string[],
-): Promise<Map<string, number>> {
-  const results = await resolveVocabularyOptionUsageBatch(ctx, setId, entryIds)
-  return new Map([...results.entries()].map(([entryId, result]) => [entryId, result.count]))
 }
 
 export {

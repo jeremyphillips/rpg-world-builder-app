@@ -3,10 +3,12 @@ import {
   assertDamageTypesActiveInCampaign,
   assertLanguagesActiveInCampaign,
   assertSensesActiveInCampaign,
-  collectDamageTypeIdsFromBody,
-  collectLanguageIdsFromBody,
-  collectSenseTypeIdsFromBody,
 } from '../../vocabulary'
+import {
+  extractSpeciesDamageTypeIds,
+  extractSpeciesLanguageIds,
+  extractSpeciesSenseTypeIds,
+} from '../../vocabulary/lib/reference-sources/species'
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
@@ -40,12 +42,13 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
         }
       : ctx.input
 
-  await assertDamageTypesActiveInCampaign(
-    ctx.campaignId,
-    collectDamageTypeIdsFromBody(inputForVocab),
-  )
-  await assertSensesActiveInCampaign(ctx.campaignId, collectSenseTypeIdsFromBody(inputForVocab))
-  await assertLanguagesActiveInCampaign(ctx.campaignId, collectLanguageIdsFromBody(inputForVocab))
+  await assertDamageTypesActiveInCampaign(ctx.campaignId, [
+    ...extractSpeciesDamageTypeIds(inputForVocab),
+  ])
+  await assertSensesActiveInCampaign(ctx.campaignId, [...extractSpeciesSenseTypeIds(inputForVocab)])
+  await assertLanguagesActiveInCampaign(ctx.campaignId, [
+    ...extractSpeciesLanguageIds(inputForVocab),
+  ])
 
   const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
   assertSpeciesClassSlugsFromInput(inputForVocab, classes)

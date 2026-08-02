@@ -21,20 +21,8 @@ export {
   VOCABULARY_SOURCE_LABELS,
   VOCABULARY_STATUS_LABELS,
   UNKNOWN_VOCABULARY_SET_MESSAGE,
-  VOCABULARY_NOT_IMPLEMENTED_MESSAGE,
-  VOCABULARY_BULK_ACTIONS_MENU_LABEL,
-  VOCABULARY_BULK_ACTION_EDIT_AVAILABILITY_LABEL,
-  VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE,
-  VOCABULARY_DISABLE_BLOCKED_HEADLINE,
-  VOCABULARY_DISABLE_BLOCKED_DESCRIPTION,
-  VOCABULARY_DELETE_BLOCKED_HEADLINE,
-  VOCABULARY_DELETE_BLOCKED_DESCRIPTION,
-  VOCABULARY_BULK_BLOCKED_DIALOG_HEADLINE,
-  VOCABULARY_BULK_BLOCKED_DIALOG_DESCRIPTION,
   getVocabularySourceLabel,
   getVocabularyStatusLabel,
-  formatBulkVocabularyAvailabilityFullSuccess,
-  formatBulkVocabularyAvailabilityPartialSuccess,
 } from './lib/labels'
 export { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from './lib/usage-references.constants'
 
@@ -42,6 +30,7 @@ export type { VocabularyEntryFormValues } from './lib/vocabulary-entry-form-fiel
 export {
   buildVocabularyEntrySheetFields,
   vocabularyEntrySheetFormSchema,
+  vocabularyAvailableFromStatus,
   type VocabularyEntrySheetFormValues,
 } from './lib/vocabulary-entry-form-fields'
 export {
@@ -50,7 +39,7 @@ export {
 } from './lib/vocabulary-entry-form-registry'
 export {
   buildVocabularyEntrySheetDefaultValues,
-  buildVocabularyEntrySheetFieldItems,
+  requireVocabularyEntryFormDefinition,
   resolveVocabularyEntrySheetHeadline,
   submitVocabularyEntrySheet,
 } from './lib/vocabulary-entry-sheet.lib'

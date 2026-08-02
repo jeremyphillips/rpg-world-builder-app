@@ -10,13 +10,14 @@ import {
 
 import {
   buildVocabularyEntrySheetDefaultValues,
-  buildVocabularyEntrySheetFieldItems,
   resolveVocabularyEntrySheetHeadline,
   submitVocabularyEntrySheet,
   useVocabularyEntryUsage,
   vocabularyEntrySheetFormSchema,
   type VocabularyEntryFormValues,
 } from '@/features/vocabulary'
+
+import { buildVocabularyEntrySheetFieldItems } from '../lib/vocabulary/vocabulary-entry-sheet-fields.lib'
 
 type UseVocabularyEntrySheetOptions = {
   open: boolean

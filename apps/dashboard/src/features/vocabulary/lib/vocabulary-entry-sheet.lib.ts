@@ -1,18 +1,12 @@
-import { createElement } from 'react'
 import type {
   ContentUsageBlocker,
   VocabularyOptionSetId,
   VocabularyOptionWithUsage,
-  VocabularyUsageReference,
 } from '@rpg/contracts'
 import { getVocabularySetCapability } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
-
-import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
 
 import { fetchVocabularyDisableAvailability } from '../api/vocabulary-api'
 import {
-  buildVocabularyEntrySheetFields,
   vocabularyAvailableFromStatus,
   vocabularyStatusFromAvailable,
   type VocabularyEntryFormValues,
@@ -48,42 +42,6 @@ export function buildVocabularyEntrySheetDefaultValues(
     description: '',
     available: true,
   }
-}
-
-export function buildVocabularyEntrySheetFieldItems(input: {
-  setId: VocabularyOptionSetId
-  campaignId: string
-  groupId: string
-  isEdit: boolean
-  isPending: boolean
-  entry?: VocabularyOptionWithUsage
-  usageResolution: boolean
-  references: VocabularyUsageReference[]
-}): FormItem[] {
-  requireVocabularyEntryFormDefinition(input.setId)
-
-  const sheetFields = buildVocabularyEntrySheetFields({
-    groupId: input.groupId,
-    pending: input.isPending,
-    available: input.entry ? vocabularyAvailableFromStatus(input.entry.status) : true,
-  })
-
-  if (!input.isEdit || !input.usageResolution) {
-    return sheetFields
-  }
-
-  return [
-    ...sheetFields,
-    {
-      kind: 'slot' as const,
-      name: 'usageReferences',
-      render: () =>
-        createElement(UsageReferencesSection, {
-          campaignId: input.campaignId,
-          references: input.references,
-        }),
-    },
-  ]
 }
 
 export async function submitVocabularyEntrySheet(input: {

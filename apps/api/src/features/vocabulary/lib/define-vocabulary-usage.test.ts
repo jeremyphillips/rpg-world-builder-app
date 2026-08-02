@@ -55,6 +55,7 @@ describe('defineVocabularyUsage', () => {
         { source: batchOnlySource, entry: false, batch: true },
       ],
       summaryLabels: { singular: 'reference', plural: 'references' },
+      overviewUsageScope: 'content_only',
     })
 
     const ctx = { campaignId: 'camp_1' }
@@ -91,5 +92,33 @@ describe('defineVocabularyUsage', () => {
         summaryLabels: { singular: 'x', plural: 'xs' },
       }),
     ).toThrow(/batch source/)
+  })
+
+  it('requires explicit non-complete overviewUsageScope when entry sources exceed batch', () => {
+    const batchSource = mockSource(new Map())
+    const entryOnlySource = mockSource(new Map())
+
+    expect(() =>
+      defineVocabularyUsage({
+        setId: CREATURE_TYPE_SET_ID,
+        sources: [
+          { source: batchSource, entry: true, batch: true },
+          { source: entryOnlySource, entry: true, batch: false },
+        ],
+        summaryLabels: { singular: 'x', plural: 'xs' },
+      }),
+    ).toThrow(/overviewUsageScope/)
+
+    expect(() =>
+      defineVocabularyUsage({
+        setId: CREATURE_TYPE_SET_ID,
+        sources: [
+          { source: batchSource, entry: true, batch: true },
+          { source: entryOnlySource, entry: true, batch: false },
+        ],
+        summaryLabels: { singular: 'x', plural: 'xs' },
+        overviewUsageScope: 'complete',
+      }),
+    ).toThrow(/overviewUsageScope/)
   })
 })

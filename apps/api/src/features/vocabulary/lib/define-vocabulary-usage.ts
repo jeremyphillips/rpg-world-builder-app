@@ -33,15 +33,47 @@ export type VocabularyUsageSourceRegistration = {
   batch: boolean
 }
 
+export const VOCABULARY_OVERVIEW_USAGE_SCOPES = ['complete', 'content_only'] as const
+
+export type VocabularyOverviewUsageScope = (typeof VOCABULARY_OVERVIEW_USAGE_SCOPES)[number]
+
 export type DefineVocabularyUsageInput = {
   setId: VocabularyOptionSetId
   sources: readonly VocabularyUsageSourceRegistration[]
   summaryLabels: VocabularyUsageSummaryLabels
+  overviewUsageScope?: VocabularyOverviewUsageScope
 }
 
 export type VocabularyUsageRegistration = DefineVocabularyUsageInput & {
+  overviewUsageScope: VocabularyOverviewUsageScope
   entryResolver: VocabularyUsageResolver
   batchResolver: VocabularySetBatchUsageResolver
+}
+
+function resolveOverviewUsageScope(
+  sources: readonly VocabularyUsageSourceRegistration[],
+  declaredScope: VocabularyOverviewUsageScope | undefined,
+): VocabularyOverviewUsageScope {
+  const hasEntryOnlySource = sources.some(
+    (registration) => registration.entry && !registration.batch,
+  )
+
+  if (hasEntryOnlySource) {
+    if (declaredScope == null || declaredScope === 'complete') {
+      throw new Error(
+        'Vocabulary usage registration with entry-only sources requires an explicit non-complete overviewUsageScope (e.g. "content_only").',
+      )
+    }
+    return declaredScope
+  }
+
+  if (declaredScope != null && declaredScope !== 'complete') {
+    throw new Error(
+      'Vocabulary usage registration with fully batched sources must use overviewUsageScope "complete".',
+    )
+  }
+
+  return 'complete'
 }
 
 function buildEntryResolver(
@@ -95,8 +127,11 @@ export function defineVocabularyUsage(
     )
   }
 
+  const overviewUsageScope = resolveOverviewUsageScope(input.sources, input.overviewUsageScope)
+
   return {
     ...input,
+    overviewUsageScope,
     entryResolver: buildEntryResolver(input.sources),
     batchResolver: buildBatchResolver(input.sources),
   }

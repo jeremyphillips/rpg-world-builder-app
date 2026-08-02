@@ -10,10 +10,9 @@ import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 import { VocabularyAvailabilityBlockedDialog } from './vocabulary-availability-blocked-dialog.client'
 import { useBulkUpdateVocabularyAvailability } from '../lib/vocabulary/bulk/use-bulk-update-vocabulary-availability.client'
 import type { BulkVocabularyAvailabilityApplyResult } from '../lib/vocabulary/bulk/bulk-apply-vocabulary-availability.lib'
-import {
-  VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE,
-  VOCABULARY_STATUS_LABELS,
-} from '@/features/vocabulary'
+import { VOCABULARY_STATUS_LABELS } from '@/features/vocabulary'
+
+import { VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE } from '../lib/labels'
 
 const STATUS_OPTIONS = (['active', 'disabled'] as const).map((value) => ({
   value,

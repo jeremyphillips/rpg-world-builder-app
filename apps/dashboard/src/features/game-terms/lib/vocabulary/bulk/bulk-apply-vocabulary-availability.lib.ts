@@ -7,12 +7,12 @@ import {
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
+import { fetchVocabularyDisableAvailability, updateVocabularyEntry } from '@/features/vocabulary'
+
 import {
-  fetchVocabularyDisableAvailability,
   formatBulkVocabularyAvailabilityFullSuccess,
   formatBulkVocabularyAvailabilityPartialSuccess,
-  updateVocabularyEntry,
-} from '@/features/vocabulary'
+} from '../../labels'
 
 export const VOCABULARY_BULK_UPDATE_CONCURRENCY = 5
 
