@@ -25,7 +25,10 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
+  /** Preview panel horizontal inset only — does not imply row borders. */
   inset?: SearchResultRowInset
+  /** Parent list owns separators; rows inside shared result lists must set this. */
+  borderless?: boolean
   className?: string
 }
 
@@ -37,6 +40,7 @@ export function SearchResultRow({
   campaignUnavailable = false,
   onActivate,
   inset,
+  borderless = false,
   className,
 }: SearchResultRowProps) {
   const accessibleName = campaignUnavailable
@@ -71,7 +75,7 @@ export function SearchResultRow({
   return (
     <Link
       to={href}
-      className={cn(searchResultRowVariants({ inset: inset ?? 'none' }), className)}
+      className={cn(searchResultRowVariants({ borderless }), className)}
       onClick={onActivate}
       aria-label={accessibleName}
     >

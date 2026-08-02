@@ -11,28 +11,30 @@ import {
   deriveGlobalSearchPreviewGroupState,
 } from '../lib/global-search-preview-group'
 import {
-  globalSearchPreviewGroupHeadingCountClasses,
-  globalSearchPreviewGroupHeadingVariants,
-  globalSearchPreviewGroupListClasses,
-  globalSearchPreviewGroupVariants,
-  globalSearchPreviewInsetClasses,
-  globalSearchPreviewShowAllLinkVariants,
-} from '../lib/global-search-preview.variants'
+  globalSearchGroupHeadingCountClasses,
+  globalSearchGroupHeadingVariants,
+  globalSearchGroupSectionVariants,
+  globalSearchGroupShowAllLinkVariants,
+  globalSearchResultListClasses,
+} from '../lib/global-search-group.variants'
+import { globalSearchPreviewInsetClasses } from '../lib/global-search-preview.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
-import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
 import { SearchResultRow } from './search-result-row.client'
 
-export type GlobalSearchPreviewGroupSectionProps = {
-  section: GlobalSearchGroupSection
+export type GlobalSearchGroupSectionProps = {
+  section: GlobalSearchGroupSectionModel
   sectionIndex: number
-  sections: readonly GlobalSearchGroupSection[]
+  sections: readonly GlobalSearchGroupSectionModel[]
   resolveHref: (document: GlobalSearchDocument) => string
   onResultActivate?: () => void
-  onShowAll?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => void
-  showAllHref?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => string
+  onShowAll?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => void
+  showAllHref?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => string
+  /** Preview panel horizontal inset — page uses default full-width layout. */
+  inset?: 'panel'
 }
 
-export function GlobalSearchPreviewGroupSection({
+export function GlobalSearchGroupSection({
   section,
   sectionIndex,
   sections,
@@ -40,39 +42,38 @@ export function GlobalSearchPreviewGroupSection({
   onResultActivate,
   onShowAll,
   showAllHref,
-}: GlobalSearchPreviewGroupSectionProps) {
+  inset,
+}: GlobalSearchGroupSectionProps) {
   const groupLabel = getGlobalSearchFilterGroupLabel(section.filterGroup)
   const state = deriveGlobalSearchPreviewGroupState(section)
   const follows = deriveGlobalSearchPreviewGroupFollows(sections, sectionIndex)
   const showGroupAction = state === 'truncated'
   const showAllTarget = showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
   const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
-  const showAllClassName = cn(
-    globalSearchPreviewShowAllLinkVariants(),
-    globalSearchPreviewInsetClasses,
-  )
+  const insetClasses = inset === 'panel' ? globalSearchPreviewInsetClasses : undefined
+  const showAllClassName = cn(globalSearchGroupShowAllLinkVariants(), insetClasses)
 
   return (
     <section
       aria-label={`${groupLabel}, ${section.totalCount} results`}
-      className={globalSearchPreviewGroupVariants({ state })}
+      className={globalSearchGroupSectionVariants({ state })}
     >
       <div
-        className={globalSearchPreviewGroupHeadingVariants({
-          first: sectionIndex === 0,
+        className={globalSearchGroupHeadingVariants({
+          panelFirst: inset === 'panel' && sectionIndex === 0,
           follows,
         })}
       >
-        <Eyebrow size="sm" className={globalSearchPreviewInsetClasses}>
+        <Eyebrow size="sm" className={insetClasses}>
           {groupLabel}
-          <span className={globalSearchPreviewGroupHeadingCountClasses}>
+          <span className={globalSearchGroupHeadingCountClasses}>
             {' · '}
             {section.totalCount}
           </span>
         </Eyebrow>
       </div>
 
-      <div className={globalSearchPreviewGroupListClasses}>
+      <div className={globalSearchResultListClasses}>
         {section.items.map((document) => (
           <SearchResultRow
             key={document.id}
@@ -82,7 +83,8 @@ export function GlobalSearchPreviewGroupSection({
             href={resolveHref(document)}
             campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
             onActivate={onResultActivate}
-            inset="panel"
+            borderless
+            inset={inset}
           />
         ))}
       </div>

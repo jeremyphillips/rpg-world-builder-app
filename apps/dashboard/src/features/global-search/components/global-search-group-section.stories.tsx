@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
-import { GlobalSearchPreviewGroupSection } from './global-search-preview-group-section.client'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
+import { GlobalSearchGroupSection } from './global-search-group-section.client'
 
-const truncatedSection: GlobalSearchGroupSection = {
+const truncatedSection: GlobalSearchGroupSectionModel = {
   filterGroup: 'content',
   totalCount: 14,
   items: [
@@ -19,7 +19,7 @@ const truncatedSection: GlobalSearchGroupSection = {
   ],
 }
 
-const completeSection: GlobalSearchGroupSection = {
+const completeSection: GlobalSearchGroupSectionModel = {
   filterGroup: 'game-terms',
   totalCount: 2,
   items: [
@@ -45,21 +45,21 @@ const completeSection: GlobalSearchGroupSection = {
 }
 
 const meta = {
-  title: 'GlobalSearch/GlobalSearchPreviewGroupSection',
-  component: GlobalSearchPreviewGroupSection,
-  decorators: [
-    (Story) => (
-      <div className="w-96 border border-border bg-surface-subtle">
-        <Story />
-      </div>
-    ),
-  ],
-} satisfies Meta<typeof GlobalSearchPreviewGroupSection>
+  title: 'GlobalSearch/GlobalSearchGroupSection',
+  component: GlobalSearchGroupSection,
+} satisfies Meta<typeof GlobalSearchGroupSection>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Truncated: Story = {
+export const PageContext: Story = {
+  decorators: [
+    (Story) => (
+      <div className="mx-auto max-w-4xl space-y-6">
+        <Story />
+      </div>
+    ),
+  ],
   args: {
     section: truncatedSection,
     sectionIndex: 0,
@@ -69,12 +69,28 @@ export const Truncated: Story = {
   },
 }
 
+export const PanelContext: Story = {
+  decorators: [
+    (Story) => (
+      <div className="w-96 border border-border bg-surface-subtle">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    ...PageContext.args,
+    inset: 'panel',
+  },
+}
+
 export const CompleteAfterTruncated: Story = {
+  ...PanelContext,
   args: {
     section: completeSection,
     sectionIndex: 1,
     sections: [truncatedSection, completeSection],
     resolveHref: () => '/campaigns/demo/game-terms/darkvision',
     showAllHref: () => '/campaigns/demo/search?group=game-terms',
+    inset: 'panel',
   },
 }

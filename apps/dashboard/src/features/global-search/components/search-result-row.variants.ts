@@ -4,13 +4,13 @@ export const searchResultRowVariants = cva(
   'block w-full px-0 py-3 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
   {
     variants: {
-      inset: {
-        panel: 'border-b-0',
-        none: 'border-b border-border',
+      borderless: {
+        true: 'border-b-0',
+        false: 'border-b border-border',
       },
     },
     defaultVariants: {
-      inset: 'none',
+      borderless: false,
     },
   },
 )

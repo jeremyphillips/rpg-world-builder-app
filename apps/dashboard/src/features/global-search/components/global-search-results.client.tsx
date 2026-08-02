@@ -1,26 +1,22 @@
 'use client'
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
-import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { Eyebrow, notificationMenuFooterLinkVariants } from '@rpg/ui'
-import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { globalSearchResultListClasses } from '../lib/global-search-group.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
-import { GlobalSearchPreviewGroupSection } from './global-search-preview-group-section.client'
-import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
-import { SearchResultRow, type SearchResultRowInset } from './search-result-row.client'
-
-export type GlobalSearchResultsInset = SearchResultRowInset
+import { GlobalSearchGroupSection } from './global-search-group-section.client'
+import { SearchResultRow } from './search-result-row.client'
 
 export type GlobalSearchGroupedResultsProps = {
-  sections: readonly GlobalSearchGroupSection[]
+  sections: readonly GlobalSearchGroupSectionModel[]
   resolveHref: (document: GlobalSearchDocument) => string
   onResultActivate?: () => void
-  onShowAll?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => void
-  showAllHref?: (filterGroup: GlobalSearchGroupSection['filterGroup']) => string
-  inset?: GlobalSearchResultsInset
+  onShowAll?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => void
+  showAllHref?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => string
+  inset?: 'panel'
 }
 
 export function GlobalSearchGroupedResults({
@@ -35,74 +31,25 @@ export function GlobalSearchGroupedResults({
     return null
   }
 
+  const sectionElements = sections.map((section, sectionIndex) => (
+    <GlobalSearchGroupSection
+      key={section.filterGroup}
+      section={section}
+      sectionIndex={sectionIndex}
+      sections={sections}
+      resolveHref={resolveHref}
+      onResultActivate={onResultActivate}
+      onShowAll={onShowAll}
+      showAllHref={showAllHref}
+      inset={inset}
+    />
+  ))
+
   if (inset === 'panel') {
-    return (
-      <>
-        {sections.map((section, sectionIndex) => (
-          <GlobalSearchPreviewGroupSection
-            key={section.filterGroup}
-            section={section}
-            sectionIndex={sectionIndex}
-            sections={sections}
-            resolveHref={resolveHref}
-            onResultActivate={onResultActivate}
-            onShowAll={onShowAll}
-            showAllHref={showAllHref}
-          />
-        ))}
-      </>
-    )
+    return <>{sectionElements}</>
   }
 
-  return (
-    <div className="space-y-6">
-      {sections.map((section) => {
-        const groupLabel = getGlobalSearchFilterGroupLabel(section.filterGroup)
-        const showAllTarget =
-          showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
-        const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
-
-        return (
-          <section key={section.filterGroup} aria-label={groupLabel}>
-            <Eyebrow size="sm" className="mb-2">
-              {groupLabel}
-            </Eyebrow>
-            <div>
-              {section.items.map((document) => (
-                <SearchResultRow
-                  key={document.id}
-                  title={document.title}
-                  secondary={document.secondary}
-                  typeLabel={document.typeLabel}
-                  href={resolveHref(document)}
-                  campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
-                  onActivate={onResultActivate}
-                />
-              ))}
-            </div>
-            {section.totalCount > section.items.length ? (
-              onShowAll ? (
-                <button
-                  type="button"
-                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
-                  onClick={() => onShowAll(section.filterGroup)}
-                >
-                  {showAllLabel}
-                </button>
-              ) : (
-                <Link
-                  to={showAllTarget}
-                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
-                >
-                  {showAllLabel}
-                </Link>
-              )
-            ) : null}
-          </section>
-        )
-      })}
-    </div>
-  )
+  return <div className="space-y-6">{sectionElements}</div>
 }
 
 export type GlobalSearchFlatResultsProps = {
@@ -110,7 +57,6 @@ export type GlobalSearchFlatResultsProps = {
   resolveHref: (document: GlobalSearchDocument) => string
   onResultActivate?: () => void
   emptyDescription?: string
-  inset?: GlobalSearchResultsInset
 }
 
 export function GlobalSearchFlatResults({
@@ -118,7 +64,6 @@ export function GlobalSearchFlatResults({
   resolveHref,
   onResultActivate,
   emptyDescription,
-  inset,
 }: GlobalSearchFlatResultsProps) {
   if (results.length === 0) {
     return (
@@ -130,7 +75,7 @@ export function GlobalSearchFlatResults({
   }
 
   return (
-    <div>
+    <div className={globalSearchResultListClasses}>
       {results.map((document) => (
         <SearchResultRow
           key={document.id}
@@ -140,7 +85,7 @@ export function GlobalSearchFlatResults({
           href={resolveHref(document)}
           campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}
-          inset={inset}
+          borderless
         />
       ))}
     </div>

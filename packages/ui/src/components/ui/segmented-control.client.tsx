@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Text } from './text'
 import {
   segmentedControlLabelVariants,
   segmentedControlMetadataVariants,
@@ -123,9 +122,9 @@ export function SegmentedControl<TValue extends string>({
           >
             <span className={segmentedControlLabelVariants({ segmentWidth })}>{option.label}</span>
             {option.metadata ? (
-              <Text as="span" variant="muted" className={segmentedControlMetadataVariants()}>
+              <span className={segmentedControlMetadataVariants({ active: isActive })}>
                 {option.metadata}
-              </Text>
+              </span>
             ) : null}
           </button>
         )

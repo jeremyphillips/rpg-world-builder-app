@@ -71,12 +71,28 @@ describe('SearchResultRow', () => {
         typeLabel="Spell"
         href="/campaigns/c1/spells/fireball"
         inset="panel"
+        borderless
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
     expect(secondary).toHaveClass('text-xs', 'truncate')
     expect(screen.getByRole('link', { name: 'Fireball, Spell' })).toHaveClass('border-b-0')
+  })
+
+  it('removes row borders when borderless for parent-owned list separators', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Fireball"
+        secondary="3rd-level evocation"
+        typeLabel="Spell"
+        href="/campaigns/c1/spells/fireball"
+        borderless
+      />,
+    )
+
+    expect(screen.getByRole('link', { name: 'Fireball, Spell' })).toHaveClass('border-b-0')
+    expect(screen.getByRole('link', { name: 'Fireball, Spell' })).not.toHaveClass('border-border')
   })
 
   it('has no axe accessibility violations', async () => {

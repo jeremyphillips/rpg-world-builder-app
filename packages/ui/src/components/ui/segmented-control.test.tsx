@@ -69,6 +69,32 @@ describe('SegmentedControl', () => {
     expect(gameTerms.className).toContain('shrink-0')
   })
 
+  it('styles metadata one step below the segment label', () => {
+    render(
+      <SegmentedControl
+        aria-label="Search filter group"
+        value="content"
+        segmentWidth="auto"
+        options={[
+          { value: 'all', label: 'All', metadata: '24' },
+          { value: 'content', label: 'Content', metadata: '14' },
+        ]}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    const activeMetadata = screen
+      .getByRole('button', { name: /Content/i })
+      .querySelector('span:last-child')
+    const inactiveMetadata = screen
+      .getByRole('button', { name: /All/i })
+      .querySelector('span:last-child')
+
+    expect(activeMetadata).toHaveClass('text-xs', 'text-foreground-subtle')
+    expect(activeMetadata?.className).not.toContain('font-light')
+    expect(inactiveMetadata).toHaveClass('text-xs', 'text-foreground-disabled')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <SegmentedControl
