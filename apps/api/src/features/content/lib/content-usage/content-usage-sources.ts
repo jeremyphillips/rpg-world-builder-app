@@ -19,6 +19,7 @@ function characterDescriptorSource(
   descriptor: CharacterContentReferenceDescriptor,
 ): ContentUsageSource {
   return {
+    characterReference: descriptor,
     loadBlockerIndex: (ctx) =>
       indexCharacterBlockersByContentId({
         campaignId: ctx.campaignId,
@@ -42,6 +43,7 @@ export const characterSkillProficiencySource = characterDescriptorSource(
 )
 
 export const characterEquipmentSource: ContentUsageSource = {
+  characterReference: 'equipment',
   loadBlockerIndex: (ctx) =>
     indexCharacterEquipmentBlockersByContentId({
       campaignId: ctx.campaignId,

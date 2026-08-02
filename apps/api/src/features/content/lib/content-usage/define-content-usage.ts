@@ -1,4 +1,5 @@
 import type {
+  CharacterRelationshipKind,
   ContentOverviewUsageScope,
   ContentUsageBlocker,
   ContentUsageSummaryLabels,
@@ -52,10 +53,16 @@ export const CONTENT_OVERVIEW_USAGE_SCOPE_VALUES = [
   'characters',
 ] as const satisfies readonly ContentOverviewUsageScope[]
 
+export type ViewerCharacterRelationshipStrategy =
+  | { strategy: 'none' }
+  | { strategy: 'fixed'; kind: CharacterRelationshipKind; hasNoun?: string }
+  | { strategy: 'spell-selection' }
+
 export type DefineContentUsageInput = {
   contentType: ContentUsageSurfaceKey
   sources: readonly ContentUsageSourceRegistration[]
   summaryLabels: ContentUsageSummaryLabels
+  viewerCharacterRelationship: ViewerCharacterRelationshipStrategy
   /**
    * Which entity field keys the inverted index — skill-proficiencies use slug;
    * all other v1 surfaces use id.
@@ -95,6 +102,19 @@ function resolveOverviewUsageScope(
   }
 
   return 'characters'
+}
+
+function validateViewerCharacterRelationship(
+  contentType: ContentUsageSurfaceKey,
+  strategy: ViewerCharacterRelationshipStrategy,
+): void {
+  if (strategy.strategy === 'fixed' && strategy.kind === 'has') {
+    if (!strategy.hasNoun || strategy.hasNoun.trim().length === 0) {
+      throw new Error(
+        `Content usage registration for "${contentType}" requires hasNoun when viewerCharacterRelationship kind is "has".`,
+      )
+    }
+  }
 }
 
 function buildEntryResolver(
@@ -145,6 +165,8 @@ export function defineContentUsage(input: DefineContentUsageInput): ContentUsage
       `Content usage registration for "${input.contentType}" requires at least one batch source.`,
     )
   }
+
+  validateViewerCharacterRelationship(input.contentType, input.viewerCharacterRelationship)
 
   const overviewUsageScope = resolveOverviewUsageScope(input.sources, input.overviewUsageScope)
 

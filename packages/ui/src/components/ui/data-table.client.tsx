@@ -309,24 +309,29 @@ function DataTablePagination<TData>({ table, onPageSizeChange }: DataTablePagina
 // SortableHeader helper — re-usable by consumers in their column defs
 // ---------------------------------------------------------------------------
 
-interface SortableHeaderProps<TData, TValue> {
+export interface SortableHeaderProps<TData, TValue> {
   column: Column<TData, TValue>
   children: React.ReactNode
   /**
-   * Explicit accessible label for the sort button.
-   * Required when `children` contains non-string nodes (e.g. an `InfoTooltip`);
-   * falls back to `children.toString()` for plain string children.
+   * Explicit accessible label for the sort control.
+   * Required when `children` is not a plain string; also used for the info tooltip name.
    */
   label?: string
+  /** Optional tooltip body — renders an inline info icon immediately after the label. */
+  info?: React.ReactNode
 }
 
 export function SortableHeader<TData, TValue>({
   column,
   children,
   label,
+  info,
 }: SortableHeaderProps<TData, TValue>) {
-  const ariaLabel = `Sort by ${label ?? (typeof children === 'string' ? children : '')}`
+  const headerLabel = label ?? (typeof children === 'string' ? children : '')
+  const ariaLabel = `Sort by ${headerLabel}`
   const sorted = column.getIsSorted()
+  const toggleSort = () => column.toggleSorting(column.getIsSorted() === 'asc')
+  const sortButtonClassName = '-ml-2 h-7 data-[state=open]:bg-accent'
 
   const sortIcon =
     sorted === 'asc' ? (
@@ -337,12 +342,30 @@ export function SortableHeader<TData, TValue>({
       <ArrowUpDown className={dataTableSortIconVariants({ state: 'idle' })} aria-hidden="true" />
     )
 
+  if (info) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          className={sortButtonClassName}
+          onClick={toggleSort}
+          aria-label={ariaLabel}
+        >
+          {children}
+          {sortIcon}
+        </Button>
+        <InfoTooltip aria-label={`About ${headerLabel}`}>{info}</InfoTooltip>
+      </span>
+    )
+  }
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      className="-ml-2 h-7 data-[state=open]:bg-accent"
-      onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      className={sortButtonClassName}
+      onClick={toggleSort}
       aria-label={ariaLabel}
     >
       {children}

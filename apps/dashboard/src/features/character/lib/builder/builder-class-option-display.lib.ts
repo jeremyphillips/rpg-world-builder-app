@@ -5,10 +5,11 @@ import {
   buildClassDetailViewModel,
   CLASS_SECTION_LABELS,
 } from '@/features/content'
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
-export const BUILDER_CLASS_EYEBROW = 'Class'
+export const BUILDER_CLASS_EYEBROW = getContentTypeItemLabel('classes')
 
 type BuilderClassDisplayVocabulary = {
   resolveSkillLabel: (slug: string) => string

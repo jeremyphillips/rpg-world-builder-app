@@ -719,6 +719,7 @@ export type {
   RowActionMenuItem,
   RowActionsMenuLinkProps,
   RowActionsMenuProps,
+  SortableHeaderProps,
   TableBadgeCellProps,
 } from './components/ui/data-table.client'
 export {

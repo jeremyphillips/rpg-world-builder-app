@@ -1,3 +1,7 @@
-export const CONTENT_OVERVIEW_USED_BY_CHARACTERS_LABEL = 'Used by characters'
+export const CONTENT_OVERVIEW_USED_BY_CHARACTERS_LABEL = 'My characters'
 export const CONTENT_OVERVIEW_USED_BY_CHARACTERS_TOOLTIP =
-  'Counts characters that reference this content. Additional reference kinds may appear later.'
+  'Counts your characters that reference this content.'
+
+export const CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_LABEL = 'All characters'
+export const CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_TOOLTIP =
+  'Counts all characters that reference this content.'

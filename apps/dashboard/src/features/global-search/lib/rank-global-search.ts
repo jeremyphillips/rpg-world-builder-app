@@ -47,6 +47,20 @@ export function groupRankedGlobalSearchDocuments(
   return grouped
 }
 
+export function countGlobalSearchByGroup(
+  documents: readonly GlobalSearchDocument[],
+): Readonly<Record<GlobalSearchUrlGroup, number>> {
+  const grouped = groupRankedGlobalSearchDocuments(documents)
+  const counts: Record<GlobalSearchUrlGroup, number> = {
+    all: documents.length,
+    characters: grouped.get('characters')?.length ?? 0,
+    content: grouped.get('content')?.length ?? 0,
+    'game-terms': grouped.get('game-terms')?.length ?? 0,
+  }
+
+  return counts
+}
+
 export function buildGlobalSearchGroupSections(
   documents: readonly GlobalSearchDocument[],
   previewLimit: number,

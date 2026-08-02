@@ -16,48 +16,55 @@ import {
 
 const CHARACTER_SUMMARY_LABELS = { singular: 'character', plural: 'characters' } as const
 
-const CONTENT_USAGE_REGISTRATIONS_LIST = [
+export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   defineContentUsage({
     contentType: 'classes',
     sources: [{ source: characterClassSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
   }),
   defineContentUsage({
     contentType: 'subclasses',
     sources: [{ source: characterSubclassSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'subclass' },
   }),
   defineContentUsage({
     contentType: 'species',
     sources: [{ source: characterSpeciesSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'species' },
   }),
   defineContentUsage({
     contentType: 'spells',
     sources: [{ source: characterSpellSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'spell-selection' },
   }),
   defineContentUsage({
     contentType: 'feats',
     sources: [{ source: characterFeatSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'has', hasNoun: 'feat' },
   }),
   defineContentUsage({
     contentType: 'equipment',
     sources: [{ source: characterEquipmentSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'owns' },
   }),
   defineContentUsage({
     contentType: 'organizations',
     sources: [{ source: characterOrganizationSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'member' },
   }),
   defineContentUsage({
     contentType: 'skill-proficiencies',
@@ -65,6 +72,7 @@ const CONTENT_USAGE_REGISTRATIONS_LIST = [
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     lookupKey: 'slug',
     overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'fixed', kind: 'has', hasNoun: 'proficiency' },
   }),
 ] as const satisfies readonly ContentUsageRegistration[]
 

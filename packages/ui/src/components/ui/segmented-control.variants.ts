@@ -47,4 +47,14 @@ export const segmentedControlLabelVariants = cva('', {
   },
 })
 
-export const segmentedControlMetadataVariants = cva('tabular-nums text-muted-foreground')
+export const segmentedControlMetadataVariants = cva('text-xs tabular-nums', {
+  variants: {
+    active: {
+      true: 'text-foreground-subtle',
+      false: 'text-foreground-disabled',
+    },
+  },
+  defaultVariants: {
+    active: false,
+  },
+})

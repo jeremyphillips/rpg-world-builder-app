@@ -3,7 +3,7 @@ import * as React from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import type { ColumnDef } from '@tanstack/react-table'
+import type { Column, ColumnDef } from '@tanstack/react-table'
 
 import {
   BooleanCell,
@@ -112,6 +112,64 @@ describe('DataTable cell helpers', () => {
       </TableBadgeCell>,
     )
     expect(screen.getByText('System')).toBeInTheDocument()
+  })
+})
+
+describe('SortableHeader', () => {
+  function createSortableColumnMock(): Column<Item, unknown> {
+    return {
+      getIsSorted: () => false as const,
+      toggleSorting: vi.fn(),
+    } as unknown as Column<Item, unknown>
+  }
+
+  it('renders label, sort icon, and info inline', () => {
+    render(
+      <SortableHeader
+        column={createSortableColumnMock()}
+        label="My characters"
+        info="Character-scoped usage only."
+      >
+        My characters
+      </SortableHeader>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Sort by My characters' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About My characters' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Change sort direction for My characters' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('sorts when the sort control is clicked', async () => {
+    const user = userEvent.setup()
+    const toggleSorting = vi.fn()
+    const column = {
+      getIsSorted: () => false as const,
+      toggleSorting,
+    } as unknown as Column<Item, unknown>
+
+    render(
+      <SortableHeader column={column} label="My characters" info="Character-scoped usage only.">
+        My characters
+      </SortableHeader>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Sort by My characters' }))
+    expect(toggleSorting).toHaveBeenCalledTimes(1)
+  })
+
+  it('has no axe accessibility violations with info', async () => {
+    const { container } = render(
+      <SortableHeader
+        column={createSortableColumnMock()}
+        label="My characters"
+        info="Character-scoped usage only."
+      >
+        My characters
+      </SortableHeader>,
+    )
+    await expectNoAxeViolations(container)
   })
 })
 

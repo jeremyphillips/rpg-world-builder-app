@@ -2,16 +2,27 @@
 
 import { Link } from 'react-router-dom'
 
+import {
+  formatViewerCharacterRelationshipTooltip,
+  type ViewerCharacterRelationships,
+} from '@rpg/contracts'
 import { InlineInactiveStatus, Text, cn } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
+import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
 
+import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 import {
   searchResultRowHeaderVariants,
+  searchResultRowSecondaryVariants,
   searchResultRowTitleRowVariants,
+  searchResultRowTitleVariants,
   searchResultRowTypeLabelVariants,
   searchResultRowVariants,
+  type SearchResultRowDensity,
 } from './search-result-row.variants'
+
+export type { SearchResultRowDensity }
 
 export type SearchResultRowProps = {
   title: string
@@ -20,7 +31,12 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
+  density?: SearchResultRowDensity
+  surfaceContext?: GlobalSearchSurfaceContext
+  /** Parent list owns separators; rows inside shared result lists must set this. */
+  borderless?: boolean
   className?: string
+  viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
 export function SearchResultRow({
@@ -30,41 +46,61 @@ export function SearchResultRow({
   href,
   campaignUnavailable = false,
   onActivate,
+  density = 'default',
+  surfaceContext = 'page',
+  borderless = false,
   className,
+  viewerCharacterRelationships,
 }: SearchResultRowProps) {
-  const accessibleName = campaignUnavailable
-    ? `${title}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
-    : `${title}, ${typeLabel}`
+  const relationshipLabel = viewerCharacterRelationships
+    ? formatViewerCharacterRelationshipTooltip(viewerCharacterRelationships)
+    : undefined
 
-  const content = (
-    <>
-      <div className={searchResultRowHeaderVariants()}>
-        <span className={searchResultRowTitleRowVariants()}>
-          <Text as="span" className="min-w-0 truncate text-sm text-foreground">
-            {title}
-          </Text>
-          {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
-        </span>
-        <Text as="span" className={searchResultRowTypeLabelVariants()}>
-          {typeLabel}
-        </Text>
-      </div>
-      {secondary ? (
-        <Text as="p" variant="muted" className="mt-1 text-sm">
-          {secondary}
-        </Text>
-      ) : null}
-    </>
-  )
+  const accessibleName = campaignUnavailable
+    ? relationshipLabel
+      ? `${title}, ${relationshipLabel}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
+      : `${title}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
+    : relationshipLabel
+      ? `${title}, ${relationshipLabel}, ${typeLabel}`
+      : `${title}, ${typeLabel}`
 
   return (
-    <Link
-      to={href}
-      className={cn(searchResultRowVariants(), className)}
-      onClick={onActivate}
-      aria-label={accessibleName}
+    <div
+      className={cn(
+        'group relative',
+        searchResultRowVariants({ borderless, density, surfaceContext }),
+        className,
+      )}
     >
-      {content}
-    </Link>
+      <Link
+        to={href}
+        className="absolute inset-0 rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        onClick={onActivate}
+        aria-label={accessibleName}
+      />
+      <div className="pointer-events-none relative">
+        <div className={searchResultRowHeaderVariants()}>
+          <span className={searchResultRowTitleRowVariants()}>
+            <Text as="span" className={searchResultRowTitleVariants()}>
+              {title}
+            </Text>
+            {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
+            <span className="pointer-events-auto relative z-10">
+              <CharacterRelationshipIndicator
+                viewerCharacterRelationships={viewerCharacterRelationships}
+              />
+            </span>
+          </span>
+          <Text as="span" className={searchResultRowTypeLabelVariants()}>
+            {typeLabel}
+          </Text>
+        </div>
+        {secondary ? (
+          <Text as="p" variant="muted" className={searchResultRowSecondaryVariants({ density })}>
+            {secondary}
+          </Text>
+        ) : null}
+      </div>
+    </div>
   )
 }

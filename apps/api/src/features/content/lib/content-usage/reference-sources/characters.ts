@@ -4,6 +4,7 @@ import type {
   ContentUsageBlocker,
 } from '@rpg/contracts'
 import { isCampaignManager } from '@rpg/contracts'
+import { Types } from 'mongoose'
 
 import { listOpenParticipationsForCampaign } from '../../../../campaign'
 import { CharacterModel } from '../../../../character'
@@ -23,6 +24,18 @@ export type ContentUsageViewerContext = {
   controlledCharacterIds: readonly string[]
 }
 
+export type ControlledCharacterHitCache = Map<string, Promise<CharacterContentUsageHit[]>>
+
+function cacheKeyForDescriptor(
+  descriptor: CharacterContentReferenceDescriptor | 'equipment',
+): string {
+  if (descriptor === 'equipment') {
+    return 'equipment'
+  }
+
+  return `${descriptor.path}:${descriptor.matchKey}`
+}
+
 const CHARACTER_USAGE_BASE_PROJECTION = {
   _id: 1,
   name: 1,
@@ -34,6 +47,10 @@ function projectionForDescriptor(
 ): Record<string, 1> {
   if (descriptor === 'equipment') {
     return { ...CHARACTER_USAGE_BASE_PROJECTION, equipment: 1 }
+  }
+
+  if (descriptor.path === 'spells.spellId') {
+    return { ...CHARACTER_USAGE_BASE_PROJECTION, spells: 1 }
   }
 
   const root = descriptor.path.split('.')[0]!
@@ -51,6 +68,31 @@ async function loadCharacterHits(
   return CharacterModel.find({ _id: { $in: characterIds } })
     .select(projectionForDescriptor(descriptor))
     .lean<CharacterContentUsageHit[]>()
+}
+
+/** Loads lean character hits for viewer-controlled PCs only. */
+export async function loadControlledCharacterHits(
+  controlledCharacterIds: readonly string[],
+  descriptor: CharacterContentReferenceDescriptor | 'equipment',
+  cache?: ControlledCharacterHitCache,
+): Promise<CharacterContentUsageHit[]> {
+  const validCharacterIds = controlledCharacterIds.filter((characterId) =>
+    Types.ObjectId.isValid(characterId),
+  )
+
+  if (cache) {
+    const cacheKey = cacheKeyForDescriptor(descriptor)
+    const cached = cache.get(cacheKey)
+    if (cached) {
+      return cached
+    }
+
+    const pending = loadCharacterHits(validCharacterIds, descriptor)
+    cache.set(cacheKey, pending)
+    return pending
+  }
+
+  return loadCharacterHits(validCharacterIds, descriptor)
 }
 
 async function loadParticipantCharacterIds(campaignId: string): Promise<string[]> {

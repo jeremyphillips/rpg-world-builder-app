@@ -1,3 +1,7 @@
+import { getGlobalSearchFilterGroupSentenceForm, type GlobalSearchUrlGroup } from '@rpg/contracts'
+
+const NO_RESULTS_SUFFIX = 'Try a different spelling or keyword.'
+
 export const GLOBAL_SEARCH_COPY = {
   pageTitle: 'Search',
   triggerLabel: 'Search',
@@ -7,8 +11,16 @@ export const GLOBAL_SEARCH_COPY = {
   emptyQueryTitle: 'Search this campaign',
   emptyQueryDescription: 'Find characters, catalog content, and game terms by name or keyword.',
   noResultsTitle: 'No results',
-  noResultsDescription: (query: string) =>
-    `Nothing matched “${query}”. Try a different spelling or keyword.`,
+  noResultsDescription: (query: string, group: GlobalSearchUrlGroup) => {
+    if (group === 'all') {
+      return `Nothing matched “${query}”. ${NO_RESULTS_SUFFIX}`
+    }
+
+    const plural = getGlobalSearchFilterGroupSentenceForm(group, 2)
+    return `No ${plural} matched “${query}”. ${NO_RESULTS_SUFFIX}`
+  },
+  activeResultsSummary: (count: number, query: string) =>
+    `${count} result${count === 1 ? '' : 's'} for “${query}”`,
   catalogLoadError: 'Could not load search catalog.',
   tryAgain: 'Try again',
   viewAllResults: 'View all results',

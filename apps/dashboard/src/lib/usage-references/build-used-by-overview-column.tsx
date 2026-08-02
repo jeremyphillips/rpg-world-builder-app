@@ -1,5 +1,5 @@
-import { InfoTooltip, SortableHeader } from '@rpg/ui'
-import type { ColumnDef } from '@rpg/ui'
+import { SortableHeader } from '@rpg/ui'
+import type { ColumnDef, DataTableColumnWidth } from '@rpg/ui'
 
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 
@@ -14,10 +14,16 @@ export type UsedByOverviewSummaryLabels = {
   plural: string
 }
 
+export type UsedByOverviewColumnMeta = {
+  overviewCharactersUsageScope?: true
+}
+
 export type BuildUsedByOverviewColumnOptions = {
   usageSummaryLabels: UsedByOverviewSummaryLabels
   columnLabel: string
   scopeTooltip?: string
+  width?: DataTableColumnWidth
+  overviewCharactersUsageScope?: true
 }
 
 function mapUsedBySummaryToCollectionItems(
@@ -33,7 +39,8 @@ function mapUsedBySummaryToCollectionItems(
 export function buildUsedByOverviewColumn<TRow extends UsedByOverviewRow>(
   options: BuildUsedByOverviewColumnOptions,
 ): ColumnDef<TRow> {
-  const { usageSummaryLabels, columnLabel, scopeTooltip } = options
+  const { usageSummaryLabels, columnLabel, scopeTooltip, width, overviewCharactersUsageScope } =
+    options
 
   const column = buildCollectionCountColumn({
     id: 'usedBy',
@@ -42,21 +49,20 @@ export function buildUsedByOverviewColumn<TRow extends UsedByOverviewRow>(
     getCount: (row) => row.usedBy,
     singularLabel: usageSummaryLabels.singular,
     pluralLabel: usageSummaryLabels.plural,
+    ...(width ? { width } : {}),
   })
 
   return {
     ...column,
     header: ({ column: tableColumn }) => (
-      <span className="inline-flex items-center gap-1">
-        <SortableHeader column={tableColumn}>{columnLabel}</SortableHeader>
-        {scopeTooltip ? (
-          <InfoTooltip aria-label={`About ${columnLabel}`}>{scopeTooltip}</InfoTooltip>
-        ) : null}
-      </span>
+      <SortableHeader column={tableColumn} label={columnLabel} info={scopeTooltip}>
+        {columnLabel}
+      </SortableHeader>
     ),
     meta: {
       ...column.meta,
       label: columnLabel,
+      ...(overviewCharactersUsageScope ? { overviewCharactersUsageScope: true } : {}),
     },
   } as ColumnDef<TRow>
 }

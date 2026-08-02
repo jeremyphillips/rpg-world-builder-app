@@ -12,6 +12,7 @@ import type { SegmentedControlOption } from '@rpg/ui'
 
 import {
   buildGlobalSearchGroupSections,
+  countGlobalSearchByGroup,
   filterGlobalSearchByGroup,
   isGlobalSearchQueryBlank,
   rankGlobalSearchDocuments,
@@ -45,16 +46,20 @@ export function useGlobalSearchPage(campaignId: string) {
     return buildGlobalSearchGroupSections(rankedDocuments, PAGE_GROUP_PREVIEW_LIMIT)
   }, [group, hasQuery, rankedDocuments])
 
-  const filterOptions = React.useMemo<readonly SegmentedControlOption<GlobalSearchUrlGroup>[]>(
-    () => [
-      { value: 'all', label: 'All' },
+  const filterOptions = React.useMemo<
+    readonly SegmentedControlOption<GlobalSearchUrlGroup>[]
+  >(() => {
+    const counts = countGlobalSearchByGroup(rankedDocuments)
+
+    return [
+      { value: 'all', label: 'All', metadata: String(counts.all) },
       ...GLOBAL_SEARCH_FILTER_GROUPS.map((filterGroup) => ({
         value: filterGroup,
         label: getGlobalSearchFilterGroupLabel(filterGroup),
+        metadata: String(counts[filterGroup]),
       })),
-    ],
-    [],
-  )
+    ]
+  }, [rankedDocuments])
 
   const setQuery = React.useCallback(
     (nextQuery: string) => {

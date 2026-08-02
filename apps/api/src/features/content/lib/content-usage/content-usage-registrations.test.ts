@@ -44,12 +44,14 @@ describe('content usage registrations', () => {
       sources: [{ source, entry: true, batch: true }],
       summaryLabels: { singular: 'character', plural: 'characters' },
       overviewUsageScope: 'characters',
+      viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
     })
     const completeScoped = defineContentUsage({
       contentType: 'classes',
       sources: [{ source, entry: true, batch: true }],
       summaryLabels: { singular: 'character', plural: 'characters' },
       overviewUsageScope: 'complete',
+      viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
     })
 
     const ctx = { campaignId: 'camp_1' }

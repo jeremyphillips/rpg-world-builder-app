@@ -1,18 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  extractEquipmentIdsFromCharacter,
-  extractIdsFromCharacterDescriptor,
-  type CharacterContentUsageHit,
-} from './characters-extract'
-import {
   CLASS_CHARACTER_REFERENCE,
   ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SUBCLASS_CHARACTER_REFERENCE,
 } from '@rpg/contracts'
+
+import {
+  characterHitToUsageBlocker,
+  extractEquipmentIdsFromCharacter,
+  extractIdsFromCharacterDescriptor,
+  indexFixedRelationshipsByContentId,
+  indexSpellRelationshipsByContentId,
+  type CharacterContentUsageHit,
+} from './characters-extract'
 import { indexRecordsByContentId, mergeBlockerIndexes } from './index-by-content-id'
-import { characterHitToUsageBlocker } from './characters-extract'
 
 describe('characters-extract', () => {
   const hit: CharacterContentUsageHit = {
@@ -79,5 +82,48 @@ describe('index-by-content-id', () => {
 
     const merged = mergeBlockerIndexes([index, index])
     expect(merged.get('class-1')).toHaveLength(2)
+  })
+})
+
+describe('viewer character relationship extractors', () => {
+  it('indexes fixed class relationships by content id', () => {
+    const index = indexFixedRelationshipsByContentId({
+      hits: [
+        {
+          _id: 'char-1',
+          name: 'Aric',
+          characterType: 'pc',
+          classes: [{ classId: 'fighter-id' }],
+        },
+      ],
+      descriptor: CLASS_CHARACTER_REFERENCE,
+      kind: 'class',
+    })
+
+    expect(index.get('fighter-id')).toEqual([
+      { kind: 'class', characterId: 'char-1', characterName: 'Aric' },
+    ])
+  })
+
+  it('indexes mixed spell relationships by prepared and knows kind', () => {
+    const index = indexSpellRelationshipsByContentId([
+      {
+        _id: 'char-1',
+        name: 'Aric',
+        characterType: 'pc',
+        spells: [{ spellId: 'fireball-id', selection: { prepared: true } }],
+      },
+      {
+        _id: 'char-2',
+        name: 'Mira',
+        characterType: 'pc',
+        spells: [{ spellId: 'fireball-id' }],
+      },
+    ])
+
+    expect(index.get('fireball-id')).toEqual([
+      { kind: 'prepared', characterId: 'char-1', characterName: 'Aric' },
+      { kind: 'knows', characterId: 'char-2', characterName: 'Mira' },
+    ])
   })
 })

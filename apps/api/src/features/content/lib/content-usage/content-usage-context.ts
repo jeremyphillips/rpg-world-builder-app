@@ -1,6 +1,9 @@
 import type { CampaignRole } from '@rpg/contracts'
 
-import type { ContentUsageViewerContext } from './reference-sources/characters'
+import type {
+  ContentUsageViewerContext,
+  ControlledCharacterHitCache,
+} from './reference-sources/characters'
 
 /** Orchestration scope — loaders choose records; extractors stay pure. */
 export type ContentUsagePurpose = 'viewer_display' | 'authoritative_guard'
@@ -10,6 +13,8 @@ export type ContentUsageResolverContext = {
   /** Defaults to viewer_display when omitted. */
   purpose?: ContentUsagePurpose
   viewer?: ContentUsageViewerContext
+  /** Request-scoped dedupe for controlled-character Mongo loads keyed by descriptor. */
+  controlledCharacterHitCache?: ControlledCharacterHitCache
 }
 
 export function resolveContentUsagePurpose(ctx: ContentUsageResolverContext): ContentUsagePurpose {
@@ -30,10 +35,14 @@ export function buildContentUsageResolverContext(input: {
     role: CampaignRole
     controlledCharacterIds: readonly string[]
   }
+  controlledCharacterHitCache?: ControlledCharacterHitCache
 }): ContentUsageResolverContext {
   return {
     campaignId: input.campaignId,
     ...(input.purpose ? { purpose: input.purpose } : {}),
     ...(input.viewer ? { viewer: input.viewer } : {}),
+    ...(input.controlledCharacterHitCache
+      ? { controlledCharacterHitCache: input.controlledCharacterHitCache }
+      : {}),
   }
 }

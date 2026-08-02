@@ -7,6 +7,8 @@ import {
   equipmentKindSchema,
   featCategorySchema,
   gearKindSchema,
+  getContentTypeCapitalizedSentenceLabel,
+  getContentTypeTerm,
   spellcastingGearKindSchema,
   languageIdSchema,
   MAX_CHARACTER_LEVEL,
@@ -69,13 +71,13 @@ const BASE_GRANT_TYPE_LABELS: Record<BaseGrantType, string> = {
 
 export const GRANT_TYPE_LABELS: Record<GrantType, string> = {
   ...BASE_GRANT_TYPE_LABELS,
-  spells: 'Spells',
-  featChoice: 'Feat choice',
+  spells: getContentTypeCapitalizedSentenceLabel('spells', { plural: true }),
+  featChoice: `${getContentTypeTerm('feats').label} choice`,
 }
 
 export const GRANT_ROW_TYPE_LABELS: Record<GrantRowType, string> = {
   ...GRANT_TYPE_LABELS,
-  equipment: 'Equipment',
+  equipment: getContentTypeTerm('equipment').label,
 }
 
 /** Label shown in the "Granted at" select when the row has no explicit unlock level. */

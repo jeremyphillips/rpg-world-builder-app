@@ -1,4 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
+import type { CharacterRelationship, CharacterRelationshipKind } from '@rpg/contracts'
 import {
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
   type CharacterContentReferenceDescriptor,
@@ -11,7 +12,11 @@ export type CharacterContentUsageHit = {
   characterType: 'pc' | 'npc'
   classes?: Array<{ classId?: string; subclassId?: string }>
   species?: { id?: string }
-  spells?: Array<{ spellId?: string }>
+  spells?: Array<{
+    spellId?: string
+    selection?: { prepared?: boolean }
+    access?: { alwaysPrepared?: boolean }
+  }>
   feats?: Array<{ featId?: string }>
   equipment?: Partial<
     Record<(typeof CHARACTER_EQUIPMENT_INVENTORY_BUCKETS)[number], Array<{ equipmentId?: string }>>
@@ -21,6 +26,21 @@ export type CharacterContentUsageHit = {
   }
   proficiencies?: {
     skills?: Array<{ skill?: string }>
+  }
+}
+
+function characterIdFromHit(hit: CharacterContentUsageHit): string {
+  return String(hit._id)
+}
+
+export function characterHitToRelationship(
+  hit: CharacterContentUsageHit,
+  kind: CharacterRelationshipKind,
+): CharacterRelationship {
+  return {
+    kind,
+    characterId: characterIdFromHit(hit),
+    characterName: hit.name,
   }
 }
 
@@ -83,4 +103,113 @@ export function extractEquipmentIdsFromCharacter(hit: CharacterContentUsageHit):
     }
   }
   return ids
+}
+
+type RelationshipIndexBucket = Map<string, CharacterRelationship>
+
+function bucketForContentId(
+  index: Map<string, RelationshipIndexBucket>,
+  contentId: string,
+): RelationshipIndexBucket {
+  const existing = index.get(contentId)
+  if (existing) return existing
+
+  const bucket: RelationshipIndexBucket = new Map()
+  index.set(contentId, bucket)
+  return bucket
+}
+
+function indexRelationshipsByContentId<T>(
+  records: readonly T[],
+  extractIds: (record: T) => readonly string[],
+  toRelationship: (record: T) => CharacterRelationship,
+): Map<string, CharacterRelationship[]> {
+  const index = new Map<string, RelationshipIndexBucket>()
+
+  for (const record of records) {
+    const relationship = toRelationship(record)
+    const identityKey = relationship.characterId
+
+    for (const contentId of extractIds(record)) {
+      const bucket = bucketForContentId(index, contentId)
+      if (!bucket.has(identityKey)) {
+        bucket.set(identityKey, relationship)
+      }
+    }
+  }
+
+  return new Map(
+    [...index.entries()].map(([contentId, bucket]) => [contentId, [...bucket.values()]]),
+  )
+}
+
+function extractIdsForDescriptor(
+  hit: CharacterContentUsageHit,
+  descriptor: CharacterContentReferenceDescriptor | 'equipment',
+): readonly string[] {
+  if (descriptor === 'equipment') {
+    return extractEquipmentIdsFromCharacter(hit)
+  }
+  return extractIdsFromCharacterDescriptor(hit, descriptor)
+}
+
+/** Fixed-kind relationships for one character reference descriptor. */
+export function indexFixedRelationshipsByContentId(input: {
+  hits: readonly CharacterContentUsageHit[]
+  descriptor: CharacterContentReferenceDescriptor | 'equipment'
+  kind: CharacterRelationshipKind
+}): Map<string, CharacterRelationship[]> {
+  return indexRelationshipsByContentId(
+    input.hits,
+    (hit) => extractIdsForDescriptor(hit, input.descriptor),
+    (hit) => characterHitToRelationship(hit, input.kind),
+  )
+}
+
+function resolveSpellRelationshipKind(
+  spell: NonNullable<CharacterContentUsageHit['spells']>[number],
+): 'prepared' | 'knows' {
+  if (spell.selection?.prepared === true || spell.access?.alwaysPrepared === true) {
+    return 'prepared'
+  }
+  return 'knows'
+}
+
+/** Spell relationships with prepared/knows kind per character spell entry. */
+export function indexSpellRelationshipsByContentId(
+  hits: readonly CharacterContentUsageHit[],
+): Map<string, CharacterRelationship[]> {
+  const index = new Map<string, RelationshipIndexBucket>()
+
+  for (const hit of hits) {
+    const characterId = characterIdFromHit(hit)
+
+    for (const spell of hit.spells ?? []) {
+      if (typeof spell.spellId !== 'string' || spell.spellId.length === 0) {
+        continue
+      }
+
+      const kind = resolveSpellRelationshipKind(spell)
+      const bucket = bucketForContentId(index, spell.spellId)
+      const identityKey = `${characterId}:${kind}`
+      if (!bucket.has(identityKey)) {
+        bucket.set(identityKey, {
+          kind,
+          characterId,
+          characterName: hit.name,
+        })
+      }
+    }
+  }
+
+  return new Map(
+    [...index.entries()].map(([contentId, bucket]) => [contentId, [...bucket.values()]]),
+  )
+}
+
+export function relationshipsForContentEntry(
+  index: Map<string, CharacterRelationship[]>,
+  entryKey: string,
+): CharacterRelationship[] {
+  return index.get(entryKey) ?? []
 }

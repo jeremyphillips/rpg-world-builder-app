@@ -11,6 +11,7 @@ export async function getSearchCatalog(req: Request, res: Response): Promise<voi
 
   const catalog = await collectGlobalSearchCatalog({
     campaignId: membership.campaignId,
+    viewerUserId: membership.userId,
     viewerRole: membership.campaignRole,
     viewerControlledCharacterIds: membership.pcCharacterIds,
   })

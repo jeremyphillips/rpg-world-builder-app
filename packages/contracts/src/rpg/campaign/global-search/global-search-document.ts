@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { viewerCharacterRelationshipsSchema } from '../../content/lib/viewer-character-relationship'
 import { globalSearchFieldSchema } from './global-search-field'
 import { globalSearchFilterGroupSchema } from './filter-group'
 import { globalSearchTargetSchema } from './global-search-target'
@@ -18,6 +19,8 @@ export const globalSearchDocumentSchema = z.object({
   fields: z.array(globalSearchFieldSchema).min(1),
   /** Omitted when available; `false` when hidden from campaign discovery (manager catalog only). */
   campaignAvailable: z.literal(false).optional(),
+  /** Present when one or more viewer-controlled PCs relate to this content hit. */
+  viewerCharacterRelationships: viewerCharacterRelationshipsSchema.optional(),
 })
 
 export type GlobalSearchDocument = z.infer<typeof globalSearchDocumentSchema>

@@ -2,10 +2,14 @@
 
 import { useMemo, useRef } from 'react'
 
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ViewerCharacterRelationships } from '@rpg/contracts'
 import { toPlayerContentVisibility, type ContentViewer } from '@rpg/contracts'
-import type { ColumnDef } from '@rpg/ui'
+import { SortableHeader, type ColumnDef } from '@rpg/ui'
 
+import {
+  CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_LABEL,
+  CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_TOOLTIP,
+} from '../labels'
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
 import { contentOverviewListQueryKey } from './content-overview-query-keys'
 import { createOverviewColumnDefsSignature } from './content-overview-columns.lib'
@@ -14,6 +18,7 @@ import {
   type ContentBase,
   type ContentOverviewNameColumnMeta,
 } from './content-table-config'
+import type { UsedByOverviewColumnMeta } from '@/lib/usage-references/build-used-by-overview-column'
 
 /**
  * Keeps a stable column-def reference when overview routes pass a freshly allocated
@@ -37,10 +42,11 @@ export function useStableOverviewColumns<T>(
 type OverviewNameRow = ContentBase & {
   id: string
   kind?: unknown
+  viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
 /** Injects manager utility-row context into the shared overview name column. */
-export function patchOverviewNameColumn<T extends OverviewNameRow>(
+export function patchOverviewColumns<T extends OverviewNameRow>(
   columns: ColumnDef<T, unknown>[],
   context: {
     canManage: boolean
@@ -55,6 +61,27 @@ export function patchOverviewNameColumn<T extends OverviewNameRow>(
   const campaignAccessForRow = (row: T) => readContentRowCampaignAccess(row)
 
   return columns.map((column) => {
+    const columnId = column.id ?? (column as { accessorKey?: string }).accessorKey
+    const usedByMeta = column.meta as UsedByOverviewColumnMeta | undefined
+
+    if (columnId === 'usedBy' && context.canManage && usedByMeta?.overviewCharactersUsageScope) {
+      const columnLabel = CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_LABEL
+      const scopeTooltip = CONTENT_OVERVIEW_USED_BY_ALL_CHARACTERS_TOOLTIP
+
+      return {
+        ...column,
+        header: ({ column: tableColumn }) => (
+          <SortableHeader column={tableColumn} label={columnLabel} info={scopeTooltip}>
+            {columnLabel}
+          </SortableHeader>
+        ),
+        meta: {
+          ...column.meta,
+          label: columnLabel,
+        },
+      } as ColumnDef<T, unknown>
+    }
+
     const accessorKey = (column as { accessorKey?: string }).accessorKey
     if (accessorKey !== 'name') {
       return column
@@ -86,6 +113,7 @@ export function patchOverviewNameColumn<T extends OverviewNameRow>(
             source: row.original.source,
             kind: row.original.kind,
           }}
+          viewerCharacterRelationships={row.original.viewerCharacterRelationships}
         />
       ),
     }
@@ -108,7 +136,7 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
 
   return useMemo(
     () =>
-      patchOverviewNameColumn(stableColumns, {
+      patchOverviewColumns(stableColumns, {
         canManage: context.canManage,
         campaignId: context.campaignId,
         contentTypeKey: context.contentTypeKey,

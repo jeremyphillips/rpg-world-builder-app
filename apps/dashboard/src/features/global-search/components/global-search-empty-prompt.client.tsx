@@ -1,20 +1,22 @@
 'use client'
 
-import { Heading, Text } from '@rpg/ui'
+import { Heading, Text, cn } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 
 export type GlobalSearchEmptyPromptProps = {
   title?: string
   description?: string
+  className?: string
 }
 
 export function GlobalSearchEmptyPrompt({
   title = GLOBAL_SEARCH_COPY.emptyQueryTitle,
   description = GLOBAL_SEARCH_COPY.emptyQueryDescription,
+  className,
 }: GlobalSearchEmptyPromptProps) {
   return (
-    <div className="py-10 text-center">
+    <div className={cn('py-10 text-center', className)}>
       <Heading as="h2" variant="subsection">
         {title}
       </Heading>
