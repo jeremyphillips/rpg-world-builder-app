@@ -4,12 +4,13 @@ import type {
   CampaignCharacterParticipation,
   CampaignRole,
   CharacterRoutingContextResponse,
+  NpcCharacter,
   PcCharacter,
 } from '@rpg/contracts'
 import { isCampaignManager, resolveCampaignCharacterAccess } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findPcById } from '../character/character.repository'
+import { findNpcById, findPcById } from '../character/character.repository'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById } from './find-campaign-by-id'
 import {
@@ -20,6 +21,15 @@ import {
 export type CampaignCharacterAccessContext = {
   campaignId: string
   character: PcCharacter
+  participation: CampaignCharacterParticipation
+  viewerUserId: string
+  viewerRole: CampaignRole
+  capabilities: CampaignCharacterGetCapabilities
+}
+
+export type CampaignParticipantAccessContext = {
+  campaignId: string
+  character: PcCharacter | NpcCharacter
   participation: CampaignCharacterParticipation
   viewerUserId: string
   viewerRole: CampaignRole
@@ -53,14 +63,18 @@ function accessFailure(input: AccessFailureInput): { ok: false; error: HttpError
   }
 }
 
-export async function authorizeCampaignCharacterAccess(input: {
+type AuthorizeCampaignParticipantInput = {
   campaignId: string
   characterId: string
   viewerUserId: string
   viewerRole: CampaignRole
   viewerControlledCharacterIds: readonly string[]
-}): Promise<
-  { ok: true; context: CampaignCharacterAccessContext } | { ok: false; error: HttpError }
+}
+
+async function authorizeCampaignParticipantAccessInternal(
+  input: AuthorizeCampaignParticipantInput,
+): Promise<
+  { ok: true; context: CampaignParticipantAccessContext } | { ok: false; error: HttpError }
 > {
   const { campaignId, characterId, viewerUserId, viewerRole, viewerControlledCharacterIds } = input
 
@@ -77,7 +91,9 @@ export async function authorizeCampaignCharacterAccess(input: {
     })
   }
 
-  const character = await findPcById(characterId)
+  const pc = await findPcById(characterId)
+  const npc = pc ? null : await findNpcById(characterId)
+  const character = pc ?? npc
   if (!character) {
     return accessFailure({
       code: 'character_not_found',
@@ -104,7 +120,7 @@ export async function authorizeCampaignCharacterAccess(input: {
   }
 
   const resolved = resolveCampaignCharacterAccess({
-    viewerOwnsCharacter: character.userId === viewerUserId,
+    viewerOwnsCharacter: character.characterType === 'pc' && character.userId === viewerUserId,
     viewerControlsCharacter: viewerControlledCharacterIds.includes(characterId),
     viewerIsCampaignManager: isCampaignManager(viewerRole),
   })
@@ -124,6 +140,44 @@ export async function authorizeCampaignCharacterAccess(input: {
       },
     },
   }
+}
+
+export async function authorizeCampaignCharacterAccess(
+  input: AuthorizeCampaignParticipantInput,
+): Promise<
+  { ok: true; context: CampaignCharacterAccessContext } | { ok: false; error: HttpError }
+> {
+  const access = await authorizeCampaignParticipantAccessInternal(input)
+  if (!access.ok) return access
+
+  if (access.context.character.characterType !== 'pc') {
+    return accessFailure({
+      code: 'character_not_found',
+      status: 404,
+      message: 'This character could not be found in this campaign.',
+      logReason: 'character_not_found',
+      characterId: input.characterId,
+      campaignId: input.campaignId,
+      viewerUserId: input.viewerUserId,
+    })
+  }
+
+  return {
+    ok: true,
+    context: {
+      ...access.context,
+      character: access.context.character,
+    },
+  }
+}
+
+/** Authorizes campaign sheet reads for participating PCs and NPCs. */
+export async function authorizeCampaignParticipantAccess(
+  input: AuthorizeCampaignParticipantInput,
+): Promise<
+  { ok: true; context: CampaignParticipantAccessContext } | { ok: false; error: HttpError }
+> {
+  return authorizeCampaignParticipantAccessInternal(input)
 }
 
 export async function resolveCharacterRoutingContext(
