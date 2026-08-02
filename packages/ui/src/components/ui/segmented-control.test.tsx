@@ -48,6 +48,27 @@ describe('SegmentedControl', () => {
     expect(onValueChange).toHaveBeenCalledWith('gamma')
   })
 
+  it('renders auto-width segments without truncating labels', () => {
+    render(
+      <SegmentedControl
+        aria-label="Search filter group"
+        value="game-terms"
+        segmentWidth="auto"
+        options={[
+          { value: 'all', label: 'All' },
+          { value: 'characters', label: 'Characters' },
+          { value: 'content', label: 'Content' },
+          { value: 'game-terms', label: 'Game Terms' },
+        ]}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    const gameTerms = screen.getByRole('button', { name: 'Game Terms' })
+    expect(gameTerms.querySelector('span')?.className).not.toContain('truncate')
+    expect(gameTerms.className).toContain('shrink-0')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <SegmentedControl

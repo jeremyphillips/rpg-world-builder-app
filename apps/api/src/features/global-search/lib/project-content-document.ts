@@ -7,6 +7,7 @@ import type {
   GlobalSearchField,
   GlobalSearchTarget,
   Organization,
+  ResolvedContentCampaignAccess,
   SkillProficiency,
   Species,
   Spell,
@@ -28,7 +29,10 @@ import {
 
 import type { WriteEntityBase } from '../../content/lib/content-write-config'
 
-type NamedContentEntity = WriteEntityBase & { name: string }
+type NamedContentEntity = WriteEntityBase & {
+  name: string
+  campaignAccess?: ResolvedContentCampaignAccess
+}
 
 export type { NamedContentEntity }
 
@@ -241,6 +245,7 @@ export function projectContentEntity(
     secondary: projector.secondary(entity),
     target: projector.target(entity),
     fields: projector.fields(entity),
+    ...(entity.campaignAccess?.available === false ? { campaignAvailable: false as const } : {}),
   }
 }
 

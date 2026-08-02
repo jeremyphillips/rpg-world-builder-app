@@ -5,6 +5,10 @@ import {
   listResolvedVocabularySetsForCampaign,
   vocabularyUsageContextForCampaign,
 } from '../../vocabulary/sets/vocabulary.service'
+import {
+  filterVocabularyOptionsForSearch,
+  projectVocabularySearchAvailability,
+} from '../lib/filter-vocabulary-options-for-search'
 import type { SearchSource } from '../lib/search-source.types'
 
 function labelField(text: string): GlobalSearchField {
@@ -30,9 +34,9 @@ export const gameTermsSearchSource: SearchSource = {
 
     for (const set of sets) {
       const setLabel = getVocabularyOptionSetTerm(set.id).label
-      const activeOptions = set.options.filter((option) => option.status === 'active')
+      const searchableOptions = filterVocabularyOptionsForSearch(set.options, ctx.viewerRole)
 
-      for (const option of activeOptions) {
+      for (const option of searchableOptions) {
         const fields = [
           labelField(option.label),
           descriptionField(option.description),
@@ -51,6 +55,7 @@ export const gameTermsSearchSource: SearchSource = {
             termId: option.id,
           },
           fields,
+          ...projectVocabularySearchAvailability(option.status),
         })
       }
     }

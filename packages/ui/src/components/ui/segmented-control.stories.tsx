@@ -12,6 +12,25 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+export const AutoWidthSegments: Story = {
+  args: {
+    'aria-label': 'Search filter group',
+    value: 'all',
+    segmentWidth: 'auto',
+    options: [
+      { value: 'all', label: 'All' },
+      { value: 'characters', label: 'Characters' },
+      { value: 'content', label: 'Content' },
+      { value: 'game-terms', label: 'Game Terms' },
+    ],
+    onValueChange: () => undefined,
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <SegmentedControl {...args} value={value} onValueChange={(next) => setValue(next)} />
+  },
+}
+
 export const TwoSegments: Story = {
   args: {
     'aria-label': 'Spell picker mode',

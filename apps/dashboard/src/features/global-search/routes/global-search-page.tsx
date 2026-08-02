@@ -33,12 +33,20 @@ export function GlobalSearchPage() {
     <NarrowPage spacing="compact">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader heading={GLOBAL_SEARCH_COPY.pageTitle} />
-        <GlobalSearchField
-          id="global-search-page-field"
-          value={query}
-          onValueChange={setQuery}
-          autoFocus
-        />
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            setQuery(query)
+          }}
+        >
+          <GlobalSearchField
+            id="global-search-page-field"
+            value={query}
+            onValueChange={setQuery}
+            onSubmit={() => setQuery(query)}
+            autoFocus
+          />
+        </form>
       </div>
 
       <GlobalSearchResultsBody

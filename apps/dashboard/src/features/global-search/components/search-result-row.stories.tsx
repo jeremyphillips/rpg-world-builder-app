@@ -34,3 +34,13 @@ export const Character: Story = {
     href: '/campaigns/demo/characters/aria',
   },
 }
+
+export const CampaignUnavailable: Story = {
+  args: {
+    title: 'Arcane Trickster',
+    secondary: 'd8 Hit Die',
+    typeLabel: 'Class',
+    href: '/campaigns/demo/classes/arcane-trickster',
+    campaignUnavailable: true,
+  },
+}

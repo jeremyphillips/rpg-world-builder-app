@@ -11,7 +11,7 @@ import {
 import { OVERLAY_GROUP_PREVIEW_LIMIT } from '../lib/global-search-constants'
 import { useGlobalSearchCatalog } from './use-global-search-catalog'
 
-export function useGlobalSearchOverlay(campaignId: string, open: boolean) {
+export function useGlobalSearchTopbar(campaignId: string, open: boolean) {
   const [query, setQuery] = React.useState('')
   const { data, isPending, isError, refetch } = useGlobalSearchCatalog(campaignId)
 

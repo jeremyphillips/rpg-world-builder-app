@@ -8,7 +8,7 @@ Campaign-scoped client-side search over the catalog snapshot from
 | Surface      | Route / entry                     | Notes                         |
 | ------------ | --------------------------------- | ----------------------------- |
 | Results page | `/campaigns/:id/search?q=&group=` | Full list + segmented filters |
-| Overlay      | Topbar trigger / ⌘K               | Grouped preview (≤4/group)    |
+| Topbar       | Expanding input / ⌘K              | Grouped preview (≤4/group)    |
 
 ## Key files
 
@@ -16,6 +16,7 @@ Campaign-scoped client-side search over the catalog snapshot from
 - `lib/resolve-global-search-href.ts` — wire `target` → dashboard href
 - `lib/rank-global-search.ts` — `@rpg/ui` ranking + grouping helpers
 - `routes/global-search-page.tsx` — full results page
-- `components/global-search-provider.client.tsx` — overlay + shortcut host
+- `components/global-search-topbar.client.tsx` — expanding topbar input + preview panel
+- `components/global-search-provider.client.tsx` — open state + shortcut host
 
-Public barrel exports trigger + provider only; route screens lazy-load from the app router.
+Public barrel exports topbar + provider only; route screens lazy-load from the app router.

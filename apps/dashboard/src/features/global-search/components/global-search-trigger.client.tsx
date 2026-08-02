@@ -10,12 +10,16 @@ export type GlobalSearchTriggerProps = {
   disabled?: boolean
   onOpen: () => void
   className?: string
+  'aria-controls'?: string
+  'aria-expanded'?: boolean
 }
 
 export function GlobalSearchTrigger({
   disabled = false,
   onOpen,
   className,
+  'aria-controls': ariaControls,
+  'aria-expanded': ariaExpanded,
 }: GlobalSearchTriggerProps) {
   return (
     <Button
@@ -23,16 +27,18 @@ export function GlobalSearchTrigger({
       variant="ghost"
       size="icon"
       aria-label={GLOBAL_SEARCH_COPY.triggerLabel}
+      aria-controls={ariaControls}
+      aria-expanded={ariaExpanded}
       disabled={disabled}
       onClick={onOpen}
       className={cn(
-        'relative shrink-0 hover:bg-accent hover:text-accent-foreground sm:w-auto sm:min-w-[7.5rem] sm:justify-start sm:gap-2 sm:px-3 sm:[&_svg]:size-4',
+        'relative shrink-0 hover:bg-accent hover:text-accent-foreground md:w-auto md:min-w-[7.5rem] md:justify-start md:gap-2 md:px-3 md:[&_svg]:size-4',
         className,
       )}
     >
       <Search aria-hidden className="size-5" />
-      <span className="hidden text-sm sm:inline">{GLOBAL_SEARCH_COPY.triggerLabel}</span>
-      <span className="hidden text-xs text-muted-foreground sm:inline">
+      <span className="hidden text-sm md:inline">{GLOBAL_SEARCH_COPY.triggerLabel}</span>
+      <span className="hidden text-xs text-muted-foreground md:inline">
         {GLOBAL_SEARCH_COPY.triggerShortcutHint}
       </span>
     </Button>

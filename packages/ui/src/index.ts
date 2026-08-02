@@ -545,7 +545,12 @@ export {
   SegmentedControl,
   type SegmentedControlOption,
   type SegmentedControlProps,
+  type SegmentedControlSegmentWidth,
 } from './components/ui/segmented-control.client'
+export {
+  InlineInactiveStatus,
+  type InlineInactiveStatusProps,
+} from './components/ui/inline-inactive-status.client'
 export {
   sheetBodyVariants,
   sheetContentVariants,

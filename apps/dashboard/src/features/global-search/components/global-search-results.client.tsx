@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import { Heading, notificationMenuFooterLinkVariants } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { SearchResultRow } from './search-result-row.client'
@@ -51,6 +52,7 @@ export function GlobalSearchGroupedResults({
                   secondary={document.secondary}
                   typeLabel={document.typeLabel}
                   href={resolveHref(document)}
+                  campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
                   onActivate={onResultActivate}
                 />
               ))}
@@ -111,6 +113,7 @@ export function GlobalSearchFlatResults({
           secondary={document.secondary}
           typeLabel={document.typeLabel}
           href={resolveHref(document)}
+          campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}
         />
       ))}

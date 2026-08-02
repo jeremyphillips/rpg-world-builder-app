@@ -6,4 +6,6 @@ export const searchResultRowVariants = cva(
 
 export const searchResultRowHeaderVariants = cva('flex items-start justify-between gap-3')
 
+export const searchResultRowTitleRowVariants = cva('flex min-w-0 flex-1 items-center gap-2')
+
 export const searchResultRowTypeLabelVariants = cva('shrink-0 text-xs text-muted-foreground')

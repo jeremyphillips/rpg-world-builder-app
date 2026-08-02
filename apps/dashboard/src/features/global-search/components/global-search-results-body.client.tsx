@@ -68,6 +68,7 @@ export function GlobalSearchResultsBody({
           value={group}
           options={filterOptions}
           onValueChange={onGroupChange}
+          segmentWidth="auto"
           aria-label={GLOBAL_SEARCH_COPY.filterAriaLabel}
         />
       ) : null}

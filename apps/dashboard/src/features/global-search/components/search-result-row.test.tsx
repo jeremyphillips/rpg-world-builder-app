@@ -5,7 +5,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { SearchResultRow } from './search-result-row.client'
+import { SearchResultRow, SEARCH_RESULT_UNAVAILABLE_LABEL } from './search-result-row.client'
 
 describe('SearchResultRow', () => {
   it('renders presentation fields and navigates via link', () => {
@@ -40,6 +40,25 @@ describe('SearchResultRow', () => {
 
     await user.click(screen.getByRole('link', { name: 'Fireball, Spell' }))
     expect(onActivate).toHaveBeenCalledOnce()
+  })
+
+  it('shows unavailable content inline with the title for managers', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Arcane Trickster"
+        secondary="d8 Hit Die"
+        typeLabel="Class"
+        href="/campaigns/c1/classes/arcane-trickster"
+        campaignUnavailable
+      />,
+    )
+
+    expect(screen.getByText(SEARCH_RESULT_UNAVAILABLE_LABEL)).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', {
+        name: `Arcane Trickster, ${SEARCH_RESULT_UNAVAILABLE_LABEL}, Class`,
+      }),
+    ).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

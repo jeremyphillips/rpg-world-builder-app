@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import { useActiveCampaignId } from '@/features/campaign'
 
-import { GlobalSearchOverlay } from './global-search-overlay.client'
 import { useGlobalSearchShortcut } from '../hooks/use-global-search-shortcut'
 
 type GlobalSearchContextValue = {
@@ -51,12 +50,5 @@ export function GlobalSearchProvider({ children }: GlobalSearchProviderProps) {
     [campaignId, open],
   )
 
-  return (
-    <GlobalSearchContext.Provider value={value}>
-      {children}
-      {campaignId ? (
-        <GlobalSearchOverlay campaignId={campaignId} open={open} onOpenChange={setOpen} />
-      ) : null}
-    </GlobalSearchContext.Provider>
-  )
+  return <GlobalSearchContext.Provider value={value}>{children}</GlobalSearchContext.Provider>
 }

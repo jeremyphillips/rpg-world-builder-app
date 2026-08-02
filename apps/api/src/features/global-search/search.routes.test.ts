@@ -3,6 +3,7 @@ import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../lib/cookies'
+import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import {
@@ -170,5 +171,115 @@ describe('GET /api/campaigns/:campaignId/search/catalog', () => {
     expect(managerCharacterIds).toEqual(
       expect.arrayContaining([managerVisibleCharacterId, playerCharacterId]),
     )
+  })
+
+  it('includes unavailable content for managers with campaignAvailable false', async () => {
+    const owner = await registerOwner('search-catalog-unavailable@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Search Unavailable Campaign',
+    )
+
+    const createRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'hidden-search-feat',
+        name: 'Hidden Search Feat',
+        category: 'origin',
+        repeatable: { allowed: false },
+      })
+      .expect(201)
+
+    const featId = createRes.body.feats.id as string
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${featId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    const managerCatalog = await owner.agent
+      .get(`/api/campaigns/${campaignId}/search/catalog`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    const hiddenFeat = managerCatalog.body.documents.find(
+      (document: { target: { kind: string; id: string } }) =>
+        document.target.kind === 'feat' && document.target.id === featId,
+    )
+    expect(hiddenFeat).toMatchObject({
+      title: 'Hidden Search Feat',
+      campaignAvailable: false,
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'search-catalog-unavailable-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const playerCatalog = await player.agent
+      .get(`/api/campaigns/${campaignId}/search/catalog`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .expect(200)
+
+    const playerHiddenFeat = playerCatalog.body.documents.find(
+      (document: { target: { kind: string; id: string } }) =>
+        document.target.kind === 'feat' && document.target.id === featId,
+    )
+    expect(playerHiddenFeat).toBeUndefined()
+  })
+
+  it('includes disabled vocabulary for managers with campaignAvailable false', async () => {
+    const owner = await registerOwner('search-catalog-vocab-unavailable@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Search Vocab Unavailable Campaign',
+    )
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/fey`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ status: 'disabled' })
+      .expect(200)
+
+    const managerCatalog = await owner.agent
+      .get(`/api/campaigns/${campaignId}/search/catalog`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    const disabledCreatureType = managerCatalog.body.documents.find(
+      (document: {
+        filterGroup: string
+        target: { kind: string; setId: string; termId: string }
+      }) =>
+        document.filterGroup === 'game-terms' &&
+        document.target.kind === 'game-term' &&
+        document.target.setId === CREATURE_TYPE_SET_ID &&
+        document.target.termId === 'fey',
+    )
+    expect(disabledCreatureType).toMatchObject({
+      campaignAvailable: false,
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'search-catalog-vocab-unavailable-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const playerCatalog = await player.agent
+      .get(`/api/campaigns/${campaignId}/search/catalog`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .expect(200)
+
+    const playerDisabledCreatureType = playerCatalog.body.documents.find(
+      (document: { target: { kind: string; termId: string } }) =>
+        document.target.kind === 'game-term' && document.target.termId === 'fey',
+    )
+    expect(playerDisabledCreatureType).toBeUndefined()
   })
 })

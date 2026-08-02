@@ -3,15 +3,14 @@
 import { Link } from 'react-router-dom'
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
-import { Modal, cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
+import { cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
-import { GlobalSearchField } from './global-search-field.client'
 import { GlobalSearchGroupedResults } from './global-search-results.client'
 
-type GlobalSearchOverlayStatusProps = {
+type GlobalSearchPreviewStatusProps = {
   isPending: boolean
   isError: boolean
   hasQuery: boolean
@@ -20,17 +19,17 @@ type GlobalSearchOverlayStatusProps = {
   onRetry: () => void
 }
 
-function GlobalSearchOverlayStatus({
+function GlobalSearchPreviewStatus({
   isPending,
   isError,
   hasQuery,
   groupedSections,
   query,
   onRetry,
-}: GlobalSearchOverlayStatusProps) {
+}: GlobalSearchPreviewStatusProps) {
   if (isPending) {
     return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
+      <p className="py-3 text-center text-sm text-muted-foreground">
         {GLOBAL_SEARCH_COPY.loadingCatalog}
       </p>
     )
@@ -38,7 +37,7 @@ function GlobalSearchOverlayStatus({
 
   if (isError) {
     return (
-      <div className="space-y-3 py-6 text-center">
+      <div className="space-y-3 py-3 text-center">
         <p className="text-sm text-muted-foreground" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
         </p>
@@ -69,7 +68,8 @@ function GlobalSearchOverlayStatus({
   return null
 }
 
-export type GlobalSearchOverlayPanelProps = {
+export type GlobalSearchPreviewPanelProps = {
+  id: string
   campaignId: string
   query: string
   hasQuery: boolean
@@ -78,14 +78,15 @@ export type GlobalSearchOverlayPanelProps = {
   isPending: boolean
   isError: boolean
   viewAllHref: string
-  onOpenChange: (open: boolean) => void
-  onQueryChange: (query: string) => void
+  onClose: () => void
   onRetry: () => void
   resolveHref: (document: GlobalSearchDocument) => string
   showAllHref: (filterGroup: GlobalSearchGroupSection['filterGroup']) => string
+  className?: string
 }
 
-export function GlobalSearchOverlayPanel({
+export function GlobalSearchPreviewPanel({
+  id,
   campaignId,
   query,
   hasQuery,
@@ -94,60 +95,48 @@ export function GlobalSearchOverlayPanel({
   isPending,
   isError,
   viewAllHref,
-  onOpenChange,
-  onQueryChange,
+  onClose,
   onRetry,
   resolveHref,
   showAllHref,
-}: GlobalSearchOverlayPanelProps) {
-  const handleResultActivate = () => {
-    onOpenChange(false)
-  }
-
+  className,
+}: GlobalSearchPreviewPanelProps) {
   const showResults = !isPending && !isError && hasQuery && groupedSections.length > 0
 
   return (
-    <>
-      <Modal.Header headline={GLOBAL_SEARCH_COPY.pageTitle} />
-      <Modal.Body className="space-y-4">
-        <GlobalSearchField
-          id="global-search-overlay-field"
-          value={query}
-          onValueChange={onQueryChange}
-          autoFocus
-        />
+    <div id={id} role="region" aria-label={GLOBAL_SEARCH_COPY.pageTitle} className={className}>
+      <GlobalSearchPreviewStatus
+        isPending={isPending}
+        isError={isError}
+        hasQuery={hasQuery}
+        groupedSections={groupedSections}
+        query={query}
+        onRetry={onRetry}
+      />
 
-        <GlobalSearchOverlayStatus
-          isPending={isPending}
-          isError={isError}
-          hasQuery={hasQuery}
-          groupedSections={groupedSections}
-          query={query}
-          onRetry={onRetry}
-        />
-
-        {showResults ? (
+      {showResults ? (
+        <div>
           <GlobalSearchGroupedResults
             campaignId={campaignId}
             sections={groupedSections}
             resolveHref={resolveHref}
-            onResultActivate={handleResultActivate}
+            onResultActivate={onClose}
             showAllHref={showAllHref}
           />
-        ) : null}
-      </Modal.Body>
+        </div>
+      ) : null}
 
       {hasQuery && resultCount > 0 ? (
         <div className={cn('border-t border-border bg-muted p-1')}>
           <Link
             to={viewAllHref}
             className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
-            onClick={() => onOpenChange(false)}
+            onClick={onClose}
           >
             {GLOBAL_SEARCH_COPY.viewAllResults}
           </Link>
         </div>
       ) : null}
-    </>
+    </div>
   )
 }

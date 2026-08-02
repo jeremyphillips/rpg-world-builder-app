@@ -16,6 +16,8 @@ export const globalSearchDocumentSchema = z.object({
   secondary: z.string(),
   target: globalSearchTargetSchema,
   fields: z.array(globalSearchFieldSchema).min(1),
+  /** Omitted when available; `false` when hidden from campaign discovery (manager catalog only). */
+  campaignAvailable: z.literal(false).optional(),
 })
 
 export type GlobalSearchDocument = z.infer<typeof globalSearchDocumentSchema>
