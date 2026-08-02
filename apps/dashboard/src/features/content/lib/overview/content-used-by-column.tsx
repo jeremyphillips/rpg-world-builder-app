@@ -29,6 +29,7 @@ export function buildContentUsedByColumn<T extends ContentUsageRow>(
     usageSummaryLabels,
     columnLabel: label,
     scopeTooltip,
+    ...(overviewUsageScope === 'characters' ? { width: 'collectionCountWide' as const } : {}),
   })
 }
 

@@ -126,6 +126,7 @@ export type BuildCollectionCountColumnOptions<T> = {
   pluralLabel: string
   sortItems?: boolean
   maxVisibleItems?: number
+  width?: DataTableColumnWidth
 }
 
 /** Sortable collection count column with bounded tooltip summaries. */
@@ -138,6 +139,7 @@ export function buildCollectionCountColumn<T>({
   pluralLabel,
   sortItems,
   maxVisibleItems,
+  width = 'collectionCount',
 }: BuildCollectionCountColumnOptions<T>): ColumnDef<T> {
   return {
     id,
@@ -157,7 +159,7 @@ export function buildCollectionCountColumn<T>({
     meta: {
       label,
       ...dataTableColumnMeta.data,
-      ...dataTableWidthMeta('collectionCount'),
+      ...dataTableWidthMeta(width),
     },
   }
 }

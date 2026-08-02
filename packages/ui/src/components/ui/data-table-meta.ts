@@ -46,6 +46,9 @@ export const dataTableColumnWidths = {
   /** Collection count columns — compact centered `[ n ]` counters. */
   collectionCount: 'whitespace-nowrap text-center lg:w-[5.5rem] lg:max-w-[5.5rem]',
 
+  /** Collection count with descriptive header copy (e.g. "My characters"). */
+  collectionCountWide: 'whitespace-nowrap text-center lg:w-36 lg:max-w-36',
+
   /** Actions/menu column — width only; pair with `dataTableWidthMeta('actions')` for sticky chrome. */
   actions: 'w-12 max-w-12 shrink-0',
 
@@ -82,7 +85,12 @@ export function dataTableWidthMeta(width: DataTableColumnWidth) {
       cellClassName: dataTableSelectCellVariants(),
     } as const
   }
-  if (width === 'collectionCount' || width === 'compactCenter' || width === 'tinyCenter') {
+  if (
+    width === 'collectionCount' ||
+    width === 'collectionCountWide' ||
+    width === 'compactCenter' ||
+    width === 'tinyCenter'
+  ) {
     return {
       headerClassName: className,
       cellClassName: `${className} ${dataTableCenteredBodyCellLayout}`,

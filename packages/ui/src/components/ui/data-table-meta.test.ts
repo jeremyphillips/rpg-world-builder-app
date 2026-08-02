@@ -64,6 +64,11 @@ describe('dataTableWidthMeta', () => {
     expect(dataTableWidthMeta('collectionCount').headerClassName).toContain('text-center')
     expect(dataTableWidthMeta('collectionCount').cellClassName).toContain('lg:w-[5.5rem]')
   })
+
+  it('sizes wide collection count columns for descriptive headers', () => {
+    expect(dataTableWidthMeta('collectionCountWide').headerClassName).toContain('text-center')
+    expect(dataTableWidthMeta('collectionCountWide').cellClassName).toContain('lg:w-36')
+  })
 })
 
 describe('dataTableColumnChromeMeta', () => {
