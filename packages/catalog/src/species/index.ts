@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { speciesSchema } from '@rpg/contracts'
+import { getContentTypeTerm, speciesSchema } from '@rpg/contracts'
 import type { Species, SystemRulesetId } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -23,5 +23,5 @@ export function seedSpeciesSlugs(rulesetId: SystemRulesetId): ReadonlySet<string
 }
 
 export function getSpeciesBySlug(rulesetId: SystemRulesetId, slug: string): Species {
-  return getBySlug(loadSeedSpecies, rulesetId, slug, 'Species')
+  return getBySlug(loadSeedSpecies, rulesetId, slug, getContentTypeTerm('species').label)
 }

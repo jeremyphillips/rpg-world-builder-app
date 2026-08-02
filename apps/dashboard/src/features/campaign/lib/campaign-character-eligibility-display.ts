@@ -4,19 +4,35 @@ import type {
   CharacterCampaignWarning,
   CharacterCampaignWarningCategory,
 } from '@rpg/contracts'
-import { primaryBlockingIssue } from '@rpg/contracts'
+import {
+  getContentTypeCapitalizedSentenceLabel,
+  getContentTypeTerm,
+  primaryBlockingIssue,
+} from '@rpg/contracts'
 
-const CONTENT_REFERENCE_TYPE_LABELS: Record<CharacterCampaignContentReferenceType, string> = {
-  species: 'Species',
-  class: 'Class',
+const NON_CATALOG_CONTENT_REFERENCE_TYPE_LABELS = {
   subclass: 'Subclass',
-  equipment: 'Equipment',
-  spells: 'Spells',
-  feats: 'Feats',
   proficiencies: 'Proficiencies',
   tools: 'Tools',
   languages: 'Languages',
   heritage: 'Heritage',
+} as const satisfies Partial<Record<CharacterCampaignContentReferenceType, string>>
+
+function contentReferenceTypeLabel(type: CharacterCampaignContentReferenceType): string {
+  switch (type) {
+    case 'species':
+      return getContentTypeTerm('species').label
+    case 'class':
+      return getContentTypeTerm('classes').label
+    case 'equipment':
+      return getContentTypeTerm('equipment').label
+    case 'spells':
+      return getContentTypeCapitalizedSentenceLabel('spells', { plural: true })
+    case 'feats':
+      return getContentTypeCapitalizedSentenceLabel('feats', { plural: true })
+    default:
+      return NON_CATALOG_CONTENT_REFERENCE_TYPE_LABELS[type]
+  }
 }
 
 export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): string {
@@ -34,7 +50,7 @@ export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): str
     case 'subclass_unavailable':
       return `${issue.label} is not available in this campaign`
     case 'content_missing':
-      return `${CONTENT_REFERENCE_TYPE_LABELS[issue.contentType]} is not available in this campaign`
+      return `${contentReferenceTypeLabel(issue.contentType)} is not available in this campaign`
     case 'not_owned_pc':
       return 'You can only bring characters you own'
     case 'structurally_invalid':
@@ -45,9 +61,9 @@ export function formatBlockingReason(issue: CharacterCampaignBlockingIssue): str
 }
 
 export const WARNING_CATEGORY_LABELS: Record<CharacterCampaignWarningCategory, string> = {
-  equipment: 'Equipment',
-  spells: 'Spells',
-  feats: 'Feats',
+  equipment: getContentTypeTerm('equipment').label,
+  spells: getContentTypeCapitalizedSentenceLabel('spells', { plural: true }),
+  feats: getContentTypeCapitalizedSentenceLabel('feats', { plural: true }),
   proficiencies: 'Proficiencies',
 }
 

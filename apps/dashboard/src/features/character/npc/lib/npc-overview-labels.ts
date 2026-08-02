@@ -1,8 +1,10 @@
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+
 export const NPC_OVERVIEW_TABLE_KEY = 'npcs-overview' as const
 
 export const NPC_OVERVIEW_LABELS = {
-  class: 'Class',
-  species: 'Species',
+  class: getContentTypeItemLabel('classes'),
+  species: getContentTypeItemLabel('species'),
   name: 'Name',
 } as const
 

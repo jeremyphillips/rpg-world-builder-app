@@ -1,3 +1,7 @@
+import {
+  getContentTypeSentenceForm,
+  getContentTypeTerm,
+} from '../../content/lib/content-type-terms'
 import { LANGUAGE_GRANTS_SOURCE_ID } from './languages'
 import type { CharacterSelectionSource, CharacterSelectionSourceKind } from './selection-sources'
 
@@ -16,9 +20,9 @@ export type FormatSelectionSourceLabelOptions = {
 }
 
 const STATIC_SELECTION_SOURCE_LABELS: Partial<Record<CharacterSelectionSourceKind, string>> = {
-  speciesTrait: 'Granted by Species',
+  speciesTrait: `Granted by ${getContentTypeTerm('species').label}`,
   heritageOption: 'Granted by Heritage',
-  feat: 'Granted by Feat',
+  feat: `Granted by ${getContentTypeTerm('feats').label}`,
   manual: 'Added manually',
   startingGold: 'Purchased with starting gold',
   backgroundStartingEquipment: 'From background starting equipment',
@@ -41,7 +45,7 @@ function classNameForSource(
     if (characterClass) return characterClass.name
   }
 
-  return 'Class'
+  return getContentTypeTerm('classes').label
 }
 
 function formatCharacterCreationLabel(source: CharacterSelectionSource): string {
@@ -55,7 +59,7 @@ function formatClassStartingEquipmentLabel(
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): string {
   const characterClass = source.sourceId ? catalogIndex.classes.get(source.sourceId) : undefined
-  const className = characterClass?.name ?? 'class'
+  const className = characterClass?.name ?? getContentTypeSentenceForm('classes')
   return `From ${className} starting equipment`
 }
 
