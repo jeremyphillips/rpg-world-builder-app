@@ -4,7 +4,7 @@ import {
   type GlobalSearchFilterGroup,
   type GlobalSearchUrlGroup,
 } from '@rpg/contracts'
-import { rankItems } from '@rpg/ui'
+import { rankLegacySearchItems } from '@rpg/ui'
 
 export type GlobalSearchGroupSection = {
   filterGroup: GlobalSearchFilterGroup
@@ -22,7 +22,7 @@ export function rankGlobalSearchDocuments(
   query: string,
 ): GlobalSearchDocument[] {
   if (isGlobalSearchQueryBlank(query)) return []
-  return rankItems([...documents], query)
+  return rankLegacySearchItems([...documents], query, 'forgiving')
 }
 
 export function filterGlobalSearchByGroup(

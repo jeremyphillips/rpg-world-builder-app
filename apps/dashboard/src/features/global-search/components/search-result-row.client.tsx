@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom'
 
 import { InlineInactiveStatus, Text, cn } from '@rpg/ui'
 
+import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
+
 import {
   searchResultRowHeaderVariants,
   searchResultRowTitleRowVariants,
   searchResultRowTypeLabelVariants,
   searchResultRowVariants,
 } from './search-result-row.variants'
-
-export const SEARCH_RESULT_UNAVAILABLE_LABEL = 'Unavailable'
 
 export type SearchResultRowProps = {
   title: string
@@ -33,7 +33,7 @@ export function SearchResultRow({
   className,
 }: SearchResultRowProps) {
   const accessibleName = campaignUnavailable
-    ? `${title}, ${SEARCH_RESULT_UNAVAILABLE_LABEL}, ${typeLabel}`
+    ? `${title}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
     : `${title}, ${typeLabel}`
 
   const content = (
@@ -43,9 +43,7 @@ export function SearchResultRow({
           <Text as="span" className="min-w-0 truncate text-sm text-foreground">
             {title}
           </Text>
-          {campaignUnavailable ? (
-            <InlineInactiveStatus label={SEARCH_RESULT_UNAVAILABLE_LABEL} />
-          ) : null}
+          {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
         </span>
         <Text as="span" className={searchResultRowTypeLabelVariants()}>
           {typeLabel}

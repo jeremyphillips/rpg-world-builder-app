@@ -38,11 +38,19 @@ vi.mock('@/features/campaign', async (importOriginal) => {
 
 function renderTopbar() {
   return renderWithProviders(
-    <GlobalSearchProvider>
-      <GlobalSearchTopbar />
-    </GlobalSearchProvider>,
+    <div>
+      <button type="button">Outside</button>
+      <GlobalSearchProvider>
+        <GlobalSearchTopbar />
+      </GlobalSearchProvider>
+    </div>,
     { initialEntries: ['/campaigns/campaign-1'] },
   )
+}
+
+async function openTopbar(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: GLOBAL_SEARCH_COPY.triggerLabel }))
+  return screen.getByRole('searchbox', { name: GLOBAL_SEARCH_COPY.searchFieldLabel })
 }
 
 describe('GlobalSearchTopbar', () => {
@@ -52,11 +60,8 @@ describe('GlobalSearchTopbar', () => {
 
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: GLOBAL_SEARCH_COPY.triggerLabel }))
+    await openTopbar(user)
 
-    expect(
-      screen.getByRole('searchbox', { name: GLOBAL_SEARCH_COPY.searchFieldLabel }),
-    ).toBeInTheDocument()
     expect(screen.getByRole('region', { name: GLOBAL_SEARCH_COPY.pageTitle })).toBeInTheDocument()
   })
 
@@ -65,7 +70,7 @@ describe('GlobalSearchTopbar', () => {
     navigate.mockClear()
     renderTopbar()
 
-    await user.click(screen.getByRole('button', { name: GLOBAL_SEARCH_COPY.triggerLabel }))
+    await openTopbar(user)
     await user.type(
       screen.getByRole('searchbox', { name: GLOBAL_SEARCH_COPY.searchFieldLabel }),
       'fireball{Enter}',
@@ -73,6 +78,29 @@ describe('GlobalSearchTopbar', () => {
 
     expect(navigate).toHaveBeenCalledWith('/campaigns/campaign-1/search?q=fireball')
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  })
+
+  it('closes on Escape and restores focus to the trigger', async () => {
+    const user = userEvent.setup()
+    renderTopbar()
+
+    await openTopbar(user)
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: GLOBAL_SEARCH_COPY.triggerLabel })).toHaveFocus()
+  })
+
+  it('closes on outside click without stealing focus from the clicked target', async () => {
+    const user = userEvent.setup()
+    renderTopbar()
+
+    await openTopbar(user)
+    const outside = screen.getByRole('button', { name: 'Outside' })
+    await user.click(outside)
+
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    expect(outside).toHaveFocus()
   })
 
   it('has no axe accessibility violations when collapsed', async () => {

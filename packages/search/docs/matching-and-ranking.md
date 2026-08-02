@@ -161,20 +161,22 @@ dashboard path strings.
 API adapters implement `SearchSource.collect(ctx)` and call authoritative list /
 resolver paths only:
 
-| Source     | Authoritative entry points                                    |
-| ---------- | ------------------------------------------------------------- |
-| Content    | `resolveContentForCampaign` + campaign access + viewer filter |
-| Game terms | `listResolvedVocabularySetsForCampaign` (active options only) |
-| Characters | `listCampaignCharactersForViewer` + `listCampaignNpcs`        |
+| Source     | Authoritative entry points                                                    |
+| ---------- | ----------------------------------------------------------------------------- |
+| Content    | `resolveContentForCampaign` + campaign access + viewer filter                 |
+| Game terms | `listResolvedVocabularySetsForCampaign` + `resolveVocabularyOptionsForViewer` |
+| Characters | `listCampaignCharactersForViewer` + `listCampaignNpcs`                        |
 
 Visibility, presentation, and routing ownership stay with those features.
+Search adapters must only emit destinations that remain navigable for the
+viewer under those same access paths.
 
 ### Client-side matching and surface-local ranking
 
-Dashboard (and overlay later) fetch the snapshot once, map `fields` through
-`packages/ui/src/lib/search.ts` / `@rpg/search` with the `forgiving` profile,
-then compose ranking and grouping locally. Page and overlay may diverge in caps
-and truncation; adapters do not dictate order.
+Dashboard (and topbar preview) fetch the snapshot once, map `fields` through
+`rankLegacySearchItems(..., 'forgiving')` via `@rpg/ui`, then compose ranking
+and grouping locally. Page and topbar may diverge in caps and truncation;
+adapters do not dictate order.
 
 Empty-query surfaces should not rank or list the full catalog — prompt-only UX
 is enforced in dashboard Phase 2, not by the snapshot endpoint.

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
+import { ROUTES } from '@/app/routes'
+
 import { resolveGlobalSearchHref } from './resolve-global-search-href'
 
 const campaignId = 'campaign-1'
@@ -90,17 +92,34 @@ describe('rankGlobalSearchDocuments', () => {
     expect(filterGlobalSearchByGroup(ranked, 'characters')).toEqual([])
     expect(filterGlobalSearchByGroup(ranked, 'all')).toEqual(ranked)
   })
+
+  it('matches Fire Bolt with forgiving queries firebolt and fire bolt', async () => {
+    const { rankGlobalSearchDocuments } = await import('./rank-global-search')
+    const documents = [
+      makeDocument({
+        id: 'fire-bolt',
+        title: 'Fire Bolt',
+        fields: [{ text: 'Fire Bolt', weight: 1, role: 'label' }],
+      }),
+    ]
+
+    expect(rankGlobalSearchDocuments(documents, 'firebolt').map((doc) => doc.id)).toEqual([
+      'fire-bolt',
+    ])
+    expect(rankGlobalSearchDocuments(documents, 'fire bolt').map((doc) => doc.id)).toEqual([
+      'fire-bolt',
+    ])
+  })
 })
 
 describe('parseGlobalSearchUrlGroup', () => {
   it('defaults to all and accepts known segments', async () => {
-    const { parseGlobalSearchUrlGroup, buildGlobalSearchPageHref } =
-      await import('./global-search-url')
+    const { parseGlobalSearchUrlGroup } = await import('./global-search-url')
 
     expect(parseGlobalSearchUrlGroup(null)).toBe('all')
     expect(parseGlobalSearchUrlGroup('characters')).toBe('characters')
     expect(parseGlobalSearchUrlGroup('unknown')).toBe('all')
-    expect(buildGlobalSearchPageHref('c1', { q: ' fire ', group: 'content' })).toBe(
+    expect(ROUTES.campaign.search('c1', { q: ' fire ', group: 'content' })).toBe(
       '/campaigns/c1/search?q=fire&group=content',
     )
   })

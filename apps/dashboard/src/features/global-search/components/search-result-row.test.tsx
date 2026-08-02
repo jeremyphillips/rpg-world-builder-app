@@ -3,9 +3,10 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
+import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
-import { SearchResultRow, SEARCH_RESULT_UNAVAILABLE_LABEL } from './search-result-row.client'
+import { SearchResultRow } from './search-result-row.client'
 
 describe('SearchResultRow', () => {
   it('renders presentation fields and navigates via link', () => {
@@ -42,7 +43,7 @@ describe('SearchResultRow', () => {
     expect(onActivate).toHaveBeenCalledOnce()
   })
 
-  it('shows unavailable content inline with the title for managers', () => {
+  it('shows inactive content inline with the title for managers', () => {
     renderWithProviders(
       <SearchResultRow
         title="Arcane Trickster"
@@ -53,10 +54,10 @@ describe('SearchResultRow', () => {
       />,
     )
 
-    expect(screen.getByText(SEARCH_RESULT_UNAVAILABLE_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(INACTIVE_ROW_BADGE_LABEL)).toBeInTheDocument()
     expect(
       screen.getByRole('link', {
-        name: `Arcane Trickster, ${SEARCH_RESULT_UNAVAILABLE_LABEL}, Class`,
+        name: `Arcane Trickster, ${INACTIVE_ROW_BADGE_LABEL}, Class`,
       }),
     ).toBeInTheDocument()
   })

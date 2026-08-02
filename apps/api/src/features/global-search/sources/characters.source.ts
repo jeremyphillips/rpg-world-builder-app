@@ -61,6 +61,8 @@ function buildNpcDocument(
 export const charactersSearchSource: SearchSource = {
   id: 'characters',
   async collect(ctx) {
+    // Authoritative list paths only — destinations must stay navigable for this viewer
+    // (PC list visibility + campaign NPC list; related sheet reads use participant access).
     const [pcs, npcs, contentIndex] = await Promise.all([
       listCampaignCharactersForViewer({
         campaignId: ctx.campaignId,

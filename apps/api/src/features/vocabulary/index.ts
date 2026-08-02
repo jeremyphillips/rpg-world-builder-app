@@ -1,6 +1,7 @@
 export * from './lib/campaign-ruleset-patch.model'
 export * from './lib/patch-document'
 export * from './lib/resolve-vocabulary'
+export * from './lib/resolve-vocabulary-options-for-viewer'
 export * from './lib/assert-campaign-creature-types'
 export * from './lib/assert-campaign-damage-types'
 export * from './lib/assert-campaign-languages-spell-schools'

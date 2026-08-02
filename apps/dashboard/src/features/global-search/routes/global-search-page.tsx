@@ -2,6 +2,7 @@
 
 import { useParams } from 'react-router-dom'
 
+import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageHeader } from '@/components/layout/page-header'
 import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
@@ -10,7 +11,6 @@ import { GlobalSearchField } from '../components/global-search-field.client'
 import { GlobalSearchResultsBody } from '../components/global-search-results-body.client'
 import { useGlobalSearchPage } from '../hooks/use-global-search-page'
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
-import { buildGlobalSearchPageHref } from '../lib/global-search-url'
 import { resolveGlobalSearchHref } from '../lib/resolve-global-search-href'
 
 export function GlobalSearchPage() {
@@ -65,7 +65,7 @@ export function GlobalSearchPage() {
         onGroupChange={setGroup}
         resolveHref={(document) => resolveGlobalSearchHref(campaignId, document.target)}
         showAllHref={(filterGroup) =>
-          buildGlobalSearchPageHref(campaignId, { q: query, group: filterGroup })
+          ROUTES.campaign.search(campaignId, { q: query, group: filterGroup })
         }
       />
     </NarrowPage>

@@ -12,6 +12,7 @@ export { sanitizeHtml } from './lib/sanitize-html'
 export {
   matchTier,
   rankItems,
+  rankLegacySearchItems,
   scoreField,
   scoreItem,
   normalizeSearchQuery,

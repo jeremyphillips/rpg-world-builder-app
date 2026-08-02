@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom'
 
 import type { GlobalSearchDocument, GlobalSearchFilterGroup } from '@rpg/contracts'
 
+import { ROUTES } from '@/app/routes'
+
 import { useGlobalSearchTopbar } from '../hooks/use-global-search-topbar'
 import { useDismissOnOutsideInteraction } from '../hooks/use-dismiss-on-outside-interaction'
-import { buildGlobalSearchPageHref } from '../lib/global-search-url'
 import { resolveGlobalSearchHref } from '../lib/resolve-global-search-href'
 import { GlobalSearchField } from './global-search-field.client'
 import { GlobalSearchPreviewPanel } from './global-search-preview-panel.client'
@@ -25,11 +26,18 @@ const TOPBAR_SEARCH_PREVIEW_ID = 'global-search-topbar-preview'
 export function GlobalSearchTopbar() {
   const { campaignId, open, setOpen } = useGlobalSearchContext()
   const containerRef = React.useRef<HTMLDivElement>(null)
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const restoreFocusOnCloseRef = React.useRef(false)
+  const wasOpenRef = React.useRef(false)
   const disabled = !campaignId
 
-  const handleClose = React.useCallback(() => {
-    setOpen(false)
-  }, [setOpen])
+  const handleClose = React.useCallback(
+    (options?: { restoreFocus?: boolean }) => {
+      restoreFocusOnCloseRef.current = options?.restoreFocus ?? false
+      setOpen(false)
+    },
+    [setOpen],
+  )
 
   const handleOpen = React.useCallback(() => {
     if (disabled) return
@@ -39,8 +47,20 @@ export function GlobalSearchTopbar() {
   useDismissOnOutsideInteraction({
     enabled: open,
     containerRef,
-    onDismiss: handleClose,
+    onDismiss: (reason) => {
+      handleClose({ restoreFocus: reason === 'escape' })
+    },
   })
+
+  React.useEffect(() => {
+    if (wasOpenRef.current && !open && restoreFocusOnCloseRef.current) {
+      triggerRef.current?.focus()
+    }
+    wasOpenRef.current = open
+    if (!open) {
+      restoreFocusOnCloseRef.current = false
+    }
+  }, [open])
 
   if (!campaignId) {
     return (
@@ -55,6 +75,7 @@ export function GlobalSearchTopbar() {
       campaignId={campaignId}
       open={open}
       containerRef={containerRef}
+      triggerRef={triggerRef}
       onOpen={handleOpen}
       onClose={handleClose}
     />
@@ -65,14 +86,16 @@ type GlobalSearchTopbarExpandedProps = {
   campaignId: string
   open: boolean
   containerRef: React.RefObject<HTMLDivElement | null>
+  triggerRef: React.RefObject<HTMLButtonElement | null>
   onOpen: () => void
-  onClose: () => void
+  onClose: (options?: { restoreFocus?: boolean }) => void
 }
 
 function GlobalSearchTopbarExpanded({
   campaignId,
   open,
   containerRef,
+  triggerRef,
   onOpen,
   onClose,
 }: GlobalSearchTopbarExpandedProps) {
@@ -80,7 +103,7 @@ function GlobalSearchTopbarExpanded({
   const search = useGlobalSearchTopbar(campaignId, open)
 
   const handleSubmit = React.useCallback(() => {
-    navigate(buildGlobalSearchPageHref(campaignId, { q: search.query, group: 'all' }))
+    navigate(ROUTES.campaign.search(campaignId, { q: search.query, group: 'all' }))
     onClose()
   }, [campaignId, navigate, onClose, search.query])
 
@@ -91,7 +114,7 @@ function GlobalSearchTopbarExpanded({
 
   const showAllHref = React.useCallback(
     (filterGroup: GlobalSearchFilterGroup) =>
-      buildGlobalSearchPageHref(campaignId, { q: search.query, group: filterGroup }),
+      ROUTES.campaign.search(campaignId, { q: search.query, group: filterGroup }),
     [campaignId, search.query],
   )
 
@@ -106,7 +129,7 @@ function GlobalSearchTopbarExpanded({
             autoFocus
             aria-controls={TOPBAR_SEARCH_PREVIEW_ID}
             aria-expanded
-            onRequestClose={onClose}
+            onRequestClose={() => onClose({ restoreFocus: true })}
             onSubmit={handleSubmit}
             size="sm"
           />
@@ -119,7 +142,7 @@ function GlobalSearchTopbarExpanded({
             resultCount={search.resultCount}
             isPending={search.isPending}
             isError={search.isError}
-            viewAllHref={buildGlobalSearchPageHref(campaignId, { q: search.query, group: 'all' })}
+            viewAllHref={ROUTES.campaign.search(campaignId, { q: search.query, group: 'all' })}
             onClose={onClose}
             onRetry={() => {
               void search.refetch()
@@ -131,6 +154,7 @@ function GlobalSearchTopbarExpanded({
         </div>
       ) : (
         <GlobalSearchTrigger
+          ref={triggerRef}
           onOpen={onOpen}
           aria-controls={TOPBAR_SEARCH_PREVIEW_ID}
           aria-expanded={false}

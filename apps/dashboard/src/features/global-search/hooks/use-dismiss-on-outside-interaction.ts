@@ -5,7 +5,7 @@ import * as React from 'react'
 type UseDismissOnOutsideInteractionOptions = {
   enabled: boolean
   containerRef: React.RefObject<HTMLElement | null>
-  onDismiss: () => void
+  onDismiss: (reason: 'escape' | 'outside') => void
 }
 
 /** Closes an expanded topbar surface on outside click or Escape. */
@@ -21,13 +21,13 @@ export function useDismissOnOutsideInteraction({
       const target = event.target
       if (!(target instanceof Node)) return
       if (containerRef.current?.contains(target)) return
-      onDismiss()
+      onDismiss('outside')
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       event.preventDefault()
-      onDismiss()
+      onDismiss('escape')
     }
 
     document.addEventListener('mousedown', handlePointerDown)
