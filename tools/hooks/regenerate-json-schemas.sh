@@ -18,4 +18,8 @@ fi
 echo 'regenerate-json-schemas: contracts Zod inputs changed — regenerating JSON schemas'
 pnpm generate:json-schemas
 git add packages/contracts/generated .vscode/settings.json
-pnpm gate:json-schemas
+if ! git diff --exit-code packages/contracts/generated; then
+  echo '::error::Generated JSON schemas out of sync after regeneration.' >&2
+  git diff --stat packages/contracts/generated >&2
+  exit 1
+fi

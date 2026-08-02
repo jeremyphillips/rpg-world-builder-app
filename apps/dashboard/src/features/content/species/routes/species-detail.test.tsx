@@ -7,7 +7,7 @@ import {
   buildSeedCreatureTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { SPECIES_STAT_LABELS } from '@/features/content'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
@@ -16,8 +16,8 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
-vi.mock('@/features/homebrew', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/homebrew')>()
+vi.mock('@/features/vocabulary', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
   return {
     ...actual,
     useCreatureTypeVocabulary: vi.fn(),
@@ -30,7 +30,7 @@ import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ELF, HUMAN } from '../fixtures'
 import { SpeciesDetailContent } from './species-detail'

@@ -98,6 +98,10 @@ describe('CampaignSidebarNav', () => {
       expect(screen.getByRole('link', { name: entry.label })).toBeInTheDocument()
     }
     expect(screen.getByRole('link', { name: 'Homebrew' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Game Terms' })).toHaveAttribute(
+      'href',
+      ROUTES.gameTerms.hub(campaignId),
+    )
   })
 
   it('shows Manage when the viewer can manage the campaign', () => {

@@ -7,7 +7,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldConfig, type FieldOption, type FieldVisibility } from '@rpg/ui/form'
 
-import { buildActiveDamageTypeFieldOptions, vocabularyFieldLabel } from '@/features/homebrew'
+import { buildActiveDamageTypeFieldOptions, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../content-form-registry'
 

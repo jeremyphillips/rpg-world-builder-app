@@ -16,7 +16,7 @@ import type {
   LanguageVocabulary,
   SenseVocabulary,
   SpellSchoolVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import type { ContentListQueryResult } from '../list/content-client'
 import type { ContentFormOptionSets } from '../form-options/content-form-options'

@@ -11,7 +11,10 @@ import type { ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
-import { getSpellSchoolLabelFromVocabulary, type SpellSchoolVocabulary } from '@/features/homebrew'
+import {
+  getSpellSchoolLabelFromVocabulary,
+  type SpellSchoolVocabulary,
+} from '@/features/vocabulary'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,

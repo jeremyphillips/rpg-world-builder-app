@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { SpellEffectsEditor } from '../../components/spell-effects-editor.client'

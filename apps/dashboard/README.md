@@ -65,7 +65,9 @@ locally (e.g. `useSession`, `useLogout`).
 | -------------------------------------------------------------------------------------------- | ----------- |
 | `auth`, `user`, `campaign`, `admin` (stub screens)                                           | Implemented |
 | `content` — classes, species, feats, spells, equipment (family modules), skill proficiencies | Implemented |
-| `homebrew` — vocabulary sets, rules configuration                                            | Implemented |
+| `homebrew` — rules configuration hub, ruleset patch                                          | Implemented |
+| `vocabulary` — campaign vocabulary consumption (hooks, labels, field factories, form model)  | Implemented |
+| `game-terms` — Game Terms authoring UI (hub, overview, detail, sheets)                       | Implemented |
 | `character` (stub routes: list + detail wired)                                               | Scaffold    |
 | `message`, `notification`                                                                    | Scaffold    |
 | `content/monsters`, `content/locations`                                                      | Scaffold    |
@@ -112,5 +114,5 @@ Root shorthands: `pnpm storybook:dashboard`, `pnpm storybook` (UI + dashboard).
 - [code-splitting.md](./docs/code-splitting.md) — lazy routes, bundle analyzer
 - [auth-guard.md](./docs/auth-guard.md) — session gate and redirect flow
 - [content-types.md](../../docs/content-types.md) — adding a new catalog content type (contracts-first)
-- [vocabulary.md](../../docs/vocabulary.md) — homebrew vocabulary sets
+- [vocabulary.md](../../docs/vocabulary.md) — campaign vocabulary and Game Terms
 - [routing.md](../../docs/routing.md) — `ROUTES` constants and navigation conventions

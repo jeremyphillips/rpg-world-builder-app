@@ -5,7 +5,7 @@ import { type Spell } from '@rpg/contracts'
 import { TabbedForm } from '@rpg/ui/form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { buildSpellTabs, spellFormSchema } from '../../lib/spell-form-fields'
 import { spellFormDef } from '../../lib/spell-form-def'

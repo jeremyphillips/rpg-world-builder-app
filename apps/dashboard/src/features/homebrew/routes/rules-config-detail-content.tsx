@@ -25,21 +25,24 @@ import {
   useCanManageCampaign,
 } from '@/features/campaign'
 
+import {
+  buildActiveCreatureTypeFieldOptions,
+  buildActiveLanguageFieldOptions,
+  buildAttackResolutionModeFieldOptions,
+  buildEditionPresetFieldOptions,
+  useAttackResolutionModeVocabulary,
+  useCreatureTypeVocabulary,
+  useEditionPresetVocabulary,
+  useLanguageVocabulary,
+} from '@/features/vocabulary'
+
 import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
-import { buildEditionPresetFieldOptions } from '../lib/vocabulary/sets/edition-presets'
-import { buildAttackResolutionModeFieldOptions } from '../lib/vocabulary/sets/attack-resolution-modes'
-import { buildActiveCreatureTypeFieldOptions } from '../lib/vocabulary/sets/creature-types'
-import { buildActiveLanguageFieldOptions } from '../lib/vocabulary/sets/languages'
 import { disableFormItems } from '@/lib/disable-form-items'
 import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
 import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
 import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
 import { findRulesConfigEntry, type RulesConfigId } from '../lib/hub/rules-config-registry'
-import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
-import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
-import { useLanguageVocabulary } from '../hooks/use-language-vocabulary'
-import { useEditionPresetVocabulary } from '../hooks/use-edition-preset-vocabulary'
 import { usePatchCharacterCreationMutation } from '../hooks/use-patch-character-creation-mutation'
 import { usePatchMechanicsMutation } from '../hooks/use-patch-mechanics-mutation'
 import { useRulesetPatch } from '../hooks/use-ruleset-patch'

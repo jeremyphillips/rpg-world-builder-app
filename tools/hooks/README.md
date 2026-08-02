@@ -14,7 +14,7 @@ Shell helpers invoked from [`.husky/`](../../.husky/). Package scripts in the ro
 **Pre-commit** also runs [`regenerate-json-schemas.sh`](regenerate-json-schemas.sh) after
 lint-staged when staged files touch `@rpg/contracts` Zod sources that feed catalog JSON
 Schema generation. It runs `pnpm generate:json-schemas`, stages
-`packages/contracts/generated` and `.vscode/settings.json`, then `pnpm gate:json-schemas`.
-CI runs the same freshness gate on every PR.
+`packages/contracts/generated` and `.vscode/settings.json`, then verifies the working
+tree matches the index for generated output. CI runs `pnpm gate:json-schemas` on every PR.
 
 Skip all hooks locally: `HUSKY=0 git commit` / `HUSKY=0 git push`.

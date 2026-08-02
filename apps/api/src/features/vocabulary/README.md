@@ -28,9 +28,19 @@ vocabulary/
 
 Overview `usedBy` counts are capability-gated:
 
-- **`usageCounting`** — attach counts to resolved options.
+- **`usageResolution`** — attach counts to resolved options and enable usage GET.
 - **`batchUsageCounting`** — one set-level count resolver per overview load (creature-types: single species catalog read). Full blocker lists are **not** built during overview attach.
 - Disable/delete preflight and `GET .../usage` still resolve full blockers via per-entry usage resolvers.
+
+Pure reference extraction lives in `lib/reference-sources/` — field-path SSOT for extract + index; catalog loading and purpose-aware character inclusion stay in orchestration one layer above.
+
+Set-level discovery is registered via `defineVocabularyUsage` in
+`lib/vocabulary-usage-registrations.ts` — each registration declares sources with
+explicit `entry` / `batch` participation, optional `overviewUsageScope` when entry
+sources exceed batch (`content_only`), and derives entry/batch resolvers plus
+summary labels. Product capabilities (`usageResolution`, `deleteGuard`, …) remain
+independent in `@rpg/contracts`. `overviewUsageScope` is descriptive metadata on
+the resolved set DTO — it never influences source selection, counts, or guards.
 
 ## Routes
 
@@ -44,7 +54,7 @@ Mounted under `/api/campaigns/:campaignId`.
 | PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Patch system or campaign entry (`edit` / `availability` capabilities) |
 | GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner/co-owner | Advisory preflight before disabling (`disableGuard`)                  |
 | GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner/co-owner | Advisory preflight before deleting (`deleteGuard`)                    |
-| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member         | Informational usage references (`usageCounting`)                      |
+| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member         | Informational usage references (`usageResolution`)                    |
 | DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Delete campaign entry (`delete` capability)                           |
 
 Mutations assert the matching row in `VOCABULARY_SET_CAPABILITIES` (`@rpg/contracts`) and return `403` when the set does not support the operation.

@@ -5,7 +5,6 @@ import {
   validateVocabularySetCapabilityImplications,
   vocabularySetIdsRequiringFormDefinition,
   vocabularySetIdsRequiringUsageResolver,
-  vocabularySetIdsWithOverview,
 } from '@rpg/contracts'
 
 import {
@@ -33,9 +32,9 @@ describe('VOCABULARY_SET_INTEGRATION_MANIFEST', () => {
     )
   })
 
-  it('documents overview shell extension for overview-capable sets', () => {
+  it('documents overview shell extension for management-capable sets', () => {
     expect(vocabularySetIdsWithManifestExtension('overviewShell').sort()).toEqual(
-      vocabularySetIdsWithOverview().sort(),
+      vocabularySetIdsRequiringFormDefinition().sort(),
     )
   })
 
@@ -61,8 +60,8 @@ describe('capability ↔ manifest coverage', () => {
     }
   })
 
-  it('requires manifest overviewShell note when overview is enabled', () => {
-    for (const setId of vocabularySetIdsWithOverview()) {
+  it('requires manifest overviewShell note when create or edit is enabled', () => {
+    for (const setId of vocabularySetIdsRequiringFormDefinition()) {
       const entry = VOCABULARY_SET_INTEGRATION_MANIFEST[setId]
       expect(entry.extensionPoints?.overviewShell, setId).toBe(true)
     }
@@ -71,7 +70,7 @@ describe('capability ↔ manifest coverage', () => {
   it('does not mark usageResolver on sets with all usage capabilities disabled', () => {
     for (const setId of VOCABULARY_OPTION_SET_IDS) {
       const caps = VOCABULARY_SET_CAPABILITIES[setId]
-      const needsResolver = caps.usageCounting || caps.disableGuard || caps.deleteGuard
+      const needsResolver = caps.usageResolution || caps.disableGuard || caps.deleteGuard
       const entry = VOCABULARY_SET_INTEGRATION_MANIFEST[setId]
       const manifestFlag = entry.extensionPoints?.usageResolver === true
 

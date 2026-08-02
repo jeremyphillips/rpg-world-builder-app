@@ -1,101 +1,127 @@
 import {
-  CREATURE_TYPE_SET_ID,
   getVocabularySetCapability,
   vocabularySetIdsRequiringBatchCountResolver,
   vocabularySetIdsRequiringUsageResolver,
-  type ContentUsageBlocker,
   type VocabularyOptionSetId,
+  type VocabularyUsageSummaryLabels,
 } from '@rpg/contracts'
 
-import {
-  resolveCreatureTypeSpeciesUsage,
-  resolveCreatureTypeSpeciesUsageCountsBatch,
-} from './resolve-creature-type-species-usage'
+import type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
+import type {
+  VocabularyUsageRegistration,
+  VocabularyUsageResolver,
+  VocabularyUsageResolverResult,
+  VocabularySetBatchUsageResolver,
+} from './define-vocabulary-usage'
+import { VOCABULARY_USAGE_REGISTRATIONS } from './vocabulary-usage-registrations'
+import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 
-export type VocabularyUsageResolverResult = {
-  count: number
-  blockers: ContentUsageBlocker[]
-}
-
-export type VocabularyUsageResolver = (
-  campaignId: string,
-  entryId: string,
-) => Promise<VocabularyUsageResolverResult>
-
-export type VocabularySetBatchCountResolver = (
-  campaignId: string,
-  entryIds: readonly string[],
-) => Promise<Map<string, number>>
+export type {
+  VocabularyUsageResolverContext,
+  VocabularyUsagePurpose,
+} from './vocabulary-usage-context'
+export type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
+export type {
+  VocabularyUsageResolver,
+  VocabularyUsageResolverResult,
+  VocabularySetBatchUsageResolver,
+} from './define-vocabulary-usage'
 
 const defaultUsageResolver: VocabularyUsageResolver = async () => ({
   count: 0,
   blockers: [],
 })
 
-/** Partial registry — only sets with custom usage/blocker logic register an entry. */
-export const VOCABULARY_USAGE_RESOLVERS: Partial<
-  Record<VocabularyOptionSetId, VocabularyUsageResolver>
-> = {
-  [CREATURE_TYPE_SET_ID]: resolveCreatureTypeSpeciesUsage,
+function listRegistrations(): VocabularyUsageRegistration[] {
+  return Object.values(VOCABULARY_USAGE_REGISTRATIONS).filter(
+    (registration): registration is VocabularyUsageRegistration => registration != null,
+  )
 }
 
-/** Partial registry — count-only batch resolvers for overview attachUsageCounts. */
-export const VOCABULARY_BATCH_COUNT_RESOLVERS: Partial<
-  Record<VocabularyOptionSetId, VocabularySetBatchCountResolver>
-> = {
-  [CREATURE_TYPE_SET_ID]: resolveCreatureTypeSpeciesUsageCountsBatch,
+/** Derived from {@link defineVocabularyUsage} registrations — display-ready tooltip nouns. */
+export const VOCABULARY_USAGE_SUMMARY_LABELS: Partial<
+  Record<VocabularyOptionSetId, VocabularyUsageSummaryLabels>
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.summaryLabels]),
+)
+
+export function getVocabularyUsageSummaryLabels(
+  setId: VocabularyOptionSetId,
+): VocabularyUsageSummaryLabels | undefined {
+  return VOCABULARY_USAGE_SUMMARY_LABELS[setId]
 }
+
+/** Derived entry resolver registry from set-level usage registrations. */
+export const VOCABULARY_USAGE_RESOLVERS: Partial<
+  Record<VocabularyOptionSetId, VocabularyUsageResolver>
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.entryResolver]),
+)
+
+/** Derived batch resolver registry from set-level usage registrations. */
+export const VOCABULARY_BATCH_USAGE_RESOLVERS: Partial<
+  Record<VocabularyOptionSetId, VocabularySetBatchUsageResolver>
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.batchResolver]),
+)
 
 export function getVocabularyUsageResolver(setId: VocabularyOptionSetId): VocabularyUsageResolver {
   return VOCABULARY_USAGE_RESOLVERS[setId] ?? defaultUsageResolver
 }
 
-export function getVocabularyBatchCountResolver(
+export function getVocabularyBatchUsageResolver(
   setId: VocabularyOptionSetId,
-): VocabularySetBatchCountResolver | undefined {
-  return VOCABULARY_BATCH_COUNT_RESOLVERS[setId]
+): VocabularySetBatchUsageResolver | undefined {
+  return VOCABULARY_BATCH_USAGE_RESOLVERS[setId]
 }
 
-/** Asserts every guard/counting-enabled set has a registered resolver. */
+/** Asserts every guard/usage-resolution-enabled set has a usage registration with entry sources. */
 export function assertVocabularyUsageResolverCoverage(): void {
   for (const setId of vocabularySetIdsRequiringUsageResolver()) {
-    if (!VOCABULARY_USAGE_RESOLVERS[setId]) {
-      throw new Error(`Missing vocabulary usage resolver for "${setId}".`)
+    const registration = VOCABULARY_USAGE_REGISTRATIONS[setId]
+    if (!registration || !registration.sources.some((source) => source.entry)) {
+      throw new Error(`Missing vocabulary usage registration for "${setId}".`)
     }
   }
 }
 
-/** Asserts every batchUsageCounting set has a registered batch count resolver. */
+/** Asserts every batchUsageCounting set has a registration with batch sources. */
 export function assertVocabularyBatchCountResolverCoverage(): void {
   for (const setId of vocabularySetIdsRequiringBatchCountResolver()) {
-    if (!VOCABULARY_BATCH_COUNT_RESOLVERS[setId]) {
-      throw new Error(`Missing vocabulary batch count resolver for "${setId}".`)
+    const registration = VOCABULARY_USAGE_REGISTRATIONS[setId]
+    if (!registration || !registration.sources.some((source) => source.batch)) {
+      throw new Error(`Missing vocabulary batch usage registration for "${setId}".`)
     }
   }
 }
 
 export async function resolveVocabularyOptionUsage(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyUsageResolverResult> {
   const capability = getVocabularySetCapability(setId)
-  if (!capability.usageCounting && !capability.disableGuard && !capability.deleteGuard) {
-    return defaultUsageResolver(campaignId, entryId)
+  if (!capability.usageResolution && !capability.disableGuard && !capability.deleteGuard) {
+    return defaultUsageResolver(ctx, entryId)
   }
 
-  return getVocabularyUsageResolver(setId)(campaignId, entryId)
+  return getVocabularyUsageResolver(setId)(ctx, entryId)
 }
 
-export async function resolveVocabularyOptionUsageCountsBatch(
-  campaignId: string,
+export async function resolveVocabularyOptionUsageBatch(
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryIds: readonly string[],
-): Promise<Map<string, number>> {
-  const resolver = getVocabularyBatchCountResolver(setId)
+): Promise<Map<string, VocabularyBatchUsageEntryResult>> {
+  const resolver = getVocabularyBatchUsageResolver(setId)
   if (!resolver) {
-    throw new Error(`Missing vocabulary batch count resolver for "${setId}".`)
+    throw new Error(`Missing vocabulary batch usage resolver for "${setId}".`)
   }
 
-  return resolver(campaignId, entryIds)
+  return resolver(ctx, entryIds)
 }
+
+export {
+  getVocabularyUsageRegistration,
+  VOCABULARY_USAGE_REGISTRATIONS,
+} from './vocabulary-usage-registrations'

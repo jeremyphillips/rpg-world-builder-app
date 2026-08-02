@@ -3,10 +3,8 @@ import { VOCABULARY_OPTION_SET_IDS } from './vocabulary'
 
 /** Product capabilities for a campaign vocabulary option set. */
 export type VocabularySetCapability = {
-  /** Homebrew hub card. */
-  hubCard: boolean
-  /** Full overview manager (table, filters, row actions). Implies hubCard. */
-  overview: boolean
+  /** Listed on Game Terms hub and readable at overview/detail routes. */
+  browse: boolean
   create: boolean
   edit: boolean
   /** Delete campaign-sourced entries. Implies create. */
@@ -14,8 +12,8 @@ export type VocabularySetCapability = {
   /** Maps to status active/disabled in UI and PATCH. */
   availability: boolean
   bulkAvailability: boolean
-  /** Attach usedBy to resolved options. */
-  usageCounting: boolean
+  /** Usage resolution enabled — attach usedBy; enable informational GET …/usage. */
+  usageResolution: boolean
   /** Overview loads may use a set-level count batch resolver (counts only). */
   batchUsageCounting: boolean
   /** Block status → disabled when referenced (preflight + PATCH 409). */
@@ -25,28 +23,39 @@ export type VocabularySetCapability = {
 }
 
 const disabledCapabilities = (): VocabularySetCapability => ({
-  hubCard: false,
-  overview: false,
+  browse: false,
   create: false,
   edit: false,
   delete: false,
   availability: false,
   bulkAvailability: false,
-  usageCounting: false,
+  usageResolution: false,
   batchUsageCounting: false,
   disableGuard: false,
   deleteGuard: false,
 })
 
-const enabledOverviewCapabilities = (): VocabularySetCapability => ({
-  hubCard: true,
-  overview: true,
+const browseOnlyWithUsageResolutionCapabilities = (): VocabularySetCapability => ({
+  browse: true,
+  create: false,
+  edit: false,
+  delete: false,
+  availability: false,
+  bulkAvailability: false,
+  usageResolution: true,
+  batchUsageCounting: true,
+  disableGuard: false,
+  deleteGuard: false,
+})
+
+const enabledManagementCapabilities = (): VocabularySetCapability => ({
+  browse: true,
   create: true,
   edit: true,
   delete: true,
   availability: true,
   bulkAvailability: true,
-  usageCounting: true,
+  usageResolution: true,
   batchUsageCounting: true,
   disableGuard: true,
   deleteGuard: true,
@@ -57,15 +66,15 @@ const enabledOverviewCapabilities = (): VocabularySetCapability => ({
  * explicit row. Runtime registries derive enabled subsets from this map.
  */
 export const VOCABULARY_SET_CAPABILITIES = {
-  'creature-types': enabledOverviewCapabilities(),
-  'damage-types': disabledCapabilities(),
-  conditions: disabledCapabilities(),
-  languages: disabledCapabilities(),
-  senses: disabledCapabilities(),
-  sizes: disabledCapabilities(),
-  'spell-schools': disabledCapabilities(),
-  'weapon-properties': disabledCapabilities(),
-  'equipment-categories': disabledCapabilities(),
+  'creature-types': enabledManagementCapabilities(),
+  'damage-types': browseOnlyWithUsageResolutionCapabilities(),
+  conditions: browseOnlyWithUsageResolutionCapabilities(),
+  languages: browseOnlyWithUsageResolutionCapabilities(),
+  senses: browseOnlyWithUsageResolutionCapabilities(),
+  sizes: browseOnlyWithUsageResolutionCapabilities(),
+  'spell-schools': browseOnlyWithUsageResolutionCapabilities(),
+  'weapon-properties': browseOnlyWithUsageResolutionCapabilities(),
+  'equipment-categories': browseOnlyWithUsageResolutionCapabilities(),
   'edition-presets': disabledCapabilities(),
   'attack-resolution-modes': disabledCapabilities(),
 } as const satisfies Record<VocabularyOptionSetId, VocabularySetCapability>
@@ -81,22 +90,31 @@ export function validateVocabularySetCapabilityImplications(
 ): VocabularySetCapabilityViolation[] {
   const violations: VocabularySetCapabilityViolation[] = []
 
+  const managementFields = [
+    'create',
+    'edit',
+    'delete',
+    'availability',
+    'bulkAvailability',
+    'usageResolution',
+    'batchUsageCounting',
+    'disableGuard',
+    'deleteGuard',
+  ] as const satisfies readonly (keyof VocabularySetCapability)[]
+
+  for (const field of managementFields) {
+    if (capabilities[field] && !capabilities.browse) {
+      violations.push({
+        field: 'implication',
+        message: `${field} requires browse`,
+      })
+    }
+  }
+
   if (capabilities.bulkAvailability && !capabilities.availability) {
     violations.push({
       field: 'implication',
       message: 'bulkAvailability requires availability',
-    })
-  }
-  if (capabilities.availability && !capabilities.overview) {
-    violations.push({
-      field: 'implication',
-      message: 'availability requires overview',
-    })
-  }
-  if (capabilities.overview && !capabilities.hubCard) {
-    violations.push({
-      field: 'implication',
-      message: 'overview requires hubCard',
     })
   }
   if (capabilities.delete && !capabilities.create) {
@@ -105,10 +123,10 @@ export function validateVocabularySetCapabilityImplications(
       message: 'delete requires create',
     })
   }
-  if (capabilities.batchUsageCounting && !capabilities.usageCounting) {
+  if (capabilities.batchUsageCounting && !capabilities.usageResolution) {
     violations.push({
       field: 'implication',
-      message: 'batchUsageCounting requires usageCounting',
+      message: 'batchUsageCounting requires usageResolution',
     })
   }
 
@@ -119,24 +137,34 @@ export function getVocabularySetCapability(setId: VocabularyOptionSetId): Vocabu
   return VOCABULARY_SET_CAPABILITIES[setId]
 }
 
-/** Set ids with a homebrew hub card. */
+/** Set ids listed on the Game Terms hub and reachable at overview/detail routes. */
+export function vocabularySetIdsWithBrowse(
+  capabilities: Record<
+    VocabularyOptionSetId,
+    VocabularySetCapability
+  > = VOCABULARY_SET_CAPABILITIES,
+): VocabularyOptionSetId[] {
+  return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].browse)
+}
+
+/** @deprecated Use {@link vocabularySetIdsWithBrowse}. */
 export function vocabularySetIdsWithHubCard(
   capabilities: Record<
     VocabularyOptionSetId,
     VocabularySetCapability
   > = VOCABULARY_SET_CAPABILITIES,
 ): VocabularyOptionSetId[] {
-  return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].hubCard)
+  return vocabularySetIdsWithBrowse(capabilities)
 }
 
-/** Set ids with a full overview manager. */
+/** @deprecated Use {@link vocabularySetIdsWithBrowse}. */
 export function vocabularySetIdsWithOverview(
   capabilities: Record<
     VocabularyOptionSetId,
     VocabularySetCapability
   > = VOCABULARY_SET_CAPABILITIES,
 ): VocabularyOptionSetId[] {
-  return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].overview)
+  return vocabularySetIdsWithBrowse(capabilities)
 }
 
 /** Set ids that require a registered API usage/blocker resolver. */
@@ -148,7 +176,7 @@ export function vocabularySetIdsRequiringUsageResolver(
 ): VocabularyOptionSetId[] {
   return VOCABULARY_OPTION_SET_IDS.filter(
     (setId) =>
-      capabilities[setId].usageCounting ||
+      capabilities[setId].usageResolution ||
       capabilities[setId].disableGuard ||
       capabilities[setId].deleteGuard,
   )

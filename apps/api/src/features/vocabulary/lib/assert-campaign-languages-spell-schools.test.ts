@@ -10,7 +10,10 @@ import {
   getActiveLanguageIdsForCampaign,
   getActiveSpellSchoolIdsForCampaign,
 } from './assert-campaign-languages-spell-schools'
-import { updateVocabularyEntry } from '../sets/vocabulary.service'
+import {
+  updateVocabularyEntry,
+  vocabularyUsageContextForCampaign,
+} from '../sets/vocabulary.service'
 
 useIntegrationDb()
 
@@ -29,9 +32,14 @@ describe('assertLanguagesActiveInCampaign', () => {
   it('rejects disabled languages', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaignId, LANGUAGE_SET_ID, 'common', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      LANGUAGE_SET_ID,
+      'common',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(assertLanguagesActiveInCampaign(campaignId, ['common'])).rejects.toMatchObject({
       status: 400,
@@ -55,9 +63,14 @@ describe('assertSpellSchoolsActiveInCampaign', () => {
   it('rejects disabled spell schools', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaignId, SPELL_SCHOOL_SET_ID, 'evocation', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      SPELL_SCHOOL_SET_ID,
+      'evocation',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(
       assertSpellSchoolsActiveInCampaign(campaignId, ['evocation']),

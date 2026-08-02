@@ -57,11 +57,15 @@
       "file": "catalog-vocabulary-list.schema.json",
       "fileMatch": [
         "packages/catalog/src/vocabulary/data/**/attack-resolution-modes.json",
+        "packages/catalog/src/vocabulary/data/**/conditions.json",
         "packages/catalog/src/vocabulary/data/**/creature-types.json",
         "packages/catalog/src/vocabulary/data/**/damage-types.json",
         "packages/catalog/src/vocabulary/data/**/edition-presets.json",
+        "packages/catalog/src/vocabulary/data/**/equipment-categories.json",
         "packages/catalog/src/vocabulary/data/**/senses.json",
-        "packages/catalog/src/vocabulary/data/**/spell-schools.json"
+        "packages/catalog/src/vocabulary/data/**/sizes.json",
+        "packages/catalog/src/vocabulary/data/**/spell-schools.json",
+        "packages/catalog/src/vocabulary/data/**/weapon-properties.json"
       ]
     },
     {

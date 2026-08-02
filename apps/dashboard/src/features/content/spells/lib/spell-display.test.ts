@@ -8,7 +8,7 @@ import {
   getDamageTypeLabelFromVocabulary,
   getSpellSchoolDescriptionFromVocabulary,
   getSpellSchoolLabelFromVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { pickSpell } from '../../lib/fixtures/pick'
 import { DETECT_MAGIC, FIRE_BOLT } from '../fixtures'
 import { buildSpellDetailViewModel, SPELL_SECTION_LABELS, SPELL_STAT_LABELS } from './spell-display'

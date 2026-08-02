@@ -6,7 +6,7 @@ import {
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
   getSenseLabelFromVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import {
   buildSpeciesCardViewModel,
   buildSpeciesDetailViewModel,

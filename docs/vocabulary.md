@@ -2,8 +2,8 @@
 
 Cross-cutting guide to **rules vocabulary** — closed option sets (creature types,
 damage types, conditions, …) that a campaign can customize without creating
-first-class catalog content. The dashboard surfaces this under **Homebrew**;
-persistence and API contracts use neutral names (`campaign`, ruleset patch).
+first-class catalog content. The dashboard surfaces this under **Game Library →
+Game Terms**; persistence and API contracts use neutral names (`campaign`, ruleset patch).
 
 For catalog **content types** (classes, species, spells, …), see
 [content-types.md](./content-types.md). For contracts layer rules, see
@@ -19,7 +19,7 @@ flowchart LR
   patch["CampaignRulesetPatch\nMongoDB per campaign + ruleset"]
   resolver["resolveVocabularySet()"]
   api["GET /api/campaigns/:id/vocabulary/:setId"]
-  ui["Dashboard Homebrew\nvocabulary detail"]
+  ui["Dashboard Game Terms\nhub / overview / detail"]
 
   catalog --> resolver
   patch --> resolver
@@ -80,12 +80,14 @@ Shared shapes live in `@rpg/contracts`:
 | `createVocabularyMemberSchema(activeIds)` | `rpg/vocab/`                               | Validates a value against resolved **active** ids    |
 | `activeVocabularyOptionIds(set)`          | `rpg/vocab/`                               | Active id set from a resolved option set             |
 
-**Closed reference vocab** (physical damage, weapon properties) remains in
-`rpg/vocab/*_ENTRIES` maps when the set is not campaign-customizable. Each closed
+**Closed reference vocab** (physical damage, armor categories, magic item rarity) remains in
+`rpg/vocab/*_ENTRIES` maps when the set is not in `VOCABULARY_OPTION_SET_IDS`. Each closed
 map also exports a sibling `*_TERM` describing the set concept (label,
-description, counted `sentence` forms). Open sets (damage types, senses, languages,
-spell schools, creature types) export `*_TERM` plus `*_SET_ID` and use catalog seed
-JSON + campaign patch instead.
+description, counted `sentence` forms). **Open sets** (creature types, damage types,
+conditions, sizes, senses, languages, spell schools, weapon properties,
+equipment categories) export `*_TERM` plus `*_SET_ID` and use catalog seed
+JSON; browsable sets resolve through the vocabulary API (browse-only or full
+management per `VOCABULARY_SET_CAPABILITIES`).
 
 **Campaign-customizable sets** (creature types first) use catalog seed JSON +
 patch merge instead of expanding a compile-time enum. Primitive shape validation
@@ -137,22 +139,24 @@ return **409** via `assertVocabularyIdAvailable` against **all resolved option i
 
 Mutating routes enforce `VOCABULARY_SET_CAPABILITIES` server-side:
 
-| Operation                            | Capability      | Failure        |
-| ------------------------------------ | --------------- | -------------- |
-| POST entry                           | `create`        | 403            |
-| PATCH label/description              | `edit`          | 403            |
-| PATCH status                         | `availability`  | 403            |
-| DELETE entry                         | `delete`        | 403            |
-| GET disable-availability             | `disableGuard`  | 404            |
-| GET delete-availability              | `deleteGuard`   | 404            |
-| GET usage                            | `usageCounting` | 404            |
-| PATCH status → disabled (referenced) | `disableGuard`  | 409 + blockers |
+| Operation                            | Capability        | Failure        |
+| ------------------------------------ | ----------------- | -------------- |
+| POST entry                           | `create`          | 403            |
+| PATCH label/description              | `edit`            | 403            |
+| PATCH status                         | `availability`    | 403            |
+| DELETE entry                         | `delete`          | 403            |
+| GET disable-availability             | `disableGuard`    | 404            |
+| GET delete-availability              | `deleteGuard`     | 404            |
+| GET usage                            | `usageResolution` | 404            |
+| PATCH status → disabled (referenced) | `disableGuard`    | 409 + blockers |
 
-Partial API registries (creature-types species resolver registered today):
+Partial API registries (usage discovery registered for all browse sets with `usageResolution`):
 
 | Registry                         | Location                                         | Role                                         |
 | -------------------------------- | ------------------------------------------------ | -------------------------------------------- |
-| `VOCABULARY_USAGE_RESOLVERS`     | `apps/api/.../vocabulary-usage-resolvers.ts`     | Usage counts + `kind: 'content'` blockers    |
+| `defineVocabularyUsage`          | `apps/api/.../vocabulary-usage-registrations.ts` | Set-level discovery SSOT (sources, labels)   |
+| `VOCABULARY_USAGE_RESOLVERS`     | derived from registrations                       | Entry usage counts + blockers                |
+| `reference-sources/`             | `apps/api/.../vocabulary/lib/reference-sources/` | Pure extract + index over loaded records     |
 | `VOCABULARY_VALIDATION_ADAPTERS` | `apps/api/.../vocabulary-validation-adapters.ts` | Optional validation beyond active membership |
 | `VOCABULARY_ENTRY_FORM_REGISTRY` | dashboard `vocabulary-entry-form-registry.ts`    | Create/edit form defs for enabled sets       |
 
@@ -171,32 +175,51 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 - **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
 - **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
-- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; HTTP responses are not reused across surfaces.
-- **UI:** informational `UsageReferencesSection` in the edit sheet; blocked dialogs use `UsageBlockedReferenceList` with the same reference row primitives.
+- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max `VOCABULARY_USAGE_SUMMARY_LIMIT` from contracts). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned, presentational only) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms. When batch sources are a strict subset of entry sources, registration must declare `overviewUsageScope: 'content_only'`; the resolved set exposes this metadata and the dashboard renders **Used by content** with scope copy — **metadata only**, never affecting resolver topology or guards.
+- **Three resolution scopes** — overview list counts use batch sources only (role-independent); detail `GET …/usage` uses entry sources with `viewer_display`; disable/delete guards use entry sources with `authoritative_guard`. `overviewUsageScope` describes batch completeness for column copy only.
+- **Capability split** — `usageResolution` enables counts and usage GET; `disableGuard` / `deleteGuard` are independent guard flags; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support (`batchUsageCounting` requires `usageResolution`).
+- **Registration vs capability** — `defineVocabularyUsage({ setId, sources[], summaryLabels, overviewUsageScope? })` owns discovery topology (which sources participate in entry vs batch resolution). `VOCABULARY_SET_CAPABILITIES` owns product behavior (which surfaces are on). Neither duplicates the other.
+- **Purpose orchestration** — resolver context carries `purpose: 'viewer_display' | 'authoritative_guard'`. Overview attach and usage GET use `viewer_display`; disable/delete preflight and PATCH/DELETE 409 recompute `authoritative_guard` even if preflight just ran. Character language refs are viewer-scoped for display but campaign-wide for guards.
+- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; batch overview loads use `resolveVocabularyOptionUsageBatch`. Reference discovery logic lives in the API (`apps/api/.../vocabulary/lib/`); contracts own neutral DTOs only.
+- **UI:** informational `UsageReferencesSection` on detail (assembled in `game-terms`); overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
 
 ---
 
 ## Dashboard registries
 
-The Homebrew feature (`apps/dashboard/src/features/homebrew/`) uses hub registries
-under `lib/hub/` kept in sync with contracts via drift tests.
+Vocabulary consumption (API clients, hooks, option maps, field factories, entry
+form model) lives in `apps/dashboard/src/features/vocabulary/` — JSX-light, reusable
+field components only. Game Terms authoring UI (hub, overview, detail, sheets,
+bulk availability, blocked-dialog copy, and sheet field-item assembly for usage
+references) lives in `apps/dashboard/src/features/game-terms/` and depends on
+`vocabulary` only.
+The Homebrew hub and ruleset patch hooks remain in `features/homebrew/` —
+ruleset patch is unrelated debt; do not route new vocabulary consumption through
+homebrew.
 
-### Content cards (sidebar + hub)
+Category metadata SSOT is in `@rpg/contracts` (`VOCABULARY_CATEGORIES`,
+`BROWSABLE_VOCABULARY_CATEGORIES`); dashboard registries are thin projections.
+
+### Content cards (Homebrew hub)
 
 `VISIBLE_SIDEBAR_CONTENT` in `lib/hub/content-registry.ts` must match
-`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts — same types, same order. The hub
-maps this array to cards; adding a summary content type without updating the
-registry fails CI.
+`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS` in contracts — same types, same order. The
+Homebrew hub maps this array to cards; adding a summary content type without
+updating the registry fails CI.
 
-### Vocabulary sets (hub + detail rail)
+### Game Terms categories (hub + routes)
 
-`HOMEBREW_VOCABULARY_SETS` in `lib/hub/vocabulary-set-registry.ts` lists every
-`VOCABULARY_OPTION_SET_ID` with a label. **`enabled` is derived from
-`VOCABULARY_SET_CAPABILITIES.overview`** — do not maintain a parallel enable list.
-Only overview-capable sets get hub cards and an active manager; other sets appear
-in the detail rail / mobile select as not-yet-implemented.
+`GAME_TERMS_VOCABULARY_CATEGORIES` in
+`features/game-terms/lib/hub/vocabulary-set-registry.ts`
+projects `BROWSABLE_VOCABULARY_CATEGORIES` from contracts — label, description,
+order, and browse visibility come from the SSOT; do not maintain parallel maps.
 
-### Rules configuration (hub)
+**Browse vs manage:** `VOCABULARY_SET_CAPABILITIES.browse` controls hub listing
+and read routes. Management flags (`create`, `edit`, `delete`, `availability`, …)
+are independent; when false, UI omits controls rather than rendering disabled
+stubs.
+
+### Rules configuration (Homebrew hub)
 
 `HOMEBREW_RULES_CONFIGS` in `lib/hub/rules-config-registry.ts` lists rules
 configuration pages on the hub. In-page section anchors for character
@@ -204,13 +227,17 @@ configuration are derived from the campaign field registry
 (`CHARACTER_CONFIGURATION_SECTIONS` in
 `features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts`).
 
-Shared UI for all sets:
+Shared UI for browsable sets:
 
-- Route: `/campaigns/:campaignId/homebrew/vocabulary/:setId`
-- `VocabularySetNav` — desktop rail + mobile `Select`
-- `VocabularyDetailContent` — table + `VocabularyEntrySheet` (Sheet primitive)
-- `useVocabularySet` / `useVocabularyMutations` — TanStack Query against
-  vocabulary API
+- Routes: `/campaigns/:campaignId/game-terms`, `…/game-terms/:setId`,
+  `…/game-terms/:setId/:termId`
+- `VocabularyHubContent` — full-row category list with counts
+- `VocabularyOverviewContent` — table + local `VocabularyEntrySheet` state
+- `VocabularyTermDetailContent` — canonical read URL; Edit opens the same sheet
+- `useVocabularySet` / `useVocabularyMutations` / `useVocabularySets` — TanStack
+  Query against vocabulary API
+
+Legacy `/homebrew/vocabulary` paths redirect to Game Terms.
 
 Per-set consumption (forms, columns, settings) should use a thin hook that
 loads the resolved set and builds label/active-id maps — see
@@ -249,9 +276,9 @@ Work through these layers once; reuse resolver, routes, and detail UI.
 
 ### 4. Dashboard
 
-1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`overview`, `create`, …).
+1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`browse`, `create`, …).
 2. Register a form def in `VOCABULARY_ENTRY_FORM_REGISTRY` when `create`/`edit` are true.
-3. Register an API usage resolver when `usageCounting` / `disableGuard` / `deleteGuard` need custom logic.
+3. Register an API usage resolver when `usageResolution` / `disableGuard` / `deleteGuard` need custom logic.
 4. Add a consumption hook if forms or columns need labels/options (pattern:
    `useCreatureTypeVocabulary` or generic `useVocabularySetMaps`).
 5. Wire field options through the hook — do not import static seed constants in
@@ -263,8 +290,8 @@ Work through these layers once; reuse resolver, routes, and detail UI.
   differs (usually shared tests suffice).
 - Registry drift: `vocabulary-set-registry.test.ts` covers all
   `VOCABULARY_OPTION_SET_IDS`.
-- Dashboard detail: extend `vocabulary-detail-content.test.tsx` or add set-specific
-  assertions only when behavior differs from creature types.
+- Dashboard overview: extend `vocabulary-overview-content.test.tsx` or add
+  set-specific assertions only when behavior differs from creature types.
 
 Do **not** duplicate merge logic, patch persistence, or the vocabulary detail
 shell per set.
@@ -274,9 +301,9 @@ shell per set.
 ## Internal-only vocabulary sets
 
 Some sets are seeded in catalog and resolved through the vocabulary API for form
-labels, but **not** exposed on the Homebrew hub (`enabled: false` in
-`vocabulary-set-registry.ts`). Campaign managers cannot create or edit these rows
-in the vocabulary UI.
+labels, but **not** exposed on Game Terms (`internalOnly: true` in category
+SSOT; `browse: false` in capabilities). Guessed URLs return not-found even though
+the API can resolve them for other consumers.
 
 | Set id                    | Used by                                     |
 | ------------------------- | ------------------------------------------- |
@@ -315,16 +342,19 @@ usage counting (below).
 
 ### Usage counts (`usedBy`)
 
-`VOCABULARY_USAGE_RESOLVERS` in the API is the **single enforcement point** for
-delete and disable guards. Creature-types counts species references and returns
-`kind: 'content'` blockers for disable preflight and PATCH 409 races.
+`defineVocabularyUsage` registrations in the API are the **discovery SSOT** for
+where references come from. Derived entry/batch resolvers are the **single
+enforcement point** for delete and disable guards. Creature-types counts species
+references and returns `kind: 'content'` blockers for disable preflight and PATCH
+409 races.
 
-- Resolved sets attach `usedBy` on every option when `usageCounting` is true.
+- Resolved sets attach `usedBy` on every option when `usageResolution` is true.
 - Delete campaign entries succeeds when `usedBy === 0` (or `deleteGuard` is off); otherwise **409 in_use**.
-- Disable (status → disabled) runs preflight via `GET …/disable-availability`; PATCH returns **409** with blockers when referenced.
+- Disable (status → disabled) runs advisory preflight via `GET …/disable-availability`; PATCH always recomputes guard usage and returns **409** with blockers when referenced.
 - System entries cannot be deleted regardless of usage.
+- Guard resolution is campaign-authoritative (`authoritative_guard` purpose) and cannot be narrowed by viewer visibility; display resolution never exposes refs outside the viewer's allowed scope.
 
-When adding a referencing feature, extend the set's usage resolver rather than adding ad-hoc delete checks.
+When adding a referencing feature, extend the set's usage registration rather than adding ad-hoc delete checks.
 
 ### Set capabilities registry
 
@@ -365,10 +395,10 @@ apply product casing conventions.
 
 ### Campaign vocab vs closed reference sets
 
-| Source                                                    | Examples                                               | Consumption                                                                                                                                             |
-| --------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Campaign vocab** (`VOCABULARY_OPTION_SET_IDS`)          | Creature types, damage types, languages                | Resolve per campaign via vocabulary API; build label maps from the resolved set (see [Adding the next vocabulary set](#adding-the-next-vocabulary-set)) |
-| **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Weapon properties, armor categories, magic item rarity | Import label helpers from `rpg/vocab/*`; no campaign patch merge                                                                                        |
+| Source                                                    | Examples                                                                                                                   | Consumption                                                                                                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Campaign vocab** (`VOCABULARY_OPTION_SET_IDS`)          | Creature types, damage types, conditions, sizes, languages, senses, spell schools, weapon properties, equipment categories | Resolve per campaign via vocabulary API; build label maps from the resolved set (see [Adding the next vocabulary set](#adding-the-next-vocabulary-set)) |
+| **Closed reference vocab** (`*_ENTRIES`, `GameTermEntry`) | Physical damage, armor categories, magic item rarity                                                                       | Import label helpers from `rpg/vocab/*`; no vocabulary set id or catalog seed                                                                           |
 
 Catalog **content types** (classes, species, equipment, …) are separate — see
 [content-types.md](./content-types.md). The shared `pnpm vocab:audit` policy and

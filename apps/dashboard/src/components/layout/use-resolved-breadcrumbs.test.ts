@@ -82,24 +82,81 @@ describe('useResolvedBreadcrumbs', () => {
     ])
   })
 
-  it('renders a three-level vocabulary trail with stable middle href', () => {
+  it('renders game terms detail trail with param-derived category and hub link on overview', () => {
     mockUseMatches.mockReturnValue([
       makeMatch(
-        '/campaigns/c1/homebrew/vocabulary',
-        { campaignId: 'c1' },
+        '/campaigns/c1/game-terms',
+        { campaignId: 'c1', setId: 'conditions' },
         {
-          crumb: (_params, data) => ({
-            label: 'Vocabulary',
-            href: data.isCollectionIndex ? undefined : '/campaigns/c1/homebrew/vocabulary',
+          crumb: (params, data) => ({
+            label: 'Game Terms',
+            href: params.setId
+              ? '/campaigns/c1/game-terms'
+              : data.isCollectionIndex
+                ? undefined
+                : '/campaigns/c1/game-terms',
           }),
         },
       ),
       makeMatch(
-        '/campaigns/c1/homebrew/vocabulary/creature-types',
-        { campaignId: 'c1', setId: 'creature-types' },
+        '/campaigns/c1/game-terms/conditions',
+        { campaignId: 'c1', setId: 'conditions' },
         {
-          crumb: (_params, data) => ({
-            label: data.entityLabel ?? '…',
+          crumb: (params, data) => {
+            if (params.setId !== 'conditions') {
+              return null
+            }
+
+            return {
+              label: 'Conditions',
+              href: params.termId
+                ? data.isCollectionIndex
+                  ? undefined
+                  : '/campaigns/c1/game-terms/conditions'
+                : undefined,
+            }
+          },
+        },
+      ),
+      makeMatch('/campaigns/c1/game-terms/conditions', { campaignId: 'c1', setId: 'conditions' }),
+    ])
+
+    const { result } = renderHook(() => useResolvedBreadcrumbs())
+
+    expect(result.current).toEqual([
+      { label: 'Game Terms', href: '/campaigns/c1/game-terms' },
+      { label: 'Conditions' },
+    ])
+  })
+
+  it('renders game terms term detail with category href', () => {
+    mockUseMatches.mockReturnValue([
+      makeMatch(
+        '/campaigns/c1/game-terms',
+        { campaignId: 'c1', setId: 'conditions', termId: 'blinded' },
+        {
+          crumb: (params) => ({
+            label: 'Game Terms',
+            href: params.setId ? '/campaigns/c1/game-terms' : undefined,
+          }),
+        },
+      ),
+      makeMatch(
+        '/campaigns/c1/game-terms/conditions',
+        { campaignId: 'c1', setId: 'conditions', termId: 'blinded' },
+        {
+          crumb: (params) => ({
+            label: 'Conditions',
+            href: params.termId ? '/campaigns/c1/game-terms/conditions' : undefined,
+          }),
+        },
+      ),
+      makeMatch(
+        '/campaigns/c1/game-terms/conditions/blinded',
+        { campaignId: 'c1', setId: 'conditions', termId: 'blinded' },
+        {
+          crumb: (_params, { entityLabel }) => ({
+            label: entityLabel ?? '…',
           }),
         },
       ),
@@ -108,7 +165,8 @@ describe('useResolvedBreadcrumbs', () => {
     const { result } = renderHook(() => useResolvedBreadcrumbs())
 
     expect(result.current).toEqual([
-      { label: 'Vocabulary', href: '/campaigns/c1/homebrew/vocabulary' },
+      { label: 'Game Terms', href: '/campaigns/c1/game-terms' },
+      { label: 'Conditions', href: '/campaigns/c1/game-terms/conditions' },
       { label: 'Wizard' },
     ])
   })

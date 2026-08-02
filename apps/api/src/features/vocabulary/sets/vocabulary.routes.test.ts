@@ -107,6 +107,41 @@ describe('vocabulary routes', () => {
     expect(Array.isArray(usageRes.body.usage.references)).toBe(true)
   })
 
+  it('returns batch usage summary labels and bounded usedBySummary on set reads', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    const setRes = await agent
+      .get(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(setRes.body.set.usageSummaryLabels).toEqual({
+      singular: 'species',
+      plural: 'species',
+    })
+
+    const humanoid = setRes.body.set.options.find(
+      (option: { id: string }) => option.id === 'humanoid',
+    )
+    expect(humanoid.usedBy).toBeGreaterThanOrEqual(0)
+    if (humanoid.usedBy > 0) {
+      expect(humanoid.usedBySummary.length).toBeLessThanOrEqual(4)
+      expect(humanoid.usedBySummary.length).toBeLessThanOrEqual(humanoid.usedBy)
+    }
+  })
+
+  it('rejects create payloads with setId in the body', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ setId: CREATURE_TYPE_SET_ID, label: 'Robot' })
+      .expect(400)
+  })
+
   it('returns delete availability preflight for campaign entries', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createCampaign(agent, csrfToken)

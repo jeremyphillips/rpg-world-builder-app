@@ -9,20 +9,23 @@ import {
   groupUsageReferences,
 } from '@/lib/usage-references/group-usage-references'
 
-import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/homebrew/lib/vocabulary/usage-references.constants'
+import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/vocabulary/lib/usage-references.constants'
 import { UsageReferenceGroupList } from './usage-reference-group-list.client'
 
 export type UsageReferencesSectionProps = {
   campaignId: string
   references: VocabularyUsageReference[]
   disclosureLimit?: number
+  /** When true, section content is visible on load (nested groups remain collapsed). */
+  defaultOpen?: boolean
 }
 
-/** Informational "Used by" section for vocabulary entry edit surfaces. */
+/** Informational "Used by" section for vocabulary entry surfaces. */
 export function UsageReferencesSection({
   campaignId,
   references,
   disclosureLimit = VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT,
+  defaultOpen: _defaultOpen = false,
 }: UsageReferencesSectionProps) {
   const usedBy = references.length
   const groupCount = countUsageReferenceGroups(references)
@@ -48,6 +51,7 @@ export function UsageReferencesSection({
           campaignId={campaignId}
           groups={groups}
           disclosureLimit={disclosureLimit}
+          defaultExpanded={false}
         />
       ) : null}
     </section>

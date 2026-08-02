@@ -3,7 +3,7 @@ import type { Spell, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { useSpellSchoolVocabulary } from '@/features/homebrew'
+import { useSpellSchoolVocabulary } from '@/features/vocabulary'
 import {
   formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,

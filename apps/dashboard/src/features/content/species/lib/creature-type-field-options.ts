@@ -5,7 +5,7 @@ import {
   buildSeedCreatureTypeVocabulary,
   getCreatureTypeLabel as getVocabularyCreatureTypeLabel,
   type CreatureTypeVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'

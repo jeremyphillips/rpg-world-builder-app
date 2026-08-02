@@ -9,12 +9,11 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { useHomebrewSummary } from '../hooks/use-homebrew-summary'
 import { VISIBLE_SIDEBAR_CONTENT } from '../lib/hub/content-registry'
-import { ENABLED_HOMEBREW_VOCABULARY_SETS } from '../lib/hub/vocabulary-set-registry'
 import { ENABLED_HOMEBREW_RULES_CONFIGS } from '../lib/hub/rules-config-registry'
 import { HomebrewHubCard } from '../components/homebrew-hub-card'
 
 const HOMEBREW_DESCRIPTION =
-  'Customize this campaign’s content, rules vocabulary, and available options.'
+  'Customize this campaign’s content and available rules configuration options.'
 
 type HomebrewHubContentProps = {
   campaignId: string
@@ -24,7 +23,7 @@ function formatContentCount(totalCount: number): string {
   return totalCount === 1 ? '1 item available' : `${totalCount} items available`
 }
 
-/** Campaign Homebrew hub — content catalog cards and rules vocabulary entry points. */
+/** Campaign Homebrew hub — content catalog cards and rules configuration entry points. */
 export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
   const { data: summary, isPending, isError } = useHomebrewSummary(campaignId)
   const canManage = useCanManageCampaign(campaignId)
@@ -62,23 +61,6 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
                 </li>
               )
             })}
-          </ul>
-        </section>
-
-        <section aria-labelledby="homebrew-vocabulary-heading" className="space-y-4">
-          <Heading variant="section" as="h2" id="homebrew-vocabulary-heading">
-            Rules Vocabulary
-          </Heading>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ENABLED_HOMEBREW_VOCABULARY_SETS.map((entry) => (
-              <li key={entry.setId}>
-                <HomebrewHubCard
-                  title={entry.label}
-                  description="Manage campaign vocabulary options"
-                  viewHref={ROUTES.homebrew.vocabulary(campaignId, entry.setId)}
-                />
-              </li>
-            ))}
           </ul>
         </section>
 

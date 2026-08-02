@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import { SPELL_EFFECT_FIXTURES } from '../lib/effects/effect-fixtures'

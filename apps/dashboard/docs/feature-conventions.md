@@ -47,6 +47,16 @@ src/features/<feature>/
 Nested folders (e.g. `content/spells/`) are part of their parent feature, not
 separate boundary elements, so imports within a feature are unrestricted.
 
+## Vocabulary vs Game Terms
+
+| Feature      | Owns                                                                | Consumers import         |
+| ------------ | ------------------------------------------------------------------- | ------------------------ |
+| `vocabulary` | API/hooks, option maps, labels, field factories, entry form model   | `content`, `campaign`, … |
+| `game-terms` | Hub/overview/detail routes, sheets, columns, availability dialogs   | Router only (lazy)       |
+| `homebrew`   | Homebrew hub, rules config, ruleset patch (unrelated to vocab move) | Rules patch call sites   |
+
+Dependency invariant: `game-terms → vocabulary` only — never the reverse.
+
 ## Form lib
 
 Schema-driven form modules under `lib/` — suffixes, split rules, and the

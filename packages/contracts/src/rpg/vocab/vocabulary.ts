@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { vocabularyValidationMessages } from './vocabulary-messages'
+import { vocabularyUsageReferenceSchema } from './vocabulary-usage'
 
 // ---------------------------------------------------------------------------
 // Campaign vocabulary — reusable option sets (creature types, damage types, …)
@@ -73,9 +74,35 @@ export const vocabularyOptionSetSchema = z.object({
 
 export type VocabularyOptionSet = z.infer<typeof vocabularyOptionSetSchema>
 
+/** Display labels for overview Used by summary tooltips — API-owned, not inferred from set taxonomy. */
+export const vocabularyUsageSummaryLabelsSchema = z.object({
+  singular: z.string().min(1),
+  plural: z.string().min(1),
+})
+
+export type VocabularyUsageSummaryLabels = z.infer<typeof vocabularyUsageSummaryLabelsSchema>
+
+/** Declared batch scope for overview Used by — descriptive metadata only. */
+export const VOCABULARY_OVERVIEW_USAGE_SCOPES = ['complete', 'content_only'] as const
+
+export const vocabularyOverviewUsageScopeSchema = z.enum(VOCABULARY_OVERVIEW_USAGE_SCOPES)
+
+export type VocabularyOverviewUsageScope = z.infer<typeof vocabularyOverviewUsageScopeSchema>
+
+/** Max items in overview usedBySummary — API payload bound for list responses. */
+export const VOCABULARY_USAGE_SUMMARY_LIMIT = 4
+
 /** Resolved option with usage count for vocabulary management UI. */
 export const vocabularyOptionWithUsageSchema = vocabularyOptionSchema.extend({
   usedBy: z.number().int().min(0),
+  /**
+   * Bounded overview chrome only — capped server-side, non-authoritative preview of
+   * the same references `GET …/entries/:id/usage` returns. `usedBy` is the count SSOT.
+   */
+  usedBySummary: z
+    .array(vocabularyUsageReferenceSchema)
+    .max(VOCABULARY_USAGE_SUMMARY_LIMIT)
+    .optional(),
 })
 
 export type VocabularyOptionWithUsage = z.infer<typeof vocabularyOptionWithUsageSchema>
@@ -83,6 +110,10 @@ export type VocabularyOptionWithUsage = z.infer<typeof vocabularyOptionWithUsage
 export const resolvedVocabularyOptionSetSchema = z.object({
   id: vocabularyOptionSetIdSchema,
   options: z.array(vocabularyOptionWithUsageSchema),
+  /** Present when the set has a batch usage resolver with overview summary labels. */
+  usageSummaryLabels: vocabularyUsageSummaryLabelsSchema.optional(),
+  /** Present when batch overview counts are enabled — never affects resolver topology. */
+  overviewUsageScope: vocabularyOverviewUsageScopeSchema.optional(),
 })
 
 export type ResolvedVocabularyOptionSet = z.infer<typeof resolvedVocabularyOptionSetSchema>

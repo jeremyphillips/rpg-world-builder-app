@@ -17,11 +17,15 @@ const CLASS_SLUG_GLOB =
 
 const VOCABULARY_SEED_FILE_GLOBS = [
   'attack-resolution-modes',
+  'conditions',
   'creature-types',
   'damage-types',
   'edition-presets',
+  'equipment-categories',
   'senses',
+  'sizes',
   'spell-schools',
+  'weapon-properties',
 ] as const
 
 export const CATALOG_SCHEMA_MANIFEST = [

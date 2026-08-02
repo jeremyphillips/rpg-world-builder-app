@@ -25,7 +25,7 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel } from '@/features/homebrew'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {

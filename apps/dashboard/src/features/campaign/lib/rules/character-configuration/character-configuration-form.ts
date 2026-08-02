@@ -3,7 +3,7 @@ import type { FieldOption, FormItem } from '@rpg/ui/form'
 import {
   buildActiveCreatureTypeFieldOptions,
   buildSeedCreatureTypeVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import {
   buildRulesConfigLayoutFields,

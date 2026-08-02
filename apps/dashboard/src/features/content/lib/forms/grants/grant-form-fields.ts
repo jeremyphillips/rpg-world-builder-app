@@ -43,7 +43,7 @@ import {
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
   vocabularyFieldLabel,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import {
   formatChooseContentTypePlaceholder,

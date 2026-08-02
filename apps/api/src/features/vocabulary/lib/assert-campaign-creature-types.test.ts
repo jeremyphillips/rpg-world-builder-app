@@ -8,7 +8,10 @@ import {
   assertCreatureTypesActiveInCampaign,
   getActiveCreatureTypeIdsForCampaign,
 } from './assert-campaign-creature-types'
-import { updateVocabularyEntry } from '../sets/vocabulary.service'
+import {
+  updateVocabularyEntry,
+  vocabularyUsageContextForCampaign,
+} from '../sets/vocabulary.service'
 
 useIntegrationDb()
 
@@ -27,9 +30,14 @@ describe('assertCreatureTypesActiveInCampaign', () => {
   it('rejects disabled creature types', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaignId, CREATURE_TYPE_SET_ID, 'fey', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      CREATURE_TYPE_SET_ID,
+      'fey',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(assertCreatureTypesActiveInCampaign(campaignId, ['fey'])).rejects.toMatchObject({
       status: 400,

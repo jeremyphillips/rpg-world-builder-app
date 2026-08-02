@@ -253,11 +253,23 @@ export const SkillProficiencyEditRoute = withRouteSuspense(
 export const HomebrewHubRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/homebrew-hub'), 'HomebrewHub'),
 )
+export const VocabularyHubRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/game-terms/routes/vocabulary-hub'), 'VocabularyHub'),
+)
+export const VocabularyOverviewRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/game-terms/routes/vocabulary-overview'), 'VocabularyOverview'),
+)
+export const VocabularyTermDetailRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/game-terms/routes/vocabulary-term-detail'),
+    'VocabularyTermDetail',
+  ),
+)
 export const VocabularyLandingRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/homebrew/routes/vocabulary-landing'), 'VocabularyLanding'),
+  lazyNamed(() => import('@/app/legacy-vocabulary-redirects'), 'VocabularyLanding'),
 )
 export const VocabularyDetailRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/homebrew/routes/vocabulary-detail'), 'VocabularyDetail'),
+  lazyNamed(() => import('@/app/legacy-vocabulary-detail-redirect'), 'VocabularyDetail'),
 )
 export const RulesConfigDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/rules-config-detail'), 'RulesConfigDetail'),

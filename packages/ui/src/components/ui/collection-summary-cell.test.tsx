@@ -114,6 +114,26 @@ describe('CollectionSummaryCell', () => {
     )
   })
 
+  it('uses an explicit count override when summary items are bounded', async () => {
+    const user = userEvent.setup()
+    render(
+      <CollectionSummaryCell
+        items={ITEMS.slice(0, 2)}
+        count={8}
+        singularLabel="subclass"
+        pluralLabel="subclasses"
+        maxVisibleItems={4}
+      />,
+    )
+
+    expect(screen.getByRole('button')).toHaveTextContent('8')
+
+    await user.tab()
+    const tooltip = await screen.findByRole('tooltip')
+    expect(tooltip).toHaveTextContent('8 subclasses')
+    expect(tooltip).toHaveTextContent('+6 more')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <CollectionSummaryCell

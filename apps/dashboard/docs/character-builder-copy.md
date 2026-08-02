@@ -11,7 +11,7 @@ Rules vocabulary (layer 1): [vocabulary.md](../../../docs/vocabulary.md).
 
 | Layer                       | Owns                                        | Heritage example                                             | Home                                                          |
 | --------------------------- | ------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
-| **1 — Rules vocabulary**    | Campaign-customizable reference option sets | Creature type, language labels                               | `docs/vocabulary.md`, `features/homebrew/lib/vocabulary/`     |
+| **1 — Rules vocabulary**    | Campaign-customizable reference option sets | Creature type, language labels                               | `docs/vocabulary.md`, `features/vocabulary/`                  |
 | **2 — Content / ChoiceSet** | DM-authored rules-facing names              | `Elven Lineage`, `Giant Ancestry`, `Drow`                    | Catalog → `resolve*ChoiceSets()`                              |
 | **3 — Builder UI copy**     | Workflow chrome (status, helpers, change)   | `Heritage required`, `Change heritage`, `Choose one option.` | `characterBuilderDependentChoiceMessages` in `@rpg/contracts` |
 

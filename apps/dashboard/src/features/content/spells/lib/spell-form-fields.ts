@@ -21,7 +21,7 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveSpellSchoolFieldOptions,
   vocabularyFieldLabel,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import {
   descriptionField,

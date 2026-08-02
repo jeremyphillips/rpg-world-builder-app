@@ -8,7 +8,7 @@ import {
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
   getSenseLabelFromVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import { pickSpecies } from '../../lib/fixtures/pick'
 import {

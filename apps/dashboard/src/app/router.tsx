@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
+import { findBrowsableVocabularyCategory } from '@rpg/contracts'
 
 import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
@@ -62,7 +63,10 @@ import {
   NotificationsListRoute,
   CampaignInviteReviewRoute,
   RulesConfigDetailRoute,
+  VocabularyHubRoute,
   VocabularyLandingRoute,
+  VocabularyOverviewRoute,
+  VocabularyTermDetailRoute,
   VocabularyDetailRoute,
   SpeciesCreateRoute,
   SpeciesDetailRoute,
@@ -618,6 +622,55 @@ const router = createBrowserRouter(
                           path: 'edit',
                           element: <SkillProficiencyEditRoute />,
                           handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  path: 'game-terms',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params, data) => ({
+                      label: 'Game Terms',
+                      href: params.setId
+                        ? ROUTES.gameTerms.hub(params.campaignId!)
+                        : collectionCrumbHref(ROUTES.gameTerms.hub(params.campaignId!), data),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <VocabularyHubRoute /> },
+                    {
+                      path: ':setId',
+                      element: <Outlet />,
+                      handle: {
+                        crumb: (params, data) => {
+                          const category = findBrowsableVocabularyCategory(params.setId!)
+                          if (!category) {
+                            return null
+                          }
+
+                          return {
+                            label: category.label,
+                            href: params.termId
+                              ? collectionCrumbHref(
+                                  ROUTES.gameTerms.overview(params.campaignId!, params.setId!),
+                                  data,
+                                )
+                              : undefined,
+                          }
+                        },
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <VocabularyOverviewRoute /> },
+                        {
+                          path: ':termId',
+                          element: <VocabularyTermDetailRoute />,
+                          handle: {
+                            crumb: (_params, { entityLabel }) => ({
+                              label: entityLabel ?? '…',
+                            }),
+                          } satisfies CrumbHandle,
                         },
                       ],
                     },

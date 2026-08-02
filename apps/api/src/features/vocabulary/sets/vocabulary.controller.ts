@@ -24,6 +24,7 @@ import {
   resolveVocabularySetForCampaign,
   updateVocabularyEntry,
 } from './vocabulary.service'
+import { vocabularyUsageContextFromRequest } from './vocabulary-request-context'
 
 function parseSetId(raw: string): VocabularyOptionSetId {
   const parsed = vocabularyOptionSetIdSchema.safeParse(raw)
@@ -35,13 +36,15 @@ function parseSetId(raw: string): VocabularyOptionSetId {
 
 export async function listVocabularySets(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const sets = await listResolvedVocabularySetsForCampaign(campaignId)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const sets = await listResolvedVocabularySetsForCampaign(ctx)
   res.status(200).json({ sets })
 }
 
 export async function getVocabularySet(req: Request, res: Response): Promise<void> {
   const { campaignId, setId: rawSetId } = req.params as { campaignId: string; setId: string }
-  const set = await resolveVocabularySetForCampaign(campaignId, parseSetId(rawSetId))
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const set = await resolveVocabularySetForCampaign(ctx, parseSetId(rawSetId))
   res.status(200).json({ set })
 }
 
@@ -76,7 +79,8 @@ export async function createVocabularyEntry(req: Request, res: Response): Promis
     assertVocabularySetCapability(setId, 'availability')
   }
 
-  const set = await createCampaignVocabularyEntry(campaignId, input)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const set = await createCampaignVocabularyEntry(ctx, input)
   res.status(201).json({ set })
 }
 
@@ -106,7 +110,8 @@ export async function patchVocabularyEntry(req: Request, res: Response): Promise
     assertVocabularySetCapability(setId, 'availability')
   }
 
-  const set = await updateVocabularyEntry(campaignId, setId, entryId, parsed.data)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const set = await updateVocabularyEntry(ctx, setId, entryId, parsed.data)
   res.status(200).json({ set })
 }
 
@@ -123,7 +128,8 @@ export async function removeVocabularyEntry(req: Request, res: Response): Promis
   const setId = parseSetId(rawSetId)
   assertVocabularySetCapability(setId, 'delete')
 
-  const set = await deleteCampaignVocabularyEntry(campaignId, setId, entryId)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const set = await deleteCampaignVocabularyEntry(ctx, setId, entryId)
   res.status(200).json({ set })
 }
 
@@ -141,7 +147,8 @@ export async function getVocabularyDisableAvailabilityHandler(
     entryId: string
   }
   const setId = parseSetId(rawSetId)
-  const availability = await getVocabularyDisableAvailability(campaignId, setId, entryId)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const availability = await getVocabularyDisableAvailability(ctx, setId, entryId)
   res.status(200).json({ availability })
 }
 
@@ -156,7 +163,8 @@ export async function getVocabularyEntryUsageHandler(req: Request, res: Response
     entryId: string
   }
   const setId = parseSetId(rawSetId)
-  const usage = await getVocabularyEntryUsage(campaignId, setId, entryId)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const usage = await getVocabularyEntryUsage(ctx, setId, entryId)
   res.status(200).json({ usage })
 }
 
@@ -174,6 +182,7 @@ export async function getVocabularyDeleteAvailabilityHandler(
     entryId: string
   }
   const setId = parseSetId(rawSetId)
-  const availability = await getVocabularyDeleteAvailability(campaignId, setId, entryId)
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const availability = await getVocabularyDeleteAvailability(ctx, setId, entryId)
   res.status(200).json({ availability })
 }

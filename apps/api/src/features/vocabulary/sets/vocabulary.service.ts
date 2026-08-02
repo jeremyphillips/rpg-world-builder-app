@@ -25,8 +25,14 @@ import { resolveVocabularySet } from '../lib/resolve-vocabulary'
 import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
 import {
   resolveVocabularyOptionUsage,
-  resolveVocabularyOptionUsageCountsBatch,
+  resolveVocabularyOptionUsageBatch,
+  type VocabularyUsageResolverContext,
 } from '../lib/vocabulary-usage-resolvers'
+import { getVocabularyUsageRegistration } from '../lib/vocabulary-usage-registrations'
+import {
+  buildVocabularyUsageResolverContext,
+  withAuthoritativeGuardPurpose,
+} from '../lib/vocabulary-usage-context'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -57,21 +63,21 @@ function reservedVocabularyOptionIds(
 }
 
 export async function countVocabularyOptionUsage(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<number> {
   const capability = getVocabularySetCapability(setId)
-  if (!capability.usageCounting) {
+  if (!capability.usageResolution) {
     return 0
   }
 
-  const { count } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  const { count } = await resolveVocabularyOptionUsage(ctx, setId, entryId)
   return count
 }
 
 async function resolveVocabularyDisableBlockers(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyDisableAvailability> {
@@ -80,7 +86,11 @@ async function resolveVocabularyDisableBlockers(
     return { status: 'allowed' }
   }
 
-  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  const { blockers } = await resolveVocabularyOptionUsage(
+    withAuthoritativeGuardPurpose(ctx),
+    setId,
+    entryId,
+  )
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }
@@ -89,7 +99,7 @@ async function resolveVocabularyDisableBlockers(
 }
 
 async function resolveVocabularyDeleteBlockers(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyDeleteAvailability> {
@@ -98,7 +108,11 @@ async function resolveVocabularyDeleteBlockers(
     return { status: 'allowed' }
   }
 
-  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  const { blockers } = await resolveVocabularyOptionUsage(
+    withAuthoritativeGuardPurpose(ctx),
+    setId,
+    entryId,
+  )
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }
@@ -107,61 +121,84 @@ async function resolveVocabularyDeleteBlockers(
 }
 
 async function attachUsageCounts(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   options: ReturnType<typeof resolveVocabularySet>,
 ): Promise<ResolvedVocabularyOptionSet['options']> {
   const capability = getVocabularySetCapability(setId)
 
-  if (!capability.usageCounting) {
+  if (!capability.usageResolution) {
     return options.map((option) => ({ ...option, usedBy: 0 }))
   }
 
   if (capability.batchUsageCounting) {
-    const counts = await resolveVocabularyOptionUsageCountsBatch(
-      campaignId,
+    const batchResults = await resolveVocabularyOptionUsageBatch(
+      ctx,
       setId,
       options.map((option) => option.id),
     )
 
-    return options.map((option) => ({
-      ...option,
-      usedBy: counts.get(option.id) ?? 0,
-    }))
+    return options.map((option) => {
+      const result = batchResults.get(option.id) ?? { count: 0, summaryReferences: [] }
+
+      return {
+        ...option,
+        usedBy: result.count,
+        ...(result.summaryReferences.length > 0 ? { usedBySummary: result.summaryReferences } : {}),
+      }
+    })
   }
 
   return Promise.all(
     options.map(async (option) => ({
       ...option,
-      usedBy: await countVocabularyOptionUsage(campaignId, setId, option.id),
+      usedBy: await countVocabularyOptionUsage(ctx, setId, option.id),
     })),
   )
 }
 
 export async function resolveVocabularySetForCampaign(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
 ): Promise<ResolvedVocabularyOptionSet> {
+  const { campaignId } = ctx
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, setId)
 
   const seed = loadSeedVocabularyOptionSet(rulesetId, setId)
   const patchDoc = await loadPatchDocument(campaignId, rulesetId)
   const setPatch = patchDoc ? getSetPatch(patchDoc, setId) : undefined
+  const capability = getVocabularySetCapability(setId)
   const options = resolveVocabularySet(seed, setPatch)
+  const usageRegistration = capability.batchUsageCounting
+    ? getVocabularyUsageRegistration(setId)
+    : undefined
 
   return {
     id: setId,
-    options: await attachUsageCounts(campaignId, setId, options),
+    options: await attachUsageCounts(ctx, setId, options),
+    ...(usageRegistration
+      ? {
+          usageSummaryLabels: usageRegistration.summaryLabels,
+          overviewUsageScope: usageRegistration.overviewUsageScope,
+        }
+      : {}),
   }
 }
 
-export async function listResolvedVocabularySetsForCampaign(
+export function vocabularyUsageContextForCampaign(
   campaignId: string,
+): VocabularyUsageResolverContext {
+  return buildVocabularyUsageResolverContext({ campaignId })
+}
+
+export async function listResolvedVocabularySetsForCampaign(
+  ctx: VocabularyUsageResolverContext,
 ): Promise<ResolvedVocabularyOptionSet[]> {
+  const { campaignId } = ctx
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   const setIds = listSeedVocabularySetIds(rulesetId)
-  return Promise.all(setIds.map((setId) => resolveVocabularySetForCampaign(campaignId, setId)))
+  return Promise.all(setIds.map((setId) => resolveVocabularySetForCampaign(ctx, setId)))
 }
 
 async function saveSetPatch(
@@ -189,13 +226,14 @@ async function saveSetPatch(
 }
 
 export async function createCampaignVocabularyEntry(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   input: CreateVocabularyCampaignEntryInput,
 ): Promise<ResolvedVocabularyOptionSet> {
+  const { campaignId } = ctx
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, input.setId)
 
-  const current = await resolveVocabularySetForCampaign(campaignId, input.setId)
+  const current = await resolveVocabularySetForCampaign(ctx, input.setId)
 
   assertVocabularyIdAvailable({
     id: input.id,
@@ -223,7 +261,7 @@ export async function createCampaignVocabularyEntry(
     removedCampaignEntryIds,
   })
 
-  return resolveVocabularySetForCampaign(campaignId, input.setId)
+  return resolveVocabularySetForCampaign(ctx, input.setId)
 }
 
 function findResolvedOption(
@@ -306,7 +344,7 @@ async function assertVocabularyEntryPatchAllowed(
 }
 
 export async function getVocabularyDisableAvailability(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyDisableAvailability> {
@@ -318,18 +356,18 @@ export async function getVocabularyDisableAvailability(
     )
   }
 
-  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
   findResolvedOption(current, entryId)
 
-  return resolveVocabularyDisableBlockers(campaignId, setId, entryId)
+  return resolveVocabularyDisableBlockers(ctx, setId, entryId)
 }
 
 export async function getVocabularyEntryUsage(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyEntryUsage> {
-  if (!getVocabularySetCapability(setId).usageCounting) {
+  if (!getVocabularySetCapability(setId).usageResolution) {
     throw new HttpError(
       404,
       'not_found',
@@ -337,15 +375,15 @@ export async function getVocabularyEntryUsage(
     )
   }
 
-  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
   findResolvedOption(current, entryId)
 
-  const { blockers } = await resolveVocabularyOptionUsage(campaignId, setId, entryId)
+  const { blockers } = await resolveVocabularyOptionUsage(ctx, setId, entryId)
   return vocabularyEntryUsageSchema.parse(buildVocabularyEntryUsageFromBlockers(blockers))
 }
 
 export async function getVocabularyDeleteAvailability(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<VocabularyDeleteAvailability> {
@@ -357,7 +395,7 @@ export async function getVocabularyDeleteAvailability(
     )
   }
 
-  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
   const existing = findResolvedOption(current, entryId)
 
   if (existing.source === 'system') {
@@ -368,25 +406,26 @@ export async function getVocabularyDeleteAvailability(
     )
   }
 
-  return resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+  return resolveVocabularyDeleteBlockers(ctx, setId, entryId)
 }
 
 export async function updateVocabularyEntry(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
   input: UpdateVocabularyEntryInput,
 ): Promise<ResolvedVocabularyOptionSet> {
+  const { campaignId } = ctx
   await assertVocabularyEntryPatchAllowed(setId, input)
 
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, setId)
 
-  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
   const existing = findResolvedOption(current, entryId)
 
   if (input.status === 'disabled' && existing.status === 'active') {
-    const disableCheck = await resolveVocabularyDisableBlockers(campaignId, setId, entryId)
+    const disableCheck = await resolveVocabularyDisableBlockers(ctx, setId, entryId)
     if (disableCheck.status === 'blocked') {
       throw new HttpError(
         409,
@@ -406,18 +445,19 @@ export async function updateVocabularyEntry(
     patchVocabularyEntry(setPatch, existing, entryId, input),
   )
 
-  return resolveVocabularySetForCampaign(campaignId, setId)
+  return resolveVocabularySetForCampaign(ctx, setId)
 }
 
 export async function deleteCampaignVocabularyEntry(
-  campaignId: string,
+  ctx: VocabularyUsageResolverContext,
   setId: VocabularyOptionSetId,
   entryId: string,
 ): Promise<ResolvedVocabularyOptionSet> {
+  const { campaignId } = ctx
   const { rulesetId } = await requireCampaignRuleset(campaignId)
   assertSeedSetAvailable(rulesetId, setId)
 
-  const current = await resolveVocabularySetForCampaign(campaignId, setId)
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
   const existing = findResolvedOption(current, entryId)
 
   if (existing.source === 'system') {
@@ -430,7 +470,7 @@ export async function deleteCampaignVocabularyEntry(
 
   const capability = getVocabularySetCapability(setId)
   if (capability.deleteGuard) {
-    const deleteCheck = await resolveVocabularyDeleteBlockers(campaignId, setId, entryId)
+    const deleteCheck = await resolveVocabularyDeleteBlockers(ctx, setId, entryId)
     if (deleteCheck.status === 'blocked') {
       throw new HttpError(
         409,
@@ -455,5 +495,5 @@ export async function deleteCampaignVocabularyEntry(
     removedCampaignEntryIds,
   })
 
-  return resolveVocabularySetForCampaign(campaignId, setId)
+  return resolveVocabularySetForCampaign(ctx, setId)
 }

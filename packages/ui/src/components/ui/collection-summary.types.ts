@@ -8,6 +8,8 @@ export type CollectionSummaryItem = {
 
 export type CollectionSummaryCellProps = {
   items: CollectionSummaryItem[]
+  /** When set, overrides `items.length` for the count trigger and +N more math. */
+  count?: number
   singularLabel: string
   pluralLabel: string
   emptyLabel?: string

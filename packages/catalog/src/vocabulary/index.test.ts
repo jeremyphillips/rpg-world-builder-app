@@ -3,42 +3,62 @@ import {
   ATTACK_RESOLUTION_MODE_ENTRIES,
   ATTACK_RESOLUTION_MODE_IDS,
   ATTACK_RESOLUTION_MODE_SET_ID,
+  CONDITION_SET_ID,
+  CREATURE_SIZE_SET_ID,
   CREATURE_TYPE_SET_ID,
   DAMAGE_TYPE_SET_ID,
+  EFFECT_CONDITION_ENTRIES,
+  EFFECT_CONDITION_IDS,
   EDITION_PRESET_ENTRIES,
   EDITION_PRESET_IDS,
   EDITION_PRESET_SET_ID,
+  EQUIPMENT_CATEGORY_ENTRIES,
+  EQUIPMENT_CATEGORY_SET_ID,
+  type EquipmentCategory,
+  CREATURE_SIZE_ENTRIES,
+  CREATURE_SIZES,
   LANGUAGE_SET_ID,
   SENSE_SET_ID,
   SPELL_SCHOOL_SET_ID,
+  WEAPON_PROPERTY_ENTRIES,
+  WEAPON_PROPERTY_SET_ID,
+  WEAPON_PROPERTIES,
   VOCABULARY_OPTION_SET_IDS,
-  vocabularySetIdsWithOverview,
+  vocabularySetIdsWithBrowse,
 } from '@rpg/contracts'
 import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts/primitives'
 
 import {
   ATTACK_RESOLUTION_MODES,
+  CONDITIONS,
   CREATURE_TYPES,
   DAMAGE_TYPES,
   EDITION_PRESETS,
+  EQUIPMENT_CATEGORIES,
   LANGUAGES,
   SENSES,
+  SIZES,
   SPELL_SCHOOLS,
+  WEAPON_PROPERTIES as SEED_WEAPON_PROPERTIES,
   getSeedAttackResolutionModeEntry,
   getSeedAttackResolutionModeLabel,
+  getSeedConditionEntry,
   getSeedCreatureTypeEntry,
   getSeedCreatureTypeLabel,
   getSeedDamageTypeEntry,
   getSeedDamageTypeLabel,
   getSeedEditionPresetEntry,
   getSeedEditionPresetLabel,
+  getSeedEquipmentCategoryEntry,
   getSeedLanguageCategory,
   getSeedLanguageEntry,
   getSeedLanguageLabel,
   getSeedSenseEntry,
   getSeedSenseLabel,
+  getSeedSizeEntry,
   getSeedSpellSchoolEntry,
   getSeedSpellSchoolLabel,
+  getSeedWeaponPropertyEntry,
   getVocabularyOptionById,
   listSeedVocabularySetIds,
   loadSeedAttackResolutionModes,
@@ -276,6 +296,56 @@ describe('SRD 5.2.1 edition preset vocabulary seed', () => {
   })
 })
 
+describe('SRD 5.2.1 condition vocabulary seed', () => {
+  it('matches contract condition ids and copy', () => {
+    expect([...CONDITIONS].sort()).toEqual([...EFFECT_CONDITION_IDS].sort())
+
+    for (const id of EFFECT_CONDITION_IDS) {
+      const seed = getSeedConditionEntry(RULESET, id)
+      const contract = EFFECT_CONDITION_ENTRIES[id]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+})
+
+describe('SRD 5.2.1 size vocabulary seed', () => {
+  it('matches contract size ids and copy', () => {
+    expect([...SIZES].sort()).toEqual([...CREATURE_SIZES].sort())
+
+    for (const id of CREATURE_SIZES) {
+      const seed = getSeedSizeEntry(RULESET, id)
+      const contract = CREATURE_SIZE_ENTRIES[id]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+})
+
+describe('SRD 5.2.1 weapon property vocabulary seed', () => {
+  it('matches contract weapon property ids and copy', () => {
+    expect([...SEED_WEAPON_PROPERTIES].sort()).toEqual([...WEAPON_PROPERTIES].sort())
+
+    for (const id of WEAPON_PROPERTIES) {
+      const seed = getSeedWeaponPropertyEntry(RULESET, id)
+      const contract = WEAPON_PROPERTY_ENTRIES[id]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+})
+
+describe('SRD 5.2.1 equipment category vocabulary seed', () => {
+  it('matches contract equipment category ids and copy', () => {
+    for (const id of EQUIPMENT_CATEGORIES) {
+      const seed = getSeedEquipmentCategoryEntry(RULESET, id)
+      const contract = EQUIPMENT_CATEGORY_ENTRIES[id as EquipmentCategory]
+      expect(seed?.label).toBe(contract.label)
+      expect(seed?.description).toBe(contract.description)
+    }
+  })
+})
+
 describe('SRD 5.2.1 attack resolution mode vocabulary seed', () => {
   const attackResolutionModes = loadSeedAttackResolutionModes(RULESET)
 
@@ -309,12 +379,16 @@ describe('seeded vocabulary set registry', () => {
     expect(listSeedVocabularySetIds(RULESET).sort()).toEqual(
       [
         ATTACK_RESOLUTION_MODE_SET_ID,
+        CONDITION_SET_ID,
+        CREATURE_SIZE_SET_ID,
         CREATURE_TYPE_SET_ID,
         DAMAGE_TYPE_SET_ID,
         EDITION_PRESET_SET_ID,
+        EQUIPMENT_CATEGORY_SET_ID,
         LANGUAGE_SET_ID,
         SENSE_SET_ID,
         SPELL_SCHOOL_SET_ID,
+        WEAPON_PROPERTY_SET_ID,
       ].sort(),
     )
   })
@@ -326,10 +400,11 @@ describe('seeded vocabulary set registry', () => {
     }
   })
 
-  it('seeds overview-capable sets for the default system ruleset', () => {
+  it('seeds every browsable vocabulary set for the default system ruleset', () => {
     const seededIds = new Set(listSeedVocabularySetIds(DEFAULT_SYSTEM_RULESET_ID))
-    for (const setId of vocabularySetIdsWithOverview()) {
-      expect(seededIds.has(setId), `${setId} requires catalog seed for overview`).toBe(true)
+
+    for (const setId of vocabularySetIdsWithBrowse()) {
+      expect(seededIds.has(setId), `${setId} requires catalog seed`).toBe(true)
     }
   })
 })

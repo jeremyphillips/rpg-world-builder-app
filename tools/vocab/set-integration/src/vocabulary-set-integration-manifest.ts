@@ -20,6 +20,10 @@ export type VocabularySetIntegrationManifest = Record<
   VocabularySetIntegrationManifestEntry
 >
 
+const usageResolverExtension = {
+  extensionPoints: { usageResolver: true as const },
+} as const
+
 /** Lightweight discoverability index — runtime SSOT is `VOCABULARY_SET_CAPABILITIES`. */
 export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManifest = {
   'creature-types': {
@@ -33,35 +37,43 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   'damage-types': {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Spell + species damage references; composed usage resolver.',
+    ...usageResolverExtension,
   },
   conditions: {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Spell tag conditions; catalog seed mirrors contract condition entries.',
+    ...usageResolverExtension,
   },
   languages: {
     owner: 'shared',
-    notes: 'Rules configuration consumption; vocabulary manager not enabled.',
+    notes: 'Species, class grants, and character language refs (entry-only; purpose-aware guards).',
+    ...usageResolverExtension,
   },
   senses: {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Species trait sense grants.',
+    ...usageResolverExtension,
   },
   sizes: {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Species size arrays.',
+    ...usageResolverExtension,
   },
   'spell-schools': {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Spell school field references.',
+    ...usageResolverExtension,
   },
   'weapon-properties': {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Weapon equipment property arrays.',
+    ...usageResolverExtension,
   },
   'equipment-categories': {
     owner: 'catalog',
-    notes: 'Enum + term only; no catalog seed yet.',
+    notes: 'Equipment kind taxonomy references.',
+    ...usageResolverExtension,
   },
   'edition-presets': {
     owner: 'dashboard',

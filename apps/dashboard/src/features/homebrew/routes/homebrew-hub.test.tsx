@@ -36,19 +36,19 @@ describe('HomebrewHubContent', () => {
     useCanManageCampaignMock.mockReturnValue(false)
   })
 
-  it('renders content and vocabulary sections with hub cards', () => {
+  it('renders content and rules configuration sections with hub cards', () => {
     renderHub()
 
     expect(screen.getByRole('heading', { name: 'Homebrew' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Content' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Rules Vocabulary' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Rules Vocabulary' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Rules Configuration' })).toBeInTheDocument()
 
     for (const entry of VISIBLE_SIDEBAR_CONTENT) {
       expect(screen.getByText(entry.label)).toBeInTheDocument()
     }
 
-    expect(screen.getByText('Creature Types')).toBeInTheDocument()
+    expect(screen.queryByText('Creature Types')).not.toBeInTheDocument()
     expect(screen.getByText('Character Configuration')).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'View' }).length).toBeGreaterThan(0)
   })

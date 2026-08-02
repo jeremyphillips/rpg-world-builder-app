@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi, afterEach } from 'vitest'
 
-import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
