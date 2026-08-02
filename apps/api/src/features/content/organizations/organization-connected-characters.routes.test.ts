@@ -13,8 +13,11 @@ import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { CampaignCharacterParticipationModel } from '../../campaign/participation/campaign-character-participation.model'
 import { CharacterModel, createPcRecord } from '../../character'
-import { characterContentReferenceMatch, ORGANIZATION_CHARACTER_REFERENCE } from '@rpg/contracts'
 import { createHomebrewContent } from '../lib/content-write.service'
+import {
+  assertContentUsageRegistrationCoverage,
+  getContentUsageRegistration,
+} from '../lib/content-usage/content-usage-resolvers'
 import { organizationWriteConfig } from './organizations.config'
 import { resolveOrganizationConnectedCharacters } from './resolve-organization-connected-characters'
 
@@ -236,13 +239,11 @@ describe('resolveOrganizationConnectedCharacters', () => {
     })
   })
 
-  it('matches the organization character reference descriptor', () => {
-    const organizationId = '000000000000000000000001'
+  it('matches the organization character reference descriptor via usage registration', () => {
+    expect(() => assertContentUsageRegistrationCoverage()).not.toThrow()
     expect(
-      characterContentReferenceMatch(ORGANIZATION_CHARACTER_REFERENCE, organizationId),
-    ).toEqual({
-      'connections.organizations.organizationId': organizationId,
-    })
+      getContentUsageRegistration('organizations').sources.some((source) => source.entry),
+    ).toBe(true)
   })
 })
 

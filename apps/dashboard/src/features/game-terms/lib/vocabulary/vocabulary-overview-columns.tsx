@@ -1,6 +1,5 @@
 import {
   SortableHeader,
-  InfoTooltip,
   dataTableColumnMeta,
   dataTableNameLinkCellVariants,
   dataTableWidthMeta,
@@ -13,7 +12,8 @@ import type {
 } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
 
-import { buildCollectionCountColumn, buildSourceColumn } from '@/lib/data-table/column-builders'
+import { buildSourceColumn } from '@/lib/data-table/column-builders'
+import { buildUsedByOverviewColumn } from '@/lib/usage-references/build-used-by-overview-column'
 
 import { VocabularyAvailabilityMetadata } from '../../components/vocabulary-availability-metadata.client'
 import { VOCABULARY_SOURCE_BADGE } from '@/features/vocabulary'
@@ -34,15 +34,6 @@ type VocabularyColumnsOptions = {
   overviewUsageScope?: VocabularyOverviewUsageScope
 }
 
-function mapUsedBySummaryToCollectionItems(
-  entry: VocabularyOptionWithUsage,
-): { id: string; label: string }[] {
-  return (entry.usedBySummary ?? []).map((reference) => ({
-    id: reference.id,
-    label: reference.label,
-  }))
-}
-
 function buildVocabularyUsedByColumn(
   usageSummaryLabels: VocabularyUsageSummaryLabels,
   overviewUsageScope?: VocabularyOverviewUsageScope,
@@ -52,30 +43,11 @@ function buildVocabularyUsedByColumn(
   const scopeTooltip =
     overviewUsageScope === 'content_only' ? VOCABULARY_OVERVIEW_USED_BY_CONTENT_TOOLTIP : undefined
 
-  const column = buildCollectionCountColumn({
-    id: 'usedBy',
-    label,
-    getItems: mapUsedBySummaryToCollectionItems,
-    getCount: (row) => row.usedBy,
-    singularLabel: usageSummaryLabels.singular,
-    pluralLabel: usageSummaryLabels.plural,
+  return buildUsedByOverviewColumn<VocabularyOptionWithUsage>({
+    usageSummaryLabels,
+    columnLabel: label,
+    scopeTooltip,
   })
-
-  return {
-    ...column,
-    header: ({ column: tableColumn }) => (
-      <span className="inline-flex items-center gap-1">
-        <SortableHeader column={tableColumn}>{label}</SortableHeader>
-        {scopeTooltip ? (
-          <InfoTooltip aria-label={`About ${label}`}>{scopeTooltip}</InfoTooltip>
-        ) : null}
-      </span>
-    ),
-    meta: {
-      ...column.meta,
-      label,
-    },
-  } as ColumnDef<VocabularyOptionWithUsage>
 }
 
 export function vocabularyColumns(

@@ -11,7 +11,6 @@ import {
 import { getContentEntityUsage } from '../lib/content-usage/get-content-entity-usage'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import {
-  deleteContentCampaignAccess,
   getContentCampaignAccessAvailability,
   updateContentCampaignAccess,
 } from '../lib/content-campaign-access.service'
@@ -142,6 +141,5 @@ export async function deleteSubclassItem(req: Request, res: Response): Promise<v
     return
   }
 
-  await deleteContentCampaignAccess(campaignId, 'subclasses', subclassId)
   res.status(200).json({ result })
 }

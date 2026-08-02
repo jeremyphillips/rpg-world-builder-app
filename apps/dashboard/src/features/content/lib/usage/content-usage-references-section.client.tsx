@@ -1,6 +1,6 @@
 'use client'
 
-import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
+import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section.client'
 
 import { useContentEntryUsage } from './use-content-entry-usage'
 
@@ -10,17 +10,28 @@ export type ContentUsageReferencesSectionProps = {
   entityId: string
 }
 
-/** Detail "Used by" section — mounts only when usage loads for a registered content surface. */
+/** Detail usage section for registered content surfaces — explicit query states. */
 export function ContentUsageReferencesSection({
   campaignId,
   routeKey,
   entityId,
 }: ContentUsageReferencesSectionProps) {
-  const { data: usage } = useContentEntryUsage(campaignId, routeKey, entityId)
+  const {
+    data: usage,
+    isPending,
+    isError,
+    refetch,
+  } = useContentEntryUsage(campaignId, routeKey, entityId)
 
-  if (!usage) {
-    return null
-  }
-
-  return <UsageReferencesSection campaignId={campaignId} references={usage.references} />
+  return (
+    <UsageReferencesQuerySection
+      campaignId={campaignId}
+      isPending={isPending}
+      isError={isError}
+      onRetry={() => {
+        void refetch()
+      }}
+      references={usage?.references}
+    />
+  )
 }

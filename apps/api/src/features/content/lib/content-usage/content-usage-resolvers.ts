@@ -4,7 +4,11 @@ import type {
   ContentOverviewUsageScope,
   ContentUsageSummaryLabels,
 } from '@rpg/contracts'
-import { contentEntryUsageSchema } from '@rpg/contracts'
+import {
+  API_CONTENT_TYPE_KEYS,
+  contentEntryUsageSchema,
+  contentListUsageFieldsSchema,
+} from '@rpg/contracts'
 
 import type { ContentBatchUsageEntryResult } from './build-content-batch-entry-result'
 import type {
@@ -71,6 +75,30 @@ export function resolveContentUsageLookupKey(
 ): string {
   const registration = getContentUsageRegistration(contentType)
   return registration.lookupKey === 'slug' ? entity.slug : entity.id
+}
+
+/** Nested surfaces registered separately from {@link API_CONTENT_TYPE_KEYS}. */
+export const NESTED_CONTENT_USAGE_SURFACE_KEYS = [
+  'subclasses',
+] as const satisfies readonly ContentUsageSurfaceKey[]
+
+/** Expected usage registrations — derived from contracts/API type SSOT. */
+export const EXPECTED_CONTENT_USAGE_SURFACES = [
+  ...API_CONTENT_TYPE_KEYS,
+  ...NESTED_CONTENT_USAGE_SURFACE_KEYS,
+] as const satisfies readonly ContentUsageSurfaceKey[]
+
+/** Asserts every catalog + nested surface has entry and batch usage registrations. */
+export function assertContentUsageRegistrationCoverage(): void {
+  for (const contentType of EXPECTED_CONTENT_USAGE_SURFACES) {
+    const registration = CONTENT_USAGE_REGISTRATIONS[contentType]
+    if (!registration || !registration.sources.some((source) => source.entry)) {
+      throw new Error(`Missing content usage registration with entry sources for "${contentType}".`)
+    }
+    if (!registration.sources.some((source) => source.batch)) {
+      throw new Error(`Missing content usage registration with batch sources for "${contentType}".`)
+    }
+  }
 }
 
 export async function resolveContentUsage(
@@ -140,11 +168,11 @@ export async function attachContentUsageCounts<T extends { id: string; slug: str
 
   return items.map((item, index) => {
     const result = batchResults.get(lookupKeys[index]!) ?? { count: 0, summaryReferences: [] }
-    return {
-      ...item,
+    const usageFields = contentListUsageFieldsSchema.parse({
       usedBy: result.count,
       ...(result.summaryReferences.length > 0 ? { usedBySummary: result.summaryReferences } : {}),
-    }
+    })
+    return { ...item, ...usageFields }
   })
 }
 

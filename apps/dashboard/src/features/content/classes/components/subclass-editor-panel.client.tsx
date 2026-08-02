@@ -10,6 +10,7 @@ import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { CampaignAccessSection } from '../../lib/campaign-access/campaign-access-section.client'
 import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
+import { SubclassUsageReferencesSection } from './subclass-usage-references-section.client'
 import { ContentEditHeadingBadges } from '../../lib/campaign-access/content-edit-heading-badges.client'
 import { isDraftSubclassId, isSubclassDeletable } from '../lib/subclasses/subclass-editor-constants'
 import {
@@ -144,6 +145,12 @@ export function SubclassEditorPanel({
         />
 
         <FormItems items={bodyFields} idPrefix={`subclass-editor-${subclassId}`} />
+
+        <SubclassUsageReferencesSection
+          campaignId={campaignId}
+          classId={classId}
+          subclassId={subclassId}
+        />
 
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
           {deletable ? (

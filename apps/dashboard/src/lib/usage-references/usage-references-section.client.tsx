@@ -9,7 +9,7 @@ import {
   groupUsageReferences,
 } from '@/lib/usage-references/group-usage-references'
 
-import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/vocabulary/lib/usage-references.constants'
+import { USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/lib/usage-references/constants'
 import { UsageReferenceGroupList } from './usage-reference-group-list.client'
 
 export type UsageReferencesSectionProps = {
@@ -24,7 +24,7 @@ export type UsageReferencesSectionProps = {
 export function UsageReferencesSection({
   campaignId,
   references,
-  disclosureLimit = VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT,
+  disclosureLimit = USAGE_REFERENCE_DISCLOSURE_LIMIT,
   defaultOpen: _defaultOpen = false,
 }: UsageReferencesSectionProps) {
   const usedBy = references.length

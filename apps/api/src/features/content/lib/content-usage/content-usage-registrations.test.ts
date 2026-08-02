@@ -6,22 +6,19 @@ import {
 } from './content-usage-registrations'
 import { defineContentUsage } from './define-content-usage'
 import type { ContentUsageSource } from './content-usage-source'
+import {
+  assertContentUsageRegistrationCoverage,
+  EXPECTED_CONTENT_USAGE_SURFACES,
+} from './content-usage-resolvers'
 
 describe('content usage registrations', () => {
-  it('registers every character-backed content surface including subclasses', () => {
+  it('registers every expected content usage surface', () => {
     const keys = Object.keys(CONTENT_USAGE_REGISTRATIONS).sort()
-    expect(keys).toEqual(
-      [
-        'classes',
-        'equipment',
-        'feats',
-        'organizations',
-        'skill-proficiencies',
-        'species',
-        'spells',
-        'subclasses',
-      ].sort(),
-    )
+    expect(keys).toEqual([...EXPECTED_CONTENT_USAGE_SURFACES].sort())
+  })
+
+  it('assertContentUsageRegistrationCoverage passes for the current registry', () => {
+    expect(() => assertContentUsageRegistrationCoverage()).not.toThrow()
   })
 
   it('declares characters overview scope for v1 character-only batch', () => {
