@@ -1,6 +1,10 @@
 import type {
   ContentDeletionAvailability,
   ContentDeletionResult,
+  ContentEntryUsage,
+  ContentListUsageFields,
+  ContentOverviewUsageScope,
+  ContentUsageSummaryLabels,
   CreateSubclassInput,
   ResolvedSubclass,
   Subclass,
@@ -15,16 +19,47 @@ import {
 
 import { CSRF_HEADER, patchJson, postJson, request } from '@/lib/api-client'
 
+export type SubclassListRow = ResolvedSubclass & ContentListUsageFields
+
+export type SubclassesListResult = {
+  subclasses: SubclassListRow[]
+  usageSummaryLabels?: ContentUsageSummaryLabels
+  overviewUsageScope?: ContentOverviewUsageScope
+}
+
 export async function fetchSubclasses(
   campaignId: string,
   classId: string,
-): Promise<ResolvedSubclass[]> {
-  const { subclasses } = await request<{ subclasses: ResolvedSubclass[] }>(
+): Promise<SubclassesListResult> {
+  const body = await request<{
+    subclasses: SubclassListRow[]
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  }>(
     `/api/campaigns/${campaignId}/content/classes/${classId}/subclasses`,
     undefined,
     'Could not load subclasses.',
   )
-  return subclasses
+
+  return {
+    subclasses: body.subclasses,
+    ...(body.usageSummaryLabels ? { usageSummaryLabels: body.usageSummaryLabels } : {}),
+    ...(body.overviewUsageScope ? { overviewUsageScope: body.overviewUsageScope } : {}),
+  }
+}
+
+/** Informational usage references for a nested subclass. */
+export async function fetchSubclassUsage(
+  campaignId: string,
+  classId: string,
+  subclassId: string,
+): Promise<ContentEntryUsage> {
+  const { usage } = await request<{ usage: ContentEntryUsage }>(
+    `/api/campaigns/${campaignId}/content/classes/${classId}/subclasses/${subclassId}/usage`,
+    undefined,
+    'Could not load subclass usage.',
+  )
+  return usage
 }
 
 export async function createSubclass(

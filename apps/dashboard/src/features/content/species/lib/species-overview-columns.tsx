@@ -1,4 +1,5 @@
 import type { Species, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { formatMovementDisplay, getCreatureSizeLabel } from '@rpg/contracts'
 import { dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -55,8 +56,15 @@ const emptySpeciesFilterSchema = buildContentFilterSchema<SpeciesRow, SpeciesOve
 )
 
 /** Species column definitions with the name cell linked to the species detail page. */
-export function speciesColumns(campaignId: string) {
+export function speciesColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<Species>(speciesMiddleColumns(), {
+    ...usage,
     contentType: 'species',
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })

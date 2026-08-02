@@ -79,6 +79,8 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
   demote published homebrew to draft (owner/co-owner only; `409` when blocked)
 - `GET /api/campaigns/:campaignId/content/:contentType/:entityId/deletion-availability` —
   advisory delete preflight (owner/co-owner only)
+- `GET /api/campaigns/:campaignId/content/:contentType/:entityId/usage` —
+  informational character usage references (any campaign role; registration-gated)
 - `DELETE /api/campaigns/:campaignId/content/:contentType/:entityId` — delete homebrew
   (owner/co-owner only; `409` when blocked by character usage)
 - `GET /api/campaigns/:campaignId/content/:contentType/:entityId/campaign-access-availability` —
@@ -90,7 +92,14 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
   (same semantics; `targetType: 'subclasses'` in `ContentCampaignAccessModel`)
 
 List responses attach resolved `campaignAccess` on every row (default available /
-`all_players`). Availability-off hides future discovery only — it does not remove
+`all_players`). When a type registers batch usage sources, rows also include
+`usedBy` / optional `usedBySummary`, and the response may include
+`usageSummaryLabels` + `overviewUsageScope` (descriptive metadata for overview
+chrome — does not change resolver topology). See
+`lib/content-usage/` and [`docs/content-types.md`](../../../../../docs/content-types.md)
+§ Delete homebrew content.
+
+Availability-off hides future discovery only — it does not remove
 existing character references. See
 [`lib/content-campaign-access-policy.test.ts`](lib/content-campaign-access-policy.test.ts).
 

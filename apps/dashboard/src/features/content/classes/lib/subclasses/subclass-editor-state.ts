@@ -1,4 +1,4 @@
-import type { ContentSource, Subclass } from '@rpg/contracts'
+import type { ContentSource, ContentListUsageFields, Subclass } from '@rpg/contracts'
 
 import type { SubclassFormValues } from './subclass-form-fields'
 import { serializeSubclassFormValues } from './subclass-form-value-snapshot'
@@ -20,6 +20,7 @@ export type SubclassListItem = {
   name: string
   source: ContentSource | 'unsaved'
   classId: string
+  usedBy?: number
 }
 
 export function createSubclassDraft(classId: string): SubclassDraft {
@@ -43,7 +44,7 @@ export function draftToListItem(
 }
 
 export function subclassToListItem(
-  subclass: Subclass,
+  subclass: Subclass & Partial<ContentListUsageFields>,
   edits: Partial<SubclassFormValues>,
 ): SubclassListItem {
   return {
@@ -51,11 +52,12 @@ export function subclassToListItem(
     name: edits.name?.trim() || subclass.name,
     source: subclass.source,
     classId: subclass.classId,
+    usedBy: subclass.usedBy,
   }
 }
 
 export function buildSubclassListItems(
-  subclasses: Subclass[],
+  subclasses: Array<Subclass & Partial<ContentListUsageFields>>,
   drafts: SubclassDraft[],
   edits: Record<string, Partial<SubclassFormValues>>,
 ): SubclassListItem[] {

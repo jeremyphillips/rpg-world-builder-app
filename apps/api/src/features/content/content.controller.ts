@@ -28,6 +28,10 @@ import { duplicateContentRequestSchema } from './lib/duplication/duplicate-conte
 import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
 import { CONTENT_DUPLICATION_IDEMPOTENCY_HEADER } from '@rpg/contracts'
 import { listCampaignAccessParticipants } from './lib/campaign-access-participants.service'
+import { buildContentListUsageEnvelope } from './lib/content-usage/build-content-list-usage-envelope'
+import { contentUsageContextFromRequest } from './lib/content-usage/content-usage-request-context'
+import { getContentEntityUsage } from './lib/content-usage/get-content-entity-usage'
+import type { ContentUsageSurfaceKey } from './lib/content-usage/define-content-usage'
 
 export async function createContentItem(req: Request, res: Response): Promise<void> {
   const { campaignId, contentType } = req.params as { campaignId: string; contentType: string }
@@ -90,6 +94,24 @@ export async function getContentDeletionAvailabilityHandler(
   const writeConfig = getContentWriteConfig(contentType)!
   const availability = await getContentDeletionAvailability(writeConfig, campaignId, entityId)
   res.status(200).json({ availability })
+}
+
+export async function getContentUsageHandler(req: Request, res: Response): Promise<void> {
+  const { campaignId, contentType, entityId } = req.params as {
+    campaignId: string
+    contentType: string
+    entityId: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+  const writeConfig = getContentWriteConfig(contentType)!
+  const usage = await getContentEntityUsage(
+    writeConfig,
+    contentUsageContextFromRequest(req, campaignId),
+    entityId,
+  )
+  res.status(200).json({ usage })
 }
 
 export async function deleteContentItem(req: Request, res: Response): Promise<void> {
@@ -169,7 +191,20 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   const items = await resolveContentForCampaign(contentType, campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
   const visible = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
-  res.status(200).json({ [writeConfig.responseKey]: visible })
+  const usageEnvelope = await buildContentListUsageEnvelope(
+    contentUsageContextFromRequest(req, campaignId),
+    contentType as ContentUsageSurfaceKey,
+    visible,
+  )
+  res.status(200).json({
+    [writeConfig.responseKey]: usageEnvelope.items,
+    ...(usageEnvelope.usageSummaryLabels
+      ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
+      : {}),
+    ...(usageEnvelope.overviewUsageScope
+      ? { overviewUsageScope: usageEnvelope.overviewUsageScope }
+      : {}),
+  })
 }
 
 export async function getContentCampaignAccessAvailabilityHandler(

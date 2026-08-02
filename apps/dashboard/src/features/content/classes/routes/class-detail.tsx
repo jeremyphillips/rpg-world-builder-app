@@ -17,6 +17,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
+import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
 import { ClassProgressionTable } from '../components/class-progression-table'
 import { ClassProficienciesSection } from '../components/class-proficiencies-section.client'
 import { FeatureItem } from '../lib/feature-item'
@@ -193,6 +194,11 @@ export function ClassDetailContent({
           vocabulary={vocabulary}
         />
         {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
+        <ContentUsageReferencesSection
+          campaignId={campaignId}
+          routeKey="classes"
+          entityId={classId}
+        />
       </ContentDetailLayout>
       {showProgressionTable ? (
         <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />

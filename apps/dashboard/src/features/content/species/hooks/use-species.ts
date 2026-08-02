@@ -16,6 +16,7 @@ export const speciesQueryKey = speciesContentList.queryKey
 
 /** Load all species available in the given campaign (system seed + homebrew). */
 export const useSpecies = speciesContentList.useQuery
+export const useSpeciesUsageMeta = speciesContentList.useUsageMeta
 
 export const { useCreateContent: useCreateSpecies, useUpdateContent: useUpdateSpecies } =
   createContentMutationHooks('species', speciesQueryKey)

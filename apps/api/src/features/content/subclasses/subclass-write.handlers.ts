@@ -8,8 +8,9 @@ import {
   deleteContentEntity,
   getContentDeletionAvailability,
 } from '../lib/content-deletion.service'
+import { getContentEntityUsage } from '../lib/content-usage/get-content-entity-usage'
+import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import {
-  deleteContentCampaignAccess,
   getContentCampaignAccessAvailability,
   updateContentCampaignAccess,
 } from '../lib/content-campaign-access.service'
@@ -118,6 +119,18 @@ export async function getSubclassDeletionAvailabilityHandler(
   res.status(200).json({ availability })
 }
 
+export async function getSubclassUsageHandler(req: Request, res: Response): Promise<void> {
+  const { campaignId, classId, subclassId } = subclassRouteParams(req)
+  await assertResolvedSubclassBelongsToClass(campaignId, classId, subclassId)
+
+  const usage = await getContentEntityUsage(
+    subclassWriteConfig,
+    contentUsageContextFromRequest(req, campaignId),
+    subclassId,
+  )
+  res.status(200).json({ usage })
+}
+
 export async function deleteSubclassItem(req: Request, res: Response): Promise<void> {
   const { campaignId, classId, subclassId } = subclassRouteParams(req)
   await assertResolvedSubclassBelongsToClass(campaignId, classId, subclassId)
@@ -128,6 +141,5 @@ export async function deleteSubclassItem(req: Request, res: Response): Promise<v
     return
   }
 
-  await deleteContentCampaignAccess(campaignId, 'subclasses', subclassId)
   res.status(200).json({ result })
 }

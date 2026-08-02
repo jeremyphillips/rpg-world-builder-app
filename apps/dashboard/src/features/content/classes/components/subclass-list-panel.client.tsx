@@ -1,3 +1,4 @@
+import type { ContentUsageSummaryLabels } from '@rpg/contracts'
 import { cn, Badge, Button, Text } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
@@ -11,6 +12,7 @@ export interface SubclassListPanelProps {
   items: SubclassListItem[]
   selectedId: string | null
   modifiedIds: ReadonlySet<string>
+  usageSummaryLabels?: ContentUsageSummaryLabels
   onSelect: (id: string) => void
   onAdd: () => void
   onDeleteRequest: (id: string) => void
@@ -86,14 +88,31 @@ interface SubclassListRowProps {
   item: SubclassListItem
   isSelected: boolean
   isModified: boolean
+  usageSummaryLabels?: ContentUsageSummaryLabels
   onSelect: (id: string) => void
   onDeleteRequest: (id: string) => void
+}
+
+function SubclassListRowUsedByBadge({
+  usedBy,
+  usageSummaryLabels,
+}: {
+  usedBy: number
+  usageSummaryLabels: ContentUsageSummaryLabels
+}) {
+  const label = usedBy === 1 ? usageSummaryLabels.singular : usageSummaryLabels.plural
+  return (
+    <Badge appearance="outline" tone="neutral" size="sm">
+      {usedBy} {label}
+    </Badge>
+  )
 }
 
 function SubclassListRow({
   item,
   isSelected,
   isModified,
+  usageSummaryLabels,
   onSelect,
   onDeleteRequest,
 }: SubclassListRowProps) {
@@ -108,6 +127,12 @@ function SubclassListRow({
         >
           <span className="block truncate font-medium">{item.name || UNTITLED_SUBCLASS_LABEL}</span>
           <SubclassListRowBadges source={item.source} isModified={isModified} />
+          {usageSummaryLabels && typeof item.usedBy === 'number' && item.usedBy > 0 ? (
+            <SubclassListRowUsedByBadge
+              usedBy={item.usedBy}
+              usageSummaryLabels={usageSummaryLabels}
+            />
+          ) : null}
         </button>
         <SubclassListRowDeleteControl item={item} onDeleteRequest={onDeleteRequest} />
       </div>
@@ -119,6 +144,7 @@ export function SubclassListPanel({
   items,
   selectedId,
   modifiedIds,
+  usageSummaryLabels,
   onSelect,
   onAdd,
   onDeleteRequest,
@@ -141,6 +167,7 @@ export function SubclassListPanel({
               item={item}
               isSelected={item.id === selectedId}
               isModified={modifiedIds.has(item.id)}
+              usageSummaryLabels={usageSummaryLabels}
               onSelect={onSelect}
               onDeleteRequest={onDeleteRequest}
             />

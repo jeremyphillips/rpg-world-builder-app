@@ -1,4 +1,5 @@
 import type { WeaponEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import {
   WEAPON_CATEGORIES,
   WEAPON_MASTERIES,
@@ -82,8 +83,15 @@ export const weaponFilterSchema = buildContentFilterSchema<WeaponRow, WeaponOver
 )
 
 /** Weapon column definitions with the name cell linked to the detail page. */
-export function weaponColumns(campaignId: string) {
+export function weaponColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<WeaponEquipment>(WEAPON_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'weapons', row.id),
   })

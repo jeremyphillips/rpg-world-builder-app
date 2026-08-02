@@ -16,6 +16,7 @@ export const spellsQueryKey = spellsContentList.queryKey
 
 /** Load all spells available in the given campaign (system seed + homebrew). */
 export const useSpells = spellsContentList.useQuery
+export const useSpellsUsageMeta = spellsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateSpell, useUpdateContent: useUpdateSpell } =
   createContentMutationHooks('spells', spellsQueryKey)

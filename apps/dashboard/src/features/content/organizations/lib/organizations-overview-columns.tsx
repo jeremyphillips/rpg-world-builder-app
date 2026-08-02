@@ -5,6 +5,7 @@ import {
   type Organization,
   type WithCampaignAccess,
 } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { dataTableColumnChromeMeta, SortableHeader, type ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
@@ -53,8 +54,15 @@ export const organizationsFilterSchema = buildContentFilterSchema<
   }),
 ])
 
-export function organizationsColumns(campaignId: string) {
+export function organizationsColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<Organization>(ORGANIZATION_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'organizations',
     nameHref: (row) => ROUTES.content.organizations.detail(campaignId, row.id),
   })

@@ -104,8 +104,6 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   resolveDemoteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
   /** Whether character references block demotion. Defaults to true. */
   characterUsageBlocksDemotion?: boolean
-  /** When set, replaces default character usage resolution for delete guards. */
-  resolveCharacterUsageBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
 }
 
 /** Selects the create/update input schema for a validation intent. */

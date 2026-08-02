@@ -112,6 +112,45 @@ describe('content list routes', () => {
       .get('/api/campaigns/000000000000000000000000/content/classes')
       .expect(401)
   })
+
+  it('attaches usedBy usage fields on list responses for registered surfaces', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/species`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.usageSummaryLabels).toEqual({
+      singular: 'character',
+      plural: 'characters',
+    })
+    expect(res.body.overviewUsageScope).toBe('characters')
+    expect(typeof res.body.species[0].usedBy).toBe('number')
+  })
+
+  it('returns content entry usage with derived usedBy count', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/species`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const speciesId = listRes.body.species[0].id as string
+
+    const usageRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/species/${speciesId}/usage`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(usageRes.body.usage).toMatchObject({
+      references: expect.any(Array),
+      usedBy: usageRes.body.usage.references.length,
+    })
+  })
 })
 
 describe('content draft visibility', () => {

@@ -8,7 +8,7 @@ import {
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useSpecies } from '../hooks/use-species'
+import { useSpecies, useSpeciesUsageMeta } from '../hooks/use-species'
 import { speciesColumns, speciesFilterSchema } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
@@ -16,6 +16,9 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table.
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: species = [], isPending, isError } = useSpecies(campaignId)
+  const { data: usageMeta } = useSpeciesUsageMeta(campaignId)
+  const usageSummaryLabels = usageMeta?.usageSummaryLabels
+  const overviewUsageScope = usageMeta?.overviewUsageScope
 
   return (
     <ContentOverviewShell
@@ -29,7 +32,12 @@ export function SpeciesOverview() {
       <ContentOverviewTable<WithCampaignAccess<Species>>
         contentTypeKey="species"
         campaignId={campaignId}
-        columns={speciesColumns(campaignId) as ColumnDef<WithCampaignAccess<Species>, unknown>[]}
+        columns={
+          speciesColumns(campaignId, { usageSummaryLabels, overviewUsageScope }) as ColumnDef<
+            WithCampaignAccess<Species>,
+            unknown
+          >[]
+        }
         filterSchema={speciesFilterSchema()}
         data={species as WithCampaignAccess<Species>[]}
         caption={formatContentOverviewCaption('species', 'Playable')}

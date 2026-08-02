@@ -2,7 +2,9 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
+  type ContentOverviewUsageScope,
   type ContentStatus,
+  type ContentUsageSummaryLabels,
   type EquipmentCost,
   type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
@@ -23,6 +25,7 @@ import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'
 import { shouldPresentContentSource } from '../content-type-presentation'
+import { buildContentUsedByColumn } from './content-used-by-column'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -50,6 +53,9 @@ export type ContentTableOptions<T> = {
   editHref?: (row: T) => string
   /** Whether the viewer can manage campaign content (overview utility row). */
   canManage?: boolean
+  /** When set with overviewUsageScope from list API, appends Used By column. */
+  usageSummaryLabels?: ContentUsageSummaryLabels
+  overviewUsageScope?: ContentOverviewUsageScope
 }
 
 export type ContentOverviewNameColumnMeta<T> = {
@@ -87,7 +93,14 @@ export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
   options: ContentTableOptions<T>,
 ): ColumnDef<T>[] {
-  const { contentType, nameHref, editHref, canManage = false } = options
+  const {
+    contentType,
+    nameHref,
+    editHref,
+    canManage = false,
+    usageSummaryLabels,
+    overviewUsageScope,
+  } = options
 
   const imageColumn: ColumnDef<T> = {
     accessorKey: 'imageKey',
@@ -139,10 +152,21 @@ export function buildContentColumns<T extends ContentBase>(
     label: 'Status',
   })
 
+  const usedByColumn =
+    usageSummaryLabels != null
+      ? [
+          buildContentUsedByColumn<T & { id: string; usedBy: number }>(
+            usageSummaryLabels,
+            overviewUsageScope,
+          ) as ColumnDef<T>,
+        ]
+      : []
+
   return [
     imageColumn,
     nameColumn,
     ...stampDataColumns(middleColumns),
+    ...usedByColumn,
     statusColumn,
     ...(shouldPresentContentSource(contentType) ? [sourceColumn] : []),
   ]

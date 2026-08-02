@@ -20,7 +20,6 @@ import {
   assertSubclassRouteClassId,
 } from './assert-subclass-parent-class'
 import { HomebrewSubclassModel, type HomebrewSubclassSchemaType } from './homebrew-subclass.model'
-import { resolveSubclassCharacterUsageBlockers } from './resolve-subclass-character-usage-blockers'
 import { SubclassPatchModel } from './subclass-patch.model'
 
 type HomebrewSubclassRecord = HomebrewSubclassSchemaType & { _id: unknown }
@@ -92,7 +91,6 @@ export const subclassWriteConfig: ContentWriteConfig<Subclass> = {
   toHomebrewEntity: toHomebrewSubclass,
   bodyFromCreateInput,
   validateBeforeWrite: validateSubclassBeforeWrite,
-  resolveCharacterUsageBlockers: resolveSubclassCharacterUsageBlockers,
 }
 
 export { assertSubclassRouteClassId }

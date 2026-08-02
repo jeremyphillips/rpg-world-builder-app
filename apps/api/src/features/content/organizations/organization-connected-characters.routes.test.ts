@@ -13,8 +13,11 @@ import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { CampaignCharacterParticipationModel } from '../../campaign/participation/campaign-character-participation.model'
 import { CharacterModel, createPcRecord } from '../../character'
-import { getContentCharacterUsageMatcher } from '../lib/content-character-usage/content-character-usage-matchers'
 import { createHomebrewContent } from '../lib/content-write.service'
+import {
+  assertContentUsageRegistrationCoverage,
+  getContentUsageRegistration,
+} from '../lib/content-usage/content-usage-resolvers'
 import { organizationWriteConfig } from './organizations.config'
 import { resolveOrganizationConnectedCharacters } from './resolve-organization-connected-characters'
 
@@ -236,11 +239,11 @@ describe('resolveOrganizationConnectedCharacters', () => {
     })
   })
 
-  it('matches the organization usage matcher fragment', async () => {
-    const organizationId = '000000000000000000000001'
-    expect(getContentCharacterUsageMatcher('organizations', organizationId, 'ignored')).toEqual({
-      'connections.organizations.organizationId': organizationId,
-    })
+  it('matches the organization character reference descriptor via usage registration', () => {
+    expect(() => assertContentUsageRegistrationCoverage()).not.toThrow()
+    expect(
+      getContentUsageRegistration('organizations').sources.some((source) => source.entry),
+    ).toBe(true)
   })
 })
 

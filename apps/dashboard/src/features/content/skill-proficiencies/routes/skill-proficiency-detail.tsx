@@ -19,6 +19,7 @@ import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentLinkBadge } from '../../lib/detail/content-link-badge'
+import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
 import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
 
 function SkillExamplesList({
@@ -110,7 +111,13 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
             <ClassSkillChoicesList campaignId={campaignId} skillSlug={skill.slug} />
           </div>
         }
-      />
+      >
+        <ContentUsageReferencesSection
+          campaignId={campaignId}
+          routeKey="skill-proficiencies"
+          entityId={skillId}
+        />
+      </ContentDetailLayout>
     </WidePage>
   )
 }

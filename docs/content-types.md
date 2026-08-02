@@ -275,21 +275,38 @@ Homebrew-only deletion is wired for all six registered catalog types. System SRD
 
 ### Contract shapes (`@rpg/contracts`)
 
-| Shape                         | Role                                                                                                           |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `ContentDeletionAvailability` | Advisory preflight — `{ status: 'allowed' }` or `{ status: 'blocked', blockers }`                              |
-| `ContentDeletionResult`       | Authoritative delete outcome — `{ status: 'deleted' }` or `{ status: 'blocked', blockers }` on `409`           |
-| `ContentDeletionBlocker`      | Discriminated union — `kind: 'usage'` (with `ContentUsageReference`) or `kind: 'rule'` (future business rules) |
-| `ContentUsageReference`       | Domain identity for a blocking character — **no API hrefs**; dashboard resolves links locally                  |
+| Shape                                | Role                                                                                                  |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `ContentDeletionAvailability`        | Advisory preflight — `{ status: 'allowed' }` or `{ status: 'blocked', blockers }`                     |
+| `ContentDeletionResult`              | Authoritative delete outcome — `{ status: 'deleted' }` or `{ status: 'blocked', blockers }` on `409`  |
+| `ContentUsageBlocker`                | Discriminated union — `kind: 'usage'` (`ContentUsageReference`), `kind: 'content'`, or `kind: 'rule'` |
+| `ContentUsageReference`              | Domain identity for a blocking character — **no API hrefs**; dashboard resolves links locally         |
+| `ContentEntryUsage`                  | Detail GET — `{ references, usedBy }` where `usedBy === references.length`                            |
+| `ContentListUsageFields`             | List row — `{ usedBy, usedBySummary? }` when batch sources register                                   |
+| `ContentInformationalUsageReference` | Informational ref (`kind: 'character' \| 'content'`) for overview/detail chrome                       |
+| `ContentOverviewUsageScope`          | Overview metadata only — `'characters'` (v1) or `'complete'`; does not change resolver selection      |
 
-### Campaign participant usage query
+### Campaign participant usage discovery (SSOT)
 
-Character usage blockers consider only characters participating in the campaign that owns the homebrew entity:
+**Registration owns where references come from; delete/demote/access policy owns what those references prevent.**
 
-1. **NPCs** — all character docs with `{ characterType: 'npc', campaignId }`.
-2. **PCs** — union of all `CampaignMembership.characterIds` for `{ campaignId }`, deduped, then sanitized to ids that still exist in MongoDB (stale membership references are dropped silently).
+Character (and future) usage discovery lives under
+`apps/api/src/features/content/lib/content-usage/`:
 
-The resolver runs one composed Mongo query per branch (NPC path and PC `$in` path), merges hits deduped by character id, and maps to `ContentDeletionBlocker` rows. Per-type matcher fragments live in `content-character-usage-matchers.ts` (skill proficiencies match on **slug**, not envelope id).
+| Piece                            | Role                                                                                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `reference-sources/`             | Pure extract/index helpers (character field paths + equipment buckets)                                       |
+| `defineContentUsage`             | Declares sources with `entry`/`batch` flags, derives resolvers, `overviewUsageScope` metadata                |
+| `content-usage-registrations.ts` | One registration per surface (`ApiContentTypeKey` + `subclasses`)                                            |
+| Purpose scopes                   | `viewer_display` (detail GET / overview batch) vs `authoritative_guard` (delete / demote / availability-off) |
+
+- Skill proficiencies look up by **slug**; all other v1 surfaces by **id**.
+- Purpose scopes — **overview batch is viewer-visible informational usage**; **mutation guards use authoritative campaign-wide usage**. Managers see equivalent counts on overview; non-managers may see a subset of character references. Labels/tooltips must not imply campaign-completeness for players.
+- `overviewUsageScope` is **metadata only** — it does not change which sources run. V1 character-only batch uses `characters` so overview chrome can say “Used by characters” honestly.
+- Optional `resolveDeleteBlockers` / `resolveDemoteBlockers` remain **policy additive hooks** (extra rule blockers), not discovery overrides.
+- Org connected-characters pagination is a **rich adapter** over the same registration discovery stack (`authoritative_guard`), not a parallel matcher path.
+
+List responses attach `usedBy` / optional `usedBySummary` plus response-level `usageSummaryLabels` / `overviewUsageScope` when the surface registers batch sources. Detail: `GET …/content/:type/:id/usage` (and nested subclass twin).
 
 ### Authorization and entity resolution
 
@@ -298,10 +315,10 @@ Delete reuses the same entity resolution path as update (`resolveContentEntityFo
 Optional per-type hook on `ContentWriteConfig`:
 
 ```typescript
-resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentDeletionBlocker[]>
+resolveDeleteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
 ```
 
-Default: `[]`. Character usage blockers are always resolved by the shared service; the hook adds additional blockers only.
+Default: `[]`. Character usage blockers are always resolved via content-usage registration (`authoritative_guard`); the hook adds additional blockers only.
 
 ### Dashboard UX
 

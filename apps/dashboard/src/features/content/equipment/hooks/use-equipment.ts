@@ -16,6 +16,7 @@ export const equipmentQueryKey = equipmentContentList.queryKey
 
 /** Load all equipment available in the given campaign (system seed + homebrew). */
 export const useEquipment = equipmentContentList.useQuery
+export const useEquipmentUsageMeta = equipmentContentList.useUsageMeta
 
 export const { useCreateContent: useCreateEquipment, useUpdateContent: useUpdateEquipment } =
   createContentMutationHooks('equipment', equipmentQueryKey)

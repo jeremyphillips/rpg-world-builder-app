@@ -1,4 +1,5 @@
 import type { ModelingStatus, Spell, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import {
   effectiveSpellModelingStatus,
   getModelingStatusLabel,
@@ -123,8 +124,16 @@ function buildSpellsFilterSchema(spellSchoolVocabulary: SpellSchoolVocabulary | 
 }
 
 /** Spell column definitions with the name cell linked to the detail page. */
-export function spellsColumns(campaignId: string, spellSchoolVocabulary?: SpellSchoolVocabulary) {
+export function spellsColumns(
+  campaignId: string,
+  spellSchoolVocabulary?: SpellSchoolVocabulary,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<Spell>(buildSpellsMiddleColumns(spellSchoolVocabulary), {
+    ...usage,
     contentType: 'spells',
     nameHref: (row) => ROUTES.content.spells.detail(campaignId, row.id),
   })

@@ -4,6 +4,7 @@ import {
   type VehicleEquipment,
   type WithCampaignAccess,
 } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { SortableHeader, type ColumnDef } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
@@ -49,8 +50,15 @@ export const vehicleFilterSchema = buildContentFilterSchema<VehicleRow, VehicleO
 )
 
 /** Vehicle column definitions with the name cell linked to the detail page. */
-export function vehicleColumns(campaignId: string) {
+export function vehicleColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<VehicleEquipment>(VEHICLE_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'vehicles', row.id),
   })

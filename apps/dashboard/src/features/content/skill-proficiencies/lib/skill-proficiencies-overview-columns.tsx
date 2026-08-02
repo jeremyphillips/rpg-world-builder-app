@@ -1,4 +1,5 @@
 import type { SkillProficiency, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
 import { dataTableColumnChromeMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -45,8 +46,15 @@ export const skillProficienciesFilterSchema = buildContentFilterSchema<
 ])
 
 /** Skill proficiency column definitions with the name cell linked to the detail page. */
-export function skillProficienciesColumns(campaignId: string) {
+export function skillProficienciesColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<SkillProficiency>(SKILL_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'skill-proficiencies',
     nameHref: (row) => ROUTES.content.skillProficiencies.detail(campaignId, row.id),
   })

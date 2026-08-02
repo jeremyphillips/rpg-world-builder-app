@@ -1,4 +1,5 @@
 import type { ArmorEquipment, WithCampaignAccess } from '@rpg/contracts'
+import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
 import { ARMOR_CATEGORIES, getArmorAcDisplay, getArmorCategoryLabel } from '@rpg/contracts'
 import { dataTableTypographyMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
@@ -62,8 +63,15 @@ export const armorFilterSchema = buildContentFilterSchema<ArmorRow, ArmorOvervie
 )
 
 /** Armor column definitions with the name cell linked to the detail page. */
-export function armorColumns(campaignId: string) {
+export function armorColumns(
+  campaignId: string,
+  usage?: {
+    usageSummaryLabels?: ContentUsageSummaryLabels
+    overviewUsageScope?: ContentOverviewUsageScope
+  },
+) {
   return buildContentColumns<ArmorEquipment>(ARMOR_MIDDLE_COLUMNS, {
+    ...usage,
     contentType: 'equipment',
     nameHref: (row) => ROUTES.content.equipment.detail(campaignId, 'armor', row.id),
   })

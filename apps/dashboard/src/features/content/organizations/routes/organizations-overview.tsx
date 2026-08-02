@@ -10,7 +10,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
-import { useOrganizations } from '../hooks/use-organizations'
+import { useOrganizations, useOrganizationsUsageMeta } from '../hooks/use-organizations'
 import {
   organizationsColumns,
   organizationsFilterSchema,
@@ -19,6 +19,9 @@ import {
 export function OrganizationsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { data: organizations = [], isPending, isError } = useOrganizations(campaignId)
+  const { data: usageMeta } = useOrganizationsUsageMeta(campaignId)
+  const usageSummaryLabels = usageMeta?.usageSummaryLabels
+  const overviewUsageScope = usageMeta?.overviewUsageScope
 
   return (
     <ContentOverviewShell
@@ -33,7 +36,10 @@ export function OrganizationsOverview() {
         contentTypeKey="organizations"
         campaignId={campaignId}
         columns={
-          organizationsColumns(campaignId) as ColumnDef<WithCampaignAccess<Organization>, unknown>[]
+          organizationsColumns(campaignId, { usageSummaryLabels, overviewUsageScope }) as ColumnDef<
+            WithCampaignAccess<Organization>,
+            unknown
+          >[]
         }
         filterSchema={organizationsFilterSchema}
         data={organizations as WithCampaignAccess<Organization>[]}

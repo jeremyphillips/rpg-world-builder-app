@@ -27,6 +27,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
+import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
 
 // ---------------------------------------------------------------------------
 // Sub-components (markup only — labels and formatting live in species-display)
@@ -140,6 +141,11 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         }
       >
         <SpeciesDetailSections sections={viewModel.sections} />
+        <ContentUsageReferencesSection
+          campaignId={campaignId}
+          routeKey="species"
+          entityId={species.id}
+        />
       </ContentDetailLayout>
     </WidePage>
   )

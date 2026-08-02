@@ -4,7 +4,11 @@ import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
 import { ConfirmDialog } from '@rpg/ui'
 
-import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
+import type {
+  ContentCampaignAccessPatch,
+  ContentUsageSummaryLabels,
+  ResolvedSubclass,
+} from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
@@ -38,6 +42,7 @@ import {
 import { SubclassEditorPanel } from './subclass-editor-panel.client'
 import { SubclassListPanel } from './subclass-list-panel.client'
 import { SubclassDeleteDialog } from './subclass-delete-dialog.client'
+import { useSubclassesUsageMeta } from '../hooks/use-subclasses'
 
 export interface ClassSubclassesTabProps {
   campaignId?: string
@@ -289,12 +294,14 @@ function ClassSubclassesTabBody({
   formCtx,
   editor,
   defaultFeatureLevel,
+  usageSummaryLabels,
 }: {
   campaignId: string
   classId: string
   formCtx: ContentFormCtx
   editor: SubclassEditorState
   defaultFeatureLevel: number
+  usageSummaryLabels?: ContentUsageSummaryLabels
 }) {
   const {
     handleSave,
@@ -365,6 +372,7 @@ function ClassSubclassesTabBody({
             items={editor.listItems}
             selectedId={editor.selectedId}
             modifiedIds={editor.modifiedIds}
+            usageSummaryLabels={usageSummaryLabels}
             onSelect={handleSelect}
             onAdd={editor.handleAdd}
             onDeleteRequest={handleDeleteRequest}
@@ -446,6 +454,10 @@ export function ClassSubclassesTab({
     classId,
     subclassesOverride,
   )
+  const { data: usageMeta } = useSubclassesUsageMeta(
+    mode === 'edit' && campaignId && classId ? campaignId : undefined,
+    mode === 'edit' && campaignId && classId ? classId : undefined,
+  )
   const editor = useSubclassEditorState(classId, subclasses)
 
   if (mode === 'create' || !campaignId || !classId) {
@@ -468,6 +480,7 @@ export function ClassSubclassesTab({
         formCtx={formCtx}
         editor={editor}
         defaultFeatureLevel={Number(subclassChoiceFeature.level)}
+        usageSummaryLabels={usageMeta?.usageSummaryLabels}
       />
     </CampaignAccessFormProvider>
   )

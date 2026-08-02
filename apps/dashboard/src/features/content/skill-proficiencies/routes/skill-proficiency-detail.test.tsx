@@ -8,6 +8,9 @@ import { ROUTES } from '@/app/routes'
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
+vi.mock('../../lib/usage/content-usage-references-section.client', () => ({
+  ContentUsageReferencesSection: () => null,
+}))
 vi.mock('../../classes/hooks/use-classes')
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),

@@ -16,6 +16,7 @@ export const skillProficienciesQueryKey = skillProficienciesContentList.queryKey
 
 /** Load all skill proficiencies available in the given campaign (system seed + homebrew). */
 export const useSkillProficiencies = skillProficienciesContentList.useQuery
+export const useSkillProficienciesUsageMeta = skillProficienciesContentList.useUsageMeta
 
 export const {
   useCreateContent: useCreateSkillProficiency,
