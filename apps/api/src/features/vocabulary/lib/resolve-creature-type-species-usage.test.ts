@@ -12,6 +12,7 @@ import {
 } from './resolve-creature-type-species-usage'
 
 const resolveCatalogMock = vi.mocked(resolveCatalogForCampaign)
+const ctx = { campaignId: 'camp_1' }
 
 describe('resolveCreatureTypeSpeciesUsageBatch', () => {
   beforeEach(() => {
@@ -24,7 +25,7 @@ describe('resolveCreatureTypeSpeciesUsageBatch', () => {
   })
 
   it('returns counts and bounded summary references from one catalog load', async () => {
-    const results = await resolveCreatureTypeSpeciesUsageBatch('camp_1', [
+    const results = await resolveCreatureTypeSpeciesUsageBatch(ctx, [
       'humanoid',
       'aberration',
       'construct',
@@ -64,7 +65,7 @@ describe('resolveCreatureTypeSpeciesUsage', () => {
   })
 
   it('returns blockers for a single entry', async () => {
-    const result = await resolveCreatureTypeSpeciesUsage('camp_1', 'humanoid')
+    const result = await resolveCreatureTypeSpeciesUsage(ctx, 'humanoid')
 
     expect(result.count).toBe(1)
     expect(result.blockers).toEqual([

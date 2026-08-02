@@ -51,7 +51,7 @@ export function useVocabularyEntrySheet({
     campaignId,
     setId,
     entry?.id,
-    open && isEdit && capabilities.usageCounting,
+    open && isEdit && capabilities.usageResolution,
   )
 
   const defaultValues = useMemo(
@@ -68,12 +68,12 @@ export function useVocabularyEntrySheet({
         isEdit,
         isPending,
         entry,
-        usageCounting: capabilities.usageCounting,
+        usageResolution: capabilities.usageResolution,
         references: usage?.references ?? [],
       }),
     [
       campaignId,
-      capabilities.usageCounting,
+      capabilities.usageResolution,
       entry,
       groupId,
       isEdit,

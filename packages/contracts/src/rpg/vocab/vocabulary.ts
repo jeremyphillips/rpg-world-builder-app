@@ -82,6 +82,9 @@ export const vocabularyUsageSummaryLabelsSchema = z.object({
 
 export type VocabularyUsageSummaryLabels = z.infer<typeof vocabularyUsageSummaryLabelsSchema>
 
+/** Max items in overview usedBySummary — API payload bound for list responses. */
+export const VOCABULARY_USAGE_SUMMARY_LIMIT = 4
+
 /** Resolved option with usage count for vocabulary management UI. */
 export const vocabularyOptionWithUsageSchema = vocabularyOptionSchema.extend({
   usedBy: z.number().int().min(0),
@@ -89,7 +92,10 @@ export const vocabularyOptionWithUsageSchema = vocabularyOptionSchema.extend({
    * Bounded overview chrome only — capped server-side, non-authoritative preview of
    * the same references `GET …/entries/:id/usage` returns. `usedBy` is the count SSOT.
    */
-  usedBySummary: z.array(vocabularyUsageReferenceSchema).optional(),
+  usedBySummary: z
+    .array(vocabularyUsageReferenceSchema)
+    .max(VOCABULARY_USAGE_SUMMARY_LIMIT)
+    .optional(),
 })
 
 export type VocabularyOptionWithUsage = z.infer<typeof vocabularyOptionWithUsageSchema>

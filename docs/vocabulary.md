@@ -139,22 +139,23 @@ return **409** via `assertVocabularyIdAvailable` against **all resolved option i
 
 Mutating routes enforce `VOCABULARY_SET_CAPABILITIES` server-side:
 
-| Operation                            | Capability      | Failure        |
-| ------------------------------------ | --------------- | -------------- |
-| POST entry                           | `create`        | 403            |
-| PATCH label/description              | `edit`          | 403            |
-| PATCH status                         | `availability`  | 403            |
-| DELETE entry                         | `delete`        | 403            |
-| GET disable-availability             | `disableGuard`  | 404            |
-| GET delete-availability              | `deleteGuard`   | 404            |
-| GET usage                            | `usageCounting` | 404            |
-| PATCH status → disabled (referenced) | `disableGuard`  | 409 + blockers |
+| Operation                            | Capability        | Failure        |
+| ------------------------------------ | ----------------- | -------------- |
+| POST entry                           | `create`          | 403            |
+| PATCH label/description              | `edit`            | 403            |
+| PATCH status                         | `availability`    | 403            |
+| DELETE entry                         | `delete`          | 403            |
+| GET disable-availability             | `disableGuard`    | 404            |
+| GET delete-availability              | `deleteGuard`     | 404            |
+| GET usage                            | `usageResolution` | 404            |
+| PATCH status → disabled (referenced) | `disableGuard`    | 409 + blockers |
 
-Partial API registries (creature-types species resolver registered today):
+Partial API registries (usage resolvers registered for all browse sets with `usageResolution`):
 
 | Registry                         | Location                                         | Role                                         |
 | -------------------------------- | ------------------------------------------------ | -------------------------------------------- |
-| `VOCABULARY_USAGE_RESOLVERS`     | `apps/api/.../vocabulary-usage-resolvers.ts`     | Usage counts + `kind: 'content'` blockers    |
+| `VOCABULARY_USAGE_RESOLVERS`     | `apps/api/.../vocabulary-usage-resolvers.ts`     | Usage counts + blockers                      |
+| `reference-sources/`             | `apps/api/.../vocabulary/lib/reference-sources/` | Pure extract + index over loaded records     |
 | `VOCABULARY_VALIDATION_ADAPTERS` | `apps/api/.../vocabulary-validation-adapters.ts` | Optional validation beyond active membership |
 | `VOCABULARY_ENTRY_FORM_REGISTRY` | dashboard `vocabulary-entry-form-registry.ts`    | Create/edit form defs for enabled sets       |
 
@@ -173,8 +174,8 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 - **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
 - **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
-- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max 4). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms.
-- **Capability split** — `usageCounting` enables counts, usage GET, and disable/delete guards; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support.
+- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max `VOCABULARY_USAGE_SUMMARY_LIMIT` from contracts). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned, presentational only) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms.
+- **Capability split** — `usageResolution` enables counts and usage GET; `disableGuard` / `deleteGuard` are independent guard flags; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support (`batchUsageCounting` requires `usageResolution`).
 - **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; batch overview loads use `resolveVocabularyOptionUsageBatch`. Reference discovery logic lives in the API (`apps/api/.../vocabulary/lib/`); contracts own neutral DTOs only.
 - **UI:** informational `UsageReferencesSection` on detail; overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
 
@@ -264,7 +265,7 @@ Work through these layers once; reuse resolver, routes, and detail UI.
 
 1. Flip capability flags in `VOCABULARY_SET_CAPABILITIES` (`browse`, `create`, …).
 2. Register a form def in `VOCABULARY_ENTRY_FORM_REGISTRY` when `create`/`edit` are true.
-3. Register an API usage resolver when `usageCounting` / `disableGuard` / `deleteGuard` need custom logic.
+3. Register an API usage resolver when `usageResolution` / `disableGuard` / `deleteGuard` need custom logic.
 4. Add a consumption hook if forms or columns need labels/options (pattern:
    `useCreatureTypeVocabulary` or generic `useVocabularySetMaps`).
 5. Wire field options through the hook — do not import static seed constants in
@@ -332,7 +333,7 @@ usage counting (below).
 delete and disable guards. Creature-types counts species references and returns
 `kind: 'content'` blockers for disable preflight and PATCH 409 races.
 
-- Resolved sets attach `usedBy` on every option when `usageCounting` is true.
+- Resolved sets attach `usedBy` on every option when `usageResolution` is true.
 - Delete campaign entries succeeds when `usedBy === 0` (or `deleteGuard` is off); otherwise **409 in_use**.
 - Disable (status → disabled) runs preflight via `GET …/disable-availability`; PATCH returns **409** with blockers when referenced.
 - System entries cannot be deleted regardless of usage.

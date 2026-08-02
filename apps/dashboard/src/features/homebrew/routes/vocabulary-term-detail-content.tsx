@@ -156,7 +156,7 @@ function VocabularyTermDetailPage({
               setId={setId}
               entry={entry}
               canEdit={canEdit}
-              showUsage={capabilities.usageCounting}
+              showUsage={capabilities.usageResolution}
               onEdit={handleEdit}
             />
           ) : null}

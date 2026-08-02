@@ -1,13 +1,19 @@
 import { LANGUAGE_SET_ID, SPELL_SCHOOL_SET_ID, activeVocabularyOptionIds } from '@rpg/contracts'
 
-import { resolveVocabularySetForCampaign } from '../sets/vocabulary.service'
+import {
+  resolveVocabularySetForCampaign,
+  vocabularyUsageContextForCampaign,
+} from '../sets/vocabulary.service'
 import { assertVocabularyIdsActiveInCampaign } from './assert-vocabulary-ids-active-in-campaign'
 
 /** Active language ids for a campaign's resolved vocabulary set. */
 export async function getActiveLanguageIdsForCampaign(
   campaignId: string,
 ): Promise<ReadonlySet<string>> {
-  const set = await resolveVocabularySetForCampaign(campaignId, LANGUAGE_SET_ID)
+  const set = await resolveVocabularySetForCampaign(
+    vocabularyUsageContextForCampaign(campaignId),
+    LANGUAGE_SET_ID,
+  )
   return activeVocabularyOptionIds(set)
 }
 
@@ -23,7 +29,10 @@ export async function assertLanguagesActiveInCampaign(
 export async function getActiveSpellSchoolIdsForCampaign(
   campaignId: string,
 ): Promise<ReadonlySet<string>> {
-  const set = await resolveVocabularySetForCampaign(campaignId, SPELL_SCHOOL_SET_ID)
+  const set = await resolveVocabularySetForCampaign(
+    vocabularyUsageContextForCampaign(campaignId),
+    SPELL_SCHOOL_SET_ID,
+  )
   return activeVocabularyOptionIds(set)
 }
 

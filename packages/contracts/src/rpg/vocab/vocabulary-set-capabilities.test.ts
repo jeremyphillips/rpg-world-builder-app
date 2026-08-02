@@ -12,6 +12,18 @@ import {
 } from './vocabulary-set-capabilities'
 import { VOCABULARY_INTERNAL_ONLY_SET_IDS } from './vocabulary-category-registry'
 
+const BROWSE_SETS_WITH_USAGE_RESOLUTION = [
+  'creature-types',
+  'damage-types',
+  'conditions',
+  'languages',
+  'senses',
+  'sizes',
+  'spell-schools',
+  'weapon-properties',
+  'equipment-categories',
+] as const
+
 describe('VOCABULARY_SET_CAPABILITIES', () => {
   it('defines capabilities for every contract vocabulary set id', () => {
     expect(Object.keys(VOCABULARY_SET_CAPABILITIES).sort()).toEqual(
@@ -42,12 +54,16 @@ describe('VOCABULARY_SET_CAPABILITIES', () => {
     )
   })
 
-  it('requires usage resolver registration for creature-types only', () => {
-    expect(vocabularySetIdsRequiringUsageResolver()).toEqual(['creature-types'])
+  it('requires usage resolver registration for every usageResolution set', () => {
+    expect(vocabularySetIdsRequiringUsageResolver().sort()).toEqual(
+      [...BROWSE_SETS_WITH_USAGE_RESOLUTION].sort(),
+    )
   })
 
-  it('requires batch count resolver registration for creature-types only', () => {
-    expect(vocabularySetIdsRequiringBatchCountResolver()).toEqual(['creature-types'])
+  it('requires batch count resolver registration for every batchUsageCounting set', () => {
+    expect(vocabularySetIdsRequiringBatchCountResolver().sort()).toEqual(
+      [...BROWSE_SETS_WITH_USAGE_RESOLUTION].sort(),
+    )
   })
 
   it('requires form definitions for sets with create or edit', () => {
@@ -64,7 +80,7 @@ describe('validateVocabularySetCapabilityImplications', () => {
       delete: false,
       availability: false,
       bulkAvailability: true,
-      usageCounting: false,
+      usageResolution: false,
       batchUsageCounting: false,
       disableGuard: false,
       deleteGuard: false,
@@ -82,13 +98,31 @@ describe('validateVocabularySetCapabilityImplications', () => {
       delete: false,
       availability: false,
       bulkAvailability: false,
-      usageCounting: false,
+      usageResolution: false,
       batchUsageCounting: false,
       disableGuard: false,
       deleteGuard: false,
     }
     expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
       'create requires browse',
+    )
+  })
+
+  it('flags batchUsageCounting without usageResolution', () => {
+    const cap: VocabularySetCapability = {
+      browse: true,
+      create: false,
+      edit: false,
+      delete: false,
+      availability: false,
+      bulkAvailability: false,
+      usageResolution: false,
+      batchUsageCounting: true,
+      disableGuard: false,
+      deleteGuard: false,
+    }
+    expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
+      'batchUsageCounting requires usageResolution',
     )
   })
 })
@@ -104,7 +138,7 @@ describe('capability derivation fixture', () => {
         delete: true,
         availability: true,
         bulkAvailability: true,
-        usageCounting: false,
+        usageResolution: false,
         batchUsageCounting: false,
         disableGuard: false,
         deleteGuard: false,
@@ -120,6 +154,10 @@ describe('capability derivation fixture', () => {
     expect(vocabularySetIdsRequiringFormDefinition(fixtureCapabilities).sort()).toEqual(
       ['creature-types', 'damage-types'].sort(),
     )
-    expect(vocabularySetIdsRequiringUsageResolver(fixtureCapabilities)).toEqual(['creature-types'])
+    expect(vocabularySetIdsRequiringUsageResolver(fixtureCapabilities).sort()).toEqual(
+      vocabularySetIdsRequiringUsageResolver()
+        .filter((setId) => setId !== 'damage-types')
+        .sort(),
+    )
   })
 })

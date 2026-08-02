@@ -12,8 +12,8 @@ export type VocabularySetCapability = {
   /** Maps to status active/disabled in UI and PATCH. */
   availability: boolean
   bulkAvailability: boolean
-  /** Attach usedBy to resolved options. */
-  usageCounting: boolean
+  /** Usage resolution enabled — attach usedBy; enable informational GET …/usage. */
+  usageResolution: boolean
   /** Overview loads may use a set-level count batch resolver (counts only). */
   batchUsageCounting: boolean
   /** Block status → disabled when referenced (preflight + PATCH 409). */
@@ -29,21 +29,21 @@ const disabledCapabilities = (): VocabularySetCapability => ({
   delete: false,
   availability: false,
   bulkAvailability: false,
-  usageCounting: false,
+  usageResolution: false,
   batchUsageCounting: false,
   disableGuard: false,
   deleteGuard: false,
 })
 
-const browseOnlyCapabilities = (): VocabularySetCapability => ({
+const browseOnlyWithUsageResolutionCapabilities = (): VocabularySetCapability => ({
   browse: true,
   create: false,
   edit: false,
   delete: false,
   availability: false,
   bulkAvailability: false,
-  usageCounting: false,
-  batchUsageCounting: false,
+  usageResolution: true,
+  batchUsageCounting: true,
   disableGuard: false,
   deleteGuard: false,
 })
@@ -55,7 +55,7 @@ const enabledManagementCapabilities = (): VocabularySetCapability => ({
   delete: true,
   availability: true,
   bulkAvailability: true,
-  usageCounting: true,
+  usageResolution: true,
   batchUsageCounting: true,
   disableGuard: true,
   deleteGuard: true,
@@ -67,14 +67,14 @@ const enabledManagementCapabilities = (): VocabularySetCapability => ({
  */
 export const VOCABULARY_SET_CAPABILITIES = {
   'creature-types': enabledManagementCapabilities(),
-  'damage-types': browseOnlyCapabilities(),
-  conditions: browseOnlyCapabilities(),
-  languages: browseOnlyCapabilities(),
-  senses: browseOnlyCapabilities(),
-  sizes: browseOnlyCapabilities(),
-  'spell-schools': browseOnlyCapabilities(),
-  'weapon-properties': browseOnlyCapabilities(),
-  'equipment-categories': browseOnlyCapabilities(),
+  'damage-types': browseOnlyWithUsageResolutionCapabilities(),
+  conditions: browseOnlyWithUsageResolutionCapabilities(),
+  languages: browseOnlyWithUsageResolutionCapabilities(),
+  senses: browseOnlyWithUsageResolutionCapabilities(),
+  sizes: browseOnlyWithUsageResolutionCapabilities(),
+  'spell-schools': browseOnlyWithUsageResolutionCapabilities(),
+  'weapon-properties': browseOnlyWithUsageResolutionCapabilities(),
+  'equipment-categories': browseOnlyWithUsageResolutionCapabilities(),
   'edition-presets': disabledCapabilities(),
   'attack-resolution-modes': disabledCapabilities(),
 } as const satisfies Record<VocabularyOptionSetId, VocabularySetCapability>
@@ -96,7 +96,7 @@ export function validateVocabularySetCapabilityImplications(
     'delete',
     'availability',
     'bulkAvailability',
-    'usageCounting',
+    'usageResolution',
     'batchUsageCounting',
     'disableGuard',
     'deleteGuard',
@@ -123,10 +123,10 @@ export function validateVocabularySetCapabilityImplications(
       message: 'delete requires create',
     })
   }
-  if (capabilities.batchUsageCounting && !capabilities.usageCounting) {
+  if (capabilities.batchUsageCounting && !capabilities.usageResolution) {
     violations.push({
       field: 'implication',
-      message: 'batchUsageCounting requires usageCounting',
+      message: 'batchUsageCounting requires usageResolution',
     })
   }
 
@@ -176,7 +176,7 @@ export function vocabularySetIdsRequiringUsageResolver(
 ): VocabularyOptionSetId[] {
   return VOCABULARY_OPTION_SET_IDS.filter(
     (setId) =>
-      capabilities[setId].usageCounting ||
+      capabilities[setId].usageResolution ||
       capabilities[setId].disableGuard ||
       capabilities[setId].deleteGuard,
   )

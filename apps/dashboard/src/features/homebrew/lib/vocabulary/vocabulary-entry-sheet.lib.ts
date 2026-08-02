@@ -57,7 +57,7 @@ export function buildVocabularyEntrySheetFieldItems(input: {
   isEdit: boolean
   isPending: boolean
   entry?: VocabularyOptionWithUsage
-  usageCounting: boolean
+  usageResolution: boolean
   references: VocabularyUsageReference[]
 }): FormItem[] {
   requireVocabularyEntryFormDefinition(input.setId)
@@ -68,7 +68,7 @@ export function buildVocabularyEntrySheetFieldItems(input: {
     available: input.entry ? vocabularyAvailableFromStatus(input.entry.status) : true,
   })
 
-  if (!input.isEdit || !input.usageCounting) {
+  if (!input.isEdit || !input.usageResolution) {
     return sheetFields
   }
 

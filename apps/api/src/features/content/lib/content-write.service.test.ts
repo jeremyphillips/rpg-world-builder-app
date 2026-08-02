@@ -16,7 +16,7 @@ import { createHomebrewContent, updateContentEntity } from './content-write.serv
 import { resolveCatalogForCampaign } from '../content.service'
 import { HttpError } from '../../../lib/http-error'
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
-import { updateVocabularyEntry } from '../../vocabulary'
+import { updateVocabularyEntry, vocabularyUsageContextForCampaign } from '../../vocabulary'
 
 useIntegrationDb()
 
@@ -539,9 +539,14 @@ describe('createHomebrewContent (species)', () => {
 
   it('rejects a disabled creature type', async () => {
     const campaign = await makeTestCampaign()
-    await updateVocabularyEntry(campaign.id, CREATURE_TYPE_SET_ID, 'beast', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaign.id),
+      CREATURE_TYPE_SET_ID,
+      'beast',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(
       createHomebrewContent(speciesWriteConfig, campaign.id, {

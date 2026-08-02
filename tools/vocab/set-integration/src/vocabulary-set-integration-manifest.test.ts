@@ -70,7 +70,7 @@ describe('capability ↔ manifest coverage', () => {
   it('does not mark usageResolver on sets with all usage capabilities disabled', () => {
     for (const setId of VOCABULARY_OPTION_SET_IDS) {
       const caps = VOCABULARY_SET_CAPABILITIES[setId]
-      const needsResolver = caps.usageCounting || caps.disableGuard || caps.deleteGuard
+      const needsResolver = caps.usageResolution || caps.disableGuard || caps.deleteGuard
       const entry = VOCABULARY_SET_INTEGRATION_MANIFEST[setId]
       const manifestFlag = entry.extensionPoints?.usageResolver === true
 

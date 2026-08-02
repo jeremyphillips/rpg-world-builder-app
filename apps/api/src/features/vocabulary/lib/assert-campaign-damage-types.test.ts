@@ -10,7 +10,10 @@ import {
   getActiveDamageTypeIdsForCampaign,
   getActiveSenseIdsForCampaign,
 } from './assert-campaign-damage-types'
-import { updateVocabularyEntry } from '../sets/vocabulary.service'
+import {
+  updateVocabularyEntry,
+  vocabularyUsageContextForCampaign,
+} from '../sets/vocabulary.service'
 
 useIntegrationDb()
 
@@ -29,9 +32,14 @@ describe('assertDamageTypesActiveInCampaign', () => {
   it('rejects disabled damage types', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaignId, DAMAGE_TYPE_SET_ID, 'fire', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      DAMAGE_TYPE_SET_ID,
+      'fire',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(assertDamageTypesActiveInCampaign(campaignId, ['fire'])).rejects.toMatchObject({
       status: 400,
@@ -53,9 +61,14 @@ describe('assertSensesActiveInCampaign', () => {
   it('rejects disabled senses', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Disabled' })
 
-    await updateVocabularyEntry(campaignId, SENSE_SET_ID, 'darkvision', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      SENSE_SET_ID,
+      'darkvision',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expect(assertSensesActiveInCampaign(campaignId, ['darkvision'])).rejects.toMatchObject({
       status: 400,

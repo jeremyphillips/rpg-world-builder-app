@@ -20,6 +20,10 @@ export type VocabularySetIntegrationManifest = Record<
   VocabularySetIntegrationManifestEntry
 >
 
+const usageResolverExtension = {
+  extensionPoints: { usageResolver: true as const },
+} as const
+
 /** Lightweight discoverability index — runtime SSOT is `VOCABULARY_SET_CAPABILITIES`. */
 export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManifest = {
   'creature-types': {
@@ -33,35 +37,43 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   'damage-types': {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Spell + species damage references; composed usage resolver.',
+    ...usageResolverExtension,
   },
   conditions: {
     owner: 'catalog',
-    notes: 'Catalog seed mirrors contract condition entries for Game Terms browse.',
+    notes: 'Spell tag conditions; catalog seed mirrors contract condition entries.',
+    ...usageResolverExtension,
   },
   languages: {
     owner: 'shared',
-    notes: 'Rules configuration consumption; vocabulary manager not enabled.',
+    notes: 'Species, class grants, and viewer-scoped character language refs.',
+    ...usageResolverExtension,
   },
   senses: {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Species trait sense grants.',
+    ...usageResolverExtension,
   },
   sizes: {
     owner: 'catalog',
-    notes: 'Catalog seed mirrors contract creature size entries for Game Terms browse.',
+    notes: 'Species size arrays.',
+    ...usageResolverExtension,
   },
   'spell-schools': {
     owner: 'catalog',
-    notes: 'Consumption-only until capabilities enable overview.',
+    notes: 'Spell school field references.',
+    ...usageResolverExtension,
   },
   'weapon-properties': {
     owner: 'catalog',
-    notes: 'Catalog seed mirrors contract weapon property entries for Game Terms browse.',
+    notes: 'Weapon equipment property arrays.',
+    ...usageResolverExtension,
   },
   'equipment-categories': {
     owner: 'catalog',
-    notes: 'Catalog seed mirrors equipment kind taxonomy for Game Terms browse.',
+    notes: 'Equipment kind taxonomy references.',
+    ...usageResolverExtension,
   },
   'edition-presets': {
     owner: 'dashboard',

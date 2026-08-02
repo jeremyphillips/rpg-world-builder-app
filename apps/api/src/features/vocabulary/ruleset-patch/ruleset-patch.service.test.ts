@@ -26,7 +26,10 @@ import {
   updateCharacterCreationPatch,
   updateMechanicsPatch,
 } from './ruleset-patch.service'
-import { updateVocabularyEntry } from '../sets/vocabulary.service'
+import {
+  updateVocabularyEntry,
+  vocabularyUsageContextForCampaign,
+} from '../sets/vocabulary.service'
 
 useIntegrationDb()
 
@@ -129,9 +132,14 @@ describe('updateCharacterCreationPatch', () => {
   it('rejects disabled creature types in the creature type policy', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Types' })
 
-    await updateVocabularyEntry(campaignId, CREATURE_TYPE_SET_ID, 'fey', {
-      status: 'disabled',
-    })
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaignId),
+      CREATURE_TYPE_SET_ID,
+      'fey',
+      {
+        status: 'disabled',
+      },
+    )
 
     await expectHttpErrorAsync(
       () =>
