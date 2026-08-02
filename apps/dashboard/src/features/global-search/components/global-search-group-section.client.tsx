@@ -94,6 +94,7 @@ export function GlobalSearchGroupSection({
             borderless
             density={rowDensity}
             surfaceContext={surfaceContext}
+            viewerCharacterRelationships={document.viewerCharacterRelationships}
           />
         ))}
       </div>

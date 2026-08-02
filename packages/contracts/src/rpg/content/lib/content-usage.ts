@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { vocabularyUsageReferenceSchema } from '../../vocab/vocabulary-usage'
+import { viewerCharacterRelationshipsSchema } from './viewer-character-relationship'
 
 /** Display labels for overview Used by summary tooltips — API-owned. */
 export const contentUsageSummaryLabelsSchema = z.object({
@@ -57,6 +58,8 @@ export const contentListUsageFieldsSchema = z.object({
     .array(contentInformationalUsageReferenceSchema)
     .max(CONTENT_USAGE_SUMMARY_LIMIT)
     .optional(),
+  /** Viewer-controlled PC relationships — grouped preview for name-row indicator chrome. */
+  viewerCharacterRelationships: viewerCharacterRelationshipsSchema.optional(),
 })
 
 export type ContentListUsageFields = z.infer<typeof contentListUsageFieldsSchema>

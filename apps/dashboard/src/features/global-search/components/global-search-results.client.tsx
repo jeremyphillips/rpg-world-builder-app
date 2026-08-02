@@ -88,6 +88,7 @@ export function GlobalSearchFlatResults({
           onActivate={onResultActivate}
           borderless
           surfaceContext="page"
+          viewerCharacterRelationships={document.viewerCharacterRelationships}
         />
       ))}
     </div>

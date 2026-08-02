@@ -5,11 +5,13 @@ import type {
   ContentTypeKey,
   PlayerContentVisibility,
   ResolvedContentCampaignAccess,
+  ViewerCharacterRelationships,
 } from '@rpg/contracts'
 import { dataTableNameLinkCellVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog.client'
+import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
 import { ContentAccessMetadata } from './content-access-metadata.client'
 import { ContentOverviewUtilityActions } from './content-overview-utility-actions.client'
@@ -26,6 +28,7 @@ export type ContentOverviewNameCellProps = {
   contentTypeKey?: ContentTypeKey
   queryKeyFn?: (campaignId: string) => readonly unknown[]
   duplicateSource?: DuplicateContentSource
+  viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
 /** Two-line overview name cell — identity on line 1; utility row + metadata on line 2. */
@@ -41,6 +44,7 @@ export function ContentOverviewNameCell({
   contentTypeKey,
   queryKeyFn,
   duplicateSource,
+  viewerCharacterRelationships,
 }: ContentOverviewNameCellProps) {
   const draftBadge = status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
   const showManagerLine = canManage
@@ -57,6 +61,9 @@ export function ContentOverviewNameCell({
           <span className="font-medium text-foreground">{name}</span>
         )}
         {draftBadge}
+        <CharacterRelationshipIndicator
+          viewerCharacterRelationships={viewerCharacterRelationships}
+        />
       </span>
 
       {showManagerLine || showPlayerLine ? (

@@ -1,5 +1,7 @@
 export * from './character-content-reference'
 export * from './content-usage'
+export * from './viewer-character-relationship'
+export * from './format-viewer-character-relationship-tooltip'
 export * from './campaign-access'
 export * from './content-bulk-campaign-access'
 export * from './campaign-access-participants'

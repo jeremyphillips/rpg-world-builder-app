@@ -59,6 +59,7 @@ describe('defineContentUsage', () => {
       ],
       summaryLabels: { singular: 'character', plural: 'characters' },
       overviewUsageScope: 'characters',
+      viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
     })
 
     const ctx = { campaignId: 'camp_1' }
@@ -80,6 +81,7 @@ describe('defineContentUsage', () => {
         contentType: 'classes',
         sources: [{ source, entry: false, batch: true }],
         summaryLabels: { singular: 'x', plural: 'xs' },
+        viewerCharacterRelationship: { strategy: 'none' },
       }),
     ).toThrow(/entry source/)
 
@@ -88,6 +90,7 @@ describe('defineContentUsage', () => {
         contentType: 'classes',
         sources: [{ source, entry: true, batch: false }],
         summaryLabels: { singular: 'x', plural: 'xs' },
+        viewerCharacterRelationship: { strategy: 'none' },
       }),
     ).toThrow(/batch source/)
   })
@@ -104,6 +107,7 @@ describe('defineContentUsage', () => {
           { source: entryOnlySource, entry: true, batch: false },
         ],
         summaryLabels: { singular: 'x', plural: 'xs' },
+        viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
       }),
     ).toThrow(/overviewUsageScope/)
 
@@ -116,6 +120,7 @@ describe('defineContentUsage', () => {
         ],
         summaryLabels: { singular: 'x', plural: 'xs' },
         overviewUsageScope: 'complete',
+        viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
       }),
     ).toThrow(/overviewUsageScope/)
   })
@@ -126,7 +131,21 @@ describe('defineContentUsage', () => {
       contentType: 'classes',
       sources: [{ source, entry: true, batch: true }],
       summaryLabels: { singular: 'character', plural: 'characters' },
+      viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },
     })
     expect(registration.overviewUsageScope).toBe('characters')
+  })
+
+  it('requires hasNoun when viewerCharacterRelationship kind is has', () => {
+    const source = mockSource(new Map())
+
+    expect(() =>
+      defineContentUsage({
+        contentType: 'feats',
+        sources: [{ source, entry: true, batch: true }],
+        summaryLabels: { singular: 'character', plural: 'characters' },
+        viewerCharacterRelationship: { strategy: 'fixed', kind: 'has' },
+      }),
+    ).toThrow(/hasNoun/)
   })
 })

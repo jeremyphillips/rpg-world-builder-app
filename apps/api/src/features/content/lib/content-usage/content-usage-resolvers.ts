@@ -90,6 +90,15 @@ export const EXPECTED_CONTENT_USAGE_SURFACES = [
 
 /** Asserts every catalog + nested surface has entry and batch usage registrations. */
 export function assertContentUsageRegistrationCoverage(): void {
+  const registrationKeys = Object.keys(CONTENT_USAGE_REGISTRATIONS).sort()
+  const expectedKeys = [...EXPECTED_CONTENT_USAGE_SURFACES].sort()
+
+  if (registrationKeys.join('|') !== expectedKeys.join('|')) {
+    throw new Error(
+      `Content usage registration keys drift from EXPECTED_CONTENT_USAGE_SURFACES: registered=[${registrationKeys.join(', ')}], expected=[${expectedKeys.join(', ')}].`,
+    )
+  }
+
   for (const contentType of EXPECTED_CONTENT_USAGE_SURFACES) {
     const registration = CONTENT_USAGE_REGISTRATIONS[contentType]
     if (!registration || !registration.sources.some((source) => source.entry)) {
@@ -97,6 +106,9 @@ export function assertContentUsageRegistrationCoverage(): void {
     }
     if (!registration.sources.some((source) => source.batch)) {
       throw new Error(`Missing content usage registration with batch sources for "${contentType}".`)
+    }
+    if (!registration.viewerCharacterRelationship) {
+      throw new Error(`Missing viewerCharacterRelationship declaration for "${contentType}".`)
     }
   }
 }

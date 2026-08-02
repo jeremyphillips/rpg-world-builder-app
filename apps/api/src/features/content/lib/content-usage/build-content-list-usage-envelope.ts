@@ -5,6 +5,7 @@ import {
   CONTENT_USAGE_REGISTRATIONS,
   type ContentUsageSurfaceKey,
 } from './content-usage-resolvers'
+import { attachViewerCharacterRelationships } from './resolve-viewer-character-relationships'
 import type { ContentUsageResolverContext } from './content-usage-context'
 
 export type ContentListUsageEnvelope<T> = {
@@ -27,8 +28,9 @@ export async function buildContentListUsageEnvelope<T extends { id: string; slug
   }
 
   const withUsage = await attachContentUsageCounts(ctx, contentType, items)
+  const withRelationships = await attachViewerCharacterRelationships(ctx, contentType, withUsage)
   return {
-    items: withUsage,
+    items: withRelationships,
     usageSummaryLabels: registration.summaryLabels,
     overviewUsageScope: registration.overviewUsageScope,
   }

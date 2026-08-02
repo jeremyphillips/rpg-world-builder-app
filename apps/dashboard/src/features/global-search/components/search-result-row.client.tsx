@@ -2,9 +2,14 @@
 
 import { Link } from 'react-router-dom'
 
+import {
+  formatViewerCharacterRelationshipTooltip,
+  type ViewerCharacterRelationships,
+} from '@rpg/contracts'
 import { InlineInactiveStatus, Text, cn } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
+import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
 
 import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 import {
@@ -31,6 +36,7 @@ export type SearchResultRowProps = {
   /** Parent list owns separators; rows inside shared result lists must set this. */
   borderless?: boolean
   className?: string
+  viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
 export function SearchResultRow({
@@ -44,10 +50,19 @@ export function SearchResultRow({
   surfaceContext = 'page',
   borderless = false,
   className,
+  viewerCharacterRelationships,
 }: SearchResultRowProps) {
+  const relationshipLabel = viewerCharacterRelationships
+    ? formatViewerCharacterRelationshipTooltip(viewerCharacterRelationships)
+    : undefined
+
   const accessibleName = campaignUnavailable
-    ? `${title}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
-    : `${title}, ${typeLabel}`
+    ? relationshipLabel
+      ? `${title}, ${relationshipLabel}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
+      : `${title}, ${INACTIVE_ROW_BADGE_LABEL}, ${typeLabel}`
+    : relationshipLabel
+      ? `${title}, ${relationshipLabel}, ${typeLabel}`
+      : `${title}, ${typeLabel}`
 
   const content = (
     <>
@@ -57,6 +72,9 @@ export function SearchResultRow({
             {title}
           </Text>
           {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
+          <CharacterRelationshipIndicator
+            viewerCharacterRelationships={viewerCharacterRelationships}
+          />
         </span>
         <Text as="span" className={searchResultRowTypeLabelVariants()}>
           {typeLabel}
@@ -73,7 +91,11 @@ export function SearchResultRow({
   return (
     <Link
       to={href}
-      className={cn(searchResultRowVariants({ borderless, density, surfaceContext }), className)}
+      className={cn(
+        'group',
+        searchResultRowVariants({ borderless, density, surfaceContext }),
+        className,
+      )}
       onClick={onActivate}
       aria-label={accessibleName}
     >

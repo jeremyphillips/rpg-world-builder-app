@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react'
 
-import type { ContentTypeKey } from '@rpg/contracts'
+import type { ContentTypeKey, ViewerCharacterRelationships } from '@rpg/contracts'
 import { toPlayerContentVisibility, type ContentViewer } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
@@ -37,6 +37,7 @@ export function useStableOverviewColumns<T>(
 type OverviewNameRow = ContentBase & {
   id: string
   kind?: unknown
+  viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
 /** Injects manager utility-row context into the shared overview name column. */
@@ -86,6 +87,7 @@ export function patchOverviewNameColumn<T extends OverviewNameRow>(
             source: row.original.source,
             kind: row.original.kind,
           }}
+          viewerCharacterRelationships={row.original.viewerCharacterRelationships}
         />
       ),
     }
