@@ -4,6 +4,7 @@ import {
   GLOBAL_SEARCH_FILTER_GROUP_ENTRIES,
   GLOBAL_SEARCH_FILTER_GROUPS,
   getGlobalSearchFilterGroupLabel,
+  getGlobalSearchFilterGroupTypeLabel,
 } from './filter-group'
 
 describe('global search filter group vocabulary', () => {
@@ -12,5 +13,7 @@ describe('global search filter group vocabulary', () => {
     expect(getGlobalSearchFilterGroupLabel('content')).toBe(
       GLOBAL_SEARCH_FILTER_GROUP_ENTRIES.content.label,
     )
+    expect(getGlobalSearchFilterGroupTypeLabel('characters')).toBe('Character')
+    expect(getGlobalSearchFilterGroupTypeLabel('game-terms')).toBe('Game Term')
   })
 })

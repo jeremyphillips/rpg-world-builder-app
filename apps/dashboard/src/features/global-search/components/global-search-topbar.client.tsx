@@ -135,7 +135,6 @@ function GlobalSearchTopbarExpanded({
           />
           <GlobalSearchPreviewPanel
             id={TOPBAR_SEARCH_PREVIEW_ID}
-            campaignId={campaignId}
             query={search.query}
             hasQuery={search.hasQuery}
             groupedSections={search.groupedSections}

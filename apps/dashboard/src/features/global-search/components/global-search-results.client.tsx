@@ -13,7 +13,6 @@ import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { SearchResultRow } from './search-result-row.client'
 
 export type GlobalSearchGroupedResultsProps = {
-  campaignId: string
   sections: readonly GlobalSearchGroupSection[]
   resolveHref: (document: GlobalSearchDocument) => string
   onResultActivate?: () => void

@@ -50,7 +50,6 @@ export function GlobalSearchPage() {
       </div>
 
       <GlobalSearchResultsBody
-        campaignId={campaignId}
         query={query}
         group={group}
         hasQuery={hasQuery}

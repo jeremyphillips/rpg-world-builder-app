@@ -70,7 +70,6 @@ function GlobalSearchPreviewStatus({
 
 export type GlobalSearchPreviewPanelProps = {
   id: string
-  campaignId: string
   query: string
   hasQuery: boolean
   groupedSections: readonly GlobalSearchGroupSection[]
@@ -87,7 +86,6 @@ export type GlobalSearchPreviewPanelProps = {
 
 export function GlobalSearchPreviewPanel({
   id,
-  campaignId,
   query,
   hasQuery,
   groupedSections,
@@ -117,7 +115,6 @@ export function GlobalSearchPreviewPanel({
       {showResults ? (
         <div>
           <GlobalSearchGroupedResults
-            campaignId={campaignId}
             sections={groupedSections}
             resolveHref={resolveHref}
             onResultActivate={onClose}

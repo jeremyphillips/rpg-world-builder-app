@@ -25,6 +25,7 @@ import {
   getOrganizationKindLabel,
   getEquipmentSearchName,
   joinCompactSegments,
+  stripHtmlTags,
 } from '@rpg/contracts'
 
 import type { WriteEntityBase } from '../../content/lib/content-write-config'
@@ -37,14 +38,6 @@ type NamedContentEntity = WriteEntityBase & {
 export type { NamedContentEntity }
 
 const CONTENT_TYPE_LABEL = 'content' as const
-
-function stripHtml(html: string | undefined): string {
-  if (!html) return ''
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 function labelField(text: string): GlobalSearchField {
   return { text, weight: 1, role: 'label' }
@@ -74,7 +67,7 @@ function buildClassFields(characterClass: CharacterClass): GlobalSearchField[] {
   return [
     labelField(characterClass.name),
     keywordField(characterClass.slug),
-    descriptionField(stripHtml(characterClass.description)),
+    descriptionField(stripHtmlTags(characterClass.description ?? '')),
   ]
 }
 
@@ -107,7 +100,7 @@ function buildSpeciesFields(species: Species): GlobalSearchField[] {
   return [
     labelField(species.name),
     keywordField(species.slug),
-    descriptionField(stripHtml(species.description)),
+    descriptionField(stripHtmlTags(species.description ?? '')),
   ]
 }
 
@@ -123,7 +116,7 @@ function buildFeatFields(feat: Feat): GlobalSearchField[] {
   return [
     labelField(feat.name),
     keywordField(feat.slug),
-    descriptionField(stripHtml(feat.description)),
+    descriptionField(stripHtmlTags(feat.description ?? '')),
   ]
 }
 
@@ -178,7 +171,7 @@ function buildOrganizationFields(organization: Organization): GlobalSearchField[
   return [
     labelField(organization.name),
     keywordField(organization.slug),
-    descriptionField(stripHtml(organization.description)),
+    descriptionField(stripHtmlTags(organization.description ?? '')),
   ]
 }
 

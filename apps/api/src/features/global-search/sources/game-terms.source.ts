@@ -1,5 +1,5 @@
 import type { GlobalSearchDocument, GlobalSearchField } from '@rpg/contracts'
-import { getVocabularyOptionSetTerm } from '@rpg/contracts'
+import { getGlobalSearchFilterGroupTypeLabel, getVocabularyOptionSetTerm } from '@rpg/contracts'
 
 import {
   listResolvedVocabularySetsForCampaign,
@@ -22,6 +22,8 @@ function groupField(text: string): GlobalSearchField {
   return { text, weight: 0.25, role: 'group' }
 }
 
+const GAME_TERM_TYPE_LABEL = getGlobalSearchFilterGroupTypeLabel('game-terms')
+
 export const gameTermsSearchSource: SearchSource = {
   id: 'game-terms',
   async collect(ctx) {
@@ -43,7 +45,7 @@ export const gameTermsSearchSource: SearchSource = {
         documents.push({
           id: `game-term:${set.id}:${option.id}`,
           filterGroup: 'game-terms',
-          typeLabel: 'Game Term',
+          typeLabel: GAME_TERM_TYPE_LABEL,
           title: option.label,
           secondary: setLabel,
           target: {

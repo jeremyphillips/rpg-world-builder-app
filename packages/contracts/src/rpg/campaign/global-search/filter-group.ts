@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { keysFromEntries, vocabEnumFromEntries } from '../../vocab/enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../../vocab/types'
+import { getTermCompactLabel, type GameTermEntry, type VocabularyTerm } from '../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Global search filter groups — URL `?group=` segments and row grouping.
@@ -19,6 +19,7 @@ export const GLOBAL_SEARCH_FILTER_GROUP_TERM = {
 export const GLOBAL_SEARCH_FILTER_GROUP_ENTRIES = {
   characters: {
     label: 'Characters',
+    compactLabel: 'Character',
     description: 'Campaign player characters and NPCs.',
     sentence: {
       singular: 'character',
@@ -35,6 +36,7 @@ export const GLOBAL_SEARCH_FILTER_GROUP_ENTRIES = {
   },
   'game-terms': {
     label: 'Game Terms',
+    compactLabel: 'Game Term',
     description: 'Campaign vocabulary entries and reference terms.',
     sentence: {
       singular: 'game term',
@@ -53,6 +55,11 @@ export const globalSearchFilterGroupSchema = vocabEnumFromEntries(
 
 export function getGlobalSearchFilterGroupLabel(group: GlobalSearchFilterGroup): string {
   return GLOBAL_SEARCH_FILTER_GROUP_ENTRIES[group].label
+}
+
+/** Fine row type label for filter-group-scoped docs (e.g. Character, Game Term). */
+export function getGlobalSearchFilterGroupTypeLabel(group: GlobalSearchFilterGroup): string {
+  return getTermCompactLabel(GLOBAL_SEARCH_FILTER_GROUP_ENTRIES[group])
 }
 
 /** URL segment values including the aggregate "all" filter. */

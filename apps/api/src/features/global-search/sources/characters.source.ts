@@ -1,5 +1,9 @@
 import type { GlobalSearchDocument, GlobalSearchField } from '@rpg/contracts'
-import { formatCharacterSummary, resolveCharacterSummaryParts } from '@rpg/contracts'
+import {
+  formatCharacterSummary,
+  getGlobalSearchFilterGroupTypeLabel,
+  resolveCharacterSummaryParts,
+} from '@rpg/contracts'
 
 import { createCharacterSummaryLabelLookup } from '../../character/lib/build-character-card-summary-dto.lib'
 import { buildCampaignContentEligibilityIndex } from '../../campaign-invite'
@@ -7,7 +11,7 @@ import { listCampaignCharactersForViewer } from '../../campaign/list-campaign-ch
 import { listCampaignNpcs } from '../../campaign/npc/npc.service'
 import type { SearchSource } from '../lib/search-source.types'
 
-const CHARACTER_TYPE_LABEL = 'Character'
+const CHARACTER_TYPE_LABEL = getGlobalSearchFilterGroupTypeLabel('characters')
 
 function labelField(text: string): GlobalSearchField {
   return { text, weight: 1, role: 'label' }

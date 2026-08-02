@@ -9,7 +9,6 @@ import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import { GlobalSearchFlatResults, GlobalSearchGroupedResults } from './global-search-results.client'
 
 export type GlobalSearchResultsBodyProps = {
-  campaignId: string
   query: string
   group: GlobalSearchUrlGroup
   hasQuery: boolean
@@ -27,7 +26,6 @@ export type GlobalSearchResultsBodyProps = {
 }
 
 export function GlobalSearchResultsBody({
-  campaignId,
   query,
   group,
   hasQuery,
@@ -76,7 +74,6 @@ export function GlobalSearchResultsBody({
       {group === 'all' && groupedSections ? (
         groupedSections.length > 0 ? (
           <GlobalSearchGroupedResults
-            campaignId={campaignId}
             sections={groupedSections}
             resolveHref={resolveHref}
             onResultActivate={onResultActivate}
