@@ -137,11 +137,49 @@ Field mapping mirrors legacy `@rpg/ui` roles: `label` → `primary`, `value` →
 `keyword`, `description` → `secondary`. Gate parity:
 `packages/ui/src/components/ui/option-query.lib.test.ts`.
 
-## Global search (principles only)
+## Global search
 
-Future global search should reuse `@rpg/search` matching language and
-`@rpg/search/ranking` mechanics, but ranking composition remains surface-local.
-No canonical global pipeline is assumed across apps.
+Campaign-scoped global search uses a **presentation-first catalog snapshot** —
+not a query API and not a third-party search engine.
+
+### Wire shape
+
+`GET /api/campaigns/:campaignId/search/catalog` returns
+`{ documents: GlobalSearchDocument[], scope }` where each document carries:
+
+- `filterGroup` — coarse segment (`characters` | `content` | `game-terms`)
+- `typeLabel` — fine row label (`Spell`, `Character`, …)
+- `title`, `secondary` — feature-owned presentation projected at index time
+- `target` — structured destination (discriminated union); dashboard resolves `href`
+- `fields` — weighted searchable text compatible with `@rpg/ui` legacy roles
+
+Adapters **never** embed `@rpg/search` `SearchDocument`, attach scores, or emit
+dashboard path strings.
+
+### Source registry
+
+API adapters implement `SearchSource.collect(ctx)` and call authoritative list /
+resolver paths only:
+
+| Source     | Authoritative entry points                                                    |
+| ---------- | ----------------------------------------------------------------------------- |
+| Content    | `resolveContentForCampaign` + campaign access + viewer filter                 |
+| Game terms | `listResolvedVocabularySetsForCampaign` + `resolveVocabularyOptionsForViewer` |
+| Characters | `listCampaignCharactersForViewer` + `listCampaignNpcs`                        |
+
+Visibility, presentation, and routing ownership stay with those features.
+Search adapters must only emit destinations that remain navigable for the
+viewer under those same access paths.
+
+### Client-side matching and surface-local ranking
+
+Dashboard (and topbar preview) fetch the snapshot once, map `fields` through
+`rankLegacySearchItems(..., 'forgiving')` via `@rpg/ui`, then compose ranking
+and grouping locally. Page and topbar may diverge in caps and truncation;
+adapters do not dictate order.
+
+Empty-query surfaces should not rank or list the full catalog — prompt-only UX
+is enforced in dashboard Phase 2, not by the snapshot endpoint.
 
 ## Compatibility characterization
 

@@ -1,6 +1,7 @@
 import { SidebarTrigger, cn } from '@rpg/ui'
 
 import { useSession } from '@/features/auth'
+import { GlobalSearchTopbar } from '@/features/global-search'
 import { NotificationBellMenu } from '@/features/notification'
 
 import { appShellHorizontalPaddingClasses } from './app-shell.variants'
@@ -33,6 +34,7 @@ export function Topbar({ sidebarOpen, onToggleSidebar }: TopbarProps) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        {user ? <GlobalSearchTopbar /> : null}
         {user ? <NotificationBellMenu /> : null}
         {user ? <TopbarUserMenu user={user} /> : null}
       </div>

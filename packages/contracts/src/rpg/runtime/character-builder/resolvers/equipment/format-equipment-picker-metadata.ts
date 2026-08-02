@@ -1,12 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
 import { getEquipmentKindLabel } from '../../../../content/equipment'
-
-function stripHtmlTags(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
+import { stripHtmlTags } from '../../../../../lib/strip-html-tags'
 
 /** Primary picker label for equipment search documents. */
 export function getEquipmentSearchName(equipment: Equipment): string {

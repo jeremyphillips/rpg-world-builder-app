@@ -14,6 +14,7 @@ import { validate } from '../../middleware/validate'
 import * as controller from './campaign.controller'
 import * as campaignCharacterController from './campaign-character.controller'
 import * as onboardingController from './campaign-onboarding.controller'
+import { getSearchCatalog } from '../global-search'
 
 export const campaignRouter: Router = Router()
 
@@ -50,6 +51,12 @@ campaignRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   controller.listParty,
+)
+campaignRouter.get(
+  '/:campaignId/search/catalog',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  getSearchCatalog,
 )
 campaignRouter.get(
   '/:campaignId/characters',

@@ -2,6 +2,7 @@ import { ADMIN_ROUTES } from './admin-routes'
 import { CONTENT_ROUTES } from './content-routes'
 import { GAME_TERMS_ROUTES } from './game-terms-routes'
 import { HOMEBREW_ROUTES } from './homebrew-routes'
+import type { GlobalSearchUrlGroup } from '@rpg/contracts'
 
 export const ROUTES = {
   home: '/',
@@ -59,6 +60,21 @@ export const ROUTES = {
       new: (id: string) => `/campaigns/${id}/npcs/new`,
       import: (id: string) => `/campaigns/${id}/npcs/import`,
       detail: (id: string, npcId: string) => `/campaigns/${id}/npcs/${npcId}`,
+    },
+    search: (campaignId: string, options?: { q?: string; group?: GlobalSearchUrlGroup }) => {
+      const params = new URLSearchParams()
+      const trimmedQuery = options?.q?.trim()
+
+      if (trimmedQuery) {
+        params.set('q', trimmedQuery)
+      }
+
+      if (options?.group && options.group !== 'all') {
+        params.set('group', options.group)
+      }
+
+      const query = params.toString()
+      return query ? `/campaigns/${campaignId}/search?${query}` : `/campaigns/${campaignId}/search`
     },
   },
   admin: ADMIN_ROUTES,

@@ -16,6 +16,7 @@ export {
 export {
   AVAILABILITY_REASON_CODES,
   AVAILABILITY_REASON_REGISTRY,
+  INACTIVE_ROW_BADGE_LABEL,
   getAvailabilityReasonDefinition,
   resolveReasonAction,
   severityRank,

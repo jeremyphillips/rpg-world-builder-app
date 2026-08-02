@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
 import { useSyncActiveCampaign } from '@/features/campaign'
+import { GlobalSearchProvider } from '@/features/global-search'
 import { Sidebar } from './sidebar/index'
 import { Topbar } from './topbar'
 import { AppBreadcrumb } from './app-breadcrumb'
@@ -30,16 +31,18 @@ export function AppShell() {
 
   return (
     <BreadcrumbLabelProvider>
-      <div className="flex min-h-dvh bg-background">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
-          <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
-          <AppShellBreadcrumbRail />
-          <main className={appShellMainClasses}>
-            <Outlet />
-          </main>
+      <GlobalSearchProvider>
+        <div className="flex min-h-dvh bg-background">
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+            <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
+            <AppShellBreadcrumbRail />
+            <main className={appShellMainClasses}>
+              <Outlet />
+            </main>
+          </div>
         </div>
-      </div>
+      </GlobalSearchProvider>
     </BreadcrumbLabelProvider>
   )
 }

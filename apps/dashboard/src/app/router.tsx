@@ -63,6 +63,7 @@ import {
   NotificationsListRoute,
   CampaignInviteReviewRoute,
   RulesConfigDetailRoute,
+  GlobalSearchPageRoute,
   VocabularyHubRoute,
   VocabularyLandingRoute,
   VocabularyOverviewRoute,
@@ -273,6 +274,11 @@ const router = createBrowserRouter(
                   path: 'settings',
                   element: <CampaignSettingsRoute />,
                   handle: { crumb: () => ({ label: 'Settings' }) } satisfies CrumbHandle,
+                },
+                {
+                  path: 'search',
+                  element: <GlobalSearchPageRoute />,
+                  handle: { crumb: () => ({ label: 'Search' }) } satisfies CrumbHandle,
                 },
                 {
                   path: 'npcs',

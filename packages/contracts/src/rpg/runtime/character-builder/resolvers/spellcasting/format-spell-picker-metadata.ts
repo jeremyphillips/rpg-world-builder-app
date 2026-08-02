@@ -10,6 +10,7 @@ import {
   formatSpellDurationLabel,
   formatSpellRangeLabel,
 } from '../../../../content/spell/format-spell-metadata-core'
+import { stripHtmlTags } from '../../../../../lib/strip-html-tags'
 
 export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
 
@@ -86,13 +87,6 @@ export function buildSpellPickerCompactSummary(spell: Spell): SpellPickerCompact
       descriptors: buildSpellPickerClassificationDescriptors(spell),
     },
   }
-}
-
-function stripHtmlTags(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
 }
 
 /** Search text for spell picker ranking — name, school, level, tags, and plain description. */

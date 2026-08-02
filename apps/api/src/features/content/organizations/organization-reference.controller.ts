@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { HttpError } from '../../../lib/http-error'
-import { authorizeCampaignCharacterAccess } from '../../campaign/campaign-character-access.service'
+import { authorizeCampaignParticipantAccess } from '../../campaign/campaign-character-access.service'
 import { resolveCharacterOrganizationReferences } from './resolve-organization-reference'
 
 export async function listCharacterOrganizationReferences(
@@ -17,7 +17,7 @@ export async function listCharacterOrganizationReferences(
     throw HttpError.forbidden('Not a member of this campaign')
   }
 
-  const access = await authorizeCampaignCharacterAccess({
+  const access = await authorizeCampaignParticipantAccess({
     campaignId,
     characterId,
     viewerUserId: req.user!.id,

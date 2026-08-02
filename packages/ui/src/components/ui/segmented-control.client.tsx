@@ -5,6 +5,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { Text } from './text'
 import {
+  segmentedControlLabelVariants,
   segmentedControlMetadataVariants,
   segmentedControlRootVariants,
   segmentedControlSegmentVariants,
@@ -17,11 +18,15 @@ export type SegmentedControlOption<TValue extends string> = {
   metadata?: string
 }
 
+export type SegmentedControlSegmentWidth = 'equal' | 'auto'
+
 export type SegmentedControlProps<TValue extends string> = {
   value: TValue
   options: readonly SegmentedControlOption<TValue>[]
   onValueChange: (value: TValue) => void
   fullWidth?: boolean
+  /** `equal` stretches segments and truncates labels; `auto` sizes each segment to its label. */
+  segmentWidth?: SegmentedControlSegmentWidth
   'aria-label'?: string
   className?: string
 }
@@ -44,6 +49,7 @@ export function SegmentedControl<TValue extends string>({
   options,
   onValueChange,
   fullWidth = false,
+  segmentWidth = 'equal',
   'aria-label': ariaLabel,
   className,
 }: SegmentedControlProps<TValue>) {
@@ -111,11 +117,11 @@ export function SegmentedControl<TValue extends string>({
             aria-pressed={isActive}
             disabled={option.disabled}
             tabIndex={index === (activeIndex >= 0 ? activeIndex : 0) ? 0 : -1}
-            className={segmentedControlSegmentVariants({ active: isActive })}
+            className={segmentedControlSegmentVariants({ active: isActive, segmentWidth })}
             onClick={() => selectSegment(index)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
-            <span className="truncate">{option.label}</span>
+            <span className={segmentedControlLabelVariants({ segmentWidth })}>{option.label}</span>
             {option.metadata ? (
               <Text as="span" variant="muted" className={segmentedControlMetadataVariants()}>
                 {option.metadata}
