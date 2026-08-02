@@ -32,7 +32,13 @@ Overview `usedBy` counts are capability-gated:
 - **`batchUsageCounting`** — one set-level count resolver per overview load (creature-types: single species catalog read). Full blocker lists are **not** built during overview attach.
 - Disable/delete preflight and `GET .../usage` still resolve full blockers via per-entry usage resolvers.
 
-Pure reference extraction lives in `lib/reference-sources/` — field-path SSOT for extract + index; catalog loading and viewer-scoped character inclusion stay in orchestration resolvers one layer above.
+Pure reference extraction lives in `lib/reference-sources/` — field-path SSOT for extract + index; catalog loading and purpose-aware character inclusion stay in orchestration one layer above.
+
+Set-level discovery is registered via `defineVocabularyUsage` in
+`lib/vocabulary-usage-registrations.ts` — each registration declares sources with
+explicit `entry` / `batch` participation and derives entry/batch resolvers plus
+summary labels. Product capabilities (`usageResolution`, `deleteGuard`, …) remain
+independent in `@rpg/contracts`.
 
 ## Routes
 

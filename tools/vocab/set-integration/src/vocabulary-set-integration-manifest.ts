@@ -47,7 +47,7 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   languages: {
     owner: 'shared',
-    notes: 'Species, class grants, and viewer-scoped character language refs.',
+    notes: 'Species, class grants, and character language refs (entry-only; purpose-aware guards).',
     ...usageResolverExtension,
   },
   senses: {

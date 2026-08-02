@@ -150,11 +150,12 @@ Mutating routes enforce `VOCABULARY_SET_CAPABILITIES` server-side:
 | GET usage                            | `usageResolution` | 404            |
 | PATCH status → disabled (referenced) | `disableGuard`    | 409 + blockers |
 
-Partial API registries (usage resolvers registered for all browse sets with `usageResolution`):
+Partial API registries (usage discovery registered for all browse sets with `usageResolution`):
 
 | Registry                         | Location                                         | Role                                         |
 | -------------------------------- | ------------------------------------------------ | -------------------------------------------- |
-| `VOCABULARY_USAGE_RESOLVERS`     | `apps/api/.../vocabulary-usage-resolvers.ts`     | Usage counts + blockers                      |
+| `defineVocabularyUsage`          | `apps/api/.../vocabulary-usage-registrations.ts` | Set-level discovery SSOT (sources, labels)   |
+| `VOCABULARY_USAGE_RESOLVERS`     | derived from registrations                       | Entry usage counts + blockers                |
 | `reference-sources/`             | `apps/api/.../vocabulary/lib/reference-sources/` | Pure extract + index over loaded records     |
 | `VOCABULARY_VALIDATION_ADAPTERS` | `apps/api/.../vocabulary-validation-adapters.ts` | Optional validation beyond active membership |
 | `VOCABULARY_ENTRY_FORM_REGISTRY` | dashboard `vocabulary-entry-form-registry.ts`    | Create/edit form defs for enabled sets       |
@@ -176,6 +177,8 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 - **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
 - **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max `VOCABULARY_USAGE_SUMMARY_LIMIT` from contracts). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned, presentational only) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms.
 - **Capability split** — `usageResolution` enables counts and usage GET; `disableGuard` / `deleteGuard` are independent guard flags; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support (`batchUsageCounting` requires `usageResolution`).
+- **Registration vs capability** — `defineVocabularyUsage({ setId, sources[], summaryLabels })` owns discovery topology (which sources participate in entry vs batch resolution). `VOCABULARY_SET_CAPABILITIES` owns product behavior (which surfaces are on). Neither duplicates the other.
+- **Purpose orchestration** — resolver context carries `purpose: 'viewer_display' | 'authoritative_guard'`. Overview attach and usage GET use `viewer_display`; disable/delete preflight and PATCH/DELETE 409 recompute `authoritative_guard` even if preflight just ran. Character language refs are viewer-scoped for display but campaign-wide for guards.
 - **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; batch overview loads use `resolveVocabularyOptionUsageBatch`. Reference discovery logic lives in the API (`apps/api/.../vocabulary/lib/`); contracts own neutral DTOs only.
 - **UI:** informational `UsageReferencesSection` on detail; overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
 
@@ -336,16 +339,19 @@ usage counting (below).
 
 ### Usage counts (`usedBy`)
 
-`VOCABULARY_USAGE_RESOLVERS` in the API is the **single enforcement point** for
-delete and disable guards. Creature-types counts species references and returns
-`kind: 'content'` blockers for disable preflight and PATCH 409 races.
+`defineVocabularyUsage` registrations in the API are the **discovery SSOT** for
+where references come from. Derived entry/batch resolvers are the **single
+enforcement point** for delete and disable guards. Creature-types counts species
+references and returns `kind: 'content'` blockers for disable preflight and PATCH
+409 races.
 
 - Resolved sets attach `usedBy` on every option when `usageResolution` is true.
 - Delete campaign entries succeeds when `usedBy === 0` (or `deleteGuard` is off); otherwise **409 in_use**.
-- Disable (status → disabled) runs preflight via `GET …/disable-availability`; PATCH returns **409** with blockers when referenced.
+- Disable (status → disabled) runs advisory preflight via `GET …/disable-availability`; PATCH always recomputes guard usage and returns **409** with blockers when referenced.
 - System entries cannot be deleted regardless of usage.
+- Guard resolution is campaign-authoritative (`authoritative_guard` purpose) and cannot be narrowed by viewer visibility; display resolution never exposes refs outside the viewer's allowed scope.
 
-When adding a referencing feature, extend the set's usage resolver rather than adding ad-hoc delete checks.
+When adding a referencing feature, extend the set's usage registration rather than adding ad-hoc delete checks.
 
 ### Set capabilities registry
 

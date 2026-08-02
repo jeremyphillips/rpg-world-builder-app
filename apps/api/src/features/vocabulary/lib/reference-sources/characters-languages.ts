@@ -1,10 +1,11 @@
 import type { CampaignRole, ContentUsageBlocker } from '@rpg/contracts'
 import { isCampaignManager } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../../campaign'
-import { CharacterModel } from '../../../character'
+import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
+import { CharacterModel } from '../../../character/character.model'
 
 import { indexRecordsByVocabId } from './index-by-vocab-id'
+import type { VocabularyUsagePurpose } from '../vocabulary-usage-context'
 
 export type VocabularyUsageViewerContext = {
   userId: string
@@ -41,6 +42,34 @@ function extractCharacterLanguageIds(hit: CharacterLanguageHit): readonly string
   return (hit.proficiencies?.languages ?? []).map((entry) => entry.language)
 }
 
+async function loadActiveCharacterIds(campaignId: string): Promise<string[]> {
+  const participations = await listOpenParticipationsForCampaign(campaignId)
+  return participations
+    .filter((participation) => participation.roster.status !== 'retired')
+    .map((participation) => participation.characterId)
+}
+
+async function loadCharacterLanguageHits(
+  characterIds: readonly string[],
+): Promise<CharacterLanguageHit[]> {
+  if (characterIds.length === 0) {
+    return []
+  }
+
+  return CharacterModel.find({
+    _id: { $in: characterIds },
+    'proficiencies.languages.0': { $exists: true },
+  })
+    .select({ _id: 1, name: 1, characterType: 1, proficiencies: 1 })
+    .lean<CharacterLanguageHit[]>()
+}
+
+async function loadAuthoritativeCharacterLanguageHits(
+  campaignId: string,
+): Promise<CharacterLanguageHit[]> {
+  return loadCharacterLanguageHits(await loadActiveCharacterIds(campaignId))
+}
+
 async function loadVisibleCharacterLanguageHits(
   campaignId: string,
   viewer: VocabularyUsageViewerContext,
@@ -56,28 +85,34 @@ async function loadVisibleCharacterLanguageHits(
     })
     .map((participation) => participation.characterId)
 
-  if (visibleCharacterIds.length === 0) {
+  return loadCharacterLanguageHits(visibleCharacterIds)
+}
+
+async function loadCharacterLanguageHitsForPurpose(input: {
+  campaignId: string
+  purpose?: VocabularyUsagePurpose
+  viewer?: VocabularyUsageViewerContext
+}): Promise<CharacterLanguageHit[]> {
+  const purpose = input.purpose ?? 'viewer_display'
+
+  if (purpose === 'authoritative_guard') {
+    return loadAuthoritativeCharacterLanguageHits(input.campaignId)
+  }
+
+  if (!input.viewer) {
     return []
   }
 
-  return CharacterModel.find({
-    _id: { $in: visibleCharacterIds },
-    'proficiencies.languages.0': { $exists: true },
-  })
-    .select({ _id: 1, name: 1, characterType: 1, proficiencies: 1 })
-    .lean<CharacterLanguageHit[]>()
+  return loadVisibleCharacterLanguageHits(input.campaignId, input.viewer)
 }
 
-/** Viewer-scoped character language refs — returns empty index when viewer context is absent. */
+/** Character language refs — viewer-scoped for display; campaign-wide for guards. */
 export async function indexCharacterLanguageBlockersByLanguageId(input: {
   campaignId: string
+  purpose?: VocabularyUsagePurpose
   viewer?: VocabularyUsageViewerContext
 }): Promise<Map<string, ContentUsageBlocker[]>> {
-  if (!input.viewer) {
-    return new Map()
-  }
-
-  const hits = await loadVisibleCharacterLanguageHits(input.campaignId, input.viewer)
+  const hits = await loadCharacterLanguageHitsForPurpose(input)
 
   return indexRecordsByVocabId(hits, extractCharacterLanguageIds, (hit) =>
     characterToUsageBlocker(hit, input.campaignId),

@@ -29,7 +29,10 @@ import {
   resolveVocabularyOptionUsageBatch,
   type VocabularyUsageResolverContext,
 } from '../lib/vocabulary-usage-resolvers'
-import { buildVocabularyUsageResolverContext } from '../lib/vocabulary-usage-context'
+import {
+  buildVocabularyUsageResolverContext,
+  withAuthoritativeGuardPurpose,
+} from '../lib/vocabulary-usage-context'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -83,7 +86,11 @@ async function resolveVocabularyDisableBlockers(
     return { status: 'allowed' }
   }
 
-  const { blockers } = await resolveVocabularyOptionUsage(ctx, setId, entryId)
+  const { blockers } = await resolveVocabularyOptionUsage(
+    withAuthoritativeGuardPurpose(ctx),
+    setId,
+    entryId,
+  )
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }
@@ -101,7 +108,11 @@ async function resolveVocabularyDeleteBlockers(
     return { status: 'allowed' }
   }
 
-  const { blockers } = await resolveVocabularyOptionUsage(ctx, setId, entryId)
+  const { blockers } = await resolveVocabularyOptionUsage(
+    withAuthoritativeGuardPurpose(ctx),
+    setId,
+    entryId,
+  )
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }

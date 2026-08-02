@@ -1,88 +1,49 @@
 import {
-  CONDITION_SET_ID,
-  CREATURE_SIZE_SET_ID,
-  CREATURE_TYPE_SET_ID,
-  DAMAGE_TYPE_SET_ID,
-  EQUIPMENT_CATEGORY_SET_ID,
   getVocabularySetCapability,
-  LANGUAGE_SET_ID,
-  SENSE_SET_ID,
-  SPELL_SCHOOL_SET_ID,
   vocabularySetIdsRequiringBatchCountResolver,
   vocabularySetIdsRequiringUsageResolver,
-  WEAPON_PROPERTY_SET_ID,
-  type ContentUsageBlocker,
   type VocabularyOptionSetId,
   type VocabularyUsageSummaryLabels,
 } from '@rpg/contracts'
 
 import type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
-import {
-  resolveConditionSpellUsage,
-  resolveConditionSpellUsageBatch,
-} from './resolve-condition-spell-usage'
-import {
-  resolveCreatureTypeSpeciesUsage,
-  resolveCreatureTypeSpeciesUsageBatch,
-} from './resolve-creature-type-species-usage'
-import { resolveDamageTypeUsage, resolveDamageTypeUsageBatch } from './resolve-damage-type-usage'
-import {
-  resolveEquipmentCategoryUsage,
-  resolveEquipmentCategoryUsageBatch,
-} from './resolve-equipment-category-usage'
-import { resolveLanguageUsage, resolveLanguageUsageBatch } from './resolve-language-usage'
-import {
-  resolveSenseSpeciesUsage,
-  resolveSenseSpeciesUsageBatch,
-} from './resolve-sense-species-usage'
-import { resolveSizeSpeciesUsage, resolveSizeSpeciesUsageBatch } from './resolve-size-species-usage'
-import {
-  resolveSpellSchoolSpellUsage,
-  resolveSpellSchoolSpellUsageBatch,
-} from './resolve-spell-school-spell-usage'
-import {
-  resolveWeaponPropertyEquipmentUsage,
-  resolveWeaponPropertyEquipmentUsageBatch,
-} from './resolve-weapon-property-equipment-usage'
+import type {
+  VocabularyUsageRegistration,
+  VocabularyUsageResolver,
+  VocabularyUsageResolverResult,
+  VocabularySetBatchUsageResolver,
+} from './define-vocabulary-usage'
+import { VOCABULARY_USAGE_REGISTRATIONS } from './vocabulary-usage-registrations'
 import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 
-export type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
+export type {
+  VocabularyUsageResolverContext,
+  VocabularyUsagePurpose,
+} from './vocabulary-usage-context'
 export type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
-
-export type VocabularyUsageResolverResult = {
-  count: number
-  blockers: ContentUsageBlocker[]
-}
-
-export type VocabularyUsageResolver = (
-  ctx: VocabularyUsageResolverContext,
-  entryId: string,
-) => Promise<VocabularyUsageResolverResult>
-
-export type VocabularySetBatchUsageResolver = (
-  ctx: VocabularyUsageResolverContext,
-  entryIds: readonly string[],
-) => Promise<Map<string, VocabularyBatchUsageEntryResult>>
+export type {
+  VocabularyUsageResolver,
+  VocabularyUsageResolverResult,
+  VocabularySetBatchUsageResolver,
+} from './define-vocabulary-usage'
 
 const defaultUsageResolver: VocabularyUsageResolver = async () => ({
   count: 0,
   blockers: [],
 })
 
-/** Display-ready tooltip nouns for overview Used by summaries — API-owned, presentational only. */
+function listRegistrations(): VocabularyUsageRegistration[] {
+  return Object.values(VOCABULARY_USAGE_REGISTRATIONS).filter(
+    (registration): registration is VocabularyUsageRegistration => registration != null,
+  )
+}
+
+/** Derived from {@link defineVocabularyUsage} registrations — display-ready tooltip nouns. */
 export const VOCABULARY_USAGE_SUMMARY_LABELS: Partial<
   Record<VocabularyOptionSetId, VocabularyUsageSummaryLabels>
-> = {
-  [CREATURE_TYPE_SET_ID]: { singular: 'species', plural: 'species' },
-  [SPELL_SCHOOL_SET_ID]: { singular: 'spell', plural: 'spells' },
-  [CREATURE_SIZE_SET_ID]: { singular: 'species', plural: 'species' },
-  [WEAPON_PROPERTY_SET_ID]: { singular: 'weapon', plural: 'weapons' },
-  [EQUIPMENT_CATEGORY_SET_ID]: { singular: 'item', plural: 'items' },
-  [CONDITION_SET_ID]: { singular: 'spell', plural: 'spells' },
-  [DAMAGE_TYPE_SET_ID]: { singular: 'reference', plural: 'references' },
-  [LANGUAGE_SET_ID]: { singular: 'reference', plural: 'references' },
-  [SENSE_SET_ID]: { singular: 'species', plural: 'species' },
-}
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.summaryLabels]),
+)
 
 export function getVocabularyUsageSummaryLabels(
   setId: VocabularyOptionSetId,
@@ -90,35 +51,19 @@ export function getVocabularyUsageSummaryLabels(
   return VOCABULARY_USAGE_SUMMARY_LABELS[setId]
 }
 
-/** Partial registry — only sets with custom usage/blocker logic register an entry. */
+/** Derived entry resolver registry from set-level usage registrations. */
 export const VOCABULARY_USAGE_RESOLVERS: Partial<
   Record<VocabularyOptionSetId, VocabularyUsageResolver>
-> = {
-  [CREATURE_TYPE_SET_ID]: resolveCreatureTypeSpeciesUsage,
-  [SPELL_SCHOOL_SET_ID]: resolveSpellSchoolSpellUsage,
-  [CREATURE_SIZE_SET_ID]: resolveSizeSpeciesUsage,
-  [WEAPON_PROPERTY_SET_ID]: resolveWeaponPropertyEquipmentUsage,
-  [EQUIPMENT_CATEGORY_SET_ID]: resolveEquipmentCategoryUsage,
-  [CONDITION_SET_ID]: resolveConditionSpellUsage,
-  [DAMAGE_TYPE_SET_ID]: resolveDamageTypeUsage,
-  [LANGUAGE_SET_ID]: resolveLanguageUsage,
-  [SENSE_SET_ID]: resolveSenseSpeciesUsage,
-}
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.entryResolver]),
+)
 
-/** Partial registry — batch resolvers for overview attachUsageCounts. */
+/** Derived batch resolver registry from set-level usage registrations. */
 export const VOCABULARY_BATCH_USAGE_RESOLVERS: Partial<
   Record<VocabularyOptionSetId, VocabularySetBatchUsageResolver>
-> = {
-  [CREATURE_TYPE_SET_ID]: resolveCreatureTypeSpeciesUsageBatch,
-  [SPELL_SCHOOL_SET_ID]: resolveSpellSchoolSpellUsageBatch,
-  [CREATURE_SIZE_SET_ID]: resolveSizeSpeciesUsageBatch,
-  [WEAPON_PROPERTY_SET_ID]: resolveWeaponPropertyEquipmentUsageBatch,
-  [EQUIPMENT_CATEGORY_SET_ID]: resolveEquipmentCategoryUsageBatch,
-  [CONDITION_SET_ID]: resolveConditionSpellUsageBatch,
-  [DAMAGE_TYPE_SET_ID]: resolveDamageTypeUsageBatch,
-  [LANGUAGE_SET_ID]: resolveLanguageUsageBatch,
-  [SENSE_SET_ID]: resolveSenseSpeciesUsageBatch,
-}
+> = Object.fromEntries(
+  listRegistrations().map((registration) => [registration.setId, registration.batchResolver]),
+)
 
 /** @deprecated Use {@link VOCABULARY_BATCH_USAGE_RESOLVERS}. */
 export const VOCABULARY_BATCH_COUNT_RESOLVERS = VOCABULARY_BATCH_USAGE_RESOLVERS
@@ -140,20 +85,22 @@ export function getVocabularyBatchCountResolver(
   return getVocabularyBatchUsageResolver(setId)
 }
 
-/** Asserts every guard/usage-resolution-enabled set has a registered resolver. */
+/** Asserts every guard/usage-resolution-enabled set has a usage registration with entry sources. */
 export function assertVocabularyUsageResolverCoverage(): void {
   for (const setId of vocabularySetIdsRequiringUsageResolver()) {
-    if (!VOCABULARY_USAGE_RESOLVERS[setId]) {
-      throw new Error(`Missing vocabulary usage resolver for "${setId}".`)
+    const registration = VOCABULARY_USAGE_REGISTRATIONS[setId]
+    if (!registration || !registration.sources.some((source) => source.entry)) {
+      throw new Error(`Missing vocabulary usage registration for "${setId}".`)
     }
   }
 }
 
-/** Asserts every batchUsageCounting set has a registered batch usage resolver. */
+/** Asserts every batchUsageCounting set has a registration with batch sources. */
 export function assertVocabularyBatchCountResolverCoverage(): void {
   for (const setId of vocabularySetIdsRequiringBatchCountResolver()) {
-    if (!VOCABULARY_BATCH_USAGE_RESOLVERS[setId]) {
-      throw new Error(`Missing vocabulary batch usage resolver for "${setId}".`)
+    const registration = VOCABULARY_USAGE_REGISTRATIONS[setId]
+    if (!registration || !registration.sources.some((source) => source.batch)) {
+      throw new Error(`Missing vocabulary batch usage registration for "${setId}".`)
     }
   }
 }
@@ -193,3 +140,8 @@ export async function resolveVocabularyOptionUsageCountsBatch(
   const results = await resolveVocabularyOptionUsageBatch(ctx, setId, entryIds)
   return new Map([...results.entries()].map(([entryId, result]) => [entryId, result.count]))
 }
+
+export {
+  getVocabularyUsageRegistration,
+  VOCABULARY_USAGE_REGISTRATIONS,
+} from './vocabulary-usage-registrations'

@@ -1,29 +1,15 @@
-import type { Species } from '@rpg/contracts'
+import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
-import { speciesWriteConfig } from '../../content/species/species.config'
-
-import { extractSpeciesCreatureTypeId } from './reference-sources/species'
-import {
-  resolveCatalogVocabUsage,
-  resolveCatalogVocabUsageBatch,
-} from './resolve-catalog-vocab-usage'
-import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 import type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
-
-function speciesCreatureTypeUsageConfig() {
-  return {
-    readConfig: speciesWriteConfig.readConfig,
-    contentTypeKey: 'species' as const,
-    extractIds: (record: Species) => extractSpeciesCreatureTypeId(record),
-  }
-}
+import { getVocabularyUsageRegistration } from './vocabulary-usage-registrations'
+import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 
 /** Batch resolver for overview loads — one species catalog read per set. */
 export async function resolveCreatureTypeSpeciesUsageBatch(
   ctx: VocabularyUsageResolverContext,
   entryIds: readonly string[],
 ): Promise<Map<string, VocabularyBatchUsageEntryResult>> {
-  return resolveCatalogVocabUsageBatch(ctx, speciesCreatureTypeUsageConfig(), entryIds)
+  return getVocabularyUsageRegistration(CREATURE_TYPE_SET_ID).batchResolver(ctx, entryIds)
 }
 
 /** Species referencing a creature type id — used for usage counts and disable/delete blockers. */
@@ -31,5 +17,5 @@ export async function resolveCreatureTypeSpeciesUsage(
   ctx: VocabularyUsageResolverContext,
   entryId: string,
 ): Promise<{ count: number; blockers: import('@rpg/contracts').ContentUsageBlocker[] }> {
-  return resolveCatalogVocabUsage(ctx, speciesCreatureTypeUsageConfig(), entryId)
+  return getVocabularyUsageRegistration(CREATURE_TYPE_SET_ID).entryResolver(ctx, entryId)
 }

@@ -1,33 +1,19 @@
-import type { Equipment } from '@rpg/contracts'
+import { WEAPON_PROPERTY_SET_ID } from '@rpg/contracts'
 
-import { equipmentWriteConfig } from '../../content/equipment/equipment.config'
-
-import { extractWeaponPropertyIds } from './reference-sources/equipment'
-import {
-  resolveCatalogVocabUsage,
-  resolveCatalogVocabUsageBatch,
-} from './resolve-catalog-vocab-usage'
-import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 import type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
-
-function weaponPropertyUsageConfig() {
-  return {
-    readConfig: equipmentWriteConfig.readConfig,
-    contentTypeKey: 'equipment' as const,
-    extractIds: (record: Equipment) => extractWeaponPropertyIds(record),
-  }
-}
+import { getVocabularyUsageRegistration } from './vocabulary-usage-registrations'
+import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 
 export async function resolveWeaponPropertyEquipmentUsageBatch(
   ctx: VocabularyUsageResolverContext,
   entryIds: readonly string[],
 ): Promise<Map<string, VocabularyBatchUsageEntryResult>> {
-  return resolveCatalogVocabUsageBatch(ctx, weaponPropertyUsageConfig(), entryIds)
+  return getVocabularyUsageRegistration(WEAPON_PROPERTY_SET_ID).batchResolver(ctx, entryIds)
 }
 
 export async function resolveWeaponPropertyEquipmentUsage(
   ctx: VocabularyUsageResolverContext,
   entryId: string,
 ): Promise<{ count: number; blockers: import('@rpg/contracts').ContentUsageBlocker[] }> {
-  return resolveCatalogVocabUsage(ctx, weaponPropertyUsageConfig(), entryId)
+  return getVocabularyUsageRegistration(WEAPON_PROPERTY_SET_ID).entryResolver(ctx, entryId)
 }

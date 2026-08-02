@@ -1,33 +1,19 @@
-import type { Species } from '@rpg/contracts'
+import { CREATURE_SIZE_SET_ID } from '@rpg/contracts'
 
-import { speciesWriteConfig } from '../../content/species/species.config'
-
-import { extractSpeciesSizeIds } from './reference-sources/species'
-import {
-  resolveCatalogVocabUsage,
-  resolveCatalogVocabUsageBatch,
-} from './resolve-catalog-vocab-usage'
-import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 import type { VocabularyBatchUsageEntryResult } from './build-vocabulary-batch-entry-result'
-
-function speciesSizeUsageConfig() {
-  return {
-    readConfig: speciesWriteConfig.readConfig,
-    contentTypeKey: 'species' as const,
-    extractIds: (record: Species) => extractSpeciesSizeIds(record),
-  }
-}
+import { getVocabularyUsageRegistration } from './vocabulary-usage-registrations'
+import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'
 
 export async function resolveSizeSpeciesUsageBatch(
   ctx: VocabularyUsageResolverContext,
   entryIds: readonly string[],
 ): Promise<Map<string, VocabularyBatchUsageEntryResult>> {
-  return resolveCatalogVocabUsageBatch(ctx, speciesSizeUsageConfig(), entryIds)
+  return getVocabularyUsageRegistration(CREATURE_SIZE_SET_ID).batchResolver(ctx, entryIds)
 }
 
 export async function resolveSizeSpeciesUsage(
   ctx: VocabularyUsageResolverContext,
   entryId: string,
 ): Promise<{ count: number; blockers: import('@rpg/contracts').ContentUsageBlocker[] }> {
-  return resolveCatalogVocabUsage(ctx, speciesSizeUsageConfig(), entryId)
+  return getVocabularyUsageRegistration(CREATURE_SIZE_SET_ID).entryResolver(ctx, entryId)
 }
