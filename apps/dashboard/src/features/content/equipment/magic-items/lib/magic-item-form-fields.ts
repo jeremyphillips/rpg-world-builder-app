@@ -7,7 +7,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel } from '@/features/homebrew'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'

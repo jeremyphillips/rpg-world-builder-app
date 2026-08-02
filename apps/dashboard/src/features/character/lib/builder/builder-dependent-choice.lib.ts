@@ -15,7 +15,7 @@ import {
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
   getSenseLabelFromVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { buildSpeciesDetailViewModel, buildSpellGrantVocabulary } from '@/features/content'
 
 export type DependentChoiceSectionCopy = {

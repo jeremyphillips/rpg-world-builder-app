@@ -17,7 +17,7 @@ import {
   getSpellSchoolLabelFromVocabulary,
   useDamageTypeVocabulary,
   useSpellSchoolVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { useSpells } from '../hooks/use-spells'
 import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'

@@ -9,7 +9,7 @@ import {
   groupUsageReferences,
 } from '@/lib/usage-references/group-usage-references'
 
-import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/homebrew/lib/vocabulary/usage-references.constants'
+import { VOCABULARY_USAGE_REFERENCE_DISCLOSURE_LIMIT } from '@/features/vocabulary/lib/usage-references.constants'
 import { UsageReferenceGroupList } from './usage-reference-group-list.client'
 
 export type UsageReferencesSectionProps = {

@@ -183,10 +183,16 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 ## Dashboard registries
 
-Vocabulary UI lives in `apps/dashboard/src/features/homebrew/` (feature-folder
-move is tracked as follow-up debt). Category metadata SSOT is in
-`@rpg/contracts` (`VOCABULARY_CATEGORIES`, `BROWSABLE_VOCABULARY_CATEGORIES`);
-the dashboard registry is a thin projection.
+Vocabulary consumption (API clients, hooks, option maps, field factories, entry
+form model) lives in `apps/dashboard/src/features/vocabulary/`. Game Terms
+authoring UI (hub, overview, detail, sheets, bulk availability) lives in
+`apps/dashboard/src/features/game-terms/` and depends on `vocabulary` only.
+The Homebrew hub and ruleset patch hooks remain in `features/homebrew/` —
+ruleset patch is unrelated debt; do not route new vocabulary consumption through
+homebrew.
+
+Category metadata SSOT is in `@rpg/contracts` (`VOCABULARY_CATEGORIES`,
+`BROWSABLE_VOCABULARY_CATEGORIES`); dashboard registries are thin projections.
 
 ### Content cards (Homebrew hub)
 
@@ -197,7 +203,8 @@ updating the registry fails CI.
 
 ### Game Terms categories (hub + routes)
 
-`GAME_TERMS_VOCABULARY_CATEGORIES` in `lib/hub/vocabulary-set-registry.ts`
+`GAME_TERMS_VOCABULARY_CATEGORIES` in
+`features/game-terms/lib/hub/vocabulary-set-registry.ts`
 projects `BROWSABLE_VOCABULARY_CATEGORIES` from contracts — label, description,
 order, and browse visibility come from the SSOT; do not maintain parallel maps.
 

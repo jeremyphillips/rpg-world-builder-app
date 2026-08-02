@@ -33,7 +33,7 @@ import {
   type GroupFieldItem,
 } from '@rpg/ui/form'
 
-import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/homebrew'
+import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects.client'
 import {

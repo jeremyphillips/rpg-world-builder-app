@@ -13,7 +13,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel } from '@/features/homebrew'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { EditionPresetEffects } from '../../../components/edition-preset-effects.client'
 import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-form-labels'

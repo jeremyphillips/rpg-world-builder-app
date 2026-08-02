@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { PROFICIENCY_DOMAIN_ENTRIES, skillSchema } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
-import { vocabularyHubLabel } from '@/features/homebrew/lib/vocabulary/term-labels'
+import { vocabularyHubLabel } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import {

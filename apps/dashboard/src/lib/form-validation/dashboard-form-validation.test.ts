@@ -21,7 +21,7 @@ import {
   buildSeedAttackResolutionModeVocabulary,
   buildSeedCreatureTypeVocabulary,
   buildSeedEditionPresetVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import {
   buildMechanicsConfigFields,
   mechanicsValuesSchema,
@@ -43,7 +43,7 @@ import {
   vocabularyEntryCreateFormSchema,
   vocabularyEntryEditFields,
   vocabularyEntryEditFormSchema,
-} from '@/features/homebrew/lib/vocabulary/vocabulary-entry-form-fields'
+} from '@/features/vocabulary/lib/vocabulary-entry-form-fields'
 
 const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(buildSeedCreatureTypeVocabulary())
 const editionPresetOptions = buildEditionPresetFieldOptions(buildSeedEditionPresetVocabulary())

@@ -15,7 +15,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/homebrew'
+import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'

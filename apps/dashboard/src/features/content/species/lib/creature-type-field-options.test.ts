@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
-import { buildSeedCreatureTypeVocabulary } from '@/features/homebrew'
+import { buildSeedCreatureTypeVocabulary } from '@/features/vocabulary'
 
 import {
   allowedCharacterCreatureTypesFromCtx,

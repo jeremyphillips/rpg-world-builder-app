@@ -3,7 +3,7 @@ import { Form } from '@rpg/ui/form'
 import { z } from 'zod'
 
 import { makeContentFormCtx } from '@/features/content/lib/fixtures/content-form-ctx'
-import { buildSeedDamageTypeVocabulary } from '@/features/homebrew'
+import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 import { resolutionFields } from '../../lib/form/resolution-form-fields'

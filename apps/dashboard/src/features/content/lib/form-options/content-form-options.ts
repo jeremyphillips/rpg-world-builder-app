@@ -23,7 +23,7 @@ import {
   useLanguageVocabulary,
   useSenseVocabulary,
   useSpellSchoolVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useEquipment } from '../../equipment/hooks/use-equipment'

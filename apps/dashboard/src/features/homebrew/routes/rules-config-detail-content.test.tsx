@@ -15,14 +15,16 @@ import {
 import { renderWithDataRouter } from '@/lib/test-router'
 import { makeTestQueryClient } from '@/test/render'
 
-import { buildAttackResolutionModeVocabulary } from '../lib/vocabulary/sets/attack-resolution-modes'
-import { buildCreatureTypeVocabulary } from '../lib/vocabulary/sets/creature-types'
-import { buildEditionPresetVocabulary } from '../lib/vocabulary/sets/edition-presets'
-import { buildLanguageVocabulary } from '../lib/vocabulary/sets/languages'
-import { useAttackResolutionModeVocabulary } from '../hooks/use-attack-resolution-mode-vocabulary'
-import { useCreatureTypeVocabulary } from '../hooks/use-creature-type-vocabulary'
-import { useEditionPresetVocabulary } from '../hooks/use-edition-preset-vocabulary'
-import { useLanguageVocabulary } from '../hooks/use-language-vocabulary'
+import {
+  buildAttackResolutionModeVocabulary,
+  buildCreatureTypeVocabulary,
+  buildEditionPresetVocabulary,
+  buildLanguageVocabulary,
+  useAttackResolutionModeVocabulary,
+  useCreatureTypeVocabulary,
+  useEditionPresetVocabulary,
+  useLanguageVocabulary,
+} from '@/features/vocabulary'
 import { useRulesetPatch } from '../hooks/use-ruleset-patch'
 
 vi.mock('@/features/campaign', async (importOriginal) => {
@@ -53,21 +55,16 @@ vi.mock('../hooks/use-ruleset-patch', () => ({
   useRulesetPatch: vi.fn(),
 }))
 
-vi.mock('../hooks/use-creature-type-vocabulary', () => ({
-  useCreatureTypeVocabulary: vi.fn(),
-}))
-
-vi.mock('../hooks/use-language-vocabulary', () => ({
-  useLanguageVocabulary: vi.fn(),
-}))
-
-vi.mock('../hooks/use-edition-preset-vocabulary', () => ({
-  useEditionPresetVocabulary: vi.fn(),
-}))
-
-vi.mock('../hooks/use-attack-resolution-mode-vocabulary', () => ({
-  useAttackResolutionModeVocabulary: vi.fn(),
-}))
+vi.mock('@/features/vocabulary', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
+  return {
+    ...actual,
+    useCreatureTypeVocabulary: vi.fn(),
+    useLanguageVocabulary: vi.fn(),
+    useEditionPresetVocabulary: vi.fn(),
+    useAttackResolutionModeVocabulary: vi.fn(),
+  }
+})
 
 vi.mock('../hooks/use-patch-character-creation-mutation', () => ({
   usePatchCharacterCreationMutation: vi.fn(() => ({

@@ -132,11 +132,12 @@ and [content/README.md](../src/features/content/README.md).
 These patterns intentionally **do not** follow `*-form-fields` / `*-form-values`
 naming:
 
-| Area                       | Pattern                         | Notes                                            |
-| -------------------------- | ------------------------------- | ------------------------------------------------ |
-| `user/lib/*-fields.ts`     | Profile/settings field builders | Not content `ContentFormDef` modules             |
-| `homebrew/lib/vocabulary/` | Vocabulary set editors          | See [vocabulary.md](../../../docs/vocabulary.md) |
-| `auth/`                    | No `lib/` folder                | Session gate + thin hooks only                   |
+| Area                   | Pattern                         | Notes                                            |
+| ---------------------- | ------------------------------- | ------------------------------------------------ |
+| `user/lib/*-fields.ts` | Profile/settings field builders | Not content `ContentFormDef` modules             |
+| `vocabulary/`          | Vocabulary consumption adapters | See [vocabulary.md](../../../docs/vocabulary.md) |
+| `game-terms/`          | Game Terms authoring UI         | See [vocabulary.md](../../../docs/vocabulary.md) |
+| `auth/`                | No `lib/` folder                | Session gate + thin hooks only                   |
 
 Shared content infra (`content-*-form-fields.ts`, `grant-form-*.ts`, `content-form-registry.ts`,
 etc.) is listed as **exception** rows in the form-lib inventory — not per-type

@@ -28,7 +28,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel } from '@/features/homebrew'
+import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 export const RESOLUTION_SECTION_LABELS = {
   selection: 'Selection',

@@ -14,7 +14,7 @@ import {
   useSenseVocabulary,
   getLanguageLabelFromVocabulary,
   getSenseLabelFromVocabulary,
-} from '@/features/homebrew'
+} from '@/features/vocabulary'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
 import {
   buildSpeciesDetailViewModel,

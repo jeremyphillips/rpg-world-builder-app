@@ -4,7 +4,7 @@ import { type SpeciesCultureConfig } from '@rpg/contracts'
 import { personalNameComponentSchema } from '@rpg/contracts/vocab'
 import { type FormItem } from '@rpg/ui/form'
 
-import { buildActiveLanguageFieldOptions } from '@/features/homebrew'
+import { buildActiveLanguageFieldOptions } from '@/features/vocabulary'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'

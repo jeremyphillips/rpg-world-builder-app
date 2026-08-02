@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
-import { buildSeedSpellSchoolVocabulary } from '@/features/homebrew'
+import { buildSeedSpellSchoolVocabulary } from '@/features/vocabulary'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
 import { spellsColumns } from './spells-overview-columns'
