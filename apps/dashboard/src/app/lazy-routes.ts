@@ -274,3 +274,6 @@ export const VocabularyDetailRoute = withRouteSuspense(
 export const RulesConfigDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/homebrew/routes/rules-config-detail'), 'RulesConfigDetail'),
 )
+export const GlobalSearchPageRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/global-search/routes/global-search-page'), 'GlobalSearchPage'),
+)
