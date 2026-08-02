@@ -9,6 +9,7 @@ import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import {
   searchResultRowHeaderVariants,
   searchResultRowInsetContentVariants,
+  searchResultRowSecondaryVariants,
   searchResultRowTitleRowVariants,
   searchResultRowTitleVariants,
   searchResultRowTypeLabelVariants,
@@ -56,7 +57,11 @@ export function SearchResultRow({
         </Text>
       </div>
       {secondary ? (
-        <Text as="p" variant="muted" className="mt-1 text-sm">
+        <Text
+          as="p"
+          variant="muted"
+          className={searchResultRowSecondaryVariants({ inset: inset ?? 'none' })}
+        >
           {secondary}
         </Text>
       ) : null}
@@ -66,7 +71,7 @@ export function SearchResultRow({
   return (
     <Link
       to={href}
-      className={cn(searchResultRowVariants(), className)}
+      className={cn(searchResultRowVariants({ inset: inset ?? 'none' }), className)}
       onClick={onActivate}
       aria-label={accessibleName}
     >

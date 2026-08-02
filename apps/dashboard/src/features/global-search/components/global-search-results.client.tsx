@@ -2,13 +2,13 @@
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { Eyebrow, cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
+import { Eyebrow, notificationMenuFooterLinkVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
-import { globalSearchPreviewInsetClasses } from '../lib/global-search-preview.variants'
 import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
+import { GlobalSearchPreviewGroupSection } from './global-search-preview-group-section.client'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
 import { SearchResultRow, type SearchResultRowInset } from './search-result-row.client'
 
@@ -35,7 +35,24 @@ export function GlobalSearchGroupedResults({
     return null
   }
 
-  const insetClasses = inset === 'panel' ? globalSearchPreviewInsetClasses : undefined
+  if (inset === 'panel') {
+    return (
+      <>
+        {sections.map((section, sectionIndex) => (
+          <GlobalSearchPreviewGroupSection
+            key={section.filterGroup}
+            section={section}
+            sectionIndex={sectionIndex}
+            sections={sections}
+            resolveHref={resolveHref}
+            onResultActivate={onResultActivate}
+            onShowAll={onShowAll}
+            showAllHref={showAllHref}
+          />
+        ))}
+      </>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -43,10 +60,11 @@ export function GlobalSearchGroupedResults({
         const groupLabel = getGlobalSearchFilterGroupLabel(section.filterGroup)
         const showAllTarget =
           showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
+        const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
 
         return (
           <section key={section.filterGroup} aria-label={groupLabel}>
-            <Eyebrow size="sm" className={cn('mb-2', insetClasses)}>
+            <Eyebrow size="sm" className="mb-2">
               {groupLabel}
             </Eyebrow>
             <div>
@@ -59,7 +77,6 @@ export function GlobalSearchGroupedResults({
                   href={resolveHref(document)}
                   campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
                   onActivate={onResultActivate}
-                  inset={inset}
                 />
               ))}
             </div>
@@ -67,23 +84,17 @@ export function GlobalSearchGroupedResults({
               onShowAll ? (
                 <button
                   type="button"
-                  className={cn(
-                    notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
-                    insetClasses,
-                  )}
+                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
                   onClick={() => onShowAll(section.filterGroup)}
                 >
-                  {GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →
+                  {showAllLabel}
                 </button>
               ) : (
                 <Link
                   to={showAllTarget}
-                  className={cn(
-                    notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
-                    insetClasses,
-                  )}
+                  className={notificationMenuFooterLinkVariants({ emphasis: 'strong' })}
                 >
-                  {GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →
+                  {showAllLabel}
                 </Link>
               )
             ) : null}

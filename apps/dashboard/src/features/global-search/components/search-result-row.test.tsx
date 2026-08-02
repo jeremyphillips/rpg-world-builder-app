@@ -63,6 +63,22 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
+  it('uses compact truncated secondary copy in preview panel rows', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Fireball"
+        secondary="3rd-level evocation · Instantaneous · Extra detail"
+        typeLabel="Spell"
+        href="/campaigns/c1/spells/fireball"
+        inset="panel"
+      />,
+    )
+
+    const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
+    expect(secondary).toHaveClass('text-xs', 'truncate')
+    expect(screen.getByRole('link', { name: 'Fireball, Spell' })).toHaveClass('border-b-0')
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <SearchResultRow

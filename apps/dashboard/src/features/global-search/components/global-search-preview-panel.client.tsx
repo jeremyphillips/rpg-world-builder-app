@@ -3,12 +3,13 @@
 import { Link } from 'react-router-dom'
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
-import { cn, notificationMenuFooterLinkVariants } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 import {
   globalSearchPreviewBodyClasses,
   globalSearchPreviewFooterClasses,
+  globalSearchPreviewFooterLinkVariants,
   globalSearchPreviewInsetClasses,
 } from '../lib/global-search-preview.variants'
 import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
@@ -87,14 +88,7 @@ type GlobalSearchPreviewFooterProps = {
 function GlobalSearchPreviewFooter({ viewAllHref, onClose }: GlobalSearchPreviewFooterProps) {
   return (
     <footer className={globalSearchPreviewFooterClasses}>
-      <Link
-        to={viewAllHref}
-        className={cn(
-          notificationMenuFooterLinkVariants({ emphasis: 'strong' }),
-          globalSearchPreviewInsetClasses,
-        )}
-        onClick={onClose}
-      >
+      <Link to={viewAllHref} className={globalSearchPreviewFooterLinkVariants()} onClick={onClose}>
         {GLOBAL_SEARCH_COPY.viewAllResults}
       </Link>
     </footer>
