@@ -8,7 +8,7 @@ import {
 import {
   assertVocabularyBatchCountResolverCoverage,
   assertVocabularyUsageResolverCoverage,
-  VOCABULARY_BATCH_COUNT_RESOLVERS,
+  VOCABULARY_BATCH_USAGE_RESOLVERS,
   VOCABULARY_USAGE_RESOLVERS,
 } from './vocabulary-usage-resolvers'
 
@@ -26,7 +26,7 @@ describe('vocabulary usage resolvers', () => {
       expect(VOCABULARY_USAGE_RESOLVERS[setId]).toBeDefined()
     }
     for (const setId of vocabularySetIdsRequiringBatchCountResolver()) {
-      expect(VOCABULARY_BATCH_COUNT_RESOLVERS[setId]).toBeDefined()
+      expect(VOCABULARY_BATCH_USAGE_RESOLVERS[setId]).toBeDefined()
     }
   })
 })

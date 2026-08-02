@@ -17,6 +17,7 @@ const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 
 const mockSet: ResolvedVocabularyOptionSet = {
   id: 'creature-types',
+  usageSummaryLabels: { singular: 'species', plural: 'species' },
   options: [
     {
       id: 'aberration',
@@ -32,6 +33,22 @@ const mockSet: ResolvedVocabularyOptionSet = {
       source: 'campaign',
       status: 'active',
       usedBy: 2,
+      usedBySummary: [
+        {
+          kind: 'content',
+          contentTypeKey: 'species',
+          id: 'sp_1',
+          label: 'Sprite',
+          slug: 'sprite',
+        },
+        {
+          kind: 'content',
+          contentTypeKey: 'species',
+          id: 'sp_2',
+          label: 'Pixie',
+          slug: 'pixie',
+        },
+      ],
     },
   ],
 }
@@ -59,7 +76,7 @@ describe('VocabularyOverviewContent', () => {
       ROUTES.gameTerms.detail('camp_1', 'creature-types', 'aberration'),
     )
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /2 species/i })).toBeInTheDocument()
   })
 
   it('shows browse-only overview for sets without management capabilities', () => {

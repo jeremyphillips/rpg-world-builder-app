@@ -86,9 +86,10 @@ export async function createVocabularyEntry(
   campaignId: string,
   input: CreateVocabularyCampaignEntryInput,
 ): Promise<ResolvedVocabularyOptionSet> {
+  const { setId, ...body } = input
   const { set } = await postJson<{ set: ResolvedVocabularyOptionSet }>(
-    `${vocabularySetPath(campaignId, input.setId)}/entries`,
-    input,
+    `${vocabularySetPath(campaignId, setId)}/entries`,
+    body,
     'Could not create vocabulary entry.',
   )
   return set

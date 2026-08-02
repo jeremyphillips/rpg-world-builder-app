@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
+import { findBrowsableVocabularyCategory } from '@rpg/contracts'
 
 import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
@@ -632,7 +633,9 @@ const router = createBrowserRouter(
                   handle: {
                     crumb: (params, data) => ({
                       label: 'Game Terms',
-                      href: collectionCrumbHref(ROUTES.gameTerms.hub(params.campaignId!), data),
+                      href: params.setId
+                        ? ROUTES.gameTerms.hub(params.campaignId!)
+                        : collectionCrumbHref(ROUTES.gameTerms.hub(params.campaignId!), data),
                     }),
                   } satisfies CrumbHandle,
                   children: [
@@ -641,9 +644,22 @@ const router = createBrowserRouter(
                       path: ':setId',
                       element: <Outlet />,
                       handle: {
-                        crumb: (_params, { entityLabel }) => ({
-                          label: entityLabel ?? '…',
-                        }),
+                        crumb: (params, data) => {
+                          const category = findBrowsableVocabularyCategory(params.setId!)
+                          if (!category) {
+                            return null
+                          }
+
+                          return {
+                            label: category.label,
+                            href: params.termId
+                              ? collectionCrumbHref(
+                                  ROUTES.gameTerms.overview(params.campaignId!, params.setId!),
+                                  data,
+                                )
+                              : undefined,
+                          }
+                        },
                       } satisfies CrumbHandle,
                       children: [
                         { index: true, element: <VocabularyOverviewRoute /> },

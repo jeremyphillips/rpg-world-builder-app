@@ -24,8 +24,9 @@ import {
 import { resolveVocabularySet } from '../lib/resolve-vocabulary'
 import { buildVocabularyEntryUsageFromBlockers } from '../lib/map-vocabulary-usage-references'
 import {
+  getVocabularyUsageSummaryLabels,
   resolveVocabularyOptionUsage,
-  resolveVocabularyOptionUsageCountsBatch,
+  resolveVocabularyOptionUsageBatch,
 } from '../lib/vocabulary-usage-resolvers'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
@@ -118,16 +119,21 @@ async function attachUsageCounts(
   }
 
   if (capability.batchUsageCounting) {
-    const counts = await resolveVocabularyOptionUsageCountsBatch(
+    const batchResults = await resolveVocabularyOptionUsageBatch(
       campaignId,
       setId,
       options.map((option) => option.id),
     )
 
-    return options.map((option) => ({
-      ...option,
-      usedBy: counts.get(option.id) ?? 0,
-    }))
+    return options.map((option) => {
+      const result = batchResults.get(option.id) ?? { count: 0, summaryReferences: [] }
+
+      return {
+        ...option,
+        usedBy: result.count,
+        ...(result.summaryReferences.length > 0 ? { usedBySummary: result.summaryReferences } : {}),
+      }
+    })
   }
 
   return Promise.all(
@@ -148,11 +154,16 @@ export async function resolveVocabularySetForCampaign(
   const seed = loadSeedVocabularyOptionSet(rulesetId, setId)
   const patchDoc = await loadPatchDocument(campaignId, rulesetId)
   const setPatch = patchDoc ? getSetPatch(patchDoc, setId) : undefined
+  const capability = getVocabularySetCapability(setId)
   const options = resolveVocabularySet(seed, setPatch)
+  const usageSummaryLabels = capability.batchUsageCounting
+    ? getVocabularyUsageSummaryLabels(setId)
+    : undefined
 
   return {
     id: setId,
     options: await attachUsageCounts(campaignId, setId, options),
+    ...(usageSummaryLabels ? { usageSummaryLabels } : {}),
   }
 }
 

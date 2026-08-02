@@ -20,6 +20,11 @@ const STORY_VOCABULARY_OPTIONS: VocabularyOptionWithUsage[] = [
     source: 'system',
     status: 'active',
     usedBy: 3,
+    usedBySummary: [
+      { kind: 'content', contentTypeKey: 'species', id: '1', label: 'Elf', slug: 'elf' },
+      { kind: 'content', contentTypeKey: 'species', id: '2', label: 'Human', slug: 'human' },
+      { kind: 'content', contentTypeKey: 'species', id: '3', label: 'Orc', slug: 'orc' },
+    ],
   },
   {
     id: 'fey-kin',
@@ -50,7 +55,9 @@ export const Default: Story = {
   render: () => (
     <CatalogOverviewTable
       tableKey="vocabulary-creature-types"
-      columns={vocabularyColumns()}
+      columns={vocabularyColumns({
+        usageSummaryLabels: { singular: 'species', plural: 'species' },
+      })}
       data={STORY_VOCABULARY_OPTIONS}
       caption="Creature type vocabulary options"
     />

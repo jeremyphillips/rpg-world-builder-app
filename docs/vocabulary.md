@@ -173,8 +173,10 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 
 - **Deferred save** in the entry sheet: label, description, and availability save together on **Save**; disable preflight runs at save time. Row popover availability remains an immediate-action surface.
 - **Usage GET** (`…/entries/:entryId/usage`) returns neutral `VocabularyEntryUsage` with `references[]`; `usedBy` is always `references.length`. Unpaginated in Phase 4 — current resolvers (creature-type → species) return small full lists.
-- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; HTTP responses are not reused across surfaces.
-- **UI:** informational `UsageReferencesSection` in the edit sheet; blocked dialogs use `UsageBlockedReferenceList` with the same reference row primitives.
+- **Overview summary** — when `batchUsageCounting` is enabled, list rows may include bounded `usedBySummary` (`VocabularyUsageReference[]`, max 4). This is **non-authoritative** overview chrome; `usedBy` remains the count SSOT. Set-level `usageSummaryLabels` (API-owned) supplies tooltip nouns (e.g. `"species"`) — not inferred from vocabulary taxonomy terms.
+- **Capability split** — `usageCounting` enables counts, usage GET, and disable/delete guards; `batchUsageCounting` additionally enables the overview Used by column with batch resolver support.
+- **Resolver SSOT:** usage GET, disable preflight, and delete preflight all delegate to `resolveVocabularyOptionUsage`; batch overview loads use `resolveVocabularyOptionUsageBatch`. Reference discovery logic lives in the API (`apps/api/.../vocabulary/lib/`); contracts own neutral DTOs only.
+- **UI:** informational `UsageReferencesSection` on detail; overview Used by reuses `CollectionSummaryCell` via `buildCollectionCountColumn`.
 
 ---
 

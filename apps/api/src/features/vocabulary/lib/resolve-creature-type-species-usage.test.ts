@@ -8,12 +8,12 @@ import { resolveCatalogForCampaign } from '../../content/content.service'
 
 import {
   resolveCreatureTypeSpeciesUsage,
-  resolveCreatureTypeSpeciesUsageCountsBatch,
+  resolveCreatureTypeSpeciesUsageBatch,
 } from './resolve-creature-type-species-usage'
 
 const resolveCatalogMock = vi.mocked(resolveCatalogForCampaign)
 
-describe('resolveCreatureTypeSpeciesUsageCountsBatch', () => {
+describe('resolveCreatureTypeSpeciesUsageBatch', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     resolveCatalogMock.mockResolvedValue([
@@ -23,17 +23,35 @@ describe('resolveCreatureTypeSpeciesUsageCountsBatch', () => {
     ] as unknown as Awaited<ReturnType<typeof resolveCatalogForCampaign>>)
   })
 
-  it('returns counts for multiple entry ids from one catalog load', async () => {
-    const counts = await resolveCreatureTypeSpeciesUsageCountsBatch('camp_1', [
+  it('returns counts and bounded summary references from one catalog load', async () => {
+    const results = await resolveCreatureTypeSpeciesUsageBatch('camp_1', [
       'humanoid',
       'aberration',
       'construct',
     ])
 
     expect(resolveCatalogMock).toHaveBeenCalledTimes(1)
-    expect(counts.get('humanoid')).toBe(2)
-    expect(counts.get('aberration')).toBe(1)
-    expect(counts.get('construct')).toBe(0)
+    expect(results.get('humanoid')).toEqual({
+      count: 2,
+      summaryReferences: [
+        {
+          kind: 'content',
+          contentTypeKey: 'species',
+          id: 'sp_2',
+          label: 'Dwarf',
+          slug: 'dwarf',
+        },
+        {
+          kind: 'content',
+          contentTypeKey: 'species',
+          id: 'sp_1',
+          label: 'Elf',
+          slug: 'elf',
+        },
+      ],
+    })
+    expect(results.get('aberration')?.count).toBe(1)
+    expect(results.get('construct')).toEqual({ count: 0, summaryReferences: [] })
   })
 })
 

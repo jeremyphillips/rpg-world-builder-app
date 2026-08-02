@@ -16,26 +16,26 @@ function resolveVisibleItems(
   items: CollectionSummaryItem[],
   maxVisibleItems: number,
   sortItems: boolean,
+  displayCount: number,
 ): { visible: CollectionSummaryItem[]; hiddenCount: number } {
   const ordered = sortItems
     ? [...items].sort((left, right) => left.label.localeCompare(right.label))
     : items
   const visible = ordered.slice(0, maxVisibleItems)
-  return { visible, hiddenCount: items.length - visible.length }
+  return { visible, hiddenCount: Math.max(0, displayCount - visible.length) }
 }
 
 function buildAccessibleSummary(
-  items: CollectionSummaryItem[],
+  displayCount: number,
   visible: CollectionSummaryItem[],
   hiddenCount: number,
   singularLabel: string,
   pluralLabel: string,
 ): string {
-  const count = items.length
-  const noun = count === 1 ? singularLabel : pluralLabel
+  const noun = displayCount === 1 ? singularLabel : pluralLabel
   const names = visible.map((item) => item.label).join(', ')
   const suffix = hiddenCount > 0 ? `, and ${hiddenCount} more` : ''
-  return `${count} ${noun}: ${names}${suffix}`
+  return `${displayCount} ${noun}: ${names}${suffix}`
 }
 
 /**
@@ -46,19 +46,33 @@ function buildAccessibleSummary(
  */
 export function CollectionSummaryCell({
   items,
+  count,
   singularLabel,
   pluralLabel,
   emptyLabel = DEFAULT_EMPTY_LABEL,
   maxVisibleItems = DEFAULT_MAX_VISIBLE_ITEMS,
   sortItems = false,
 }: CollectionSummaryCellProps) {
-  if (items.length === 0) {
+  const displayCount = count ?? items.length
+
+  if (displayCount === 0) {
     return <span className="text-muted-foreground">{emptyLabel}</span>
   }
 
-  const { visible, hiddenCount } = resolveVisibleItems(items, maxVisibleItems, sortItems)
-  const heading = formatCountLabel(items.length, singularLabel, pluralLabel)
-  const ariaLabel = buildAccessibleSummary(items, visible, hiddenCount, singularLabel, pluralLabel)
+  const { visible, hiddenCount } = resolveVisibleItems(
+    items,
+    maxVisibleItems,
+    sortItems,
+    displayCount,
+  )
+  const heading = formatCountLabel(displayCount, singularLabel, pluralLabel)
+  const ariaLabel = buildAccessibleSummary(
+    displayCount,
+    visible,
+    hiddenCount,
+    singularLabel,
+    pluralLabel,
+  )
 
   return (
     <TooltipProvider>
@@ -69,7 +83,7 @@ export function CollectionSummaryCell({
             aria-label={ariaLabel}
             className={cn(collectionSummaryCounterVariants())}
           >
-            {items.length}
+            {displayCount}
           </button>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs space-y-1 px-3 py-2">

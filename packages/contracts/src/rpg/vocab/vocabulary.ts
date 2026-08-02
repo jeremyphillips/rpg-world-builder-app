@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { vocabularyValidationMessages } from './vocabulary-messages'
+import { vocabularyUsageReferenceSchema } from './vocabulary-usage'
 
 // ---------------------------------------------------------------------------
 // Campaign vocabulary — reusable option sets (creature types, damage types, …)
@@ -73,9 +74,22 @@ export const vocabularyOptionSetSchema = z.object({
 
 export type VocabularyOptionSet = z.infer<typeof vocabularyOptionSetSchema>
 
+/** Display labels for overview Used by summary tooltips — API-owned, not inferred from set taxonomy. */
+export const vocabularyUsageSummaryLabelsSchema = z.object({
+  singular: z.string().min(1),
+  plural: z.string().min(1),
+})
+
+export type VocabularyUsageSummaryLabels = z.infer<typeof vocabularyUsageSummaryLabelsSchema>
+
 /** Resolved option with usage count for vocabulary management UI. */
 export const vocabularyOptionWithUsageSchema = vocabularyOptionSchema.extend({
   usedBy: z.number().int().min(0),
+  /**
+   * Bounded overview chrome only — capped server-side, non-authoritative preview of
+   * the same references `GET …/entries/:id/usage` returns. `usedBy` is the count SSOT.
+   */
+  usedBySummary: z.array(vocabularyUsageReferenceSchema).optional(),
 })
 
 export type VocabularyOptionWithUsage = z.infer<typeof vocabularyOptionWithUsageSchema>
@@ -83,6 +97,8 @@ export type VocabularyOptionWithUsage = z.infer<typeof vocabularyOptionWithUsage
 export const resolvedVocabularyOptionSetSchema = z.object({
   id: vocabularyOptionSetIdSchema,
   options: z.array(vocabularyOptionWithUsageSchema),
+  /** Present when the set has a batch usage resolver with overview summary labels. */
+  usageSummaryLabels: vocabularyUsageSummaryLabelsSchema.optional(),
 })
 
 export type ResolvedVocabularyOptionSet = z.infer<typeof resolvedVocabularyOptionSetSchema>

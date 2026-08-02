@@ -146,6 +146,7 @@ export function buildCollectionCountColumn<T>({
     cell: ({ row }) => (
       <CollectionSummaryCell
         items={getItems(row.original)}
+        count={getCount(row.original)}
         singularLabel={singularLabel}
         pluralLabel={pluralLabel}
         sortItems={sortItems}

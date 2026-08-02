@@ -10,6 +10,7 @@ import { useFilterState } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { useOverviewSelection } from '@/lib/data-table/use-overview-selection'
+import { notifyVocabularyEntryDeleted } from '@/lib/notify'
 import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-menu.client'
 import {
   overviewUnavailableNameCellClassName,
@@ -79,8 +80,18 @@ export function useVocabularyOverviewPage({
         nameHref: (entry) => ROUTES.gameTerms.detail(campaignId, setId, entry.id),
         onEdit: showEdit ? onEdit : undefined,
         canEdit: showEdit,
+        usageSummaryLabels: capabilities.batchUsageCounting
+          ? vocabularySet?.usageSummaryLabels
+          : undefined,
       }),
-    [campaignId, onEdit, setId, showEdit],
+    [
+      campaignId,
+      capabilities.batchUsageCounting,
+      onEdit,
+      setId,
+      showEdit,
+      vocabularySet?.usageSummaryLabels,
+    ],
   )
 
   const getRowClassName = useCallback(
@@ -105,7 +116,10 @@ export function useVocabularyOverviewPage({
         entry={row}
         canManage={showRowActions}
         onDelete={(entry) => {
-          void mutations.deleteEntry.mutateAsync(entry.id)
+          const entryLabel = entry.label
+          void mutations.deleteEntry.mutateAsync(entry.id, {
+            onSuccess: () => notifyVocabularyEntryDeleted(entryLabel),
+          })
         }}
       />
     ),

@@ -140,3 +140,15 @@ export function notifyBulkVocabularyAvailabilityResult(result: {
 
   toast.warning(result.summary)
 }
+
+export function notifyVocabularyEntryCreated(entryLabel: string): void {
+  toast.success(`${entryLabel} created.`)
+}
+
+export function notifyVocabularyEntrySaved(entryLabel: string): void {
+  toast.success(`${entryLabel} saved.`)
+}
+
+export function notifyVocabularyEntryDeleted(entryLabel: string): void {
+  toast.success(`${entryLabel} deleted.`)
+}

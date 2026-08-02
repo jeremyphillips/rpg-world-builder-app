@@ -16,6 +16,7 @@ import { WidePage } from '@/components/layout/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
 import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
+import { notifyVocabularyEntrySaved } from '@/lib/notify'
 
 import {
   VocabularyEntrySheet,
@@ -125,6 +126,7 @@ function VocabularyTermDetailPage({
         status: values.status,
       },
     })
+    notifyVocabularyEntrySaved(values.label)
     setSheetOpen(false)
   }
 

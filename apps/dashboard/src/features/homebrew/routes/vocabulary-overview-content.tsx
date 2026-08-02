@@ -13,8 +13,8 @@ import { buttonVariants } from '@rpg/ui'
 import { PageHeader } from '@/components/layout/page-header'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
+import { notifyVocabularyEntryCreated, notifyVocabularyEntrySaved } from '@/lib/notify'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 
 import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog.client'
@@ -82,6 +82,7 @@ function VocabularyOverviewPage({
         description: values.description || undefined,
         status: values.status,
       })
+      notifyVocabularyEntryCreated(values.label)
     } else if (sheet.mode === 'edit') {
       await mutations.patchEntry.mutateAsync({
         entryId: sheet.entry.id,
@@ -91,6 +92,7 @@ function VocabularyOverviewPage({
           status: values.status,
         },
       })
+      notifyVocabularyEntrySaved(values.label)
     }
 
     setSheet({ mode: 'closed' })
@@ -200,8 +202,6 @@ export function VocabularyOverviewContent({
   const setTerm = getVocabularyOptionSetTerm(setId)
   const singularLabel = vocabularyFieldLabel(setTerm)
   const pluralLabel = vocabularyFieldLabel(setTerm, { plural: true })
-
-  useSetBreadcrumbLabel(category.label)
 
   return (
     <VocabularyOverviewPage

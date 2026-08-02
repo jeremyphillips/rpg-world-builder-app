@@ -32,7 +32,7 @@ export interface BreadcrumbModeHandle {
  * Attach via `handle: { crumb: … }` on a `createBrowserRouter` route object.
  */
 export interface CrumbHandle {
-  crumb: (params: Readonly<Params<string>>, data: BreadcrumbData) => CrumbItem
+  crumb: (params: Readonly<Params<string>>, data: BreadcrumbData) => CrumbItem | null
 }
 
 /** Narrow type-guard: does a route handle implement CrumbHandle? */

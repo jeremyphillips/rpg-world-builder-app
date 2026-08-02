@@ -58,31 +58,33 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
         defaultErrorLabel="Could not load game terms."
       >
         <ul className={campaignDestinationListVariants()}>
-          {GAME_TERMS_VOCABULARY_CATEGORIES.map((category) => {
-            const counts = countsBySetId.get(category.setId)
-            const metadataParts = [formatTermCount(counts?.total ?? 0)]
-            if (canManage && (counts?.unavailable ?? 0) > 0) {
-              metadataParts.push(formatUnavailableCount(counts!.unavailable))
-            }
+          {[...GAME_TERMS_VOCABULARY_CATEGORIES]
+            .sort((left, right) => left.label.localeCompare(right.label))
+            .map((category) => {
+              const counts = countsBySetId.get(category.setId)
+              const metadataParts = [formatTermCount(counts?.total ?? 0)]
+              if (canManage && (counts?.unavailable ?? 0) > 0) {
+                metadataParts.push(formatUnavailableCount(counts!.unavailable))
+              }
 
-            return (
-              <li key={category.setId}>
-                <Link
-                  to={ROUTES.gameTerms.overview(campaignId, category.setId)}
-                  className="flex w-full items-center gap-3 p-6 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  <div className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="font-medium text-foreground">{category.label}</span>
-                    <Text variant="small">{category.description}</Text>
-                    <Text variant="muted" className="text-xs">
-                      {metadataParts.join(' · ')}
-                    </Text>
-                  </div>
-                  <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />
-                </Link>
-              </li>
-            )
-          })}
+              return (
+                <li key={category.setId}>
+                  <Link
+                    to={ROUTES.gameTerms.overview(campaignId, category.setId)}
+                    className="flex w-full items-center gap-3 p-6 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <span className="font-medium text-foreground">{category.label}</span>
+                      <Text variant="small">{category.description}</Text>
+                      <Text variant="muted" className="text-xs">
+                        {metadataParts.join(' · ')}
+                      </Text>
+                    </div>
+                    <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />
+                  </Link>
+                </li>
+              )
+            })}
         </ul>
       </PageLoadState>
     </WidePage>

@@ -5,10 +5,10 @@ import {
   dataTableWidthMeta,
 } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
-import type { VocabularyOptionWithUsage } from '@rpg/contracts'
+import type { VocabularyOptionWithUsage, VocabularyUsageSummaryLabels } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
 
-import { buildSourceColumn } from '@/lib/data-table/column-builders'
+import { buildCollectionCountColumn, buildSourceColumn } from '@/lib/data-table/column-builders'
 
 import { VocabularyAvailabilityMetadata } from '../../components/vocabulary-availability-metadata.client'
 import { VOCABULARY_SOURCE_BADGE } from './labels'
@@ -20,14 +20,37 @@ type VocabularyColumnsOptions = {
   nameHref?: (entry: VocabularyOptionWithUsage) => string
   onEdit?: (entry: VocabularyOptionWithUsage) => void
   canEdit?: boolean
+  usageSummaryLabels?: VocabularyUsageSummaryLabels
+}
+
+function mapUsedBySummaryToCollectionItems(
+  entry: VocabularyOptionWithUsage,
+): { id: string; label: string }[] {
+  return (entry.usedBySummary ?? []).map((reference) => ({
+    id: reference.id,
+    label: reference.label,
+  }))
+}
+
+function buildVocabularyUsedByColumn(
+  usageSummaryLabels: VocabularyUsageSummaryLabels,
+): ColumnDef<VocabularyOptionWithUsage> {
+  return buildCollectionCountColumn({
+    id: 'usedBy',
+    label: 'Used By',
+    getItems: mapUsedBySummaryToCollectionItems,
+    getCount: (row) => row.usedBy,
+    singularLabel: usageSummaryLabels.singular,
+    pluralLabel: usageSummaryLabels.plural,
+  })
 }
 
 export function vocabularyColumns(
   options: VocabularyColumnsOptions = {},
 ): ColumnDef<VocabularyOptionWithUsage>[] {
-  const { nameHref, onEdit, canEdit = false } = options
+  const { nameHref, onEdit, canEdit = false, usageSummaryLabels } = options
 
-  return [
+  const columns: ColumnDef<VocabularyOptionWithUsage>[] = [
     {
       accessorKey: 'label',
       header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
@@ -78,15 +101,11 @@ export function vocabularyColumns(
       badgeMap: VOCABULARY_SOURCE_BADGE,
       width: 'badge',
     }),
-    {
-      accessorKey: 'usedBy',
-      header: ({ column }) => <SortableHeader column={column}>Used By</SortableHeader>,
-      cell: ({ row }) => row.getValue<number>('usedBy'),
-      meta: {
-        ...dataTableColumnMeta.data,
-        label: 'Used By',
-        ...dataTableWidthMeta('compactCenter'),
-      },
-    },
   ]
+
+  if (usageSummaryLabels) {
+    columns.push(buildVocabularyUsedByColumn(usageSummaryLabels))
+  }
+
+  return columns
 }
