@@ -8,6 +8,8 @@ import {
   type FieldControlVariantProps,
   type FieldWidth,
 } from './field-control.variants'
+import { FieldDerivedMeta } from './field-derived-meta.client'
+import { useFieldDerivedMetaContext } from './field-derived-meta-context.client'
 import {
   fieldAnatomyStackClasses,
   fieldErrorTextVariants,
@@ -22,8 +24,10 @@ interface FieldContextValue {
   controlId: string
   hintId: string
   errorId: string
+  derivedMetaId: string
   hasError: boolean
   hasHint: boolean
+  hasDerivedMeta: boolean
   describedBy: string | undefined
   size: FieldSize
   required: boolean
@@ -84,9 +88,14 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const controlId = id ?? generatedId
     const hintId = `${controlId}-hint`
     const errorId = `${controlId}-error`
+    const derivedMetaId = `${controlId}-derived-meta`
+    const { meta: derivedMeta } = useFieldDerivedMetaContext()
     const hasError = invalid ?? Boolean(error)
     const hasHint = Boolean(hint)
-    const autoDescribedBy = hasError ? errorId : hasHint ? hintId : undefined
+    const hasDerivedMeta = Boolean(derivedMeta?.rows.length)
+    const autoDescribedBy = hasError
+      ? errorId
+      : [hasHint && hintId, hasDerivedMeta && derivedMetaId].filter(Boolean).join(' ') || undefined
     const describedBy = describedByOverride ?? autoDescribedBy
 
     const value = React.useMemo<FieldContextValue>(
@@ -94,15 +103,30 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         controlId,
         hintId,
         errorId,
+        derivedMetaId,
         hasError,
         hasHint,
+        hasDerivedMeta,
         describedBy,
         size,
         required,
         error,
         hint,
       }),
-      [controlId, hintId, errorId, hasError, hasHint, describedBy, size, required, error, hint],
+      [
+        controlId,
+        hintId,
+        errorId,
+        derivedMetaId,
+        hasError,
+        hasHint,
+        hasDerivedMeta,
+        describedBy,
+        size,
+        required,
+        error,
+        hint,
+      ],
     )
 
     return (
@@ -268,6 +292,12 @@ function FieldError({ className, children, ...props }: FieldErrorProps) {
 }
 FieldError.displayName = 'Field.Error'
 
+function FieldDerivedMetaSlot({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const { derivedMetaId } = useFieldContext('Field.DerivedMeta')
+  return <FieldDerivedMeta id={derivedMetaId} className={className} {...props} />
+}
+FieldDerivedMetaSlot.displayName = 'Field.DerivedMeta'
+
 /**
  * Compound field primitive. Compose the parts directly for bespoke layouts, or
  * use the prop-based wrappers (`TextField`, `SelectField`, …) which assemble
@@ -279,6 +309,7 @@ export const Field = {
   Label: FieldLabel,
   Control: FieldControl,
   Hint: FieldHint,
+  DerivedMeta: FieldDerivedMetaSlot,
   Error: FieldError,
 }
 

@@ -21,6 +21,13 @@ export {
   type SearchFieldRole,
   type WeightedSearchField,
 } from './lib/search'
+export {
+  assembleComboboxOptionSearchDocument,
+  optionMatchesQuery,
+  rankOptionsByQuery,
+  scoreOptionQuery,
+  type LabelValueDescriptionOption,
+} from './components/ui/option-query.lib'
 export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'
@@ -160,6 +167,10 @@ export {
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
+export {
+  TextSuggestionsField,
+  type TextSuggestionsFieldProps,
+} from './components/ui/text-suggestions-field.client'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export {
   OptionalFieldDisclosure,

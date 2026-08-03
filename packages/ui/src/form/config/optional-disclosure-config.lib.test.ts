@@ -14,6 +14,18 @@ function textareaField(
   }
 }
 
+function selectField(
+  overrides: Partial<Extract<FieldConfig, { type: 'select' }>> = {},
+): Extract<FieldConfig, { type: 'select' }> {
+  return {
+    type: 'select',
+    name: 'mode',
+    label: 'Mode',
+    options: [],
+    ...overrides,
+  }
+}
+
 describe('assertOptionalDisclosureFieldConfig', () => {
   afterEach(() => {
     vi.restoreAllMocks()
@@ -31,19 +43,47 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     expect(error).not.toHaveBeenCalled()
   })
 
+  it('allows a valid select optionalDisclosure config', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    assertOptionalDisclosureFieldConfig(
+      selectField({
+        optionalDisclosure: { addLabel: 'Add function override' },
+      }),
+    )
+
+    expect(error).not.toHaveBeenCalled()
+  })
+
+  it('allows a valid textSuggestions optionalDisclosure config', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    assertOptionalDisclosureFieldConfig({
+      type: 'textSuggestions',
+      name: 'classification.specialization',
+      label: 'Specialization',
+      suggestions: {
+        dependsOn: ['classification.archetype'],
+        suggestionsWhen: () => [],
+      },
+      optionalDisclosure: { addLabel: 'Add specialization' },
+    })
+
+    expect(error).not.toHaveBeenCalled()
+  })
+
   it('errors when optionalDisclosure is used on an unsupported field kind', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     assertOptionalDisclosureFieldConfig({
-      type: 'select',
-      name: 'mode',
-      label: 'Mode',
-      options: [],
-      optionalDisclosure: { addLabel: 'Add mode note' },
+      type: 'number',
+      name: 'count',
+      label: 'Count',
+      optionalDisclosure: { addLabel: 'Add count note' },
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(
-      expect.stringContaining('only allowed for text, textarea, richtext'),
+      expect.stringContaining('only allowed for text, textSuggestions, textarea, richtext, select'),
     )
   })
 

@@ -4,6 +4,12 @@ import type { GlobalSearchDocument } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import { parseGlobalSearchUrlGroup } from './global-search-url'
+import {
+  buildGlobalSearchGroupSections,
+  filterGlobalSearchByGroup,
+  rankGlobalSearchDocuments,
+} from './rank-global-search'
 import { resolveGlobalSearchHref } from './resolve-global-search-href'
 
 const campaignId = 'campaign-1'
@@ -58,18 +64,14 @@ function makeDocument(
 }
 
 describe('rankGlobalSearchDocuments', () => {
-  it('returns no matches for blank queries', async () => {
-    const { rankGlobalSearchDocuments } = await import('./rank-global-search')
+  it('returns no matches for blank queries', () => {
     const documents = [makeDocument({ id: 'a', title: 'Fireball' })]
 
     expect(rankGlobalSearchDocuments(documents, '')).toEqual([])
     expect(rankGlobalSearchDocuments(documents, '   ')).toEqual([])
   })
 
-  it('ranks matching documents and groups them for preview sections', async () => {
-    const { rankGlobalSearchDocuments, buildGlobalSearchGroupSections, filterGlobalSearchByGroup } =
-      await import('./rank-global-search')
-
+  it('ranks matching documents and groups them for preview sections', () => {
     const documents = [
       makeDocument({ id: 'spell-1', title: 'Fireball', filterGroup: 'content' }),
       makeDocument({
@@ -93,8 +95,7 @@ describe('rankGlobalSearchDocuments', () => {
     expect(filterGlobalSearchByGroup(ranked, 'all')).toEqual(ranked)
   })
 
-  it('matches Fire Bolt with forgiving queries firebolt and fire bolt', async () => {
-    const { rankGlobalSearchDocuments } = await import('./rank-global-search')
+  it('matches Fire Bolt with forgiving queries firebolt and fire bolt', () => {
     const documents = [
       makeDocument({
         id: 'fire-bolt',
@@ -113,9 +114,7 @@ describe('rankGlobalSearchDocuments', () => {
 })
 
 describe('parseGlobalSearchUrlGroup', () => {
-  it('defaults to all and accepts known segments', async () => {
-    const { parseGlobalSearchUrlGroup } = await import('./global-search-url')
-
+  it('defaults to all and accepts known segments', () => {
     expect(parseGlobalSearchUrlGroup(null)).toBe('all')
     expect(parseGlobalSearchUrlGroup('characters')).toBe('characters')
     expect(parseGlobalSearchUrlGroup('unknown')).toBe('all')

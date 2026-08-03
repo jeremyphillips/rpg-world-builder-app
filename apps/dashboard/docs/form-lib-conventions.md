@@ -20,6 +20,19 @@ campaign settings, homebrew rules). UI layer detail lives in
 Campaign settings follow the same suffixes under `features/campaign/lib/` (e.g.
 `campaign-profile-form-fields.ts`, `mechanics-form-values.ts`).
 
+### Form projection modules
+
+When the persisted contracts shape is correct but too granular for authoring UX,
+add a dedicated projection module (e.g. `location-authoring-type.ts`) that:
+
+- Composes ids from contracts arrays — never a hand-typed parallel taxonomy
+- Maps bidirectionally at `*-form-values.ts` boundaries only
+- Exports visibility/sync helpers consumed by `*-form-fields.ts` and `*-form-sync.ts`
+- Never appears in API payloads, persisted drafts outside the form, or hierarchy logic
+
+Reference: locations Location type projection —
+[locations-building-classification.md](./locations-building-classification.md#authoring-flow).
+
 ## Validation
 
 Table-level domain rules (contiguous level ranges, cross-row overlap, campaign

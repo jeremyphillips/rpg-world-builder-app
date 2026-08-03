@@ -10,13 +10,14 @@ describe('content type presentation policy', () => {
 
   it('retains source presentation for existing bundled content types', () => {
     for (const contentType of CONTENT_TYPE_KEYS.filter(
-      (registeredType) => registeredType !== 'organizations',
+      (registeredType) => registeredType !== 'organizations' && registeredType !== 'locations',
     )) {
       expect(shouldPresentContentSource(contentType)).toBe(true)
     }
   })
 
-  it('suppresses campaign-authorship chrome for organizations', () => {
+  it('suppresses campaign-authorship chrome for campaign-authored types', () => {
     expect(shouldPresentContentSource('organizations')).toBe(false)
+    expect(shouldPresentContentSource('locations')).toBe(false)
   })
 })

@@ -21,6 +21,7 @@ export const CONTENT_TYPE_PRESENTATION = {
   equipment: { source: 'badge-and-filter' },
   'skill-proficiencies': { source: 'badge-and-filter' },
   organizations: { source: 'suppressed' },
+  locations: { source: 'suppressed' },
 } as const satisfies Record<ContentTypeKey, ContentTypePresentationPolicy>
 
 export function getContentTypePresentation(

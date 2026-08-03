@@ -4,6 +4,8 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ComboboxField } from './combobox-field.client'
+import { FieldRow } from './field-row'
+import { SelectField } from './select-field'
 
 const weaponOptions = [
   { value: 'dagger', label: 'Dagger' },
@@ -383,6 +385,36 @@ describe('ComboboxField', () => {
       />,
     )
     await expectNoAxeViolations(container)
+  })
+
+  it('stretches the control shell to a fractional row width', () => {
+    render(
+      <FieldRow>
+        <SelectField
+          id="authoring-type"
+          label="Location type"
+          width="1/3"
+          options={[{ label: 'Building', value: 'building' }]}
+          value="building"
+        />
+        <ComboboxField
+          id="archetype"
+          label="Archetype"
+          width="2/3"
+          multiple={false}
+          options={[{ label: 'Inn', value: 'inn' }]}
+          value=""
+          placeholder="Search building archetypes…"
+        />
+      </FieldRow>,
+    )
+
+    const trigger = screen.getByRole('combobox', { name: 'Archetype' })
+    const controlShell = trigger.closest('.w-full.min-w-0')
+
+    expect(screen.getByLabelText('Archetype').closest('.grow-\\[8\\]')).toHaveClass('max-w-2/3')
+    expect(controlShell).not.toBeNull()
+    expect(controlShell).toContainElement(trigger)
   })
 
   it('has no accessibility violations when required and in error state', async () => {

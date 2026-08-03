@@ -11,7 +11,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import type { FieldSizeToken } from './field-sizing.variants'
 
-export type FieldRowAlignment = 'control-edge' | 'center' | 'stretch'
+export type FieldRowAlignment = 'control-edge' | 'start' | 'center' | 'stretch'
 export type FieldControlBand = 'single-line' | 'content-sized'
 /** `grid` is settings-style only in v1 — no multi-column label grid yet. */
 export type FieldRowLayout = 'flow' | 'grid'
@@ -40,6 +40,7 @@ export const fieldRowVariants = cva('flex flex-wrap', {
   variants: {
     align: {
       'control-edge': 'items-end',
+      start: 'items-start',
       center: 'items-center',
       stretch: 'items-stretch',
     } satisfies Record<FieldRowAlignment, string>,

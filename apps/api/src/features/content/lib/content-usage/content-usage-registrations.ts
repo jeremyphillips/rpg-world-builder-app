@@ -12,6 +12,8 @@ import {
   characterSpeciesSource,
   characterSpellSource,
   characterSubclassSource,
+  locationParentReferenceSource,
+  campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
 const CHARACTER_SUMMARY_LABELS = { singular: 'character', plural: 'characters' } as const
@@ -65,6 +67,16 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'member' },
+  }),
+  defineContentUsage({
+    contentType: 'locations',
+    sources: [
+      { source: locationParentReferenceSource, entry: true, batch: true },
+      { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
+    ],
+    summaryLabels: { singular: 'location', plural: 'locations' },
+    overviewUsageScope: 'complete',
+    viewerCharacterRelationship: { strategy: 'none' },
   }),
   defineContentUsage({
     contentType: 'skill-proficiencies',

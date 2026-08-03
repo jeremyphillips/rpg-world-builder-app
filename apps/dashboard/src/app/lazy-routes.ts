@@ -184,6 +184,22 @@ export const OrganizationEditRoute = withRouteSuspense(
   ),
 )
 
+export const LocationsOverviewRoute = withRouteSuspense(
+  lazyNamed(
+    () => import('@/features/content/locations/routes/locations-overview'),
+    'LocationsOverview',
+  ),
+)
+export const LocationDetailRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/locations/routes/location-detail'), 'LocationDetail'),
+)
+export const LocationCreateRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/locations/routes/location-create'), 'LocationCreate'),
+)
+export const LocationEditRoute = withRouteSuspense(
+  lazyNamed(() => import('@/features/content/locations/routes/location-edit'), 'LocationEdit'),
+)
+
 export const SpellsOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/spells/routes/spells-overview'), 'SpellsOverview'),
 )

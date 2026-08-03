@@ -24,16 +24,23 @@ import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-me
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
 import { pickFieldChromeProps } from '../../components/ui/field-chrome.variants'
-import { normalizeFieldHint } from '../field-config'
+import { collectFieldDynamicDependsOn } from '../field-config'
+import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
-import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
+import {
+  OptionalDisclosureSelectFieldRenderer,
+  OptionalDisclosureTextareaFieldRenderer,
+  OptionalDisclosureTextSuggestionsFieldRenderer,
+} from './fields/optional-disclosure-field-renderer.client'
 import { SelectFieldRenderer } from './fields/select-field-renderer.client'
+import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
   FieldType,
   InputSelectFieldConfig,
   SelectFieldConfig,
+  TextSuggestionsFieldConfig,
   InlineSentenceFieldConfig,
   InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
@@ -113,6 +120,7 @@ const fieldRenderers: {
     | 'chooseFromChips'
     | 'inputUnit'
     | 'rollValue'
+    | 'textSuggestions'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
   text: ({ config, field, id, hint, hintPosition, ...validation }) => (
@@ -393,6 +401,7 @@ const fieldRenderers: {
       onChange={field.onChange}
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}
+      resolveFilteredOptions={config.resolveFilteredOptions}
     />
   ),
   editableGrid: ({ config, field, id, namePrefix, ...validation }) => (
@@ -431,6 +440,22 @@ export interface FieldRendererProps {
   namePrefix?: string
 }
 
+function wrapFieldDerivedMetaPresentation(
+  node: React.ReactElement,
+  resolved: ReturnType<typeof resolveFieldRenderConfig>,
+) {
+  if (!resolved.derivedMeta && !resolved.derivedMetaReserveSpace) return node
+
+  return (
+    <FieldDerivedMetaProvider
+      meta={resolved.derivedMeta}
+      reserveSpace={resolved.derivedMetaReserveSpace}
+    >
+      {node}
+    </FieldDerivedMetaProvider>
+  )
+}
+
 /**
  * Binds one `FieldConfig` to react-hook-form via `useController` (so only this
  * field re-renders on its own value/error change) and dispatches to the matching
@@ -440,12 +465,11 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const { size: inheritedSize } = useFormSectionContext()
   const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
 
-  const hintDependsOn = normalizeFieldHint(config.hint).resolve?.dependsOn ?? []
-  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
+  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
+  const resolved = resolveFieldRenderConfig(config, inheritedSize, dynamicValues, optionValues)
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,
@@ -455,15 +479,58 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     hint: resolved.hint,
     hintPosition: resolved.hintPosition,
   })
-  if (specialized) return specialized
+  if (specialized) {
+    return wrapFieldDerivedMetaPresentation(specialized, resolved)
+  }
 
   if (config.type === 'select') {
-    return (
-      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />
+    if (config.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(config)
+      return wrapFieldDerivedMetaPresentation(
+        <OptionalDisclosureSelectFieldRenderer
+          config={config}
+          disclosure={config.optionalDisclosure}
+          fullName={fullName}
+          id={id}
+          namePrefix={namePrefix}
+        />,
+        resolved,
+      )
+    }
+
+    return wrapFieldDerivedMetaPresentation(
+      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />,
+      resolved,
     )
   }
 
-  return (
+  if (config.type === 'textSuggestions') {
+    if (config.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(config)
+      return wrapFieldDerivedMetaPresentation(
+        <OptionalDisclosureTextSuggestionsFieldRenderer
+          config={config}
+          disclosure={config.optionalDisclosure}
+          fullName={fullName}
+          id={id}
+          namePrefix={namePrefix}
+        />,
+        resolved,
+      )
+    }
+
+    return wrapFieldDerivedMetaPresentation(
+      <TextSuggestionsFieldRenderer
+        config={config}
+        fullName={fullName}
+        id={id}
+        namePrefix={namePrefix}
+      />,
+      resolved,
+    )
+  }
+
+  return wrapFieldDerivedMetaPresentation(
     <StandardFieldRenderer
       config={config}
       renderConfig={resolved.config as StandardFieldConfig}
@@ -472,7 +539,8 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       fullName={fullName}
       id={id}
       namePrefix={namePrefix}
-    />
+    />,
+    resolved,
   )
 }
 
@@ -480,6 +548,7 @@ type StandardFieldConfig = Exclude<
   FieldConfig,
   | InputSelectFieldConfig
   | SelectFieldConfig
+  | TextSuggestionsFieldConfig
   | LevelRangeFieldConfig
   | InlineSentenceFieldConfig
   | InlineChooseCountFieldConfig

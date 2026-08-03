@@ -6,6 +6,7 @@ import type {
   GlobalSearchDocument,
   GlobalSearchField,
   GlobalSearchTarget,
+  Location,
   Organization,
   ResolvedContentCampaignAccess,
   SkillProficiency,
@@ -22,6 +23,7 @@ import {
   getContentTypeTerm,
   getCreatureSizeLabel,
   getFeatCategoryLabel,
+  getLocationKindLabel,
   getOrganizationKindLabel,
   getEquipmentSearchName,
   joinCompactSegments,
@@ -179,6 +181,22 @@ function buildOrganizationTarget(organization: Organization): GlobalSearchTarget
   return { kind: 'organization', id: organization.id }
 }
 
+function buildLocationSecondary(location: Location): string {
+  return getLocationKindLabel(location.kind)
+}
+
+function buildLocationFields(location: Location): GlobalSearchField[] {
+  return [
+    labelField(location.name),
+    keywordField(location.slug),
+    descriptionField(stripHtmlTags(location.description ?? '')),
+  ]
+}
+
+function buildLocationTarget(location: Location): GlobalSearchTarget {
+  return { kind: 'location', id: location.id }
+}
+
 type ContentProjector<T extends WriteEntityBase> = {
   secondary: (entity: T) => string
   fields: (entity: T) => GlobalSearchField[]
@@ -222,6 +240,11 @@ const CONTENT_PROJECTORS: {
     secondary: (entity) => buildOrganizationSecondary(entity as Organization),
     fields: (entity) => buildOrganizationFields(entity as Organization),
     target: (entity) => buildOrganizationTarget(entity as Organization),
+  },
+  locations: {
+    secondary: (entity) => buildLocationSecondary(entity as Location),
+    fields: (entity) => buildLocationFields(entity as Location),
+    target: (entity) => buildLocationTarget(entity as Location),
   },
 }
 

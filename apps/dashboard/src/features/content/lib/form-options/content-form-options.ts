@@ -9,6 +9,7 @@ import {
   type Equipment,
   type Feat,
   isWeaponEquipment,
+  type Location,
   type SkillProficiency,
   type Spell,
   type WeaponCategory,
@@ -28,6 +29,7 @@ import {
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useFeats } from '../../feats/hooks/use-feats'
+import { useLocations } from '../../locations/hooks/use-locations'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
@@ -65,6 +67,9 @@ export interface ContentFormOptionSets {
   richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
   /** Content type filters shown in rich-text link pickers. */
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
+  /** Campaign locations for parent pickers and hierarchy-aware forms. */
+  locations: FieldOption[]
+  locationEntities?: Location[]
 }
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
@@ -88,7 +93,15 @@ function useContentCatalogLists(campaignId: string | undefined) {
   const featsQuery = useFeats(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
   const equipmentQuery = useEquipment(campaignId)
-  const queries = [classesQuery, spellsQuery, featsQuery, skillsQuery, equipmentQuery]
+  const locationsQuery = useLocations(campaignId)
+  const queries = [
+    classesQuery,
+    spellsQuery,
+    featsQuery,
+    skillsQuery,
+    equipmentQuery,
+    locationsQuery,
+  ]
 
   return {
     classes: classesQuery.data,
@@ -96,6 +109,7 @@ function useContentCatalogLists(campaignId: string | undefined) {
     feats: featsQuery.data,
     skills: skillsQuery.data,
     equipment: equipmentQuery.data,
+    locations: locationsQuery.data,
     isPending: isAnyPending(...queries),
     isError: isAnyError(...queries),
   }
@@ -182,6 +196,12 @@ function buildRichTextLinkOptionSets(input: {
   }
 }
 
+function buildLocationFieldOptions(locations: Location[] | undefined): FieldOption[] {
+  return sortFieldOptions(
+    locations?.map((location) => ({ value: location.id, label: location.name })) ?? [],
+  )
+}
+
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
@@ -190,6 +210,7 @@ export function buildContentFormOptionSets(input: {
   feats?: Feat[]
   skills?: SkillProficiency[]
   equipment?: Equipment[]
+  locations?: Location[]
 }): ContentFormOptionSets {
   return {
     classes: toSortedContentFieldOptions(input.classes, 'classes'),
@@ -213,6 +234,8 @@ export function buildContentFormOptionSets(input: {
       'equipment',
     ),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
+    locations: buildLocationFieldOptions(input.locations),
+    locationEntities: input.locations,
     ...buildRichTextLinkOptionSets(input),
   }
 }
@@ -235,8 +258,17 @@ export function useContentFormOptions(campaignId: string | undefined): {
         feats: catalog.feats,
         skills: catalog.skills,
         equipment: catalog.equipment,
+        locations: catalog.locations,
       }),
-    [campaignId, catalog.classes, catalog.spells, catalog.feats, catalog.skills, catalog.equipment],
+    [
+      campaignId,
+      catalog.classes,
+      catalog.spells,
+      catalog.feats,
+      catalog.skills,
+      catalog.equipment,
+      catalog.locations,
+    ],
   )
 
   const ctx = useMemo(

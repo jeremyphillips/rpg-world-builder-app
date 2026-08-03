@@ -12,6 +12,10 @@ vi.mock('../api/campaign-client', () => ({
   updateCampaign: vi.fn(),
 }))
 
+vi.mock('@/features/content/locations/hooks/use-locations', () => ({
+  useLocations: vi.fn(() => ({ data: [] })),
+}))
+
 import {
   listCampaigns as listCampaignsFn,
   updateCampaign as updateCampaignFn,
@@ -68,11 +72,12 @@ describe('CampaignSettings', () => {
     expect(screen.getByDisplayValue('A dungeon delve.')).toBeInTheDocument()
   })
 
-  it('shows identity and flavor tabs only', async () => {
+  it('shows identity, flavor, and world tabs', async () => {
     renderSettings()
     await screen.findByDisplayValue('Sunless Citadel')
     expect(screen.getByRole('tab', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Flavor' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'World' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Rules' })).not.toBeInTheDocument()
   })
 
@@ -101,6 +106,7 @@ describe('CampaignSettings', () => {
         playStyle: ['dungeon_crawl'],
         mood: ['heroic'],
       },
+      settings: { primaryWorldId: null },
     })
   })
 

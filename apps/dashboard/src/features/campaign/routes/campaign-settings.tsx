@@ -8,8 +8,10 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
+import { useLocations } from '@/features/content/locations/hooks/use-locations'
 
 import { flavorFields, identityFields } from '../lib/profile/campaign-profile-form-fields'
+import { buildWorldSettingsFields } from '../lib/world/world-settings-form-fields'
 import {
   buildUpdateCampaignInput,
   campaignSettingsSchema,
@@ -31,6 +33,7 @@ export function CampaignSettings() {
   const { campaignId } = useParams<{ campaignId: string }>()
   const { data: campaigns, isPending: isLoadingCampaigns, isError } = useCampaigns()
   const campaign = campaigns?.find((c) => c.id === campaignId)
+  const { data: locations } = useLocations(campaignId ?? '')
 
   const { mutateAsync, isPending } = useUpdateCampaign(campaignId ?? '')
 
@@ -45,8 +48,9 @@ export function CampaignSettings() {
     (): TabbedFormTab[] => [
       { id: 'identity', label: 'Identity', fields: identityFields },
       { id: 'flavor', label: 'Flavor', fields: flavorFields },
+      { id: 'world', label: 'World', fields: buildWorldSettingsFields(locations) },
     ],
-    [],
+    [locations],
   )
 
   const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {

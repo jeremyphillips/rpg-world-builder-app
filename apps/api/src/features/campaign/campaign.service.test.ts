@@ -21,6 +21,9 @@ import { getRulesetPatchRead } from '../vocabulary'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
 import { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
+import { createHomebrewContent } from '../content/lib/content-write.service'
+import { locationWriteConfig } from '../content/locations/locations.config'
+import { HttpError } from '../../lib/http-error'
 
 useIntegrationDb()
 
@@ -436,6 +439,48 @@ describe('updateCampaign', () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
     await expect(updateCampaign('507f1f77bcf86cd799439011', { name: 'Nope' })).resolves.toBeNull()
     void owner
+  })
+
+  it('persists and clears primaryWorldId when settings are patched', async () => {
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const { campaign } = await createCampaign({ name: 'World Campaign', createdBy: owner.id })
+    const world = await createHomebrewContent(locationWriteConfig, campaign.id, {
+      slug: 'faerun',
+      kind: 'world',
+      name: 'Faerûn',
+    })
+
+    const withWorld = await updateCampaign(campaign.id, {
+      settings: { primaryWorldId: world.id },
+    })
+    expect(withWorld?.configuration.settings?.primaryWorldId).toBe(world.id)
+
+    const cleared = await updateCampaign(campaign.id, {
+      settings: { primaryWorldId: null },
+    })
+    expect(cleared?.configuration.settings?.primaryWorldId).toBeUndefined()
+  })
+
+  it('rejects primaryWorldId when the location is not a world', async () => {
+    const owner = await makeTestUser({ email: 'owner@example.com' })
+    const { campaign } = await createCampaign({ name: 'Region Campaign', createdBy: owner.id })
+    const world = await createHomebrewContent(locationWriteConfig, campaign.id, {
+      slug: 'parent-world',
+      kind: 'world',
+      name: 'Parent World',
+    })
+    const region = await createHomebrewContent(locationWriteConfig, campaign.id, {
+      slug: 'sword-coast',
+      kind: 'region',
+      name: 'Sword Coast',
+      parentLocationId: world.id,
+    })
+
+    await expect(
+      updateCampaign(campaign.id, {
+        settings: { primaryWorldId: region.id },
+      }),
+    ).rejects.toBeInstanceOf(HttpError)
   })
 })
 

@@ -22,6 +22,7 @@ import type { FieldSize } from '../components/ui/field.client'
 import type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
 import type { FieldChrome } from '../components/ui/field-chrome.variants'
 import type { FieldWidth } from '../components/ui/field-control.variants'
+import type { FieldRowAlignment } from '../components/ui/field-control-band.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
 import type {
@@ -64,6 +65,7 @@ export type { FieldChrome } from '../components/ui/field-chrome.variants'
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
   | 'text'
+  | 'textSuggestions'
   | 'number'
   | 'textarea'
   | 'select'
@@ -94,6 +96,8 @@ export interface FieldOption {
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
+  /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
+  searchTerms?: readonly string[]
   /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
   meta?: string[]
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
@@ -189,11 +193,45 @@ export interface FieldDynamicHint {
   hintWhen: (values: Record<string, unknown>) => string | undefined
 }
 
+/** Resolves suggestion strings from watched form values (e.g. archetype-driven vocab). */
+export interface FieldDynamicSuggestions {
+  dependsOn: readonly string[]
+  suggestionsWhen: (values: Record<string, unknown>) => readonly string[]
+}
+
+/** Resolves select options from watched form values (e.g. exclude archetype defaults). */
+export interface FieldDynamicSelectOptions {
+  dependsOn: readonly string[]
+  optionsWhen: (values: Record<string, unknown>) => readonly FieldOption[]
+}
+
 /** Static and dynamic hint configuration on leaf fields. */
 export interface FieldHintConfig {
   text?: string
   position?: FieldHintPosition
   resolve?: FieldDynamicHint
+}
+
+/** One label/value row in derived field metadata (informational, not authored). */
+export interface FieldDerivedMetaRow {
+  label: string
+  value: string
+}
+
+/** Resolved derived metadata below the control — display-only, never serialized. */
+export interface FieldDerivedMeta {
+  rows: readonly FieldDerivedMetaRow[]
+}
+
+/**
+ * Dynamic metadata projected from watched form values (e.g. archetype typical uses).
+ * Informational only — must not participate in values, dirty state, validation, or serialization.
+ */
+export interface FieldDerivedMetaConfig {
+  /** When true, reserve one metadata line to prevent empty → populated layout shift. */
+  reserveSpace?: boolean
+  dependsOn: readonly string[]
+  metaWhen: (values: Record<string, unknown>) => FieldDerivedMeta | undefined
 }
 
 /**
@@ -232,6 +270,8 @@ interface BaseFieldConfig {
    */
   width?: FieldWidth
   hint?: string | FieldHintConfig
+  /** Informational metadata below the control — resolved from other field values. */
+  derivedMeta?: FieldDerivedMetaConfig
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean
@@ -263,11 +303,17 @@ interface BaseFieldConfig {
   presentation?: FieldPresentationConfig
 }
 
-/** Field kinds that may use `optionalDisclosure` when renderer support lands. */
-export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext'] as const
+/** Field kinds that may use `optionalDisclosure`. */
+export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
+  'text',
+  'textSuggestions',
+  'textarea',
+  'richtext',
+  'select',
+] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
-/** Collapse empty optional prose fields behind an add control (v1: textarea only). */
+/** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
   removeLabel?: string
@@ -283,6 +329,14 @@ export interface TextFieldConfig extends BaseFieldConfig {
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
   autoComplete?: string
   defaultValue?: string
+}
+
+export interface TextSuggestionsFieldConfig extends BaseFieldConfig {
+  type: 'textSuggestions'
+  placeholder?: string
+  defaultValue?: string
+  suggestions: FieldDynamicSuggestions
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 export interface NumberFieldConfig extends BaseFieldConfig {
@@ -331,9 +385,13 @@ export interface TextareaFieldConfig extends BaseFieldConfig {
  */
 export interface SelectFieldConfig extends BaseFieldConfig {
   type: 'select'
-  options: SelectFieldOptionListItem[]
+  /** Static options — omit when `optionsResolve` supplies the list at render time. */
+  options?: SelectFieldOptionListItem[]
+  /** Dynamic options resolved from watched values; replaces `options` when set. */
+  optionsResolve?: FieldDynamicSelectOptions
   placeholder?: string
   defaultValue?: string
+  optionalDisclosure?: OptionalDisclosureConfig
   /** Disables individual options when `enabledWhen` is false for the current values. */
   optionAvailability?: FieldOptionAvailability
   /**
@@ -608,6 +666,15 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
    * Defaults to removable `Chip` pills. Use for links, badges, or compact summaries.
    */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /**
+   * Custom filter/rank for panel options. When omitted, the combobox uses default
+   * substring matching in static `options` order. Selected values must stay visible.
+   */
+  resolveFilteredOptions?: (
+    options: FieldOption[],
+    query: string,
+    selected: string[],
+  ) => FieldOption[]
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
@@ -765,6 +832,7 @@ export interface InputUnitFieldConfig extends BaseFieldConfig {
  */
 export type FieldConfig =
   | TextFieldConfig
+  | TextSuggestionsFieldConfig
   | NumberFieldConfig
   | TextareaFieldConfig
   | SelectFieldConfig
@@ -795,10 +863,30 @@ export function isRowSlotItem(item: RowFieldItem): item is SlotConfig {
   return 'kind' in item && item.kind === 'slot'
 }
 
+/** Whether a row field reserves one line of derived metadata below its control. */
+export function rowFieldReservesDerivedMeta(field: RowFieldItem): boolean {
+  if (isRowSlotItem(field)) return false
+  return Boolean(field.derivedMeta?.reserveSpace)
+}
+
+/**
+ * Resolves row flex alignment. Rows with reserved derived metadata use top
+ * alignment so sibling controls stay aligned while metadata extends below one field.
+ */
+export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>): FieldRowAlignment {
+  if (item.align) return item.align
+  return item.fields.some(rowFieldReservesDerivedMeta) ? 'start' : 'control-edge'
+}
+
 export interface RowConfig {
   kind: 'row'
   fields: RowFieldItem[]
   className?: string
+  /**
+   * Flex cross-axis alignment for row siblings. When omitted, defaults to
+   * `start` if any field uses `derivedMeta.reserveSpace`, else `control-edge`.
+   */
+  align?: FieldRowAlignment
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
   /** When hidden, the whole row unmounts. */
@@ -1173,6 +1261,7 @@ export function buildItemDefaultValues(itemFields: FormItem[]): Record<string, u
  */
 const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   text: '',
+  textSuggestions: '',
   number: undefined,
   textarea: '',
   select: '',
@@ -1377,6 +1466,20 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
   }
 }
 
+/** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
+export function collectFieldDynamicDependsOn(field: {
+  hint?: BaseFieldConfig['hint']
+  derivedMeta?: BaseFieldConfig['derivedMeta']
+  type?: FieldConfig['type']
+  optionsResolve?: FieldDynamicSelectOptions
+}): readonly string[] {
+  const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
+  const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
+  const optionsResolveDependsOn =
+    field.type === 'select' && field.optionsResolve ? field.optionsResolve.dependsOn : []
+  return [...new Set([...hintDependsOn, ...derivedMetaDependsOn, ...optionsResolveDependsOn])]
+}
+
 /** Resolves static and dynamic hint text for a field config. */
 export function resolveFieldHint(
   field: Pick<BaseFieldConfig, 'hint'>,
@@ -1454,13 +1557,25 @@ export function applyOptionAvailabilityToSelectOptions(
   )
 }
 
-/** Resolves a select field's flat option list after availability and array filters. */
+/** Resolves a select field's option list, applying dynamic resolution when configured. */
+export function resolveSelectFieldConfigOptions(
+  config: SelectFieldConfig,
+  values: Record<string, unknown>,
+): SelectFieldOptionListItem[] {
+  if (config.optionsResolve) {
+    return [...config.optionsResolve.optionsWhen(values)]
+  }
+  return config.options ?? []
+}
+
+/** Resolves a select field's flat option list after dynamic resolution, availability, and array filters. */
 export function resolveSelectFieldFlatOptions(
   config: SelectFieldConfig,
   optionValues: Record<string, unknown>,
   arrayFilter?: (options: FieldOption[], fieldName: string) => FieldOption[],
+  dynamicValues: Record<string, unknown> = optionValues,
 ): FieldOption[] {
-  let options = flattenSelectFieldOptions(config.options)
+  let options = flattenSelectFieldOptions(resolveSelectFieldConfigOptions(config, dynamicValues))
   if (config.optionAvailability) {
     options = applyOptionAvailabilityToFieldOptions(
       options,

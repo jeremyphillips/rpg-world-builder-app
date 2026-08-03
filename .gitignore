@@ -48,6 +48,10 @@ pnpm-debug.log*
 !.vscode/form.code-snippets
 
 # Cursor
-.cursor/plans
+.cursor/
+
+# Python
+__pycache__/
+*.py[cod]plans
 
 CHEATSHEET.md

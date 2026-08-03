@@ -14,6 +14,7 @@ import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error
 import type { SelectFieldConfig } from '../../field-config'
 import {
   fieldDefaultValue,
+  collectFieldDynamicDependsOn,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
   resolveSelectFieldFlatOptions,
@@ -29,10 +30,8 @@ export function useSelectFieldRendererState(
   const { size: inheritedSize } = useFormSectionContext()
   const arrayContext = useArrayFieldContext()
   const optionValues = useDependsOnValues(config.optionAvailability?.dependsOn ?? [], namePrefix)
-  const hintDependsOn =
-    typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
-  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
-  const resolved = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
+  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
+  const resolved = resolveFieldRenderConfig(config, inheritedSize, dynamicValues, optionValues)
   const renderConfig = resolved.config as SelectFieldConfig
 
   const { field, fieldState } = useController({
@@ -47,10 +46,13 @@ export function useSelectFieldRendererState(
 
   const resolvedOptions = useMemo(
     () =>
-      resolveSelectFieldFlatOptions(renderConfig, optionValues, (options, fieldName) =>
-        applyArrayFilterSelectOptions(options, fieldName, arrayContext),
+      resolveSelectFieldFlatOptions(
+        renderConfig,
+        optionValues,
+        (options, fieldName) => applyArrayFilterSelectOptions(options, fieldName, arrayContext),
+        dynamicValues,
       ),
-    [arrayContext, optionValues, renderConfig],
+    [arrayContext, dynamicValues, optionValues, renderConfig],
   )
 
   const isReadOnly = isSelectFieldReadOnly(renderConfig, resolvedOptions)

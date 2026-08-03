@@ -8,6 +8,8 @@ export interface ComboboxFieldOption {
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
+  /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
+  searchTerms?: readonly string[]
 }
 
 export interface ComboboxSelectedItemRenderContext {
@@ -21,6 +23,13 @@ export type ComboboxRenderSelectedItem = (
   option: ComboboxFieldOption,
   context: ComboboxSelectedItemRenderContext,
 ) => ReactNode
+
+/** Optional combobox panel resolver; defaults to {@link filterOptions} order when omitted. */
+export type ResolveComboboxFilteredOptions = (
+  options: ComboboxFieldOption[],
+  query: string,
+  selected: string[],
+) => ComboboxFieldOption[]
 
 export interface ComboboxFieldControlProps {
   label: string
@@ -38,4 +47,6 @@ export interface ComboboxFieldControlProps {
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Custom filter/rank for panel options; selected values must remain visible when set. */
+  resolveFilteredOptions?: ResolveComboboxFilteredOptions
 }

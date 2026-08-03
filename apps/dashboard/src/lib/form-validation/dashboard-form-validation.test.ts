@@ -33,6 +33,7 @@ import {
   identitySchema,
 } from '@/features/campaign/lib/profile/campaign-profile-form-fields'
 import { campaignSettingsSchema } from '@/features/campaign/lib/campaign-settings-form-values'
+import { buildWorldSettingsFields } from '@/features/campaign/lib/world/world-settings-form-fields'
 import { accountFields, accountFormSchema } from '@/features/user/lib/account-fields'
 import {
   changePasswordFields,
@@ -94,8 +95,8 @@ describe('dashboard form validation', () => {
     })
   })
 
-  it('campaign settings (identity + flavor)', () => {
-    const fields = [...identityFields, ...flavorFields]
+  it('campaign settings (identity + flavor + world)', () => {
+    const fields = [...identityFields, ...flavorFields, ...buildWorldSettingsFields([])]
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(campaignSettingsSchema, fields)
     assertInvalidSubmitUsesRefinedMessages(campaignSettingsSchema, fields, {

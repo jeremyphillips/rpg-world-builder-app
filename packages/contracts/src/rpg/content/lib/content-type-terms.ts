@@ -56,6 +56,14 @@ export const CONTENT_TYPE_TERMS = {
       plural: 'organizations',
     },
   },
+  locations: {
+    label: 'Location',
+    description: 'A campaign-authored place in the world hierarchy.',
+    sentence: {
+      singular: 'location',
+      plural: 'locations',
+    },
+  },
 } as const satisfies Record<ContentTypeKey, VocabularyTerm>
 
 /** Returns the catalog content-type term for a collection key. */
@@ -84,6 +92,7 @@ export const FEAT_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.feats
 export const EQUIPMENT_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.equipment
 export const SKILL_PROFICIENCY_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS['skill-proficiencies']
 export const ORGANIZATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.organizations
+export const LOCATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.locations
 
 /** Every `ContentTypeKey` has a registered term — drift guard for new catalog types. */
 export const CONTENT_TYPE_TERM_KEYS = CONTENT_TYPE_KEYS

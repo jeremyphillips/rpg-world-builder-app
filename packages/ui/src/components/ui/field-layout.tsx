@@ -53,25 +53,31 @@ export function FieldLayout({
 
   const bandedControl = <div className={presentation.controlBandClassName}>{controlNode}</div>
 
+  const derivedMetaNode = <Field.DerivedMeta />
+
   const fieldBody =
     hintPosition === 'below-label' ? (
-      <div data-field-align="" className={presentation.alignmentAnchorClassName}>
-        {label ? (
-          <div className={fieldLabelHintStackClasses}>
-            {label}
+      <>
+        <div data-field-align="" className={presentation.alignmentAnchorClassName}>
+          {label ? (
+            <div className={fieldLabelHintStackClasses}>
+              {label}
+              <Field.Hint />
+            </div>
+          ) : (
             <Field.Hint />
-          </div>
-        ) : (
-          <Field.Hint />
-        )}
-        {bandedControl}
-      </div>
+          )}
+          {bandedControl}
+        </div>
+        {derivedMetaNode}
+      </>
     ) : (
       <>
         <div data-field-align="" className={presentation.alignmentAnchorClassName}>
           {label}
           {bandedControl}
         </div>
+        {derivedMetaNode}
         <Field.Hint />
       </>
     )

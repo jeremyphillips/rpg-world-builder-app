@@ -29,6 +29,9 @@ const campaignSchema = new Schema(
         magicLevel: { type: String, enum: MAGIC_LEVELS },
         difficulty: { type: String, enum: DIFFICULTIES },
       },
+      settings: {
+        primaryWorldId: { type: String },
+      },
     },
     status: { type: String, enum: CAMPAIGN_STATUSES, required: true, default: 'draft' },
     visibility: { type: String, enum: CAMPAIGN_VISIBILITY, required: true, default: 'private' },

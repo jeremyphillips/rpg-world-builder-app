@@ -6,20 +6,52 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 ## Standard leaf types (brief)
 
-| `type`      | Value     | Notes                                                                      |
-| ----------- | --------- | -------------------------------------------------------------------------- |
-| `text`      | `string`  | Optional `inputType`, `autoComplete`                                       |
-| `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                           |
-| `textarea`  | `string`  | `rows`, optional `optionalDisclosure` (v1: textarea only)                  |
-| `select`    | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen` |
-| `radio`     | `string`  | `orientation`, `labelHidden`                                               |
-| `radioCard` | `string`  | Card-style options with `meta` / `badge`                                   |
-| `checkbox`  | `boolean` |                                                                            |
-| `switch`    | `boolean` | `labelPosition`: `inline`, `above`, `settings`                             |
-| `select`    | `string`  | `labelPosition`: `inline`, `above`, `settings`                             |
-| `file`      | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
+| `type`            | Value     | Notes                                                                      |
+| ----------------- | --------- | -------------------------------------------------------------------------- |
+| `text`            | `string`  | Optional `inputType`, `autoComplete`                                       |
+| `textSuggestions` | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure` |
+| `number`          | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                           |
+| `textarea`        | `string`  | `rows`, optional `optionalDisclosure`                                      |
+| `select`          | `string`  | `options`, optional `optionalDisclosure`                                   |
+| `select`          | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen` |
+| `radio`           | `string`  | `orientation`, `labelHidden`                                               |
+| `radioCard`       | `string`  | Card-style options with `meta` / `badge`                                   |
+| `checkbox`        | `boolean` |                                                                            |
+| `switch`          | `boolean` | `labelPosition`: `inline`, `above`, `settings`                             |
+| `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                             |
+| `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
 
 `select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+
+### Text suggestions (`textSuggestions`)
+
+Advisory-only text field: persisted value is always a plain string, free entry is valid,
+and suggestions never affect validation. When `suggestionsWhen` returns a non-empty list and
+the trimmed value is empty, the control renders a **Recommended** row of inline suggestion
+buttons beneath the input (all terms wrap naturally — no search, chevron, or dropdown). An
+empty suggestion list degrades to a plain text input. Optional disclosure (`optionalDisclosure`)
+owns collapsed/expanded chrome; the primitive itself is unaware of disclosure state.
+
+Clicking a suggestion writes the exact registry term string. Display labels may title-case
+for readability only.
+
+```ts
+{
+  type: 'textSuggestions',
+  name: 'classification.specialization',
+  label: 'Specialization',
+  placeholder: 'Enter specialization…',
+  hint: 'Add a specialization when you want to describe a more specific kind of building.',
+  suggestions: {
+    dependsOn: ['classification.archetype'],
+    suggestionsWhen: (values) => resolveSpecializationSuggestions(values),
+  },
+  optionalDisclosure: {
+    addLabel: 'Add specialization',
+    removeLabel: 'Remove specialization',
+  },
+}
+```
 
 ### Select read-only presentation
 
@@ -41,14 +73,53 @@ instead of a one-option dropdown. Value stays registered in RHF and still valida
 Works with `filterSelectOptions` on parent `array` configs — `readOnlyWhen` receives the
 resolved flat option list after array filtering and `optionAvailability`.
 
+## Derived metadata (`derivedMeta`)
+
+Information resolved from the current selected value — distinct from **hint** (author
+guidance) and **validation** (errors). Rendered below the control via `FieldLayout`.
+
+**Invariant:** derived metadata is informational only. It must never participate in form
+values, dirty state, validation, or serialization.
+
+```ts
+{
+  type: 'combobox',
+  name: 'classification.archetype',
+  label: 'Archetype',
+  options: archetypeOptions,
+  derivedMeta: {
+    reserveSpace: true,
+    dependsOn: ['classification.archetype'],
+    metaWhen: (values) => {
+      const archetype = values['classification.archetype']
+      if (typeof archetype !== 'string') return undefined
+      return {
+        rows: [{ label: 'Typical uses', value: formatArchetypeFunctions(archetype) }],
+      }
+    },
+  },
+}
+```
+
+- **`rows`** — label/value pairs; v1 uses the same single-line row chrome for every row.
+- **`reserveSpace: true`** — reserves **one metadata line** so empty → populated does not
+  shift layout. Does not reserve multi-line or multi-row height.
+- **`optionsResolve`** — dynamic select options from watched values; returned options replace
+  a static `options` list (use to exclude values that would be semantic no-ops).
+- **Row alignment** — when any sibling in a `kind: 'row'` uses `reserveSpace`, the row
+  defaults to `align: 'start'` (`items-start`) so sibling controls stay top-aligned while
+  metadata extends below one field. Override with `RowConfig.align` when needed.
+- **Accessibility** — when no error is present, `aria-describedby` may reference both hint
+  and derived-metadata ids. Errors still take exclusive precedence.
+
 ## Optional disclosure (`optionalDisclosure`)
 
-Collapses empty optional prose fields behind a compact **+ Add …** control. When expanded
+Collapses empty optional fields behind a compact **+ Add …** control. When expanded
 (or when populated and `expandWhenPopulated` is true), the field label and control render
 with a **Remove** action that clears the value and collapses back to the add control.
 
-**v1:** renderer support is **textarea only**. `OPTIONAL_DISCLOSURE_FIELD_KINDS` lists
-`text`, `textarea`, and `richtext` for future enablement; dev guards log when
+**Implemented for:** `textarea`, `select`. `OPTIONAL_DISCLOSURE_FIELD_KINDS` also lists
+`text` and `richtext` for future enablement; dev guards log when
 `optionalDisclosure` is used on unimplemented kinds.
 
 ```ts
@@ -232,6 +303,9 @@ Searchable dropdown for large lists (catalog refs).
 - Filter matches `label`, `description`, `value`.
 - Multi: removable badges; `renderSelectedItem` for custom previews.
 - Stale selected values stay visible when missing from `options`.
+- `resolveFilteredOptions(options, query, selected)` — optional custom filter/rank for large
+  vocabularies (e.g. building archetype Model E precedence). Selected values must remain
+  visible when set, matching the default `filterOptions` contract.
 
 ## Level range (`levelRange`)
 

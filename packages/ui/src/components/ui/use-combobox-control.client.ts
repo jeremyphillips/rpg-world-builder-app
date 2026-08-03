@@ -27,6 +27,7 @@ export function useComboboxControl({
   loading,
   placeholder,
   enableSearch = true,
+  resolveFilteredOptions,
 }: ComboboxFieldControlProps) {
   const generatedId = React.useId()
   const [open, setOpen] = React.useState(false)
@@ -41,8 +42,11 @@ export function useComboboxControl({
   const atMax = max !== undefined && selected.length >= max
 
   const filteredOptions = React.useMemo(
-    () => filterOptions(options, query, selected),
-    [options, query, selected],
+    () =>
+      resolveFilteredOptions
+        ? resolveFilteredOptions(options, query, selected)
+        : filterOptions(options, query, selected),
+    [options, query, resolveFilteredOptions, selected],
   )
   const highlightedIndex = clampHighlightedIndex(activeIndex, filteredOptions.length)
   const selectedOptions = React.useMemo(

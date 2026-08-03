@@ -90,6 +90,7 @@ describe('mapCampaignToSettingsValues', () => {
       mood: ['heroic'],
       magicLevel: 'standard_fantasy',
       difficulty: 'dangerous',
+      primaryWorldId: '__none__',
     })
   })
 
@@ -107,6 +108,7 @@ describe('mapCampaignToSettingsValues', () => {
       mood: undefined,
       magicLevel: undefined,
       difficulty: undefined,
+      primaryWorldId: '__none__',
     })
   })
 })
@@ -372,7 +374,7 @@ describe('mapRulesetPatchToRulesValues', () => {
 })
 
 describe('buildUpdateCampaignInput', () => {
-  it('maps settings form values to identity and flavor only', () => {
+  it('maps settings form values to identity, flavor, and world settings', () => {
     expect(
       buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign), 'new-banner.webp'),
     ).toEqual({
@@ -385,6 +387,18 @@ describe('buildUpdateCampaignInput', () => {
         magicLevel: 'standard_fantasy',
         difficulty: 'dangerous',
       },
+      settings: { primaryWorldId: null },
+    })
+  })
+
+  it('includes primaryWorldId when a world is selected', () => {
+    expect(
+      buildUpdateCampaignInput({
+        ...mapCampaignToSettingsValues(campaign),
+        primaryWorldId: 'world-faerun',
+      }),
+    ).toMatchObject({
+      settings: { primaryWorldId: 'world-faerun' },
     })
   })
 

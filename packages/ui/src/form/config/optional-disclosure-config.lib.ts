@@ -4,7 +4,11 @@ import {
   type OptionalDisclosureFieldKind,
 } from '../field-config'
 
-export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = ['textarea'] as const
+export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
+  'textarea',
+  'select',
+  'textSuggestions',
+] as const
 export type OptionalDisclosureImplementedKind =
   (typeof OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS)[number]
 

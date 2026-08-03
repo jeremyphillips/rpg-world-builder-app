@@ -1,6 +1,6 @@
 import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import type { FormItem, TabbedFormTab } from '@rpg/ui/form'
+import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 
 import type {
   ContentSource,
@@ -98,6 +98,10 @@ export interface ContentFormDef<
   ) => ZodType<FieldValues>
   /** Returns the ordered `FormItem[]` for this type. */
   buildFields: (ctx: ContentFormCtx) => FormItem[]
+  /**
+   * Optional value sync rules executed by the form shell when driver fields change.
+   */
+  valueSyncs?: FormValueSync[]
   /** Name field hoisted above tabs / the rest of the form in create/edit shells. */
   nameField: (ctx: ContentFormCtx) => FormItem
   /**

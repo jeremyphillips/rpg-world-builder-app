@@ -91,9 +91,13 @@ describe('CampaignSidebarNav', () => {
       'href',
       ROUTES.content.organizations.overview(campaignId),
     )
+    expect(screen.getByRole('link', { name: 'Locations' })).toHaveAttribute(
+      'href',
+      ROUTES.content.locations.overview(campaignId),
+    )
 
     for (const entry of VISIBLE_SIDEBAR_CONTENT.filter(
-      (item) => item.contentType !== 'organizations',
+      (item) => item.contentType !== 'organizations' && item.contentType !== 'locations',
     )) {
       expect(screen.getByRole('link', { name: entry.label })).toBeInTheDocument()
     }

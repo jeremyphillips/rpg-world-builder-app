@@ -69,6 +69,87 @@ const multiFields: FormItem[] = [
 ]
 
 describe('Form combobox field', () => {
+  it('applies row fraction width classes beside a 1/3 select', () => {
+    const schema = z.object({
+      authoringType: z.string(),
+      archetype: z.string().optional(),
+    })
+    const fields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'authoringType',
+            label: 'Location type',
+            width: '1/3',
+            options: [{ label: 'Building', value: 'building' }],
+          },
+          {
+            type: 'combobox',
+            name: 'archetype',
+            label: 'Archetype',
+            width: '2/3',
+            multiple: false,
+            options: [{ label: 'Inn', value: 'inn' }],
+            visibility: {
+              dependsOn: ['authoringType'],
+              visibleWhen: (values) => values.authoringType === 'building',
+            },
+            derivedMeta: {
+              reserveSpace: true,
+              dependsOn: ['archetype'],
+              metaWhen: () => ({ rows: [{ label: 'Typical uses', value: 'Lodging' }] }),
+            },
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ authoringType: 'building' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const locationRoot = screen.getByLabelText('Location type').closest('.grow-\\[4\\]')
+    const archetypeRoot = screen.getByLabelText('Archetype').closest('.grow-\\[8\\]')
+
+    expect(locationRoot).toHaveClass('grow-[4]', 'max-w-1/3')
+    expect(archetypeRoot).toHaveClass('grow-[8]', 'max-w-2/3')
+  })
+
+  it('applies custom resolveFilteredOptions order in the panel', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({ choice: z.string().optional() })
+    const orderedOptions = [
+      { value: 'first', label: 'First match' },
+      { value: 'second', label: 'Second match' },
+    ]
+    const fields: FormItem[] = [
+      {
+        type: 'combobox',
+        name: 'choice',
+        label: 'Choice',
+        multiple: false,
+        options: orderedOptions,
+        resolveFilteredOptions: (opts, query) =>
+          query ? [...opts].reverse().filter((option) => option.label.includes('match')) : opts,
+      },
+    ]
+
+    render(<Form schema={schema} fields={fields} defaultValues={{}} onSubmit={vi.fn()} />)
+
+    await user.click(screen.getByRole('combobox', { name: 'Choice' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search Choice' }), 'match')
+
+    const panelOptions = screen.getAllByRole('option')
+    expect(panelOptions[0]).toHaveAccessibleName('Second match')
+  })
+
   it('submits multi-select values from the combobox adapter', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

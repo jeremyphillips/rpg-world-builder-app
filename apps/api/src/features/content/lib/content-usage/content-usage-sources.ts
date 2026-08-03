@@ -13,6 +13,8 @@ import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,
 } from './reference-sources/characters'
+import { indexLocationParentBlockersByContentId } from './reference-sources/locations'
+import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import type { ContentUsageSource } from './content-usage-source'
 
 function characterDescriptorSource(
@@ -50,4 +52,12 @@ export const characterEquipmentSource: ContentUsageSource = {
       purpose: ctx.purpose,
       viewer: ctx.viewer,
     }),
+}
+
+export const locationParentReferenceSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexLocationParentBlockersByContentId(ctx),
+}
+
+export const campaignPrimaryWorldReferenceSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCampaignPrimaryWorldBlockersByContentId(ctx),
 }

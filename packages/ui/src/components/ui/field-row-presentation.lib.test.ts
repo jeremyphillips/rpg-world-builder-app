@@ -74,6 +74,11 @@ describe('resolveFieldRowClasses', () => {
     expect(classes).toContain('items-center')
     expect(classes).toContain('gap-2')
   })
+
+  it('maps start alignment for rows with reserved derived metadata', () => {
+    const classes = resolveFieldRowClasses({ align: 'start' })
+    expect(classes).toContain('items-start')
+  })
 })
 
 describe('mapFormLabelPositionToLayout', () => {

@@ -18,6 +18,7 @@ const ROUTE_KEY_TO_CONTENT_ROUTE_SECTION: Record<string, ContentRouteSection> = 
   equipment: 'equipment',
   'skill-proficiencies': 'skillProficiencies',
   organizations: 'organizations',
+  locations: 'locations',
 }
 
 /** Maps API `routeKey` values to `CONTENT_ROUTES` section keys. */

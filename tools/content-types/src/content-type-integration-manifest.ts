@@ -138,6 +138,19 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     },
     capabilities: { required: true },
   },
+  locations: {
+    catalog: { bundledContent: 'none' },
+    api: {
+      registrationPath: 'apps/api/src/features/content/locations/locations.config.ts',
+    },
+    dashboard: {
+      folder: 'locations',
+      routeSection: 'locations',
+      formDefinitionPath: 'apps/dashboard/src/features/content/locations/lib/location-form-def.ts',
+      visibleInSidebar: true,
+    },
+    capabilities: { required: true },
+  },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>
 
 export type ContentTypeIntegrationManifest = typeof CONTENT_TYPE_INTEGRATION_MANIFEST

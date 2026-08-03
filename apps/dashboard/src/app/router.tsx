@@ -53,6 +53,10 @@ import {
   OrganizationDetailRoute,
   OrganizationEditRoute,
   OrganizationsOverviewRoute,
+  LocationCreateRoute,
+  LocationDetailRoute,
+  LocationEditRoute,
+  LocationsOverviewRoute,
   SkillProficienciesOverviewRoute,
   SkillProficiencyCreateRoute,
   SkillProficiencyDetailRoute,
@@ -516,6 +520,47 @@ const router = createBrowserRouter(
                         {
                           path: 'edit',
                           element: <OrganizationEditRoute />,
+                          handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  path: 'locations',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params, data) => ({
+                      label: getContentTypeCollectionLabel('locations'),
+                      href: collectionCrumbHref(
+                        ROUTES.content.locations.overview(params.campaignId!),
+                        data,
+                      ),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <LocationsOverviewRoute /> },
+                    {
+                      path: 'new',
+                      element: <LocationCreateRoute />,
+                    },
+                    {
+                      path: ':locationId',
+                      element: <Outlet />,
+                      handle: {
+                        crumb: (params, data) => ({
+                          label: data.entityLabel ?? '…',
+                          href: entityDetailCrumbHref(
+                            ROUTES.content.locations.detail(params.campaignId!, params.locationId!),
+                            data,
+                          ),
+                        }),
+                      } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <LocationDetailRoute /> },
+                        {
+                          path: 'edit',
+                          element: <LocationEditRoute />,
                           handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
                         },
                       ],
