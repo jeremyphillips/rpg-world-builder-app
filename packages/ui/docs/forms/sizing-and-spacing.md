@@ -135,11 +135,11 @@ within that band; helper/validation content renders below the alignment anchor
 (`data-field-align`). Container layout may be flow or grid, but control sizing and
 alignment semantics are shared across forms and filters.
 
-| Concept            | Module                     | Notes                                                                                          |
-| ------------------ | -------------------------- | ---------------------------------------------------------------------------------------------- |
-| Control band       | `fieldControlBandVariants` | `sm`/`md`/`lg` → `min-h-8`/`min-h-9`/`min-h-11`; `content-sized` opts out for multiline shells |
-| Field presentation | `resolveFieldPresentation` | `labelLayout`: `hidden` \| `stacked` \| `inline` \| `settings`                                 |
-| Row classes        | `resolveFieldRowClasses`   | Default `align: 'control-edge'` → `items-end`; form gap `gap-6`, toolbar/filter gap `gap-2`    |
+| Concept            | Module                     | Notes                                                                                                                                                                         |
+| ------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Control band       | `fieldControlBandVariants` | `sm`/`md`/`lg` → `min-h-8`/`min-h-9`/`min-h-11`; `content-sized` opts out for multiline shells                                                                                |
+| Field presentation | `resolveFieldPresentation` | `labelLayout`: `hidden` \| `stacked` \| `inline` \| `settings`                                                                                                                |
+| Row classes        | `resolveFieldRowClasses`   | Default `align: 'control-edge'` → `items-end`; rows with `derivedMeta.reserveSpace` default to `align: 'start'` → `items-start`; form gap `gap-6`, toolbar/filter gap `gap-2` |
 
 `Field.Error` and `hintPosition="below-control"` stay **outside** `data-field-align` so
 row `items-end` targets label + control band, not messages.

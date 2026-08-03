@@ -84,7 +84,6 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationEntities = ctx.options?.locationEntities
 
   return [
-    descriptionField(ctx),
     {
       kind: 'row',
       fields: [
@@ -109,6 +108,7 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       visibility: parentLocationFieldVisibility(),
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
     },
+    descriptionField(ctx),
   ]
 }
 

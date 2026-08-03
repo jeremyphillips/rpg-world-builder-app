@@ -49,4 +49,29 @@ describe('field-renderer-config.lib', () => {
       derivedMeta: { rows: [{ label: 'Typical uses', value: 'Care' }] },
     })
   })
+
+  it('resolves dynamic select options from watched values', () => {
+    const config = {
+      type: 'select',
+      name: 'classification.functionOverride',
+      label: 'Function override',
+      optionsResolve: {
+        dependsOn: ['classification.archetype'],
+        optionsWhen: (values: Record<string, unknown>) =>
+          values['classification.archetype'] === 'almshouse'
+            ? [{ value: 'lodging', label: 'Lodging' }]
+            : [{ value: 'care', label: 'Care' }],
+      },
+    } satisfies FieldConfig
+
+    expect(resolveFieldRenderConfig(config, 'md', {}, {}).config).toMatchObject({
+      options: [{ value: 'care', label: 'Care' }],
+    })
+    expect(
+      resolveFieldRenderConfig(config, 'md', { 'classification.archetype': 'almshouse' }, {})
+        .config,
+    ).toMatchObject({
+      options: [{ value: 'lodging', label: 'Lodging' }],
+    })
+  })
 })

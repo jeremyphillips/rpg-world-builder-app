@@ -51,6 +51,18 @@ describe('FieldRow', () => {
     expect(container.firstChild).not.toHaveClass('grid')
   })
 
+  it('supports start alignment for rows with reserved derived metadata', () => {
+    const { container } = render(
+      <FieldRow align="start">
+        <TextField id="first" label="First name" />
+        <TextField id="last" label="Last name" />
+      </FieldRow>,
+    )
+
+    expect(container.firstChild).toHaveClass('items-start')
+    expect(container.firstChild).not.toHaveClass('items-end')
+  })
+
   it('wraps each field’s label + control band in a data-field-align anchor', () => {
     const { container } = render(
       <FieldRow>

@@ -73,6 +73,11 @@ values, dirty state, validation, or serialization.
 - **`rows`** — label/value pairs; v1 uses the same single-line row chrome for every row.
 - **`reserveSpace: true`** — reserves **one metadata line** so empty → populated does not
   shift layout. Does not reserve multi-line or multi-row height.
+- **`optionsResolve`** — dynamic select options from watched values; returned options replace
+  a static `options` list (use to exclude values that would be semantic no-ops).
+- **Row alignment** — when any sibling in a `kind: 'row'` uses `reserveSpace`, the row
+  defaults to `align: 'start'` (`items-start`) so sibling controls stay top-aligned while
+  metadata extends below one field. Override with `RowConfig.align` when needed.
 - **Accessibility** — when no error is present, `aria-describedby` may reference both hint
   and derived-metadata ids. Errors still take exclusive precedence.
 

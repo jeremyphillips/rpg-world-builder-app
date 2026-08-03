@@ -1,6 +1,10 @@
 import {
+  BUILDING_ARCHETYPE_IDS,
+  getBuildingArchetypeFunctions,
   getRegionTypeIds,
   INTERIOR_TYPE_DEFINITIONS,
+  type BuildingArchetype,
+  type BuildingFunctionFamily,
   type InteriorClassificationType,
   type RegionClassificationKind,
 } from '@rpg/contracts'
@@ -55,6 +59,20 @@ function syncBuildingArchetypeChange(
   }
 
   return Object.keys(patch).length > 0 ? classificationPatch(values, patch) : undefined
+}
+
+function syncRedundantFunctionOverride(
+  values: Record<string, unknown>,
+): Partial<Record<string, unknown>> | undefined {
+  const classification = readClassification(values)
+  const { archetype, functionOverride } = classification
+  if (!archetype || !functionOverride) return undefined
+  if (!BUILDING_ARCHETYPE_IDS.includes(archetype as BuildingArchetype)) return undefined
+
+  const defaultFunctions = getBuildingArchetypeFunctions(archetype as BuildingArchetype)
+  if (!defaultFunctions.includes(functionOverride as BuildingFunctionFamily)) return undefined
+
+  return classificationPatch(values, { functionOverride: undefined })
 }
 
 /** Clears specialization and function override when the building archetype changes. */
@@ -133,6 +151,19 @@ export const locationFormValueSyncs: FormValueSync[] = [
         return syncBuildingArchetypeChange(values)
       }
       return undefined
+    },
+  },
+  {
+    dependsOn: ['classification.archetype', 'classification.functionOverride'],
+    apply: (values, changedKeys) => {
+      if (!isBuildingAuthoringType(values)) return undefined
+      if (
+        !changedKeys.includes('classification.archetype') &&
+        !changedKeys.includes('classification.functionOverride')
+      ) {
+        return undefined
+      }
+      return syncRedundantFunctionOverride(values)
     },
   },
   {

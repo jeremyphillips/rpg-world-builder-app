@@ -4,7 +4,10 @@ import {
   buildBuildingArchetypeFieldOptions,
   BUILDING_FUNCTION_OVERRIDE_HINT,
   formatBuildingArchetypeOptionDescription,
+  hasBuildingFunctionOverrideChoices,
+  isRedundantBuildingFunctionOverride,
   resolveBuildingArchetypeDerivedMeta,
+  resolveBuildingFunctionOverrideFieldOptions,
 } from './building-archetype-form-options'
 import {
   buildLocationClassificationFields,
@@ -69,6 +72,40 @@ describe('building archetype form options', () => {
     expect(
       resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'guildhall' })?.rows[0],
     ).toMatchObject({ value: 'Assembly · Governance' })
+  })
+})
+
+describe('building function override options', () => {
+  it('excludes all default functions for the selected archetype', () => {
+    expect(
+      resolveBuildingFunctionOverrideFieldOptions({ 'classification.archetype': 'almshouse' }).map(
+        (option) => option.value,
+      ),
+    ).not.toContain('care')
+  })
+
+  it('excludes every default when an archetype has multiple functions', () => {
+    const values = resolveBuildingFunctionOverrideFieldOptions({
+      'classification.archetype': 'inn',
+    }).map((option) => option.value)
+
+    expect(values).not.toContain('lodging')
+    expect(values).not.toContain('food_drink_social')
+  })
+
+  it('detects redundant overrides that repeat an archetype default', () => {
+    expect(
+      isRedundantBuildingFunctionOverride({
+        'classification.archetype': 'almshouse',
+        'classification.functionOverride': 'care',
+      }),
+    ).toBe(true)
+    expect(
+      isRedundantBuildingFunctionOverride({
+        'classification.archetype': 'temple',
+        'classification.functionOverride': 'lodging',
+      }),
+    ).toBe(false)
   })
 })
 
@@ -138,17 +175,20 @@ describe('buildLocationClassificationFields building UX', () => {
     })
   })
 
-  it('wires function override with static guidance and no dynamic default-function hint', () => {
+  it('wires function override with dynamic options and hides when no choices remain', () => {
     const overrideField = fieldByName(
       buildLocationClassificationFields(),
       'classification.functionOverride',
     )
     expect(overrideField).toMatchObject({
       type: 'select',
-      placeholder: 'Use archetype defaults',
+      placeholder: 'Select function…',
       hint: BUILDING_FUNCTION_OVERRIDE_HINT,
+      optionsResolve: {
+        dependsOn: ['classification.archetype'],
+      },
       visibility: {
-        dependsOn: ['authoringType'],
+        dependsOn: ['authoringType', 'classification.archetype'],
       },
       optionalDisclosure: {
         addLabel: 'Add function override',
@@ -156,6 +196,14 @@ describe('buildLocationClassificationFields building UX', () => {
       },
     })
     expect(overrideField).not.toHaveProperty('hint.resolve')
-    expect(BUILDING_FUNCTION_OVERRIDE_HINT).not.toMatch(/Default functions:/)
+    expect(
+      resolveBuildingFunctionOverrideFieldOptions({ 'classification.archetype': 'almshouse' }),
+    ).not.toEqual(expect.arrayContaining([expect.objectContaining({ value: 'care' })]))
+    expect(
+      hasBuildingFunctionOverrideChoices({
+        authoringType: 'building',
+        'classification.archetype': 'inn',
+      }),
+    ).toBe(true)
   })
 })

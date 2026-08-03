@@ -10,12 +10,12 @@ history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/bui
 
 ## The four layers
 
-| Layer              | Field                                 | Question it answers                                            | Author-facing?                                             |
-| ------------------ | ------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
-| **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                       |
-| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)          |
-| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional free text with registry suggestions         |
-| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional disclosure select (`Add function override`) |
+| Layer              | Field                                 | Question it answers                                            | Author-facing?                                                                                   |
+| ------------------ | ------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                                                             |
+| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)                                                |
+| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional free text with registry suggestions                                               |
+| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional disclosure select (`Add function override`); excludes archetype default functions |
 
 Two more registry fields support discovery but are not separate authored layers:
 

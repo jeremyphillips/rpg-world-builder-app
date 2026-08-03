@@ -9,7 +9,7 @@ import {
 } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
-import { isRowSlotItem } from '../field-config'
+import { isRowSlotItem, resolveRowFieldAlign } from '../field-config'
 import { FieldNode, FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
 import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
 
@@ -37,7 +37,7 @@ export function RowFieldSection({
     <React.Fragment key={`row-${index}`}>
       <FieldSeparatorWrapper separator={item.separator}>
         <ArrayItemPresentationContext.Provider value={value}>
-          <FieldRow className={item.className}>
+          <FieldRow align={resolveRowFieldAlign(item)} className={item.className}>
             {item.fields.map((field) => {
               if (isRowSlotItem(field)) {
                 return (

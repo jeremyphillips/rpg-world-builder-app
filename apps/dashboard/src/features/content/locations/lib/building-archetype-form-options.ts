@@ -184,6 +184,33 @@ export function buildBuildingFunctionOverrideFieldOptions(): FieldOption[] {
   )
 }
 
+/** Override choices excluding the selected archetype's default function families. */
+export function resolveBuildingFunctionOverrideFieldOptions(
+  values: Record<string, unknown>,
+): FieldOption[] {
+  const archetype = readSelectedArchetype(values)
+  const defaultFunctions = archetype ? getBuildingArchetypeFunctions(archetype) : []
+  const defaultFunctionIds = new Set(defaultFunctions)
+
+  return BUILDING_FUNCTION_FAMILY_IDS.filter((id) => !defaultFunctionIds.has(id)).map((id) => ({
+    value: id,
+    label: BUILDING_FUNCTION_FAMILY_ENTRIES[id].label,
+  }))
+}
+
+export function hasBuildingFunctionOverrideChoices(values: Record<string, unknown>): boolean {
+  return resolveBuildingFunctionOverrideFieldOptions(values).length > 0
+}
+
+/** True when the override repeats an archetype default (semantic no-op). */
+export function isRedundantBuildingFunctionOverride(values: Record<string, unknown>): boolean {
+  const archetype = readSelectedArchetype(values)
+  const override = values['classification.functionOverride']
+  if (!archetype || typeof override !== 'string') return false
+
+  return getBuildingArchetypeFunctions(archetype).includes(override as BuildingFunctionFamily)
+}
+
 /** Derived metadata for the selected building archetype (typical function uses). */
 export function resolveBuildingArchetypeDerivedMeta(
   values: Record<string, unknown>,

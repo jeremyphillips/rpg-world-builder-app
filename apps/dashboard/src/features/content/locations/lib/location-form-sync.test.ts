@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
-import { applyAuthoringTypeValueSync, applyBuildingArchetypeValueSync } from './location-form-sync'
+import {
+  applyAuthoringTypeValueSync,
+  applyBuildingArchetypeValueSync,
+  locationFormValueSyncs,
+} from './location-form-sync'
+
+function applyRedundantFunctionOverrideSync(values: Record<string, unknown>) {
+  const sync = locationFormValueSyncs.find(
+    (entry) =>
+      entry.dependsOn.includes('classification.functionOverride') &&
+      entry.dependsOn.includes('classification.archetype'),
+  )
+  if (!sync) throw new Error('expected redundant function override sync')
+  return sync.apply(values, ['classification.functionOverride'])
+}
 
 describe('applyBuildingArchetypeValueSync', () => {
   it('returns undefined when specialization and override are already clear', () => {
@@ -27,6 +41,37 @@ describe('applyBuildingArchetypeValueSync', () => {
         functionOverride: undefined,
       },
     })
+  })
+})
+
+describe('redundant function override sync', () => {
+  it('clears an override that repeats the selected archetype default', () => {
+    expect(
+      applyRedundantFunctionOverrideSync({
+        authoringType: 'building',
+        classification: {
+          archetype: 'almshouse',
+          functionOverride: 'care',
+        },
+      }),
+    ).toEqual({
+      classification: {
+        archetype: 'almshouse',
+        functionOverride: undefined,
+      },
+    })
+  })
+
+  it('keeps a meaningful override that differs from archetype defaults', () => {
+    expect(
+      applyRedundantFunctionOverrideSync({
+        authoringType: 'building',
+        classification: {
+          archetype: 'temple',
+          functionOverride: 'lodging',
+        },
+      }),
+    ).toBeUndefined()
   })
 })
 

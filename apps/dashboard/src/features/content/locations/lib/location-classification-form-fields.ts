@@ -19,9 +19,10 @@ import type { FieldOption, FieldOptionAvailability, FormItem, RowFieldItem } fro
 
 import {
   buildBuildingArchetypeFieldOptions,
-  buildBuildingFunctionOverrideFieldOptions,
   BUILDING_FUNCTION_OVERRIDE_HINT,
+  hasBuildingFunctionOverrideChoices,
   resolveBuildingArchetypeDerivedMeta,
+  resolveBuildingFunctionOverrideFieldOptions,
 } from './building-archetype-form-options'
 import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
 import {
@@ -57,7 +58,6 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
 )
 
 const buildingArchetypeOptions = buildBuildingArchetypeFieldOptions()
-const buildingFunctionOverrideOptions = buildBuildingFunctionOverrideFieldOptions()
 
 const buildingArchetypeDerivedMeta = {
   reserveSpace: true,
@@ -112,6 +112,14 @@ function visibleWhenRegionClassificationKindSet() {
     dependsOn: ['authoringType', 'classification.kind'],
     visibleWhen: (watched: Record<string, unknown>) =>
       watched['authoringType'] === 'region' && typeof watched['classification.kind'] === 'string',
+  }
+}
+
+function visibleWhenBuildingFunctionOverrideAvailable() {
+  return {
+    dependsOn: ['authoringType', 'classification.archetype'],
+    visibleWhen: (watched: Record<string, unknown>) =>
+      watched['authoringType'] === 'building' && hasBuildingFunctionOverrideChoices(watched),
   }
 }
 
@@ -204,10 +212,13 @@ export function buildLocationClassificationFields(): FormItem[] {
       type: 'select',
       name: 'classification.functionOverride',
       label: 'Function override',
-      options: buildingFunctionOverrideOptions,
-      placeholder: 'Use archetype defaults',
+      optionsResolve: {
+        dependsOn: ['classification.archetype'],
+        optionsWhen: resolveBuildingFunctionOverrideFieldOptions,
+      },
+      placeholder: 'Select function…',
       hint: BUILDING_FUNCTION_OVERRIDE_HINT,
-      visibility: visibleForAuthoringType('building'),
+      visibility: visibleWhenBuildingFunctionOverrideAvailable(),
       optionalDisclosure: {
         addLabel: 'Add function override',
         removeLabel: 'Remove function override',

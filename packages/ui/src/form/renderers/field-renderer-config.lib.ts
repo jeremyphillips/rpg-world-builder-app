@@ -7,6 +7,7 @@ import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   resolveFieldHintPresentation,
+  resolveSelectFieldConfigOptions,
 } from '../field-config'
 import { resolveInheritedFieldSize } from '../../components/ui/field.variants'
 
@@ -66,6 +67,22 @@ export function resolveFieldRenderConfig(
 
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
+
+  if (config.type === 'select') {
+    const options = resolveSelectFieldConfigOptions(config, dynamicValues)
+    const resolvedOptions = optionAvailability
+      ? applyOptionAvailabilityToSelectOptions(options, optionAvailability, optionValues)
+      : options
+
+    return {
+      config: {
+        ...renderConfig,
+        options: resolvedOptions,
+      } as FieldConfig,
+      ...basePresentation,
+    }
+  }
+
   if (!optionAvailability) {
     return {
       config: renderConfig,
@@ -78,20 +95,6 @@ export function resolveFieldRenderConfig(
       config: {
         ...renderConfig,
         options: applyOptionAvailabilityToFieldOptions(
-          config.options,
-          optionAvailability,
-          optionValues,
-        ),
-      } as FieldConfig,
-      ...basePresentation,
-    }
-  }
-
-  if (config.type === 'select') {
-    return {
-      config: {
-        ...renderConfig,
-        options: applyOptionAvailabilityToSelectOptions(
           config.options,
           optionAvailability,
           optionValues,

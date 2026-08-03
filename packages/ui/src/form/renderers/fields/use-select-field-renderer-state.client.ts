@@ -46,10 +46,13 @@ export function useSelectFieldRendererState(
 
   const resolvedOptions = useMemo(
     () =>
-      resolveSelectFieldFlatOptions(renderConfig, optionValues, (options, fieldName) =>
-        applyArrayFilterSelectOptions(options, fieldName, arrayContext),
+      resolveSelectFieldFlatOptions(
+        renderConfig,
+        optionValues,
+        (options, fieldName) => applyArrayFilterSelectOptions(options, fieldName, arrayContext),
+        dynamicValues,
       ),
-    [arrayContext, optionValues, renderConfig],
+    [arrayContext, dynamicValues, optionValues, renderConfig],
   )
 
   const isReadOnly = isSelectFieldReadOnly(renderConfig, resolvedOptions)
