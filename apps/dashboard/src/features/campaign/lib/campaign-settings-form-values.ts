@@ -2,6 +2,7 @@ import type { z } from 'zod'
 import type { CreateCampaignInput } from '@rpg/contracts'
 
 import { flavorSchema, identitySchema } from './profile/campaign-profile-form-fields'
+import { worldSettingsSchema } from './world/world-settings-form-fields'
 import { inviteMembersSchema } from './invite-members-form-fields'
 import {
   buildUpdateCampaignInput,
@@ -21,7 +22,7 @@ export {
 } from './rules/character-configuration/character-configuration-form-values'
 export { buildUpdateCampaignInput, mapCampaignToSettingsValues }
 
-export const campaignSettingsSchema = identitySchema.and(flavorSchema)
+export const campaignSettingsSchema = identitySchema.and(flavorSchema).and(worldSettingsSchema)
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 

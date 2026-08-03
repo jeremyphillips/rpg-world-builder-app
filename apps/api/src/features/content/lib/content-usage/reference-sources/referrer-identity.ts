@@ -3,11 +3,16 @@ import type { ContentUsageBlocker } from '@rpg/contracts'
 export type ContentUsageReferrerIdentity =
   | { kind: 'content'; contentTypeKey: string; id: string }
   | { kind: 'character'; id: string }
+  | { kind: 'rule'; code: string }
 
 /** Stable dedupe key for content usage referrers — resolvers must not invent ad-hoc keys. */
 export function contentUsageReferrerIdentityKey(referrer: ContentUsageReferrerIdentity): string {
   if (referrer.kind === 'content') {
     return `content:${referrer.contentTypeKey}:${referrer.id}`
+  }
+
+  if (referrer.kind === 'rule') {
+    return `rule:${referrer.code}`
   }
 
   return `character:${referrer.id}`
@@ -31,7 +36,10 @@ export function contentUsageReferrerIdentityFromBlocker(
     }
   }
 
-  throw new Error(`Unsupported content usage referrer blocker kind: ${blocker.kind}`)
+  return {
+    kind: 'rule',
+    code: blocker.code,
+  }
 }
 
 export function contentUsageReferrerIdentityKeyFromBlocker(blocker: ContentUsageBlocker): string {

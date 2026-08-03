@@ -3,8 +3,17 @@ import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
 import { updateCampaignCharacterCreationInputSchema } from './patches/campaign-character-creation-patch'
+import { campaignSettingsSchema, updateCampaignSettingsInputSchema } from './campaign-settings'
 import { campaignInviteEmailsInputSchema } from './invite/invite'
 import { campaignRecoveryReasonSchema, campaignViewerStateSchema } from './viewer/resolve-state'
+
+export {
+  CAMPAIGN_PRIMARY_WORLD_RULE_CODE,
+  campaignSettingsSchema,
+  updateCampaignSettingsInputSchema,
+  type CampaignSettings,
+  type UpdateCampaignSettingsInput,
+} from './campaign-settings'
 
 export {
   EXTENDED_PROGRESSION_TIER_NAME_MAX,
@@ -82,6 +91,7 @@ export type CampaignFlavor = z.infer<typeof campaignFlavorSchema>
 
 export const campaignConfigurationSchema = z.object({
   flavor: campaignFlavorSchema.optional(),
+  settings: campaignSettingsSchema.optional(),
 })
 
 export type CampaignConfiguration = z.infer<typeof campaignConfigurationSchema>
@@ -220,6 +230,9 @@ export type CreateCampaignResult = z.infer<typeof createCampaignResultSchema>
 export const updateCampaignInputSchema = createCampaignInputSchema
   .partial({ name: true })
   .omit({ rulesetId: true, characterCreation: true, campaignTemplateId: true })
+  .extend({
+    settings: updateCampaignSettingsInputSchema.optional(),
+  })
 
 export type UpdateCampaignInput = z.infer<typeof updateCampaignInputSchema>
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
+import { updateCampaign } from '../../campaign/campaign.service'
 import {
   deleteContentEntity,
   getContentDeletionAvailability,
@@ -121,5 +122,32 @@ describe('location lifecycle hierarchy', () => {
       status: 400,
       code: 'invalid_hierarchy',
     })
+  })
+
+  it('blocks deletion when the world is the campaign primary world', async () => {
+    const campaign = await makeTestCampaign()
+    const world = await seedWorld(campaign.id, 'primary-world', 'Primary World')
+
+    await updateCampaign(campaign.id, {
+      settings: { primaryWorldId: world.id },
+    })
+
+    const availability = await getContentDeletionAvailability(
+      locationWriteConfig,
+      campaign.id,
+      world.id,
+    )
+    expect(availability.status).toBe('blocked')
+    if (availability.status !== 'blocked') throw new Error('expected blocked')
+    expect(availability.blockers).toEqual([
+      expect.objectContaining({
+        kind: 'rule',
+        code: 'campaign.settings.primaryWorldId',
+      }),
+    ])
+
+    await expect(
+      deleteContentEntity(locationWriteConfig, campaign.id, world.id),
+    ).resolves.toMatchObject({ status: 'blocked' })
   })
 })

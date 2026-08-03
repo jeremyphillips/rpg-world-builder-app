@@ -20,4 +20,14 @@ describe('updateCampaignInputSchema', () => {
   it('does not expose creation-only template selection', () => {
     expect(updateCampaignInputSchema.parse({ campaignTemplateId: 'classic-adventure' })).toEqual({})
   })
+
+  it('accepts campaign settings patches', () => {
+    expect(
+      updateCampaignInputSchema.parse({
+        settings: { primaryWorldId: 'world-faerun' },
+      }),
+    ).toEqual({
+      settings: { primaryWorldId: 'world-faerun' },
+    })
+  })
 })

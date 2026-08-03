@@ -13,6 +13,7 @@ import {
   characterSpellSource,
   characterSubclassSource,
   locationParentReferenceSource,
+  campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
 const CHARACTER_SUMMARY_LABELS = { singular: 'character', plural: 'characters' } as const
@@ -69,7 +70,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'locations',
-    sources: [{ source: locationParentReferenceSource, entry: true, batch: true }],
+    sources: [
+      { source: locationParentReferenceSource, entry: true, batch: true },
+      { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
+    ],
     summaryLabels: { singular: 'location', plural: 'locations' },
     overviewUsageScope: 'complete',
     viewerCharacterRelationship: { strategy: 'none' },

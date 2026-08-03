@@ -22,6 +22,7 @@ import {
   assertValidInitialCampaignInviteRecipients,
 } from './create-campaign-invites.lib'
 import { findCampaignById, toCampaign } from './find-campaign-by-id'
+import { validateCampaignPrimaryWorldId } from './validate-campaign-primary-world'
 import { listCharactersForUser } from '../character'
 import {
   listOpenPcParticipationCharacterIdsForCampaign,
@@ -142,11 +143,27 @@ function buildFlavorUpdateSet(
   return $set
 }
 
-function buildCampaignUpdateSet(input: UpdateCampaignInput): Record<string, unknown> {
-  return {
+type CampaignMongoUpdate = {
+  $set: Record<string, unknown>
+  $unset: Record<string, 1>
+}
+
+function buildCampaignMongoUpdate(input: UpdateCampaignInput): CampaignMongoUpdate {
+  const $set: Record<string, unknown> = {
     ...buildIdentityUpdateSet(input),
     ...(input.flavor ? buildFlavorUpdateSet(input.flavor) : {}),
   }
+  const $unset: Record<string, 1> = {}
+
+  if (input.settings) {
+    if (input.settings.primaryWorldId === null) {
+      $unset['configuration.settings.primaryWorldId'] = 1
+    } else if (input.settings.primaryWorldId !== undefined) {
+      $set['configuration.settings.primaryWorldId'] = input.settings.primaryWorldId
+    }
+  }
+
+  return { $set, $unset }
 }
 
 /** Merge a partial update into an existing campaign document. Returns null when the id is invalid or missing. */
@@ -156,16 +173,25 @@ export async function updateCampaign(
 ): Promise<Campaign | null> {
   if (!isValidObjectId(campaignId)) return null
 
-  const $set = buildCampaignUpdateSet(input)
-  if (Object.keys($set).length === 0) {
+  if (input.settings?.primaryWorldId) {
+    await validateCampaignPrimaryWorldId(campaignId, input.settings.primaryWorldId)
+  }
+
+  const { $set, $unset } = buildCampaignMongoUpdate(input)
+  const hasSet = Object.keys($set).length > 0
+  const hasUnset = Object.keys($unset).length > 0
+
+  if (!hasSet && !hasUnset) {
     return findCampaignById(campaignId)
   }
 
-  const doc = await CampaignModel.findByIdAndUpdate(
-    campaignId,
-    { $set },
-    { returnDocument: 'after' },
-  ).lean<CampaignRecord | null>()
+  const mongoUpdate: Record<string, unknown> = {}
+  if (hasSet) mongoUpdate.$set = $set
+  if (hasUnset) mongoUpdate.$unset = $unset
+
+  const doc = await CampaignModel.findByIdAndUpdate(campaignId, mongoUpdate, {
+    returnDocument: 'after',
+  }).lean<CampaignRecord | null>()
   if (!doc) return null
   return toCampaign(doc)
 }
