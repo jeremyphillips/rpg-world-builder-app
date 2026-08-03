@@ -205,21 +205,17 @@ export function buildLocationClassificationFields(): FormItem[] {
       visibility: visibleForAuthoringType('building'),
     },
     {
-      kind: 'group',
-      legend: 'Advanced classification',
-      legendSize: 'subsection',
-      disclosure: { variant: 'legend', defaultOpen: false },
+      type: 'select',
+      name: 'classification.functionOverride',
+      label: 'Function override',
+      options: buildingFunctionOverrideOptions,
+      placeholder: 'Use archetype defaults',
+      hint: { resolve: buildingFunctionOverrideDynamicHint },
       visibility: visibleForAuthoringType('building'),
-      fields: [
-        {
-          type: 'select',
-          name: 'classification.functionOverride',
-          label: 'Function override',
-          options: buildingFunctionOverrideOptions,
-          placeholder: 'Use archetype defaults',
-          hint: { resolve: buildingFunctionOverrideDynamicHint },
-        },
-      ],
+      optionalDisclosure: {
+        addLabel: 'Add function override',
+        removeLabel: 'Remove function override',
+      },
     },
     {
       type: 'select',

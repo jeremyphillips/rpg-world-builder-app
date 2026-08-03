@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import type { ComboboxFieldConfig, GroupConfig, TextSuggestionsFieldConfig } from '@rpg/ui/form'
+import type {
+  ComboboxFieldConfig,
+  SelectFieldConfig,
+  TextSuggestionsFieldConfig,
+} from '@rpg/ui/form'
 
 import {
   buildBuildingArchetypeFieldOptions,
@@ -20,17 +24,6 @@ function fieldByName(items: FormItemLike[], name: string) {
     throw new Error(`expected field ${name}`)
   }
   return field
-}
-
-function groupByLegend(items: FormItemLike[], legend: string): GroupConfig {
-  const group = items.find(
-    (item): item is GroupConfig =>
-      'kind' in item && item.kind === 'group' && item.legend === legend,
-  )
-  if (!group) {
-    throw new Error(`expected group ${legend}`)
-  }
-  return group
 }
 
 describe('building archetype form options', () => {
@@ -72,9 +65,6 @@ describe('buildLocationClassificationFields building UX', () => {
       return [item.name]
     })
     const secondaryNames = buildLocationClassificationFields().flatMap((item) => {
-      if ('kind' in item && item.kind === 'group') {
-        return 'legend' in item && item.legend === 'Advanced classification' ? [item.legend] : []
-      }
       if ('kind' in item) {
         return []
       }
@@ -92,7 +82,7 @@ describe('buildLocationClassificationFields building UX', () => {
     expect(secondaryNames).toEqual([
       'classification.type',
       'classification.specialization',
-      'Advanced classification',
+      'classification.functionOverride',
       'classification.type',
     ])
   })
@@ -134,16 +124,21 @@ describe('buildLocationClassificationFields building UX', () => {
     })
   })
 
-  it('keeps advanced classification collapsed by default with override hint wiring', () => {
-    const advancedGroup = groupByLegend(
+  it('wires function override as an optional-disclosure select driven by archetype', () => {
+    const overrideField = fieldByName(
       buildLocationClassificationFields(),
-      'Advanced classification',
-    )
-    expect(advancedGroup.disclosure).toEqual({ variant: 'legend', defaultOpen: false })
-    expect(advancedGroup.legendSize).toBe('subsection')
-    expect(advancedGroup.fields[0]).toMatchObject({
-      name: 'classification.functionOverride',
+      'classification.functionOverride',
+    ) as SelectFieldConfig
+    expect(overrideField).toMatchObject({
+      type: 'select',
       placeholder: 'Use archetype defaults',
+      visibility: {
+        dependsOn: ['authoringType'],
+      },
+      optionalDisclosure: {
+        addLabel: 'Add function override',
+        removeLabel: 'Remove function override',
+      },
       hint: {
         resolve: {
           dependsOn: ['classification.archetype'],

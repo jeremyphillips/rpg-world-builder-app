@@ -10,12 +10,12 @@ history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/bui
 
 ## The four layers
 
-| Layer              | Field                                 | Question it answers                                            | Author-facing?                                          |
-| ------------------ | ------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
-| **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                    |
-| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Read-only hint (Typical uses)                           |
-| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional free text with registry suggestions      |
-| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional, collapsed under Advanced classification |
+| Layer              | Field                                 | Question it answers                                            | Author-facing?                                             |
+| ------------------ | ------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                       |
+| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Read-only hint (Typical uses)                              |
+| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional free text with registry suggestions         |
+| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional disclosure select (`Add function override`) |
 
 Two more registry fields support discovery but are not separate authored layers:
 
@@ -97,15 +97,15 @@ validation or parent availability.
 
 ## Authoring modules
 
-| Module                                    | Role                                                           |
-| ----------------------------------------- | -------------------------------------------------------------- |
-| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity |
-| `location-create-shortcuts.ts`            | Create-route prefill, promoted shortcuts, child-type menus     |
-| `location-classification-form-fields.ts`  | Archetype combobox, specialization, advanced override group    |
-| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                    |
-| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                    |
-| `location-form-sync.ts`                   | Clears specialization and override on archetype change         |
-| `location-overview-search.lib.ts`         | Overview name-search discovery strings                         |
-| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                        |
+| Module                                    | Role                                                                  |
+| ----------------------------------------- | --------------------------------------------------------------------- |
+| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity        |
+| `location-create-shortcuts.ts`            | Create-route prefill, promoted shortcuts, child-type menus            |
+| `location-classification-form-fields.ts`  | Archetype combobox, specialization, optional function-override select |
+| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                           |
+| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                           |
+| `location-form-sync.ts`                   | Clears specialization and override on archetype change                |
+| `location-overview-search.lib.ts`         | Overview name-search discovery strings                                |
+| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                               |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

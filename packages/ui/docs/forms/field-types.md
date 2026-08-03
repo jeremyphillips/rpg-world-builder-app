@@ -10,7 +10,8 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 | ----------- | --------- | -------------------------------------------------------------------------- |
 | `text`      | `string`  | Optional `inputType`, `autoComplete`                                       |
 | `number`    | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                           |
-| `textarea`  | `string`  | `rows`, optional `optionalDisclosure` (v1: textarea only)                  |
+| `textarea`  | `string`  | `rows`, optional `optionalDisclosure`                                      |
+| `select`    | `string`  | `options`, optional `optionalDisclosure`                                   |
 | `select`    | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen` |
 | `radio`     | `string`  | `orientation`, `labelHidden`                                               |
 | `radioCard` | `string`  | Card-style options with `meta` / `badge`                                   |
@@ -43,12 +44,12 @@ resolved flat option list after array filtering and `optionAvailability`.
 
 ## Optional disclosure (`optionalDisclosure`)
 
-Collapses empty optional prose fields behind a compact **+ Add …** control. When expanded
+Collapses empty optional fields behind a compact **+ Add …** control. When expanded
 (or when populated and `expandWhenPopulated` is true), the field label and control render
 with a **Remove** action that clears the value and collapses back to the add control.
 
-**v1:** renderer support is **textarea only**. `OPTIONAL_DISCLOSURE_FIELD_KINDS` lists
-`text`, `textarea`, and `richtext` for future enablement; dev guards log when
+**Implemented for:** `textarea`, `select`. `OPTIONAL_DISCLOSURE_FIELD_KINDS` also lists
+`text` and `richtext` for future enablement; dev guards log when
 `optionalDisclosure` is used on unimplemented kinds.
 
 ```ts

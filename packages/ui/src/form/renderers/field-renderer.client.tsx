@@ -26,7 +26,10 @@ import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-rendere
 import { pickFieldChromeProps } from '../../components/ui/field-chrome.variants'
 import { normalizeFieldHint } from '../field-config'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
-import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
+import {
+  OptionalDisclosureSelectFieldRenderer,
+  OptionalDisclosureTextareaFieldRenderer,
+} from './fields/optional-disclosure-field-renderer.client'
 import { SelectFieldRenderer } from './fields/select-field-renderer.client'
 import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
@@ -461,6 +464,19 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   if (specialized) return specialized
 
   if (config.type === 'select') {
+    if (config.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(config)
+      return (
+        <OptionalDisclosureSelectFieldRenderer
+          config={config}
+          disclosure={config.optionalDisclosure}
+          fullName={fullName}
+          id={id}
+          namePrefix={namePrefix}
+        />
+      )
+    }
+
     return (
       <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />
     )

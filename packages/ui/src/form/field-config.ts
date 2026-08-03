@@ -272,11 +272,11 @@ interface BaseFieldConfig {
   presentation?: FieldPresentationConfig
 }
 
-/** Field kinds that may use `optionalDisclosure` when renderer support lands. */
-export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext'] as const
+/** Field kinds that may use `optionalDisclosure`. */
+export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext', 'select'] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
-/** Collapse empty optional prose fields behind an add control (v1: textarea only). */
+/** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
   removeLabel?: string
@@ -351,6 +351,7 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   options: SelectFieldOptionListItem[]
   placeholder?: string
   defaultValue?: string
+  optionalDisclosure?: OptionalDisclosureConfig
   /** Disables individual options when `enabledWhen` is false for the current values. */
   optionAvailability?: FieldOptionAvailability
   /**
