@@ -187,9 +187,7 @@ describe('building archetype registry integrity', () => {
     expect(getBuildingSpecializationTerms('temple')).toEqual(
       expect.arrayContaining(['cathedral', 'sea temple', 'funerary temple']),
     )
-    expect(getBuildingSpecializationTerms('warehouse')).toEqual(
-      expect.arrayContaining(['bonded warehouse', 'icehouse', 'silo']),
-    )
+    expect(getBuildingSpecializationTerms('granary')).toEqual(expect.arrayContaining(['silo']))
   })
 
   it('keeps shard ids disjoint with composed count matching shard sum', () => {
@@ -215,5 +213,115 @@ describe('building archetype registry integrity', () => {
     }
 
     expect(Object.keys(BUILDING_CORPUS_DISPOSITIONS).length).toBe(308)
+  })
+
+  it('rejects placeholder targets on specialization and manifestation dispositions', () => {
+    const knownIds = new Set<string>([...BUILDING_ARCHETYPE_IDS, ...BUILDING_CORPUS_IDS])
+
+    for (const id of BUILDING_CORPUS_IDS) {
+      const disposition = BUILDING_CORPUS_DISPOSITIONS[id]
+      if (disposition.kind !== 'specialization' && disposition.kind !== 'manifestation') {
+        continue
+      }
+
+      const target = disposition.of
+      expect(target, `${id} ${disposition.kind} of`).not.toBe('n')
+      expect(target.trim(), `${id} ${disposition.kind} of`).not.toBe('')
+      expect(
+        knownIds.has(target),
+        `${id} ${disposition.kind} of "${target}" must be a corpus or archetype id`,
+      ).toBe(true)
+    }
+  })
+
+  it('reconciles the 88 audited specialization terms to exactly one final disposition', () => {
+    const allSpecializationTerms = new Map<string, BuildingArchetype>()
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      for (const term of getBuildingSpecializationTerms(id)) {
+        expect(allSpecializationTerms.has(term), `duplicate specialization term: ${term}`).toBe(
+          false,
+        )
+        allSpecializationTerms.set(term, id)
+      }
+    }
+
+    const additions = new Set(['sawmill', 'livery stable'])
+    const promotedArchetypeLabels = new Map<string, BuildingArchetype>([
+      ['barber surgeon', 'barber_surgeon'],
+      ['boathouse', 'boathouse'],
+      ['clock tower', 'clock_tower'],
+      ['cooperage', 'cooperage'],
+      ['distillery', 'distillery'],
+      ['harbourmaster office', 'harbourmaster_office'],
+      ['opium den', 'opium_den'],
+      ['schoolhouse', 'schoolhouse'],
+      ['smokehouse', 'smokehouse'],
+      ['wheelwright', 'wheelwright'],
+    ])
+    const promotedManifestationLabels = new Map<string, BuildingArchetype>([
+      ['houseboat', 'houseboat'],
+      ['igloo', 'igloo'],
+      ['tipi', 'tipi'],
+      ['yurt', 'yurt'],
+    ])
+    const removedTerms = new Set([
+      'baptistery',
+      'divination parlor',
+      'enchanting hall',
+      'gamekeepers cottage',
+      'hunting lodge wing',
+      'malt house',
+      'oast house',
+      'portal chamber',
+      'residential lodging house',
+      'summoning hall',
+      'temple infirmary',
+      'tent pavilion',
+      'well house',
+    ])
+    const movedTerms: Record<string, BuildingArchetype> = {
+      'artificer atelier': 'factory',
+      'bounty office': 'adventurers_guild',
+      silo: 'granary',
+      tollhouse: 'checkpoint',
+      workhouse: 'poorhouse',
+    }
+    const renamedFrom = 'elven tree dwelling'
+    const renamedTo = 'tree dwelling'
+
+    const auditedTerms = [
+      ...[...allSpecializationTerms.keys()].filter((term) => !additions.has(term)),
+      ...removedTerms,
+      ...promotedArchetypeLabels.keys(),
+      ...promotedManifestationLabels.keys(),
+    ]
+    expect(new Set(auditedTerms).size).toBe(88)
+
+    for (const term of removedTerms) {
+      expect(allSpecializationTerms.has(term), `removed term still present: ${term}`).toBe(false)
+    }
+    expect(allSpecializationTerms.get(renamedTo)).toBe('house')
+    expect(allSpecializationTerms.has(renamedFrom)).toBe(false)
+
+    for (const [term, parent] of Object.entries(movedTerms)) {
+      expect(allSpecializationTerms.get(term)).toBe(parent)
+    }
+
+    for (const [label, id] of promotedArchetypeLabels) {
+      expect(BUILDING_ARCHETYPE_ENTRIES[id].label.trim().toLowerCase()).toBe(label)
+      expect(getBuildingSpecializationTerms(id)).toEqual([])
+    }
+    for (const [label, id] of promotedManifestationLabels) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      expect(entry.label.trim().toLowerCase()).toBe(label)
+      expect('manifestationOf' in entry && entry.manifestationOf).toBe('house')
+      expect(getBuildingSpecializationTerms(id)).toEqual([])
+    }
+
+    expect(getBuildingSpecializationTerms('wizard_tower')).toEqual([])
+    expect(getBuildingSpecializationTerms('mill')).toEqual(expect.arrayContaining(['sawmill']))
+    expect(getBuildingSpecializationTerms('stable')).toEqual(
+      expect.arrayContaining(['livery stable']),
+    )
   })
 })

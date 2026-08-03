@@ -1,6 +1,12 @@
 import type { BuildingArchetypeShardEntry } from './types'
 
 export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
+  distillery: {
+    label: 'Distillery',
+    description: 'A building primarily serving spirits production.',
+    functions: ['production'],
+    searchTerms: ['spirits', 'distillation', 'liquor'],
+  },
   domus: {
     label: 'Domus',
     description: 'A building primarily serving dwelling.',
@@ -33,15 +39,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'A building primarily serving mass manufacturing.',
     functions: ['production'],
     searchTerms: ['manufacturing', 'industry', 'production'],
-    specializationTerms: ['cooperage', 'dyeworks', 'foundry', 'golem workshop', 'ropewalk'],
+    specializationTerms: ['artificer atelier', 'dyeworks', 'foundry', 'golem workshop', 'ropewalk'],
   },
   festhall: {
     label: 'Festhall',
     description: 'A building primarily serving public feasting/revelry venue.',
     functions: ['food_drink_social'],
-    aliases: ['feast hall'],
+    aliases: ['feast hall', 'banqueting house'],
     searchTerms: ['feasting', 'revelry', 'banquet'],
-    specializationTerms: ['banqueting house'],
   },
   folly: {
     label: 'Folly',
@@ -85,6 +90,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'A building primarily serving grain storage.',
     functions: ['storage'],
     searchTerms: ['grain', 'food', 'storage'],
+    specializationTerms: ['silo'],
   },
   granary_on_stilts: {
     label: 'Granary On Stilts',
@@ -112,6 +118,5 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'The headquarters of a craft or trade guild.',
     functions: ['assembly', 'governance'],
     searchTerms: ['guild', 'craft', 'trade'],
-    specializationTerms: ['bounty office'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

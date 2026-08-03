@@ -34,6 +34,12 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     functions: ['production'],
     searchTerms: ['salt', 'evaporation', 'extraction'],
   },
+  schoolhouse: {
+    label: 'Schoolhouse',
+    description: 'A building primarily serving basic local education.',
+    functions: ['knowledge'],
+    searchTerms: ['school', 'education', 'children'],
+  },
   shipyard: {
     label: 'Shipyard',
     description: 'A building primarily serving ship construction.',
@@ -69,14 +75,25 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving animal processing.',
     functions: ['production'],
     searchTerms: ['butchery', 'meat', 'processing'],
-    specializationTerms: ['smokehouse'],
+  },
+  smokehouse: {
+    label: 'Smokehouse',
+    description: 'A building primarily serving food preservation by smoking.',
+    functions: ['production', 'storage'],
+    searchTerms: ['smoking', 'preservation', 'meat'],
   },
   stable: {
     label: 'Stable',
     description: 'A building for housing and caring for mounts.',
     functions: ['service'],
     searchTerms: ['horses', 'mounts', 'livery'],
-    specializationTerms: ['beast stable', 'coach house', 'griffon aerie', 'kennel'],
+    specializationTerms: [
+      'beast stable',
+      'coach house',
+      'griffon aerie',
+      'kennel',
+      'livery stable',
+    ],
   },
   stave_church: {
     label: 'Stave Church',
@@ -124,14 +141,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A religious or ceremonial structure.',
     functions: ['worship'],
     searchTerms: ['worship', 'prayer', 'sacred'],
-    specializationTerms: [
-      'baptistery',
-      'cathedral',
-      'oracle shrine',
-      'temple infirmary',
-      'sea temple',
-      'funerary temple',
-    ],
+    specializationTerms: ['cathedral', 'oracle shrine', 'sea temple', 'funerary temple'],
   },
   tenement: {
     label: 'Tenement',
@@ -153,6 +163,13 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     manifestationOf: 'mausoleum',
     searchTerms: ['vaulted', 'greek', 'tholos'],
   },
+  tipi: {
+    label: 'Tipi',
+    description: 'A building primarily serving dwelling.',
+    functions: ['dwelling'],
+    manifestationOf: 'house',
+    searchTerms: ['portable', 'hide', 'nomadic'],
+  },
   tolbooth: {
     label: 'Tolbooth',
     description: 'A building primarily serving administration.',
@@ -165,7 +182,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving (varies by occupant).',
     functions: ['service'],
     searchTerms: ['tall', 'fortified', 'observation'],
-    specializationTerms: ['clock tower'],
   },
   town_hall: {
     label: 'Town Hall',

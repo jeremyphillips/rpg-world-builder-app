@@ -6,13 +6,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving education (advanced).',
     functions: ['knowledge'],
     searchTerms: ['education', 'school', 'learning'],
-    specializationTerms: ['bardic college', 'schoolhouse'],
+    specializationTerms: ['bardic college'],
   },
   adventurers_guild: {
     label: 'Adventurers Guild',
     description: 'A building primarily serving quest brokerage.',
     functions: ['assembly', 'governance'],
     searchTerms: ['quest', 'guild', 'party'],
+    specializationTerms: ['bounty office'],
   },
   almshouse: {
     label: 'Almshouse',
@@ -33,7 +34,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     functions: ['retail', 'care'],
     aliases: ['pharmacy'],
     searchTerms: ['remedies', 'potions', 'medicine'],
-    specializationTerms: ['barber surgeon', 'potion shop'],
+    specializationTerms: ['potion shop'],
   },
   archive: {
     label: 'Archive',
@@ -88,24 +89,22 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
   },
   barn: {
     label: 'Barn',
-    description: 'A building primarily serving farm storage.',
+    description: 'A building primarily serving farm storage and outbuildings.',
     functions: ['service', 'storage'],
     searchTerms: ['farm', 'livestock', 'storage'],
-    specializationTerms: [
-      'boathouse',
-      'byre',
-      'dovecote',
-      'shearing shed',
-      'threshing barn',
-      'tithe barn',
-      'well house',
-    ],
+    specializationTerms: ['byre', 'dovecote', 'shearing shed', 'threshing barn', 'tithe barn'],
   },
   barracks: {
     label: 'Barracks',
     description: 'A building primarily serving garrison housing.',
     functions: ['defense_watch', 'dwelling'],
     searchTerms: ['garrison', 'soldiers', 'military'],
+  },
+  barber_surgeon: {
+    label: 'Barber Surgeon',
+    description: 'A building primarily serving surgical and bloodletting care.',
+    functions: ['care', 'service'],
+    searchTerms: ['surgery', 'bloodletting', 'medicine'],
   },
   basilica: {
     label: 'Basilica',
@@ -138,7 +137,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     functions: ['service'],
     aliases: ['smithy', 'forge'],
     searchTerms: ['metal', 'ironwork', 'smithing'],
-    specializationTerms: ['artificer atelier', 'wheelwright'],
   },
   blockhouse: {
     label: 'Blockhouse',
@@ -146,19 +144,24 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     functions: ['service'],
     searchTerms: ['fortification', 'strongpoint', 'defense'],
   },
+  boathouse: {
+    label: 'Boathouse',
+    description: 'A building primarily serving small-craft shelter.',
+    functions: ['storage'],
+    searchTerms: ['boats', 'craft', 'waterfront'],
+  },
   boarding_house: {
     label: 'Boarding House',
     description: 'A building primarily serving lodging (residential-term).',
     functions: ['lodging'],
     searchTerms: ['lodging', 'roomers', 'residential'],
-    specializationTerms: ['flophouse', 'residential lodging house'],
+    specializationTerms: ['flophouse'],
   },
   brewery: {
     label: 'Brewery',
     description: 'A building primarily serving beverage production.',
     functions: ['production'],
     searchTerms: ['beer', 'ale', 'brewing'],
-    specializationTerms: ['distillery', 'malt house', 'oast house'],
   },
   brickworks: {
     label: 'Brickworks',
@@ -178,7 +181,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving commercial sex.',
     functions: ['service'],
     searchTerms: ['pleasure', 'courtesan', 'entertainment'],
-    specializationTerms: ['opium den'],
   },
   caravanserai: {
     label: 'Caravanserai',
@@ -198,6 +200,13 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving movement control.',
     functions: ['service'],
     searchTerms: ['border', 'control', 'inspection'],
+    specializationTerms: ['tollhouse'],
+  },
+  clock_tower: {
+    label: 'Clock Tower',
+    description: 'A building primarily serving timekeeping and civic signal.',
+    functions: ['defense_watch'],
+    searchTerms: ['clock', 'timekeeping', 'bell'],
   },
   coaching_inn: {
     label: 'Coaching Inn',
@@ -216,6 +225,12 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving command/control.',
     functions: ['service'],
     searchTerms: ['military', 'command', 'headquarters'],
+  },
+  cooperage: {
+    label: 'Cooperage',
+    description: 'A building primarily serving barrel making.',
+    functions: ['production'],
+    searchTerms: ['barrels', 'cooper', 'casks'],
   },
   courthouse: {
     label: 'Courthouse',
@@ -241,6 +256,5 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving trade inspection.',
     functions: ['governance', 'retail'],
     searchTerms: ['trade', 'tariff', 'inspection'],
-    specializationTerms: ['harbourmaster office', 'tollhouse'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

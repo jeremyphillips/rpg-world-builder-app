@@ -7,7 +7,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_U_Z = {
     functions: ['storage'],
     aliases: ['storehouse'],
     searchTerms: ['storage', 'goods', 'cargo'],
-    specializationTerms: ['icehouse', 'silo', 'bonded warehouse'],
+    specializationTerms: ['icehouse', 'bonded warehouse'],
   },
   washhouse: {
     label: 'Washhouse',
@@ -33,16 +33,23 @@ export const BUILDING_ARCHETYPE_ENTRIES_U_Z = {
     functions: ['service'],
     searchTerms: ['weighing', 'trade', 'verification'],
   },
+  wheelwright: {
+    label: 'Wheelwright',
+    description: 'A building primarily serving wheel making.',
+    functions: ['service'],
+    searchTerms: ['wheels', 'cartwright', 'woodwork'],
+  },
   wizard_tower: {
     label: 'Wizard Tower',
     description: 'A building primarily serving residence.',
     functions: ['dwelling', 'knowledge'],
     searchTerms: ['magic', 'wizard', 'arcane'],
-    specializationTerms: [
-      'divination parlor',
-      'enchanting hall',
-      'portal chamber',
-      'summoning hall',
-    ],
+  },
+  yurt: {
+    label: 'Yurt',
+    description: 'A building primarily serving dwelling.',
+    functions: ['dwelling'],
+    manifestationOf: 'house',
+    searchTerms: ['felt', 'portable', 'nomadic'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

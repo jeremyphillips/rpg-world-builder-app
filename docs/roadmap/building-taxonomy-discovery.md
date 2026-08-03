@@ -1109,3 +1109,47 @@ Locations overview exposes Model E semantics beyond the authoring combobox:
 
 Plain-language explainer and worked examples:
 [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
+
+## Editorial appendix — Phase 8 specialization cleanup (2026-08-03)
+
+Resolved all 17 NEEDS_REVIEW items from the specializationTerms audit. Final
+disposition ledger for the 88 audited terms:
+
+| Disposition              | Count | Terms                                                                                                                                                                                                                   |
+| ------------------------ | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keep in place            | 55    | Unchanged parent mapping (e.g. clinic → hospital, bonded warehouse → warehouse)                                                                                                                                         |
+| Rename                   | 1     | `elven tree dwelling` → `tree dwelling` on house (affiliation qualifier dropped)                                                                                                                                        |
+| Remove                   | 13    | residential lodging house, well house, hunting lodge wing, gamekeepers cottage, temple infirmary, enchanting hall, portal chamber, summoning hall, malt house, oast house, baptistery, divination parlor, tent pavilion |
+| Move within channel      | 5     | workhouse → poorhouse; silo → granary; tollhouse → checkpoint; artificer atelier → factory; bounty office → adventurers_guild                                                                                           |
+| Promote to manifestation | 4     | igloo, tipi, yurt, houseboat (`manifestationOf: 'house'`)                                                                                                                                                               |
+| Promote to archetype     | 10    | distillery, opium den, schoolhouse, barber surgeon, boathouse, wheelwright, cooperage, harbourmaster office, clock tower, smokehouse                                                                                    |
+
+Plus **2 additions** (outside the 88): `sawmill` → mill; `livery stable` → stable.
+
+**Post-cleanup registry counts (143 entries):**
+
+| Field                 | Count |
+| --------------------- | ----- |
+| Registry entries      | 143   |
+| `specializationTerms` | 30    |
+| Total suggestions     | 63    |
+
+**Deliberate cross-channel decisions (documented, not bugs):**
+
+- `clinic`: hospital specialization; healers_house retains `'clinic'` as searchTerm only.
+- `livery`: stable searchTerm; `'livery stable'` is a separate specialization string.
+- `townhouse` / `machiya`: house specialization vs machiya manifestation — different channels.
+
+**Deferred (explicit):**
+
+- `shipwreck dwelling` — corpus-backed; add only on separate approval.
+- `hovel` — re-dispositioned to `overlay` (quality axis, not specialization vocabulary).
+- Temporary-structure modeling — tent pavilion removal; future bench ticket if needed.
+- Foundry search in Archetype picker — product decision before ranking changes.
+
+**Persistence boundary:** `classification.specialization` remains free text. Promotions
+add stable archetype ids; previously authored strings like `specialization: 'Distillery'`
+or `'Elven tree dwelling'` stay valid — no migration.
+
+Mechanical coverage: `building-archetype.test.ts` reconciles all 88 audited terms to
+exactly one final disposition; corpus dispositions reject placeholder `of: 'n'` targets.

@@ -20,7 +20,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     description: 'A building primarily serving dwelling.',
     functions: ['dwelling', 'governance'],
     searchTerms: ['estate', 'landowner', 'gentry'],
-    specializationTerms: ['dower house', 'hunting lodge wing'],
+    specializationTerms: ['dower house'],
   },
   market: {
     label: 'Market',
@@ -70,7 +70,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     description: 'A building primarily serving mechanical processing.',
     functions: ['production'],
     searchTerms: ['grinding', 'flour', 'waterwheel'],
-    specializationTerms: ['fulling mill', 'watermill', 'windmill'],
+    specializationTerms: ['fulling mill', 'sawmill', 'watermill', 'windmill'],
   },
   mint: {
     label: 'Mint',
@@ -122,6 +122,12 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     functions: ['service'],
     searchTerms: ['astronomy', 'stars', 'sky'],
   },
+  opium_den: {
+    label: 'Opium Den',
+    description: 'A building primarily serving opium consumption venue.',
+    functions: ['service'],
+    searchTerms: ['opium', 'den', 'vice'],
+  },
   orphanage: {
     label: 'Orphanage',
     description: 'A building primarily serving child custodial care.',
@@ -152,7 +158,8 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     label: 'Poorhouse',
     description: 'A building primarily serving pauper relief housing.',
     functions: ['service'],
-    searchTerms: ['pauper', 'relief', 'workhouse'],
+    searchTerms: ['pauper', 'relief', 'almshouse'],
+    specializationTerms: ['workhouse'],
   },
   post_house: {
     label: 'Post House',
@@ -172,6 +179,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     functions: ['governance'],
     aliases: ['jail', 'gaol'],
     searchTerms: ['detention', 'incarceration', 'cells'],
-    specializationTerms: ['mage prison', 'workhouse'],
+    specializationTerms: ['mage prison'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

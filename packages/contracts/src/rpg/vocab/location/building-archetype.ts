@@ -17,7 +17,7 @@
  *
  * `specializationTerms` are registry-owned optional refinements for free-text
  * `classification.specialization`. A suggestion must be an archetype-specific,
- * commonly useful instance refinement (coaching inn, summer palace, bonded
+ * commonly useful instance refinement (roadside inn, summer palace, bonded
  * warehouse, sea temple). Suggestions must represent genuinely narrower variants,
  * not aliases, manifestations, search terms, or restatements of the archetype.
  * Rejected categories: conditions (ruined), affiliations
