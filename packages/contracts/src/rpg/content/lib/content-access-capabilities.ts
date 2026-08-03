@@ -22,5 +22,6 @@ export const CONTENT_ACCESS_CAPABILITIES: Record<ContentAccessTargetType, Conten
     feats: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
     'skill-proficiencies': { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
     organizations: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
+    locations: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
     subclasses: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
   }

@@ -68,7 +68,7 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
   })
 
   it('only requires packages for entries with bundled content', () => {
-    expect(contentTypeKeysWithoutBundledContent()).toEqual(['organizations'])
+    expect(contentTypeKeysWithoutBundledContent()).toEqual(['locations', 'organizations'])
     expect(contentTypeKeysWithCatalogPackage().map(({ key }) => key)).toEqual(
       CONTENT_TYPE_KEYS.filter(
         (key) => CONTENT_TYPE_INTEGRATION_MANIFEST[key].catalog.bundledContent === 'bundled',

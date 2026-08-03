@@ -138,6 +138,10 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     },
     capabilities: { required: true },
   },
+  locations: {
+    catalog: { bundledContent: 'none' },
+    capabilities: { required: true },
+  },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>
 
 export type ContentTypeIntegrationManifest = typeof CONTENT_TYPE_INTEGRATION_MANIFEST

@@ -13,6 +13,7 @@ export const CONTENT_TYPE_KEYS = [
   'equipment',
   'skill-proficiencies',
   'organizations',
+  'locations',
 ] as const
 
 export type ContentTypeKey = (typeof CONTENT_TYPE_KEYS)[number]
