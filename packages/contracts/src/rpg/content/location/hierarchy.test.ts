@@ -6,6 +6,7 @@ import {
   getAllowedParentKinds,
   getParentRequirement,
   isValidParentKind,
+  validateLocationParentRequirement,
 } from './hierarchy'
 import { LOCATION_KIND_IDS } from '../../vocab/location/kind'
 
@@ -46,5 +47,12 @@ describe('LOCATION_KIND_DEFINITIONS integrity', () => {
 
   it('allows settlement → world without requiring a region wrapper', () => {
     expect(isValidParentKind('settlement', 'world')).toBe(true)
+  })
+
+  it('validates parent requirement presence per kind', () => {
+    expect(validateLocationParentRequirement('plane', undefined)).toBeUndefined()
+    expect(validateLocationParentRequirement('plane', 'parent-1')).toBeDefined()
+    expect(validateLocationParentRequirement('region', undefined)).toBeDefined()
+    expect(validateLocationParentRequirement('world', undefined)).toBeUndefined()
   })
 })

@@ -13,6 +13,7 @@ import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,
 } from './reference-sources/characters'
+import { indexLocationParentBlockersByContentId } from './reference-sources/locations'
 import type { ContentUsageSource } from './content-usage-source'
 
 function characterDescriptorSource(
@@ -50,4 +51,8 @@ export const characterEquipmentSource: ContentUsageSource = {
       purpose: ctx.purpose,
       viewer: ctx.viewer,
     }),
+}
+
+export const locationParentReferenceSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexLocationParentBlockersByContentId(ctx),
 }

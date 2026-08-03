@@ -25,6 +25,7 @@ export type ContentUsageSurfaceKey =
   | 'equipment'
   | 'skill-proficiencies'
   | 'organizations'
+  | 'locations'
   | 'subclasses'
 
 export type ContentUsageResolverResult = {

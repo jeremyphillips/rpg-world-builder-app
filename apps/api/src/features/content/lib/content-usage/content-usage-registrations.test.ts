@@ -21,9 +21,13 @@ describe('content usage registrations', () => {
     expect(() => assertContentUsageRegistrationCoverage()).not.toThrow()
   })
 
-  it('declares characters overview scope for v1 character-only batch', () => {
+  it('declares characters overview scope for character-referenced content types', () => {
     for (const registration of Object.values(CONTENT_USAGE_REGISTRATIONS)) {
       if (!registration) continue
+      if (registration.contentType === 'locations') {
+        expect(registration.overviewUsageScope).toBe('complete')
+        continue
+      }
       expect(registration.overviewUsageScope).toBe('characters')
       expect(registration.sources.some((source) => source.batch)).toBe(true)
       expect(registration.sources.some((source) => source.entry)).toBe(true)

@@ -13,6 +13,7 @@ import { featRegistration } from './feats/feats.config'
 import type { ContentTypeConfig } from './lib/content-type-config'
 import type { ContentWriteConfig, WriteEntityBase } from './lib/content-write-config'
 import { organizationRegistration } from './organizations/organizations.config'
+import { locationRegistration } from './locations/locations.config'
 import { skillProficiencyRegistration } from './skill-proficiencies/skill-proficiencies.config'
 import { speciesRegistration } from './species/species.config'
 import { spellRegistration } from './spells/spells.config'
@@ -36,6 +37,7 @@ const CONTENT_TYPES = {
   },
   equipment: equipmentRegistration,
   organizations: organizationRegistration,
+  locations: locationRegistration,
   'skill-proficiencies': skillProficiencyRegistration,
   species: speciesRegistration,
   spells: spellRegistration,

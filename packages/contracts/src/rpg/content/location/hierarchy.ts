@@ -43,5 +43,23 @@ export function getParentRequirement(kind: LocationKind): LocationParentRequirem
   return LOCATION_KIND_DEFINITIONS[kind].parentRequirement
 }
 
+/** Validates parent presence against kind policy. Returns an error message when invalid. */
+export function validateLocationParentRequirement(
+  kind: LocationKind,
+  parentLocationId: string | undefined,
+): string | undefined {
+  const requirement = getParentRequirement(kind)
+
+  if (requirement === 'forbidden' && parentLocationId !== undefined) {
+    return 'This location kind cannot have a parent.'
+  }
+
+  if (requirement === 'required' && parentLocationId === undefined) {
+    return 'This location kind requires a parent location.'
+  }
+
+  return undefined
+}
+
 /** Every registered kind has a hierarchy definition. */
 export const LOCATION_KINDS_WITH_DEFINITIONS = LOCATION_KIND_IDS

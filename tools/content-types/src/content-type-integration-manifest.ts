@@ -140,6 +140,9 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
   },
   locations: {
     catalog: { bundledContent: 'none' },
+    api: {
+      registrationPath: 'apps/api/src/features/content/locations/locations.config.ts',
+    },
     capabilities: { required: true },
   },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>

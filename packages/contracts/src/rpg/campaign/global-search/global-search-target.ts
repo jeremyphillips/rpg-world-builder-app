@@ -42,6 +42,11 @@ export const globalSearchOrganizationTargetSchema = z.object({
   id: z.string().min(1),
 })
 
+export const globalSearchLocationTargetSchema = z.object({
+  kind: z.literal('location'),
+  id: z.string().min(1),
+})
+
 export const globalSearchCharacterTargetSchema = z.object({
   kind: z.literal('character'),
   id: z.string().min(1),
@@ -62,6 +67,7 @@ export const globalSearchTargetSchema = z.discriminatedUnion('kind', [
   globalSearchEquipmentTargetSchema,
   globalSearchSkillProficiencyTargetSchema,
   globalSearchOrganizationTargetSchema,
+  globalSearchLocationTargetSchema,
   globalSearchCharacterTargetSchema,
   globalSearchGameTermTargetSchema,
 ])

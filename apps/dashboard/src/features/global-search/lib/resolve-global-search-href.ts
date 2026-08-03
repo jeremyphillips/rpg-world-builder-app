@@ -2,23 +2,36 @@ import type { GlobalSearchTarget } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+type ContentDetailRoute = (campaignId: string, id: string) => string
+
+/** Content targets resolved with a single entity id. */
+const CONTENT_DETAIL_ROUTES = {
+  class: ROUTES.content.classes.detail,
+  spell: ROUTES.content.spells.detail,
+  species: ROUTES.content.species.detail,
+  feat: ROUTES.content.feats.detail,
+  'skill-proficiency': ROUTES.content.skillProficiencies.detail,
+  organization: ROUTES.content.organizations.detail,
+  location: ROUTES.content.locations.detail,
+} as const satisfies Record<string, ContentDetailRoute>
+
+type ContentDetailTargetKind = keyof typeof CONTENT_DETAIL_ROUTES
+
+function isContentDetailTarget(
+  target: GlobalSearchTarget,
+): target is Extract<GlobalSearchTarget, { kind: ContentDetailTargetKind }> {
+  return target.kind in CONTENT_DETAIL_ROUTES
+}
+
 /** Maps a structured wire target to a dashboard href for the active campaign. */
 export function resolveGlobalSearchHref(campaignId: string, target: GlobalSearchTarget): string {
+  if (isContentDetailTarget(target)) {
+    return CONTENT_DETAIL_ROUTES[target.kind](campaignId, target.id)
+  }
+
   switch (target.kind) {
-    case 'class':
-      return ROUTES.content.classes.detail(campaignId, target.id)
-    case 'spell':
-      return ROUTES.content.spells.detail(campaignId, target.id)
-    case 'species':
-      return ROUTES.content.species.detail(campaignId, target.id)
-    case 'feat':
-      return ROUTES.content.feats.detail(campaignId, target.id)
     case 'equipment':
       return ROUTES.content.equipment.detail(campaignId, target.family, target.id)
-    case 'skill-proficiency':
-      return ROUTES.content.skillProficiencies.detail(campaignId, target.id)
-    case 'organization':
-      return ROUTES.content.organizations.detail(campaignId, target.id)
     case 'character':
       return target.characterType === 'npc'
         ? ROUTES.campaign.npcs.detail(campaignId, target.id)
