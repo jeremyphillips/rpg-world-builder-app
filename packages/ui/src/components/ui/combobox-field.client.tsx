@@ -18,6 +18,7 @@ import type {
   ComboboxFieldControlProps,
   ComboboxFieldOption,
   ComboboxRenderSelectedItem,
+  ResolveComboboxFilteredOptions,
 } from './combobox-field.types'
 import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
@@ -28,6 +29,7 @@ export type {
   ComboboxFieldOption,
   ComboboxRenderSelectedItem,
   ComboboxSelectedItemRenderContext,
+  ResolveComboboxFilteredOptions,
 } from './combobox-field.types'
 
 export interface ComboboxFieldProps extends SelectFieldValueProps, FieldChromeProps {
@@ -48,6 +50,8 @@ export interface ComboboxFieldProps extends SelectFieldValueProps, FieldChromePr
   enableSearch?: boolean
   /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Custom filter/rank for panel options; selected values must remain visible when set. */
+  resolveFilteredOptions?: ResolveComboboxFilteredOptions
   hintPosition?: FieldHintPosition
 }
 
@@ -142,6 +146,7 @@ export function ComboboxField({
   emptyMessage = 'No options found.',
   enableSearch = true,
   renderSelectedItem,
+  resolveFilteredOptions,
   hintPosition,
   chrome,
 }: ComboboxFieldProps) {
@@ -183,6 +188,7 @@ export function ComboboxField({
             emptyMessage={emptyMessage}
             enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}
+            resolveFilteredOptions={resolveFilteredOptions}
           />
         }
         chrome={chrome}

@@ -303,6 +303,9 @@ Searchable dropdown for large lists (catalog refs).
 - Filter matches `label`, `description`, `value`.
 - Multi: removable badges; `renderSelectedItem` for custom previews.
 - Stale selected values stay visible when missing from `options`.
+- `resolveFilteredOptions(options, query, selected)` — optional custom filter/rank for large
+  vocabularies (e.g. building archetype Model E precedence). Selected values must remain
+  visible when set, matching the default `filterOptions` contract.
 
 ## Level range (`levelRange`)
 

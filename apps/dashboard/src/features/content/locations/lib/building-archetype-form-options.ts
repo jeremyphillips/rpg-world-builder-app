@@ -175,6 +175,26 @@ export function rankBuildingArchetypeFieldOptions(query: string): FieldOption[] 
     .map((entry) => entry.option)
 }
 
+/** Combobox resolver: Model E rank plus selected-value visibility (matches filterOptions contract). */
+export function resolveBuildingArchetypeFilteredOptions(
+  options: FieldOption[],
+  query: string,
+  selected: string[] = [],
+): FieldOption[] {
+  const normalized = query.trim()
+  const filtered = normalized ? rankBuildingArchetypeFieldOptions(normalized) : options
+
+  const visibleValues = new Set(filtered.map((option) => option.value))
+  const result = [...filtered]
+  for (const value of selected) {
+    if (!visibleValues.has(value)) {
+      result.push(options.find((option) => option.value === value) ?? { value, label: value })
+      visibleValues.add(value)
+    }
+  }
+  return result
+}
+
 export function buildBuildingFunctionOverrideFieldOptions(): FieldOption[] {
   return toOptions(
     BUILDING_FUNCTION_FAMILY_IDS,

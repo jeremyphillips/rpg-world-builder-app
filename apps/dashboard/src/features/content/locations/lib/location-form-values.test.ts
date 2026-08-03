@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createLocationInputSchema } from '@rpg/contracts'
 
-import { DOCK_WARD, SWORD_COAST, WATERDEEP, YAWNING_PORTAL } from '../fixtures'
+import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   canonicalFieldsForAuthoringType,
   resolveLocationAuthoringType,
@@ -20,7 +20,7 @@ describe('locationToFormValues', () => {
   })
 
   it('hydrates settlement subtype fields through authoringType', () => {
-    const values = locationToFormValues(WATERDEEP)
+    const values = locationToFormValues(HARBORFORD)
 
     expect(values.authoringType).toBe('settlement')
     expect(values.settlementType).toBe('city')
@@ -64,7 +64,7 @@ describe('buildLocationCreateInput', () => {
   })
 
   it('maps region authoringType to canonical region classification', () => {
-    const values = locationToFormValues(SWORD_COAST) as LocationFormValues
+    const values = locationToFormValues(GREYSHORE) as LocationFormValues
     const input = buildLocationCreateInput(values)
 
     expect(values.authoringType).toBe('region')

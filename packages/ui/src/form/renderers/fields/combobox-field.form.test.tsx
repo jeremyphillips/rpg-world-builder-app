@@ -122,6 +122,34 @@ describe('Form combobox field', () => {
     expect(archetypeRoot).toHaveClass('grow-[8]', 'max-w-2/3')
   })
 
+  it('applies custom resolveFilteredOptions order in the panel', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({ choice: z.string().optional() })
+    const orderedOptions = [
+      { value: 'first', label: 'First match' },
+      { value: 'second', label: 'Second match' },
+    ]
+    const fields: FormItem[] = [
+      {
+        type: 'combobox',
+        name: 'choice',
+        label: 'Choice',
+        multiple: false,
+        options: orderedOptions,
+        resolveFilteredOptions: (opts, query) =>
+          query ? [...opts].reverse().filter((option) => option.label.includes('match')) : opts,
+      },
+    ]
+
+    render(<Form schema={schema} fields={fields} defaultValues={{}} onSubmit={vi.fn()} />)
+
+    await user.click(screen.getByRole('combobox', { name: 'Choice' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search Choice' }), 'match')
+
+    const panelOptions = screen.getAllByRole('option')
+    expect(panelOptions[0]).toHaveAccessibleName('Second match')
+  })
+
   it('submits multi-select values from the combobox adapter', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

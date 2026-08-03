@@ -22,6 +22,7 @@ import {
   BUILDING_FUNCTION_OVERRIDE_HINT,
   hasBuildingFunctionOverrideChoices,
   resolveBuildingArchetypeDerivedMeta,
+  resolveBuildingArchetypeFilteredOptions,
   resolveBuildingFunctionOverrideFieldOptions,
 } from './building-archetype-form-options'
 import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
@@ -189,6 +190,7 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
       derivedMeta: buildingArchetypeDerivedMeta,
+      resolveFilteredOptions: resolveBuildingArchetypeFilteredOptions,
       width: '2/3',
     },
     {

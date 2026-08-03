@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { LOCATIONS_LIST, WATERDEEP, YAWNING_PORTAL } from '../fixtures'
+import { LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import { LOCATION_EMPTY_SECTION_TEXT } from '../lib/location-display'
 import { LocationDetailContent } from './location-detail'
 
@@ -19,7 +19,7 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: useCanManageCampaignMock,
 }))
 
-function renderDetail(location = WATERDEEP) {
+function renderDetail(location = HARBORFORD) {
   return render(
     <MemoryRouter>
       <LocationDetailContent
@@ -38,8 +38,8 @@ describe('LocationDetailContent', () => {
     expect(screen.getByText('Settlement')).toBeInTheDocument()
     expect(screen.getByText('City')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Location path' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Faerûn' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Sword Coast' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Aldermere' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contained locations' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
   })
@@ -52,7 +52,7 @@ describe('LocationDetailContent', () => {
 
   it('shows add-location shortcuts for campaign managers', () => {
     useCanManageCampaignMock.mockReturnValue(true)
-    renderDetail(WATERDEEP)
+    renderDetail(HARBORFORD)
 
     expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
   })

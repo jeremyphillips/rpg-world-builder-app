@@ -5,12 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { writeStoredCampaignId } from '@rpg/contracts'
 
+import type * as RequestModule from './request'
+
 const { putJson } = vi.hoisted(() => ({
   putJson: vi.fn(),
 }))
 
 vi.mock('./request', async () => {
-  const actual = await vi.importActual<typeof import('./request')>('./request')
+  const actual = await vi.importActual<typeof RequestModule>('./request')
   return {
     ...actual,
     putJson,

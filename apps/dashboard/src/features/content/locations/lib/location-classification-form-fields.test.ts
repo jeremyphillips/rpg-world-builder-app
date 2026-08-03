@@ -9,6 +9,7 @@ import {
   hasBuildingFunctionOverrideChoices,
   isRedundantBuildingFunctionOverride,
   resolveBuildingArchetypeDerivedMeta,
+  resolveBuildingArchetypeFilteredOptions,
   resolveBuildingFunctionOverrideFieldOptions,
 } from './building-archetype-form-options'
 import {
@@ -162,6 +163,13 @@ describe('buildLocationClassificationFields building UX', () => {
       },
     })
     expect(archetypeField).not.toHaveProperty('hint')
+    expect(archetypeField).toMatchObject({
+      resolveFilteredOptions: resolveBuildingArchetypeFilteredOptions,
+    })
+    expect(
+      resolveBuildingArchetypeFilteredOptions(buildBuildingArchetypeFieldOptions(), 'inn', [])[0]
+        ?.value,
+    ).toBe('inn')
   })
 
   it('wires specialization as an optional text-suggestions field gated on building and archetype', () => {

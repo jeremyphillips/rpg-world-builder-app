@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
-import { DOCK_WARD, FAERUN, LOCATIONS_LIST, WATERDEEP, YAWNING_PORTAL } from '../fixtures'
+import { DOCK_WARD, ALDERMERE, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   buildLocationAncestrySegments,
   buildLocationChildren,
@@ -18,29 +18,29 @@ describe('buildLocationAncestrySegments', () => {
     const segments = buildLocationAncestrySegments(YAWNING_PORTAL, byId, CAMPAIGN_ID)
 
     expect(segments.map((segment) => segment.name)).toEqual([
-      'Faerûn',
-      'Sword Coast',
-      'Waterdeep',
+      'Aldermere',
+      'Greyshore',
+      'Harborford',
       'Dock Ward',
     ])
-    expect(segments[0]?.href).toBe(`/campaigns/${CAMPAIGN_ID}/locations/${FAERUN.id}`)
+    expect(segments[0]?.href).toBe(`/campaigns/${CAMPAIGN_ID}/locations/${ALDERMERE.id}`)
   })
 
   it('returns empty ancestry for a root location', () => {
     const byId = buildLocationsById(LOCATIONS_LIST)
-    expect(buildLocationAncestrySegments(FAERUN, byId, CAMPAIGN_ID)).toEqual([])
+    expect(buildLocationAncestrySegments(ALDERMERE, byId, CAMPAIGN_ID)).toEqual([])
   })
 
   it('stops when a cycle is detected', () => {
     const locationA: Location = {
-      ...FAERUN,
+      ...ALDERMERE,
       id: 'location-cycle-a',
       slug: 'cycle-a',
       name: 'Cycle A',
       parentLocationId: 'location-cycle-b',
     }
     const locationB: Location = {
-      ...FAERUN,
+      ...ALDERMERE,
       id: 'location-cycle-b',
       slug: 'cycle-b',
       name: 'Cycle B',
@@ -55,7 +55,7 @@ describe('buildLocationAncestrySegments', () => {
 
 describe('buildLocationChildren', () => {
   it('returns direct children sorted by name', () => {
-    const children = buildLocationChildren(WATERDEEP.id, LOCATIONS_LIST, CAMPAIGN_ID)
+    const children = buildLocationChildren(HARBORFORD.id, LOCATIONS_LIST, CAMPAIGN_ID)
     expect(children.map((child) => child.name)).toEqual(['Dock Ward'])
     expect(children[0]?.kindLabel).toBe('District')
   })
@@ -63,15 +63,15 @@ describe('buildLocationChildren', () => {
 
 describe('buildLocationDetailViewModel', () => {
   it('includes kind, subtype, parent, ancestry, and children', () => {
-    const viewModel = buildLocationDetailViewModel(WATERDEEP, {
+    const viewModel = buildLocationDetailViewModel(HARBORFORD, {
       locations: LOCATIONS_LIST,
       campaignId: CAMPAIGN_ID,
     })
 
     expect(viewModel.statRows.map((row) => row.label)).toEqual(['Kind', 'Subtype', 'Parent'])
     expect(viewModel.statRows[1]?.value).toBe('City')
-    expect(viewModel.statRows[2]?.value).toBe('Sword Coast')
-    expect(viewModel.ancestry.map((segment) => segment.name)).toEqual(['Faerûn', 'Sword Coast'])
+    expect(viewModel.statRows[2]?.value).toBe('Greyshore')
+    expect(viewModel.ancestry.map((segment) => segment.name)).toEqual(['Aldermere', 'Greyshore'])
     expect(viewModel.children.items.map((child) => child.name)).toEqual(['Dock Ward'])
   })
 

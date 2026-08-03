@@ -401,6 +401,7 @@ const fieldRenderers: {
       onChange={field.onChange}
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}
+      resolveFilteredOptions={config.resolveFilteredOptions}
     />
   ),
   editableGrid: ({ config, field, id, namePrefix, ...validation }) => (

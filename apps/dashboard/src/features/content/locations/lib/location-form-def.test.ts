@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { createLocationInputSchema, type CreateLocationInput } from '@rpg/contracts'
 
-import { WATERDEEP, YAWNING_PORTAL } from '../fixtures'
+import { HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import { resolveLocationAuthoringType } from './location-authoring-type'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormValues } from './location-form-fields'
@@ -12,14 +12,14 @@ it('type: toInput return type matches CreateLocationInput', () => {
 
 describe('locationFormDef', () => {
   it('round-trips location fields into a publish input', () => {
-    const values = locationFormDef.toFormValues(WATERDEEP) as LocationFormValues
+    const values = locationFormDef.toFormValues(HARBORFORD) as LocationFormValues
     const input = locationFormDef.toInput(values)
     expect(() => createLocationInputSchema.parse(input)).not.toThrow()
     expect(input.kind).toBe('settlement')
     if (input.kind === 'settlement') {
       expect(input.settlementType).toBe('city')
     }
-    expect(input.parentLocationId).toBe(WATERDEEP.parentLocationId)
+    expect(input.parentLocationId).toBe(HARBORFORD.parentLocationId)
     expect(values.authoringType).toBe('settlement')
   })
 

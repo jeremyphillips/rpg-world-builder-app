@@ -666,6 +666,15 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
    * Defaults to removable `Chip` pills. Use for links, badges, or compact summaries.
    */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /**
+   * Custom filter/rank for panel options. When omitted, the combobox uses default
+   * substring matching in static `options` order. Selected values must stay visible.
+   */
+  resolveFilteredOptions?: (
+    options: FieldOption[],
+    query: string,
+    selected: string[],
+  ) => FieldOption[]
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'

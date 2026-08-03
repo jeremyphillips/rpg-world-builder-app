@@ -45,12 +45,12 @@ describe('buildLocationCreateInitialValues', () => {
   it('prefers explicit parent prefill over campaign defaults', () => {
     expect(
       buildLocationCreateInitialValues(
-        { authoringType: 'site', parentLocationId: 'location-waterdeep' },
-        { parentLocationId: 'location-faerun' },
+        { authoringType: 'site', parentLocationId: 'location-harborford' },
+        { parentLocationId: 'location-aldermere' },
       ),
     ).toEqual({
       authoringType: 'site',
-      parentLocationId: 'location-waterdeep',
+      parentLocationId: 'location-harborford',
     })
   })
 
@@ -58,11 +58,11 @@ describe('buildLocationCreateInitialValues', () => {
     expect(
       buildLocationCreateInitialValues(
         { authoringType: 'building' },
-        { parentLocationId: 'location-faerun' },
+        { parentLocationId: 'location-aldermere' },
       ),
     ).toEqual({
       authoringType: 'building',
-      parentLocationId: 'location-faerun',
+      parentLocationId: 'location-aldermere',
     })
   })
 })
@@ -72,9 +72,9 @@ describe('buildLocationCreateHref', () => {
     expect(
       buildLocationCreateHref('campaign-1', {
         authoringType: 'settlement',
-        parentLocationId: 'location-sword-coast',
+        parentLocationId: 'location-greyshore',
       }),
-    ).toBe('/campaigns/campaign-1/locations/new?type=settlement&parent=location-sword-coast')
+    ).toBe('/campaigns/campaign-1/locations/new?type=settlement&parent=location-greyshore')
   })
 })
 

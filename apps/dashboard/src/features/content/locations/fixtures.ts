@@ -13,32 +13,32 @@ const baseLocation = {
   updatedAt: CONTENT_TIMESTAMP,
 }
 
-export const FAERUN: Location = {
+export const ALDERMERE: Location = {
   ...baseLocation,
-  id: 'location-faerun',
-  slug: 'faerun',
-  name: 'Faerûn',
+  id: 'location-aldermere',
+  slug: 'aldermere',
+  name: 'Aldermere',
   kind: 'world',
 }
 
-export const SWORD_COAST: Location = {
+export const GREYSHORE: Location = {
   ...baseLocation,
-  id: 'location-sword-coast',
-  slug: 'sword-coast',
-  name: 'Sword Coast',
+  id: 'location-greyshore',
+  slug: 'greyshore',
+  name: 'Greyshore',
   kind: 'region',
   classification: { kind: 'geographic', type: 'coast' },
-  parentLocationId: FAERUN.id,
+  parentLocationId: ALDERMERE.id,
 }
 
-export const WATERDEEP: Location = {
+export const HARBORFORD: Location = {
   ...baseLocation,
-  id: 'location-waterdeep',
-  slug: 'waterdeep',
-  name: 'Waterdeep',
+  id: 'location-harborford',
+  slug: 'harborford',
+  name: 'Harborford',
   kind: 'settlement',
   settlementType: 'city',
-  parentLocationId: SWORD_COAST.id,
+  parentLocationId: GREYSHORE.id,
 }
 
 export const DOCK_WARD: Location = {
@@ -47,7 +47,7 @@ export const DOCK_WARD: Location = {
   slug: 'dock-ward',
   name: 'Dock Ward',
   kind: 'district',
-  parentLocationId: WATERDEEP.id,
+  parentLocationId: HARBORFORD.id,
 }
 
 export const YAWNING_PORTAL: Location = {
@@ -61,4 +61,4 @@ export const YAWNING_PORTAL: Location = {
   parentLocationId: DOCK_WARD.id,
 }
 
-export const LOCATIONS_LIST = [FAERUN, SWORD_COAST, WATERDEEP, DOCK_WARD, YAWNING_PORTAL] as const
+export const LOCATIONS_LIST = [ALDERMERE, GREYSHORE, HARBORFORD, DOCK_WARD, YAWNING_PORTAL] as const

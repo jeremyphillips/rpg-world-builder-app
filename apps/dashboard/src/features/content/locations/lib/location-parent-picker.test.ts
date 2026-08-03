@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DOCK_WARD, SWORD_COAST, YAWNING_PORTAL } from '../fixtures'
+import { DOCK_WARD, GREYSHORE, YAWNING_PORTAL } from '../fixtures'
 import {
   buildParentLocationOptionAvailability,
   parentLocationFieldVisibility,
@@ -30,13 +30,13 @@ describe('parentLocationFieldVisibility', () => {
 
 describe('buildParentLocationOptionAvailability', () => {
   const enabledWhen = buildParentLocationOptionAvailability(
-    [SWORD_COAST, DOCK_WARD, YAWNING_PORTAL],
+    [GREYSHORE, DOCK_WARD, YAWNING_PORTAL],
     YAWNING_PORTAL.id,
   ).enabledWhen!
 
   it('maps building authoring type to structure kind when validating parents', () => {
     expect(enabledWhen({ authoringType: 'building' }, DOCK_WARD.id)).toBe(true)
-    expect(enabledWhen({ authoringType: 'building' }, SWORD_COAST.id)).toBe(false)
+    expect(enabledWhen({ authoringType: 'building' }, GREYSHORE.id)).toBe(false)
   })
 
   it('rejects self as a parent option', () => {

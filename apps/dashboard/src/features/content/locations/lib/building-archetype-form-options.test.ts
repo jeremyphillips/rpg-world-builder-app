@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildBuildingArchetypeFieldOptions,
   buildBuildingArchetypeSearchTerms,
   filterBuildingArchetypeFieldOptions,
   rankBuildingArchetypeFieldOptions,
+  resolveBuildingArchetypeFilteredOptions,
 } from './building-archetype-form-options'
 
 function matchingArchetypeValues(query: string): string[] {
@@ -79,5 +81,23 @@ describe('building archetype combobox search', () => {
     )
 
     expect(rankedValues[0]).toBe('warehouse')
+  })
+
+  it('resolver keeps selected values visible when they do not match the query', () => {
+    const options = buildBuildingArchetypeFieldOptions()
+    const resolved = resolveBuildingArchetypeFilteredOptions(options, 'inn', ['warehouse'])
+
+    expect(resolved.map((option) => option.value)[0]).toBe('inn')
+    expect(resolved.map((option) => option.value)).toContain('warehouse')
+  })
+
+  it('wired resolver puts inn first for query inn', () => {
+    const resolved = resolveBuildingArchetypeFilteredOptions(
+      buildBuildingArchetypeFieldOptions(),
+      'inn',
+      [],
+    )
+
+    expect(resolved[0]?.value).toBe('inn')
   })
 })
