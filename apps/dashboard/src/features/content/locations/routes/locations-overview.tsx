@@ -5,11 +5,11 @@ import type { ColumnDef } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import {
   formatContentCollectionAvailabilityCaption,
-  formatContentCreateHeading,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { LocationCreateActions } from '../components/location-create-actions.client'
 import { useLocations, useLocationsUsageMeta } from '../hooks/use-locations'
 import { locationsColumns, locationsFilterSchema } from '../lib/locations-overview-columns'
 
@@ -26,8 +26,7 @@ export function LocationsOverview() {
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
-      newHref={ROUTES.content.locations.create(campaignId)}
-      newLabel={formatContentCreateHeading('locations')}
+      actions={<LocationCreateActions campaignId={campaignId} />}
     >
       <ContentOverviewTable<WithCampaignAccess<Location>>
         contentTypeKey="locations"

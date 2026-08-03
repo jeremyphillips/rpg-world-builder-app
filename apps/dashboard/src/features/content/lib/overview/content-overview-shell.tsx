@@ -14,6 +14,8 @@ type ContentOverviewShellProps = {
   newHref?: string
   /** Label for the "New" button. Defaults to `"New"`. */
   newLabel?: string
+  /** When provided, replaces the default `newHref` link action. */
+  actions?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -29,15 +31,18 @@ export function ContentOverviewShell({
   campaignId,
   newHref,
   newLabel = 'New',
+  actions,
   children,
 }: ContentOverviewShellProps) {
   const canManage = useCanManageCampaign(campaignId)
-  const showNew = canManage && newHref
-  const actions = showNew ? (
-    <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
-      {newLabel}
-    </Link>
-  ) : undefined
+  const showNew = canManage && (actions != null || newHref)
+  const resolvedActions =
+    actions ??
+    (newHref ? (
+      <Link to={newHref} className={buttonVariants({ size: 'sm' })}>
+        {newLabel}
+      </Link>
+    ) : undefined)
 
   return (
     <OverviewPageShell
@@ -45,7 +50,7 @@ export function ContentOverviewShell({
       isPending={isPending}
       isError={isError}
       errorLabel={errorLabel}
-      actions={actions}
+      actions={showNew ? resolvedActions : undefined}
     >
       {children}
     </OverviewPageShell>

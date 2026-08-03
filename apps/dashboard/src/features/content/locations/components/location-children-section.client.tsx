@@ -7,16 +7,23 @@ import { LOCATION_SECTION_LABELS, type LocationChildrenViewModel } from '../lib/
 
 export type LocationChildrenSectionProps = {
   childrenViewModel: LocationChildrenViewModel
+  headerActions?: React.ReactNode
 }
 
-export function LocationChildrenSection({ childrenViewModel }: LocationChildrenSectionProps) {
+export function LocationChildrenSection({
+  childrenViewModel,
+  headerActions,
+}: LocationChildrenSectionProps) {
   const { items, emptyText } = childrenViewModel
 
   return (
     <section aria-labelledby="location-children-heading" className="space-y-4">
-      <Heading variant="group" as="h2" id="location-children-heading">
-        {LOCATION_SECTION_LABELS.children}
-      </Heading>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Heading variant="group" as="h2" id="location-children-heading">
+          {LOCATION_SECTION_LABELS.children}
+        </Heading>
+        {headerActions}
+      </div>
 
       {items.length === 0 ? (
         <Text variant="muted">{emptyText}</Text>

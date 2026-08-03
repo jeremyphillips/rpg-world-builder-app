@@ -140,6 +140,7 @@ describe('buildLocationClassificationFields building UX', () => {
       'Advanced classification',
     )
     expect(advancedGroup.disclosure).toEqual({ variant: 'legend', defaultOpen: false })
+    expect(advancedGroup.legendSize).toBe('subsection')
     expect(advancedGroup.fields[0]).toMatchObject({
       name: 'classification.functionOverride',
       placeholder: 'Use archetype defaults',

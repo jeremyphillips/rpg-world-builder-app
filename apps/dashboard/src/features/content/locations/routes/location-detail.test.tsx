@@ -8,11 +8,15 @@ import { LOCATIONS_LIST, WATERDEEP, YAWNING_PORTAL } from '../fixtures'
 import { LOCATION_EMPTY_SECTION_TEXT } from '../lib/location-display'
 import { LocationDetailContent } from './location-detail'
 
+const { useCanManageCampaignMock } = vi.hoisted(() => ({
+  useCanManageCampaignMock: vi.fn(() => false),
+}))
+
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('@/features/campaign', () => ({
-  useCanManageCampaign: vi.fn(() => false),
+  useCanManageCampaign: useCanManageCampaignMock,
 }))
 
 function renderDetail(location = WATERDEEP) {
@@ -44,6 +48,13 @@ describe('LocationDetailContent', () => {
     renderDetail(YAWNING_PORTAL)
 
     expect(screen.getByText(LOCATION_EMPTY_SECTION_TEXT.children)).toBeInTheDocument()
+  })
+
+  it('shows add-location shortcuts for campaign managers', () => {
+    useCanManageCampaignMock.mockReturnValue(true)
+    renderDetail(WATERDEEP)
+
+    expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

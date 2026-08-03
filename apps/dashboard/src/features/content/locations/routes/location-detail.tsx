@@ -5,6 +5,7 @@ import { RichTextContent } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
+import { useCanManageCampaign } from '@/features/campaign'
 import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
@@ -14,6 +15,7 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
+import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
 import { LocationAncestry } from '../components/location-ancestry.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
 import { useLocations } from '../hooks/use-locations'
@@ -29,6 +31,7 @@ export function LocationDetailContent({
   locations: readonly Location[]
 }) {
   useSetBreadcrumbLabel(location.name)
+  const canManage = useCanManageCampaign(campaignId)
   const viewModel = useMemo(
     () =>
       buildLocationDetailViewModel(location, {
@@ -56,7 +59,18 @@ export function LocationDetailContent({
       >
         <div className="space-y-8">
           <LocationAncestry segments={viewModel.ancestry} currentName={location.name} />
-          <LocationChildrenSection childrenViewModel={viewModel.children} />
+          <LocationChildrenSection
+            childrenViewModel={viewModel.children}
+            headerActions={
+              canManage ? (
+                <LocationAddChildMenu
+                  campaignId={campaignId}
+                  parentLocationId={location.id}
+                  parentKind={location.kind}
+                />
+              ) : undefined
+            }
+          />
         </div>
       </ContentDetailLayout>
     </WidePage>

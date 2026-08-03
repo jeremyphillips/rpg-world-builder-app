@@ -78,15 +78,34 @@ The locations overview keeps three discovery paths distinct:
 Kind, source, status, and campaign availability filters behave like other content
 overviews. See [content-overviews.md](./content-overviews.md).
 
+## Authoring flow
+
+Location create/edit forms use a dashboard-owned **Location type** projection
+(`authoringType`) instead of exposing canonical `kind` + `structureType`
+separately. The mapping module (`location-authoring-type.ts`) hydrates and
+serializes at the form boundary only — API payloads stay canonical.
+
+| Author intent           | Location type          | Primary field   | Persists as                                       |
+| ----------------------- | ---------------------- | --------------- | ------------------------------------------------- |
+| Inn in a city district  | Building               | Archetype → Inn | `kind: structure`, `structureType: building`, …   |
+| Generic defensive wall  | Fortification          | —               | `kind: structure`, `structureType: fortification` |
+| Rare unclassified shell | Unclassified structure | —               | `kind: structure` (no `structureType`)            |
+
+Creation shortcuts (`?type=` on the create route, overview dropdown, detail-page
+**Add location** menu) only prefill the same form — they never bypass hierarchy
+validation or parent availability.
+
 ## Authoring modules
 
-| Module                                    | Role                                                        |
-| ----------------------------------------- | ----------------------------------------------------------- |
-| `location-classification-form-fields.ts`  | Archetype combobox, specialization, advanced override group |
-| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                 |
-| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                 |
-| `location-form-sync.ts`                   | Clears specialization and override on archetype change      |
-| `location-overview-search.lib.ts`         | Overview name-search discovery strings                      |
-| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                     |
+| Module                                    | Role                                                           |
+| ----------------------------------------- | -------------------------------------------------------------- |
+| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity |
+| `location-create-shortcuts.ts`            | Create-route prefill, promoted shortcuts, child-type menus     |
+| `location-classification-form-fields.ts`  | Archetype combobox, specialization, advanced override group    |
+| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                    |
+| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                    |
+| `location-form-sync.ts`                   | Clears specialization and override on archetype change         |
+| `location-overview-search.lib.ts`         | Overview name-search discovery strings                         |
+| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                        |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

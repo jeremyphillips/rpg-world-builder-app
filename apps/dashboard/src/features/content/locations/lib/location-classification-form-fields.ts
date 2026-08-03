@@ -207,6 +207,7 @@ export function buildLocationClassificationFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Advanced classification',
+      legendSize: 'subsection',
       disclosure: { variant: 'legend', defaultOpen: false },
       visibility: visibleForAuthoringType('building'),
       fields: [
