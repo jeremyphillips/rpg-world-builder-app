@@ -9,7 +9,7 @@ const meta = {
     id: 'specialization',
     label: 'Specialization',
     suggestions: ['coaching inn', 'roadside inn', 'ferry house'],
-    placeholder: 'Optional',
+    placeholder: 'Enter specialization…',
   },
 } satisfies Meta<typeof TextSuggestionsField>
 
@@ -23,9 +23,52 @@ export const Empty: Story = {
   },
 }
 
+export const WithSuggestions: Story = {
+  args: {
+    value: '',
+    hint: 'Add a specialization when you want to describe a more specific kind of building.',
+    onValueChange: () => {},
+  },
+}
+
+export const OneSuggestion: Story = {
+  args: {
+    value: '',
+    suggestions: ['planar embassy'],
+    onValueChange: () => {},
+  },
+}
+
+export const ManySuggestions: Story = {
+  args: {
+    value: '',
+    suggestions: [
+      'bakery',
+      'butcher',
+      'chandler',
+      'cobbler',
+      'general store',
+      'jeweler',
+      'magic shop',
+      'pawnshop',
+      'tailor',
+    ],
+    onValueChange: () => {},
+  },
+}
+
+export const NoSuggestionsFreeEntry: Story = {
+  args: {
+    value: '',
+    suggestions: [],
+    hint: 'Add a specialization when you want to describe a more specific kind of building.',
+    onValueChange: () => {},
+  },
+}
+
 export const WithValue: Story = {
   args: {
-    value: 'Sea temple',
+    value: 'sea temple',
     suggestions: ['sea temple', 'funerary temple', 'cathedral'],
     onValueChange: () => {},
   },
@@ -34,7 +77,7 @@ export const WithValue: Story = {
 export const WithHint: Story = {
   args: {
     value: '',
-    hint: 'Optional refinement for this archetype.',
+    hint: 'Add a specialization when you want to describe a more specific kind of building.',
     onValueChange: () => {},
   },
 }

@@ -30,6 +30,7 @@ import { renderSpecializedField } from './fields/field-renderer-specialized.clie
 import {
   OptionalDisclosureSelectFieldRenderer,
   OptionalDisclosureTextareaFieldRenderer,
+  OptionalDisclosureTextSuggestionsFieldRenderer,
 } from './fields/optional-disclosure-field-renderer.client'
 import { SelectFieldRenderer } from './fields/select-field-renderer.client'
 import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
@@ -503,6 +504,20 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   }
 
   if (config.type === 'textSuggestions') {
+    if (config.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(config)
+      return wrapFieldDerivedMetaPresentation(
+        <OptionalDisclosureTextSuggestionsFieldRenderer
+          config={config}
+          disclosure={config.optionalDisclosure}
+          fullName={fullName}
+          id={id}
+          namePrefix={namePrefix}
+        />,
+        resolved,
+      )
+    }
+
     return wrapFieldDerivedMetaPresentation(
       <TextSuggestionsFieldRenderer
         config={config}

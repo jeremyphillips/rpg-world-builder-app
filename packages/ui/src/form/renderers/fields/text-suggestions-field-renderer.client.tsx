@@ -54,7 +54,6 @@ export function TextSuggestionsFieldRenderer({
       label={config.label}
       suggestions={suggestions}
       placeholder={config.placeholder}
-      emptyMessage={config.emptyMessage}
       hint={hintPresentation.text}
       hintPosition={hintPresentation.position}
       info={config.info}

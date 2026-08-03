@@ -65,6 +65,9 @@ const buildingArchetypeDerivedMeta = {
   metaWhen: resolveBuildingArchetypeDerivedMeta,
 }
 
+const BUILDING_SPECIALIZATION_HINT =
+  'Add a specialization when you want to describe a more specific kind of building.'
+
 const buildingSpecializationSuggestions = {
   dependsOn: ['classification.archetype'],
   suggestionsWhen: resolveBuildingSpecializationSuggestions,
@@ -112,6 +115,15 @@ function visibleWhenRegionClassificationKindSet() {
     dependsOn: ['authoringType', 'classification.kind'],
     visibleWhen: (watched: Record<string, unknown>) =>
       watched['authoringType'] === 'region' && typeof watched['classification.kind'] === 'string',
+  }
+}
+
+function visibleWhenBuildingSpecializationAvailable() {
+  return {
+    dependsOn: ['authoringType', 'classification.archetype'],
+    visibleWhen: (watched: Record<string, unknown>) =>
+      watched['authoringType'] === 'building' &&
+      typeof watched['classification.archetype'] === 'string',
   }
 }
 
@@ -175,6 +187,7 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
       derivedMeta: buildingArchetypeDerivedMeta,
+      width: 'full',
     },
     {
       type: 'select',
@@ -204,9 +217,14 @@ export function buildLocationClassificationFields(): FormItem[] {
       type: 'textSuggestions',
       name: 'classification.specialization',
       label: 'Specialization',
-      placeholder: 'Optional',
+      placeholder: 'Enter specialization…',
+      hint: BUILDING_SPECIALIZATION_HINT,
       suggestions: buildingSpecializationSuggestions,
-      visibility: visibleForAuthoringType('building'),
+      visibility: visibleWhenBuildingSpecializationAvailable(),
+      optionalDisclosure: {
+        addLabel: 'Add specialization',
+        removeLabel: 'Remove specialization',
+      },
     },
     {
       type: 'select',

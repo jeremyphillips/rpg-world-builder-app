@@ -55,6 +55,23 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     expect(error).not.toHaveBeenCalled()
   })
 
+  it('allows a valid textSuggestions optionalDisclosure config', () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    assertOptionalDisclosureFieldConfig({
+      type: 'textSuggestions',
+      name: 'classification.specialization',
+      label: 'Specialization',
+      suggestions: {
+        dependsOn: ['classification.archetype'],
+        suggestionsWhen: () => [],
+      },
+      optionalDisclosure: { addLabel: 'Add specialization' },
+    })
+
+    expect(error).not.toHaveBeenCalled()
+  })
+
   it('errors when optionalDisclosure is used on an unsupported field kind', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
@@ -66,7 +83,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(
-      expect.stringContaining('only allowed for text, textarea, richtext, select'),
+      expect.stringContaining('only allowed for text, textSuggestions, textarea, richtext, select'),
     )
   })
 

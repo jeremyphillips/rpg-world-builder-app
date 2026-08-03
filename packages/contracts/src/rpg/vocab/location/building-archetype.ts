@@ -18,7 +18,9 @@
  * `specializationTerms` are registry-owned optional refinements for free-text
  * `classification.specialization`. A suggestion must be an archetype-specific,
  * commonly useful instance refinement (coaching inn, summer palace, bonded
- * warehouse, sea temple). Rejected categories: conditions (ruined), affiliations
+ * warehouse, sea temple). Suggestions must represent genuinely narrower variants,
+ * not aliases, manifestations, search terms, or restatements of the archetype.
+ * Rejected categories: conditions (ruined), affiliations
  * (royal — unless identity-bearing like summer palace), cultural manifestations
  * (use `manifestationOf` archetypes), and arbitrary adjectives (large, old).
  * Terms are lowercase, trimmed, and deduplicated; they must not duplicate the

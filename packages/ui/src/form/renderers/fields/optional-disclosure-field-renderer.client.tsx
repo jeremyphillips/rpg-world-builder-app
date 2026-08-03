@@ -1,19 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
+import { useController, useFormState } from 'react-hook-form'
 
 import { FieldReadOnlyValueField } from '../../../components/ui/field-read-only-value.client'
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { SelectField } from '../../../components/ui/select-field'
 import { TextareaField } from '../../../components/ui/textarea-field'
+import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
+import { resolveInheritedFieldSize } from '../../../components/ui/field.variants'
+import { useDependsOnValues } from '../../config/form-depends-on.client'
+import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
+import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type {
   OptionalDisclosureConfig,
   SelectFieldConfig,
   TextareaFieldConfig,
+  TextSuggestionsFieldConfig,
 } from '../../field-config'
+import { fieldDefaultValue, resolveFieldHintPresentation } from '../../field-config'
+import { useFormSectionContext } from '../../context/form-section.context'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
@@ -157,6 +166,106 @@ export function OptionalDisclosureSelectFieldRenderer({
         label=""
         aria-label={state.renderConfig.label}
         {...state.validation}
+      />
+    </OptionalFieldDisclosure>
+  )
+}
+
+export type OptionalDisclosureTextSuggestionsFieldRendererProps = {
+  config: TextSuggestionsFieldConfig
+  disclosure: OptionalDisclosureConfig
+  fullName: string
+  id: string
+  namePrefix?: string
+}
+
+/** Optional-disclosure wrapper for schema-driven text-suggestions fields. */
+export function OptionalDisclosureTextSuggestionsFieldRenderer({
+  config,
+  disclosure,
+  fullName,
+  id,
+  namePrefix,
+}: OptionalDisclosureTextSuggestionsFieldRendererProps) {
+  const { size: inheritedSize } = useFormSectionContext()
+  const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
+  const suggestionValuesKey = JSON.stringify(suggestionValues)
+  const hintDependsOn =
+    typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
+  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
+  const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
+  const hintPresentation = resolveFieldHintPresentation(config, hintValues)
+  const size = resolveInheritedFieldSize({ explicit: config.size, inherited: inheritedSize })
+
+  const { field, fieldState } = useController({
+    name: fullName,
+    defaultValue: fieldDefaultValue(config),
+  })
+  const { errors } = useFormState()
+  const validation = useFieldErrorPresentation(
+    fieldState.error?.message ?? resolveNestedFieldErrorMessage(errors, fullName),
+    fullName,
+  )
+
+  const [manualOpen, setManualOpen] = useState(false)
+  const [dependencyCollapsed, setDependencyCollapsed] = useState(false)
+  const hasValue = Boolean(String(field.value ?? '').trim())
+  const expandWhenPopulated = disclosure.expandWhenPopulated !== false
+  const open = !dependencyCollapsed && (manualOpen || (expandWhenPopulated && hasValue))
+
+  useEffect(() => {
+    setManualOpen(false)
+    setDependencyCollapsed(true)
+  }, [suggestionValuesKey])
+
+  useEffect(() => {
+    if (hasValue) {
+      setDependencyCollapsed(false)
+    }
+  }, [hasValue])
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setManualOpen(nextOpen)
+    if (nextOpen) {
+      setDependencyCollapsed(false)
+    }
+  }
+
+  const handleRemove = () => {
+    field.onChange('')
+    setManualOpen(false)
+    setDependencyCollapsed(false)
+  }
+
+  return (
+    <OptionalFieldDisclosure
+      controlId={id}
+      fieldLabel={config.label}
+      addLabel={disclosure.addLabel}
+      removeLabel={disclosure.removeLabel}
+      open={open}
+      onOpenChange={handleOpenChange}
+      onRemove={handleRemove}
+      size={size}
+    >
+      <TextSuggestionsField
+        id={id}
+        {...pickFieldChromeProps(config)}
+        label=""
+        ariaLabel={config.label}
+        suggestions={suggestions}
+        placeholder={config.placeholder}
+        hint={hintPresentation.text}
+        hintPosition={hintPresentation.position}
+        info={config.info}
+        required={config.required}
+        disabled={config.disabled}
+        size={size}
+        width={config.width}
+        value={field.value ?? fieldDefaultValue(config)}
+        onValueChange={field.onChange}
+        onBlur={field.onBlur}
+        {...validation}
       />
     </OptionalFieldDisclosure>
   )

@@ -1,4 +1,4 @@
-import { beforeAll, describe, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
 import { z } from 'zod'
@@ -28,7 +28,7 @@ const fields: FormItem[] = [
     type: 'textSuggestions',
     name: 'refinement',
     label: 'Refinement',
-    placeholder: 'Optional',
+    placeholder: 'Enter refinement…',
     suggestions: {
       dependsOn: ['driver'],
       suggestionsWhen: (values) =>
@@ -43,7 +43,22 @@ const fields: FormItem[] = [
 ]
 
 describe('Form textSuggestions field', () => {
-  it('submits free-text and suggestion-selected values', async () => {
+  it('renders as a plain textbox with inline suggestion actions', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ driver: 'inn' }}
+        onSubmit={() => {}}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Refinement' })).toBeInTheDocument()
+    expect(screen.getByText('Suggested')).toBeInTheDocument()
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('submits free-text and exact suggestion-selected values', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
 
@@ -57,10 +72,8 @@ describe('Form textSuggestions field', () => {
       />,
     )
 
-    const refinement = screen.getByRole('combobox', { name: 'Refinement' })
-    await user.click(refinement)
-    await user.click(screen.getByRole('option', { name: 'Coaching inn' }))
+    await user.click(screen.getByRole('button', { name: 'Coaching inn' }))
 
-    await submitAndExpectPayload(user, onSubmit, { refinement: 'Coaching inn', driver: 'inn' })
+    await submitAndExpectPayload(user, onSubmit, { refinement: 'coaching inn', driver: 'inn' })
   })
 })

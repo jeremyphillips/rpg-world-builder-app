@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import type { TextSuggestionsFieldConfig } from '@rpg/ui/form'
+
 import {
   buildBuildingArchetypeFieldOptions,
   BUILDING_FUNCTION_OVERRIDE_HINT,
@@ -13,6 +15,9 @@ import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
 } from './location-classification-form-fields'
+
+const BUILDING_SPECIALIZATION_HINT =
+  'Add a specialization when you want to describe a more specific kind of building.'
 
 type FormItemLike = ReturnType<typeof buildLocationClassificationFields>[number]
 
@@ -147,6 +152,7 @@ describe('buildLocationClassificationFields building UX', () => {
       type: 'combobox',
       multiple: false,
       placeholder: 'Search building archetypes…',
+      width: 'full',
       visibility: {
         dependsOn: ['authoringType'],
       },
@@ -158,21 +164,45 @@ describe('buildLocationClassificationFields building UX', () => {
     expect(archetypeField).not.toHaveProperty('hint')
   })
 
-  it('wires specialization as text-with-suggestions driven by archetype', () => {
+  it('wires specialization as an optional text-suggestions field gated on building and archetype', () => {
     const specializationField = fieldByName(
       buildLocationClassificationFields(),
       'classification.specialization',
-    )
+    ) as TextSuggestionsFieldConfig
     expect(specializationField).toMatchObject({
       type: 'textSuggestions',
-      placeholder: 'Optional',
+      placeholder: 'Enter specialization…',
+      hint: BUILDING_SPECIALIZATION_HINT,
       visibility: {
-        dependsOn: ['authoringType'],
+        dependsOn: ['authoringType', 'classification.archetype'],
       },
       suggestions: {
         dependsOn: ['classification.archetype'],
       },
+      optionalDisclosure: {
+        addLabel: 'Add specialization',
+        removeLabel: 'Remove specialization',
+      },
     })
+    expect(specializationField.suggestions).not.toHaveProperty('headingWhen')
+    expect(
+      specializationField.visibility?.visibleWhen?.({
+        authoringType: 'building',
+        'classification.archetype': 'inn',
+      }),
+    ).toBe(true)
+    expect(
+      specializationField.visibility?.visibleWhen?.({
+        authoringType: 'region',
+        'classification.archetype': 'inn',
+      }),
+    ).toBe(false)
+    expect(
+      specializationField.visibility?.visibleWhen?.({
+        authoringType: 'building',
+        'classification.archetype': undefined,
+      }),
+    ).toBe(false)
   })
 
   it('wires function override with dynamic options and hides when no choices remain', () => {

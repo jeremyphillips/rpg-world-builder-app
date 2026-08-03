@@ -1,24 +1,16 @@
 'use client'
 
 import * as React from 'react'
-import * as PopoverPrimitive from '@radix-ui/react-popover'
 
 import { cn } from '../../lib/utils'
-import { Field, type FieldSize } from './field.client'
+import { Field, FieldHintText } from './field.client'
 import { FieldLayout } from './field-layout'
-import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
-import { Input } from './input.client'
-import { ListboxOptionButton } from './listbox-option.client'
-import {
-  comboboxContentVariants,
-  comboboxEmptyVariants,
-  comboboxListVariants,
-} from './combobox-field.variants'
 import { FieldLabelContent } from './field-label-content'
-import { filterTextSuggestions, formatTextSuggestionLabel } from './text-suggestions-field.lib'
-
-const EMPTY_SUGGESTIONS_MESSAGE = 'No suggestions match your input.'
+import { fieldAnatomyStackClasses } from './field.variants'
+import { Input } from './input.client'
+import { TextSuggestionsActions } from './text-suggestions-field-parts.client'
+import { useTextSuggestionsField } from './text-suggestions-field.use.client'
 
 export interface TextSuggestionsFieldProps {
   id: string
@@ -27,19 +19,20 @@ export interface TextSuggestionsFieldProps {
   suggestions: readonly string[]
   onValueChange: (value: string | undefined) => void
   placeholder?: string
-  emptyMessage?: string
   error?: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
-  size?: FieldSize
-  width?: FieldWidth
+  size?: React.ComponentProps<typeof Field.Root>['size']
+  width?: React.ComponentProps<typeof Field.Root>['width']
   onBlur?: () => void
+  /** Used when the visible label is provided by a parent shell (e.g. optional disclosure). */
+  ariaLabel?: string
 }
 
-/** Text input with an optional suggestion list — free entry is always allowed. */
+/** Text input with optional inline advisory suggestions — free entry is always allowed. */
 export function TextSuggestionsField({
   id,
   label,
@@ -47,170 +40,60 @@ export function TextSuggestionsField({
   suggestions,
   onValueChange,
   placeholder,
-  emptyMessage = EMPTY_SUGGESTIONS_MESSAGE,
   error,
   hint,
-  hintPosition,
+  hintPosition: _hintPosition,
   info,
   required = false,
   disabled = false,
   size = 'md',
   width = 'full',
   onBlur,
+  ariaLabel,
 }: TextSuggestionsFieldProps) {
-  const listboxId = `${id}-listbox`
-  const [open, setOpen] = React.useState(false)
-  const [activeIndex, setActiveIndex] = React.useState(0)
-  const inputRef = React.useRef<HTMLInputElement>(null)
-
-  const displayValue = value ?? ''
-  const filteredSuggestions = React.useMemo(
-    () => filterTextSuggestions(suggestions, displayValue),
-    [displayValue, suggestions],
-  )
-  const showPanel = open && suggestions.length > 0
-  const highlightedIndex =
-    filteredSuggestions.length === 0 ? -1 : Math.min(activeIndex, filteredSuggestions.length - 1)
+  const hintId = `${id}-hint`
+  const field = useTextSuggestionsField({ value, onValueChange, onBlur })
   const hasError = Boolean(error)
-  const describedBy = hasError ? `${id}-error` : hint ? `${id}-hint` : undefined
-
-  function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen)
-    if (!nextOpen) {
-      setActiveIndex(0)
-      onBlur?.()
-    }
-  }
-
-  function selectSuggestion(nextValue: string) {
-    onValueChange(nextValue)
-    setOpen(false)
-    setActiveIndex(0)
-  }
-
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const nextValue = event.target.value
-    onValueChange(nextValue === '' ? undefined : nextValue)
-    setOpen(true)
-    setActiveIndex(0)
-  }
-
-  function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (!showPanel || filteredSuggestions.length === 0) {
-      if (event.key === 'Escape') setOpen(false)
-      return
-    }
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      setActiveIndex((index) => Math.min(index + 1, filteredSuggestions.length - 1))
-      return
-    }
-
-    if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      setActiveIndex((index) => Math.max(index - 1, 0))
-      return
-    }
-
-    if (event.key === 'Enter') {
-      const suggestion = filteredSuggestions[highlightedIndex]
-      if (suggestion) {
-        event.preventDefault()
-        selectSuggestion(formatTextSuggestionLabel(suggestion))
-      }
-      return
-    }
-
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      setOpen(false)
-    }
-  }
+  const showSuggestions = suggestions.length > 0 && !field.trimmedInput
+  const describedBy =
+    [hasError ? `${id}-error` : undefined, hint ? hintId : undefined].filter(Boolean).join(' ') ||
+    undefined
+  const inputAriaLabel = ariaLabel ?? (label.trim() ? label : undefined)
+  const showLabel = Boolean(label.trim())
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+    <Field.Root id={id} error={error} required={required} size={size} width={width}>
       <FieldLayout
-        hintPosition={hintPosition}
         label={
-          <Field.Label id={`${id}-label`} htmlFor={id}>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+          showLabel ? (
+            <Field.Label id={`${id}-label`} htmlFor={id}>
+              <FieldLabelContent label={label} info={info} />
+            </Field.Label>
+          ) : null
         }
         control={
-          <PopoverPrimitive.Root open={showPanel} onOpenChange={handleOpenChange}>
-            <PopoverPrimitive.Anchor asChild>
-              <Input
-                ref={inputRef}
-                id={id}
-                role="combobox"
-                aria-expanded={showPanel}
-                aria-controls={showPanel ? listboxId : undefined}
-                aria-autocomplete="list"
-                aria-haspopup="listbox"
-                size={size}
+          <div className={cn(fieldAnatomyStackClasses, 'gap-2')}>
+            <Input
+              id={id}
+              size={size}
+              disabled={disabled}
+              placeholder={placeholder}
+              value={field.displayValue}
+              aria-label={inputAriaLabel}
+              aria-invalid={hasError || undefined}
+              aria-describedby={describedBy}
+              onChange={field.handleInputChange}
+              onBlur={field.handleInputBlur}
+            />
+            {hint ? <FieldHintText id={hintId}>{hint}</FieldHintText> : null}
+            {showSuggestions ? (
+              <TextSuggestionsActions
+                suggestions={suggestions}
                 disabled={disabled}
-                placeholder={placeholder}
-                value={displayValue}
-                aria-invalid={hasError || undefined}
-                aria-describedby={describedBy}
-                onChange={handleInputChange}
-                onFocus={() => {
-                  if (suggestions.length > 0) setOpen(true)
-                }}
-                onKeyDown={handleInputKeyDown}
-                onBlur={() => {
-                  window.setTimeout(() => {
-                    if (!inputRef.current?.matches(':focus')) {
-                      handleOpenChange(false)
-                    }
-                  }, 0)
-                }}
+                onSelect={field.handleSuggestionSelect}
               />
-            </PopoverPrimitive.Anchor>
-
-            <PopoverPrimitive.Portal>
-              <PopoverPrimitive.Content
-                align="start"
-                side="bottom"
-                avoidCollisions
-                sideOffset={4}
-                onOpenAutoFocus={(event) => event.preventDefault()}
-                onInteractOutside={(event) => {
-                  if (inputRef.current?.contains(event.target as Node)) {
-                    event.preventDefault()
-                  }
-                }}
-                className={cn(comboboxContentVariants(), 'w-[var(--radix-popover-trigger-width)]')}
-              >
-                <div
-                  id={listboxId}
-                  role="listbox"
-                  aria-label={`${label} suggestions`}
-                  className={comboboxListVariants()}
-                >
-                  {filteredSuggestions.length > 0 ? (
-                    filteredSuggestions.map((suggestion, index) => {
-                      const formatted = formatTextSuggestionLabel(suggestion)
-                      const isSelected = displayValue.trim().toLowerCase() === suggestion
-                      return (
-                        <ListboxOptionButton
-                          key={suggestion}
-                          option={{ label: formatted, value: suggestion }}
-                          isSelected={isSelected}
-                          isHighlighted={index === highlightedIndex}
-                          onHighlight={() => setActiveIndex(index)}
-                          onSelect={() => selectSuggestion(formatted)}
-                        />
-                      )
-                    })
-                  ) : (
-                    <p className={comboboxEmptyVariants()}>{emptyMessage}</p>
-                  )}
-                </div>
-              </PopoverPrimitive.Content>
-            </PopoverPrimitive.Portal>
-          </PopoverPrimitive.Root>
+            ) : null}
+          </div>
         }
       />
     </Field.Root>

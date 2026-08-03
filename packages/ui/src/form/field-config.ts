@@ -304,7 +304,13 @@ interface BaseFieldConfig {
 }
 
 /** Field kinds that may use `optionalDisclosure`. */
-export const OPTIONAL_DISCLOSURE_FIELD_KINDS = ['text', 'textarea', 'richtext', 'select'] as const
+export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
+  'text',
+  'textSuggestions',
+  'textarea',
+  'richtext',
+  'select',
+] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
 /** Collapse empty optional fields behind an add control (textarea and select). */
@@ -328,9 +334,9 @@ export interface TextFieldConfig extends BaseFieldConfig {
 export interface TextSuggestionsFieldConfig extends BaseFieldConfig {
   type: 'textSuggestions'
   placeholder?: string
-  emptyMessage?: string
   defaultValue?: string
   suggestions: FieldDynamicSuggestions
+  optionalDisclosure?: OptionalDisclosureConfig
 }
 
 export interface NumberFieldConfig extends BaseFieldConfig {

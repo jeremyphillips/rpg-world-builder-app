@@ -6,9 +6,23 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { TextSuggestionsField } from './text-suggestions-field.client'
 
+const INN_SUGGESTIONS = ['coaching inn', 'roadside inn', 'ferry house'] as const
+const SHOP_SUGGESTIONS = [
+  'bakery',
+  'butcher',
+  'chandler',
+  'cobbler',
+  'general store',
+  'jeweler',
+  'magic shop',
+  'pawnshop',
+  'tailor',
+] as const
+
 function ControlledSpecialization(props: {
   initialValue?: string
   suggestions: readonly string[]
+  hint?: string
 }) {
   const [value, setValue] = React.useState(props.initialValue)
   return (
@@ -17,13 +31,15 @@ function ControlledSpecialization(props: {
       label="Specialization"
       value={value}
       suggestions={props.suggestions}
+      hint={props.hint}
+      placeholder="Enter specialization…"
       onValueChange={setValue}
     />
   )
 }
 
 describe('TextSuggestionsField', () => {
-  it('associates the label with the combobox input', () => {
+  it('renders as a plain text input with or without suggestions', () => {
     render(
       <TextSuggestionsField
         id="specialization"
@@ -33,22 +49,34 @@ describe('TextSuggestionsField', () => {
         onValueChange={() => {}}
       />,
     )
-    expect(screen.getByRole('combobox', { name: 'Specialization' })).toHaveAttribute(
-      'id',
-      'specialization',
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Specialization' })).toBeInTheDocument()
+  })
+
+  it('does not render chevron or listbox affordances', () => {
+    const { container } = render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={['coaching inn']}
+        onValueChange={() => {}}
+      />,
     )
+    expect(container.querySelector('.lucide-chevron-down')).not.toBeInTheDocument()
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 
   it('allows free text entry without forcing a suggestion', async () => {
     const user = userEvent.setup()
     render(<ControlledSpecialization suggestions={['coaching inn']} />)
 
-    const input = screen.getByRole('combobox', { name: 'Specialization' })
+    const input = screen.getByRole('textbox', { name: 'Specialization' })
     await user.type(input, 'Custom refinement')
     expect(input).toHaveValue('Custom refinement')
   })
 
-  it('fills the value when a suggestion is selected', async () => {
+  it('persists the exact registry term when a suggestion is clicked', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
     render(
@@ -61,9 +89,117 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    await user.click(screen.getByRole('combobox', { name: 'Specialization' }))
-    await user.click(screen.getByRole('option', { name: 'Coaching inn' }))
-    expect(onValueChange).toHaveBeenCalledWith('Coaching inn')
+    await user.click(screen.getByRole('button', { name: 'Coaching inn' }))
+    expect(onValueChange).toHaveBeenCalledWith('coaching inn')
+  })
+
+  it('shows one inline suggestion action without dropdown UI', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={['planar embassy']}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getByText('Suggested')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Planar embassy' })).toBeInTheDocument()
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+  })
+
+  it('shows all suggestions inline for small and large sets', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={INN_SUGGESTIONS}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Coaching inn' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Roadside inn' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Ferry house' })).toBeInTheDocument()
+  })
+
+  it('wraps six or more suggestions inline without search UI', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={SHOP_SUGGESTIONS}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getAllByRole('button')).toHaveLength(SHOP_SUGGESTIONS.length)
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  })
+
+  it('does not render an empty Suggested region when there are no terms', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={[]}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+  })
+
+  it('hides suggestions when the value is non-empty and restores them when cleared', async () => {
+    const user = userEvent.setup()
+    render(<ControlledSpecialization suggestions={INN_SUGGESTIONS} />)
+
+    const input = screen.getByRole('textbox', { name: 'Specialization' })
+    expect(screen.getByText('Suggested')).toBeInTheDocument()
+
+    await user.type(input, 'Custom')
+    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+
+    await user.clear(input)
+    expect(screen.getByText('Suggested')).toBeInTheDocument()
+  })
+
+  it('hydrates persisted custom values unchanged and hides suggestions', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value="Harbor inn"
+        suggestions={INN_SUGGESTIONS}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveValue('Harbor inn')
+    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+  })
+
+  it('renders hint above the Suggested row', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        hint="Add a specialization when you want to describe a more specific kind of building."
+        suggestions={INN_SUGGESTIONS}
+        onValueChange={() => {}}
+      />,
+    )
+
+    const hint = screen.getByText(
+      'Add a specialization when you want to describe a more specific kind of building.',
+    )
+    const suggested = screen.getByText('Suggested')
+    expect(hint.compareDocumentPosition(suggested)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
   it('passes axe checks', async () => {
@@ -71,8 +207,9 @@ describe('TextSuggestionsField', () => {
       <TextSuggestionsField
         id="specialization"
         label="Specialization"
-        value="Sea temple"
-        suggestions={['sea temple', 'funerary temple']}
+        value=""
+        hint="Add a specialization when you want to describe a more specific kind of building."
+        suggestions={INN_SUGGESTIONS}
         onValueChange={() => {}}
       />,
     )
