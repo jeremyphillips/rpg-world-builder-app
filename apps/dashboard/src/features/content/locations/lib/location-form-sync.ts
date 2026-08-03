@@ -84,6 +84,13 @@ function syncBuildingArchetypeChange(
   return Object.keys(patch).length > 0 ? classificationPatch(values, patch) : undefined
 }
 
+/** Clears specialization and function override when the building archetype changes. */
+export function applyBuildingArchetypeValueSync(
+  values: Record<string, unknown>,
+): Partial<Record<string, unknown>> | undefined {
+  return syncBuildingArchetypeChange(values)
+}
+
 function syncRegionClassificationKindChange(
   values: Record<string, unknown>,
 ): Partial<Record<string, unknown>> | undefined {

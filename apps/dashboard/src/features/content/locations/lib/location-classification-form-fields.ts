@@ -1,8 +1,4 @@
 import {
-  BUILDING_ARCHETYPE_ENTRIES,
-  BUILDING_ARCHETYPE_IDS,
-  BUILDING_FUNCTION_FAMILY_ENTRIES,
-  BUILDING_FUNCTION_FAMILY_IDS,
   getRegionTypeIds,
   getRegionTypeLabelForKind,
   INTERIOR_TYPE_DEFINITIONS,
@@ -17,9 +13,16 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption, FieldOptionAvailability, FormItem } from '@rpg/ui/form'
 
+import {
+  buildBuildingArchetypeFieldOptions,
+  buildBuildingFunctionOverrideFieldOptions,
+  formatBuildingArchetypeTypicalUsesHint,
+  formatBuildingFunctionOverrideHint,
+} from './building-archetype-form-options'
 import { visibleForLocationKind } from './location-display'
 
 const SELECT_PLACEHOLDER = 'Select…'
+const BUILDING_ARCHETYPE_PLACEHOLDER = 'Search building archetypes…'
 
 function entriesToFieldOptions<T extends string>(
   ids: readonly T[],
@@ -45,15 +48,18 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
   })),
 )
 
-const buildingArchetypeOptions = entriesToFieldOptions(
-  BUILDING_ARCHETYPE_IDS,
-  BUILDING_ARCHETYPE_ENTRIES,
-)
+const buildingArchetypeOptions = buildBuildingArchetypeFieldOptions()
+const buildingFunctionOverrideOptions = buildBuildingFunctionOverrideFieldOptions()
 
-const buildingFunctionOverrideOptions = entriesToFieldOptions(
-  BUILDING_FUNCTION_FAMILY_IDS,
-  BUILDING_FUNCTION_FAMILY_ENTRIES,
-)
+const buildingArchetypeTypicalUsesHint = {
+  dependsOn: ['classification.archetype'],
+  hintWhen: formatBuildingArchetypeTypicalUsesHint,
+}
+
+const buildingFunctionOverrideDynamicHint = {
+  dependsOn: ['classification.archetype'],
+  hintWhen: formatBuildingFunctionOverrideHint,
+}
 
 const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interiorType) =>
   entriesToFieldOptions(
@@ -144,12 +150,14 @@ export function buildLocationClassificationFields(): FormItem[] {
       visibility: visibleForLocationKind('structure'),
     },
     {
-      type: 'select',
+      type: 'combobox',
       name: 'classification.archetype',
       label: 'Archetype',
       options: buildingArchetypeOptions,
-      placeholder: SELECT_PLACEHOLDER,
+      multiple: false,
+      placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
       visibility: visibleForStructureType('building'),
+      hint: { resolve: buildingArchetypeTypicalUsesHint },
     },
     {
       type: 'text',
@@ -170,6 +178,7 @@ export function buildLocationClassificationFields(): FormItem[] {
           label: 'Function override',
           options: buildingFunctionOverrideOptions,
           placeholder: 'Use archetype defaults',
+          hint: { resolve: buildingFunctionOverrideDynamicHint },
         },
       ],
     },

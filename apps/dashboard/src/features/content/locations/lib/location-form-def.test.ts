@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { createLocationInputSchema, type CreateLocationInput } from '@rpg/contracts'
 
-import { WATERDEEP } from '../fixtures'
+import { WATERDEEP, YAWNING_PORTAL } from '../fixtures'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormValues } from './location-form-fields'
 
@@ -19,6 +19,17 @@ describe('locationFormDef', () => {
       expect(input.settlementType).toBe('city')
     }
     expect(input.parentLocationId).toBe(WATERDEEP.parentLocationId)
+  })
+
+  it('round-trips building classification into a publish input', () => {
+    const values = locationFormDef.toFormValues(YAWNING_PORTAL) as LocationFormValues
+    const input = locationFormDef.toInput(values)
+    expect(() => createLocationInputSchema.parse(input)).not.toThrow()
+    expect(input.kind).toBe('structure')
+    if (input.kind === 'structure') {
+      expect(input.structureType).toBe('building')
+      expect(input.classification).toEqual({ archetype: 'tavern' })
+    }
   })
 
   it('allows incomplete drafts without parent or subtype fields', () => {

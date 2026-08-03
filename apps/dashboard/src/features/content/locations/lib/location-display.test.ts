@@ -75,6 +75,16 @@ describe('buildLocationDetailViewModel', () => {
     expect(viewModel.children.items.map((child) => child.name)).toEqual(['Dock Ward'])
   })
 
+  it('shows building archetype classification in the subtype row', () => {
+    const viewModel = buildLocationDetailViewModel(YAWNING_PORTAL, {
+      locations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(viewModel.statRows.map((row) => row.label)).toEqual(['Kind', 'Subtype', 'Parent'])
+    expect(viewModel.statRows[1]?.value).toBe('Building · Tavern')
+  })
+
   it('omits subtype row when unset', () => {
     const viewModel = buildLocationDetailViewModel(DOCK_WARD, {
       locations: LOCATIONS_LIST,
