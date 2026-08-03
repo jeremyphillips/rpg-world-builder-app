@@ -20,6 +20,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     description: 'A building primarily serving dwelling.',
     functions: ['dwelling', 'governance'],
     searchTerms: ['estate', 'landowner', 'gentry'],
+    specializationTerms: ['dower house', 'hunting lodge wing'],
   },
   market: {
     label: 'Market',
@@ -69,6 +70,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     description: 'A building primarily serving mechanical processing.',
     functions: ['production'],
     searchTerms: ['grinding', 'flour', 'waterwheel'],
+    specializationTerms: ['fulling mill', 'watermill', 'windmill'],
   },
   mint: {
     label: 'Mint',
@@ -138,6 +140,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     description: 'A grand residence of a ruler or noble house.',
     functions: ['dwelling', 'governance'],
     searchTerms: ['royal', 'ruler', 'noble'],
+    specializationTerms: ['summer palace', 'winter palace'],
   },
   paladin_chapterhouse: {
     label: 'Paladin Chapterhouse',
@@ -169,5 +172,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_M_P = {
     functions: ['governance'],
     aliases: ['jail', 'gaol'],
     searchTerms: ['detention', 'incarceration', 'cells'],
+    specializationTerms: ['mage prison', 'workhouse'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

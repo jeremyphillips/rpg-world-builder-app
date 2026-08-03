@@ -19,6 +19,7 @@ import {
   formatBuildingArchetypeTypicalUsesHint,
   formatBuildingFunctionOverrideHint,
 } from './building-archetype-form-options'
+import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
 import { visibleForLocationKind } from './location-display'
 
 const SELECT_PLACEHOLDER = 'Select…'
@@ -59,6 +60,11 @@ const buildingArchetypeTypicalUsesHint = {
 const buildingFunctionOverrideDynamicHint = {
   dependsOn: ['classification.archetype'],
   hintWhen: formatBuildingFunctionOverrideHint,
+}
+
+const buildingSpecializationSuggestions = {
+  dependsOn: ['classification.archetype'],
+  suggestionsWhen: resolveBuildingSpecializationSuggestions,
 }
 
 const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interiorType) =>
@@ -160,10 +166,11 @@ export function buildLocationClassificationFields(): FormItem[] {
       hint: { resolve: buildingArchetypeTypicalUsesHint },
     },
     {
-      type: 'text',
+      type: 'textSuggestions',
       name: 'classification.specialization',
       label: 'Specialization',
       placeholder: 'Optional',
+      suggestions: buildingSpecializationSuggestions,
       visibility: visibleForStructureType('building'),
     },
     {

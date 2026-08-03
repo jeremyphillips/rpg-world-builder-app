@@ -7,6 +7,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_U_Z = {
     functions: ['storage'],
     aliases: ['storehouse'],
     searchTerms: ['storage', 'goods', 'cargo'],
+    specializationTerms: ['icehouse', 'silo', 'bonded warehouse'],
   },
   washhouse: {
     label: 'Washhouse',
@@ -37,5 +38,11 @@ export const BUILDING_ARCHETYPE_ENTRIES_U_Z = {
     description: 'A building primarily serving residence.',
     functions: ['dwelling', 'knowledge'],
     searchTerms: ['magic', 'wizard', 'arcane'],
+    specializationTerms: [
+      'divination parlor',
+      'enchanting hall',
+      'portal chamber',
+      'summoning hall',
+    ],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

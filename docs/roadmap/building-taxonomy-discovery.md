@@ -1070,3 +1070,42 @@ caravanserai/caravan.
 
 Dashboard combobox ranking implements Model E precedence: label exact → label
 prefix → alias → manifestation parent label → function label → search term.
+
+## Editorial appendix — Phase 8 specialization vocabulary (2026-08-03)
+
+Phase 8 added registry-owned `specializationTerms` on archetype entries plus
+`getBuildingSpecializationTerms()` for projection. Curation applied Phase 6
+disposition triage with admission rules: instance refinements only (coaching
+inn, summer palace, bonded warehouse, sea temple); rejected conditions (hovel,
+shipwreck dwelling), affiliations without identity-bearing refinement, and
+cultural manifestations (those remain `manifestationOf` archetypes).
+
+**Curation counts (129 registry entries):**
+
+| Field                 | Entries with values |
+| --------------------- | ------------------- |
+| `specializationTerms` | 32                  |
+| Total suggestions     | 89                  |
+
+Parent mapping resolved Phase 6 placeholder `of: 'n'` dispositions to canonical
+archetypes (e.g. bakery/butcher/tailor → shop; baptistery/cathedral → temple;
+watermill/windmill → mill). Plan exemplars added where corpus gaps remained:
+inn/roadside inn, palace/summer palace/winter palace, warehouse/bonded warehouse,
+temple/sea temple/funerary temple.
+
+Dashboard specialization authoring uses `@rpg/ui` `textSuggestions` — free text
+with archetype-driven registry suggestions; changing archetype still clears
+specialization via existing form sync.
+
+## Editorial appendix — Phase 9 overview filters and docs (2026-08-03)
+
+Locations overview exposes Model E semantics beyond the authoring combobox:
+
+| Surface          | Implementation                                                                                                               |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Name search      | `getLocationOverviewSearchText()` — name + archetype label, specialization, aliases, search terms, effective function labels |
+| Archetype filter | Exact `classification.archetype` equality                                                                                    |
+| Function filter  | Membership via `getEffectiveBuildingFunctions()` (override-aware)                                                            |
+
+Plain-language explainer and worked examples:
+[`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).

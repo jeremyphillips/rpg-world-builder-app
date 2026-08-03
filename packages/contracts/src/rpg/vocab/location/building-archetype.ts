@@ -12,6 +12,17 @@
  * searchTerms with the manifestation's own searchTerms (deduplicated). Dashboard
  * search and ranking consume the composed terms — never manually repeat root
  * discovery vocabulary on manifestation rows.
+ *
+ * ## Specialization admission rules (Phase 8)
+ *
+ * `specializationTerms` are registry-owned optional refinements for free-text
+ * `classification.specialization`. A suggestion must be an archetype-specific,
+ * commonly useful instance refinement (coaching inn, summer palace, bonded
+ * warehouse, sea temple). Rejected categories: conditions (ruined), affiliations
+ * (royal — unless identity-bearing like summer palace), cultural manifestations
+ * (use `manifestationOf` archetypes), and arbitrary adjectives (large, old).
+ * Terms are lowercase, trimmed, and deduplicated; they must not duplicate the
+ * entry label, aliases, or searchTerms.
  */
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
@@ -36,6 +47,7 @@ type BuildingArchetypeEntry = GameTermEntry & {
   readonly manifestationOf?: string
   readonly aliases?: readonly string[]
   readonly searchTerms?: readonly string[]
+  readonly specializationTerms?: readonly string[]
 }
 
 export const BUILDING_ARCHETYPE_ENTRIES = {
@@ -109,6 +121,14 @@ export function getBuildingArchetypeAliases(archetype: BuildingArchetype): reado
 export function getBuildingArchetypeSearchTerms(archetype: BuildingArchetype): readonly string[] {
   const entry = BUILDING_ARCHETYPE_ENTRIES[archetype]
   return 'searchTerms' in entry && entry.searchTerms ? entry.searchTerms : []
+}
+
+/** Returns curated specialization suggestions for an archetype (registry-owned). */
+export function getBuildingSpecializationTerms(archetype: BuildingArchetype): readonly string[] {
+  const entry = BUILDING_ARCHETYPE_ENTRIES[archetype]
+  return 'specializationTerms' in entry && entry.specializationTerms
+    ? entry.specializationTerms
+    : []
 }
 
 /**

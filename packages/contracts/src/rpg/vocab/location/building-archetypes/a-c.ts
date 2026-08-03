@@ -6,6 +6,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving education (advanced).',
     functions: ['knowledge'],
     searchTerms: ['education', 'school', 'learning'],
+    specializationTerms: ['bardic college', 'schoolhouse'],
   },
   adventurers_guild: {
     label: 'Adventurers Guild',
@@ -32,6 +33,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     functions: ['retail', 'care'],
     aliases: ['pharmacy'],
     searchTerms: ['remedies', 'potions', 'medicine'],
+    specializationTerms: ['barber surgeon', 'potion shop'],
   },
   archive: {
     label: 'Archive',
@@ -44,12 +46,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving spectacle games.',
     functions: ['spectacle'],
     searchTerms: ['combat', 'games', 'spectacle'],
+    specializationTerms: ['amphitheater', 'fighting pit'],
   },
   armory: {
     label: 'Armory',
     description: 'A building primarily serving arms storage/maintenance.',
     functions: ['storage', 'defense_watch'],
     searchTerms: ['weapons', 'arms', 'armor'],
+    specializationTerms: ['powder magazine'],
   },
   arsenal: {
     label: 'Arsenal',
@@ -80,12 +84,22 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving finance (deposit/lend).',
     functions: ['finance'],
     searchTerms: ['finance', 'money', 'deposit'],
+    specializationTerms: ['counting house', 'moneylender'],
   },
   barn: {
     label: 'Barn',
     description: 'A building primarily serving farm storage.',
     functions: ['service', 'storage'],
     searchTerms: ['farm', 'livestock', 'storage'],
+    specializationTerms: [
+      'boathouse',
+      'byre',
+      'dovecote',
+      'shearing shed',
+      'threshing barn',
+      'tithe barn',
+      'well house',
+    ],
   },
   barracks: {
     label: 'Barracks',
@@ -124,6 +138,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     functions: ['service'],
     aliases: ['smithy', 'forge'],
     searchTerms: ['metal', 'ironwork', 'smithing'],
+    specializationTerms: ['artificer atelier', 'wheelwright'],
   },
   blockhouse: {
     label: 'Blockhouse',
@@ -136,12 +151,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving lodging (residential-term).',
     functions: ['lodging'],
     searchTerms: ['lodging', 'roomers', 'residential'],
+    specializationTerms: ['flophouse', 'residential lodging house'],
   },
   brewery: {
     label: 'Brewery',
     description: 'A building primarily serving beverage production.',
     functions: ['production'],
     searchTerms: ['beer', 'ale', 'brewing'],
+    specializationTerms: ['distillery', 'malt house', 'oast house'],
   },
   brickworks: {
     label: 'Brickworks',
@@ -161,6 +178,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving commercial sex.',
     functions: ['service'],
     searchTerms: ['pleasure', 'courtesan', 'entertainment'],
+    specializationTerms: ['opium den'],
   },
   caravanserai: {
     label: 'Caravanserai',
@@ -223,5 +241,6 @@ export const BUILDING_ARCHETYPE_ENTRIES_A_C = {
     description: 'A building primarily serving trade inspection.',
     functions: ['governance', 'retail'],
     searchTerms: ['trade', 'tariff', 'inspection'],
+    specializationTerms: ['harbourmaster office', 'tollhouse'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

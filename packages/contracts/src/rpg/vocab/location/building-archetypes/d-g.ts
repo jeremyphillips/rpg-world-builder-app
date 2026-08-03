@@ -20,6 +20,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'A building primarily serving diplomatic mission.',
     functions: ['service'],
     searchTerms: ['diplomatic', 'ambassador', 'mission'],
+    specializationTerms: ['planar embassy'],
   },
   exchange: {
     label: 'Exchange',
@@ -32,6 +33,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'A building primarily serving mass manufacturing.',
     functions: ['production'],
     searchTerms: ['manufacturing', 'industry', 'production'],
+    specializationTerms: ['cooperage', 'dyeworks', 'foundry', 'golem workshop', 'ropewalk'],
   },
   festhall: {
     label: 'Festhall',
@@ -39,6 +41,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     functions: ['food_drink_social'],
     aliases: ['feast hall'],
     searchTerms: ['feasting', 'revelry', 'banquet'],
+    specializationTerms: ['banqueting house'],
   },
   folly: {
     label: 'Folly',
@@ -95,17 +98,20 @@ export const BUILDING_ARCHETYPE_ENTRIES_D_G = {
     description: 'A building primarily serving protected cultivation.',
     functions: ['service'],
     searchTerms: ['plants', 'cultivation', 'garden'],
+    specializationTerms: ['orangery'],
   },
   guard_post: {
     label: 'Guard Post',
     description: 'A building primarily serving watch/public order.',
     functions: ['defense_watch'],
     searchTerms: ['guard', 'watch', 'patrol'],
+    specializationTerms: ['ranger station'],
   },
   guildhall: {
     label: 'Guildhall',
     description: 'The headquarters of a craft or trade guild.',
     functions: ['assembly', 'governance'],
     searchTerms: ['guild', 'craft', 'trade'],
+    specializationTerms: ['bounty office'],
   },
 } as const satisfies Record<string, BuildingArchetypeShardEntry>

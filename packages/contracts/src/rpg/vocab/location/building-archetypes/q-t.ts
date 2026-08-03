@@ -45,6 +45,17 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving retail (general).',
     functions: ['retail'],
     searchTerms: ['merchant', 'retail', 'store'],
+    specializationTerms: [
+      'bakery',
+      'butcher',
+      'chandler',
+      'cobbler',
+      'general store',
+      'jeweler',
+      'magic shop',
+      'pawnshop',
+      'tailor',
+    ],
   },
   siheyuan: {
     label: 'Siheyuan',
@@ -58,12 +69,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving animal processing.',
     functions: ['production'],
     searchTerms: ['butchery', 'meat', 'processing'],
+    specializationTerms: ['smokehouse'],
   },
   stable: {
     label: 'Stable',
     description: 'A building for housing and caring for mounts.',
     functions: ['service'],
     searchTerms: ['horses', 'mounts', 'livery'],
+    specializationTerms: ['beast stable', 'coach house', 'griffon aerie', 'kennel'],
   },
   stave_church: {
     label: 'Stave Church',
@@ -111,6 +124,14 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A religious or ceremonial structure.',
     functions: ['worship'],
     searchTerms: ['worship', 'prayer', 'sacred'],
+    specializationTerms: [
+      'baptistery',
+      'cathedral',
+      'oracle shrine',
+      'temple infirmary',
+      'sea temple',
+      'funerary temple',
+    ],
   },
   tenement: {
     label: 'Tenement',
@@ -123,6 +144,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving staged performance.',
     functions: ['spectacle'],
     searchTerms: ['performance', 'stage', 'drama'],
+    specializationTerms: ['odeon'],
   },
   tholos: {
     label: 'Tholos',
@@ -143,6 +165,7 @@ export const BUILDING_ARCHETYPE_ENTRIES_Q_T = {
     description: 'A building primarily serving (varies by occupant).',
     functions: ['service'],
     searchTerms: ['tall', 'fortified', 'observation'],
+    specializationTerms: ['clock tower'],
   },
   town_hall: {
     label: 'Town Hall',

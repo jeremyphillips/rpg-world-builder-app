@@ -28,12 +28,14 @@ import { normalizeFieldHint } from '../field-config'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import { OptionalDisclosureTextareaFieldRenderer } from './fields/optional-disclosure-field-renderer.client'
 import { SelectFieldRenderer } from './fields/select-field-renderer.client'
+import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {
   FieldConfig,
   FieldType,
   InputSelectFieldConfig,
   SelectFieldConfig,
+  TextSuggestionsFieldConfig,
   InlineSentenceFieldConfig,
   InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
@@ -113,6 +115,7 @@ const fieldRenderers: {
     | 'chooseFromChips'
     | 'inputUnit'
     | 'rollValue'
+    | 'textSuggestions'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
   text: ({ config, field, id, hint, hintPosition, ...validation }) => (
@@ -463,6 +466,17 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     )
   }
 
+  if (config.type === 'textSuggestions') {
+    return (
+      <TextSuggestionsFieldRenderer
+        config={config}
+        fullName={fullName}
+        id={id}
+        namePrefix={namePrefix}
+      />
+    )
+  }
+
   return (
     <StandardFieldRenderer
       config={config}
@@ -480,6 +494,7 @@ type StandardFieldConfig = Exclude<
   FieldConfig,
   | InputSelectFieldConfig
   | SelectFieldConfig
+  | TextSuggestionsFieldConfig
   | LevelRangeFieldConfig
   | InlineSentenceFieldConfig
   | InlineChooseCountFieldConfig

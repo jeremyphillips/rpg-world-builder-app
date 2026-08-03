@@ -20,6 +20,7 @@ function isMultiChoice(field: ChipsFieldConfig | ComboboxFieldConfig): boolean {
 /** Static category per field type; chips/combobox/inputSelect refine on config below. */
 const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   text: 'text',
+  textSuggestions: 'text',
   textarea: 'text',
   markdown: 'text',
   richtext: 'text',

@@ -167,6 +167,10 @@ export {
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
+export {
+  TextSuggestionsField,
+  type TextSuggestionsFieldProps,
+} from './components/ui/text-suggestions-field.client'
 export { TextareaField, type TextareaFieldProps } from './components/ui/textarea-field'
 export {
   OptionalFieldDisclosure,

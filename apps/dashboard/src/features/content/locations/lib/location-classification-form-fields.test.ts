@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ComboboxFieldConfig, GroupConfig } from '@rpg/ui/form'
+import type { ComboboxFieldConfig, GroupConfig, TextSuggestionsFieldConfig } from '@rpg/ui/form'
 
 import {
   buildBuildingArchetypeFieldOptions,
@@ -99,6 +99,22 @@ describe('buildLocationClassificationFields building UX', () => {
         resolve: {
           dependsOn: ['classification.archetype'],
         },
+      },
+    })
+  })
+
+  it('wires specialization as text-with-suggestions driven by archetype', () => {
+    const specializationField = fieldByName(
+      'classification.specialization',
+    ) as TextSuggestionsFieldConfig
+    expect(specializationField).toMatchObject({
+      type: 'textSuggestions',
+      placeholder: 'Optional',
+      visibility: {
+        dependsOn: ['kind', 'structureType'],
+      },
+      suggestions: {
+        dependsOn: ['classification.archetype'],
       },
     })
   })

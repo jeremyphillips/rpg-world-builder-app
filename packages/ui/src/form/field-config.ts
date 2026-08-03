@@ -64,6 +64,7 @@ export type { FieldChrome } from '../components/ui/field-chrome.variants'
 /** The set of control types the schema-driven `<Form>` renderer can render. */
 export type FieldType =
   | 'text'
+  | 'textSuggestions'
   | 'number'
   | 'textarea'
   | 'select'
@@ -191,6 +192,12 @@ export interface FieldDynamicHint {
   hintWhen: (values: Record<string, unknown>) => string | undefined
 }
 
+/** Resolves suggestion strings from watched form values (e.g. archetype-driven vocab). */
+export interface FieldDynamicSuggestions {
+  dependsOn: readonly string[]
+  suggestionsWhen: (values: Record<string, unknown>) => readonly string[]
+}
+
 /** Static and dynamic hint configuration on leaf fields. */
 export interface FieldHintConfig {
   text?: string
@@ -285,6 +292,14 @@ export interface TextFieldConfig extends BaseFieldConfig {
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
   autoComplete?: string
   defaultValue?: string
+}
+
+export interface TextSuggestionsFieldConfig extends BaseFieldConfig {
+  type: 'textSuggestions'
+  placeholder?: string
+  emptyMessage?: string
+  defaultValue?: string
+  suggestions: FieldDynamicSuggestions
 }
 
 export interface NumberFieldConfig extends BaseFieldConfig {
@@ -767,6 +782,7 @@ export interface InputUnitFieldConfig extends BaseFieldConfig {
  */
 export type FieldConfig =
   | TextFieldConfig
+  | TextSuggestionsFieldConfig
   | NumberFieldConfig
   | TextareaFieldConfig
   | SelectFieldConfig
@@ -1175,6 +1191,7 @@ export function buildItemDefaultValues(itemFields: FormItem[]): Record<string, u
  */
 const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   text: '',
+  textSuggestions: '',
   number: undefined,
   textarea: '',
   select: '',

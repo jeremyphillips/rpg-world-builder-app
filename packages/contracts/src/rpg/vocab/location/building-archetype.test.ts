@@ -19,6 +19,7 @@ import {
   getBuildingArchetypeDiscoveryTerms,
   getBuildingArchetypeSearchTerms,
   getBuildingManifestationRoot,
+  getBuildingSpecializationTerms,
   type BuildingArchetype,
 } from './building-archetype'
 
@@ -149,6 +150,46 @@ describe('building archetype registry integrity', () => {
     const terms = getBuildingArchetypeDiscoveryTerms('caravanserai')
     expect(terms).toEqual(expect.arrayContaining(['caravan', 'traveler', 'inn']))
     expect(terms.indexOf('caravan')).toBeLessThan(terms.indexOf('inn'))
+  })
+
+  it('normalizes specializationTerms to lowercase trimmed deduplicated values', () => {
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      if (!('specializationTerms' in entry) || !entry.specializationTerms) continue
+
+      expect(entry.specializationTerms).toEqual(normalizeTerms(entry.specializationTerms))
+      for (const term of entry.specializationTerms) {
+        expect(term).toBe(term.trim().toLowerCase())
+      }
+    }
+  })
+
+  it('keeps specializationTerms distinct from label, aliases, and searchTerms', () => {
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      const label = entry.label.trim().toLowerCase()
+      const aliases = normalizeTerms(getBuildingArchetypeAliases(id))
+      const searchTerms = normalizeTerms(getBuildingArchetypeSearchTerms(id))
+      const specializationTerms = normalizeTerms(getBuildingSpecializationTerms(id))
+
+      for (const term of specializationTerms) {
+        expect(term).not.toBe(label)
+        expect(aliases).not.toContain(term)
+        expect(searchTerms).not.toContain(term)
+      }
+    }
+  })
+
+  it('exposes registry specialization suggestions via getBuildingSpecializationTerms', () => {
+    expect(getBuildingSpecializationTerms('inn')).toEqual(
+      expect.arrayContaining(['ferry house', 'roadside inn']),
+    )
+    expect(getBuildingSpecializationTerms('temple')).toEqual(
+      expect.arrayContaining(['cathedral', 'sea temple', 'funerary temple']),
+    )
+    expect(getBuildingSpecializationTerms('warehouse')).toEqual(
+      expect.arrayContaining(['bonded warehouse', 'icehouse', 'silo']),
+    )
   })
 
   it('keeps shard ids disjoint with composed count matching shard sum', () => {
