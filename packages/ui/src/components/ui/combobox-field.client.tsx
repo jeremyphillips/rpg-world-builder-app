@@ -66,7 +66,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
   const control = useComboboxControl(props)
 
   return (
-    <div className="space-y-0">
+    <div className="w-full min-w-0 space-y-0">
       <PopoverPrimitive.Root open={control.open} onOpenChange={control.handleOpenChange}>
         <ComboboxTrigger
           listboxId={control.listboxId}

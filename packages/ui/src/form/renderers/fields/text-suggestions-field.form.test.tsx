@@ -54,7 +54,7 @@ describe('Form textSuggestions field', () => {
     )
 
     expect(screen.getByRole('textbox', { name: 'Refinement' })).toBeInTheDocument()
-    expect(screen.getByText('Suggested')).toBeInTheDocument()
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 
@@ -72,7 +72,7 @@ describe('Form textSuggestions field', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Coaching inn' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Coaching inn' }))
 
     await submitAndExpectPayload(user, onSubmit, { refinement: 'coaching inn', driver: 'inn' })
   })

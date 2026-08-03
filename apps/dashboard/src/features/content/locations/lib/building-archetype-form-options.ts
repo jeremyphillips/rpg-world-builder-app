@@ -199,6 +199,7 @@ export function resolveBuildingFunctionOverrideFieldOptions(
 }
 
 export function hasBuildingFunctionOverrideChoices(values: Record<string, unknown>): boolean {
+  if (!readSelectedArchetype(values)) return false
   return resolveBuildingFunctionOverrideFieldOptions(values).length > 0
 }
 

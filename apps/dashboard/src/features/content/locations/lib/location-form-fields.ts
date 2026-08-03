@@ -94,6 +94,7 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
           options: buildLocationAuthoringTypeOptions(),
           placeholder: LOCATION_SELECT_PLACEHOLDER,
           required: true,
+          width: '1/3',
         },
         ...buildLocationPrimaryClassificationFields(),
       ],

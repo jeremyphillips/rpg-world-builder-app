@@ -131,7 +131,9 @@ function visibleWhenBuildingFunctionOverrideAvailable() {
   return {
     dependsOn: ['authoringType', 'classification.archetype'],
     visibleWhen: (watched: Record<string, unknown>) =>
-      watched['authoringType'] === 'building' && hasBuildingFunctionOverrideChoices(watched),
+      watched['authoringType'] === 'building' &&
+      typeof watched['classification.archetype'] === 'string' &&
+      hasBuildingFunctionOverrideChoices(watched),
   }
 }
 
@@ -187,7 +189,7 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
       derivedMeta: buildingArchetypeDerivedMeta,
-      width: 'full',
+      width: '2/3',
     },
     {
       type: 'select',

@@ -116,7 +116,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add specialization' }))
     expect(screen.getByRole('textbox', { name: 'Specialization' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Coaching inn' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Coaching inn' })).toBeInTheDocument()
 
     await selectArchetype(user, 'Embassy')
 

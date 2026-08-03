@@ -152,7 +152,7 @@ describe('buildLocationClassificationFields building UX', () => {
       type: 'combobox',
       multiple: false,
       placeholder: 'Search building archetypes…',
-      width: 'full',
+      width: '2/3',
       visibility: {
         dependsOn: ['authoringType'],
       },
@@ -235,5 +235,10 @@ describe('buildLocationClassificationFields building UX', () => {
         'classification.archetype': 'inn',
       }),
     ).toBe(true)
+    expect(
+      hasBuildingFunctionOverrideChoices({
+        authoringType: 'building',
+      }),
+    ).toBe(false)
   })
 })

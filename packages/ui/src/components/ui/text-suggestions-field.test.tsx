@@ -89,7 +89,7 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Coaching inn' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Coaching inn' }))
     expect(onValueChange).toHaveBeenCalledWith('coaching inn')
   })
 
@@ -104,8 +104,8 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    expect(screen.getByText('Suggested')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Planar embassy' })).toBeInTheDocument()
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Planar embassy' })).toBeInTheDocument()
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
   })
 
@@ -120,9 +120,9 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Coaching inn' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Roadside inn' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Ferry house' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Coaching inn' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Roadside inn' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Ferry house' })).toBeInTheDocument()
   })
 
   it('wraps six or more suggestions inline without search UI', () => {
@@ -136,11 +136,11 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    expect(screen.getAllByRole('button')).toHaveLength(SHOP_SUGGESTIONS.length)
+    expect(screen.getAllByRole('checkbox')).toHaveLength(SHOP_SUGGESTIONS.length)
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it('does not render an empty Suggested region when there are no terms', () => {
+  it('does not render an empty Recommended region when there are no terms', () => {
     render(
       <TextSuggestionsField
         id="specialization"
@@ -151,7 +151,7 @@ describe('TextSuggestionsField', () => {
       />,
     )
 
-    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+    expect(screen.queryByText('Recommended')).not.toBeInTheDocument()
   })
 
   it('hides suggestions when the value is non-empty and restores them when cleared', async () => {
@@ -159,13 +159,13 @@ describe('TextSuggestionsField', () => {
     render(<ControlledSpecialization suggestions={INN_SUGGESTIONS} />)
 
     const input = screen.getByRole('textbox', { name: 'Specialization' })
-    expect(screen.getByText('Suggested')).toBeInTheDocument()
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
 
     await user.type(input, 'Custom')
-    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+    expect(screen.queryByText('Recommended')).not.toBeInTheDocument()
 
     await user.clear(input)
-    expect(screen.getByText('Suggested')).toBeInTheDocument()
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
   })
 
   it('hydrates persisted custom values unchanged and hides suggestions', () => {
@@ -180,10 +180,10 @@ describe('TextSuggestionsField', () => {
     )
 
     expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveValue('Harbor inn')
-    expect(screen.queryByText('Suggested')).not.toBeInTheDocument()
+    expect(screen.queryByText('Recommended')).not.toBeInTheDocument()
   })
 
-  it('renders hint above the Suggested row', () => {
+  it('renders hint above the Recommended row', () => {
     render(
       <TextSuggestionsField
         id="specialization"
@@ -198,8 +198,8 @@ describe('TextSuggestionsField', () => {
     const hint = screen.getByText(
       'Add a specialization when you want to describe a more specific kind of building.',
     )
-    const suggested = screen.getByText('Suggested')
-    expect(hint.compareDocumentPosition(suggested)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    const recommended = screen.getByText('Recommended')
+    expect(hint.compareDocumentPosition(recommended)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
   it('passes axe checks', async () => {

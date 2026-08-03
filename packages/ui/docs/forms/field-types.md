@@ -27,7 +27,7 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 
 Advisory-only text field: persisted value is always a plain string, free entry is valid,
 and suggestions never affect validation. When `suggestionsWhen` returns a non-empty list and
-the trimmed value is empty, the control renders a **Suggested** row of inline text action
+the trimmed value is empty, the control renders a **Recommended** row of inline suggestion
 buttons beneath the input (all terms wrap naturally — no search, chevron, or dropdown). An
 empty suggestion list degrades to a plain text input. Optional disclosure (`optionalDisclosure`)
 owns collapsed/expanded chrome; the primitive itself is unaware of disclosure state.
