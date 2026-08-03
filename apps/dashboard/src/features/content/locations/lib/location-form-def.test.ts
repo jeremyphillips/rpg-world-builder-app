@@ -34,6 +34,26 @@ describe('locationFormDef', () => {
     }
     expect(values.authoringType).toBe('building')
     expect(resolveLocationAuthoringType(YAWNING_PORTAL)).toBe('building')
+    expect(input).not.toHaveProperty('authoringType')
+  })
+
+  it('serializes authoringType building to canonical structure fields', () => {
+    const input = locationFormDef.toInput({
+      name: 'The Sleeping Giant',
+      authoringType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
+      classification: { archetype: 'inn' },
+    } as LocationFormValues)
+
+    expect(input).toMatchObject({
+      kind: 'structure',
+      structureType: 'building',
+      classification: { archetype: 'inn' },
+    })
+    expect(locationFormDef.toFormValues(YAWNING_PORTAL)).toMatchObject({
+      authoringType: 'building',
+      classification: { archetype: 'tavern' },
+    })
   })
 
   it('allows incomplete drafts without parent or subtype fields', () => {

@@ -10,6 +10,8 @@ import {
 import {
   buildLocationAuthoringTypeOptions,
   canonicalFieldsForAuthoringType,
+  clearInvalidFieldsForAuthoringType,
+  formFieldsValidForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
   resolveLocationAuthoringType,
   UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
@@ -96,5 +98,39 @@ describe('location authoring type mapping', () => {
         .slice(0, -1)
         .every((option) => STRUCTURE_TYPE_IDS.includes(option.value as StructureType)),
     ).toBe(true)
+  })
+})
+
+describe('formFieldsValidForAuthoringType', () => {
+  it('allows building-only classification fields for building', () => {
+    expect(formFieldsValidForAuthoringType('building')).toEqual({
+      topLevel: new Set(),
+      classification: new Set(['archetype', 'specialization', 'functionOverride']),
+    })
+  })
+
+  it('allows no classification fields for fortification', () => {
+    expect(formFieldsValidForAuthoringType('fortification')).toEqual({
+      topLevel: new Set(),
+      classification: new Set(),
+    })
+  })
+})
+
+describe('clearInvalidFieldsForAuthoringType', () => {
+  it('clears building classification when the target type is not building', () => {
+    expect(
+      clearInvalidFieldsForAuthoringType(
+        {
+          classification: { archetype: 'inn', specialization: 'Harbor inn' },
+        },
+        'fortification',
+      ),
+    ).toEqual({
+      classification: {
+        archetype: undefined,
+        specialization: undefined,
+      },
+    })
   })
 })

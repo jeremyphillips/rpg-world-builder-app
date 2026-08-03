@@ -6,8 +6,10 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption, FieldOptionAvailability } from '@rpg/ui/form'
 
-import { canonicalFieldsForAuthoringType } from './location-authoring-type'
-import { resolveAuthoringTypeFromFormValues } from './location-form-values'
+import {
+  canonicalFieldsForAuthoringType,
+  resolveAuthoringTypeFromFormValues,
+} from './location-authoring-type'
 
 function resolveChildKind(watched: Record<string, unknown>): LocationKind | undefined {
   const authoringType = resolveAuthoringTypeFromFormValues(watched)

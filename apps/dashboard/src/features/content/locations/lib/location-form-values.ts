@@ -11,9 +11,7 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import {
   canonicalFieldsForAuthoringType,
-  LOCATION_AUTHORING_TYPE_IDS,
   resolveLocationAuthoringType,
-  type LocationAuthoringType,
 } from './location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
 
@@ -183,28 +181,20 @@ export function buildLocationCreateInput(
   ctx?: ContentFormInputCtx<Location>,
   validationIntent: ContentValidationIntent = 'publish',
 ): CreateLocationInput {
+  const body = buildLocationBodyFields(values)
+  const payload = {
+    slug: slugForInputParse(values.name, ctx),
+    ...body,
+  }
+
+  if (validationIntent === 'draft' && !('kind' in body)) {
+    return finalizeContentInput(payload, ctx) as CreateLocationInput
+  }
+
   const schema =
     validationIntent === 'draft' ? createLocationDraftInputSchema : createLocationInputSchema
 
-  const input = schema.parse({
-    slug: slugForInputParse(values.name, ctx),
-    ...buildLocationBodyFields(values),
-  })
+  const input = schema.parse(payload)
 
   return finalizeContentInput(input, ctx) as CreateLocationInput
-}
-
-/** @internal Exported for parent-picker and sync modules within the form layer. */
-export function resolveAuthoringTypeFromFormValues(
-  values: Record<string, unknown>,
-): LocationAuthoringType | undefined {
-  const authoringType = values['authoringType']
-  if (
-    typeof authoringType !== 'string' ||
-    authoringType === '' ||
-    !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(authoringType)
-  ) {
-    return undefined
-  }
-  return authoringType as LocationAuthoringType
 }

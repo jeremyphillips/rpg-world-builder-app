@@ -2,16 +2,14 @@ import {
   getRegionTypeIds,
   INTERIOR_TYPE_DEFINITIONS,
   type InteriorClassificationType,
-  type LocationKind,
   type RegionClassificationKind,
 } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
 import {
-  canonicalFieldsForAuthoringType,
-  type LocationAuthoringType,
+  clearInvalidFieldsForAuthoringType,
+  resolveAuthoringTypeFromFormValues,
 } from './location-authoring-type'
-import { resolveAuthoringTypeFromFormValues } from './location-form-values'
 
 type ClassificationFormSlice = {
   kind?: string
@@ -43,49 +41,6 @@ function classificationPatch(
   }
 }
 
-function clearClassificationFieldsInvalidForKind(
-  kind: LocationKind | undefined,
-): Partial<Record<string, unknown>> | undefined {
-  const patch: Partial<Record<string, unknown>> = {}
-
-  if (kind !== 'region' && kind !== 'structure' && kind !== 'interior') {
-    patch.classification = undefined
-  }
-
-  if (kind !== 'interior') {
-    patch.interiorType = undefined
-  }
-
-  return Object.keys(patch).length > 0 ? patch : undefined
-}
-
-function clearFieldsInvalidForAuthoringType(
-  authoringType: LocationAuthoringType | undefined,
-): Partial<Record<string, unknown>> | undefined {
-  if (!authoringType) return undefined
-
-  const { kind, structureType } = canonicalFieldsForAuthoringType(authoringType)
-  const patch = clearClassificationFieldsInvalidForKind(kind) ?? {}
-
-  if (kind === 'structure' && structureType !== 'building') {
-    patch.classification = undefined
-  }
-
-  if (kind !== 'plane') {
-    patch.planeType = undefined
-  }
-
-  if (kind !== 'settlement') {
-    patch.settlementType = undefined
-  }
-
-  if (kind !== 'site') {
-    patch.siteType = undefined
-  }
-
-  return Object.keys(patch).length > 0 ? patch : undefined
-}
-
 function syncBuildingArchetypeChange(
   values: Record<string, unknown>,
 ): Partial<Record<string, unknown>> | undefined {
@@ -107,6 +62,13 @@ export function applyBuildingArchetypeValueSync(
   values: Record<string, unknown>,
 ): Partial<Record<string, unknown>> | undefined {
   return syncBuildingArchetypeChange(values)
+}
+
+/** Clears subtype and classification fields invalid for the selected authoring type. */
+export function applyAuthoringTypeValueSync(
+  values: Record<string, unknown>,
+): Partial<Record<string, unknown>> | undefined {
+  return clearInvalidFieldsForAuthoringType(values, resolveAuthoringTypeFromFormValues(values))
 }
 
 function syncRegionClassificationKindChange(
@@ -161,9 +123,7 @@ export const locationFormValueSyncs: FormValueSync[] = [
   {
     dependsOn: ['authoringType'],
     apply: (values, changedKeys) =>
-      changedKeys.includes('authoringType')
-        ? clearFieldsInvalidForAuthoringType(resolveAuthoringTypeFromFormValues(values))
-        : undefined,
+      changedKeys.includes('authoringType') ? applyAuthoringTypeValueSync(values) : undefined,
   },
   {
     dependsOn: ['classification.archetype'],

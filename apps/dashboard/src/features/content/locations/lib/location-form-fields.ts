@@ -20,7 +20,7 @@ import {
   buildLocationAuthoringTypeOptions,
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
-  type LocationAuthoringType,
+  resolveAuthoringTypeFromFormValues,
 } from './location-authoring-type'
 import {
   buildParentLocationOptionAvailability,
@@ -112,10 +112,9 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-/** Resolves canonical kind from form values for hierarchy helpers outside the form layer. */
-export function resolveLocationKindFromFormValues(values: {
-  authoringType?: LocationAuthoringType | ''
-}): ReturnType<typeof canonicalFieldsForAuthoringType>['kind'] | undefined {
-  if (!values.authoringType) return undefined
-  return canonicalFieldsForAuthoringType(values.authoringType).kind
+/** Resolves canonical kind from form values for hierarchy helpers within the form layer. */
+export function resolveLocationKindFromFormValues(values: Record<string, unknown>) {
+  const authoringType = resolveAuthoringTypeFromFormValues(values)
+  if (!authoringType) return undefined
+  return canonicalFieldsForAuthoringType(authoringType).kind
 }

@@ -83,6 +83,156 @@ export function visibleForAuthoringType(...types: LocationAuthoringType[]) {
   }
 }
 
+/** Top-level location form fields governed by authoring type validity. */
+export type LocationAuthoringTopLevelField =
+  | 'planeType'
+  | 'settlementType'
+  | 'siteType'
+  | 'interiorType'
+
+/** Nested classification keys governed by authoring type validity. */
+export type LocationAuthoringClassificationField =
+  | 'kind'
+  | 'type'
+  | 'archetype'
+  | 'specialization'
+  | 'functionOverride'
+
+export interface LocationAuthoringFieldValidity {
+  topLevel: ReadonlySet<LocationAuthoringTopLevelField>
+  classification: ReadonlySet<LocationAuthoringClassificationField>
+}
+
+const ALL_TOP_LEVEL_FIELDS: LocationAuthoringTopLevelField[] = [
+  'planeType',
+  'settlementType',
+  'siteType',
+  'interiorType',
+]
+
+const ALL_CLASSIFICATION_FIELDS: LocationAuthoringClassificationField[] = [
+  'kind',
+  'type',
+  'archetype',
+  'specialization',
+  'functionOverride',
+]
+
+/** Which form fields remain valid for a selected authoring type. */
+export function formFieldsValidForAuthoringType(
+  type: LocationAuthoringType,
+): LocationAuthoringFieldValidity {
+  const topLevel = new Set<LocationAuthoringTopLevelField>()
+  const classification = new Set<LocationAuthoringClassificationField>()
+
+  switch (type) {
+    case 'plane':
+      topLevel.add('planeType')
+      break
+    case 'settlement':
+      topLevel.add('settlementType')
+      break
+    case 'site':
+      topLevel.add('siteType')
+      break
+    case 'region':
+      classification.add('kind')
+      classification.add('type')
+      break
+    case 'building':
+      classification.add('archetype')
+      classification.add('specialization')
+      classification.add('functionOverride')
+      break
+    case 'interior':
+      topLevel.add('interiorType')
+      classification.add('type')
+      break
+    default:
+      break
+  }
+
+  return { topLevel, classification }
+}
+
+/** Parses a watched form value into a known authoring type, if present. */
+export function resolveAuthoringTypeFromFormValues(
+  values: Record<string, unknown>,
+): LocationAuthoringType | undefined {
+  const authoringType = values['authoringType']
+  if (
+    typeof authoringType !== 'string' ||
+    authoringType === '' ||
+    !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(authoringType)
+  ) {
+    return undefined
+  }
+  return authoringType as LocationAuthoringType
+}
+
+function clearInvalidTopLevelFields(
+  values: Record<string, unknown>,
+  validTopLevel: ReadonlySet<LocationAuthoringTopLevelField>,
+): Partial<Record<string, unknown>> {
+  const patch: Partial<Record<string, unknown>> = {}
+
+  for (const field of ALL_TOP_LEVEL_FIELDS) {
+    if (!validTopLevel.has(field) && values[field] !== undefined) {
+      patch[field] = undefined
+    }
+  }
+
+  return patch
+}
+
+function clearInvalidClassificationFields(
+  values: Record<string, unknown>,
+  validClassification: ReadonlySet<LocationAuthoringClassificationField>,
+): Partial<Record<string, unknown>> {
+  const classification = values['classification']
+  if (!classification || typeof classification !== 'object') {
+    return validClassification.size || classification === undefined
+      ? {}
+      : { classification: undefined }
+  }
+
+  const current = classification as Record<string, unknown>
+  const classificationPatch: Record<string, undefined> = {}
+
+  for (const field of ALL_CLASSIFICATION_FIELDS) {
+    if (!validClassification.has(field) && current[field] !== undefined) {
+      classificationPatch[field] = undefined
+    }
+  }
+
+  if (Object.keys(classificationPatch).length === 0) {
+    return {}
+  }
+
+  return {
+    classification: {
+      ...current,
+      ...classificationPatch,
+    },
+  }
+}
+
+/** Clears form values that are invalid for the selected authoring type. */
+export function clearInvalidFieldsForAuthoringType(
+  values: Record<string, unknown>,
+  authoringType: LocationAuthoringType | undefined,
+): Partial<Record<string, unknown>> | undefined {
+  if (!authoringType) return undefined
+
+  const { topLevel, classification } = formFieldsValidForAuthoringType(authoringType)
+  const patch = {
+    ...clearInvalidTopLevelFields(values, topLevel),
+    ...clearInvalidClassificationFields(values, classification),
+  }
+
+  return Object.keys(patch).length > 0 ? patch : undefined
+}
+
 function nonStructureKindOption(id: NonStructureLocationKind): FieldOption {
   return { value: id, label: LOCATION_KIND_ENTRIES[id].label }
 }

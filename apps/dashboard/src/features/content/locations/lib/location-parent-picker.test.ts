@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { parentLocationFieldVisibility } from './location-parent-picker'
+import { DOCK_WARD, SWORD_COAST, YAWNING_PORTAL } from '../fixtures'
+import {
+  buildParentLocationOptionAvailability,
+  parentLocationFieldVisibility,
+} from './location-parent-picker'
 
 describe('parentLocationFieldVisibility', () => {
   const visibleWhen = parentLocationFieldVisibility().visibleWhen!
@@ -17,5 +21,25 @@ describe('parentLocationFieldVisibility', () => {
 
   it('hides the parent field for types that forbid a parent', () => {
     expect(visibleWhen({ authoringType: 'plane' })).toBe(false)
+  })
+
+  it('maps building authoring type to structure kind for parent visibility', () => {
+    expect(visibleWhen({ authoringType: 'building' })).toBe(true)
+  })
+})
+
+describe('buildParentLocationOptionAvailability', () => {
+  const enabledWhen = buildParentLocationOptionAvailability(
+    [SWORD_COAST, DOCK_WARD, YAWNING_PORTAL],
+    YAWNING_PORTAL.id,
+  ).enabledWhen!
+
+  it('maps building authoring type to structure kind when validating parents', () => {
+    expect(enabledWhen({ authoringType: 'building' }, DOCK_WARD.id)).toBe(true)
+    expect(enabledWhen({ authoringType: 'building' }, SWORD_COAST.id)).toBe(false)
+  })
+
+  it('rejects self as a parent option', () => {
+    expect(enabledWhen({ authoringType: 'building' }, YAWNING_PORTAL.id)).toBe(false)
   })
 })
