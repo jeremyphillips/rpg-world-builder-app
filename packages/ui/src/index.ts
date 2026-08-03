@@ -21,6 +21,13 @@ export {
   type SearchFieldRole,
   type WeightedSearchField,
 } from './lib/search'
+export {
+  assembleComboboxOptionSearchDocument,
+  optionMatchesQuery,
+  rankOptionsByQuery,
+  scoreOptionQuery,
+  type LabelValueDescriptionOption,
+} from './components/ui/option-query.lib'
 export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
 export { Text, type TextProps } from './components/ui/text'

@@ -5,6 +5,7 @@ import { scoreItem } from '../../lib/search'
 import {
   assembleComboboxOptionSearchDocument,
   optionMatchesQuery,
+  rankOptionsByQuery,
   type LabelValueDescriptionOption,
 } from './option-query.lib'
 
@@ -64,5 +65,50 @@ describe('option-query.lib', () => {
 
     expect(optionMatchesQuery(fireballOption, 'fire ball')).toBe(true)
     expect(optionMatchesQuery(fireballOption, 'fireball')).toBe(true)
+  })
+
+  it('assembles keyword fields from searchTerms', () => {
+    const option: LabelValueDescriptionOption = {
+      value: 'stable',
+      label: 'Stable',
+      searchTerms: ['horses', 'lodging'],
+    }
+
+    expect(assembleComboboxOptionSearchDocument(option)).toEqual({
+      id: 'stable',
+      fields: [
+        { key: 'label', text: 'Stable', role: 'primary' },
+        { key: 'value', text: 'stable', role: 'keyword' },
+        { key: 'searchTerm-0', text: 'horses', role: 'keyword' },
+        { key: 'searchTerm-1', text: 'lodging', role: 'keyword' },
+      ],
+    })
+  })
+
+  it('matches composed searchTerms with the forgiving profile', () => {
+    const option: LabelValueDescriptionOption = {
+      value: 'stable',
+      label: 'Stable',
+      searchTerms: ['horses'],
+    }
+
+    expect(optionMatchesQuery(option, 'horses')).toBe(true)
+    expect(optionMatchesQuery(option, 'cow')).toBe(false)
+  })
+
+  it('ranks label exact match above search-term-only match', () => {
+    const libraryOption: LabelValueDescriptionOption = {
+      value: 'library',
+      label: 'Library',
+    }
+    const archiveOption: LabelValueDescriptionOption = {
+      value: 'archive',
+      label: 'Archive',
+      searchTerms: ['library'],
+    }
+
+    expect(
+      rankOptionsByQuery([archiveOption, libraryOption], 'library').map((option) => option.value),
+    ).toEqual(['library', 'archive'])
   })
 })

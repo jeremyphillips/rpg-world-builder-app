@@ -8,6 +8,8 @@ export interface ComboboxFieldOption {
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
+  /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
+  searchTerms?: readonly string[]
 }
 
 export interface ComboboxSelectedItemRenderContext {

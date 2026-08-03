@@ -94,6 +94,8 @@ export interface FieldOption {
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
+  /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
+  searchTerms?: readonly string[]
   /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
   meta?: string[]
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
