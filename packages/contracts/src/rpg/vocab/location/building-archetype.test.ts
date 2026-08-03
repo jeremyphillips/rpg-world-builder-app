@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { BUILDING_CORPUS_DISPOSITIONS, BUILDING_CORPUS_IDS } from './building-corpus-disposition'
+import { BUILDING_ARCHETYPE_ENTRIES_A_C } from './building-archetypes/a-c'
+import { BUILDING_ARCHETYPE_ENTRIES_D_G } from './building-archetypes/d-g'
+import { BUILDING_ARCHETYPE_ENTRIES_H_L } from './building-archetypes/h-l'
+import { BUILDING_ARCHETYPE_ENTRIES_M_P } from './building-archetypes/m-p'
+import { BUILDING_ARCHETYPE_ENTRIES_Q_T } from './building-archetypes/q-t'
+import { BUILDING_ARCHETYPE_ENTRIES_U_Z } from './building-archetypes/u-z'
+import { BUILDING_ARCHETYPE_SHARD_ENTRIES } from './building-archetypes'
 import {
   BUILDING_FUNCTION_FAMILY_ENTRIES,
   type BuildingFunctionFamily,
@@ -10,6 +18,15 @@ import {
   getBuildingManifestationRoot,
   type BuildingArchetype,
 } from './building-archetype'
+
+const BUILDING_ARCHETYPE_SHARDS = [
+  BUILDING_ARCHETYPE_ENTRIES_A_C,
+  BUILDING_ARCHETYPE_ENTRIES_D_G,
+  BUILDING_ARCHETYPE_ENTRIES_H_L,
+  BUILDING_ARCHETYPE_ENTRIES_M_P,
+  BUILDING_ARCHETYPE_ENTRIES_Q_T,
+  BUILDING_ARCHETYPE_ENTRIES_U_Z,
+] as const
 
 function normalizeSearchTerms(terms: readonly string[] | undefined): readonly string[] {
   if (!terms) return []
@@ -64,5 +81,30 @@ describe('building archetype registry integrity', () => {
         expect(term).toBe(term.trim().toLowerCase())
       }
     }
+  })
+
+  it('keeps shard ids disjoint with composed count matching shard sum', () => {
+    const shardKeyCounts = BUILDING_ARCHETYPE_SHARDS.map((shard) => Object.keys(shard).length)
+    const composedKeyCount = Object.keys(BUILDING_ARCHETYPE_SHARD_ENTRIES).length
+    expect(composedKeyCount).toBe(shardKeyCounts.reduce((sum, count) => sum + count, 0))
+
+    const seen = new Set<string>()
+    for (const shard of BUILDING_ARCHETYPE_SHARDS) {
+      for (const id of Object.keys(shard)) {
+        expect(seen.has(id)).toBe(false)
+        seen.add(id)
+      }
+    }
+  })
+
+  it('maps every corpus id to exactly one disposition', () => {
+    expect(BUILDING_CORPUS_IDS.length).toBe(308)
+    expect(new Set(BUILDING_CORPUS_IDS).size).toBe(308)
+
+    for (const id of BUILDING_CORPUS_IDS) {
+      expect(BUILDING_CORPUS_DISPOSITIONS[id]).toBeDefined()
+    }
+
+    expect(Object.keys(BUILDING_CORPUS_DISPOSITIONS).length).toBe(308)
   })
 })

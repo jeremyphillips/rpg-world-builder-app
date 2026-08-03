@@ -1006,3 +1006,39 @@ this commit — future renames require deliberate migration.
 
 Working-set ids retained unchanged where they survived curation (`food_drink_social`,
 `care`, etc.). Seven families added; zero working-set ids removed.
+
+## Editorial appendix — Phase 6 archetype disposition (2026-08-03)
+
+Machine-checkable disposition artifact:
+[`building-corpus-disposition.ts`](../../packages/contracts/src/rpg/vocab/location/building-corpus-disposition.ts).
+Comprehensive registry shards compose
+[`BUILDING_ARCHETYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-archetype.ts)
+via neutral alphabetical files under
+[`building-archetypes/`](../../packages/contracts/src/rpg/vocab/location/building-archetypes/).
+
+### Corpus coverage
+
+| Metric                                          | Count |
+| ----------------------------------------------- | ----- |
+| Corpus ids (`BUILDING_CORPUS_IDS`)              | 308   |
+| Registry entries (`BUILDING_ARCHETYPE_ENTRIES`) | 129   |
+
+### Disposition counts by kind
+
+| Kind             | Count | Role                                                                       |
+| ---------------- | ----- | -------------------------------------------------------------------------- |
+| `archetype`      | 97    | Canonical registry identity                                                |
+| `manifestation`  | 29    | Cultural/historical archetype with `manifestationOf` parent                |
+| `specialization` | 84    | Phase 8 suggestion vocabulary (not registry entries)                       |
+| `composite`      | 24    | Hierarchy guidance for multi-building complexes                            |
+| `interior`       | 30    | Owned by interior classification                                           |
+| `form_only`      | 24    | Owned by `structureType` (infrastructure, monument, vessel, fortification) |
+| `site`           | 6     | Owned by site kind                                                         |
+| `overlay`        | 6     | Role/condition overlay on a base building                                  |
+| `not_building`   | 8     | Below location granularity or non-place                                    |
+
+Archetype ids are **persisted vocabulary** after this pass. Registry curation
+resolved Phase 5 open items: `caravanserai → inn` manifestation with
+`lodging + retail`; `cathedral → temple` specialization (rank, not use);
+`palace` / `monastery` / `shipyard` remain composite dispositions with registry
+entries because `Lvl: arch`.

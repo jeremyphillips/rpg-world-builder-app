@@ -1,6 +1,13 @@
+/**
+ * Building archetype registry for Model E classification.
+ *
+ * Archetype ids are persisted vocabulary — established in Phase 6 curation
+ * (2026-08-03). Future renames or removals require deliberate migration.
+ */
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
+import { BUILDING_ARCHETYPE_SHARD_ENTRIES } from './building-archetypes'
 import {
   BUILDING_FUNCTION_FAMILY_ENTRIES,
   type BuildingFunctionFamily,
@@ -22,66 +29,7 @@ type BuildingArchetypeEntry = GameTermEntry & {
 }
 
 export const BUILDING_ARCHETYPE_ENTRIES = {
-  house: {
-    label: 'House',
-    description: 'A private dwelling.',
-    functions: ['dwelling'],
-  },
-  inn: {
-    label: 'Inn',
-    description: 'A lodging house that also serves food and drink.',
-    functions: ['lodging', 'food_drink_social'],
-    searchTerms: ['traveler'],
-  },
-  tavern: {
-    label: 'Tavern',
-    description: 'A venue for food, drink, and social gathering.',
-    functions: ['food_drink_social'],
-  },
-  warehouse: {
-    label: 'Warehouse',
-    description: 'A storage or logistics structure.',
-    functions: ['storage'],
-  },
-  guildhall: {
-    label: 'Guildhall',
-    description: 'The headquarters of a craft or trade guild.',
-    functions: ['assembly', 'governance'],
-  },
-  temple: {
-    label: 'Temple',
-    description: 'A religious or ceremonial structure.',
-    functions: ['worship'],
-  },
-  stable: {
-    label: 'Stable',
-    description: 'A building for housing and caring for mounts.',
-    functions: ['service'],
-    searchTerms: ['horses'],
-  },
-  palace: {
-    label: 'Palace',
-    description: 'A grand residence of a ruler or noble house.',
-    functions: ['dwelling', 'governance'],
-  },
-  blacksmith: {
-    label: 'Blacksmith',
-    description: 'A smithy or metalworking shop.',
-    functions: ['service'],
-  },
-  library: {
-    label: 'Library',
-    description: 'A building for study and curated records.',
-    functions: ['knowledge'],
-    searchTerms: ['books'],
-  },
-  caravanserai: {
-    label: 'Caravanserai',
-    description: 'A roadside inn for merchants and caravan travelers.',
-    functions: ['lodging', 'retail'],
-    manifestationOf: 'inn',
-    searchTerms: ['caravan'],
-  },
+  ...BUILDING_ARCHETYPE_SHARD_ENTRIES,
 } as const satisfies Record<string, BuildingArchetypeEntry>
 
 export type BuildingArchetype = keyof typeof BUILDING_ARCHETYPE_ENTRIES

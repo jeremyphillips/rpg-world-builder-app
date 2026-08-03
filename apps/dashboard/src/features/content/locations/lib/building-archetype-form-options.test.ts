@@ -34,7 +34,7 @@ describe('building archetype combobox search', () => {
   })
 
   it('includes temple for worship', () => {
-    expect(matchingArchetypeValues('worship')).toEqual(['temple'])
+    expect(matchingArchetypeValues('worship')).toEqual(expect.arrayContaining(['temple']))
   })
 
   it('ranks the Inn label above manifestation search-term matches for inn', () => {
