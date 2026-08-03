@@ -3,6 +3,15 @@
  *
  * Archetype ids are persisted vocabulary — established in Phase 6 curation
  * (2026-08-03). Future renames or removals require deliberate migration.
+ *
+ * ## Manifestation discovery inheritance (Phase 7)
+ *
+ * Manifestation entries do **not** store the root archetype's label, aliases, or
+ * searchTerms in their own registry fields. At projection time,
+ * `getBuildingArchetypeDiscoveryTerms()` composes the root's label, aliases, and
+ * searchTerms with the manifestation's own searchTerms (deduplicated). Dashboard
+ * search and ranking consume the composed terms — never manually repeat root
+ * discovery vocabulary on manifestation rows.
  */
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
@@ -25,6 +34,7 @@ export const BUILDING_ARCHETYPE_TERM = {
 type BuildingArchetypeEntry = GameTermEntry & {
   readonly functions: readonly [BuildingFunctionFamily, BuildingFunctionFamily?]
   readonly manifestationOf?: string
+  readonly aliases?: readonly string[]
   readonly searchTerms?: readonly string[]
 }
 
@@ -41,6 +51,18 @@ export const buildingArchetypeSchema = vocabEnumFromEntries(BUILDING_ARCHETYPE_E
 export type BuildingClassificationInput = {
   readonly archetype: BuildingArchetype
   readonly functionOverride?: BuildingFunctionFamily
+}
+
+function normalizeDiscoveryTerms(terms: readonly string[]): readonly string[] {
+  const seen = new Set<string>()
+  const normalized: string[] = []
+  for (const term of terms) {
+    const value = term.trim().toLowerCase()
+    if (!value || seen.has(value)) continue
+    seen.add(value)
+    normalized.push(value)
+  }
+  return normalized
 }
 
 /** Returns the registry entry for an archetype id, if known. */
@@ -77,10 +99,43 @@ export function getEffectiveBuildingFunctions(
   return getBuildingArchetypeFunctions(classification.archetype)
 }
 
-/** Returns normalized search terms for an archetype, if any. */
+/** Returns stored aliases for an archetype (own registry field only). */
+export function getBuildingArchetypeAliases(archetype: BuildingArchetype): readonly string[] {
+  const entry = BUILDING_ARCHETYPE_ENTRIES[archetype]
+  return 'aliases' in entry && entry.aliases ? entry.aliases : []
+}
+
+/** Returns stored search terms for an archetype (own registry field only). */
 export function getBuildingArchetypeSearchTerms(archetype: BuildingArchetype): readonly string[] {
   const entry = BUILDING_ARCHETYPE_ENTRIES[archetype]
   return 'searchTerms' in entry && entry.searchTerms ? entry.searchTerms : []
+}
+
+/**
+ * Returns composed discovery terms for search.
+ * Root archetypes: own searchTerms only.
+ * Manifestations: own searchTerms plus inherited root label, aliases, and searchTerms
+ * (deduplicated — inherited terms are not stored on the manifestation row).
+ */
+export function getBuildingArchetypeDiscoveryTerms(
+  archetype: BuildingArchetype,
+): readonly string[] {
+  const entry = BUILDING_ARCHETYPE_ENTRIES[archetype]
+  const ownTerms = getBuildingArchetypeSearchTerms(archetype)
+
+  if (!('manifestationOf' in entry) || !entry.manifestationOf) {
+    return ownTerms
+  }
+
+  const root = entry.manifestationOf as BuildingArchetype
+  const rootEntry = BUILDING_ARCHETYPE_ENTRIES[root]
+  const inherited = [
+    rootEntry.label,
+    ...getBuildingArchetypeAliases(root),
+    ...getBuildingArchetypeSearchTerms(root),
+  ]
+
+  return normalizeDiscoveryTerms([...ownTerms, ...inherited])
 }
 
 /** Walks manifestationOf links to the root archetype. */

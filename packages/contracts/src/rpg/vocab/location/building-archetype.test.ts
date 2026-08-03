@@ -15,6 +15,9 @@ import {
 import {
   BUILDING_ARCHETYPE_ENTRIES,
   BUILDING_ARCHETYPE_IDS,
+  getBuildingArchetypeAliases,
+  getBuildingArchetypeDiscoveryTerms,
+  getBuildingArchetypeSearchTerms,
   getBuildingManifestationRoot,
   type BuildingArchetype,
 } from './building-archetype'
@@ -28,7 +31,7 @@ const BUILDING_ARCHETYPE_SHARDS = [
   BUILDING_ARCHETYPE_ENTRIES_U_Z,
 ] as const
 
-function normalizeSearchTerms(terms: readonly string[] | undefined): readonly string[] {
+function normalizeTerms(terms: readonly string[] | undefined): readonly string[] {
   if (!terms) return []
   const seen = new Set<string>()
   const normalized: string[] = []
@@ -39,6 +42,19 @@ function normalizeSearchTerms(terms: readonly string[] | undefined): readonly st
     normalized.push(value)
   }
   return normalized
+}
+
+function rootDiscoveryTerms(root: BuildingArchetype): Set<string> {
+  const rootEntry = BUILDING_ARCHETYPE_ENTRIES[root]
+  const terms = new Set<string>()
+  terms.add(rootEntry.label.trim().toLowerCase())
+  for (const alias of getBuildingArchetypeAliases(root)) {
+    terms.add(alias)
+  }
+  for (const term of getBuildingArchetypeSearchTerms(root)) {
+    terms.add(term)
+  }
+  return terms
 }
 
 describe('building archetype registry integrity', () => {
@@ -76,11 +92,63 @@ describe('building archetype registry integrity', () => {
       const entry = BUILDING_ARCHETYPE_ENTRIES[id]
       if (!('searchTerms' in entry) || !entry.searchTerms) continue
 
-      expect(entry.searchTerms).toEqual(normalizeSearchTerms(entry.searchTerms))
+      expect(entry.searchTerms).toEqual(normalizeTerms(entry.searchTerms))
       for (const term of entry.searchTerms) {
         expect(term).toBe(term.trim().toLowerCase())
       }
     }
+  })
+
+  it('normalizes aliases to lowercase trimmed deduplicated values', () => {
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      if (!('aliases' in entry) || !entry.aliases) continue
+
+      expect(entry.aliases).toEqual(normalizeTerms(entry.aliases))
+      for (const alias of entry.aliases) {
+        expect(alias).toBe(alias.trim().toLowerCase())
+      }
+    }
+  })
+
+  it('keeps aliases and searchTerms disjoint and aliases distinct from label', () => {
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      const label = entry.label.trim().toLowerCase()
+      const aliases = normalizeTerms(getBuildingArchetypeAliases(id))
+      const searchTerms = normalizeTerms(getBuildingArchetypeSearchTerms(id))
+
+      for (const alias of aliases) {
+        expect(alias).not.toBe(label)
+      }
+
+      const aliasSet = new Set(aliases)
+      for (const term of searchTerms) {
+        expect(aliasSet.has(term)).toBe(false)
+      }
+    }
+  })
+
+  it('keeps manifestation discovery terms from duplicating inherited root vocabulary', () => {
+    for (const id of BUILDING_ARCHETYPE_IDS) {
+      const entry = BUILDING_ARCHETYPE_ENTRIES[id]
+      if (!('manifestationOf' in entry) || !entry.manifestationOf) continue
+
+      const root = entry.manifestationOf as BuildingArchetype
+      const inherited = rootDiscoveryTerms(root)
+      const ownAliases = normalizeTerms(getBuildingArchetypeAliases(id))
+      const ownSearchTerms = normalizeTerms(getBuildingArchetypeSearchTerms(id))
+
+      for (const term of [...ownAliases, ...ownSearchTerms]) {
+        expect(inherited.has(term)).toBe(false)
+      }
+    }
+  })
+
+  it('composes manifestation discovery terms from root label, aliases, and searchTerms', () => {
+    const terms = getBuildingArchetypeDiscoveryTerms('caravanserai')
+    expect(terms).toEqual(expect.arrayContaining(['caravan', 'traveler', 'inn']))
+    expect(terms.indexOf('caravan')).toBeLessThan(terms.indexOf('inn'))
   })
 
   it('keeps shard ids disjoint with composed count matching shard sum', () => {

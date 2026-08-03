@@ -1042,3 +1042,31 @@ resolved Phase 5 open items: `caravanserai → inn` manifestation with
 `lodging + retail`; `cathedral → temple` specialization (rank, not use);
 `palace` / `monastery` / `shipyard` remain composite dispositions with registry
 entries because `Lvl: arch`.
+
+## Editorial appendix — Phase 7 alias/search curation (2026-08-03)
+
+Phase 7 added registry-owned `aliases` (true synonyms) and curated
+`searchTerms` (broader discovery vocabulary) across the 129-archetype registry.
+
+**Manifestation inheritance decision:** manifestation rows do **not** store the
+root archetype's label, aliases, or searchTerms.
+`getBuildingArchetypeDiscoveryTerms()` composes root discovery vocabulary at
+projection time; integrity tests lint manifestations for no-duplication of
+inherited terms.
+
+**Curation counts (129 registry entries):**
+
+| Field         | Entries with values |
+| ------------- | ------------------- |
+| `aliases`     | 7                   |
+| `searchTerms` | 129                 |
+
+Alias-bearing entries: apartment_building (flats), apothecary (pharmacy),
+blacksmith (smithy, forge), festhall (feast hall), prison (jail, gaol), tavern
+(pub, alehouse), warehouse (storehouse).
+
+Seed discovery terms preserved: inn/traveler, stable/horses, library/books,
+caravanserai/caravan.
+
+Dashboard combobox ranking implements Model E precedence: label exact → label
+prefix → alias → manifestation parent label → function label → search term.
