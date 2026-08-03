@@ -1,4 +1,4 @@
-import type { Location } from '@rpg/contracts'
+import { buildingClassificationSchema, type Location } from '@rpg/contracts'
 
 import { STORY_CAMPAIGN_ID } from '../lib/fixtures/constants'
 
@@ -27,7 +27,7 @@ export const SWORD_COAST: Location = {
   slug: 'sword-coast',
   name: 'Sword Coast',
   kind: 'region',
-  regionType: 'coast',
+  classification: { kind: 'geographic', type: 'coast' },
   parentLocationId: FAERUN.id,
 }
 
@@ -56,7 +56,8 @@ export const YAWNING_PORTAL: Location = {
   slug: 'yawning-portal',
   name: 'Yawning Portal',
   kind: 'structure',
-  structureType: 'tavern',
+  structureType: 'building',
+  classification: buildingClassificationSchema.parse({ type: 'business', subtype: 'tavern' }),
   parentLocationId: DOCK_WARD.id,
 }
 

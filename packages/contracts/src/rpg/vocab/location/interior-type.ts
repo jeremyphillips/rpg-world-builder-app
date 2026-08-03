@@ -3,7 +3,7 @@ import type { GameTermEntry, VocabularyTerm } from '../types'
 
 export const INTERIOR_TYPE_TERM = {
   label: 'Interior Type',
-  description: 'The layout role of an indoor space.',
+  description: 'The structural role of a location within an interior.',
   sentence: {
     singular: 'interior type',
     plural: 'interior types',
@@ -11,37 +11,25 @@ export const INTERIOR_TYPE_TERM = {
 } as const satisfies VocabularyTerm
 
 export const INTERIOR_TYPE_ENTRIES = {
-  room: {
-    label: 'Room',
-    description: 'A single enclosed chamber.',
+  level: {
+    label: 'Level',
+    description: 'A vertical slice or story within a structure.',
   },
-  floor: {
-    label: 'Floor',
-    description: 'A level or story within a structure.',
+  space: {
+    label: 'Space',
+    description: 'An enclosed or bounded room-like area.',
   },
-  corridor: {
-    label: 'Corridor',
-    description: 'A hallway or passage connecting other spaces.',
+  passage: {
+    label: 'Passage',
+    description: 'A connecting route between other interior spaces.',
   },
-  chamber: {
-    label: 'Chamber',
-    description: 'A large or significant enclosed space.',
+  vertical_access: {
+    label: 'Vertical Access',
+    description: 'Stairs, ladders, or other means of moving between levels.',
   },
-  hall: {
-    label: 'Hall',
-    description: 'A grand room or assembly space.',
-  },
-  cellar: {
-    label: 'Cellar',
-    description: 'An underground or basement level.',
-  },
-  attic: {
-    label: 'Attic',
-    description: 'An upper storage or loft space.',
-  },
-  balcony: {
-    label: 'Balcony',
-    description: 'An elevated platform or overlook.',
+  overlook: {
+    label: 'Overlook',
+    description: 'An elevated platform or viewing area.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

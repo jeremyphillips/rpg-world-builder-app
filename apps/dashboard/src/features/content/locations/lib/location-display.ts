@@ -1,12 +1,12 @@
 import {
-  getInteriorTypeLabel,
+  getInteriorClassificationLabel,
   getLocationKindEntry,
   getLocationKindLabel,
   getPlaneTypeLabel,
-  getRegionTypeLabel,
+  getRegionClassificationLabel,
   getSettlementTypeLabel,
   getSiteTypeLabel,
-  getStructureTypeLabel,
+  getStructureClassificationLabel,
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
@@ -57,8 +57,8 @@ const subtypeLabelByKind: Partial<
       ? getPlaneTypeLabel(location.planeType)
       : undefined,
   region: (location) =>
-    location.kind === 'region' && location.regionType
-      ? getRegionTypeLabel(location.regionType)
+    location.kind === 'region' && location.classification
+      ? getRegionClassificationLabel(location.classification)
       : undefined,
   settlement: (location) =>
     location.kind === 'settlement' && location.settlementType
@@ -67,12 +67,18 @@ const subtypeLabelByKind: Partial<
   site: (location) =>
     location.kind === 'site' && location.siteType ? getSiteTypeLabel(location.siteType) : undefined,
   structure: (location) =>
-    location.kind === 'structure' && location.structureType
-      ? getStructureTypeLabel(location.structureType)
+    location.kind === 'structure'
+      ? getStructureClassificationLabel({
+          structureType: location.structureType,
+          classification: location.classification,
+        })
       : undefined,
   interior: (location) =>
-    location.kind === 'interior' && location.interiorType
-      ? getInteriorTypeLabel(location.interiorType)
+    location.kind === 'interior'
+      ? getInteriorClassificationLabel({
+          interiorType: location.interiorType,
+          classification: location.classification,
+        })
       : undefined,
 }
 

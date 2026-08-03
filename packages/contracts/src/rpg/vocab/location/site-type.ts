@@ -13,43 +13,43 @@ export const SITE_TYPE_TERM = {
 export const SITE_TYPE_ENTRIES = {
   landmark: {
     label: 'Landmark',
-    description: 'A notable natural or constructed feature used for navigation.',
+    description: 'A notable place or feature recognized as a distinct destination.',
   },
   ruin: {
     label: 'Ruin',
-    description: 'The remains of a former settlement, structure, or monument.',
+    description: 'The remains of a former settlement, structure, or constructed site.',
   },
   dungeon: {
     label: 'Dungeon',
-    description: 'An adventure site such as a tomb, cavern complex, or stronghold.',
+    description: 'A discrete adventure site intended for exploration or encounter play.',
   },
-  wilderness: {
-    label: 'Wilderness',
-    description: 'An untamed tract of land without a fixed structure.',
-  },
-  road: {
-    label: 'Road',
-    description: 'A traveled route such as a highway, trail, or pass.',
+  route: {
+    label: 'Route',
+    description: 'A traveled path or corridor such as a road, trail, pass, or trade route.',
   },
   crossing: {
     label: 'Crossing',
-    description: 'A bridge, ford, or other passage over an obstacle.',
+    description: 'A notable passage across or through a geographic obstacle.',
   },
   battlefield: {
     label: 'Battlefield',
-    description: 'A site marked by a significant battle or siege.',
+    description: 'A place defined by a significant battle, siege, or military event.',
   },
   sacred_ground: {
     label: 'Sacred Ground',
-    description: 'A shrine, grove, cemetery, or other consecrated place.',
+    description: 'A consecrated or culturally sacred place defined primarily by its location.',
   },
   mine: {
     label: 'Mine',
-    description: 'An excavation or quarry worked for resources.',
+    description: 'A site where stone, ore, or other resources are extracted.',
   },
   camp: {
     label: 'Camp',
     description: 'A temporary or semi-permanent encampment.',
+  },
+  other: {
+    label: 'Other',
+    description: 'Another type of discrete site.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

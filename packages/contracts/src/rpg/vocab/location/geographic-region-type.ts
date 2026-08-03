@@ -1,16 +1,16 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
-export const REGION_TYPE_TERM = {
-  label: 'Region Type',
-  description: 'The geographic character of a region.',
+export const GEOGRAPHIC_REGION_TYPE_TERM = {
+  label: 'Geographic Region Type',
+  description: 'The physical or ecological character of a region.',
   sentence: {
-    singular: 'region type',
-    plural: 'region types',
+    singular: 'geographic region type',
+    plural: 'geographic region types',
   },
 } as const satisfies VocabularyTerm
 
-export const REGION_TYPE_ENTRIES = {
+export const GEOGRAPHIC_REGION_TYPE_ENTRIES = {
   continent: {
     label: 'Continent',
     description: 'A large landmass spanning a substantial part of a world.',
@@ -57,18 +57,18 @@ export const REGION_TYPE_ENTRIES = {
   },
 } as const satisfies Record<string, GameTermEntry>
 
-export type RegionType = keyof typeof REGION_TYPE_ENTRIES
+export type GeographicRegionType = keyof typeof GEOGRAPHIC_REGION_TYPE_ENTRIES
 
-export const REGION_TYPE_IDS = keysFromEntries(REGION_TYPE_ENTRIES)
+export const GEOGRAPHIC_REGION_TYPE_IDS = keysFromEntries(GEOGRAPHIC_REGION_TYPE_ENTRIES)
 
-export const regionTypeSchema = vocabEnumFromEntries(REGION_TYPE_ENTRIES)
+export const geographicRegionTypeSchema = vocabEnumFromEntries(GEOGRAPHIC_REGION_TYPE_ENTRIES)
 
-/** Returns the reference entry for a region type id, if known. */
-export function getRegionTypeEntry(id: string): GameTermEntry | undefined {
-  return REGION_TYPE_ENTRIES[id as RegionType]
+/** Returns the reference entry for a geographic region type id, if known. */
+export function getGeographicRegionTypeEntry(id: string): GameTermEntry | undefined {
+  return GEOGRAPHIC_REGION_TYPE_ENTRIES[id as GeographicRegionType]
 }
 
-/** Returns the display label for a region type. Falls back to the raw id. */
-export function getRegionTypeLabel(id: string): string {
-  return getRegionTypeEntry(id)?.label ?? id
+/** Returns the display label for a geographic region type. Falls back to the raw id. */
+export function getGeographicRegionTypeLabel(id: string): string {
+  return getGeographicRegionTypeEntry(id)?.label ?? id
 }

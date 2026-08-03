@@ -21,6 +21,38 @@ function sharedBodyFields(values: LocationFormValues) {
   }
 }
 
+function buildRegionClassification(values: LocationFormValues) {
+  const classification = values.classification
+  if (classification?.kind !== 'political' && classification?.kind !== 'geographic') {
+    return {}
+  }
+  if (!classification.type) return {}
+  return {
+    classification: {
+      kind: classification.kind,
+      type: classification.type,
+    },
+  }
+}
+
+function buildBuildingClassification(values: LocationFormValues) {
+  const classification = values.classification
+  if (!classification?.type) return {}
+  return {
+    classification: classification.subtype
+      ? { type: classification.type, subtype: classification.subtype }
+      : { type: classification.type },
+  }
+}
+
+function buildInteriorClassification(values: LocationFormValues) {
+  const classification = values.classification
+  if (!classification?.type) return {}
+  return {
+    classification: { type: classification.type },
+  }
+}
+
 const kindBodyFieldBuilders: Record<
   LocationKind,
   (values: LocationFormValues) => Record<string, unknown>
@@ -34,7 +66,7 @@ const kindBodyFieldBuilders: Record<
   region: (values) => ({
     ...sharedBodyFields(values),
     kind: 'region',
-    ...(values.regionType ? { regionType: values.regionType } : {}),
+    ...buildRegionClassification(values),
   }),
   settlement: (values) => ({
     ...sharedBodyFields(values),
@@ -51,11 +83,13 @@ const kindBodyFieldBuilders: Record<
     ...sharedBodyFields(values),
     kind: 'structure',
     ...(values.structureType ? { structureType: values.structureType } : {}),
+    ...(values.structureType === 'building' ? buildBuildingClassification(values) : {}),
   }),
   interior: (values) => ({
     ...sharedBodyFields(values),
     kind: 'interior',
     ...(values.interiorType ? { interiorType: values.interiorType } : {}),
+    ...buildInteriorClassification(values),
   }),
 }
 
@@ -74,13 +108,44 @@ const kindFormValueExtractors: Partial<
   Record<LocationKind, (entity: Location) => Partial<LocationFormValues>>
 > = {
   plane: (entity) => (entity.kind === 'plane' ? { planeType: entity.planeType } : {}),
-  region: (entity) => (entity.kind === 'region' ? { regionType: entity.regionType } : {}),
+  region: (entity) =>
+    entity.kind === 'region' && entity.classification
+      ? {
+          classification: {
+            kind: entity.classification.kind,
+            type: entity.classification.type,
+          },
+        }
+      : {},
   settlement: (entity) =>
     entity.kind === 'settlement' ? { settlementType: entity.settlementType } : {},
   site: (entity) => (entity.kind === 'site' ? { siteType: entity.siteType } : {}),
   structure: (entity) =>
-    entity.kind === 'structure' ? { structureType: entity.structureType } : {},
-  interior: (entity) => (entity.kind === 'interior' ? { interiorType: entity.interiorType } : {}),
+    entity.kind === 'structure'
+      ? {
+          structureType: entity.structureType,
+          ...(entity.classification
+            ? {
+                classification: {
+                  type: entity.classification.type,
+                  ...('subtype' in entity.classification &&
+                  typeof entity.classification.subtype === 'string'
+                    ? { subtype: entity.classification.subtype }
+                    : {}),
+                },
+              }
+            : {}),
+        }
+      : {},
+  interior: (entity) =>
+    entity.kind === 'interior'
+      ? {
+          interiorType: entity.interiorType,
+          ...(entity.classification
+            ? { classification: { type: entity.classification.type } }
+            : {}),
+        }
+      : {},
 }
 
 export function locationToFormValues(entity: Location): Partial<LocationFormValues> {

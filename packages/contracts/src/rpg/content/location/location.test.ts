@@ -127,11 +127,11 @@ describe('location authoring inputs', () => {
     expect(
       updateLocationInputSchema.parse({
         kind: 'region',
-        regionType: 'coast',
+        classification: { kind: 'geographic', type: 'coast' },
       }),
     ).toEqual({
       kind: 'region',
-      regionType: 'coast',
+      classification: { kind: 'geographic', type: 'coast' },
     })
 
     expect(

@@ -9,6 +9,7 @@ import {
   locationNameField,
   type LocationFormValues,
 } from './location-form-fields'
+import { locationFormValueSyncs } from './location-form-sync'
 import {
   buildLocationCreateInput,
   locationCreateDefaultValues,
@@ -23,6 +24,7 @@ const locationFormDef: ContentFormDef<Location, LocationFormValues, CreateLocati
   nameField: locationNameField,
   createDefaultValues: locationCreateDefaultValues,
   buildFields: buildLocationFields,
+  valueSyncs: locationFormValueSyncs,
   toFormValues: locationToFormValues,
   toInput: buildLocationCreateInput,
   useListQuery: useLocations,

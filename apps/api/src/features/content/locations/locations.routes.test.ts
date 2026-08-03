@@ -36,7 +36,7 @@ describe('location content routes', () => {
         slug: 'sword-coast',
         kind: 'region',
         name: 'Sword Coast',
-        regionType: 'coast',
+        classification: { kind: 'geographic', type: 'coast' },
         parentLocationId: world.id,
       })
       .expect(201)

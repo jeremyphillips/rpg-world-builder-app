@@ -8,16 +8,18 @@ import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 import { contentMetaSchema, slugSchema } from '../lib/envelope'
 import { locationBaseSchema } from './base'
 import { districtLocationKindFields } from './district-variant'
-import { interiorLocationKindFields } from './interior-variant'
+import { interiorLocationKindFields, refineInteriorBodyClassification } from './interior-body'
 import { planeLocationKindFields } from './plane-variant'
 import { regionLocationKindFields } from './region-variant'
 import { settlementLocationKindFields } from './settlement-variant'
 import { siteLocationKindFields } from './site-variant'
-import { structureLocationKindFields } from './structure-variant'
+import { structureLocationKindFields, refineStructureBodyClassification } from './structure-body'
 import { worldLocationKindFields } from './world-variant'
 import { interiorTypeSchema } from '../../vocab/location/interior-type'
 import { planeTypeSchema } from '../../vocab/location/plane-type'
-import { regionTypeSchema } from '../../vocab/location/region-type'
+import { regionClassificationSchema } from './region-classification'
+import { buildingClassificationSchema } from './building-classification'
+import { interiorClassificationSchema } from './interior-classification'
 import { settlementTypeSchema } from '../../vocab/location/settlement-type'
 import { siteTypeSchema } from '../../vocab/location/site-type'
 import { structureTypeSchema } from '../../vocab/location/structure-type'
@@ -30,7 +32,7 @@ import { structureTypeSchema } from '../../vocab/location/structure-type'
 
 const planeLocationBodyFields = locationBaseSchema.extend(planeLocationKindFields)
 const worldLocationBodyFields = locationBaseSchema.extend(worldLocationKindFields)
-const regionLocationBodyFields = locationBaseSchema.extend(regionLocationKindFields)
+const regionLocationBodyFields = locationBaseSchema.extend(regionLocationKindFields).strict()
 const settlementLocationBodyFields = locationBaseSchema.extend(settlementLocationKindFields)
 const districtLocationBodyFields = locationBaseSchema.extend(districtLocationKindFields)
 const siteLocationBodyFields = locationBaseSchema.extend(siteLocationKindFields)
@@ -43,8 +45,11 @@ export const regionBodySchema = regionLocationBodyFields
 export const settlementBodySchema = settlementLocationBodyFields
 export const districtBodySchema = districtLocationBodyFields
 export const siteBodySchema = siteLocationBodyFields
-export const structureBodySchema = structureLocationBodyFields
-export const interiorBodySchema = interiorLocationBodyFields
+const structureLocationBodySchema = structureLocationBodyFields
+const interiorLocationBodySchema = interiorLocationBodyFields
+
+export { structureBodySchema } from './structure-body'
+export { interiorBodySchema } from './interior-body'
 
 const locationBodyVariants = [
   planeBodySchema,
@@ -53,14 +58,22 @@ const locationBodyVariants = [
   settlementBodySchema,
   districtBodySchema,
   siteBodySchema,
-  structureBodySchema,
-  interiorBodySchema,
+  structureLocationBodySchema,
+  interiorLocationBodySchema,
 ] as const
 
 /** Publish-complete editable body for every location kind. */
 export const locationBodySchema = z
   .discriminatedUnion('kind', [...locationBodyVariants])
   .describe(formatUnionBranchDescription('kind', [...LOCATION_KIND_IDS]))
+  .superRefine((data, ctx) => {
+    if (data.kind === 'structure') {
+      refineStructureBodyClassification(data, ctx)
+    }
+    if (data.kind === 'interior') {
+      refineInteriorBodyClassification(data, ctx)
+    }
+  })
 
 export type LocationBody = z.infer<typeof locationBodySchema>
 
@@ -87,8 +100,8 @@ export const createLocationInputSchema = z.discriminatedUnion('kind', [
   settlementBodySchema.extend({ slug: slugSchema }),
   districtBodySchema.extend({ slug: slugSchema }),
   siteBodySchema.extend({ slug: slugSchema }),
-  structureBodySchema.extend({ slug: slugSchema }),
-  interiorBodySchema.extend({ slug: slugSchema }),
+  structureLocationBodySchema.extend({ slug: slugSchema }),
+  interiorLocationBodySchema.extend({ slug: slugSchema }),
 ])
 
 export type CreateLocationInput = z.infer<typeof createLocationInputSchema>
@@ -114,7 +127,7 @@ const worldLocationBodyDraftFields = locationBaseDraftSchema.extend({
 
 const regionLocationBodyDraftFields = locationBaseDraftSchema.extend({
   kind: z.literal('region'),
-  regionType: regionTypeSchema.optional(),
+  classification: regionClassificationSchema.optional(),
 })
 
 const settlementLocationBodyDraftFields = locationBaseDraftSchema.extend({
@@ -134,11 +147,13 @@ const siteLocationBodyDraftFields = locationBaseDraftSchema.extend({
 const structureLocationBodyDraftFields = locationBaseDraftSchema.extend({
   kind: z.literal('structure'),
   structureType: structureTypeSchema.optional(),
+  classification: buildingClassificationSchema.optional(),
 })
 
 const interiorLocationBodyDraftFields = locationBaseDraftSchema.extend({
   kind: z.literal('interior'),
   interiorType: interiorTypeSchema.optional(),
+  classification: interiorClassificationSchema.optional(),
 })
 
 export const planeBodyDraftSchema = planeLocationBodyDraftFields
@@ -164,6 +179,14 @@ const locationBodyDraftVariants = [
 export const locationBodyDraftSchema = z
   .discriminatedUnion('kind', [...locationBodyDraftVariants])
   .describe(formatUnionBranchDescription('kind', [...LOCATION_KIND_IDS]))
+  .superRefine((data, ctx) => {
+    if (data.kind === 'structure') {
+      refineStructureBodyClassification(data, ctx)
+    }
+    if (data.kind === 'interior') {
+      refineInteriorBodyClassification(data, ctx)
+    }
+  })
 
 export type LocationBodyDraft = z.infer<typeof locationBodyDraftSchema>
 

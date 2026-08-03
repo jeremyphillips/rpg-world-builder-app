@@ -3,7 +3,7 @@ import type { GameTermEntry, VocabularyTerm } from '../types'
 
 export const STRUCTURE_TYPE_TERM = {
   label: 'Structure Type',
-  description: 'The built form or primary use of a structure.',
+  description: 'The built form or primary role of a structure.',
   sentence: {
     singular: 'structure type',
     plural: 'structure types',
@@ -13,43 +13,23 @@ export const STRUCTURE_TYPE_TERM = {
 export const STRUCTURE_TYPE_ENTRIES = {
   building: {
     label: 'Building',
-    description: 'A general-purpose enclosed structure.',
+    description: 'An enclosed structure that can be further classified by use.',
   },
-  tower: {
-    label: 'Tower',
-    description: 'A tall or fortified vertical structure.',
+  fortification: {
+    label: 'Fortification',
+    description: 'A defensive structure such as a wall, tower, or keep.',
   },
-  fortress: {
-    label: 'Fortress',
-    description: 'A defensive stronghold or keep.',
+  infrastructure: {
+    label: 'Infrastructure',
+    description: 'A constructed utility or transport work such as a bridge or aqueduct.',
   },
-  temple: {
-    label: 'Temple',
-    description: 'A religious or ceremonial structure.',
+  monument: {
+    label: 'Monument',
+    description: 'A commemorative or symbolic constructed landmark.',
   },
-  manor: {
-    label: 'Manor',
-    description: 'A noble estate or large residence.',
-  },
-  tavern: {
-    label: 'Tavern',
-    description: 'An inn, tavern, or similar hospitality venue.',
-  },
-  shop: {
-    label: 'Shop',
-    description: 'A storefront or workshop.',
-  },
-  warehouse: {
-    label: 'Warehouse',
-    description: 'A storage or logistics structure.',
-  },
-  ship: {
-    label: 'Ship',
-    description: 'A vessel treated as a visitable structure.',
-  },
-  wall: {
-    label: 'Wall',
-    description: 'A defensive wall, gatehouse, or barrier segment.',
+  vessel: {
+    label: 'Vessel',
+    description: 'A ship or other mobile craft treated as a visitable structure.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

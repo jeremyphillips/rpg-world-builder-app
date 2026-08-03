@@ -1,10 +1,17 @@
 import {
   getParentRequirement,
   isValidParentKind,
+  LOCATION_KIND_IDS,
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
 import type { FieldOption, FieldOptionAvailability } from '@rpg/ui/form'
+
+function parseLocationKind(value: unknown): LocationKind | undefined {
+  return typeof value === 'string' && (LOCATION_KIND_IDS as readonly string[]).includes(value)
+    ? (value as LocationKind)
+    : undefined
+}
 
 export function buildParentLocationOptions(
   locations: readonly Location[] | undefined,
@@ -18,8 +25,8 @@ export function parentLocationFieldVisibility() {
   return {
     dependsOn: ['kind'],
     visibleWhen: (watched: Record<string, unknown>) => {
-      const kind = watched['kind']
-      return typeof kind === 'string' && getParentRequirement(kind as LocationKind) !== 'forbidden'
+      const kind = parseLocationKind(watched['kind'])
+      return kind != null && getParentRequirement(kind) !== 'forbidden'
     },
   }
 }
@@ -33,8 +40,8 @@ export function buildParentLocationOptionAvailability(
   return {
     dependsOn: ['kind'],
     enabledWhen: (watched, optionValue) => {
-      const childKind = watched['kind']
-      if (typeof childKind !== 'string' || typeof optionValue !== 'string') {
+      const childKind = parseLocationKind(watched['kind'])
+      if (!childKind || typeof optionValue !== 'string') {
         return false
       }
       if (entityId && optionValue === entityId) {
@@ -46,7 +53,7 @@ export function buildParentLocationOptionAvailability(
         return false
       }
 
-      return isValidParentKind(childKind as LocationKind, parent.kind)
+      return isValidParentKind(childKind, parent.kind)
     },
   }
 }
