@@ -22,4 +22,31 @@ describe('field-renderer-config.lib', () => {
 
     expect(resolveFieldRenderConfig(config, 'md', {}, {}).config.size).toBe('md')
   })
+
+  it('resolves derived metadata from watched values', () => {
+    const config = {
+      type: 'combobox',
+      name: 'classification.archetype',
+      label: 'Archetype',
+      options: [],
+      derivedMeta: {
+        reserveSpace: true,
+        dependsOn: ['classification.archetype'],
+        metaWhen: (values) =>
+          values['classification.archetype']
+            ? { rows: [{ label: 'Typical uses', value: 'Care' }] }
+            : undefined,
+      },
+    } satisfies FieldConfig
+
+    expect(resolveFieldRenderConfig(config, 'md', {}, {})).toMatchObject({
+      derivedMeta: undefined,
+      derivedMetaReserveSpace: true,
+    })
+    expect(
+      resolveFieldRenderConfig(config, 'md', { 'classification.archetype': 'almshouse' }, {}),
+    ).toMatchObject({
+      derivedMeta: { rows: [{ label: 'Typical uses', value: 'Care' }] },
+    })
+  })
 })

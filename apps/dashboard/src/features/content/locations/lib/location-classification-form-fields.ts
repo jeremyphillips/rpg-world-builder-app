@@ -20,8 +20,8 @@ import type { FieldOption, FieldOptionAvailability, FormItem, RowFieldItem } fro
 import {
   buildBuildingArchetypeFieldOptions,
   buildBuildingFunctionOverrideFieldOptions,
-  formatBuildingArchetypeTypicalUsesHint,
-  formatBuildingFunctionOverrideHint,
+  BUILDING_FUNCTION_OVERRIDE_HINT,
+  resolveBuildingArchetypeDerivedMeta,
 } from './building-archetype-form-options'
 import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
 import {
@@ -59,14 +59,10 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
 const buildingArchetypeOptions = buildBuildingArchetypeFieldOptions()
 const buildingFunctionOverrideOptions = buildBuildingFunctionOverrideFieldOptions()
 
-const buildingArchetypeTypicalUsesHint = {
+const buildingArchetypeDerivedMeta = {
+  reserveSpace: true,
   dependsOn: ['classification.archetype'],
-  hintWhen: formatBuildingArchetypeTypicalUsesHint,
-}
-
-const buildingFunctionOverrideDynamicHint = {
-  dependsOn: ['classification.archetype'],
-  hintWhen: formatBuildingFunctionOverrideHint,
+  metaWhen: resolveBuildingArchetypeDerivedMeta,
 }
 
 const buildingSpecializationSuggestions = {
@@ -170,7 +166,7 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       multiple: false,
       placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
-      hint: { resolve: buildingArchetypeTypicalUsesHint },
+      derivedMeta: buildingArchetypeDerivedMeta,
     },
     {
       type: 'select',
@@ -210,7 +206,7 @@ export function buildLocationClassificationFields(): FormItem[] {
       label: 'Function override',
       options: buildingFunctionOverrideOptions,
       placeholder: 'Use archetype defaults',
-      hint: { resolve: buildingFunctionOverrideDynamicHint },
+      hint: BUILDING_FUNCTION_OVERRIDE_HINT,
       visibility: visibleForAuthoringType('building'),
       optionalDisclosure: {
         addLabel: 'Add function override',

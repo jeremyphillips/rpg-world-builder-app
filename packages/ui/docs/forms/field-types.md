@@ -42,6 +42,40 @@ instead of a one-option dropdown. Value stays registered in RHF and still valida
 Works with `filterSelectOptions` on parent `array` configs — `readOnlyWhen` receives the
 resolved flat option list after array filtering and `optionAvailability`.
 
+## Derived metadata (`derivedMeta`)
+
+Information resolved from the current selected value — distinct from **hint** (author
+guidance) and **validation** (errors). Rendered below the control via `FieldLayout`.
+
+**Invariant:** derived metadata is informational only. It must never participate in form
+values, dirty state, validation, or serialization.
+
+```ts
+{
+  type: 'combobox',
+  name: 'classification.archetype',
+  label: 'Archetype',
+  options: archetypeOptions,
+  derivedMeta: {
+    reserveSpace: true,
+    dependsOn: ['classification.archetype'],
+    metaWhen: (values) => {
+      const archetype = values['classification.archetype']
+      if (typeof archetype !== 'string') return undefined
+      return {
+        rows: [{ label: 'Typical uses', value: formatArchetypeFunctions(archetype) }],
+      }
+    },
+  },
+}
+```
+
+- **`rows`** — label/value pairs; v1 uses the same single-line row chrome for every row.
+- **`reserveSpace: true`** — reserves **one metadata line** so empty → populated does not
+  shift layout. Does not reserve multi-line or multi-row height.
+- **Accessibility** — when no error is present, `aria-describedby` may reference both hint
+  and derived-metadata ids. Errors still take exclusive precedence.
+
 ## Optional disclosure (`optionalDisclosure`)
 
 Collapses empty optional fields behind a compact **+ Add …** control. When expanded

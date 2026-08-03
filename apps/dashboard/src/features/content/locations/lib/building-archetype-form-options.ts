@@ -12,10 +12,10 @@ import {
   type BuildingFunctionFamily,
 } from '@rpg/contracts'
 import { optionMatchesQuery } from '@rpg/ui'
-import { toOptions, type FieldOption } from '@rpg/ui/form'
+import { toOptions, type FieldDerivedMeta, type FieldOption } from '@rpg/ui/form'
 
-const BUILDING_FUNCTION_OVERRIDE_GUIDANCE =
-  'Only change this when this particular building serves a substantially different function than its archetype normally does.'
+export const BUILDING_FUNCTION_OVERRIDE_HINT =
+  "Replaces the archetype's typical uses for this building."
 
 /** Precedence tiers for archetype combobox ranking (higher = better match). */
 const RANK_TIER = {
@@ -184,23 +184,19 @@ export function buildBuildingFunctionOverrideFieldOptions(): FieldOption[] {
   )
 }
 
-/** Read-only typical-uses hint shown after an archetype is selected. */
-export function formatBuildingArchetypeTypicalUsesHint(
+/** Derived metadata for the selected building archetype (typical function uses). */
+export function resolveBuildingArchetypeDerivedMeta(
   values: Record<string, unknown>,
-): string | undefined {
+): FieldDerivedMeta | undefined {
   const archetype = readSelectedArchetype(values)
   if (!archetype) return undefined
 
-  return `Typical uses: ${formatBuildingFunctionFamilyLabels(getBuildingArchetypeFunctions(archetype))}`
-}
-
-/** Guidance and default-function context for the function override control. */
-export function formatBuildingFunctionOverrideHint(
-  values: Record<string, unknown>,
-): string | undefined {
-  const archetype = readSelectedArchetype(values)
-  if (!archetype) return BUILDING_FUNCTION_OVERRIDE_GUIDANCE
-
-  const defaults = formatBuildingFunctionFamilyLabels(getBuildingArchetypeFunctions(archetype))
-  return `Default functions: ${defaults}. ${BUILDING_FUNCTION_OVERRIDE_GUIDANCE}`
+  return {
+    rows: [
+      {
+        label: 'Typical uses',
+        value: formatBuildingFunctionFamilyLabels(getBuildingArchetypeFunctions(archetype)),
+      },
+    ],
+  }
 }

@@ -205,6 +205,28 @@ export interface FieldHintConfig {
   resolve?: FieldDynamicHint
 }
 
+/** One label/value row in derived field metadata (informational, not authored). */
+export interface FieldDerivedMetaRow {
+  label: string
+  value: string
+}
+
+/** Resolved derived metadata below the control — display-only, never serialized. */
+export interface FieldDerivedMeta {
+  rows: readonly FieldDerivedMetaRow[]
+}
+
+/**
+ * Dynamic metadata projected from watched form values (e.g. archetype typical uses).
+ * Informational only — must not participate in values, dirty state, validation, or serialization.
+ */
+export interface FieldDerivedMetaConfig {
+  /** When true, reserve one metadata line to prevent empty → populated layout shift. */
+  reserveSpace?: boolean
+  dependsOn: readonly string[]
+  metaWhen: (values: Record<string, unknown>) => FieldDerivedMeta | undefined
+}
+
 /**
  * Patches form values when watched driver fields change (after initial mount).
  * Used to remove dependent selections when a mode or category changes.
@@ -241,6 +263,8 @@ interface BaseFieldConfig {
    */
   width?: FieldWidth
   hint?: string | FieldHintConfig
+  /** Informational metadata below the control — resolved from other field values. */
+  derivedMeta?: FieldDerivedMetaConfig
   /** Renders the label `[i]` InfoTooltip. */
   info?: ReactNode
   required?: boolean
@@ -1395,6 +1419,15 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
     position: hint.position ?? 'below-label',
     resolve: hint.resolve,
   }
+}
+
+/** Collects watched field names for dynamic hint and derived metadata resolution. */
+export function collectFieldDynamicDependsOn(
+  field: Pick<BaseFieldConfig, 'hint' | 'derivedMeta'>,
+): readonly string[] {
+  const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
+  const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
+  return [...new Set([...hintDependsOn, ...derivedMetaDependsOn])]
 }
 
 /** Resolves static and dynamic hint text for a field config. */

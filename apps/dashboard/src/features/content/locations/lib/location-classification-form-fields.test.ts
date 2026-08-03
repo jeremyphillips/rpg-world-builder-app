@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import type {
-  ComboboxFieldConfig,
-  SelectFieldConfig,
-  TextSuggestionsFieldConfig,
-} from '@rpg/ui/form'
 
 import {
   buildBuildingArchetypeFieldOptions,
+  BUILDING_FUNCTION_OVERRIDE_HINT,
   formatBuildingArchetypeOptionDescription,
-  formatBuildingArchetypeTypicalUsesHint,
-  formatBuildingFunctionOverrideHint,
+  resolveBuildingArchetypeDerivedMeta,
 } from './building-archetype-form-options'
 import {
   buildLocationClassificationFields,
@@ -44,17 +39,36 @@ describe('building archetype form options', () => {
     })
   })
 
-  it('formats typical uses from function labels only', () => {
-    expect(formatBuildingArchetypeTypicalUsesHint({ 'classification.archetype': 'inn' })).toBe(
-      'Typical uses: Lodging · Food & drink',
-    )
-    expect(formatBuildingArchetypeTypicalUsesHint({})).toBeUndefined()
+  it('returns undefined derived metadata when no archetype is selected', () => {
+    expect(resolveBuildingArchetypeDerivedMeta({})).toBeUndefined()
   })
 
-  it('formats function override guidance with default functions', () => {
-    expect(formatBuildingFunctionOverrideHint({ 'classification.archetype': 'temple' })).toBe(
-      'Default functions: Worship. Only change this when this particular building serves a substantially different function than its archetype normally does.',
-    )
+  it('resolves typical uses as separate label and value rows', () => {
+    expect(resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'inn' })).toEqual({
+      rows: [{ label: 'Typical uses', value: 'Lodging · Food & drink' }],
+    })
+    expect(
+      resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'guildhall' }),
+    ).toEqual({
+      rows: [{ label: 'Typical uses', value: 'Assembly · Governance' }],
+    })
+  })
+
+  it('resolves caravanserai typical uses from the registry without a related archetype row', () => {
+    expect(
+      resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'caravanserai' }),
+    ).toEqual({
+      rows: [{ label: 'Typical uses', value: 'Lodging · Retail' }],
+    })
+  })
+
+  it('updates derived metadata when the selected archetype changes', () => {
+    expect(
+      resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'inn' })?.rows[0],
+    ).toMatchObject({ value: 'Lodging · Food & drink' })
+    expect(
+      resolveBuildingArchetypeDerivedMeta({ 'classification.archetype': 'guildhall' })?.rows[0],
+    ).toMatchObject({ value: 'Assembly · Governance' })
   })
 })
 
@@ -87,11 +101,11 @@ describe('buildLocationClassificationFields building UX', () => {
     ])
   })
 
-  it('wires the archetype combobox for buildings with typical-uses hint resolution', () => {
+  it('wires the archetype combobox with derived metadata instead of a dynamic hint', () => {
     const archetypeField = fieldByName(
       buildLocationPrimaryClassificationFields(),
       'classification.archetype',
-    ) as ComboboxFieldConfig
+    )
     expect(archetypeField).toMatchObject({
       type: 'combobox',
       multiple: false,
@@ -99,19 +113,19 @@ describe('buildLocationClassificationFields building UX', () => {
       visibility: {
         dependsOn: ['authoringType'],
       },
-      hint: {
-        resolve: {
-          dependsOn: ['classification.archetype'],
-        },
+      derivedMeta: {
+        reserveSpace: true,
+        dependsOn: ['classification.archetype'],
       },
     })
+    expect(archetypeField).not.toHaveProperty('hint')
   })
 
   it('wires specialization as text-with-suggestions driven by archetype', () => {
     const specializationField = fieldByName(
       buildLocationClassificationFields(),
       'classification.specialization',
-    ) as TextSuggestionsFieldConfig
+    )
     expect(specializationField).toMatchObject({
       type: 'textSuggestions',
       placeholder: 'Optional',
@@ -124,14 +138,15 @@ describe('buildLocationClassificationFields building UX', () => {
     })
   })
 
-  it('wires function override as an optional-disclosure select driven by archetype', () => {
+  it('wires function override with static guidance and no dynamic default-function hint', () => {
     const overrideField = fieldByName(
       buildLocationClassificationFields(),
       'classification.functionOverride',
-    ) as SelectFieldConfig
+    )
     expect(overrideField).toMatchObject({
       type: 'select',
       placeholder: 'Use archetype defaults',
+      hint: BUILDING_FUNCTION_OVERRIDE_HINT,
       visibility: {
         dependsOn: ['authoringType'],
       },
@@ -139,11 +154,8 @@ describe('buildLocationClassificationFields building UX', () => {
         addLabel: 'Add function override',
         removeLabel: 'Remove function override',
       },
-      hint: {
-        resolve: {
-          dependsOn: ['classification.archetype'],
-        },
-      },
     })
+    expect(overrideField).not.toHaveProperty('hint.resolve')
+    expect(BUILDING_FUNCTION_OVERRIDE_HINT).not.toMatch(/Default functions:/)
   })
 })

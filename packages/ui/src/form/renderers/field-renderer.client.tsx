@@ -24,7 +24,8 @@ import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-me
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
 import { pickFieldChromeProps } from '../../components/ui/field-chrome.variants'
-import { normalizeFieldHint } from '../field-config'
+import { collectFieldDynamicDependsOn } from '../field-config'
+import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
 import {
   OptionalDisclosureSelectFieldRenderer,
@@ -437,6 +438,22 @@ export interface FieldRendererProps {
   namePrefix?: string
 }
 
+function wrapFieldDerivedMetaPresentation(
+  node: React.ReactElement,
+  resolved: ReturnType<typeof resolveFieldRenderConfig>,
+) {
+  if (!resolved.derivedMeta && !resolved.derivedMetaReserveSpace) return node
+
+  return (
+    <FieldDerivedMetaProvider
+      meta={resolved.derivedMeta}
+      reserveSpace={resolved.derivedMetaReserveSpace}
+    >
+      {node}
+    </FieldDerivedMetaProvider>
+  )
+}
+
 /**
  * Binds one `FieldConfig` to react-hook-form via `useController` (so only this
  * field re-renders on its own value/error change) and dispatches to the matching
@@ -446,12 +463,11 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const { size: inheritedSize } = useFormSectionContext()
   const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
 
-  const hintDependsOn = normalizeFieldHint(config.hint).resolve?.dependsOn ?? []
-  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
+  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(config, inheritedSize, hintValues, optionValues)
+  const resolved = resolveFieldRenderConfig(config, inheritedSize, dynamicValues, optionValues)
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,
@@ -461,39 +477,44 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     hint: resolved.hint,
     hintPosition: resolved.hintPosition,
   })
-  if (specialized) return specialized
+  if (specialized) {
+    return wrapFieldDerivedMetaPresentation(specialized, resolved)
+  }
 
   if (config.type === 'select') {
     if (config.optionalDisclosure) {
       assertOptionalDisclosureFieldConfig(config)
-      return (
+      return wrapFieldDerivedMetaPresentation(
         <OptionalDisclosureSelectFieldRenderer
           config={config}
           disclosure={config.optionalDisclosure}
           fullName={fullName}
           id={id}
           namePrefix={namePrefix}
-        />
+        />,
+        resolved,
       )
     }
 
-    return (
-      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />
+    return wrapFieldDerivedMetaPresentation(
+      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />,
+      resolved,
     )
   }
 
   if (config.type === 'textSuggestions') {
-    return (
+    return wrapFieldDerivedMetaPresentation(
       <TextSuggestionsFieldRenderer
         config={config}
         fullName={fullName}
         id={id}
         namePrefix={namePrefix}
-      />
+      />,
+      resolved,
     )
   }
 
-  return (
+  return wrapFieldDerivedMetaPresentation(
     <StandardFieldRenderer
       config={config}
       renderConfig={resolved.config as StandardFieldConfig}
@@ -502,7 +523,8 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       fullName={fullName}
       id={id}
       namePrefix={namePrefix}
-    />
+    />,
+    resolved,
   )
 }
 

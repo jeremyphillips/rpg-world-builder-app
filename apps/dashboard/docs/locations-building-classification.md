@@ -13,7 +13,7 @@ history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/bui
 | Layer              | Field                                 | Question it answers                                            | Author-facing?                                             |
 | ------------------ | ------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                       |
-| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Read-only hint (Typical uses)                              |
+| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)          |
 | **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional free text with registry suggestions         |
 | **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional disclosure select (`Add function override`) |
 
@@ -51,7 +51,9 @@ parent archetype.
 **Caravanserai** is a cultural **manifestation** of **Inn** in the registry
 (`manifestationOf: 'inn'`). Authors pick Caravanserai when that identity matters;
 discovery search still connects it to inn/traveler/caravan vocabulary at
-projection time.
+projection time. The archetype picker shows manifestation context on option rows;
+post-selection authoring shows **Typical uses** only (not a separate Related
+archetype line) to keep a single stable metadata row below the control.
 
 ### Temple with a care override
 
