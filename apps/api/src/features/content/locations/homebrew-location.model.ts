@@ -1,7 +1,8 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
 import {
-  BUILDING_TYPE_IDS,
+  BUILDING_ARCHETYPE_IDS,
+  BUILDING_FUNCTION_FAMILY_IDS,
   GEOGRAPHIC_REGION_TYPE_IDS,
   INTERIOR_TYPE_IDS,
   LOCATION_KIND_IDS,
@@ -11,7 +12,6 @@ import {
   SETTLEMENT_TYPE_IDS,
   SITE_TYPE_IDS,
   STRUCTURE_TYPE_IDS,
-  getBuildingSubtypeIds,
   getInteriorSubtypeIds,
   type InteriorClassificationType,
 } from '@rpg/contracts'
@@ -23,11 +23,15 @@ import {
 
 const { model, models, Schema } = mongoose
 
-const buildingSubtypeIds = BUILDING_TYPE_IDS.flatMap((type) => [...getBuildingSubtypeIds(type)])
 const interiorClassificationTypeIds = (
   ['level', 'space', 'passage', 'vertical_access', 'overlook'] as const
 ).flatMap((interiorType) => [...getInteriorSubtypeIds(interiorType as InteriorClassificationType)])
 
+/**
+ * Classification subdoc mirrors storage shape only.
+ * `kind`/`type` discriminate region and interior branches; building fields are Model E.
+ * Zod contracts own cross-field classification validity — do not duplicate here.
+ */
 const homebrewLocationSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
@@ -41,11 +45,12 @@ const homebrewLocationSchema = new Schema(
         enum: [
           ...POLITICAL_REGION_TYPE_IDS,
           ...GEOGRAPHIC_REGION_TYPE_IDS,
-          ...BUILDING_TYPE_IDS,
           ...interiorClassificationTypeIds,
         ],
       },
-      subtype: { type: String, enum: [...buildingSubtypeIds] },
+      archetype: { type: String, enum: [...BUILDING_ARCHETYPE_IDS] },
+      functionOverride: { type: String, enum: [...BUILDING_FUNCTION_FAMILY_IDS] },
+      specialization: { type: String },
     },
     settlementType: { type: String, enum: [...SETTLEMENT_TYPE_IDS] },
     siteType: { type: String, enum: [...SITE_TYPE_IDS] },

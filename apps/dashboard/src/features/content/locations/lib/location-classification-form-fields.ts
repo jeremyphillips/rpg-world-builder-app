@@ -1,7 +1,8 @@
 import {
-  BUILDING_TYPE_DEFINITIONS,
-  BUILDING_TYPE_IDS,
-  getBuildingSubtypeIds,
+  BUILDING_ARCHETYPE_ENTRIES,
+  BUILDING_ARCHETYPE_IDS,
+  BUILDING_FUNCTION_FAMILY_ENTRIES,
+  BUILDING_FUNCTION_FAMILY_IDS,
   getRegionTypeIds,
   getRegionTypeLabelForKind,
   INTERIOR_TYPE_DEFINITIONS,
@@ -11,7 +12,6 @@ import {
   REGION_CLASSIFICATION_KIND_IDS,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
-  type BuildingType,
   type InteriorClassificationType,
   type RegionClassificationKind,
 } from '@rpg/contracts'
@@ -45,8 +45,14 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
   })),
 )
 
-const allBuildingSubtypeOptions = BUILDING_TYPE_IDS.flatMap((type) =>
-  entriesToFieldOptions(getBuildingSubtypeIds(type), BUILDING_TYPE_DEFINITIONS[type].subtypes),
+const buildingArchetypeOptions = entriesToFieldOptions(
+  BUILDING_ARCHETYPE_IDS,
+  BUILDING_ARCHETYPE_ENTRIES,
+)
+
+const buildingFunctionOverrideOptions = entriesToFieldOptions(
+  BUILDING_FUNCTION_FAMILY_IDS,
+  BUILDING_FUNCTION_FAMILY_ENTRIES,
 )
 
 const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interiorType) =>
@@ -66,19 +72,6 @@ function regionClassificationTypeAvailability(): FieldOptionAvailability {
       const kind = watched['classification.kind']
       if (typeof kind !== 'string') return false
       return (getRegionTypeIds(kind as RegionClassificationKind) as readonly string[]).includes(
-        optionValue,
-      )
-    },
-  }
-}
-
-function buildingSubtypeAvailability(): FieldOptionAvailability {
-  return {
-    dependsOn: ['classification.type'],
-    enabledWhen: (watched, optionValue) => {
-      const type = watched['classification.type']
-      if (typeof type !== 'string') return false
-      return (getBuildingSubtypeIds(type as BuildingType) as readonly string[]).includes(
         optionValue,
       )
     },
@@ -112,16 +105,6 @@ function visibleWhenRegionClassificationKindSet() {
     dependsOn: ['kind', 'classification.kind'],
     visibleWhen: (watched: Record<string, unknown>) =>
       watched['kind'] === 'region' && typeof watched['classification.kind'] === 'string',
-  }
-}
-
-function visibleWhenBuildingClassificationTypeSet() {
-  return {
-    dependsOn: ['kind', 'structureType', 'classification.type'],
-    visibleWhen: (watched: Record<string, unknown>) =>
-      watched['kind'] === 'structure' &&
-      watched['structureType'] === 'building' &&
-      typeof watched['classification.type'] === 'string',
   }
 }
 
@@ -162,25 +145,33 @@ export function buildLocationClassificationFields(): FormItem[] {
     },
     {
       type: 'select',
-      name: 'classification.type',
-      label: 'Building type',
-      options: entriesToFieldOptions(
-        BUILDING_TYPE_IDS,
-        Object.fromEntries(
-          BUILDING_TYPE_IDS.map((id) => [id, { label: BUILDING_TYPE_DEFINITIONS[id].label }]),
-        ) as Record<BuildingType, { label: string }>,
-      ),
+      name: 'classification.archetype',
+      label: 'Archetype',
+      options: buildingArchetypeOptions,
       placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForStructureType('building'),
     },
     {
-      type: 'select',
-      name: 'classification.subtype',
-      label: 'Building subtype',
-      options: allBuildingSubtypeOptions,
-      placeholder: SELECT_PLACEHOLDER,
-      visibility: visibleWhenBuildingClassificationTypeSet(),
-      optionAvailability: buildingSubtypeAvailability(),
+      type: 'text',
+      name: 'classification.specialization',
+      label: 'Specialization',
+      placeholder: 'Optional',
+      visibility: visibleForStructureType('building'),
+    },
+    {
+      kind: 'group',
+      legend: 'Advanced classification',
+      disclosure: { variant: 'legend', defaultOpen: false },
+      visibility: visibleForStructureType('building'),
+      fields: [
+        {
+          type: 'select',
+          name: 'classification.functionOverride',
+          label: 'Function override',
+          options: buildingFunctionOverrideOptions,
+          placeholder: 'Use archetype defaults',
+        },
+      ],
     },
     {
       type: 'select',

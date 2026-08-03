@@ -139,4 +139,168 @@ describe('location content routes', () => {
     })
     expect(createRes.body.locations.parentLocationId).toBeUndefined()
   })
+
+  it('persists Model E building classification variants', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const worldRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ slug: 'model-e-world', kind: 'world', name: 'Model E World' })
+      .expect(201)
+
+    const settlementRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'model-e-settlement',
+        kind: 'settlement',
+        name: 'Model E Settlement',
+        settlementType: 'city',
+        parentLocationId: worldRes.body.locations.id,
+      })
+      .expect(201)
+
+    const parentId = settlementRes.body.locations.id
+
+    const archetypeOnlyRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'yawning-portal',
+        kind: 'structure',
+        name: 'Yawning Portal',
+        structureType: 'building',
+        classification: { archetype: 'tavern' },
+        parentLocationId: parentId,
+      })
+      .expect(201)
+    expect(archetypeOnlyRes.body.locations.classification).toEqual({ archetype: 'tavern' })
+
+    const specializationRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'coaching-inn',
+        kind: 'structure',
+        name: 'Coaching Inn',
+        structureType: 'building',
+        classification: { archetype: 'inn', specialization: 'Coaching inn' },
+        parentLocationId: parentId,
+      })
+      .expect(201)
+    expect(specializationRes.body.locations.classification).toEqual({
+      archetype: 'inn',
+      specialization: 'Coaching inn',
+    })
+
+    const overrideRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'healing-temple',
+        kind: 'structure',
+        name: 'Healing Temple',
+        structureType: 'building',
+        classification: { archetype: 'temple', functionOverride: 'care' },
+        parentLocationId: parentId,
+      })
+      .expect(201)
+    expect(overrideRes.body.locations.classification).toEqual({
+      archetype: 'temple',
+      functionOverride: 'care',
+    })
+
+    const manifestationRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'desert-rest',
+        kind: 'structure',
+        name: 'Desert Rest',
+        structureType: 'building',
+        classification: { archetype: 'caravanserai' },
+        parentLocationId: parentId,
+      })
+      .expect(201)
+    expect(manifestationRes.body.locations.classification).toEqual({ archetype: 'caravanserai' })
+
+    const unclassifiedRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'unfinished-hall',
+        kind: 'structure',
+        name: 'Unfinished Hall',
+        structureType: 'building',
+        parentLocationId: parentId,
+      })
+      .expect(201)
+    expect(unclassifiedRes.body.locations.classification).toBeUndefined()
+  })
+
+  it('rejects invalid Model E building classification values', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const worldRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ slug: 'reject-world', kind: 'world', name: 'Reject World' })
+      .expect(201)
+
+    const settlementRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'reject-settlement',
+        kind: 'settlement',
+        name: 'Reject Settlement',
+        settlementType: 'town',
+        parentLocationId: worldRes.body.locations.id,
+      })
+      .expect(201)
+
+    const parentId = settlementRes.body.locations.id
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'bad-archetype',
+        kind: 'structure',
+        name: 'Bad Archetype',
+        structureType: 'building',
+        classification: { archetype: 'not_an_archetype' },
+        parentLocationId: parentId,
+      })
+      .expect(400)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'bad-override',
+        kind: 'structure',
+        name: 'Bad Override',
+        structureType: 'building',
+        classification: { archetype: 'temple', functionOverride: 'not_a_function' },
+        parentLocationId: parentId,
+      })
+      .expect(400)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'fort-with-classification',
+        kind: 'structure',
+        name: 'Fort With Classification',
+        structureType: 'fortification',
+        classification: { archetype: 'tavern' },
+        parentLocationId: parentId,
+      })
+      .expect(400)
+  })
 })

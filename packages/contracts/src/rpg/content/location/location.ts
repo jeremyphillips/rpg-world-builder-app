@@ -8,12 +8,20 @@ import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 import { contentMetaSchema, slugSchema } from '../lib/envelope'
 import { locationBaseSchema } from './base'
 import { districtLocationKindFields } from './district-variant'
-import { interiorLocationKindFields, refineInteriorBodyClassification } from './interior-body'
+import {
+  interiorBodySchema,
+  interiorLocationKindFields,
+  refineInteriorBodyClassification,
+} from './interior-body'
 import { planeLocationKindFields } from './plane-variant'
 import { regionLocationKindFields } from './region-variant'
+import {
+  refineStructureBodyClassification,
+  structureBodySchema,
+  structureLocationKindFields,
+} from './structure-body'
 import { settlementLocationKindFields } from './settlement-variant'
 import { siteLocationKindFields } from './site-variant'
-import { structureLocationKindFields, refineStructureBodyClassification } from './structure-body'
 import { worldLocationKindFields } from './world-variant'
 import { interiorTypeSchema } from '../../vocab/location/interior-type'
 import { planeTypeSchema } from '../../vocab/location/plane-type'
@@ -100,8 +108,8 @@ export const createLocationInputSchema = z.discriminatedUnion('kind', [
   settlementBodySchema.extend({ slug: slugSchema }),
   districtBodySchema.extend({ slug: slugSchema }),
   siteBodySchema.extend({ slug: slugSchema }),
-  structureLocationBodySchema.extend({ slug: slugSchema }),
-  interiorLocationBodySchema.extend({ slug: slugSchema }),
+  structureBodySchema.extend({ slug: slugSchema }),
+  interiorBodySchema.extend({ slug: slugSchema }),
 ])
 
 export type CreateLocationInput = z.infer<typeof createLocationInputSchema>

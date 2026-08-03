@@ -1,8 +1,6 @@
 import {
-  getBuildingSubtypeIds,
   getRegionTypeIds,
   INTERIOR_TYPE_DEFINITIONS,
-  type BuildingType,
   type InteriorClassificationType,
   type LocationKind,
   type RegionClassificationKind,
@@ -12,7 +10,9 @@ import type { FormValueSync } from '@rpg/ui/form'
 type ClassificationFormSlice = {
   kind?: string
   type?: string
-  subtype?: string
+  archetype?: string
+  functionOverride?: string
+  specialization?: string
 }
 
 function readClassification(values: Record<string, unknown>): ClassificationFormSlice {
@@ -68,23 +68,20 @@ function syncStructureTypeChange(
   return { classification: undefined }
 }
 
-function syncBuildingClassificationTypeChange(
+function syncBuildingArchetypeChange(
   values: Record<string, unknown>,
 ): Partial<Record<string, unknown>> | undefined {
   const classification = readClassification(values)
-  const type = classification.type
-  if (!type) {
-    return classification.subtype ? classificationPatch(values, { subtype: undefined }) : undefined
+  const patch: Partial<ClassificationFormSlice> = {}
+
+  if (classification.specialization) {
+    patch.specialization = undefined
+  }
+  if (classification.functionOverride) {
+    patch.functionOverride = undefined
   }
 
-  const subtype = classification.subtype
-  if (!subtype) return undefined
-
-  if (!(getBuildingSubtypeIds(type as BuildingType) as readonly string[]).includes(subtype)) {
-    return classificationPatch(values, { subtype: undefined })
-  }
-
-  return undefined
+  return Object.keys(patch).length > 0 ? classificationPatch(values, patch) : undefined
 }
 
 function syncRegionClassificationKindChange(
@@ -145,11 +142,11 @@ export const locationFormValueSyncs: FormValueSync[] = [
       changedKeys.includes('structureType') ? syncStructureTypeChange(values) : undefined,
   },
   {
-    dependsOn: ['classification.type'],
+    dependsOn: ['classification.archetype'],
     apply: (values, changedKeys) => {
-      if (!changedKeys.includes('classification.type')) return undefined
+      if (!changedKeys.includes('classification.archetype')) return undefined
       if (values['kind'] === 'structure' && values['structureType'] === 'building') {
-        return syncBuildingClassificationTypeChange(values)
+        return syncBuildingArchetypeChange(values)
       }
       return undefined
     },

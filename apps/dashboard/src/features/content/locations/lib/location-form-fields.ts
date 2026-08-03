@@ -53,7 +53,9 @@ const classificationFormSchema = z
   .object({
     kind: z.string().optional(),
     type: z.string().optional(),
-    subtype: z.string().optional(),
+    archetype: z.string().optional(),
+    functionOverride: z.string().optional(),
+    specialization: z.string().optional(),
   })
   .optional()
 
