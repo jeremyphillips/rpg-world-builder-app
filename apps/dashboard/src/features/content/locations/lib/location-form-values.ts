@@ -9,6 +9,12 @@ import {
 
 import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import {
+  canonicalFieldsForAuthoringType,
+  LOCATION_AUTHORING_TYPE_IDS,
+  resolveLocationAuthoringType,
+  type LocationAuthoringType,
+} from './location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
 
 export const locationCreateDefaultValues: Partial<LocationFormValues> = {}
@@ -91,12 +97,15 @@ const kindBodyFieldBuilders: Record<
     kind: 'site',
     ...(values.siteType ? { siteType: values.siteType } : {}),
   }),
-  structure: (values) => ({
-    ...sharedBodyFields(values),
-    kind: 'structure',
-    ...(values.structureType ? { structureType: values.structureType } : {}),
-    ...(values.structureType === 'building' ? buildBuildingClassification(values) : {}),
-  }),
+  structure: (values) => {
+    const { structureType } = canonicalFieldsForAuthoringType(values.authoringType)
+    return {
+      ...sharedBodyFields(values),
+      kind: 'structure',
+      ...(structureType ? { structureType } : {}),
+      ...(structureType === 'building' ? buildBuildingClassification(values) : {}),
+    }
+  },
   interior: (values) => ({
     ...sharedBodyFields(values),
     kind: 'interior',
@@ -106,14 +115,15 @@ const kindBodyFieldBuilders: Record<
 }
 
 function buildLocationBodyFields(values: LocationFormValues): Record<string, unknown> {
-  if (!values.kind) {
+  if (!values.authoringType) {
     return {
       name: values.name,
       description: values.description || undefined,
     }
   }
 
-  return kindBodyFieldBuilders[values.kind](values)
+  const { kind } = canonicalFieldsForAuthoringType(values.authoringType)
+  return kindBodyFieldBuilders[kind](values)
 }
 
 const kindFormValueExtractors: Partial<
@@ -133,22 +143,17 @@ const kindFormValueExtractors: Partial<
     entity.kind === 'settlement' ? { settlementType: entity.settlementType } : {},
   site: (entity) => (entity.kind === 'site' ? { siteType: entity.siteType } : {}),
   structure: (entity) =>
-    entity.kind === 'structure'
+    entity.kind === 'structure' && entity.classification
       ? {
-          structureType: entity.structureType,
-          ...(entity.classification
-            ? {
-                classification: {
-                  archetype: entity.classification.archetype,
-                  ...(entity.classification.specialization
-                    ? { specialization: entity.classification.specialization }
-                    : {}),
-                  ...(entity.classification.functionOverride
-                    ? { functionOverride: entity.classification.functionOverride }
-                    : {}),
-                },
-              }
-            : {}),
+          classification: {
+            archetype: entity.classification.archetype,
+            ...(entity.classification.specialization
+              ? { specialization: entity.classification.specialization }
+              : {}),
+            ...(entity.classification.functionOverride
+              ? { functionOverride: entity.classification.functionOverride }
+              : {}),
+          },
         }
       : {},
   interior: (entity) =>
@@ -167,7 +172,7 @@ export function locationToFormValues(entity: Location): Partial<LocationFormValu
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
-    kind: entity.kind,
+    authoringType: resolveLocationAuthoringType(entity),
     parentLocationId: entity.parentLocationId,
     ...kindFormValueExtractors[entity.kind]?.(entity),
   }
@@ -187,4 +192,19 @@ export function buildLocationCreateInput(
   })
 
   return finalizeContentInput(input, ctx) as CreateLocationInput
+}
+
+/** @internal Exported for parent-picker and sync modules within the form layer. */
+export function resolveAuthoringTypeFromFormValues(
+  values: Record<string, unknown>,
+): LocationAuthoringType | undefined {
+  const authoringType = values['authoringType']
+  if (
+    typeof authoringType !== 'string' ||
+    authoringType === '' ||
+    !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(authoringType)
+  ) {
+    return undefined
+  }
+  return authoringType as LocationAuthoringType
 }

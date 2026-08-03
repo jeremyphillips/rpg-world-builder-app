@@ -7,20 +7,23 @@ import {
   formatBuildingArchetypeTypicalUsesHint,
   formatBuildingFunctionOverrideHint,
 } from './building-archetype-form-options'
-import { buildLocationClassificationFields } from './location-classification-form-fields'
+import {
+  buildLocationClassificationFields,
+  buildLocationPrimaryClassificationFields,
+} from './location-classification-form-fields'
 
-function fieldByName(name: string) {
-  const field = buildLocationClassificationFields().find(
-    (item) => !('kind' in item) && item.name === name,
-  )
+type FormItemLike = ReturnType<typeof buildLocationClassificationFields>[number]
+
+function fieldByName(items: FormItemLike[], name: string) {
+  const field = items.find((item) => !('kind' in item) && item.name === name)
   if (!field) {
     throw new Error(`expected field ${name}`)
   }
   return field
 }
 
-function groupByLegend(legend: string): GroupConfig {
-  const group = buildLocationClassificationFields().find(
+function groupByLegend(items: FormItemLike[], legend: string): GroupConfig {
+  const group = items.find(
     (item): item is GroupConfig =>
       'kind' in item && item.kind === 'group' && item.legend === legend,
   )
@@ -63,8 +66,12 @@ describe('building archetype form options', () => {
 })
 
 describe('buildLocationClassificationFields building UX', () => {
-  it('orders building fields as structure type, archetype, specialization, then advanced group', () => {
-    const names = buildLocationClassificationFields().flatMap((item) => {
+  it('keeps secondary fields after the primary classification row', () => {
+    const primaryNames = buildLocationPrimaryClassificationFields().flatMap((item) => {
+      if ('kind' in item) return []
+      return [item.name]
+    })
+    const secondaryNames = buildLocationClassificationFields().flatMap((item) => {
       if ('kind' in item && item.kind === 'group') {
         return 'legend' in item && item.legend === 'Advanced classification' ? [item.legend] : []
       }
@@ -74,26 +81,33 @@ describe('buildLocationClassificationFields building UX', () => {
       return [item.name]
     })
 
-    expect(names).toEqual([
+    expect(primaryNames).toEqual([
+      'planeType',
       'classification.kind',
-      'classification.type',
-      'structureType',
+      'settlementType',
+      'siteType',
       'classification.archetype',
+      'interiorType',
+    ])
+    expect(secondaryNames).toEqual([
+      'classification.type',
       'classification.specialization',
       'Advanced classification',
-      'interiorType',
       'classification.type',
     ])
   })
 
   it('wires the archetype combobox for buildings with typical-uses hint resolution', () => {
-    const archetypeField = fieldByName('classification.archetype') as ComboboxFieldConfig
+    const archetypeField = fieldByName(
+      buildLocationPrimaryClassificationFields(),
+      'classification.archetype',
+    ) as ComboboxFieldConfig
     expect(archetypeField).toMatchObject({
       type: 'combobox',
       multiple: false,
       placeholder: 'Search building archetypes…',
       visibility: {
-        dependsOn: ['kind', 'structureType'],
+        dependsOn: ['authoringType'],
       },
       hint: {
         resolve: {
@@ -105,13 +119,14 @@ describe('buildLocationClassificationFields building UX', () => {
 
   it('wires specialization as text-with-suggestions driven by archetype', () => {
     const specializationField = fieldByName(
+      buildLocationClassificationFields(),
       'classification.specialization',
     ) as TextSuggestionsFieldConfig
     expect(specializationField).toMatchObject({
       type: 'textSuggestions',
       placeholder: 'Optional',
       visibility: {
-        dependsOn: ['kind', 'structureType'],
+        dependsOn: ['authoringType'],
       },
       suggestions: {
         dependsOn: ['classification.archetype'],
@@ -120,7 +135,10 @@ describe('buildLocationClassificationFields building UX', () => {
   })
 
   it('keeps advanced classification collapsed by default with override hint wiring', () => {
-    const advancedGroup = groupByLegend('Advanced classification')
+    const advancedGroup = groupByLegend(
+      buildLocationClassificationFields(),
+      'Advanced classification',
+    )
     expect(advancedGroup.disclosure).toEqual({ variant: 'legend', defaultOpen: false })
     expect(advancedGroup.fields[0]).toMatchObject({
       name: 'classification.functionOverride',

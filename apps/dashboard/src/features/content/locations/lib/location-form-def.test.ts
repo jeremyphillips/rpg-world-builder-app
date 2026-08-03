@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from 'vitest'
 import { createLocationInputSchema, type CreateLocationInput } from '@rpg/contracts'
 
 import { WATERDEEP, YAWNING_PORTAL } from '../fixtures'
+import { resolveLocationAuthoringType } from './location-authoring-type'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormValues } from './location-form-fields'
 
@@ -19,6 +20,7 @@ describe('locationFormDef', () => {
       expect(input.settlementType).toBe('city')
     }
     expect(input.parentLocationId).toBe(WATERDEEP.parentLocationId)
+    expect(values.authoringType).toBe('settlement')
   })
 
   it('round-trips building classification into a publish input', () => {
@@ -30,11 +32,13 @@ describe('locationFormDef', () => {
       expect(input.structureType).toBe('building')
       expect(input.classification).toEqual({ archetype: 'tavern' })
     }
+    expect(values.authoringType).toBe('building')
+    expect(resolveLocationAuthoringType(YAWNING_PORTAL)).toBe('building')
   })
 
   it('allows incomplete drafts without parent or subtype fields', () => {
     const input = locationFormDef.toInput(
-      { name: 'Unfinished Site', kind: 'site' } as LocationFormValues,
+      { name: 'Unfinished Site', authoringType: 'site' } as LocationFormValues,
       undefined,
       'draft',
     )
@@ -43,7 +47,7 @@ describe('locationFormDef', () => {
     expect(input).not.toHaveProperty('siteType')
   })
 
-  it('requires kind for publish', () => {
+  it('requires authoringType for publish', () => {
     expect(() => locationFormDef.toInput({ name: 'Incomplete' } as LocationFormValues)).toThrow()
   })
 })

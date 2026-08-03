@@ -1,16 +1,18 @@
 import {
   getParentRequirement,
   isValidParentKind,
-  LOCATION_KIND_IDS,
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
 import type { FieldOption, FieldOptionAvailability } from '@rpg/ui/form'
 
-function parseLocationKind(value: unknown): LocationKind | undefined {
-  return typeof value === 'string' && (LOCATION_KIND_IDS as readonly string[]).includes(value)
-    ? (value as LocationKind)
-    : undefined
+import { canonicalFieldsForAuthoringType } from './location-authoring-type'
+import { resolveAuthoringTypeFromFormValues } from './location-form-values'
+
+function resolveChildKind(watched: Record<string, unknown>): LocationKind | undefined {
+  const authoringType = resolveAuthoringTypeFromFormValues(watched)
+  if (!authoringType) return undefined
+  return canonicalFieldsForAuthoringType(authoringType).kind
 }
 
 export function buildParentLocationOptions(
@@ -23,9 +25,9 @@ export function buildParentLocationOptions(
 
 export function parentLocationFieldVisibility() {
   return {
-    dependsOn: ['kind'],
+    dependsOn: ['authoringType'],
     visibleWhen: (watched: Record<string, unknown>) => {
-      const kind = parseLocationKind(watched['kind'])
+      const kind = resolveChildKind(watched)
       return kind != null && getParentRequirement(kind) !== 'forbidden'
     },
   }
@@ -38,9 +40,9 @@ export function buildParentLocationOptionAvailability(
   const locationsById = new Map((locations ?? []).map((location) => [location.id, location]))
 
   return {
-    dependsOn: ['kind'],
+    dependsOn: ['authoringType'],
     enabledWhen: (watched, optionValue) => {
-      const childKind = parseLocationKind(watched['kind'])
+      const childKind = resolveChildKind(watched)
       if (!childKind || typeof optionValue !== 'string') {
         return false
       }

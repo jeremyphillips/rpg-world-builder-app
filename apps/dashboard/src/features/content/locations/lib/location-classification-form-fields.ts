@@ -4,14 +4,18 @@ import {
   INTERIOR_TYPE_DEFINITIONS,
   INTERIOR_TYPE_ENTRIES,
   INTERIOR_TYPE_IDS,
+  PLANE_TYPE_ENTRIES,
+  PLANE_TYPE_IDS,
   REGION_CLASSIFICATION_DEFINITIONS,
   REGION_CLASSIFICATION_KIND_IDS,
-  STRUCTURE_TYPE_ENTRIES,
-  STRUCTURE_TYPE_IDS,
+  SETTLEMENT_TYPE_ENTRIES,
+  SETTLEMENT_TYPE_IDS,
+  SITE_TYPE_ENTRIES,
+  SITE_TYPE_IDS,
   type InteriorClassificationType,
   type RegionClassificationKind,
 } from '@rpg/contracts'
-import type { FieldOption, FieldOptionAvailability, FormItem } from '@rpg/ui/form'
+import type { FieldOption, FieldOptionAvailability, FormItem, RowFieldItem } from '@rpg/ui/form'
 
 import {
   buildBuildingArchetypeFieldOptions,
@@ -20,7 +24,10 @@ import {
   formatBuildingFunctionOverrideHint,
 } from './building-archetype-form-options'
 import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
-import { visibleForLocationKind } from './location-display'
+import {
+  buildLocationAuthoringTypeOptions,
+  visibleForAuthoringType,
+} from './location-authoring-type'
 
 const SELECT_PLACEHOLDER = 'Select…'
 const BUILDING_ARCHETYPE_PLACEHOLDER = 'Search building archetypes…'
@@ -104,40 +111,82 @@ function interiorClassificationTypeAvailability(): FieldOptionAvailability {
   }
 }
 
-function visibleForStructureType(structureType: string) {
-  return {
-    dependsOn: ['kind', 'structureType'],
-    visibleWhen: (watched: Record<string, unknown>) =>
-      watched['kind'] === 'structure' && watched['structureType'] === structureType,
-  }
-}
-
 function visibleWhenRegionClassificationKindSet() {
   return {
-    dependsOn: ['kind', 'classification.kind'],
+    dependsOn: ['authoringType', 'classification.kind'],
     visibleWhen: (watched: Record<string, unknown>) =>
-      watched['kind'] === 'region' && typeof watched['classification.kind'] === 'string',
+      watched['authoringType'] === 'region' && typeof watched['classification.kind'] === 'string',
   }
 }
 
 function visibleWhenInteriorTypeSet() {
   return {
-    dependsOn: ['kind', 'interiorType'],
+    dependsOn: ['authoringType', 'interiorType'],
     visibleWhen: (watched: Record<string, unknown>) =>
-      watched['kind'] === 'interior' && typeof watched['interiorType'] === 'string',
+      watched['authoringType'] === 'interior' && typeof watched['interiorType'] === 'string',
   }
 }
 
-export function buildLocationClassificationFields(): FormItem[] {
+/** Primary classification fields paired with Location type in the authoring row. */
+export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
   return [
+    {
+      type: 'select',
+      name: 'planeType',
+      label: 'Plane type',
+      options: entriesToFieldOptions(PLANE_TYPE_IDS, PLANE_TYPE_ENTRIES),
+      placeholder: SELECT_PLACEHOLDER,
+      visibility: visibleForAuthoringType('plane'),
+    },
     {
       type: 'select',
       name: 'classification.kind',
       label: 'Classification',
       options: regionClassificationKindOptions,
       placeholder: SELECT_PLACEHOLDER,
-      visibility: visibleForLocationKind('region'),
+      visibility: visibleForAuthoringType('region'),
     },
+    {
+      type: 'select',
+      name: 'settlementType',
+      label: 'Settlement type',
+      options: entriesToFieldOptions(SETTLEMENT_TYPE_IDS, SETTLEMENT_TYPE_ENTRIES),
+      placeholder: SELECT_PLACEHOLDER,
+      visibility: visibleForAuthoringType('settlement'),
+    },
+    {
+      type: 'select',
+      name: 'siteType',
+      label: 'Site type',
+      options: entriesToFieldOptions(SITE_TYPE_IDS, SITE_TYPE_ENTRIES),
+      placeholder: SELECT_PLACEHOLDER,
+      visibility: visibleForAuthoringType('site'),
+    },
+    {
+      type: 'combobox',
+      name: 'classification.archetype',
+      label: 'Archetype',
+      options: buildingArchetypeOptions,
+      multiple: false,
+      placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
+      visibility: visibleForAuthoringType('building'),
+      hint: { resolve: buildingArchetypeTypicalUsesHint },
+    },
+    {
+      type: 'select',
+      name: 'interiorType',
+      label: 'Interior type',
+      options: entriesToFieldOptions(INTERIOR_TYPE_IDS, INTERIOR_TYPE_ENTRIES),
+      placeholder: SELECT_PLACEHOLDER,
+      visibility: visibleForAuthoringType('interior'),
+    },
+  ]
+}
+
+export { buildLocationAuthoringTypeOptions }
+
+export function buildLocationClassificationFields(): FormItem[] {
+  return [
     {
       type: 'select',
       name: 'classification.type',
@@ -148,36 +197,18 @@ export function buildLocationClassificationFields(): FormItem[] {
       optionAvailability: regionClassificationTypeAvailability(),
     },
     {
-      type: 'select',
-      name: 'structureType',
-      label: 'Structure type',
-      options: entriesToFieldOptions(STRUCTURE_TYPE_IDS, STRUCTURE_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
-      visibility: visibleForLocationKind('structure'),
-    },
-    {
-      type: 'combobox',
-      name: 'classification.archetype',
-      label: 'Archetype',
-      options: buildingArchetypeOptions,
-      multiple: false,
-      placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
-      visibility: visibleForStructureType('building'),
-      hint: { resolve: buildingArchetypeTypicalUsesHint },
-    },
-    {
       type: 'textSuggestions',
       name: 'classification.specialization',
       label: 'Specialization',
       placeholder: 'Optional',
       suggestions: buildingSpecializationSuggestions,
-      visibility: visibleForStructureType('building'),
+      visibility: visibleForAuthoringType('building'),
     },
     {
       kind: 'group',
       legend: 'Advanced classification',
       disclosure: { variant: 'legend', defaultOpen: false },
-      visibility: visibleForStructureType('building'),
+      visibility: visibleForAuthoringType('building'),
       fields: [
         {
           type: 'select',
@@ -188,14 +219,6 @@ export function buildLocationClassificationFields(): FormItem[] {
           hint: { resolve: buildingFunctionOverrideDynamicHint },
         },
       ],
-    },
-    {
-      type: 'select',
-      name: 'interiorType',
-      label: 'Interior type',
-      options: entriesToFieldOptions(INTERIOR_TYPE_IDS, INTERIOR_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
-      visibility: visibleForLocationKind('interior'),
     },
     {
       type: 'select',

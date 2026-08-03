@@ -7,6 +7,12 @@ import {
 } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
+import {
+  canonicalFieldsForAuthoringType,
+  type LocationAuthoringType,
+} from './location-authoring-type'
+import { resolveAuthoringTypeFromFormValues } from './location-form-values'
+
 type ClassificationFormSlice = {
   kind?: string
   type?: string
@@ -46,10 +52,6 @@ function clearClassificationFieldsInvalidForKind(
     patch.classification = undefined
   }
 
-  if (kind !== 'structure') {
-    patch.structureType = undefined
-  }
-
   if (kind !== 'interior') {
     patch.interiorType = undefined
   }
@@ -57,15 +59,31 @@ function clearClassificationFieldsInvalidForKind(
   return Object.keys(patch).length > 0 ? patch : undefined
 }
 
-function syncStructureTypeChange(
-  values: Record<string, unknown>,
+function clearFieldsInvalidForAuthoringType(
+  authoringType: LocationAuthoringType | undefined,
 ): Partial<Record<string, unknown>> | undefined {
-  const structureType = values['structureType']
-  if (structureType === 'building') {
-    return undefined
+  if (!authoringType) return undefined
+
+  const { kind, structureType } = canonicalFieldsForAuthoringType(authoringType)
+  const patch = clearClassificationFieldsInvalidForKind(kind) ?? {}
+
+  if (kind === 'structure' && structureType !== 'building') {
+    patch.classification = undefined
   }
 
-  return { classification: undefined }
+  if (kind !== 'plane') {
+    patch.planeType = undefined
+  }
+
+  if (kind !== 'settlement') {
+    patch.settlementType = undefined
+  }
+
+  if (kind !== 'site') {
+    patch.siteType = undefined
+  }
+
+  return Object.keys(patch).length > 0 ? patch : undefined
 }
 
 function syncBuildingArchetypeChange(
@@ -134,25 +152,24 @@ function syncInteriorTypeChange(
   return undefined
 }
 
+function isBuildingAuthoringType(values: Record<string, unknown>): boolean {
+  return resolveAuthoringTypeFromFormValues(values) === 'building'
+}
+
 /** Pass to `<Form valueSyncs={…}>` on location create/edit routes. */
 export const locationFormValueSyncs: FormValueSync[] = [
   {
-    dependsOn: ['kind'],
+    dependsOn: ['authoringType'],
     apply: (values, changedKeys) =>
-      changedKeys.includes('kind')
-        ? clearClassificationFieldsInvalidForKind(values['kind'] as LocationKind | undefined)
+      changedKeys.includes('authoringType')
+        ? clearFieldsInvalidForAuthoringType(resolveAuthoringTypeFromFormValues(values))
         : undefined,
-  },
-  {
-    dependsOn: ['structureType'],
-    apply: (values, changedKeys) =>
-      changedKeys.includes('structureType') ? syncStructureTypeChange(values) : undefined,
   },
   {
     dependsOn: ['classification.archetype'],
     apply: (values, changedKeys) => {
       if (!changedKeys.includes('classification.archetype')) return undefined
-      if (values['kind'] === 'structure' && values['structureType'] === 'building') {
+      if (isBuildingAuthoringType(values)) {
         return syncBuildingArchetypeChange(values)
       }
       return undefined
@@ -161,7 +178,8 @@ export const locationFormValueSyncs: FormValueSync[] = [
   {
     dependsOn: ['classification.kind'],
     apply: (values, changedKeys) =>
-      changedKeys.includes('classification.kind') && values['kind'] === 'region'
+      changedKeys.includes('classification.kind') &&
+      resolveAuthoringTypeFromFormValues(values) === 'region'
         ? syncRegionClassificationKindChange(values)
         : undefined,
   },
