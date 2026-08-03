@@ -59,6 +59,12 @@ export const VISIBLE_SIDEBAR_CONTENT: readonly VisibleSidebarContentEntry[] = [
     overview: ROUTES.content.organizations.overview,
     create: ROUTES.content.organizations.create,
   },
+  {
+    contentType: 'locations',
+    label: getContentTypeCollectionLabel('locations'),
+    overview: ROUTES.content.locations.overview,
+    create: ROUTES.content.locations.create,
+  },
 ]
 
 export function findVisibleSidebarContent(

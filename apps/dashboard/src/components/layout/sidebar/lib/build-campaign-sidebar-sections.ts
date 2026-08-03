@@ -12,7 +12,7 @@ import {
 } from './sidebar-nav-model'
 
 const GAME_LIBRARY_CONTENT = VISIBLE_SIDEBAR_CONTENT.filter(
-  (entry) => entry.contentType !== 'organizations',
+  (entry) => entry.contentType !== 'organizations' && entry.contentType !== 'locations',
 )
 
 export type BuildCampaignSidebarSectionsInput = {
@@ -74,6 +74,17 @@ function buildWorldSectionItems(campaignId: string): SidebarNavItem[] {
         id: 'organizations',
         label: organizations.label,
         href: organizations.overview(campaignId),
+      }),
+    )
+  }
+
+  const locations = findVisibleSidebarContent('locations')
+  if (locations) {
+    items.push(
+      sidebarNavItem({
+        id: 'locations',
+        label: locations.label,
+        href: locations.overview(campaignId),
       }),
     )
   }

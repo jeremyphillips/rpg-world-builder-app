@@ -54,21 +54,22 @@ describe('buildCampaignSidebarSections', () => {
     })
 
     const worldItems = sections.find((section) => section.id === 'world')!.items
-    expect(worldItems.map((item) => item.label)).toEqual(['NPCs', 'Organizations'])
+    expect(worldItems.map((item) => item.label)).toEqual(['NPCs', 'Organizations', 'Locations'])
     expect(worldItems[0]).toMatchObject({ href: ROUTES.campaign.npcs.list(campaignId) })
 
     const gameLibraryLabels = sections
       .find((section) => section.id === 'gameLibrary')!
       .items.map((item) => item.label)
     const expectedGameLibraryLabels = [
-      ...VISIBLE_SIDEBAR_CONTENT.filter((entry) => entry.contentType !== 'organizations').map(
-        (entry) => entry.label,
-      ),
+      ...VISIBLE_SIDEBAR_CONTENT.filter(
+        (entry) => entry.contentType !== 'organizations' && entry.contentType !== 'locations',
+      ).map((entry) => entry.label),
       'Game Terms',
       'Homebrew',
     ]
     expect(gameLibraryLabels).toEqual(expectedGameLibraryLabels)
     expect(gameLibraryLabels).not.toContain('Organizations')
+    expect(gameLibraryLabels).not.toContain('Locations')
   })
 
   it('links Equipment to the existing hub route', () => {
