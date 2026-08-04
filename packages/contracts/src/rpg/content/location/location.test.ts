@@ -46,6 +46,7 @@ describe('location body contracts', () => {
     expect(locationBodyDraftSchema.parse({ kind: 'site', name: '  ' })).toEqual({
       kind: 'site',
       name: 'Untitled Location',
+      partyAssociations: [],
     })
   })
 
@@ -132,6 +133,7 @@ describe('location authoring inputs', () => {
     ).toEqual({
       kind: 'region',
       classification: { kind: 'geographic', type: 'coast' },
+      partyAssociations: [],
     })
 
     expect(
@@ -139,6 +141,7 @@ describe('location authoring inputs', () => {
     ).toEqual({
       kind: 'site',
       description: '<p>Notes</p>',
+      partyAssociations: [],
     })
   })
 })

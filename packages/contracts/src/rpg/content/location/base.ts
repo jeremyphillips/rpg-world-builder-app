@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { contentBodyBaseSchema } from '../lib/envelope'
+import { locationPartyAssociationsSchema } from './party-association'
 
 /**
  * Shared body fields present on every location union variant.
@@ -14,6 +15,7 @@ import { contentBodyBaseSchema } from '../lib/envelope'
  */
 export const locationBaseSchema = contentBodyBaseSchema.extend({
   parentLocationId: z.string().min(1).optional(),
+  partyAssociations: locationPartyAssociationsSchema,
 })
 
 export type LocationBaseFields = z.infer<typeof locationBaseSchema>

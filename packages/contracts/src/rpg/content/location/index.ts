@@ -1,4 +1,5 @@
 export * from './base'
+export * from './party-association'
 export * from './plane-variant'
 export * from './world-variant'
 export * from './region-classification'
