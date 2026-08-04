@@ -48,6 +48,7 @@ describe('location party associations lib', () => {
           party: { kind: 'character', characterId: 'missing-character' },
         },
       ],
+      campaignId: 'camp_1',
       charactersById: new Map(),
       organizationsById: new Map(),
     })
@@ -154,7 +155,7 @@ describe('location party associations lib', () => {
     ).toBe(true)
   })
 
-  it('includes party summary on association rows', () => {
+  it('includes party summary and href on association rows', () => {
     const rows = buildLocationPartyAssociationRows({
       associations: [
         {
@@ -163,6 +164,7 @@ describe('location party associations lib', () => {
           party: { kind: 'character', characterId: 'char-1' },
         },
       ],
+      campaignId: 'camp_1',
       charactersById: new Map([
         [
           'char-1',
@@ -178,5 +180,6 @@ describe('location party associations lib', () => {
     })
 
     expect(rows[0]?.partySummary).toBe('Dwarf · Level 4 Fighter')
+    expect(rows[0]?.partyHref).toBe('/campaigns/camp_1/characters/char-1')
   })
 })

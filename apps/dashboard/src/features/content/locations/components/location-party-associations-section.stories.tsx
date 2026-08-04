@@ -13,10 +13,12 @@ import {
   LOCATION_PARTY_SECTION_DESCRIPTION,
   LOCATION_PARTY_SEARCH_DISABLED_PLACEHOLDER,
 } from '../lib/location-party-associations.lib'
+import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
-function SectionStory() {
+function SectionStory({ authoringType = 'building' }: { authoringType?: LocationAuthoringType }) {
   const form = useForm({
     defaultValues: {
+      authoringType,
       [LOCATION_PARTY_ASSOCIATIONS_FIELD]: [],
     },
   })
@@ -48,6 +50,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Empty: Story = {
+  render: () => <SectionStory authoringType="building" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.getByText(LOCATION_PARTY_SECTION_DESCRIPTION)).toBeInTheDocument()
@@ -57,6 +60,7 @@ export const Empty: Story = {
 }
 
 export const OpensPicker: Story = {
+  render: () => <SectionStory authoringType="building" />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Add relationship' }))

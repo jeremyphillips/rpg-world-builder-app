@@ -13,6 +13,11 @@ import {
   type Organization,
 } from '@rpg/contracts'
 
+import { ROUTES } from '@/app/routes'
+
+import type { LocationAuthoringType } from './location-authoring-type'
+import { getAvailableLocationPartyAssociationKinds } from './location-party-authoring-policy'
+
 export const LOCATION_PARTY_ASSOCIATIONS_FIELD = 'partyAssociations'
 
 export const LOCATION_PARTY_SECTION_LABEL = 'People & organizations'
@@ -52,13 +57,12 @@ export type LocationPartyAssociationRow = {
   semanticLabel: string
   partyLabel: string
   partySummary?: string
+  partyHref?: string
   partyUnresolved: boolean
 }
 
-export function buildLocationPartySemanticOptions() {
-  return (
-    Object.keys(LOCATION_PARTY_ASSOCIATION_SEMANTIC_ENTRIES) as LocationPartyAssociationSemanticId[]
-  ).map((value) => ({
+export function buildLocationPartySemanticOptions(authoringType: LocationAuthoringType) {
+  return getAvailableLocationPartyAssociationKinds(authoringType).map((value) => ({
     value,
     label: getLocationPartyAssociationSemanticLabel(value),
     description: LOCATION_PARTY_ASSOCIATION_SEMANTIC_ENTRIES[value].description,
@@ -67,6 +71,7 @@ export function buildLocationPartySemanticOptions() {
 
 export function buildLocationPartyAssociationRows(input: {
   associations: readonly LocationPartyAssociation[]
+  campaignId: string
   charactersById: ReadonlyMap<string, LocationPartyCharacterOption>
   organizationsById: ReadonlyMap<string, Organization>
 }): LocationPartyAssociationRow[] {
@@ -80,6 +85,11 @@ export function buildLocationPartyAssociationRows(input: {
       charactersById: input.charactersById,
       organizationsById: input.organizationsById,
     })
+    const partyHref = resolvePartyHref(association.party, {
+      campaignId: input.campaignId,
+      charactersById: input.charactersById,
+      organizationsById: input.organizationsById,
+    })
 
     return {
       association,
@@ -87,6 +97,7 @@ export function buildLocationPartyAssociationRows(input: {
       semanticLabel: getLocationPartyAssociationSemanticLabel(semanticKey),
       partyLabel: partyLabel.label,
       partySummary,
+      partyHref,
       partyUnresolved: partyLabel.unresolved,
     }
   })
@@ -104,6 +115,27 @@ export function groupLocationPartyAssociationRows(
   }
 
   return grouped
+}
+
+function resolvePartyHref(
+  party: LocationPartyRef,
+  ctx: {
+    campaignId: string
+    charactersById: ReadonlyMap<string, LocationPartyCharacterOption>
+    organizationsById: ReadonlyMap<string, Organization>
+  },
+): string | undefined {
+  if (party.kind === 'character') {
+    const character = ctx.charactersById.get(party.characterId)
+    if (!character) return undefined
+    return character.characterType === 'npc'
+      ? ROUTES.campaign.npcs.detail(ctx.campaignId, character.id)
+      : ROUTES.campaign.characters.detail(ctx.campaignId, character.id)
+  }
+
+  const organization = ctx.organizationsById.get(party.organizationId)
+  if (!organization) return undefined
+  return ROUTES.content.organizations.detail(ctx.campaignId, organization.id)
 }
 
 function resolvePartyLabel(

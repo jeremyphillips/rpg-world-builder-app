@@ -28,12 +28,17 @@ import {
   removeLocationPartyAssociation,
   type LocationPartyCharacterOption,
 } from '../lib/location-party-associations.lib'
+import {
+  resolveAuthoringTypeFromFormValues,
+  type LocationAuthoringType,
+} from '../lib/location-authoring-type'
 
 export function LocationPartyAssociationsSection() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const { setValue, watch } = useFormContext()
   const associations = (watch(LOCATION_PARTY_ASSOCIATIONS_FIELD) ??
     []) as LocationPartyAssociation[]
+  const authoringType = resolveAuthoringTypeFromFormValues(watch()) as LocationAuthoringType
   const [pickerOpen, setPickerOpen] = React.useState(false)
   const [semanticKey, setSemanticKey] = React.useState<LocationPartyAssociationSemanticId | null>(
     null,
@@ -70,10 +75,11 @@ export function LocationPartyAssociationsSection() {
     () =>
       buildLocationPartyAssociationRows({
         associations,
+        campaignId,
         charactersById,
         organizationsById,
       }),
-    [associations, charactersById, organizationsById],
+    [associations, campaignId, charactersById, organizationsById],
   )
 
   const groupedRows = React.useMemo(() => groupLocationPartyAssociationRows(rows), [rows])
@@ -169,6 +175,7 @@ export function LocationPartyAssociationsSection() {
         onOpenChange={handlePickerOpenChange}
         campaignId={campaignId}
         associations={associations}
+        authoringType={authoringType}
         semanticKey={semanticKey}
         onSemanticKeyChange={setSemanticKey}
         onSelectParty={handleSelectParty}

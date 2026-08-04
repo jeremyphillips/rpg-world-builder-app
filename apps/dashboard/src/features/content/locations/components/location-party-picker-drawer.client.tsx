@@ -43,12 +43,14 @@ import {
   resolvePartyKindForRelationshipChange,
   type LocationPartyCharacterOption,
 } from '../lib/location-party-associations.lib'
+import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
 export type LocationPartyPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   campaignId: string
   associations: readonly LocationPartyAssociation[]
+  authoringType: LocationAuthoringType
   semanticKey: LocationPartyAssociationSemanticId | null
   onSemanticKeyChange: (semanticKey: LocationPartyAssociationSemanticId) => void
   onSelectParty: (party: { kind: LocationPartyKind; id: string }) => void
@@ -89,12 +91,16 @@ export function LocationPartyPickerDrawer({
   onOpenChange,
   campaignId,
   associations,
+  authoringType,
   semanticKey,
   onSemanticKeyChange,
   onSelectParty,
   onRemoveParty,
 }: LocationPartyPickerDrawerProps) {
-  const semanticOptions = React.useMemo(() => buildLocationPartySemanticOptions(), [])
+  const semanticOptions = React.useMemo(
+    () => buildLocationPartySemanticOptions(authoringType),
+    [authoringType],
+  )
   const partyKinds = semanticKey ? buildPartyKindsForSemanticKey(semanticKey) : []
   const [partyKind, setPartyKind] = React.useState<LocationPartyKind | null>(null)
 

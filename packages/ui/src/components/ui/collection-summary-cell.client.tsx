@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tool
 import { collectionSummaryCounterVariants } from './collection-summary.variants'
 import type { CollectionSummaryCellProps, CollectionSummaryItem } from './collection-summary.types'
 
-const DEFAULT_EMPTY_LABEL = '—'
+const DEFAULT_EMPTY_LABEL = '0'
 const DEFAULT_MAX_VISIBLE_ITEMS = 4
 
 function formatCountLabel(count: number, singularLabel: string, pluralLabel: string): string {
