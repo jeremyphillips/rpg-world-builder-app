@@ -55,9 +55,27 @@ Managers opt into selection mode via **Select** in the utility bar row 2.
 - Selection persists across pagination; header checkbox and **Select page** share the same page-scoped operation.
 - Cap: `CONTENT_OVERVIEW_BULK_SELECTION_LIMIT` (50) — relabels to **Select N** when the page exceeds remaining capacity.
 - **Done** clears selection, exits mode, and returns focus to **Select**.
-- V1 bulk action: **Edit campaign availability** (`BulkCampaignAccessDialog`).
+- Bulk actions menu: **Edit campaign availability** on all content types; **Change parent
+  location** on locations only. Each action opens its own dialog via `bulkExtensions[]`.
+- Selection state is shared across bulk dialogs via `useContentOverviewBulkSelection` — dialog
+  open/close and apply callbacks stay per extension.
 
-Modules: `use-content-overview-selection.ts`, `content-bulk-actions-menu.client.tsx`.
+Modules: `use-content-overview-selection.ts`, `use-content-overview-bulk-selection.ts`,
+`content-bulk-actions-menu.client.tsx`, `content-overview-table.client.tsx` (`bulkExtensions`).
+
+### Bulk actions
+
+| Action                     | Content types | Dialog module                    |
+| -------------------------- | ------------- | -------------------------------- |
+| Edit campaign availability | All catalog   | `BulkCampaignAccessDialog`       |
+| Change parent location     | Locations     | `BulkChangeParentLocationDialog` |
+
+Both follow the unified action lifecycle documented in [actions.md](./actions.md). After apply,
+only **updated** targets leave selection; blocked targets remain selected for retry.
+
+**Locations hierarchy graph:** parent-assignment validation builds a graph from the overview
+`data` prop (full manager-visible campaign list from `useLocations`). Do not use table-filtered
+`visibleRows` — see `build-location-hierarchy-graph.ts`.
 
 ## Components
 
@@ -65,8 +83,10 @@ Modules: `use-content-overview-selection.ts`, `content-bulk-actions-menu.client.
 | --------------------------------------------- | ---------------------------------------------------- |
 | `overview-result-summary.client.tsx`          | Shared result count + supplemental disclosure        |
 | `overview-selection-cluster.client.tsx`       | Browse Select trigger and selection-mode actions     |
-| `content-bulk-actions-menu.client.tsx`        | V1 bulk actions dropdown                             |
+| `content-bulk-actions-menu.client.tsx`        | Bulk actions dropdown (availability + extensions)    |
 | `use-content-overview-selection.ts`           | Selection mode state, cap, filter pruning            |
+| `use-content-overview-bulk-selection.ts`      | Shared selection for multiple bulk dialogs           |
+| `content-overview-table.client.tsx`           | `bulkExtensions[]` wiring and apply-complete handler |
 | `content-overview-availability-ui.lib.tsx`    | Hidden-unavailable supplement and empty-state CTA    |
 | `content-overview-name-cell.client.tsx`       | Composes both lines                                  |
 | `content-overview-utility-actions.client.tsx` | Manager `Edit · Duplicate` actions                   |
