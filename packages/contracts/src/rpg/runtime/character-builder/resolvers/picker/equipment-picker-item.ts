@@ -1,4 +1,4 @@
-import type { SearchDocument } from '@rpg/search'
+import type { SearchDocument } from '@rpg/search/types'
 
 import type { Equipment } from '../../../../content/equipment'
 import {

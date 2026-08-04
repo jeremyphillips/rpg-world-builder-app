@@ -2,7 +2,7 @@ import {
   CONTENT_VISIBILITY_MODES,
   type ContentVisibilityMode,
 } from '../../vocab/content-visibility'
-import { CONTENT_TYPE_KEYS } from './content-type-keys'
+import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
 
 export const CONTENT_ACCESS_TARGET_TYPES = [...CONTENT_TYPE_KEYS, 'subclasses'] as const
 

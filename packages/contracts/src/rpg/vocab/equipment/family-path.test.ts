@@ -6,7 +6,7 @@ import {
   familyPathToEquipmentKind,
   getEquipmentFamilyLabel,
   isEquipmentFamilyPath,
-} from './equipment-family-path'
+} from './family-path'
 
 describe('equipment family path helpers', () => {
   it('maps equipment kinds to overview path segments', () => {

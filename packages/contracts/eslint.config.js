@@ -44,7 +44,7 @@ export default [
           rules: [
             { from: ['validation'], allow: ['validation'] },
             { from: ['shared'], allow: ['validation', 'shared', 'primitives'] },
-            { from: ['vocab'], allow: ['validation', 'vocab'] },
+            { from: ['vocab'], allow: ['validation', 'vocab', 'primitives'] },
             { from: ['primitives'], allow: ['validation', 'vocab', 'primitives'] },
             { from: ['character-builder'], allow: ['validation', 'character-builder'] },
             { from: ['content'], allow: ['validation', 'vocab', 'primitives', 'content'] },

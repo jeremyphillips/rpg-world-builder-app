@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { EQUIPMENT_KIND_LABELS, type EquipmentKind } from '../../vocab/equipment/kind'
+import { EQUIPMENT_KIND_LABELS, type EquipmentKind } from './kind'
 
 /** URL path segments for equipment family overviews (kebab-case). */
 export const EQUIPMENT_FAMILY_PATHS = [

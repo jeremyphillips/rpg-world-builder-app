@@ -9,6 +9,32 @@ type CampaignAccessRow = {
   campaignAccess: ResolvedContentCampaignAccess
 }
 
+/** Patch one row's parent location in the shared locations list query cache. */
+export function patchContentOverviewListLocationParent<
+  T extends { id: string; parentLocationId?: string },
+>(
+  queryClient: QueryClient,
+  campaignId: string,
+  entityId: string,
+  parentLocationId: string | undefined,
+): void {
+  queryClient.setQueryData<ContentListResult<T>>(
+    contentOverviewListQueryKey(campaignId, 'locations'),
+    (current) => {
+      if (!current?.items) {
+        return current
+      }
+
+      return {
+        ...current,
+        items: current.items.map((row) =>
+          row.id === entityId ? { ...row, parentLocationId } : row,
+        ),
+      }
+    },
+  )
+}
+
 /** Patch one row's campaign access in the shared content list query cache. */
 export function patchContentOverviewListCampaignAccess<T extends CampaignAccessRow>(
   queryClient: QueryClient,

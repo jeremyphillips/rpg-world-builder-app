@@ -3,7 +3,10 @@
 import { memo, useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+  partitionApplyOutcomes,
   supportsContentBulkCampaignAccess,
+  type ActionApplyOutcome,
+  type ActionTargetFailure,
   type CampaignAvailabilityFilter,
   type ContentTypeKey,
   type WithCampaignAccess,
@@ -39,7 +42,7 @@ import {
   buildContentOverviewEmptyState,
   buildContentOverviewHiddenSupplement,
 } from './content-overview-availability-ui.lib'
-import { useContentOverviewBulkAccess } from './use-content-overview-bulk-access.client'
+import { useContentOverviewBulkSelection } from './use-content-overview-bulk-selection'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_ID,
   deriveCampaignAvailabilityScope,
@@ -48,6 +51,7 @@ import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
 import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
 import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
+import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
 import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table.client'
 import {
   overviewUnavailableNameCellClassName,
@@ -62,6 +66,9 @@ import {
 } from '@/lib/overview-preferences'
 
 const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
+const EMPTY_BULK_EXTENSIONS: ContentOverviewBulkExtension<
+  WithCampaignAccess<ContentBase> & { id: string }
+>[] = []
 const OVERVIEW_NAME_COLUMN_ID = 'name'
 const COLUMNS_ARIA_LABEL = 'Choose visible columns'
 
@@ -89,6 +96,7 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   onRowSelectionStateChange: (state: Record<string, boolean>) => void
   getRowCanSelect: (row: T) => boolean
   onEditCampaignAccess?: () => void
+  additionalBulkActions?: readonly OverviewBulkAction[]
   getEditHref: (row: T) => string
   onColumnChange: (state: ColumnChangeState) => void
   caption?: string
@@ -124,6 +132,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   onRowSelectionStateChange,
   getRowCanSelect,
   onEditCampaignAccess,
+  additionalBulkActions = [],
   getEditHref,
   onColumnChange,
   caption,
@@ -192,8 +201,12 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
           onEnterSelectionMode={onEnterSelectionMode}
           onExitSelectionMode={onExitSelectionMode}
           bulkActionsMenu={
-            controls.selectedRowCount > 0 && onEditCampaignAccess ? (
-              <ContentBulkActionsMenu onEditCampaignAccess={onEditCampaignAccess} />
+            controls.selectedRowCount > 0 &&
+            (onEditCampaignAccess || additionalBulkActions.length > 0) ? (
+              <ContentBulkActionsMenu
+                onEditCampaignAccess={onEditCampaignAccess}
+                additionalActions={additionalBulkActions}
+              />
             ) : undefined
           }
           selectTriggerRef={selectTriggerRef}
@@ -202,6 +215,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     [
       canManage,
       onEditCampaignAccess,
+      additionalBulkActions,
       onEnterSelectionMode,
       onExitSelectionMode,
       selectTriggerRef,
@@ -263,6 +277,24 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   props: ContentOverviewDataTableProps<T>,
 ) => React.JSX.Element
 
+export type ContentOverviewBulkExtensionRenderContext<
+  T extends WithCampaignAccess<ContentBase> & { id: string },
+> = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  campaignId: string
+  selectedRows: T[]
+  campaignRows: T[]
+  onApplyComplete: (outcomes: ActionApplyOutcome<unknown, ActionTargetFailure>[]) => void
+}
+
+export type ContentOverviewBulkExtension<
+  T extends WithCampaignAccess<ContentBase> & { id: string },
+> = {
+  menuAction: OverviewBulkAction
+  renderDialog: (context: ContentOverviewBulkExtensionRenderContext<T>) => ReactNode
+}
+
 export type ContentOverviewTableProps<
   T extends WithCampaignAccess<ContentBase> & { id: string },
   TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
@@ -274,6 +306,7 @@ export type ContentOverviewTableProps<
   data: T[]
   caption?: string
   getEditHref: (row: T) => string
+  bulkExtensions?: ContentOverviewBulkExtension<T>[]
 }
 
 export function ContentOverviewTable<
@@ -287,6 +320,7 @@ export function ContentOverviewTable<
   data,
   caption,
   getEditHref,
+  bulkExtensions = EMPTY_BULK_EXTENSIONS,
 }: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
   const selectTriggerRef = useRef<HTMLButtonElement>(null)
@@ -361,8 +395,71 @@ export function ContentOverviewTable<
   const itemLabel = getContentTypeMidSentenceLabel(contentTypeKey)
 
   const visibleRowIds = useMemo(() => new Set(visibleRows.map((row) => row.id)), [visibleRows])
-  const bulkAccess = useContentOverviewBulkAccess<T>(visibleRowIds)
+  const {
+    selectionMode,
+    rowSelection,
+    selectedRows,
+    selectedCount,
+    selectionLimit,
+    selectionLiveRegionId,
+    selectionLiveRegionMessage,
+    selectionCapDescriptionId,
+    getRowCanSelect,
+    enterSelectionMode,
+    handleExitSelectionMode: exitBulkSelectionMode,
+    onRowSelectionChange,
+    onRowSelectionStateChange,
+    removeFromSelection,
+  } = useContentOverviewBulkSelection<T>(visibleRowIds)
+  const [bulkAccessOpen, setBulkAccessOpen] = useState(false)
+  const [openExtensionId, setOpenExtensionId] = useState<string | null>(null)
   const supportsBulkCampaignAccess = supportsContentBulkCampaignAccess(contentTypeKey)
+
+  const openBulkAccessDialog = useCallback(() => {
+    setBulkAccessOpen(true)
+  }, [])
+
+  const handleBulkAccessApplyComplete = useCallback(
+    (result: { updatedIds: string[]; fullSuccess: boolean }) => {
+      removeFromSelection(result.updatedIds)
+
+      if (result.fullSuccess) {
+        setBulkAccessOpen(false)
+        exitBulkSelectionMode()
+      }
+    },
+    [exitBulkSelectionMode, removeFromSelection],
+  )
+
+  const handleExtensionApplyComplete = useCallback(
+    (outcomes: ActionApplyOutcome<unknown, ActionTargetFailure>[]) => {
+      const { updated, blocked, failed } = partitionApplyOutcomes(outcomes)
+      removeFromSelection(updated.map((outcome) => outcome.targetId))
+
+      if (updated.length > 0 && blocked.length === 0 && failed.length === 0) {
+        setOpenExtensionId(null)
+        exitBulkSelectionMode()
+      }
+    },
+    [exitBulkSelectionMode, removeFromSelection],
+  )
+
+  const handleExitSelectionMode = useCallback(() => {
+    setBulkAccessOpen(false)
+    setOpenExtensionId(null)
+    exitBulkSelectionMode()
+  }, [exitBulkSelectionMode])
+
+  const additionalBulkActions = useMemo(() => {
+    if (!canManage || selectedCount === 0) {
+      return [] as OverviewBulkAction[]
+    }
+
+    return bulkExtensions.map((extension) => ({
+      ...extension.menuAction,
+      onSelect: () => setOpenExtensionId(extension.menuAction.id),
+    }))
+  }, [bulkExtensions, canManage, selectedCount])
 
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
@@ -480,22 +577,23 @@ export function ContentOverviewTable<
         itemLabel={itemLabel}
         campaignAvailability={campaignAvailability}
         resultSupplement={resultSupplement}
-        selectionMode={bulkAccess.selectionMode}
-        rowSelection={bulkAccess.rowSelection}
-        selectionLimit={bulkAccess.selectionLimit}
-        selectionLiveRegionId={bulkAccess.selectionLiveRegionId}
-        selectionLiveRegionMessage={bulkAccess.selectionLiveRegionMessage}
-        selectionCapDescriptionId={bulkAccess.selectionCapDescriptionId}
-        onEnterSelectionMode={bulkAccess.enterSelectionMode}
-        onExitSelectionMode={bulkAccess.handleExitSelectionMode}
-        onRowSelectionChange={bulkAccess.onRowSelectionChange}
-        onRowSelectionStateChange={bulkAccess.onRowSelectionStateChange}
-        getRowCanSelect={bulkAccess.getRowCanSelect}
+        selectionMode={selectionMode}
+        rowSelection={rowSelection}
+        selectionLimit={selectionLimit}
+        selectionLiveRegionId={selectionLiveRegionId}
+        selectionLiveRegionMessage={selectionLiveRegionMessage}
+        selectionCapDescriptionId={selectionCapDescriptionId}
+        onEnterSelectionMode={enterSelectionMode}
+        onExitSelectionMode={handleExitSelectionMode}
+        onRowSelectionChange={onRowSelectionChange}
+        onRowSelectionStateChange={onRowSelectionStateChange}
+        getRowCanSelect={getRowCanSelect}
         onEditCampaignAccess={
-          canManage && supportsBulkCampaignAccess && bulkAccess.selectedCount > 0
-            ? bulkAccess.openBulkAccessDialog
+          canManage && supportsBulkCampaignAccess && selectedCount > 0
+            ? openBulkAccessDialog
             : undefined
         }
+        additionalBulkActions={additionalBulkActions}
         getEditHref={getEditHref}
         onColumnChange={handleColumnChange}
         caption={caption}
@@ -507,16 +605,31 @@ export function ContentOverviewTable<
 
       {canManage && supportsBulkCampaignAccess ? (
         <BulkCampaignAccessDialog
-          open={bulkAccess.bulkAccessOpen}
-          onOpenChange={bulkAccess.setBulkAccessOpen}
+          open={bulkAccessOpen}
+          onOpenChange={setBulkAccessOpen}
           campaignId={campaignId}
           targetType={contentTypeKey}
           contentTypeKey={contentTypeKey}
           itemLabelPlural={pluralNoun}
-          selectedRows={bulkAccess.selectedRows}
-          onApplyComplete={bulkAccess.handleBulkApplyComplete}
+          selectedRows={selectedRows}
+          onApplyComplete={handleBulkAccessApplyComplete}
         />
       ) : null}
+
+      {canManage
+        ? bulkExtensions.map((extension) => (
+            <div key={extension.menuAction.id}>
+              {extension.renderDialog({
+                open: openExtensionId === extension.menuAction.id,
+                onOpenChange: (open) => setOpenExtensionId(open ? extension.menuAction.id : null),
+                campaignId,
+                selectedRows: selectedRows,
+                campaignRows: data,
+                onApplyComplete: handleExtensionApplyComplete,
+              })}
+            </div>
+          ))
+        : null}
     </div>
   )
 }

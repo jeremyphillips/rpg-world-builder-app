@@ -32,6 +32,7 @@ export type ActionDialogShellProps<TBlocker, TFailure extends ActionTargetFailur
   onCheckedChange?: (targetId: string, checked: boolean) => void
   onConfigureApply?: () => void
   configureApplyDisabled?: boolean
+  configureApplyLabel?: string
   onResolveConfirm?: () => void
   onResolveBack?: () => void
   onRetryFailed?: () => void
@@ -57,6 +58,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
   onCheckedChange,
   onConfigureApply,
   configureApplyDisabled = false,
+  configureApplyLabel,
   onResolveConfirm,
   onResolveBack,
   onRetryFailed,
@@ -109,6 +111,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
             pending={pending}
             confirmedCount={confirmedCount}
             configureApplyDisabled={configureApplyDisabled}
+            configureApplyLabel={configureApplyLabel}
             onResolveBack={onResolveBack}
             onCancel={handleCancel}
             onConfigureApply={onConfigureApply}

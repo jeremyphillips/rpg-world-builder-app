@@ -23,6 +23,7 @@ export type ActionDialogShellFooterProps = {
   pending: boolean
   confirmedCount: number
   configureApplyDisabled: boolean
+  configureApplyLabel?: string
   onResolveBack?: () => void
   onCancel: () => void
   onConfigureApply?: () => void
@@ -35,6 +36,7 @@ export function ActionDialogShellFooter({
   pending,
   confirmedCount,
   configureApplyDisabled,
+  configureApplyLabel,
   onResolveBack,
   onCancel,
   onConfigureApply,
@@ -61,7 +63,7 @@ export function ActionDialogShellFooter({
           disabled={pending || configureApplyDisabled}
           onClick={onConfigureApply}
         >
-          {ACTION_CONFIGURE_APPLY_LABEL}
+          {configureApplyLabel ?? ACTION_CONFIGURE_APPLY_LABEL}
         </Button>
       ) : null}
 

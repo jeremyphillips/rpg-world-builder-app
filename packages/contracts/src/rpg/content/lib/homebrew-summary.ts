@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { ContentTypeKey } from './content-type-keys'
+import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 
 /** Visible-sidebar content types summarized on the Homebrew hub. */
 export const HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS = [

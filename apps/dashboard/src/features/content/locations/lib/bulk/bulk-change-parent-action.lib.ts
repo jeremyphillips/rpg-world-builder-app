@@ -1,0 +1,164 @@
+import {
+  createBlockedActionTarget,
+  createEligibleActionTarget,
+  createActionValidationResult,
+  getErrorMessage,
+  isApiError,
+  LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES,
+  validateLocationParentAssignment,
+  type ActionApplyOutcome,
+  type ActionTargetFailure,
+  type ActionTargetIdentity,
+  type ActionValidationResult,
+  type Location,
+  type LocationKind,
+  type LocationParentAssignmentBlocker,
+  type LocationParentAssignmentBlockerCode,
+} from '@rpg/contracts'
+
+import { updateContent } from '../../../lib/list/content-client'
+import { buildLocationHierarchyGraph } from '../build-location-hierarchy-graph'
+import type { BulkChangeParentConfig } from './build-bulk-change-parent-fields'
+
+const BULK_UPDATE_CONCURRENCY = 5
+
+export type BulkChangeParentRow = {
+  id: string
+  name: string
+  kind: LocationKind
+  parentLocationId?: string
+}
+
+function toTargetIdentity(row: BulkChangeParentRow): ActionTargetIdentity {
+  return { targetId: row.id, targetName: row.name }
+}
+
+export function isBulkChangeParentNoOp(
+  row: BulkChangeParentRow,
+  config: BulkChangeParentConfig,
+): boolean {
+  const currentParentId = row.parentLocationId ?? null
+  return currentParentId === config.proposedParentId
+}
+
+export function resolveBulkChangeParentApplicableRows(
+  rows: readonly BulkChangeParentRow[],
+  config: BulkChangeParentConfig,
+): BulkChangeParentRow[] {
+  return rows.filter((row) => !isBulkChangeParentNoOp(row, config))
+}
+
+export function validateBulkChangeParent(
+  rows: readonly BulkChangeParentRow[],
+  config: BulkChangeParentConfig,
+  campaignLocations: readonly Location[],
+): ActionValidationResult<LocationParentAssignmentBlocker> {
+  const applicableRows = resolveBulkChangeParentApplicableRows(rows, config)
+  const locationsById = buildLocationHierarchyGraph(campaignLocations)
+
+  const targets = applicableRows.map((row) => {
+    const blockers = validateLocationParentAssignment({
+      locationId: row.id,
+      locationKind: row.kind,
+      proposedParentId: config.proposedParentId,
+      locationsById,
+    })
+
+    if (blockers.length > 0) {
+      return createBlockedActionTarget(toTargetIdentity(row), blockers)
+    }
+
+    return createEligibleActionTarget(toTargetIdentity(row))
+  })
+
+  return createActionValidationResult(targets)
+}
+
+function parsePatchHierarchyBlockedError(err: unknown): LocationParentAssignmentBlocker[] | null {
+  if (!isApiError(err) || err.status !== 400) {
+    return null
+  }
+
+  if (err.code !== 'invalid_hierarchy' && err.code !== 'invalid_parent') {
+    return null
+  }
+
+  const code: LocationParentAssignmentBlockerCode =
+    err.code === 'invalid_parent'
+      ? LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_not_found
+      : LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.cycle
+
+  return [{ kind: 'rule', code, message: err.message }]
+}
+
+export type BulkChangeParentApplyUpdate = {
+  rowId: string
+  parentLocationId: string | undefined
+}
+
+export async function applyBulkChangeParentToTargets(
+  rows: readonly BulkChangeParentRow[],
+  targetIds: readonly string[],
+  config: BulkChangeParentConfig,
+  campaignId: string,
+): Promise<{
+  outcomes: ActionApplyOutcome<LocationParentAssignmentBlocker, ActionTargetFailure>[]
+  updates: BulkChangeParentApplyUpdate[]
+}> {
+  const targetIdSet = new Set(targetIds)
+  const applicableRows = rows.filter(
+    (row) => targetIdSet.has(row.id) && !isBulkChangeParentNoOp(row, config),
+  )
+
+  if (applicableRows.length === 0) {
+    return { outcomes: [], updates: [] }
+  }
+
+  const patchBody =
+    config.proposedParentId === null
+      ? { parentLocationId: null }
+      : { parentLocationId: config.proposedParentId }
+
+  const outcomes: ActionApplyOutcome<LocationParentAssignmentBlocker, ActionTargetFailure>[] = []
+  const updates: BulkChangeParentApplyUpdate[] = []
+
+  for (let index = 0; index < applicableRows.length; index += BULK_UPDATE_CONCURRENCY) {
+    const batch = applicableRows.slice(index, index + BULK_UPDATE_CONCURRENCY)
+    const batchResults = await Promise.allSettled(
+      batch.map(async (row) => {
+        await updateContent(campaignId, 'locations', row.id, patchBody)
+        return row
+      }),
+    )
+
+    for (let batchIndex = 0; batchIndex < batchResults.length; batchIndex += 1) {
+      const settled = batchResults[batchIndex]!
+      const row = batch[batchIndex]!
+
+      if (settled.status === 'fulfilled') {
+        const parentLocationId =
+          config.proposedParentId === null ? undefined : config.proposedParentId
+        outcomes.push({ status: 'updated', targetId: row.id })
+        updates.push({ rowId: row.id, parentLocationId })
+        continue
+      }
+
+      const blockers = parsePatchHierarchyBlockedError(settled.reason)
+      if (blockers) {
+        outcomes.push({ status: 'blocked', targetId: row.id, blockers })
+        continue
+      }
+
+      outcomes.push({
+        status: 'failed',
+        targetId: row.id,
+        failure: {
+          code: 'request_error',
+          message: getErrorMessage(settled.reason, 'Could not update parent location.'),
+        },
+      })
+    }
+  }
+
+  return { outcomes, updates }
+}

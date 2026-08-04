@@ -5,7 +5,7 @@ import {
   CONTENT_ACCESS_TARGET_TYPES,
   supportsContentBulkCampaignAccess,
 } from './content-access-capabilities'
-import { CONTENT_TYPE_KEYS } from './content-type-keys'
+import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
 
 describe('CONTENT_ACCESS_CAPABILITIES', () => {
   it('defines a capability entry for every content access target type', () => {

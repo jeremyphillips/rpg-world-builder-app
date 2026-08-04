@@ -13,10 +13,9 @@ import {
   mapSingleUsageGuardAvailabilityToValidationResult,
   mapUsageGuardAvailabilityBatchToValidationResult,
   mapUsageGuardAvailabilityToActionTarget,
-  type UsageGuardAvailabilityWire,
-} from '../content/lib/content-action-validation'
-import type { ContentUsageBlocker } from '../content/lib/content-deletion'
-import type { VocabularyDisableAvailability } from '../content/lib/content-deletion'
+} from '../../lib/usage-guard-action-validation'
+import type { VocabularyDisableAvailability } from './vocabulary-disable-availability'
+import type { VocabularyUsageBlocker } from './vocabulary-disable-availability'
 import type { VocabularyDisableAvailabilityBatchResponse } from './vocabulary-disable-availability-batch'
 
 export type VocabularyDisableAvailabilityWire = VocabularyDisableAvailability
@@ -33,21 +32,21 @@ export function mapVocabularyDisableAvailabilityBatchToValidationResult(
     target: { targetId: string; targetName: string }
     availability: VocabularyDisableAvailabilityWire
   }[],
-): ActionValidationResult<ContentUsageBlocker> {
+): ActionValidationResult<VocabularyUsageBlocker> {
   return mapUsageGuardAvailabilityBatchToValidationResult(entries)
 }
 
 export function mapSingleVocabularyDisableAvailabilityToValidationResult(
   target: { targetId: string; targetName: string },
   availability: VocabularyDisableAvailabilityWire,
-): ActionValidationResult<ContentUsageBlocker> {
+): ActionValidationResult<VocabularyUsageBlocker> {
   return mapSingleUsageGuardAvailabilityToValidationResult(target, availability)
 }
 
 export function mapVocabularyDisableAvailabilityBatchResponse(
   requestedIds: readonly string[],
   response: VocabularyDisableAvailabilityBatchResponse,
-): ActionBatchValidationResult<ContentUsageBlocker> {
+): ActionBatchValidationResult<VocabularyUsageBlocker> {
   const correspondenceError = assertBatchResponseCorrespondence(requestedIds, response.targets)
   if (correspondenceError) {
     return createMalformedBatchValidationResult(requestedIds)
@@ -75,5 +74,3 @@ export function mapVocabularyDisableAvailabilityBatchResponse(
     failures,
   }
 }
-
-export type { UsageGuardAvailabilityWire }

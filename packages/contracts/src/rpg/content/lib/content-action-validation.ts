@@ -5,48 +5,23 @@ import {
 } from '../../../lib/action-validation-batch'
 import {
   createActionValidationResult,
-  createBlockedActionTarget,
-  createEligibleActionTarget,
-  createSingleTargetValidationResult,
   type ActionApplyOutcome,
   type ActionBatchValidationResult,
   type ActionTargetFailure,
-  type ActionTargetIdentity,
   type ActionTargetResult,
-  type ActionValidationResult,
 } from '../../../lib/action-validation'
+import { mapUsageGuardAvailabilityToActionTarget } from '../../../lib/usage-guard-action-validation'
 import type { ContentCampaignAccessAvailabilityBatchResponse } from './campaign-access-batch'
 import type { ContentCampaignAccessUpdateResult } from './campaign-access'
-import type { ContentUsageBlocker } from './content-deletion'
+import type { ContentUsageBlocker } from './content-usage-blocker'
 
-/** Shared advisory availability wire shape used by campaign access and usage guards. */
-export type UsageGuardAvailabilityWire =
-  | { status: 'allowed' }
-  | { status: 'blocked'; blockers: ContentUsageBlocker[] }
+export type { UsageGuardAvailabilityWire } from '../../../lib/usage-guard-action-validation'
 
-export function mapUsageGuardAvailabilityToActionTarget(
-  target: ActionTargetIdentity,
-  availability: UsageGuardAvailabilityWire,
-): ActionTargetResult<ContentUsageBlocker> {
-  if (availability.status === 'allowed') {
-    return createEligibleActionTarget(target)
-  }
-
-  return createBlockedActionTarget(target, availability.blockers)
-}
-
-export function mapUsageGuardAvailabilityBatchToValidationResult(
-  entries: readonly {
-    target: ActionTargetIdentity
-    availability: UsageGuardAvailabilityWire
-  }[],
-): ActionValidationResult<ContentUsageBlocker> {
-  return createActionValidationResult(
-    entries.map(({ target, availability }) =>
-      mapUsageGuardAvailabilityToActionTarget(target, availability),
-    ),
-  )
-}
+export {
+  mapSingleUsageGuardAvailabilityToValidationResult,
+  mapUsageGuardAvailabilityBatchToValidationResult,
+  mapUsageGuardAvailabilityToActionTarget,
+} from '../../../lib/usage-guard-action-validation'
 
 export function mapContentCampaignAccessUpdateResultToApplyOutcome(
   targetId: string,
@@ -64,15 +39,6 @@ export function mapContentCampaignAccessUpdateResultToApplyOutcome(
     targetId,
     blockers: result.blockers,
   }
-}
-
-export function mapSingleUsageGuardAvailabilityToValidationResult(
-  target: ActionTargetIdentity,
-  availability: UsageGuardAvailabilityWire,
-): ActionValidationResult<ContentUsageBlocker> {
-  return createSingleTargetValidationResult(
-    mapUsageGuardAvailabilityToActionTarget(target, availability),
-  )
 }
 
 export function mapContentCampaignAccessAvailabilityBatchResponse(

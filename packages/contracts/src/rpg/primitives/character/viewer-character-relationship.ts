@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
-
 export const CHARACTER_RELATIONSHIP_KINDS = [
   'class',
   'subclass',
@@ -39,7 +37,7 @@ export type CharacterRelationship = z.infer<typeof characterRelationshipSchema>
 export const viewerCharacterRelationshipGroupSchema = z.object({
   kind: characterRelationshipKindSchema,
   count: z.number().int().min(1),
-  relationships: z.array(characterRelationshipSchema).min(1).max(CONTENT_USAGE_SUMMARY_LIMIT),
+  relationships: z.array(characterRelationshipSchema).min(1),
 })
 
 export type ViewerCharacterRelationshipGroup = z.infer<

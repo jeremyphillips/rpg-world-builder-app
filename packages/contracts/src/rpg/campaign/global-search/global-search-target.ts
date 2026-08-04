@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { equipmentFamilyPathSchema } from '../../content/lib/equipment-family-path'
+import { equipmentFamilyPathSchema } from '../../vocab/equipment/family-path'
 
 // ---------------------------------------------------------------------------
 // Structured navigation targets — dashboard resolves href; API never emits paths.

@@ -23,7 +23,7 @@ truth ([`.husky/pre-commit`](.husky/pre-commit),
 dependents via Turbo):
 
 ```text
-pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm typecheck:affected → pnpm test:affected
+pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm lint:affected → pnpm typecheck:affected → pnpm test:affected
 ```
 
 **Pre-push** (full suite before sharing):

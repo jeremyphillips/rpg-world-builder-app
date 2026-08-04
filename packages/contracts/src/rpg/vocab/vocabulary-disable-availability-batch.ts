@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
-import { vocabularyDisableAvailabilitySchema } from '../content/lib/content-deletion'
 import {
   ACTION_VALIDATE_BATCH_TARGET_LIMIT,
   createBatchTargetOutcomeSchema,
   createBatchTargetsRequestSchema,
   uniqueTargetIdsRefinement,
 } from '../../lib/action-validation-batch'
+import { vocabularyDisableAvailabilitySchema } from './vocabulary-disable-availability'
 
 const vocabularyDisableAvailabilityBatchTargetSchema = z.object({
   entryId: z.string().min(1),
