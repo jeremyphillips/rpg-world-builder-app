@@ -38,6 +38,7 @@ const API_ERROR_CODE_BY_BLOCKER_CODE: Record<
   descendant_parent: INVALID_HIERARCHY_API_CODE,
   invalid_parent_kind: INVALID_HIERARCHY_API_CODE,
   cycle: INVALID_HIERARCHY_API_CODE,
+  hierarchy_violation: INVALID_HIERARCHY_API_CODE,
 }
 
 function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
@@ -147,7 +148,9 @@ async function buildHierarchyGraphForParentAssignment(
 }
 
 function throwLocationParentAssignmentBlocker(blocker: LocationParentAssignmentBlocker): never {
-  throw new HttpError(400, API_ERROR_CODE_BY_BLOCKER_CODE[blocker.code], blocker.message)
+  throw new HttpError(400, API_ERROR_CODE_BY_BLOCKER_CODE[blocker.code], blocker.message, {
+    blockerCode: blocker.code,
+  })
 }
 
 async function validateDirectChildrenForKindChange(

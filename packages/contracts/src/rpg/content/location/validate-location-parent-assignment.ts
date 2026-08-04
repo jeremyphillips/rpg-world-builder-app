@@ -14,6 +14,7 @@ export const LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES = {
   invalid_parent_kind: 'invalid_parent_kind',
   parent_not_found: 'parent_not_found',
   cycle: 'cycle',
+  hierarchy_violation: 'hierarchy_violation',
 } as const
 
 export type LocationParentAssignmentBlockerCode =
@@ -267,3 +268,60 @@ export function validateLocationParentAssignment(
 
   return []
 }
+
+const LOCATION_PARENT_ASSIGNMENT_MESSAGE_BY_CODE: Record<
+  LocationParentAssignmentBlockerCode,
+  string
+> = {
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_forbidden]:
+    'This location kind cannot have a parent.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_required]:
+    'This location kind requires a parent location.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.self_parent]: 'A location cannot be its own parent.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_not_found]:
+    'Parent location was not found in this campaign.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.descendant_parent]:
+    'A location cannot be moved under one of its descendants.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.cycle]:
+    'This parent would create a circular location hierarchy.',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.invalid_parent_kind]: '',
+  [LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.hierarchy_violation]:
+    'This parent assignment is not allowed.',
+}
+
+const INVALID_PARENT_KIND_MESSAGE_PATTERN = /^A .+ cannot be placed under a .+\.$/
+
+function isLocationParentAssignmentBlockerCode(
+  value: string,
+): value is LocationParentAssignmentBlockerCode {
+  return Object.values(LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES).includes(
+    value as LocationParentAssignmentBlockerCode,
+  )
+}
+
+/** Reverse-map API/validator messages to structured blocker codes when possible. */
+export function inferLocationParentAssignmentBlockerFromMessage(
+  message: string,
+): LocationParentAssignmentBlocker {
+  for (const [code, canonicalMessage] of Object.entries(
+    LOCATION_PARENT_ASSIGNMENT_MESSAGE_BY_CODE,
+  ) as Array<[LocationParentAssignmentBlockerCode, string]>) {
+    if (canonicalMessage.length > 0 && message === canonicalMessage) {
+      return createLocationParentAssignmentBlocker(code, message)
+    }
+  }
+
+  if (INVALID_PARENT_KIND_MESSAGE_PATTERN.test(message)) {
+    return createLocationParentAssignmentBlocker(
+      LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.invalid_parent_kind,
+      message,
+    )
+  }
+
+  return createLocationParentAssignmentBlocker(
+    LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.hierarchy_violation,
+    message.length > 0 ? message : LOCATION_PARENT_ASSIGNMENT_MESSAGE_BY_CODE.hierarchy_violation,
+  )
+}
+
+export { isLocationParentAssignmentBlockerCode }

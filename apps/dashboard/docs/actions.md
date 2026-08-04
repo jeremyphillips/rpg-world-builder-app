@@ -76,20 +76,37 @@ See [feedback.md](./feedback.md). Summary:
 - Expected blockers and apply-time races while the modal is open → modal only.
 - Operational failures while the modal is open → Result/local error only.
 - Success / confirmed partial / accepted mixed → toast after close.
+- Blocker-only closes (no updated, no failed) → no toast — already disclosed in Resolve.
+- Cancel after partial apply → sync updated targets from selection only; no toast.
+
+## Close ordering and idempotency
+
+Bulk action dialogs use `finalizeActionDialogCloseWithOutcomes`:
+
+1. **Sync** — remove updated target ids from table selection (and any cache hooks), regardless of close reason (including cancel after partial apply).
+2. **Close** — `onOpenChange(false)`.
+3. **Notify** — toast via `notifyActionOutcomes` when `shouldNotifyActionOutcomes` permits (microtask, same as legacy `finalizeActionDialogClose`).
+
+A per-open `closedRef` guard prevents duplicate sync/toast if cancel or overlay close fires twice in one cycle. Reset the guard when the dialog opens.
+
+Post-close summaries use `deriveActionApplySummary(outcomes)` — single `fullSuccess` interpretation shared by overview hooks and dialogs.
 
 ## Components
 
-| Module                        | Role                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| `useActionLifecycle`          | Phase machine, validate/apply orchestration                              |
-| `ActionDialogShell`           | Layout for configure / resolve / result                                  |
-| `ActionTargetResolutionList`  | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
-| `ActionBlockedDialog`         | Single blocked projection — header + flat reference list only            |
-| `ActionBlockerReferences`     | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
-| `action-messages.ts`          | Shared blocked/success/result copy                                       |
-| `action-validate-strategy.ts` | Fan-out and batch validate strategies + lifecycle result resolution      |
-| `action-validate-batch.ts`    | Shared batch POST helper for validate transport                          |
-| `fan-out-validate.ts`         | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
+| Module                         | Role                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `useActionLifecycle`           | Phase machine, validate/apply orchestration                              |
+| `ActionDialogShell`            | Layout for configure / resolve / result                                  |
+| `ActionTargetResolutionList`   | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
+| `ActionBlockedDialog`          | Single blocked projection — header + flat reference list only            |
+| `ActionBlockerReferences`      | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
+| `action-messages.ts`           | Shared blocked/success/result copy                                       |
+| `action-apply-summary.lib.ts`  | `deriveActionApplySummary` — shared post-apply ids + `fullSuccess`       |
+| `action-outcome-notify.lib.ts` | Post-close toast policy (`shouldNotifyActionOutcomes`)                   |
+| `action-dialog-close.lib.ts`   | Close ordering + idempotency (`finalizeActionDialogCloseWithOutcomes`)   |
+| `action-validate-strategy.ts`  | Fan-out and batch validate strategies + lifecycle result resolution      |
+| `action-validate-batch.ts`     | Shared batch POST helper for validate transport                          |
+| `fan-out-validate.ts`          | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
 
 ## Batch validate transport (Phase 2)
 

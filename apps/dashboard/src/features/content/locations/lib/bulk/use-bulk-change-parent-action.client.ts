@@ -3,14 +3,13 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  partitionApplyOutcomes,
   type ActionTargetFailure,
   type ActionTargetIdentity,
   type Location,
   type LocationParentAssignmentBlocker,
 } from '@rpg/contracts'
-import { toast } from '@rpg/ui'
 
+import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
 import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
 import { patchContentOverviewListLocationParent } from '@/features/content/lib/overview/content-overview-list-cache.lib'
 
@@ -76,33 +75,24 @@ export function useBulkChangeParentAction({
       event: ActionLifecycleCloseEvent<LocationParentAssignmentBlocker, ActionTargetFailure>,
       config: BulkChangeParentConfig | null,
     ) => {
-      if (event.reason === 'cancel' || event.outcomes.length === 0) {
-        return
-      }
-
-      const { updated, blocked } = partitionApplyOutcomes(event.outcomes)
-      if (updated.length === 0) {
-        return
-      }
-
       const parentName =
         config?.proposedParentId != null
           ? campaignLocations.find((location) => location.id === config.proposedParentId)?.name
           : undefined
 
-      const toastCopy = formatBulkChangeParentSuccessToast({
-        updatedCount: updated.length,
-        blockedCount: blocked.length,
-        parentName,
-        isClearing: config?.proposedParentId === null,
+      notifyActionOutcomes({
+        outcomes: event.outcomes,
+        closeReason: event.reason,
+        nounPlural: 'locations',
+        nounSingular: 'location',
+        formatSuccess: (updatedCount) =>
+          formatBulkChangeParentSuccessToast({
+            updatedCount,
+            blockedCount: 0,
+            parentName,
+            isClearing: config?.proposedParentId === null,
+          }).title,
       })
-
-      if (toastCopy.tone === 'warning') {
-        toast.warning(toastCopy.title, { description: toastCopy.description })
-        return
-      }
-
-      toast.success(toastCopy.title, { description: toastCopy.description })
     },
     [campaignLocations],
   )

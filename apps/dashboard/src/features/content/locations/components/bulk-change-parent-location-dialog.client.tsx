@@ -13,7 +13,8 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
-  finalizeActionDialogClose,
+  buildActionDialogNotify,
+  finalizeActionDialogCloseWithOutcomes,
   useActionLifecycle,
   type ActionLifecycleCloseEvent,
 } from '@/lib/actions'
@@ -69,6 +70,8 @@ export function BulkChangeParentLocationDialog({
     [selectedRows],
   )
 
+  const closeGuardRef = useRef(false)
+
   const { validate, apply, notifyClose } = useBulkChangeParentAction({
     campaignId,
     rows: selectedRows,
@@ -79,15 +82,18 @@ export function BulkChangeParentLocationDialog({
 
   const handleClose = useCallback(
     (event: ActionLifecycleCloseEvent<LocationParentAssignmentBlocker, ActionTargetFailure>) => {
-      finalizeActionDialogClose(
+      finalizeActionDialogCloseWithOutcomes({
         onOpenChange,
-        event.reason === 'cancel'
-          ? undefined
-          : () => {
-              notifyClose(event, pendingConfigRef.current)
-              onApplyComplete(event.outcomes)
-            },
-      )
+        event,
+        closedRef: closeGuardRef,
+        syncOutcomes: () => {
+          onApplyComplete(event.outcomes)
+        },
+        notify: buildActionDialogNotify({
+          event,
+          notify: () => notifyClose(event, pendingConfigRef.current),
+        }),
+      })
     },
     [notifyClose, onApplyComplete, onOpenChange],
   )
@@ -102,9 +108,12 @@ export function BulkChangeParentLocationDialog({
   })
 
   useEffect(() => {
-    if (!open) {
-      form.reset(BULK_CHANGE_PARENT_FORM_FIELD_DEFAULTS)
+    if (open) {
+      closeGuardRef.current = false
+      return
     }
+
+    form.reset(BULK_CHANGE_PARENT_FORM_FIELD_DEFAULTS)
   }, [form, open])
 
   const handleConfigureApply = useCallback(() => {

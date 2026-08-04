@@ -3,8 +3,6 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  partitionApplyOutcomes,
-  type ActionApplyOutcome,
   type ActionTargetFailure,
   type ActionTargetIdentity,
   type BulkCampaignAccessFormValues,
@@ -21,8 +19,8 @@ import { patchContentOverviewListCampaignAccess } from '../../overview/content-o
 import {
   applyBulkCampaignAccessToTargets,
   validateBulkCampaignAccess,
+  type BulkUpdateRow,
 } from './bulk-campaign-access-action.lib'
-import type { BulkUpdateRow } from './bulk-apply-campaign-access.lib'
 
 export type UseBulkCampaignAccessActionOptions = {
   campaignId: string
@@ -94,14 +92,11 @@ export function useBulkCampaignAccessAction({
       event: ActionLifecycleCloseEvent<ContentUsageBlocker, ActionTargetFailure>,
       config: BulkCampaignAccessFormValues | null,
     ) => {
-      if (event.reason === 'cancel' || event.outcomes.length === 0) {
-        return
-      }
-
       const available = config ? resolveBulkAvailabilityTarget(config) : undefined
 
       notifyActionOutcomes({
         outcomes: event.outcomes,
+        closeReason: event.reason,
         nounPlural: 'items',
         nounSingular: 'item',
         formatSuccess:
@@ -114,26 +109,11 @@ export function useBulkCampaignAccessAction({
     [],
   )
 
-  const toLegacyResult = useCallback(
-    (outcomes: ActionApplyOutcome<ContentUsageBlocker, ActionTargetFailure>[]) => {
-      const { updated, blocked, failed } = partitionApplyOutcomes(outcomes)
-
-      return {
-        updatedIds: updated.map((outcome) => outcome.targetId),
-        blockedIds: blocked.map((outcome) => outcome.targetId),
-        failedIds: failed.map((outcome) => outcome.targetId),
-        fullSuccess: updated.length > 0 && blocked.length === 0 && failed.length === 0,
-      }
-    },
-    [],
-  )
-
   return {
     validate,
     apply,
     notifyClose,
-    toLegacyResult,
   }
 }
 
-export type { BulkUpdateRow } from './bulk-apply-campaign-access.lib'
+export type { BulkUpdateRow }

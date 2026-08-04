@@ -7,9 +7,12 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
-  finalizeActionDialogClose,
+  buildActionDialogNotify,
+  deriveActionApplySummary,
+  finalizeActionDialogCloseWithOutcomes,
   NPC_ROSTER_STATUS_ACTION,
   useActionLifecycle,
+  type ActionApplySummary,
   type ActionLifecycleCloseEvent,
 } from '@/lib/actions'
 import type { ActionTargetFailure } from '@rpg/contracts'
@@ -30,7 +33,7 @@ export type BulkRosterStatusDialogProps = {
   onOpenChange: (open: boolean) => void
   campaignId: string
   selectedRows: CampaignNpcListItem[]
-  onApplyComplete: (result: { updatedIds: string[]; fullSuccess: boolean }) => void
+  onApplyComplete: (result: ActionApplySummary) => void
 }
 
 export function BulkRosterStatusDialog({
@@ -65,24 +68,31 @@ export function BulkRosterStatusDialog({
     [selectedRows],
   )
 
-  const { apply, notifyClose, toLegacyResult } = useBulkRosterStatusAction({
+  const closeGuardRef = useRef(false)
+
+  const { apply, notifyClose } = useBulkRosterStatusAction({
     campaignId,
     rows: selectedRows,
   })
 
   const handleClose = useCallback(
     (event: ActionLifecycleCloseEvent<never, ActionTargetFailure>) => {
-      finalizeActionDialogClose(
+      const summary = deriveActionApplySummary(event.outcomes)
+
+      finalizeActionDialogCloseWithOutcomes({
         onOpenChange,
-        event.reason === 'cancel'
-          ? undefined
-          : () => {
-              notifyClose(event)
-              onApplyComplete(toLegacyResult(event.outcomes))
-            },
-      )
+        event,
+        closedRef: closeGuardRef,
+        syncOutcomes: () => {
+          onApplyComplete(summary)
+        },
+        notify: buildActionDialogNotify({
+          event,
+          notify: () => notifyClose(event),
+        }),
+      })
     },
-    [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
+    [notifyClose, onApplyComplete, onOpenChange],
   )
 
   const lifecycle = useActionLifecycle({
@@ -94,9 +104,12 @@ export function BulkRosterStatusDialog({
   })
 
   useEffect(() => {
-    if (!open) {
-      form.reset(BULK_ROSTER_STATUS_FORM_FIELD_DEFAULTS)
+    if (open) {
+      closeGuardRef.current = false
+      return
     }
+
+    form.reset(BULK_ROSTER_STATUS_FORM_FIELD_DEFAULTS)
   }, [form, open])
 
   const handleConfigureApply = useCallback(() => {

@@ -26,9 +26,12 @@ import {
   fetchContentCampaignAccessAvailabilityBatch,
   updateRouteContentCampaignAccess,
 } from '../campaign-access-api'
-import type { BulkUpdateRow } from './bulk-apply-campaign-access.lib'
+import type { ContentBase } from '../../overview/content-table-config'
+import type { WithCampaignAccess } from '@rpg/contracts'
 
 const BULK_UPDATE_CONCURRENCY = 5
+
+export type BulkUpdateRow = WithCampaignAccess<ContentBase & { id: string }>
 
 export function bulkCampaignAccessTurnsUnavailable(
   formValues: BulkCampaignAccessFormValues,

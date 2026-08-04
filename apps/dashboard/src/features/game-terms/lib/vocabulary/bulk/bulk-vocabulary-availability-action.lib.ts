@@ -24,7 +24,7 @@ import {
   updateVocabularyEntry,
 } from '@/features/vocabulary'
 
-import { VOCABULARY_BULK_UPDATE_CONCURRENCY } from './bulk-apply-vocabulary-availability.lib'
+export const VOCABULARY_BULK_UPDATE_CONCURRENCY = 5
 
 export function vocabularyAvailabilityRequiresValidation(
   setId: VocabularyOptionSetId,

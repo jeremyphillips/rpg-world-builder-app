@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { ApiError, LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES } from '@rpg/contracts'
 
 import { ALDERMERE, DOCK_WARD, GREYSHORE, HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
 import {
@@ -85,5 +86,62 @@ describe('bulk-change-parent-action.lib', () => {
     expect(updateContent).toHaveBeenCalledWith(campaignId, 'locations', HARBORFORD.id, {
       parentLocationId: null,
     })
+  })
+
+  it('reads blockerCode from API hierarchy errors', async () => {
+    updateContent.mockRejectedValueOnce(
+      new ApiError(
+        400,
+        'invalid_hierarchy',
+        'A location cannot be moved under one of its descendants.',
+        {
+          blockerCode: LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.descendant_parent,
+        },
+      ),
+    )
+
+    const { outcomes } = await applyBulkChangeParentToTargets(
+      rows,
+      [HARBORFORD.id],
+      { proposedParentId: ALDERMERE.id },
+      campaignId,
+    )
+
+    expect(outcomes).toEqual([
+      {
+        status: 'blocked',
+        targetId: HARBORFORD.id,
+        blockers: [
+          expect.objectContaining({
+            code: LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.descendant_parent,
+          }),
+        ],
+      },
+    ])
+  })
+
+  it('infers hierarchy codes from messages without defaulting to cycle', async () => {
+    updateContent.mockRejectedValueOnce(
+      new ApiError(400, 'invalid_hierarchy', 'Something unexpected.'),
+    )
+
+    const { outcomes } = await applyBulkChangeParentToTargets(
+      rows,
+      [HARBORFORD.id],
+      { proposedParentId: ALDERMERE.id },
+      campaignId,
+    )
+
+    expect(outcomes).toEqual([
+      {
+        status: 'blocked',
+        targetId: HARBORFORD.id,
+        blockers: [
+          expect.objectContaining({
+            code: LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.hierarchy_violation,
+          }),
+        ],
+      },
+    ])
   })
 })

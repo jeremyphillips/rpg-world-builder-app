@@ -7,8 +7,11 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
-  finalizeActionDialogClose,
+  buildActionDialogNotify,
+  deriveActionApplySummary,
+  finalizeActionDialogCloseWithOutcomes,
   useActionLifecycle,
+  type ActionApplySummary,
   type ActionLifecycleCloseEvent,
 } from '@/lib/actions'
 
@@ -46,12 +49,7 @@ export type BulkCampaignAccessDialogProps = {
   contentTypeKey: ContentTypeKey
   itemLabelPlural: string
   selectedRows: Array<WithCampaignAccess<ContentBase & { id: string }>>
-  onApplyComplete: (result: {
-    updatedIds: string[]
-    blockedIds: string[]
-    failedIds: string[]
-    fullSuccess: boolean
-  }) => void
+  onApplyComplete: (result: ActionApplySummary) => void
 }
 
 export function BulkCampaignAccessDialog({
@@ -88,7 +86,9 @@ export function BulkCampaignAccessDialog({
     [selectedRows],
   )
 
-  const { validate, apply, notifyClose, toLegacyResult } = useBulkCampaignAccessAction({
+  const closeGuardRef = useRef(false)
+
+  const { validate, apply, notifyClose } = useBulkCampaignAccessAction({
     campaignId,
     contentTypeKey,
     rows: selectedRows,
@@ -103,17 +103,22 @@ export function BulkCampaignAccessDialog({
         import('@rpg/contracts').ActionTargetFailure
       >,
     ) => {
-      finalizeActionDialogClose(
+      const summary = deriveActionApplySummary(event.outcomes)
+
+      finalizeActionDialogCloseWithOutcomes({
         onOpenChange,
-        event.reason === 'cancel'
-          ? undefined
-          : () => {
-              notifyClose(event, pendingConfigRef.current)
-              onApplyComplete(toLegacyResult(event.outcomes))
-            },
-      )
+        event,
+        closedRef: closeGuardRef,
+        syncOutcomes: () => {
+          onApplyComplete(summary)
+        },
+        notify: buildActionDialogNotify({
+          event,
+          notify: () => notifyClose(event, pendingConfigRef.current),
+        }),
+      })
     },
-    [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
+    [notifyClose, onApplyComplete, onOpenChange],
   )
 
   const lifecycle = useActionLifecycle({
@@ -126,9 +131,12 @@ export function BulkCampaignAccessDialog({
   })
 
   useEffect(() => {
-    if (!open) {
-      form.reset(BULK_CAMPAIGN_ACCESS_FORM_FIELD_DEFAULTS)
+    if (open) {
+      closeGuardRef.current = false
+      return
     }
+
+    form.reset(BULK_CAMPAIGN_ACCESS_FORM_FIELD_DEFAULTS)
   }, [form, open])
 
   const handleConfigureApply = useCallback(() => {

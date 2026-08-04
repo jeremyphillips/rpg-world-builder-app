@@ -65,10 +65,10 @@ Modules: `use-content-overview-selection.ts`, `use-content-overview-bulk-selecti
 
 ### Bulk actions
 
-| Action                     | Content types | Dialog module                    |
-| -------------------------- | ------------- | -------------------------------- |
-| Edit campaign availability | All catalog   | `BulkCampaignAccessDialog`       |
-| Change parent location     | Locations     | `BulkChangeParentLocationDialog` |
+| Action                     | Content types                                                   | Dialog module                    |
+| -------------------------- | --------------------------------------------------------------- | -------------------------------- |
+| Edit campaign availability | Supported content types (`supportsContentBulkCampaignAccess()`) | `BulkCampaignAccessDialog`       |
+| Change parent location     | Locations                                                       | `BulkChangeParentLocationDialog` |
 
 Both follow the unified action lifecycle documented in [actions.md](./actions.md). After apply,
 only **updated** targets leave selection; blocked targets remain selected for retry.

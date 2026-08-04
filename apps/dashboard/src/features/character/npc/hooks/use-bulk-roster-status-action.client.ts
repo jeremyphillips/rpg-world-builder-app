@@ -3,8 +3,6 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  partitionApplyOutcomes,
-  type ActionApplyOutcome,
   type ActionTargetFailure,
   type CampaignNpcDetail,
   type CampaignNpcListItem,
@@ -67,12 +65,9 @@ export function useBulkRosterStatusAction({ campaignId, rows }: UseBulkRosterSta
 
   const notifyClose = useCallback(
     (event: ActionLifecycleCloseEvent<never, ActionTargetFailure>) => {
-      if (event.reason === 'cancel' || event.outcomes.length === 0) {
-        return
-      }
-
       notifyActionOutcomes({
         outcomes: event.outcomes,
+        closeReason: event.reason,
         nounPlural: NPC_ROSTER_STATUS_ACTION.nounPlural,
         nounSingular: NPC_ROSTER_STATUS_ACTION.nounSingular,
       })
@@ -80,22 +75,8 @@ export function useBulkRosterStatusAction({ campaignId, rows }: UseBulkRosterSta
     [],
   )
 
-  const toLegacyResult = useCallback(
-    (outcomes: ActionApplyOutcome<never, ActionTargetFailure>[]) => {
-      const { updated, failed } = partitionApplyOutcomes(outcomes)
-
-      return {
-        updatedIds: updated.map((outcome) => outcome.targetId),
-        failedIds: failed.map((outcome) => outcome.targetId),
-        fullSuccess: updated.length > 0 && failed.length === 0,
-      }
-    },
-    [],
-  )
-
   return {
     apply,
     notifyClose,
-    toLegacyResult,
   }
 }

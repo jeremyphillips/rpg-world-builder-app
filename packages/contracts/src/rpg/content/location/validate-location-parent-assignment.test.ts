@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES,
   buildLocationHierarchyGraphFromNodes,
+  inferLocationParentAssignmentBlockerFromMessage,
   validateLocationParentAssignment,
   type LocationHierarchyNode,
 } from './validate-location-parent-assignment'
@@ -185,5 +186,27 @@ describe('buildLocationHierarchyGraphFromNodes', () => {
 
     expect(locationsById.get('a')).toEqual(nodes[0])
     expect(locationsById.get('b')).toEqual(nodes[1])
+  })
+})
+
+describe('inferLocationParentAssignmentBlockerFromMessage', () => {
+  it('reverse-maps canonical validator messages', () => {
+    expect(
+      inferLocationParentAssignmentBlockerFromMessage(
+        'A location cannot be moved under one of its descendants.',
+      ).code,
+    ).toBe(LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.descendant_parent)
+
+    expect(
+      inferLocationParentAssignmentBlockerFromMessage(
+        'A Settlement cannot be placed under a Region.',
+      ).code,
+    ).toBe(LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.invalid_parent_kind)
+  })
+
+  it('falls back to hierarchy_violation for unknown messages', () => {
+    expect(inferLocationParentAssignmentBlockerFromMessage('Something unexpected.').code).toBe(
+      LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.hierarchy_violation,
+    )
   })
 })

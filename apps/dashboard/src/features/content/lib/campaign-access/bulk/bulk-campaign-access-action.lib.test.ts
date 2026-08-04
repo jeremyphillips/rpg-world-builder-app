@@ -205,4 +205,54 @@ describe('bulk-campaign-access-action.lib', () => {
       },
     ])
   })
+
+  it('fetches CSRF once and applies all rows with the shared token', async () => {
+    updateRouteContentCampaignAccess.mockResolvedValue({
+      status: 'updated',
+      campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+    })
+
+    const bulkRows = [
+      {
+        id: 'class-1',
+        name: 'Wizard',
+        source: 'system' as const,
+        status: 'published' as const,
+        campaignAccess: unavailableAccess,
+      },
+      {
+        id: 'class-2',
+        name: 'Fighter',
+        source: 'system' as const,
+        status: 'published' as const,
+        campaignAccess: unavailableAccess,
+      },
+      {
+        id: 'class-3',
+        name: 'Rogue',
+        source: 'system' as const,
+        status: 'published' as const,
+        campaignAccess: unavailableAccess,
+      },
+    ]
+
+    const { outcomes } = await applyBulkCampaignAccessToTargets(
+      bulkRows,
+      ['class-1', 'class-2', 'class-3'],
+      {
+        available: { kind: 'set', value: true },
+        visibilityMode: { kind: 'unchanged' },
+      },
+      'campaign-1',
+      'classes',
+    )
+
+    expect(fetchCsrfToken).toHaveBeenCalledTimes(1)
+    expect(updateRouteContentCampaignAccess).toHaveBeenCalledTimes(3)
+    for (const call of updateRouteContentCampaignAccess.mock.calls) {
+      expect(call[4]).toEqual({ csrfToken: 'shared-csrf-token' })
+    }
+
+    expect(outcomes.filter((outcome) => outcome.status === 'updated')).toHaveLength(3)
+  })
 })

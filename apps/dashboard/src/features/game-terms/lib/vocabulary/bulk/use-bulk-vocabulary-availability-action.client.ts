@@ -3,8 +3,6 @@
 import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  partitionApplyOutcomes,
-  type ActionApplyOutcome,
   type ActionTargetFailure,
   type ActionTargetIdentity,
   type ContentUsageBlocker,
@@ -64,12 +62,9 @@ export function useBulkVocabularyAvailabilityAction({
 
   const notifyClose = useCallback(
     (event: ActionLifecycleCloseEvent<ContentUsageBlocker, ActionTargetFailure>) => {
-      if (event.reason === 'cancel' || event.outcomes.length === 0) {
-        return
-      }
-
       notifyActionOutcomes({
         outcomes: event.outcomes,
+        closeReason: event.reason,
         nounPlural: 'entries',
         nounSingular: 'entry',
       })
@@ -77,28 +72,9 @@ export function useBulkVocabularyAvailabilityAction({
     [],
   )
 
-  const toLegacyResult = useCallback(
-    (outcomes: ActionApplyOutcome<ContentUsageBlocker, ActionTargetFailure>[]) => {
-      const { updated, blocked, failed } = partitionApplyOutcomes(outcomes)
-
-      return {
-        updatedIds: updated.map((outcome) => outcome.targetId),
-        blockedResults: blocked.map((outcome) => ({
-          rowId: outcome.targetId,
-          label: rows.find((row) => row.id === outcome.targetId)?.label ?? outcome.targetId,
-          blockers: outcome.blockers,
-        })),
-        failedIds: failed.map((outcome) => outcome.targetId),
-        fullSuccess: updated.length > 0 && blocked.length === 0 && failed.length === 0,
-      }
-    },
-    [rows],
-  )
-
   return {
     validate,
     apply,
     notifyClose,
-    toLegacyResult,
   }
 }

@@ -4,7 +4,9 @@ import {
   createEligibleActionTarget,
   createActionValidationResult,
   getErrorMessage,
+  inferLocationParentAssignmentBlockerFromMessage,
   isApiError,
+  isLocationParentAssignmentBlockerCode,
   LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES,
   validateLocationParentAssignment,
   type ActionApplyOutcome,
@@ -16,7 +18,6 @@ import {
   type Location,
   type LocationKind,
   type LocationParentAssignmentBlocker,
-  type LocationParentAssignmentBlockerCode,
 } from '@rpg/contracts'
 
 import { updateContent } from '../../../lib/list/content-client'
@@ -121,12 +122,30 @@ function parsePatchHierarchyBlockedError(err: unknown): LocationParentAssignment
     return null
   }
 
-  const code: LocationParentAssignmentBlockerCode =
-    err.code === 'invalid_parent'
-      ? LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_not_found
-      : LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.cycle
+  const details = err.details
+  const blockerCodeFromApi =
+    typeof details === 'object' && details !== null && 'blockerCode' in details
+      ? (details as { blockerCode?: unknown }).blockerCode
+      : undefined
 
-  return [{ kind: 'rule', code, message: err.message }]
+  if (
+    typeof blockerCodeFromApi === 'string' &&
+    isLocationParentAssignmentBlockerCode(blockerCodeFromApi)
+  ) {
+    return [{ kind: 'rule', code: blockerCodeFromApi, message: err.message }]
+  }
+
+  if (err.code === 'invalid_parent') {
+    return [
+      {
+        kind: 'rule',
+        code: LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.parent_not_found,
+        message: err.message,
+      },
+    ]
+  }
+
+  return [inferLocationParentAssignmentBlockerFromMessage(err.message)]
 }
 
 export type BulkChangeParentApplyUpdate = {

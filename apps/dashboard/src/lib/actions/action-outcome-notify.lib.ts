@@ -5,6 +5,7 @@ import {
 } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
 
+import type { ActionLifecycleCloseReason } from './action-lifecycle.types'
 import {
   formatActionMixedResult,
   formatActionPartialSuccess,
@@ -15,6 +16,7 @@ export type NotifyActionOutcomesInput = {
   outcomes: readonly ActionApplyOutcome<unknown, ActionTargetFailure>[]
   nounPlural: string
   nounSingular?: string
+  closeReason?: ActionLifecycleCloseReason
   formatSuccess?: (updatedCount: number) => string
 }
 
@@ -26,6 +28,30 @@ function hasReportableOutcomes(counts: OutcomeCounts): boolean {
 
 function isFailureOnly(counts: OutcomeCounts): boolean {
   return counts.failed.length > 0 && counts.updated.length === 0 && counts.blocked.length === 0
+}
+
+function isBlockerOnly(counts: OutcomeCounts): boolean {
+  return counts.blocked.length > 0 && counts.updated.length === 0 && counts.failed.length === 0
+}
+
+/** Whether a post-close toast should fire for the outcome mix and close reason. */
+export function shouldNotifyActionOutcomes(
+  counts: OutcomeCounts,
+  closeReason: ActionLifecycleCloseReason,
+): boolean {
+  if (closeReason === 'cancel') {
+    return false
+  }
+
+  if (!hasReportableOutcomes(counts)) {
+    return false
+  }
+
+  if (isBlockerOnly(counts)) {
+    return false
+  }
+
+  return true
 }
 
 function formatActionOutcomeSummary(
@@ -82,11 +108,12 @@ export function notifyActionOutcomes({
   outcomes,
   nounPlural,
   nounSingular = nounPlural,
+  closeReason = 'success',
   formatSuccess,
 }: NotifyActionOutcomesInput): void {
   const counts = partitionApplyOutcomes(outcomes)
 
-  if (!hasReportableOutcomes(counts)) {
+  if (!shouldNotifyActionOutcomes(counts, closeReason)) {
     return
   }
 

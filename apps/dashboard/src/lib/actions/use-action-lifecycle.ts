@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  createEligibleActionTarget,
   getBlockedActionTargets,
   getEligibleActionTargets,
   getErrorMessage,
@@ -11,6 +12,7 @@ import {
   partitionApplyOutcomes,
   type ActionApplyOutcome,
   type ActionTargetFailure,
+  type ActionTargetIdentity,
   type ActionValidationResult,
 } from '@rpg/contracts'
 
@@ -20,6 +22,8 @@ import type {
   ActionResolutionRowModel,
   UseActionLifecycleOptions,
 } from './action-lifecycle.types'
+
+const VALIDATION_SNAPSHOT_MISSING_ERROR = 'Internal error: validation snapshot missing.'
 
 function resolveActionLifecycleErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message.length > 0) {
@@ -40,6 +44,21 @@ function createInitialConfirmedTargetIds(
   return new Set(getEligibleActionTargets(validation).map((target) => target.targetId))
 }
 
+function buildSyntheticEligibleSnapshot<TBlocker>(
+  targetIds: readonly string[],
+  targets: readonly ActionTargetIdentity[],
+): ActionValidationResult<TBlocker> {
+  return {
+    targets: targetIds.map((targetId) => {
+      const target = targets.find((entry) => entry.targetId === targetId)
+      return createEligibleActionTarget({
+        targetId,
+        targetName: target?.targetName ?? targetId,
+      })
+    }),
+  }
+}
+
 export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailure, TConfig>({
   open,
   targets,
@@ -52,19 +71,25 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
   const [validationResult, setValidationResult] = useState<ActionValidationResult<TBlocker> | null>(
     null,
   )
+  const validationResultRef = useRef<ActionValidationResult<TBlocker> | null>(null)
   const [confirmedTargetIds, setConfirmedTargetIds] = useState<Set<string>>(() => new Set<string>())
   const [applyOutcomes, setApplyOutcomes] = useState<ActionApplyOutcome<TBlocker, TFailure>[]>([])
   const [localError, setLocalError] = useState<string | null>(null)
   const [pendingConfig, setPendingConfig] = useState<TConfig | null>(null)
 
+  const commitValidationResult = useCallback((result: ActionValidationResult<TBlocker> | null) => {
+    validationResultRef.current = result
+    setValidationResult(result)
+  }, [])
+
   const resetLifecycle = useCallback(() => {
     setPhase('configure')
-    setValidationResult(null)
+    commitValidationResult(null)
     setConfirmedTargetIds(new Set())
     setApplyOutcomes([])
     setLocalError(null)
     setPendingConfig(null)
-  }, [])
+  }, [commitValidationResult])
 
   useEffect(() => {
     if (!open) {
@@ -73,7 +98,11 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
   }, [open, resetLifecycle])
 
   const executeApply = useCallback(
-    async (targetIds: readonly string[], config: TConfig) => {
+    async (
+      targetIds: readonly string[],
+      config: TConfig,
+      validationSnapshot?: ActionValidationResult<TBlocker> | null,
+    ) => {
       setPhase('submitting')
       setLocalError(null)
 
@@ -84,17 +113,18 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
         const { blocked, failed, updated } = partitionApplyOutcomes(outcomes)
 
         if (blocked.length > 0) {
-          const merged = mergeApplyBlockedOutcomesIntoValidation(
-            validationResult ?? {
-              targets: targets.map((target) => ({
-                status: 'eligible' as const,
-                targetId: target.targetId,
-                targetName: target.targetName,
-              })),
-            },
-            blocked,
-          )
-          setValidationResult(merged)
+          const snapshotForMerge = requiresValidation
+            ? (validationSnapshot ?? validationResultRef.current)
+            : buildSyntheticEligibleSnapshot<TBlocker>(targetIds, targets)
+
+          if (requiresValidation && !snapshotForMerge) {
+            setLocalError(VALIDATION_SNAPSHOT_MISSING_ERROR)
+            setPhase('resolve')
+            return
+          }
+
+          const merged = mergeApplyBlockedOutcomesIntoValidation(snapshotForMerge!, blocked)
+          commitValidationResult(merged)
           setConfirmedTargetIds(createInitialConfirmedTargetIds(merged, targetIds))
           setPhase('resolve')
           return
@@ -119,7 +149,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
         setPhase(requiresValidation ? 'resolve' : 'result')
       }
     },
-    [apply, onClose, requiresValidation, targets],
+    [apply, commitValidationResult, onClose, requiresValidation, targets],
   )
 
   const startApply = useCallback(
@@ -136,7 +166,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
 
         try {
           const result = await validate(targets, config)
-          setValidationResult(result)
+          commitValidationResult(result)
           setConfirmedTargetIds(createInitialConfirmedTargetIds(result, []))
 
           if (hasActionValidationBlockers(result)) {
@@ -145,7 +175,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
           }
 
           const eligibleIds = getEligibleActionTargets(result).map((target) => target.targetId)
-          await executeApply(eligibleIds, config)
+          await executeApply(eligibleIds, config, result)
         } catch (error) {
           setLocalError(resolveActionLifecycleErrorMessage(error, 'Could not validate the action.'))
           setPhase('configure')
@@ -159,7 +189,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
         config,
       )
     },
-    [executeApply, requiresValidation, targets, validate],
+    [commitValidationResult, executeApply, requiresValidation, targets, validate],
   )
 
   const confirmResolve = useCallback(async () => {
@@ -173,7 +203,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
       return
     }
 
-    await executeApply(targetIds, pendingConfig)
+    await executeApply(targetIds, pendingConfig, validationResultRef.current)
   }, [confirmedTargetIds, executeApply, pendingConfig])
 
   const retryFailed = useCallback(async () => {
@@ -192,7 +222,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
       return
     }
 
-    await executeApply(failedIds, pendingConfig)
+    await executeApply(failedIds, pendingConfig, validationResultRef.current)
   }, [applyOutcomes, executeApply, pendingConfig])
 
   const goBackToConfigure = useCallback(() => {

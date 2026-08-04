@@ -8,11 +8,14 @@ import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
 import {
   ActionDialogShell,
-  finalizeActionDialogClose,
+  buildActionDialogNotify,
+  deriveActionApplySummary,
+  finalizeActionDialogCloseWithOutcomes,
   formatActionBlockedDescription,
   formatActionBlockedTitle,
   useActionLifecycle,
   VOCABULARY_DISABLE_ACTION,
+  type ActionApplySummary,
   type ActionLifecycleCloseEvent,
 } from '@/lib/actions'
 
@@ -36,16 +39,7 @@ export type BulkVocabularyAvailabilityDialogProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   selectedRows: VocabularyOptionWithUsage[]
-  onApplyComplete: (result: {
-    updatedIds: string[]
-    blockedResults: Array<{
-      rowId: string
-      label: string
-      blockers: import('@rpg/contracts').ContentUsageBlocker[]
-    }>
-    failedIds: string[]
-    fullSuccess: boolean
-  }) => void
+  onApplyComplete: (result: ActionApplySummary) => void
 }
 
 export function BulkVocabularyAvailabilityDialog({
@@ -73,7 +67,9 @@ export function BulkVocabularyAvailabilityDialog({
     [selectedRows, status],
   )
 
-  const { validate, apply, notifyClose, toLegacyResult } = useBulkVocabularyAvailabilityAction({
+  const closeGuardRef = useRef(false)
+
+  const { validate, apply, notifyClose } = useBulkVocabularyAvailabilityAction({
     campaignId,
     setId,
     rows: selectedRows,
@@ -86,17 +82,22 @@ export function BulkVocabularyAvailabilityDialog({
         import('@rpg/contracts').ActionTargetFailure
       >,
     ) => {
-      finalizeActionDialogClose(
+      const summary = deriveActionApplySummary(event.outcomes)
+
+      finalizeActionDialogCloseWithOutcomes({
         onOpenChange,
-        event.reason === 'cancel'
-          ? undefined
-          : () => {
-              notifyClose(event)
-              onApplyComplete(toLegacyResult(event.outcomes))
-            },
-      )
+        event,
+        closedRef: closeGuardRef,
+        syncOutcomes: () => {
+          onApplyComplete(summary)
+        },
+        notify: buildActionDialogNotify({
+          event,
+          notify: () => notifyClose(event),
+        }),
+      })
     },
-    [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
+    [notifyClose, onApplyComplete, onOpenChange],
   )
 
   const lifecycle = useActionLifecycle({
@@ -109,9 +110,12 @@ export function BulkVocabularyAvailabilityDialog({
   })
 
   useEffect(() => {
-    if (!open) {
-      form.reset({ status: 'active' })
+    if (open) {
+      closeGuardRef.current = false
+      return
     }
+
+    form.reset({ status: 'active' })
   }, [form, open])
 
   const handleConfigureApply = useCallback(() => {

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import type { BulkCampaignAccessApplyResult } from '../campaign-access/bulk/bulk-apply-campaign-access.lib'
+import type { ActionApplySummary } from '@/lib/actions'
 import { useContentOverviewBulkSelection } from './use-content-overview-bulk-selection'
 
 export function useContentOverviewBulkAccess<T extends { id: string }>(
@@ -12,7 +12,7 @@ export function useContentOverviewBulkAccess<T extends { id: string }>(
   const selection = useContentOverviewBulkSelection<T>(visibleRowIds)
 
   const handleBulkApplyComplete = useCallback(
-    (result: Pick<BulkCampaignAccessApplyResult, 'updatedIds' | 'fullSuccess'>) => {
+    (result: Pick<ActionApplySummary, 'updatedIds' | 'fullSuccess'>) => {
       selection.removeFromSelection(result.updatedIds)
 
       if (result.fullSuccess) {

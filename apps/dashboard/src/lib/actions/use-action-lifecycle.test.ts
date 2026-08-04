@@ -166,4 +166,48 @@ describe('useActionLifecycle', () => {
 
     expect(apply).toHaveBeenCalledWith(['a'], { mode: 'active' })
   })
+
+  it('merges apply-time blocked outcomes into the committed validation snapshot only', async () => {
+    const onClose = vi.fn()
+
+    const { result } = renderHook(() =>
+      useActionLifecycle({
+        open: true,
+        targets: [
+          { targetId: 'a', targetName: 'Alpha' },
+          { targetId: 'b', targetName: 'Beta' },
+          { targetId: 'c', targetName: 'Gamma' },
+        ],
+        validate: async () => ({
+          targets: [
+            { status: 'eligible', targetId: 'a', targetName: 'Alpha' },
+            { status: 'eligible', targetId: 'b', targetName: 'Beta' },
+          ],
+        }),
+        apply: async (targetIds) =>
+          targetIds.map((targetId) =>
+            targetId === 'b'
+              ? {
+                  status: 'blocked' as const,
+                  targetId,
+                  blockers: [{ kind: 'rule', code: 'race', message: 'Blocked.' }],
+                }
+              : { status: 'updated' as const, targetId },
+          ),
+        onClose,
+      }),
+    )
+
+    await act(async () => {
+      await result.current.startApply({ mode: 'off' })
+    })
+
+    expect(result.current.phase).toBe('resolve')
+    expect(result.current.validationResult?.targets).toHaveLength(2)
+    expect(result.current.validationResult?.targets.map((target) => target.targetId)).toEqual([
+      'a',
+      'b',
+    ])
+    expect(onClose).not.toHaveBeenCalled()
+  })
 })

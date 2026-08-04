@@ -1,5 +1,5 @@
 import type { CampaignRole, ContentUsageBlocker } from '@rpg/contracts'
-import { isCampaignManager } from '@rpg/contracts'
+import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
 import { CharacterModel } from '../../../character/character.model'
@@ -28,6 +28,7 @@ function characterToUsageBlocker(
 ): ContentUsageBlocker {
   return {
     kind: 'usage',
+    sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
     usage: {
       kind: 'character',
       id: String(hit._id),
