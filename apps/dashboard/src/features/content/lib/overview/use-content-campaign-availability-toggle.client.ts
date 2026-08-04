@@ -17,6 +17,7 @@ import {
 import { resolvedToCampaignAccessPatch } from '../campaign-access/campaign-access-state'
 import { notifyCampaignAccessUpdated, notifyCampaignAccessUpdateFailed } from '@/lib/notify'
 import type { ContentBase } from './content-table-config'
+import { patchContentOverviewListCampaignAccess } from './content-overview-list-cache.lib'
 import { contentOverviewListQueryKey } from './content-overview-query-keys'
 
 export type UseContentCampaignAvailabilityToggleOptions = {
@@ -108,20 +109,20 @@ export function useContentCampaignAvailabilityToggle({
   entityNameRef.current = entityName
 
   const resolveEntityName = useCallback(() => {
-    const rows = queryClient.getQueryData<WithCampaignAccess<ContentBase & { id: string }>[]>(
-      contentOverviewListQueryKey(campaignId, contentTypeKey),
-    )
-    return rows?.find((row) => row.id === entityId)?.name ?? entityNameRef.current
+    const cached = queryClient.getQueryData<{
+      items?: Array<WithCampaignAccess<ContentBase & { id: string }>>
+    }>(contentOverviewListQueryKey(campaignId, contentTypeKey))
+    return cached?.items?.find((row) => row.id === entityId)?.name ?? entityNameRef.current
   }, [campaignId, contentTypeKey, entityId, queryClient])
 
   const updateCachedAccess = useCallback(
     (nextAccess: ResolvedContentCampaignAccess) => {
-      queryClient.setQueryData<WithCampaignAccess<ContentBase & { id: string }>[]>(
-        contentOverviewListQueryKey(campaignId, contentTypeKey),
-        (current) =>
-          current?.map((row) =>
-            row.id === entityId ? { ...row, campaignAccess: nextAccess } : row,
-          ),
+      patchContentOverviewListCampaignAccess(
+        queryClient,
+        campaignId,
+        contentTypeKey,
+        entityId,
+        nextAccess,
       )
     },
     [campaignId, contentTypeKey, entityId, queryClient],

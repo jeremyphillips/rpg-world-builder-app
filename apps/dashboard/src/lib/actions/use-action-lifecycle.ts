@@ -21,6 +21,14 @@ import type {
   UseActionLifecycleOptions,
 } from './action-lifecycle.types'
 
+function resolveActionLifecycleErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message.length > 0) {
+    return error.message
+  }
+
+  return getErrorMessage(error, fallback)
+}
+
 function createInitialConfirmedTargetIds(
   validation: ActionValidationResult<unknown> | null,
   fallbackTargetIds: readonly string[],
@@ -97,13 +105,17 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
           return
         }
 
-        onClose({
-          reason: 'success',
-          outcomes,
-          fullSuccess: updated.length === targetIds.length,
-        })
+        try {
+          onClose({
+            reason: 'success',
+            outcomes,
+            fullSuccess: updated.length === targetIds.length,
+          })
+        } catch {
+          // Apply succeeded; close side effects must not surface as apply failures.
+        }
       } catch (error) {
-        setLocalError(getErrorMessage(error, 'Could not complete the action.'))
+        setLocalError(resolveActionLifecycleErrorMessage(error, 'Could not complete the action.'))
         setPhase(requiresValidation ? 'resolve' : 'result')
       }
     },
@@ -135,11 +147,7 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
           const eligibleIds = getEligibleActionTargets(result).map((target) => target.targetId)
           await executeApply(eligibleIds, config)
         } catch (error) {
-          const message =
-            error instanceof Error && error.message.length > 0
-              ? error.message
-              : getErrorMessage(error, 'Could not validate the action.')
-          setLocalError(message)
+          setLocalError(resolveActionLifecycleErrorMessage(error, 'Could not validate the action.'))
           setPhase('configure')
         }
 

@@ -16,7 +16,7 @@ import {
 import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
 import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
 import { formatCampaignAccessAvailabilityToast } from '../campaign-access-labels'
-import { contentOverviewListQueryKey } from '../../overview/content-overview-query-keys'
+import { patchContentOverviewListCampaignAccess } from '../../overview/content-overview-list-cache.lib'
 
 import {
   applyBulkCampaignAccessToTargets,
@@ -48,12 +48,12 @@ export function useBulkCampaignAccessAction({
 
   const updateCachedAccess = useCallback(
     (entityId: string, nextAccess: ResolvedContentCampaignAccess) => {
-      queryClient.setQueryData<BulkUpdateRow[]>(
-        contentOverviewListQueryKey(campaignId, contentTypeKey),
-        (current) =>
-          current?.map((row) =>
-            row.id === entityId ? { ...row, campaignAccess: nextAccess } : row,
-          ),
+      patchContentOverviewListCampaignAccess(
+        queryClient,
+        campaignId,
+        contentTypeKey,
+        entityId,
+        nextAccess,
       )
     },
     [campaignId, contentTypeKey, queryClient],
@@ -77,7 +77,11 @@ export function useBulkCampaignAccessAction({
       )
 
       updates.forEach((update) => {
-        updateCachedAccess(update.rowId, update.campaignAccess)
+        try {
+          updateCachedAccess(update.rowId, update.campaignAccess)
+        } catch {
+          // Cache sync is best-effort; server state is authoritative.
+        }
       })
 
       return outcomes

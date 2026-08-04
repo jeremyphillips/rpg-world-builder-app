@@ -1,3 +1,4 @@
+export * from './action-dialog-close.lib'
 export * from './action-lifecycle.types'
 export * from './action-messages'
 export * from './action-toast-policy'

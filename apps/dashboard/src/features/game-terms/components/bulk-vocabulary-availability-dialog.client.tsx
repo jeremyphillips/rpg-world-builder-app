@@ -8,6 +8,7 @@ import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
 import {
   ActionDialogShell,
+  finalizeActionDialogClose,
   formatActionBlockedDescription,
   formatActionBlockedTitle,
   useActionLifecycle,
@@ -85,11 +86,15 @@ export function BulkVocabularyAvailabilityDialog({
         import('@rpg/contracts').ActionTargetFailure
       >,
     ) => {
-      if (event.reason !== 'cancel') {
-        notifyClose(event)
-        onApplyComplete(toLegacyResult(event.outcomes))
-      }
-      onOpenChange(false)
+      finalizeActionDialogClose(
+        onOpenChange,
+        event.reason === 'cancel'
+          ? undefined
+          : () => {
+              notifyClose(event)
+              onApplyComplete(toLegacyResult(event.outcomes))
+            },
+      )
     },
     [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
   )

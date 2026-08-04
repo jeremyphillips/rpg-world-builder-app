@@ -81,6 +81,15 @@ describe('action messages', () => {
 
     expect(
       formatActionBlockedDescription({
+        mode: 'bulk-partial',
+        blockedCount: 2,
+        selectedCount: 5,
+        noun: 'items',
+      }),
+    ).toContain('already excluded')
+
+    expect(
+      formatActionBlockedDescription({
         mode: 'bulk-all',
         blockedCount: 3,
         selectedCount: 3,

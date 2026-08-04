@@ -8,6 +8,7 @@ import { FormFieldStack } from '@rpg/ui/form'
 import {
   ActionDialogShell,
   CONTENT_AVAILABILITY_OFF_ACTION,
+  finalizeActionDialogClose,
   formatActionBlockedDescription,
   formatActionBlockedTitle,
   useActionLifecycle,
@@ -94,11 +95,15 @@ export function BulkCampaignAccessDialog({
         import('@rpg/contracts').ActionTargetFailure
       >,
     ) => {
-      if (event.reason !== 'cancel') {
-        notifyClose(event, pendingConfigRef.current)
-        onApplyComplete(toLegacyResult(event.outcomes))
-      }
-      onOpenChange(false)
+      finalizeActionDialogClose(
+        onOpenChange,
+        event.reason === 'cancel'
+          ? undefined
+          : () => {
+              notifyClose(event, pendingConfigRef.current)
+              onApplyComplete(toLegacyResult(event.outcomes))
+            },
+      )
     },
     [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
   )

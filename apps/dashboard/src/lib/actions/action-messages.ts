@@ -91,7 +91,7 @@ export function formatActionBlockedDescription({
     return `All ${selectedCount} selected ${noun} are blocked by active ${referenceLabel}. Remove the references before continuing.`
   }
 
-  return `${blockedCount} of ${selectedCount} selected ${noun} are blocked by active ${referenceLabel}. Uncheck blocked items or remove the references before continuing.`
+  return `${blockedCount} of ${selectedCount} selected ${noun} are blocked by active ${referenceLabel}. Blocked items are already excluded — remove the references to include them, or continue with the eligible items.`
 }
 
 function formatActionBlockedSingleDescription({

@@ -7,6 +7,7 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
+  finalizeActionDialogClose,
   NPC_ROSTER_STATUS_ACTION,
   useActionLifecycle,
   type ActionLifecycleCloseEvent,
@@ -71,11 +72,15 @@ export function BulkRosterStatusDialog({
 
   const handleClose = useCallback(
     (event: ActionLifecycleCloseEvent<never, ActionTargetFailure>) => {
-      if (event.reason !== 'cancel') {
-        notifyClose(event)
-        onApplyComplete(toLegacyResult(event.outcomes))
-      }
-      onOpenChange(false)
+      finalizeActionDialogClose(
+        onOpenChange,
+        event.reason === 'cancel'
+          ? undefined
+          : () => {
+              notifyClose(event)
+              onApplyComplete(toLegacyResult(event.outcomes))
+            },
+      )
     },
     [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
   )

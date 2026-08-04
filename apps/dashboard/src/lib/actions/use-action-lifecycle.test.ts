@@ -61,6 +61,54 @@ describe('useActionLifecycle', () => {
     )
   })
 
+  it('does not surface localError when apply succeeds but onClose throws', async () => {
+    const onClose = vi.fn(() => {
+      throw new Error('Close side effect failed.')
+    })
+
+    const { result } = renderHook(() =>
+      useActionLifecycle({
+        open: true,
+        targets: [{ targetId: 'a', targetName: 'Alpha' }],
+        validate: async () => ({
+          targets: [{ status: 'eligible', targetId: 'a', targetName: 'Alpha' }],
+        }),
+        apply: async () => [{ status: 'updated', targetId: 'a' }],
+        onClose,
+      }),
+    )
+
+    await act(async () => {
+      await result.current.startApply({ mode: 'off' })
+    })
+
+    expect(onClose).toHaveBeenCalled()
+    expect(result.current.localError).toBeNull()
+  })
+
+  it('preserves Error.message when apply throws', async () => {
+    const onClose = vi.fn()
+
+    const { result } = renderHook(() =>
+      useActionLifecycle({
+        open: true,
+        targets: [{ targetId: 'a', targetName: 'Alpha' }],
+        requiresValidation: false,
+        apply: async () => {
+          throw new Error('Cache update failed.')
+        },
+        onClose,
+      }),
+    )
+
+    await act(async () => {
+      await result.current.startApply({ mode: 'off' })
+    })
+
+    expect(result.current.localError).toBe('Cache update failed.')
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
   it('returns to configure with localError when validate throws', async () => {
     const onClose = vi.fn()
 
