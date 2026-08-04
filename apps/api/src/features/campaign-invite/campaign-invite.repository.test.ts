@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 import { CAMPAIGN_INVITE_EXPIRY_DAYS } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../test/setup/integration-db'
+import { CampaignInviteModel } from './campaign-invite.model'
 import { generateInviteToken, hashInviteToken } from './campaign-invite-token'
 import {
   beginInviteDeliveryAttempt,
@@ -18,6 +19,10 @@ import {
 } from './campaign-invite.repository'
 
 useIntegrationDb()
+
+beforeAll(async () => {
+  await CampaignInviteModel.init()
+})
 
 function inviteExpiryDate(): Date {
   const expiresAt = new Date()

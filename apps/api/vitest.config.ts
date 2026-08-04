@@ -4,6 +4,10 @@ import { defineConfig } from 'vitest/config'
 // Leaf configs are referenced from the repo-root vitest runner (see vitest.config.ts).
 export default defineConfig({
   test: {
-    projects: ['./vitest.integration.config.ts', './vitest.unit.config.ts'],
+    projects: [
+      './vitest.integration.config.ts',
+      './vitest.integration-serial.config.ts',
+      './vitest.unit.config.ts',
+    ],
   },
 })

@@ -5,6 +5,7 @@ import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
 import { assignPcToCampaignMember } from '../../test/helpers/campaign-participation'
+import { useIntegrationDb } from '../../test/setup/integration-db'
 import { addControlledCharacterToMembership } from './participation/assign-controlled-pc.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import {
@@ -12,6 +13,8 @@ import {
   listCampaignPartyForOverview,
 } from './campaign-overview.service'
 import { createOrConfirmPlayerMembership } from './participation/create-or-confirm-player-membership'
+
+useIntegrationDb()
 
 describe('campaign overview service', () => {
   it('lists members with onboarding state derived from controlled characters', async () => {

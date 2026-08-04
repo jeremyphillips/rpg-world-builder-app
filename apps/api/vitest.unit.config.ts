@@ -11,6 +11,7 @@ export default mergeConfig(
       environment: 'node',
       include: [...unitTestFiles],
       fileParallelism: true,
+      sequence: { groupOrder: 0 },
     },
   }),
 )
