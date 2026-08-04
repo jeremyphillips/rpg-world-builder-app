@@ -1,4 +1,5 @@
 import {
+  ACTION_PLAN_UNCHANGED_REASONS,
   createBlockedActionTarget,
   createEligibleActionTarget,
   createActionValidationResult,
@@ -7,6 +8,8 @@ import {
   LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES,
   validateLocationParentAssignment,
   type ActionApplyOutcome,
+  type ActionPlanResult,
+  type ActionPlanUnchangedReason,
   type ActionTargetFailure,
   type ActionTargetIdentity,
   type ActionValidationResult,
@@ -39,6 +42,41 @@ export function isBulkChangeParentNoOp(
 ): boolean {
   const currentParentId = row.parentLocationId ?? null
   return currentParentId === config.proposedParentId
+}
+
+export function resolveBulkChangeParentUnchangedReason(
+  _row: BulkChangeParentRow,
+  config: BulkChangeParentConfig,
+): ActionPlanUnchangedReason {
+  if (config.proposedParentId === null) {
+    return ACTION_PLAN_UNCHANGED_REASONS.already_top_level
+  }
+
+  return ACTION_PLAN_UNCHANGED_REASONS.already_target_parent
+}
+
+export function buildBulkChangeParentPlan(
+  rows: readonly BulkChangeParentRow[],
+  config: BulkChangeParentConfig,
+): ActionPlanResult {
+  return {
+    targets: rows.map((row) => {
+      if (isBulkChangeParentNoOp(row, config)) {
+        return {
+          status: 'unchanged' as const,
+          targetId: row.id,
+          targetName: row.name,
+          reason: resolveBulkChangeParentUnchangedReason(row, config),
+        }
+      }
+
+      return {
+        status: 'wouldChange' as const,
+        targetId: row.id,
+        targetName: row.name,
+      }
+    }),
+  }
 }
 
 export function resolveBulkChangeParentApplicableRows(

@@ -70,6 +70,20 @@ export const ConfigureClearParent: Story = {
   },
 }
 
+export const ConfigureAllUnchanged: Story = {
+  args: {
+    selectedRows: [withCampaignAccess(HARBORFORD)],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When every selected location already uses the chosen parent, the summary reads "All N locations already use …" and no apply button is shown.',
+      },
+    },
+  },
+}
+
 export const PartialBlockedSelection: Story = {
   args: {
     selectedRows: [

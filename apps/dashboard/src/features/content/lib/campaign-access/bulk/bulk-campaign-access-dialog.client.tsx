@@ -7,10 +7,7 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
-  CONTENT_AVAILABILITY_OFF_ACTION,
   finalizeActionDialogClose,
-  formatActionBlockedDescription,
-  formatActionBlockedTitle,
   useActionLifecycle,
   type ActionLifecycleCloseEvent,
 } from '@/lib/actions'
@@ -18,9 +15,15 @@ import {
 import {
   BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE,
   BULK_CAMPAIGN_ACCESS_DRAFT_NOTE,
-  formatBulkCampaignAccessChangePreview,
+  createBulkCampaignAccessDescriptor,
+  formatBulkCampaignAccessBlockedDescription,
+  formatBulkCampaignAccessBlockedTitle,
+  formatBulkCampaignAccessConfigureApplyLabel,
+  formatBulkCampaignAccessConfigureSummary,
   formatBulkCampaignAccessDialogDescription,
-  formatBulkCampaignAccessSelectedCount,
+  formatBulkCampaignAccessResolutionLegend,
+  formatBulkCampaignAccessResolveApplyLabel,
+  formatBulkCampaignAccessResolveTally,
 } from '../campaign-access-labels'
 import {
   BULK_CAMPAIGN_ACCESS_FORM_FIELD_DEFAULTS,
@@ -60,6 +63,10 @@ export function BulkCampaignAccessDialog({
   selectedRows,
   onApplyComplete,
 }: BulkCampaignAccessDialogProps) {
+  const descriptor = useMemo(
+    () => createBulkCampaignAccessDescriptor(itemLabelPlural),
+    [itemLabelPlural],
+  )
   const formId = useId()
   const fields = useMemo(() => buildBulkCampaignAccessFields(targetType), [targetType])
   const form = useForm<BulkCampaignAccessFormFieldValues>({
@@ -129,29 +136,61 @@ export function BulkCampaignAccessDialog({
     void lifecycle.startApply(config)
   }, [form, lifecycle])
 
+  const isResolvePhase = lifecycle.phase === 'resolve'
+  const hasBlockers = isResolvePhase && lifecycle.blockedCount > 0
   const blockedMode =
-    lifecycle.blockedCount === selectedRows.length
+    hasBlockers && lifecycle.confirmedCount === 0 && preview.wouldChangeCount > 0
       ? 'bulk-all'
-      : lifecycle.blockedCount > 0
-        ? 'bulk-partial'
-        : 'single'
+      : 'bulk-partial'
 
-  const resolveDescription =
-    lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
-      ? formatActionBlockedDescription({
-          mode: blockedMode,
-          action: CONTENT_AVAILABILITY_OFF_ACTION,
-          blockedCount: lifecycle.blockedCount,
-          selectedCount: preview.wouldChangeCount,
-          noun: 'item',
-          referenceNoun: 'character',
-        })
-      : undefined
+  const configureSummary = formatBulkCampaignAccessConfigureSummary({
+    wouldChangeCount: preview.wouldChangeCount,
+    unchangedCount: preview.unchangedCount,
+    unchangedReasons: preview.unchangedReasons,
+    descriptor,
+  })
+
+  const resolveDescription = hasBlockers
+    ? formatBulkCampaignAccessBlockedDescription({
+        mode: blockedMode,
+        blockedCount: lifecycle.blockedCount,
+        wouldChangeCount: preview.wouldChangeCount,
+        eligibleCount: lifecycle.confirmedCount,
+        descriptor,
+      })
+    : undefined
+
+  const resolveTally = hasBlockers
+    ? formatBulkCampaignAccessResolveTally({
+        readyCount: lifecycle.confirmedCount,
+        blockedCount: lifecycle.blockedCount,
+        unchangedCount: preview.unchangedCount,
+        unchangedReasons: preview.unchangedReasons,
+        descriptor,
+      })
+    : undefined
 
   const description =
-    lifecycle.phase === 'resolve' && resolveDescription
+    isResolvePhase && resolveDescription
       ? resolveDescription
       : formatBulkCampaignAccessDialogDescription(selectedRows.length, itemLabelPlural)
+
+  const configureApplyLabel = formatBulkCampaignAccessConfigureApplyLabel({
+    wouldChangeCount: preview.wouldChangeCount,
+    descriptor,
+  })
+
+  const resolveApplyLabel = formatBulkCampaignAccessResolveApplyLabel({
+    confirmedCount: lifecycle.confirmedCount,
+    descriptor,
+  })
+
+  const resolutionLegend = hasBlockers
+    ? formatBulkCampaignAccessResolutionLegend({
+        mode: blockedMode === 'bulk-all' ? 'all-blocked' : 'partial',
+        descriptor,
+      })
+    : undefined
 
   return (
     <ActionDialogShell
@@ -166,11 +205,12 @@ export function BulkCampaignAccessDialog({
       phase={lifecycle.phase}
       pending={lifecycle.pending}
       headline={
-        lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
-          ? formatActionBlockedTitle({ mode: blockedMode, action: CONTENT_AVAILABILITY_OFF_ACTION })
+        hasBlockers
+          ? formatBulkCampaignAccessBlockedTitle(descriptor)
           : BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE
       }
       description={description}
+      useCustomResolveHeadline={hasBlockers}
       campaignId={campaignId}
       configureSlot={
         <FormProvider {...form}>
@@ -179,24 +219,26 @@ export function BulkCampaignAccessDialog({
       }
       summarySlot={
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p>{formatBulkCampaignAccessSelectedCount(preview.selectedCount)}</p>
-          <p>
-            {formatBulkCampaignAccessChangePreview(
-              preview.wouldChangeCount,
-              preview.unchangedCount,
-            )}
-          </p>
+          {isResolvePhase && resolveTally ? (
+            <p>{resolveTally}</p>
+          ) : preview.hasChanges ? (
+            <p>{configureSummary}</p>
+          ) : null}
           <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
         </div>
       }
       localError={lifecycle.localError}
       resolutionRows={lifecycle.resolutionRows}
-      resolutionLegend="Apply to"
+      resolutionLegend={resolutionLegend}
       confirmedCount={lifecycle.confirmedCount}
-      resolveNoun="items"
+      resolveNoun={itemLabelPlural}
       onCheckedChange={lifecycle.toggleConfirmedTarget}
       onConfigureApply={handleConfigureApply}
-      configureApplyDisabled={!preview.hasChanges || preview.wouldChangeCount === 0}
+      configureApplyDisabled={!preview.hasChanges}
+      configureApplyLabel={configureApplyLabel}
+      configureApplyHidden={!preview.hasChanges || preview.wouldChangeCount === 0}
+      resolveApplyLabel={resolveApplyLabel}
+      resolveApplyHidden={hasBlockers && lifecycle.confirmedCount === 0}
       onResolveConfirm={() => void lifecycle.confirmResolve()}
       onResolveBack={lifecycle.goBackToConfigure}
       onRetryFailed={() => void lifecycle.retryFailed()}

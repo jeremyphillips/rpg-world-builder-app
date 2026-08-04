@@ -1,3 +1,14 @@
+import { ACTION_PLAN_UNCHANGED_REASONS, type ActionPlanUnchangedReason } from '@rpg/contracts'
+
+import {
+  formatAllSelectedDescriptorCount,
+  formatBlockedOfWouldChangeDescription,
+  formatBulkResolveTally,
+  formatCountPhrase,
+  formatDescriptorCount,
+  formatWouldChangeUnchangedSummary,
+  type BulkActionDescriptor,
+} from '@/lib/actions/action-count-grammar'
 import {
   CONTENT_AVAILABILITY_OFF_ACTION,
   formatActionBlockedDescription,
@@ -106,6 +117,169 @@ export function formatBulkCampaignAccessDialogDescription(
   return `Apply changes to ${selectedCount} selected ${itemLabelPlural}.`
 }
 
+export function createBulkCampaignAccessDescriptor(itemLabelPlural: string): BulkActionDescriptor {
+  const singular =
+    itemLabelPlural.endsWith('s') && itemLabelPlural.length > 1
+      ? itemLabelPlural.slice(0, -1)
+      : itemLabelPlural
+
+  return {
+    nounSingular: singular,
+    nounPlural: itemLabelPlural,
+  }
+}
+
+function formatCampaignAccessHomogeneousUnchangedReason(input: {
+  count: number
+  reason: ActionPlanUnchangedReason
+}): string {
+  switch (input.reason) {
+    case ACTION_PLAN_UNCHANGED_REASONS.already_available:
+      return formatCountPhrase(input.count, {
+        zero: '0 already available',
+        one: '1 already available',
+        many: `${input.count} already available`,
+      })
+    case ACTION_PLAN_UNCHANGED_REASONS.already_unavailable:
+      return formatCountPhrase(input.count, {
+        zero: '0 already unavailable',
+        one: '1 already unavailable',
+        many: `${input.count} already unavailable`,
+      })
+    case ACTION_PLAN_UNCHANGED_REASONS.already_matches:
+      return formatCountPhrase(input.count, {
+        zero: '0 already match these settings',
+        one: '1 already matches these settings',
+        many: `${input.count} already match these settings`,
+      })
+    default:
+      return `${input.count} unchanged`
+  }
+}
+
+function formatCampaignAccessAllUnchangedSummary(input: {
+  unchangedCount: number
+  unchangedReasons: readonly ActionPlanUnchangedReason[]
+  descriptor: BulkActionDescriptor
+}): string {
+  if (
+    input.unchangedReasons.length === 1 &&
+    input.unchangedReasons[0] === ACTION_PLAN_UNCHANGED_REASONS.already_matches
+  ) {
+    return formatCountPhrase(input.unchangedCount, {
+      zero: `All 0 ${input.descriptor.nounPlural} already match these settings.`,
+      one: `All 1 ${input.descriptor.nounSingular} already matches these settings.`,
+      many: `All ${input.unchangedCount} ${input.descriptor.nounPlural} already match these settings.`,
+    })
+  }
+
+  return `${formatAllSelectedDescriptorCount(input.unchangedCount, input.descriptor)} are already up to date.`
+}
+
+export function formatBulkCampaignAccessConfigureSummary(input: {
+  wouldChangeCount: number
+  unchangedCount: number
+  unchangedReasons: readonly ActionPlanUnchangedReason[]
+  descriptor: BulkActionDescriptor
+}): string {
+  if (input.wouldChangeCount === 0 && input.unchangedCount > 0) {
+    return formatCampaignAccessAllUnchangedSummary(input)
+  }
+
+  return formatWouldChangeUnchangedSummary({
+    wouldChangeCount: input.wouldChangeCount,
+    unchangedCount: input.unchangedCount,
+    unchangedReasons: input.unchangedReasons,
+    descriptor: input.descriptor,
+    formatWouldChangeSegment: ({ wouldChangeCount, descriptor }) =>
+      `${formatDescriptorCount(wouldChangeCount, descriptor)} will change`,
+    formatHomogeneousReason: ({ count, reason }) =>
+      formatCampaignAccessHomogeneousUnchangedReason({ count, reason }),
+  })
+}
+
+export function formatBulkCampaignAccessConfigureApplyLabel(input: {
+  wouldChangeCount: number
+  descriptor: BulkActionDescriptor
+}): string | undefined {
+  if (input.wouldChangeCount === 0) {
+    return undefined
+  }
+
+  return `Apply to ${formatDescriptorCount(input.wouldChangeCount, input.descriptor)}`
+}
+
+export function formatBulkCampaignAccessResolveApplyLabel(input: {
+  confirmedCount: number
+  descriptor: BulkActionDescriptor
+}): string | undefined {
+  if (input.confirmedCount === 0) {
+    return undefined
+  }
+
+  return `Apply to ${formatDescriptorCount(input.confirmedCount, input.descriptor)}`
+}
+
+export function formatBulkCampaignAccessBlockedTitle(descriptor: BulkActionDescriptor): string {
+  return `Cannot update all ${descriptor.nounPlural}`
+}
+
+export function formatBulkCampaignAccessBlockedDescription(input: {
+  mode: 'bulk-all' | 'bulk-partial'
+  blockedCount: number
+  wouldChangeCount: number
+  eligibleCount: number
+  descriptor: BulkActionDescriptor
+}): string {
+  if (input.mode === 'bulk-partial') {
+    const continueHint =
+      input.eligibleCount > 0
+        ? `Remove the references to include ${input.blockedCount === 1 ? 'it' : 'them'}, or continue with the ${formatDescriptorCount(input.eligibleCount, input.descriptor)}.`
+        : undefined
+
+    return formatBlockedOfWouldChangeDescription({
+      blockedCount: input.blockedCount,
+      wouldChangeCount: input.wouldChangeCount,
+      descriptor: input.descriptor,
+      blockerKind: 'active character references',
+      continueHint,
+    })
+  }
+
+  return `All ${input.descriptor.nounPlural} that would change are blocked by active character references. Remove the references before continuing.`
+}
+
+export function formatBulkCampaignAccessResolveTally(input: {
+  readyCount: number
+  blockedCount: number
+  unchangedCount: number
+  unchangedReasons: readonly ActionPlanUnchangedReason[]
+  descriptor: BulkActionDescriptor
+}): string {
+  return formatBulkResolveTally({
+    readyCount: input.readyCount,
+    blockedCount: input.blockedCount,
+    unchangedCount: input.unchangedCount,
+    unchangedReasons: input.unchangedReasons,
+    descriptor: input.descriptor,
+    formatHomogeneousUnchangedReason: ({ count, reason }) =>
+      formatCampaignAccessHomogeneousUnchangedReason({ count, reason }),
+  })
+}
+
+export function formatBulkCampaignAccessResolutionLegend(input: {
+  mode: 'partial' | 'all-blocked'
+  descriptor: BulkActionDescriptor
+}): string {
+  if (input.mode === 'all-blocked') {
+    return `Blocked ${input.descriptor.nounPlural}`
+  }
+
+  const titleCase =
+    input.descriptor.nounPlural.charAt(0).toUpperCase() + input.descriptor.nounPlural.slice(1)
+  return `${titleCase} to update`
+}
+
 /** Bulk availability field label. */
 export const BULK_CAMPAIGN_ACCESS_AVAILABILITY_LABEL = 'Availability'
 
@@ -117,7 +291,7 @@ export function formatBulkCampaignAccessSelectedCount(selectedCount: number): st
   return `${selectedCount} item${selectedCount === 1 ? '' : 's'} selected.`
 }
 
-/** Bulk preview line for changed vs unchanged counts. */
+/** @deprecated Use formatBulkCampaignAccessConfigureSummary. */
 export function formatBulkCampaignAccessChangePreview(
   wouldChangeCount: number,
   unchangedCount: number,

@@ -11,11 +11,12 @@ import {
   ACTION_RETRY_FAILED_LABEL,
 } from './action-messages'
 import {
-  isActionConfigurePhase,
-  isActionResolvePhase,
-  isActionResultPhase,
-  resolveActionCancelLabel,
-} from './action-dialog-shell.lib'
+  shouldRenderActionConfigureApplyButton,
+  shouldRenderActionResolveApplyButton,
+  shouldRenderActionResolveBackButton,
+  shouldRenderActionRetryFailedButton,
+} from './action-dialog-shell-footer.lib'
+import { resolveActionCancelLabel } from './action-dialog-shell.lib'
 import type { ActionLifecyclePhase } from './action-lifecycle.types'
 
 export type ActionDialogShellFooterProps = {
@@ -24,6 +25,9 @@ export type ActionDialogShellFooterProps = {
   confirmedCount: number
   configureApplyDisabled: boolean
   configureApplyLabel?: string
+  configureApplyHidden?: boolean
+  resolveApplyLabel?: string
+  resolveApplyHidden?: boolean
   onResolveBack?: () => void
   onCancel: () => void
   onConfigureApply?: () => void
@@ -37,6 +41,9 @@ export function ActionDialogShellFooter({
   confirmedCount,
   configureApplyDisabled,
   configureApplyLabel,
+  configureApplyHidden = false,
+  resolveApplyLabel,
+  resolveApplyHidden = false,
   onResolveBack,
   onCancel,
   onConfigureApply,
@@ -44,10 +51,12 @@ export function ActionDialogShellFooter({
   onRetryFailed,
 }: ActionDialogShellFooterProps) {
   const cancelLabel = resolveActionCancelLabel(phase)
+  const showConfigureApply = shouldRenderActionConfigureApplyButton(phase, configureApplyHidden)
+  const showResolveApply = shouldRenderActionResolveApplyButton(phase, resolveApplyHidden)
 
   return (
     <>
-      {isActionResolvePhase(phase) ? (
+      {shouldRenderActionResolveBackButton(phase) ? (
         <Button type="button" variant="outline" disabled={pending} onClick={onResolveBack}>
           {ACTION_RESOLVE_BACK_LABEL}
         </Button>
@@ -57,7 +66,7 @@ export function ActionDialogShellFooter({
         {cancelLabel === 'Close' ? ACTION_CLOSE_LABEL : ACTION_CANCEL_LABEL}
       </Button>
 
-      {isActionConfigurePhase(phase) ? (
+      {showConfigureApply ? (
         <Button
           type="button"
           disabled={pending || configureApplyDisabled}
@@ -67,13 +76,13 @@ export function ActionDialogShellFooter({
         </Button>
       ) : null}
 
-      {isActionResolvePhase(phase) ? (
+      {showResolveApply ? (
         <Button type="button" disabled={pending || confirmedCount === 0} onClick={onResolveConfirm}>
-          {ACTION_RESOLVE_APPLY_LABEL}
+          {resolveApplyLabel ?? ACTION_RESOLVE_APPLY_LABEL}
         </Button>
       ) : null}
 
-      {isActionResultPhase(phase) ? (
+      {shouldRenderActionRetryFailedButton(phase) ? (
         <Button type="button" disabled={pending} onClick={onRetryFailed}>
           {ACTION_RETRY_FAILED_LABEL}
         </Button>

@@ -109,7 +109,7 @@ describe('action messages', () => {
         updated: 0,
         noun: 'items',
       }),
-    ).toBe('2 eligible · 1 blocked · 3 unchanged')
+    ).toBe('2 ready · 1 blocked · 3 unchanged')
 
     expect(formatActionSuccess(2, 'items', 'item')).toBe('Updated 2 items.')
     expect(formatActionPartialSuccess(1, 2, 1, 'entries', 'entry')).toBe(

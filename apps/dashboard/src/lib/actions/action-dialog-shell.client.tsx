@@ -33,6 +33,10 @@ export type ActionDialogShellProps<TBlocker, TFailure extends ActionTargetFailur
   onConfigureApply?: () => void
   configureApplyDisabled?: boolean
   configureApplyLabel?: string
+  configureApplyHidden?: boolean
+  resolveApplyLabel?: string
+  resolveApplyHidden?: boolean
+  useCustomResolveHeadline?: boolean
   onResolveConfirm?: () => void
   onResolveBack?: () => void
   onRetryFailed?: () => void
@@ -59,6 +63,10 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
   onConfigureApply,
   configureApplyDisabled = false,
   configureApplyLabel,
+  configureApplyHidden = false,
+  resolveApplyLabel,
+  resolveApplyHidden = false,
+  useCustomResolveHeadline = false,
   onResolveConfirm,
   onResolveBack,
   onRetryFailed,
@@ -70,6 +78,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
     headline,
     confirmedCount,
     resolveNoun,
+    useCustomResolveHeadline,
   })
 
   const handleCancel = () => {
@@ -112,6 +121,9 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
             confirmedCount={confirmedCount}
             configureApplyDisabled={configureApplyDisabled}
             configureApplyLabel={configureApplyLabel}
+            configureApplyHidden={configureApplyHidden}
+            resolveApplyLabel={resolveApplyLabel}
+            resolveApplyHidden={resolveApplyHidden}
             onResolveBack={onResolveBack}
             onCancel={handleCancel}
             onConfigureApply={onConfigureApply}

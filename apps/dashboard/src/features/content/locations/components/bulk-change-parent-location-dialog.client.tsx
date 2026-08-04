@@ -19,20 +19,12 @@ import {
 } from '@/lib/actions'
 
 import {
-  BULK_CHANGE_PARENT_DIALOG_HEADLINE,
-  formatBulkChangeParentBlockedDescription,
-  formatBulkChangeParentBlockedTitle,
-  formatBulkChangeParentChangePreview,
-  formatBulkChangeParentConfigureApplyLabel,
-  formatBulkChangeParentDialogDescription,
-  formatBulkChangeParentSelectedCount,
-} from '../lib/bulk/bulk-change-parent-labels'
-import {
   BULK_CHANGE_PARENT_FORM_FIELD_DEFAULTS,
   buildBulkChangeParentFields,
   toBulkChangeParentConfig,
   type BulkChangeParentFormFieldValues,
 } from '../lib/bulk/build-bulk-change-parent-fields'
+import { resolveBulkChangeParentDialogPresentation } from '../lib/bulk/resolve-bulk-change-parent-dialog-presentation'
 import { resolveBulkChangeParentPreview } from '../lib/bulk/resolve-bulk-change-parent-preview'
 import { useBulkChangeParentAction } from '../lib/bulk/use-bulk-change-parent-action.client'
 import type { ContentBase } from '../../lib/overview/content-table-config'
@@ -125,30 +117,15 @@ export function BulkChangeParentLocationDialog({
     void lifecycle.startApply(config)
   }, [form, lifecycle])
 
-  const blockedMode =
-    lifecycle.blockedCount === selectedRows.length
-      ? 'bulk-all'
-      : lifecycle.blockedCount > 0
-        ? 'bulk-partial'
-        : 'bulk-partial'
-
-  const resolveDescription =
-    lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
-      ? formatBulkChangeParentBlockedDescription({
-          mode: blockedMode,
-          blockedCount: lifecycle.blockedCount,
-          selectedCount: preview.wouldChangeCount,
-        })
-      : undefined
-
-  const description =
-    lifecycle.phase === 'resolve' && resolveDescription
-      ? resolveDescription
-      : formatBulkChangeParentDialogDescription(selectedRows.length)
-
-  const configureApplyLabel = formatBulkChangeParentConfigureApplyLabel({
-    wouldChangeCount: preview.wouldChangeCount,
-    isClearing: preview.isClearing,
+  const isResolvePhase = lifecycle.phase === 'resolve'
+  const hasBlockers = isResolvePhase && lifecycle.blockedCount > 0
+  const presentation = resolveBulkChangeParentDialogPresentation({
+    isResolvePhase,
+    hasBlockers,
+    blockedCount: lifecycle.blockedCount,
+    confirmedCount: lifecycle.confirmedCount,
+    preview,
+    selectedCount: selectedRows.length,
   })
 
   return (
@@ -163,35 +140,28 @@ export function BulkChangeParentLocationDialog({
       }}
       phase={lifecycle.phase}
       pending={lifecycle.pending}
-      headline={
-        lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
-          ? formatBulkChangeParentBlockedTitle(blockedMode)
-          : BULK_CHANGE_PARENT_DIALOG_HEADLINE
-      }
-      description={description}
+      headline={presentation.headline}
+      description={presentation.description}
+      useCustomResolveHeadline={presentation.useCustomResolveHeadline}
       campaignId={campaignId}
       configureSlot={
         <FormProvider {...form}>
           <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable" />
         </FormProvider>
       }
-      summarySlot={
-        <div className="space-y-1 text-sm text-muted-foreground">
-          <p>{formatBulkChangeParentSelectedCount(preview.selectedCount)}</p>
-          <p>
-            {formatBulkChangeParentChangePreview(preview.wouldChangeCount, preview.unchangedCount)}
-          </p>
-        </div>
-      }
+      summarySlot={presentation.summarySlot}
       localError={lifecycle.localError}
       resolutionRows={lifecycle.resolutionRows}
-      resolutionLegend="Apply to"
+      resolutionLegend={presentation.resolutionLegend}
       confirmedCount={lifecycle.confirmedCount}
       resolveNoun="locations"
       onCheckedChange={lifecycle.toggleConfirmedTarget}
       onConfigureApply={handleConfigureApply}
-      configureApplyDisabled={!preview.isConfigured || preview.wouldChangeCount === 0}
-      configureApplyLabel={configureApplyLabel}
+      configureApplyDisabled={!preview.isConfigured}
+      configureApplyLabel={presentation.configureApplyLabel}
+      configureApplyHidden={presentation.configureApplyHidden}
+      resolveApplyLabel={presentation.resolveApplyLabel}
+      resolveApplyHidden={presentation.resolveApplyHidden}
       onResolveConfirm={() => void lifecycle.confirmResolve()}
       onResolveBack={lifecycle.goBackToConfigure}
       onRetryFailed={() => void lifecycle.retryFailed()}

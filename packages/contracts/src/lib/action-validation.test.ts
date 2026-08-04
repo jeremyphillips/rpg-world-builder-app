@@ -1,16 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ACTION_PLAN_UNCHANGED_REASONS,
   countPlanTargetsByStatus,
   createBlockedActionTarget,
   createEligibleActionTarget,
   createSingleTargetValidationResult,
   getBlockedActionTargets,
+  getDistinctUnchangedReasons,
   getEligibleActionTargets,
   getUnchangedPlanTargets,
   getWouldChangePlanTargets,
+  groupUnchangedPlanTargetsByReason,
   hasActionValidationBlockers,
   hasApplyOperationalFailures,
+  hasHomogeneousUnchangedReason,
   mergeApplyBlockedOutcomesIntoValidation,
   partitionApplyOutcomes,
   type ActionApplyOutcome,
@@ -45,13 +49,52 @@ describe('action validation helpers', () => {
     const plan: ActionPlanResult = {
       targets: [
         { status: 'wouldChange', targetId: 'a', targetName: 'Alpha' },
-        { status: 'unchanged', targetId: 'b', targetName: 'Beta' },
+        {
+          status: 'unchanged',
+          targetId: 'b',
+          targetName: 'Beta',
+          reason: ACTION_PLAN_UNCHANGED_REASONS.already_matches,
+        },
       ],
     }
 
     expect(getWouldChangePlanTargets(plan)).toHaveLength(1)
     expect(getUnchangedPlanTargets(plan)).toHaveLength(1)
     expect(countPlanTargetsByStatus(plan)).toEqual({ wouldChange: 1, unchanged: 1 })
+  })
+
+  it('groups unchanged plan targets by reason', () => {
+    const plan: ActionPlanResult = {
+      targets: [
+        {
+          status: 'unchanged',
+          targetId: 'a',
+          targetName: 'Alpha',
+          reason: ACTION_PLAN_UNCHANGED_REASONS.already_available,
+        },
+        {
+          status: 'unchanged',
+          targetId: 'b',
+          targetName: 'Beta',
+          reason: ACTION_PLAN_UNCHANGED_REASONS.already_available,
+        },
+        {
+          status: 'unchanged',
+          targetId: 'c',
+          targetName: 'Gamma',
+          reason: ACTION_PLAN_UNCHANGED_REASONS.already_unavailable,
+        },
+      ],
+    }
+
+    expect(getDistinctUnchangedReasons(plan)).toEqual([
+      ACTION_PLAN_UNCHANGED_REASONS.already_available,
+      ACTION_PLAN_UNCHANGED_REASONS.already_unavailable,
+    ])
+    expect(hasHomogeneousUnchangedReason(plan)).toBe(false)
+    expect(
+      groupUnchangedPlanTargetsByReason(plan).get(ACTION_PLAN_UNCHANGED_REASONS.already_available),
+    ).toHaveLength(2)
   })
 
   it('requires structured failure payloads on failed apply outcomes', () => {

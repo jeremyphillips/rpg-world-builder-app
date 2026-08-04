@@ -146,7 +146,7 @@ export function formatBulkActionSummary(input: ActionBulkSummaryInput): string {
   const parts: string[] = []
 
   if (input.eligible > 0) {
-    parts.push(`${input.eligible} eligible`)
+    parts.push(`${input.eligible} ready`)
   }
   if (input.blocked > 0) {
     parts.push(`${input.blocked} blocked`)

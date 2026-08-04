@@ -1,7 +1,8 @@
 import {
-  BULK_CAMPAIGN_ACCESS_FORM_DEFAULT,
-  countBulkCampaignAccessChanges,
-  hasBulkCampaignAccessChanges,
+  buildBulkCampaignAccessPlan,
+  countPlanTargetsByStatus,
+  getDistinctUnchangedReasons,
+  type ActionPlanResult,
   type BulkCampaignAccessFormValues,
   type ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
@@ -26,20 +27,37 @@ export type BulkCampaignAccessPreview = {
   wouldChangeCount: number
   unchangedCount: number
   hasChanges: boolean
+  plan: ActionPlanResult
+  unchangedReasons: ReturnType<typeof getDistinctUnchangedReasons>
 }
 
 export function resolveBulkCampaignAccessPreview(
-  selected: ReadonlyArray<{ campaignAccess: ResolvedContentCampaignAccess }>,
+  selected: ReadonlyArray<{
+    campaignAccess: ResolvedContentCampaignAccess
+    id: string
+    name: string
+  }>,
   fieldValues: BulkCampaignAccessFormFieldValues,
 ): BulkCampaignAccessPreview {
   const bulk = toBulkCampaignAccessFormValues(fieldValues)
-  const { wouldChangeCount, unchangedCount } = countBulkCampaignAccessChanges(selected, bulk)
+  const plan = buildBulkCampaignAccessPlan(
+    selected.map((row) => ({
+      targetId: row.id,
+      targetName: row.name,
+      campaignAccess: row.campaignAccess,
+    })),
+    bulk,
+  )
+  const { wouldChange: wouldChangeCount, unchanged: unchangedCount } =
+    countPlanTargetsByStatus(plan)
 
   return {
     selectedCount: selected.length,
     wouldChangeCount,
     unchangedCount,
-    hasChanges: hasBulkCampaignAccessChanges(bulk),
+    hasChanges: bulk.available.kind !== 'unchanged' || bulk.visibilityMode.kind !== 'unchanged',
+    plan,
+    unchangedReasons: getDistinctUnchangedReasons(plan),
   }
 }
 
@@ -50,4 +68,4 @@ export function createBulkCampaignAccessFieldDefaults(): BulkCampaignAccessFormF
   }
 }
 
-export const BULK_CAMPAIGN_ACCESS_EMPTY_FORM_VALUES = BULK_CAMPAIGN_ACCESS_FORM_DEFAULT
+export { BULK_CAMPAIGN_ACCESS_FORM_DEFAULT as BULK_CAMPAIGN_ACCESS_EMPTY_FORM_VALUES } from '@rpg/contracts'

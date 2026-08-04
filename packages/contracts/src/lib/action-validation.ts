@@ -22,13 +22,29 @@ export type ActionBatchValidationResult<
   failures: Array<{ targetId: string; failure: TFailure }>
 }
 
+export const ACTION_PLAN_UNCHANGED_REASONS = {
+  already_target_parent: 'already_target_parent',
+  already_top_level: 'already_top_level',
+  already_available: 'already_available',
+  already_unavailable: 'already_unavailable',
+  already_matches: 'already_matches',
+} as const
+
+export type ActionPlanUnchangedReason =
+  (typeof ACTION_PLAN_UNCHANGED_REASONS)[keyof typeof ACTION_PLAN_UNCHANGED_REASONS]
+
 /**
  * Planning / change detection — separate from validation.
  * Built when comparing current record state to requested operations.
  */
 export type ActionPlanTarget =
   | { status: 'wouldChange'; targetId: string; targetName: string }
-  | { status: 'unchanged'; targetId: string; targetName: string }
+  | {
+      status: 'unchanged'
+      targetId: string
+      targetName: string
+      reason: ActionPlanUnchangedReason
+    }
 
 export type ActionPlanResult = {
   targets: ActionPlanTarget[]
@@ -131,6 +147,35 @@ export function countPlanTargetsByStatus(plan: ActionPlanResult): {
   }
 
   return { wouldChange, unchanged }
+}
+
+export function groupUnchangedPlanTargetsByReason(
+  plan: ActionPlanResult,
+): Map<ActionPlanUnchangedReason, Extract<ActionPlanTarget, { status: 'unchanged' }>[]> {
+  const grouped = new Map<
+    ActionPlanUnchangedReason,
+    Extract<ActionPlanTarget, { status: 'unchanged' }>[]
+  >()
+
+  for (const target of plan.targets) {
+    if (target.status !== 'unchanged') {
+      continue
+    }
+
+    const existing = grouped.get(target.reason) ?? []
+    existing.push(target)
+    grouped.set(target.reason, existing)
+  }
+
+  return grouped
+}
+
+export function getDistinctUnchangedReasons(plan: ActionPlanResult): ActionPlanUnchangedReason[] {
+  return [...groupUnchangedPlanTargetsByReason(plan).keys()]
+}
+
+export function hasHomogeneousUnchangedReason(plan: ActionPlanResult): boolean {
+  return getDistinctUnchangedReasons(plan).length <= 1
 }
 
 export function partitionApplyOutcomes<TBlocker, TFailure extends ActionTargetFailure>(

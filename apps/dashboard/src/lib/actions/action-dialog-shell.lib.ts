@@ -11,12 +11,18 @@ export function resolveActionDialogHeadline({
   headline,
   confirmedCount,
   resolveNoun,
+  useCustomResolveHeadline = false,
 }: {
   phase: ActionLifecyclePhase
   headline: string
   confirmedCount: number
   resolveNoun: string
+  useCustomResolveHeadline?: boolean
 }): string {
+  if (phase === 'resolve' && useCustomResolveHeadline) {
+    return headline
+  }
+
   if (phase === 'resolve') {
     return formatActionResolveHeadline(confirmedCount, resolveNoun)
   }
