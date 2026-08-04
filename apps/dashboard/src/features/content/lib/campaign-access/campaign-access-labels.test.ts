@@ -1,42 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  formatCampaignAccessAvailabilityToast,
-  formatCampaignAccessNoLongerAvailableMessage,
-  formatCampaignAccessNowAvailableMessage,
-} from './campaign-access-labels'
+import { formatCampaignAccessBlockedDescription } from './campaign-access-labels'
 
-describe('formatCampaignAccessAvailabilityToast', () => {
-  it('uses quoted name for a single named item', () => {
-    expect(
-      formatCampaignAccessAvailabilityToast({ count: 1, name: 'Fireball', available: true }),
-    ).toBe('"Fireball" is now available in this campaign.')
-    expect(
-      formatCampaignAccessAvailabilityToast({ count: 1, name: 'Fireball', available: false }),
-    ).toBe('"Fireball" is no longer available in this campaign.')
+describe('campaign access labels', () => {
+  it('formats single blocked copy from scope when one target has multiple references', () => {
+    expect(formatCampaignAccessBlockedDescription(2, 'Sharpshooter')).toBe(
+      'This Sharpshooter is currently used by 2 active characters. Remove the references before making it unavailable.',
+    )
+    expect(formatCampaignAccessBlockedDescription(2, 'Sharpshooter')).not.toContain('selected')
   })
 
-  it('uses count copy for one item without a name', () => {
-    expect(formatCampaignAccessAvailabilityToast({ count: 1, available: true })).toBe(
-      '1 item is now available in this campaign.',
+  it('falls back to generic subject when target name is omitted', () => {
+    expect(formatCampaignAccessBlockedDescription(1)).toBe(
+      'This content is currently used by 1 active character. Remove the references before making it unavailable.',
     )
   })
 
-  it('uses plural count copy for multiple items', () => {
-    expect(formatCampaignAccessAvailabilityToast({ count: 2, available: true })).toBe(
-      '2 items are now available in this campaign.',
-    )
-    expect(formatCampaignAccessAvailabilityToast({ count: 2, available: false })).toBe(
-      '2 items are no longer available in this campaign.',
-    )
-  })
-
-  it('delegates row-toggle helpers to the shared formatter', () => {
-    expect(formatCampaignAccessNowAvailableMessage('Fireball')).toBe(
-      '"Fireball" is now available in this campaign.',
-    )
-    expect(formatCampaignAccessNoLongerAvailableMessage('Fireball')).toBe(
-      '"Fireball" is no longer available in this campaign.',
+  it('ignores legacy placeholder target names', () => {
+    expect(formatCampaignAccessBlockedDescription(2, 'This item')).toBe(
+      'This content is currently used by 2 active characters. Remove the references before making it unavailable.',
     )
   })
 })

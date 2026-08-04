@@ -1,5 +1,10 @@
+import type { ModalSize } from '@rpg/ui'
+
 import { formatActionResolveHeadline, formatActionResultHeadline } from './action-messages'
 import type { ActionLifecyclePhase } from './action-lifecycle.types'
+
+/** Shared width for configure, resolve, result, and single-blocked action modals. */
+export const ACTION_DIALOG_MODAL_SIZE = 'md' satisfies ModalSize
 
 export function resolveActionDialogHeadline({
   phase,

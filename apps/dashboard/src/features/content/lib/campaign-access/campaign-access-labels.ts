@@ -79,12 +79,19 @@ export function formatCampaignAccessBlockedHeadline(): string {
 }
 
 /** Blocked availability-off dialog body when characters still reference the content. */
-export function formatCampaignAccessBlockedDescription(count: number): string {
+export function formatCampaignAccessBlockedDescription(
+  referenceCount: number,
+  targetName?: string,
+): string {
   return formatActionBlockedDescription({
-    blockedCount: count,
-    selectedCount: count,
+    mode: 'single',
+    action: CONTENT_AVAILABILITY_OFF_ACTION,
+    blockedCount: referenceCount,
+    selectedCount: 1,
     noun: 'item',
     referenceNoun: 'character',
+    referenceCount,
+    targetName,
   })
 }
 

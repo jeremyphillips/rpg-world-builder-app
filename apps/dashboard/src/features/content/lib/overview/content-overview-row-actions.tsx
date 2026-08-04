@@ -70,6 +70,7 @@ export function ContentOverviewRowActions({
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
         campaignId={campaignId}
+        targetName={entityName}
         blockers={blockers}
       />
     </>

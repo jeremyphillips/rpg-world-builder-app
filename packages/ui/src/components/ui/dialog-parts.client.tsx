@@ -31,7 +31,11 @@ export function dialogDismissHandlers(
 
 export function DialogCloseButton({ closeLabel }: { closeLabel: string }) {
   return (
-    <DialogPrimitive.Close aria-label={closeLabel} className={dialogCloseButtonClassName}>
+    <DialogPrimitive.Close
+      aria-label={closeLabel}
+      data-modal-skip-autofocus=""
+      className={dialogCloseButtonClassName}
+    >
       <X className="size-4" />
     </DialogPrimitive.Close>
   )

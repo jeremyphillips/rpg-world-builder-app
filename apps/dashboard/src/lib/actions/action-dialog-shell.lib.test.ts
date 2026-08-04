@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  ACTION_DIALOG_MODAL_SIZE,
   isActionConfigurePhase,
   isActionResolvePhase,
   isActionResultPhase,
@@ -10,6 +11,10 @@ import {
 } from './action-dialog-shell.lib'
 
 describe('action dialog shell helpers', () => {
+  it('uses a shared modal width for all action dialogs', () => {
+    expect(ACTION_DIALOG_MODAL_SIZE).toBe('md')
+  })
+
   it('resolves headlines by phase', () => {
     expect(
       resolveActionDialogHeadline({

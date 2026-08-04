@@ -7,7 +7,7 @@ import { FormFieldStack } from '@rpg/ui/form'
 
 import {
   ActionDialogShell,
-  CONTENT_AVAILABILITY_ACTION,
+  CONTENT_AVAILABILITY_OFF_ACTION,
   formatActionBlockedDescription,
   formatActionBlockedTitle,
   useActionLifecycle,
@@ -134,6 +134,8 @@ export function BulkCampaignAccessDialog({
   const resolveDescription =
     lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
       ? formatActionBlockedDescription({
+          mode: blockedMode,
+          action: CONTENT_AVAILABILITY_OFF_ACTION,
           blockedCount: lifecycle.blockedCount,
           selectedCount: preview.wouldChangeCount,
           noun: 'item',
@@ -160,7 +162,7 @@ export function BulkCampaignAccessDialog({
       pending={lifecycle.pending}
       headline={
         lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
-          ? formatActionBlockedTitle({ mode: blockedMode, action: CONTENT_AVAILABILITY_ACTION })
+          ? formatActionBlockedTitle({ mode: blockedMode, action: CONTENT_AVAILABILITY_OFF_ACTION })
           : BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE
       }
       description={description}

@@ -101,20 +101,9 @@ export function NpcStatusEditor({
     onOpenChange(false)
   })
 
-  const handleOpenAutoFocus = (event: Event) => {
-    event.preventDefault()
-    const content = event.currentTarget as HTMLElement
-    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, textarea')
-    firstField?.focus()
-  }
-
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content
-        size="md"
-        aria-busy={updateStatus.isPending || undefined}
-        onOpenAutoFocus={handleOpenAutoFocus}
-      >
+      <Modal.Content size="md" aria-busy={updateStatus.isPending || undefined}>
         <Modal.Header
           headline="Edit status"
           description="Update roster and vital status for this NPC."

@@ -79,14 +79,15 @@ See [feedback.md](./feedback.md). Summary:
 
 ## Components
 
-| Module                       | Role                                        |
-| ---------------------------- | ------------------------------------------- |
-| `useActionLifecycle`         | Phase machine, validate/apply orchestration |
-| `ActionDialogShell`          | Layout for configure / resolve / result     |
-| `ActionTargetResolutionList` | Bounded scroll region (`bg-surface-subtle`) |
-| `ActionBlockerReferences`    | Wrapper over `UsageBlockedReferenceList`    |
-| `action-messages.ts`         | Shared blocked/success/result copy          |
-| `fan-out-validate.ts`        | Concurrency-5 authoritative GET preflight   |
+| Module                       | Role                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `useActionLifecycle`         | Phase machine, validate/apply orchestration                              |
+| `ActionDialogShell`          | Layout for configure / resolve / result                                  |
+| `ActionTargetResolutionList` | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
+| `ActionBlockedDialog`        | Single blocked projection — header + flat reference list only            |
+| `ActionBlockerReferences`    | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
+| `action-messages.ts`         | Shared blocked/success/result copy                                       |
+| `fan-out-validate.ts`        | Concurrency-5 authoritative GET preflight                                |
 
 ## Related docs
 

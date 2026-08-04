@@ -12,10 +12,16 @@ export type ActionBlockedTitleInput = {
 }
 
 export type ActionBlockedDescriptionInput = {
+  mode: ActionBlockedMode
+  action?: ActionDescriptor
   blockedCount: number
   selectedCount: number
   noun: string
   referenceNoun?: string
+  /** Active references blocking a single target — defaults to blockedCount. */
+  referenceCount?: number
+  /** Named target for single blocked copy — e.g. content or entry title. */
+  targetName?: string
 }
 
 export type ActionBulkSummaryInput = {
@@ -61,11 +67,24 @@ export function formatActionBlockedTitle({ mode, action }: ActionBlockedTitleInp
 }
 
 export function formatActionBlockedDescription({
+  mode,
+  action,
   blockedCount,
   selectedCount,
   noun,
   referenceNoun = 'character',
+  referenceCount = blockedCount,
+  targetName,
 }: ActionBlockedDescriptionInput): string {
+  if (mode === 'single') {
+    return formatActionBlockedSingleDescription({
+      action,
+      referenceCount,
+      referenceNoun,
+      targetName,
+    })
+  }
+
   const referenceLabel = blockedCount === 1 ? referenceNoun : `${referenceNoun}s`
 
   if (blockedCount === selectedCount) {
@@ -73,6 +92,54 @@ export function formatActionBlockedDescription({
   }
 
   return `${blockedCount} of ${selectedCount} selected ${noun} are blocked by active ${referenceLabel}. Uncheck blocked items or remove the references before continuing.`
+}
+
+function formatActionBlockedSingleDescription({
+  action,
+  referenceCount,
+  referenceNoun,
+  targetName,
+}: {
+  action?: ActionDescriptor
+  referenceCount: number
+  referenceNoun: string
+  targetName?: string
+}): string {
+  const referenceLabel = referenceCount === 1 ? referenceNoun : `${referenceNoun}s`
+  const subject = resolveSingleBlockedSubject(action, targetName)
+
+  if (action?.actionKind === 'availability-off') {
+    return `This ${subject} is currently used by ${referenceCount} active ${referenceLabel}. Remove the references before making it unavailable.`
+  }
+
+  if (action?.actionKind === 'disable') {
+    return `This ${subject} is currently used by ${referenceCount} active ${referenceLabel}. Remove the references before disabling.`
+  }
+
+  return `This ${subject} is currently used by ${referenceCount} active ${referenceLabel}. Remove the references before continuing.`
+}
+
+const GENERIC_BLOCKED_TARGET_PLACEHOLDERS = new Set(['this item', 'this entry', 'this content'])
+
+function isGenericBlockedTargetPlaceholder(targetName: string): boolean {
+  return GENERIC_BLOCKED_TARGET_PLACEHOLDERS.has(targetName.trim().toLowerCase())
+}
+
+function resolveSingleBlockedSubject(action?: ActionDescriptor, targetName?: string): string {
+  const trimmed = targetName?.trim()
+  if (trimmed && !isGenericBlockedTargetPlaceholder(trimmed)) {
+    return trimmed
+  }
+
+  if (action?.actionKind === 'availability-off') {
+    return 'content'
+  }
+
+  if (action?.actionKind === 'disable') {
+    return 'entry'
+  }
+
+  return action?.nounSingular ?? 'item'
 }
 
 export function formatBulkActionSummary(input: ActionBulkSummaryInput): string {

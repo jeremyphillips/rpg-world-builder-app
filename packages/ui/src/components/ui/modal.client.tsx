@@ -9,6 +9,7 @@ import {
   DialogPanelHeader as ModalHeaderBase,
   dialogDismissHandlers,
 } from './dialog-parts.client'
+import { handleModalOpenAutoFocus } from './modal-focus.lib'
 import {
   modalContentVariants,
   modalBodyVariants,
@@ -55,6 +56,7 @@ const ModalContent = React.forwardRef<
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
+      onOpenAutoFocus,
       onInteractOutside,
       onEscapeKeyDown,
       ...props
@@ -72,6 +74,7 @@ const ModalContent = React.forwardRef<
           onInteractOutside,
           onEscapeKeyDown,
         )}
+        onOpenAutoFocus={(event) => handleModalOpenAutoFocus(event, onOpenAutoFocus)}
         {...props}
       >
         {children}
@@ -128,7 +131,8 @@ ModalFooter.displayName = 'Modal.Footer'
 
 /**
  * Compound, accessible modal built on Radix Dialog (focus trap, scroll lock,
- * portal, Esc/overlay close baked in). Compose the parts directly:
+ * portal, Esc/overlay close baked in). On open, auto-focus skips label info
+ * tooltips and lands on the first meaningful field control.
  *
  * ```tsx
  * <Modal.Root open={open} onOpenChange={setOpen}>

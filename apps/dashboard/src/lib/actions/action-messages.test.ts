@@ -22,9 +22,57 @@ describe('action messages', () => {
     ).toBe('Some entries could not be disabled')
   })
 
+  it('ignores generic placeholder target names that would double-prefix copy', () => {
+    expect(
+      formatActionBlockedDescription({
+        mode: 'single',
+        action: CONTENT_AVAILABILITY_OFF_ACTION,
+        targetName: 'This item',
+        blockedCount: 2,
+        selectedCount: 2,
+        noun: 'item',
+        referenceNoun: 'character',
+        referenceCount: 2,
+      }),
+    ).toBe(
+      'This content is currently used by 2 active characters. Remove the references before making it unavailable.',
+    )
+  })
+
+  it('formats single blocked descriptions from scope, not reference count parity with selection', () => {
+    expect(
+      formatActionBlockedDescription({
+        mode: 'single',
+        action: CONTENT_AVAILABILITY_OFF_ACTION,
+        targetName: 'Sharpshooter',
+        blockedCount: 2,
+        selectedCount: 2,
+        noun: 'item',
+        referenceNoun: 'character',
+        referenceCount: 2,
+      }),
+    ).toBe(
+      'This Sharpshooter is currently used by 2 active characters. Remove the references before making it unavailable.',
+    )
+
+    expect(
+      formatActionBlockedDescription({
+        mode: 'single',
+        action: CONTENT_AVAILABILITY_OFF_ACTION,
+        targetName: 'Sharpshooter',
+        blockedCount: 2,
+        selectedCount: 2,
+        noun: 'item',
+        referenceNoun: 'character',
+        referenceCount: 2,
+      }),
+    ).not.toContain('selected')
+  })
+
   it('formats blocked descriptions for partial and full bulk blockers', () => {
     expect(
       formatActionBlockedDescription({
+        mode: 'bulk-partial',
         blockedCount: 2,
         selectedCount: 5,
         noun: 'items',
@@ -33,6 +81,7 @@ describe('action messages', () => {
 
     expect(
       formatActionBlockedDescription({
+        mode: 'bulk-all',
         blockedCount: 3,
         selectedCount: 3,
         noun: 'entries',

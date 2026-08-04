@@ -5,6 +5,7 @@ import { Alert, Modal } from '@rpg/ui'
 
 import { ActionDialogShellFooter } from './action-dialog-shell-footer.client'
 import {
+  ACTION_DIALOG_MODAL_SIZE,
   isActionResolvePhase,
   resolveActionDialogHeadline,
   shouldRenderActionConfigureBody,
@@ -81,7 +82,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="md" aria-busy={pending || undefined}>
+      <Modal.Content size={ACTION_DIALOG_MODAL_SIZE} aria-busy={pending || undefined}>
         <Modal.Header headline={resolvedHeadline} description={description} />
 
         <Modal.Body className="space-y-4">

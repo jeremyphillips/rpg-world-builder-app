@@ -1,11 +1,13 @@
 'use client'
 
-import type { ActionTargetFailure, ContentUsageBlocker } from '@rpg/contracts'
-import { Checkbox, SemanticText } from '@rpg/ui'
+import type { ActionTargetFailure } from '@rpg/contracts'
+import { Eyebrow } from '@rpg/ui'
 
-import { ActionBlockerReferences } from './action-blocker-references.client'
 import type { ActionResolutionRowModel } from './action-lifecycle.types'
 import { actionResolutionRowVariants } from './action-resolution-list.variants'
+import { ActionResolutionRowCheckbox } from './action-resolution-row-checkbox.client'
+import { ActionResolutionRowDetail } from './action-resolution-row-detail.client'
+import { resolveActionResolutionIssueStatusLabel } from './action-resolution-row.lib'
 
 export type ActionTargetResolutionRowProps<TBlocker, TFailure extends ActionTargetFailure> = {
   row: ActionResolutionRowModel<TBlocker, TFailure>
@@ -19,45 +21,32 @@ export function ActionTargetResolutionRow<TBlocker, TFailure extends ActionTarge
   onCheckedChange,
 }: ActionTargetResolutionRowProps<TBlocker, TFailure>) {
   const checkboxId = `action-target-${row.targetId}`
+  const issueStatusLabel = resolveActionResolutionIssueStatusLabel(row.state)
 
   return (
     <li className={actionResolutionRowVariants({ state: row.state })}>
-      {!row.disabled && onCheckedChange ? (
-        <Checkbox
-          id={checkboxId}
-          checked={row.checked}
-          disabled={row.disabled}
-          onCheckedChange={(checked) => onCheckedChange(row.targetId, checked === true)}
-          aria-label={`Apply to ${row.targetName}`}
-        />
-      ) : null}
+      <ActionResolutionRowCheckbox
+        row={row}
+        checkboxId={checkboxId}
+        onCheckedChange={onCheckedChange}
+      />
 
-      <div className="min-w-0 flex-1 space-y-2">
-        <label
-          htmlFor={row.disabled ? undefined : checkboxId}
-          className={row.disabled ? undefined : 'cursor-pointer font-medium'}
-        >
-          {row.targetName}
-        </label>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <label
+            htmlFor={row.disabled ? undefined : checkboxId}
+            className={row.disabled ? 'font-medium' : 'cursor-pointer font-medium'}
+          >
+            {row.targetName}
+          </label>
+          {issueStatusLabel ? (
+            <Eyebrow size="xs" tone="muted" className="shrink-0">
+              {issueStatusLabel}
+            </Eyebrow>
+          ) : null}
+        </div>
 
-        {row.state === 'blocked' && row.blockers && campaignId ? (
-          <ActionBlockerReferences
-            campaignId={campaignId}
-            blockers={row.blockers as ContentUsageBlocker[]}
-          />
-        ) : null}
-
-        {row.state === 'failed' && row.failure ? (
-          <SemanticText tone="destructive" className="text-sm">
-            {row.failure.message}
-          </SemanticText>
-        ) : null}
-
-        {row.state === 'updated' ? (
-          <SemanticText tone="success" className="text-sm">
-            Updated
-          </SemanticText>
-        ) : null}
+        <ActionResolutionRowDetail row={row} campaignId={campaignId} />
       </div>
     </li>
   )

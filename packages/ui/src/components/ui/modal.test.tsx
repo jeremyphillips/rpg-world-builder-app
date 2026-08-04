@@ -6,6 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
+import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
 
 function renderModal(contentProps: Record<string, unknown> = {}) {
@@ -89,6 +90,35 @@ describe('Modal', () => {
     await screen.findByRole('dialog')
 
     await expectNoAxeViolations(document.body)
+  })
+
+  it('does not open label info tooltips on dialog auto-focus', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header headline="Edit availability" />
+          <Modal.Body>
+            <label htmlFor="availability">
+              Availability
+              <InfoTooltip aria-label="About Availability">Tooltip body</InfoTooltip>
+            </label>
+            <button id="availability" type="button" role="combobox">
+              Leave unchanged
+            </button>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    await screen.findByRole('dialog')
+
+    expect(document.getElementById('availability')).toHaveFocus()
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 })
 

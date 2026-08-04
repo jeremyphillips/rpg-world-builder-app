@@ -57,6 +57,7 @@ export function InfoTooltip({ 'aria-label': ariaLabel, children, className }: In
           <button
             type="button"
             aria-label={ariaLabel}
+            data-info-tooltip-trigger=""
             onClick={(event) => event.preventDefault()}
             className={cn(
               'inline-flex size-4 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',

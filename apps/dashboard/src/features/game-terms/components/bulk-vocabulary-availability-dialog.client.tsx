@@ -125,6 +125,8 @@ export function BulkVocabularyAvailabilityDialog({
   const resolveDescription =
     lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
       ? formatActionBlockedDescription({
+          mode: blockedMode,
+          action: VOCABULARY_DISABLE_ACTION,
           blockedCount: lifecycle.blockedCount,
           selectedCount: previewCount,
           noun: 'entry',

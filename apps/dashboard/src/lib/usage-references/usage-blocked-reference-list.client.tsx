@@ -1,12 +1,12 @@
 'use client'
 
-import { Text } from '@rpg/ui'
 import type { ContentUsageBlocker } from '@rpg/contracts'
 
 import { partitionRuleBlockers } from '@/lib/usage-references/map-content-usage-blockers'
 
 import { groupUsageReferences } from './group-usage-references'
 import { UsageReferenceGroupList } from './usage-reference-group-list.client'
+import { usageReferenceRowListClasses } from './usage-reference-list.lib'
 
 export type UsageBlockedReferenceListProps = {
   campaignId: string
@@ -20,7 +20,7 @@ export function UsageBlockedReferenceList({
   campaignId,
   blockers,
   disclosureLimit,
-  defaultExpanded = true,
+  defaultExpanded = false,
 }: UsageBlockedReferenceListProps) {
   const { references, ruleBlockers } = partitionRuleBlockers(blockers)
   const groups = groupUsageReferences(references)
@@ -37,11 +37,9 @@ export function UsageBlockedReferenceList({
       ) : null}
 
       {ruleBlockers.length > 0 ? (
-        <ul className="space-y-2">
+        <ul className={usageReferenceRowListClasses}>
           {ruleBlockers.map((blocker) => (
-            <li key={blocker.code}>
-              <Text variant="small">{blocker.message}</Text>
-            </li>
+            <li key={blocker.code}>{blocker.message}</li>
           ))}
         </ul>
       ) : null}

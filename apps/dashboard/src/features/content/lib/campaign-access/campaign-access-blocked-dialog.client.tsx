@@ -11,6 +11,7 @@ export interface CampaignAccessBlockedDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   campaignId: string
+  targetName?: string
   blockers: ContentUsageBlocker[]
 }
 
@@ -18,6 +19,7 @@ export function CampaignAccessBlockedDialog({
   open,
   onOpenChange,
   campaignId,
+  targetName,
   blockers,
 }: CampaignAccessBlockedDialogProps) {
   const usageCount =
@@ -28,8 +30,9 @@ export function CampaignAccessBlockedDialog({
       open={open}
       onOpenChange={onOpenChange}
       campaignId={campaignId}
+      targetName={targetName}
       title={formatCampaignAccessBlockedHeadline()}
-      description={formatCampaignAccessBlockedDescription(usageCount)}
+      description={formatCampaignAccessBlockedDescription(usageCount, targetName)}
       blockers={blockers}
     />
   )
