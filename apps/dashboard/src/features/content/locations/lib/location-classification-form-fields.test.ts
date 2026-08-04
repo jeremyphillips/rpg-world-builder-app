@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { TextSuggestionsFieldConfig } from '@rpg/ui/form'
+import type { SelectFieldConfig, TextSuggestionsFieldConfig } from '@rpg/ui/form'
 
 import {
   buildBuildingArchetypeFieldOptions,
@@ -248,5 +248,21 @@ describe('buildLocationClassificationFields building UX', () => {
         authoringType: 'building',
       }),
     ).toBe(false)
+  })
+
+  it('does not throw when region type availability runs with an invalid classification kind', () => {
+    const regionTypeField = fieldByName(
+      buildLocationClassificationFields(),
+      'classification.type',
+    ) as SelectFieldConfig
+    if (regionTypeField.type !== 'select' || !regionTypeField.optionAvailability) {
+      throw new Error('expected region classification.type select with optionAvailability')
+    }
+
+    const { enabledWhen } = regionTypeField.optionAvailability
+
+    expect(() => enabledWhen({ 'classification.kind': '' }, 'coast')).not.toThrow()
+    expect(enabledWhen({ 'classification.kind': '' }, 'coast')).toBe(false)
+    expect(enabledWhen({ 'classification.kind': 'geographic' }, 'coast')).toBe(true)
   })
 })

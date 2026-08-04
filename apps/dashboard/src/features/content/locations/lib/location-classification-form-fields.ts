@@ -1,9 +1,11 @@
 import {
+  getInteriorSubtypeIds,
   getRegionTypeIds,
   getRegionTypeLabelForKind,
   INTERIOR_TYPE_DEFINITIONS,
   INTERIOR_TYPE_ENTRIES,
   INTERIOR_TYPE_IDS,
+  isRegionClassificationKind,
   PLANE_TYPE_ENTRIES,
   PLANE_TYPE_IDS,
   REGION_CLASSIFICATION_DEFINITIONS,
@@ -13,7 +15,6 @@ import {
   SITE_TYPE_ENTRIES,
   SITE_TYPE_IDS,
   type InteriorClassificationType,
-  type RegionClassificationKind,
 } from '@rpg/contracts'
 import type { FieldOption, FieldOptionAvailability, FormItem, RowFieldItem } from '@rpg/ui/form'
 
@@ -84,15 +85,17 @@ const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interior
   ),
 )
 
+function isInteriorClassificationType(value: unknown): value is InteriorClassificationType {
+  return typeof value === 'string' && (INTERIOR_TYPE_IDS as readonly string[]).includes(value)
+}
+
 function regionClassificationTypeAvailability(): FieldOptionAvailability {
   return {
     dependsOn: ['classification.kind'],
     enabledWhen: (watched, optionValue) => {
       const kind = watched['classification.kind']
-      if (typeof kind !== 'string') return false
-      return (getRegionTypeIds(kind as RegionClassificationKind) as readonly string[]).includes(
-        optionValue,
-      )
+      if (typeof kind !== 'string' || !isRegionClassificationKind(kind)) return false
+      return (getRegionTypeIds(kind) as readonly string[]).includes(optionValue)
     },
   }
 }
@@ -102,11 +105,8 @@ function interiorClassificationTypeAvailability(): FieldOptionAvailability {
     dependsOn: ['interiorType'],
     enabledWhen: (watched, optionValue) => {
       const interiorType = watched['interiorType']
-      if (typeof interiorType !== 'string') return false
-      const subtypeIds = Object.keys(
-        INTERIOR_TYPE_DEFINITIONS[interiorType as InteriorClassificationType].subtypes,
-      )
-      return subtypeIds.includes(optionValue)
+      if (!isInteriorClassificationType(interiorType)) return false
+      return (getInteriorSubtypeIds(interiorType) as readonly string[]).includes(optionValue)
     },
   }
 }
@@ -114,8 +114,14 @@ function interiorClassificationTypeAvailability(): FieldOptionAvailability {
 function visibleWhenRegionClassificationKindSet() {
   return {
     dependsOn: ['authoringType', 'classification.kind'],
-    visibleWhen: (watched: Record<string, unknown>) =>
-      watched['authoringType'] === 'region' && typeof watched['classification.kind'] === 'string',
+    visibleWhen: (watched: Record<string, unknown>) => {
+      const kind = watched['classification.kind']
+      return (
+        watched['authoringType'] === 'region' &&
+        typeof kind === 'string' &&
+        isRegionClassificationKind(kind)
+      )
+    },
   }
 }
 
@@ -142,7 +148,8 @@ function visibleWhenInteriorTypeSet() {
   return {
     dependsOn: ['authoringType', 'interiorType'],
     visibleWhen: (watched: Record<string, unknown>) =>
-      watched['authoringType'] === 'interior' && typeof watched['interiorType'] === 'string',
+      watched['authoringType'] === 'interior' &&
+      isInteriorClassificationType(watched['interiorType']),
   }
 }
 
