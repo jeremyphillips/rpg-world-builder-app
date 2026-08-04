@@ -2,6 +2,8 @@ import type {
   ContentAccessTargetType,
   ContentCampaignAccess,
   ContentCampaignAccessAvailability,
+  ContentCampaignAccessAvailabilityBatchResponse,
+  ContentCampaignAccessAvailabilityBatchTargetOutcome,
   ContentCampaignAccessUpdateResult,
   ContentUsageBlocker,
   ResolvedContentCampaignAccess,
@@ -9,6 +11,12 @@ import type {
 import { contentCampaignAccessPatchSchema, resolveContentCampaignAccess } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
+import {
+  mapBatchTargetError,
+  mapBatchTargetsWithConcurrency,
+  resolveContentEntityDisplayName,
+} from '../../../lib/action-batch-validate'
+import { assertBatchResponseMatchesRequest } from '../../../lib/assert-batch-response-correspondence'
 import {
   contentUsageSurfaceKeyForWriteConfig,
   resolveAuthoritativeContentUsageBlockers,
@@ -116,6 +124,44 @@ export async function getContentCampaignAccessAvailability<T extends WriteEntity
     return { status: 'blocked', blockers }
   }
   return { status: 'allowed' }
+}
+
+async function evaluateContentCampaignAccessBatchTarget<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  entityId: string,
+): Promise<ContentCampaignAccessAvailabilityBatchTargetOutcome> {
+  try {
+    const { entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
+    const targetName = resolveContentEntityDisplayName(entity)
+    const availability = await getContentCampaignAccessAvailability(config, campaignId, entityId)
+    return { targetId: entityId, targetName, availability }
+  } catch (err) {
+    console.error('batch campaign access availability failed', {
+      campaignId,
+      contentType: config.typeName,
+      entityId,
+      err,
+    })
+    return mapBatchTargetError(err, entityId, entityId)
+  }
+}
+
+/** Batch advisory preflight — one outcome per requested entity ID in request order. */
+export async function batchGetContentCampaignAccessAvailability<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  entityIds: readonly string[],
+): Promise<ContentCampaignAccessAvailabilityBatchResponse> {
+  const targets = await mapBatchTargetsWithConcurrency({
+    targets: entityIds,
+    evaluateTarget: (entityId) =>
+      evaluateContentCampaignAccessBatchTarget(config, campaignId, entityId),
+  })
+
+  const response = { targets }
+  assertBatchResponseMatchesRequest(entityIds, response)
+  return response
 }
 
 async function loadStoredCampaignAccess(

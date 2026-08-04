@@ -195,4 +195,41 @@ describe('vocabulary routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .expect(404)
   })
+
+  it('returns batch disable-availability with allowed targets when disableGuard is disabled', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    const res = await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entryId: 'psychic' }, { entryId: 'fire' }] })
+      .expect(200)
+
+    expect(res.body.targets).toHaveLength(2)
+    expect(res.body.targets.map((target: { targetId: string }) => target.targetId)).toEqual([
+      'psychic',
+      'fire',
+    ])
+    expect(
+      res.body.targets.every(
+        (target: { availability: { status: string } }) => target.availability?.status === 'allowed',
+      ),
+    ).toBe(true)
+  })
+
+  it('rejects duplicate entry IDs in vocabulary disable batch requests', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entryId: 'psychic' }, { entryId: 'psychic' }] })
+      .expect(400)
+  })
 })

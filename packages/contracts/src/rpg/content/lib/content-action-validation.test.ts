@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  mapContentCampaignAccessAvailabilityBatchResponse,
   mapContentCampaignAccessUpdateResultToApplyOutcome,
   mapSingleUsageGuardAvailabilityToValidationResult,
   mapUsageGuardAvailabilityBatchToValidationResult,
@@ -72,6 +73,22 @@ describe('content action validation adapters', () => {
     ])
 
     expect(result.targets.map((target) => target.status)).toEqual(['eligible', 'blocked'])
+  })
+
+  it('maps batch wire responses into validation and preserved failures', () => {
+    const result = mapContentCampaignAccessAvailabilityBatchResponse(['a', 'b'], {
+      targets: [
+        { targetId: 'a', targetName: 'Alpha', availability: { status: 'allowed' } },
+        {
+          targetId: 'b',
+          targetName: 'Beta',
+          failure: { code: 'validate_error', message: 'Availability could not be checked.' },
+        },
+      ],
+    })
+
+    expect(result.validation.targets).toHaveLength(1)
+    expect(result.failures).toHaveLength(1)
   })
 
   it('maps authoritative campaign access update results to apply outcomes', () => {

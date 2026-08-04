@@ -1,9 +1,10 @@
 import { Router } from 'express'
 
-import { CAMPAIGN_ROLES } from '@rpg/contracts'
+import { CAMPAIGN_ROLES, vocabularyDisableAvailabilityBatchRequestSchema } from '@rpg/contracts'
 
 import { requireAuth } from '../../../middleware/require-auth'
 import { requireCampaignRole } from '../../../middleware/require-role'
+import { validate } from '../../../middleware/validate'
 import * as controller from './vocabulary.controller'
 
 export const vocabularyRouter: Router = Router({ mergeParams: true })
@@ -41,6 +42,14 @@ vocabularyRouter.get(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.getVocabularyDisableAvailabilityHandler,
+)
+
+vocabularyRouter.post(
+  '/:setId/entries/disable-availability/batch',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(vocabularyDisableAvailabilityBatchRequestSchema),
+  controller.batchGetVocabularyDisableAvailabilityHandler,
 )
 
 vocabularyRouter.get(

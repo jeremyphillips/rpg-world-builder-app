@@ -1,14 +1,21 @@
 import {
+  assertBatchResponseCorrespondence,
+  createMalformedBatchValidationResult,
+  isBatchTargetFailureOutcome,
+} from '../../../lib/action-validation-batch'
+import {
   createActionValidationResult,
   createBlockedActionTarget,
   createEligibleActionTarget,
   createSingleTargetValidationResult,
   type ActionApplyOutcome,
+  type ActionBatchValidationResult,
   type ActionTargetFailure,
   type ActionTargetIdentity,
   type ActionTargetResult,
   type ActionValidationResult,
 } from '../../../lib/action-validation'
+import type { ContentCampaignAccessAvailabilityBatchResponse } from './campaign-access-batch'
 import type { ContentCampaignAccessUpdateResult } from './campaign-access'
 import type { ContentUsageBlocker } from './content-deletion'
 
@@ -66,4 +73,36 @@ export function mapSingleUsageGuardAvailabilityToValidationResult(
   return createSingleTargetValidationResult(
     mapUsageGuardAvailabilityToActionTarget(target, availability),
   )
+}
+
+export function mapContentCampaignAccessAvailabilityBatchResponse(
+  requestedIds: readonly string[],
+  response: ContentCampaignAccessAvailabilityBatchResponse,
+): ActionBatchValidationResult<ContentUsageBlocker> {
+  const correspondenceError = assertBatchResponseCorrespondence(requestedIds, response.targets)
+  if (correspondenceError) {
+    return createMalformedBatchValidationResult(requestedIds)
+  }
+
+  const validationTargets: ActionTargetResult<ContentUsageBlocker>[] = []
+  const failures: Array<{ targetId: string; failure: ActionTargetFailure }> = []
+
+  for (const outcome of response.targets) {
+    if (isBatchTargetFailureOutcome(outcome)) {
+      failures.push({ targetId: outcome.targetId, failure: outcome.failure })
+      continue
+    }
+
+    validationTargets.push(
+      mapUsageGuardAvailabilityToActionTarget(
+        { targetId: outcome.targetId, targetName: outcome.targetName },
+        outcome.availability,
+      ),
+    )
+  }
+
+  return {
+    validation: createActionValidationResult(validationTargets),
+    failures,
+  }
 }

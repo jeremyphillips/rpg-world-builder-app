@@ -1,6 +1,7 @@
 export * from './lib/bulk-field-operation'
 export * from './lib/strip-html-tags'
 export * from './lib/action-validation'
+export * from './lib/action-validation-batch'
 export * from './validation'
 export * from './shared'
 export * from './rpg/vocab'

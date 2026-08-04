@@ -19,6 +19,7 @@ import {
   deleteCampaignVocabularyEntry,
   getVocabularyDeleteAvailability,
   getVocabularyDisableAvailability,
+  batchGetVocabularyDisableAvailability,
   getVocabularyEntryUsage,
   listResolvedVocabularySetsForCampaign,
   resolveVocabularySetForCampaign,
@@ -150,6 +151,20 @@ export async function getVocabularyDisableAvailabilityHandler(
   const ctx = vocabularyUsageContextFromRequest(req, campaignId)
   const availability = await getVocabularyDisableAvailability(ctx, setId, entryId)
   res.status(200).json({ availability })
+}
+
+export async function batchGetVocabularyDisableAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, setId: rawSetId } = req.params as { campaignId: string; setId: string }
+  const setId = parseSetId(rawSetId)
+  const { targets } = req.body as { targets: Array<{ entryId: string }> }
+  const entryIds = targets.map((target) => target.entryId)
+
+  const ctx = vocabularyUsageContextFromRequest(req, campaignId)
+  const batch = await batchGetVocabularyDisableAvailability(ctx, setId, entryIds)
+  res.status(200).json(batch)
 }
 
 export async function getVocabularyEntryUsageHandler(req: Request, res: Response): Promise<void> {

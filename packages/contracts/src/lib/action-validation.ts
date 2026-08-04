@@ -13,6 +13,15 @@ export type ActionValidationResult<TBlocker> = {
   targets: ActionTargetResult<TBlocker>[]
 }
 
+/** Batch validate transport result — separates eligible/blocked from per-target validate failures. */
+export type ActionBatchValidationResult<
+  TBlocker,
+  TFailure extends ActionTargetFailure = ActionTargetFailure,
+> = {
+  validation: ActionValidationResult<TBlocker>
+  failures: Array<{ targetId: string; failure: TFailure }>
+}
+
 /**
  * Planning / change detection — separate from validation.
  * Built when comparing current record state to requested operations.

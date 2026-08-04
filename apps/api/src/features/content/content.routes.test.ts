@@ -654,6 +654,54 @@ describe('content campaign access routes', () => {
     expect(res.body.availability).toEqual({ status: 'allowed' })
   })
 
+  it('returns batch campaign-access-availability in request order', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createFirst = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'batch-preflight-a', name: 'Batch Preflight A' })
+      .expect(201)
+
+    const createSecond = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'batch-preflight-b', name: 'Batch Preflight B' })
+      .expect(201)
+
+    const firstId = createFirst.body.feats.id as string
+    const secondId = createSecond.body.feats.id as string
+
+    const res = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/campaign-access-availability/batch`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entityId: firstId }, { entityId: secondId }] })
+      .expect(200)
+
+    expect(res.body.targets).toHaveLength(2)
+    expect(res.body.targets.map((target: { targetId: string }) => target.targetId)).toEqual([
+      firstId,
+      secondId,
+    ])
+    expect(res.body.targets[0]).toMatchObject({
+      targetId: firstId,
+      targetName: 'Batch Preflight A',
+      availability: { status: 'allowed' },
+    })
+  })
+
+  it('rejects duplicate entity IDs in campaign-access batch requests', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/campaign-access-availability/batch`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entityId: 'feat_1' }, { entityId: 'feat_1' }] })
+      .expect(400)
+  })
+
   it('returns normalized campaignAccess from PATCH for client baseline', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createTestCampaign(agent, csrfToken)
