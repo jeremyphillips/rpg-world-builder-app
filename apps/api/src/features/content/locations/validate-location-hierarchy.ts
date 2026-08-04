@@ -1,8 +1,11 @@
 import {
   getLocationKindLabel,
   isValidParentKind,
-  validateLocationParentRequirement,
+  validateLocationParentAssignment,
+  type LocationHierarchyNode,
   type LocationKind,
+  type LocationParentAssignmentBlocker,
+  type LocationParentAssignmentBlockerCode,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
@@ -19,6 +22,22 @@ type LocationParentRecord = {
   _id: unknown
   kind: LocationKind
   parentLocationId?: string
+}
+
+const INVALID_PARENT_API_CODE = 'invalid_parent' as const
+const INVALID_HIERARCHY_API_CODE = 'invalid_hierarchy' as const
+
+const API_ERROR_CODE_BY_BLOCKER_CODE: Record<
+  LocationParentAssignmentBlockerCode,
+  typeof INVALID_PARENT_API_CODE | typeof INVALID_HIERARCHY_API_CODE
+> = {
+  parent_not_found: INVALID_PARENT_API_CODE,
+  parent_forbidden: INVALID_HIERARCHY_API_CODE,
+  parent_required: INVALID_HIERARCHY_API_CODE,
+  self_parent: INVALID_HIERARCHY_API_CODE,
+  descendant_parent: INVALID_HIERARCHY_API_CODE,
+  invalid_parent_kind: INVALID_HIERARCHY_API_CODE,
+  cycle: INVALID_HIERARCHY_API_CODE,
 }
 
 function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
@@ -65,42 +84,70 @@ async function loadParentRecord(
     .lean<LocationParentRecord>()
 
   if (!parent) {
-    throw new HttpError(400, 'invalid_parent', 'Parent location was not found in this campaign.')
+    throw new HttpError(
+      400,
+      INVALID_PARENT_API_CODE,
+      'Parent location was not found in this campaign.',
+    )
   }
 
   return parent
 }
 
-async function wouldCreateCycle(
-  campaignId: string,
+function toHierarchyNode(
   locationId: string,
+  record: Pick<LocationParentRecord, 'kind' | 'parentLocationId'>,
+): LocationHierarchyNode {
+  return {
+    id: locationId,
+    kind: record.kind,
+    parentLocationId: record.parentLocationId,
+  }
+}
+
+async function buildHierarchyGraphForParentAssignment(
+  campaignId: string,
+  locationId: string | undefined,
+  locationKind: LocationKind,
   proposedParentId: string,
-): Promise<boolean> {
-  let currentId: string | undefined = proposedParentId
+  proposedParent: LocationParentRecord,
+): Promise<Map<string, LocationHierarchyNode>> {
+  const locationsById = new Map<string, LocationHierarchyNode>()
+  locationsById.set(proposedParentId, toHierarchyNode(proposedParentId, proposedParent))
+
+  if (locationId) {
+    locationsById.set(locationId, {
+      id: locationId,
+      kind: locationKind,
+      parentLocationId: undefined,
+    })
+  }
+
   const visited = new Set<string>()
+  let currentId: string | undefined = proposedParent.parentLocationId
 
   while (currentId) {
-    if (currentId === locationId) {
-      return true
-    }
     if (visited.has(currentId)) {
       break
     }
     visited.add(currentId)
 
-    const ancestor: { parentLocationId?: string } | null = await HomebrewLocationModel.findOne({
-      _id: currentId,
-      campaignId,
-    })
-      .select('parentLocationId')
-      .lean<{ parentLocationId?: string }>()
+    const ancestor = await HomebrewLocationModel.findOne({ _id: currentId, campaignId })
+      .select('kind parentLocationId')
+      .lean<LocationParentRecord>()
     if (!ancestor) {
       break
     }
+
+    locationsById.set(currentId, toHierarchyNode(currentId, ancestor))
     currentId = ancestor.parentLocationId
   }
 
-  return false
+  return locationsById
+}
+
+function throwLocationParentAssignmentBlocker(blocker: LocationParentAssignmentBlocker): never {
+  throw new HttpError(400, API_ERROR_CODE_BY_BLOCKER_CODE[blocker.code], blocker.message)
 }
 
 async function validateDirectChildrenForKindChange(
@@ -124,7 +171,7 @@ async function validateDirectChildrenForKindChange(
     if (!isValidParentKind(child.kind, nextKind)) {
       throw new HttpError(
         400,
-        'invalid_hierarchy',
+        INVALID_HIERARCHY_API_CODE,
         `Cannot change kind to ${getLocationKindLabel(nextKind)} because child location "${child.name}" requires a different parent kind.`,
       )
     }
@@ -135,31 +182,36 @@ async function validateDirectChildrenForKindChange(
 export async function validateLocationHierarchy(ctx: ContentWriteContext): Promise<void> {
   const { kind, parentLocationId, locationId } = mergedLocationFields(ctx)
 
-  const parentRequirementError = validateLocationParentRequirement(kind, parentLocationId)
-  if (parentRequirementError) {
-    throw new HttpError(400, 'invalid_hierarchy', parentRequirementError)
-  }
-
-  if (parentLocationId) {
-    if (locationId && parentLocationId === locationId) {
-      throw new HttpError(400, 'invalid_hierarchy', 'A location cannot be its own parent.')
+  if (!parentLocationId) {
+    const blockers = validateLocationParentAssignment({
+      locationId: locationId ?? '',
+      locationKind: kind,
+      proposedParentId: null,
+      locationsById: locationId
+        ? new Map([[locationId, { id: locationId, kind, parentLocationId: undefined }]])
+        : new Map(),
+    })
+    if (blockers.length > 0) {
+      throwLocationParentAssignmentBlocker(blockers[0]!)
     }
-
+  } else {
     const parent = await loadParentRecord(ctx.campaignId, parentLocationId)
-    if (!isValidParentKind(kind, parent.kind)) {
-      throw new HttpError(
-        400,
-        'invalid_hierarchy',
-        `A ${getLocationKindLabel(kind)} cannot be placed under a ${getLocationKindLabel(parent.kind)}.`,
-      )
-    }
+    const locationsById = await buildHierarchyGraphForParentAssignment(
+      ctx.campaignId,
+      locationId,
+      kind,
+      parentLocationId,
+      parent,
+    )
 
-    if (locationId && (await wouldCreateCycle(ctx.campaignId, locationId, parentLocationId))) {
-      throw new HttpError(
-        400,
-        'invalid_hierarchy',
-        'Parent selection would create a circular location hierarchy.',
-      )
+    const blockers = validateLocationParentAssignment({
+      locationId: locationId ?? '',
+      locationKind: kind,
+      proposedParentId: parentLocationId,
+      locationsById,
+    })
+    if (blockers.length > 0) {
+      throwLocationParentAssignmentBlocker(blockers[0]!)
     }
   }
 

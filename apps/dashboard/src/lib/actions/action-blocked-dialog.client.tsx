@@ -30,7 +30,7 @@ export function ActionBlockedDialog({
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size={ACTION_DIALOG_MODAL_SIZE}>
-        <Modal.Header headline={title} description={description} />
+        <Modal.Header className="mb-2" headline={title} description={description} />
 
         <Modal.Body>
           <ActionBlockerReferences campaignId={campaignId} blockers={blockers} variant="flat" />
