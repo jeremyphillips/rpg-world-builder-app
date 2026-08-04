@@ -76,7 +76,7 @@ export function useNotificationInboxPage() {
 
   const items = React.useMemo(
     () => (data?.pages ? data.pages.flatMap((page) => page.items) : []),
-    [data?.pages],
+    [data],
   )
   const unreadCount = data?.pages[0]?.unreadCount ?? 0
 

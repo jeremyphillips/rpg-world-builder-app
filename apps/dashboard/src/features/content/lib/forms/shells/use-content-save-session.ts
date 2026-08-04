@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useFormState, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import { useSchemaFormSubmit } from '@rpg/ui/form'
 
@@ -47,7 +47,10 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
   const schemaFormSubmit = useSchemaFormSubmit<TFieldValues>()
   const inFlightRef = useRef(false)
   const onSavedRef = useRef(onSaved)
-  onSavedRef.current = onSaved
+
+  useEffect(() => {
+    onSavedRef.current = onSaved
+  })
 
   const hasUnsavedEdits =
     mode === 'edit' ? bodyDirty || campaignAccess.isDirty : campaignAccess.isDirty

@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   partitionApplyOutcomes,
@@ -133,7 +133,7 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   getRowCanSelect,
   onEditCampaignAccess,
   additionalBulkActions = [],
-  getEditHref,
+  getEditHref: _getEditHref,
   onColumnChange,
   caption,
   emptyState,
@@ -141,9 +141,6 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   registerActionTrigger,
   selectTriggerRef,
 }: ContentOverviewDataTableProps<T>) {
-  const getEditHrefRef = useRef(getEditHref)
-  getEditHrefRef.current = getEditHref
-
   const rowActions = useCallback(
     (row: T) => (
       <ContentOverviewRowActions
@@ -159,7 +156,15 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
         triggerRef={(element) => registerActionTrigger(row.id, element)}
       />
     ),
-    [campaignAvailability, campaignId, canManage, contentTypeKey, itemLabel, registerActionTrigger],
+    [
+      campaignAvailability,
+      campaignId,
+      canManage,
+      contentTypeKey,
+      itemLabel,
+      registerActionTrigger,
+      restoreFocusRef,
+    ],
   )
 
   const getRowClassName = useCallback(
@@ -309,6 +314,7 @@ export type ContentOverviewTableProps<
   bulkExtensions?: ContentOverviewBulkExtension<T>[]
 }
 
+// fallow-ignore-next-line complexity
 export function ContentOverviewTable<
   T extends WithCampaignAccess<ContentBase> & { id: string },
   TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
@@ -327,21 +333,20 @@ export function ContentOverviewTable<
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
   const canManage = useCanManageCampaign(campaignId)
   const viewer = useContentViewer(campaignId)
-  const getEditHrefRef = useRef(getEditHref)
-  getEditHrefRef.current = getEditHref
-
-  const discoveryFilteredData = useMemo(
-    () => filterCatalogRowsForViewer(data, viewer),
-    [data, viewer],
-  )
 
   const overviewColumns = useOverviewColumnsWithNameContext(columns, {
     canManage,
     campaignId,
     contentTypeKey,
     viewer,
-    getEditHref: (row) => getEditHrefRef.current(row),
+    getEditHref,
   })
+
+  const discoveryFilteredData = useMemo(
+    () => filterCatalogRowsForViewer(data, viewer),
+    [data, viewer],
+  )
+
   const columnSchema = useMemo(
     () => buildContentOverviewColumnSchema(overviewColumns as ColumnDef<unknown>[]),
     [overviewColumns],
@@ -517,7 +522,10 @@ export function ContentOverviewTable<
   )
 
   const restoreFocusRef = useRef(restoreFocusAfterRowRemoved)
-  restoreFocusRef.current = restoreFocusAfterRowRemoved
+
+  useEffect(() => {
+    restoreFocusRef.current = restoreFocusAfterRowRemoved
+  })
 
   const registerActionTrigger = useCallback((rowId: string, element: HTMLButtonElement | null) => {
     if (element) {

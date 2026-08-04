@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   type CampaignAvailabilityFilter,
@@ -104,9 +104,12 @@ export function useContentCampaignAvailabilityToggle({
   const [blockedOpen, setBlockedOpen] = useState(false)
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const onRowRemovedRef = useRef(onRowRemoved)
-  onRowRemovedRef.current = onRowRemoved
   const entityNameRef = useRef(entityName)
-  entityNameRef.current = entityName
+
+  useEffect(() => {
+    onRowRemovedRef.current = onRowRemoved
+    entityNameRef.current = entityName
+  })
 
   const resolveEntityName = useCallback(() => {
     const cached = queryClient.getQueryData<{
@@ -127,6 +130,8 @@ export function useContentCampaignAvailabilityToggle({
     },
     [campaignId, contentTypeKey, entityId, queryClient],
   )
+
+  const handleAvailableChangeRef = useRef<((nextAvailable: boolean) => Promise<void>) | null>(null)
 
   const handleAvailableChange = useCallback(
     async (nextAvailable: boolean) => {
@@ -156,7 +161,7 @@ export function useContentCampaignAvailabilityToggle({
           }
         } catch (err) {
           notifyCampaignAccessUpdateFailed(entityId, nextAvailable, err, () => {
-            void handleAvailableChange(nextAvailable)
+            void handleAvailableChangeRef.current?.(nextAvailable)
           })
           return
         } finally {
@@ -178,7 +183,7 @@ export function useContentCampaignAvailabilityToggle({
           updateCachedAccess(campaignAccess)
         }
         notifyCampaignAccessUpdateFailed(entityId, nextAvailable, err, () => {
-          void handleAvailableChange(nextAvailable)
+          void handleAvailableChangeRef.current?.(nextAvailable)
         })
       } finally {
         setPending(false)
@@ -195,6 +200,10 @@ export function useContentCampaignAvailabilityToggle({
       updateCachedAccess,
     ],
   )
+
+  useEffect(() => {
+    handleAvailableChangeRef.current = handleAvailableChange
+  })
 
   return {
     pending,

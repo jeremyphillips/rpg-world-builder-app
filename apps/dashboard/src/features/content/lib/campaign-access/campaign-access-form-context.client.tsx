@@ -106,7 +106,10 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
   }
 
   const bindingsRef = useRef(bindings)
-  bindingsRef.current = bindings
+
+  useEffect(() => {
+    bindingsRef.current = bindings
+  })
 
   useEffect(() => {
     register({

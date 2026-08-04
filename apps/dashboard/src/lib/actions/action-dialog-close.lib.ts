@@ -1,4 +1,4 @@
-import { partitionApplyOutcomes } from '@rpg/contracts'
+import { partitionApplyOutcomes, type ActionTargetFailure } from '@rpg/contracts'
 
 import { deriveActionApplySummary } from './action-apply-summary.lib'
 import type { ActionLifecycleCloseEvent } from './action-lifecycle.types'
@@ -26,7 +26,7 @@ export function finalizeActionDialogClose(
 
 export type FinalizeActionDialogCloseWithOutcomesInput = {
   onOpenChange: (open: boolean) => void
-  event: ActionLifecycleCloseEvent<unknown, import('@rpg/contracts').ActionTargetFailure>
+  event: ActionLifecycleCloseEvent<unknown, ActionTargetFailure>
   syncOutcomes: () => void
   notify?: () => void
   closedRef: { current: boolean }
@@ -71,7 +71,7 @@ export function finalizeActionDialogCloseWithOutcomes({
 }
 
 export type BuildActionDialogNotifyInput = {
-  event: ActionLifecycleCloseEvent<unknown, import('@rpg/contracts').ActionTargetFailure>
+  event: ActionLifecycleCloseEvent<unknown, ActionTargetFailure>
   notify: () => void
 }
 

@@ -55,8 +55,10 @@ vi.mock('../hooks/use-ruleset-patch', () => ({
   useRulesetPatch: vi.fn(),
 }))
 
+import type * as VocabularyFeature from '@/features/vocabulary'
+
 vi.mock('@/features/vocabulary', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
+  const actual = await importOriginal<typeof VocabularyFeature>()
   return {
     ...actual,
     useCreatureTypeVocabulary: vi.fn(),

@@ -27,10 +27,12 @@ vi.mock('@/features/campaign', () => ({
   usePersistCampaignSelection: () => persistCampaignSelection,
 }))
 
+import type * as ReactRouterDom from 'react-router-dom'
+
 const navigate = vi.fn()
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  const actual = await vi.importActual<typeof ReactRouterDom>('react-router-dom')
   return {
     ...actual,
     useNavigate: () => navigate,

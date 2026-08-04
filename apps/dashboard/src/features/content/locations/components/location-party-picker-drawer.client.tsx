@@ -67,10 +67,12 @@ const NO_ITEMS_MESSAGE = 'No parties are available for this relationship.'
 
 function useLocationPartySuccessFlashes(clearWhen: string) {
   const [flashKeys, setFlashKeys] = React.useState<ReadonlySet<string>>(() => new Set())
+  const [trackedClearWhen, setTrackedClearWhen] = React.useState(clearWhen)
 
-  React.useEffect(() => {
+  if (clearWhen !== trackedClearWhen) {
+    setTrackedClearWhen(clearWhen)
     setFlashKeys(new Set())
-  }, [clearWhen])
+  }
 
   const triggerFlash = React.useCallback((exactKey: string) => {
     setFlashKeys((current) => new Set(current).add(exactKey))
@@ -87,6 +89,7 @@ function useLocationPartySuccessFlashes(clearWhen: string) {
   return { flashKeys, triggerFlash }
 }
 
+// fallow-ignore-next-line complexity
 export function LocationPartyPickerDrawer({
   open,
   onOpenChange,
@@ -104,13 +107,17 @@ export function LocationPartyPickerDrawer({
   )
   const partyKinds = semanticKey ? buildPartyKindsForSemanticKey(semanticKey) : []
   const [partyKind, setPartyKind] = React.useState<LocationPartyKind | null>(null)
+  const partyKindSyncKey = `${open}:${partyKinds.join(',')}`
+  const [trackedPartyKindSyncKey, setTrackedPartyKindSyncKey] = React.useState(partyKindSyncKey)
 
-  React.useEffect(() => {
-    if (!open) return
+  if (open && partyKindSyncKey !== trackedPartyKindSyncKey) {
+    setTrackedPartyKindSyncKey(partyKindSyncKey)
     setPartyKind((current) =>
       resolvePartyKindForRelationshipChange({ previousPartyKind: current, partyKinds }),
     )
-  }, [open, partyKinds])
+  } else if (!open && partyKindSyncKey !== trackedPartyKindSyncKey) {
+    setTrackedPartyKindSyncKey(partyKindSyncKey)
+  }
 
   const relationshipContextKey = `${semanticKey ?? 'none'}::${partyKind ?? 'none'}`
   const { flashKeys, triggerFlash } = useLocationPartySuccessFlashes(relationshipContextKey)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { ContentUsageBlocker, ContentSource } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
@@ -31,13 +31,15 @@ export function useContentDemoteFlow({
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const [demoteError, setDemoteError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const [trackedEntityId, setTrackedEntityId] = useState(entityId)
+  if (entityId !== trackedEntityId) {
+    setTrackedEntityId(entityId)
     setConfirmOpen(false)
     setBlockedOpen(false)
     setBlockers([])
     setDemoteError(null)
     setCheckingAvailability(false)
-  }, [entityId])
+  }
 
   const handleDemoteClick = useCallback(async () => {
     if (entitySource !== 'homebrew' || entityStatus !== 'published' || checkingAvailability) return

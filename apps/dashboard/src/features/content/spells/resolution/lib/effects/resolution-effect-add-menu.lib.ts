@@ -1,4 +1,5 @@
 import type { SpellAtomicEffectKind } from '@rpg/contracts'
+import type { ArrayAddActionConfig } from '@rpg/ui/form'
 import {
   SPELL_RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   SPELL_RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
@@ -57,9 +58,7 @@ export function createResolutionEffectAppendDefaults(
   }
 }
 
-export type ResolutionEffectArrayAddMenuConfig = NonNullable<
-  import('@rpg/ui/form').ArrayAddActionConfig['menu']
->
+export type ResolutionEffectArrayAddMenuConfig = NonNullable<ArrayAddActionConfig['menu']>
 
 /** Builds the searchable resolution effect template add menu (3 kinds). */
 export function buildResolutionEffectArrayAddMenu(): ResolutionEffectArrayAddMenuConfig {

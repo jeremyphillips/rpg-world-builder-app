@@ -82,20 +82,24 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
     setValidationResult(result)
   }, [])
 
-  const resetLifecycle = useCallback(() => {
-    setPhase('configure')
-    commitValidationResult(null)
-    setConfirmedTargetIds(new Set())
-    setApplyOutcomes([])
-    setLocalError(null)
-    setPendingConfig(null)
-  }, [commitValidationResult])
+  const [trackedOpen, setTrackedOpen] = useState(open)
+  if (open !== trackedOpen) {
+    setTrackedOpen(open)
+    if (!open) {
+      setPhase('configure')
+      setValidationResult(null)
+      setConfirmedTargetIds(new Set())
+      setApplyOutcomes([])
+      setLocalError(null)
+      setPendingConfig(null)
+    }
+  }
 
   useEffect(() => {
     if (!open) {
-      resetLifecycle()
+      validationResultRef.current = null
     }
-  }, [open, resetLifecycle])
+  }, [open])
 
   const executeApply = useCallback(
     async (

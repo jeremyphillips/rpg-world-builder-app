@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type {
   ContentUsageBlocker,
@@ -38,7 +38,10 @@ export function useVocabularyAvailabilityToggle({
   const [blockedOpen, setBlockedOpen] = useState(false)
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const entryLabelRef = useRef(entry.label)
-  entryLabelRef.current = entry.label
+
+  useEffect(() => {
+    entryLabelRef.current = entry.label
+  })
 
   const updateCachedSet = useCallback(
     (nextSet: ResolvedVocabularyOptionSet) => {
@@ -63,6 +66,8 @@ export function useVocabularyAvailabilityToggle({
     [entry.id, queryClient, queryKey],
   )
 
+  const handleAvailableChangeRef = useRef<((nextAvailable: boolean) => Promise<void>) | null>(null)
+
   const handleAvailableChange = useCallback(
     async (nextAvailable: boolean) => {
       if (pending) return
@@ -85,7 +90,7 @@ export function useVocabularyAvailabilityToggle({
             nextAvailable,
             err,
             () => {
-              void handleAvailableChange(nextAvailable)
+              void handleAvailableChangeRef.current?.(nextAvailable)
             },
           )
           return
@@ -106,7 +111,7 @@ export function useVocabularyAvailabilityToggle({
       } catch (err) {
         updateCachedStatus(previousStatus)
         notifyVocabularyAvailabilityUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
-          void handleAvailableChange(nextAvailable)
+          void handleAvailableChangeRef.current?.(nextAvailable)
         })
       } finally {
         setPending(false)
@@ -114,6 +119,10 @@ export function useVocabularyAvailabilityToggle({
     },
     [campaignId, entry.id, entry.status, pending, setId, updateCachedSet, updateCachedStatus],
   )
+
+  useEffect(() => {
+    handleAvailableChangeRef.current = handleAvailableChange
+  })
 
   return {
     pending,

@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import type { ContentAccessTargetType, ContentTypeKey, WithCampaignAccess } from '@rpg/contracts'
+import type {
+  ContentAccessTargetType,
+  ContentTypeKey,
+  WithCampaignAccess,
+  ContentUsageBlocker,
+  ActionTargetFailure,
+} from '@rpg/contracts'
 import { FormFieldStack } from '@rpg/ui/form'
 
 import {
@@ -52,6 +58,7 @@ export type BulkCampaignAccessDialogProps = {
   onApplyComplete: (result: ActionApplySummary) => void
 }
 
+// fallow-ignore-next-line complexity
 export function BulkCampaignAccessDialog({
   open,
   onOpenChange,
@@ -97,12 +104,7 @@ export function BulkCampaignAccessDialog({
   const pendingConfigRef = useRef<ReturnType<typeof toBulkCampaignAccessFormValues> | null>(null)
 
   const handleClose = useCallback(
-    (
-      event: ActionLifecycleCloseEvent<
-        import('@rpg/contracts').ContentUsageBlocker,
-        import('@rpg/contracts').ActionTargetFailure
-      >,
-    ) => {
+    (event: ActionLifecycleCloseEvent<ContentUsageBlocker, ActionTargetFailure>) => {
       const summary = deriveActionApplySummary(event.outcomes)
 
       finalizeActionDialogCloseWithOutcomes({

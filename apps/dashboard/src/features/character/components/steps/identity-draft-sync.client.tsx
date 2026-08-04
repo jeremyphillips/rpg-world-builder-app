@@ -27,7 +27,9 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
   const onDraftChangeRef = useRef(onDraftChange)
   const priorDraftRef = useRef(draftIdentity)
 
-  onDraftChangeRef.current = onDraftChange
+  useEffect(() => {
+    onDraftChangeRef.current = onDraftChange
+  })
 
   useEffect(() => {
     const previousDraft = priorDraftRef.current

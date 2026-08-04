@@ -15,8 +15,10 @@ import { useContentSaveSession } from './use-content-save-session'
 
 const toastSuccess = vi.hoisted(() => vi.fn())
 
+import type * as RpgUi from '@rpg/ui'
+
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof RpgUi>()
   return {
     ...actual,
     toast: Object.assign(vi.fn(), {

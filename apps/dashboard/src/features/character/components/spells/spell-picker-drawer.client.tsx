@@ -100,9 +100,13 @@ export function SpellPickerDrawer({
   )
   const [openSyncKey, setOpenSyncKey] = React.useState(0)
   const sheetStateRef = React.useRef({ searchQuery: '', activeTabId: '' })
+  const openBrowseSyncKey = open
+    ? `${String(initialMode)}:${modes.join(',')}:${recommendationsEnabled}`
+    : 'closed'
+  const [trackedOpenBrowseSyncKey, setTrackedOpenBrowseSyncKey] = React.useState(openBrowseSyncKey)
 
-  React.useEffect(() => {
-    if (!open) return
+  if (open && openBrowseSyncKey !== trackedOpenBrowseSyncKey) {
+    setTrackedOpenBrowseSyncKey(openBrowseSyncKey)
     const nextMode = resolveInitialSpellPickerMode(modes, initialMode)
     setMode(nextMode)
     const resolved = resolveModeBrowseState(browseBuckets, nextMode, (entry) =>
@@ -116,7 +120,9 @@ export function SpellPickerDrawer({
     )
     setBrowseState(sanitized)
     setOpenSyncKey((current) => current + 1)
-  }, [open, initialMode, modes, recommendationsEnabled])
+  } else if (!open && trackedOpenBrowseSyncKey !== 'closed') {
+    setTrackedOpenBrowseSyncKey('closed')
+  }
 
   const activeChoiceSet = choiceSetForSpellPickerMode(mode, cantripChoiceSet, preparedChoiceSet)
   const activeSelectedIds = selectedIdsForSpellPickerMode(

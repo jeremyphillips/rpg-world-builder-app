@@ -69,8 +69,6 @@ export function useNotificationBellMenu() {
         },
         onBeforeNavigate: () => {
           setOpen(false)
-          markedSeenIdsRef.current.clear()
-          markSeenInFlightRef.current = false
         },
       })
     },
@@ -84,10 +82,7 @@ export function useNotificationBellMenu() {
     })
   }, [markAllRead, refetch])
 
-  const previewItems = React.useMemo(
-    () => mapNotificationsToPreviewItems(items, handleActivate),
-    [handleActivate, items],
-  )
+  const previewItems = mapNotificationsToPreviewItems(items, handleActivate)
 
   return {
     open,

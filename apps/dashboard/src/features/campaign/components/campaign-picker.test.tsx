@@ -16,8 +16,10 @@ import { makeSessionUser } from '@/test/fixtures/session'
 import { CAMPAIGN_ONBOARDING_INDEX_ROW_BODY } from '../lib/campaign-onboarding-copy'
 import { CampaignPicker } from './campaign-picker'
 
+import type * as ApiClient from '@rpg/api-client'
+
 vi.mock('@rpg/api-client', async () => {
-  const actual = await vi.importActual<typeof import('@rpg/api-client')>('@rpg/api-client')
+  const actual = await vi.importActual<typeof ApiClient>('@rpg/api-client')
   return {
     ...actual,
     persistCampaignSelectionRemote: vi.fn(),

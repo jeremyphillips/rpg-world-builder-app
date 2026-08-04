@@ -9,6 +9,7 @@ import type {
   ClassOptionPolicy,
   EquipmentBudgetSummary,
   ResolvedStartingEquipmentFunding,
+  StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 
@@ -48,7 +49,7 @@ export type EquipmentInventorySummaryProps = {
   onChangeEquipmentOption?: () => void
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
-  onCommitConversion?: (preview: import('@rpg/contracts').StartingPackageConversionPreview) => void
+  onCommitConversion?: (preview: StartingPackageConversionPreview) => void
 }
 
 export function EquipmentInventorySummary({

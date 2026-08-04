@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { ContentUsageBlocker, ContentSource, ContentTypeKey } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
@@ -36,13 +36,15 @@ export function useContentDeleteFlow({
   const [blockers, setBlockers] = useState<ContentUsageBlocker[]>([])
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const [trackedEntityId, setTrackedEntityId] = useState(entityId)
+  if (entityId !== trackedEntityId) {
+    setTrackedEntityId(entityId)
     setConfirmOpen(false)
     setBlockedOpen(false)
     setBlockers([])
     setDeleteError(null)
     setCheckingAvailability(false)
-  }, [entityId])
+  }
 
   const handleDeleteClick = useCallback(async () => {
     if (entitySource !== 'homebrew' || checkingAvailability) return

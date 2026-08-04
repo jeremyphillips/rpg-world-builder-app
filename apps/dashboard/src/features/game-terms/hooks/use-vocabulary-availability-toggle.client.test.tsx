@@ -10,8 +10,10 @@ import type { ResolvedVocabularyOptionSet, VocabularyOptionWithUsage } from '@rp
 import { vocabularySetQueryKey } from '@/features/vocabulary'
 import { useVocabularyAvailabilityToggle } from './use-vocabulary-availability-toggle.client'
 
+import type * as VocabularyFeature from '@/features/vocabulary'
+
 vi.mock('@/features/vocabulary', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
+  const actual = await importOriginal<typeof VocabularyFeature>()
   return {
     ...actual,
     fetchVocabularyDisableAvailability: vi.fn(),

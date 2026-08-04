@@ -434,7 +434,7 @@ export function FixedScoresAssignment({
 
   const handleSelectScore = useCallback(
     (ability: Ability, value: string) => {
-      let nextScores = scores
+      let nextScores: typeof scores
 
       if (value === FIXED_SCORES_EMPTY_SCORE_VALUE || value.trim() === '') {
         nextScores = clearAbilityScore(scores, ability)

@@ -11,8 +11,10 @@ const fetchContentCampaignAccessAvailabilityBatch = vi.fn()
 const updateRouteContentCampaignAccess = vi.fn()
 const fetchCsrfToken = vi.fn()
 
+import type * as Contracts from '@rpg/contracts'
+
 vi.mock('@rpg/contracts', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/contracts')>()
+  const actual = await importOriginal<typeof Contracts>()
   return {
     ...actual,
     fetchCsrfToken: () => fetchCsrfToken(),

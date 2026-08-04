@@ -31,7 +31,10 @@ export function FormUnsavedChangesGuard({
   const hasUnsavedChanges =
     hasUnsavedEditsOverride ?? (hasDirtyFields(dirtyFields) || subclassEdits)
   const unsavedRef = useRef(hasUnsavedChanges)
-  unsavedRef.current = hasUnsavedChanges
+
+  useEffect(() => {
+    unsavedRef.current = hasUnsavedChanges
+  })
 
   const shouldBlockNavigation = useCallback(
     ({

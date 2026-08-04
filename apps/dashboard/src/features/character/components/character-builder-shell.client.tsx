@@ -219,22 +219,27 @@ export function CharacterBuilderShell({
     [context, draft, resolvedChoiceSets, validationVisibleStepIds],
   )
 
-  useEffect(() => {
-    if (railValidationVisibleStepIds.length === validationVisibleStepIds.length) {
-      const isUnchanged = railValidationVisibleStepIds.every(
+  const railIdsKey = railValidationVisibleStepIds.join('\0')
+  const [lastRailIdsKey, setLastRailIdsKey] = useState(railIdsKey)
+  if (railIdsKey !== lastRailIdsKey) {
+    setLastRailIdsKey(railIdsKey)
+    const isUnchanged =
+      railValidationVisibleStepIds.length === validationVisibleStepIds.length &&
+      railValidationVisibleStepIds.every(
         (stepId, index) => stepId === validationVisibleStepIds[index],
       )
-      if (isUnchanged) return
+    if (!isUnchanged) {
+      setValidationVisibleStepIds(railValidationVisibleStepIds)
     }
+  }
 
-    setValidationVisibleStepIds(railValidationVisibleStepIds)
-  }, [railValidationVisibleStepIds, validationVisibleStepIds])
-
-  useEffect(() => {
-    if (!validationVisibleStepIds.includes(currentStepId)) {
-      return
-    }
-
+  const shouldSyncDraftValidationIssues = validationVisibleStepIds.includes(currentStepId)
+  const draftValidationSyncKey = shouldSyncDraftValidationIssues
+    ? `${currentStepId}:${JSON.stringify([context, draft, resolvedChoiceSets, validationVisibleStepIds])}`
+    : ''
+  const [lastDraftValidationSyncKey, setLastDraftValidationSyncKey] = useState('')
+  if (shouldSyncDraftValidationIssues && draftValidationSyncKey !== lastDraftValidationSyncKey) {
+    setLastDraftValidationSyncKey(draftValidationSyncKey)
     setValidationIssues((previous) =>
       resolveStepValidationIssuesAfterDraftChange(
         previous,
@@ -244,7 +249,7 @@ export function CharacterBuilderShell({
         resolvedChoiceSets,
       ),
     )
-  }, [context, currentStepId, draft, resolvedChoiceSets, validationVisibleStepIds])
+  }
 
   const handleEquipmentPickerFocusConsumed = useCallback(() => {
     setPendingEquipmentPickerFocus(undefined)

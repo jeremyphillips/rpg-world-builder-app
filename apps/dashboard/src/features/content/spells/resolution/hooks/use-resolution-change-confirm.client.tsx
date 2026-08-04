@@ -396,28 +396,26 @@ function createController(
 
 export function useResolutionChangeController(): ResolutionChangeController {
   const form = useFormContext()
-  const formRef = React.useRef(form)
-  formRef.current = form
 
   return React.useMemo(() => {
     const existing = controllers.get(form.control)
     if (existing) return existing
 
     const defaultResolution = (
-      formRef.current.formState.defaultValues as { resolution?: ResolutionFormValues }
+      form.formState.defaultValues as { resolution?: ResolutionFormValues }
     ).resolution
 
     const controller = createController(
       () => ({
-        control: formRef.current.control,
-        getValues: formRef.current.getValues.bind(formRef.current),
-        setValue: formRef.current.setValue.bind(formRef.current),
+        control: form.control,
+        getValues: form.getValues.bind(form),
+        setValue: form.setValue.bind(form),
       }),
       defaultResolution,
     )
     controllers.set(form.control, controller)
     return controller
-  }, [form.control])
+  }, [form])
 }
 
 export function useResolutionChangeSnapshot() {

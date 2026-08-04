@@ -28,6 +28,7 @@ export function useEquipmentPickerFocusIntent(args: {
       return
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- consumes one-shot focus intent and opens the picker in the same commit.
     setConsumedEquipmentPickerFocusIds((previous) => {
       const next = new Set(previous)
       next.add(equipmentPickerFocus.requestId)

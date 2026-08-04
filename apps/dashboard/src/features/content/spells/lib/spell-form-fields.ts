@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import {
-  AREA_GEOMETRY_SHAPES,
+  type AREA_GEOMETRY_SHAPES,
   DAMAGE_TYPE_TERM,
   castingTimeUnitSchema,
   damageTypeIdSchema,
