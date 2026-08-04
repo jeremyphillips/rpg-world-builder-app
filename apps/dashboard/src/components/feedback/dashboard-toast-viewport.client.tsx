@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
 import { ToastViewport } from '@rpg/ui'
@@ -10,13 +10,21 @@ import {
   dashboardToastViewportVariants,
 } from './dashboard-toast-viewport.variants'
 
+function subscribeToClientMount() {
+  return () => {}
+}
+
+function getClientSnapshot() {
+  return true
+}
+
+function getServerSnapshot() {
+  return false
+}
+
 /** Body-level portal so toast layering is not trapped by app-shell stacking contexts. */
 export function DashboardToastViewport() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(subscribeToClientMount, getClientSnapshot, getServerSnapshot)
 
   if (!mounted) {
     return null

@@ -8,17 +8,19 @@ import {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
 } from '../../context/array-item-presentation.context'
-import {
-  resolveArrayItemHeader,
-  type ResolvedArrayItemHeader,
-} from '../../config/array/array-item-config.lib'
-import type { ArrayConfig, ArrayItemConfig, RowConfig } from '../../field-config'
+import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
+import type {
+  ArrayConfig,
+  ArrayItemConfig,
+  ArrayItemHeaderConfig,
+  RowConfig,
+} from '../../field-config'
 import { isRowSlotItem } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { NestedFormItems } from '../../containers/form-item-node.client'
 import { FieldNode } from '../../containers/form-conditional.client'
 import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
-import { resolveIssueProminence } from '../../errors/resolve-issue-prominence'
+import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 import { FieldRow } from '../../../components/ui/field-row'
 import { ArrayItemToolbar, ArrayItemDragHandle } from './array-item-header.client'
 import { ArrayItemCompactRow } from './array-item-compact-row.client'
@@ -69,7 +71,7 @@ interface ArrayFieldItemActionsRailProps {
   issueCount: number
   rowLabel: string
   onFocusIssue: () => void
-  badgeProminence: ReturnType<typeof resolveIssueProminence>
+  badgeProminence: ArrayItemIssueProminence
   variant: 'compact' | 'detailed'
   embedded: boolean
 }
@@ -215,7 +217,7 @@ function CompactInlineArrayFieldItem({
 interface ToolbarArrayFieldItemProps extends ArrayFieldItemChromeProps {
   legend: string
   index: number
-  headerConfig: ReturnType<typeof resolveArrayItemHeader>
+  headerConfig: ArrayItemHeaderConfig
   itemValues: Record<string, unknown>
   watchedPrimary: unknown
   showDragHandle: boolean

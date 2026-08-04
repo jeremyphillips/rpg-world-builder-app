@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { ContentSource } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
@@ -28,9 +28,11 @@ export function useContentPublishFlow({
   const publishRequest = useContentEditPublishRequest()
   const [publishError, setPublishError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const [trackedEntityId, setTrackedEntityId] = useState(entityId)
+  if (entityId !== trackedEntityId) {
+    setTrackedEntityId(entityId)
     setPublishError(null)
-  }, [entityId])
+  }
 
   const runPublishMutation = useCallback(async () => {
     await publishMutation.mutateAsync(entityId)

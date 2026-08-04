@@ -2,7 +2,7 @@ import type { HomebrewSummaryContentType } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeCollectionLabel } from '@/features/content'
 
 export type VisibleSidebarContentEntry = {
   contentType: HomebrewSummaryContentType

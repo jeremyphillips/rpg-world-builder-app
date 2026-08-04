@@ -30,7 +30,7 @@ import {
   buildOutcomeApplicationRowPresentation,
 } from '../../lib/form/resolution-outcome-application-row.lib'
 import {
-  amountOptionsForEffect,
+  type amountOptionsForEffect,
   outcomeApplicationAmountField,
   outcomeApplicationAmountOptions,
 } from '../../lib/form/resolution-outcome-applications-form-fields'

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { DEFAULT_SYSTEM_RULESET_ID, LANGUAGE_SET_ID } from '@rpg/contracts'
 
-import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useCampaigns } from '@/lib/campaign/campaigns-query'
 
 import {
   buildActiveLanguageCategoryFieldOptions,

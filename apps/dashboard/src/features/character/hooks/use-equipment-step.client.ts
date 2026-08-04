@@ -205,7 +205,7 @@ export function useEquipmentStep(args: {
         }
   const budget = useMemo(
     () => (showBudget ? resolveEquipmentStepBudget(draft, catalogIndex, context) : undefined),
-    [catalogIndex, context, draft, showBudget],
+    [catalogIndex, context, draft, equipmentStepSurfaceResult],
   )
 
   const goldOptionFunding = useMemo(
@@ -427,7 +427,9 @@ export function useEquipmentStep(args: {
     })
   }, [catalogIndex, draft, fundingByOptionId, pendingPackageSwitch])
 
+  // Keeps pending package-switch draft quantities aligned with live inventory snapshots.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reactive reconciliation when draft edits change inventory outside the modal.
     setPendingPackageSwitch((prev) => {
       if (!prev) return null
 

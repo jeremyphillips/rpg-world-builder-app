@@ -2,17 +2,14 @@ import { useMemo } from 'react'
 import { type SystemRulesetId } from '@rpg/contracts'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
-import { useBuildContext } from '@/features/character/hooks/use-build-context'
-import { useCharacterOrganizationReferences } from '@/features/character/hooks/use-character-organization-references'
-import {
-  buildCharacterDetailViewModel,
-  type CharacterDetailViewModel,
-} from '@/features/character/lib/display/character-display'
+import { useBuildContext } from '@/features/character'
+import { useCharacterOrganizationReferences } from '@/features/character'
+import { buildCharacterDetailViewModel, type CharacterDetailViewModel } from '@/features/character'
 import {
   combineQueryError,
   combineQueryPending,
   resolveQueryErrorLabel,
-} from '@/features/character/lib/resolve-query-error-label.lib'
+} from '@/features/character'
 
 import { useCampaignCharacter } from './use-campaign-character'
 

@@ -11,7 +11,7 @@ import {
 import { EquipmentInventoryColumn } from './equipment-inventory-column.client'
 import { EquipmentPurchasedInventorySection } from './equipment-purchased-inventory-section.client'
 import {
-  buildPackageSwitchDraftPurchasedGroups,
+  type buildPackageSwitchDraftPurchasedGroups,
   PACKAGE_SWITCH_SAFETY_NOTE,
 } from './equipment-package-switch-resolution.lib'
 import {

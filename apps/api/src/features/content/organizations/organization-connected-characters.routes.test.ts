@@ -11,7 +11,7 @@ import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
-import { CampaignCharacterParticipationModel } from '../../campaign/participation/campaign-character-participation.model'
+import { CampaignCharacterParticipationModel } from '../../campaign'
 import { CharacterModel, createPcRecord } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import {

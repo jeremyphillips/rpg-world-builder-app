@@ -1,4 +1,5 @@
 import type { WeightedSearchField } from '@rpg/ui'
+import type { ArrayAddActionConfig } from '@rpg/ui/form'
 import type { SpellAtomicEffectKind } from '@rpg/contracts'
 
 import {
@@ -8,9 +9,7 @@ import {
   type EffectTemplate,
 } from './effect-template-registry'
 
-export type EffectArrayAddMenuConfig = NonNullable<
-  import('@rpg/ui/form').ArrayAddActionConfig['menu']
->
+export type EffectArrayAddMenuConfig = NonNullable<ArrayAddActionConfig['menu']>
 
 function buildTemplateSearchTerms(template: EffectTemplate): WeightedSearchField[] {
   const fields: WeightedSearchField[] = [

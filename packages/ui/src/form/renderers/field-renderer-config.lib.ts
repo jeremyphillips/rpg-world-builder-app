@@ -57,7 +57,7 @@ export function resolveFieldRenderConfig(
   })
   const hintPresentation = resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
-  let renderConfig: FieldConfig = { ...config, size: resolvedSize }
+  const renderConfig: FieldConfig = { ...config, size: resolvedSize }
 
   const basePresentation = {
     hint: hintPresentation.text,

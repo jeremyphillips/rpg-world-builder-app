@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom'
 
-import { CampaignCharacterStatusSummary } from '@/features/character/components/detail/campaign-character-status-summary.client'
-import { CharacterDetailContent } from '@/features/character/components/detail/character-detail-content.client'
-import { CharacterOrganizationsSummary } from '@/features/character/components/detail/character-organizations-summary.client'
-import { CharacterSheetDetailShell } from '@/features/character/components/detail/character-sheet-detail-shell'
+import { CampaignCharacterStatusSummary } from '@/features/character'
+import { CharacterDetailContent } from '@/features/character'
+import { CharacterOrganizationsSummary } from '@/features/character'
+import { CharacterSheetDetailShell } from '@/features/character'
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'

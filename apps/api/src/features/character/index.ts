@@ -20,3 +20,12 @@ export {
 } from './character.service'
 export { enrichPcsWithOpenCampaign } from './enrich-pcs-with-open-campaign.lib'
 export { toNpcListCharacterSummary } from './to-npc-character'
+export {
+  buildCharacterCardSummaryDto,
+  createCharacterSummaryLabelLookup,
+} from './lib/build-character-card-summary-dto.lib'
+export {
+  getCharacterDeletionAvailability,
+  getCharacterDeletionBlockersForCampaign,
+  getCharacterLocationPartyDeletionBlockers,
+} from './character-deletion.service'

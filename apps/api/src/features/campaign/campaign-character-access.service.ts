@@ -10,7 +10,7 @@ import type {
 import { isCampaignManager, resolveCampaignCharacterAccess } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { findNpcById, findPcById } from '../character/character.repository'
+import { findNpcById, findPcById } from '../character'
 import { CampaignMembershipModel } from './campaign-membership.model'
 import { findCampaignById } from './find-campaign-by-id'
 import {

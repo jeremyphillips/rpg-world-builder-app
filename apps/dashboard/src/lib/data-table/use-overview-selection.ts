@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 export type OverviewRowSelectionState = Record<string, boolean>
 
@@ -17,30 +17,26 @@ export function useOverviewSelection<T extends { id: string }>({
   const [rowSelection, setRowSelection] = useState<OverviewRowSelectionState>({})
   const [selectedRows, setSelectedRows] = useState<T[]>([])
 
-  useEffect(() => {
-    setRowSelection((current: OverviewRowSelectionState) => {
-      const next = Object.fromEntries(
-        Object.entries(current).filter(([id]) => visibleRowIds.has(id)),
-      )
-      return Object.keys(next).length === Object.keys(current).length ? current : next
-    })
-  }, [visibleRowIds])
+  const effectiveRowSelection = useMemo(() => {
+    const next = Object.fromEntries(
+      Object.entries(rowSelection).filter(([id]) => visibleRowIds.has(id)),
+    )
+    return Object.keys(next).length === Object.keys(rowSelection).length ? rowSelection : next
+  }, [rowSelection, visibleRowIds])
 
-  useEffect(() => {
-    setSelectedRows((current) => {
-      const next = current.filter((row) => visibleRowIds.has(row.id))
-      return next.length === current.length ? current : next
-    })
-  }, [visibleRowIds])
+  const effectiveSelectedRows = useMemo(
+    () => selectedRows.filter((row) => visibleRowIds.has(row.id)),
+    [selectedRows, visibleRowIds],
+  )
 
-  const selectedCount = selectedRows.length
+  const selectedCount = effectiveSelectedRows.length
 
   const getRowCanSelect = useCallback(
     (row: T) => {
-      if (rowSelection[row.id]) return true
+      if (effectiveRowSelection[row.id]) return true
       return selectedCount < selectionLimit
     },
-    [rowSelection, selectedCount, selectionLimit],
+    [effectiveRowSelection, selectedCount, selectionLimit],
   )
 
   const enterSelectionMode = useCallback(() => {
@@ -85,8 +81,8 @@ export function useOverviewSelection<T extends { id: string }>({
 
   return {
     selectionMode,
-    rowSelection,
-    selectedRows,
+    rowSelection: effectiveRowSelection,
+    selectedRows: effectiveSelectedRows,
     selectedCount,
     selectionLimit,
     selectionCapDescriptionId,

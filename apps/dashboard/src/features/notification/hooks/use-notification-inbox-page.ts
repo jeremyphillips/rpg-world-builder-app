@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
-import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useCampaigns } from '@/features/campaign'
 import {
   INVALID_CAMPAIGN_SCOPE_COPY,
   parseCampaignIdFromSearch,
@@ -76,7 +76,7 @@ export function useNotificationInboxPage() {
 
   const items = React.useMemo(
     () => (data?.pages ? data.pages.flatMap((page) => page.items) : []),
-    [data?.pages],
+    [data],
   )
   const unreadCount = data?.pages[0]?.unreadCount ?? 0
 

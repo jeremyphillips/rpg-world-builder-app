@@ -18,6 +18,7 @@ import { SwitchField } from '../../components/ui/switch-field'
 import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
+import type { FieldHintPosition } from '../../components/ui/field.variants'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
@@ -86,7 +87,7 @@ interface RenderArgs<K extends FieldType> {
   field: ControllerRenderProps
   id: string
   hint?: string
-  hintPosition?: import('../../components/ui/field.variants').FieldHintPosition
+  hintPosition?: FieldHintPosition
   error?: string
   invalid?: boolean
   describedBy?: string
@@ -231,7 +232,7 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  checkbox: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  checkbox: ({ config, field, id, hint, hintPosition: _hintPosition, ...validation }) => (
     <CheckboxField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -561,7 +562,7 @@ interface StandardFieldRendererProps {
   config: FieldConfig
   renderConfig: StandardFieldConfig
   hint?: string
-  hintPosition?: import('../../components/ui/field.variants').FieldHintPosition
+  hintPosition?: FieldHintPosition
   fullName: string
   id: string
   namePrefix?: string

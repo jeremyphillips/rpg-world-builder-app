@@ -13,7 +13,7 @@ vi.mock('../../character/hooks/use-campaign-build-context')
 import { useCampaignCharacterNavigationContext as useCampaignCharacterNavigationContextFn } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters as useCampaignCharactersFn } from '../hooks/use-campaign-characters'
 import { useCampaigns as useCampaignsFn } from '../hooks/use-campaigns'
-import { useCampaignBuildContext as useCampaignBuildContextFn } from '../../character/hooks/use-campaign-build-context'
+import { useCampaignBuildContext as useCampaignBuildContextFn } from '@/features/character'
 import { CampaignCharactersOverview } from './campaign-characters-overview'
 
 const useCampaignCharacterNavigationContext = vi.mocked(useCampaignCharacterNavigationContextFn)

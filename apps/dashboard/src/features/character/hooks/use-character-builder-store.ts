@@ -27,7 +27,7 @@ function useCharacterBuilderDraftScope(
 
   return useMemo(
     () => (context ? resolveCharacterBuilderDraftScope(context, session?.user.id) : null),
-    [context, session?.user.id],
+    [context?.characterKind, context?.mode, context?.rulesScope, session?.user.id],
   )
 }
 

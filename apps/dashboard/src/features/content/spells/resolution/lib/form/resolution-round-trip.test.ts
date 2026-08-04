@@ -12,7 +12,7 @@ import {
   INFlict_WOUNDS_RESOLUTION,
   MAGIC_MISSILE_RESOLUTION,
   MASS_HEALING_WORD_RESOLUTION,
-  SPELL_RESOLUTION_FIXTURES,
+  type SPELL_RESOLUTION_FIXTURES,
 } from '@rpg/contracts'
 import { resolutionFormSchema } from './resolution-form-schema'
 import { formOutcomesToStoredShape } from './resolution-outcome-slots.lib'

@@ -8,7 +8,7 @@ import { ApiError } from '@rpg/contracts'
 import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campaign-invite'
 
 import { ROUTES } from '@/app/routes'
-import { useSession } from '@/features/auth/hooks/use-session'
+import { useSession } from '@/features/auth'
 import { usePersistCampaignSelection } from '@/features/campaign'
 
 import {

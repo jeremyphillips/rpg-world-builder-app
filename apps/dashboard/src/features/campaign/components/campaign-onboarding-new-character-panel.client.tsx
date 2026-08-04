@@ -6,8 +6,8 @@ import { Heading, Text } from '@rpg/ui'
 import { PageLoadState } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 import { useSession } from '@/features/auth'
-import { CharacterBuilderShell } from '@/features/character/components/character-builder-shell.client'
-import { useCampaignPcOnboardingBuildContext } from '@/features/character/hooks/use-campaign-build-context'
+import { CharacterBuilderShell } from '@/features/character'
+import { useCampaignPcOnboardingBuildContext } from '@/features/character'
 
 export function CampaignOnboardingNewCharacterPanel({
   context,

@@ -6,7 +6,7 @@ import type {
 import { CAMPAIGN_ROLES } from '@rpg/contracts'
 
 import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character'
-import { buildCharacterCardSummaryDto } from '../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../character'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'
 import { HttpError } from '../../lib/http-error'

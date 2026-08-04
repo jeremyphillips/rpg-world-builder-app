@@ -53,9 +53,9 @@ export function resolveFieldContainerChromeClasses(
   return resolveSurfaceClasses({ ...surface, tone })
 }
 
-export function isCompactLabelTone(
-  value: string,
-): value is import('./compact-label.lib').CompactLabelTone {
+import type { CompactLabelTone } from './compact-label.lib'
+
+export function isCompactLabelTone(value: string): value is CompactLabelTone {
   return (
     value === 'neutral' ||
     value === 'info' ||

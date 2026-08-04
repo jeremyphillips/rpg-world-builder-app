@@ -1,6 +1,6 @@
 import type { ApiContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 
-import type { ContentTypeConfig } from '../../content/lib/content-type-config'
+import type { ContentTypeConfig } from '../../content'
 
 import { loadCatalogBlockerIndex } from './resolve-catalog-vocab-usage'
 import type { VocabularyUsageResolverContext } from './vocabulary-usage-context'

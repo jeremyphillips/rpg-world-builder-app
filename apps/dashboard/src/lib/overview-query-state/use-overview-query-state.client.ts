@@ -74,9 +74,12 @@ export function useOverviewQueryState<TData, TFilters extends Record<string, unk
 } {
   const [searchParams, setSearchParams] = useSearchParams()
   const searchParamsRef = useRef(searchParams)
-  searchParamsRef.current = searchParams
   const setSearchParamsRef = useRef(setSearchParams)
-  setSearchParamsRef.current = setSearchParams
+
+  useEffect(() => {
+    searchParamsRef.current = searchParams
+    setSearchParamsRef.current = setSearchParams
+  })
 
   const allowedSortIdsKey = createAllowedSortIdsKey(allowedSortIds)
   const searchParamsKey = createSearchParamsKey(searchParams)
@@ -100,10 +103,16 @@ export function useOverviewQueryState<TData, TFilters extends Record<string, unk
 
   const [filters, setFilters] = useState<TFilters>(urlQuery.filters)
   const filtersRef = useRef(filters)
-  filtersRef.current = filters
+
+  useEffect(() => {
+    filtersRef.current = filters
+  })
 
   const urlQueryRef = useRef(urlQuery)
-  urlQueryRef.current = urlQuery
+
+  useEffect(() => {
+    urlQueryRef.current = urlQuery
+  })
 
   const urlFiltersKey = createFilterStateKey(schema, urlQuery.filters)
   const lastSyncedUrlFiltersKeyRef = useRef(urlFiltersKey)
@@ -288,15 +297,18 @@ export function useOverviewQueryState<TData, TFilters extends Record<string, unk
   )
 
   const setFilterValueActionRef = useRef(setFilterValueAction)
-  setFilterValueActionRef.current = setFilterValueAction
   const setFiltersActionRef = useRef(setFiltersAction)
-  setFiltersActionRef.current = setFiltersAction
   const setSortActionRef = useRef(setSortAction)
-  setSortActionRef.current = setSortAction
   const setPageActionRef = useRef(setPageAction)
-  setPageActionRef.current = setPageAction
   const resetFiltersActionRef = useRef(resetFiltersAction)
-  resetFiltersActionRef.current = resetFiltersAction
+
+  useEffect(() => {
+    setFilterValueActionRef.current = setFilterValueAction
+    setFiltersActionRef.current = setFiltersAction
+    setSortActionRef.current = setSortAction
+    setPageActionRef.current = setPageAction
+    resetFiltersActionRef.current = resetFiltersAction
+  })
 
   const actions = useMemo(
     () => ({

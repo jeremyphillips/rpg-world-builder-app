@@ -5,10 +5,7 @@ import * as React from 'react'
 import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
-import {
-  buildCatalogDisclosureLabel,
-  CatalogCollapsibleList,
-} from '@/features/content/components/catalog'
+import { buildCatalogDisclosureLabel, CatalogCollapsibleList } from '@/features/content'
 import {
   buildSpellDetailViewModel,
   SpellCatalogItemHeader,

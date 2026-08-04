@@ -33,7 +33,7 @@ import {
   stripHtmlTags,
 } from '@rpg/contracts'
 
-import type { WriteEntityBase } from '../../content/lib/content-write-config'
+import type { WriteEntityBase } from '../../content'
 
 type NamedContentEntity = WriteEntityBase & {
   name: string

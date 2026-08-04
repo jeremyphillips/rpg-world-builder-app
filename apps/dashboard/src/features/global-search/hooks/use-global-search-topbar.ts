@@ -13,15 +13,18 @@ import { useGlobalSearchCatalog } from './use-global-search-catalog'
 
 export function useGlobalSearchTopbar(campaignId: string, open: boolean) {
   const [query, setQuery] = React.useState('')
-  const { data, isPending, isError, refetch } = useGlobalSearchCatalog(campaignId, {
-    enabled: open,
-  })
+  const [trackedOpen, setTrackedOpen] = React.useState(open)
 
-  React.useEffect(() => {
+  if (open !== trackedOpen) {
+    setTrackedOpen(open)
     if (!open) {
       setQuery('')
     }
-  }, [open])
+  }
+
+  const { data, isPending, isError, refetch } = useGlobalSearchCatalog(campaignId, {
+    enabled: open,
+  })
 
   const documents = data?.documents ?? []
   const hasQuery = !isGlobalSearchQueryBlank(query)

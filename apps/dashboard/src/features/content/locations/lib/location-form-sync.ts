@@ -1,12 +1,13 @@
 import {
   BUILDING_ARCHETYPE_IDS,
   getBuildingArchetypeFunctions,
+  getInteriorSubtypeIds,
   getRegionTypeIds,
-  INTERIOR_TYPE_DEFINITIONS,
+  INTERIOR_TYPE_IDS,
+  isRegionClassificationKind,
   type BuildingArchetype,
   type BuildingFunctionFamily,
   type InteriorClassificationType,
-  type RegionClassificationKind,
 } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
@@ -101,7 +102,11 @@ function syncRegionClassificationKindChange(
   const type = classification.type
   if (!type) return undefined
 
-  if (!(getRegionTypeIds(kind as RegionClassificationKind) as readonly string[]).includes(type)) {
+  if (!isRegionClassificationKind(kind)) {
+    return classificationPatch(values, { type: undefined })
+  }
+
+  if (!(getRegionTypeIds(kind) as readonly string[]).includes(type)) {
     return classificationPatch(values, { type: undefined })
   }
 
@@ -112,7 +117,10 @@ function syncInteriorTypeChange(
   values: Record<string, unknown>,
 ): Partial<Record<string, unknown>> | undefined {
   const interiorType = values['interiorType']
-  if (typeof interiorType !== 'string') {
+  if (
+    typeof interiorType !== 'string' ||
+    !(INTERIOR_TYPE_IDS as readonly string[]).includes(interiorType)
+  ) {
     return readClassification(values).type
       ? classificationPatch(values, { type: undefined })
       : undefined
@@ -122,10 +130,8 @@ function syncInteriorTypeChange(
   const type = classification.type
   if (!type) return undefined
 
-  const validTypes = Object.keys(
-    INTERIOR_TYPE_DEFINITIONS[interiorType as InteriorClassificationType].subtypes,
-  )
-  if (!validTypes.includes(type)) {
+  const validTypes = getInteriorSubtypeIds(interiorType as InteriorClassificationType)
+  if (!(validTypes as readonly string[]).includes(type)) {
     return classificationPatch(values, { type: undefined })
   }
 

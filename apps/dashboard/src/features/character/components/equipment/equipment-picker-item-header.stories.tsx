@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
-import { pickEquipment } from '@/features/content/lib/fixtures/pick'
+import { pickEquipment } from '@/features/content'
 
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {

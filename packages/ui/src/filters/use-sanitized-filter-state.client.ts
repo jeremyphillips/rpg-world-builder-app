@@ -21,10 +21,12 @@ export function useSanitizedFilterState<TData, TState extends Record<string, unk
   enabled = true,
 }: UseSanitizedFilterStateOptions<TData, TState>) {
   const stateRef = React.useRef(state)
-  stateRef.current = state
-
   const onStateChangeRef = React.useRef(onStateChange)
-  onStateChangeRef.current = onStateChange
+
+  React.useEffect(() => {
+    stateRef.current = state
+    onStateChangeRef.current = onStateChange
+  })
 
   React.useEffect(() => {
     if (!enabled) return

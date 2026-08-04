@@ -8,7 +8,7 @@ import type {
 import { getOrganizationKindLabel } from '@rpg/contracts'
 import { Alert, Text } from '@rpg/ui'
 
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeItemLabel } from '@/features/content'
 import { characterBuilderPreviewStatGridClasses } from '../character-builder-shell.variants'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
 import { resolveBuilderModelingAdvisories } from '../../lib/builder-preview/builder-review-advisories.lib'

@@ -4,8 +4,8 @@ import { getGlobalSearchFilterGroupTypeLabel, getVocabularyOptionSetTerm } from 
 import {
   listResolvedVocabularySetsForCampaign,
   vocabularyUsageContextForCampaign,
-} from '../../vocabulary/sets/vocabulary.service'
-import { resolveVocabularyOptionsForViewer } from '../../vocabulary/lib/resolve-vocabulary-options-for-viewer'
+} from '../../vocabulary'
+import { resolveVocabularyOptionsForViewer } from '../../vocabulary'
 import type { SearchSource } from '../lib/search-source.types'
 
 function labelField(text: string): GlobalSearchField {

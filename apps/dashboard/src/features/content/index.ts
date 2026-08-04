@@ -1,3 +1,56 @@
+// Lightweight cross-feature surface — keep before route/form exports to avoid barrel init cycles.
+export {
+  formatAddContentTypeLabel,
+  formatContentCollectionAvailabilityCaption,
+  formatContentCreateHeading,
+  getContentTypeCollectionLabel,
+  getContentTypeItemLabel,
+  getContentTypeMidSentenceLabel,
+} from './lib/content-type-labels'
+export {
+  buildCatalogDrowGrantDisplayVocabulary,
+  DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  getCatalogDrowHeritageGrantGroups,
+  getCatalogDrowHeritageOption,
+  getDrowHeritageSpellCatalog,
+  STORY_CAMPAIGN_ID,
+  STORY_RULESET_ID,
+  pickClass,
+  pickEquipment,
+  pickFeat,
+  pickSkillProficiency,
+  pickSpecies,
+  pickSpell,
+  pickSubclass,
+  pickSubclassesForClass,
+} from './lib/fixtures'
+export {
+  CatalogCollapsibleList,
+  buildCatalogDisclosureLabel,
+  CatalogMetadataRenderer,
+  type CatalogCollapsibleListProps,
+  type CatalogMetadataLine,
+} from './components/catalog'
+export {
+  CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
+  CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
+  CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL,
+  CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL,
+  formatHideUnavailableAriaLabel,
+  formatHiddenUnavailableNotice,
+  formatNoAvailableMatchesLabel,
+  formatShowAllCampaignAvailabilityAriaLabel,
+  formatShowUnavailableAriaLabel,
+  formatUnavailableItemsShownNotice,
+  formatUnavailableMatchesLine,
+} from './lib/campaign-access/campaign-access-table-labels'
+export { CITY_COUNCIL, SILVER_CIRCLE, ORGANIZATIONS_LIST } from './organizations/fixtures'
+export type { EquipmentCatalogItemHeaderTone } from './equipment/components/equipment-catalog-item-header.client'
+export type { SpellCatalogItemHeaderTone } from './spells/components/spell-catalog-item-header.client'
+
 export { ClassesOverview, ClassDetail, useClasses, classesQueryKey } from './classes'
 export { ClassCreate } from './classes/routes/class-create'
 export { ClassEdit } from './classes/routes/class-edit'
@@ -17,6 +70,7 @@ export {
   type EquipmentDetailViewModel,
   type EquipmentPickerRowViewModel,
   EquipmentDetailMetadata,
+  EquipmentCatalogItemHeader,
 } from './equipment'
 export { EquipmentEdit } from './equipment/routes/equipment-edit'
 export {
@@ -82,13 +136,6 @@ export type {
   SpellMarker,
 } from './spells/components/spell-catalog-item-header.client'
 export {
-  CatalogCollapsibleList,
-  buildCatalogDisclosureLabel,
-  CatalogMetadataRenderer,
-  type CatalogCollapsibleListProps,
-  type CatalogMetadataLine,
-} from './components/catalog'
-export {
   ContentCreateShell,
   ContentFormShellResolver,
 } from './lib/forms/shells/content-create-shell'
@@ -121,3 +168,5 @@ export {
   createContentMutationHooks,
   useContentWriteMutation,
 } from './lib/list/use-content-mutations'
+export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog.client'
+export { ContentCampaignAvailabilityAction } from './lib/overview/content-campaign-availability-action.client'

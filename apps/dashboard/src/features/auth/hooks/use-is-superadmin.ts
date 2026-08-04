@@ -1,4 +1,4 @@
-import { useSession } from '@/features/auth/hooks/use-session'
+import { useSession } from './use-session'
 
 /** Returns true when the current user is a superadmin. */
 export function useIsSuperadmin(): boolean {

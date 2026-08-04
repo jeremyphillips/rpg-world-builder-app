@@ -19,25 +19,29 @@ vi.mock('@/features/campaign', async (importOriginal) => {
   }
 })
 
-vi.mock('@/features/content/species/hooks/use-species', () => ({
-  useSpecies: () => ({
-    data: [
-      {
-        id: 'srd-cc-5.2.1:elf',
-        slug: 'elf',
-        name: 'Elf',
-        source: 'system',
-        status: 'published',
-        languageAffinities: ['elvish'],
-        culture: {
-          id: 'elven',
-          name: 'Elven',
-          naming: { supported: true, personalNameComponents: ['family'] },
+vi.mock('@/features/content', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useSpecies: () => ({
+      data: [
+        {
+          id: 'srd-cc-5.2.1:elf',
+          slug: 'elf',
+          name: 'Elf',
+          source: 'system',
+          status: 'published',
+          languageAffinities: ['elvish'],
+          culture: {
+            id: 'elven',
+            name: 'Elven',
+            naming: { supported: true, personalNameComponents: ['family'] },
+          },
         },
-      },
-    ],
-  }),
-}))
+      ],
+    }),
+  }
+})
 
 const composed = {
   conventions: [ELVISH_PERSONAL_CONVENTION],

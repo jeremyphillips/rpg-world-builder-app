@@ -1,7 +1,7 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
-import { toContentUsageBlocker } from '../../../../vocabulary/lib/reference-sources/content-referrer'
+import { toContentUsageBlocker } from '../../../../vocabulary'
 import { HomebrewLocationModel } from '../../../locations/homebrew-location.model'
 import { extractAllPartyIdsFromLocation } from '../../../locations/location-party-reference.lib'
 import { indexRecordsByContentId } from './index-by-content-id'

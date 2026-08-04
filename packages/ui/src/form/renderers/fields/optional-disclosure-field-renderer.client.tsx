@@ -49,13 +49,14 @@ export function OptionalDisclosureTextareaFieldRenderer({
   hint,
   hintPosition,
 }: OptionalDisclosureTextareaRendererProps) {
+  const { ref: registerRef, value, onChange, onBlur } = field
   const [manualOpen, setManualOpen] = useState(false)
-  const hasValue = Boolean(String(field.value ?? '').trim())
+  const hasValue = Boolean(String(value ?? '').trim())
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const open = manualOpen || (expandWhenPopulated && hasValue)
 
   const handleRemove = () => {
-    field.onChange('')
+    onChange('')
     setManualOpen(false)
   }
 
@@ -87,10 +88,10 @@ export function OptionalDisclosureTextareaFieldRenderer({
         placeholder={config.placeholder}
         rows={config.rows}
         disabled={config.disabled}
-        ref={field.ref}
-        value={field.value ?? ''}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
+        ref={registerRef}
+        value={value ?? ''}
+        onChange={onChange}
+        onBlur={onBlur}
       />
     </OptionalFieldDisclosure>
   )
@@ -214,12 +215,16 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   const open = !dependencyCollapsed && (manualOpen || (expandWhenPopulated && hasValue))
 
   useEffect(() => {
+    // Reset disclosure when suggestion drivers change; must stay synchronous so
+    // Form valueSync effects in the same commit clear dependent values first.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- disclosure reset is intentionally ordered with FormValueSyncEffects in the parent commit
     setManualOpen(false)
     setDependencyCollapsed(true)
   }, [suggestionValuesKey])
 
   useEffect(() => {
     if (hasValue) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- expand populated optional fields when value sync repopulates the control
       setDependencyCollapsed(false)
     }
   }, [hasValue])

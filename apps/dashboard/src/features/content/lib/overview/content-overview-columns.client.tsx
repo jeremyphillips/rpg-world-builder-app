@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo, useState } from 'react'
 
 import type { ContentTypeKey, ViewerCharacterRelationships } from '@rpg/contracts'
 import { toPlayerContentVisibility, type ContentViewer } from '@rpg/contracts'
@@ -28,15 +28,13 @@ export function useStableOverviewColumns<T>(
   columns: ColumnDef<T, unknown>[],
 ): ColumnDef<T, unknown>[] {
   const signature = createOverviewColumnDefsSignature(columns as ColumnDef<unknown>[])
-  const stableColumnsRef = useRef(columns)
-  const signatureRef = useRef(signature)
+  const [cached, setCached] = useState({ signature, columns })
 
-  if (signatureRef.current !== signature) {
-    signatureRef.current = signature
-    stableColumnsRef.current = columns
+  if (cached.signature !== signature) {
+    setCached({ signature, columns })
   }
 
-  return stableColumnsRef.current
+  return cached.columns
 }
 
 type OverviewNameRow = ContentBase & {
@@ -131,8 +129,6 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
   },
 ): ColumnDef<T, unknown>[] {
   const stableColumns = useStableOverviewColumns(columns)
-  const getEditHrefRef = useRef(context.getEditHref)
-  getEditHrefRef.current = context.getEditHref
 
   return useMemo(
     () =>
@@ -141,8 +137,15 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
         campaignId: context.campaignId,
         contentTypeKey: context.contentTypeKey,
         viewer: context.viewer,
-        getEditHref: (row) => getEditHrefRef.current(row),
+        getEditHref: context.getEditHref,
       }),
-    [stableColumns, context.canManage, context.campaignId, context.contentTypeKey, context.viewer],
+    [
+      stableColumns,
+      context.canManage,
+      context.campaignId,
+      context.contentTypeKey,
+      context.viewer,
+      context.getEditHref,
+    ],
   )
 }

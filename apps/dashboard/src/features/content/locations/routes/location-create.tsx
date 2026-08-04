@@ -2,7 +2,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
-import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useCampaigns } from '@/features/campaign'
 import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
 import {
   buildLocationCreateInitialValues,

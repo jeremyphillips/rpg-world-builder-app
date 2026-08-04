@@ -1,6 +1,6 @@
 import type { ContentDeletionAvailability, ContentUsageBlocker } from '@rpg/contracts'
 
-import { findLocationPartyBlockersForCharacter } from '../content/lib/content-usage/reference-sources/location-party-associations'
+import { findLocationPartyBlockersForCharacter } from '../content'
 
 /** Advisory preflight for PC/NPC delete when location party associations exist. */
 export async function getCharacterLocationPartyDeletionBlockers(
@@ -23,7 +23,6 @@ export async function getCharacterDeletionBlockersForCampaign(
   campaignId: string,
   characterId: string,
 ): Promise<ContentUsageBlocker[]> {
-  const { findLocationPartyBlockersForCharacterInCampaign } =
-    await import('../content/lib/content-usage/reference-sources/location-party-associations')
+  const { findLocationPartyBlockersForCharacterInCampaign } = await import('../content')
   return findLocationPartyBlockersForCharacterInCampaign(campaignId, characterId)
 }

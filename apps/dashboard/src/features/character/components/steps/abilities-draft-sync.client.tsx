@@ -42,8 +42,10 @@ export function AbilitiesDraftSync({
     context.characterCreationRules.abilityGeneration,
   )
 
-  onDraftChangeRef.current = onDraftChange
-  draftAbilitiesRef.current = draftAbilities
+  useEffect(() => {
+    onDraftChangeRef.current = onDraftChange
+    draftAbilitiesRef.current = draftAbilities
+  })
 
   useEffect(() => {
     const previousDraft = priorDraftRef.current

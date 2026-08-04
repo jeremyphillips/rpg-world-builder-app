@@ -1,8 +1,8 @@
 import type { CampaignRole, ContentUsageBlocker } from '@rpg/contracts'
 import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../../character/character.model'
+import { listOpenParticipationsForCampaign } from '../../../campaign'
+import { CharacterModel } from '../../../character'
 
 import { indexRecordsByVocabId } from './index-by-vocab-id'
 import type { VocabularyUsagePurpose } from '../vocabulary-usage-context'

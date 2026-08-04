@@ -18,5 +18,6 @@ export {
   acceptCampaignInvite,
   listCampaignInvitesForOverview,
   resolveCampaignInviteByToken,
+  revokeCampaignInvite,
   sendCampaignInvite,
 } from './campaign-invite.service'

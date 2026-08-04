@@ -11,7 +11,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 import {
   campaignDestinationChevronClasses,
   campaignDestinationListVariants,
-} from '@/features/campaign/components/campaign-destination.variants'
+} from '@/features/campaign'
 
 import { useVocabularySets } from '@/features/vocabulary'
 import { GAME_TERMS_VOCABULARY_CATEGORIES } from '../lib/hub/vocabulary-set-registry'

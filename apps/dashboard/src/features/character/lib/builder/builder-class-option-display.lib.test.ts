@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { CLASS_SECTION_LABELS, CLASS_STAT_LABELS } from '@/features/content'
-import { pickClass, pickSkillProficiency } from '@/features/content/lib/fixtures/pick'
+import { pickClass, pickSkillProficiency } from '@/features/content'
 
 import { buildClassDetailsSheetContent } from './builder-class-option-display.lib'
 import { populatedBuilderCatalog } from '../character-builder-fixtures'

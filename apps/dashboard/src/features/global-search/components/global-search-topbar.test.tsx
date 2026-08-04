@@ -9,10 +9,13 @@ import { GlobalSearchProvider } from './global-search-provider.client'
 import { GlobalSearchTopbar } from './global-search-topbar.client'
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 
+import type * as ReactRouterDom from 'react-router-dom'
+import type * as CampaignFeature from '@/features/campaign'
+
 const navigate = vi.fn()
 
 vi.mock('react-router-dom', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('react-router-dom')>()
+  const actual = await importOriginal<typeof ReactRouterDom>()
   return {
     ...actual,
     useNavigate: () => navigate,
@@ -29,7 +32,7 @@ vi.mock('../hooks/use-global-search-catalog', () => ({
 }))
 
 vi.mock('@/features/campaign', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/campaign')>()
+  const actual = await importOriginal<typeof CampaignFeature>()
   return {
     ...actual,
     useActiveCampaignId: () => 'campaign-1',

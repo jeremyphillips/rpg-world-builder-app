@@ -3,7 +3,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
-import { pickEquipment } from '@/features/content/lib/fixtures/pick'
+import { pickEquipment } from '@/features/content'
 
 import { EquipmentPickerItemHeader } from './equipment-picker-item-header.client'
 import {

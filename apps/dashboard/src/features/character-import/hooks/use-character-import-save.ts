@@ -6,8 +6,8 @@ import {
   type CharacterImportResult,
 } from '@rpg/contracts/character-import'
 
-import { useCreateCharacter } from '@/features/character/hooks/use-create-character'
-import { useCreateNpc } from '@/features/character/npc/hooks/use-create-npc'
+import { useCreateCharacter } from '@/features/character'
+import { useCreateNpc } from '@/features/character'
 
 import { formatCharacterImportFinalizationError } from '../model/character-import-save.lib'
 import type { CharacterImportSaveTarget } from '../model/character-import-target.lib'

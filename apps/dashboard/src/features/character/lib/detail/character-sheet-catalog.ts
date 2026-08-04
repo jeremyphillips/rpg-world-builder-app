@@ -15,10 +15,10 @@ import {
   type Spell,
 } from '@rpg/contracts'
 
-import type { CatalogMetadataLine } from '@/features/content/components/catalog'
-import type { EquipmentCatalogItemHeaderTone } from '@/features/content/equipment/components/equipment-catalog-item-header.client'
-import type { SpellCatalogItemHeaderTone } from '@/features/content/spells/components/spell-catalog-item-header.client'
-import type { SpellMarker } from '@/features/content/spells/components/spell-catalog-item-header.client'
+import type { CatalogMetadataLine } from '@/features/content'
+import type { EquipmentCatalogItemHeaderTone } from '@/features/content'
+import type { SpellCatalogItemHeaderTone } from '@/features/content'
+import type { SpellMarker } from '@/features/content'
 
 import { formatContentReferenceLabel } from '../display/format-content-reference-label'
 import {

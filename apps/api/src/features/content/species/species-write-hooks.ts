@@ -8,7 +8,7 @@ import {
   extractSpeciesDamageTypeIds,
   extractSpeciesLanguageIds,
   extractSpeciesSenseTypeIds,
-} from '../../vocabulary/lib/reference-sources/species'
+} from '../../vocabulary'
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'

@@ -147,7 +147,6 @@ function ManagedInventoryRow({
   const [internalOpen, setInternalOpen] = useState(false)
   const isOpen = open ?? internalOpen
   const equipment = entry.rows.find((row) => row.equipment)?.equipment
-  if (!equipment) return null
 
   const handleOpenChange = useCallback(
     (next: boolean) => {
@@ -156,6 +155,8 @@ function ManagedInventoryRow({
     },
     [onOpenChange],
   )
+
+  if (!equipment) return null
 
   return (
     <article className={equipmentInventoryRowClasses}>

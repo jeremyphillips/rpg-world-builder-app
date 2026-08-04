@@ -5,7 +5,7 @@ import {
   type OrganizationReferenceResolution,
 } from '@rpg/contracts'
 
-import { CharacterModel } from '../../character/character.model'
+import { CharacterModel } from '../../character'
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewOrganizationModel } from './homebrew-organization.model'

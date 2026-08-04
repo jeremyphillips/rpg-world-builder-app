@@ -1,8 +1,8 @@
 import type { ApiContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
 import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
-import type { ContentTypeConfig } from '../../content/lib/content-type-config'
-import { resolveCatalogForCampaign } from '../../content/content.service'
+import type { ContentTypeConfig } from '../../content'
+import { resolveCatalogForCampaign } from '../../content'
 
 import {
   blockersForVocabEntry,

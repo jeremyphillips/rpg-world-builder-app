@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
-import { CHARACTER_CONTROLLER_DISPLAY } from '@/features/character/lib/display/character-display-labels'
+import { CHARACTER_CONTROLLER_DISPLAY } from '@/features/character'
 
 import { CampaignOverviewPartySection } from './campaign-overview-party-section'
 

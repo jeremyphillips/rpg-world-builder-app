@@ -1,6 +1,6 @@
 import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
 
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeItemLabel } from '@/features/content'
 import {
   buildSeedCreatureTypeVocabulary,
   buildSeedSenseVocabulary,

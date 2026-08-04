@@ -2,8 +2,8 @@ import type { Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../lib/cookies'
-import { CampaignCharacterParticipationModel } from '../campaign/participation/campaign-character-participation.model'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
+import { CampaignCharacterParticipationModel } from '../campaign'
+import { CampaignMembershipModel } from '../campaign'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
 import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import {

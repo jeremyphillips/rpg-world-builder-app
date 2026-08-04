@@ -12,10 +12,7 @@ import {
   isEquipmentStackable,
 } from '@rpg/contracts'
 
-import {
-  formatAddContentTypeLabel,
-  getContentTypeItemLabel,
-} from '@/features/content/lib/content-type-labels'
+import { formatAddContentTypeLabel, getContentTypeItemLabel } from '@/features/content'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
@@ -236,14 +233,16 @@ export function EquipmentPickerDrawer({
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
   const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
+  const [trackedOpen, setTrackedOpen] = React.useState(open)
 
-  // Browse context (category, affordable toggle, sort) preserved across close/reopen.
-  // Reset only via explicit Clear filters / Reset view or a future context-key change.
-  React.useEffect(() => {
+  if (open !== trackedOpen) {
+    setTrackedOpen(open)
     if (!open) {
       setAddQuantities({})
     }
-  }, [open])
+  }
+
+  // Browse context (category, affordable toggle, sort) preserved across close/reopen.
 
   const showRarityFilter =
     isMagicItemsWorkflow &&

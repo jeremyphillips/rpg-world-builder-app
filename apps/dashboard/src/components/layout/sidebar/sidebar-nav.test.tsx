@@ -15,8 +15,10 @@ vi.mock('@/features/auth', () => ({
   useIsElevatedPlatformRole: vi.fn(() => false),
 }))
 
+import type * as CampaignFeature from '@/features/campaign'
+
 vi.mock('@/features/campaign', async () => {
-  const actual = await vi.importActual<typeof import('@/features/campaign')>('@/features/campaign')
+  const actual = await vi.importActual<typeof CampaignFeature>('@/features/campaign')
   return {
     ...actual,
     useCanManageCampaign: vi.fn(() => false),

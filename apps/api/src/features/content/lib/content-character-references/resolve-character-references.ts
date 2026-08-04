@@ -6,7 +6,7 @@ import type {
 import { characterContentReferenceMatch } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
-import { buildCharacterCardSummaryDto } from '../../../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../../../character'
 import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite'
 import { CharacterModel } from '../../../character'
 

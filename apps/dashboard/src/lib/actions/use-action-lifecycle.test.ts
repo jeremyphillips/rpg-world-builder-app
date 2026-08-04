@@ -3,6 +3,7 @@
  */
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import type { ActionApplyOutcome, ActionTargetFailure } from '@rpg/contracts'
 
 import { useActionLifecycle } from './use-action-lifecycle'
 
@@ -142,12 +143,9 @@ describe('useActionLifecycle', () => {
   it('skips validation when requiresValidation is false', async () => {
     const onClose = vi.fn()
     const apply = vi.fn(
-      async (): Promise<
-        import('@rpg/contracts').ActionApplyOutcome<
-          unknown,
-          import('@rpg/contracts').ActionTargetFailure
-        >[]
-      > => [{ status: 'updated', targetId: 'a' }],
+      async (): Promise<ActionApplyOutcome<unknown, ActionTargetFailure>[]> => [
+        { status: 'updated', targetId: 'a' },
+      ],
     )
 
     const { result } = renderHook(() =>

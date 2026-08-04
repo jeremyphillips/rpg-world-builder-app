@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CITY_COUNCIL } from '@/features/content/organizations/fixtures'
+import { CITY_COUNCIL } from '@/features/content'
 
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
 import { CharacterOrganizationsSummary } from './character-organizations-summary.client'

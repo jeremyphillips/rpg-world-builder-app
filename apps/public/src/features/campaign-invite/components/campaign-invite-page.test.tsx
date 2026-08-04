@@ -9,6 +9,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { CampaignInvitePage } from './campaign-invite-page.client'
 
+import type * as ApiClient from '@rpg/api-client'
+
 const { useSession } = vi.hoisted(() => ({
   useSession: vi.fn(),
 }))
@@ -26,14 +28,14 @@ const { persistCampaignSelectionBestEffort } = vi.hoisted(() => ({
 }))
 
 vi.mock('@rpg/api-client', async () => {
-  const actual = await vi.importActual<typeof import('@rpg/api-client')>('@rpg/api-client')
+  const actual = await vi.importActual<typeof ApiClient>('@rpg/api-client')
   return {
     ...actual,
     persistCampaignSelectionBestEffort,
   }
 })
 
-vi.mock('@/features/auth/hooks/use-session', () => ({
+vi.mock('@/features/auth', () => ({
   useSession,
 }))
 

@@ -7,7 +7,7 @@ import {
 import { findCampaignById } from '../../find-campaign-by-id'
 import { findOpenParticipationForCharacter } from '../campaign-character-participation.repository'
 import { listCharactersForUser } from '../../../character'
-import { buildCharacterCardSummaryDto } from '../../../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../../../character'
 import { buildCampaignContentEligibilityIndex } from '../../../campaign-invite'
 import { resolveCampaignCharacterEligibilityContext } from './resolve-campaign-character-eligibility-context.lib'
 

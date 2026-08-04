@@ -903,7 +903,8 @@ export async function sendFirstDirectMessageRecord({
 
   try {
     return await write()
-  } catch (error) {
+  } catch (initialError) {
+    let error = initialError
     if (isMongoDuplicateKeyError(error)) {
       try {
         return await write()

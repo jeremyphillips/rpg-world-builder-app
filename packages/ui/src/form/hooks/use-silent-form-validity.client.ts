@@ -40,16 +40,12 @@ export function useSilentFormValidity({
 
   React.useEffect(() => {
     if (!enabled) {
-      setCanSubmit(true)
-      setIsChecking(false)
       hasResultRef.current = false
       isFirstRunRef.current = true
       return
     }
 
     if (!validateSilently) {
-      setCanSubmit(false)
-      setIsChecking(false)
       return
     }
 
@@ -78,6 +74,10 @@ export function useSilentFormValidity({
 
   if (!enabled) {
     return { canSubmit: true, isChecking: false }
+  }
+
+  if (!validateSilently) {
+    return { canSubmit: false, isChecking: false }
   }
 
   return { canSubmit, isChecking }

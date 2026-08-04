@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { homebrewSummaryQueryKey } from '@/lib/query-keys/homebrew-summary'
+
 import { getHomebrewSummary } from '../api/homebrew-api'
 
-export function homebrewSummaryQueryKey(campaignId: string) {
-  return ['campaigns', campaignId, 'homebrew', 'summary'] as const
-}
+export { homebrewSummaryQueryKey } from '@/lib/query-keys/homebrew-summary'
 
 /** Load content counts for the Homebrew hub cards. */
 export function useHomebrewSummary(campaignId: string | undefined) {

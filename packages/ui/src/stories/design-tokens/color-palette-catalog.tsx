@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useSyncExternalStore, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Heading } from '../../components/ui/heading'
@@ -38,36 +38,41 @@ import {
   colorPaletteSwatchVisualClasses,
 } from './color-palette.variants'
 
+function readResolvedCssColor(cssVar: ColorToken['cssVar'], usage: ColorToken['usage']): string {
+  if (typeof document === 'undefined') return ''
+
+  const probe = document.createElement('div')
+  probe.style.display = 'none'
+
+  if (usage === 'text') {
+    probe.style.color = `var(${cssVar})`
+  } else if (usage === 'border') {
+    probe.style.borderTop = `1px solid var(${cssVar})`
+  } else {
+    probe.style.backgroundColor = `var(${cssVar})`
+  }
+
+  document.body.appendChild(probe)
+  const styles = getComputedStyle(probe)
+  const value =
+    usage === 'text'
+      ? styles.color
+      : usage === 'border'
+        ? styles.borderTopColor
+        : styles.backgroundColor
+
+  document.body.removeChild(probe)
+  return value
+}
+
 function useResolvedCssColor(cssVar: ColorToken['cssVar'], usage: ColorToken['usage']): string {
-  const { theme } = useTheme()
-  const [resolved, setResolved] = useState('')
+  useTheme()
 
-  useEffect(() => {
-    const probe = document.createElement('div')
-    probe.style.display = 'none'
-
-    if (usage === 'text') {
-      probe.style.color = `var(${cssVar})`
-    } else if (usage === 'border') {
-      probe.style.borderTop = `1px solid var(${cssVar})`
-    } else {
-      probe.style.backgroundColor = `var(${cssVar})`
-    }
-
-    document.body.appendChild(probe)
-    const styles = getComputedStyle(probe)
-    const value =
-      usage === 'text'
-        ? styles.color
-        : usage === 'border'
-          ? styles.borderTopColor
-          : styles.backgroundColor
-
-    document.body.removeChild(probe)
-    setResolved(value)
-  }, [cssVar, usage, theme])
-
-  return resolved
+  return useSyncExternalStore(
+    () => () => {},
+    () => readResolvedCssColor(cssVar, usage),
+    () => '',
+  )
 }
 
 function ColorSwatch({ token }: { token: ColorToken }) {

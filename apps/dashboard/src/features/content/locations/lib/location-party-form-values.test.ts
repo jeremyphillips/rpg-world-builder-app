@@ -44,4 +44,28 @@ describe('locationToFormValues party associations', () => {
 
     expect(input.partyAssociations).toEqual(location.partyAssociations)
   })
+
+  it('serializes npc owner associations for save', () => {
+    const input = buildLocationCreateInput({
+      name: YAWNING_PORTAL.name,
+      authoringType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
+      classification: { archetype: 'tavern' },
+      partyAssociations: [
+        {
+          id: 'assoc-owner-npc',
+          kind: 'ownership',
+          party: { kind: 'character', characterId: 'npc-durnan' },
+        },
+      ],
+    })
+
+    expect(input.partyAssociations).toEqual([
+      {
+        id: 'assoc-owner-npc',
+        kind: 'ownership',
+        party: { kind: 'character', characterId: 'npc-durnan' },
+      },
+    ])
+  })
 })

@@ -16,8 +16,8 @@ import {
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
-import { getDrowHeritageSpellCatalog } from '@/features/content/lib/fixtures/grant-display-fixtures'
-import { pickSpecies } from '@/features/content/lib/fixtures/pick'
+import { getDrowHeritageSpellCatalog } from '@/features/content'
+import { pickSpecies } from '@/features/content'
 import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,

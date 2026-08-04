@@ -27,9 +27,11 @@ export function BuilderFormContinueRegistration<TFieldValues extends FieldValues
   const onContinueValidationFailedRef = useRef(onContinueValidationFailed)
   const toDraftPatchRef = useRef(toDraftPatch)
 
-  onStepCompleteRef.current = onStepComplete
-  onContinueValidationFailedRef.current = onContinueValidationFailed
-  toDraftPatchRef.current = toDraftPatch
+  useEffect(() => {
+    onStepCompleteRef.current = onStepComplete
+    onContinueValidationFailedRef.current = onContinueValidationFailed
+    toDraftPatchRef.current = toDraftPatch
+  })
 
   useEffect(() => {
     return registerBuilderFormContinueHandler(stepId, async () => {

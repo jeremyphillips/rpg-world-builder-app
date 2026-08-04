@@ -120,31 +120,52 @@ export function useVocabularyOverviewPage({
   )
 
   const rowActions = useCallback(
-    createVocabularyRowActionsRenderer({
-      campaignId,
-      setId,
-      showRowActions,
-      onDelete: handleDelete,
-    }),
+    (row: VocabularyOptionWithUsage) =>
+      createVocabularyRowActionsRenderer({
+        campaignId,
+        setId,
+        showRowActions,
+        onDelete: handleDelete,
+      })(row),
     [campaignId, handleDelete, setId, showRowActions],
   )
 
-  const selectionConfig = buildVocabularyBulkSelectionConfig({
-    canManage,
-    bulkAvailability: capabilities.bulkAvailability,
-    selectionMode,
-    rowSelection,
-    selectedCount,
-    selectionLiveRegionId,
-    selectionCapDescriptionId,
-    enterSelectionMode,
-    exitSelectionMode,
-    onRowSelectionChange,
-    onRowSelectionStateChange,
-    getRowCanSelect,
-    selectTriggerRef,
-    onOpenBulkDialog: () => setBulkOpen(true),
-  })
+  const selectionConfigCore = useMemo(
+    () =>
+      buildVocabularyBulkSelectionConfig({
+        canManage,
+        bulkAvailability: capabilities.bulkAvailability,
+        selectionMode,
+        rowSelection,
+        selectedCount,
+        selectionLiveRegionId,
+        selectionCapDescriptionId,
+        enterSelectionMode,
+        exitSelectionMode,
+        onRowSelectionChange,
+        onRowSelectionStateChange,
+        getRowCanSelect,
+        selectTriggerRef: { current: null },
+        onOpenBulkDialog: () => setBulkOpen(true),
+      }),
+    [
+      canManage,
+      capabilities.bulkAvailability,
+      enterSelectionMode,
+      exitSelectionMode,
+      getRowCanSelect,
+      onRowSelectionChange,
+      onRowSelectionStateChange,
+      rowSelection,
+      selectedCount,
+      selectionCapDescriptionId,
+      selectionLiveRegionId,
+      selectionMode,
+    ],
+  )
+
+  const selectionConfig =
+    selectionConfigCore === undefined ? undefined : { ...selectionConfigCore, selectTriggerRef }
 
   return {
     capabilities,

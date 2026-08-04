@@ -5,7 +5,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { pickClass, pickSkillProficiency } from '@/features/content/lib/fixtures/pick'
+import { pickClass, pickSkillProficiency } from '@/features/content'
 
 import {
   createStandaloneBuilderContextFixture,

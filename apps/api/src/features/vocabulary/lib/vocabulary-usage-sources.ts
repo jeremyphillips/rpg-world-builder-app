@@ -43,7 +43,7 @@ function deferredCatalogSource<T extends CatalogRecord>(
 }
 
 export const speciesCreatureTypeSource = deferredCatalogSource(async () => {
-  const { speciesWriteConfig } = await import('../../content/species/species.config')
+  const { speciesWriteConfig } = await import('../../content')
   return {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',
@@ -52,7 +52,7 @@ export const speciesCreatureTypeSource = deferredCatalogSource(async () => {
 })
 
 export const spellSchoolSource = deferredCatalogSource(async () => {
-  const { spellWriteConfig } = await import('../../content/spells/spells.config')
+  const { spellWriteConfig } = await import('../../content')
   return {
     readConfig: spellWriteConfig.readConfig,
     contentTypeKey: 'spells',
@@ -61,7 +61,7 @@ export const spellSchoolSource = deferredCatalogSource(async () => {
 })
 
 export const speciesSizeSource = deferredCatalogSource(async () => {
-  const { speciesWriteConfig } = await import('../../content/species/species.config')
+  const { speciesWriteConfig } = await import('../../content')
   return {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',
@@ -70,7 +70,7 @@ export const speciesSizeSource = deferredCatalogSource(async () => {
 })
 
 export const weaponPropertySource = deferredCatalogSource(async () => {
-  const { equipmentWriteConfig } = await import('../../content/equipment/equipment.config')
+  const { equipmentWriteConfig } = await import('../../content')
   return {
     readConfig: equipmentWriteConfig.readConfig,
     contentTypeKey: 'equipment',
@@ -79,7 +79,7 @@ export const weaponPropertySource = deferredCatalogSource(async () => {
 })
 
 export const equipmentCategorySource = deferredCatalogSource(async () => {
-  const { equipmentWriteConfig } = await import('../../content/equipment/equipment.config')
+  const { equipmentWriteConfig } = await import('../../content')
   return {
     readConfig: equipmentWriteConfig.readConfig,
     contentTypeKey: 'equipment',
@@ -88,7 +88,7 @@ export const equipmentCategorySource = deferredCatalogSource(async () => {
 })
 
 export const spellConditionSource = deferredCatalogSource(async () => {
-  const { spellWriteConfig } = await import('../../content/spells/spells.config')
+  const { spellWriteConfig } = await import('../../content')
   return {
     readConfig: spellWriteConfig.readConfig,
     contentTypeKey: 'spells',
@@ -97,7 +97,7 @@ export const spellConditionSource = deferredCatalogSource(async () => {
 })
 
 export const speciesDamageTypeSource = deferredCatalogSource(async () => {
-  const { speciesWriteConfig } = await import('../../content/species/species.config')
+  const { speciesWriteConfig } = await import('../../content')
   return {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',
@@ -106,7 +106,7 @@ export const speciesDamageTypeSource = deferredCatalogSource(async () => {
 })
 
 export const spellDamageTypeSource = deferredCatalogSource(async () => {
-  const { spellWriteConfig } = await import('../../content/spells/spells.config')
+  const { spellWriteConfig } = await import('../../content')
   return {
     readConfig: spellWriteConfig.readConfig,
     contentTypeKey: 'spells',
@@ -115,7 +115,7 @@ export const spellDamageTypeSource = deferredCatalogSource(async () => {
 })
 
 export const speciesLanguageSource = deferredCatalogSource(async () => {
-  const { speciesWriteConfig } = await import('../../content/species/species.config')
+  const { speciesWriteConfig } = await import('../../content')
   return {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',
@@ -124,7 +124,7 @@ export const speciesLanguageSource = deferredCatalogSource(async () => {
 })
 
 export const classLanguageSource = deferredCatalogSource(async () => {
-  const { classContentConfig } = await import('../../content/classes/classes.config')
+  const { classContentConfig } = await import('../../content')
   return {
     readConfig: classContentConfig,
     contentTypeKey: 'classes',
@@ -143,7 +143,7 @@ export const characterLanguageSource: VocabularyUsageSource = {
 }
 
 export const speciesSenseSource = deferredCatalogSource(async () => {
-  const { speciesWriteConfig } = await import('../../content/species/species.config')
+  const { speciesWriteConfig } = await import('../../content')
   return {
     readConfig: speciesWriteConfig.readConfig,
     contentTypeKey: 'species',

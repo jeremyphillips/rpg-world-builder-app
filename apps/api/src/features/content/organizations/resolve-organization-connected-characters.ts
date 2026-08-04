@@ -2,7 +2,7 @@ import type { PaginatedItems, ReferencingCharacterSummary } from '@rpg/contracts
 
 import { buildCampaignContentEligibilityIndex } from '../../campaign-invite'
 import { CharacterModel } from '../../character'
-import { buildCharacterCardSummaryDto } from '../../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../../character'
 import { resolveCatalogForCampaign } from '../content.service'
 import { resolveContentUsage } from '../lib/content-usage/content-usage-resolvers'
 import { organizationWriteConfig } from './organizations.config'

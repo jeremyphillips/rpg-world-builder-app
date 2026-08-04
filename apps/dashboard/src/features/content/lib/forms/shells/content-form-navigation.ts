@@ -1,6 +1,6 @@
 import type { EquipmentKind } from '@rpg/contracts'
 
-import { CONTENT_ROUTES } from '@/app/content-routes'
+import { type CONTENT_ROUTES } from '@/app/content-routes'
 import { contentEditHref } from '../../detail/content-edit-href'
 import {
   equipmentKindToFamilyPath,

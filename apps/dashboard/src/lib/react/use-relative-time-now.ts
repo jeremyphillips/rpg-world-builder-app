@@ -8,11 +8,17 @@ const MS_PER_MINUTE = 60 * 1000
 export function useRelativeTimeNow(): Date {
   const isVisible = useDocumentVisible()
   const [now, setNow] = React.useState(() => new Date())
+  const [trackedVisible, setTrackedVisible] = React.useState(isVisible)
+
+  if (isVisible !== trackedVisible) {
+    setTrackedVisible(isVisible)
+    if (isVisible) {
+      setNow(new Date())
+    }
+  }
 
   React.useEffect(() => {
     if (!isVisible) return
-
-    setNow(new Date())
 
     let intervalId: number | undefined
 

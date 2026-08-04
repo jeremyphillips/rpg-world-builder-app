@@ -6,7 +6,7 @@ import type { OrganizationReferenceResolution } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { UNAVAILABLE_ORGANIZATION_LABEL } from '@/features/character/lib/display/character-display'
+import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
 
 export type CharacterOrganizationsSummaryProps = {
   campaignId: string

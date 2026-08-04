@@ -29,7 +29,7 @@ import {
   resolveEquipmentAcquisitionPlan,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantEligibility,
-  resolveMagicItemGrantProgressList,
+  type resolveMagicItemGrantProgressList,
   readMagicItemSelections,
   standardStartingWealthTableId,
   totalSelectedForEquipment,

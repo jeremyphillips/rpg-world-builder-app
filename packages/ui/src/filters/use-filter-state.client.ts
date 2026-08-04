@@ -18,12 +18,14 @@ export function useFilterState<TData, TState extends Record<string, unknown>>(
   const [state, setState] = React.useState<TState>(() =>
     sanitizeFilterState(schema, options?.initialValues ?? {}, { data: options?.data }),
   )
+  const [prevSchema, setPrevSchema] = React.useState(schema)
+  const [prevData, setPrevData] = React.useState(options?.data)
 
-  React.useEffect(() => {
-    if (!options?.sanitizeOnSchemaChange) return
-
+  if (options?.sanitizeOnSchemaChange && (schema !== prevSchema || options?.data !== prevData)) {
+    setPrevSchema(schema)
+    setPrevData(options?.data)
     setState((current) => sanitizeFilterState(schema, current, { data: options?.data }))
-  }, [schema, options?.data, options?.sanitizeOnSchemaChange])
+  }
 
   const setValue = React.useCallback(
     (id: FilterFieldId<TState>, value: TState[FilterFieldId<TState>] | undefined) => {

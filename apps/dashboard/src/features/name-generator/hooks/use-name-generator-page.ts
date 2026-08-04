@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
 import { useActiveCampaignId } from '@/features/campaign'
-import { useSpecies } from '@/features/content/species/hooks/use-species'
+import { useSpecies } from '@/features/content'
 
 import {
   buildCultureFilterContexts,

@@ -1,7 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
-import type { VocabularyOptionSetId, VocabularyOptionStatus } from '@rpg/contracts'
+import type {
+  VocabularyOptionSetId,
+  VocabularyOptionStatus,
+  ContentUsageBlocker,
+  ActionTargetFailure,
+} from '@rpg/contracts'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
@@ -76,12 +81,7 @@ export function BulkVocabularyAvailabilityDialog({
   })
 
   const handleClose = useCallback(
-    (
-      event: ActionLifecycleCloseEvent<
-        import('@rpg/contracts').ContentUsageBlocker,
-        import('@rpg/contracts').ActionTargetFailure
-      >,
-    ) => {
+    (event: ActionLifecycleCloseEvent<ContentUsageBlocker, ActionTargetFailure>) => {
       const summary = deriveActionApplySummary(event.outcomes)
 
       finalizeActionDialogCloseWithOutcomes({

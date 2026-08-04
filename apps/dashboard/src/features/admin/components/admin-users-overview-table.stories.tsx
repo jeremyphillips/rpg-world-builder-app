@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MemoryRouter } from 'react-router-dom'
 
 import { AdminUsersOverviewTable } from '../components/admin-users-overview-table.client'
 
@@ -14,9 +13,7 @@ const meta = {
   decorators: [
     (Story) => (
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <Story />
-        </MemoryRouter>
+        <Story />
       </QueryClientProvider>
     ),
   ],

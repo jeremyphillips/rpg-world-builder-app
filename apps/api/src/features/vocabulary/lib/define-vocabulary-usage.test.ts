@@ -1,13 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import { CREATURE_TYPE_SET_ID, type ContentUsageBlocker } from '@rpg/contracts'
 
 import { defineVocabularyUsage } from './define-vocabulary-usage'
 import type { VocabularyUsageSource } from './vocabulary-usage-source'
 
-function mockSource(
-  index: Map<string, import('@rpg/contracts').ContentUsageBlocker[]>,
-): VocabularyUsageSource {
+function mockSource(index: Map<string, ContentUsageBlocker[]>): VocabularyUsageSource {
   return {
     loadBlockerIndex: vi.fn(async () => index),
   }

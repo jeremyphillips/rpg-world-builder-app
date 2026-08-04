@@ -12,7 +12,7 @@ import {
 } from './content-client'
 import { duplicateContent } from '../duplication/duplicate-content-api'
 import { DUPLICATE_CONTENT_FALLBACK_ERROR } from '../duplication/duplicate-content-labels'
-import { homebrewSummaryQueryKey } from '../../../homebrew/hooks/use-homebrew-summary'
+import { homebrewSummaryQueryKey } from '@/lib/query-keys/homebrew-summary'
 
 export type ContentMutationHooksOptions = {
   /** Additional query keys to invalidate after a successful write. */

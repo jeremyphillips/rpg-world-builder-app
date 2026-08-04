@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { FilterFieldId, FilterSchema } from '@rpg/ui/filters'
 import {
@@ -24,7 +24,10 @@ export function useFilterUrlState<TData, TFilters extends Record<string, unknown
 }: UseFilterUrlStateOptions<TData, TFilters>) {
   const [searchParams, setSearchParams] = useSearchParams()
   const searchParamsRef = useRef(searchParams)
-  searchParamsRef.current = searchParams
+
+  useEffect(() => {
+    searchParamsRef.current = searchParams
+  })
 
   const searchParamsKey = createSearchParamsKey(searchParams)
 
