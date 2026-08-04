@@ -1,10 +1,21 @@
 'use client'
 
-import { useEffect, useId, useMemo } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { CampaignNpcListItem } from '@rpg/contracts'
-import { Button, Modal, Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
+
+import {
+  ActionDialogShell,
+  buildActionDialogNotify,
+  deriveActionApplySummary,
+  finalizeActionDialogCloseWithOutcomes,
+  NPC_ROSTER_STATUS_ACTION,
+  useActionLifecycle,
+  type ActionApplySummary,
+  type ActionLifecycleCloseEvent,
+} from '@/lib/actions'
+import type { ActionTargetFailure } from '@rpg/contracts'
 
 import {
   BULK_ROSTER_STATUS_FORM_FIELD_DEFAULTS,
@@ -15,14 +26,14 @@ import {
   resolveBulkRosterStatusPreview,
   toBulkRosterStatusFormValues,
 } from '../lib/bulk/resolve-bulk-roster-status-preview'
-import { useBulkUpdateNpcRosterStatus } from '../hooks/use-bulk-update-npc-roster-status'
+import { useBulkRosterStatusAction } from '../hooks/use-bulk-roster-status-action.client'
 
 export type BulkRosterStatusDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   campaignId: string
   selectedRows: CampaignNpcListItem[]
-  onApplyComplete: (result: { updatedIds: string[]; fullSuccess: boolean }) => void
+  onApplyComplete: (result: ActionApplySummary) => void
 }
 
 export function BulkRosterStatusDialog({
@@ -46,73 +57,100 @@ export function BulkRosterStatusDialog({
       ),
     [fieldValues, selectedRows],
   )
-  const { apply, pending, resultSummary } = useBulkUpdateNpcRosterStatus({ campaignId })
+  const pendingConfigRef = useRef<ReturnType<typeof toBulkRosterStatusFormValues> | null>(null)
+
+  const targets = useMemo(
+    () =>
+      selectedRows.map((row) => ({
+        targetId: row.character.id,
+        targetName: row.character.name,
+      })),
+    [selectedRows],
+  )
+
+  const closeGuardRef = useRef(false)
+
+  const { apply, notifyClose } = useBulkRosterStatusAction({
+    campaignId,
+    rows: selectedRows,
+  })
+
+  const handleClose = useCallback(
+    (event: ActionLifecycleCloseEvent<never, ActionTargetFailure>) => {
+      const summary = deriveActionApplySummary(event.outcomes)
+
+      finalizeActionDialogCloseWithOutcomes({
+        onOpenChange,
+        event,
+        closedRef: closeGuardRef,
+        syncOutcomes: () => {
+          onApplyComplete(summary)
+        },
+        notify: buildActionDialogNotify({
+          event,
+          notify: () => notifyClose(event),
+        }),
+      })
+    },
+    [notifyClose, onApplyComplete, onOpenChange],
+  )
+
+  const lifecycle = useActionLifecycle({
+    open,
+    targets,
+    requiresValidation: false,
+    apply,
+    onClose: handleClose,
+  })
 
   useEffect(() => {
-    if (!open) {
-      form.reset(BULK_ROSTER_STATUS_FORM_FIELD_DEFAULTS)
+    if (open) {
+      closeGuardRef.current = false
+      return
     }
+
+    form.reset(BULK_ROSTER_STATUS_FORM_FIELD_DEFAULTS)
   }, [form, open])
 
-  const handleApply = async () => {
-    const values = form.getValues()
-    const bulkValues = toBulkRosterStatusFormValues(values)
-    const result = await apply(selectedRows, bulkValues)
-    onApplyComplete(result)
-
-    if (result.fullSuccess) {
-      onOpenChange(false)
-    }
-  }
-
-  const handleOpenAutoFocus = (event: Event) => {
-    event.preventDefault()
-    const content = event.currentTarget as HTMLElement
-    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, input')
-    firstField?.focus()
-  }
+  const handleConfigureApply = useCallback(() => {
+    const config = toBulkRosterStatusFormValues(form.getValues())
+    pendingConfigRef.current = config
+    void lifecycle.startApply(config)
+  }, [form, lifecycle])
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content
-        size="md"
-        aria-busy={pending || undefined}
-        onOpenAutoFocus={handleOpenAutoFocus}
-      >
-        <Modal.Header
-          headline="Edit roster status"
-          description={`Apply roster status changes to ${selectedRows.length} selected NPC${selectedRows.length === 1 ? '' : 's'}.`}
-        />
-        <Modal.Body>
-          <FormProvider {...form}>
-            <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable">
-              <div className="mt-6 space-y-1 text-sm text-muted-foreground">
-                <p>
-                  {preview.wouldChangeCount} will change, {preview.unchangedCount} already match.
-                </p>
-                {resultSummary ? <Text variant="info">{resultSummary}</Text> : null}
-              </div>
-            </FormFieldStack>
-          </FormProvider>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={pending}
-            onClick={() => onOpenChange(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            disabled={!preview.hasChanges || preview.wouldChangeCount === 0 || pending}
-            onClick={() => void handleApply()}
-          >
-            Apply changes
-          </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+    <ActionDialogShell
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          lifecycle.cancel()
+        } else {
+          onOpenChange(nextOpen)
+        }
+      }}
+      phase={lifecycle.phase}
+      pending={lifecycle.pending}
+      headline="Edit roster status"
+      description={`Apply roster status changes to ${selectedRows.length} selected NPC${selectedRows.length === 1 ? '' : 's'}.`}
+      configureSlot={
+        <FormProvider {...form}>
+          <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable" />
+        </FormProvider>
+      }
+      summarySlot={
+        <p className="text-sm text-muted-foreground">
+          {preview.wouldChangeCount} will change, {preview.unchangedCount} already match.
+        </p>
+      }
+      localError={lifecycle.localError}
+      resolutionRows={lifecycle.resolutionRows}
+      confirmedCount={lifecycle.confirmedCount}
+      resolveNoun={NPC_ROSTER_STATUS_ACTION.nounPlural.toLowerCase()}
+      onConfigureApply={handleConfigureApply}
+      configureApplyDisabled={!preview.hasChanges || preview.wouldChangeCount === 0}
+      onRetryFailed={() => void lifecycle.retryFailed()}
+      onCancel={lifecycle.cancel}
+      onAcceptMixedResult={lifecycle.acceptMixedResult}
+    />
   )
 }

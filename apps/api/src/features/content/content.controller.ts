@@ -18,6 +18,7 @@ import {
 } from './lib/content-status.service'
 import {
   getContentCampaignAccessAvailability,
+  batchGetContentCampaignAccessAvailability,
   updateContentCampaignAccess,
   attachCampaignAccessForTargetType,
 } from './lib/content-campaign-access.service'
@@ -222,6 +223,25 @@ export async function getContentCampaignAccessAvailabilityHandler(
   const writeConfig = getContentWriteConfig(contentType)!
   const availability = await getContentCampaignAccessAvailability(writeConfig, campaignId, entityId)
   res.status(200).json({ availability })
+}
+
+export async function batchGetContentCampaignAccessAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, contentType } = req.params as {
+    campaignId: string
+    contentType: string
+  }
+  if (!isContentWriteType(contentType)) {
+    throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
+  }
+
+  const writeConfig = getContentWriteConfig(contentType)!
+  const { targets } = req.body as { targets: Array<{ entityId: string }> }
+  const entityIds = targets.map((target) => target.entityId)
+  const batch = await batchGetContentCampaignAccessAvailability(writeConfig, campaignId, entityIds)
+  res.status(200).json(batch)
 }
 
 export async function updateContentCampaignAccessHandler(

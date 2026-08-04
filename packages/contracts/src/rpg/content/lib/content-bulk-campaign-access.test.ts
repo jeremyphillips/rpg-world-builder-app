@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { ACTION_PLAN_UNCHANGED_REASONS } from '../../../lib/action-validation'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from './campaign-access'
 import {
   applyBulkCampaignAccessOperations,
   BULK_CAMPAIGN_ACCESS_FORM_DEFAULT,
+  buildBulkCampaignAccessPlan,
   countBulkCampaignAccessChanges,
   hasBulkCampaignAccessChanges,
   isBulkCampaignAccessNoOp,
+  resolveBulkCampaignAccessUnchangedReason,
   type BulkCampaignAccessFormValues,
 } from './content-bulk-campaign-access'
 
@@ -112,5 +115,53 @@ describe('bulk campaign access helpers', () => {
         visibilityMode: { kind: 'unchanged' },
       }),
     ).toBe(true)
+  })
+
+  it('resolves unchanged reasons for availability-only no-ops', () => {
+    const bulk: BulkCampaignAccessFormValues = {
+      available: { kind: 'set', value: true },
+      visibilityMode: { kind: 'unchanged' },
+    }
+
+    expect(resolveBulkCampaignAccessUnchangedReason(baseAccess, bulk)).toBe(
+      ACTION_PLAN_UNCHANGED_REASONS.already_available,
+    )
+  })
+
+  it('builds plan targets with structured unchanged reasons', () => {
+    const bulk: BulkCampaignAccessFormValues = {
+      available: { kind: 'set', value: false },
+      visibilityMode: { kind: 'unchanged' },
+    }
+
+    const plan = buildBulkCampaignAccessPlan(
+      [
+        {
+          targetId: 'a',
+          targetName: 'Alpha',
+          campaignAccess: baseAccess,
+        },
+        {
+          targetId: 'b',
+          targetName: 'Beta',
+          campaignAccess: {
+            ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+            available: false,
+            effectiveAudience: 'none',
+          },
+        },
+      ],
+      bulk,
+    )
+
+    expect(plan.targets).toEqual([
+      { status: 'wouldChange', targetId: 'a', targetName: 'Alpha' },
+      {
+        status: 'unchanged',
+        targetId: 'b',
+        targetName: 'Beta',
+        reason: ACTION_PLAN_UNCHANGED_REASONS.already_unavailable,
+      },
+    ])
   })
 })

@@ -37,6 +37,22 @@ errors (e.g. delete confirmation), and sustained builder warnings.
 | `notifyCampaignAccessUpdateFailed`    | Row toggle network failure with Retry                             |
 | `notifyBulkCampaignAccessResult`      | Bulk availability modal apply result                              |
 
+## Action validation modals
+
+Unified single/bulk actions use [`lib/actions/`](../src/lib/actions/) for lifecycle-owned
+feedback. See [actions.md](./actions.md).
+
+| Condition                                                | Ownership                                               |
+| -------------------------------------------------------- | ------------------------------------------------------- |
+| Expected blockers while action modal open (Resolve)      | Modal only — **no** error toast                         |
+| Apply-time 409 races                                     | Modal Resolve — **no** error toast                      |
+| Operational failures while modal open                    | Result/local error — **no** duplicate toast             |
+| Success / confirmed partial / accepted mixed after close | Toast via domain helpers + `action-messages` formatters |
+| Out-of-band failure (origin UI gone)                     | Toast OK                                                |
+
+Use `shouldSuppressActionErrorToast()` and `shouldEmitActionResultToast()` from
+[`action-toast-policy.ts`](../src/lib/actions/action-toast-policy.ts) when wiring new actions.
+
 Do not re-export `toast` from `notify.ts`.
 
 ## Destructive retry pattern

@@ -50,6 +50,7 @@ describe('location lifecycle hierarchy', () => {
     expect(availability.blockers).toHaveLength(1)
     expect(availability.blockers[0]).toMatchObject({
       kind: 'content',
+      sourceKey: 'location_parent',
       contentTypeKey: 'locations',
       id: region.id,
       label: 'Sword Coast',

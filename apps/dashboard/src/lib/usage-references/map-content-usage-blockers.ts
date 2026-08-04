@@ -1,4 +1,5 @@
 import type { ContentUsageBlocker, VocabularyUsageReference } from '@rpg/contracts'
+import { isSourceKeyedUsageBlocker } from '@rpg/contracts'
 
 /** Maps operation blockers to neutral references for shared list rendering. */
 export function contentUsageBlockersToUsageReferences(
@@ -33,13 +34,27 @@ export function contentUsageBlockersToUsageReferences(
 }
 
 export function partitionRuleBlockers(blockers: ContentUsageBlocker[]): {
+  usageBlockers: ContentUsageBlocker[]
   references: VocabularyUsageReference[]
   ruleBlockers: Extract<ContentUsageBlocker, { kind: 'rule' }>[]
 } {
-  const references = contentUsageBlockersToUsageReferences(blockers)
-  const ruleBlockers = blockers.filter(
-    (blocker): blocker is Extract<ContentUsageBlocker, { kind: 'rule' }> => blocker.kind === 'rule',
-  )
+  const usageBlockers: ContentUsageBlocker[] = []
+  const ruleBlockers: Extract<ContentUsageBlocker, { kind: 'rule' }>[] = []
 
-  return { references, ruleBlockers }
+  for (const blocker of blockers) {
+    if (isSourceKeyedUsageBlocker(blocker)) {
+      usageBlockers.push(blocker)
+      continue
+    }
+
+    if (blocker.kind === 'rule') {
+      ruleBlockers.push(blocker)
+    }
+  }
+
+  return {
+    usageBlockers,
+    references: contentUsageBlockersToUsageReferences(usageBlockers),
+    ruleBlockers,
+  }
 }

@@ -46,6 +46,8 @@ export interface CampaignAccessSectionProps {
   initialAccess?: ResolvedContentCampaignAccess
   /** Create-time draft callback — no API writes until the entity id exists. */
   onDraftChange?: (patch: ContentCampaignAccessPatch) => void
+  /** Display name for single blocked dialog copy when availability-off is blocked. */
+  entityName?: string
   /** Called after a successful persisted PATCH on edit. */
   onPersistedChange?: (access: ResolvedContentCampaignAccess) => void
 }
@@ -57,6 +59,7 @@ export function CampaignAccessSection({
   classId,
   initialAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   onDraftChange,
+  entityName,
   onPersistedChange,
 }: CampaignAccessSectionProps) {
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
@@ -303,6 +306,8 @@ export function CampaignAccessSection({
       <CampaignAccessBlockedDialog
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
+        campaignId={campaignId}
+        targetName={entityName}
         blockers={blockers}
       />
     </CampaignAccessAvailabilityProvider>

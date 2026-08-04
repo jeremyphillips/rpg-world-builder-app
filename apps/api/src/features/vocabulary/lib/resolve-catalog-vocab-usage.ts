@@ -1,4 +1,5 @@
 import type { ApiContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import type { ContentTypeConfig } from '../../content/lib/content-type-config'
 import { resolveCatalogForCampaign } from '../../content/content.service'
@@ -34,7 +35,7 @@ async function loadCatalogBlockerIndex<T extends CatalogRecord>(
 ): Promise<Map<string, ContentUsageBlocker[]>> {
   const records = await resolveCatalogForCampaign(config.readConfig, campaignId)
   return indexRecordsByVocabId(records, config.extractIds, (record) =>
-    toContentUsageBlocker(config.contentTypeKey, record),
+    toContentUsageBlocker(config.contentTypeKey, record, USAGE_BLOCKER_SOURCE_KEYS.unknown),
   )
 }
 

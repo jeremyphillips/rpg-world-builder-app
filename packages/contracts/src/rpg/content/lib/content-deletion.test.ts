@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { contentUsageBlockerSchema, vocabularyDisableAvailabilitySchema } from './content-deletion'
+import { contentUsageBlockerSchema } from './content-usage-blocker'
 
 describe('contentUsageBlockerSchema', () => {
   it('parses kind: content blockers', () => {
     const parsed = contentUsageBlockerSchema.parse({
       kind: 'content',
+      sourceKey: 'location_parent',
       contentTypeKey: 'species',
       id: 'abc123',
       label: 'Elf',
@@ -13,6 +14,7 @@ describe('contentUsageBlockerSchema', () => {
     })
     expect(parsed).toEqual({
       kind: 'content',
+      sourceKey: 'location_parent',
       contentTypeKey: 'species',
       id: 'abc123',
       label: 'Elf',
@@ -23,6 +25,7 @@ describe('contentUsageBlockerSchema', () => {
   it('still parses existing kind: usage blockers', () => {
     const parsed = contentUsageBlockerSchema.parse({
       kind: 'usage',
+      sourceKey: 'character_usage',
       usage: {
         kind: 'character',
         id: 'char-1',
@@ -31,29 +34,5 @@ describe('contentUsageBlockerSchema', () => {
       },
     })
     expect(parsed.kind).toBe('usage')
-  })
-})
-
-describe('vocabularyDisableAvailabilitySchema', () => {
-  it('parses allowed preflight', () => {
-    expect(vocabularyDisableAvailabilitySchema.parse({ status: 'allowed' })).toEqual({
-      status: 'allowed',
-    })
-  })
-
-  it('parses blocked preflight with content blockers', () => {
-    const parsed = vocabularyDisableAvailabilitySchema.parse({
-      status: 'blocked',
-      blockers: [
-        {
-          kind: 'content',
-          contentTypeKey: 'species',
-          id: 'sp1',
-          label: 'Elf',
-          slug: 'elf',
-        },
-      ],
-    })
-    expect(parsed.status).toBe('blocked')
   })
 })

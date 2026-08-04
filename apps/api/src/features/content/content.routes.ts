@@ -1,9 +1,10 @@
 import { Router } from 'express'
 
-import { CAMPAIGN_ROLES } from '@rpg/contracts'
+import { CAMPAIGN_ROLES, contentCampaignAccessAvailabilityBatchRequestSchema } from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
 import { requireCampaignRole } from '../../middleware/require-role'
+import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
 import { listClasses } from './classes/list-classes'
@@ -62,6 +63,14 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   subclassController.getSubclassCampaignAccessAvailabilityHandler,
+)
+
+contentRouter.post(
+  '/classes/:classId/subclasses/campaign-access-availability/batch',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(contentCampaignAccessAvailabilityBatchRequestSchema),
+  subclassController.batchGetSubclassCampaignAccessAvailabilityHandler,
 )
 
 contentRouter.patch(
@@ -172,6 +181,14 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.getContentCampaignAccessAvailabilityHandler,
+)
+
+contentRouter.post(
+  '/:contentType/campaign-access-availability/batch',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(contentCampaignAccessAvailabilityBatchRequestSchema),
+  controller.batchGetContentCampaignAccessAvailabilityHandler,
 )
 
 contentRouter.patch(

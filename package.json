@@ -15,6 +15,7 @@
     "build:ci": "turbo run build --filter='...[origin/main]' --filter='!@rpg/bench'",
     "clean": "turbo run clean",
     "lint": "turbo run lint",
+    "lint:affected": "turbo run lint --filter='...[HEAD]'",
     "lint:ci": "turbo run lint --filter='...[origin/main]'",
     "test": "turbo run test",
     "test:affected": "turbo run test --filter='...[HEAD]'",

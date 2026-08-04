@@ -69,6 +69,8 @@ export function ContentOverviewRowActions({
       <CampaignAccessBlockedDialog
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
+        campaignId={campaignId}
+        targetName={entityName}
         blockers={blockers}
       />
     </>

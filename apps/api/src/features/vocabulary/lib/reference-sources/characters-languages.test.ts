@@ -1,4 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 vi.mock('../../../campaign/participation/campaign-character-participation.repository', () => ({
   listOpenParticipationsForCampaign: vi.fn(),
@@ -94,5 +95,19 @@ describe('indexCharacterLanguageBlockersByLanguageId', () => {
       'proficiencies.languages.0': { $exists: true },
     })
     expect(index.get('elvish')).toHaveLength(2)
+  })
+
+  it('stamps character_usage sourceKey on blockers', async () => {
+    const index = await indexCharacterLanguageBlockersByLanguageId({
+      campaignId: 'camp_1',
+      purpose: 'viewer_display',
+      viewer: {
+        userId: 'user_1',
+        role: 'pc',
+        controlledCharacterIds: ['char_visible'],
+      },
+    })
+
+    expect(index.get('elvish')?.[0]?.sourceKey).toBe(USAGE_BLOCKER_SOURCE_KEYS.character_usage)
   })
 })

@@ -1,4 +1,4 @@
-import type { ContentTypeKey } from './content-type-keys'
+import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 
 /** Per-type nested authored-id regeneration policy for duplication. */
 export type NestedIdRegeneration = 'none' | { paths: readonly string[] }

@@ -13,9 +13,14 @@
     "./ranking": {
       "types": "./src/ranking/index.ts",
       "default": "./src/ranking/index.ts"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./src/types.ts"
     }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run"

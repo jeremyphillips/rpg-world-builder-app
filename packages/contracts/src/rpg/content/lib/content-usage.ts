@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
 import { vocabularyUsageReferenceSchema } from '../../vocab/vocabulary-usage'
-import { viewerCharacterRelationshipsSchema } from './viewer-character-relationship'
-import { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
+import { contentViewerCharacterRelationshipsSchema } from './content-viewer-character-relationships'
+import { USAGE_REFERENCE_PREVIEW_LIMIT } from '../../primitives/usage/preview-limits'
 
-export { CONTENT_USAGE_SUMMARY_LIMIT } from './content-usage-limits'
+export { USAGE_REFERENCE_PREVIEW_LIMIT as CONTENT_USAGE_SUMMARY_LIMIT } from '../../primitives/usage/preview-limits'
 
 /** Display labels for overview Used by summary tooltips — API-owned. */
 export const contentUsageSummaryLabelsSchema = z.object({
@@ -56,10 +56,10 @@ export const contentListUsageFieldsSchema = z.object({
    */
   usedBySummary: z
     .array(contentInformationalUsageReferenceSchema)
-    .max(CONTENT_USAGE_SUMMARY_LIMIT)
+    .max(USAGE_REFERENCE_PREVIEW_LIMIT)
     .optional(),
   /** Viewer-controlled PC relationships — grouped preview for name-row indicator chrome. */
-  viewerCharacterRelationships: viewerCharacterRelationshipsSchema.optional(),
+  viewerCharacterRelationships: contentViewerCharacterRelationshipsSchema.optional(),
 })
 
 export type ContentListUsageFields = z.infer<typeof contentListUsageFieldsSchema>

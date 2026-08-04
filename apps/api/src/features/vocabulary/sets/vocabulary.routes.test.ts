@@ -1,10 +1,15 @@
 import request, { type Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import {
+  ACTION_BATCH_VALIDATE_FAILURE_MESSAGES,
+  ACTION_VALIDATE_BATCH_TARGET_LIMIT,
+  CREATURE_TYPE_SET_ID,
+} from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
+import { registerCampaignMember } from '../../../test/helpers/campaign-membership'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -194,5 +199,119 @@ describe('vocabulary routes', () => {
       )
       .set(CSRF_HEADER, csrfToken)
       .expect(404)
+  })
+
+  it('returns batch disable-availability with allowed targets when disableGuard is disabled', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    const res = await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entryId: 'psychic' }, { entryId: 'fire' }] })
+      .expect(200)
+
+    expect(res.body.targets).toHaveLength(2)
+    expect(res.body.targets.map((target: { targetId: string }) => target.targetId)).toEqual([
+      'psychic',
+      'fire',
+    ])
+    expect(
+      res.body.targets.every(
+        (target: { availability: { status: string } }) => target.availability?.status === 'allowed',
+      ),
+    ).toBe(true)
+  })
+
+  it('rejects duplicate entry IDs in vocabulary disable batch requests', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entryId: 'psychic' }, { entryId: 'psychic' }] })
+      .expect(400)
+  })
+
+  it('rejects vocabulary disable batch requests above the target limit', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/damage-types/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        targets: Array.from({ length: ACTION_VALIDATE_BATCH_TARGET_LIMIT + 1 }, (_, index) => ({
+          entryId: `entry_${index}`,
+        })),
+      })
+      .expect(400)
+  })
+
+  it('requires owner/co-owner auth for vocabulary disable batch requests', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'vocab-batch-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createCampaign(owner.agent, owner.csrfToken)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'vocab-batch-member@example.com',
+      campaignRole: 'pc',
+    })
+
+    await member.agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .send({ targets: [{ entryId: 'humanoid' }] })
+      .expect(403)
+  })
+
+  it('returns mixed allowed and blocked creature-type disable batch availability', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ id: 'robot', label: 'Robot' })
+      .expect(201)
+
+    const res = await agent
+      .post(
+        `/api/campaigns/${campaignId}/vocabulary/${CREATURE_TYPE_SET_ID}/entries/disable-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entryId: 'robot' }, { entryId: 'humanoid' }, { entryId: 'missing' }] })
+      .expect(200)
+
+    expect(res.body.targets.map((target: { targetId: string }) => target.targetId)).toEqual([
+      'robot',
+      'humanoid',
+      'missing',
+    ])
+    expect(res.body.targets[0]).toMatchObject({
+      availability: { status: 'allowed' },
+    })
+    expect(res.body.targets[1]).toMatchObject({
+      availability: { status: 'blocked' },
+    })
+    expect(res.body.targets[2]).toMatchObject({
+      failure: {
+        code: 'not_found',
+        message: ACTION_BATCH_VALIDATE_FAILURE_MESSAGES.notFound,
+      },
+    })
   })
 })

@@ -1,4 +1,4 @@
-import { CONTENT_TYPE_KEYS, type ContentTypeKey } from './content-type-keys'
+import { CONTENT_TYPE_KEYS, type ContentTypeKey } from '../../primitives/content/content-type-keys'
 import { SKILL_PROFICIENCY_SENTENCE } from '../../vocab/proficiency-sentence'
 import { getTermSentenceForm, type VocabularyTerm } from '../../vocab/types'
 

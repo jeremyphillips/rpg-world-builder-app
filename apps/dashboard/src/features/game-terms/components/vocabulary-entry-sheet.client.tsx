@@ -102,6 +102,7 @@ export function VocabularyEntrySheet(props: VocabularyEntrySheetProps) {
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
         campaignId={props.campaignId}
+        targetName={props.mode === 'edit' && props.entry ? props.entry.label : undefined}
         blockers={blockers}
       />
     </>

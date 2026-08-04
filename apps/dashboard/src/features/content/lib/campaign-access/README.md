@@ -50,9 +50,27 @@ Each surface resets to its own **latest persisted baseline**. A successful acces
 | When              | Mechanism                                     | Purpose                                       |
 | ----------------- | --------------------------------------------- | --------------------------------------------- |
 | Toggle off (edit) | Advisory `GET …/campaign-access-availability` | Immediate UX; revert toggle if blocked        |
+| Bulk validate     | `POST …/campaign-access-availability/batch`   | One round trip for overview bulk preflight    |
 | Save (edit)       | Authoritative `PATCH`                         | Persists or returns structured `409` blockers |
 
 Save does **not** run a separate availability GET when PATCH already returns blockers.
+
+### Batch validate (`POST …/campaign-access-availability/batch`)
+
+Used by dashboard bulk campaign availability after Phase 2. Single-item
+`GET …/:entityId/campaign-access-availability` remains for detail/toggle surfaces.
+
+| Rule                  | Behavior                                                                                                                                        |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Auth                  | owner / co-owner                                                                                                                                |
+| Request               | `{ targets: [{ entityId }] }` — unique IDs, 1–50 entries                                                                                        |
+| Response              | `{ targets: [{ targetId, targetName, availability \| failure }] }` in request order                                                             |
+| Subclasses            | `POST …/classes/:classId/subclasses/campaign-access-availability/batch` — every target must belong to `:classId` (`400 mixed_subclass_parents`) |
+| Per-target not found  | `200` with `{ failure: { code: 'not_found', message: … } }` — safe public copy                                                                  |
+| Unexpected eval error | `200` with `{ failure: { code: 'validate_error', message: … } }` — raw exception text stays server-side                                         |
+
+Dashboard client: `fetchContentCampaignAccessAvailabilityBatch` →
+`mapContentCampaignAccessAvailabilityBatchResponse`.
 
 On authoritative block, only `available` is restored to the persisted baseline; other dirty player-access edits are kept.
 
@@ -67,6 +85,14 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 - Shell wiring: `content-save-session.integration.test.tsx`
 - Participant contract: `campaign-access-form-context.test.tsx`
 - Bulk preview: `campaign-access/bulk/resolve-bulk-campaign-access-preview.test.ts`
+
+## Capability
+
+Bulk campaign availability from content overviews requires both `canManage` and
+`supportsContentBulkCampaignAccess(contentTypeKey)`. Subclasses support single-item campaign
+access in the class editor but not overview-style bulk selection (`bulkCampaignAccess: false`).
+
+Shared action lifecycle docs: [actions.md](../../../../docs/actions.md).
 
 ## Shared vs bulk builders
 

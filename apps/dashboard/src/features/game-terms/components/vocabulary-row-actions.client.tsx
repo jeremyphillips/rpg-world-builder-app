@@ -105,6 +105,7 @@ export function VocabularyRowActions({
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
         campaignId={campaignId}
+        targetName={entry.label}
         blockers={blockers}
       />
 
@@ -112,6 +113,7 @@ export function VocabularyRowActions({
         open={deleteBlockedOpen}
         onOpenChange={setDeleteBlockedOpen}
         campaignId={campaignId}
+        targetName={entry.label}
         blockers={deleteBlockers}
         headline={VOCABULARY_DELETE_BLOCKED_HEADLINE}
         description={VOCABULARY_DELETE_BLOCKED_DESCRIPTION}

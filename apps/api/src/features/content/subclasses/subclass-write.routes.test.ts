@@ -8,6 +8,7 @@ import { useIntegrationApp } from '../../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
 const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
+const WIZARD_CLASS_ID = 'srd-cc-5.2.1:wizard'
 
 async function registerAndLogin(): Promise<{ agent: Agent; csrfToken: string }> {
   return registerAndLoginTestUser(getApp())
@@ -177,5 +178,29 @@ describe('subclass write routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .send({ classId: 'srd-cc-5.2.1:wizard', name: 'Mismatch' })
       .expect(400)
+  })
+
+  it('rejects subclass batch requests when targets belong to a different parent class', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const wizardListRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${WIZARD_CLASS_ID}/subclasses`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const wizardSubclass = wizardListRes.body.subclasses[0]
+    expect(wizardSubclass).toBeDefined()
+
+    await agent
+      .post(
+        `/api/campaigns/${campaignId}/content/classes/${FIGHTER_CLASS_ID}/subclasses/campaign-access-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entityId: wizardSubclass.id as string }] })
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.error?.code).toBe('mixed_subclass_parents')
+      })
   })
 })

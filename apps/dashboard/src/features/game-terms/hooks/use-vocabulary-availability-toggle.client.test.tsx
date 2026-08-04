@@ -20,8 +20,8 @@ vi.mock('@/features/vocabulary', async (importOriginal) => {
 })
 
 vi.mock('@/lib/notify', () => ({
-  notifyCampaignAccessUpdated: vi.fn(),
-  notifyCampaignAccessUpdateFailed: vi.fn(),
+  notifyVocabularyAvailabilityUpdated: vi.fn(),
+  notifyVocabularyAvailabilityUpdateFailed: vi.fn(),
 }))
 
 import { updateVocabularyEntry } from '@/features/vocabulary'

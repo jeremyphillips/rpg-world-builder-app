@@ -1,12 +1,16 @@
 import {
   ApiError,
   campaignAccessParticipantRosterSchema,
+  contentCampaignAccessAvailabilityBatchResponseSchema,
   contentCampaignAccessAvailabilitySchema,
   contentCampaignAccessUpdateResultSchema,
   fetchCsrfToken,
   type ContentAccessTargetType,
+  type ContentCampaignAccessAvailabilityBatchResponse,
   type ContentCampaignAccessPatch,
 } from '@rpg/contracts'
+
+import { postActionBatchValidate } from '@/lib/actions/action-validate-batch'
 
 import { CSRF_HEADER } from '@/lib/api-client'
 
@@ -70,6 +74,21 @@ function contentCampaignAccessPath(
   return `/api/campaigns/${campaignId}/content/${targetType}/${entityId}/${suffix}`
 }
 
+function contentCampaignAccessBatchPath(
+  campaignId: string,
+  targetType: ContentAccessTargetType,
+  classId?: string,
+): string {
+  if (targetType === 'subclasses') {
+    if (!classId) {
+      throw new Error('classId is required when targetType is subclasses.')
+    }
+    return `/api/campaigns/${campaignId}/content/classes/${classId}/subclasses/campaign-access-availability/batch`
+  }
+
+  return `/api/campaigns/${campaignId}/content/${targetType}/campaign-access-availability/batch`
+}
+
 export async function fetchCampaignAccessParticipantRoster(
   campaignId: string,
   options?: { fallbackMessage?: string; csrfToken?: string },
@@ -121,6 +140,21 @@ export async function fetchContentCampaignAccessAvailability(
     res,
     options?.fallbackMessage ?? 'Could not check campaign access availability.',
   )
+}
+
+export async function fetchContentCampaignAccessAvailabilityBatch(
+  campaignId: string,
+  targetType: ContentAccessTargetType,
+  entityIds: readonly string[],
+  options?: CampaignAccessRequestOptions,
+): Promise<ContentCampaignAccessAvailabilityBatchResponse> {
+  const body = await postActionBatchValidate<{ targets: unknown }>({
+    path: contentCampaignAccessBatchPath(campaignId, targetType, options?.classId),
+    body: { targets: entityIds.map((entityId) => ({ entityId })) },
+    fallbackMessage: options?.fallbackMessage ?? 'Could not check campaign access availability.',
+  })
+
+  return contentCampaignAccessAvailabilityBatchResponseSchema.parse(body)
 }
 
 export async function updateContentCampaignAccess(

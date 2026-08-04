@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { paginatedItemsSchema, type PaginatedItems } from '../../../shared/paginated-items'
+import { paginatedItemsSchema, type PaginatedItems } from '../../../lib/paginated-items'
 
 import { characterCardSummarySchema } from './character-card-dtos'
 

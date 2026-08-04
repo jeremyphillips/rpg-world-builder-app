@@ -12,8 +12,10 @@ import { getContentEntityUsage } from '../lib/content-usage/get-content-entity-u
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import {
   getContentCampaignAccessAvailability,
+  batchGetContentCampaignAccessAvailability,
   updateContentCampaignAccess,
 } from '../lib/content-campaign-access.service'
+import { assertSubclassBatchTargetsBelongToClass } from './assert-subclass-batch-targets'
 
 function routeParams(req: Request): { campaignId: string; classId: string } {
   return req.params as { campaignId: string; classId: string }
@@ -82,6 +84,24 @@ export async function getSubclassCampaignAccessAvailabilityHandler(
     subclassId,
   )
   res.status(200).json({ availability })
+}
+
+export async function batchGetSubclassCampaignAccessAvailabilityHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, classId } = routeParams(req)
+  const { targets } = req.body as { targets: Array<{ entityId: string }> }
+  const entityIds = targets.map((target) => target.entityId)
+
+  await assertSubclassBatchTargetsBelongToClass(campaignId, classId, entityIds)
+
+  const batch = await batchGetContentCampaignAccessAvailability(
+    subclassWriteConfig,
+    campaignId,
+    entityIds,
+  )
+  res.status(200).json(batch)
 }
 
 export async function updateSubclassCampaignAccessHandler(

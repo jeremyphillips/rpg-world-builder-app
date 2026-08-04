@@ -6,6 +6,7 @@ import { ChevronDown } from 'lucide-react'
 import type { VocabularyUsageReference } from '@rpg/contracts'
 
 import { UsageReferenceRow } from './usage-reference-row.client'
+import { usageReferenceRowListClasses } from './usage-reference-list.lib'
 
 export type UsageReferenceGroupListProps = {
   campaignId: string
@@ -33,7 +34,7 @@ function UsageReferenceGroupItems({
   const remainingCount = references.length - disclosureLimit
 
   return (
-    <ul className="list-disc space-y-2 pl-5" role="list">
+    <ul className={usageReferenceRowListClasses} role="list">
       {visibleReferences.map((reference) => (
         <li key={`${reference.kind}:${reference.id}`}>
           <UsageReferenceRow reference={reference} campaignId={campaignId} />

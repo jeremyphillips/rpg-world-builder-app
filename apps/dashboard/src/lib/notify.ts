@@ -38,6 +38,32 @@ export function notifyDuplicateContentCreated(): void {
   toast.success(DUPLICATE_CONTENT_CREATED_MESSAGE)
 }
 
+export function notifyVocabularyAvailabilityUpdated(
+  name: string | undefined,
+  available: boolean,
+): void {
+  toast.success(
+    available
+      ? `${name ?? 'Entry'} is now available.`
+      : `${name ?? 'Entry'} is no longer available.`,
+  )
+}
+
+export function notifyVocabularyAvailabilityUpdateFailed(
+  entityId: string,
+  available: boolean,
+  err: unknown,
+  retry: () => void,
+): void {
+  toast({
+    id: `vocabulary-availability:${entityId}`,
+    title: available ? 'Could not enable entry.' : 'Could not disable entry.',
+    description: getErrorMessage(err, 'Could not update vocabulary availability.'),
+    tone: 'destructive',
+    action: { label: 'Retry', onClick: retry },
+  })
+}
+
 export function notifyCampaignAccessUpdated(name: string | undefined, available: boolean): void {
   toast.success(
     formatCampaignAccessAvailabilityToast({

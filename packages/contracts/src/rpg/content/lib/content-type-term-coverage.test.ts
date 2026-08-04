@@ -4,7 +4,7 @@ import { PROFICIENCY_DOMAIN_ENTRIES } from '../../vocab/proficiency'
 import { SKILL_PROFICIENCY_SENTENCE } from '../../vocab/proficiency-sentence'
 import { getVocabularyTermLabel } from '../../vocab/types'
 import { CONTENT_TYPE_CAPABILITIES } from './content-type-capabilities'
-import { CONTENT_TYPE_KEYS } from './content-type-keys'
+import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
 import {
   CONTENT_TYPE_TERMS,
   CONTENT_TYPE_TERM_KEYS,

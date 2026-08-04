@@ -80,6 +80,12 @@ flowchart BT
 | Weapon mode presentation formatters (extracted from vocab)                               | `rpg/primitives/weapon/`            | `mode-compatibility-messages.ts`                                                                                             |
 | Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
 | Shared content helpers (grants, envelope, keys)                                          | `rpg/content/lib/`                  | `rpg/content/lib/grants.ts`                                                                                                  |
+| Domain-neutral action/transport envelopes (no RPG semantics)                             | `src/lib/`                          | `lib/action-validation.ts`, `lib/paginated-items.ts`, `lib/usage-guard-action-validation.ts`                                 |
+| Catalog type identity closed sets                                                        | `rpg/primitives/content/`           | `primitives/content/content-type-keys.ts`                                                                                    |
+| Generic usage reference / shared blocker union                                           | `rpg/primitives/usage/`             | `primitives/usage/usage-blocker.ts`                                                                                          |
+| Viewer–content relationship wire model                                                   | `rpg/primitives/character/`         | `primitives/character/viewer-character-relationship.ts`                                                                      |
+| Vocabulary disable/result availability                                                   | `rpg/vocab/`                        | `vocab/vocabulary-disable-availability.ts`                                                                                   |
+| Equipment family URL path segments                                                       | `rpg/vocab/equipment/`              | `vocab/equipment/family-path.ts`                                                                                             |
 | Creature-like runtime primitives (PC, NPC, monster)                                      | `rpg/runtime/creature/`             | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
 | A stored character sheet or builder runtime contract                                     | `rpg/runtime/`                      | `rpg/runtime/character/sheet.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)                  |
 | Composed campaign-character wire DTOs (not campaign rules)                               | `rpg/runtime/campaign/`             | `npc-dtos.ts`, `pc-list-item-dto.ts`, `party-pc-list-item-dto.ts`                                                            |
@@ -145,7 +151,7 @@ Acyclic **downward** imports only — lower layers never import higher layers.
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `validation/`            | `validation/` only                                                                                                        | everything else                                                                            |
 | `shared/`                | `validation/`, `shared/`, `rpg/primitives/`                                                                               | `rpg/vocab/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`                              |
-| `rpg/vocab/`             | `validation/`, `rpg/vocab/`                                                                                               | `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`              |
+| `rpg/vocab/`             | `validation/`, `rpg/vocab/`, `rpg/primitives/` (catalog identity + generic usage wire pieces only)                        | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                                 |
 | `rpg/primitives/`        | `validation/`, `rpg/vocab/`, `rpg/primitives/`                                                                            | `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `shared/`                                 |
 | `rpg/content/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`                                                            | `rpg/runtime/`, `rpg/campaign/`, `shared/`                                                 |
 | `rpg/runtime/`           | `validation/`, `rpg/vocab/`, `rpg/primitives/`, `rpg/content/`, `rpg/runtime/`, `rpg/campaign/`, `rpg/character-builder/` | `shared/`                                                                                  |
@@ -165,6 +171,11 @@ resolved character-creation patch). Campaign never imports runtime, so the
 graph stays acyclic.
 
 Deep relative imports and barrel imports are both valid within the allowed graph.
+
+**`src/lib/`** holds domain-neutral contracts and transport envelopes only (e.g.
+action validation helpers, paginated list envelopes). Do not place catalog keys,
+usage blockers, or other RPG-owned concepts in `src/lib/` merely because multiple
+layers consume them — use the appropriate `rpg/primitives/` or layer module instead.
 
 ### `rpg/character-builder/` (dependency leaf)
 

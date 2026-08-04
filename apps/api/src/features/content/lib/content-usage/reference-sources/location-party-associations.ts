@@ -1,4 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { toContentUsageBlocker } from '../../../../vocabulary/lib/reference-sources/content-referrer'
 import { HomebrewLocationModel } from '../../../locations/homebrew-location.model'
@@ -25,11 +26,15 @@ export async function indexLocationPartyBlockersByContentId(
     docs,
     (doc) => extractAllPartyIdsFromLocation(doc),
     (doc) =>
-      toContentUsageBlocker('locations', {
-        id: String(doc._id),
-        name: doc.name,
-        slug: doc.slug,
-      }),
+      toContentUsageBlocker(
+        'locations',
+        {
+          id: String(doc._id),
+          name: doc.name,
+          slug: doc.slug,
+        },
+        USAGE_BLOCKER_SOURCE_KEYS.unknown,
+      ),
   )
 }
 
@@ -49,11 +54,15 @@ export async function findLocationPartyBlockersForCharacter(
     .lean<LocationPartyReferenceRecord[]>()
 
   return docs.map((doc) =>
-    toContentUsageBlocker('locations', {
-      id: String(doc._id),
-      name: doc.name,
-      slug: doc.slug,
-    }),
+    toContentUsageBlocker(
+      'locations',
+      {
+        id: String(doc._id),
+        name: doc.name,
+        slug: doc.slug,
+      },
+      USAGE_BLOCKER_SOURCE_KEYS.unknown,
+    ),
   )
 }
 
@@ -75,10 +84,14 @@ export async function findLocationPartyBlockersForCharacterInCampaign(
     .lean<LocationPartyReferenceRecord[]>()
 
   return docs.map((doc) =>
-    toContentUsageBlocker('locations', {
-      id: String(doc._id),
-      name: doc.name,
-      slug: doc.slug,
-    }),
+    toContentUsageBlocker(
+      'locations',
+      {
+        id: String(doc._id),
+        name: doc.name,
+        slug: doc.slug,
+      },
+      USAGE_BLOCKER_SOURCE_KEYS.unknown,
+    ),
   )
 }

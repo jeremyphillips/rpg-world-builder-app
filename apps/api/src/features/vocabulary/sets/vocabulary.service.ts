@@ -6,6 +6,8 @@ import type {
   UpdateVocabularyEntryInput,
   VocabularyDeleteAvailability,
   VocabularyDisableAvailability,
+  VocabularyDisableAvailabilityBatchResponse,
+  VocabularyDisableAvailabilityBatchTargetOutcome,
   VocabularyEntryUsage,
   VocabularyOptionSetId,
   VocabularyOptionSetPatch,
@@ -13,6 +15,11 @@ import type {
 import { getVocabularySetCapability, vocabularyEntryUsageSchema } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
+import {
+  mapBatchTargetError,
+  mapBatchTargetsWithConcurrency,
+} from '../../../lib/action-batch-validate'
+import { assertBatchResponseMatchesRequest } from '../../../lib/assert-batch-response-correspondence'
 import { assertVocabularyIdAvailable } from '../lib/assert-vocabulary-id-available'
 import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
 import {
@@ -360,6 +367,75 @@ export async function getVocabularyDisableAvailability(
   findResolvedOption(current, entryId)
 
   return resolveVocabularyDisableBlockers(ctx, setId, entryId)
+}
+
+async function evaluateVocabularyDisableBatchTarget(
+  ctx: VocabularyUsageResolverContext,
+  set: ResolvedVocabularyOptionSet,
+  setId: VocabularyOptionSetId,
+  entryId: string,
+): Promise<VocabularyDisableAvailabilityBatchTargetOutcome> {
+  const option = set.options.find((entry) => entry.id === entryId)
+  if (!option) {
+    return mapBatchTargetError(
+      new HttpError(404, 'not_found', `Vocabulary entry "${entryId}" not found.`),
+      entryId,
+      entryId,
+    )
+  }
+
+  try {
+    const availability = await resolveVocabularyDisableBlockers(ctx, setId, entryId)
+    return { targetId: entryId, targetName: option.label, availability }
+  } catch (err) {
+    console.error('batch vocabulary disable availability failed', {
+      campaignId: ctx.campaignId,
+      setId,
+      entryId,
+      err,
+    })
+    return mapBatchTargetError(err, entryId, option.label)
+  }
+}
+
+export async function batchGetVocabularyDisableAvailability(
+  ctx: VocabularyUsageResolverContext,
+  setId: VocabularyOptionSetId,
+  entryIds: readonly string[],
+): Promise<VocabularyDisableAvailabilityBatchResponse> {
+  const current = await resolveVocabularySetForCampaign(ctx, setId)
+
+  if (!getVocabularySetCapability(setId).disableGuard) {
+    const targets = entryIds.map((entryId) => {
+      const option = current.options.find((entry) => entry.id === entryId)
+      if (!option) {
+        return mapBatchTargetError(
+          new HttpError(404, 'not_found', `Vocabulary entry "${entryId}" not found.`),
+          entryId,
+          entryId,
+        )
+      }
+
+      return {
+        targetId: entryId,
+        targetName: option.label,
+        availability: { status: 'allowed' as const },
+      }
+    })
+
+    const response = { targets }
+    assertBatchResponseMatchesRequest(entryIds, response)
+    return response
+  }
+
+  const targets = await mapBatchTargetsWithConcurrency({
+    targets: entryIds,
+    evaluateTarget: (entryId) => evaluateVocabularyDisableBatchTarget(ctx, current, setId, entryId),
+  })
+
+  const response = { targets }
+  assertBatchResponseMatchesRequest(entryIds, response)
+  return response
 }
 
 export async function getVocabularyEntryUsage(

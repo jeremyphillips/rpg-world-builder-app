@@ -1,4 +1,10 @@
 import type { BulkFieldOperation } from '../../../lib/bulk-field-operation'
+import {
+  ACTION_PLAN_UNCHANGED_REASONS,
+  type ActionPlanResult,
+  type ActionPlanUnchangedReason,
+  type ActionTargetIdentity,
+} from '../../../lib/action-validation'
 import type { ContentVisibilityMode } from '../../vocab/content-visibility'
 
 import {
@@ -103,4 +109,54 @@ export function countBulkCampaignAccessChanges(
   }
 
   return { wouldChangeCount, unchangedCount }
+}
+
+export function resolveBulkCampaignAccessUnchangedReason(
+  current: ResolvedContentCampaignAccess,
+  bulk: BulkCampaignAccessFormValues,
+): ActionPlanUnchangedReason {
+  const availabilityTouched = bulk.available.kind !== 'unchanged'
+  const visibilityTouched = bulk.visibilityMode.kind !== 'unchanged'
+
+  if (availabilityTouched && visibilityTouched) {
+    return ACTION_PLAN_UNCHANGED_REASONS.already_matches
+  }
+
+  if (availabilityTouched) {
+    const nextAvailable = resolveBulkField(
+      bulk.available,
+      current.available,
+      DEFAULT_CONTENT_CAMPAIGN_ACCESS.available,
+    )
+
+    return nextAvailable
+      ? ACTION_PLAN_UNCHANGED_REASONS.already_available
+      : ACTION_PLAN_UNCHANGED_REASONS.already_unavailable
+  }
+
+  return ACTION_PLAN_UNCHANGED_REASONS.already_matches
+}
+
+export function buildBulkCampaignAccessPlan(
+  selected: ReadonlyArray<{ campaignAccess: ResolvedContentCampaignAccess } & ActionTargetIdentity>,
+  bulk: BulkCampaignAccessFormValues,
+): ActionPlanResult {
+  return {
+    targets: selected.map((row) => {
+      if (isBulkCampaignAccessNoOp(row.campaignAccess, bulk)) {
+        return {
+          status: 'unchanged' as const,
+          targetId: row.targetId,
+          targetName: row.targetName,
+          reason: resolveBulkCampaignAccessUnchangedReason(row.campaignAccess, bulk),
+        }
+      }
+
+      return {
+        status: 'wouldChange' as const,
+        targetId: row.targetId,
+        targetName: row.targetName,
+      }
+    }),
+  }
 }

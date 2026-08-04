@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { formatViewerCharacterRelationshipTooltip } from './format-viewer-character-relationship-tooltip'
-import type { ViewerCharacterRelationships } from './viewer-character-relationship'
+import type { ViewerCharacterRelationships } from '../../primitives/character/viewer-character-relationship'
 
 function envelope(
   input: Partial<ViewerCharacterRelationships> &

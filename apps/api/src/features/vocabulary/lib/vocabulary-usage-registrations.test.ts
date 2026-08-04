@@ -73,6 +73,7 @@ describe('creature-types usage via registration', () => {
         id: 'sp_1',
         label: 'Elf',
         slug: 'elf',
+        sourceKey: 'unknown',
       },
     ])
   })

@@ -10,7 +10,10 @@ import type {
   VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
-import { notifyCampaignAccessUpdateFailed, notifyCampaignAccessUpdated } from '@/lib/notify'
+import {
+  notifyVocabularyAvailabilityUpdateFailed,
+  notifyVocabularyAvailabilityUpdated,
+} from '@/lib/notify'
 
 import {
   fetchVocabularyDisableAvailability,
@@ -77,9 +80,14 @@ export function useVocabularyAvailabilityToggle({
             return
           }
         } catch (err) {
-          notifyCampaignAccessUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
-            void handleAvailableChange(nextAvailable)
-          })
+          notifyVocabularyAvailabilityUpdateFailed(
+            entryLabelRef.current,
+            nextAvailable,
+            err,
+            () => {
+              void handleAvailableChange(nextAvailable)
+            },
+          )
           return
         } finally {
           setPending(false)
@@ -94,10 +102,10 @@ export function useVocabularyAvailabilityToggle({
           status: nextStatus,
         })
         updateCachedSet(nextSet)
-        notifyCampaignAccessUpdated(entryLabelRef.current, nextAvailable)
+        notifyVocabularyAvailabilityUpdated(entryLabelRef.current, nextAvailable)
       } catch (err) {
         updateCachedStatus(previousStatus)
-        notifyCampaignAccessUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
+        notifyVocabularyAvailabilityUpdateFailed(entryLabelRef.current, nextAvailable, err, () => {
           void handleAvailableChange(nextAvailable)
         })
       } finally {

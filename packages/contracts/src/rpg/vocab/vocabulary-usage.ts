@@ -1,23 +1,12 @@
 import { z } from 'zod'
 
-import { CONTENT_TYPE_KEYS } from '../content/lib/content-type-keys'
+import { catalogUsageReferenceSchema } from '../primitives/content/catalog-usage-reference'
+import { characterUsageReferenceSchema } from '../primitives/usage/character-usage-reference'
 
 /** Informational usage reference — same identity blockers reuse at operation boundaries. */
 export const vocabularyUsageReferenceSchema = z.discriminatedUnion('kind', [
-  z.object({
-    kind: z.literal('content'),
-    contentTypeKey: z.enum(CONTENT_TYPE_KEYS),
-    id: z.string(),
-    label: z.string(),
-    slug: z.string(),
-  }),
-  z.object({
-    kind: z.literal('character'),
-    id: z.string(),
-    label: z.string(),
-    characterType: z.enum(['pc', 'npc']),
-    campaignId: z.string().optional(),
-  }),
+  catalogUsageReferenceSchema,
+  characterUsageReferenceSchema,
 ])
 
 export type VocabularyUsageReference = z.infer<typeof vocabularyUsageReferenceSchema>
