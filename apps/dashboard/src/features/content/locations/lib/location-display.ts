@@ -1,7 +1,7 @@
 import {
   formatLocationDisplaySummary,
   getLocationKindEntry,
-  INTERIOR_TYPE_DEFINITIONS,
+  resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
   type Location,
   type LocationDisplaySummary,
@@ -63,31 +63,6 @@ export type LocationDetailViewModel = {
   identity: LocationDetailIdentityViewModel
   description?: string
   children: LocationChildrenViewModel
-}
-
-export function resolveLocationDetailClassificationFieldLabel(
-  location: Location,
-): string | undefined {
-  switch (location.kind) {
-    case 'structure':
-      return location.structureType === 'building' ? 'Archetype' : undefined
-    case 'settlement':
-    case 'region':
-      return 'Classification'
-    case 'site':
-      return 'Site type'
-    case 'plane':
-      return 'Plane type'
-    case 'interior': {
-      const interiorType = location.interiorType
-      if (interiorType && interiorType in INTERIOR_TYPE_DEFINITIONS) {
-        return `${INTERIOR_TYPE_DEFINITIONS[interiorType as keyof typeof INTERIOR_TYPE_DEFINITIONS].label} type`
-      }
-      return 'Interior type'
-    }
-    default:
-      return undefined
-  }
 }
 
 export function resolveLocationDetailSpecializationFieldLabel(

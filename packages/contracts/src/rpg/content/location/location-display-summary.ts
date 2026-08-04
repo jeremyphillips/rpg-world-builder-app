@@ -1,6 +1,7 @@
 import { getBuildingArchetypeLabel } from '../../vocab/location/building-archetype'
 import {
   getInteriorSubtypeLabel,
+  INTERIOR_TYPE_DEFINITIONS,
   type InteriorClassificationType,
 } from '../../vocab/location/interior-type-definitions'
 import { getLocationKindLabel } from '../../vocab/location/kind'
@@ -136,4 +137,30 @@ export function locationDisplaySummarySortKey(
   summary: LocationDisplaySummary,
 ): readonly [string, string, string] {
   return [summary.typeLabel, summary.classificationLabel ?? '', summary.specializationLabel ?? '']
+}
+
+/** Detail/read row label for the location classification field, when present. */
+export function resolveLocationDetailClassificationFieldLabel(
+  location: Location,
+): string | undefined {
+  switch (location.kind) {
+    case 'structure':
+      return location.structureType === 'building' ? 'Archetype' : undefined
+    case 'settlement':
+    case 'region':
+      return 'Classification'
+    case 'site':
+      return 'Site type'
+    case 'plane':
+      return 'Plane type'
+    case 'interior': {
+      const interiorType = location.interiorType
+      if (interiorType && interiorType in INTERIOR_TYPE_DEFINITIONS) {
+        return `${INTERIOR_TYPE_DEFINITIONS[interiorType as InteriorClassificationType].label} type`
+      }
+      return 'Interior type'
+    }
+    default:
+      return undefined
+  }
 }

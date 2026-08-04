@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
 import { Badge } from '@rpg/ui'
 
 import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
@@ -9,11 +8,9 @@ const meta = {
   component: LocationLinkedEntityCard,
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <div className="max-w-md">
-          <Story />
-        </div>
-      </MemoryRouter>
+      <div className="max-w-md">
+        <Story />
+      </div>
     ),
   ],
 } satisfies Meta<typeof LocationLinkedEntityCard>

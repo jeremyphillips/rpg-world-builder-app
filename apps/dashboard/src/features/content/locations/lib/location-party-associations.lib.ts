@@ -51,6 +51,44 @@ export type LocationPartyCharacterOption = {
   characterType: 'pc' | 'npc'
 }
 
+type CampaignCharacterListEntry = {
+  character: {
+    id: string
+    name: string
+    summary: string
+  }
+}
+
+type NpcListEntry = {
+  character: {
+    id: string
+    name: string
+  }
+}
+
+/** Merges open campaign PCs and NPCs into a sorted lookup for party association rows. */
+export function buildLocationPartyCharactersById(
+  campaignCharacters: readonly CampaignCharacterListEntry[],
+  npcs: readonly NpcListEntry[],
+): Map<string, LocationPartyCharacterOption> {
+  const entries: LocationPartyCharacterOption[] = [
+    ...campaignCharacters.map(({ character }) => ({
+      id: character.id,
+      name: character.name,
+      summary: character.summary,
+      characterType: 'pc' as const,
+    })),
+    ...npcs.map(({ character }) => ({
+      id: character.id,
+      name: character.name,
+      summary: '',
+      characterType: 'npc' as const,
+    })),
+  ].sort((left, right) => left.name.localeCompare(right.name))
+
+  return new Map(entries.map((entry) => [entry.id, entry]))
+}
+
 export type LocationPartyAssociationRow = {
   association: LocationPartyAssociation
   semanticKey: LocationPartyAssociationSemanticId

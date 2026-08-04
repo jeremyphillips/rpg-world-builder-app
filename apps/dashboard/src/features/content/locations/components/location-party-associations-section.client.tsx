@@ -20,25 +20,34 @@ import { LocationPartyPickerDrawer } from './location-party-picker-drawer.client
 import {
   appendLocationPartyAssociation,
   buildLocationPartyAssociationRows,
+  buildLocationPartyCharactersById,
   groupLocationPartyAssociationRows,
   LOCATION_PARTY_ADD_LABEL,
   LOCATION_PARTY_ASSOCIATIONS_FIELD,
   LOCATION_PARTY_EMPTY_TEXT,
   LOCATION_PARTY_SECTION_DESCRIPTION,
   removeLocationPartyAssociation,
-  type LocationPartyCharacterOption,
 } from '../lib/location-party-associations.lib'
 import {
   resolveAuthoringTypeFromFormValues,
   type LocationAuthoringType,
 } from '../lib/location-authoring-type'
+import { isLocationPartyAssociationAuthoringSupported } from '../lib/location-party-authoring-policy'
 
-export function LocationPartyAssociationsSection() {
-  const { campaignId = '' } = useParams<{ campaignId: string }>()
+export type LocationPartyAssociationsSectionProps = {
+  campaignId?: string
+}
+
+export function LocationPartyAssociationsSection({
+  campaignId: campaignIdProp,
+}: LocationPartyAssociationsSectionProps = {}) {
+  const { campaignId: campaignIdParam = '' } = useParams<{ campaignId: string }>()
+  const campaignId = campaignIdProp ?? campaignIdParam
   const { setValue, watch } = useFormContext()
   const associations = (watch(LOCATION_PARTY_ASSOCIATIONS_FIELD) ??
     []) as LocationPartyAssociation[]
   const authoringType = resolveAuthoringTypeFromFormValues(watch()) as LocationAuthoringType
+  const canAddAssociations = isLocationPartyAssociationAuthoringSupported(authoringType)
   const [pickerOpen, setPickerOpen] = React.useState(false)
   const [semanticKey, setSemanticKey] = React.useState<LocationPartyAssociationSemanticId | null>(
     null,
@@ -48,23 +57,10 @@ export function LocationPartyAssociationsSection() {
   const { data: npcs = [] } = useNpcs(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
-  const charactersById = React.useMemo(() => {
-    const entries: LocationPartyCharacterOption[] = [
-      ...campaignCharacters.map(({ character }) => ({
-        id: character.id,
-        name: character.name,
-        summary: character.summary,
-        characterType: 'pc' as const,
-      })),
-      ...npcs.map(({ character }) => ({
-        id: character.id,
-        name: character.name,
-        summary: '',
-        characterType: 'npc' as const,
-      })),
-    ]
-    return new Map(entries.map((entry) => [entry.id, entry]))
-  }, [campaignCharacters, npcs])
+  const charactersById = React.useMemo(
+    () => buildLocationPartyCharactersById(campaignCharacters, npcs),
+    [campaignCharacters, npcs],
+  )
 
   const organizationsById = React.useMemo(
     () => new Map(organizations.map((organization) => [organization.id, organization])),
@@ -89,6 +85,7 @@ export function LocationPartyAssociationsSection() {
   }
 
   const handleOpenPicker = () => {
+    if (!canAddAssociations) return
     setSemanticKey(null)
     setPickerOpen(true)
   }
@@ -125,9 +122,11 @@ export function LocationPartyAssociationsSection() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <Text variant="muted">{LOCATION_PARTY_SECTION_DESCRIPTION}</Text>
-        <Button type="button" onClick={handleOpenPicker}>
-          {LOCATION_PARTY_ADD_LABEL}
-        </Button>
+        {canAddAssociations ? (
+          <Button type="button" onClick={handleOpenPicker}>
+            {LOCATION_PARTY_ADD_LABEL}
+          </Button>
+        ) : null}
       </div>
 
       {rows.length === 0 ? (
@@ -170,17 +169,19 @@ export function LocationPartyAssociationsSection() {
         </div>
       )}
 
-      <LocationPartyPickerDrawer
-        open={pickerOpen}
-        onOpenChange={handlePickerOpenChange}
-        campaignId={campaignId}
-        associations={associations}
-        authoringType={authoringType}
-        semanticKey={semanticKey}
-        onSemanticKeyChange={setSemanticKey}
-        onSelectParty={handleSelectParty}
-        onRemoveParty={handleRemoveParty}
-      />
+      {canAddAssociations ? (
+        <LocationPartyPickerDrawer
+          open={pickerOpen}
+          onOpenChange={handlePickerOpenChange}
+          campaignId={campaignId}
+          associations={associations}
+          authoringType={authoringType}
+          semanticKey={semanticKey}
+          onSemanticKeyChange={setSemanticKey}
+          onSelectParty={handleSelectParty}
+          onRemoveParty={handleRemoveParty}
+        />
+      ) : null}
     </div>
   )
 }

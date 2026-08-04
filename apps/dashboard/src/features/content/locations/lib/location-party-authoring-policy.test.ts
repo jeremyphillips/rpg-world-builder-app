@@ -6,6 +6,7 @@ import {
   getAvailableLocationPartyAssociationKinds,
   isLocationPartyAssociationAuthoringSupported,
   LOCATION_PARTY_AUTHORING_POLICY,
+  shouldShowLocationPartyAssociationsSection,
 } from './location-party-authoring-policy'
 import { buildLocationPartySemanticOptions } from './location-party-associations.lib'
 
@@ -89,5 +90,26 @@ describe('location party authoring policy', () => {
       'works_at',
     ])
     expect(buildLocationPartySemanticOptions('region')).toEqual([])
+  })
+
+  it('shows the section when associations exist even if authoring is unsupported', () => {
+    expect(
+      shouldShowLocationPartyAssociationsSection({
+        authoringType: 'site',
+        associations: [
+          {
+            id: 'assoc-1',
+            kind: 'ownership',
+            party: { kind: 'organization', organizationId: 'org-1' },
+          },
+        ],
+      }),
+    ).toBe(true)
+    expect(
+      shouldShowLocationPartyAssociationsSection({
+        authoringType: 'site',
+        associations: [],
+      }),
+    ).toBe(false)
   })
 })

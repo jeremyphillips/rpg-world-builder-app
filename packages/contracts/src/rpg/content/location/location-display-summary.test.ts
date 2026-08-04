@@ -4,6 +4,7 @@ import { buildingClassificationSchema } from './building-classification'
 import {
   formatLocationDisplaySummary,
   locationDisplaySummarySortKey,
+  resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
 } from './location-display-summary'
 import type { Location } from './location'
@@ -124,5 +125,29 @@ describe('locationDisplaySummarySortKey', () => {
         classificationLabel: 'Guildhall',
       }),
     ).toEqual(['Building', 'Guildhall', ''])
+  })
+})
+
+describe('resolveLocationDetailClassificationFieldLabel', () => {
+  it('returns archetype label for building structures', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+    }
+
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Archetype')
+  })
+
+  it('returns settlement classification label', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'settlement',
+      settlementType: 'city',
+      parentLocationId: 'loc_parent',
+    }
+
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Classification')
   })
 })

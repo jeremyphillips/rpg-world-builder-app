@@ -30,6 +30,9 @@ export async function deleteAdminUser(
   const characters = await listCharactersForUser(targetUser.id)
   for (const character of characters) {
     const result = await deleteCharacterForUser(character.id, targetUser.id)
+    if (result.status === 'blocked') {
+      return { deleted: false, blockers: ['character_referenced_by_locations'] }
+    }
     if (result.status !== 'deleted') {
       throw new Error(`Failed to delete character ${character.id} for user ${targetUser.id}`)
     }

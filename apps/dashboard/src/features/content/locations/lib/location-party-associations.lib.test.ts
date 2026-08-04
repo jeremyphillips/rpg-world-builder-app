@@ -4,6 +4,7 @@ import {
   appendLocationPartyAssociation,
   buildLocationPartyAddActionLabel,
   buildLocationPartyAssociationExactKeyFromSelection,
+  buildLocationPartyCharactersById,
   buildLocationPartyAssociationRows,
   buildRelatedToSegmentOptions,
   findLocationPartyAssociationId,
@@ -13,6 +14,27 @@ import {
 } from './location-party-associations.lib'
 
 describe('location party associations lib', () => {
+  it('merges campaign PCs and NPCs into a sorted lookup map', () => {
+    const map = buildLocationPartyCharactersById(
+      [
+        {
+          character: { id: 'pc-2', name: 'Zara', summary: 'Rogue' },
+        },
+        {
+          character: { id: 'pc-1', name: 'Aldric', summary: 'Fighter' },
+        },
+      ],
+      [{ character: { id: 'npc-1', name: 'Durnan' } }],
+    )
+
+    expect([...map.keys()]).toEqual(['pc-1', 'npc-1', 'pc-2'])
+    expect(map.get('npc-1')).toMatchObject({
+      name: 'Durnan',
+      summary: '',
+      characterType: 'npc',
+    })
+  })
+
   it('appends associations and prevents v1 duplicate exact keys', () => {
     const first = appendLocationPartyAssociation({
       associations: [],

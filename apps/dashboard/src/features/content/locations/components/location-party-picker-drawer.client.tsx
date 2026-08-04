@@ -30,6 +30,7 @@ import { useOrganizations } from '@/features/content/organizations/hooks/use-org
 import {
   buildLocationPartyAddActionLabel,
   buildLocationPartyAssociationExactKeyFromSelection,
+  buildLocationPartyCharactersById,
   buildLocationPartySearchText,
   buildLocationPartySemanticOptions,
   buildPartyKindsForSemanticKey,
@@ -118,21 +119,10 @@ export function LocationPartyPickerDrawer({
   const { data: npcs = [] } = useNpcs(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
-  const characters = React.useMemo<LocationPartyCharacterOption[]>(() => {
-    const pcItems = campaignCharacters.map(({ character }) => ({
-      id: character.id,
-      name: character.name,
-      summary: character.summary,
-      characterType: 'pc' as const,
-    }))
-    const npcItems = npcs.map(({ character }) => ({
-      id: character.id,
-      name: character.name,
-      summary: '',
-      characterType: 'npc' as const,
-    }))
-    return [...pcItems, ...npcItems].sort((left, right) => left.name.localeCompare(right.name))
-  }, [campaignCharacters, npcs])
+  const characters = React.useMemo(
+    () => [...buildLocationPartyCharactersById(campaignCharacters, npcs).values()],
+    [campaignCharacters, npcs],
+  )
 
   const items = React.useMemo<PickerItem[]>(() => {
     if (!semanticKey || !partyKind) return []

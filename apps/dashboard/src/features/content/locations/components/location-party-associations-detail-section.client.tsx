@@ -12,13 +12,13 @@ import { useOrganizations } from '@/features/content/organizations/hooks/use-org
 import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
 import {
   buildLocationPartyAssociationRows,
+  buildLocationPartyCharactersById,
   groupLocationPartyAssociationRows,
   LOCATION_PARTY_EMPTY_TEXT,
   LOCATION_PARTY_SECTION_LABEL,
-  type LocationPartyCharacterOption,
 } from '../lib/location-party-associations.lib'
 import { resolveLocationAuthoringType } from '../lib/location-authoring-type'
-import { isLocationPartyAssociationAuthoringSupported } from '../lib/location-party-authoring-policy'
+import { shouldShowLocationPartyAssociationsSection } from '../lib/location-party-authoring-policy'
 
 export function LocationPartyAssociationsDetailSection({
   location,
@@ -29,30 +29,19 @@ export function LocationPartyAssociationsDetailSection({
 }) {
   const associations = location.partyAssociations ?? []
   const authoringType = resolveLocationAuthoringType(location)
-  const showSection =
-    associations.length > 0 || isLocationPartyAssociationAuthoringSupported(authoringType)
+  const showSection = shouldShowLocationPartyAssociationsSection({
+    authoringType,
+    associations,
+  })
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(campaignId)
   const { data: npcs = [] } = useNpcs(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
-  const charactersById = React.useMemo(() => {
-    const entries: LocationPartyCharacterOption[] = [
-      ...campaignCharacters.map(({ character }) => ({
-        id: character.id,
-        name: character.name,
-        summary: character.summary,
-        characterType: 'pc' as const,
-      })),
-      ...npcs.map(({ character }) => ({
-        id: character.id,
-        name: character.name,
-        summary: '',
-        characterType: 'npc' as const,
-      })),
-    ]
-    return new Map(entries.map((entry) => [entry.id, entry]))
-  }, [campaignCharacters, npcs])
+  const charactersById = React.useMemo(
+    () => buildLocationPartyCharactersById(campaignCharacters, npcs),
+    [campaignCharacters, npcs],
+  )
 
   const organizationsById = React.useMemo(
     () =>

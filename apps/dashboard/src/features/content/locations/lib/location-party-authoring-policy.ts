@@ -1,4 +1,4 @@
-import type { LocationPartyAssociationSemanticId } from '@rpg/contracts'
+import type { LocationPartyAssociation, LocationPartyAssociationSemanticId } from '@rpg/contracts'
 
 import { LOCATION_AUTHORING_TYPE_IDS, type LocationAuthoringType } from './location-authoring-type'
 
@@ -36,6 +36,17 @@ export function isLocationPartyAssociationAuthoringSupported(
   authoringType: LocationAuthoringType,
 ): boolean {
   return getAvailableLocationPartyAssociationKinds(authoringType).length > 0
+}
+
+/** True when party associations should appear in detail or edit surfaces. */
+export function shouldShowLocationPartyAssociationsSection(input: {
+  authoringType: LocationAuthoringType
+  associations: readonly LocationPartyAssociation[]
+}): boolean {
+  return (
+    input.associations.length > 0 ||
+    isLocationPartyAssociationAuthoringSupported(input.authoringType)
+  )
 }
 
 /** Ensures policy keys stay aligned with the dashboard LocationAuthoringType SSOT. */

@@ -30,8 +30,11 @@ import {
   parentLocationFieldVisibility,
 } from './location-parent-picker'
 import { LocationPartyAssociationsSection } from '../components/location-party-associations-section.client'
-import { LOCATION_PARTY_ASSOCIATIONS_FIELD } from './location-party-associations.lib'
-import { isLocationPartyAssociationAuthoringSupported } from './location-party-authoring-policy'
+import {
+  LOCATION_PARTY_ASSOCIATIONS_FIELD,
+  LOCATION_PARTY_SECTION_LABEL,
+} from './location-party-associations.lib'
+import { shouldShowLocationPartyAssociationsSection } from './location-party-authoring-policy'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -119,13 +122,18 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
     descriptionField(ctx),
     {
       kind: 'group',
-      legend: 'People & organizations',
+      legend: LOCATION_PARTY_SECTION_LABEL,
       legendSize: 'subsection',
       visibility: {
-        dependsOn: ['authoringType'],
+        dependsOn: ['authoringType', LOCATION_PARTY_ASSOCIATIONS_FIELD],
         visibleWhen: (watched) => {
           const authoringType = resolveAuthoringTypeFromFormValues(watched)
-          return authoringType ? isLocationPartyAssociationAuthoringSupported(authoringType) : false
+          if (!authoringType) return false
+          const associations = watched[LOCATION_PARTY_ASSOCIATIONS_FIELD]
+          return shouldShowLocationPartyAssociationsSection({
+            authoringType,
+            associations: Array.isArray(associations) ? associations : [],
+          })
         },
       },
       fields: [

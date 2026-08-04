@@ -7,6 +7,7 @@ import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { createPcRecord, CharacterModel } from '../../character'
+import { deleteCampaignNpc } from '../../campaign/npc/npc.service'
 import {
   deleteContentEntity,
   getContentDeletionAvailability,
@@ -238,5 +239,41 @@ describe('location party association lifecycle', () => {
 
     const stillExists = await CharacterModel.findById(pc.id).lean()
     expect(stillExists).not.toBeNull()
+  })
+
+  it('blocks NPC delete when referenced by a location party association', async () => {
+    const campaign = await makeTestCampaign()
+    const world = await seedWorld(campaign.id)
+    const district = await seedStructureParent(campaign.id, world.id)
+    const { character: npc } = await createCampaignNpc(campaign.id, {
+      ...minimalNpcRequestInput,
+      name: 'Referenced NPC',
+    })
+
+    await createHomebrewContent(locationWriteConfig, campaign.id, {
+      slug: 'npc-workplace',
+      kind: 'structure',
+      name: 'NPC Workplace',
+      structureType: 'building',
+      classification: { archetype: 'tavern' },
+      parentLocationId: district.id,
+      partyAssociations: [
+        {
+          id: 'assoc-operator',
+          kind: 'operation',
+          role: 'operator',
+          party: { kind: 'character', characterId: npc.id },
+        },
+      ],
+    })
+
+    const result = await deleteCampaignNpc(campaign.id, npc.id)
+    expect(result).toMatchObject({ status: 'blocked' })
+    if (result.status !== 'blocked') throw new Error('expected blocked')
+    expect(result.blockers[0]).toMatchObject({
+      kind: 'content',
+      contentTypeKey: 'locations',
+      label: 'NPC Workplace',
+    })
   })
 })
