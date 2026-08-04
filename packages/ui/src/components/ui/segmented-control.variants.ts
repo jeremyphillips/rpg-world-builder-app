@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const segmentedControlRootVariants = cva(
-  'inline-flex rounded-lg border border-border bg-segmented-track p-0.5',
+  'inline-flex gap-[calc(var(--spacing)*0.5)] rounded-lg border border-border bg-segmented-track p-0.5',
   {
     variants: {
       fullWidth: {

@@ -82,6 +82,7 @@ function CatalogToolbarSearchField({
         aria-label={search.ariaLabel ?? search.placeholder}
         className="pl-9"
         size={controlSize}
+        disabled={search.disabled}
       />
     </div>
   )

@@ -100,4 +100,27 @@ describe('CatalogPickerSelectionActions', () => {
 
     expect(screen.getByRole('button', { name: 'Add' })).toHaveClass('border-interactive-outline')
   })
+
+  it('supports a custom add label', () => {
+    render(
+      <CatalogPickerSelectionActions
+        selected={false}
+        canSelect
+        addLabel="Add as owner"
+        onAdd={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add as owner' })).toBeInTheDocument()
+  })
+
+  it('renders success confirmation with precedence over remove', () => {
+    render(
+      <CatalogPickerSelectionActions phase="success" selected onAdd={vi.fn()} onRemove={vi.fn()} />,
+    )
+
+    expect(screen.getByText('✓ Added')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+  })
 })

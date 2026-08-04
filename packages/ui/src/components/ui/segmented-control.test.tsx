@@ -95,6 +95,23 @@ describe('SegmentedControl', () => {
     expect(inactiveMetadata).toHaveClass('text-xs', 'text-foreground-disabled')
   })
 
+  it('supports null value with no active segment', () => {
+    render(
+      <SegmentedControl
+        aria-label="Related to"
+        value={null}
+        options={[
+          { value: 'character', label: 'Characters', disabled: true },
+          { value: 'organization', label: 'Organizations', disabled: true },
+        ]}
+        onValueChange={vi.fn()}
+        fullWidth
+      />,
+    )
+
+    expect(screen.queryByRole('button', { pressed: true })).not.toBeInTheDocument()
+  })
+
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <SegmentedControl

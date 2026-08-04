@@ -120,7 +120,6 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'group',
       legend: 'People & organizations',
       legendSize: 'subsection',
-      chrome: { variant: 'panel', emphasis: 'subtle' },
       fields: [
         {
           kind: 'slot',

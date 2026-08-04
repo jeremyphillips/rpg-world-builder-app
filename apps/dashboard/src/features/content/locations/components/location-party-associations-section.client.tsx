@@ -24,6 +24,7 @@ import {
   LOCATION_PARTY_ADD_LABEL,
   LOCATION_PARTY_ASSOCIATIONS_FIELD,
   LOCATION_PARTY_EMPTY_TEXT,
+  LOCATION_PARTY_SECTION_DESCRIPTION,
   removeLocationPartyAssociation,
   type LocationPartyCharacterOption,
 } from '../lib/location-party-associations.lib'
@@ -35,7 +36,7 @@ export function LocationPartyAssociationsSection() {
     []) as LocationPartyAssociation[]
   const [pickerOpen, setPickerOpen] = React.useState(false)
   const [semanticKey, setSemanticKey] = React.useState<LocationPartyAssociationSemanticId | null>(
-    'owner',
+    null,
   )
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(campaignId)
@@ -81,6 +82,18 @@ export function LocationPartyAssociationsSection() {
     setValue(LOCATION_PARTY_ASSOCIATIONS_FIELD, next, { shouldDirty: true, shouldValidate: true })
   }
 
+  const handleOpenPicker = () => {
+    setSemanticKey(null)
+    setPickerOpen(true)
+  }
+
+  const handlePickerOpenChange = (open: boolean) => {
+    setPickerOpen(open)
+    if (!open) {
+      setSemanticKey(null)
+    }
+  }
+
   const handleSelectParty = (selection: { kind: 'character' | 'organization'; id: string }) => {
     if (!semanticKey) return
 
@@ -98,13 +111,15 @@ export function LocationPartyAssociationsSection() {
     )
   }
 
+  const handleRemoveParty = (associationId: string) => {
+    updateAssociations(removeLocationPartyAssociation(associations, associationId))
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <Text variant="muted">
-          Link owners, occupants, and operators without changing what kind of place this is.
-        </Text>
-        <Button type="button" onClick={() => setPickerOpen(true)}>
+      <div className="flex items-center justify-between gap-4">
+        <Text variant="muted">{LOCATION_PARTY_SECTION_DESCRIPTION}</Text>
+        <Button type="button" onClick={handleOpenPicker}>
           {LOCATION_PARTY_ADD_LABEL}
         </Button>
       </div>
@@ -126,6 +141,13 @@ export function LocationPartyAssociationsSection() {
                     key={row.association.id}
                     itemLabel={`${row.semanticLabel}: ${row.partyLabel}`}
                     label={<Text as="span">{row.partyLabel}</Text>}
+                    footer={
+                      row.partySummary ? (
+                        <Text variant="muted" className="text-sm">
+                          {row.partySummary}
+                        </Text>
+                      ) : undefined
+                    }
                     meta={
                       row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : undefined
                     }
@@ -144,11 +166,13 @@ export function LocationPartyAssociationsSection() {
 
       <LocationPartyPickerDrawer
         open={pickerOpen}
-        onOpenChange={setPickerOpen}
+        onOpenChange={handlePickerOpenChange}
         campaignId={campaignId}
+        associations={associations}
         semanticKey={semanticKey}
         onSemanticKeyChange={setSemanticKey}
         onSelectParty={handleSelectParty}
+        onRemoveParty={handleRemoveParty}
       />
     </div>
   )

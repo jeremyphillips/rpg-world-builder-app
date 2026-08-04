@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   appendLocationPartyAssociation,
+  buildLocationPartyAddActionLabel,
+  buildLocationPartyAssociationExactKeyFromSelection,
   buildLocationPartyAssociationRows,
+  buildRelatedToSegmentOptions,
+  findLocationPartyAssociationId,
+  isLocationPartyAssociationSelected,
+  resolvePartyKindForRelationshipChange,
   wouldDuplicateLocationPartyAssociation,
 } from './location-party-associations.lib'
 
@@ -48,5 +54,129 @@ describe('location party associations lib', () => {
 
     expect(rows).toHaveLength(1)
     expect(rows[0]?.partyUnresolved).toBe(true)
+  })
+
+  it('builds add action labels from semantic keys', () => {
+    expect(buildLocationPartyAddActionLabel('owner')).toBe('Add as owner')
+    expect(buildLocationPartyAddActionLabel('tenant')).toBe('Add as tenant')
+    expect(buildLocationPartyAddActionLabel('resident')).toBe('Add as resident')
+    expect(buildLocationPartyAddActionLabel('headquarters')).toBe('Add as headquarters')
+    expect(buildLocationPartyAddActionLabel('operator')).toBe('Add as operator')
+    expect(buildLocationPartyAddActionLabel('works_at')).toBe('Add as works here')
+  })
+
+  it('builds related-to segments with stable mount and disable rules', () => {
+    expect(buildRelatedToSegmentOptions(null)).toEqual([
+      { value: 'character', label: 'Characters', disabled: true },
+      { value: 'organization', label: 'Organizations', disabled: true },
+    ])
+
+    expect(buildRelatedToSegmentOptions('owner')).toEqual([
+      { value: 'character', label: 'Characters', disabled: false },
+      { value: 'organization', label: 'Organizations', disabled: false },
+    ])
+
+    expect(buildRelatedToSegmentOptions('resident')).toEqual([
+      { value: 'character', label: 'Characters', disabled: false },
+      { value: 'organization', label: 'Organizations', disabled: true },
+    ])
+  })
+
+  it('preserves valid party kind across relationship changes', () => {
+    expect(
+      resolvePartyKindForRelationshipChange({
+        previousPartyKind: 'character',
+        partyKinds: ['character', 'organization'],
+      }),
+    ).toBe('character')
+
+    expect(
+      resolvePartyKindForRelationshipChange({
+        previousPartyKind: 'organization',
+        partyKinds: ['character'],
+      }),
+    ).toBe('character')
+
+    expect(
+      resolvePartyKindForRelationshipChange({
+        previousPartyKind: null,
+        partyKinds: ['organization'],
+      }),
+    ).toBe('organization')
+  })
+
+  it('resolves exact association keys and ids for remove', () => {
+    const associations = appendLocationPartyAssociation({
+      associations: [],
+      semanticKey: 'owner',
+      party: { kind: 'character', characterId: 'char-1' },
+      id: 'assoc-owner',
+    })
+
+    const operatorAssociations = appendLocationPartyAssociation({
+      associations,
+      semanticKey: 'operator',
+      party: { kind: 'character', characterId: 'char-1' },
+      id: 'assoc-operator',
+    })
+
+    const ownerParty = { kind: 'character' as const, characterId: 'char-1' }
+
+    expect(
+      buildLocationPartyAssociationExactKeyFromSelection({
+        semanticKey: 'owner',
+        party: ownerParty,
+      }),
+    ).toContain('owner::character:char-1')
+
+    expect(
+      findLocationPartyAssociationId({
+        associations: operatorAssociations,
+        semanticKey: 'owner',
+        party: ownerParty,
+      }),
+    ).toBe('assoc-owner')
+
+    expect(
+      isLocationPartyAssociationSelected({
+        associations: operatorAssociations,
+        semanticKey: 'operator',
+        party: ownerParty,
+      }),
+    ).toBe(true)
+
+    expect(
+      isLocationPartyAssociationSelected({
+        associations: operatorAssociations,
+        semanticKey: 'owner',
+        party: ownerParty,
+      }),
+    ).toBe(true)
+  })
+
+  it('includes party summary on association rows', () => {
+    const rows = buildLocationPartyAssociationRows({
+      associations: [
+        {
+          id: 'row-1',
+          kind: 'ownership',
+          party: { kind: 'character', characterId: 'char-1' },
+        },
+      ],
+      charactersById: new Map([
+        [
+          'char-1',
+          {
+            id: 'char-1',
+            name: 'Morgan Stonebreaker',
+            summary: 'Dwarf · Level 4 Fighter',
+            characterType: 'pc',
+          },
+        ],
+      ]),
+      organizationsById: new Map(),
+    })
+
+    expect(rows[0]?.partySummary).toBe('Dwarf · Level 4 Fighter')
   })
 })

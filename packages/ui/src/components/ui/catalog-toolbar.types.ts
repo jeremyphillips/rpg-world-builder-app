@@ -22,6 +22,7 @@ export type CatalogToolbarSearch = {
   onQueryChange: (value: string) => void
   placeholder?: string
   ariaLabel?: string
+  disabled?: boolean
 }
 
 export type CatalogToolbarProps = {
