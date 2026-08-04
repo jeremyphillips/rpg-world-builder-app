@@ -68,6 +68,14 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 - Participant contract: `campaign-access-form-context.test.tsx`
 - Bulk preview: `campaign-access/bulk/resolve-bulk-campaign-access-preview.test.ts`
 
+## Capability
+
+Bulk campaign availability from content overviews requires both `canManage` and
+`supportsContentBulkCampaignAccess(contentTypeKey)`. Subclasses support single-item campaign
+access in the class editor but not overview-style bulk selection (`bulkCampaignAccess: false`).
+
+Shared action lifecycle docs: [actions.md](../../../../docs/actions.md).
+
 ## Shared vs bulk builders
 
 | Concern     | Detail (`buildCampaignAccessFields`) | Bulk (`buildBulkCampaignAccessFields`)                      |

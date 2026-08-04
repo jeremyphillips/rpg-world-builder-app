@@ -1,3 +1,9 @@
+import {
+  CONTENT_AVAILABILITY_OFF_ACTION,
+  formatActionBlockedDescription,
+  formatActionBlockedTitle,
+} from '@/lib/actions/action-messages'
+
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'
 
@@ -69,13 +75,17 @@ export const CAMPAIGN_ACCESS_UNSAVED_SUFFIX = ' · Unsaved'
 
 /** Blocked availability-off dialog headline. */
 export function formatCampaignAccessBlockedHeadline(): string {
-  return 'Cannot turn off availability'
+  return formatActionBlockedTitle({ mode: 'single', action: CONTENT_AVAILABILITY_OFF_ACTION })
 }
 
 /** Blocked availability-off dialog body when characters still reference the content. */
 export function formatCampaignAccessBlockedDescription(count: number): string {
-  const noun = count === 1 ? 'character' : 'characters'
-  return `This content is currently used by ${count} active ${noun}. Remove the references before making it unavailable.`
+  return formatActionBlockedDescription({
+    blockedCount: count,
+    selectedCount: count,
+    noun: 'item',
+    referenceNoun: 'character',
+  })
 }
 
 /** Bulk campaign-access modal headline. */

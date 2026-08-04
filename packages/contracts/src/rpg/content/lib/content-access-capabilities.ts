@@ -9,19 +9,39 @@ export const CONTENT_ACCESS_TARGET_TYPES = [...CONTENT_TYPE_KEYS, 'subclasses'] 
 export type ContentAccessTargetType = (typeof CONTENT_ACCESS_TARGET_TYPES)[number]
 
 export type ContentAccessCapability =
-  | { mode: 'owned'; visibilityModes: readonly ContentVisibilityMode[] }
+  | {
+      mode: 'owned'
+      visibilityModes: readonly ContentVisibilityMode[]
+      /** Overview-style bulk campaign availability edits for this target type. */
+      bulkCampaignAccess: boolean
+    }
   | { mode: 'inherited'; parentType: ContentAccessTargetType }
   | { mode: 'unsupported' }
 
+const ownedContentAccessCapability = (
+  bulkCampaignAccess = true,
+): Extract<ContentAccessCapability, { mode: 'owned' }> => ({
+  mode: 'owned',
+  visibilityModes: CONTENT_VISIBILITY_MODES,
+  bulkCampaignAccess,
+})
+
 export const CONTENT_ACCESS_CAPABILITIES: Record<ContentAccessTargetType, ContentAccessCapability> =
   {
-    classes: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    species: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    spells: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    equipment: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    feats: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    'skill-proficiencies': { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    organizations: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    locations: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
-    subclasses: { mode: 'owned', visibilityModes: CONTENT_VISIBILITY_MODES },
+    classes: ownedContentAccessCapability(),
+    species: ownedContentAccessCapability(),
+    spells: ownedContentAccessCapability(),
+    equipment: ownedContentAccessCapability(),
+    feats: ownedContentAccessCapability(),
+    'skill-proficiencies': ownedContentAccessCapability(),
+    organizations: ownedContentAccessCapability(),
+    locations: ownedContentAccessCapability(),
+    /** Subclasses are edited in the class editor — not bulk-selected from content overviews. */
+    subclasses: ownedContentAccessCapability(false),
   }
+
+/** Whether a target type supports overview-style bulk campaign availability edits. */
+export function supportsContentBulkCampaignAccess(targetType: ContentAccessTargetType): boolean {
+  const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
+  return capability.mode === 'owned' && capability.bulkCampaignAccess
+}

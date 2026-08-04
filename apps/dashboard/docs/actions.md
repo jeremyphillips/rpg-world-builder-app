@@ -1,0 +1,95 @@
+# Unified action validation
+
+Shared lifecycle for single and bulk dashboard actions that need configure → validate →
+resolve → submit → result flows. Domain policy stays in feature `lib/` modules; this folder
+owns the shell, lifecycle controller, formatters, fan-out validate client, and toast policy.
+
+## Ownership
+
+| Concern                                         | Owner                                      |
+| ----------------------------------------------- | ------------------------------------------ |
+| Domain-neutral validation / plan / apply shapes | `@rpg/contracts` (`lib/action-validation`) |
+| Domain blocker adapters                         | `@rpg/contracts` domain modules            |
+| Capability flags                                | `@rpg/contracts` capability maps           |
+| Authorization (`canManage`)                     | Existing campaign auth hooks               |
+| Lifecycle + shell + formatters                  | `apps/dashboard/src/lib/actions/`          |
+| Field builders, apply mutations, labels         | Feature `lib/`                             |
+
+## Lifecycle
+
+```text
+Configure → Validating → Resolve (when blocked) → Submitting → Result (operational failures)
+                ↘ Submitting (all eligible) ↗
+```
+
+- **Back** returns Resolve → Configure.
+- **Cancel** always abandons/closes.
+- Resolve checkboxes mean “apply this operation,” not table selection.
+
+## Validation vs planning
+
+- Validation statuses are `eligible | blocked` only.
+- `unchanged` and `wouldChange` belong in plan/apply outcomes — never on validation results.
+- Single-item validation is a one-element `ActionValidationResult`.
+
+## Per-target atomicity
+
+Compound campaign availability edits are all-or-nothing per target. If availability-off is
+blocked for a row, that row receives none of the bulk mutation — including player-access /
+visibility fields.
+
+## Races vs operational failures
+
+| Signal                     | Classification          | UI                                     |
+| -------------------------- | ----------------------- | -------------------------------------- |
+| PATCH `409` with blockers  | Expected race / blocker | Merge into Resolve — no error toast    |
+| Network / unexpected `5xx` | Operational failure     | Result phase with structured `failure` |
+
+Operational failures are never modeled as usage blockers.
+
+## Mixed execution
+
+N× PATCH is not transactional. Updated targets stay updated; failed targets remain retryable.
+Closing after mixed outcomes uses toast policy — never imply full atomic success.
+
+## Capability vs authorization
+
+Menus and actions require **both**:
+
+```text
+capability && canManage
+```
+
+Capability answers whether a kind supports the operation. Authorization answers whether the
+current user may manage the campaign. Do not collapse them.
+
+| Domain                       | Capability SSOT                                |
+| ---------------------------- | ---------------------------------------------- |
+| Content bulk campaign access | `supportsContentBulkCampaignAccess()`          |
+| Vocabulary bulk availability | `VOCABULARY_SET_CAPABILITIES.bulkAvailability` |
+| NPC bulk roster status       | `supportsCharacterBulkRosterStatus('npc')`     |
+
+## Toast policy
+
+See [feedback.md](./feedback.md). Summary:
+
+- Expected blockers and apply-time races while the modal is open → modal only.
+- Operational failures while the modal is open → Result/local error only.
+- Success / confirmed partial / accepted mixed → toast after close.
+
+## Components
+
+| Module                       | Role                                        |
+| ---------------------------- | ------------------------------------------- |
+| `useActionLifecycle`         | Phase machine, validate/apply orchestration |
+| `ActionDialogShell`          | Layout for configure / resolve / result     |
+| `ActionTargetResolutionList` | Bounded scroll region (`bg-surface-subtle`) |
+| `ActionBlockerReferences`    | Wrapper over `UsageBlockedReferenceList`    |
+| `action-messages.ts`         | Shared blocked/success/result copy          |
+| `fan-out-validate.ts`        | Concurrency-5 authoritative GET preflight   |
+
+## Related docs
+
+- [feedback.md](./feedback.md) — toast ownership
+- [availability.md](./availability.md) — UI-derived inactive chrome (out of scope here)
+- [campaign-access README](../src/features/content/lib/campaign-access/README.md)
