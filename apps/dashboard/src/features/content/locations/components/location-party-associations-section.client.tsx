@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useParams } from 'react-router-dom'
-import { useFormContext } from 'react-hook-form'
+import { Controller, useFormContext } from 'react-hook-form'
 
 import {
   type LocationPartyAssociation,
@@ -33,19 +33,24 @@ import {
   type LocationAuthoringType,
 } from '../lib/location-authoring-type'
 import { isLocationPartyAssociationAuthoringSupported } from '../lib/location-party-authoring-policy'
+import type { LocationFormValues } from '../lib/location-form-fields'
 
 export type LocationPartyAssociationsSectionProps = {
   campaignId?: string
 }
 
-export function LocationPartyAssociationsSection({
-  campaignId: campaignIdProp,
-}: LocationPartyAssociationsSectionProps = {}) {
-  const { campaignId: campaignIdParam = '' } = useParams<{ campaignId: string }>()
-  const campaignId = campaignIdProp ?? campaignIdParam
-  const { setValue, watch } = useFormContext()
-  const associations = (watch(LOCATION_PARTY_ASSOCIATIONS_FIELD) ??
-    []) as LocationPartyAssociation[]
+type LocationPartyAssociationsSectionContentProps = {
+  campaignId: string
+  associations: LocationPartyAssociation[]
+  onAssociationsChange: (next: LocationPartyAssociation[]) => void
+}
+
+function LocationPartyAssociationsSectionContent({
+  campaignId,
+  associations,
+  onAssociationsChange,
+}: LocationPartyAssociationsSectionContentProps) {
+  const { watch } = useFormContext<LocationFormValues>()
   const authoringType = resolveAuthoringTypeFromFormValues(watch()) as LocationAuthoringType
   const canAddAssociations = isLocationPartyAssociationAuthoringSupported(authoringType)
   const [pickerOpen, setPickerOpen] = React.useState(false)
@@ -80,10 +85,6 @@ export function LocationPartyAssociationsSection({
 
   const groupedRows = React.useMemo(() => groupLocationPartyAssociationRows(rows), [rows])
 
-  const updateAssociations = (next: LocationPartyAssociation[]) => {
-    setValue(LOCATION_PARTY_ASSOCIATIONS_FIELD, next, { shouldDirty: true, shouldValidate: true })
-  }
-
   const handleOpenPicker = () => {
     if (!canAddAssociations) return
     setSemanticKey(null)
@@ -105,7 +106,7 @@ export function LocationPartyAssociationsSection({
         ? { kind: 'character', characterId: selection.id }
         : { kind: 'organization', organizationId: selection.id }
 
-    updateAssociations(
+    onAssociationsChange(
       appendLocationPartyAssociation({
         associations,
         semanticKey,
@@ -115,7 +116,7 @@ export function LocationPartyAssociationsSection({
   }
 
   const handleRemoveParty = (associationId: string) => {
-    updateAssociations(removeLocationPartyAssociation(associations, associationId))
+    onAssociationsChange(removeLocationPartyAssociation(associations, associationId))
   }
 
   return (
@@ -123,7 +124,7 @@ export function LocationPartyAssociationsSection({
       <div className="flex items-center justify-between gap-4">
         <Text variant="muted">{LOCATION_PARTY_SECTION_DESCRIPTION}</Text>
         {canAddAssociations ? (
-          <Button type="button" onClick={handleOpenPicker}>
+          <Button type="button" variant="outline" onClick={handleOpenPicker}>
             {LOCATION_PARTY_ADD_LABEL}
           </Button>
         ) : null}
@@ -156,11 +157,7 @@ export function LocationPartyAssociationsSection({
                     meta={
                       row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : undefined
                     }
-                    onRemove={() =>
-                      updateAssociations(
-                        removeLocationPartyAssociation(associations, row.association.id),
-                      )
-                    }
+                    onRemove={() => handleRemoveParty(row.association.id)}
                   />
                 ))}
               </div>
@@ -183,5 +180,27 @@ export function LocationPartyAssociationsSection({
         />
       ) : null}
     </div>
+  )
+}
+
+export function LocationPartyAssociationsSection({
+  campaignId: campaignIdProp,
+}: LocationPartyAssociationsSectionProps = {}) {
+  const { campaignId: campaignIdParam = '' } = useParams<{ campaignId: string }>()
+  const campaignId = campaignIdProp ?? campaignIdParam
+  const { control } = useFormContext<LocationFormValues>()
+
+  return (
+    <Controller
+      name={LOCATION_PARTY_ASSOCIATIONS_FIELD}
+      control={control}
+      render={({ field }) => (
+        <LocationPartyAssociationsSectionContent
+          campaignId={campaignId}
+          associations={(field.value ?? []) as LocationPartyAssociation[]}
+          onAssociationsChange={field.onChange}
+        />
+      )}
+    />
   )
 }
