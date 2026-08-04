@@ -4,6 +4,21 @@ export const catalogToolbarVariants = cva('space-y-4 px-6 pb-4')
 
 export const catalogToolbarSearchRowVariants = cva('relative')
 
+export const catalogToolbarSearchIconVariants = cva(
+  'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2',
+  {
+    variants: {
+      disabled: {
+        true: 'text-input-disabled',
+        false: 'text-input-placeholder',
+      },
+    },
+    defaultVariants: {
+      disabled: false,
+    },
+  },
+)
+
 export const catalogToolbarTabRowVariants = cva(
   'flex items-center justify-between gap-4 border-b border-border',
 )

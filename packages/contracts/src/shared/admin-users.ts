@@ -7,6 +7,7 @@ export const ADMIN_USER_DELETE_BLOCK_REASONS = [
   'self',
   'last_superadmin',
   'owns_campaigns',
+  'character_referenced_by_locations',
 ] as const
 
 export const adminUserDeleteBlockReasonSchema = z.enum(ADMIN_USER_DELETE_BLOCK_REASONS)

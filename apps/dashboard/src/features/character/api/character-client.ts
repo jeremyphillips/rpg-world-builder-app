@@ -1,13 +1,17 @@
 import {
+  ApiError,
+  contentDeletionResultSchema,
+  fetchCsrfToken,
   getCharacterBuilderChromeMessages,
   type CharacterRoutingContextResponse,
+  type ContentDeletionResult,
   type CreateCharacterInput,
   type PcCharacter,
   type PcCharacterListItem,
   type SystemRulesetId,
 } from '@rpg/contracts'
 
-import { deleteJson, postJson, request } from '@/lib/api-client'
+import { CSRF_HEADER, postJson, request } from '@/lib/api-client'
 
 const CREATE_CHARACTER_ERROR = getCharacterBuilderChromeMessages('standalone_pc').createErrorDefault
 const DELETE_CHARACTER_ERROR = 'Could not delete character.'
@@ -51,8 +55,32 @@ export async function getCharacterRoutingContext(
   )
 }
 
-export async function deleteCharacter(characterId: string): Promise<void> {
-  await deleteJson(`/api/characters/${characterId}`, DELETE_CHARACTER_ERROR)
+export async function deleteCharacter(characterId: string): Promise<ContentDeletionResult> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`/api/characters/${encodeURIComponent(characterId)}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+
+  if (res.status === 204) {
+    return { status: 'deleted' }
+  }
+
+  const body = (await res.json().catch(() => null)) as {
+    result?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+
+  if (res.status === 409) {
+    return contentDeletionResultSchema.parse(body?.result)
+  }
+
+  throw new ApiError(
+    res.status,
+    body?.error?.code ?? 'request_error',
+    body?.error?.message ?? DELETE_CHARACTER_ERROR,
+  )
 }
 
 export type { CreateCharacterInput, PcCharacter, SystemRulesetId }

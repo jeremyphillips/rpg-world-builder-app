@@ -1,12 +1,16 @@
 import {
+  ApiError,
+  contentDeletionResultSchema,
+  fetchCsrfToken,
   getCharacterBuilderChromeMessages,
   type CampaignNpcDetail,
   type CampaignNpcListItem,
   type CampaignNpcStatusPatch,
+  type ContentDeletionResult,
   type CreateNpcRequestInput,
 } from '@rpg/contracts'
 
-import { deleteJson, patchJson, postJson, request } from '@/lib/api-client'
+import { CSRF_HEADER, patchJson, postJson, request } from '@/lib/api-client'
 
 const LIST_NPCS_ERROR = 'Could not load NPCs.'
 const GET_NPC_ERROR = 'Could not load NPC.'
@@ -65,8 +69,32 @@ export async function createNpc(
   return npc
 }
 
-export async function deleteNpc(campaignId: string, npcId: string): Promise<void> {
-  await deleteJson(`${npcCollectionPath(campaignId)}/${npcId}`, DELETE_NPC_ERROR)
+export async function deleteNpc(campaignId: string, npcId: string): Promise<ContentDeletionResult> {
+  const csrfToken = await fetchCsrfToken()
+  const res = await fetch(`${npcCollectionPath(campaignId)}/${encodeURIComponent(npcId)}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: { [CSRF_HEADER]: csrfToken },
+  })
+
+  if (res.status === 204) {
+    return { status: 'deleted' }
+  }
+
+  const body = (await res.json().catch(() => null)) as {
+    result?: unknown
+    error?: { code?: string; message?: string }
+  } | null
+
+  if (res.status === 409) {
+    return contentDeletionResultSchema.parse(body?.result)
+  }
+
+  throw new ApiError(
+    res.status,
+    body?.error?.code ?? 'request_error',
+    body?.error?.message ?? DELETE_NPC_ERROR,
+  )
 }
 
 export async function patchNpcStatus(

@@ -79,6 +79,8 @@ const DELETE_BLOCK_REASON_MESSAGES: Record<AdminUserDeleteBlockReason, string> =
   self: 'You cannot delete your own account',
   last_superadmin: 'This user is the last superadmin',
   owns_campaigns: 'This user owns one or more campaigns',
+  character_referenced_by_locations:
+    'One or more of this user’s characters are linked from a location',
 }
 
 export function getPrimaryDeleteBlockReasonMessage(
@@ -89,6 +91,7 @@ export function getPrimaryDeleteBlockReasonMessage(
     'self',
     'last_superadmin',
     'owns_campaigns',
+    'character_referenced_by_locations',
   ]
 
   for (const reason of priority) {

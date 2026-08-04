@@ -20,11 +20,14 @@ import {
   buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
   equipmentKindToFamilyPath,
+  getAssociationSemanticKey,
   getContentTypeTerm,
   getCreatureSizeLabel,
+  formatLocationDisplaySummary,
   getFeatCategoryLabel,
-  getLocationKindLabel,
+  getLocationPartyAssociationSemanticLabel,
   getOrganizationKindLabel,
+  resolveLocationDisplaySummary,
   getEquipmentSearchName,
   joinCompactSegments,
   stripHtmlTags,
@@ -182,14 +185,19 @@ function buildOrganizationTarget(organization: Organization): GlobalSearchTarget
 }
 
 function buildLocationSecondary(location: Location): string {
-  return getLocationKindLabel(location.kind)
+  return formatLocationDisplaySummary(resolveLocationDisplaySummary(location))
 }
 
 function buildLocationFields(location: Location): GlobalSearchField[] {
+  const partyKeywords = (location.partyAssociations ?? []).map((association) =>
+    getLocationPartyAssociationSemanticLabel(getAssociationSemanticKey(association)),
+  )
+
   return [
     labelField(location.name),
     keywordField(location.slug),
     descriptionField(stripHtmlTags(location.description ?? '')),
+    ...partyKeywords.map((text) => keywordField(text, 0.25)),
   ]
 }
 

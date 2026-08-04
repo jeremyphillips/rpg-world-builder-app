@@ -18,3 +18,10 @@ Schema generation. It runs `pnpm generate:json-schemas`, stages
 tree matches the index for generated output. CI runs `pnpm gate:json-schemas` on every PR.
 
 Skip all hooks locally: `HUSKY=0 git commit` / `HUSKY=0 git push`.
+
+## Turbo task dependencies
+
+In [`turbo.json`](../../turbo.json), only **`lint`** depends on upstream `^build` (ESLint
+type-aware rules / generated artifacts). **`typecheck`** and **`test`** run directly against
+workspace source exports — pre-commit `*:affected` does not trigger implicit package builds
+for those tasks.

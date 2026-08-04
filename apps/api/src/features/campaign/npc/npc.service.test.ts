@@ -6,7 +6,10 @@ import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { seedCharacterParticipation } from '../../../test/helpers/campaign-participation'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createCampaignNpc, listCampaignNpcs } from './npc.service'
+
+useIntegrationDb()
 
 describe('createCampaignNpc', () => {
   it('persists an NPC with open campaign participation', async () => {

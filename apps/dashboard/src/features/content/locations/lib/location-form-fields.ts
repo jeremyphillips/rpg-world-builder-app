@@ -1,6 +1,8 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   interiorTypeSchema,
+  locationPartyAssociationsSchema,
   planeTypeSchema,
   settlementTypeSchema,
   siteTypeSchema,
@@ -27,6 +29,12 @@ import {
   buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
+import { LocationPartyAssociationsSection } from '../components/location-party-associations-section.client'
+import {
+  LOCATION_PARTY_ASSOCIATIONS_FIELD,
+  LOCATION_PARTY_SECTION_LABEL,
+} from './location-party-associations.lib'
+import { shouldShowLocationPartyAssociationsSection } from './location-party-authoring-policy'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -54,6 +62,7 @@ export const locationFormSchema = z
     siteType: siteTypeSchema.optional(),
     interiorType: interiorTypeSchema.optional(),
     classification: classificationFormSchema,
+    partyAssociations: locationPartyAssociationsSchema,
   })
   .superRefine((values, ctx) => {
     const { kind } = canonicalFieldsForAuthoringType(values.authoringType)
@@ -74,6 +83,7 @@ export const locationDraftFormSchema = z.object({
   siteType: draftOptionalSelect(siteTypeSchema),
   interiorType: draftOptionalSelect(interiorTypeSchema),
   classification: classificationFormSchema,
+  partyAssociations: locationPartyAssociationsSchema,
 })
 
 export type LocationFormValues = z.infer<typeof locationFormSchema>
@@ -110,6 +120,30 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
     },
     descriptionField(ctx),
+    {
+      kind: 'group',
+      legend: LOCATION_PARTY_SECTION_LABEL,
+      legendSize: 'subsection',
+      visibility: {
+        dependsOn: ['authoringType', LOCATION_PARTY_ASSOCIATIONS_FIELD],
+        visibleWhen: (watched) => {
+          const authoringType = resolveAuthoringTypeFromFormValues(watched)
+          if (!authoringType) return false
+          const associations = watched[LOCATION_PARTY_ASSOCIATIONS_FIELD]
+          return shouldShowLocationPartyAssociationsSection({
+            authoringType,
+            associations: Array.isArray(associations) ? associations : [],
+          })
+        },
+      },
+      fields: [
+        {
+          kind: 'slot',
+          name: LOCATION_PARTY_ASSOCIATIONS_FIELD,
+          render: () => createElement(LocationPartyAssociationsSection),
+        },
+      ],
+    },
   ]
 }
 

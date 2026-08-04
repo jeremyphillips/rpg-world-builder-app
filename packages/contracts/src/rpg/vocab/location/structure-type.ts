@@ -35,6 +35,9 @@ export const STRUCTURE_TYPE_ENTRIES = {
 
 export type StructureType = keyof typeof STRUCTURE_TYPE_ENTRIES
 
+/** Generic unclassified structure — maps to `kind: 'structure'` with no `structureType`. */
+export const UNCLASSIFIED_STRUCTURE_LABEL = 'Unclassified structure' as const
+
 export const STRUCTURE_TYPE_IDS = keysFromEntries(STRUCTURE_TYPE_ENTRIES)
 
 export const structureTypeSchema = vocabEnumFromEntries(STRUCTURE_TYPE_ENTRIES)

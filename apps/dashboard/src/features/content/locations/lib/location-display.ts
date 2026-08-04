@@ -1,19 +1,16 @@
 import {
-  getInteriorClassificationLabel,
+  formatLocationDisplaySummary,
   getLocationKindEntry,
-  getLocationKindLabel,
-  getPlaneTypeLabel,
-  getRegionClassificationLabel,
-  getSettlementTypeLabel,
-  getSiteTypeLabel,
-  getStructureClassificationLabel,
+  resolveLocationDetailClassificationFieldLabel,
+  resolveLocationDisplaySummary,
   type Location,
+  type LocationDisplaySummary,
   type LocationKind,
 } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+export const LOCATION_UNKNOWN_ANCESTOR_LABEL = 'Unknown location' as const
 
 export const LOCATION_SECTION_LABELS = {
   ancestry: 'Location path',
@@ -24,17 +21,37 @@ export const LOCATION_EMPTY_SECTION_TEXT = {
   children: 'No contained locations yet.',
 } as const
 
+/** @deprecated Use LocationLocatedInSegment — kept for LocationAncestry stories. */
 export type LocationAncestrySegment = {
   id: string
   name: string
   href: string
 }
 
+export type LocationLocatedInSegment = {
+  id: string
+  name: string
+  href?: string
+}
+
+export type LocationDetailIdentityRow = {
+  label: string
+  value: string
+  info?: string
+  infoAriaLabel?: string
+}
+
+export type LocationDetailIdentityViewModel = {
+  displaySummary: LocationDisplaySummary
+  rows: LocationDetailIdentityRow[]
+  locatedIn: LocationLocatedInSegment[]
+}
+
 export type LocationChildItem = {
   id: string
   name: string
-  kindLabel: string
   href: string
+  summaryLine: string
 }
 
 export type LocationChildrenViewModel = {
@@ -43,59 +60,58 @@ export type LocationChildrenViewModel = {
 }
 
 export type LocationDetailViewModel = {
-  statRows: ContentStatRowData[]
+  identity: LocationDetailIdentityViewModel
   description?: string
-  ancestry: LocationAncestrySegment[]
   children: LocationChildrenViewModel
 }
 
-const subtypeLabelByKind: Partial<
-  Record<LocationKind, (location: Location) => string | undefined>
-> = {
-  plane: (location) =>
-    location.kind === 'plane' && location.planeType
-      ? getPlaneTypeLabel(location.planeType)
-      : undefined,
-  region: (location) =>
-    location.kind === 'region' && location.classification
-      ? getRegionClassificationLabel(location.classification)
-      : undefined,
-  settlement: (location) =>
-    location.kind === 'settlement' && location.settlementType
-      ? getSettlementTypeLabel(location.settlementType)
-      : undefined,
-  site: (location) =>
-    location.kind === 'site' && location.siteType ? getSiteTypeLabel(location.siteType) : undefined,
-  structure: (location) =>
-    location.kind === 'structure'
-      ? getStructureClassificationLabel({
-          structureType: location.structureType,
-          classification: location.classification,
-        })
-      : undefined,
-  interior: (location) =>
-    location.kind === 'interior'
-      ? getInteriorClassificationLabel({
-          interiorType: location.interiorType,
-          classification: location.classification,
-        })
-      : undefined,
+export function resolveLocationDetailSpecializationFieldLabel(
+  location: Location,
+): 'Specialization' | undefined {
+  const summary = resolveLocationDisplaySummary(location)
+  return summary.specializationLabel ? 'Specialization' : undefined
 }
 
-function getLocationSubtypeLabel(location: Location): string | undefined {
-  return subtypeLabelByKind[location.kind]?.(location)
+function buildLocationDetailIdentityRows(location: Location): LocationDetailIdentityRow[] {
+  const summary = resolveLocationDisplaySummary(location)
+  const rows: LocationDetailIdentityRow[] = [
+    {
+      label: 'Type',
+      value: summary.typeLabel,
+      info: getLocationKindEntry(location.kind)?.description,
+      infoAriaLabel: `About ${summary.typeLabel}`,
+    },
+  ]
+
+  const classificationFieldLabel = resolveLocationDetailClassificationFieldLabel(location)
+  if (classificationFieldLabel && summary.classificationLabel) {
+    rows.push({
+      label: classificationFieldLabel,
+      value: summary.classificationLabel,
+    })
+  }
+
+  const specializationFieldLabel = resolveLocationDetailSpecializationFieldLabel(location)
+  if (specializationFieldLabel && summary.specializationLabel) {
+    rows.push({
+      label: specializationFieldLabel,
+      value: summary.specializationLabel,
+    })
+  }
+
+  return rows
 }
 
 export function buildLocationsById(locations: readonly Location[]): Map<string, Location> {
   return new Map(locations.map((location) => [location.id, location]))
 }
 
-export function buildLocationAncestrySegments(
+export function buildLocationLocatedInSegments(
   location: Location,
   locationsById: ReadonlyMap<string, Location>,
   campaignId: string,
-): LocationAncestrySegment[] {
-  const segments: LocationAncestrySegment[] = []
+): LocationLocatedInSegment[] {
+  const segments: LocationLocatedInSegment[] = []
   const visited = new Set<string>([location.id])
   let current: Location | undefined = location
 
@@ -105,7 +121,13 @@ export function buildLocationAncestrySegments(
     visited.add(parentId)
 
     const parent = locationsById.get(parentId)
-    if (!parent) break
+    if (!parent) {
+      segments.unshift({
+        id: parentId,
+        name: LOCATION_UNKNOWN_ANCESTOR_LABEL,
+      })
+      break
+    }
 
     segments.unshift({
       id: parent.id,
@@ -118,6 +140,17 @@ export function buildLocationAncestrySegments(
   return segments
 }
 
+/** @deprecated Use buildLocationLocatedInSegments. */
+export function buildLocationAncestrySegments(
+  location: Location,
+  locationsById: ReadonlyMap<string, Location>,
+  campaignId: string,
+): LocationAncestrySegment[] {
+  return buildLocationLocatedInSegments(location, locationsById, campaignId).flatMap((segment) =>
+    segment.href ? [{ id: segment.id, name: segment.name, href: segment.href }] : [],
+  )
+}
+
 export function buildLocationChildren(
   locationId: string,
   locations: readonly Location[],
@@ -128,10 +161,49 @@ export function buildLocationChildren(
     .map((location) => ({
       id: location.id,
       name: location.name,
-      kindLabel: getLocationKindLabel(location.kind),
       href: ROUTES.content.locations.detail(campaignId, location.id),
+      summaryLine: formatLocationDisplaySummary(resolveLocationDisplaySummary(location)),
     }))
     .sort((left, right) => left.name.localeCompare(right.name))
+}
+
+export type LocationChildSummaryItem = {
+  id: string
+  label: string
+}
+
+export function buildChildSummariesByParentId(
+  locations: readonly Location[],
+): Map<string, LocationChildSummaryItem[]> {
+  const summaries = new Map<string, LocationChildSummaryItem[]>()
+
+  for (const location of locations) {
+    const parentId = location.parentLocationId
+    if (!parentId) continue
+
+    const bucket = summaries.get(parentId) ?? []
+    bucket.push({ id: location.id, label: location.name })
+    summaries.set(parentId, bucket)
+  }
+
+  for (const [parentId, items] of summaries) {
+    summaries.set(
+      parentId,
+      [...items].sort((left, right) => left.label.localeCompare(right.label)),
+    )
+  }
+
+  return summaries
+}
+
+export function buildChildCountByParentId(locations: readonly Location[]): Map<string, number> {
+  const counts = new Map<string, number>()
+
+  for (const [parentId, items] of buildChildSummariesByParentId(locations)) {
+    counts.set(parentId, items.length)
+  }
+
+  return counts
 }
 
 export function buildLocationDetailViewModel(
@@ -142,33 +214,15 @@ export function buildLocationDetailViewModel(
   },
 ): LocationDetailViewModel {
   const locationsById = buildLocationsById(ctx.locations)
-  const parent = location.parentLocationId
-    ? locationsById.get(location.parentLocationId)
-    : undefined
-  const kindLabel = getLocationKindLabel(location.kind)
-  const subtypeLabel = getLocationSubtypeLabel(location)
-
-  const statRows: ContentStatRowData[] = [
-    {
-      label: 'Kind',
-      value: kindLabel,
-      info: getLocationKindEntry(location.kind)?.description,
-      infoAriaLabel: `About ${kindLabel}`,
-    },
-  ]
-
-  if (subtypeLabel) {
-    statRows.push({ label: 'Subtype', value: subtypeLabel })
-  }
-
-  if (parent) {
-    statRows.push({ label: 'Parent', value: parent.name })
-  }
+  const displaySummary = resolveLocationDisplaySummary(location)
 
   return {
-    statRows,
+    identity: {
+      displaySummary,
+      rows: buildLocationDetailIdentityRows(location),
+      locatedIn: buildLocationLocatedInSegments(location, locationsById, ctx.campaignId),
+    },
     description: location.description,
-    ancestry: buildLocationAncestrySegments(location, locationsById, ctx.campaignId),
     children: {
       items: buildLocationChildren(location.id, ctx.locations, ctx.campaignId),
       emptyText: LOCATION_EMPTY_SECTION_TEXT.children,

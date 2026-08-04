@@ -20,6 +20,6 @@ describe('AllCampaignsLink', () => {
     expect(link.className).toContain(
       sidebarNavItemVariants({ active: false, tone: 'workspaceExit' }),
     )
-    expect(link.querySelector('[aria-hidden="true"]')).toHaveClass('size-4.5', 'shrink-0')
+    expect(link.querySelector('[aria-hidden="true"]')).toHaveClass('size-4', 'shrink-0')
   })
 })

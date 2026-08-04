@@ -20,7 +20,9 @@ Do **not** duplicate combinatorial validation matrices here — those live in
 | Path                              | Purpose                                                                 |
 | --------------------------------- | ----------------------------------------------------------------------- |
 | `setup/global-setup.ts`           | One shared `MongoMemoryServer` per integration run (Vitest globalSetup) |
-| `setup/connect-integration-db.ts` | Connects Mongoose to the shared server (`api:integration` setupFiles)   |
+| `setup/connect-integration-db.ts` | Connects Mongoose to a **per-worker DB** on the shared replset          |
+| `setup/integration-mongo-uri.ts`  | Worker-scoped DB name suffix (`vitest_w{N}`) on the shared URI          |
+| `setup/integration-test-files.ts` | Serial-only integration paths (`realtime.integration.test.ts`)          |
 | `setup/integration-db.ts`         | `useIntegrationDb()` — `beforeEach(clearTestDb)` for integration tests  |
 | `setup/integration-app.ts`        | `useIntegrationApp()` — DB + `createApp()` for route tests              |
 | `setup/unit-test-files.ts`        | Pure lib test paths (parallel `api:unit` project, no Mongo)             |
@@ -45,8 +47,9 @@ Route tests use `useIntegrationApp()` and call `getApp()` inside each test.
 
 DB clearing uses **`beforeEach(clearTestDb)`** via `useIntegrationDb()` — not `afterEach`.
 
-Integration tests run in the **`api:integration`** Vitest project (serial files, shared
-in-memory Mongo). Pure lib tests run in **`api:unit`** (parallel, no DB). Auth hashing uses
+Integration tests run in **`api:integration`** (parallel files, worker-isolated DBs on one
+in-memory replset, default `maxWorkers: 2`) and **`api:integration-serial`** (Socket.IO /
+realtime only). Pure lib tests run in **`api:unit`** (parallel, no DB). Auth hashing uses
 fewer bcrypt rounds in test (`src/lib/bcrypt-rounds.ts`) for speed; production stays at 12.
 
 ## Catalog-aligned starting wealth
@@ -80,6 +83,7 @@ See also [`src/features/vocabulary/README.md`](../src/features/vocabulary/README
 ```sh
 pnpm --filter @rpg/api test
 pnpm --filter @rpg/api exec vitest run --project api:integration
+pnpm --filter @rpg/api exec vitest run --project api:integration-serial
 pnpm --filter @rpg/api exec vitest run --project api:unit
 pnpm --filter @rpg/api typecheck
 ```

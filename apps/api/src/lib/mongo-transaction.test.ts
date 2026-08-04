@@ -5,6 +5,9 @@ import {
   detectMongoTransactionSupport,
   resolveMongoTransactionCapability,
 } from './mongo-transaction'
+import { useIntegrationDb } from '../test/setup/integration-db'
+
+useIntegrationDb()
 
 describe('mongo-transaction', () => {
   it('detects transaction support on a replica-set test harness', async () => {

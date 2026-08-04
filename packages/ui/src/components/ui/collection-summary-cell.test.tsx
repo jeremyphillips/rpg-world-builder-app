@@ -17,10 +17,10 @@ const ITEMS = [
 ]
 
 describe('CollectionSummaryCell', () => {
-  it('renders a non-interactive empty label when there are no items', () => {
+  it('renders a non-interactive zero count when there are no items', () => {
     render(<CollectionSummaryCell items={[]} singularLabel="subclass" pluralLabel="subclasses" />)
 
-    expect(screen.getByText('—')).toBeInTheDocument()
+    expect(screen.getByText('0')).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 

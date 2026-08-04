@@ -114,6 +114,7 @@ export function CatalogPickerSheet<TItem>({
   emptyState,
   loading = false,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
+  searchDisabled = false,
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
@@ -221,6 +222,7 @@ export function CatalogPickerSheet<TItem>({
             onQueryChange: setSearchQuery,
             placeholder: searchPlaceholder,
             ariaLabel: searchPlaceholder,
+            disabled: searchDisabled,
           }}
           tabs={toolbarTabs}
           primaryControls={primaryControls}

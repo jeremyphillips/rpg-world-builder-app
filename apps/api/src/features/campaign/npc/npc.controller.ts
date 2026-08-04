@@ -34,9 +34,13 @@ export async function getById(req: Request, res: Response): Promise<void> {
 
 export async function remove(req: Request, res: Response): Promise<void> {
   const { campaignId, npcId } = req.params as { campaignId: string; npcId: string }
-  const deleted = await deleteCampaignNpc(campaignId, npcId)
-  if (!deleted) {
+  const result = await deleteCampaignNpc(campaignId, npcId)
+  if (result.status === 'not_found') {
     throw new HttpError(404, 'not_found', 'NPC not found.')
+  }
+  if (result.status === 'blocked') {
+    res.status(409).json({ result })
+    return
   }
   res.status(204).send()
 }

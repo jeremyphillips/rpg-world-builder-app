@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { ContentDeletionResult } from '@rpg/contracts'
 
 import { deleteNpc } from '../api/npc-client'
 import { npcQueryKey, npcsQueryKey } from './use-npcs'
@@ -14,9 +15,12 @@ export function useDeleteNpc() {
 
   return useMutation({
     mutationFn: ({ campaignId, npcId }: DeleteNpcVariables) => deleteNpc(campaignId, npcId),
-    onSuccess: (_result, { campaignId, npcId }) => {
+    onSuccess: (result, { campaignId, npcId }) => {
+      if (result.status !== 'deleted') return
       void queryClient.invalidateQueries({ queryKey: npcsQueryKey(campaignId) })
       void queryClient.removeQueries({ queryKey: npcQueryKey(campaignId, npcId) })
     },
   })
 }
+
+export type DeleteNpcMutationResult = ContentDeletionResult

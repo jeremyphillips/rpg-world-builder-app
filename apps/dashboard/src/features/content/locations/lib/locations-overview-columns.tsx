@@ -1,29 +1,70 @@
-import { getLocationKindLabel, type Location } from '@rpg/contracts'
-import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
+import {
+  formatLocationDisplaySummary,
+  locationDisplaySummarySortKey,
+  resolveLocationDisplaySummary,
+  type Location,
+} from '@rpg/contracts'
 import { dataTableColumnChromeMeta, SortableHeader, type ColumnDef } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
+
+import { buildChildSummariesByParentId, type LocationChildSummaryItem } from './location-display'
 
 export type { LocationsOverviewFilterState } from './locations-overview-filter-schema'
 export { locationsFilterSchema } from './locations-overview-filter-schema'
+
+function compareLocationDisplaySortKeys(
+  left: readonly [string, string, string],
+  right: readonly [string, string, string],
+): number {
+  for (let index = 0; index < left.length; index += 1) {
+    const comparison = left[index]!.localeCompare(right[index]!)
+    if (comparison !== 0) return comparison
+  }
+  return 0
+}
 
 function buildParentNameById(locations: readonly Location[]): Map<string, string> {
   return new Map(locations.map((location) => [location.id, location.name]))
 }
 
+function buildLocationContainsColumn(
+  childSummariesByParentId: Map<string, LocationChildSummaryItem[]>,
+): ColumnDef<Location> {
+  return buildCollectionCountColumn({
+    id: 'contains',
+    label: 'Contains',
+    getItems: (row) => childSummariesByParentId.get(row.id) ?? [],
+    getCount: (row) => childSummariesByParentId.get(row.id)?.length ?? 0,
+    singularLabel: 'location',
+    pluralLabel: 'locations',
+  })
+}
+
 function buildLocationMiddleColumns(
   campaignId: string,
   parentNameById: Map<string, string>,
+  childSummariesByParentId: Map<string, LocationChildSummaryItem[]>,
 ): ColumnDef<Location>[] {
   return [
     {
-      accessorKey: 'kind',
-      header: ({ column }) => <SortableHeader column={column}>Kind</SortableHeader>,
-      cell: ({ row }) => getLocationKindLabel(row.getValue<Location['kind']>('kind')),
-      filterFn: 'equalsString',
-      meta: { label: 'Kind', ...dataTableColumnChromeMeta('medium', 'meta') },
+      id: 'locationType',
+      accessorFn: (row) => locationDisplaySummarySortKey(resolveLocationDisplaySummary(row)),
+      header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+      cell: ({ row }) => formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original)),
+      sortingFn: (left, right) =>
+        compareLocationDisplaySortKeys(
+          locationDisplaySummarySortKey(resolveLocationDisplaySummary(left.original)),
+          locationDisplaySummarySortKey(resolveLocationDisplaySummary(right.original)),
+        ),
+      filterFn: (row, _columnId, filterValue) => {
+        const summary = formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original))
+        return summary.toLowerCase().includes(String(filterValue).toLowerCase())
+      },
+      meta: { label: 'Type', ...dataTableColumnChromeMeta('medium', 'meta') },
     },
     {
       id: 'parentLocation',
@@ -47,6 +88,7 @@ function buildLocationMiddleColumns(
       },
       meta: { label: 'Parent', ...dataTableColumnChromeMeta('medium', 'meta') },
     },
+    buildLocationContainsColumn(childSummariesByParentId),
   ]
 }
 
@@ -54,15 +96,17 @@ export function locationsColumns(
   campaignId: string,
   options?: {
     locations?: readonly Location[]
-    usageSummaryLabels?: ContentUsageSummaryLabels
-    overviewUsageScope?: ContentOverviewUsageScope
   },
 ) {
-  const parentNameById = buildParentNameById(options?.locations ?? [])
+  const locations = options?.locations ?? []
+  const parentNameById = buildParentNameById(locations)
+  const childSummariesByParentId = buildChildSummariesByParentId(locations)
 
-  return buildContentColumns<Location>(buildLocationMiddleColumns(campaignId, parentNameById), {
-    ...options,
-    contentType: 'locations',
-    nameHref: (row) => ROUTES.content.locations.detail(campaignId, row.id),
-  })
+  return buildContentColumns<Location>(
+    buildLocationMiddleColumns(campaignId, parentNameById, childSummariesByParentId),
+    {
+      contentType: 'locations',
+      nameHref: (row) => ROUTES.content.locations.detail(campaignId, row.id),
+    },
+  )
 }

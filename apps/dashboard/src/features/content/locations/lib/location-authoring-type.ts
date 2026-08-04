@@ -10,6 +10,7 @@ import {
   LOCATION_KIND_IDS,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
+  UNCLASSIFIED_STRUCTURE_LABEL,
   type LocationKind,
   type StructureType,
 } from '@rpg/contracts'
@@ -20,7 +21,7 @@ type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 /** Generic unclassified structure — maps to `kind: 'structure'` with no `structureType`. */
 export const UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE = 'structure' as const
 
-export const UNCLASSIFIED_STRUCTURE_LABEL = 'Unclassified structure'
+export { UNCLASSIFIED_STRUCTURE_LABEL } from '@rpg/contracts'
 
 const NON_STRUCTURE_LOCATION_KIND_IDS = LOCATION_KIND_IDS.filter(
   (id): id is NonStructureLocationKind => id !== 'structure',

@@ -46,7 +46,7 @@ export const CONTENT_TYPE_CAPABILITIES: Record<ContentTypeKey, ContentTypeCapabi
   },
   locations: {
     canDuplicate: true,
-    nestedIdRegeneration: noNestedRegenerationRequired,
+    nestedIdRegeneration: { paths: ['partyAssociations'] },
   },
 }
 

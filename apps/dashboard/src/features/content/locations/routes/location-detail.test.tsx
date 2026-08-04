@@ -17,6 +17,13 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 }))
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: useCanManageCampaignMock,
+  useCampaignCharacters: vi.fn(() => ({ data: [] })),
+}))
+vi.mock('@/features/character/npc/hooks/use-npcs', () => ({
+  useNpcs: vi.fn(() => ({ data: [] })),
+}))
+vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
+  useOrganizations: vi.fn(() => ({ data: [] })),
 }))
 
 function renderDetail(location = HARBORFORD) {
@@ -32,16 +39,26 @@ function renderDetail(location = HARBORFORD) {
 }
 
 describe('LocationDetailContent', () => {
-  it('renders kind metadata, ancestry path, and contained locations', () => {
+  it('renders identity metadata, located-in links, and contained locations', () => {
     renderDetail()
 
+    expect(screen.getByText('Type')).toBeInTheDocument()
     expect(screen.getByText('Settlement')).toBeInTheDocument()
+    expect(screen.getByText('Classification')).toBeInTheDocument()
     expect(screen.getByText('City')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Location path' })).toBeInTheDocument()
+    expect(screen.getByText('Located in')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Location path' })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Aldermere' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contained locations' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
+  })
+
+  it('shows building archetype in identity metadata', () => {
+    renderDetail(YAWNING_PORTAL)
+
+    expect(screen.getByText('Archetype')).toBeInTheDocument()
+    expect(screen.getByText('Tavern')).toBeInTheDocument()
   })
 
   it('shows empty copy when there are no contained locations', () => {

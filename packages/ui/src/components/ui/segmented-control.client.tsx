@@ -20,7 +20,8 @@ export type SegmentedControlOption<TValue extends string> = {
 export type SegmentedControlSegmentWidth = 'equal' | 'auto'
 
 export type SegmentedControlProps<TValue extends string> = {
-  value: TValue
+  /** When null, no segment is selected (all `aria-pressed={false}`). */
+  value: TValue | null
   options: readonly SegmentedControlOption<TValue>[]
   onValueChange: (value: TValue) => void
   fullWidth?: boolean
@@ -115,7 +116,7 @@ export function SegmentedControl<TValue extends string>({
             type="button"
             aria-pressed={isActive}
             disabled={option.disabled}
-            tabIndex={index === (activeIndex >= 0 ? activeIndex : 0) ? 0 : -1}
+            tabIndex={activeIndex >= 0 && index === activeIndex ? 0 : -1}
             className={segmentedControlSegmentVariants({ active: isActive, segmentWidth })}
             onClick={() => selectSegment(index)}
             onKeyDown={(event) => handleKeyDown(event, index)}

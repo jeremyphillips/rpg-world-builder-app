@@ -60,6 +60,8 @@ export type CatalogPickerSheetProps<TItem> = {
   emptyState?: ReactNode
   loading?: boolean
   searchPlaceholder?: string
+  /** When true, search input is disabled (placeholder may still update). */
+  searchDisabled?: boolean
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string

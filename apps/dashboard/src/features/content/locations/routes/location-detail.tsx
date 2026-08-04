@@ -16,8 +16,9 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
-import { LocationAncestry } from '../components/location-ancestry.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
+import { LocationDetailIdentity } from '../components/location-detail-identity.client'
+import { LocationPartyAssociationsDetailSection } from '../components/location-party-associations-detail-section.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 
@@ -50,7 +51,7 @@ export function LocationDetailContent({
         imageName={location.name}
         campaignId={campaignId}
         editHref={contentEditHref('locations', campaignId, location.id)}
-        statRows={viewModel.statRows}
+        metadata={<LocationDetailIdentity identity={viewModel.identity} />}
         descriptionContent={
           viewModel.description ? (
             <RichTextContent html={viewModel.description} size="md" tone="muted" />
@@ -58,7 +59,7 @@ export function LocationDetailContent({
         }
       >
         <div className="space-y-8">
-          <LocationAncestry segments={viewModel.ancestry} currentName={location.name} />
+          <LocationPartyAssociationsDetailSection location={location} campaignId={campaignId} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
             headerActions={

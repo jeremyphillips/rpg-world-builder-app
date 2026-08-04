@@ -10,6 +10,7 @@ import {
   buildDeleteDependencyLines,
   resolveOwnedCampaignBlockCopy,
 } from '../lib/delete-user-dialog.lib'
+import { getPrimaryDeleteBlockReasonMessage } from '../lib/admin-users-labels'
 
 type DeleteUserDialogProps = {
   user: AdminUserDeleteSubject
@@ -76,6 +77,22 @@ function resolveBlockedDialog(
         />
       )
     }
+  }
+
+  if (blockers.includes('character_referenced_by_locations')) {
+    return (
+      <BlockedDeleteDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        headline="User cannot be deleted"
+        description={
+          <Text variant="muted">
+            {getPrimaryDeleteBlockReasonMessage(blockers) ??
+              'One or more characters are linked from a location.'}
+          </Text>
+        }
+      />
+    )
   }
 
   return null

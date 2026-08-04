@@ -348,6 +348,10 @@
   color: var(--field-control-fg-disabled);
 }
 
+@utility text-input-placeholder {
+  color: var(--field-control-placeholder);
+}
+
 @utility bg-input-invalid-subtle {
   background-color: var(--field-control-bg-invalid);
 }

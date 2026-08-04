@@ -2,10 +2,12 @@
 
 import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
+import type { ContentUsageBlocker } from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { ContentDeletionBlockedDialog } from '@/features/content/lib/delete/content-deletion-blocked-dialog.client'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
@@ -65,6 +67,8 @@ export function CharacterDetailContent({
   const navigate = useNavigate()
   const deleteCharacter = useDeleteCharacter()
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [deleteBlockersOpen, setDeleteBlockersOpen] = useState(false)
+  const [deleteBlockers, setDeleteBlockers] = useState<ContentUsageBlocker[]>([])
 
   const deleteDialogOpen = deleteConfig?.open ?? confirmDeleteOpen
   const setDeleteDialogOpen = deleteConfig?.onOpenChange ?? setConfirmDeleteOpen
@@ -76,7 +80,14 @@ export function CharacterDetailContent({
     }
 
     deleteCharacter.mutate(viewModel.id, {
-      onSuccess: () => {
+      onSuccess: (result) => {
+        if (result.status === 'blocked') {
+          setConfirmDeleteOpen(false)
+          setDeleteBlockers(result.blockers)
+          setDeleteBlockersOpen(true)
+          return
+        }
+
         setConfirmDeleteOpen(false)
         void navigate(ROUTES.characters.list)
       },
@@ -132,6 +143,13 @@ export function CharacterDetailContent({
         confirmLabel="Delete"
         confirmVariant="destructive"
         onConfirm={handleDelete}
+      />
+
+      <ContentDeletionBlockedDialog
+        open={deleteBlockersOpen}
+        onOpenChange={setDeleteBlockersOpen}
+        entityName={viewModel.identity.name}
+        blockers={deleteBlockers}
       />
     </div>
   )

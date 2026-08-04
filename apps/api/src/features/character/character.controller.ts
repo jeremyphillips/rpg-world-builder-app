@@ -43,9 +43,13 @@ export async function getRoutingContext(req: Request, res: Response): Promise<vo
 
 export async function remove(req: Request, res: Response): Promise<void> {
   const { characterId } = req.params as { characterId: string }
-  const deleted = await deleteCharacterForUser(characterId, req.user!.id)
-  if (!deleted) {
+  const result = await deleteCharacterForUser(characterId, req.user!.id)
+  if (result.status === 'not_found') {
     throw new HttpError(404, 'not_found', 'Character not found.')
+  }
+  if (result.status === 'blocked') {
+    res.status(409).json({ result })
+    return
   }
   res.status(204).send()
 }

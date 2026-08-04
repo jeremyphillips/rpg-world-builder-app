@@ -1,9 +1,9 @@
 'use client'
 
-import { Link } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 
 import { LOCATION_SECTION_LABELS, type LocationChildrenViewModel } from '../lib/location-display'
+import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
 
 export type LocationChildrenSectionProps = {
   childrenViewModel: LocationChildrenViewModel
@@ -31,12 +31,11 @@ export function LocationChildrenSection({
         <ul className="space-y-2">
           {items.map((item) => (
             <li key={item.id}>
-              <Link to={item.href} className="text-link hover:underline">
-                {item.name}
-              </Link>
-              <Text variant="muted" className="ml-2 inline">
-                {item.kindLabel}
-              </Text>
+              <LocationLinkedEntityCard
+                name={item.name}
+                href={item.href}
+                summaryLine={item.summaryLine}
+              />
             </li>
           ))}
         </ul>

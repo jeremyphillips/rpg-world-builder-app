@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { ContentDeletionResult } from '@rpg/contracts'
 
 import { deleteCharacter } from '../api/character-client'
 import { characterQueryKey } from './use-character'
@@ -13,9 +14,12 @@ export function useDeleteCharacter() {
 
   return useMutation({
     mutationFn: deleteCharacter,
-    onSuccess: (_result, characterId) => {
+    onSuccess: (result, characterId) => {
+      if (result.status !== 'deleted') return
       void queryClient.invalidateQueries({ queryKey: charactersQueryKey })
       void queryClient.removeQueries({ queryKey: characterQueryKey(characterId) })
     },
   })
 }
+
+export type DeleteCharacterMutationResult = ContentDeletionResult
