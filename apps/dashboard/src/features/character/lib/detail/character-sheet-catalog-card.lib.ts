@@ -1,4 +1,4 @@
-import type { CatalogMetadataLine } from '@/features/content/components/catalog'
+import type { CatalogMetadataLine } from '@/features/content'
 
 export type CharacterSheetItemSource = {
   label: string

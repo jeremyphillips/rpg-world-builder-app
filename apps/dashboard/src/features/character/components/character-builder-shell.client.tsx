@@ -24,7 +24,7 @@ import type {
 import { buttonVariants, Button, Heading, Spinner, Text, Alert } from '@rpg/ui'
 
 import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
-import { useCompleteCampaignOnboarding } from '@/features/campaign/hooks/use-campaign-onboarding-eligible-characters'
+import { useCompleteCampaignOnboarding } from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../hooks/use-character-preview'

@@ -12,10 +12,7 @@ import {
   isEquipmentStackable,
 } from '@rpg/contracts'
 
-import {
-  formatAddContentTypeLabel,
-  getContentTypeItemLabel,
-} from '@/features/content/lib/content-type-labels'
+import { formatAddContentTypeLabel, getContentTypeItemLabel } from '@/features/content'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'

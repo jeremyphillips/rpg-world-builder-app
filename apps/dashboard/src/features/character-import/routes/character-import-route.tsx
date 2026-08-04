@@ -5,7 +5,7 @@ import { buttonVariants, Heading } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { useBuildContext } from '@/features/character/hooks/use-build-context'
+import { useBuildContext } from '@/features/character'
 
 import { CharacterImportForm } from '../components/character-import-form.client'
 import {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { pickSpell } from '@/features/content/lib/fixtures/pick'
+import { pickSpell } from '@/features/content'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,

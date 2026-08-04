@@ -8,7 +8,7 @@ import { Trash2 } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { useIsSuperadmin } from '@/features/auth/hooks/use-is-superadmin'
+import { useIsSuperadmin } from '@/features/auth'
 
 import { DeleteUserDialog } from '../components/delete-user-dialog.client'
 import { AdminUserContextLine } from '../components/admin-user-tab-nav.client'

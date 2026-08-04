@@ -1,6 +1,6 @@
 import type { CharacterBuilderDraft } from '@rpg/contracts'
 
-import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeMidSentenceLabel } from '@/features/content'
 
 export const BUILDER_ASI_FEAT_MODELING_ADVISORY =
   'Higher-level ability score improvements and feat choices are not yet modeled. This character uses its initial ability scores.'

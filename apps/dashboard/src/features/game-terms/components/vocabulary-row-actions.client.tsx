@@ -10,7 +10,7 @@ import type {
 } from '@rpg/contracts'
 import { getVocabularySetCapability } from '@rpg/contracts'
 
-import { ContentCampaignAvailabilityAction } from '@/features/content/lib/overview/content-campaign-availability-action.client'
+import { ContentCampaignAvailabilityAction } from '@/features/content'
 
 import { fetchVocabularyDeleteAvailability } from '@/features/vocabulary'
 

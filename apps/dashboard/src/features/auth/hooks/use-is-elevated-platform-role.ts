@@ -1,4 +1,4 @@
-import { useSession } from '@/features/auth/hooks/use-session'
+import { useSession } from './use-session'
 
 /** Returns true when the current user holds an elevated platform role (admin or superadmin). */
 export function useIsElevatedPlatformRole(): boolean {

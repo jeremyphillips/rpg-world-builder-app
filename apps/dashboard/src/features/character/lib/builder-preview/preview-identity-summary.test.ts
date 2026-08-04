@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 
-import { pickSpecies } from '@/features/content/lib/fixtures/pick'
+import { pickSpecies } from '@/features/content'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,

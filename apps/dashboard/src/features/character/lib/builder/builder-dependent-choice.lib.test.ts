@@ -8,11 +8,8 @@ import {
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
-import {
-  DROW_HERITAGE_SHEET_SUMMARY_LINES,
-  getDrowHeritageSpellCatalog,
-} from '@/features/content/lib/fixtures/grant-display-fixtures'
-import { pickSpecies } from '@/features/content/lib/fixtures/pick'
+import { DROW_HERITAGE_SHEET_SUMMARY_LINES, getDrowHeritageSpellCatalog } from '@/features/content'
+import { pickSpecies } from '@/features/content'
 
 import {
   findSpeciesHeritageChoiceSet,

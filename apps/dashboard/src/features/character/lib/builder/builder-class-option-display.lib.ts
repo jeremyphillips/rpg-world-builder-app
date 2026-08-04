@@ -5,7 +5,7 @@ import {
   buildClassDetailViewModel,
   CLASS_SECTION_LABELS,
 } from '@/features/content'
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeItemLabel } from '@/features/content'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
 

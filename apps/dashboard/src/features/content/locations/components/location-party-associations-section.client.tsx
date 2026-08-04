@@ -12,9 +12,9 @@ import {
 import { Badge, Button, Heading, InsetPanel, Text } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character/npc/hooks/use-npcs'
-import { useOrganizations } from '@/features/content/organizations/hooks/use-organizations'
-import { BuilderInventoryRow } from '@/features/character/components/builder/builder-inventory-row.client'
+import { useNpcs } from '@/features/character'
+import { useOrganizations } from '@/features/content'
+import { BuilderInventoryRow } from '@/features/character'
 
 import { LocationPartyPickerDrawer } from './location-party-picker-drawer.client'
 import {

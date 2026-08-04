@@ -5,15 +5,12 @@ import * as React from 'react'
 import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
-import {
-  buildCatalogDisclosureLabel,
-  CatalogCollapsibleList,
-} from '@/features/content/components/catalog'
+import { buildCatalogDisclosureLabel, CatalogCollapsibleList } from '@/features/content'
 import {
   buildEquipmentDetailViewModel,
   EquipmentDetailMetadata,
   EquipmentCatalogItemHeader,
-} from '@/features/content/equipment'
+} from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
 import {
   createCharacterDetailEquipmentFilterSchema,

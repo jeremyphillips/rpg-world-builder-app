@@ -8,7 +8,7 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
-import { useLocations } from '@/features/content/locations/hooks/use-locations'
+import { useLocations } from '@/features/content'
 
 import { flavorFields, identityFields } from '../lib/profile/campaign-profile-form-fields'
 import { buildWorldSettingsFields } from '../lib/world/world-settings-form-fields'

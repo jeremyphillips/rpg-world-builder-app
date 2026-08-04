@@ -4,7 +4,7 @@ import { NAME_SUBJECT_KIND_ENTRIES, toVocabOptions } from '@rpg/contracts/name-g
 
 import { createEqualsFilter, createFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeItemLabel } from '@/features/content'
 
 import { applyNameGeneratorFilterChange } from './apply-name-generator-filter-change'
 import type { NamingCultureFilterContext } from './compose-name-generator-conventions'

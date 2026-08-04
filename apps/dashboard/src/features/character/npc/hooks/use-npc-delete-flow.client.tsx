@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import type { ContentUsageBlocker } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { ContentDeletionBlockedDialog } from '@/features/content/lib/delete/content-deletion-blocked-dialog.client'
+import { ContentDeletionBlockedDialog } from '@/features/content'
 
 import type { CharacterDetailDeleteConfig } from '../../components/detail/character-detail-content.client'
 import { useDeleteNpc } from './use-delete-npc'

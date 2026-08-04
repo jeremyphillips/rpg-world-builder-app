@@ -6,9 +6,9 @@ import { renderWithProviders } from '@/test/render'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '@/features/character/lib/character-builder-fixtures'
-import { buildCharacterDetailViewModel } from '@/features/character/lib/display/character-display'
-import { SAMPLE_PC } from '@/features/character/lib/character-fixtures'
+} from '@/features/character'
+import { buildCharacterDetailViewModel } from '@/features/character'
+import { SAMPLE_PC } from '@/features/character'
 
 import { CampaignCharacterDetail } from './campaign-character-detail'
 

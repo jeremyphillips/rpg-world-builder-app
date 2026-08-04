@@ -6,8 +6,8 @@ import type { Location, Organization } from '@rpg/contracts'
 import { Badge, Heading, Text } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character/npc/hooks/use-npcs'
-import { useOrganizations } from '@/features/content/organizations/hooks/use-organizations'
+import { useNpcs } from '@/features/character'
+import { useOrganizations } from '@/features/content'
 
 import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
 import {

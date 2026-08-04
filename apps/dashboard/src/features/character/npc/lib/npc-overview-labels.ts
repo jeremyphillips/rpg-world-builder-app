@@ -1,4 +1,4 @@
-import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
+import { getContentTypeItemLabel } from '@/features/content'
 
 export const NPC_OVERVIEW_TABLE_KEY = 'npcs-overview' as const
 

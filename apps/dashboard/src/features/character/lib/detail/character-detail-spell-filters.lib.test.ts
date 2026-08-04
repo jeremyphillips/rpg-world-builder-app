@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { pickSpell } from '@/features/content/lib/fixtures/pick'
+import { pickSpell } from '@/features/content'
 
 import { createCharacterDetailSpellFilterSchema } from './character-detail-spell-filter-schema'
 import {

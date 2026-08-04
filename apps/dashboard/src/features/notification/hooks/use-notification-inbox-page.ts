@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
-import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useCampaigns } from '@/features/campaign'
 import {
   INVALID_CAMPAIGN_SCOPE_COPY,
   parseCampaignIdFromSearch,

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { pickEquipment } from '@/features/content/lib/fixtures/pick'
+import { pickEquipment } from '@/features/content'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,

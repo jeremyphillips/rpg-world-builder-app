@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { useCampaigns } from '@/features/campaign/hooks/use-campaigns'
+import { useCampaigns } from '@/features/campaign'
 import { useFilterUrlState } from '@/lib/filters'
 
 import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'

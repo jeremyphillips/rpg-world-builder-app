@@ -5,13 +5,10 @@ import { Text } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { OverviewPageShell } from '@/components/layout/overview-page-shell'
 import { CharacterListCard } from '@/features/character'
-import {
-  normalizeListController,
-  resolveCharacterControllerDisplay,
-} from '@/features/character/lib/display/character-display'
+import { normalizeListController, resolveCharacterControllerDisplay } from '@/features/character'
 
-import { useCampaignBuildContext } from '../../character/hooks/use-campaign-build-context'
-import { resolveQueryErrorLabel } from '../../character/lib/resolve-query-error-label.lib'
+import { useCampaignBuildContext } from '@/features/character'
+import { resolveQueryErrorLabel } from '@/features/character'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
 import { useCampaigns } from '../hooks/use-campaigns'

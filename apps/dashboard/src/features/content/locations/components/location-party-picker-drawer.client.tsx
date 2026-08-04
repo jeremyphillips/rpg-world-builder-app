@@ -19,13 +19,13 @@ import {
 } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { resolveCatalogPickerRowActionPhase } from '@/features/character/components/picker/catalog-picker-row-action.lib'
-import { CatalogPickerItemHeader } from '@/features/character/components/picker/catalog-picker-item-header.client'
-import { CatalogPickerSelectionActions } from '@/features/character/components/picker/catalog-picker-selection-actions.client'
-import { catalogPickerShellProps } from '@/features/character/components/picker/catalog-picker-shell.lib'
-import { CATALOG_PICKER_COMMIT_SUCCESS_MS } from '@/features/character/components/picker/use-catalog-picker-commit-confirmation.client'
-import { useNpcs } from '@/features/character/npc/hooks/use-npcs'
-import { useOrganizations } from '@/features/content/organizations/hooks/use-organizations'
+import { resolveCatalogPickerRowActionPhase } from '@/features/character'
+import { CatalogPickerItemHeader } from '@/features/character'
+import { CatalogPickerSelectionActions } from '@/features/character'
+import { catalogPickerShellProps } from '@/features/character'
+import { CATALOG_PICKER_COMMIT_SUCCESS_MS } from '@/features/character'
+import { useNpcs } from '@/features/character'
+import { useOrganizations } from '@/features/content'
 
 import {
   buildLocationPartyAddActionLabel,

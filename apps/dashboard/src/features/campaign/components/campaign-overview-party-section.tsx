@@ -3,10 +3,7 @@ import { Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
-import {
-  normalizePartyController,
-  resolveCharacterControllerDisplay,
-} from '@/features/character/lib/display/character-display'
+import { normalizePartyController, resolveCharacterControllerDisplay } from '@/features/character'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,

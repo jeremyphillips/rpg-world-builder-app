@@ -5,7 +5,7 @@ import type { FilterFieldId } from '@rpg/ui/filters'
 import {
   CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL,
   formatShowUnavailableAriaLabel,
-} from '@/features/content/lib/campaign-access/campaign-access-table-labels'
+} from '@/features/content'
 import { resolveAvailabilityFilteredEmptyCopy } from '@/lib/overview/availability-empty-state-copy.lib'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
 import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from '@/lib/overview/overview-availability-supplement.client'

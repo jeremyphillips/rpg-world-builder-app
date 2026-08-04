@@ -2,9 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import type { ResolvedVocabularyOptionSet } from '@rpg/contracts'
 
-vi.mock('@/features/campaign', () => ({
-  useCanManageCampaign: vi.fn(),
-}))
+vi.mock('@/features/campaign', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useCanManageCampaign: vi.fn(),
+  }
+})
 
 import { useCanManageCampaign } from '@/features/campaign'
 

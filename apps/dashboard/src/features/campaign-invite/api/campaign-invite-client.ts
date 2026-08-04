@@ -6,12 +6,9 @@ import type {
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
-import { campaignOnboardingContextQueryKey } from '@/features/campaign/hooks/use-campaign-onboarding-context'
-import { campaignsQueryKey } from '@/features/campaign/hooks/use-campaigns'
-import {
-  notificationsInboxRootQueryKey,
-  notificationsQueryKey,
-} from '@/features/notification/lib/notification-query-keys'
+import { campaignOnboardingContextQueryKey } from '@/features/campaign'
+import { campaignsQueryKey } from '@/features/campaign'
+import { notificationsInboxRootQueryKey, notificationsQueryKey } from '@/features/notification'
 
 const RESOLVE_INVITE_ERROR = 'Could not load this invitation.'
 const ACCEPT_INVITE_ERROR = 'Could not accept this invitation.'

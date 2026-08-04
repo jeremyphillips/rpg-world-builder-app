@@ -8,8 +8,8 @@ import {
   resolveDependentChoiceSectionCopy,
 } from '../lib/builder/builder-dependent-choice.lib'
 import { DEPENDENT_KIND_HERITAGE } from '../lib/builder/builder-parent-choice-status.lib'
-import { getDrowHeritageSpellCatalog } from '@/features/content/lib/fixtures/grant-display-fixtures'
-import { pickSpecies } from '@/features/content/lib/fixtures/pick'
+import { getDrowHeritageSpellCatalog } from '@/features/content'
+import { pickSpecies } from '@/features/content'
 import { BuilderDependentChoiceSection } from './builder-dependent-choice-section.client'
 
 const elf = pickSpecies('elf')

@@ -4,14 +4,14 @@ import { buttonVariants, Heading } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/narrow-page'
 import { PageLoadState } from '@/components/layout/page-load-state'
-import { useCampaignBuildContext } from '@/features/character/hooks/use-campaign-build-context'
-import { NpcAuthoringGate } from '@/features/character/npc/components/npc-authoring-gate.client'
+import { useCampaignBuildContext } from '@/features/character'
+import { NpcAuthoringGate } from '@/features/character'
 
-import { CharacterImportForm } from '@/features/character-import/components/character-import-form.client'
+import { CharacterImportForm } from '@/features/character-import'
 import {
   CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
   type CharacterImportSaveTarget,
-} from '@/features/character-import/model/character-import-target.lib'
+} from '@/features/character-import'
 
 export function NpcImportRoute() {
   const navigate = useNavigate()

@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { ContentDeletionBlockedDialog } from '@/features/content/lib/delete/content-deletion-blocked-dialog.client'
+import { ContentDeletionBlockedDialog } from '@/features/content'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'

@@ -24,10 +24,7 @@ import {
   type RecognizedSpeciesPreview,
   type RecognizedSpellPreview,
 } from '@rpg/contracts/character-import'
-import {
-  getContentTypeCollectionLabel,
-  getContentTypeItemLabel,
-} from '@/features/content/lib/content-type-labels'
+import { getContentTypeCollectionLabel, getContentTypeItemLabel } from '@/features/content'
 import type { SemanticTextEmphasis, SemanticTextTone } from '@rpg/ui'
 
 /** Display copy when a source field has no mapped value. */

@@ -6,7 +6,7 @@ import type { AdminUserListItem } from '@rpg/contracts'
 import { RowActionsMenu, type RowActionsMenuLinkProps } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
-import { useIsSuperadmin } from '@/features/auth/hooks/use-is-superadmin'
+import { useIsSuperadmin } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
 
 import { DeleteUserDialog } from './delete-user-dialog.client'
