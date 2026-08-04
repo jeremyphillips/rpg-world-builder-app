@@ -61,6 +61,36 @@ describe('useActionLifecycle', () => {
     )
   })
 
+  it('returns to configure with localError when validate throws', async () => {
+    const onClose = vi.fn()
+
+    const { result } = renderHook(() =>
+      useActionLifecycle({
+        open: true,
+        targets: [
+          { targetId: 'a', targetName: 'Alpha' },
+          { targetId: 'b', targetName: 'Beta' },
+        ],
+        validate: async () => {
+          throw new Error(
+            'Alpha: Availability could not be checked.\nBeta: Availability could not be checked.',
+          )
+        },
+        apply: vi.fn(),
+        onClose,
+      }),
+    )
+
+    await act(async () => {
+      await result.current.startApply({ mode: 'off' })
+    })
+
+    expect(result.current.phase).toBe('configure')
+    expect(result.current.localError).toContain('Alpha')
+    expect(result.current.localError).toContain('Beta')
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
   it('skips validation when requiresValidation is false', async () => {
     const onClose = vi.fn()
     const apply = vi.fn(

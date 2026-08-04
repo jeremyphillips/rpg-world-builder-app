@@ -1,7 +1,12 @@
 import request, { type Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
-import { CHILL_TOUCH_RESOLUTION, ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+import {
+  ACTION_BATCH_VALIDATE_FAILURE_MESSAGES,
+  ACTION_VALIDATE_BATCH_TARGET_LIMIT,
+  CHILL_TOUCH_RESOLUTION,
+  ELDRITCH_BLAST_RESOLUTION,
+} from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../lib/cookies'
 import { createPcRecord } from '../character'
@@ -700,6 +705,103 @@ describe('content campaign access routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .send({ targets: [{ entityId: 'feat_1' }, { entityId: 'feat_1' }] })
       .expect(400)
+  })
+
+  it('rejects campaign-access batch requests above the target limit', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/campaign-access-availability/batch`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        targets: Array.from({ length: ACTION_VALIDATE_BATCH_TARGET_LIMIT + 1 }, (_, index) => ({
+          entityId: `feat_${index}`,
+        })),
+      })
+      .expect(400)
+  })
+
+  it('requires owner/co-owner auth for campaign-access batch requests', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'batch-access-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'batch-access-member@example.com',
+      campaignRole: 'pc',
+    })
+
+    await member.agent
+      .post(`/api/campaigns/${campaignId}/content/feats/campaign-access-availability/batch`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .send({ targets: [{ entityId: 'feat_1' }] })
+      .expect(403)
+  })
+
+  it('returns mixed allowed and blocked batch availability with safe not_found failures', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const allowedRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'batch-allowed-feat', name: 'Batch Allowed Feat' })
+      .expect(201)
+
+    const blockedRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug: 'batch-blocked-feat', name: 'Batch Blocked Feat' })
+      .expect(201)
+
+    const allowedId = allowedRes.body.feats.id as string
+    const blockedId = blockedRes.body.feats.id as string
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        ...minimalNpcRequestInput,
+        name: 'Batch Blocker NPC',
+        feats: [{ featId: blockedId }],
+      })
+      .expect(201)
+
+    const res = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats/campaign-access-availability/batch`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        targets: [
+          { entityId: allowedId },
+          { entityId: blockedId },
+          { entityId: 'missing-feat-id' },
+        ],
+      })
+      .expect(200)
+
+    expect(res.body.targets.map((target: { targetId: string }) => target.targetId)).toEqual([
+      allowedId,
+      blockedId,
+      'missing-feat-id',
+    ])
+    expect(res.body.targets[0]).toMatchObject({
+      availability: { status: 'allowed' },
+    })
+    expect(res.body.targets[1]).toMatchObject({
+      availability: { status: 'blocked' },
+    })
+    expect(res.body.targets[2]).toMatchObject({
+      failure: {
+        code: 'not_found',
+        message: ACTION_BATCH_VALIDATE_FAILURE_MESSAGES.notFound,
+      },
+    })
+    expect(JSON.stringify(res.body.targets[2])).not.toMatch(/Error:|Exception/i)
   })
 
   it('returns normalized campaignAccess from PATCH for client baseline', async () => {

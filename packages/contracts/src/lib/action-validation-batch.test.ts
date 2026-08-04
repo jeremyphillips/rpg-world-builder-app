@@ -148,4 +148,46 @@ describe('batch response mappers', () => {
     expect(result.failures).toHaveLength(2)
     expect(result.failures.every((entry) => entry.failure.code === 'malformed_response')).toBe(true)
   })
+
+  it('maps batch availability entries equivalently to composing single-target mappers', () => {
+    const entries = [
+      {
+        targetId: 'a',
+        targetName: 'Alpha',
+        availability: { status: 'allowed' as const },
+      },
+      {
+        targetId: 'b',
+        targetName: 'Beta',
+        availability: {
+          status: 'blocked' as const,
+          blockers: [
+            {
+              kind: 'usage' as const,
+              usage: {
+                kind: 'character' as const,
+                id: 'char-1',
+                label: 'Aldric',
+                characterType: 'pc' as const,
+              },
+            },
+          ],
+        },
+      },
+    ]
+
+    const batchResult = mapContentCampaignAccessAvailabilityBatchResponse(
+      entries.map((entry) => entry.targetId),
+      { targets: entries },
+    )
+
+    for (const entry of entries) {
+      const single = mapContentCampaignAccessAvailabilityBatchResponse([entry.targetId], {
+        targets: [entry],
+      })
+      expect(
+        batchResult.validation.targets.find((target) => target.targetId === entry.targetId),
+      ).toEqual(single.validation.targets[0])
+    }
+  })
 })

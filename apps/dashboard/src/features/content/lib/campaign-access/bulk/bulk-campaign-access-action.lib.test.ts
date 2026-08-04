@@ -152,6 +152,31 @@ describe('bulk-campaign-access-action.lib', () => {
     ).rejects.toThrow(/Wizard|Fighter/)
   })
 
+  it('treats malformed batch correspondence as a whole-batch validate error', async () => {
+    fetchContentCampaignAccessAvailabilityBatch.mockResolvedValue({
+      targets: [
+        {
+          targetId: 'class-1',
+          targetName: 'Wizard',
+          availability: { status: 'allowed' },
+        },
+      ],
+    })
+
+    await expect(
+      validateBulkCampaignAccess(
+        rows,
+        {
+          available: { kind: 'set', value: false },
+          visibilityMode: { kind: 'unchanged' },
+        },
+        'campaign-1',
+        'classes',
+      ),
+    ).rejects.toThrow(/Wizard|Fighter/)
+    expect(fetchContentCampaignAccessAvailabilityBatch).toHaveBeenCalledTimes(1)
+  })
+
   it('maps apply-time 409 blockers and operational failures separately', async () => {
     updateRouteContentCampaignAccess
       .mockResolvedValueOnce({

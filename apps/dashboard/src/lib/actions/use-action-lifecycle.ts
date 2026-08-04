@@ -135,7 +135,11 @@ export function useActionLifecycle<TBlocker, TFailure extends ActionTargetFailur
           const eligibleIds = getEligibleActionTargets(result).map((target) => target.targetId)
           await executeApply(eligibleIds, config)
         } catch (error) {
-          setLocalError(getErrorMessage(error, 'Could not validate the action.'))
+          const message =
+            error instanceof Error && error.message.length > 0
+              ? error.message
+              : getErrorMessage(error, 'Could not validate the action.')
+          setLocalError(message)
           setPhase('configure')
         }
 

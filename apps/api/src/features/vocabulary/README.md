@@ -46,18 +46,28 @@ the resolved set DTO — it never influences source selection, counts, or guards
 
 Mounted under `/api/campaigns/:campaignId`.
 
-| Method | Path                                                       | Role           | Description                                                           |
-| ------ | ---------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
-| GET    | `/vocabulary`                                              | member         | All resolved vocabulary sets for the campaign ruleset                 |
-| GET    | `/vocabulary/:setId`                                       | member         | One resolved set with `usedBy` counts                                 |
-| POST   | `/vocabulary/:setId/entries`                               | owner/co-owner | Create a campaign vocabulary entry (`create` capability)              |
-| PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Patch system or campaign entry (`edit` / `availability` capabilities) |
-| GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner/co-owner | Advisory preflight before disabling (`disableGuard`)                  |
-| GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner/co-owner | Advisory preflight before deleting (`deleteGuard`)                    |
-| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member         | Informational usage references (`usageResolution`)                    |
-| DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Delete campaign entry (`delete` capability)                           |
+| Method | Path                                                       | Role           | Description                                                                         |
+| ------ | ---------------------------------------------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| GET    | `/vocabulary`                                              | member         | All resolved vocabulary sets for the campaign ruleset                               |
+| GET    | `/vocabulary/:setId`                                       | member         | One resolved set with `usedBy` counts                                               |
+| POST   | `/vocabulary/:setId/entries`                               | owner/co-owner | Create a campaign vocabulary entry (`create` capability)                            |
+| PATCH  | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Patch system or campaign entry (`edit` / `availability` capabilities)               |
+| GET    | `/vocabulary/:setId/entries/:entryId/disable-availability` | owner/co-owner | Advisory preflight before disabling (`disableGuard`)                                |
+| POST   | `/vocabulary/:setId/entries/disable-availability/batch`    | owner/co-owner | Batch advisory preflight for bulk disable (`disableGuard` or short-circuit allowed) |
+| GET    | `/vocabulary/:setId/entries/:entryId/delete-availability`  | owner/co-owner | Advisory preflight before deleting (`deleteGuard`)                                  |
+| GET    | `/vocabulary/:setId/entries/:entryId/usage`                | member         | Informational usage references (`usageResolution`)                                  |
+| DELETE | `/vocabulary/:setId/entries/:entryId`                      | owner/co-owner | Delete campaign entry (`delete` capability)                                         |
 
 Mutations assert the matching row in `VOCABULARY_SET_CAPABILITIES` (`@rpg/contracts`) and return `403` when the set does not support the operation.
+
+### Batch disable-availability
+
+`POST /vocabulary/:setId/entries/disable-availability/batch`
+
+- Body: `{ targets: [{ entryId }] }` — unique entry IDs, 1–50 targets (`ACTION_VALIDATE_BATCH_TARGET_LIMIT`).
+- Response: `{ targets: [...] }` — one outcome per requested ID in request order; each entry is either `{ availability }` or `{ failure: { code, message } }`.
+- Safe public failure messages only (`not_found`, `validate_error`, …) — internal exception text is logged server-side.
+- Sets without `disableGuard` return `200` with all targets allowed (matches single GET short-circuit behavior).
 
 ## Ruleset patch
 

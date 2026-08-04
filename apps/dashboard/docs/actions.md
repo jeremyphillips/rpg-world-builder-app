@@ -98,11 +98,30 @@ Bulk availability validate uses **one batch POST per validation pass** via
 `createFanOutValidateStrategy` for parity tests and explicit rollback only — **not** as an
 automatic fallback when batch POST fails.
 
-- Request IDs must be unique (duplicate IDs → `400`).
-- Response must contain exactly one entry per requested ID in request order.
-- Correspondence violations and transport failures surface as validate-phase operational
-  errors listing every failed target — the lifecycle returns to Configure with `localError`.
-- `ACTION_VALIDATE_BATCH_TARGET_LIMIT` is 50 (matches overview selection cap).
+### Wire contract
+
+- **`ActionBatchValidationResult<TBlocker>`** — `{ validation: ActionValidationResult, failures[] }`.
+  Blockers land in `validation`; per-target transport/eval failures land in `failures` with
+  structured `{ code, message }` entries.
+- Request body IDs must be **unique** (duplicate IDs → `400`).
+- Response must contain **exactly one entry per requested ID in request order**.
+- Correspondence violations are treated as malformed server responses — the whole batch fails
+  validation; the dashboard does not partially apply batch results.
+- `ACTION_VALIDATE_BATCH_TARGET_LIMIT` is **50** (matches overview selection cap).
+
+### Validate-phase failure diagnostics
+
+When `failures.length > 0`, feature `validateBulk*` helpers throw before returning to
+`useActionLifecycle`. The lifecycle catches the error, sets `localError` to a newline-separated
+list of **`targetName: message`** lines covering **every** failed target, and returns to
+**Configure**. Blockers in `validation` still follow the normal **Resolve** path when no
+transport failures are present.
+
+### Performance note
+
+Batch POST removes N HTTP round trips from the dashboard; server-side v1 still evaluates targets
+with concurrency 5. Deeper resolver batching is optional follow-up when parity tests and latency
+checks justify it.
 
 ## Related docs
 
