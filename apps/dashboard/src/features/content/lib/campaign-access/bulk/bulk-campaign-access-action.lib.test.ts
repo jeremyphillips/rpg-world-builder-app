@@ -7,7 +7,7 @@ import {
   validateBulkCampaignAccess,
 } from './bulk-campaign-access-action.lib'
 
-const fetchContentCampaignAccessAvailability = vi.fn()
+const fetchContentCampaignAccessAvailabilityBatch = vi.fn()
 const updateRouteContentCampaignAccess = vi.fn()
 const fetchCsrfToken = vi.fn()
 
@@ -20,8 +20,8 @@ vi.mock('@rpg/contracts', async (importOriginal) => {
 })
 
 vi.mock('../campaign-access-api', () => ({
-  fetchContentCampaignAccessAvailability: (...args: unknown[]) =>
-    fetchContentCampaignAccessAvailability(...args),
+  fetchContentCampaignAccessAvailabilityBatch: (...args: unknown[]) =>
+    fetchContentCampaignAccessAvailabilityBatch(...args),
   updateRouteContentCampaignAccess: (...args: unknown[]) =>
     updateRouteContentCampaignAccess(...args),
 }))
@@ -56,7 +56,7 @@ const rows = [
 
 describe('bulk-campaign-access-action.lib', () => {
   beforeEach(() => {
-    fetchContentCampaignAccessAvailability.mockReset()
+    fetchContentCampaignAccessAvailabilityBatch.mockReset()
     updateRouteContentCampaignAccess.mockReset()
     fetchCsrfToken.mockReset()
     fetchCsrfToken.mockResolvedValue('shared-csrf-token')
@@ -77,13 +77,24 @@ describe('bulk-campaign-access-action.lib', () => {
     ).toBe(false)
   })
 
-  it('validates blocked rows before apply and skips GET for visibility-only changes', async () => {
-    fetchContentCampaignAccessAvailability
-      .mockResolvedValueOnce({
-        status: 'blocked',
-        blockers: [{ kind: 'usage', characterId: 'char-1', characterName: 'Aldric' }],
-      })
-      .mockResolvedValueOnce({ status: 'allowed' })
+  it('uses one batch POST per validation pass and skips rows that do not need preflight', async () => {
+    fetchContentCampaignAccessAvailabilityBatch.mockResolvedValue({
+      targets: [
+        {
+          targetId: 'class-1',
+          targetName: 'Wizard',
+          availability: {
+            status: 'blocked',
+            blockers: [{ kind: 'usage', characterId: 'char-1', characterName: 'Aldric' }],
+          },
+        },
+        {
+          targetId: 'class-2',
+          targetName: 'Fighter',
+          availability: { status: 'allowed' },
+        },
+      ],
+    })
 
     const validation = await validateBulkCampaignAccess(
       rows,
@@ -95,8 +106,19 @@ describe('bulk-campaign-access-action.lib', () => {
       'classes',
     )
 
-    expect(fetchContentCampaignAccessAvailability).toHaveBeenCalledTimes(2)
+    expect(fetchContentCampaignAccessAvailabilityBatch).toHaveBeenCalledTimes(1)
+    expect(fetchContentCampaignAccessAvailabilityBatch).toHaveBeenCalledWith(
+      'campaign-1',
+      'classes',
+      ['class-1', 'class-2'],
+      { classId: undefined },
+    )
     expect(validation.targets.filter((target) => target.status === 'blocked')).toHaveLength(1)
+    expect(validation.targets.find((target) => target.targetId === 'class-2')?.status).toBe(
+      'eligible',
+    )
+
+    fetchContentCampaignAccessAvailabilityBatch.mockReset()
 
     const visibilityOnlyValidation = await validateBulkCampaignAccess(
       rows,
@@ -108,9 +130,26 @@ describe('bulk-campaign-access-action.lib', () => {
       'classes',
     )
 
+    expect(fetchContentCampaignAccessAvailabilityBatch).not.toHaveBeenCalled()
     expect(visibilityOnlyValidation.targets.every((target) => target.status === 'eligible')).toBe(
       true,
     )
+  })
+
+  it('surfaces batch validate failures without fan-out retry', async () => {
+    fetchContentCampaignAccessAvailabilityBatch.mockRejectedValue(new Error('Server unavailable'))
+
+    await expect(
+      validateBulkCampaignAccess(
+        rows,
+        {
+          available: { kind: 'set', value: false },
+          visibilityMode: { kind: 'unchanged' },
+        },
+        'campaign-1',
+        'classes',
+      ),
+    ).rejects.toThrow(/Wizard|Fighter/)
   })
 
   it('maps apply-time 409 blockers and operational failures separately', async () => {

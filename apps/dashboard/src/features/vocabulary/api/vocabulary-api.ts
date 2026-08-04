@@ -1,13 +1,16 @@
-import type {
-  CreateVocabularyCampaignEntryInput,
-  ResolvedVocabularyOptionSet,
-  UpdateVocabularyEntryInput,
-  VocabularyDeleteAvailability,
-  VocabularyDisableAvailability,
-  VocabularyEntryUsage,
-  VocabularyOptionSetId,
+import {
+  vocabularyDisableAvailabilityBatchResponseSchema,
+  type CreateVocabularyCampaignEntryInput,
+  type ResolvedVocabularyOptionSet,
+  type UpdateVocabularyEntryInput,
+  type VocabularyDeleteAvailability,
+  type VocabularyDisableAvailability,
+  type VocabularyDisableAvailabilityBatchResponse,
+  type VocabularyEntryUsage,
+  type VocabularyOptionSetId,
 } from '@rpg/contracts'
 
+import { postActionBatchValidate } from '@/lib/actions/action-validate-batch'
 import { deleteJson, patchJson, postJson, request } from '@/lib/api-client'
 
 function vocabularySetPath(campaignId: string, setId: VocabularyOptionSetId) {
@@ -51,6 +54,21 @@ export async function fetchVocabularyDisableAvailability(
     'Could not check vocabulary disable availability.',
   )
   return availability
+}
+
+/** Batch advisory preflight for disabling vocabulary entries. */
+export async function fetchVocabularyDisableAvailabilityBatch(
+  campaignId: string,
+  setId: VocabularyOptionSetId,
+  entryIds: readonly string[],
+): Promise<VocabularyDisableAvailabilityBatchResponse> {
+  const body = await postActionBatchValidate<{ targets: unknown }>({
+    path: `${vocabularySetPath(campaignId, setId)}/entries/disable-availability/batch`,
+    body: { targets: entryIds.map((entryId) => ({ entryId })) },
+    fallbackMessage: 'Could not check vocabulary disable availability.',
+  })
+
+  return vocabularyDisableAvailabilityBatchResponseSchema.parse(body)
 }
 
 /** Advisory preflight for deleting a vocabulary entry. */

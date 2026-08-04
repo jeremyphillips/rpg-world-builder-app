@@ -79,15 +79,30 @@ See [feedback.md](./feedback.md). Summary:
 
 ## Components
 
-| Module                       | Role                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| `useActionLifecycle`         | Phase machine, validate/apply orchestration                              |
-| `ActionDialogShell`          | Layout for configure / resolve / result                                  |
-| `ActionTargetResolutionList` | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
-| `ActionBlockedDialog`        | Single blocked projection — header + flat reference list only            |
-| `ActionBlockerReferences`    | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
-| `action-messages.ts`         | Shared blocked/success/result copy                                       |
-| `fan-out-validate.ts`        | Concurrency-5 authoritative GET preflight                                |
+| Module                        | Role                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `useActionLifecycle`          | Phase machine, validate/apply orchestration                              |
+| `ActionDialogShell`           | Layout for configure / resolve / result                                  |
+| `ActionTargetResolutionList`  | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
+| `ActionBlockedDialog`         | Single blocked projection — header + flat reference list only            |
+| `ActionBlockerReferences`     | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
+| `action-messages.ts`          | Shared blocked/success/result copy                                       |
+| `action-validate-strategy.ts` | Fan-out and batch validate strategies + lifecycle result resolution      |
+| `action-validate-batch.ts`    | Shared batch POST helper for validate transport                          |
+| `fan-out-validate.ts`         | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
+
+## Batch validate transport (Phase 2)
+
+Bulk availability validate uses **one batch POST per validation pass** via
+`createBatchValidateStrategy`. Fan-out GET remains available through
+`createFanOutValidateStrategy` for parity tests and explicit rollback only — **not** as an
+automatic fallback when batch POST fails.
+
+- Request IDs must be unique (duplicate IDs → `400`).
+- Response must contain exactly one entry per requested ID in request order.
+- Correspondence violations and transport failures surface as validate-phase operational
+  errors listing every failed target — the lifecycle returns to Configure with `localError`.
+- `ACTION_VALIDATE_BATCH_TARGET_LIMIT` is 50 (matches overview selection cap).
 
 ## Related docs
 

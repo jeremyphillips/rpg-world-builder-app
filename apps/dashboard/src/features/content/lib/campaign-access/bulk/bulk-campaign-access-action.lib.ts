@@ -1,12 +1,11 @@
 import {
   applyBulkCampaignAccessOperations,
-  createActionValidationResult,
   createEligibleActionTarget,
   fetchCsrfToken,
   getErrorMessage,
   isBulkCampaignAccessNoOp,
+  mapContentCampaignAccessAvailabilityBatchResponse,
   mapContentCampaignAccessUpdateResultToApplyOutcome,
-  mapUsageGuardAvailabilityToActionTarget,
   type ActionApplyOutcome,
   type ActionTargetFailure,
   type ActionTargetIdentity,
@@ -17,10 +16,14 @@ import {
   type ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 
-import { fanOutValidate } from '@/lib/actions/fan-out-validate'
+import {
+  createBatchValidateStrategy,
+  mergeBatchValidationTargets,
+  resolveActionBatchValidationForLifecycle,
+} from '@/lib/actions/action-validate-strategy'
 
 import {
-  fetchContentCampaignAccessAvailability,
+  fetchContentCampaignAccessAvailabilityBatch,
   updateRouteContentCampaignAccess,
 } from '../campaign-access-api'
 import type { BulkUpdateRow } from './bulk-apply-campaign-access.lib'
@@ -69,30 +72,57 @@ export async function validateBulkCampaignAccess(
   formValues: BulkCampaignAccessFormValues,
   campaignId: string,
   contentTypeKey: ContentTypeKey,
+  options?: { classId?: string },
 ): Promise<ActionValidationResult<ContentUsageBlocker>> {
   const applicableRows = resolveBulkCampaignAccessApplicableRows(rows, formValues)
+  const targetNamesById = new Map(applicableRows.map((row) => [row.id, row.name] as const))
+  const preEligibleById = new Map<string, ReturnType<typeof createEligibleActionTarget>>()
+  const rowsRequiringValidation: BulkUpdateRow[] = []
 
-  const targets = await fanOutValidate({
-    targets: applicableRows,
-    validateTarget: async (row) => {
-      const target = toTargetIdentity(row)
+  for (const row of applicableRows) {
+    if (!bulkCampaignAccessRowRequiresAvailabilityValidation(row, formValues)) {
+      preEligibleById.set(row.id, createEligibleActionTarget(toTargetIdentity(row)))
+      continue
+    }
 
-      if (!bulkCampaignAccessRowRequiresAvailabilityValidation(row, formValues)) {
-        return createEligibleActionTarget(target)
-      }
+    rowsRequiringValidation.push(row)
+  }
 
-      const availability = await fetchContentCampaignAccessAvailability(
+  if (rowsRequiringValidation.length === 0) {
+    return mergeBatchValidationTargets(
+      applicableRows.map((row) => ({ targetId: row.id })),
+      preEligibleById,
+      { targets: [] },
+    )
+  }
+
+  const strategy = createBatchValidateStrategy<
+    BulkUpdateRow,
+    Awaited<ReturnType<typeof fetchContentCampaignAccessAvailabilityBatch>>,
+    ContentUsageBlocker
+  >({
+    getTargetId: (row) => row.id,
+    fetchBatch: (validationRows) =>
+      fetchContentCampaignAccessAvailabilityBatch(
         campaignId,
         contentTypeKey,
-        row.id,
-      )
-
-      return mapUsageGuardAvailabilityToActionTarget(target, availability)
-    },
-    concurrency: BULK_UPDATE_CONCURRENCY,
+        validationRows.map((row) => row.id),
+        { classId: options?.classId },
+      ),
+    mapResponse: (requestedIds, response) =>
+      mapContentCampaignAccessAvailabilityBatchResponse(requestedIds, response),
+    batchFailureMessage: 'Could not check campaign access availability.',
   })
 
-  return createActionValidationResult(targets)
+  const batchResult = await strategy.validate(rowsRequiringValidation)
+
+  resolveActionBatchValidationForLifecycle(batchResult, targetNamesById)
+
+  return mergeBatchValidationTargets(
+    applicableRows.map((row) => ({ targetId: row.id })),
+    preEligibleById,
+    batchResult.validation,
+  )
 }
 
 export type BulkCampaignAccessApplyUpdates = Array<{

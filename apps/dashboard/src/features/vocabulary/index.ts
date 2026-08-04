@@ -47,5 +47,6 @@ export {
 export {
   fetchVocabularyDeleteAvailability,
   fetchVocabularyDisableAvailability,
+  fetchVocabularyDisableAvailabilityBatch,
   updateVocabularyEntry,
 } from './api/vocabulary-api'

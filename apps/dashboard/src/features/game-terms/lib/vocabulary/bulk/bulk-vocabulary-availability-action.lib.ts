@@ -1,10 +1,9 @@
 import {
-  createActionValidationResult,
   createEligibleActionTarget,
   getErrorMessage,
   getVocabularySetCapability,
   isApiError,
-  mapUsageGuardAvailabilityToActionTarget,
+  mapVocabularyDisableAvailabilityBatchResponse,
   type ActionApplyOutcome,
   type ActionTargetFailure,
   type ActionTargetIdentity,
@@ -15,8 +14,15 @@ import {
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
-import { fanOutValidate } from '@/lib/actions/fan-out-validate'
-import { fetchVocabularyDisableAvailability, updateVocabularyEntry } from '@/features/vocabulary'
+import {
+  createBatchValidateStrategy,
+  mergeBatchValidationTargets,
+  resolveActionBatchValidationForLifecycle,
+} from '@/lib/actions/action-validate-strategy'
+import {
+  fetchVocabularyDisableAvailabilityBatch,
+  updateVocabularyEntry,
+} from '@/features/vocabulary'
 
 import { VOCABULARY_BULK_UPDATE_CONCURRENCY } from './bulk-apply-vocabulary-availability.lib'
 
@@ -60,24 +66,44 @@ export async function validateBulkVocabularyAvailability(
   setId: VocabularyOptionSetId,
 ): Promise<ActionValidationResult<ContentUsageBlocker>> {
   const applicableRows = resolveVocabularyAvailabilityApplicableRows(rows, status)
+  const targetNamesById = new Map(applicableRows.map((row) => [row.id, row.label] as const))
 
   if (!vocabularyAvailabilityRequiresValidation(setId, status)) {
-    return createActionValidationResult(
-      applicableRows.map((row) => createEligibleActionTarget(toTargetIdentity(row))),
+    return mergeBatchValidationTargets(
+      applicableRows.map((row) => ({ targetId: row.id })),
+      new Map(
+        applicableRows.map((row) => [row.id, createEligibleActionTarget(toTargetIdentity(row))]),
+      ),
+      { targets: [] },
     )
   }
 
-  const targets = await fanOutValidate({
-    targets: applicableRows,
-    validateTarget: async (row) => {
-      const target = toTargetIdentity(row)
-      const availability = await fetchVocabularyDisableAvailability(campaignId, setId, row.id)
-      return mapUsageGuardAvailabilityToActionTarget(target, availability)
-    },
-    concurrency: VOCABULARY_BULK_UPDATE_CONCURRENCY,
+  const strategy = createBatchValidateStrategy<
+    VocabularyOptionWithUsage,
+    Awaited<ReturnType<typeof fetchVocabularyDisableAvailabilityBatch>>,
+    ContentUsageBlocker
+  >({
+    getTargetId: (row) => row.id,
+    fetchBatch: (validationRows) =>
+      fetchVocabularyDisableAvailabilityBatch(
+        campaignId,
+        setId,
+        validationRows.map((row) => row.id),
+      ),
+    mapResponse: (requestedIds, response) =>
+      mapVocabularyDisableAvailabilityBatchResponse(requestedIds, response),
+    batchFailureMessage: 'Could not check vocabulary disable availability.',
   })
 
-  return createActionValidationResult(targets)
+  const batchResult = await strategy.validate(applicableRows)
+
+  resolveActionBatchValidationForLifecycle(batchResult, targetNamesById)
+
+  return mergeBatchValidationTargets(
+    applicableRows.map((row) => ({ targetId: row.id })),
+    new Map(),
+    batchResult.validation,
+  )
 }
 
 export async function applyBulkVocabularyAvailabilityToTargets(
