@@ -18,6 +18,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
 import { LocationAncestry } from '../components/location-ancestry.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
+import { LocationPartyAssociationsDetailSection } from '../components/location-party-associations-detail-section.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 
@@ -59,6 +60,7 @@ export function LocationDetailContent({
       >
         <div className="space-y-8">
           <LocationAncestry segments={viewModel.ancestry} currentName={location.name} />
+          <LocationPartyAssociationsDetailSection location={location} campaignId={campaignId} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
             headerActions={

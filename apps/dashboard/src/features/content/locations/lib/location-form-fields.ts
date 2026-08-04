@@ -1,6 +1,8 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   interiorTypeSchema,
+  locationPartyAssociationsSchema,
   planeTypeSchema,
   settlementTypeSchema,
   siteTypeSchema,
@@ -27,6 +29,8 @@ import {
   buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
+import { LocationPartyAssociationsSection } from '../components/location-party-associations-section.client'
+import { LOCATION_PARTY_ASSOCIATIONS_FIELD } from './location-party-associations.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -54,6 +58,7 @@ export const locationFormSchema = z
     siteType: siteTypeSchema.optional(),
     interiorType: interiorTypeSchema.optional(),
     classification: classificationFormSchema,
+    partyAssociations: locationPartyAssociationsSchema,
   })
   .superRefine((values, ctx) => {
     const { kind } = canonicalFieldsForAuthoringType(values.authoringType)
@@ -74,6 +79,7 @@ export const locationDraftFormSchema = z.object({
   siteType: draftOptionalSelect(siteTypeSchema),
   interiorType: draftOptionalSelect(interiorTypeSchema),
   classification: classificationFormSchema,
+  partyAssociations: locationPartyAssociationsSchema,
 })
 
 export type LocationFormValues = z.infer<typeof locationFormSchema>
@@ -110,6 +116,19 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
     },
     descriptionField(ctx),
+    {
+      kind: 'group',
+      legend: 'People & organizations',
+      legendSize: 'subsection',
+      chrome: { variant: 'panel', emphasis: 'subtle' },
+      fields: [
+        {
+          kind: 'slot',
+          name: LOCATION_PARTY_ASSOCIATIONS_FIELD,
+          render: () => createElement(LocationPartyAssociationsSection),
+        },
+      ],
+    },
   ]
 }
 

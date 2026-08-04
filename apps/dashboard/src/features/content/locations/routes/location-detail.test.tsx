@@ -17,6 +17,13 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 }))
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: useCanManageCampaignMock,
+  useCampaignCharacters: vi.fn(() => ({ data: [] })),
+}))
+vi.mock('@/features/character/npc/hooks/use-npcs', () => ({
+  useNpcs: vi.fn(() => ({ data: [] })),
+}))
+vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
+  useOrganizations: vi.fn(() => ({ data: [] })),
 }))
 
 function renderDetail(location = HARBORFORD) {

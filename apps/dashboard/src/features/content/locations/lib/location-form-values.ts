@@ -22,6 +22,7 @@ function sharedBodyFields(values: LocationFormValues) {
     name: values.name,
     description: values.description || undefined,
     ...(values.parentLocationId ? { parentLocationId: values.parentLocationId } : {}),
+    partyAssociations: values.partyAssociations ?? [],
   }
 }
 
@@ -172,6 +173,7 @@ export function locationToFormValues(entity: Location): Partial<LocationFormValu
     description: entity.description,
     authoringType: resolveLocationAuthoringType(entity),
     parentLocationId: entity.parentLocationId,
+    partyAssociations: entity.partyAssociations ?? [],
     ...kindFormValueExtractors[entity.kind]?.(entity),
   }
 }

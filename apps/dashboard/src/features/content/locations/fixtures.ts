@@ -11,6 +11,7 @@ const baseLocation = {
   campaignId: STORY_CAMPAIGN_ID,
   createdAt: CONTENT_TIMESTAMP,
   updatedAt: CONTENT_TIMESTAMP,
+  partyAssociations: [],
 }
 
 export const ALDERMERE: Location = {
