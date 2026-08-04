@@ -32,7 +32,7 @@ export function NavItem({ to, label, icon: Icon, end, isActive: isActiveOverride
       className={() => sidebarNavItemVariants({ active: matchSidebarNavHref(pathname, item) })}
       aria-current={matchSidebarNavHref(pathname, item) ? 'page' : undefined}
     >
-      <Icon className="size-4.5 shrink-0" size={18} strokeWidth={1.75} aria-hidden />
+      <Icon className="size-4 shrink-0" size={16} strokeWidth={1.75} aria-hidden />
       {label}
     </NavLink>
   )

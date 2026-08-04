@@ -13,7 +13,7 @@ export const allCampaignsLinkClasses = sidebarNavItemVariants({
 export function AllCampaignsLink() {
   return (
     <Link to={ROUTES.campaign.list} className={allCampaignsLinkClasses}>
-      <ChevronLeft className="size-4.5 shrink-0" size={18} strokeWidth={1.75} aria-hidden />
+      <ChevronLeft className="size-4 shrink-0" size={16} strokeWidth={1.75} aria-hidden />
       All campaigns
     </Link>
   )
