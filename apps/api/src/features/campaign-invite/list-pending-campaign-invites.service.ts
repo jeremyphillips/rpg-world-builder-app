@@ -1,7 +1,7 @@
 import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { CampaignModel, type CampaignSchemaType } from '../campaign/campaign.model'
+import { CampaignMembershipModel } from '../campaign'
+import { CampaignModel, type CampaignSchemaType } from '../campaign'
 import { findUsersByIds } from '../user'
 import { expireInviteIfNeeded, normalizeInviteEmail } from './campaign-invite.lib'
 import { listPendingInvitesByNormalizedEmail } from './campaign-invite.repository'

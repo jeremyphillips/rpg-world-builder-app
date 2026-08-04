@@ -1,7 +1,7 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 import { CAMPAIGN_PRIMARY_WORLD_RULE_CODE, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
-import { CampaignModel } from '../../../../campaign/campaign.model'
+import { CampaignModel } from '../../../../campaign'
 import type { ContentUsageResolverContext } from '../content-usage-context'
 
 type CampaignPrimaryWorldRecord = {

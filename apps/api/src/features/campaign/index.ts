@@ -16,3 +16,12 @@ export {
   createOrConfirmPlayerMembership,
   findCampaignMembershipByCampaignAndUser,
 } from './participation/create-or-confirm-player-membership'
+export { listCampaignCharactersForViewer } from './list-campaign-characters.service'
+export { deleteCampaignNpc, listCampaignNpcs } from './npc/npc.service'
+export {
+  authorizeCampaignCharacterAccess,
+  authorizeCampaignParticipantAccess,
+  resolveCharacterRoutingContext,
+} from './campaign-character-access.service'
+export { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
+export { resolveMemberOpenParticipatingCharacterIds } from './participation/resolve-member-open-participating-character-ids.lib'

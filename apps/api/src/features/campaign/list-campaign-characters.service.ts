@@ -2,7 +2,7 @@ import type { CampaignCharacterListItem, CampaignRole } from '@rpg/contracts'
 import { isCampaignManager } from '@rpg/contracts'
 
 import { findPcsByIds } from '../character'
-import { buildCharacterCardSummaryDto } from '../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../character'
 import { HttpError } from '../../lib/http-error'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'

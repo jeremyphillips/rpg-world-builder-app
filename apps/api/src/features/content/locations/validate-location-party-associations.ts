@@ -1,6 +1,6 @@
 import type { LocationPartyAssociation } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../campaign/participation/campaign-character-participation.repository'
+import { listOpenParticipationsForCampaign } from '../../campaign'
 import { HttpError } from '../../../lib/http-error'
 import type { ContentWriteContext } from '../lib/content-write-config'
 import { HomebrewOrganizationModel } from '../organizations/homebrew-organization.model'

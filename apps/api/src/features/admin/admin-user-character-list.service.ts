@@ -11,7 +11,7 @@ import { loadSeedSubclasses } from '@rpg/catalog/classes'
 import { matchesAnyTextSearchQuery } from '../../lib/text-search.lib'
 
 import { enrichPcsWithOpenCampaign, listCharactersForUser } from '../character'
-import { buildCharacterCardSummaryDto } from '../character/lib/build-character-card-summary-dto.lib'
+import { buildCharacterCardSummaryDto } from '../character'
 import { buildCampaignContentEligibilityMap } from '../campaign-invite'
 import { listSystemContentForRuleset } from '../ruleset'
 import type { ContentTypeName } from '../content'

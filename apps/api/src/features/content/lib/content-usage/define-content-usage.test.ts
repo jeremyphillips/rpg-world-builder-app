@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import type { ContentUsageBlocker } from '@rpg/contracts'
+
 import { defineContentUsage } from './define-content-usage'
 import type { ContentUsageSource } from './content-usage-source'
 
-function mockSource(
-  index: Map<string, import('@rpg/contracts').ContentUsageBlocker[]>,
-): ContentUsageSource {
+function mockSource(index: Map<string, ContentUsageBlocker[]>): ContentUsageSource {
   return {
     loadBlockerIndex: vi.fn(async () => index),
   }

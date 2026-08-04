@@ -4,10 +4,7 @@ import {
   assertDamageTypesActiveInCampaign,
   assertSpellSchoolsActiveInCampaign,
 } from '../../vocabulary'
-import {
-  extractSpellDamageTypeIds,
-  extractSpellSchoolId,
-} from '../../vocabulary/lib/reference-sources/spells'
+import { extractSpellDamageTypeIds, extractSpellSchoolId } from '../../vocabulary'
 import { resolveCatalogForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'

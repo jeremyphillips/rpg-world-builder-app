@@ -18,7 +18,7 @@ import {
   updateCharacterVital,
 } from '../../character'
 import { HttpError } from '../../../lib/http-error'
-import { getCharacterDeletionBlockersForCampaign } from '../../character/character-deletion.service'
+import { getCharacterDeletionBlockersForCampaign } from '../../character'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 import {
   createParticipation,

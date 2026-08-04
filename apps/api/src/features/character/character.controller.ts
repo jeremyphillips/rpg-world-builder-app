@@ -10,7 +10,7 @@ import {
   listCharactersForUser,
 } from './character.service'
 import { enrichPcsWithOpenCampaign } from './enrich-pcs-with-open-campaign.lib'
-import { resolveCharacterRoutingContext } from '../campaign/campaign-character-access.service'
+import { resolveCharacterRoutingContext } from '../campaign'
 
 export async function create(req: Request, res: Response): Promise<void> {
   const character = await createCharacter(req.body as CreateCharacterInput, req.user!.id)

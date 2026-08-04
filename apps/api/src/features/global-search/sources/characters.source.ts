@@ -5,10 +5,10 @@ import {
   resolveCharacterSummaryParts,
 } from '@rpg/contracts'
 
-import { createCharacterSummaryLabelLookup } from '../../character/lib/build-character-card-summary-dto.lib'
+import { createCharacterSummaryLabelLookup } from '../../character'
 import { buildCampaignContentEligibilityIndex } from '../../campaign-invite'
-import { listCampaignCharactersForViewer } from '../../campaign/list-campaign-characters.service'
-import { listCampaignNpcs } from '../../campaign/npc/npc.service'
+import { listCampaignCharactersForViewer } from '../../campaign'
+import { listCampaignNpcs } from '../../campaign'
 import type { SearchSource } from '../lib/search-source.types'
 
 const CHARACTER_TYPE_LABEL = getGlobalSearchFilterGroupTypeLabel('characters')

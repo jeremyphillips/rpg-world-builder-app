@@ -1,9 +1,9 @@
 import type { CampaignInvite } from '@rpg/contracts'
 import { CAMPAIGN_MANAGE_ROLES } from '@rpg/contracts'
 
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { findCampaignById } from '../campaign/find-campaign-by-id'
-import { findInviteById } from '../campaign-invite/campaign-invite.repository'
+import { CampaignMembershipModel } from '../campaign'
+import { findCampaignById } from '../campaign'
+import { findInviteById } from '../campaign-invite'
 import { findSessionUserById, findUserByEmail } from '../user'
 import {
   campaignInviteDedupeKey,

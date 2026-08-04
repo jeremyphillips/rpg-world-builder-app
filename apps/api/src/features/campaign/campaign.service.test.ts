@@ -9,7 +9,7 @@ import {
 } from '../../services/email/providers/fake-email.provider'
 import { setEmailProviderForTests } from '../../services/email/email.service'
 import { CampaignMembershipModel } from './campaign-membership.model'
-import { createPcRecord } from '../character/character.repository'
+import { createPcRecord } from '../character'
 import {
   createCampaign,
   isCampaignMember,
@@ -21,8 +21,8 @@ import { getRulesetPatchRead } from '../vocabulary'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
 import { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
-import { createHomebrewContent } from '../content/lib/content-write.service'
-import { locationWriteConfig } from '../content/locations/locations.config'
+import { createHomebrewContent } from '../content'
+import { locationWriteConfig } from '../content'
 import { HttpError } from '../../lib/http-error'
 
 useIntegrationDb()

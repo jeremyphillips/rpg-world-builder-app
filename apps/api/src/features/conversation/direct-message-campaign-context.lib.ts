@@ -2,10 +2,10 @@ import type { CampaignRole } from '@rpg/contracts'
 import { resolveCampaignViewerParticipation } from '@rpg/contracts'
 import { isValidObjectId } from 'mongoose'
 
-import { CampaignModel } from '../campaign/campaign.model'
-import { CampaignMembershipModel } from '../campaign/campaign-membership.model'
-import { listOpenParticipationsForCampaign } from '../campaign/participation/campaign-character-participation.repository'
-import { resolveMemberOpenParticipatingCharacterIds } from '../campaign/participation/resolve-member-open-participating-character-ids.lib'
+import { CampaignModel } from '../campaign'
+import { CampaignMembershipModel } from '../campaign'
+import { listOpenParticipationsForCampaign } from '../campaign'
+import { resolveMemberOpenParticipatingCharacterIds } from '../campaign'
 import { findPcOwnerIdsByCharacterIds } from '../character'
 import {
   isEligibleDirectMessagePeerInSharedCampaign,

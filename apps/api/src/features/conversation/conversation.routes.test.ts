@@ -15,8 +15,8 @@ import { useIntegrationDb } from '../../test/setup/integration-db'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 import { ConversationModel } from './conversation.model'
 import { MessageModel } from './message.model'
-import { NotificationModel } from '../notification/notification.model'
-import { directMessageDedupeKey } from '../notification/notification-dedupe-keys'
+import { NotificationModel } from '../notification'
+import { directMessageDedupeKey } from '../notification'
 
 const getApp = useIntegrationApp()
 

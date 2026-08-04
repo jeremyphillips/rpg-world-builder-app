@@ -11,6 +11,7 @@ export {
   extractSpeciesSenseTypeIds,
 } from './lib/reference-sources/species'
 export { extractSpellDamageTypeIds, extractSpellSchoolId } from './lib/reference-sources/spells'
+export { toContentUsageBlocker } from './lib/reference-sources/content-referrer'
 export * from './lib/assert-vocabulary-id-available'
 export * from './ruleset-patch/ruleset-patch.service'
 export * from './sets/vocabulary.service'

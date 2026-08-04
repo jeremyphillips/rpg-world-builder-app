@@ -7,7 +7,7 @@ import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { createPcRecord, CharacterModel } from '../../character'
-import { deleteCampaignNpc } from '../../campaign/npc/npc.service'
+import { deleteCampaignNpc } from '../../campaign'
 import {
   deleteContentEntity,
   getContentDeletionAvailability,
@@ -227,7 +227,7 @@ describe('location party association lifecycle', () => {
       ],
     })
 
-    const { deleteCharacterForUser } = await import('../../character/character.service')
+    const { deleteCharacterForUser } = await import('../../character')
     const result = await deleteCharacterForUser(pc.id, campaign.owner.id)
     expect(result).toMatchObject({ status: 'blocked' })
     if (result.status !== 'blocked') throw new Error('expected blocked')

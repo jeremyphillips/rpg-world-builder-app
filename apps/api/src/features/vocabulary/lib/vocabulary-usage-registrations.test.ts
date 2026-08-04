@@ -6,7 +6,7 @@ vi.mock('../../content/content.service', () => ({
 
 import { CREATURE_TYPE_SET_ID, LANGUAGE_SET_ID } from '@rpg/contracts'
 
-import { resolveCatalogForCampaign } from '../../content/content.service'
+import { resolveCatalogForCampaign } from '../../content'
 
 import {
   resolveVocabularyOptionUsage,

@@ -1,7 +1,7 @@
 import { getLocationKindLabel, type LocationKind } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { HomebrewLocationModel } from '../content/locations/homebrew-location.model'
+import { HomebrewLocationModel } from '../content'
 
 /** Validates that a campaign primary world reference exists, is in-campaign, and is a world. */
 export async function validateCampaignPrimaryWorldId(

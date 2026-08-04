@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
-import { updateCampaign } from '../../campaign/campaign.service'
+import { updateCampaign } from '../../campaign'
 import {
   deleteContentEntity,
   getContentDeletionAvailability,

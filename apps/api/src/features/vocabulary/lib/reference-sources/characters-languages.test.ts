@@ -11,8 +11,8 @@ vi.mock('../../../character/character.model', () => ({
   },
 }))
 
-import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../../character/character.model'
+import { listOpenParticipationsForCampaign } from '../../../campaign'
+import { CharacterModel } from '../../../character'
 
 import { indexCharacterLanguageBlockersByLanguageId } from './characters-languages'
 

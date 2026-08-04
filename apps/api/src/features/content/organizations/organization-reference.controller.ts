@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 
 import { HttpError } from '../../../lib/http-error'
-import { authorizeCampaignParticipantAccess } from '../../campaign/campaign-character-access.service'
+import { authorizeCampaignParticipantAccess } from '../../campaign'
 import { resolveCharacterOrganizationReferences } from './resolve-organization-reference'
 
 export async function listCharacterOrganizationReferences(

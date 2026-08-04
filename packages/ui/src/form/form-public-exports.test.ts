@@ -1,7 +1,13 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import * as Form from './index'
-import type { FieldChrome, FieldSize, FieldWidth, SurfaceConfig } from './index'
+import type {
+  DiceFormulaTailOperator,
+  FieldChrome,
+  FieldSize,
+  FieldWidth,
+  SurfaceConfig,
+} from './index'
 
 const REQUIRED_PUBLIC_EXPORTS = [
   'FIELD_WIDTHS',
@@ -34,7 +40,7 @@ describe('@rpg/ui/form public exports', () => {
     expectTypeOf<FieldSize>().not.toBeAny()
     expectTypeOf<FieldChrome>().not.toBeAny()
     expectTypeOf<SurfaceConfig>().not.toBeAny()
-    expectTypeOf<import('./index').DiceFormulaTailOperator>().toEqualTypeOf<
+    expectTypeOf<DiceFormulaTailOperator>().toEqualTypeOf<
       (typeof Form.DICE_FORMULA_TAIL_OPERATORS)[number]
     >()
   })

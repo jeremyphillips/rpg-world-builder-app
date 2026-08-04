@@ -11,7 +11,7 @@ import { HttpError } from '../../lib/http-error'
 import { deliverConversationActivity, deliverNotificationRead } from '../../realtime'
 import { findSessionUserById } from '../user'
 import { directMessageDedupeKey, markNotificationReadByDedupeKey } from '../notification'
-import { getUnreadNotificationCount } from '../notification/notification.service'
+import { getUnreadNotificationCount } from '../notification'
 import {
   buildConversationForParticipant,
   decodeConversationCursor,

@@ -8,15 +8,11 @@ import {
   resetFakeEmailSentMessages,
 } from '../../services/email/providers/fake-email.provider'
 import { setEmailProviderForTests } from '../../services/email/email.service'
-import {
-  acceptCampaignInvite,
-  revokeCampaignInvite,
-  sendCampaignInvite,
-} from '../campaign-invite/campaign-invite.service'
-import { createInviteRecord } from '../campaign-invite/campaign-invite.repository'
-import { computeInviteExpiresAt } from '../campaign-invite/campaign-invite.lib'
-import { generateInviteToken, hashInviteToken } from '../campaign-invite/campaign-invite-token'
-import { CampaignInviteModel } from '../campaign-invite/campaign-invite.model'
+import { acceptCampaignInvite, revokeCampaignInvite, sendCampaignInvite } from '../campaign-invite'
+import { createInviteRecord } from '../campaign-invite'
+import { computeInviteExpiresAt } from '../campaign-invite'
+import { generateInviteToken, hashInviteToken } from '../campaign-invite'
+import { CampaignInviteModel } from '../campaign-invite'
 import {
   campaignInviteDedupeKey,
   campaignInviteInviteeLifecycleDedupeKey,

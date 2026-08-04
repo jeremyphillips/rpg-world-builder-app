@@ -10,7 +10,7 @@ import type {
 import { CampaignMembershipModel } from '../campaign'
 import { CampaignInviteModel } from '../campaign-invite'
 import { CharacterModel, listCharactersForUser } from '../character'
-import { getCharacterLocationPartyDeletionBlockers } from '../character/character-deletion.service'
+import { getCharacterLocationPartyDeletionBlockers } from '../character'
 import { countSuperadminsExcluding, type UserWithActivityTimestamps } from '../user'
 
 const EMPTY_CAMPAIGN_COUNTS: AdminUserCampaignCounts = {

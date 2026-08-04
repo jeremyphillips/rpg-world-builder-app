@@ -78,7 +78,7 @@ function upsertToast(options: ToastOptions): string {
   const withoutId = memoryState.toasts.filter((toast) => toast.id !== id)
   const openToasts = withoutId.filter((toast) => toast.open)
   const closedToasts = withoutId.filter((toast) => !toast.open)
-  let nextOpen = [{ ...options, id, open: true }, ...openToasts]
+  const nextOpen = [{ ...options, id, open: true }, ...openToasts]
 
   while (nextOpen.length > toastVisibleLimit) {
     const evicted = nextOpen.pop()
