@@ -2,6 +2,7 @@
  * @vitest-environment jsdom
  */
 import { render, screen } from '@testing-library/react'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -17,6 +18,7 @@ describe('ActionBlockerReferences', () => {
           blockers={[
             {
               kind: 'usage',
+              sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
               usage: {
                 kind: 'character',
                 id: 'pc_1',
@@ -27,6 +29,7 @@ describe('ActionBlockerReferences', () => {
             },
             {
               kind: 'usage',
+              sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
               usage: {
                 kind: 'character',
                 id: 'pc_2',
@@ -54,6 +57,7 @@ describe('ActionBlockerReferences', () => {
           blockers={[
             {
               kind: 'usage',
+              sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
               usage: {
                 kind: 'character',
                 id: 'pc_1',
@@ -64,6 +68,7 @@ describe('ActionBlockerReferences', () => {
             },
             {
               kind: 'content',
+              sourceKey: USAGE_BLOCKER_SOURCE_KEYS.unknown,
               contentTypeKey: 'species',
               id: 'sp_1',
               label: 'Elf',
@@ -74,9 +79,9 @@ describe('ActionBlockerReferences', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('Used by 1 active character')).toBeInTheDocument()
+    expect(screen.getByText('Referenced by 1 active character')).toBeInTheDocument()
     expect(screen.getByText('Morgran Stonebreaker')).toBeInTheDocument()
-    expect(screen.getByText('Used by 1 active species entry')).toBeInTheDocument()
+    expect(screen.getByText('Referenced by 1 item')).toBeInTheDocument()
     expect(screen.queryByText('Elf')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /show/i })).toBeInTheDocument()
   })

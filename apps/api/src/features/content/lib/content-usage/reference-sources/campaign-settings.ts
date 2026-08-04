@@ -1,5 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { CAMPAIGN_PRIMARY_WORLD_RULE_CODE } from '@rpg/contracts'
+import { CAMPAIGN_PRIMARY_WORLD_RULE_CODE, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { CampaignModel } from '../../../../campaign/campaign.model'
 import type { ContentUsageResolverContext } from '../content-usage-context'
@@ -30,6 +30,7 @@ export async function indexCampaignPrimaryWorldBlockersByContentId(
     kind: 'rule',
     code: CAMPAIGN_PRIMARY_WORLD_RULE_CODE,
     message: `Set as the primary world for campaign "${doc.identity.name}".`,
+    sourceKey: USAGE_BLOCKER_SOURCE_KEYS.campaign_primary_world,
   }
 
   return new Map([[primaryWorldId, [blocker]]])

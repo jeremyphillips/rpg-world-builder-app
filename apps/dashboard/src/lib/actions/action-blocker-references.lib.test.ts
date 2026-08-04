@@ -1,6 +1,5 @@
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
-
-import { USAGE_REFERENCE_CHARACTER_GROUP_KEY } from '@/lib/usage-references/group-usage-references'
 
 import {
   actionBlockerReferenceFlatListClasses,
@@ -23,34 +22,19 @@ describe('action-blocker-references.lib', () => {
     expect(actionBlockedFlatPanelClasses).toContain('bg-destructive-subtle')
   })
 
-  it('formats character usage summaries verbosely', () => {
+  it('formats row summaries from semantic sourceKey', () => {
     expect(
       formatActionBlockedUsageGroupSummary({
-        key: USAGE_REFERENCE_CHARACTER_GROUP_KEY,
-        label: 'Characters',
-        count: 1,
-        references: [],
+        sourceKey: USAGE_BLOCKER_SOURCE_KEYS.location_parent,
+        referenceCount: 1,
       }),
-    ).toBe('Used by 1 active character')
+    ).toBe('Parent of 1 location')
 
     expect(
       formatActionBlockedUsageGroupSummary({
-        key: USAGE_REFERENCE_CHARACTER_GROUP_KEY,
-        label: 'Characters',
-        count: 2,
-        references: [],
+        sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
+        referenceCount: 2,
       }),
-    ).toBe('Used by 2 active characters')
-  })
-
-  it('formats content usage summaries verbosely', () => {
-    expect(
-      formatActionBlockedUsageGroupSummary({
-        key: 'species',
-        label: 'Species',
-        count: 2,
-        references: [],
-      }),
-    ).toBe('Used by 2 active species entries')
+    ).toBe('Referenced by 2 active characters')
   })
 })

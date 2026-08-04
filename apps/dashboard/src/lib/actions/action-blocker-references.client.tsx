@@ -6,9 +6,9 @@ import { Button, Text } from '@rpg/ui'
 import { ChevronDown } from 'lucide-react'
 
 import {
-  groupUsageReferences,
-  type UsageReferenceGroup,
-} from '@/lib/usage-references/group-usage-references'
+  groupUsageBlockersBySourceKey,
+  type UsageBlockerSourceGroup,
+} from '@/lib/usage-references/group-usage-blockers-by-source'
 import { partitionRuleBlockers } from '@/lib/usage-references/map-content-usage-blockers'
 import { UsageReferenceRow } from '@/lib/usage-references/usage-reference-row.client'
 
@@ -40,7 +40,7 @@ function ActionBlockerReferenceLinks({
   listClassName,
 }: {
   campaignId: string
-  references: UsageReferenceGroup['references']
+  references: UsageBlockerSourceGroup['references']
   disclosureLimit: number
   listClassName: string
 }) {
@@ -79,12 +79,15 @@ function ActionBlockerReferenceGroup({
   initiallyExpanded,
 }: {
   campaignId: string
-  group: UsageReferenceGroup
+  group: UsageBlockerSourceGroup
   disclosureLimit: number
   initiallyExpanded: boolean
 }) {
   const [expanded, setExpanded] = useState(initiallyExpanded)
-  const summary = formatActionBlockedUsageGroupSummary(group)
+  const summary = formatActionBlockedUsageGroupSummary({
+    sourceKey: group.sourceKey,
+    referenceCount: group.references.length,
+  })
 
   if (initiallyExpanded) {
     return (
@@ -142,7 +145,7 @@ function ActionBlockerFlatReferences({
   disclosureLimit,
 }: {
   campaignId: string
-  allReferences: UsageReferenceGroup['references']
+  allReferences: UsageBlockerSourceGroup['references']
   ruleBlockers: ReturnType<typeof partitionRuleBlockers>['ruleBlockers']
   disclosureLimit: number
 }) {
@@ -179,8 +182,8 @@ export function ActionBlockerReferences({
   disclosureLimit = ACTION_BLOCKER_REFERENCE_DISCLOSURE_LIMIT,
   variant = 'grouped',
 }: ActionBlockerReferencesProps) {
-  const { references, ruleBlockers } = partitionRuleBlockers(blockers)
-  const groups = groupUsageReferences(references)
+  const { usageBlockers, ruleBlockers } = partitionRuleBlockers(blockers)
+  const groups = groupUsageBlockersBySourceKey(usageBlockers)
 
   if (variant === 'flat') {
     return (
@@ -197,7 +200,7 @@ export function ActionBlockerReferences({
     <div className="space-y-2">
       {groups.map((group, index) => (
         <ActionBlockerReferenceGroup
-          key={group.key}
+          key={group.sourceKey}
           campaignId={campaignId}
           group={group}
           disclosureLimit={disclosureLimit}

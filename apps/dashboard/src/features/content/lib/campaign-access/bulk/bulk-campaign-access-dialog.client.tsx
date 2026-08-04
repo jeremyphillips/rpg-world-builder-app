@@ -35,6 +35,7 @@ import {
   toBulkCampaignAccessFormValues,
 } from './resolve-bulk-campaign-access-preview'
 import { useBulkCampaignAccessAction } from './use-bulk-campaign-access-action.client'
+import { collectDistinctSourceKeysFromBlockedTargets } from '@/lib/usage-references/group-usage-blockers-by-source'
 import type { ContentBase } from '../../overview/content-table-config'
 
 export type BulkCampaignAccessDialogProps = {
@@ -150,6 +151,14 @@ export function BulkCampaignAccessDialog({
     descriptor,
   })
 
+  const blockedSourceKeys = useMemo(
+    () =>
+      lifecycle.validationResult
+        ? collectDistinctSourceKeysFromBlockedTargets(lifecycle.validationResult.targets)
+        : [],
+    [lifecycle.validationResult],
+  )
+
   const resolveDescription = hasBlockers
     ? formatBulkCampaignAccessBlockedDescription({
         mode: blockedMode,
@@ -157,6 +166,7 @@ export function BulkCampaignAccessDialog({
         wouldChangeCount: preview.wouldChangeCount,
         eligibleCount: lifecycle.confirmedCount,
         descriptor,
+        sourceKeys: blockedSourceKeys,
       })
     : undefined
 

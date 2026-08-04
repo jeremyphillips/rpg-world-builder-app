@@ -1,4 +1,4 @@
-import type { ApiContentTypeKey, ContentUsageBlocker } from '@rpg/contracts'
+import type { ApiContentTypeKey, ContentUsageBlocker, UsageBlockerSourceKey } from '@rpg/contracts'
 
 type ContentRecord = {
   id: string
@@ -9,9 +9,11 @@ type ContentRecord = {
 export function toContentUsageBlocker(
   contentTypeKey: ApiContentTypeKey,
   record: ContentRecord,
+  sourceKey: UsageBlockerSourceKey,
 ): ContentUsageBlocker {
   return {
     kind: 'content',
+    sourceKey,
     contentTypeKey,
     id: record.id,
     label: record.name,

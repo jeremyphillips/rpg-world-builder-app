@@ -1,4 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { toContentUsageBlocker } from '../../../../vocabulary/lib/reference-sources/content-referrer'
 import { HomebrewLocationModel } from '../../../locations/homebrew-location.model'
@@ -24,10 +25,14 @@ export async function indexLocationParentBlockersByContentId(
     docs,
     (doc) => (doc.parentLocationId ? [doc.parentLocationId] : []),
     (doc) =>
-      toContentUsageBlocker('locations', {
-        id: String(doc._id),
-        name: doc.name,
-        slug: doc.slug,
-      }),
+      toContentUsageBlocker(
+        'locations',
+        {
+          id: String(doc._id),
+          name: doc.name,
+          slug: doc.slug,
+        },
+        USAGE_BLOCKER_SOURCE_KEYS.location_parent,
+      ),
   )
 }

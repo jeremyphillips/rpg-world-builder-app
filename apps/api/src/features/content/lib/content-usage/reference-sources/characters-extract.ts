@@ -1,4 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
+import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 import type { CharacterRelationship, CharacterRelationshipKind } from '@rpg/contracts'
 import {
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
@@ -50,6 +51,7 @@ export function characterHitToUsageBlocker(
 ): ContentUsageBlocker {
   return {
     kind: 'usage',
+    sourceKey: USAGE_BLOCKER_SOURCE_KEYS.character_usage,
     usage: {
       kind: 'character',
       id: String(hit._id),

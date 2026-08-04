@@ -2,13 +2,14 @@ import { ACTION_PLAN_UNCHANGED_REASONS, type ActionPlanUnchangedReason } from '@
 
 import {
   formatAllSelectedDescriptorCount,
-  formatBlockedOfWouldChangeDescription,
   formatBulkResolveTally,
   formatCountPhrase,
   formatDescriptorCount,
   formatWouldChangeUnchangedSummary,
   type BulkActionDescriptor,
 } from '@/lib/actions/action-count-grammar'
+import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-blocker-copy'
+import type { UsageBlockerSourceKey } from '@rpg/contracts'
 import {
   CONTENT_AVAILABILITY_OFF_ACTION,
   formatActionBlockedDescription,
@@ -230,23 +231,16 @@ export function formatBulkCampaignAccessBlockedDescription(input: {
   wouldChangeCount: number
   eligibleCount: number
   descriptor: BulkActionDescriptor
+  sourceKeys: readonly UsageBlockerSourceKey[]
 }): string {
-  if (input.mode === 'bulk-partial') {
-    const continueHint =
-      input.eligibleCount > 0
-        ? `Remove the references to include ${input.blockedCount === 1 ? 'it' : 'them'}, or continue with the ${formatDescriptorCount(input.eligibleCount, input.descriptor)}.`
-        : undefined
-
-    return formatBlockedOfWouldChangeDescription({
-      blockedCount: input.blockedCount,
-      wouldChangeCount: input.wouldChangeCount,
-      descriptor: input.descriptor,
-      blockerKind: 'active character references',
-      continueHint,
-    })
-  }
-
-  return `All ${input.descriptor.nounPlural} that would change are blocked by active character references. Remove the references before continuing.`
+  return formatUsageBlockerBulkDescription({
+    mode: input.mode,
+    blockedTargetCount: input.blockedCount,
+    wouldChangeCount: input.wouldChangeCount,
+    eligibleCount: input.eligibleCount,
+    descriptor: input.descriptor,
+    sourceKeys: input.sourceKeys,
+  })
 }
 
 export function formatBulkCampaignAccessResolveTally(input: {
