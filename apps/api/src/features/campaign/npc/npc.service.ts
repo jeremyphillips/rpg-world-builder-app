@@ -2,6 +2,7 @@ import type {
   CampaignNpcDetail,
   CampaignNpcListItem,
   CampaignNpcStatusPatch,
+  ContentDeletionResult,
   CreateNpcRequestInput,
   CreateNpcServiceInput,
 } from '@rpg/contracts'
@@ -17,6 +18,7 @@ import {
   updateCharacterVital,
 } from '../../character'
 import { HttpError } from '../../../lib/http-error'
+import { getCharacterDeletionBlockersForCampaign } from '../../character/character-deletion.service'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 import {
   createParticipation,
@@ -126,17 +128,30 @@ export async function getCampaignNpc(
   return { character: character!, participation }
 }
 
-export async function deleteCampaignNpc(campaignId: string, npcId: string): Promise<boolean> {
+export async function deleteCampaignNpc(
+  campaignId: string,
+  npcId: string,
+): Promise<ContentDeletionResult | { status: 'not_found' }> {
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
   const participation = await findOpenParticipation({ campaignId, characterId: npcId })
-  if (!participation) return false
+  if (!participation) return { status: 'not_found' }
+
+  const blockers = await getCharacterDeletionBlockersForCampaign(campaignId, npcId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
 
   await deleteAllParticipationsForCharacter(npcId)
-  return deleteNpcById(npcId)
+  const deleted = await deleteNpcById(npcId)
+  if (!deleted) {
+    return { status: 'not_found' }
+  }
+
+  return { status: 'deleted' }
 }
 
 export async function patchCampaignNpcStatus(

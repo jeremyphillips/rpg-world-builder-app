@@ -13,6 +13,7 @@ import {
   characterSpellSource,
   characterSubclassSource,
   locationParentReferenceSource,
+  locationPartyReferenceSource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -63,7 +64,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'organizations',
-    sources: [{ source: characterOrganizationSource, entry: true, batch: true }],
+    sources: [
+      { source: characterOrganizationSource, entry: true, batch: true },
+      { source: locationPartyReferenceSource, entry: true, batch: true },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'member' },

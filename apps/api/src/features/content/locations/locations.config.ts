@@ -14,6 +14,12 @@ import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewLocationModel, type HomebrewLocationSchemaType } from './homebrew-location.model'
 import { validateLocationHierarchy } from './validate-location-hierarchy'
+import { validateLocationPartyAssociations } from './validate-location-party-associations'
+
+async function validateLocationBeforeWrite(ctx: Parameters<typeof validateLocationHierarchy>[0]) {
+  await validateLocationHierarchy(ctx)
+  await validateLocationPartyAssociations(ctx)
+}
 
 type HomebrewLocationRecord = HomebrewLocationSchemaType & { _id: unknown }
 
@@ -68,7 +74,7 @@ export const locationWriteConfig: ContentWriteConfig<Location> = {
   homebrewModel: HomebrewLocationModel,
   toHomebrewEntity: toHomebrewLocation,
   bodyFromCreateInput,
-  validateBeforeWrite: validateLocationHierarchy,
+  validateBeforeWrite: validateLocationBeforeWrite,
   characterUsageBlocksDemotion: false,
 }
 
