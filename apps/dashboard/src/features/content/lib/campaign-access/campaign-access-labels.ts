@@ -120,10 +120,6 @@ export function formatBulkCampaignAccessChangePreview(
   return `${changedLabel} ${unchangedLabel}`
 }
 
-/** Neutral copy when blocked counts cannot be predicted pre-apply. */
-export const BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE =
-  'Blocked items cannot be predicted before applying.'
-
 /** Reminder that bulk access edits do not publish drafts. */
 export const BULK_CAMPAIGN_ACCESS_DRAFT_NOTE = 'Draft items remain draft.'
 

@@ -1,15 +1,20 @@
 'use client'
 
-import { useEffect, useId, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import type { ContentAccessTargetType, ContentTypeKey, WithCampaignAccess } from '@rpg/contracts'
-import { Button, Modal } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 
-import { CampaignAccessBlockedDialog } from '../campaign-access-blocked-dialog.client'
 import {
-  BULK_CAMPAIGN_ACCESS_APPLY_LABEL,
-  BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE,
+  ActionDialogShell,
+  CONTENT_AVAILABILITY_ACTION,
+  formatActionBlockedDescription,
+  formatActionBlockedTitle,
+  useActionLifecycle,
+  type ActionLifecycleCloseEvent,
+} from '@/lib/actions'
+
+import {
   BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE,
   BULK_CAMPAIGN_ACCESS_DRAFT_NOTE,
   formatBulkCampaignAccessChangePreview,
@@ -25,7 +30,7 @@ import {
   resolveBulkCampaignAccessPreview,
   toBulkCampaignAccessFormValues,
 } from './resolve-bulk-campaign-access-preview'
-import { useBulkUpdateCampaignAccess } from './use-bulk-update-campaign-access'
+import { useBulkCampaignAccessAction } from './use-bulk-campaign-access-action.client'
 import type { ContentBase } from '../../overview/content-table-config'
 
 export type BulkCampaignAccessDialogProps = {
@@ -55,7 +60,6 @@ export function BulkCampaignAccessDialog({
   onApplyComplete,
 }: BulkCampaignAccessDialogProps) {
   const formId = useId()
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
   const fields = useMemo(() => buildBulkCampaignAccessFields(targetType), [targetType])
   const form = useForm<BulkCampaignAccessFormFieldValues>({
     defaultValues: BULK_CAMPAIGN_ACCESS_FORM_FIELD_DEFAULTS,
@@ -69,9 +73,43 @@ export function BulkCampaignAccessDialog({
       ),
     [fieldValues, selectedRows],
   )
-  const { apply, pending, blockedOpen, blockers, setBlockedOpen } = useBulkUpdateCampaignAccess({
+
+  const targets = useMemo(
+    () => selectedRows.map((row) => ({ targetId: row.id, targetName: row.name })),
+    [selectedRows],
+  )
+
+  const { validate, apply, notifyClose, toLegacyResult } = useBulkCampaignAccessAction({
     campaignId,
     contentTypeKey,
+    rows: selectedRows,
+  })
+
+  const pendingConfigRef = useRef<ReturnType<typeof toBulkCampaignAccessFormValues> | null>(null)
+
+  const handleClose = useCallback(
+    (
+      event: ActionLifecycleCloseEvent<
+        import('@rpg/contracts').ContentUsageBlocker,
+        import('@rpg/contracts').ActionTargetFailure
+      >,
+    ) => {
+      if (event.reason !== 'cancel') {
+        notifyClose(event, pendingConfigRef.current)
+        onApplyComplete(toLegacyResult(event.outcomes))
+      }
+      onOpenChange(false)
+    },
+    [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
+  )
+
+  const lifecycle = useActionLifecycle({
+    open,
+    targets,
+    requiresValidation: true,
+    validate,
+    apply,
+    onClose: handleClose,
   })
 
   useEffect(() => {
@@ -80,84 +118,83 @@ export function BulkCampaignAccessDialog({
     }
   }, [form, open])
 
-  const handleApply = async () => {
-    const values = form.getValues()
-    const bulkValues = toBulkCampaignAccessFormValues(values)
-    const result = await apply(selectedRows, bulkValues)
-    onApplyComplete(result)
+  const handleConfigureApply = useCallback(() => {
+    const config = toBulkCampaignAccessFormValues(form.getValues())
+    pendingConfigRef.current = config
+    void lifecycle.startApply(config)
+  }, [form, lifecycle])
 
-    if (result.fullSuccess) {
-      onOpenChange(false)
-    }
-  }
+  const blockedMode =
+    lifecycle.blockedCount === selectedRows.length
+      ? 'bulk-all'
+      : lifecycle.blockedCount > 0
+        ? 'bulk-partial'
+        : 'single'
 
-  const handleOpenAutoFocus = (event: Event) => {
-    event.preventDefault()
-    const content = event.currentTarget as HTMLElement
-    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, input')
-    firstField?.focus()
-  }
+  const resolveDescription =
+    lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
+      ? formatActionBlockedDescription({
+          blockedCount: lifecycle.blockedCount,
+          selectedCount: preview.wouldChangeCount,
+          noun: 'item',
+          referenceNoun: 'character',
+        })
+      : undefined
+
+  const description =
+    lifecycle.phase === 'resolve' && resolveDescription
+      ? resolveDescription
+      : formatBulkCampaignAccessDialogDescription(selectedRows.length, itemLabelPlural)
 
   return (
-    <>
-      <Modal.Root open={open} onOpenChange={onOpenChange}>
-        <Modal.Content
-          size="md"
-          aria-busy={pending || undefined}
-          onOpenAutoFocus={handleOpenAutoFocus}
-        >
-          <Modal.Header
-            headline={BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE}
-            description={formatBulkCampaignAccessDialogDescription(
-              selectedRows.length,
-              itemLabelPlural,
+    <ActionDialogShell
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          lifecycle.cancel()
+        } else {
+          onOpenChange(nextOpen)
+        }
+      }}
+      phase={lifecycle.phase}
+      pending={lifecycle.pending}
+      headline={
+        lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
+          ? formatActionBlockedTitle({ mode: blockedMode, action: CONTENT_AVAILABILITY_ACTION })
+          : BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE
+      }
+      description={description}
+      campaignId={campaignId}
+      configureSlot={
+        <FormProvider {...form}>
+          <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable" />
+        </FormProvider>
+      }
+      summarySlot={
+        <div className="space-y-1 text-sm text-muted-foreground">
+          <p>{formatBulkCampaignAccessSelectedCount(preview.selectedCount)}</p>
+          <p>
+            {formatBulkCampaignAccessChangePreview(
+              preview.wouldChangeCount,
+              preview.unchangedCount,
             )}
-          />
-
-          <Modal.Body>
-            <FormProvider {...form}>
-              <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable">
-                <div className="mt-6 space-y-1 text-sm text-muted-foreground">
-                  <p>{formatBulkCampaignAccessSelectedCount(preview.selectedCount)}</p>
-                  <p>
-                    {formatBulkCampaignAccessChangePreview(
-                      preview.wouldChangeCount,
-                      preview.unchangedCount,
-                    )}
-                  </p>
-                  <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
-                  <p>{BULK_CAMPAIGN_ACCESS_BLOCKED_PREVIEW_NOTE}</p>
-                </div>
-              </FormFieldStack>
-            </FormProvider>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              ref={triggerRef}
-              type="button"
-              disabled={pending || !preview.hasChanges}
-              onClick={() => void handleApply()}
-            >
-              {BULK_CAMPAIGN_ACCESS_APPLY_LABEL}
-            </Button>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal.Root>
-
-      <CampaignAccessBlockedDialog
-        open={blockedOpen}
-        onOpenChange={setBlockedOpen}
-        blockers={blockers}
-      />
-    </>
+          </p>
+          <p>{BULK_CAMPAIGN_ACCESS_DRAFT_NOTE}</p>
+        </div>
+      }
+      localError={lifecycle.localError}
+      resolutionRows={lifecycle.resolutionRows}
+      resolutionLegend="Apply to"
+      confirmedCount={lifecycle.confirmedCount}
+      resolveNoun="items"
+      onCheckedChange={lifecycle.toggleConfirmedTarget}
+      onConfigureApply={handleConfigureApply}
+      configureApplyDisabled={!preview.hasChanges || preview.wouldChangeCount === 0}
+      onResolveConfirm={() => void lifecycle.confirmResolve()}
+      onResolveBack={lifecycle.goBackToConfigure}
+      onRetryFailed={() => void lifecycle.retryFailed()}
+      onCancel={lifecycle.cancel}
+      onAcceptMixedResult={lifecycle.acceptMixedResult}
+    />
   )
 }

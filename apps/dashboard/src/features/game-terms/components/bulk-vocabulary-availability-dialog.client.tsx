@@ -1,18 +1,24 @@
 'use client'
 
-import { useCallback, useEffect, useId, useMemo } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import type { VocabularyOptionSetId, VocabularyOptionStatus } from '@rpg/contracts'
-import { Button, Modal } from '@rpg/ui'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { VocabularyAvailabilityBlockedDialog } from './vocabulary-availability-blocked-dialog.client'
-import { useBulkUpdateVocabularyAvailability } from '../lib/vocabulary/bulk/use-bulk-update-vocabulary-availability.client'
-import type { BulkVocabularyAvailabilityApplyResult } from '../lib/vocabulary/bulk/bulk-apply-vocabulary-availability.lib'
+import {
+  ActionDialogShell,
+  formatActionBlockedDescription,
+  formatActionBlockedTitle,
+  useActionLifecycle,
+  VOCABULARY_DISABLE_ACTION,
+  type ActionLifecycleCloseEvent,
+} from '@/lib/actions'
+
 import { VOCABULARY_STATUS_LABELS } from '@/features/vocabulary'
 
 import { VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE } from '../lib/labels'
+import { useBulkVocabularyAvailabilityAction } from '../lib/vocabulary/bulk/use-bulk-vocabulary-availability-action.client'
 
 const STATUS_OPTIONS = (['active', 'disabled'] as const).map((value) => ({
   value,
@@ -29,7 +35,16 @@ export type BulkVocabularyAvailabilityDialogProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   selectedRows: VocabularyOptionWithUsage[]
-  onApplyComplete: (result: BulkVocabularyAvailabilityApplyResult) => void
+  onApplyComplete: (result: {
+    updatedIds: string[]
+    blockedResults: Array<{
+      rowId: string
+      label: string
+      blockers: import('@rpg/contracts').ContentUsageBlocker[]
+    }>
+    failedIds: string[]
+    fullSuccess: boolean
+  }) => void
 }
 
 export function BulkVocabularyAvailabilityDialog({
@@ -45,8 +60,48 @@ export function BulkVocabularyAvailabilityDialog({
     defaultValues: { status: 'active' },
   })
   const status = useWatch({ control: form.control, name: 'status' })
-  const { apply, pending, blockedOpen, blockedResults, setBlockedOpen } =
-    useBulkUpdateVocabularyAvailability({ campaignId, setId })
+  const pendingStatusRef = useRef<VocabularyOptionStatus>('active')
+
+  const targets = useMemo(
+    () => selectedRows.map((row) => ({ targetId: row.id, targetName: row.label })),
+    [selectedRows],
+  )
+
+  const previewCount = useMemo(
+    () => selectedRows.filter((row) => row.status !== status).length,
+    [selectedRows, status],
+  )
+
+  const { validate, apply, notifyClose, toLegacyResult } = useBulkVocabularyAvailabilityAction({
+    campaignId,
+    setId,
+    rows: selectedRows,
+  })
+
+  const handleClose = useCallback(
+    (
+      event: ActionLifecycleCloseEvent<
+        import('@rpg/contracts').ContentUsageBlocker,
+        import('@rpg/contracts').ActionTargetFailure
+      >,
+    ) => {
+      if (event.reason !== 'cancel') {
+        notifyClose(event)
+        onApplyComplete(toLegacyResult(event.outcomes))
+      }
+      onOpenChange(false)
+    },
+    [notifyClose, onApplyComplete, onOpenChange, toLegacyResult],
+  )
+
+  const lifecycle = useActionLifecycle({
+    open,
+    targets,
+    requiresValidation: true,
+    validate,
+    apply,
+    onClose: handleClose,
+  })
 
   useEffect(() => {
     if (!open) {
@@ -54,87 +109,91 @@ export function BulkVocabularyAvailabilityDialog({
     }
   }, [form, open])
 
-  const previewCount = useMemo(
-    () => selectedRows.filter((row) => row.status !== status).length,
-    [selectedRows, status],
-  )
+  const handleConfigureApply = useCallback(() => {
+    const nextStatus = form.getValues('status') ?? 'active'
+    pendingStatusRef.current = nextStatus
+    void lifecycle.startApply(nextStatus)
+  }, [form, lifecycle])
 
-  const handleApply = useCallback(async () => {
-    const result = await apply(selectedRows, status ?? 'active')
-    onApplyComplete(result)
-    onOpenChange(false)
-  }, [apply, onApplyComplete, onOpenChange, selectedRows, status])
+  const blockedMode =
+    lifecycle.blockedCount === previewCount
+      ? 'bulk-all'
+      : lifecycle.blockedCount > 0
+        ? 'bulk-partial'
+        : 'single'
 
-  const handleOpenAutoFocus = (event: Event) => {
-    event.preventDefault()
-    const content = event.currentTarget as HTMLElement
-    const firstField = content.querySelector<HTMLElement>('[role="combobox"], select, input')
-    firstField?.focus()
-  }
+  const resolveDescription =
+    lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
+      ? formatActionBlockedDescription({
+          blockedCount: lifecycle.blockedCount,
+          selectedCount: previewCount,
+          noun: 'entry',
+          referenceNoun: 'content reference',
+        })
+      : undefined
+
+  const description =
+    lifecycle.phase === 'resolve' && resolveDescription
+      ? resolveDescription
+      : `Apply a new availability status to ${selectedRows.length} selected ${
+          selectedRows.length === 1 ? 'entry' : 'entries'
+        }.`
 
   return (
-    <>
-      <Modal.Root open={open} onOpenChange={onOpenChange}>
-        <Modal.Content
-          size="sm"
-          aria-busy={pending || undefined}
-          onOpenAutoFocus={handleOpenAutoFocus}
-        >
-          <Modal.Header
-            headline={VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE}
-            description={`Apply a new availability status to ${selectedRows.length} selected ${
-              selectedRows.length === 1 ? 'entry' : 'entries'
-            }.`}
+    <ActionDialogShell
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          lifecycle.cancel()
+        } else {
+          onOpenChange(nextOpen)
+        }
+      }}
+      phase={lifecycle.phase}
+      pending={lifecycle.pending}
+      headline={
+        lifecycle.phase === 'resolve' && lifecycle.blockedCount > 0
+          ? formatActionBlockedTitle({ mode: blockedMode, action: VOCABULARY_DISABLE_ACTION })
+          : VOCABULARY_BULK_AVAILABILITY_DIALOG_HEADLINE
+      }
+      description={description}
+      campaignId={campaignId}
+      configureSlot={
+        <FormProvider {...form}>
+          <FormFieldStack
+            fields={[
+              {
+                type: 'select',
+                name: 'status',
+                label: 'Availability',
+                options: STATUS_OPTIONS,
+                required: true,
+              },
+            ]}
+            idPrefix={formId}
+            size="md"
+            rhythm="comfortable"
           />
-
-          <Modal.Body>
-            <FormProvider {...form}>
-              <FormFieldStack
-                fields={[
-                  {
-                    type: 'select',
-                    name: 'status',
-                    label: 'Availability',
-                    options: STATUS_OPTIONS,
-                    required: true,
-                  },
-                ]}
-                idPrefix={formId}
-                size="md"
-                rhythm="comfortable"
-              />
-            </FormProvider>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
-            </p>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={pending || previewCount === 0}
-              onClick={() => void handleApply()}
-            >
-              Apply
-            </Button>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal.Root>
-
-      <VocabularyAvailabilityBlockedDialog
-        open={blockedOpen}
-        onOpenChange={setBlockedOpen}
-        campaignId={campaignId}
-        blockedResults={blockedResults}
-      />
-    </>
+        </FormProvider>
+      }
+      summarySlot={
+        <p className="text-sm text-muted-foreground">
+          {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
+        </p>
+      }
+      localError={lifecycle.localError}
+      resolutionRows={lifecycle.resolutionRows}
+      resolutionLegend="Apply to"
+      confirmedCount={lifecycle.confirmedCount}
+      resolveNoun="entries"
+      onCheckedChange={lifecycle.toggleConfirmedTarget}
+      onConfigureApply={handleConfigureApply}
+      configureApplyDisabled={previewCount === 0}
+      onResolveConfirm={() => void lifecycle.confirmResolve()}
+      onResolveBack={lifecycle.goBackToConfigure}
+      onRetryFailed={() => void lifecycle.retryFailed()}
+      onCancel={lifecycle.cancel}
+      onAcceptMixedResult={lifecycle.acceptMixedResult}
+    />
   )
 }

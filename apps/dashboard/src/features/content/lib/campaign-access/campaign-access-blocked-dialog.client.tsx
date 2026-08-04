@@ -1,7 +1,7 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { Button, Modal } from '@rpg/ui'
 
-import { ContentUsageBlockedList } from '../content-usage-blocked-list.client'
+import { ActionBlockedDialog } from '@/lib/actions/action-blocked-dialog.client'
+
 import {
   formatCampaignAccessBlockedDescription,
   formatCampaignAccessBlockedHeadline,
@@ -10,35 +10,27 @@ import {
 export interface CampaignAccessBlockedDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  campaignId: string
   blockers: ContentUsageBlocker[]
 }
 
 export function CampaignAccessBlockedDialog({
   open,
   onOpenChange,
+  campaignId,
   blockers,
 }: CampaignAccessBlockedDialogProps) {
   const usageCount =
     blockers.filter((blocker) => blocker.kind === 'usage').length || blockers.length
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
-        <Modal.Header
-          headline={formatCampaignAccessBlockedHeadline()}
-          description={formatCampaignAccessBlockedDescription(usageCount)}
-        />
-
-        <Modal.Body>
-          <ContentUsageBlockedList blockers={blockers} />
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+    <ActionBlockedDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      campaignId={campaignId}
+      title={formatCampaignAccessBlockedHeadline()}
+      description={formatCampaignAccessBlockedDescription(usageCount)}
+      blockers={blockers}
+    />
   )
 }

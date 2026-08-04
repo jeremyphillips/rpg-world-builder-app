@@ -303,6 +303,7 @@ export function CampaignAccessSection({
       <CampaignAccessBlockedDialog
         open={blockedOpen}
         onOpenChange={setBlockedOpen}
+        campaignId={campaignId}
         blockers={blockers}
       />
     </CampaignAccessAvailabilityProvider>

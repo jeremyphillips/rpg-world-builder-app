@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from 'react'
 import type { CampaignNpcListItem, CharacterBuildCatalogIndex } from '@rpg/contracts'
+import { supportsCharacterBulkRosterStatus } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import { applyFilterSchema } from '@rpg/ui/filters'
 
@@ -58,6 +59,8 @@ export function NpcsOverviewTable({ campaignId, catalogIndex, npcs }: NpcsOvervi
     openBulkRosterDialog,
   } = useNpcOverviewBulkRoster<NpcOverviewTableRow>(visibleRowIds)
 
+  const supportsBulkRosterStatus = supportsCharacterBulkRosterStatus('npc')
+
   return (
     <>
       <CatalogOverviewTable
@@ -87,13 +90,16 @@ export function NpcsOverviewTable({ campaignId, catalogIndex, npcs }: NpcsOvervi
                 getRowCanSelect,
                 selectTriggerRef,
                 getSelectRowLabel: (row) => row.character.name,
-                bulkActionsMenu: <NpcBulkActionsMenu onEditRosterStatus={openBulkRosterDialog} />,
+                bulkActionsMenu:
+                  supportsBulkRosterStatus && canManage ? (
+                    <NpcBulkActionsMenu onEditRosterStatus={openBulkRosterDialog} />
+                  ) : undefined,
               }
             : undefined
         }
       />
 
-      {canManage ? (
+      {canManage && supportsBulkRosterStatus ? (
         <BulkRosterStatusDialog
           open={bulkRosterOpen}
           onOpenChange={setBulkRosterOpen}

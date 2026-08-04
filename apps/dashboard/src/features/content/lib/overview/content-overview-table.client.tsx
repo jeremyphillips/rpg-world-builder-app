@@ -3,6 +3,7 @@
 import { memo, useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+  supportsContentBulkCampaignAccess,
   type CampaignAvailabilityFilter,
   type ContentTypeKey,
   type WithCampaignAccess,
@@ -361,6 +362,7 @@ export function ContentOverviewTable<
 
   const visibleRowIds = useMemo(() => new Set(visibleRows.map((row) => row.id)), [visibleRows])
   const bulkAccess = useContentOverviewBulkAccess<T>(visibleRowIds)
+  const supportsBulkCampaignAccess = supportsContentBulkCampaignAccess(contentTypeKey)
 
   const handleAdvancedOpenChange = useCallback(
     (open: boolean) => {
@@ -490,7 +492,9 @@ export function ContentOverviewTable<
         onRowSelectionStateChange={bulkAccess.onRowSelectionStateChange}
         getRowCanSelect={bulkAccess.getRowCanSelect}
         onEditCampaignAccess={
-          canManage && bulkAccess.selectedCount > 0 ? bulkAccess.openBulkAccessDialog : undefined
+          canManage && supportsBulkCampaignAccess && bulkAccess.selectedCount > 0
+            ? bulkAccess.openBulkAccessDialog
+            : undefined
         }
         getEditHref={getEditHref}
         onColumnChange={handleColumnChange}
@@ -501,7 +505,7 @@ export function ContentOverviewTable<
         selectTriggerRef={selectTriggerRef}
       />
 
-      {canManage ? (
+      {canManage && supportsBulkCampaignAccess ? (
         <BulkCampaignAccessDialog
           open={bulkAccess.bulkAccessOpen}
           onOpenChange={bulkAccess.setBulkAccessOpen}
