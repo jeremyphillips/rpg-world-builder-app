@@ -10,7 +10,13 @@ import {
   type LocationPartyRef,
   type Organization,
 } from '@rpg/contracts'
-import { CatalogPickerSheet, FieldRadiogroupLabel, SegmentedControl, SelectField } from '@rpg/ui'
+import {
+  CatalogPickerSheet,
+  FieldRadiogroupLabel,
+  SegmentedControl,
+  SelectField,
+  Text,
+} from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
 import { resolveCatalogPickerRowActionPhase } from '@/features/character/components/picker/catalog-picker-row-action.lib'
@@ -30,6 +36,7 @@ import {
   buildRelatedToSegmentOptions,
   findLocationPartyAssociationId,
   isLocationPartyAssociationSelected,
+  LOCATION_PARTY_CHOOSE_RELATIONSHIP_LIST_MESSAGE,
   LOCATION_PARTY_RELATED_TO_LABEL,
   LOCATION_PARTY_RELATIONSHIP_PLACEHOLDER,
   LOCATION_PARTY_SEARCH_DISABLED_PLACEHOLDER,
@@ -176,7 +183,13 @@ export function LocationPartyPickerDrawer({
       headerBelowDescription={headerControls}
       searchDisabled={searchDisabled}
       searchPlaceholder={searchPlaceholder}
-      emptyState={<></>}
+      emptyState={
+        semanticKey ? undefined : (
+          <Text variant="muted" className="text-sm" role="status">
+            {LOCATION_PARTY_CHOOSE_RELATIONSHIP_LIST_MESSAGE}
+          </Text>
+        )
+      }
       items={items}
       getItemKey={(item) => (item.kind === 'character' ? item.character.id : item.organization.id)}
       getItemToolbarLabel={(item) =>

@@ -8,6 +8,7 @@ import { STORY_CAMPAIGN_ID } from '@/features/content/lib/fixtures/constants'
 import { LocationPartyAssociationsSection } from './location-party-associations-section.client'
 import {
   LOCATION_PARTY_ASSOCIATIONS_FIELD,
+  LOCATION_PARTY_CHOOSE_RELATIONSHIP_LIST_MESSAGE,
   LOCATION_PARTY_EMPTY_TEXT,
   LOCATION_PARTY_SECTION_DESCRIPTION,
   LOCATION_PARTY_SEARCH_DISABLED_PLACEHOLDER,
@@ -79,7 +80,7 @@ export const OpensPicker: Story = {
     await expect(within(dialog).getByRole('button', { name: 'Characters' })).toBeDisabled()
     await expect(within(dialog).getByRole('button', { name: 'Organizations' })).toBeDisabled()
     await expect(
-      within(dialog).queryByText('Choose a relationship to search for people and organizations.'),
-    ).not.toBeInTheDocument()
+      within(dialog).getByText(LOCATION_PARTY_CHOOSE_RELATIONSHIP_LIST_MESSAGE),
+    ).toBeInTheDocument()
   },
 }

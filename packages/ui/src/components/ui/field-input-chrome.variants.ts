@@ -32,7 +32,8 @@ export const fieldInputDisabledClasses =
 export const fieldInputReadonlyClasses =
   '[readonly]:bg-input-readonly [readonly]:border-input-readonly'
 
-export const fieldInputPlaceholderClasses = 'placeholder:text-muted-foreground'
+export const fieldInputPlaceholderClasses =
+  'placeholder:text-input-placeholder disabled:placeholder:text-input-disabled'
 
 /** Browser autofill often bypasses `bg-input` — pin fill to field-control bg. */
 export const fieldInputAutofillClasses =

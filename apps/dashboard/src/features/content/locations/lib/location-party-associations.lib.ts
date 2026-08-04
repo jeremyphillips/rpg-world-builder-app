@@ -28,6 +28,9 @@ export const LOCATION_PARTY_RELATED_TO_LABEL = 'Related to'
 
 export const LOCATION_PARTY_SEARCH_DISABLED_PLACEHOLDER = 'Choose a relationship first'
 
+export const LOCATION_PARTY_CHOOSE_RELATIONSHIP_LIST_MESSAGE =
+  'Choose a relationship to see available people and organizations.'
+
 export const LOCATION_PARTY_KIND_ORDER: readonly LocationPartyKind[] = ['character', 'organization']
 
 export const LOCATION_PARTY_ADD_LABEL = 'Add relationship'

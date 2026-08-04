@@ -348,6 +348,22 @@
   color: var(--field-control-fg-disabled);
 }
 
+@utility text-input-placeholder {
+  color: var(--field-control-placeholder);
+}
+
+@utility placeholder:text-input-placeholder {
+  &::placeholder {
+    color: var(--field-control-placeholder);
+  }
+}
+
+@utility disabled:placeholder:text-input-disabled {
+  &:disabled::placeholder {
+    color: var(--field-control-fg-disabled);
+  }
+}
+
 @utility bg-input-invalid-subtle {
   background-color: var(--field-control-bg-invalid);
 }

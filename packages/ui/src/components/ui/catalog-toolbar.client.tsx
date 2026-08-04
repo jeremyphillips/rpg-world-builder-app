@@ -18,6 +18,7 @@ import {
   catalogToolbarFilterActionsVariants,
   catalogToolbarFilterControlsVariants,
   catalogToolbarFilterRowVariants,
+  catalogToolbarSearchIconVariants,
   catalogToolbarSearchRowVariants,
   catalogToolbarStandaloneActionsVariants,
   catalogToolbarTabRowVariants,
@@ -72,7 +73,7 @@ function CatalogToolbarSearchField({
   return (
     <div className={catalogToolbarSearchRowVariants()}>
       <Search
-        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+        className={catalogToolbarSearchIconVariants({ disabled: search.disabled })}
         aria-hidden
       />
       <Input
