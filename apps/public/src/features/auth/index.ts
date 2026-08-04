@@ -1,5 +1,6 @@
 export { AuthRedirect } from './components/auth-redirect.client'
 export { LoginForm } from './components/login-form'
 export { SignupForm } from './components/signup-form'
+export { logout } from './api/auth-client'
 export { useSession, sessionQueryKey } from './hooks/use-session'
 export { useLogout } from './hooks/use-logout'

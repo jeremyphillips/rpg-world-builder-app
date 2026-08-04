@@ -8,8 +8,7 @@ import { persistCampaignSelectionBestEffort } from '@rpg/api-client'
 import { CampaignInviteReviewContent, resolveInviteViewState } from '@rpg/campaign-invite'
 
 import { ROUTES } from '@/lib/routes'
-import { useSession } from '@/features/auth/hooks/use-session'
-import { logout } from '@/features/auth/api/auth-client'
+import { logout, useSession } from '@/features/auth'
 
 import {
   acceptCampaignInviteByToken,
