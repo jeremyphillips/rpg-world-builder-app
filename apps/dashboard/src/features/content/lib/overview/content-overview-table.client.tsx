@@ -1,57 +1,13 @@
 'use client'
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { memo, useCallback, useMemo, useRef, type ReactNode } from 'react'
 import {
-  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
-  partitionApplyOutcomes,
-  supportsContentBulkCampaignAccess,
-  type ActionApplyOutcome,
-  type ActionTargetFailure,
   type CampaignAvailabilityFilter,
   type ContentTypeKey,
   type WithCampaignAccess,
 } from '@rpg/contracts'
 import { type ColumnDef, type ColumnChangeState, type DataTableUtilityControls } from '@rpg/ui'
-import {
-  applyFilterSchema,
-  getEffectiveFilterValue,
-  getSchemaFieldsByPlacement,
-  type FilterFieldId,
-  type FilterSchema,
-} from '@rpg/ui/filters'
 
-import { getContentTypeMidSentenceLabel } from '../content-type-labels'
-import { useCanManageCampaign } from '@/features/campaign'
-import {
-  buildContentOverviewColumnSchema,
-  getContentOverviewSortableColumnIds,
-} from './content-overview-columns.lib'
-import { useOverviewColumnsWithNameContext } from './content-overview-columns.client'
-import { filterCatalogRowsForViewer } from './filter-catalog-rows-for-viewer'
-import { useContentViewer } from './use-content-viewer'
-import {
-  CONTENT_OVERVIEW_PREFERENCES_DEFAULTS,
-  hydrateContentOverviewPreferences,
-  persistContentOverviewPreferences,
-  type ContentOverviewPageSize,
-  type ContentOverviewPreferences,
-} from './content-overview-preferences'
-import { ContentOverviewRowActions } from './content-overview-row-actions'
-import { BulkCampaignAccessDialog } from '../campaign-access/bulk/bulk-campaign-access-dialog.client'
-import {
-  buildContentOverviewEmptyState,
-  buildContentOverviewHiddenSupplement,
-} from './content-overview-availability-ui.lib'
-import { useContentOverviewBulkSelection } from './use-content-overview-bulk-selection'
-import {
-  CAMPAIGN_AVAILABILITY_FILTER_ID,
-  deriveCampaignAvailabilityScope,
-} from './content-availability-table.lib'
-import type { ContentBase } from './content-table-config'
-import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
-import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
-import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
-import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
 import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table.client'
 import {
   overviewUnavailableNameCellClassName,
@@ -60,12 +16,29 @@ import {
 import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary.client'
 import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster.client'
 import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
-import {
-  applyOverviewAdvancedOpenPreferences,
-  applyOverviewColumnChangePreferences,
-} from '@/lib/overview-preferences'
+import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
 
-const DEFAULT_OVERVIEW_SORT = { id: 'name' } as const
+import { ContentOverviewRowActions } from './content-overview-row-actions'
+import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'
+import { ContentOverviewTableBulkDialogs } from './content-overview-table-bulk-dialogs.client'
+import type {
+  ContentOverviewBulkExtension,
+  ContentOverviewTableProps,
+} from './content-overview-table.types'
+import type { ContentBase } from './content-table-config'
+import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'
+import type {
+  ContentOverviewPageSize,
+  ContentOverviewPreferences,
+} from './content-overview-preferences'
+import { useContentOverviewTable } from './use-content-overview-table.client'
+
+export type {
+  ContentOverviewBulkExtension,
+  ContentOverviewBulkExtensionRenderContext,
+  ContentOverviewTableProps,
+} from './content-overview-table.types'
+
 const EMPTY_BULK_EXTENSIONS: ContentOverviewBulkExtension<
   WithCampaignAccess<ContentBase> & { id: string }
 >[] = []
@@ -282,362 +255,85 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   props: ContentOverviewDataTableProps<T>,
 ) => React.JSX.Element
 
-export type ContentOverviewBulkExtensionRenderContext<
-  T extends WithCampaignAccess<ContentBase> & { id: string },
-> = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  campaignId: string
-  selectedRows: T[]
-  campaignRows: T[]
-  onApplyComplete: (outcomes: ActionApplyOutcome<unknown, ActionTargetFailure>[]) => void
-}
-
-export type ContentOverviewBulkExtension<
-  T extends WithCampaignAccess<ContentBase> & { id: string },
-> = {
-  menuAction: OverviewBulkAction
-  renderDialog: (context: ContentOverviewBulkExtensionRenderContext<T>) => ReactNode
-}
-
-export type ContentOverviewTableProps<
-  T extends WithCampaignAccess<ContentBase> & { id: string },
-  TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
-> = {
-  contentTypeKey: ContentTypeKey
-  campaignId: string
-  columns: ColumnDef<T, unknown>[]
-  filterSchema: FilterSchema<T, TFilters>
-  data: T[]
-  caption?: string
-  getEditHref: (row: T) => string
-  bulkExtensions?: ContentOverviewBulkExtension<T>[]
-}
-
-// fallow-ignore-next-line complexity
 export function ContentOverviewTable<
   T extends WithCampaignAccess<ContentBase> & { id: string },
   TFilters extends ContentOverviewBaseFilterState = ContentOverviewBaseFilterState,
->({
-  contentTypeKey,
-  campaignId,
-  columns,
-  filterSchema,
-  data,
-  caption,
-  getEditHref,
-  bulkExtensions = EMPTY_BULK_EXTENSIONS,
-}: ContentOverviewTableProps<T, TFilters>) {
+>(props: ContentOverviewTableProps<T, TFilters>) {
   const tableRootRef = useRef<HTMLDivElement>(null)
-  const selectTriggerRef = useRef<HTMLButtonElement>(null)
   const actionTriggerRefs = useRef(new Map<string, HTMLButtonElement>())
-  const canManage = useCanManageCampaign(campaignId)
-  const viewer = useContentViewer(campaignId)
-
-  const overviewColumns = useOverviewColumnsWithNameContext(columns, {
-    canManage,
-    campaignId,
-    contentTypeKey,
-    viewer,
-    getEditHref,
+  const model = useContentOverviewTable({
+    ...props,
+    bulkExtensions: props.bulkExtensions ?? EMPTY_BULK_EXTENSIONS,
+    tableRootRef,
+    actionTriggerRefs,
   })
-
-  const discoveryFilteredData = useMemo(
-    () => filterCatalogRowsForViewer(data, viewer),
-    [data, viewer],
-  )
-
-  const columnSchema = useMemo(
-    () => buildContentOverviewColumnSchema(overviewColumns as ColumnDef<unknown>[]),
-    [overviewColumns],
-  )
-  const [preferences, setPreferences] = useState<ContentOverviewPreferences>(() =>
-    hydrateContentOverviewPreferences(contentTypeKey, columnSchema),
-  )
-  const advancedOpen = preferences.advancedOpen ?? false
-  const allowedSortIds = useMemo(
-    () => getContentOverviewSortableColumnIds(overviewColumns as ColumnDef<unknown>[]),
-    [overviewColumns],
-  )
-  const advancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
-    [filterSchema],
-  )
-  const hasAdvancedFields = advancedFields.length > 0
-  const { query, actions } = useContentOverviewQueryState<T, TFilters>({
-    schema: filterSchema,
-    allowedSortIds,
-    defaultSort: DEFAULT_OVERVIEW_SORT,
-  })
-
-  const campaignAvailabilityFilterId = CAMPAIGN_AVAILABILITY_FILTER_ID as FilterFieldId<TFilters>
-
-  const filterState = query.filters
-  const campaignAvailability =
-    (getEffectiveFilterValue(filterSchema, filterState, campaignAvailabilityFilterId) as
-      | CampaignAvailabilityFilter
-      | undefined) ?? CAMPAIGN_AVAILABILITY_FILTER_DEFAULT
-
-  const scopedRows = useMemo(
-    () =>
-      applyFilterSchema(filterSchema, filterState, discoveryFilteredData, {
-        excludeFieldIds: [campaignAvailabilityFilterId],
-      }),
-    [campaignAvailabilityFilterId, discoveryFilteredData, filterSchema, filterState],
-  )
-
-  const scope = useMemo(
-    () => deriveCampaignAvailabilityScope(scopedRows, { campaignAvailability }),
-    [campaignAvailability, scopedRows],
-  )
-
-  const visibleRows = useMemo(
-    () => applyFilterSchema(filterSchema, filterState, discoveryFilteredData),
-    [discoveryFilteredData, filterSchema, filterState],
-  )
-
-  const pluralNoun = getContentTypeMidSentenceLabel(contentTypeKey, { plural: true })
-  const itemLabel = getContentTypeMidSentenceLabel(contentTypeKey)
-
-  const visibleRowIds = useMemo(() => new Set(visibleRows.map((row) => row.id)), [visibleRows])
-  const {
-    selectionMode,
-    rowSelection,
-    selectedRows,
-    selectedCount,
-    selectionLimit,
-    selectionLiveRegionId,
-    selectionLiveRegionMessage,
-    selectionCapDescriptionId,
-    getRowCanSelect,
-    enterSelectionMode,
-    handleExitSelectionMode: exitBulkSelectionMode,
-    onRowSelectionChange,
-    onRowSelectionStateChange,
-    removeFromSelection,
-  } = useContentOverviewBulkSelection<T>(visibleRowIds)
-  const [bulkAccessOpen, setBulkAccessOpen] = useState(false)
-  const [openExtensionId, setOpenExtensionId] = useState<string | null>(null)
-  const supportsBulkCampaignAccess = supportsContentBulkCampaignAccess(contentTypeKey)
-
-  const openBulkAccessDialog = useCallback(() => {
-    setBulkAccessOpen(true)
-  }, [])
-
-  const handleBulkAccessApplyComplete = useCallback(
-    (result: { updatedIds: string[]; fullSuccess: boolean }) => {
-      removeFromSelection(result.updatedIds)
-
-      if (result.fullSuccess) {
-        setBulkAccessOpen(false)
-        exitBulkSelectionMode()
-      }
-    },
-    [exitBulkSelectionMode, removeFromSelection],
-  )
-
-  const handleExtensionApplyComplete = useCallback(
-    (outcomes: ActionApplyOutcome<unknown, ActionTargetFailure>[]) => {
-      const { updated, blocked, failed } = partitionApplyOutcomes(outcomes)
-      removeFromSelection(updated.map((outcome) => outcome.targetId))
-
-      if (updated.length > 0 && blocked.length === 0 && failed.length === 0) {
-        setOpenExtensionId(null)
-        exitBulkSelectionMode()
-      }
-    },
-    [exitBulkSelectionMode, removeFromSelection],
-  )
-
-  const handleExitSelectionMode = useCallback(() => {
-    setBulkAccessOpen(false)
-    setOpenExtensionId(null)
-    exitBulkSelectionMode()
-  }, [exitBulkSelectionMode])
-
-  const additionalBulkActions = useMemo(() => {
-    if (!canManage || selectedCount === 0) {
-      return [] as OverviewBulkAction[]
-    }
-
-    return bulkExtensions.map((extension) => ({
-      ...extension.menuAction,
-      onSelect: () => setOpenExtensionId(extension.menuAction.id),
-    }))
-  }, [bulkExtensions, canManage, selectedCount])
-
-  const handleAdvancedOpenChange = useCallback(
-    (open: boolean) => {
-      setPreferences((current) => {
-        const { next, changed } = applyOverviewAdvancedOpenPreferences(current, open)
-        if (!changed) return current
-
-        persistContentOverviewPreferences(contentTypeKey, next)
-        return next
-      })
-    },
-    [contentTypeKey],
-  )
-
-  const handleColumnChange = useCallback(
-    (state: ColumnChangeState) => {
-      setPreferences((current) => {
-        const { next, changed } = applyOverviewColumnChangePreferences(current, state)
-        if (!changed) return current
-
-        persistContentOverviewPreferences(contentTypeKey, next)
-        return next
-      })
-    },
-    [contentTypeKey],
-  )
-
-  const handleFilterValueChange = useCallback(
-    (id: FilterFieldId<TFilters>, value: unknown) => {
-      actions.setFilterValue(id, value as TFilters[typeof id])
-    },
-    [actions],
-  )
-
-  const restoreFocusAfterRowRemoved = useCallback(
-    (removedRowId: string) => {
-      const orderedIds = visibleRows.map((row) => row.id)
-      const removedIndex = orderedIds.indexOf(removedRowId)
-      const candidateIds = [
-        ...orderedIds.slice(removedIndex + 1),
-        ...orderedIds.slice(0, removedIndex).reverse(),
-      ]
-
-      for (const candidateId of candidateIds) {
-        const trigger = actionTriggerRefs.current.get(candidateId)
-        if (trigger) {
-          trigger.focus()
-          return
-        }
-      }
-
-      tableRootRef.current?.focus()
-    },
-    [visibleRows],
-  )
-
-  const restoreFocusRef = useRef(restoreFocusAfterRowRemoved)
-
-  useEffect(() => {
-    restoreFocusRef.current = restoreFocusAfterRowRemoved
-  })
-
-  const registerActionTrigger = useCallback((rowId: string, element: HTMLButtonElement | null) => {
-    if (element) {
-      actionTriggerRefs.current.set(rowId, element)
-      return
-    }
-
-    actionTriggerRefs.current.delete(rowId)
-  }, [])
-
-  const tablePageSize: ContentOverviewPageSize =
-    preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
-
-  const resultSupplement = useMemo(
-    () =>
-      buildContentOverviewHiddenSupplement({
-        scope,
-        campaignAvailability,
-        campaignAvailabilityFilterId,
-        actions,
-      }),
-    [actions, campaignAvailability, campaignAvailabilityFilterId, scope],
-  )
-
-  const emptyState = useCallback(
-    () =>
-      buildContentOverviewEmptyState({
-        campaignAvailability,
-        scope,
-        pluralNoun,
-        campaignAvailabilityFilterId,
-        actions,
-      }),
-    [actions, campaignAvailability, campaignAvailabilityFilterId, pluralNoun, scope],
-  )
 
   return (
     <div ref={tableRootRef} tabIndex={-1} className="flex flex-col gap-3 outline-none">
       <CatalogOverviewFilterChrome
-        filterSchema={filterSchema}
-        filterState={filterState}
-        onFilterChange={handleFilterValueChange}
-        onResetFilters={() => actions.resetFilters()}
-        advancedOpen={hasAdvancedFields ? advancedOpen : false}
-        onAdvancedOpenChange={hasAdvancedFields ? handleAdvancedOpenChange : () => undefined}
+        filterSchema={props.filterSchema}
+        filterState={model.filterState}
+        onFilterChange={model.handleFilterValueChange}
+        onResetFilters={() => model.actions.resetFilters()}
+        advancedOpen={model.hasAdvancedFields ? model.advancedOpen : false}
+        onAdvancedOpenChange={
+          model.hasAdvancedFields ? model.handleAdvancedOpenChange : () => undefined
+        }
       />
 
       <ContentOverviewDataTable
-        columns={overviewColumns}
-        data={visibleRows}
-        pageSize={tablePageSize}
-        columnVisibility={preferences.columnVisibility}
-        columnOrder={preferences.columnOrder}
-        canManage={canManage}
-        campaignId={campaignId}
-        contentTypeKey={contentTypeKey}
-        itemLabel={itemLabel}
-        campaignAvailability={campaignAvailability}
-        resultSupplement={resultSupplement}
-        selectionMode={selectionMode}
-        rowSelection={rowSelection}
-        selectionLimit={selectionLimit}
-        selectionLiveRegionId={selectionLiveRegionId}
-        selectionLiveRegionMessage={selectionLiveRegionMessage}
-        selectionCapDescriptionId={selectionCapDescriptionId}
-        onEnterSelectionMode={enterSelectionMode}
-        onExitSelectionMode={handleExitSelectionMode}
-        onRowSelectionChange={onRowSelectionChange}
-        onRowSelectionStateChange={onRowSelectionStateChange}
-        getRowCanSelect={getRowCanSelect}
+        columns={model.overviewColumns}
+        data={model.visibleRows}
+        pageSize={model.tablePageSize}
+        columnVisibility={model.preferences.columnVisibility}
+        columnOrder={model.preferences.columnOrder}
+        canManage={model.canManage}
+        campaignId={props.campaignId}
+        contentTypeKey={props.contentTypeKey}
+        itemLabel={model.itemLabel}
+        campaignAvailability={model.campaignAvailability}
+        resultSupplement={model.resultSupplement}
+        selectionMode={model.selectionMode}
+        rowSelection={model.rowSelection}
+        selectionLimit={model.selectionLimit}
+        selectionLiveRegionId={model.selectionLiveRegionId}
+        selectionLiveRegionMessage={model.selectionLiveRegionMessage}
+        selectionCapDescriptionId={model.selectionCapDescriptionId}
+        onEnterSelectionMode={model.enterSelectionMode}
+        onExitSelectionMode={model.handleExitSelectionMode}
+        onRowSelectionChange={model.onRowSelectionChange}
+        onRowSelectionStateChange={model.onRowSelectionStateChange}
+        getRowCanSelect={model.getRowCanSelect}
         onEditCampaignAccess={
-          canManage && supportsBulkCampaignAccess && selectedCount > 0
-            ? openBulkAccessDialog
+          model.canManage && model.supportsBulkCampaignAccess && model.selectedCount > 0
+            ? model.openBulkAccessDialog
             : undefined
         }
-        additionalBulkActions={additionalBulkActions}
-        getEditHref={getEditHref}
-        onColumnChange={handleColumnChange}
-        caption={caption}
-        emptyState={emptyState}
-        restoreFocusRef={restoreFocusRef}
-        registerActionTrigger={registerActionTrigger}
-        selectTriggerRef={selectTriggerRef}
+        additionalBulkActions={model.additionalBulkActions}
+        getEditHref={props.getEditHref}
+        onColumnChange={model.handleColumnChange}
+        caption={props.caption}
+        emptyState={model.emptyState}
+        restoreFocusRef={model.restoreFocusRef}
+        registerActionTrigger={model.registerActionTrigger}
+        selectTriggerRef={model.selectTriggerRef}
       />
 
-      {canManage && supportsBulkCampaignAccess ? (
-        <BulkCampaignAccessDialog
-          open={bulkAccessOpen}
-          onOpenChange={setBulkAccessOpen}
-          campaignId={campaignId}
-          targetType={contentTypeKey}
-          contentTypeKey={contentTypeKey}
-          itemLabelPlural={pluralNoun}
-          selectedRows={selectedRows}
-          onApplyComplete={handleBulkAccessApplyComplete}
-        />
-      ) : null}
-
-      {canManage
-        ? bulkExtensions.map((extension) => (
-            <div key={extension.menuAction.id}>
-              {extension.renderDialog({
-                open: openExtensionId === extension.menuAction.id,
-                onOpenChange: (open) => setOpenExtensionId(open ? extension.menuAction.id : null),
-                campaignId,
-                selectedRows: selectedRows,
-                campaignRows: data,
-                onApplyComplete: handleExtensionApplyComplete,
-              })}
-            </div>
-          ))
-        : null}
+      <ContentOverviewTableBulkDialogs
+        bulkAccessOpen={model.bulkAccessOpen}
+        bulkExtensions={model.bulkExtensions}
+        campaignId={props.campaignId}
+        canManage={model.canManage}
+        contentTypeKey={props.contentTypeKey}
+        data={props.data}
+        itemLabelPlural={model.pluralNoun}
+        onBulkAccessApplyComplete={model.handleBulkAccessApplyComplete}
+        onExtensionApplyComplete={model.handleExtensionApplyComplete}
+        openExtensionId={model.openExtensionId}
+        selectedRows={model.selectedRows}
+        setBulkAccessOpen={model.setBulkAccessOpen}
+        setOpenExtensionId={model.setOpenExtensionId}
+      />
     </div>
   )
 }
