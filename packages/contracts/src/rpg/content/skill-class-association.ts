@@ -22,6 +22,22 @@ export function skillSlugsFromClassChoices(cls: ClassSkillChoiceSource): SkillId
   return [...slugs].sort((a, b) => a.localeCompare(b)) as SkillId[]
 }
 
+/** Display summary for class skill choice pools — choose from first meaningful package. */
+export function classSkillChoiceDisplaySummary(cls: ClassSkillChoiceSource): {
+  choose: number
+  optionSlugs: SkillId[]
+} {
+  const meaningful = meaningfulSkillChoices(cls)
+  if (meaningful.length === 0) {
+    return { choose: 0, optionSlugs: [] }
+  }
+
+  return {
+    choose: meaningful[0]!.choose,
+    optionSlugs: skillSlugsFromClassChoices(cls),
+  }
+}
+
 /** Class records whose skill choice pools include `skillSlug` (inverse read). */
 export type ClassOfferingSkillChoice = Pick<
   ClassStored,
