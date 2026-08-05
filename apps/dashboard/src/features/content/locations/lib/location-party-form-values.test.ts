@@ -40,6 +40,7 @@ describe('locationToFormValues party associations', () => {
       parentLocationId: location.parentLocationId,
       classification: formValues.classification,
       partyAssociations: location.partyAssociations,
+      territorialAuthority: [],
     })
 
     expect(input.partyAssociations).toEqual(location.partyAssociations)
@@ -58,6 +59,7 @@ describe('locationToFormValues party associations', () => {
           party: { kind: 'character', characterId: 'npc-durnan' },
         },
       ],
+      territorialAuthority: [],
     })
 
     expect(input.partyAssociations).toEqual([

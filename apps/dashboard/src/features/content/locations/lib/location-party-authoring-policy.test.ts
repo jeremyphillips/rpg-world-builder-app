@@ -18,11 +18,19 @@ describe('location party authoring policy', () => {
     )
   })
 
-  it('hides authoring for plane, world, region, site, and monument', () => {
-    for (const authoringType of ['plane', 'world', 'region', 'site', 'monument'] as const) {
+  it('hides authoring for plane, world, site, and monument', () => {
+    for (const authoringType of ['plane', 'world', 'site', 'monument'] as const) {
       expect(isLocationPartyAssociationAuthoringSupported(authoringType)).toBe(false)
       expect(getAvailableLocationPartyAssociationKinds(authoringType)).toEqual([])
     }
+  })
+
+  it('offers headquarters and operator for region', () => {
+    expect(getAvailableLocationPartyAssociationKinds('region')).toEqual([
+      'headquarters',
+      'operator',
+    ])
+    expect(isLocationPartyAssociationAuthoringSupported('region')).toBe(true)
   })
 
   it('offers resident and headquarters for settlement and district', () => {
@@ -89,7 +97,10 @@ describe('location party authoring policy', () => {
       'operator',
       'works_at',
     ])
-    expect(buildLocationPartySemanticOptions('region')).toEqual([])
+    expect(buildLocationPartySemanticOptions('region').map((option) => option.value)).toEqual([
+      'headquarters',
+      'operator',
+    ])
   })
 
   it('shows the section when associations exist even if authoring is unsupported', () => {

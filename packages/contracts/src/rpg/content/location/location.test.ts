@@ -134,6 +134,7 @@ describe('location authoring inputs', () => {
       kind: 'region',
       classification: { kind: 'geographic', type: 'coast' },
       partyAssociations: [],
+      territorialAuthority: [],
     })
 
     expect(

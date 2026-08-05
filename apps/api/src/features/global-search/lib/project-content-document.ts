@@ -27,6 +27,7 @@ import {
   getFeatCategoryLabel,
   getLocationPartyAssociationSemanticLabel,
   getOrganizationKindLabel,
+  getTerritorialAuthorityLabel,
   resolveLocationDisplaySummary,
   getEquipmentSearchName,
   joinCompactSegments,
@@ -193,11 +194,19 @@ function buildLocationFields(location: Location): GlobalSearchField[] {
     getLocationPartyAssociationSemanticLabel(getAssociationSemanticKey(association)),
   )
 
+  const territorialKeywords =
+    location.kind === 'region'
+      ? (location.territorialAuthority ?? []).map((relationship) =>
+          getTerritorialAuthorityLabel(relationship.kind),
+        )
+      : []
+
   return [
     labelField(location.name),
     keywordField(location.slug),
     descriptionField(stripHtmlTags(location.description ?? '')),
     ...partyKeywords.map((text) => keywordField(text, 0.25)),
+    ...territorialKeywords.map((text) => keywordField(text, 0.25)),
   ]
 }
 

@@ -38,6 +38,7 @@ describe('getLocationOverviewSearchText', () => {
       name: 'Sword Coast',
       kind: 'region',
       classification: { kind: 'geographic', type: 'coast' },
+      territorialAuthority: [],
     }
 
     expect(getLocationOverviewSearchText(region)).toEqual(['Sword Coast'])

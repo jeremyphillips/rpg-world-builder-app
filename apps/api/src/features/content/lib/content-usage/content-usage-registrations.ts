@@ -14,6 +14,7 @@ import {
   characterSubclassSource,
   locationParentReferenceSource,
   locationPartyReferenceSource,
+  locationTerritorialAuthorityReferenceSource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -67,6 +68,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     sources: [
       { source: characterOrganizationSource, entry: true, batch: true },
       { source: locationPartyReferenceSource, entry: true, batch: true },
+      { source: locationTerritorialAuthorityReferenceSource, entry: true, batch: true },
     ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',

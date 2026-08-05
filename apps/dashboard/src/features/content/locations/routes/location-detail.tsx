@@ -19,6 +19,7 @@ import { LocationAddChildMenu } from '../components/location-add-child-menu.clie
 import { LocationChildrenSection } from '../components/location-children-section.client'
 import { LocationDetailIdentity } from '../components/location-detail-identity.client'
 import { LocationPartyAssociationsDetailSection } from '../components/location-party-associations-detail-section.client'
+import { TerritorialAuthorityDetailSection } from '../components/territorial-authority-detail-section.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 
@@ -59,6 +60,7 @@ export function LocationDetailContent({
         }
       >
         <div className="space-y-8">
+          <TerritorialAuthorityDetailSection location={location} campaignId={campaignId} />
           <LocationPartyAssociationsDetailSection location={location} campaignId={campaignId} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}

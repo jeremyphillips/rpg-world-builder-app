@@ -111,4 +111,26 @@ describe('regenerateNestedContentKeysForDuplicate', () => {
     })
     expect((body.features as Array<{ id: string }>)[0]?.id).not.toBe('rage')
   })
+
+  it('forces new ids for party and territorial relationship arrays', () => {
+    const body = regenerateNestedContentKeysForDuplicate(
+      {
+        partyAssociations: [
+          {
+            id: 'assoc-1',
+            kind: 'ownership',
+            party: { kind: 'organization', organizationId: 'org-1' },
+          },
+        ],
+        territorialAuthority: [{ id: 'ta-1', organizationId: 'org-1', kind: 'governs' }],
+      },
+      {
+        destinationSlug: 'region-copy',
+        nestedIdRegeneration: { paths: ['partyAssociations', 'territorialAuthority'] },
+      },
+    )
+
+    expect((body.partyAssociations as Array<{ id: string }>)[0]?.id).not.toBe('assoc-1')
+    expect((body.territorialAuthority as Array<{ id: string }>)[0]?.id).not.toBe('ta-1')
+  })
 })

@@ -15,6 +15,17 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
+vi.mock('../hooks/use-organization-connected-regions', () => ({
+  useOrganizationConnectedRegions: vi.fn(() => ({
+    data: {
+      items: [],
+      total: 0,
+    },
+    isPending: false,
+    isError: false,
+    error: null,
+  })),
+}))
 vi.mock('../hooks/use-organization-connected-characters', () => ({
   useOrganizationConnectedCharacters: vi.fn(() => ({
     data: {
@@ -51,6 +62,7 @@ describe('OrganizationDetailContent', () => {
     renderDetail()
     expect(screen.getByText('Government')).toBeInTheDocument()
     expect(screen.getByText('The elected council governing the city.')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Connected regions' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connected characters' })).toBeInTheDocument()
     expect(screen.getByText('1 connected character')).toBeInTheDocument()
     expect(screen.getByText('Circle Envoy')).toBeInTheDocument()
