@@ -26,10 +26,7 @@ import {
   resolveOrganizationKindsForDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import {
-  buildOrganizationLocationConnectionKeySet,
-  organizationLocationConnectionKey,
-} from '../../lib/location-connection-duplicate-keys'
-import {
+  buildOrganizationLocationConnectionDisabledKinds,
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -95,10 +92,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
   )
 
   const excludeConnectionId = mode === 'edit' ? initialConnection?.id : undefined
-  const existingKeys = React.useMemo(
-    () => buildOrganizationLocationConnectionKeySet(existingConnections, excludeConnectionId),
-    [existingConnections, excludeConnectionId],
-  )
 
   const eligibleLocations = React.useMemo(
     () =>
@@ -116,13 +109,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const kindOptions = React.useMemo(() => {
     if (!selectedLocation) return []
     const familyKinds = resolveOrganizationKindsForDrawerIntent(selectedLocation, intent)
-    const disabledKinds = new Set(
-      familyKinds.filter((kind) =>
-        existingKeys.has(organizationLocationConnectionKey(selectedLocation.id, kind)),
-      ),
-    )
+    const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
+      locationId: selectedLocation.id,
+      kinds: familyKinds,
+      connections: existingConnections,
+      excludeConnectionId,
+    })
     return buildOrganizationLocationConnectionKindOptions(familyKinds, disabledKinds)
-  }, [existingKeys, intent, selectedLocation])
+  }, [excludeConnectionId, existingConnections, intent, selectedLocation])
 
   const activeKind = resolveActiveConnectionKind(
     selectedKind,
@@ -199,7 +193,8 @@ function OrganizationLocationConnectionLinkDrawerContent({
         const hasAvailableKind = organizationForwardLocationHasAvailableKind(
           location,
           intent,
-          existingKeys,
+          existingConnections,
+          excludeConnectionId,
         )
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 

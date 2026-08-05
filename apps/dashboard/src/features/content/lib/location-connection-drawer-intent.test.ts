@@ -12,7 +12,6 @@ import {
   resolvePeopleSectionOrganizationAddAffordances,
   resolveTerritorialSectionOrganizationAddAffordances,
 } from './location-connection-drawer-intent'
-import { organizationLocationConnectionKey } from './location-connection-duplicate-keys'
 
 function regionLocation(overrides: Partial<Location> = {}): Location {
   return {
@@ -79,33 +78,77 @@ describe('location-connection-drawer-intent', () => {
     ])
   })
 
-  it('disables forward location rows only when all family kinds are linked', () => {
+  it('disables forward location rows after one territorial authority kind is linked', () => {
     const location = regionLocation()
-    const existingKeys = new Set([organizationLocationConnectionKey(location.id, 'governs')])
+    const connections = [{ id: 'conn-1', locationId: location.id, kind: 'governs' as const }]
 
     expect(
-      organizationForwardLocationHasAvailableKind(location, 'territorial_authority', existingKeys),
-    ).toBe(true)
-    expect(
-      organizationForwardLocationHasAvailableKind(location, 'geographic_presence', existingKeys),
-    ).toBe(true)
-
-    existingKeys.add(organizationLocationConnectionKey(location.id, 'controls'))
-    existingKeys.add(organizationLocationConnectionKey(location.id, 'claims'))
-    expect(
-      organizationForwardLocationHasAvailableKind(location, 'territorial_authority', existingKeys),
+      organizationForwardLocationHasAvailableKind(location, 'territorial_authority', connections),
     ).toBe(false)
+    expect(
+      organizationForwardLocationHasAvailableKind(location, 'geographic_presence', connections),
+    ).toBe(true)
   })
 
-  it('keeps inverse organization rows selectable when only some family kinds are linked', () => {
-    const existingKeys = new Set(['org-1:governs'])
+  it('keeps forward location rows selectable when only some site kinds are linked', () => {
+    const location = {
+      ...settlementLocation(),
+      id: 'building-1',
+      kind: 'structure',
+      structureType: 'building',
+    } as Location
+    const connections = [{ id: 'conn-1', locationId: location.id, kind: 'owns' as const }]
+
+    expect(organizationForwardLocationHasAvailableKind(location, 'site', connections)).toBe(true)
+  })
+
+  it('allows kind changes within territorial authority during edit', () => {
+    const location = regionLocation()
+    const connections = [{ id: 'conn-1', locationId: location.id, kind: 'governs' as const }]
+
+    expect(
+      organizationForwardLocationHasAvailableKind(
+        location,
+        'territorial_authority',
+        connections,
+        'conn-1',
+      ),
+    ).toBe(true)
+  })
+
+  it('disables inverse organization rows after one territorial authority kind is linked', () => {
     const eligibleKinds = filterOrganizationKindsByFamily(
       ['operates_in', 'governs', 'controls', 'claims'],
       'territorial_authority',
     )
+    const rows = [
+      {
+        subject: { id: 'org-1' },
+        kind: 'governs' as const,
+        relationshipId: 'rel-1',
+      },
+    ]
 
-    expect(organizationInverseSubjectHasAvailableKind('org-1', eligibleKinds, existingKeys)).toBe(
-      true,
+    expect(
+      organizationInverseSubjectHasAvailableKind('org-1', 'region-1', eligibleKinds, rows),
+    ).toBe(false)
+  })
+
+  it('allows inverse kind changes within territorial authority during edit', () => {
+    const eligibleKinds = filterOrganizationKindsByFamily(
+      ['governs', 'controls', 'claims'],
+      'territorial_authority',
     )
+    const rows = [
+      {
+        subject: { id: 'org-1' },
+        kind: 'governs' as const,
+        relationshipId: 'rel-1',
+      },
+    ]
+
+    expect(
+      organizationInverseSubjectHasAvailableKind('org-1', 'region-1', eligibleKinds, rows, 'rel-1'),
+    ).toBe(true)
   })
 })

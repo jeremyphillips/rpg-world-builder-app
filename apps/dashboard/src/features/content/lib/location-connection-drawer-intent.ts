@@ -7,14 +7,16 @@ import type {
 } from '@rpg/contracts'
 import {
   getOrganizationLocationConnectionFamily,
+  organizationLocationConnectionHasAvailableKindInFamily,
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
 
 import { toLocationConnectionEligibilityInput } from './location-connection-eligibility-input'
 import {
+  buildOrganizationInverseLocationConnections,
   buildOrganizationLocationConnectionKeySet,
   buildSubjectLocationConnectionKeySet,
-  organizationLocationConnectionKey,
+  organizationLocationConnectionHasAvailableKind,
   subjectLocationConnectionKey,
 } from './location-connection-duplicate-keys'
 
@@ -51,7 +53,7 @@ export const ORGANIZATION_DRAWER_FULLY_LINKED_REASONS: Record<
   OrganizationConnectionDrawerIntent,
   string
 > = {
-  territorial_authority: 'All authority types already linked.',
+  territorial_authority: 'Territorial authority already linked.',
   geographic_presence: 'Organization presence already linked.',
   site: 'All site relationship types already linked.',
 }
@@ -132,22 +134,45 @@ export function locationEligibleForOrganizationDrawerIntent(
 export function organizationForwardLocationHasAvailableKind(
   location: Location,
   intent: OrganizationConnectionDrawerIntent,
-  existingKeys: ReadonlySet<string>,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  excludeConnectionId?: string,
 ): boolean {
   const kinds = resolveOrganizationKindsForDrawerIntent(location, intent)
-  return kinds.some(
-    (kind) => !existingKeys.has(organizationLocationConnectionKey(location.id, kind)),
-  )
+  return organizationLocationConnectionHasAvailableKind({
+    locationId: location.id,
+    kinds,
+    connections,
+    excludeConnectionId,
+  })
 }
 
 export function organizationInverseSubjectHasAvailableKind(
   subjectId: string,
+  locationId: string,
   eligibleKinds: readonly OrganizationLocationConnectionKind[],
-  existingKeys: ReadonlySet<string>,
+  rows: ReadonlyArray<{
+    subject: { id: string }
+    kind: string
+    relationshipId?: string
+  }>,
+  excludeRelationshipId?: string,
 ): boolean {
-  return eligibleKinds.some(
-    (kind) => !existingKeys.has(subjectLocationConnectionKey(subjectId, kind)),
+  const connections = buildOrganizationInverseLocationConnections(
+    rows,
+    locationId,
+    subjectId,
+    excludeRelationshipId,
   )
+
+  return organizationLocationConnectionHasAvailableKindInFamily({
+    locationId,
+    kinds: eligibleKinds,
+    connections,
+  })
 }
 
 export function characterInverseSubjectHasAvailableKind(
@@ -263,11 +288,21 @@ export function buildCharacterInverseExistingKeys(
 export function filterLocationsForOrganizationDrawerIntent(
   locations: readonly Location[],
   intent: OrganizationConnectionDrawerIntent,
-  existingKeys: ReadonlySet<string>,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  excludeConnectionId?: string,
 ): Location[] {
   return locations.filter(
     (location) =>
       locationEligibleForOrganizationDrawerIntent(location, intent) &&
-      organizationForwardLocationHasAvailableKind(location, intent, existingKeys),
+      organizationForwardLocationHasAvailableKind(
+        location,
+        intent,
+        connections,
+        excludeConnectionId,
+      ),
   )
 }

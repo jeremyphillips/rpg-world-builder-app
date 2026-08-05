@@ -30,11 +30,9 @@ import {
   resolveLocationInverseOrganizationAddTitle,
   resolveOrganizationKindsForDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
+import { buildOrganizationInverseLocationConnections } from '../../lib/location-connection-duplicate-keys'
 import {
-  buildSubjectLocationConnectionKeySet,
-  subjectLocationConnectionKey,
-} from '../../lib/location-connection-duplicate-keys'
-import {
+  buildOrganizationLocationConnectionDisabledKinds,
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -97,14 +95,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     [connectedPartyRows],
   )
 
-  const existingKeys = React.useMemo(
-    () =>
-      buildSubjectLocationConnectionKeySet(
-        orgRows,
-        mode === 'edit' ? initialConnection?.relationshipId : undefined,
-      ),
-    [initialConnection?.relationshipId, mode, orgRows],
-  )
+  const excludeRelationshipId = mode === 'edit' ? initialConnection?.relationshipId : undefined
 
   const eligibleKinds = React.useMemo(
     () => resolveOrganizationKindsForDrawerIntent(location, intent),
@@ -113,13 +104,19 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
 
   const kindOptions = React.useMemo(() => {
     if (!selectedOrganizationId) return []
-    const disabledKinds = new Set(
-      eligibleKinds.filter((kind) =>
-        existingKeys.has(subjectLocationConnectionKey(selectedOrganizationId, kind)),
-      ),
+    const connections = buildOrganizationInverseLocationConnections(
+      orgRows,
+      location.id,
+      selectedOrganizationId,
+      excludeRelationshipId,
     )
+    const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
+      locationId: location.id,
+      kinds: eligibleKinds,
+      connections,
+    })
     return buildOrganizationLocationConnectionKindOptions(eligibleKinds, disabledKinds)
-  }, [eligibleKinds, existingKeys, selectedOrganizationId])
+  }, [eligibleKinds, excludeRelationshipId, location.id, orgRows, selectedOrganizationId])
 
   const activeKind = resolveActiveConnectionKind(
     selectedKind,
@@ -192,8 +189,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         const isSelected = selectedOrganizationId === organization.id
         const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
           organization.id,
+          location.id,
           eligibleKinds,
-          existingKeys,
+          orgRows,
+          excludeRelationshipId,
         )
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 

@@ -153,6 +153,49 @@ describe('organization location connection nested routes', () => {
     ])
   })
 
+  it('rejects a second territorial authority kind on the same region', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const { region } = await seedRegionLocation(campaignId)
+
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaignId,
+      minimalOrganizationInput,
+    )
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-loc-governs',
+        locationId: region.id,
+        kind: 'governs',
+      })
+      .expect(201)
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-loc-controls',
+        locationId: region.id,
+        kind: 'controls',
+      })
+      .expect(400)
+
+    await agent
+      .patch(locationConnectionsPath(campaignId, organization.id, 'org-loc-governs'))
+      .set(CSRF_HEADER, csrfToken)
+      .send({ kind: 'controls' })
+      .expect(200)
+
+    const updatedOrganization = await HomebrewOrganizationModel.findById(organization.id).lean()
+    expect(updatedOrganization?.connections?.locations).toEqual([
+      { id: 'org-loc-governs', locationId: region.id, kind: 'controls' },
+    ])
+  })
+
   it('rejects region headquarters and duplicate location/kind pairs', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)

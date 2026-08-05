@@ -1,9 +1,14 @@
 import { z } from 'zod'
 
 import {
+  getOrganizationLocationConnectionFamily,
   organizationLocationConnectionKindSchema,
   type OrganizationLocationConnectionKind,
 } from '../vocab/location/organization-location-connection'
+import {
+  getOrganizationLocationConnectionFamilyCardinality,
+  organizationLocationConnectionFamilyViolationMessage,
+} from './lib/organization-location-connection-family-rules'
 
 export const organizationLocationConnectionSchema = z.object({
   id: z.string().min(1),
@@ -19,6 +24,7 @@ export const organizationLocationConnectionsSchema = z
   .superRefine((connections, ctx) => {
     const seenIds = new Set<string>()
     const seenLocationKinds = new Set<string>()
+    const seenLocationFamilies = new Set<string>()
 
     connections.forEach((connection, index) => {
       if (seenIds.has(connection.id)) {
@@ -39,6 +45,19 @@ export const organizationLocationConnectionsSchema = z
         })
       }
       seenLocationKinds.add(locationKindKey)
+
+      const family = getOrganizationLocationConnectionFamily(connection.kind)
+      if (getOrganizationLocationConnectionFamilyCardinality(family) === 'one_per_family') {
+        const locationFamilyKey = `${connection.locationId}:${family}`
+        if (seenLocationFamilies.has(locationFamilyKey)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: organizationLocationConnectionFamilyViolationMessage(family),
+            path: [index, 'kind'],
+          })
+        }
+        seenLocationFamilies.add(locationFamilyKey)
+      }
     })
   })
 

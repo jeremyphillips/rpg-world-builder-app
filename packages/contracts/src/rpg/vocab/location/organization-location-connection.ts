@@ -10,6 +10,15 @@ export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS = [
 export type OrganizationLocationConnectionFamily =
   (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS)[number]
 
+export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY = {
+  site: 'one_per_kind',
+  geographic_presence: 'one_per_family',
+  territorial_authority: 'one_per_family',
+} as const
+
+export type OrganizationLocationConnectionFamilyCardinality =
+  (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY)[OrganizationLocationConnectionFamily]
+
 export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
   label: 'Organization location connection',
   description:
