@@ -10,6 +10,7 @@ import * as subclassController from './subclasses/subclass-write.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
 import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
+import { listOrganizationConnectedRegions } from './organizations/organization-connected-regions.controller'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
@@ -42,6 +43,13 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listOrganizationConnectedCharacters,
+)
+
+contentRouter.get(
+  '/organizations/:organizationId/connected-regions',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listOrganizationConnectedRegions,
 )
 
 contentRouter.post(

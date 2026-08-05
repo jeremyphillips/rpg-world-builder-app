@@ -15,7 +15,9 @@ import {
 } from './location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
 
-export const locationCreateDefaultValues: Partial<LocationFormValues> = {}
+export const locationCreateDefaultValues: Partial<LocationFormValues> = {
+  territorialAuthority: [],
+}
 
 function sharedBodyFields(values: LocationFormValues) {
   return {
@@ -84,6 +86,7 @@ const kindBodyFieldBuilders: Record<
     ...sharedBodyFields(values),
     kind: 'region',
     ...buildRegionClassification(values),
+    territorialAuthority: values.territorialAuthority ?? [],
   }),
   settlement: (values) => ({
     ...sharedBodyFields(values),
@@ -130,12 +133,17 @@ const kindFormValueExtractors: Partial<
 > = {
   plane: (entity) => (entity.kind === 'plane' ? { planeType: entity.planeType } : {}),
   region: (entity) =>
-    entity.kind === 'region' && entity.classification
+    entity.kind === 'region'
       ? {
-          classification: {
-            kind: entity.classification.kind,
-            type: entity.classification.type,
-          },
+          ...(entity.classification
+            ? {
+                classification: {
+                  kind: entity.classification.kind,
+                  type: entity.classification.type,
+                },
+              }
+            : {}),
+          territorialAuthority: entity.territorialAuthority ?? [],
         }
       : {},
   settlement: (entity) =>

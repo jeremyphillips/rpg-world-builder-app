@@ -1,6 +1,7 @@
 import type { LocationPartyAssociation, LocationPartyAssociationSemanticId } from '@rpg/contracts'
 
 import { LOCATION_AUTHORING_TYPE_IDS, type LocationAuthoringType } from './location-authoring-type'
+import { getLocationRelationshipCapabilities } from './location-relationship-capabilities'
 
 /**
  * Conservative v1 dashboard authoring policy — not domain truth.
@@ -9,19 +10,20 @@ import { LOCATION_AUTHORING_TYPE_IDS, type LocationAuthoringType } from './locat
  * for each location authoring type. Contracts/API remain permissive for all kinds.
  */
 export const LOCATION_PARTY_AUTHORING_POLICY = {
-  plane: [],
-  world: [],
-  region: [],
-  settlement: ['resident', 'headquarters'],
-  district: ['resident', 'headquarters'],
-  site: [],
-  building: ['owner', 'tenant', 'resident', 'headquarters', 'operator', 'works_at'],
-  fortification: ['owner', 'resident', 'headquarters', 'operator', 'works_at'],
-  infrastructure: ['owner', 'operator', 'works_at'],
-  monument: [],
-  vessel: ['owner', 'resident', 'operator', 'works_at'],
-  structure: ['owner', 'tenant', 'resident', 'headquarters', 'operator', 'works_at'],
-  interior: ['tenant', 'resident', 'headquarters', 'works_at'],
+  plane: getLocationRelationshipCapabilities('plane').partyAssociationSemanticKeys,
+  world: getLocationRelationshipCapabilities('world').partyAssociationSemanticKeys,
+  region: getLocationRelationshipCapabilities('region').partyAssociationSemanticKeys,
+  settlement: getLocationRelationshipCapabilities('settlement').partyAssociationSemanticKeys,
+  district: getLocationRelationshipCapabilities('district').partyAssociationSemanticKeys,
+  site: getLocationRelationshipCapabilities('site').partyAssociationSemanticKeys,
+  building: getLocationRelationshipCapabilities('building').partyAssociationSemanticKeys,
+  fortification: getLocationRelationshipCapabilities('fortification').partyAssociationSemanticKeys,
+  infrastructure:
+    getLocationRelationshipCapabilities('infrastructure').partyAssociationSemanticKeys,
+  monument: getLocationRelationshipCapabilities('monument').partyAssociationSemanticKeys,
+  vessel: getLocationRelationshipCapabilities('vessel').partyAssociationSemanticKeys,
+  structure: getLocationRelationshipCapabilities('structure').partyAssociationSemanticKeys,
+  interior: getLocationRelationshipCapabilities('interior').partyAssociationSemanticKeys,
 } as const satisfies Record<LocationAuthoringType, readonly LocationPartyAssociationSemanticId[]>
 
 /** Relationship semantic keys currently available for authoring on this location type. */

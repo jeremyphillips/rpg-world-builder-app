@@ -6,12 +6,19 @@ import {
   formatConnectedCharactersCount,
   ORGANIZATION_EMPTY_SECTION_TEXT,
   type OrganizationConnectedCharactersViewModel,
+  type OrganizationConnectedRegionsViewModel,
 } from './organization-display'
 
 const emptyConnectedCharacters: OrganizationConnectedCharactersViewModel = {
   previewItems: [],
   total: 0,
   emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
+}
+
+const emptyConnectedRegions: OrganizationConnectedRegionsViewModel = {
+  previewItems: [],
+  total: 0,
+  emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedRegions,
 }
 
 describe('formatConnectedCharactersCount', () => {
@@ -23,7 +30,13 @@ describe('formatConnectedCharactersCount', () => {
 
 describe('buildOrganizationDetailViewModel', () => {
   it('maps kind vocabulary, authored description, and connected characters', () => {
-    expect(buildOrganizationDetailViewModel(CITY_COUNCIL, emptyConnectedCharacters)).toEqual({
+    expect(
+      buildOrganizationDetailViewModel(
+        CITY_COUNCIL,
+        emptyConnectedCharacters,
+        emptyConnectedRegions,
+      ),
+    ).toEqual({
       statRows: [
         {
           label: 'Type',
@@ -34,6 +47,7 @@ describe('buildOrganizationDetailViewModel', () => {
       ],
       description: '<p>The elected council governing the city.</p>',
       connectedCharacters: emptyConnectedCharacters,
+      connectedRegions: emptyConnectedRegions,
     })
   })
 })

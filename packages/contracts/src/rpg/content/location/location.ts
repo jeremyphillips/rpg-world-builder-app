@@ -138,6 +138,7 @@ const worldLocationBodyDraftFields = locationBaseDraftSchema.extend({
 const regionLocationBodyDraftFields = locationBaseDraftSchema.extend({
   kind: z.literal('region'),
   classification: regionClassificationSchema.optional(),
+  territorialAuthority: regionLocationKindFields.territorialAuthority,
 })
 
 const settlementLocationBodyDraftFields = locationBaseDraftSchema.extend({

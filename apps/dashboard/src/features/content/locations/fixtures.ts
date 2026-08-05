@@ -1,4 +1,4 @@
-import { buildingClassificationSchema, type Location } from '@rpg/contracts'
+import { buildingClassificationSchema, type Location, type RegionLocation } from '@rpg/contracts'
 
 import { STORY_CAMPAIGN_ID } from '../lib/fixtures/constants'
 
@@ -22,7 +22,7 @@ export const ALDERMERE: Location = {
   kind: 'world',
 }
 
-export const GREYSHORE: Location = {
+export const GREYSHORE: RegionLocation = {
   ...baseLocation,
   id: 'location-greyshore',
   slug: 'greyshore',
@@ -30,6 +30,7 @@ export const GREYSHORE: Location = {
   kind: 'region',
   classification: { kind: 'geographic', type: 'coast' },
   parentLocationId: ALDERMERE.id,
+  territorialAuthority: [],
 }
 
 export const HARBORFORD: Location = {

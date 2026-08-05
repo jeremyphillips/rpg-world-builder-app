@@ -43,6 +43,7 @@ describe('resolveLocationDisplaySummary', () => {
       id: 'loc_region',
       kind: 'region',
       classification: { kind: 'political', type: 'kingdom' },
+      territorialAuthority: [],
     }
 
     expect(resolveLocationDisplaySummary(settlement)).toEqual({

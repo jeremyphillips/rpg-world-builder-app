@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CITY_COUNCIL, SILVER_CIRCLE } from '../fixtures'
 import { organizationConnectedCharactersQueryKey } from '../hooks/use-organization-connected-characters'
+import { organizationConnectedRegionsQueryKey } from '../hooks/use-organization-connected-regions'
 import { OrganizationDetailContent } from './organization-detail'
 
 const meta = {
@@ -14,6 +15,13 @@ const meta = {
     (Story, context) => {
       const organization = context.args.organization ?? CITY_COUNCIL
       const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      queryClient.setQueryData(
+        organizationConnectedRegionsQueryKey(STORY_CAMPAIGN_ID, organization.id),
+        {
+          items: [],
+          total: 0,
+        },
+      )
       queryClient.setQueryData(
         organizationConnectedCharactersQueryKey(STORY_CAMPAIGN_ID, organization.id),
         {

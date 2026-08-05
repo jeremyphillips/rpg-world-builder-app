@@ -20,6 +20,33 @@ function hasStableId(value: unknown): value is { id: string; name: string } {
   return hasName(value) && typeof value.id === 'string' && value.id.length > 0
 }
 
+type IdOnlyRow = { id?: string; [key: string]: unknown }
+
+function hasIdOnlyRow(value: unknown): value is IdOnlyRow {
+  return typeof value === 'object' && value !== null
+}
+
+function forceRegenerateIdOnlyArray(
+  rows: unknown[] | undefined,
+  destinationSlug: string,
+  pathPrefix: string,
+): unknown[] | undefined {
+  if (rows === undefined) return undefined
+
+  const usedIds = new Set<string>()
+  return rows.filter(hasIdOnlyRow).map((row, index) => {
+    const { id: _id, ...rest } = row
+    let id = deriveContentKey(`${destinationSlug}-${pathPrefix}-${index + 1}`)
+    if (usedIds.has(id)) {
+      let suffix = 2
+      while (usedIds.has(`${id}-${suffix}`)) suffix += 1
+      id = `${id}-${suffix}`
+    }
+    usedIds.add(id)
+    return { ...rest, id }
+  })
+}
+
 function stableIdentifiedArray(
   incoming: unknown[] | undefined,
   existing?: unknown[],
@@ -172,6 +199,65 @@ export interface RegenerateNestedContentKeysContext {
   nestedIdRegeneration: NestedIdRegeneration
 }
 
+function regenerateFeaturesOrTraitsPathForDuplicate(
+  result: Record<string, unknown>,
+  path: 'features' | 'traits',
+  destinationSlug: string,
+): void {
+  if (!(path in result) || !Array.isArray(result[path])) return
+  result[path] = forceRegenerateIdentifiedArray(result[path] as unknown[], destinationSlug)
+}
+
+function regenerateHeritagePathForDuplicate(
+  result: Record<string, unknown>,
+  destinationSlug: string,
+): void {
+  if (!('heritage' in result)) return
+  result.heritage = forceRegenerateHeritageObject(result.heritage, destinationSlug)
+}
+
+function regenerateResolutionPathForDuplicate(
+  result: Record<string, unknown>,
+  destinationSlug: string,
+): void {
+  if (!('resolution' in result)) return
+  result.resolution = regenerateSpellResolution(result.resolution, destinationSlug)
+}
+
+function regenerateIdOnlyRelationshipPathForDuplicate(
+  result: Record<string, unknown>,
+  path: 'partyAssociations' | 'territorialAuthority',
+  destinationSlug: string,
+): void {
+  if (!(path in result) || !Array.isArray(result[path])) return
+  result[path] = forceRegenerateIdOnlyArray(result[path] as unknown[], destinationSlug, path)
+}
+
+function regenerateNestedPathForDuplicate(
+  result: Record<string, unknown>,
+  path: string,
+  destinationSlug: string,
+): void {
+  if (path === 'features' || path === 'traits') {
+    regenerateFeaturesOrTraitsPathForDuplicate(result, path, destinationSlug)
+    return
+  }
+
+  if (path === 'heritage') {
+    regenerateHeritagePathForDuplicate(result, destinationSlug)
+    return
+  }
+
+  if (path === 'resolution') {
+    regenerateResolutionPathForDuplicate(result, destinationSlug)
+    return
+  }
+
+  if (path === 'partyAssociations' || path === 'territorialAuthority') {
+    regenerateIdOnlyRelationshipPathForDuplicate(result, path, destinationSlug)
+  }
+}
+
 /**
  * Forces new nested authored ids for duplication — never preserves source ids,
  * even when they would be valid on create.
@@ -185,25 +271,7 @@ export function regenerateNestedContentKeysForDuplicate(
   const result = { ...body }
 
   for (const path of context.nestedIdRegeneration.paths) {
-    if (path === 'features' || path === 'traits') {
-      if (!(path in result) || !Array.isArray(result[path])) continue
-      result[path] = forceRegenerateIdentifiedArray(
-        result[path] as unknown[],
-        context.destinationSlug,
-      )
-      continue
-    }
-
-    if (path === 'heritage') {
-      if (!('heritage' in result)) continue
-      result.heritage = forceRegenerateHeritageObject(result.heritage, context.destinationSlug)
-      continue
-    }
-
-    if (path === 'resolution') {
-      if (!('resolution' in result)) continue
-      result.resolution = regenerateSpellResolution(result.resolution, context.destinationSlug)
-    }
+    regenerateNestedPathForDuplicate(result, path, context.destinationSlug)
   }
 
   return result

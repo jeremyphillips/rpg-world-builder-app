@@ -15,6 +15,7 @@ import {
 } from './reference-sources/characters'
 import { indexLocationParentBlockersByContentId } from './reference-sources/locations'
 import { indexLocationPartyBlockersByContentId } from './reference-sources/location-party-associations'
+import { indexLocationTerritorialAuthorityBlockersByContentId } from './reference-sources/location-territorial-authority'
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import type { ContentUsageSource } from './content-usage-source'
 
@@ -61,6 +62,10 @@ export const locationParentReferenceSource: ContentUsageSource = {
 
 export const locationPartyReferenceSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexLocationPartyBlockersByContentId(ctx),
+}
+
+export const locationTerritorialAuthorityReferenceSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexLocationTerritorialAuthorityBlockersByContentId(ctx),
 }
 
 export const campaignPrimaryWorldReferenceSource: ContentUsageSource = {
