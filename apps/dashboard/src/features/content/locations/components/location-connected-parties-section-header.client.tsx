@@ -3,6 +3,7 @@
 import type { LocationConnectedPartySectionGroup } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
+import type { LocationInverseOrganizationAddAffordance } from '../../lib/location-connection-drawer-intent'
 import {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
@@ -13,8 +14,39 @@ type LocationConnectedPartiesSectionHeaderProps = {
   sectionGroup: LocationConnectedPartySectionGroup
   canManage: boolean
   hasRows: boolean
-  onAddOrganization?: () => void
+  organizationAddAffordances?: readonly LocationInverseOrganizationAddAffordance[]
+  onAddOrganization?: (intent: LocationInverseOrganizationAddAffordance['intent']) => void
   onAddCharacter?: () => void
+}
+
+function LocationConnectedPartiesAddActions({
+  organizationAddAffordances,
+  onAddOrganization,
+  onAddCharacter,
+}: {
+  organizationAddAffordances: readonly LocationInverseOrganizationAddAffordance[]
+  onAddOrganization: (intent: LocationInverseOrganizationAddAffordance['intent']) => void
+  onAddCharacter?: () => void
+}) {
+  return (
+    <div className="flex flex-wrap justify-end gap-2">
+      {organizationAddAffordances.map((affordance) => (
+        <Button
+          key={affordance.intent}
+          type="button"
+          variant="outline"
+          onClick={() => onAddOrganization(affordance.intent)}
+        >
+          {affordance.label}
+        </Button>
+      ))}
+      {onAddCharacter ? (
+        <Button type="button" variant="outline" onClick={onAddCharacter}>
+          Link character
+        </Button>
+      ) : null}
+    </div>
+  )
 }
 
 // fallow-ignore-next-line complexity
@@ -22,12 +54,14 @@ export function LocationConnectedPartiesSectionHeader({
   sectionGroup,
   canManage,
   hasRows,
+  organizationAddAffordances = [],
   onAddOrganization,
   onAddCharacter,
 }: LocationConnectedPartiesSectionHeaderProps) {
-  const showAddOrganization =
+  const showOrganizationAdds =
     canManage &&
     (sectionGroup === 'territorial_authority' || sectionGroup === 'people_and_organizations') &&
+    organizationAddAffordances.length > 0 &&
     onAddOrganization
   const showAddCharacter =
     canManage && sectionGroup === 'people_and_organizations' && onAddCharacter
@@ -47,19 +81,12 @@ export function LocationConnectedPartiesSectionHeader({
             <Text variant="muted">{LOCATION_CONNECTED_PARTIES_SECTION_HELPERS[sectionGroup]}</Text>
           ) : null}
         </div>
-        {showAddOrganization || showAddCharacter ? (
-          <div className="flex flex-wrap justify-end gap-2">
-            {showAddOrganization ? (
-              <Button type="button" variant="outline" onClick={onAddOrganization}>
-                Link organization
-              </Button>
-            ) : null}
-            {showAddCharacter ? (
-              <Button type="button" variant="outline" onClick={onAddCharacter}>
-                Link character
-              </Button>
-            ) : null}
-          </div>
+        {showOrganizationAdds || showAddCharacter ? (
+          <LocationConnectedPartiesAddActions
+            organizationAddAffordances={showOrganizationAdds ? organizationAddAffordances : []}
+            onAddOrganization={onAddOrganization!}
+            onAddCharacter={showAddCharacter ? onAddCharacter : undefined}
+          />
         ) : null}
       </div>
 

@@ -19,18 +19,19 @@ export function LocationConnectedPartiesDrawers({
 }: LocationConnectedPartiesDrawersProps) {
   return (
     <>
-      {detail.canAddOrganization ? (
+      {detail.canAddOrganizationInverse && detail.organizationDrawerState ? (
         <LocationInverseOrganizationConnectionLinkDrawer
           open={detail.organizationDrawerState != null}
           onOpenChange={(open) => {
             if (!open) detail.setOrganizationDrawerState(null)
           }}
-          mode={detail.organizationDrawerState?.mode ?? 'add'}
+          mode={detail.organizationDrawerState.mode}
+          intent={detail.organizationDrawerState.intent}
           location={location}
           organizations={detail.organizations}
           connectedPartyRows={detail.rows}
           initialConnection={
-            detail.organizationDrawerState?.mode === 'edit'
+            detail.organizationDrawerState.mode === 'edit'
               ? detail.organizationDrawerState.connection
               : undefined
           }

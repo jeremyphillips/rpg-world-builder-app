@@ -8,6 +8,11 @@ import { ApiError } from '@rpg/contracts'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useLocations } from '../../locations/hooks/use-locations'
+import {
+  locationEligibleForOrganizationDrawerIntent,
+  organizationDrawerIntentFromKind,
+  type OrganizationConnectionDrawerIntent,
+} from '../../lib/location-connection-drawer-intent'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'
 import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
@@ -16,8 +21,12 @@ import type { OrganizationLocationConnectionEditTarget } from '../components/org
 import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
 
 type DrawerState =
-  | { mode: 'add' }
-  | { mode: 'edit'; connection: OrganizationLocationConnectionEditTarget }
+  | { mode: 'add'; intent: OrganizationConnectionDrawerIntent }
+  | {
+      mode: 'edit'
+      intent: OrganizationConnectionDrawerIntent
+      connection: OrganizationLocationConnectionEditTarget
+    }
 
 export function useOrganizationLocationConnectionsDetail(
   campaignId: string,
@@ -53,6 +62,20 @@ export function useOrganizationLocationConnectionsDetail(
       })),
     [locationReferencesQuery.data],
   )
+
+  const availableAddIntents = React.useMemo(() => {
+    const intents: OrganizationConnectionDrawerIntent[] = []
+    for (const intent of ['site', 'geographic_presence', 'territorial_authority'] as const) {
+      if (
+        (locationsQuery.data ?? []).some((location) =>
+          locationEligibleForOrganizationDrawerIntent(location, intent),
+        )
+      ) {
+        intents.push(intent)
+      }
+    }
+    return intents
+  }, [locationsQuery.data])
 
   const mutationError =
     mutations.error instanceof ApiError
@@ -91,16 +114,34 @@ export function useOrganizationLocationConnectionsDetail(
     [mutations],
   )
 
+  const openAddDrawer = React.useCallback((intent: OrganizationConnectionDrawerIntent) => {
+    setDrawerState({ mode: 'add', intent })
+  }, [])
+
+  const openEditDrawer = React.useCallback(
+    (connection: OrganizationLocationConnectionEditTarget) => {
+      setDrawerState({
+        mode: 'edit',
+        intent: organizationDrawerIntentFromKind(connection.kind),
+        connection,
+      })
+    },
+    [],
+  )
+
   return {
     canManage,
     locations: locationsQuery.data ?? [],
     locationConnections,
     existingConnections,
+    availableAddIntents,
     locationReferencesQuery,
     mutations,
     mutationError,
     drawerState,
     setDrawerState,
+    openAddDrawer,
+    openEditDrawer,
     handleSubmit,
     handleRemoveConnection,
   }

@@ -31,6 +31,8 @@ export const TerritorialAuthority: Story = {
     rows: sampleRows,
     canManage: true,
     showEmptySection: true,
+    organizationAddAffordances: [{ intent: 'territorial_authority', label: 'Add authority' }],
+    onAddOrganization: () => undefined,
   },
 }
 
@@ -41,6 +43,9 @@ export const ManagerEmptyPeople: Story = {
     rows: [],
     canManage: true,
     showEmptySection: true,
+    organizationAddAffordances: [
+      { intent: 'geographic_presence', label: 'Add organization presence' },
+    ],
     onAddOrganization: () => undefined,
     onAddCharacter: () => undefined,
   },

@@ -3,6 +3,7 @@
 import type { Location } from '@rpg/contracts'
 
 import { OrganizationLocationConnectionLinkDrawer } from './organization-location-connection-link-drawer.client'
+import { OrganizationLocationConnectionAddMenu } from './organization-location-connection-add-menu.client'
 import {
   OrganizationLocationConnectionsSection,
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
@@ -30,28 +31,30 @@ export function OrganizationLocationConnectionsDetailSection({
         mutationError={detail.mutationError}
         isMutationPending={detail.mutations.isPending}
         pendingConnectionId={detail.mutations.pendingConnectionId}
-        onAddConnection={
-          detail.canManage ? () => detail.setDrawerState({ mode: 'add' }) : undefined
+        addConnectionAction={
+          detail.canManage ? (
+            <OrganizationLocationConnectionAddMenu
+              availableIntents={detail.availableAddIntents}
+              onSelectIntent={detail.openAddDrawer}
+            />
+          ) : undefined
         }
-        onEditConnection={
-          detail.canManage
-            ? (connection) => detail.setDrawerState({ mode: 'edit', connection })
-            : undefined
-        }
+        onEditConnection={detail.canManage ? detail.openEditDrawer : undefined}
         onRemoveConnection={detail.canManage ? detail.handleRemoveConnection : undefined}
       />
 
-      {detail.canManage ? (
+      {detail.canManage && detail.drawerState ? (
         <OrganizationLocationConnectionLinkDrawer
           open={detail.drawerState != null}
           onOpenChange={(open) => {
             if (!open) detail.setDrawerState(null)
           }}
-          mode={detail.drawerState?.mode ?? 'add'}
+          mode={detail.drawerState.mode}
+          intent={detail.drawerState.intent}
           locations={detail.locations as Location[]}
           existingConnections={detail.existingConnections}
           initialConnection={
-            detail.drawerState?.mode === 'edit'
+            detail.drawerState.mode === 'edit'
               ? {
                   id: detail.drawerState.connection.connectionId,
                   locationId: detail.drawerState.connection.locationId,

@@ -9,16 +9,9 @@ import { useLocationConnectedPartiesDetail } from '../hooks/use-location-connect
 
 export { LOCATION_CONNECTED_PARTIES_MUTATION_ERROR } from '../hooks/use-location-connected-parties-detail.client'
 
-// fallow-ignore-next-line complexity
-export function LocationConnectedPartiesDetailSections({
-  campaignId,
-  location,
-}: {
-  campaignId: string
-  location: Location
-}) {
-  const detail = useLocationConnectedPartiesDetail(campaignId, location)
+type DetailState = ReturnType<typeof useLocationConnectedPartiesDetail>
 
+function LocationConnectedPartiesQueryState({ detail }: { detail: DetailState }) {
   if (detail.connectedPartiesQuery.isPending) {
     return <Text variant="muted">Loading connected parties…</Text>
   }
@@ -27,10 +20,19 @@ export function LocationConnectedPartiesDetailSections({
     return <Text variant="muted">Could not load connected parties for this location.</Text>
   }
 
-  if (!detail.showTerritorialSection && !detail.showPeopleSection) {
-    return null
-  }
+  return null
+}
 
+// fallow-ignore-next-line complexity
+function LocationConnectedPartiesSections({
+  campaignId,
+  location,
+  detail,
+}: {
+  campaignId: string
+  location: Location
+  detail: DetailState
+}) {
   const sharedSectionProps = {
     campaignId,
     rows: detail.rows,
@@ -57,10 +59,11 @@ export function LocationConnectedPartiesDetailSections({
             detail.canManage ||
             detail.rows.some((row) => row.sectionGroup === 'territorial_authority')
           }
+          organizationAddAffordances={
+            detail.canAddOrganizationInverse ? detail.territorialOrganizationAddAffordances : []
+          }
           onAddOrganization={
-            detail.canAddOrganization
-              ? () => detail.setOrganizationDrawerState({ mode: 'add' })
-              : undefined
+            detail.canAddOrganizationInverse ? detail.openOrganizationAddDrawer : undefined
           }
         />
       ) : null}
@@ -73,10 +76,11 @@ export function LocationConnectedPartiesDetailSections({
             detail.canManage ||
             detail.rows.some((row) => row.sectionGroup === 'people_and_organizations')
           }
+          organizationAddAffordances={
+            detail.canAddOrganizationInverse ? detail.peopleOrganizationAddAffordances : []
+          }
           onAddOrganization={
-            detail.canAddPeopleOrganization
-              ? () => detail.setOrganizationDrawerState({ mode: 'add' })
-              : undefined
+            detail.canAddOrganizationInverse ? detail.openOrganizationAddDrawer : undefined
           }
           onAddCharacter={
             detail.canAddCharacter
@@ -88,5 +92,27 @@ export function LocationConnectedPartiesDetailSections({
 
       <LocationConnectedPartiesDrawers location={location} detail={detail} />
     </div>
+  )
+}
+
+export function LocationConnectedPartiesDetailSections({
+  campaignId,
+  location,
+}: {
+  campaignId: string
+  location: Location
+}) {
+  const detail = useLocationConnectedPartiesDetail(campaignId, location)
+
+  if (detail.connectedPartiesQuery.isPending || detail.connectedPartiesQuery.isError) {
+    return <LocationConnectedPartiesQueryState detail={detail} />
+  }
+
+  if (!detail.showTerritorialSection && !detail.showPeopleSection) {
+    return null
+  }
+
+  return (
+    <LocationConnectedPartiesSections campaignId={campaignId} location={location} detail={detail} />
   )
 }

@@ -7,6 +7,11 @@ import { Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
+import type {
+  LocationInverseOrganizationAddAffordance,
+  OrganizationConnectionDrawerIntent,
+} from '../../lib/location-connection-drawer-intent'
+
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartyRowCard } from './location-connected-party-row-card.client'
 
@@ -62,7 +67,8 @@ export type LocationConnectedPartiesSectionProps = {
   rows: readonly LocationConnectedPartyRow[]
   canManage?: boolean
   showEmptySection?: boolean
-  onAddOrganization?: () => void
+  organizationAddAffordances?: readonly LocationInverseOrganizationAddAffordance[]
+  onAddOrganization?: (intent: OrganizationConnectionDrawerIntent) => void
   onAddCharacter?: () => void
   isMutationPending?: boolean
   pendingRelationshipId?: string
@@ -82,6 +88,7 @@ export function LocationConnectedPartiesSection({
   rows,
   canManage = false,
   showEmptySection = true,
+  organizationAddAffordances,
   onAddOrganization,
   onAddCharacter,
   isMutationPending = false,
@@ -119,6 +126,7 @@ export function LocationConnectedPartiesSection({
         sectionGroup={sectionGroup}
         canManage={canManage}
         hasRows={sectionRows.length > 0}
+        organizationAddAffordances={organizationAddAffordances}
         onAddOrganization={onAddOrganization}
         onAddCharacter={onAddCharacter}
       />

@@ -40,7 +40,7 @@ describe('LocationConnectedPartiesSection', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows manager scaffolding and add actions when empty', () => {
+  it('shows manager scaffolding and region-specific add actions when empty', () => {
     render(
       <MemoryRouter>
         <LocationConnectedPartiesSection
@@ -49,6 +49,9 @@ describe('LocationConnectedPartiesSection', () => {
           rows={[]}
           canManage
           showEmptySection
+          organizationAddAffordances={[
+            { intent: 'geographic_presence', label: 'Add organization presence' },
+          ]}
           onAddOrganization={() => undefined}
           onAddCharacter={() => undefined}
         />
@@ -58,8 +61,30 @@ describe('LocationConnectedPartiesSection', () => {
     expect(
       screen.getByText(LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Link organization' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add organization presence' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Link character' })).toBeInTheDocument()
+  })
+
+  it('invokes add organization intent callbacks', async () => {
+    const user = userEvent.setup()
+    const onAddOrganization = vi.fn()
+
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          sectionGroup="territorial_authority"
+          rows={[]}
+          canManage
+          showEmptySection
+          organizationAddAffordances={[{ intent: 'territorial_authority', label: 'Add authority' }]}
+          onAddOrganization={onAddOrganization}
+        />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add authority' }))
+    expect(onAddOrganization).toHaveBeenCalledWith('territorial_authority')
   })
 
   it('invokes edit callbacks for connected rows', async () => {

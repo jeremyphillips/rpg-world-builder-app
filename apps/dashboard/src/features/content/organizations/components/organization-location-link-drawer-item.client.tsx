@@ -9,12 +9,11 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { LOCATION_CONNECTION_ALREADY_LINKED_REASON } from '../../lib/location-connection-kind-options'
-
 type OrganizationLocationLinkDrawerItemProps = {
   location: Location
   isSelected: boolean
   hasAvailableKind: boolean
+  fullyLinkedReason: string
   onSelect: () => void
   onClear: () => void
 }
@@ -23,6 +22,7 @@ export function OrganizationLocationLinkDrawerItem({
   location,
   isSelected,
   hasAvailableKind,
+  fullyLinkedReason,
   onSelect,
   onClear,
 }: OrganizationLocationLinkDrawerItemProps) {
@@ -36,9 +36,7 @@ export function OrganizationLocationLinkDrawerItem({
           segments: [
             {
               type: 'text',
-              text: hasAvailableKind
-                ? getLocationKindLabel(location.kind)
-                : LOCATION_CONNECTION_ALREADY_LINKED_REASON,
+              text: hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason,
             },
           ],
         },

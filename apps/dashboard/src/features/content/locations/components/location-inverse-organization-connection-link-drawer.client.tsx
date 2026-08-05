@@ -8,26 +8,32 @@ import type {
   Organization,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel, resolveLocationConnectionEligibility } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
+import { getOrganizationKindLabel } from '@rpg/contracts'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
+import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { catalogPickerShellProps } from '@/features/character'
 
-import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
-  buildOrganizationLocationConnectionKindOptions,
-  LOCATION_CONNECTION_KIND_FIELD_LABEL,
-} from '../../lib/location-connection-kind-options'
+  ORGANIZATION_DRAWER_EDIT_TITLES,
+  ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
+  ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
+  ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
+  type OrganizationConnectionDrawerIntent,
+  organizationInverseSubjectHasAvailableKind,
+  resolveLocationInverseOrganizationAddTitle,
+  resolveOrganizationKindsForDrawerIntent,
+} from '../../lib/location-connection-drawer-intent'
 import {
   buildSubjectLocationConnectionKeySet,
   subjectLocationConnectionKey,
 } from '../../lib/location-connection-duplicate-keys'
+import {
+  buildOrganizationLocationConnectionKindOptions,
+  resolveActiveConnectionKind,
+} from '../../lib/location-connection-kind-options'
 import { LocationInverseOrganizationLinkDrawerItem } from './location-inverse-organization-link-drawer-item.client'
 
-export const LOCATION_INVERSE_ORG_LINK_DRAWER_ADD_TITLE = 'Link organization'
-export const LOCATION_INVERSE_ORG_LINK_DRAWER_EDIT_TITLE = 'Edit organization connection'
-export const LOCATION_INVERSE_ORG_LINK_SUBMIT_ADD_LABEL = 'Link organization'
-export const LOCATION_INVERSE_ORG_LINK_SUBMIT_EDIT_LABEL = 'Save connection'
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
 
@@ -35,6 +41,7 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'add' | 'edit'
+  intent: OrganizationConnectionDrawerIntent
   location: Location
   organizations: readonly Organization[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -50,21 +57,11 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   }) => Promise<void>
 }
 
-function organizationHasAvailableKind(
-  organizationId: string,
-  eligibleKinds: readonly OrganizationLocationConnectionKind[],
-  existingKeys: ReadonlySet<string>,
-): boolean {
-  return eligibleKinds.some(
-    (kind) => !existingKeys.has(subjectLocationConnectionKey(organizationId, kind)),
-  )
-}
-
 export function LocationInverseOrganizationConnectionLinkDrawer(
   props: LocationInverseOrganizationConnectionLinkDrawerProps,
 ) {
   const remountKey = props.open
-    ? `${props.mode}:${props.initialConnection?.relationshipId ?? 'add'}`
+    ? `${props.mode}:${props.intent}:${props.initialConnection?.relationshipId ?? 'add'}`
     : 'closed'
 
   return <LocationInverseOrganizationConnectionLinkDrawerContent key={remountKey} {...props} />
@@ -75,6 +72,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   open,
   onOpenChange,
   mode,
+  intent,
   location,
   organizations,
   connectedPartyRows,
@@ -104,10 +102,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   )
 
   const eligibleKinds = React.useMemo(
-    () =>
-      resolveLocationConnectionEligibility(toLocationConnectionEligibilityInput(location))
-        .organizationKinds,
-    [location],
+    () => resolveOrganizationKindsForDrawerIntent(location, intent),
+    [intent, location],
   )
 
   const kindOptions = React.useMemo(() => {
@@ -120,10 +116,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     return buildOrganizationLocationConnectionKindOptions(eligibleKinds, disabledKinds)
   }, [eligibleKinds, existingKeys, selectedOrganizationId])
 
-  const activeKind =
-    selectedKind && kindOptions.some((option) => option.value === selectedKind && !option.disabled)
-      ? selectedKind
-      : null
+  const activeKind = resolveActiveConnectionKind(
+    selectedKind,
+    kindOptions,
+  ) as OrganizationLocationConnectionKind | null
 
   const canSubmit = Boolean(selectedOrganizationId && activeKind && !isSubmitting)
 
@@ -134,8 +130,17 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
 
   const title =
     mode === 'add'
-      ? LOCATION_INVERSE_ORG_LINK_DRAWER_ADD_TITLE
-      : LOCATION_INVERSE_ORG_LINK_DRAWER_EDIT_TITLE
+      ? resolveLocationInverseOrganizationAddTitle(intent, location)
+      : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
+
+  const submitAddLabel =
+    mode === 'add'
+      ? intent === 'territorial_authority' && location.kind === 'settlement'
+        ? 'Add governing organization'
+        : ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
+      : 'Save connection'
+
+  const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
 
   return (
     <CatalogPickerSheet
@@ -148,17 +153,11 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       noItemsMessage="No organizations are available."
       headerBelowDescription={
         selectedOrganizationId ? (
-          <SelectField
+          <LocationConnectionKindStep
             id="location-inverse-organization-connection-kind"
-            label={LOCATION_CONNECTION_KIND_FIELD_LABEL}
-            value={activeKind ?? ''}
-            placeholder="Choose connection type…"
-            options={kindOptions.map((option) => ({
-              value: option.value,
-              label: option.label,
-              disabled: option.disabled,
-              description: option.disabled ? option.disabledReason : option.description,
-            }))}
+            label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+            options={kindOptions}
+            value={activeKind}
             onValueChange={(value) => setSelectedKind(value as OrganizationLocationConnectionKind)}
           />
         ) : null
@@ -174,9 +173,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         selectedOrganizationId ? (
           <div className="flex justify-end border-t border-border px-4 py-3">
             <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-              {mode === 'add'
-                ? LOCATION_INVERSE_ORG_LINK_SUBMIT_ADD_LABEL
-                : LOCATION_INVERSE_ORG_LINK_SUBMIT_EDIT_LABEL}
+              {mode === 'add' ? submitAddLabel : 'Save connection'}
             </Button>
           </div>
         ) : null
@@ -191,11 +188,12 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         <LocationInverseOrganizationLinkDrawerItem
           organization={organization}
           isSelected={selectedOrganizationId === organization.id}
-          hasAvailableKind={organizationHasAvailableKind(
+          hasAvailableKind={organizationInverseSubjectHasAvailableKind(
             organization.id,
             eligibleKinds,
             existingKeys,
           )}
+          fullyLinkedReason={fullyLinkedReason}
           onSelect={() => {
             setSelectedOrganizationId(organization.id)
             setSelectedKind(null)

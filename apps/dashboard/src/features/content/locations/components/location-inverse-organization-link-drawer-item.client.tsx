@@ -9,12 +9,11 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { LOCATION_CONNECTION_ALREADY_LINKED_REASON } from '../../lib/location-connection-kind-options'
-
 type LocationInverseOrganizationLinkDrawerItemProps = {
   organization: Organization
   isSelected: boolean
   hasAvailableKind: boolean
+  fullyLinkedReason: string
   onSelect: () => void
   onClear: () => void
 }
@@ -23,6 +22,7 @@ export function LocationInverseOrganizationLinkDrawerItem({
   organization,
   isSelected,
   hasAvailableKind,
+  fullyLinkedReason,
   onSelect,
   onClear,
 }: LocationInverseOrganizationLinkDrawerItemProps) {
@@ -38,7 +38,7 @@ export function LocationInverseOrganizationLinkDrawerItem({
               type: 'text',
               text: hasAvailableKind
                 ? getOrganizationKindLabel(organization.organizationKind)
-                : LOCATION_CONNECTION_ALREADY_LINKED_REASON,
+                : fullyLinkedReason,
             },
           ],
         },

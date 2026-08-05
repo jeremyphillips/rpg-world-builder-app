@@ -6,7 +6,6 @@ import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
 import { Pencil } from 'lucide-react'
 import {
   Badge,
-  Button,
   ContentCardIconAction,
   ContentCardRemoveButton,
   Heading,
@@ -46,7 +45,7 @@ export type OrganizationLocationConnectionsSectionProps = {
   mutationError?: string | null
   isMutationPending?: boolean
   pendingConnectionId?: string
-  onAddConnection?: () => void
+  addConnectionAction?: React.ReactNode
   onEditConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
 }
@@ -61,7 +60,7 @@ export function OrganizationLocationConnectionsSection({
   mutationError = null,
   isMutationPending = false,
   pendingConnectionId,
-  onAddConnection,
+  addConnectionAction,
   onEditConnection,
   onRemoveConnection,
 }: OrganizationLocationConnectionsSectionProps) {
@@ -92,9 +91,7 @@ export function OrganizationLocationConnectionsSection({
             <Text variant="muted">{ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER}</Text>
           ) : null}
         </div>
-        {canManage && onAddConnection ? (
-          <OrganizationLocationConnectionAddButton onClick={onAddConnection} />
-        ) : null}
+        {canManage && addConnectionAction ? addConnectionAction : null}
       </div>
 
       {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
@@ -170,23 +167,5 @@ export function OrganizationLocationConnectionsSection({
         </div>
       )}
     </section>
-  )
-}
-
-export type OrganizationLocationConnectionAddButtonProps = {
-  label?: string
-  disabled?: boolean
-  onClick?: () => void
-}
-
-export function OrganizationLocationConnectionAddButton({
-  label = 'Link location',
-  disabled = false,
-  onClick,
-}: OrganizationLocationConnectionAddButtonProps) {
-  return (
-    <Button type="button" variant="outline" disabled={disabled} onClick={onClick}>
-      {label}
-    </Button>
   )
 }

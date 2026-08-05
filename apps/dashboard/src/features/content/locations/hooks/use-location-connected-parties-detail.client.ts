@@ -12,7 +12,6 @@ import {
   ApiError,
   canInverseWriteAnyLocationConnection,
   canInverseWriteLocationConnectionForOwner,
-  getOrganizationLocationConnectionFamily,
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
 import { useQueryClient } from '@tanstack/react-query'
@@ -36,6 +35,12 @@ import {
   resolveLocationConnectedPartiesSectionEligibility,
   shouldShowLocationConnectedPartiesSection,
 } from '../../lib/location-connected-parties-section-visibility'
+import {
+  organizationDrawerIntentFromKind,
+  type OrganizationConnectionDrawerIntent,
+  resolvePeopleSectionOrganizationAddAffordances,
+  resolveTerritorialSectionOrganizationAddAffordances,
+} from '../../lib/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
@@ -45,9 +50,10 @@ export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =
   'Could not update connected parties for this location.'
 
 type OrganizationDrawerState =
-  | { mode: 'add' }
+  | { mode: 'add'; intent: OrganizationConnectionDrawerIntent }
   | {
       mode: 'edit'
+      intent: OrganizationConnectionDrawerIntent
       connection: {
         relationshipId: string
         organizationId: string
@@ -175,6 +181,16 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [location],
   )
 
+  const territorialOrganizationAddAffordances = React.useMemo(
+    () => resolveTerritorialSectionOrganizationAddAffordances(location),
+    [location],
+  )
+
+  const peopleOrganizationAddAffordances = React.useMemo(
+    () => resolvePeopleSectionOrganizationAddAffordances(location),
+    [location],
+  )
+
   const invalidate = React.useCallback(
     async (input: { organizationId?: string; characterId?: string }) => {
       await invalidateLocationConnectionQueries(queryClient, {
@@ -279,10 +295,18 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [campaignId, characterDrawerState, invalidate, locationId, runMutation],
   )
 
+  const openOrganizationAddDrawer = React.useCallback(
+    (intent: OrganizationConnectionDrawerIntent) => {
+      setOrganizationDrawerState({ mode: 'add', intent })
+    },
+    [],
+  )
+
   const handleEditConnection = React.useCallback((target: LocationConnectedPartyEditTarget) => {
     if (target.subjectType === 'organization') {
       setOrganizationDrawerState({
         mode: 'edit',
+        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
         connection: {
           relationshipId: target.relationshipId,
           organizationId: target.subjectId,
@@ -324,6 +348,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     setOrganizationDrawerState,
     characterDrawerState,
     setCharacterDrawerState,
+    openOrganizationAddDrawer,
     handleRemoveConnection,
     handleOrganizationSubmit,
     handleCharacterSubmit,
@@ -343,19 +368,13 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       rows,
       sectionGroup: 'people_and_organizations',
     }),
-    canAddOrganization:
-      canWriteInverse &&
-      canInverseWriteLocationConnectionForOwner('organizations') &&
-      eligibility.organizationKinds.length > 0,
+    territorialOrganizationAddAffordances,
+    peopleOrganizationAddAffordances,
     canAddCharacter:
       canWriteInverse &&
       canInverseWriteLocationConnectionForOwner('characters') &&
       eligibility.characterKinds.length > 0,
-    canAddPeopleOrganization:
-      canWriteInverse &&
-      canInverseWriteLocationConnectionForOwner('organizations') &&
-      eligibility.organizationKinds.some(
-        (kind) => getOrganizationLocationConnectionFamily(kind) !== 'territorial_authority',
-      ),
+    canAddOrganizationInverse:
+      canWriteInverse && canInverseWriteLocationConnectionForOwner('organizations'),
   }
 }

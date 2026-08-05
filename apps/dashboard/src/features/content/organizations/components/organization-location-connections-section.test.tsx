@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { Button } from '@rpg/ui'
 
 import {
   OrganizationLocationConnectionsSection,
@@ -57,7 +58,11 @@ describe('OrganizationLocationConnectionsSection', () => {
           }}
           canManage
           showEmptySection
-          onAddConnection={() => undefined}
+          addConnectionAction={
+            <Button type="button" variant="outline">
+              Add connection
+            </Button>
+          }
         />
       </MemoryRouter>,
     )
@@ -65,7 +70,7 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(
       screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Link location' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add connection' })).toBeInTheDocument()
 
     rerender(
       <MemoryRouter>
@@ -95,9 +100,8 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
   })
 
-  it('invokes add and edit callbacks for managers', async () => {
+  it('invokes edit callbacks for managers', async () => {
     const user = userEvent.setup()
-    const onAddConnection = vi.fn()
     const onEditConnection = vi.fn()
 
     render(
@@ -106,14 +110,10 @@ describe('OrganizationLocationConnectionsSection', () => {
           locationConnections={sampleLocationConnections}
           canManage
           showEmptySection
-          onAddConnection={onAddConnection}
           onEditConnection={onEditConnection}
         />
       </MemoryRouter>,
     )
-
-    await user.click(screen.getByRole('button', { name: 'Link location' }))
-    expect(onAddConnection).toHaveBeenCalledTimes(1)
 
     await user.click(screen.getByRole('button', { name: 'Edit Grey Coast Governs' }))
     expect(onEditConnection).toHaveBeenCalledWith({

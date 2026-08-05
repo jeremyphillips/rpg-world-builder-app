@@ -6,7 +6,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { LOCATION_CONNECTION_ALREADY_LINKED_REASON } from '../../lib/location-connection-kind-options'
+import { CHARACTER_DRAWER_FULLY_LINKED_REASON } from '../../lib/location-connection-drawer-intent'
 import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
 
 type LocationInverseCharacterLinkDrawerItemProps = {
@@ -38,12 +38,23 @@ export function LocationInverseCharacterLinkDrawerItem({
                     type: 'text',
                     text: hasAvailableKind
                       ? character.summary
-                      : LOCATION_CONNECTION_ALREADY_LINKED_REASON,
+                      : CHARACTER_DRAWER_FULLY_LINKED_REASON,
                   },
                 ],
               },
             ]
-          : []
+          : hasAvailableKind
+            ? []
+            : [
+                {
+                  segments: [
+                    {
+                      type: 'text',
+                      text: CHARACTER_DRAWER_FULLY_LINKED_REASON,
+                    },
+                  ],
+                },
+              ]
       }
       actions={
         <CatalogPickerSelectionActions

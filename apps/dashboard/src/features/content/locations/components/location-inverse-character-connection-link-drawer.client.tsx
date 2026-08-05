@@ -8,26 +8,28 @@ import type {
   LocationConnectedPartyRow,
 } from '@rpg/contracts'
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
+import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { catalogPickerShellProps } from '@/features/character'
 
+import { characterInverseSubjectHasAvailableKind } from '../../lib/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
-import {
-  buildCharacterLocationConnectionKindOptions,
-  LOCATION_CONNECTION_KIND_FIELD_LABEL,
-} from '../../lib/location-connection-kind-options'
 import {
   buildSubjectLocationConnectionKeySet,
   subjectLocationConnectionKey,
 } from '../../lib/location-connection-duplicate-keys'
+import {
+  buildCharacterLocationConnectionKindOptions,
+  LOCATION_CONNECTION_KIND_FIELD_LABEL,
+  resolveActiveConnectionKind,
+} from '../../lib/location-connection-kind-options'
 import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
 import { LocationInverseCharacterLinkDrawerItem } from './location-inverse-character-link-drawer-item.client'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_ADD_TITLE = 'Link character'
 export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE = 'Edit character connection'
 export const LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_ADD_LABEL = 'Link character'
-export const LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_EDIT_LABEL = 'Save connection'
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
 
@@ -45,16 +47,6 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   }
   isSubmitting?: boolean
   onSubmit: (input: { characterId: string; kind: CharacterLocationConnectionKind }) => Promise<void>
-}
-
-function characterHasAvailableKind(
-  characterId: string,
-  eligibleKinds: readonly CharacterLocationConnectionKind[],
-  existingKeys: ReadonlySet<string>,
-): boolean {
-  return eligibleKinds.some(
-    (kind) => !existingKeys.has(subjectLocationConnectionKey(characterId, kind)),
-  )
 }
 
 export function LocationInverseCharacterConnectionLinkDrawer(
@@ -117,10 +109,10 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
     return buildCharacterLocationConnectionKindOptions(eligibleKinds, disabledKinds)
   }, [eligibleKinds, existingKeys, selectedCharacterId])
 
-  const activeKind =
-    selectedKind && kindOptions.some((option) => option.value === selectedKind && !option.disabled)
-      ? selectedKind
-      : null
+  const activeKind = resolveActiveConnectionKind(
+    selectedKind,
+    kindOptions,
+  ) as CharacterLocationConnectionKind | null
 
   const canSubmit = Boolean(selectedCharacterId && activeKind && !isSubmitting)
 
@@ -145,17 +137,11 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       noItemsMessage="No characters are available."
       headerBelowDescription={
         selectedCharacterId ? (
-          <SelectField
+          <LocationConnectionKindStep
             id="location-inverse-character-connection-kind"
             label={LOCATION_CONNECTION_KIND_FIELD_LABEL}
-            value={activeKind ?? ''}
-            placeholder="Choose connection type…"
-            options={kindOptions.map((option) => ({
-              value: option.value,
-              label: option.label,
-              disabled: option.disabled,
-              description: option.disabled ? option.disabledReason : option.description,
-            }))}
+            options={kindOptions}
+            value={activeKind}
             onValueChange={(value) => setSelectedKind(value as CharacterLocationConnectionKind)}
           />
         ) : null
@@ -173,7 +159,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
               {mode === 'add'
                 ? LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_ADD_LABEL
-                : LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_EDIT_LABEL}
+                : 'Save connection'}
             </Button>
           </div>
         ) : null
@@ -186,7 +172,11 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         <LocationInverseCharacterLinkDrawerItem
           character={character}
           isSelected={selectedCharacterId === character.id}
-          hasAvailableKind={characterHasAvailableKind(character.id, eligibleKinds, existingKeys)}
+          hasAvailableKind={characterInverseSubjectHasAvailableKind(
+            character.id,
+            eligibleKinds,
+            existingKeys,
+          )}
           onSelect={() => {
             setSelectedCharacterId(character.id)
             setSelectedKind(null)

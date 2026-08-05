@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Button } from '@rpg/ui'
 
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import {
@@ -54,7 +55,11 @@ export const ManagerEmpty: Story = {
     },
     canManage: true,
     showEmptySection: true,
-    onAddConnection: () => undefined,
+    addConnectionAction: (
+      <Button type="button" variant="outline">
+        Add connection
+      </Button>
+    ),
   },
 }
 
