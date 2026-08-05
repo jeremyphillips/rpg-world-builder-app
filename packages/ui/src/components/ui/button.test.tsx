@@ -53,6 +53,16 @@ describe('Button', () => {
       'size-control-action-compact',
       '[&_svg]:size-icon-glyph-md',
     )
+
+    rerender(
+      <Button size="icon-lg" aria-label="Large icon action">
+        <span aria-hidden>+</span>
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Large icon action' })).toHaveClass(
+      'size-control-action-lg',
+      '[&_svg]:size-icon-glyph-lg',
+    )
   })
 
   it('applies outline button chrome from token recipes', () => {

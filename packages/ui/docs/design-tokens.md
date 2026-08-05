@@ -233,11 +233,12 @@ buttons (align to field `h-8` / 32px), spinner sizing.
 ### Named pairings
 
 | Recipe                                    | Hit     | Glyph |
-| ----------------------------------------- | ------- | ----- |
+| ----------------------------------------- | ------- | ----- | ----------------------- |
 | `controlActionCompactIconClasses`         | compact | md    |
 | `controlActionCompactTextClasses`         | compact | —     |
 | `controlActionCompactTextWithIconClasses` | compact | sm    |
 | `controlActionDefaultIconClasses`         | default | lg    |
+| `controlActionLgIconClasses`              | lg      | lg    | Button `size="icon-lg"` |
 
 Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
 `control-action.variants.test.ts`.

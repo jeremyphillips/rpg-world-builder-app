@@ -3,6 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import {
   controlActionCompactIconClasses,
+  controlActionDefaultIconClasses,
+  controlActionLgIconClasses,
   controlActionCompactTextWithIconClasses,
 } from './control-action.variants'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
@@ -41,6 +43,7 @@ export const buttonVariants = cva(
         sm: 'rounded-md px-3 text-xs',
         lg: 'rounded-md px-6',
         icon: '',
+        'icon-lg': '',
       },
       density: {
         default: '',
@@ -51,7 +54,8 @@ export const buttonVariants = cva(
       { size: 'default', density: 'default', class: 'h-9' },
       { size: 'sm', density: 'default', class: 'h-8' },
       { size: 'lg', density: 'default', class: 'h-10' },
-      { size: 'icon', density: 'default', class: 'size-control-action-default' },
+      { size: 'icon', density: 'default', class: controlActionDefaultIconClasses },
+      { size: 'icon-lg', density: 'default', class: controlActionLgIconClasses },
       { size: 'default', density: 'compact', class: 'h-8 px-3 py-1' },
       {
         size: 'sm',

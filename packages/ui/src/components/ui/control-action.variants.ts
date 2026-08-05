@@ -36,3 +36,9 @@ export const controlActionDefaultIconClasses = cn(
   controlActionDefaultSizeClasses,
   iconGlyphDescendantClasses.lg,
 )
+
+/** Large icon-button — 40px hit target + lg (16px) glyph; pairs with Button `size="icon-lg"`. */
+export const controlActionLgIconClasses = cn(
+  controlActionLgSizeClasses,
+  iconGlyphDescendantClasses.lg,
+)

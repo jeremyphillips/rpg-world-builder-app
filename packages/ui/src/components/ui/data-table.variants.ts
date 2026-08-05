@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+import { iconGlyphDescendantClasses, iconGlyphRootClasses } from './icon-glyph.variants'
 import { establishSurfaceCurrent, portalPopoverSurfaceClasses } from './surface-current.lib'
 
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
@@ -136,7 +136,7 @@ export const dataTableBodyCellVariants = cva('transition-colors', {
 })
 
 /** Sort icon visibility and size inside SortableHeader. */
-export const dataTableSortIconVariants = cva('ml-1 size-3 shrink-0', {
+export const dataTableSortIconVariants = cva(cn('ml-1 shrink-0', iconGlyphRootClasses.sm), {
   variants: {
     state: {
       asc: 'opacity-70',

@@ -101,7 +101,8 @@ export const buttonSizeToComboboxFieldSize = {
   default: 'md',
   lg: 'lg',
   icon: 'md',
-} as const satisfies Record<'sm' | 'default' | 'lg' | 'icon', FieldSizeToken>
+  'icon-lg': 'lg',
+} as const satisfies Record<'sm' | 'default' | 'lg' | 'icon' | 'icon-lg', FieldSizeToken>
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */
 export const fieldDigitTrailingIconClasses = {

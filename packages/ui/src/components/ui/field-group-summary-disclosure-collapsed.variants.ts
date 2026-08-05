@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { iconGlyphRootClasses } from './icon-glyph.variants'
+
 /** Status line row — indicator, label, and detail separator. */
 export const fieldGroupSummaryStatusLineClasses = 'flex min-w-0 items-center gap-1.5 text-sm'
 
@@ -26,7 +28,7 @@ export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
   variants: {
     indicator: {
       dot: 'size-1.5 rounded-full bg-semantic-success',
-      inactive: 'size-3.5',
+      inactive: iconGlyphRootClasses.md,
     },
     tone: {
       neutral: '',

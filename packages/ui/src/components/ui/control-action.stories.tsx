@@ -7,6 +7,7 @@ import {
   controlActionCompactTextClasses,
   controlActionCompactTextWithIconClasses,
   controlActionDefaultIconClasses,
+  controlActionLgIconClasses,
 } from './control-action.variants'
 
 const meta = {
@@ -35,6 +36,9 @@ export const HitTargetPairings: Story = {
       <button type="button" aria-label="Default icon" className={controlActionDefaultIconClasses}>
         <Settings aria-hidden />
       </button>
+      <button type="button" aria-label="Large icon" className={controlActionLgIconClasses}>
+        <Settings aria-hidden />
+      </button>
     </div>
   ),
 }
@@ -50,6 +54,9 @@ export const ButtonIntegration: Story = {
         Compact
       </Button>
       <Button size="icon" aria-label="Settings">
+        <Settings aria-hidden />
+      </Button>
+      <Button size="icon-lg" aria-label="Settings large">
         <Settings aria-hidden />
       </Button>
     </div>
