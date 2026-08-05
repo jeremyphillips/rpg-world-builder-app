@@ -27,8 +27,8 @@ export function OrganizationConnectedRegionPreviewList({
   return (
     <div className="space-y-3">
       <ul className="space-y-2">
-        {items.map(({ card, detailHref }) => (
-          <li key={`${card.id}-${card.summary}`}>
+        {items.map(({ relationshipId, card, detailHref }) => (
+          <li key={relationshipId}>
             <ContentEntityCard
               heading={card.name}
               subheading={card.summary}

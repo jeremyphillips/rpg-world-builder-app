@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import { canInverseWriteCrossContentRelationship } from '@rpg/contracts'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { ORGANIZATION_CONNECTED_REGIONS_LOAD_ERROR } from '../lib/organization-connected-regions.constants'
@@ -10,6 +11,7 @@ import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 const sampleConnectedRegions = {
   previewItems: [
     {
+      relationshipId: 'ta-governs',
       card: {
         id: 'region-1',
         name: 'Grey Coast',
@@ -105,6 +107,20 @@ describe('OrganizationConnectedRegionsSection', () => {
     expect(
       screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.connectedRegions),
     ).not.toBeInTheDocument()
+  })
+
+  it('does not render inverse edit affordances while registry inverse capability is read-only', () => {
+    expect(canInverseWriteCrossContentRelationship('region_territorial_authority')).toBe(false)
+
+    render(
+      <MemoryRouter>
+        <OrganizationConnectedRegionsSection connectedRegions={sampleConnectedRegions} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /remove/i })).not.toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {

@@ -14,6 +14,7 @@ export function buildOrganizationConnectedRegionCards(
 } {
   return {
     previewItems: connectedRegions.items.map((connectedRegion) => ({
+      relationshipId: connectedRegion.relationshipId,
       card: {
         id: connectedRegion.region.id,
         name: connectedRegion.region.name,

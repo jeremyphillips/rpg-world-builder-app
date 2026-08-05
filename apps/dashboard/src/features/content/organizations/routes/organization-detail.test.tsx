@@ -4,9 +4,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import { ORGANIZATION_CONNECTED_REGIONS_LOAD_ERROR } from '../lib/organization-connected-regions.constants'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import { CITY_COUNCIL } from '../fixtures'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
+import { useOrganizationConnectedRegions } from '../hooks/use-organization-connected-regions'
 import { OrganizationDetailContent } from './organization-detail'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
@@ -15,6 +17,8 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
+
+const mockUseOrganizationConnectedRegions = vi.mocked(useOrganizationConnectedRegions)
 vi.mock('../hooks/use-organization-connected-regions', () => ({
   useOrganizationConnectedRegions: vi.fn(() => ({
     data: {
@@ -82,6 +86,22 @@ describe('OrganizationDetailContent', () => {
     expect(screen.getByText('Loading…')).toBeInTheDocument()
     expect(
       screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows connected regions load error separately from empty state', () => {
+    mockUseOrganizationConnectedRegions.mockReturnValueOnce({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      error: new Error('failed'),
+    } as ReturnType<typeof useOrganizationConnectedRegions>)
+
+    renderDetail()
+
+    expect(screen.getByText(ORGANIZATION_CONNECTED_REGIONS_LOAD_ERROR)).toBeInTheDocument()
+    expect(
+      screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.connectedRegions),
     ).not.toBeInTheDocument()
   })
 

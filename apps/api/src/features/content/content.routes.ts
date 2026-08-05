@@ -7,6 +7,7 @@ import { requireCampaignRole } from '../../middleware/require-role'
 import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
+import * as territorialAuthorityController from './locations/territorial-authority.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
 import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
@@ -50,6 +51,27 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listOrganizationConnectedRegions,
+)
+
+contentRouter.post(
+  '/locations/:locationId/territorial-authorities',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  territorialAuthorityController.createTerritorialAuthorityItem,
+)
+
+contentRouter.patch(
+  '/locations/:locationId/territorial-authorities/:relationshipId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  territorialAuthorityController.updateTerritorialAuthorityItem,
+)
+
+contentRouter.delete(
+  '/locations/:locationId/territorial-authorities/:relationshipId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  territorialAuthorityController.deleteTerritorialAuthorityItem,
 )
 
 contentRouter.post(

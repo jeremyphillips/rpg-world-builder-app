@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 
+import { getCrossContentRelationshipProjection } from '@rpg/contracts'
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
@@ -70,17 +71,37 @@ describe('resolveOrganizationConnectedRegions', () => {
     expect(result?.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          relationshipId: 'ta-governs',
           relationshipFamily: 'territorialAuthority',
           relationshipKind: 'governs',
           relationshipLabel: 'Governs',
         }),
         expect.objectContaining({
+          relationshipId: 'assoc-hq',
           relationshipFamily: 'partyAssociation',
           relationshipKind: 'headquarters',
           relationshipLabel: 'Headquarters',
         }),
       ]),
     )
+  })
+
+  it('registers region_territorial_authority and location_party_association projections', () => {
+    const territorial = getCrossContentRelationshipProjection('region_territorial_authority')
+    const party = getCrossContentRelationshipProjection('location_party_association')
+
+    expect(territorial).toMatchObject({
+      ownerContentType: 'locations',
+      targetContentType: 'organizations',
+      ownerField: 'territorialAuthority',
+      capabilities: { forward: 'write', inverse: 'read' },
+    })
+    expect(party).toMatchObject({
+      ownerContentType: 'locations',
+      targetContentType: 'organizations',
+      ownerField: 'partyAssociations',
+      capabilities: { forward: 'write', inverse: 'read' },
+    })
   })
 })
 
@@ -143,6 +164,7 @@ describe('organization connected regions routes', () => {
     expect(res.body).toEqual({
       items: [
         expect.objectContaining({
+          relationshipId: 'ta-governs',
           relationshipFamily: 'territorialAuthority',
           relationshipKind: 'governs',
           relationshipLabel: 'Governs',

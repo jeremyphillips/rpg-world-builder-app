@@ -22,6 +22,7 @@ export type OrganizationConnectedCharacterPreviewItem = {
 }
 
 export type OrganizationConnectedRegionPreviewItem = {
+  relationshipId: string
   card: { id: string; name: string; summary: string }
   detailHref: string
 }

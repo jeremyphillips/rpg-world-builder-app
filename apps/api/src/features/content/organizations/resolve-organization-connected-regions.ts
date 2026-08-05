@@ -46,6 +46,7 @@ function expandTerritorialRows(
   return (region.territorialAuthority ?? [])
     .filter((relationship) => relationship.organizationId === organizationId)
     .map((relationship) => ({
+      relationshipId: relationship.id,
       relationshipFamily: 'territorialAuthority' as const,
       relationshipKind: relationship.kind,
       relationshipLabel: getTerritorialAuthorityLabel(relationship.kind),
@@ -75,6 +76,7 @@ function expandPartyRows(
     .map((association) => {
       const semanticKey = getAssociationSemanticKey(association)
       return {
+        relationshipId: association.id,
         relationshipFamily: 'partyAssociation' as const,
         relationshipKind: semanticKey,
         relationshipLabel: getLocationPartyAssociationSemanticLabel(semanticKey),
@@ -110,6 +112,7 @@ function sortConnectedRegionRows(rows: readonly ConnectedRegionRow[]): Connected
 
 function toPublicRow(row: ConnectedRegionRow): OrganizationConnectedRegionSummary {
   return {
+    relationshipId: row.relationshipId,
     relationshipFamily: row.relationshipFamily,
     relationshipKind: row.relationshipKind,
     relationshipLabel: row.relationshipLabel,

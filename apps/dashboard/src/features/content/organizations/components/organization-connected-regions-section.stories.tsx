@@ -18,6 +18,7 @@ export const WithPreview: Story = {
     connectedRegions: {
       previewItems: [
         {
+          relationshipId: 'ta-governs',
           card: {
             id: 'region-1',
             name: 'Grey Coast',
@@ -26,6 +27,7 @@ export const WithPreview: Story = {
           detailHref: '/campaigns/camp-1/locations/region-1',
         },
         {
+          relationshipId: 'assoc-hq',
           card: {
             id: 'region-2',
             name: 'Sunset Vale',

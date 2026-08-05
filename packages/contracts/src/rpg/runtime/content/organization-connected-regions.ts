@@ -13,6 +13,7 @@ export type OrganizationConnectedRegionRelationshipFamily = z.infer<
 
 /** A region linked to an organization via territorial authority or party association. */
 export const organizationConnectedRegionSummarySchema = z.object({
+  relationshipId: z.string().min(1),
   relationshipFamily: organizationConnectedRegionRelationshipFamilySchema,
   relationshipKind: z.string().min(1),
   relationshipLabel: z.string().min(1),

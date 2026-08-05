@@ -70,9 +70,16 @@ Domain projections extend with kind and other metadata only when meaningful:
 ## Mutation ownership
 
 Regions are `locations` with `kind: 'region'`. Nested location routes are the
-**canonical** surface for targeted territorial-authority mutation. Full location
-`PATCH` and nested commands must delegate to the **same** domain mutator and
-validator — not parallel validation paths.
+**canonical** surface for targeted territorial-authority mutation:
+
+```text
+POST   /api/campaigns/:campaignId/content/locations/:locationId/territorial-authorities
+PATCH  /api/campaigns/:campaignId/content/locations/:locationId/territorial-authorities/:relationshipId
+DELETE /api/campaigns/:campaignId/content/locations/:locationId/territorial-authorities/:relationshipId
+```
+
+Full location `PATCH` and nested commands delegate to the **same** domain mutator
+and validator — not parallel validation paths.
 
 Organization UI calls nested location endpoints; it never `PATCH`es organization
 with reciprocal arrays.
@@ -102,11 +109,11 @@ region, regardless of which UI originated the request.
 
 ### Location → Organization (party + territorial)
 
-| Concern                 | Detail                                                            |
-| ----------------------- | ----------------------------------------------------------------- |
-| **Authoritative owner** | Location `partyAssociations[]`; region `territorialAuthority[]`   |
-| **Inverse**             | `resolve-organization-connected-regions` + connected-regions DTO  |
-| **Party inverse UI**    | Regions-only listing while usage blockers span all location kinds |
+| Concern                 | Detail                                                                                          |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| **Authoritative owner** | Location `partyAssociations[]`; region `territorialAuthority[]`                                 |
+| **Inverse**             | `resolve-organization-connected-regions` + connected-regions DTO (`relationshipId` on each row) |
+| **Party inverse UI**    | Organization detail lists **regions only**; usage blockers still span all location kinds        |
 
 ## What to reuse vs invent
 
