@@ -230,7 +230,12 @@ export function CatalogPickerSheet<TItem>({
           actions={renderedActions}
         />
 
-        <Sheet.Body className={catalogPickerSheetBodyVariants({ className: sheetBodyClassName })}>
+        <Sheet.Body
+          className={catalogPickerSheetBodyVariants({
+            hasFooter: Boolean(footer),
+            className: sheetBodyClassName,
+          })}
+        >
           {bodyContent}
         </Sheet.Body>
 

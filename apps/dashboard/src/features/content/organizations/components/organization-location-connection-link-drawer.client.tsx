@@ -179,12 +179,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
       }
       footer={
         selectedLocation ? (
-          <div className="flex justify-end border-t border-border px-4 py-3">
-            <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-              {mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'}
-            </Button>
-          </div>
-        ) : null
+          <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
+            {mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'}
+          </Button>
+        ) : undefined
       }
       items={eligibleLocations}
       getItemKey={(location) => location.id}

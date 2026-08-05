@@ -171,12 +171,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       }
       footer={
         selectedOrganizationId ? (
-          <div className="flex justify-end border-t border-border px-4 py-3">
-            <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-              {mode === 'add' ? submitAddLabel : 'Save connection'}
-            </Button>
-          </div>
-        ) : null
+          <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
+            {mode === 'add' ? submitAddLabel : 'Save connection'}
+          </Button>
+        ) : undefined
       }
       items={organizations}
       getItemKey={(organization) => organization.id}

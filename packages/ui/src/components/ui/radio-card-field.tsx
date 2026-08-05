@@ -1,8 +1,9 @@
-import { RadioCard, type RadioCardOption } from './radio-card.client'
+import { RadioCard, type RadioCardDensity, type RadioCardOption } from './radio-card.client'
 import { RadioFieldShell, type BaseRadioFieldProps } from './radio-field-shell'
 
 export interface RadioCardFieldProps extends BaseRadioFieldProps {
   options: RadioCardOption[]
+  density?: RadioCardDensity
   name?: string
   disabled?: boolean
   value?: string
@@ -20,6 +21,7 @@ export function RadioCardField({
   id,
   label,
   options,
+  density,
   error,
   hint,
   hintPosition,
@@ -54,6 +56,7 @@ export function RadioCardField({
           aria-labelledby={labelId}
           name={name}
           disabled={disabled}
+          density={density}
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}

@@ -53,6 +53,7 @@ export function LocationConnectionKindStep({
     <RadioCardField
       id={id}
       label={label}
+      density="compact"
       value={value ?? ''}
       options={toRadioCardOptions(options)}
       onValueChange={onValueChange}
