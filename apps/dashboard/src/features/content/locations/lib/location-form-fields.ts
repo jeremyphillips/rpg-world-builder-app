@@ -131,30 +131,6 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
     descriptionField(ctx),
     {
       kind: 'group',
-      legend: LOCATION_PARTY_SECTION_LABEL,
-      legendSize: 'subsection',
-      visibility: {
-        dependsOn: ['authoringType', LOCATION_PARTY_ASSOCIATIONS_FIELD],
-        visibleWhen: (watched) => {
-          const authoringType = resolveAuthoringTypeFromFormValues(watched)
-          if (!authoringType) return false
-          const associations = watched[LOCATION_PARTY_ASSOCIATIONS_FIELD]
-          return shouldShowLocationPartyAssociationsSection({
-            authoringType,
-            associations: Array.isArray(associations) ? associations : [],
-          })
-        },
-      },
-      fields: [
-        {
-          kind: 'slot',
-          name: LOCATION_PARTY_ASSOCIATIONS_FIELD,
-          render: () => createElement(LocationPartyAssociationsSection),
-        },
-      ],
-    },
-    {
-      kind: 'group',
       legend: TERRITORIAL_AUTHORITY_SECTION_LABEL,
       legendSize: 'subsection',
       visibility: {
@@ -174,6 +150,30 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
           kind: 'slot',
           name: TERRITORIAL_AUTHORITY_FIELD,
           render: () => createElement(TerritorialAuthoritySection),
+        },
+      ],
+    },
+    {
+      kind: 'group',
+      legend: LOCATION_PARTY_SECTION_LABEL,
+      legendSize: 'subsection',
+      visibility: {
+        dependsOn: ['authoringType', LOCATION_PARTY_ASSOCIATIONS_FIELD],
+        visibleWhen: (watched) => {
+          const authoringType = resolveAuthoringTypeFromFormValues(watched)
+          if (!authoringType) return false
+          const associations = watched[LOCATION_PARTY_ASSOCIATIONS_FIELD]
+          return shouldShowLocationPartyAssociationsSection({
+            authoringType,
+            associations: Array.isArray(associations) ? associations : [],
+          })
+        },
+      },
+      fields: [
+        {
+          kind: 'slot',
+          name: LOCATION_PARTY_ASSOCIATIONS_FIELD,
+          render: () => createElement(LocationPartyAssociationsSection),
         },
       ],
     },
