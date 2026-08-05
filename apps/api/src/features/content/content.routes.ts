@@ -8,8 +8,10 @@ import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
 import * as territorialAuthorityController from './locations/territorial-authority.handlers'
+import * as characterLocationConnectionController from './characters/character-location-connection.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
+import { listCharacterLocationReferences } from './locations/location-reference.controller'
 import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
 import { listOrganizationConnectedRegions } from './organizations/organization-connected-regions.controller'
 
@@ -37,6 +39,34 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listCharacterOrganizationReferences,
+)
+
+contentRouter.get(
+  '/locations/references/:characterId',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listCharacterLocationReferences,
+)
+
+contentRouter.post(
+  '/characters/:characterId/location-connections',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  characterLocationConnectionController.createCharacterLocationConnectionItem,
+)
+
+contentRouter.patch(
+  '/characters/:characterId/location-connections/:connectionId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  characterLocationConnectionController.updateCharacterLocationConnectionItem,
+)
+
+contentRouter.delete(
+  '/characters/:characterId/location-connections/:connectionId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  characterLocationConnectionController.deleteCharacterLocationConnectionItem,
 )
 
 contentRouter.get(

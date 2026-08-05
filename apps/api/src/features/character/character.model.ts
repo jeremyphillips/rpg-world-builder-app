@@ -25,7 +25,7 @@ const characterSchema = new Schema(
     feats: { type: [Schema.Types.Mixed], default: [] },
     connections: {
       type: Schema.Types.Mixed,
-      default: () => ({ organizations: [] }),
+      default: () => ({ organizations: [], locations: [] }),
       required: true,
     },
     vital: { type: Schema.Types.Mixed },

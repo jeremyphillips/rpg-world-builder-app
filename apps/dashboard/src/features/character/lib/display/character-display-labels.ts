@@ -35,7 +35,7 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   speciesTraits: 'No species traits.',
   feats: 'No feats.',
   featuresAndTraits: 'No features, traits, or feats.',
-  connections: 'No organization connections.',
+  connections: 'No connections.',
   narrative: 'No narrative details recorded.',
 } as const
 
@@ -54,6 +54,8 @@ export const CHARACTER_DETAIL_TAB_LABELS = {
 } as const
 
 export const UNAVAILABLE_ORGANIZATION_LABEL = 'Unavailable organization'
+
+export const UNAVAILABLE_LOCATION_LABEL = 'Unavailable location'
 
 export const CHARACTER_CONTROLLER_DISPLAY = {
   noPlayerAssigned: 'No player assigned',

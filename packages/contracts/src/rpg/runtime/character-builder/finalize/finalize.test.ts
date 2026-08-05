@@ -69,7 +69,7 @@ describe('finalizeCharacterBuild', () => {
     }
     const input = finalizeCharacterBuild(
       makeCompleteDraft({
-        connections: { organizations: [{ organizationId: organization.id }] },
+        connections: { organizations: [{ organizationId: organization.id }], locations: [] },
       }),
       {
         ...builderTestContext,
@@ -79,6 +79,7 @@ describe('finalizeCharacterBuild', () => {
 
     expect(input.connections).toEqual({
       organizations: [{ organizationId: organization.id }],
+      locations: [],
     })
   })
 
@@ -86,7 +87,10 @@ describe('finalizeCharacterBuild', () => {
     expect(() =>
       finalizeCharacterBuild(
         makeCompleteDraft({
-          connections: { organizations: [{ organizationId: 'organization-removed' }] },
+          connections: {
+            organizations: [{ organizationId: 'organization-removed' }],
+            locations: [],
+          },
         }),
         builderTestContext,
       ),

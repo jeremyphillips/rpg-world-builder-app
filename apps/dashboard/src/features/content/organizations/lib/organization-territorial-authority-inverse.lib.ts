@@ -17,7 +17,7 @@ export function canEditOrganizationTerritorialAuthorityInverse(
   canManageCampaign: boolean,
 ): boolean {
   return (
-    canManageCampaign && canInverseWriteCrossContentRelationship('region_territorial_authority')
+    canManageCampaign && canInverseWriteCrossContentRelationship('organization_location_connection')
   )
 }
 

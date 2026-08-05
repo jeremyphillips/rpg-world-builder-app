@@ -9,6 +9,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { useCharacterOrganizationReferences } from '../../hooks/use-character-organization-references'
+import { useCharacterLocationReferences } from '../../hooks/use-character-location-references'
 import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
 import { resolveQueryErrorLabel } from '../../lib/resolve-query-error-label.lib'
 import { useNpcDeleteFlow } from './use-npc-delete-flow.client'
@@ -24,6 +25,7 @@ export function useNpcDetailPage() {
     npcId,
     canManage,
   )
+  const locationReferencesQuery = useCharacterLocationReferences(campaignId, npcId)
 
   const viewModel = useMemo(() => {
     if (!npcQuery.data || !buildContextQuery.catalogIndex || !buildContextQuery.context) {
@@ -36,12 +38,14 @@ export function useNpcDetailPage() {
       rules: buildContextQuery.context.characterCreationRules,
       xpProgression: getStandardXpProgression(npcQuery.data.character.rulesetId as SystemRulesetId),
       organizationReferences: organizationReferencesQuery.data,
+      locationReferences: locationReferencesQuery.data,
     })
   }, [
     buildContextQuery.catalogIndex,
     buildContextQuery.context,
     npcQuery.data,
     organizationReferencesQuery.data,
+    locationReferencesQuery.data,
   ])
 
   const deleteFlow = useNpcDeleteFlow({

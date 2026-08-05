@@ -8,6 +8,7 @@ import {
   characterEquipmentSource,
   characterFeatSource,
   characterOrganizationSource,
+  characterLocationSource,
   characterSkillProficiencySource,
   characterSpeciesSource,
   characterSpellSource,
@@ -79,6 +80,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     sources: [
       { source: locationParentReferenceSource, entry: true, batch: true },
       { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
+      { source: characterLocationSource, entry: true, batch: true },
     ],
     summaryLabels: { singular: 'location', plural: 'locations' },
     overviewUsageScope: 'complete',

@@ -58,6 +58,7 @@ export function ConnectionsStep({
     onDraftChange({
       connections: {
         organizations: organizationIds.map((organizationId) => ({ organizationId })),
+        locations: draft.connections.locations,
       },
     })
   }

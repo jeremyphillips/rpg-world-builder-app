@@ -152,7 +152,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
     species: {},
     class: { level: 1 },
     abilities: {},
-    connections: { organizations: [] },
+    connections: { organizations: [], locations: [] },
     choiceSelections: {},
     touchedStepIds: [],
   }

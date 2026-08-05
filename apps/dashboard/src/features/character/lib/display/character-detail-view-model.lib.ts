@@ -1,11 +1,12 @@
 import type {
   Character,
   CharacterBuildCatalogIndex,
+  CharacterLocationReferenceResolution,
   CharacterProficiencies,
   Equipment,
   MovementMode,
-  ResolvedCharacterCreationRules,
   OrganizationReferenceResolution,
+  ResolvedCharacterCreationRules,
   Species,
   XpProgressionBody,
 } from '@rpg/contracts'
@@ -15,6 +16,7 @@ import {
   deriveCharacterProfile,
   formatSignedModifier,
   formatWeaponDamageWithModifier,
+  getCharacterLocationConnectionLabel,
   getCharacterTotalLevel,
   getMovementModeLabel,
   getOrganizationKindLabel,
@@ -43,6 +45,7 @@ import {
   CHARACTER_PROFICIENCY_GROUP_LABELS,
   CHARACTER_SECTION_LABELS,
   CHARACTER_STAT_LABELS,
+  UNAVAILABLE_LOCATION_LABEL,
   UNAVAILABLE_ORGANIZATION_LABEL,
 } from './character-display-labels'
 import type {
@@ -68,6 +71,7 @@ export type CharacterDisplayInput = {
   rules: ResolvedCharacterCreationRules
   xpProgression: Pick<XpProgressionBody, 'entries'>
   organizationReferences?: readonly OrganizationReferenceResolution[]
+  locationReferences?: readonly CharacterLocationReferenceResolution[]
 }
 
 function isCharacterProficientWithWeapon(
@@ -413,8 +417,27 @@ export function buildCharacterDetailViewModel({
   rules,
   xpProgression,
   organizationReferences = [],
+  locationReferences = [],
 }: CharacterDisplayInput): CharacterDetailViewModel {
   const level = getCharacterTotalLevel(character)
+
+  const organizationItems = organizationReferences.map(({ organizationId, organization }) => ({
+    id: `organization:${organizationId}`,
+    label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
+    detail: organization?.organizationKind
+      ? getOrganizationKindLabel(organization.organizationKind)
+      : organization
+        ? 'Type not set'
+        : 'This organization is missing or no longer available.',
+  }))
+
+  const locationItems = locationReferences.map(({ connection, location }) => ({
+    id: `location:${connection.id}`,
+    label: location?.name ?? UNAVAILABLE_LOCATION_LABEL,
+    detail: location
+      ? getCharacterLocationConnectionLabel(connection.kind)
+      : 'This location is missing or no longer available.',
+  }))
 
   return {
     id: character.id,
@@ -442,15 +465,7 @@ export function buildCharacterDetailViewModel({
     feats: buildFeatsSection(character),
     connections: {
       title: CHARACTER_SECTION_LABELS.connections,
-      items: organizationReferences.map(({ organizationId, organization }) => ({
-        id: organizationId,
-        label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
-        detail: organization?.organizationKind
-          ? getOrganizationKindLabel(organization.organizationKind)
-          : organization
-            ? 'Type not set'
-            : 'This organization is missing or no longer available.',
-      })),
+      items: [...organizationItems, ...locationItems],
       emptyText: CHARACTER_EMPTY_SECTION_TEXT.connections,
     },
     narrative: character.narrative,

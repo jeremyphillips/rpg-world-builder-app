@@ -141,7 +141,7 @@ describe('buildCharacterDetailViewModel', () => {
 
     expect(viewModel.connections.items).toEqual([
       {
-        id: 'organization-missing',
+        id: 'organization:organization-missing',
         label: 'Unavailable organization',
         detail: 'This organization is missing or no longer available.',
       },

@@ -20,7 +20,7 @@ vi.mock('@/features/campaign', () => ({
   useCampaignCharacters: vi.fn(() => ({ data: [] })),
 }))
 vi.mock('@/features/character', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/character')>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     useCampaignBuildContext: vi.fn(() => ({ catalogIndex: undefined })),

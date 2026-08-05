@@ -86,21 +86,21 @@ describe('resolveOrganizationConnectedRegions', () => {
     )
   })
 
-  it('registers region_territorial_authority and location_party_association projections', () => {
-    const territorial = getCrossContentRelationshipProjection('region_territorial_authority')
-    const party = getCrossContentRelationshipProjection('location_party_association')
+  it('registers subject-owned location connection projections', () => {
+    const character = getCrossContentRelationshipProjection('character_location_connection')
+    const organization = getCrossContentRelationshipProjection('organization_location_connection')
 
-    expect(territorial).toMatchObject({
-      ownerContentType: 'locations',
-      targetContentType: 'organizations',
-      ownerField: 'territorialAuthority',
+    expect(character).toMatchObject({
+      ownerContentType: 'characters',
+      targetContentType: 'locations',
+      ownerField: 'connections.locations',
       capabilities: { forward: 'write', inverse: 'write' },
     })
-    expect(party).toMatchObject({
-      ownerContentType: 'locations',
-      targetContentType: 'organizations',
-      ownerField: 'partyAssociations',
-      capabilities: { forward: 'write', inverse: 'read' },
+    expect(organization).toMatchObject({
+      ownerContentType: 'organizations',
+      targetContentType: 'locations',
+      ownerField: 'connections.locations',
+      capabilities: { forward: 'write', inverse: 'write' },
     })
   })
 })

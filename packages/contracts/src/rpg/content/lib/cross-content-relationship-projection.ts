@@ -1,10 +1,27 @@
 import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 
+/** Owner content types referenced by the cross-content projection registry. */
+export const CROSS_CONTENT_OWNER_CONTENT_TYPE_KEYS = [
+  'classes',
+  'characters',
+  'organizations',
+] as const
+
+export type CrossContentOwnerContentType = (typeof CROSS_CONTENT_OWNER_CONTENT_TYPE_KEYS)[number]
+
+/** Target content types referenced by the cross-content projection registry. */
+export const CROSS_CONTENT_TARGET_CONTENT_TYPE_KEYS = ['skill-proficiencies', 'locations'] as const
+
+export type CrossContentTargetContentType = Extract<
+  ContentTypeKey,
+  'skill-proficiencies' | 'locations'
+>
+
 /** Declared cross-content relationship projections — descriptive metadata only. */
 export const CROSS_CONTENT_RELATIONSHIP_PROJECTION_IDS = [
   'class_skill_proficiency_choice',
-  'location_party_association',
-  'region_territorial_authority',
+  'character_location_connection',
+  'organization_location_connection',
 ] as const
 
 export type CrossContentRelationshipProjectionId =
@@ -17,8 +34,8 @@ export type CrossContentRelationshipCapability =
 
 export type CrossContentRelationshipProjectionDefinition = {
   id: CrossContentRelationshipProjectionId
-  ownerContentType: Extract<ContentTypeKey, 'classes' | 'locations'>
-  targetContentType: Extract<ContentTypeKey, 'skill-proficiencies' | 'organizations'>
+  ownerContentType: CrossContentOwnerContentType
+  targetContentType: CrossContentTargetContentType
   /**
    * Drift/documentation key only — never used for dynamic field traversal or
    * generic queries.
@@ -60,21 +77,21 @@ export const CROSS_CONTENT_RELATIONSHIP_PROJECTIONS: Record<
       inverse: 'read',
     },
   },
-  location_party_association: {
-    id: 'location_party_association',
-    ownerContentType: 'locations',
-    targetContentType: 'organizations',
-    ownerField: 'partyAssociations',
+  character_location_connection: {
+    id: 'character_location_connection',
+    ownerContentType: 'characters',
+    targetContentType: 'locations',
+    ownerField: 'connections.locations',
     capabilities: {
       forward: 'write',
-      inverse: 'read',
+      inverse: 'write',
     },
   },
-  region_territorial_authority: {
-    id: 'region_territorial_authority',
-    ownerContentType: 'locations',
-    targetContentType: 'organizations',
-    ownerField: 'territorialAuthority',
+  organization_location_connection: {
+    id: 'organization_location_connection',
+    ownerContentType: 'organizations',
+    targetContentType: 'locations',
+    ownerField: 'connections.locations',
     capabilities: {
       forward: 'write',
       inverse: 'write',

@@ -1,6 +1,7 @@
 import {
   CLASS_CHARACTER_REFERENCE,
   FEAT_CHARACTER_REFERENCE,
+  LOCATION_CHARACTER_REFERENCE,
   ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SPECIES_CHARACTER_REFERENCE,
@@ -42,6 +43,7 @@ export const characterFeatSource = characterDescriptorSource(FEAT_CHARACTER_REFE
 export const characterOrganizationSource = characterDescriptorSource(
   ORGANIZATION_CHARACTER_REFERENCE,
 )
+export const characterLocationSource = characterDescriptorSource(LOCATION_CHARACTER_REFERENCE)
 export const characterSkillProficiencySource = characterDescriptorSource(
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
 )

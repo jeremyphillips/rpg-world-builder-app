@@ -41,7 +41,7 @@ const characterBaseSchema = z.object({
   wealth: characterWealthSchema,
   narrative: characterNarrativeSchema.optional(),
   feats: z.array(characterFeatEntrySchema).default([]),
-  connections: characterConnectionsSchema.default({ organizations: [] }),
+  connections: characterConnectionsSchema.default({ organizations: [], locations: [] }),
   vital: characterVitalStateSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

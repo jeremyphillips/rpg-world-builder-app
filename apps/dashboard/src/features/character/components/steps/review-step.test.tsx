@@ -112,7 +112,7 @@ describe('ReviewStep', () => {
     }
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }] },
+      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
     }
 
     render(

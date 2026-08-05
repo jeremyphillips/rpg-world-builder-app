@@ -33,7 +33,7 @@ export const Selected: Story = {
   args: {
     draft: {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }] },
+      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
     },
   },
 }
@@ -42,7 +42,7 @@ export const StaleSelection: Story = {
   args: {
     draft: {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: 'organization-missing' }] },
+      connections: { organizations: [{ organizationId: 'organization-missing' }], locations: [] },
     },
   },
 }

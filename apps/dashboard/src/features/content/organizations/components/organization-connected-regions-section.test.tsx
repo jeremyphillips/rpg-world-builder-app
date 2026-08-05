@@ -136,7 +136,7 @@ describe('OrganizationConnectedRegionsSection', () => {
   })
 
   it('renders inverse territorial write affordances when registry and props allow writes', () => {
-    expect(canInverseWriteCrossContentRelationship('region_territorial_authority')).toBe(true)
+    expect(canInverseWriteCrossContentRelationship('organization_location_connection')).toBe(true)
 
     render(
       <MemoryRouter>

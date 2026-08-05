@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { characterLocationConnectionsSchema } from './location-connection'
+
 export const characterOrganizationConnectionSchema = z.object({
   organizationId: z.string().min(1),
 })
@@ -23,6 +25,7 @@ export const characterConnectionsSchema = z.object({
         seen.add(connection.organizationId)
       })
     }),
+  locations: characterLocationConnectionsSchema,
 })
 
 export type CharacterConnections = z.infer<typeof characterConnectionsSchema>
