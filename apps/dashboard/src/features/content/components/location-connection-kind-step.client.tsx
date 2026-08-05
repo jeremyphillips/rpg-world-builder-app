@@ -1,8 +1,9 @@
 'use client'
 
 import type { RadioCardOption } from '@rpg/ui'
-import { Heading, RadioCardField, Text } from '@rpg/ui'
+import { CollapsibleRadioCardField, Heading, Text } from '@rpg/ui'
 
+import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../lib/location-connection-drawer-intent'
 import type { LocationConnectionKindOption } from '../lib/location-connection-kind-options'
 
 export type LocationConnectionKindStepProps = {
@@ -11,6 +12,7 @@ export type LocationConnectionKindStepProps = {
   options: readonly LocationConnectionKindOption[]
   value: string | null
   onValueChange: (value: string) => void
+  changeLabel?: string
 }
 
 function toRadioCardOptions(options: readonly LocationConnectionKindOption[]): RadioCardOption[] {
@@ -28,6 +30,7 @@ export function LocationConnectionKindStep({
   options,
   value,
   onValueChange,
+  changeLabel = LOCATION_CONNECTION_KIND_CHANGE_LABEL,
 }: LocationConnectionKindStepProps) {
   const enabledOptions = options.filter((option) => !option.disabled)
 
@@ -50,9 +53,11 @@ export function LocationConnectionKindStep({
   }
 
   return (
-    <RadioCardField
+    <CollapsibleRadioCardField
       id={id}
       label={label}
+      summaryEyebrow={label}
+      changeLabel={changeLabel}
       density="compact"
       value={value ?? ''}
       options={toRadioCardOptions(options)}
