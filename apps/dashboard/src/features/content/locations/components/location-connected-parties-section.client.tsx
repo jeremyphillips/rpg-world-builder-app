@@ -14,6 +14,10 @@ import type {
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartyRowCard } from './location-connected-party-row-card.client'
+import {
+  LocationTerritorialAuthoritySectionBody,
+  TERRITORIAL_AUTHORITY_SECTION_EMPTY,
+} from './location-territorial-authority-section.client'
 
 export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
   LocationConnectedPartySectionGroup,
@@ -36,7 +40,7 @@ export const LOCATION_CONNECTED_PARTIES_EMPTY_TEXT: Record<
   LocationConnectedPartySectionGroup,
   string
 > = {
-  territorial_authority: 'No territorial authority linked yet.',
+  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_EMPTY,
   people_and_organizations: 'No people or organizations linked yet.',
 }
 
@@ -131,7 +135,18 @@ export function LocationConnectedPartiesSection({
         onAddCharacter={onAddCharacter}
       />
 
-      {sectionRows.length > 0 ? (
+      {sectionGroup === 'territorial_authority' ? (
+        sectionRows.length > 0 || canManage ? (
+          <LocationTerritorialAuthoritySectionBody
+            campaignId={campaignId}
+            rows={sectionRows}
+            canManage={canManage}
+            onAddOrganization={onAddOrganization}
+            onEditConnection={onEditConnection}
+            onRemoveConnection={onRemoveConnection}
+          />
+        ) : null
+      ) : sectionRows.length > 0 ? (
         <div className="space-y-6">
           {[...groupedRows.entries()].map(([relationshipLabel, relationshipRows]) => (
             <div key={relationshipLabel} className="space-y-2">

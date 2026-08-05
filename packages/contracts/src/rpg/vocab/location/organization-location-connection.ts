@@ -13,11 +13,10 @@ export type OrganizationLocationConnectionFamily =
 export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY = {
   site: 'one_per_kind',
   geographic_presence: 'one_per_family',
-  territorial_authority: 'one_per_family',
 } as const
 
 export type OrganizationLocationConnectionFamilyCardinality =
-  (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY)[OrganizationLocationConnectionFamily]
+  (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY)[keyof typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY]
 
 export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
   label: 'Organization location connection',
@@ -32,6 +31,8 @@ export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
 export type OrganizationLocationConnectionEntry = GameTermEntry & {
   readonly family: OrganizationLocationConnectionFamily
   readonly priority: number
+  /** Max organizations per location for this kind across the campaign; null = unlimited. */
+  readonly maxSubjectsPerLocation: number | null
 }
 
 export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
@@ -40,24 +41,28 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
     description: 'Owns or holds title to this location.',
     family: 'site',
     priority: 50,
+    maxSubjectsPerLocation: null,
   },
   tenant: {
     label: 'Tenant',
     description: 'Occupies or leases space here without owning the location.',
     family: 'site',
     priority: 40,
+    maxSubjectsPerLocation: null,
   },
   operator: {
     label: 'Operator',
     description: 'Runs or manages day-to-day operations at this location.',
     family: 'site',
     priority: 30,
+    maxSubjectsPerLocation: null,
   },
   headquarters: {
     label: 'Headquarters',
     description: 'Primary designated location for an organization.',
     family: 'site',
     priority: 20,
+    maxSubjectsPerLocation: null,
   },
   operates_in: {
     label: 'Operates in',
@@ -65,6 +70,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
       'Active organizational presence in this geographic area. Distinct from territorial authority (governs/controls/claims).',
     family: 'geographic_presence',
     priority: 10,
+    maxSubjectsPerLocation: null,
   },
   governs: {
     label: 'Governs',
@@ -72,6 +78,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
       'Exercises political or administrative authority over this region. Distinct from property or title interest (site owner).',
     family: 'territorial_authority',
     priority: 50,
+    maxSubjectsPerLocation: 1,
   },
   controls: {
     label: 'Controls',
@@ -79,12 +86,14 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
       'Exercises territorial authority over this region. Distinct from operational presence at a location (site operator).',
     family: 'territorial_authority',
     priority: 40,
+    maxSubjectsPerLocation: 1,
   },
   claims: {
     label: 'Claims',
     description: 'Asserted but contested or incomplete territorial authority over this region.',
     family: 'territorial_authority',
     priority: 30,
+    maxSubjectsPerLocation: null,
   },
 } as const satisfies Record<string, OrganizationLocationConnectionEntry>
 
@@ -116,6 +125,14 @@ export function getOrganizationLocationConnectionPriority(
   kind: OrganizationLocationConnectionKind,
 ): number {
   return ORGANIZATION_LOCATION_CONNECTION_ENTRIES[kind].priority
+}
+
+/** Returns max organizations per location for a kind, or null when unlimited. */
+export function getOrganizationLocationConnectionMaxSubjectsPerLocation(
+  kind: OrganizationLocationConnectionKind,
+): number | null {
+  const max = ORGANIZATION_LOCATION_CONNECTION_ENTRIES[kind].maxSubjectsPerLocation
+  return max ?? null
 }
 
 /** Returns the connection family for an organization location connection kind. */

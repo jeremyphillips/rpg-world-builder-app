@@ -40,7 +40,28 @@ describe('LocationConnectedPartiesSection', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows manager scaffolding and region-specific add actions when empty', () => {
+  it('shows manager slot scaffolding when territorial authority is empty', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          sectionGroup="territorial_authority"
+          rows={[]}
+          canManage
+          showEmptySection
+          organizationAddAffordances={[{ intent: 'territorial_authority', label: 'Add authority' }]}
+          onAddOrganization={() => undefined}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Controls' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Claims' })).toBeInTheDocument()
+    expect(screen.getByText('No governing organization.')).toBeInTheDocument()
+  })
+
+  it('shows manager scaffolding and region-specific add actions when people section is empty', () => {
     render(
       <MemoryRouter>
         <LocationConnectedPartiesSection
@@ -104,7 +125,8 @@ describe('LocationConnectedPartiesSection', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Edit City Council Governs' }))
+    await user.click(screen.getByRole('button', { name: 'Actions for City Council' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Change authority type' }))
     expect(onEditConnection).toHaveBeenCalledWith({
       relationshipId: 'rel-org-1',
       subjectType: 'organization',

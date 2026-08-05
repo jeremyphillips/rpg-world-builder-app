@@ -47,7 +47,8 @@ export const organizationLocationConnectionsSchema = z
       seenLocationKinds.add(locationKindKey)
 
       const family = getOrganizationLocationConnectionFamily(connection.kind)
-      if (getOrganizationLocationConnectionFamilyCardinality(family) === 'one_per_family') {
+      const familyCardinality = getOrganizationLocationConnectionFamilyCardinality(family)
+      if (familyCardinality === 'one_per_family') {
         const locationFamilyKey = `${connection.locationId}:${family}`
         if (seenLocationFamilies.has(locationFamilyKey)) {
           ctx.addIssue({

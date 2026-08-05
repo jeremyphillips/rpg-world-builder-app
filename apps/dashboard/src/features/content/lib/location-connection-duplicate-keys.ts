@@ -1,5 +1,6 @@
 import type {
   CharacterLocationConnectionKind,
+  OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
@@ -66,7 +67,9 @@ type OrganizationLocationConnectionLike = {
 export function isOrganizationLocationConnectionKindBlockedForLocation(input: {
   locationId: string
   kind: OrganizationLocationConnectionKind
+  subjectOrganizationId: string
   connections: readonly OrganizationLocationConnectionLike[]
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
 }): boolean {
   return organizationLocationConnectionKindBlockedForLocation(input)
@@ -75,10 +78,31 @@ export function isOrganizationLocationConnectionKindBlockedForLocation(input: {
 export function organizationLocationConnectionHasAvailableKind(input: {
   locationId: string
   kinds: readonly OrganizationLocationConnectionKind[]
+  subjectOrganizationId: string
   connections: readonly OrganizationLocationConnectionLike[]
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
 }): boolean {
   return organizationLocationConnectionHasAvailableKindInFamily(input)
+}
+
+export function buildOrganizationLocationConnectionEdgesAtLocation(
+  rows: ReadonlyArray<{
+    subject: { id: string; type: string }
+    kind: string
+    relationshipId: string
+  }>,
+  locationId: string,
+): OrganizationLocationConnectionEdgeAtLocation[] {
+  return rows
+    .filter((row) => row.subject.type === 'organization')
+    .map((row) => ({
+      organizationId: row.subject.id,
+      connectionId: row.relationshipId,
+      locationId,
+      kind: row.kind as OrganizationLocationConnectionKind,
+      subjectName: undefined,
+    }))
 }
 
 export function buildOrganizationInverseLocationConnections(

@@ -30,7 +30,10 @@ import {
   resolveLocationInverseOrganizationAddTitle,
   resolveOrganizationKindsForDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
-import { buildOrganizationInverseLocationConnections } from '../../lib/location-connection-duplicate-keys'
+import {
+  buildOrganizationInverseLocationConnections,
+  buildOrganizationLocationConnectionEdgesAtLocation,
+} from '../../lib/location-connection-duplicate-keys'
 import {
   buildOrganizationLocationConnectionDisabledKinds,
   buildOrganizationLocationConnectionKindOptions,
@@ -110,10 +113,18 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       selectedOrganizationId,
       excludeRelationshipId,
     )
+    const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
+      orgRows.filter((row): row is typeof row & { relationshipId: string } =>
+        Boolean(row.relationshipId),
+      ),
+      location.id,
+    )
     const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
       locationId: location.id,
       kinds: eligibleKinds,
+      subjectOrganizationId: selectedOrganizationId,
       connections,
+      edgesAtLocation,
     })
     return buildOrganizationLocationConnectionKindOptions(eligibleKinds, disabledKinds)
   }, [eligibleKinds, excludeRelationshipId, location.id, orgRows, selectedOrganizationId])

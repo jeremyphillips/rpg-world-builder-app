@@ -14,6 +14,8 @@ import {
 
 import { HttpError } from '../../../lib/http-error'
 import { HomebrewOrganizationModel } from './homebrew-organization.model'
+import { assertOrganizationLocationConnectionLocationOccupancy } from './assert-organization-location-connection-location-occupancy'
+import { loadOrganizationLocationConnectionEdgesAtLocation } from './load-organization-location-connection-edges-at-location'
 
 type OrganizationConnectionsDocument = {
   connections?: {
@@ -116,10 +118,22 @@ export type OrganizationLocationConnectionMutationResult = {
 export async function createOrganizationLocationConnectionRecord(input: {
   organizationId: string
   organization: OrganizationConnectionsDocument
+  campaignId: string
   location: LocationConnectionEligibilityInput
   body: CreateOrganizationLocationConnectionInput
 }): Promise<OrganizationLocationConnectionMutationResult> {
   assertOrganizationLocationConnectionEligible(input.location, input.body.kind)
+
+  const edgesAtLocation = await loadOrganizationLocationConnectionEdgesAtLocation(
+    input.campaignId,
+    input.body.locationId,
+  )
+  assertOrganizationLocationConnectionLocationOccupancy({
+    locationId: input.body.locationId,
+    kind: input.body.kind,
+    subjectOrganizationId: input.organizationId,
+    edgesAtLocation,
+  })
 
   const existing = readOrganizationLocationConnections(input.organization)
   const connections = addOrganizationLocationConnection(existing, input.body)
@@ -135,6 +149,7 @@ export async function createOrganizationLocationConnectionRecord(input: {
 export async function updateOrganizationLocationConnectionRecord(input: {
   organizationId: string
   organization: OrganizationConnectionsDocument
+  campaignId: string
   location: LocationConnectionEligibilityInput
   connectionId: string
   body: UpdateOrganizationLocationConnectionInput
@@ -149,8 +164,21 @@ export async function updateOrganizationLocationConnectionRecord(input: {
     )
   }
 
+  const nextLocationId = input.body.locationId ?? current.locationId
   const nextKind = input.body.kind ?? current.kind
   assertOrganizationLocationConnectionEligible(input.location, nextKind)
+
+  const edgesAtLocation = await loadOrganizationLocationConnectionEdgesAtLocation(
+    input.campaignId,
+    nextLocationId,
+  )
+  assertOrganizationLocationConnectionLocationOccupancy({
+    locationId: nextLocationId,
+    kind: nextKind,
+    subjectOrganizationId: input.organizationId,
+    edgesAtLocation,
+    excludeConnectionId: input.connectionId,
+  })
 
   const connections = updateOrganizationLocationConnection(existing, input.connectionId, input.body)
   const connection = connections.find((row) => row.id === input.connectionId)

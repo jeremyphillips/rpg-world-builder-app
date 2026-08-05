@@ -1,0 +1,15 @@
+import { cva } from 'class-variance-authority'
+
+export const crossContentRelationshipRowVariants = cva(
+  'flex items-start justify-between gap-4 border border-border bg-card px-4 py-3',
+)
+
+export const crossContentRelationshipRowContentVariants = cva('min-w-0 flex-1 space-y-1')
+
+export const crossContentRelationshipRowEyebrowVariants = cva(
+  'text-xs font-medium text-muted-foreground',
+)
+
+export const crossContentRelationshipRowHeadingVariants = cva('text-sm font-medium text-foreground')
+
+export const crossContentRelationshipRowSubheadingVariants = cva('text-xs text-muted-foreground')

@@ -48,6 +48,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   onOpenChange: (open: boolean) => void
   mode: 'add' | 'edit'
   intent: OrganizationConnectionDrawerIntent
+  organizationId: string
   locations: readonly Location[]
   existingConnections: readonly ExistingConnection[]
   initialConnection?: ExistingConnection
@@ -78,6 +79,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   onOpenChange,
   mode,
   intent,
+  organizationId,
   locations,
   existingConnections,
   initialConnection,
@@ -112,11 +114,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
     const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
       locationId: selectedLocation.id,
       kinds: familyKinds,
+      subjectOrganizationId: organizationId,
       connections: existingConnections,
       excludeConnectionId,
     })
     return buildOrganizationLocationConnectionKindOptions(familyKinds, disabledKinds)
-  }, [excludeConnectionId, existingConnections, intent, selectedLocation])
+  }, [excludeConnectionId, existingConnections, intent, organizationId, selectedLocation])
 
   const activeKind = resolveActiveConnectionKind(
     selectedKind,
@@ -193,7 +196,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
         const hasAvailableKind = organizationForwardLocationHasAvailableKind(
           location,
           intent,
+          organizationId,
           existingConnections,
+          undefined,
           excludeConnectionId,
         )
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })

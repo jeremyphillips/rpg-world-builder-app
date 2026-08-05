@@ -153,19 +153,24 @@ describe('organization location connection nested routes', () => {
     ])
   })
 
-  it('rejects a second territorial authority kind on the same region', async () => {
+  it('rejects cross-org singleton governs when another organization already governs', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
     const { region } = await seedRegionLocation(campaignId)
 
-    const organization = await createHomebrewContent(
-      organizationWriteConfig,
-      campaignId,
-      minimalOrganizationInput,
-    )
+    const firstOrganization = await createHomebrewContent(organizationWriteConfig, campaignId, {
+      ...minimalOrganizationInput,
+      slug: 'org-governs-first',
+      name: 'First Org',
+    })
+    const secondOrganization = await createHomebrewContent(organizationWriteConfig, campaignId, {
+      ...minimalOrganizationInput,
+      slug: 'org-governs-second',
+      name: 'Second Org',
+    })
 
     await agent
-      .post(locationConnectionsPath(campaignId, organization.id))
+      .post(locationConnectionsPath(campaignId, firstOrganization.id))
       .set(CSRF_HEADER, csrfToken)
       .send({
         id: 'org-loc-governs',
@@ -175,24 +180,37 @@ describe('organization location connection nested routes', () => {
       .expect(201)
 
     await agent
-      .post(locationConnectionsPath(campaignId, organization.id))
+      .post(locationConnectionsPath(campaignId, secondOrganization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-loc-governs-dup',
+        locationId: region.id,
+        kind: 'governs',
+      })
+      .expect(400)
+
+    await agent
+      .post(locationConnectionsPath(campaignId, firstOrganization.id))
       .set(CSRF_HEADER, csrfToken)
       .send({
         id: 'org-loc-controls',
         locationId: region.id,
         kind: 'controls',
       })
-      .expect(400)
+      .expect(201)
 
     await agent
-      .patch(locationConnectionsPath(campaignId, organization.id, 'org-loc-governs'))
+      .patch(locationConnectionsPath(campaignId, firstOrganization.id, 'org-loc-governs'))
       .set(CSRF_HEADER, csrfToken)
-      .send({ kind: 'controls' })
+      .send({ kind: 'claims' })
       .expect(200)
 
-    const updatedOrganization = await HomebrewOrganizationModel.findById(organization.id).lean()
+    const updatedOrganization = await HomebrewOrganizationModel.findById(
+      firstOrganization.id,
+    ).lean()
     expect(updatedOrganization?.connections?.locations).toEqual([
-      { id: 'org-loc-governs', locationId: region.id, kind: 'controls' },
+      { id: 'org-loc-governs', locationId: region.id, kind: 'claims' },
+      { id: 'org-loc-controls', locationId: region.id, kind: 'controls' },
     ])
   })
 

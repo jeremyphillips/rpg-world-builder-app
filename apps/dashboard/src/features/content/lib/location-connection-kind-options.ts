@@ -1,5 +1,6 @@
 import type {
   CharacterLocationConnectionKind,
+  OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
@@ -28,11 +29,13 @@ export const LOCATION_CONNECTION_ALREADY_LINKED_REASON = 'Already linked with th
 export function buildOrganizationLocationConnectionDisabledKinds(input: {
   locationId: string
   kinds: readonly OrganizationLocationConnectionKind[]
+  subjectOrganizationId: string
   connections: ReadonlyArray<{
     id?: string
     locationId: string
     kind: OrganizationLocationConnectionKind
   }>
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
 }): Set<OrganizationLocationConnectionKind> {
   return new Set(
@@ -40,7 +43,9 @@ export function buildOrganizationLocationConnectionDisabledKinds(input: {
       isOrganizationLocationConnectionKindBlockedForLocation({
         locationId: input.locationId,
         kind,
+        subjectOrganizationId: input.subjectOrganizationId,
         connections: input.connections,
+        edgesAtLocation: input.edgesAtLocation,
         excludeConnectionId: input.excludeConnectionId,
       }),
     ),

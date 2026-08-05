@@ -2,18 +2,19 @@ import type {
   CharacterLocationConnectionKind,
   Location,
   LocationConnectedPartyRow,
+  OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionFamily,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
   getOrganizationLocationConnectionFamily,
-  organizationLocationConnectionHasAvailableKindInFamily,
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
 
 import { toLocationConnectionEligibilityInput } from './location-connection-eligibility-input'
 import {
   buildOrganizationInverseLocationConnections,
+  buildOrganizationLocationConnectionEdgesAtLocation,
   buildOrganizationLocationConnectionKeySet,
   buildSubjectLocationConnectionKeySet,
   organizationLocationConnectionHasAvailableKind,
@@ -134,18 +135,22 @@ export function locationEligibleForOrganizationDrawerIntent(
 export function organizationForwardLocationHasAvailableKind(
   location: Location,
   intent: OrganizationConnectionDrawerIntent,
+  subjectOrganizationId: string,
   connections: ReadonlyArray<{
     id?: string
     locationId: string
     kind: OrganizationLocationConnectionKind
   }>,
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[],
   excludeConnectionId?: string,
 ): boolean {
   const kinds = resolveOrganizationKindsForDrawerIntent(location, intent)
   return organizationLocationConnectionHasAvailableKind({
     locationId: location.id,
     kinds,
+    subjectOrganizationId,
     connections,
+    edgesAtLocation,
     excludeConnectionId,
   })
 }
@@ -155,7 +160,7 @@ export function organizationInverseSubjectHasAvailableKind(
   locationId: string,
   eligibleKinds: readonly OrganizationLocationConnectionKind[],
   rows: ReadonlyArray<{
-    subject: { id: string }
+    subject: { id: string; type?: string }
     kind: string
     relationshipId?: string
   }>,
@@ -167,11 +172,23 @@ export function organizationInverseSubjectHasAvailableKind(
     subjectId,
     excludeRelationshipId,
   )
+  const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
+    rows
+      .filter((row): row is typeof row & { relationshipId: string } => Boolean(row.relationshipId))
+      .map((row) => ({
+        subject: { id: row.subject.id, type: row.subject.type ?? 'organization' },
+        kind: row.kind,
+        relationshipId: row.relationshipId,
+      })),
+    locationId,
+  )
 
-  return organizationLocationConnectionHasAvailableKindInFamily({
+  return organizationLocationConnectionHasAvailableKind({
     locationId,
     kinds: eligibleKinds,
+    subjectOrganizationId: subjectId,
     connections,
+    edgesAtLocation,
   })
 }
 
@@ -288,11 +305,13 @@ export function buildCharacterInverseExistingKeys(
 export function filterLocationsForOrganizationDrawerIntent(
   locations: readonly Location[],
   intent: OrganizationConnectionDrawerIntent,
+  subjectOrganizationId: string,
   connections: ReadonlyArray<{
     id?: string
     locationId: string
     kind: OrganizationLocationConnectionKind
   }>,
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[],
   excludeConnectionId?: string,
 ): Location[] {
   return locations.filter(
@@ -301,7 +320,9 @@ export function filterLocationsForOrganizationDrawerIntent(
       organizationForwardLocationHasAvailableKind(
         location,
         intent,
+        subjectOrganizationId,
         connections,
+        edgesAtLocation,
         excludeConnectionId,
       ),
   )

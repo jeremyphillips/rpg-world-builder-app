@@ -115,7 +115,8 @@ describe('OrganizationLocationConnectionsSection', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Edit Grey Coast Governs' }))
+    await user.click(screen.getByRole('button', { name: 'Actions for Grey Coast' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Change connection type' }))
     expect(onEditConnection).toHaveBeenCalledWith({
       connectionId: 'conn-1',
       locationId: 'region-1',

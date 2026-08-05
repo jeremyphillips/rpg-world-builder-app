@@ -51,6 +51,7 @@ export function OrganizationLocationConnectionsDetailSection({
           }}
           mode={detail.drawerState.mode}
           intent={detail.drawerState.intent}
+          organizationId={organizationId}
           locations={detail.locations as Location[]}
           existingConnections={detail.existingConnections}
           initialConnection={

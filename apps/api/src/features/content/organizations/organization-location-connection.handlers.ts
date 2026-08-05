@@ -101,6 +101,7 @@ export async function createOrganizationLocationConnectionItem(
   const result = await createOrganizationLocationConnectionRecord({
     organizationId,
     organization,
+    campaignId,
     location: toLocationEligibilityInput(location),
     body,
   })
@@ -137,6 +138,7 @@ export async function updateOrganizationLocationConnectionItem(
   const result = await updateOrganizationLocationConnectionRecord({
     organizationId,
     organization,
+    campaignId,
     location: toLocationEligibilityInput(location),
     connectionId,
     body,
