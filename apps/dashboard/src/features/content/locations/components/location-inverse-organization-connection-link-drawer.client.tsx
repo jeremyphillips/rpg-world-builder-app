@@ -188,11 +188,13 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
       }
       renderItemHeader={(organization) => {
+        const isSelected = selectedOrganizationId === organization.id
         const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
           organization.id,
           eligibleKinds,
           existingKeys,
         )
+        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
           <ContentEntityPickerRow
@@ -204,31 +206,21 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
             }
             imageKey={organization.imageKey}
             disabled={!hasAvailableKind}
-          />
-        )
-      }}
-      renderItemActions={(organization) => {
-        const isSelected = selectedOrganizationId === organization.id
-        const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
-          organization.id,
-          eligibleKinds,
-          existingKeys,
-        )
-        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
-
-        return (
-          <CatalogPickerSelectionActions
-            phase={phase}
-            canSelect={hasAvailableKind}
-            addLabel={isSelected ? 'Selected' : 'Select'}
-            onAdd={() => {
-              setSelectedOrganizationId(organization.id)
-              setSelectedKind(null)
-            }}
-            onRemove={() => {
-              setSelectedOrganizationId(null)
-              setSelectedKind(null)
-            }}
+            endSlot={
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect={hasAvailableKind}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => {
+                  setSelectedOrganizationId(organization.id)
+                  setSelectedKind(null)
+                }}
+                onRemove={() => {
+                  setSelectedOrganizationId(null)
+                  setSelectedKind(null)
+                }}
+              />
+            }
           />
         )
       }}

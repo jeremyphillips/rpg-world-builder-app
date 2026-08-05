@@ -393,6 +393,10 @@ export {
 export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
 export { ContentCard, type ContentCardProps } from './components/ui/content-card.client'
 export {
+  ContentCardBody,
+  type ContentCardBodyProps,
+} from './components/ui/content-card-body.client'
+export {
   ContentCardHeadingAction,
   ContentCardIconAction,
   type ContentCardHeadingActionProps,

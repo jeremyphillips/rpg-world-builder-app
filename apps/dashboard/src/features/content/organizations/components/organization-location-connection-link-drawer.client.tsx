@@ -194,22 +194,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
       getItemToolbarLabel={(location) => location.name}
       getSearchText={buildLocationSearchText}
       renderItemHeader={(location) => {
-        const hasAvailableKind = organizationForwardLocationHasAvailableKind(
-          location,
-          intent,
-          existingKeys,
-        )
-
-        return (
-          <ContentEntityPickerRow
-            heading={location.name}
-            subheading={hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason}
-            imageKey={location.imageKey}
-            disabled={!hasAvailableKind}
-          />
-        )
-      }}
-      renderItemActions={(location) => {
         const isSelected = selectedLocationId === location.id
         const hasAvailableKind = organizationForwardLocationHasAvailableKind(
           location,
@@ -219,18 +203,26 @@ function OrganizationLocationConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <CatalogPickerSelectionActions
-            phase={phase}
-            canSelect={hasAvailableKind}
-            addLabel={isSelected ? 'Selected' : 'Select'}
-            onAdd={() => {
-              setSelectedLocationId(location.id)
-              setSelectedKind(null)
-            }}
-            onRemove={() => {
-              setSelectedLocationId(null)
-              setSelectedKind(null)
-            }}
+          <ContentEntityPickerRow
+            heading={location.name}
+            subheading={hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason}
+            imageKey={location.imageKey}
+            disabled={!hasAvailableKind}
+            endSlot={
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect={hasAvailableKind}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => {
+                  setSelectedLocationId(location.id)
+                  setSelectedKind(null)
+                }}
+                onRemove={() => {
+                  setSelectedLocationId(null)
+                  setSelectedKind(null)
+                }}
+              />
+            }
           />
         )
       }}

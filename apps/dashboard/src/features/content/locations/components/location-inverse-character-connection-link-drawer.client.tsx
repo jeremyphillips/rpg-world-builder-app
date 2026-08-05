@@ -172,11 +172,13 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       getItemToolbarLabel={(character) => character.name}
       getSearchText={(character) => [character.name, character.summary].join(' ')}
       renderItemHeader={(character) => {
+        const isSelected = selectedCharacterId === character.id
         const hasAvailableKind = characterInverseSubjectHasAvailableKind(
           character.id,
           eligibleKinds,
           existingKeys,
         )
+        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
           <ContentEntityPickerRow
@@ -187,31 +189,21 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
                 : CHARACTER_DRAWER_FULLY_LINKED_REASON
             }
             disabled={!hasAvailableKind}
-          />
-        )
-      }}
-      renderItemActions={(character) => {
-        const isSelected = selectedCharacterId === character.id
-        const hasAvailableKind = characterInverseSubjectHasAvailableKind(
-          character.id,
-          eligibleKinds,
-          existingKeys,
-        )
-        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
-
-        return (
-          <CatalogPickerSelectionActions
-            phase={phase}
-            canSelect={hasAvailableKind}
-            addLabel={isSelected ? 'Selected' : 'Select'}
-            onAdd={() => {
-              setSelectedCharacterId(character.id)
-              setSelectedKind(null)
-            }}
-            onRemove={() => {
-              setSelectedCharacterId(null)
-              setSelectedKind(null)
-            }}
+            endSlot={
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect={hasAvailableKind}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => {
+                  setSelectedCharacterId(character.id)
+                  setSelectedKind(null)
+                }}
+                onRemove={() => {
+                  setSelectedCharacterId(null)
+                  setSelectedKind(null)
+                }}
+              />
+            }
           />
         )
       }}

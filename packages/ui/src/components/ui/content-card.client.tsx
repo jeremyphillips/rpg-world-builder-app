@@ -1,28 +1,14 @@
 'use client'
 
-import type { ReactNode } from 'react'
-
 import { cn } from '../../lib/utils'
-import { resolveContentCardHeadingRowRhythm } from './content-card.lib'
+import { ContentCardBody, type ContentCardBodyProps } from './content-card-body.client'
 import {
-  contentCardHeadingEndSlotVariants,
-  contentCardHeadingRowVariants,
-  contentCardHeadingVariants,
-  contentCardMetadataVariants,
   contentCardRootVariants,
-  contentCardSubheadingVariants,
   type ContentCardDensity,
   type ContentCardSurface,
 } from './content-card.variants'
 
-export type ContentCardProps = {
-  heading: ReactNode
-  subheading?: ReactNode
-  metadata?: ReactNode
-  media?: ReactNode
-  headingEndSlot?: ReactNode
-  endSlot?: ReactNode
-  footer?: ReactNode
+export type ContentCardProps = Omit<ContentCardBodyProps, 'rowAlign' | 'className'> & {
   density?: ContentCardDensity
   surface?: ContentCardSurface
   className?: string
@@ -42,41 +28,21 @@ export function ContentCard({
   className,
 }: ContentCardProps) {
   const hasSecondaryText = Boolean(subheading || metadata)
-  const headingRowRhythm = resolveContentCardHeadingRowRhythm({
-    hasSecondaryText,
-    hasHeadingEndSlot: Boolean(headingEndSlot),
-  })
+  const rowAlign = hasSecondaryText ? 'start' : 'center'
 
   return (
-    <article
-      className={cn(
-        contentCardRootVariants({
-          density,
-          surface,
-          rowAlign: hasSecondaryText ? 'start' : 'center',
-        }),
-        className,
-      )}
-    >
-      {media ? <div className="shrink-0">{media}</div> : null}
-      <div className="min-w-0 flex-1">
-        <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
-          <div className={cn('min-w-0 flex-1', contentCardHeadingVariants({ density }))}>
-            {heading}
-          </div>
-          {headingEndSlot ? (
-            <div className={contentCardHeadingEndSlotVariants()}>{headingEndSlot}</div>
-          ) : null}
-        </div>
-        {subheading ? (
-          <div className={contentCardSubheadingVariants({ density })}>{subheading}</div>
-        ) : null}
-        {metadata ? (
-          <div className={contentCardMetadataVariants({ density })}>{metadata}</div>
-        ) : null}
-        {footer ? <div className="mt-2">{footer}</div> : null}
-      </div>
-      {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+    <article className={cn(contentCardRootVariants({ density, surface }), className)}>
+      <ContentCardBody
+        heading={heading}
+        subheading={subheading}
+        metadata={metadata}
+        media={media}
+        headingEndSlot={headingEndSlot}
+        endSlot={endSlot}
+        footer={footer}
+        density={density}
+        rowAlign={rowAlign}
+      />
     </article>
   )
 }

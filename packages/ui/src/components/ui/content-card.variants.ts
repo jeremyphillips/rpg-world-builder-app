@@ -6,7 +6,7 @@ import {
   controlActionCompactTextClasses,
 } from './control-action.variants'
 
-export const contentCardRootVariants = cva('flex gap-3 rounded-md', {
+export const contentCardRootVariants = cva('rounded-md', {
   variants: {
     density: {
       compact: 'px-4 py-3',
@@ -17,14 +17,21 @@ export const contentCardRootVariants = cva('flex gap-3 rounded-md', {
       card: 'border border-border bg-card',
       ghost: '',
     },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+    surface: 'outline',
+  },
+})
+
+export const contentCardBodyVariants = cva('flex min-w-0 w-full gap-3', {
+  variants: {
     rowAlign: {
       start: 'items-start',
       center: 'items-center',
     },
   },
   defaultVariants: {
-    density: 'comfortable',
-    surface: 'outline',
     rowAlign: 'start',
   },
 })
