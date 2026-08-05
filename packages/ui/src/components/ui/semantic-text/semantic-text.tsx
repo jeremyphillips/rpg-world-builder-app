@@ -6,6 +6,7 @@ import {
   type SemanticTextEmphasis,
   type SemanticTextTone,
 } from './semantic-text.variants'
+import { iconGlyphDirectChildClasses } from '../icon-glyph.variants'
 
 export type { SemanticTextEmphasis, SemanticTextTone } from './semantic-text.variants'
 export { semanticTextVariants } from './semantic-text.variants'
@@ -24,7 +25,10 @@ export function SemanticText({ tone, emphasis, icon, children, className }: Sema
   return (
     <span className={cn(semanticTextVariants({ tone, emphasis }), className)}>
       {icon ? (
-        <span aria-hidden="true" className="shrink-0 leading-none [&>svg]:size-3">
+        <span
+          aria-hidden="true"
+          className={cn('shrink-0 leading-none', iconGlyphDirectChildClasses.sm)}
+        >
           {icon}
         </span>
       ) : null}

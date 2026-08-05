@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import { controlActionCompactIconClasses } from '../control-action.variants'
 import { establishSurfaceCurrent } from '../surface-current.lib'
 import {
   resolveCollapsibleListItemLeadingChrome,
@@ -38,8 +39,10 @@ export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
-export const collapsibleListItemChromeButtonClasses =
-  'flex size-6 shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+export const collapsibleListItemChromeButtonClasses = cn(
+  'flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+  controlActionCompactIconClasses,
+)
 
 /** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
 export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'

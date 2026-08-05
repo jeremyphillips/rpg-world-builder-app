@@ -60,7 +60,7 @@ Control height, padding, and type scale come from `field-sizing.variants.ts` (`s
 | `fieldDigitSizeClasses`            | Digit-width control padding                                                                 |
 | `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                     |
 | `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                       |
-| `fieldDigitTrailingIconClasses`    | Trailing icon sizing                                                                        |
+| `fieldDigitTrailingIconClasses`    | Trailing icon sizing — uses `icon-glyph` SSOT (`xs`/`md`; sm≡xs for digit chrome)           |
 
 ### `size` — control height + type scale
 
@@ -104,6 +104,18 @@ Dashboard: [`getLevelFieldOptions`](../../../../apps/dashboard/src/features/cont
 ```
 
 Do **not** combine `digits` with mixed-length enum labels — use full-width sizing instead.
+
+### Number stepper (field-adjacent chrome)
+
+Stepper side buttons align to **field control height**, not generic compact action hit targets:
+
+| Stepper `size` | Button hit target | Glyph     |
+| -------------- | ----------------- | --------- |
+| `sm`           | `size-8` (32px)   | sm (12px) |
+| `md`           | `size-8` (32px)   | md (14px) |
+
+Width formulas in `numberStepperWidthVariants` account for two 32px button columns.
+See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).
 
 ## Dense settings rows
 

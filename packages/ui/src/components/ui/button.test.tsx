@@ -51,6 +51,7 @@ describe('Button', () => {
     )
     expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass(
       'size-control-action-compact',
+      '[&_svg]:size-icon-glyph-md',
     )
   })
 

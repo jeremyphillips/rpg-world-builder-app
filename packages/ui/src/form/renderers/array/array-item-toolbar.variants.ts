@@ -56,7 +56,7 @@ export const arrayItemCollapseButtonClasses = collapsibleListItemCollapseButtonC
 /** Remove control — destructive hover; always last in the actions rail. */
 export const arrayItemRemoveButtonClasses = cn(
   arrayItemChromeButtonClasses,
-  'text-muted-foreground hover:bg-destructive-subtle hover:text-destructive [&_svg]:size-3.5',
+  'text-muted-foreground hover:bg-destructive-subtle hover:text-destructive',
 )
 
 /** Column wrapper for the title row and optional summary row below it. */

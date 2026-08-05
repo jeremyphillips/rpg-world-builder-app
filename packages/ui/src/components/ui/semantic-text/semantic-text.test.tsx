@@ -59,7 +59,7 @@ describe('SemanticText', () => {
     )
 
     const iconWrapper = container.querySelector('[aria-hidden="true"]')
-    expect(iconWrapper).toHaveClass('leading-none', '[&>svg]:size-3')
+    expect(iconWrapper).toHaveClass('leading-none', '[&>svg]:size-icon-glyph-sm')
     expect(screen.getByTestId('icon')).toBeInTheDocument()
   })
 

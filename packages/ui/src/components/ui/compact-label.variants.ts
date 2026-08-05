@@ -7,6 +7,11 @@ import {
   type CompactLabelSize,
   type CompactLabelTone,
 } from './compact-label.lib'
+import {
+  controlActionCompactIconClasses,
+  controlActionDefaultIconClasses,
+} from './control-action.variants'
+import { compactLabelIconGlyphClasses } from './icon-glyph.variants'
 
 export type CompactLabelVariantProps = {
   size?: CompactLabelSize
@@ -24,9 +29,9 @@ const compactLabelRemovablePaddingClasses: Record<'md' | 'lg', string> = {
 }
 
 const compactLabelIconSizeClasses: Record<CompactLabelSize, string> = {
-  sm: '[&_svg]:size-2.5',
-  md: '[&_svg]:size-3',
-  lg: '[&_svg]:size-3.5',
+  sm: compactLabelIconGlyphClasses('sm'),
+  md: compactLabelIconGlyphClasses('md'),
+  lg: compactLabelIconGlyphClasses('lg'),
 }
 
 /** Internal CVA — not exported from `@rpg/ui`. */
@@ -130,8 +135,8 @@ export const chipRemoveButtonVariants = cva(
   {
     variants: {
       size: {
-        md: 'size-6 [&_svg]:size-3',
-        lg: 'size-8 [&_svg]:size-4',
+        md: controlActionCompactIconClasses,
+        lg: controlActionDefaultIconClasses,
       },
     },
     defaultVariants: {

@@ -160,6 +160,7 @@ describe('ContentCard', () => {
 
     expect(screen.getByRole('link', { name: 'Open Harbor District' })).toHaveClass(
       'size-control-action-compact',
+      '[&_svg]:size-icon-glyph-md',
     )
   })
 

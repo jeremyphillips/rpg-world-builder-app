@@ -2,10 +2,10 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
-  compactActionHeightClasses,
-  compactActionIconGlyphClasses,
-  compactActionSizeClasses,
-} from './compact-action.variants'
+  controlActionCompactIconClasses,
+  controlActionCompactTextWithIconClasses,
+} from './control-action.variants'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import {
   outlineControlExpandedClasses,
   outlineControlShellClasses,
@@ -18,7 +18,10 @@ import {
  */
 export const buttonVariants = cva(
   // `cursor-pointer` is explicit because Tailwind v4 preflight resets buttons to `cursor: default`.
-  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-body-emphasis transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  cn(
+    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-body-emphasis transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+    iconGlyphDescendantClasses.lg,
+  ),
   {
     variants: {
       variant: {
@@ -48,18 +51,18 @@ export const buttonVariants = cva(
       { size: 'default', density: 'default', class: 'h-9' },
       { size: 'sm', density: 'default', class: 'h-8' },
       { size: 'lg', density: 'default', class: 'h-10' },
-      { size: 'icon', density: 'default', class: 'size-9' },
+      { size: 'icon', density: 'default', class: 'size-control-action-default' },
       { size: 'default', density: 'compact', class: 'h-8 px-3 py-1' },
       {
         size: 'sm',
         density: 'compact',
-        class: cn(compactActionHeightClasses, 'px-2 py-0', compactActionIconGlyphClasses),
+        class: cn(controlActionCompactTextWithIconClasses, 'px-2 py-0'),
       },
       { size: 'lg', density: 'compact', class: 'h-9 px-5 py-1.5' },
       {
         size: 'icon',
         density: 'compact',
-        class: cn(compactActionSizeClasses, compactActionIconGlyphClasses),
+        class: controlActionCompactIconClasses,
       },
     ],
     defaultVariants: {

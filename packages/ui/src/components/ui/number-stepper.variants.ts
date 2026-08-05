@@ -1,6 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
 import { fieldControlSizeClasses } from './field-sizing.variants'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export const numberStepperRootVariants = cva('inline-flex items-center', {
   variants: {
@@ -24,8 +26,8 @@ export const numberStepperButtonVariants = cva(
   {
     variants: {
       size: {
-        sm: 'size-7 [&_svg]:size-3',
-        md: 'size-8 [&_svg]:size-3.5',
+        sm: cn('size-8', iconGlyphDescendantClasses.sm),
+        md: cn('size-8', iconGlyphDescendantClasses.md),
       },
     },
     defaultVariants: {
@@ -60,15 +62,15 @@ export const numberStepperInputDigitWidths = {
 
 /**
  * Digit-based stepper widths: N×ch for the value slot plus two side-button columns.
- * Button columns match `numberStepperButtonVariants` (sm: 2×size-7, md: 2×size-8).
+ * Button columns match `numberStepperButtonVariants` (sm/md: 2×size-8 / 32px field chrome).
  */
 export const numberStepperWidthVariants = {
   sm: {
-    1: 'w-[calc(1*1ch+3.5rem)]',
-    2: 'w-[calc(2*1ch+3.5rem)]',
-    3: 'w-[calc(3*1ch+3.5rem)]',
-    4: 'w-[calc(4*1ch+3.5rem)]',
-    5: 'w-[calc(5*1ch+3.5rem)]',
+    1: 'w-[calc(1*1ch+4rem)]',
+    2: 'w-[calc(2*1ch+4rem)]',
+    3: 'w-[calc(3*1ch+4rem)]',
+    4: 'w-[calc(4*1ch+4rem)]',
+    5: 'w-[calc(5*1ch+4rem)]',
   },
   md: {
     1: 'w-[calc(1*1ch+4rem)]',

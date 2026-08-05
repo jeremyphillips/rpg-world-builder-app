@@ -31,7 +31,7 @@ describe('array item shell variants', () => {
   })
 
   it('keeps remove on the shared chrome hit target', () => {
-    expect(arrayItemRemoveButtonClasses).toContain('size-6')
+    expect(arrayItemRemoveButtonClasses).toContain('size-control-action-compact')
   })
 
   it('does not place trailing actions in the leading toolbar row', () => {

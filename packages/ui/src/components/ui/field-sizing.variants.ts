@@ -6,6 +6,7 @@
  * the sm/md/lg height, padding, and type-scale tuples.
  */
 import type { ButtonVariantProps } from './button.variants'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
 
@@ -102,9 +103,9 @@ export const buttonSizeToComboboxFieldSize = {
   icon: 'md',
 } as const satisfies Record<'sm' | 'default' | 'lg' | 'icon', FieldSizeToken>
 
-/** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. */
+/** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */
 export const fieldDigitTrailingIconClasses = {
-  sm: '[&_svg]:size-2.5',
-  md: '[&_svg]:size-2.5',
-  lg: '[&_svg]:size-3.5',
+  sm: iconGlyphDescendantClasses.xs,
+  md: iconGlyphDescendantClasses.xs,
+  lg: iconGlyphDescendantClasses.md,
 } as const satisfies Record<FieldSizeToken, string>

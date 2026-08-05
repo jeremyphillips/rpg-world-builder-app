@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import { establishSurfaceCurrent, portalPopoverSurfaceClasses } from './surface-current.lib'
 
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
@@ -209,3 +210,12 @@ export const dataTableFilterChipVariants = cva(
 
 /** Accessible caption below the table — supplementary source / scope note. */
 export const dataTableCaptionVariants = cva('pb-3 text-sm-meta italic text-muted-foreground')
+
+/** Row action dropdown menu item — compact text + sm glyph. */
+export function dataTableRowActionItemClasses(destructive?: boolean): string {
+  return cn(
+    'text-xs',
+    iconGlyphDescendantClasses.sm,
+    destructive && 'text-destructive focus:text-destructive',
+  )
+}

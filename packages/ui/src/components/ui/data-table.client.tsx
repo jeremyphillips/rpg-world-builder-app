@@ -98,6 +98,7 @@ import {
   dataTableImageVariants,
   dataTableNameCellVariants,
   dataTableRootVariants,
+  dataTableRowActionItemClasses,
   dataTableTableVariants,
   dataTableTableWrapVariants,
   dataTableToolbarVariants,
@@ -499,10 +500,6 @@ export interface RowActionsMenuProps {
   triggerRef?: React.Ref<HTMLButtonElement>
 }
 
-function rowActionItemClassName(destructive?: boolean): string {
-  return cn('text-xs [&_svg]:size-3', destructive && 'text-destructive focus:text-destructive')
-}
-
 function RowActionMenuItemContent({
   icon,
   label,
@@ -560,7 +557,7 @@ export function RowActionsMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className={contentClassName}>
         {items.map((item) => {
-          const itemClassName = rowActionItemClassName(item.destructive)
+          const itemClassName = dataTableRowActionItemClasses(item.destructive)
           const content = (
             <RowActionMenuItemContent
               icon={item.icon}

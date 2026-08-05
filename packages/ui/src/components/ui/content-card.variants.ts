@@ -2,10 +2,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
-  compactActionHeightClasses,
-  compactActionIconGlyphClasses,
-  compactActionSizeClasses,
-} from './compact-action.variants'
+  controlActionCompactIconClasses,
+  controlActionCompactTextClasses,
+} from './control-action.variants'
 
 export const contentCardRootVariants = cva('flex gap-3 rounded-md', {
   variants: {
@@ -85,8 +84,7 @@ export const contentCardMetadataVariants = cva('truncate text-muted-foreground',
 export const contentCardIconActionVariants = cva(
   cn(
     'inline-flex shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-control-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    compactActionSizeClasses,
-    compactActionIconGlyphClasses,
+    controlActionCompactIconClasses,
   ),
 )
 
@@ -94,7 +92,7 @@ export const contentCardIconActionVariants = cva(
 export const contentCardHeadingActionVariants = cva(
   cn(
     'inline-flex shrink-0 items-center rounded-sm pl-2 pr-0 text-sm text-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    compactActionHeightClasses,
+    controlActionCompactTextClasses,
   ),
 )
 
