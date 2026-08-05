@@ -8,13 +8,12 @@ import {
   type TerritorialAuthorityKind,
   type TerritorialAuthorityRelationship,
 } from '@rpg/contracts'
-import { Badge, Button, ContentCardRemoveButton, Heading, InsetPanel, Text } from '@rpg/ui'
+import { Button, InsetPanel, Text } from '@rpg/ui'
 
 import { useOrganizations } from '@/features/content'
 
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
-
 import { TerritorialAuthorityPickerDrawer } from './territorial-authority-picker-drawer.client'
+import { TerritorialAuthorityRelationshipList } from './territorial-authority-relationship-list.client'
 import {
   appendTerritorialAuthorityRelationship,
   buildTerritorialAuthorityRows,
@@ -125,45 +124,12 @@ function TerritorialAuthoritySectionContent({
           <InsetPanel.Text>{TERRITORIAL_AUTHORITY_EMPTY_TEXT}</InsetPanel.Text>
         </InsetPanel>
       ) : (
-        <div className="space-y-6">
-          {[...groupedRows.entries()].map(([kind, kindRelationships]) => {
-            const kindLabel = rowsById.get(kindRelationships[0]?.id ?? '')?.kindLabel ?? kind
-            return (
-              <div key={kind} className="space-y-2">
-                <Heading variant="label" as="h4">
-                  {kindLabel}
-                </Heading>
-                <div className="space-y-2" aria-label={kindLabel}>
-                  {kindRelationships.map((relationship) => {
-                    const row = rowsById.get(relationship.id)
-                    if (!row) return null
-
-                    return (
-                      <ContentEntityCard
-                        key={relationship.id}
-                        density="compact"
-                        surface="card"
-                        heading={row.organizationLabel}
-                        subheading={row.organizationSummary}
-                        endSlot={
-                          <div className="flex items-center gap-2">
-                            {row.organizationUnresolved ? (
-                              <Badge tone="warning">Unavailable</Badge>
-                            ) : null}
-                            <ContentCardRemoveButton
-                              label={`${row.kindLabel}: ${row.organizationLabel}`}
-                              onRemove={() => handleRemoveRelationship(relationship.id)}
-                            />
-                          </div>
-                        }
-                      />
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <TerritorialAuthorityRelationshipList
+          groupedRows={groupedRows}
+          rowsById={rowsById}
+          variant="edit"
+          onRemoveRelationship={handleRemoveRelationship}
+        />
       )}
 
       {canAddRelationships ? (

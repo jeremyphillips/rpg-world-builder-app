@@ -3,11 +3,10 @@
 import * as React from 'react'
 
 import type { Location, Organization } from '@rpg/contracts'
-import { Badge, Heading, Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import { useOrganizations } from '@/features/content'
 
-import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 import { resolveLocationAuthoringType } from '../lib/location-authoring-type'
 import {
   buildTerritorialAuthorityRows,
@@ -16,6 +15,7 @@ import {
   TERRITORIAL_AUTHORITY_EMPTY_TEXT,
   TERRITORIAL_AUTHORITY_SECTION_LABEL,
 } from '../lib/territorial-authority.lib'
+import { TerritorialAuthorityRelationshipList } from './territorial-authority-relationship-list.client'
 
 export function TerritorialAuthorityDetailSection({
   location,
@@ -76,45 +76,11 @@ export function TerritorialAuthorityDetailSection({
       {relationships.length === 0 ? (
         <Text variant="muted">{TERRITORIAL_AUTHORITY_EMPTY_TEXT}</Text>
       ) : (
-        <div className="space-y-6">
-          {[...groupedRows.entries()].map(([kind, kindRelationships]) => {
-            const kindLabel = rowsById.get(kindRelationships[0]?.id ?? '')?.kindLabel ?? kind
-            return (
-              <div key={kind} className="space-y-2">
-                <Heading variant="label" as="h3">
-                  {kindLabel}
-                </Heading>
-                <ul className="space-y-2">
-                  {kindRelationships.map((relationship) => {
-                    const row = rowsById.get(relationship.id)
-                    if (!row) return null
-
-                    return (
-                      <li key={relationship.id}>
-                        <ContentEntityCard
-                          heading={row.organizationLabel}
-                          href={row.organizationHref}
-                          subheading={row.organizationSummary}
-                          surface="outline"
-                          headingEndSlot={
-                            row.organizationHref ? (
-                              <ContentEntityCardViewLink href={row.organizationHref} />
-                            ) : undefined
-                          }
-                          endSlot={
-                            row.organizationUnresolved ? (
-                              <Badge tone="warning">Unavailable</Badge>
-                            ) : undefined
-                          }
-                        />
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
+        <TerritorialAuthorityRelationshipList
+          groupedRows={groupedRows}
+          rowsById={rowsById}
+          variant="detail"
+        />
       )}
     </section>
   )

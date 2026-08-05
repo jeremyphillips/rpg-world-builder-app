@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import request from 'supertest'
 
+import { CSRF_HEADER } from '../../../lib/cookies'
+import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
 import { resolveOrganizationConnectedRegions } from './resolve-organization-connected-regions'
 import { locationWriteConfig } from '../locations/locations.config'
+
+const getApp = useIntegrationApp()
 
 useIntegrationDb()
 
@@ -14,6 +20,9 @@ const minimalOrganizationInput = {
   name: 'Coastal League',
   organizationKind: 'commercial',
 } as const
+
+const connectedRegionsPath = (campaignId: string, organizationId: string) =>
+  `/api/campaigns/${campaignId}/content/organizations/${organizationId}/connected-regions?page=1&pageSize=4`
 
 describe('resolveOrganizationConnectedRegions', () => {
   it('returns family-labeled territorial and party rows separately', async () => {
@@ -72,5 +81,85 @@ describe('resolveOrganizationConnectedRegions', () => {
         }),
       ]),
     )
+  })
+})
+
+describe('organization connected regions routes', () => {
+  it('requires authentication', async () => {
+    await request(getApp())
+      .get(
+        '/api/campaigns/000000000000000000000000/content/organizations/000000000000000000000001/connected-regions',
+      )
+      .expect(401)
+  })
+
+  it('returns connected regions for authenticated campaign users', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createOrgRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/organizations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(minimalOrganizationInput)
+      .expect(201)
+
+    const organizationId = createOrgRes.body.organizations.id as string
+
+    const createWorldRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'route-world',
+        kind: 'world',
+        name: 'Route World',
+      })
+      .expect(201)
+
+    const worldId = createWorldRes.body.locations.id as string
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'route-region',
+        kind: 'region',
+        name: 'Route Region',
+        parentLocationId: worldId,
+        territorialAuthority: [
+          {
+            id: 'ta-governs',
+            organizationId,
+            kind: 'governs',
+          },
+        ],
+      })
+      .expect(201)
+
+    const res = await agent
+      .get(connectedRegionsPath(campaignId, organizationId))
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body).toEqual({
+      items: [
+        expect.objectContaining({
+          relationshipFamily: 'territorialAuthority',
+          relationshipKind: 'governs',
+          relationshipLabel: 'Governs',
+          region: expect.objectContaining({ name: 'Route Region' }),
+        }),
+      ],
+      total: 1,
+    })
+  })
+
+  it('returns 404 for a missing organization in the campaign', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    await agent
+      .get(connectedRegionsPath(campaignId, '000000000000000000000000'))
+      .set(CSRF_HEADER, csrfToken)
+      .expect(404)
   })
 })

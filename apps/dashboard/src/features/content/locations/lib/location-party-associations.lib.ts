@@ -18,13 +18,14 @@ import {
 
 import { ROUTES } from '@/app/routes'
 import { buildCharacterCardViewModel } from '@/features/character'
+import { LOCATION_PARTY_ASSOCIATION_FAMILY_LABEL } from '../../lib/location-relationship-family-labels'
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { getAvailableLocationPartyAssociationKinds } from './location-party-authoring-policy'
 
 export const LOCATION_PARTY_ASSOCIATIONS_FIELD = 'partyAssociations'
 
-export const LOCATION_PARTY_SECTION_LABEL = 'People & organizations'
+export const LOCATION_PARTY_SECTION_LABEL = LOCATION_PARTY_ASSOCIATION_FAMILY_LABEL
 
 export const LOCATION_PARTY_SECTION_DESCRIPTION =
   'Add people and organizations involved with this place, such as owners, tenants, or operators.'

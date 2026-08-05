@@ -67,6 +67,54 @@ describe('territorial authority lifecycle', () => {
     expect(updated.territorialAuthority).toHaveLength(2)
   })
 
+  it('round-trips territorial authority on draft region create and PATCH', async () => {
+    const campaign = await makeTestCampaign()
+    const world = await seedWorld(campaign.id)
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaign.id,
+      minimalOrganizationInput,
+    )
+
+    const created = await createHomebrewContent(
+      locationWriteConfig,
+      campaign.id,
+      {
+        slug: 'draft-grey-coast',
+        kind: 'region',
+        name: 'Draft Grey Coast',
+        parentLocationId: world.id,
+        territorialAuthority: [
+          {
+            id: 'ta-governs',
+            organizationId: organization.id,
+            kind: 'governs',
+          },
+        ],
+      },
+      { status: 'draft' },
+    )
+
+    expect(created.kind).toBe('region')
+    if (created.kind !== 'region') throw new Error('expected region')
+    expect(created.territorialAuthority).toHaveLength(1)
+
+    const updated = await updateContentEntity(locationWriteConfig, campaign.id, created.id, {
+      kind: 'region',
+      territorialAuthority: [
+        ...created.territorialAuthority,
+        {
+          id: 'ta-claims',
+          organizationId: organization.id,
+          kind: 'claims',
+        },
+      ],
+    })
+
+    if (updated.kind !== 'region') throw new Error('expected region')
+    expect(updated.territorialAuthority).toHaveLength(2)
+  })
+
   it('rejects unknown organization references and non-region territorial authority', async () => {
     const campaign = await makeTestCampaign()
     const world = await seedWorld(campaign.id)

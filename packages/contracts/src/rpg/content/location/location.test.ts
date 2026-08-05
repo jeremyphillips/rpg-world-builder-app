@@ -145,4 +145,56 @@ describe('location authoring inputs', () => {
       partyAssociations: [],
     })
   })
+
+  it('round-trips territorial authority on region draft create and update inputs', () => {
+    const territorialAuthority = [
+      {
+        id: 'ta-governs',
+        organizationId: 'org-northern-watch',
+        kind: 'governs' as const,
+      },
+    ]
+
+    expect(
+      createLocationDraftInputSchema.parse({
+        slug: 'grey-coast',
+        kind: 'region',
+        name: 'Grey Coast',
+        parentLocationId: 'world-northern-realm',
+        territorialAuthority,
+      }),
+    ).toMatchObject({
+      kind: 'region',
+      territorialAuthority,
+    })
+
+    expect(
+      updateLocationDraftInputSchema.parse({
+        kind: 'region',
+        territorialAuthority,
+      }),
+    ).toEqual({
+      kind: 'region',
+      partyAssociations: [],
+      territorialAuthority,
+    })
+
+    expect(
+      locationDraftStoredSchema.parse({
+        id: 'location-1',
+        slug: 'grey-coast',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'homebrew',
+        campaignId: 'campaign-1',
+        status: 'draft',
+        kind: 'region',
+        name: 'Grey Coast',
+        ...timestamps,
+        territorialAuthority,
+      }),
+    ).toMatchObject({
+      kind: 'region',
+      territorialAuthority,
+    })
+  })
 })
