@@ -60,7 +60,7 @@ export function LocationConnectedPartiesSectionHeader({
 }: LocationConnectedPartiesSectionHeaderProps) {
   const showOrganizationAdds =
     canManage &&
-    (sectionGroup === 'territorial_authority' || sectionGroup === 'people_and_organizations') &&
+    sectionGroup === 'people_and_organizations' &&
     organizationAddAffordances.length > 0 &&
     onAddOrganization
   const showAddCharacter =

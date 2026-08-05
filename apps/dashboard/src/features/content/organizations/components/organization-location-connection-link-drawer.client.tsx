@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import type { Location, OrganizationLocationConnectionKind } from '@rpg/contracts'
 import { getLocationKindLabel } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
 
 import {
   ORGANIZATION_DRAWER_EDIT_TITLES,
@@ -26,7 +27,6 @@ import {
   resolveOrganizationKindsForDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import {
-  buildOrganizationLocationConnectionDisabledKinds,
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -111,14 +111,13 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const kindOptions = React.useMemo(() => {
     if (!selectedLocation) return []
     const familyKinds = resolveOrganizationKindsForDrawerIntent(selectedLocation, intent)
-    const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
+    return buildOrganizationLocationConnectionKindOptions({
       locationId: selectedLocation.id,
       kinds: familyKinds,
       subjectOrganizationId: organizationId,
       connections: existingConnections,
       excludeConnectionId,
     })
-    return buildOrganizationLocationConnectionKindOptions(familyKinds, disabledKinds)
   }, [excludeConnectionId, existingConnections, intent, organizationId, selectedLocation])
 
   const activeKind = resolveActiveConnectionKind(
@@ -153,14 +152,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
       headerBelowDescription={
         selectedLocation ? (
           <div className="space-y-4">
-            <div className="space-y-1">
-              <Heading variant="label" as="p">
-                Location
-              </Heading>
-              <Text>
-                {selectedLocation.name} · {getLocationKindLabel(selectedLocation.kind)}
-              </Text>
-            </div>
+            <RelationshipDrawerContextHeader
+              context={`${selectedLocation.name} · ${getLocationKindLabel(selectedLocation.kind)}`}
+            />
             <LocationConnectionKindStep
               id="organization-location-connection-kind"
               label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
@@ -201,8 +195,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
           undefined,
           excludeConnectionId,
         )
-        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
-
         return (
           <ContentEntityCard
             chrome="embedded"
@@ -213,7 +205,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
             disabled={!hasAvailableKind}
             endSlot={
               <CatalogPickerSelectionActions
-                phase={phase}
+                phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
                 canSelect={hasAvailableKind}
                 addLabel={isSelected ? 'Selected' : 'Select'}
                 onAdd={() => {

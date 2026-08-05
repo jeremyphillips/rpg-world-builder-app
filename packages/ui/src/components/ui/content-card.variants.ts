@@ -19,7 +19,7 @@ export const contentCardDensityInsetVariants = cva('', {
   },
 })
 
-export const contentCardRootVariants = cva('rounded-md', {
+export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
   variants: {
     density: {
       compact: 'px-4 py-3',

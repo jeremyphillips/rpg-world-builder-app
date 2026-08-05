@@ -8,7 +8,7 @@ import {
   crossContentRelationshipRowContentVariants,
   crossContentRelationshipRowEyebrowVariants,
   crossContentRelationshipRowHeadingVariants,
-  crossContentRelationshipRowSubheadingVariants,
+  crossContentRelationshipRowSecondaryTextVariants,
   crossContentRelationshipRowVariants,
 } from './cross-content-relationship-row.variants'
 import {
@@ -20,7 +20,9 @@ export type CrossContentRelationshipRowProps = {
   relationshipEyebrow?: ReactNode
   heading: ReactNode
   href?: string
+  /** @deprecated Use secondaryText — feature-supplied disambiguation only. */
   subheading?: ReactNode
+  secondaryText?: ReactNode
   metadata?: ReactNode
   actions?: readonly RelationshipOverflowAction[]
   overflowTriggerLabel?: string
@@ -32,11 +34,13 @@ export function CrossContentRelationshipRow({
   heading,
   href,
   subheading,
+  secondaryText,
   metadata,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
   className,
 }: CrossContentRelationshipRowProps) {
+  const resolvedSecondaryText = secondaryText ?? subheading
   const resolvedHeading = href ? (
     <Link to={href} className={contentCardHeadingLinkVariants()}>
       {heading}
@@ -52,11 +56,13 @@ export function CrossContentRelationshipRow({
           <p className={crossContentRelationshipRowEyebrowVariants()}>{relationshipEyebrow}</p>
         ) : null}
         <p className={crossContentRelationshipRowHeadingVariants()}>{resolvedHeading}</p>
-        {subheading ? (
-          <p className={crossContentRelationshipRowSubheadingVariants()}>{subheading}</p>
+        {resolvedSecondaryText ? (
+          <p className={crossContentRelationshipRowSecondaryTextVariants()}>
+            {resolvedSecondaryText}
+          </p>
         ) : null}
         {metadata ? (
-          <div className={crossContentRelationshipRowSubheadingVariants()}>{metadata}</div>
+          <div className={crossContentRelationshipRowSecondaryTextVariants()}>{metadata}</div>
         ) : null}
       </div>
       {actions.length > 0 ? (

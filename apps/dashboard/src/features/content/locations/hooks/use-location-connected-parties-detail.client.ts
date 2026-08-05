@@ -50,9 +50,22 @@ export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =
   'Could not update connected parties for this location.'
 
 type OrganizationDrawerState =
-  | { mode: 'add'; intent: OrganizationConnectionDrawerIntent }
   | {
-      mode: 'edit'
+      mode: 'add'
+      intent: OrganizationConnectionDrawerIntent
+      kind?: OrganizationLocationConnectionKind
+    }
+  | {
+      mode: 'changeKind'
+      intent: OrganizationConnectionDrawerIntent
+      connection: {
+        relationshipId: string
+        organizationId: string
+        kind: OrganizationLocationConnectionKind
+      }
+    }
+  | {
+      mode: 'replaceOrganization'
       intent: OrganizationConnectionDrawerIntent
       connection: {
         relationshipId: string
@@ -79,29 +92,29 @@ async function upsertOrganizationInverseConnection(input: {
   organizationId: string
   kind: OrganizationLocationConnectionKind
 }) {
-  if (input.drawerState.mode === 'edit') {
-    const { relationshipId, organizationId: previousOrganizationId } = input.drawerState.connection
+  if (input.drawerState.mode === 'changeKind') {
+    await updateOrganizationLocationConnection(
+      input.campaignId,
+      input.drawerState.connection.organizationId,
+      input.drawerState.connection.relationshipId,
+      { kind: input.kind },
+    )
+    return { organizationIds: [input.drawerState.connection.organizationId] }
+  }
 
-    if (previousOrganizationId === input.organizationId) {
-      await updateOrganizationLocationConnection(
-        input.campaignId,
-        input.organizationId,
-        relationshipId,
-        { kind: input.kind },
-      )
-      return { organizationIds: [input.organizationId] }
-    }
-
+  if (input.drawerState.mode === 'replaceOrganization') {
     await deleteOrganizationLocationConnection(
       input.campaignId,
-      previousOrganizationId,
-      relationshipId,
+      input.drawerState.connection.organizationId,
+      input.drawerState.connection.relationshipId,
     )
     await createOrganizationLocationConnection(input.campaignId, input.organizationId, {
       locationId: input.locationId,
       kind: input.kind,
     })
-    return { organizationIds: [input.organizationId, previousOrganizationId] }
+    return {
+      organizationIds: [input.organizationId, input.drawerState.connection.organizationId],
+    }
   }
 
   await createOrganizationLocationConnection(input.campaignId, input.organizationId, {
@@ -302,10 +315,46 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [],
   )
 
+  const openTerritorialAddDrawer = React.useCallback((kind: OrganizationLocationConnectionKind) => {
+    setOrganizationDrawerState({ mode: 'add', intent: 'territorial_authority', kind })
+  }, [])
+
+  const handleChangeTerritorialKind = React.useCallback(
+    (target: LocationConnectedPartyEditTarget) => {
+      if (target.subjectType !== 'organization') return
+      setOrganizationDrawerState({
+        mode: 'changeKind',
+        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
+        connection: {
+          relationshipId: target.relationshipId,
+          organizationId: target.subjectId,
+          kind: target.kind as OrganizationLocationConnectionKind,
+        },
+      })
+    },
+    [],
+  )
+
+  const handleReplaceTerritorialOrganization = React.useCallback(
+    (target: LocationConnectedPartyEditTarget) => {
+      if (target.subjectType !== 'organization') return
+      setOrganizationDrawerState({
+        mode: 'replaceOrganization',
+        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
+        connection: {
+          relationshipId: target.relationshipId,
+          organizationId: target.subjectId,
+          kind: target.kind as OrganizationLocationConnectionKind,
+        },
+      })
+    },
+    [],
+  )
+
   const handleEditConnection = React.useCallback((target: LocationConnectedPartyEditTarget) => {
     if (target.subjectType === 'organization') {
       setOrganizationDrawerState({
-        mode: 'edit',
+        mode: 'changeKind',
         intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
         connection: {
           relationshipId: target.relationshipId,
@@ -349,10 +398,13 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     characterDrawerState,
     setCharacterDrawerState,
     openOrganizationAddDrawer,
+    openTerritorialAddDrawer,
     handleRemoveConnection,
     handleOrganizationSubmit,
     handleCharacterSubmit,
     handleEditConnection,
+    handleChangeTerritorialKind,
+    handleReplaceTerritorialOrganization,
     canEditRow,
     showTerritorialSection: shouldShowLocationConnectedPartiesSection({
       section: 'territorialAuthority',

@@ -6,18 +6,11 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
 
 describe('CrossContentRelationshipRow', () => {
-  it('renders populated relationship content without empty-state affordances', () => {
-    render(
-      <CrossContentRelationshipRow
-        relationshipEyebrow="Governs"
-        heading="The Monarchy"
-        subheading="Government"
-      />,
-    )
+  it('renders optional secondaryText when supplied', () => {
+    render(<CrossContentRelationshipRow heading="Grey Watch" secondaryText="Military" />)
 
-    expect(screen.getByText('Governs')).toBeInTheDocument()
-    expect(screen.getByText('The Monarchy')).toBeInTheDocument()
-    expect(screen.getByText('Government')).toBeInTheDocument()
+    expect(screen.getByText('Grey Watch')).toBeInTheDocument()
+    expect(screen.getByText('Military')).toBeInTheDocument()
   })
 
   it('renders overflow actions from feature-supplied items', async () => {
@@ -43,7 +36,7 @@ describe('CrossContentRelationshipRow', () => {
     const { container } = render(
       <CrossContentRelationshipRow
         heading="The Monarchy"
-        subheading="Government"
+        secondaryText="Government"
         actions={[{ id: 'view', label: 'View organization', onSelect: () => undefined }]}
         overflowTriggerLabel="Relationship actions"
       />,

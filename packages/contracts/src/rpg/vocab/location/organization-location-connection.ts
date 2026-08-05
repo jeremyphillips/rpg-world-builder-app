@@ -74,8 +74,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   governs: {
     label: 'Governs',
-    description:
-      'Exercises political or administrative authority over this region. Distinct from property or title interest (site owner).',
+    description: 'Recognized political or administrative authority over this location.',
     family: 'territorial_authority',
     priority: 50,
     maxSubjectsPerLocation: 1,
@@ -83,14 +82,15 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   controls: {
     label: 'Controls',
     description:
-      'Exercises territorial authority over this region. Distinct from operational presence at a location (site operator).',
+      'Effective or de facto control, including when control differs from the recognized government.',
     family: 'territorial_authority',
     priority: 40,
     maxSubjectsPerLocation: 1,
   },
   claims: {
     label: 'Claims',
-    description: 'Asserted but contested or incomplete territorial authority over this region.',
+    description:
+      'Asserts a territorial claim without necessarily governing or controlling this location.',
     family: 'territorial_authority',
     priority: 30,
     maxSubjectsPerLocation: null,

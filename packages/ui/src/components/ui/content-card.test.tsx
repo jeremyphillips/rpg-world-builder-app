@@ -69,6 +69,12 @@ describe('ContentCard', () => {
     )
   })
 
+  it('applies full-width root sizing so embedded cards fill flex hosts', () => {
+    const { container } = render(<ContentCard chrome="embedded" heading="Harbor District" />)
+
+    expect(container.querySelector('article')).toHaveClass('w-full', 'min-w-0')
+  })
+
   it('applies the same density inset for standalone and embedded chrome', () => {
     const density = 'compact' as const
     const inset = resolveContentCardDensityInsetClasses(density)

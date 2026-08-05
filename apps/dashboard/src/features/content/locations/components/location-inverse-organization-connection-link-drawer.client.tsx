@@ -19,6 +19,7 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
 
 import {
   ORGANIZATION_DRAWER_EDIT_TITLES,
@@ -27,7 +28,6 @@ import {
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
   type OrganizationConnectionDrawerIntent,
   organizationInverseSubjectHasAvailableKind,
-  resolveLocationInverseOrganizationAddTitle,
   resolveOrganizationKindsForDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import {
@@ -35,19 +35,31 @@ import {
   buildOrganizationLocationConnectionEdgesAtLocation,
 } from '../../lib/location-connection-duplicate-keys'
 import {
-  buildOrganizationLocationConnectionDisabledKinds,
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
+import {
+  isTerritorialAuthorityKind,
+  resolveLocationInverseOrganizationAddDrawerInstruction,
+  resolveLocationInverseOrganizationAddDrawerTitle,
+  resolveLocationInverseOrganizationAddSubmitLabel,
+  TERRITORIAL_AUTHORITY_DRAWER,
+  resolveTerritorialAuthorityChangeKindCurrent,
+  resolveTerritorialAuthorityLocationContext,
+  resolveTerritorialAuthorityReplaceContext,
+} from '../lib/location-connection-surface-copy'
 
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
 
+export type LocationInverseOrganizationDrawerMode = 'add' | 'changeKind' | 'replaceOrganization'
+
 export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  mode: 'add' | 'edit'
+  mode: LocationInverseOrganizationDrawerMode
   intent: OrganizationConnectionDrawerIntent
+  addKind?: OrganizationLocationConnectionKind
   location: Location
   organizations: readonly Organization[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -67,10 +79,18 @@ export function LocationInverseOrganizationConnectionLinkDrawer(
   props: LocationInverseOrganizationConnectionLinkDrawerProps,
 ) {
   const remountKey = props.open
-    ? `${props.mode}:${props.intent}:${props.initialConnection?.relationshipId ?? 'add'}`
+    ? `${props.mode}:${props.intent}:${props.addKind ?? 'none'}:${props.initialConnection?.relationshipId ?? 'add'}`
     : 'closed'
 
   return <LocationInverseOrganizationConnectionLinkDrawerContent key={remountKey} {...props} />
+}
+
+function hasResolvedAddKind(
+  mode: LocationInverseOrganizationDrawerMode,
+  intent: OrganizationConnectionDrawerIntent,
+  addKind?: OrganizationLocationConnectionKind,
+): addKind is OrganizationLocationConnectionKind {
+  return mode === 'add' && intent === 'territorial_authority' && addKind != null
 }
 
 // fallow-ignore-next-line complexity
@@ -79,6 +99,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   onOpenChange,
   mode,
   intent,
+  addKind,
   location,
   organizations,
   connectedPartyRows,
@@ -86,11 +107,15 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   isSubmitting = false,
   onSubmit,
 }: LocationInverseOrganizationConnectionLinkDrawerProps) {
+  const resolvedAddKind = hasResolvedAddKind(mode, intent, addKind) ? addKind : undefined
+
   const [selectedOrganizationId, setSelectedOrganizationId] = React.useState<string | null>(
-    initialConnection?.organizationId ?? null,
+    mode === 'replaceOrganization' || mode === 'changeKind'
+      ? (initialConnection?.organizationId ?? null)
+      : null,
   )
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
-    initialConnection?.kind ?? null,
+    resolvedAddKind ?? (mode === 'replaceOrganization' ? (initialConnection?.kind ?? null) : null),
   )
 
   const orgRows = React.useMemo(
@@ -98,62 +123,188 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     [connectedPartyRows],
   )
 
-  const excludeRelationshipId = mode === 'edit' ? initialConnection?.relationshipId : undefined
+  const excludeRelationshipId =
+    mode === 'changeKind' || mode === 'replaceOrganization'
+      ? initialConnection?.relationshipId
+      : undefined
 
   const eligibleKinds = React.useMemo(
     () => resolveOrganizationKindsForDrawerIntent(location, intent),
     [intent, location],
   )
 
+  const edgesAtLocation = React.useMemo(
+    () =>
+      buildOrganizationLocationConnectionEdgesAtLocation(
+        orgRows.filter((row): row is typeof row & { relationshipId: string } =>
+          Boolean(row.relationshipId),
+        ),
+        location.id,
+      ),
+    [location.id, orgRows],
+  )
+
   const kindOptions = React.useMemo(() => {
-    if (!selectedOrganizationId) return []
+    if (mode === 'replaceOrganization' || resolvedAddKind) {
+      return []
+    }
+
+    const subjectOrganizationId =
+      selectedOrganizationId ??
+      (mode === 'changeKind' ? initialConnection?.organizationId : undefined)
+
+    if (!subjectOrganizationId) {
+      return []
+    }
+
     const connections = buildOrganizationInverseLocationConnections(
       orgRows,
       location.id,
-      selectedOrganizationId,
+      subjectOrganizationId,
       excludeRelationshipId,
     )
-    const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
-      orgRows.filter((row): row is typeof row & { relationshipId: string } =>
-        Boolean(row.relationshipId),
-      ),
-      location.id,
-    )
-    const disabledKinds = buildOrganizationLocationConnectionDisabledKinds({
+
+    return buildOrganizationLocationConnectionKindOptions({
       locationId: location.id,
       kinds: eligibleKinds,
-      subjectOrganizationId: selectedOrganizationId,
+      subjectOrganizationId,
       connections,
       edgesAtLocation,
+      excludeConnectionId: excludeRelationshipId,
     })
-    return buildOrganizationLocationConnectionKindOptions(eligibleKinds, disabledKinds)
-  }, [eligibleKinds, excludeRelationshipId, location.id, orgRows, selectedOrganizationId])
+  }, [
+    edgesAtLocation,
+    eligibleKinds,
+    excludeRelationshipId,
+    initialConnection?.organizationId,
+    location.id,
+    mode,
+    orgRows,
+    resolvedAddKind,
+    selectedOrganizationId,
+  ])
 
-  const activeKind = resolveActiveConnectionKind(
-    selectedKind,
-    kindOptions,
-  ) as OrganizationLocationConnectionKind | null
+  const activeKind = (() => {
+    if (resolvedAddKind) return resolvedAddKind
+    if (mode === 'replaceOrganization' && initialConnection) return initialConnection.kind
 
-  const canSubmit = Boolean(selectedOrganizationId && activeKind && !isSubmitting)
+    return resolveActiveConnectionKind(
+      selectedKind,
+      kindOptions,
+    ) as OrganizationLocationConnectionKind | null
+  })()
+
+  const showKindStep =
+    mode === 'changeKind' || (mode === 'add' && !resolvedAddKind && selectedOrganizationId)
+
+  const lockedOrganization =
+    mode === 'changeKind' || mode === 'replaceOrganization'
+      ? organizations.find((organization) => organization.id === initialConnection?.organizationId)
+      : undefined
+
+  const canSubmit = Boolean(
+    (mode === 'changeKind'
+      ? activeKind && initialConnection?.organizationId
+      : selectedOrganizationId && activeKind) && !isSubmitting,
+  )
 
   const handleSubmit = async () => {
-    if (!selectedOrganizationId || !activeKind) return
-    await onSubmit({ organizationId: selectedOrganizationId, kind: activeKind })
+    const organizationId =
+      mode === 'changeKind' ? initialConnection?.organizationId : selectedOrganizationId
+    if (!organizationId || !activeKind) return
+    await onSubmit({ organizationId, kind: activeKind })
   }
 
-  const title =
-    mode === 'add'
-      ? resolveLocationInverseOrganizationAddTitle(intent, location)
+  const title = (() => {
+    if (mode === 'changeKind' && intent === 'territorial_authority') {
+      return TERRITORIAL_AUTHORITY_DRAWER.changeKindTitle
+    }
+    if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
+      return TERRITORIAL_AUTHORITY_DRAWER.replaceTitle
+    }
+    if (resolvedAddKind && isTerritorialAuthorityKind(resolvedAddKind)) {
+      return resolveLocationInverseOrganizationAddDrawerTitle(resolvedAddKind)
+    }
+    return mode === 'add'
+      ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
       : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
+  })()
 
-  const submitAddLabel =
-    mode === 'add'
-      ? intent === 'territorial_authority' && location.kind === 'settlement'
-        ? 'Add governing organization'
-        : ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
-      : 'Save connection'
+  const submitLabel = (() => {
+    if (mode === 'changeKind' && intent === 'territorial_authority') {
+      return TERRITORIAL_AUTHORITY_DRAWER.changeKindSubmit
+    }
+    if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
+      return TERRITORIAL_AUTHORITY_DRAWER.replaceSubmit
+    }
+    if (resolvedAddKind && isTerritorialAuthorityKind(resolvedAddKind)) {
+      return resolveLocationInverseOrganizationAddSubmitLabel(resolvedAddKind)
+    }
+    return mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'
+  })()
+
+  const instructionCopy = resolvedAddKind
+    ? resolveLocationInverseOrganizationAddDrawerInstruction(resolvedAddKind)
+    : null
+
+  const contextHeader = (() => {
+    if (intent !== 'territorial_authority') {
+      return null
+    }
+
+    if (mode === 'replaceOrganization' && initialConnection) {
+      return (
+        <RelationshipDrawerContextHeader
+          context={resolveTerritorialAuthorityReplaceContext(location, initialConnection.kind)}
+        />
+      )
+    }
+
+    if (mode === 'changeKind' && initialConnection && lockedOrganization) {
+      return (
+        <RelationshipDrawerContextHeader
+          context={resolveTerritorialAuthorityLocationContext(location)}
+          current={resolveTerritorialAuthorityChangeKindCurrent({
+            organizationName: lockedOrganization.name,
+            kind: initialConnection.kind,
+          })}
+        />
+      )
+    }
+
+    if (mode === 'add') {
+      return (
+        <RelationshipDrawerContextHeader
+          context={resolveTerritorialAuthorityLocationContext(location)}
+        />
+      )
+    }
+
+    return null
+  })()
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
+  const kindFieldLabel =
+    intent === 'territorial_authority'
+      ? 'Authority type'
+      : ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
+
+  const sortedOrganizations = React.useMemo(() => {
+    if (mode !== 'replaceOrganization' || !initialConnection) {
+      return organizations
+    }
+
+    const current = organizations.find(
+      (organization) => organization.id === initialConnection.organizationId,
+    )
+    const alternatives = organizations.filter(
+      (organization) => organization.id !== initialConnection.organizationId,
+    )
+
+    return current ? [current, ...alternatives] : organizations
+  }, [initialConnection, mode, organizations])
+
+  const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
   return (
     <CatalogPickerSheet
@@ -162,46 +313,94 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       title={title}
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
-      searchPlaceholder="Search organizations"
-      noResultsMessage="No matches for this search."
+      searchPlaceholder={
+        intent === 'territorial_authority'
+          ? TERRITORIAL_AUTHORITY_DRAWER.organizationSearchPlaceholder
+          : 'Search organizations'
+      }
+      noResultsMessage={
+        intent === 'territorial_authority'
+          ? TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults
+          : 'No matches for this search.'
+      }
       noItemsMessage="No organizations are available."
       headerBelowDescription={
-        selectedOrganizationId ? (
-          <LocationConnectionKindStep
-            id="location-inverse-organization-connection-kind"
-            label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-            options={kindOptions}
-            value={activeKind}
-            onValueChange={(value) => setSelectedKind(value as OrganizationLocationConnectionKind)}
-          />
-        ) : null
+        <div className="space-y-4">
+          {contextHeader}
+          {instructionCopy ? (
+            <Text variant="muted" className="text-sm">
+              {instructionCopy}
+            </Text>
+          ) : null}
+          {showKindStep ? (
+            <LocationConnectionKindStep
+              id="location-inverse-organization-connection-kind"
+              label={kindFieldLabel}
+              options={kindOptions}
+              value={activeKind}
+              onValueChange={(value) =>
+                setSelectedKind(value as OrganizationLocationConnectionKind)
+              }
+            />
+          ) : null}
+          {mode === 'replaceOrganization' ? (
+            <Text variant="muted" className="text-sm">
+              {TERRITORIAL_AUTHORITY_DRAWER.replaceHelper}
+            </Text>
+          ) : null}
+        </div>
       }
       emptyState={
-        !selectedOrganizationId ? (
+        mode === 'add' && !resolvedAddKind && !selectedOrganizationId ? (
           <Text variant="muted" className="text-sm" role="status">
             {LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE}
           </Text>
         ) : undefined
       }
       footer={
-        selectedOrganizationId ? (
+        (mode === 'changeKind' || selectedOrganizationId) && activeKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-            {mode === 'add' ? submitAddLabel : 'Save connection'}
+            {submitLabel}
           </Button>
         ) : undefined
       }
-      items={organizations}
+      items={mode === 'changeKind' ? [] : sortedOrganizations}
       getItemKey={(organization) => organization.id}
       getItemToolbarLabel={(organization) => organization.name}
       getSearchText={(organization) =>
         [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
       }
       renderItemHeader={(organization) => {
+        const isCurrentPinned =
+          mode === 'replaceOrganization' && organization.id === initialConnection?.organizationId
+
+        if (isCurrentPinned && lockedOrganization) {
+          return (
+            <ContentEntityCard
+              chrome="embedded"
+              density="compact"
+              heading={lockedOrganization.name}
+              subheading={getOrganizationKindLabel(lockedOrganization.organizationKind)}
+              imageKey={lockedOrganization.imageKey}
+              disabled
+              endSlot={
+                <CatalogPickerSelectionActions
+                  phase={resolveCatalogPickerRowActionPhase({ isSelected: true, isSuccess: false })}
+                  canSelect={false}
+                  addLabel={TERRITORIAL_AUTHORITY_DRAWER.replaceSelectedLabel}
+                  onAdd={() => undefined}
+                  onRemove={() => undefined}
+                />
+              }
+            />
+          )
+        }
+
         const isSelected = selectedOrganizationId === organization.id
         const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
           organization.id,
           location.id,
-          eligibleKinds,
+          availabilityKinds,
           orgRows,
           excludeRelationshipId,
         )
@@ -226,11 +425,15 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
                 addLabel={isSelected ? 'Selected' : 'Select'}
                 onAdd={() => {
                   setSelectedOrganizationId(organization.id)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
                 onRemove={() => {
                   setSelectedOrganizationId(null)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
               />
             }

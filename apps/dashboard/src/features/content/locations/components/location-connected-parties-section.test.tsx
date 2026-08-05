@@ -49,8 +49,6 @@ describe('LocationConnectedPartiesSection', () => {
           rows={[]}
           canManage
           showEmptySection
-          organizationAddAffordances={[{ intent: 'territorial_authority', label: 'Add authority' }]}
-          onAddOrganization={() => undefined}
         />
       </MemoryRouter>,
     )
@@ -59,6 +57,7 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.getByRole('heading', { name: 'Controls' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Claims' })).toBeInTheDocument()
     expect(screen.getByText('No governing organization.')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
 
   it('shows manager scaffolding and region-specific add actions when people section is empty', () => {
@@ -86,9 +85,9 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.getByRole('button', { name: 'Link character' })).toBeInTheDocument()
   })
 
-  it('invokes add organization intent callbacks', async () => {
+  it('invokes per-kind territorial add callbacks from slot actions', async () => {
     const user = userEvent.setup()
-    const onAddOrganization = vi.fn()
+    const onAddTerritorialKind = vi.fn()
 
     render(
       <MemoryRouter>
@@ -98,19 +97,35 @@ describe('LocationConnectedPartiesSection', () => {
           rows={[]}
           canManage
           showEmptySection
-          organizationAddAffordances={[{ intent: 'territorial_authority', label: 'Add authority' }]}
-          onAddOrganization={onAddOrganization}
+          onAddTerritorialKind={onAddTerritorialKind}
         />
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Add authority' }))
-    expect(onAddOrganization).toHaveBeenCalledWith('territorial_authority')
+    await user.click(screen.getByRole('button', { name: 'Add controlling organization' }))
+    expect(onAddTerritorialKind).toHaveBeenCalledWith('controls')
   })
 
-  it('invokes edit callbacks for connected rows', async () => {
+  it('renders populated territorial rows without generic entity-type metadata', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          sectionGroup="territorial_authority"
+          rows={sampleRows}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
+  })
+
+  it('invokes change-kind callbacks for territorial rows', async () => {
     const user = userEvent.setup()
-    const onEditConnection = vi.fn()
+    const onChangeTerritorialKind = vi.fn()
 
     render(
       <MemoryRouter>
@@ -120,14 +135,14 @@ describe('LocationConnectedPartiesSection', () => {
           rows={sampleRows}
           canManage
           showEmptySection
-          onEditConnection={onEditConnection}
+          onChangeTerritorialKind={onChangeTerritorialKind}
         />
       </MemoryRouter>,
     )
 
     await user.click(screen.getByRole('button', { name: 'Actions for City Council' }))
     await user.click(screen.getByRole('menuitem', { name: 'Change authority type' }))
-    expect(onEditConnection).toHaveBeenCalledWith({
+    expect(onChangeTerritorialKind).toHaveBeenCalledWith({
       relationshipId: 'rel-org-1',
       subjectType: 'organization',
       subjectId: 'org-1',

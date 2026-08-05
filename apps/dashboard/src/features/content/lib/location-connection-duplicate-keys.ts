@@ -88,7 +88,7 @@ export function organizationLocationConnectionHasAvailableKind(input: {
 
 export function buildOrganizationLocationConnectionEdgesAtLocation(
   rows: ReadonlyArray<{
-    subject: { id: string; type: string }
+    subject: { id: string; type: string; name?: string }
     kind: string
     relationshipId: string
   }>,
@@ -101,7 +101,7 @@ export function buildOrganizationLocationConnectionEdgesAtLocation(
       connectionId: row.relationshipId,
       locationId,
       kind: row.kind as OrganizationLocationConnectionKind,
-      subjectName: undefined,
+      subjectName: row.subject.name,
     }))
 }
 

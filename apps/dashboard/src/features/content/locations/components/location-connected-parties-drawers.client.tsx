@@ -27,11 +27,17 @@ export function LocationConnectedPartiesDrawers({
           }}
           mode={detail.organizationDrawerState.mode}
           intent={detail.organizationDrawerState.intent}
+          addKind={
+            detail.organizationDrawerState.mode === 'add'
+              ? detail.organizationDrawerState.kind
+              : undefined
+          }
           location={location}
           organizations={detail.organizations}
           connectedPartyRows={detail.rows}
           initialConnection={
-            detail.organizationDrawerState.mode === 'edit'
+            detail.organizationDrawerState.mode === 'changeKind' ||
+            detail.organizationDrawerState.mode === 'replaceOrganization'
               ? detail.organizationDrawerState.connection
               : undefined
           }

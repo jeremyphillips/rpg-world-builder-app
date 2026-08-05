@@ -2,7 +2,11 @@
 
 import * as React from 'react'
 
-import type { LocationConnectedPartyRow, LocationConnectedPartySectionGroup } from '@rpg/contracts'
+import type {
+  LocationConnectedPartyRow,
+  LocationConnectedPartySectionGroup,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 import { Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -14,16 +18,18 @@ import type {
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartyRowCard } from './location-connected-party-row-card.client'
+import { LocationTerritorialAuthoritySectionBody } from './location-territorial-authority-section.client'
 import {
-  LocationTerritorialAuthoritySectionBody,
   TERRITORIAL_AUTHORITY_SECTION_EMPTY,
-} from './location-territorial-authority-section.client'
+  TERRITORIAL_AUTHORITY_SECTION_HEADING,
+  TERRITORIAL_AUTHORITY_SECTION_HELPER,
+} from '../lib/location-connection-surface-copy'
 
 export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
   LocationConnectedPartySectionGroup,
   string
 > = {
-  territorial_authority: 'Territorial Authority',
+  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_HEADING,
   people_and_organizations: 'People & organizations',
 }
 
@@ -31,7 +37,7 @@ export const LOCATION_CONNECTED_PARTIES_SECTION_HELPERS: Record<
   LocationConnectedPartySectionGroup,
   string
 > = {
-  territorial_authority: 'Organizations that govern, control, or claim this location.',
+  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_HELPER,
   people_and_organizations:
     'Characters and organizations with ownership, occupancy, operations, or geographic presence here.',
 }
@@ -73,10 +79,13 @@ export type LocationConnectedPartiesSectionProps = {
   showEmptySection?: boolean
   organizationAddAffordances?: readonly LocationInverseOrganizationAddAffordance[]
   onAddOrganization?: (intent: OrganizationConnectionDrawerIntent) => void
+  onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   onAddCharacter?: () => void
   isMutationPending?: boolean
   pendingRelationshipId?: string
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
+  onChangeTerritorialKind?: (input: LocationConnectedPartyEditTarget) => void
+  onReplaceTerritorialOrganization?: (input: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
     relationshipId: string
     subjectType: LocationConnectedPartyRow['subject']['type']
@@ -94,10 +103,13 @@ export function LocationConnectedPartiesSection({
   showEmptySection = true,
   organizationAddAffordances,
   onAddOrganization,
+  onAddTerritorialKind,
   onAddCharacter,
   isMutationPending = false,
   pendingRelationshipId,
   onEditConnection,
+  onChangeTerritorialKind,
+  onReplaceTerritorialOrganization,
   onRemoveConnection,
   canEditRow,
   canRemoveRow,
@@ -141,8 +153,9 @@ export function LocationConnectedPartiesSection({
             campaignId={campaignId}
             rows={sectionRows}
             canManage={canManage}
-            onAddOrganization={onAddOrganization}
-            onEditConnection={onEditConnection}
+            onAddKind={onAddTerritorialKind}
+            onChangeKind={onChangeTerritorialKind}
+            onReplaceOrganization={onReplaceTerritorialOrganization}
             onRemoveConnection={onRemoveConnection}
           />
         ) : null

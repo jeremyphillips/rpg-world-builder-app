@@ -59,6 +59,10 @@ CollapsibleListItem        rowLayout="entity-card" rowPreset="catalog"
 
 Omit `href` at the drawer/picker layer for choose-and-submit flows. The card supports `href` in both chrome modes when navigation is intended.
 
+## Relationship rows
+
+Typed cross-content edges on detail pages use `CrossContentRelationshipRow`, not `ContentEntityCard`. See [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+
 ## `disabled`
 
 - **`ContentEntityCard`:** presentational only (`data-disabled`, `opacity-60`).

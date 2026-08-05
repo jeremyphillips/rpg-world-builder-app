@@ -8,10 +8,16 @@ import {
   getCharacterLocationConnectionLabel,
   getOrganizationLocationConnectionLabel,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
+  organizationLocationConnectionKindBlockedForOrganizationAtLocation,
+  resolveOrganizationLocationConnectionLocationOccupant,
 } from '@rpg/contracts'
 
 import { isOrganizationLocationConnectionKindBlockedForLocation } from './location-connection-duplicate-keys'
 import { LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON } from './location-connection-drawer-intent'
+import {
+  resolveTerritorialKindOccupiedReason,
+  TERRITORIAL_AUTHORITY_DRAWER,
+} from '../locations/lib/location-connection-surface-copy'
 
 export type LocationConnectionKindOption = {
   value: string
@@ -52,19 +58,109 @@ export function buildOrganizationLocationConnectionDisabledKinds(input: {
   )
 }
 
-export function buildOrganizationLocationConnectionKindOptions(
-  kinds: readonly OrganizationLocationConnectionKind[],
-  disabledKinds: ReadonlySet<OrganizationLocationConnectionKind> = new Set(),
-): LocationConnectionKindOption[] {
-  return kinds.map((kind) => ({
-    value: kind,
-    label: getOrganizationLocationConnectionLabel(kind),
-    description: ORGANIZATION_LOCATION_CONNECTION_ENTRIES[kind].description,
-    disabled: disabledKinds.has(kind),
-    disabledReason: disabledKinds.has(kind)
-      ? LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
-      : undefined,
-  }))
+function resolveOrganizationLocationConnectionKindDescription(
+  kind: OrganizationLocationConnectionKind,
+): string {
+  return ORGANIZATION_LOCATION_CONNECTION_ENTRIES[kind].description
+}
+
+function resolveOrganizationLocationConnectionKindDisabledReason(input: {
+  locationId: string
+  kind: OrganizationLocationConnectionKind
+  subjectOrganizationId?: string
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
+  excludeConnectionId?: string
+}): string | undefined {
+  const perOrgBlocked = organizationLocationConnectionKindBlockedForOrganizationAtLocation({
+    locationId: input.locationId,
+    kind: input.kind,
+    connections: input.connections,
+    excludeConnectionId: input.excludeConnectionId,
+  })
+
+  if (perOrgBlocked) {
+    if (input.kind === 'claims') {
+      return TERRITORIAL_AUTHORITY_DRAWER.duplicateClaimReason
+    }
+    return LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
+  }
+
+  if (!input.edgesAtLocation) {
+    return undefined
+  }
+
+  const occupant = resolveOrganizationLocationConnectionLocationOccupant({
+    locationId: input.locationId,
+    kind: input.kind,
+    edgesAtLocation: input.edgesAtLocation,
+    excludeConnectionId: input.excludeConnectionId,
+  })
+
+  if (!occupant) {
+    return undefined
+  }
+
+  if (input.subjectOrganizationId && occupant.organizationId === input.subjectOrganizationId) {
+    return undefined
+  }
+
+  if (input.kind === 'governs' || input.kind === 'controls') {
+    const occupantName = occupant.subjectName ?? 'Another organization'
+    return resolveTerritorialKindOccupiedReason({
+      kind: input.kind,
+      occupantName,
+    })
+  }
+
+  return LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
+}
+
+export function buildOrganizationLocationConnectionKindOptions(input: {
+  locationId: string
+  kinds: readonly OrganizationLocationConnectionKind[]
+  subjectOrganizationId?: string
+  connections?: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
+  excludeConnectionId?: string
+}): LocationConnectionKindOption[] {
+  const connections = input.connections ?? []
+
+  return input.kinds.map((kind) => {
+    const disabled = isOrganizationLocationConnectionKindBlockedForLocation({
+      locationId: input.locationId,
+      kind,
+      subjectOrganizationId: input.subjectOrganizationId ?? '',
+      connections,
+      edgesAtLocation: input.edgesAtLocation,
+      excludeConnectionId: input.excludeConnectionId,
+    })
+
+    return {
+      value: kind,
+      label: getOrganizationLocationConnectionLabel(kind),
+      description: resolveOrganizationLocationConnectionKindDescription(kind),
+      disabled,
+      disabledReason: disabled
+        ? resolveOrganizationLocationConnectionKindDisabledReason({
+            locationId: input.locationId,
+            kind,
+            subjectOrganizationId: input.subjectOrganizationId,
+            connections,
+            edgesAtLocation: input.edgesAtLocation,
+            excludeConnectionId: input.excludeConnectionId,
+          })
+        : undefined,
+    }
+  })
 }
 
 export function buildCharacterLocationConnectionKindOptions(

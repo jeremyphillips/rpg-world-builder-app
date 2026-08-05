@@ -1,15 +1,30 @@
 'use client'
 
-import type { Location } from '@rpg/contracts'
-import { SemanticText, Text } from '@rpg/ui'
+import * as React from 'react'
+
+import type {
+  Location,
+  LocationConnectedPartyRow,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
+import { ConfirmDialog, SemanticText, Text } from '@rpg/ui'
 
 import { LocationConnectedPartiesDrawers } from './location-connected-parties-drawers.client'
 import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
 import { useLocationConnectedPartiesDetail } from '../hooks/use-location-connected-parties-detail.client'
+import { resolveTerritorialRemoveConfirmation } from '../lib/location-connection-surface-copy'
 
 export { LOCATION_CONNECTED_PARTIES_MUTATION_ERROR } from '../hooks/use-location-connected-parties-detail.client'
 
 type DetailState = ReturnType<typeof useLocationConnectedPartiesDetail>
+
+type PendingTerritorialRemove = {
+  relationshipId: string
+  subjectType: LocationConnectedPartyRow['subject']['type']
+  subjectId: string
+  organizationName: string
+  kind: OrganizationLocationConnectionKind
+}
 
 function LocationConnectedPartiesQueryState({ detail }: { detail: DetailState }) {
   if (detail.connectedPartiesQuery.isPending) {
@@ -33,6 +48,37 @@ function LocationConnectedPartiesSections({
   location: Location
   detail: DetailState
 }) {
+  const [pendingRemove, setPendingRemove] = React.useState<PendingTerritorialRemove | null>(null)
+
+  const handleTerritorialRemoveRequest = React.useCallback(
+    async (input: {
+      relationshipId: string
+      subjectType: LocationConnectedPartyRow['subject']['type']
+      subjectId: string
+    }) => {
+      const row = detail.rows.find((candidate) => candidate.relationshipId === input.relationshipId)
+      if (!row || row.sectionGroup !== 'territorial_authority') {
+        await detail.handleRemoveConnection(input)
+        return
+      }
+
+      setPendingRemove({
+        ...input,
+        organizationName: row.subject.name,
+        kind: row.kind as OrganizationLocationConnectionKind,
+      })
+    },
+    [detail],
+  )
+
+  const removeConfirmation = pendingRemove
+    ? resolveTerritorialRemoveConfirmation({
+        organizationName: pendingRemove.organizationName,
+        kind: pendingRemove.kind,
+        locationName: location.name,
+      })
+    : null
+
   const sharedSectionProps = {
     campaignId,
     rows: detail.rows,
@@ -40,7 +86,13 @@ function LocationConnectedPartiesSections({
     isMutationPending: detail.isMutationPending,
     pendingRelationshipId: detail.pendingRelationshipId,
     onEditConnection: detail.canWriteInverse ? detail.handleEditConnection : undefined,
-    onRemoveConnection: detail.canWriteInverse ? detail.handleRemoveConnection : undefined,
+    onChangeTerritorialKind: detail.canWriteInverse
+      ? detail.handleChangeTerritorialKind
+      : undefined,
+    onReplaceTerritorialOrganization: detail.canWriteInverse
+      ? detail.handleReplaceTerritorialOrganization
+      : undefined,
+    onRemoveConnection: detail.canWriteInverse ? handleTerritorialRemoveRequest : undefined,
     canEditRow: detail.canEditRow,
     canRemoveRow: detail.canEditRow,
   }
@@ -59,11 +111,8 @@ function LocationConnectedPartiesSections({
             detail.canManage ||
             detail.rows.some((row) => row.sectionGroup === 'territorial_authority')
           }
-          organizationAddAffordances={
-            detail.canAddOrganizationInverse ? detail.territorialOrganizationAddAffordances : []
-          }
-          onAddOrganization={
-            detail.canAddOrganizationInverse ? detail.openOrganizationAddDrawer : undefined
+          onAddTerritorialKind={
+            detail.canAddOrganizationInverse ? detail.openTerritorialAddDrawer : undefined
           }
         />
       ) : null}
@@ -91,6 +140,22 @@ function LocationConnectedPartiesSections({
       ) : null}
 
       <LocationConnectedPartiesDrawers location={location} detail={detail} />
+
+      {pendingRemove && removeConfirmation ? (
+        <ConfirmDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setPendingRemove(null)
+          }}
+          headline={removeConfirmation.heading}
+          description={removeConfirmation.body}
+          confirmLabel={removeConfirmation.confirm}
+          confirmVariant="destructive"
+          onConfirm={() => {
+            void detail.handleRemoveConnection(pendingRemove).finally(() => setPendingRemove(null))
+          }}
+        />
+      ) : null}
     </div>
   )
 }
