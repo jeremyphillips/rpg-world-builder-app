@@ -7,7 +7,13 @@ import { getLocationKindLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
-import { catalogPickerShellProps } from '@/features/character'
+import {
+  CatalogPickerSelectionActions,
+  catalogPickerShellProps,
+  resolveCatalogPickerRowActionPhase,
+} from '@/features/character'
+
+import { ContentEntityPickerRow } from '../../lib/content-entity-picker-row.client'
 
 import {
   ORGANIZATION_DRAWER_EDIT_TITLES,
@@ -27,7 +33,6 @@ import {
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
-import { OrganizationLocationLinkDrawerItem } from './organization-location-link-drawer-item.client'
 
 export const ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER = 'Search locations'
 export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search.'
@@ -188,26 +193,47 @@ function OrganizationLocationConnectionLinkDrawerContent({
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
       getSearchText={buildLocationSearchText}
-      renderItemHeader={(location) => (
-        <OrganizationLocationLinkDrawerItem
-          location={location}
-          isSelected={selectedLocationId === location.id}
-          hasAvailableKind={organizationForwardLocationHasAvailableKind(
-            location,
-            intent,
-            existingKeys,
-          )}
-          fullyLinkedReason={fullyLinkedReason}
-          onSelect={() => {
-            setSelectedLocationId(location.id)
-            setSelectedKind(null)
-          }}
-          onClear={() => {
-            setSelectedLocationId(null)
-            setSelectedKind(null)
-          }}
-        />
-      )}
+      renderItemHeader={(location) => {
+        const hasAvailableKind = organizationForwardLocationHasAvailableKind(
+          location,
+          intent,
+          existingKeys,
+        )
+
+        return (
+          <ContentEntityPickerRow
+            heading={location.name}
+            subheading={hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason}
+            imageKey={location.imageKey}
+            disabled={!hasAvailableKind}
+          />
+        )
+      }}
+      renderItemActions={(location) => {
+        const isSelected = selectedLocationId === location.id
+        const hasAvailableKind = organizationForwardLocationHasAvailableKind(
+          location,
+          intent,
+          existingKeys,
+        )
+        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+
+        return (
+          <CatalogPickerSelectionActions
+            phase={phase}
+            canSelect={hasAvailableKind}
+            addLabel={isSelected ? 'Selected' : 'Select'}
+            onAdd={() => {
+              setSelectedLocationId(location.id)
+              setSelectedKind(null)
+            }}
+            onRemove={() => {
+              setSelectedLocationId(null)
+              setSelectedKind(null)
+            }}
+          />
+        )
+      }}
     />
   )
 }

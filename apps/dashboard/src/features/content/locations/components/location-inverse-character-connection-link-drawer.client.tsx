@@ -11,9 +11,17 @@ import { resolveLocationConnectionEligibility } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
-import { catalogPickerShellProps } from '@/features/character'
+import {
+  CatalogPickerSelectionActions,
+  catalogPickerShellProps,
+  resolveCatalogPickerRowActionPhase,
+} from '@/features/character'
 
-import { characterInverseSubjectHasAvailableKind } from '../../lib/location-connection-drawer-intent'
+import {
+  CHARACTER_DRAWER_FULLY_LINKED_REASON,
+  characterInverseSubjectHasAvailableKind,
+} from '../../lib/location-connection-drawer-intent'
+import { ContentEntityPickerRow } from '../../lib/content-entity-picker-row.client'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
@@ -25,7 +33,6 @@ import {
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
 import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
-import { LocationInverseCharacterLinkDrawerItem } from './location-inverse-character-link-drawer-item.client'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_ADD_TITLE = 'Link character'
 export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE = 'Edit character connection'
@@ -164,25 +171,50 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={(character) => [character.name, character.summary].join(' ')}
-      renderItemHeader={(character) => (
-        <LocationInverseCharacterLinkDrawerItem
-          character={character}
-          isSelected={selectedCharacterId === character.id}
-          hasAvailableKind={characterInverseSubjectHasAvailableKind(
-            character.id,
-            eligibleKinds,
-            existingKeys,
-          )}
-          onSelect={() => {
-            setSelectedCharacterId(character.id)
-            setSelectedKind(null)
-          }}
-          onClear={() => {
-            setSelectedCharacterId(null)
-            setSelectedKind(null)
-          }}
-        />
-      )}
+      renderItemHeader={(character) => {
+        const hasAvailableKind = characterInverseSubjectHasAvailableKind(
+          character.id,
+          eligibleKinds,
+          existingKeys,
+        )
+
+        return (
+          <ContentEntityPickerRow
+            heading={character.name}
+            subheading={
+              hasAvailableKind
+                ? character.summary || undefined
+                : CHARACTER_DRAWER_FULLY_LINKED_REASON
+            }
+            disabled={!hasAvailableKind}
+          />
+        )
+      }}
+      renderItemActions={(character) => {
+        const isSelected = selectedCharacterId === character.id
+        const hasAvailableKind = characterInverseSubjectHasAvailableKind(
+          character.id,
+          eligibleKinds,
+          existingKeys,
+        )
+        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+
+        return (
+          <CatalogPickerSelectionActions
+            phase={phase}
+            canSelect={hasAvailableKind}
+            addLabel={isSelected ? 'Selected' : 'Select'}
+            onAdd={() => {
+              setSelectedCharacterId(character.id)
+              setSelectedKind(null)
+            }}
+            onRemove={() => {
+              setSelectedCharacterId(null)
+              setSelectedKind(null)
+            }}
+          />
+        )
+      }}
     />
   )
 }
