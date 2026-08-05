@@ -66,6 +66,7 @@ describe('finalizeCharacterBuild', () => {
       updatedAt: '2026-07-28T12:00:00.000Z',
       name: 'Lantern Guild',
       organizationKind: 'professional' as const,
+      connections: { locations: [] },
     }
     const input = finalizeCharacterBuild(
       makeCompleteDraft({

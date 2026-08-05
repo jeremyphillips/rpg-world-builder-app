@@ -27,6 +27,9 @@ vi.mock('@/features/character', async (importOriginal) => {
     useNpcs: vi.fn(() => ({ data: [] })),
   }
 })
+vi.mock('../components/location-connected-parties-detail-sections.client', () => ({
+  LocationConnectedPartiesDetailSections: () => null,
+}))
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({ data: [] })),
 }))

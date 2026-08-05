@@ -17,9 +17,8 @@ describe('location relationship capabilities', () => {
     )
   })
 
-  it('enables region party headquarters and operator only', () => {
+  it('enables region party operator only', () => {
     expect(getLocationRelationshipCapabilities('region').partyAssociationSemanticKeys).toEqual([
-      'headquarters',
       'operator',
     ])
   })

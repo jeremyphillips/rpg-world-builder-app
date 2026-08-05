@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Organization, TerritorialAuthorityKind } from '@rpg/contracts'
+import type { Organization } from '@rpg/contracts'
 import { ApiError } from '@rpg/contracts'
 import { RichTextContent } from '@rpg/ui'
 
@@ -17,21 +17,21 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { OrganizationConnectedCharactersSection } from '../components/organization-connected-characters-section.client'
-import { OrganizationConnectedRegionsSection } from '../components/organization-connected-regions-section.client'
+import {
+  OrganizationLocationConnectionsSection,
+  ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR,
+  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
+} from '../components/organization-location-connections-section.client'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
-import { useOrganizationConnectedRegions } from '../hooks/use-organization-connected-regions'
-import { useOrganizationTerritorialAuthorityMutations } from '../hooks/use-organization-territorial-authority-mutations'
+import { useOrganizationLocationConnectionMutations } from '../hooks/use-organization-location-connection-mutations'
+import { useOrganizationLocationReferences } from '../hooks/use-organization-location-references'
 import { useOrganizations } from '../hooks/use-organizations'
 import { buildOrganizationConnectedCharacterCards } from '../lib/build-organization-connected-character-cards'
-import { buildOrganizationConnectedRegionCards } from '../lib/build-organization-connected-region-cards'
+import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import {
   buildOrganizationDetailViewModel,
   ORGANIZATION_EMPTY_SECTION_TEXT,
 } from '../lib/organization-display'
-import {
-  canEditOrganizationTerritorialAuthorityInverse,
-  ORGANIZATION_TERRITORIAL_INVERSE_MUTATION_ERROR,
-} from '../lib/organization-territorial-authority-inverse.lib'
 
 export function OrganizationDetailContent({
   organization,
@@ -42,19 +42,18 @@ export function OrganizationDetailContent({
 }) {
   useSetBreadcrumbLabel(organization.name)
   const canManage = useCanManageCampaign(campaignId)
-  const canWriteInverseTerritorial = canEditOrganizationTerritorialAuthorityInverse(canManage)
   const connectedCharactersQuery = useOrganizationConnectedCharacters(campaignId, organization.id)
-  const connectedRegionsQuery = useOrganizationConnectedRegions(campaignId, organization.id)
-  const territorialMutations = useOrganizationTerritorialAuthorityMutations(
+  const locationReferencesQuery = useOrganizationLocationReferences(campaignId, organization.id)
+  const locationConnectionMutations = useOrganizationLocationConnectionMutations(
     campaignId,
     organization.id,
   )
 
   const mutationError =
-    territorialMutations.error instanceof ApiError
-      ? territorialMutations.error.message
-      : territorialMutations.error
-        ? ORGANIZATION_TERRITORIAL_INVERSE_MUTATION_ERROR
+    locationConnectionMutations.error instanceof ApiError
+      ? locationConnectionMutations.error.message
+      : locationConnectionMutations.error
+        ? ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR
         : null
 
   const viewModel = useMemo(() => {
@@ -65,11 +64,8 @@ export function OrganizationDetailContent({
           total: 0,
         }
 
-    const connectedRegions = connectedRegionsQuery.data
-      ? buildOrganizationConnectedRegionCards(connectedRegionsQuery.data, {
-          campaignId,
-          canWriteInverseTerritorial,
-        })
+    const locationConnections = locationReferencesQuery.data
+      ? buildOrganizationLocationConnectionCards(locationReferencesQuery.data, { campaignId })
       : {
           previewItems: [],
           total: 0,
@@ -82,45 +78,15 @@ export function OrganizationDetailContent({
         emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
       },
       {
-        ...connectedRegions,
-        emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedRegions,
+        ...locationConnections,
+        emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
       },
     )
-  }, [
-    campaignId,
-    canWriteInverseTerritorial,
-    connectedCharactersQuery.data,
-    connectedRegionsQuery.data,
-    organization,
-  ])
+  }, [campaignId, connectedCharactersQuery.data, locationReferencesQuery.data, organization])
 
-  const handleAddTerritorialAuthority = async (
-    regionId: string,
-    kind: TerritorialAuthorityKind,
-  ) => {
-    territorialMutations.resetErrors()
-    await territorialMutations.addTerritorialAuthority(regionId, kind)
-  }
-
-  const handleRemoveTerritorialAuthority = async (input: {
-    regionId: string
-    relationshipId: string
-  }) => {
-    territorialMutations.resetErrors()
-    await territorialMutations.removeTerritorialAuthority(input.regionId, input.relationshipId)
-  }
-
-  const handleUpdateTerritorialAuthorityKind = async (input: {
-    regionId: string
-    relationshipId: string
-    kind: TerritorialAuthorityKind
-  }) => {
-    territorialMutations.resetErrors()
-    await territorialMutations.updateTerritorialAuthorityKind(
-      input.regionId,
-      input.relationshipId,
-      input.kind,
-    )
+  const handleRemoveConnection = async (connectionId: string) => {
+    locationConnectionMutations.resetErrors()
+    await locationConnectionMutations.removeLocationConnection(connectionId)
   }
 
   return (
@@ -140,24 +106,16 @@ export function OrganizationDetailContent({
         }
       >
         <div className="space-y-8">
-          <OrganizationConnectedRegionsSection
-            campaignId={campaignId}
-            connectedRegions={viewModel.connectedRegions}
-            canWriteInverseTerritorial={canWriteInverseTerritorial}
-            isPending={connectedRegionsQuery.isPending}
-            isError={connectedRegionsQuery.isError}
+          <OrganizationLocationConnectionsSection
+            locationConnections={viewModel.locationConnections}
+            canManage={canManage}
+            isPending={locationReferencesQuery.isPending}
+            isError={locationReferencesQuery.isError}
+            errorText={ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR}
             mutationError={mutationError}
-            isMutationPending={territorialMutations.isPending}
-            pendingRelationshipId={territorialMutations.pendingRelationshipId}
-            onAddTerritorialAuthority={
-              canWriteInverseTerritorial ? handleAddTerritorialAuthority : undefined
-            }
-            onRemoveTerritorialAuthority={
-              canWriteInverseTerritorial ? handleRemoveTerritorialAuthority : undefined
-            }
-            onUpdateTerritorialAuthorityKind={
-              canWriteInverseTerritorial ? handleUpdateTerritorialAuthorityKind : undefined
-            }
+            isMutationPending={locationConnectionMutations.isPending}
+            pendingConnectionId={locationConnectionMutations.pendingConnectionId}
+            onRemoveConnection={canManage ? handleRemoveConnection : undefined}
           />
           <OrganizationConnectedCharactersSection
             connectedCharacters={viewModel.connectedCharacters}

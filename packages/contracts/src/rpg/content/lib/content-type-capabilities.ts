@@ -42,7 +42,7 @@ export const CONTENT_TYPE_CAPABILITIES: Record<ContentTypeKey, ContentTypeCapabi
   },
   organizations: {
     canDuplicate: true,
-    nestedIdRegeneration: noNestedRegenerationRequired,
+    nestedIdRegeneration: { paths: ['connections.locations'] },
   },
   locations: {
     canDuplicate: true,

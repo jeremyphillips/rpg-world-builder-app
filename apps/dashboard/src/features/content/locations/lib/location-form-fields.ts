@@ -1,13 +1,10 @@
 import { z } from 'zod'
-import { createElement } from 'react'
 import {
   interiorTypeSchema,
-  locationPartyAssociationsSchema,
   planeTypeSchema,
   settlementTypeSchema,
   siteTypeSchema,
   slugSchema,
-  territorialAuthorityRelationshipsSchema,
   validateLocationParentRequirement,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
@@ -23,25 +20,12 @@ import {
   buildLocationAuthoringTypeOptions,
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
-  resolveAuthoringTypeFromFormValues,
 } from './location-authoring-type'
 import {
   buildParentLocationOptionAvailability,
   buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
-import { LocationPartyAssociationsSection } from '../components/location-party-associations-section.client'
-import { TerritorialAuthoritySection } from '../components/territorial-authority-section.client'
-import {
-  LOCATION_PARTY_ASSOCIATIONS_FIELD,
-  LOCATION_PARTY_SECTION_LABEL,
-} from './location-party-associations.lib'
-import { shouldShowLocationPartyAssociationsSection } from './location-party-authoring-policy'
-import {
-  shouldShowTerritorialAuthoritySection,
-  TERRITORIAL_AUTHORITY_FIELD,
-  TERRITORIAL_AUTHORITY_SECTION_LABEL,
-} from './territorial-authority.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -69,8 +53,6 @@ export const locationFormSchema = z
     siteType: siteTypeSchema.optional(),
     interiorType: interiorTypeSchema.optional(),
     classification: classificationFormSchema,
-    partyAssociations: locationPartyAssociationsSchema,
-    territorialAuthority: territorialAuthorityRelationshipsSchema,
   })
   .superRefine((values, ctx) => {
     const { kind } = canonicalFieldsForAuthoringType(values.authoringType)
@@ -91,8 +73,6 @@ export const locationDraftFormSchema = z.object({
   siteType: draftOptionalSelect(siteTypeSchema),
   interiorType: draftOptionalSelect(interiorTypeSchema),
   classification: classificationFormSchema,
-  partyAssociations: locationPartyAssociationsSchema,
-  territorialAuthority: territorialAuthorityRelationshipsSchema,
 })
 
 export type LocationFormValues = z.infer<typeof locationFormSchema>
@@ -129,60 +109,14 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
     },
     descriptionField(ctx),
-    {
-      kind: 'group',
-      legend: TERRITORIAL_AUTHORITY_SECTION_LABEL,
-      legendSize: 'subsection',
-      visibility: {
-        dependsOn: ['authoringType', TERRITORIAL_AUTHORITY_FIELD],
-        visibleWhen: (watched) => {
-          const authoringType = resolveAuthoringTypeFromFormValues(watched)
-          if (!authoringType) return false
-          const relationships = watched[TERRITORIAL_AUTHORITY_FIELD]
-          return shouldShowTerritorialAuthoritySection({
-            authoringType,
-            relationships: Array.isArray(relationships) ? relationships : [],
-          })
-        },
-      },
-      fields: [
-        {
-          kind: 'slot',
-          name: TERRITORIAL_AUTHORITY_FIELD,
-          render: () => createElement(TerritorialAuthoritySection),
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: LOCATION_PARTY_SECTION_LABEL,
-      legendSize: 'subsection',
-      visibility: {
-        dependsOn: ['authoringType', LOCATION_PARTY_ASSOCIATIONS_FIELD],
-        visibleWhen: (watched) => {
-          const authoringType = resolveAuthoringTypeFromFormValues(watched)
-          if (!authoringType) return false
-          const associations = watched[LOCATION_PARTY_ASSOCIATIONS_FIELD]
-          return shouldShowLocationPartyAssociationsSection({
-            authoringType,
-            associations: Array.isArray(associations) ? associations : [],
-          })
-        },
-      },
-      fields: [
-        {
-          kind: 'slot',
-          name: LOCATION_PARTY_ASSOCIATIONS_FIELD,
-          render: () => createElement(LocationPartyAssociationsSection),
-        },
-      ],
-    },
   ]
 }
 
 /** Resolves canonical kind from form values for hierarchy helpers within the form layer. */
 export function resolveLocationKindFromFormValues(values: Record<string, unknown>) {
-  const authoringType = resolveAuthoringTypeFromFormValues(values)
-  if (!authoringType) return undefined
-  return canonicalFieldsForAuthoringType(authoringType).kind
+  const authoringType = values.authoringType
+  if (typeof authoringType !== 'string') return undefined
+  return canonicalFieldsForAuthoringType(
+    authoringType as (typeof LOCATION_AUTHORING_TYPE_IDS)[number],
+  ).kind
 }

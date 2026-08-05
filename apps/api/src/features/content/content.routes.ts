@@ -7,13 +7,14 @@ import { requireCampaignRole } from '../../middleware/require-role'
 import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
-import * as territorialAuthorityController from './locations/territorial-authority.handlers'
 import * as characterLocationConnectionController from './characters/character-location-connection.handlers'
+import * as organizationLocationConnectionController from './organizations/organization-location-connection.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
 import { listCharacterLocationReferences } from './locations/location-reference.controller'
+import { listOrganizationLocationReferences } from './locations/organization-location-reference.controller'
+import { listLocationConnectedParties } from './locations/location-connected-parties.controller'
 import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
-import { listOrganizationConnectedRegions } from './organizations/organization-connected-regions.controller'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
@@ -69,39 +70,46 @@ contentRouter.delete(
   characterLocationConnectionController.deleteCharacterLocationConnectionItem,
 )
 
+contentRouter.post(
+  '/organizations/:organizationId/location-connections',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  organizationLocationConnectionController.createOrganizationLocationConnectionItem,
+)
+
+contentRouter.patch(
+  '/organizations/:organizationId/location-connections/:connectionId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  organizationLocationConnectionController.updateOrganizationLocationConnectionItem,
+)
+
+contentRouter.delete(
+  '/organizations/:organizationId/location-connections/:connectionId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  organizationLocationConnectionController.deleteOrganizationLocationConnectionItem,
+)
+
+contentRouter.get(
+  '/organizations/:organizationId/location-references',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listOrganizationLocationReferences,
+)
+
+contentRouter.get(
+  '/locations/:locationId/connected-parties',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listLocationConnectedParties,
+)
+
 contentRouter.get(
   '/organizations/:organizationId/connected-characters',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listOrganizationConnectedCharacters,
-)
-
-contentRouter.get(
-  '/organizations/:organizationId/connected-regions',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  listOrganizationConnectedRegions,
-)
-
-contentRouter.post(
-  '/locations/:locationId/territorial-authorities',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  territorialAuthorityController.createTerritorialAuthorityItem,
-)
-
-contentRouter.patch(
-  '/locations/:locationId/territorial-authorities/:relationshipId',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  territorialAuthorityController.updateTerritorialAuthorityItem,
-)
-
-contentRouter.delete(
-  '/locations/:locationId/territorial-authorities/:relationshipId',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  territorialAuthorityController.deleteTerritorialAuthorityItem,
 )
 
 contentRouter.post(

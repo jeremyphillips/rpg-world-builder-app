@@ -17,7 +17,7 @@ export const LOCATION_RELATIONSHIP_CAPABILITIES = {
     territorialAuthorityKinds: [],
   },
   region: {
-    partyAssociationSemanticKeys: ['headquarters', 'operator'],
+    partyAssociationSemanticKeys: ['operator'],
     territorialAuthorityKinds: [...TERRITORIAL_AUTHORITY_KIND_IDS],
   },
   settlement: {
@@ -25,7 +25,7 @@ export const LOCATION_RELATIONSHIP_CAPABILITIES = {
     territorialAuthorityKinds: [],
   },
   district: {
-    partyAssociationSemanticKeys: ['resident', 'headquarters'],
+    partyAssociationSemanticKeys: ['resident'],
     territorialAuthorityKinds: [],
   },
   site: {

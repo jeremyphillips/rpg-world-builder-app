@@ -16,6 +16,7 @@ import {
   locationParentReferenceSource,
   locationPartyReferenceSource,
   locationTerritorialAuthorityReferenceSource,
+  organizationLocationSource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -81,6 +82,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
       { source: locationParentReferenceSource, entry: true, batch: true },
       { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
       { source: characterLocationSource, entry: true, batch: true },
+      { source: organizationLocationSource, entry: true, batch: true },
     ],
     summaryLabels: { singular: 'location', plural: 'locations' },
     overviewUsageScope: 'complete',

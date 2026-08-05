@@ -15,16 +15,13 @@ import {
 } from './location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
 
-export const locationCreateDefaultValues: Partial<LocationFormValues> = {
-  territorialAuthority: [],
-}
+export const locationCreateDefaultValues: Partial<LocationFormValues> = {}
 
 function sharedBodyFields(values: LocationFormValues) {
   return {
     name: values.name,
     description: values.description || undefined,
     ...(values.parentLocationId ? { parentLocationId: values.parentLocationId } : {}),
-    partyAssociations: values.partyAssociations ?? [],
   }
 }
 
@@ -86,7 +83,6 @@ const kindBodyFieldBuilders: Record<
     ...sharedBodyFields(values),
     kind: 'region',
     ...buildRegionClassification(values),
-    territorialAuthority: values.territorialAuthority ?? [],
   }),
   settlement: (values) => ({
     ...sharedBodyFields(values),
@@ -133,17 +129,12 @@ const kindFormValueExtractors: Partial<
 > = {
   plane: (entity) => (entity.kind === 'plane' ? { planeType: entity.planeType } : {}),
   region: (entity) =>
-    entity.kind === 'region'
+    entity.kind === 'region' && entity.classification
       ? {
-          ...(entity.classification
-            ? {
-                classification: {
-                  kind: entity.classification.kind,
-                  type: entity.classification.type,
-                },
-              }
-            : {}),
-          territorialAuthority: entity.territorialAuthority ?? [],
+          classification: {
+            kind: entity.classification.kind,
+            type: entity.classification.type,
+          },
         }
       : {},
   settlement: (entity) =>
@@ -181,7 +172,6 @@ export function locationToFormValues(entity: Location): Partial<LocationFormValu
     description: entity.description,
     authoringType: resolveLocationAuthoringType(entity),
     parentLocationId: entity.parentLocationId,
-    partyAssociations: entity.partyAssociations ?? [],
     ...kindFormValueExtractors[entity.kind]?.(entity),
   }
 }

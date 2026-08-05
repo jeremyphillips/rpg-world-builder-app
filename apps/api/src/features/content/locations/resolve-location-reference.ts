@@ -1,4 +1,9 @@
-import type { CharacterLocationReferenceResolution, ContentViewer, Location } from '@rpg/contracts'
+import type {
+  CharacterLocationReferenceResolution,
+  ContentViewer,
+  Location,
+  OrganizationLocationReferenceResolution,
+} from '@rpg/contracts'
 import { canResolveSavedContentReference } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
@@ -6,6 +11,7 @@ import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewLocationModel } from '../locations/homebrew-location.model'
 import { toHomebrewLocation } from '../locations/locations.config'
+import { HomebrewOrganizationModel } from '../organizations/homebrew-organization.model'
 
 export type LocationReferenceAuthorization =
   | { source: 'campaign-character-access' }
@@ -87,4 +93,46 @@ export async function resolveLocationReference({
   }).lean<HomebrewDoc>()
 
   return doc ? toHomebrewLocation(doc) : null
+}
+
+export async function resolveOrganizationLocationReferences(input: {
+  campaignId: string
+  organizationId: string
+}): Promise<OrganizationLocationReferenceResolution[] | null> {
+  const organization = await HomebrewOrganizationModel.findOne({
+    _id: input.organizationId,
+    campaignId: input.campaignId,
+  })
+    .select({ connections: 1 })
+    .lean<{
+      connections?: {
+        locations?: Array<{ id: string; locationId: string; kind: string }>
+      }
+    } | null>()
+
+  if (!organization) return null
+
+  const connections = organization.connections?.locations ?? []
+  if (connections.length === 0) return []
+
+  const ids = connections.map(({ locationId }) => locationId)
+  const docs = await HomebrewLocationModel.find({
+    _id: { $in: ids },
+    campaignId: input.campaignId,
+  }).lean<HomebrewDoc[]>()
+  const locationsById = new Map<string, Location>(
+    docs.map((doc) => {
+      const location = toHomebrewLocation(doc)
+      return [location.id, location]
+    }),
+  )
+
+  return connections.map((connection) => ({
+    connection: {
+      id: connection.id,
+      locationId: connection.locationId,
+      kind: connection.kind as OrganizationLocationReferenceResolution['connection']['kind'],
+    },
+    location: locationsById.get(connection.locationId) ?? null,
+  }))
 }

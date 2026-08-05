@@ -1,4 +1,5 @@
 export * from './character-content-reference'
+export * from './organization-content-reference'
 export * from './content-usage'
 export * from './content-viewer-character-relationships'
 export * from './format-viewer-character-relationship-tooltip'

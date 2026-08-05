@@ -25,22 +25,22 @@ describe('location party authoring policy', () => {
     }
   })
 
-  it('offers headquarters and operator for region', () => {
-    expect(getAvailableLocationPartyAssociationKinds('region')).toEqual([
-      'headquarters',
-      'operator',
-    ])
+  it('offers operator for region', () => {
+    expect(getAvailableLocationPartyAssociationKinds('region')).toEqual(['operator'])
     expect(isLocationPartyAssociationAuthoringSupported('region')).toBe(true)
   })
 
-  it('offers resident and headquarters for settlement and district', () => {
-    for (const authoringType of ['settlement', 'district'] as const) {
-      expect(isLocationPartyAssociationAuthoringSupported(authoringType)).toBe(true)
-      expect(getAvailableLocationPartyAssociationKinds(authoringType)).toEqual([
-        'resident',
-        'headquarters',
-      ])
-    }
+  it('offers resident and headquarters for settlement', () => {
+    expect(isLocationPartyAssociationAuthoringSupported('settlement')).toBe(true)
+    expect(getAvailableLocationPartyAssociationKinds('settlement')).toEqual([
+      'resident',
+      'headquarters',
+    ])
+  })
+
+  it('offers resident for district', () => {
+    expect(isLocationPartyAssociationAuthoringSupported('district')).toBe(true)
+    expect(getAvailableLocationPartyAssociationKinds('district')).toEqual(['resident'])
   })
 
   it('offers all six current roles for building', () => {
@@ -98,7 +98,6 @@ describe('location party authoring policy', () => {
       'works_at',
     ])
     expect(buildLocationPartySemanticOptions('region').map((option) => option.value)).toEqual([
-      'headquarters',
       'operator',
     ])
   })
