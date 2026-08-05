@@ -11,6 +11,7 @@ import { useLocations } from '../../locations/hooks/use-locations'
 import {
   locationEligibleForOrganizationDrawerIntent,
   organizationDrawerIntentFromKind,
+  resolveOrganizationKindsForDrawerIntent,
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
@@ -21,7 +22,11 @@ import type { OrganizationLocationConnectionEditTarget } from '../components/org
 import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
 
 type DrawerState =
-  | { mode: 'add'; intent: OrganizationConnectionDrawerIntent }
+  | {
+      mode: 'add'
+      intent: OrganizationConnectionDrawerIntent
+      kind?: OrganizationLocationConnectionKind
+    }
   | {
       mode: 'edit'
       intent: OrganizationConnectionDrawerIntent
@@ -77,6 +82,20 @@ export function useOrganizationLocationConnectionsDetail(
     return intents
   }, [locationsQuery.data])
 
+  const emptyKindSlots = React.useMemo(() => {
+    if (!canManage) return []
+
+    const kinds = new Set<OrganizationLocationConnectionKind>()
+    for (const location of locationsQuery.data ?? []) {
+      for (const intent of availableAddIntents) {
+        for (const kind of resolveOrganizationKindsForDrawerIntent(location, intent)) {
+          kinds.add(kind)
+        }
+      }
+    }
+    return [...kinds]
+  }, [availableAddIntents, canManage, locationsQuery.data])
+
   const mutationError =
     mutations.error instanceof ApiError
       ? mutations.error.message
@@ -118,6 +137,14 @@ export function useOrganizationLocationConnectionsDetail(
     setDrawerState({ mode: 'add', intent })
   }, [])
 
+  const openAddKind = React.useCallback((kind: OrganizationLocationConnectionKind) => {
+    setDrawerState({
+      mode: 'add',
+      intent: organizationDrawerIntentFromKind(kind),
+      kind,
+    })
+  }, [])
+
   const openEditDrawer = React.useCallback(
     (connection: OrganizationLocationConnectionEditTarget) => {
       setDrawerState({
@@ -135,12 +162,14 @@ export function useOrganizationLocationConnectionsDetail(
     locationConnections,
     existingConnections,
     availableAddIntents,
+    emptyKindSlots,
     locationReferencesQuery,
     mutations,
     mutationError,
     drawerState,
     setDrawerState,
     openAddDrawer,
+    openAddKind,
     openEditDrawer,
     handleSubmit,
     handleRemoveConnection,

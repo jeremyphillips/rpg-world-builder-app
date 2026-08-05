@@ -8,7 +8,7 @@ import type {
   Organization,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -39,7 +39,6 @@ import {
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
 import {
-  isTerritorialAuthorityKind,
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddDrawerTitle,
   resolveLocationInverseOrganizationAddSubmitLabel,
@@ -87,10 +86,9 @@ export function LocationInverseOrganizationConnectionLinkDrawer(
 
 function hasResolvedAddKind(
   mode: LocationInverseOrganizationDrawerMode,
-  intent: OrganizationConnectionDrawerIntent,
   addKind?: OrganizationLocationConnectionKind,
 ): addKind is OrganizationLocationConnectionKind {
-  return mode === 'add' && intent === 'territorial_authority' && addKind != null
+  return mode === 'add' && addKind != null
 }
 
 // fallow-ignore-next-line complexity
@@ -107,7 +105,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   isSubmitting = false,
   onSubmit,
 }: LocationInverseOrganizationConnectionLinkDrawerProps) {
-  const resolvedAddKind = hasResolvedAddKind(mode, intent, addKind) ? addKind : undefined
+  const resolvedAddKind = hasResolvedAddKind(mode, addKind) ? addKind : undefined
 
   const [selectedOrganizationId, setSelectedOrganizationId] = React.useState<string | null>(
     mode === 'replaceOrganization' || mode === 'changeKind'
@@ -222,7 +220,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.replaceTitle
     }
-    if (resolvedAddKind && isTerritorialAuthorityKind(resolvedAddKind)) {
+    if (resolvedAddKind) {
       return resolveLocationInverseOrganizationAddDrawerTitle(resolvedAddKind)
     }
     return mode === 'add'
@@ -237,7 +235,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.replaceSubmit
     }
-    if (resolvedAddKind && isTerritorialAuthorityKind(resolvedAddKind)) {
+    if (resolvedAddKind) {
       return resolveLocationInverseOrganizationAddSubmitLabel(resolvedAddKind)
     }
     return mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'
@@ -248,11 +246,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     : null
 
   const contextHeader = (() => {
-    if (intent !== 'territorial_authority') {
-      return null
-    }
-
-    if (mode === 'replaceOrganization' && initialConnection) {
+    if (mode === 'replaceOrganization' && initialConnection && intent === 'territorial_authority') {
       return (
         <RelationshipDrawerContextHeader
           context={resolveTerritorialAuthorityReplaceContext(location, initialConnection.kind)}
@@ -261,13 +255,22 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     }
 
     if (mode === 'changeKind' && initialConnection && lockedOrganization) {
+      if (intent === 'territorial_authority') {
+        return (
+          <RelationshipDrawerContextHeader
+            context={resolveTerritorialAuthorityLocationContext(location)}
+            current={resolveTerritorialAuthorityChangeKindCurrent({
+              organizationName: lockedOrganization.name,
+              kind: initialConnection.kind,
+            })}
+          />
+        )
+      }
+
       return (
         <RelationshipDrawerContextHeader
           context={resolveTerritorialAuthorityLocationContext(location)}
-          current={resolveTerritorialAuthorityChangeKindCurrent({
-            organizationName: lockedOrganization.name,
-            kind: initialConnection.kind,
-          })}
+          current={`${lockedOrganization.name} · ${getOrganizationLocationConnectionLabel(initialConnection.kind)}`}
         />
       )
     }

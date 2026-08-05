@@ -154,6 +154,31 @@ export const TERRITORIAL_AUTHORITY_OVERFLOW = {
   remove: 'Remove authority',
 } as const
 
+export const LOCATION_INVERSE_PEOPLE_OVERFLOW = {
+  viewOrganization: 'View organization',
+  viewCharacter: 'View character',
+  changeKind: 'Change connection type',
+  remove: 'Remove connection',
+} as const
+
+export function resolveLocationInverseCharacterAddDrawerTitle(
+  kind: CharacterLocationConnectionKind,
+): string {
+  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[kind].addDrawerTitle
+}
+
+export function resolveLocationInverseCharacterAddDrawerInstruction(
+  kind: CharacterLocationConnectionKind,
+): string {
+  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[kind].addDrawerInstruction
+}
+
+export function resolveLocationInverseCharacterAddSubmitLabel(
+  kind: CharacterLocationConnectionKind,
+): string {
+  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[kind].addSubmit
+}
+
 export function resolveLocationInverseOrganizationSurfaceCopy(
   kind: OrganizationLocationConnectionKind,
 ): LocationInverseOrganizationSurfaceCopy {

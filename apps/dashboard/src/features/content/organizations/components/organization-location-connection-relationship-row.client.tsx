@@ -8,6 +8,7 @@ import { Badge } from '@rpg/ui'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
 import type { OrganizationLocationConnectionPreviewItem } from '../lib/organization-display'
+import { ORGANIZATION_FORWARD_OVERFLOW } from '../lib/organization-location-connection-surface-copy'
 
 export function buildOrganizationLocationConnectionOverflowActions(input: {
   item: OrganizationLocationConnectionPreviewItem
@@ -24,7 +25,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   const actions: RelationshipOverflowAction[] = [
     {
       id: 'view',
-      label: 'View location',
+      label: ORGANIZATION_FORWARD_OVERFLOW.viewLocation,
       onSelect: () => input.navigate(input.item.detailHref),
     },
   ]
@@ -32,7 +33,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   if (input.canManage && input.onEditConnection) {
     actions.push({
       id: 'change-kind',
-      label: 'Change connection type',
+      label: ORGANIZATION_FORWARD_OVERFLOW.changeKind,
       onSelect: () =>
         input.onEditConnection?.({
           connectionId: input.item.connectionId,
@@ -45,7 +46,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   if (input.canManage && input.onRemoveConnection) {
     actions.push({
       id: 'remove',
-      label: 'Remove connection',
+      label: ORGANIZATION_FORWARD_OVERFLOW.remove,
       destructive: true,
       onSelect: () => {
         if (input.isMutationPending) return
@@ -83,9 +84,7 @@ export function OrganizationLocationConnectionRelationshipRow({
 
   return (
     <CrossContentRelationshipRow
-      relationshipEyebrow={item.relationshipLabel}
       heading={item.card.name}
-      subheading={item.card.summary}
       href={item.detailHref}
       metadata={
         item.locationUnavailable ? (

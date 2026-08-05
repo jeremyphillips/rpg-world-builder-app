@@ -24,6 +24,19 @@ const sampleRows = [
   },
 ]
 
+const peopleKindSlots = [
+  {
+    subjectType: 'organization' as const,
+    kind: 'operates_in' as const,
+    heading: 'Operates in',
+  },
+  {
+    subjectType: 'character' as const,
+    kind: 'works_at' as const,
+    heading: 'Works here',
+  },
+]
+
 export const TerritorialAuthority: Story = {
   args: {
     campaignId: STORY_CAMPAIGN_ID,
@@ -31,8 +44,6 @@ export const TerritorialAuthority: Story = {
     rows: sampleRows,
     canManage: true,
     showEmptySection: true,
-    organizationAddAffordances: [{ intent: 'territorial_authority', label: 'Add authority' }],
-    onAddOrganization: () => undefined,
   },
 }
 
@@ -43,10 +54,8 @@ export const ManagerEmptyPeople: Story = {
     rows: [],
     canManage: true,
     showEmptySection: true,
-    organizationAddAffordances: [
-      { intent: 'geographic_presence', label: 'Add organization presence' },
-    ],
-    onAddOrganization: () => undefined,
-    onAddCharacter: () => undefined,
+    peopleKindSlots,
+    onAddOrganizationKind: () => undefined,
+    onAddCharacterKind: () => undefined,
   },
 }

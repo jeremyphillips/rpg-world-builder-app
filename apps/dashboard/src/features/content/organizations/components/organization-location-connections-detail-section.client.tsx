@@ -3,7 +3,6 @@
 import type { Location } from '@rpg/contracts'
 
 import { OrganizationLocationConnectionLinkDrawer } from './organization-location-connection-link-drawer.client'
-import { OrganizationLocationConnectionAddMenu } from './organization-location-connection-add-menu.client'
 import {
   OrganizationLocationConnectionsSection,
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
@@ -23,6 +22,7 @@ export function OrganizationLocationConnectionsDetailSection({
     <>
       <OrganizationLocationConnectionsSection
         locationConnections={detail.locationConnections}
+        emptyKindSlots={detail.emptyKindSlots}
         canManage={detail.canManage}
         showEmptySection={detail.canManage || detail.locationConnections.total > 0}
         isPending={detail.locationReferencesQuery.isPending}
@@ -31,14 +31,7 @@ export function OrganizationLocationConnectionsDetailSection({
         mutationError={detail.mutationError}
         isMutationPending={detail.mutations.isPending}
         pendingConnectionId={detail.mutations.pendingConnectionId}
-        addConnectionAction={
-          detail.canManage ? (
-            <OrganizationLocationConnectionAddMenu
-              availableIntents={detail.availableAddIntents}
-              onSelectIntent={detail.openAddDrawer}
-            />
-          ) : undefined
-        }
+        onAddKind={detail.canManage ? detail.openAddKind : undefined}
         onEditConnection={detail.canManage ? detail.openEditDrawer : undefined}
         onRemoveConnection={detail.canManage ? detail.handleRemoveConnection : undefined}
       />
@@ -51,6 +44,7 @@ export function OrganizationLocationConnectionsDetailSection({
           }}
           mode={detail.drawerState.mode}
           intent={detail.drawerState.intent}
+          addKind={detail.drawerState.mode === 'add' ? detail.drawerState.kind : undefined}
           organizationId={organizationId}
           locations={detail.locations as Location[]}
           existingConnections={detail.existingConnections}

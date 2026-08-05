@@ -13,58 +13,71 @@ type LocationConnectedPartiesDrawersProps = {
   detail: DetailState
 }
 
-export function LocationConnectedPartiesDrawers({
+function LocationConnectedOrganizationDrawer({
   location,
   detail,
 }: LocationConnectedPartiesDrawersProps) {
+  const drawerState = detail.organizationDrawerState
+  if (!detail.canAddOrganizationInverse || !drawerState) {
+    return null
+  }
+
+  return (
+    <LocationInverseOrganizationConnectionLinkDrawer
+      open
+      onOpenChange={(open) => {
+        if (!open) detail.setOrganizationDrawerState(null)
+      }}
+      mode={drawerState.mode}
+      intent={drawerState.intent}
+      addKind={drawerState.mode === 'add' ? drawerState.kind : undefined}
+      location={location}
+      organizations={detail.organizations}
+      connectedPartyRows={detail.rows}
+      initialConnection={
+        drawerState.mode === 'changeKind' || drawerState.mode === 'replaceOrganization'
+          ? drawerState.connection
+          : undefined
+      }
+      isSubmitting={detail.isMutationPending}
+      onSubmit={detail.handleOrganizationSubmit}
+    />
+  )
+}
+
+function LocationConnectedCharacterDrawer({
+  location,
+  detail,
+}: LocationConnectedPartiesDrawersProps) {
+  if (!detail.canAddCharacter) {
+    return null
+  }
+
+  const drawerState = detail.characterDrawerState
+
+  return (
+    <LocationInverseCharacterConnectionLinkDrawer
+      open={drawerState != null}
+      onOpenChange={(open) => {
+        if (!open) detail.setCharacterDrawerState(null)
+      }}
+      mode={drawerState?.mode ?? 'add'}
+      addKind={drawerState?.mode === 'add' ? drawerState.kind : undefined}
+      location={location}
+      characters={detail.characterOptions}
+      connectedPartyRows={detail.rows}
+      initialConnection={drawerState?.mode === 'edit' ? drawerState.connection : undefined}
+      isSubmitting={detail.isMutationPending}
+      onSubmit={detail.handleCharacterSubmit}
+    />
+  )
+}
+
+export function LocationConnectedPartiesDrawers(props: LocationConnectedPartiesDrawersProps) {
   return (
     <>
-      {detail.canAddOrganizationInverse && detail.organizationDrawerState ? (
-        <LocationInverseOrganizationConnectionLinkDrawer
-          open={detail.organizationDrawerState != null}
-          onOpenChange={(open) => {
-            if (!open) detail.setOrganizationDrawerState(null)
-          }}
-          mode={detail.organizationDrawerState.mode}
-          intent={detail.organizationDrawerState.intent}
-          addKind={
-            detail.organizationDrawerState.mode === 'add'
-              ? detail.organizationDrawerState.kind
-              : undefined
-          }
-          location={location}
-          organizations={detail.organizations}
-          connectedPartyRows={detail.rows}
-          initialConnection={
-            detail.organizationDrawerState.mode === 'changeKind' ||
-            detail.organizationDrawerState.mode === 'replaceOrganization'
-              ? detail.organizationDrawerState.connection
-              : undefined
-          }
-          isSubmitting={detail.isMutationPending}
-          onSubmit={detail.handleOrganizationSubmit}
-        />
-      ) : null}
-
-      {detail.canAddCharacter ? (
-        <LocationInverseCharacterConnectionLinkDrawer
-          open={detail.characterDrawerState != null}
-          onOpenChange={(open) => {
-            if (!open) detail.setCharacterDrawerState(null)
-          }}
-          mode={detail.characterDrawerState?.mode ?? 'add'}
-          location={location}
-          characters={detail.characterOptions}
-          connectedPartyRows={detail.rows}
-          initialConnection={
-            detail.characterDrawerState?.mode === 'edit'
-              ? detail.characterDrawerState.connection
-              : undefined
-          }
-          isSubmitting={detail.isMutationPending}
-          onSubmit={detail.handleCharacterSubmit}
-        />
-      ) : null}
+      <LocationConnectedOrganizationDrawer {...props} />
+      <LocationConnectedCharacterDrawer {...props} />
     </>
   )
 }

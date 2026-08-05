@@ -30,6 +30,12 @@ import {
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
+import { organizationLocationConnectionHasAvailableKind } from '../../lib/location-connection-duplicate-keys'
+import {
+  resolveOrganizationForwardAddDrawerInstruction,
+  resolveOrganizationForwardAddDrawerTitle,
+  resolveOrganizationForwardAddSubmitLabel,
+} from '../lib/organization-location-connection-surface-copy'
 
 export const ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER = 'Search locations'
 export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search.'
@@ -48,6 +54,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   onOpenChange: (open: boolean) => void
   mode: 'add' | 'edit'
   intent: OrganizationConnectionDrawerIntent
+  addKind?: OrganizationLocationConnectionKind
   organizationId: string
   locations: readonly Location[]
   existingConnections: readonly ExistingConnection[]
@@ -67,7 +74,7 @@ export function OrganizationLocationConnectionLinkDrawer(
   props: OrganizationLocationConnectionLinkDrawerProps,
 ) {
   const remountKey = props.open
-    ? `${props.mode}:${props.intent}:${props.initialConnection?.id ?? 'add'}`
+    ? `${props.mode}:${props.intent}:${props.addKind ?? 'none'}:${props.initialConnection?.id ?? 'add'}`
     : 'closed'
 
   return <OrganizationLocationConnectionLinkDrawerContent key={remountKey} {...props} />
@@ -79,6 +86,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   onOpenChange,
   mode,
   intent,
+  addKind,
   organizationId,
   locations,
   existingConnections,
@@ -86,11 +94,13 @@ function OrganizationLocationConnectionLinkDrawerContent({
   isSubmitting = false,
   onSubmit,
 }: OrganizationLocationConnectionLinkDrawerProps) {
+  const resolvedAddKind = mode === 'add' && addKind != null ? addKind : undefined
+
   const [selectedLocationId, setSelectedLocationId] = React.useState<string | null>(
     initialConnection?.locationId ?? null,
   )
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
-    initialConnection?.kind ?? null,
+    resolvedAddKind ?? initialConnection?.kind ?? null,
   )
 
   const excludeConnectionId = mode === 'edit' ? initialConnection?.id : undefined
@@ -109,7 +119,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   )
 
   const kindOptions = React.useMemo(() => {
-    if (!selectedLocation) return []
+    if (!selectedLocation || resolvedAddKind) return []
     const familyKinds = resolveOrganizationKindsForDrawerIntent(selectedLocation, intent)
     return buildOrganizationLocationConnectionKindOptions({
       locationId: selectedLocation.id,
@@ -118,12 +128,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
       connections: existingConnections,
       excludeConnectionId,
     })
-  }, [excludeConnectionId, existingConnections, intent, organizationId, selectedLocation])
+  }, [
+    excludeConnectionId,
+    existingConnections,
+    intent,
+    organizationId,
+    resolvedAddKind,
+    selectedLocation,
+  ])
 
-  const activeKind = resolveActiveConnectionKind(
-    selectedKind,
-    kindOptions,
-  ) as OrganizationLocationConnectionKind | null
+  const activeKind = (() => {
+    if (resolvedAddKind) return resolvedAddKind
+    return resolveActiveConnectionKind(
+      selectedKind,
+      kindOptions,
+    ) as OrganizationLocationConnectionKind | null
+  })()
+
+  const showKindStep = mode === 'add' && !resolvedAddKind && Boolean(selectedLocation)
 
   const canSubmit = Boolean(selectedLocationId && activeKind && !isSubmitting)
 
@@ -133,11 +155,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
   }
 
   const title =
-    mode === 'add'
-      ? ORGANIZATION_DRAWER_ADD_TITLES[intent]
-      : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
+    mode === 'add' && resolvedAddKind
+      ? resolveOrganizationForwardAddDrawerTitle(resolvedAddKind)
+      : mode === 'add'
+        ? ORGANIZATION_DRAWER_ADD_TITLES[intent]
+        : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
+  const instructionCopy =
+    mode === 'add' && resolvedAddKind
+      ? resolveOrganizationForwardAddDrawerInstruction(resolvedAddKind)
+      : null
+
+  const submitLabel =
+    mode === 'add' && resolvedAddKind
+      ? resolveOrganizationForwardAddSubmitLabel(resolvedAddKind)
+      : mode === 'add'
+        ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
+        : 'Save connection'
 
   return (
     <CatalogPickerSheet
@@ -155,15 +190,22 @@ function OrganizationLocationConnectionLinkDrawerContent({
             <RelationshipDrawerContextHeader
               context={`${selectedLocation.name} · ${getLocationKindLabel(selectedLocation.kind)}`}
             />
-            <LocationConnectionKindStep
-              id="organization-location-connection-kind"
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              options={kindOptions}
-              value={activeKind}
-              onValueChange={(value) =>
-                setSelectedKind(value as OrganizationLocationConnectionKind)
-              }
-            />
+            {instructionCopy ? (
+              <Text variant="muted" className="text-sm">
+                {instructionCopy}
+              </Text>
+            ) : null}
+            {showKindStep ? (
+              <LocationConnectionKindStep
+                id="organization-location-connection-kind"
+                label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+                options={kindOptions}
+                value={activeKind}
+                onValueChange={(value) =>
+                  setSelectedKind(value as OrganizationLocationConnectionKind)
+                }
+              />
+            ) : null}
           </div>
         ) : null
       }
@@ -177,7 +219,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       footer={
         selectedLocation ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-            {mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'}
+            {submitLabel}
           </Button>
         ) : undefined
       }
@@ -195,26 +237,41 @@ function OrganizationLocationConnectionLinkDrawerContent({
           undefined,
           excludeConnectionId,
         )
+        const kindAvailable =
+          resolvedAddKind == null ||
+          (resolveOrganizationKindsForDrawerIntent(location, intent).includes(resolvedAddKind) &&
+            organizationLocationConnectionHasAvailableKind({
+              locationId: location.id,
+              kinds: [resolvedAddKind],
+              subjectOrganizationId: organizationId,
+              connections: existingConnections,
+              excludeConnectionId,
+            }))
+        const canSelectLocation = resolvedAddKind ? kindAvailable : hasAvailableKind
         return (
           <ContentEntityCard
             chrome="embedded"
             density="compact"
             heading={location.name}
-            subheading={hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason}
+            subheading={canSelectLocation ? getLocationKindLabel(location.kind) : fullyLinkedReason}
             imageKey={location.imageKey}
-            disabled={!hasAvailableKind}
+            disabled={!canSelectLocation}
             endSlot={
               <CatalogPickerSelectionActions
                 phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                canSelect={hasAvailableKind}
+                canSelect={canSelectLocation}
                 addLabel={isSelected ? 'Selected' : 'Select'}
                 onAdd={() => {
                   setSelectedLocationId(location.id)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
                 onRemove={() => {
                   setSelectedLocationId(null)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
               />
             }

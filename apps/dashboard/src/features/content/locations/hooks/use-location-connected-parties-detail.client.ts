@@ -43,6 +43,7 @@ import {
 } from '../../lib/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
+import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
 import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
@@ -75,7 +76,7 @@ type OrganizationDrawerState =
     }
 
 type CharacterDrawerState =
-  | { mode: 'add' }
+  | { mode: 'add'; kind?: CharacterLocationConnectionKind }
   | {
       mode: 'edit'
       connection: {
@@ -204,6 +205,15 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [location],
   )
 
+  const peopleKindSlots = React.useMemo(
+    () =>
+      buildPeopleKindSlots({
+        organizationKinds: eligibility.organizationKinds,
+        characterKinds: eligibility.characterKinds,
+      }),
+    [eligibility.characterKinds, eligibility.organizationKinds],
+  )
+
   const invalidate = React.useCallback(
     async (input: { organizationId?: string; characterId?: string }) => {
       await invalidateLocationConnectionQueries(queryClient, {
@@ -315,8 +325,20 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [],
   )
 
+  const openOrganizationAddKind = React.useCallback((kind: OrganizationLocationConnectionKind) => {
+    setOrganizationDrawerState({
+      mode: 'add',
+      intent: organizationDrawerIntentFromKind(kind),
+      kind,
+    })
+  }, [])
+
   const openTerritorialAddDrawer = React.useCallback((kind: OrganizationLocationConnectionKind) => {
     setOrganizationDrawerState({ mode: 'add', intent: 'territorial_authority', kind })
+  }, [])
+
+  const openCharacterAddKind = React.useCallback((kind: CharacterLocationConnectionKind) => {
+    setCharacterDrawerState({ mode: 'add', kind })
   }, [])
 
   const handleChangeTerritorialKind = React.useCallback(
@@ -398,7 +420,9 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     characterDrawerState,
     setCharacterDrawerState,
     openOrganizationAddDrawer,
+    openOrganizationAddKind,
     openTerritorialAddDrawer,
+    openCharacterAddKind,
     handleRemoveConnection,
     handleOrganizationSubmit,
     handleCharacterSubmit,
@@ -422,6 +446,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     }),
     territorialOrganizationAddAffordances,
     peopleOrganizationAddAffordances,
+    peopleKindSlots,
     canAddCharacter:
       canWriteInverse &&
       canInverseWriteLocationConnectionForOwner('characters') &&

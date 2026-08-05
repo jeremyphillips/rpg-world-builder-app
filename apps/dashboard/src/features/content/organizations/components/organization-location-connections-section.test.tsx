@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { Button } from '@rpg/ui'
 
 import {
   OrganizationLocationConnectionsSection,
@@ -34,7 +33,7 @@ const sampleLocationConnections = {
 }
 
 describe('OrganizationLocationConnectionsSection', () => {
-  it('renders grouped location connection cards', () => {
+  it('renders family and kind grouped location connection rows', () => {
     render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection locationConnections={sampleLocationConnections} />
@@ -44,10 +43,31 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
     expect(screen.getByText('1 location connection')).toBeInTheDocument()
     expect(screen.getByText('Grey Coast')).toBeInTheDocument()
-    expect(screen.getByText('Territorial authority')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Territorial authority' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
   })
 
-  it('renders empty and error states', () => {
+  it('renders section empty text when no kind slots exist', () => {
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={{
+            previewItems: [],
+            total: 0,
+            emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+          }}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
+    ).toBeInTheDocument()
+  })
+
+  it('renders per-kind empty slots and error states', () => {
     const { rerender } = render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
@@ -58,19 +78,13 @@ describe('OrganizationLocationConnectionsSection', () => {
           }}
           canManage
           showEmptySection
-          addConnectionAction={
-            <Button type="button" variant="outline">
-              Add connection
-            </Button>
-          }
+          emptyKindSlots={['governs']}
         />
       </MemoryRouter>,
     )
 
-    expect(
-      screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add connection' })).toBeInTheDocument()
+    expect(screen.getByText('No governed locations linked.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add governed location' })).toBeInTheDocument()
 
     rerender(
       <MemoryRouter>
@@ -100,8 +114,9 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
   })
 
-  it('invokes edit callbacks for managers', async () => {
+  it('invokes per-kind add and edit callbacks for managers', async () => {
     const user = userEvent.setup()
+    const onAddKind = vi.fn()
     const onEditConnection = vi.fn()
 
     render(
@@ -110,10 +125,15 @@ describe('OrganizationLocationConnectionsSection', () => {
           locationConnections={sampleLocationConnections}
           canManage
           showEmptySection
+          emptyKindSlots={['controls']}
+          onAddKind={onAddKind}
           onEditConnection={onEditConnection}
         />
       </MemoryRouter>,
     )
+
+    await user.click(screen.getByRole('button', { name: 'Add controlled location' }))
+    expect(onAddKind).toHaveBeenCalledWith('controls')
 
     await user.click(screen.getByRole('button', { name: 'Actions for Grey Coast' }))
     await user.click(screen.getByRole('menuitem', { name: 'Change connection type' }))

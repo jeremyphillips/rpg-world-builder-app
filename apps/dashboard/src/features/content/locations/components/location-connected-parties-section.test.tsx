@@ -22,6 +22,19 @@ const sampleRows = [
   },
 ]
 
+const peopleKindSlots = [
+  {
+    subjectType: 'organization' as const,
+    kind: 'operates_in' as const,
+    heading: 'Operates in',
+  },
+  {
+    subjectType: 'character' as const,
+    kind: 'works_at' as const,
+    heading: 'Works here',
+  },
+]
+
 describe('LocationConnectedPartiesSection', () => {
   it('hides empty people section from read-only viewers', () => {
     render(
@@ -60,7 +73,7 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
 
-  it('shows manager scaffolding and region-specific add actions when people section is empty', () => {
+  it('shows per-kind people section scaffolding when empty', () => {
     render(
       <MemoryRouter>
         <LocationConnectedPartiesSection
@@ -69,11 +82,9 @@ describe('LocationConnectedPartiesSection', () => {
           rows={[]}
           canManage
           showEmptySection
-          organizationAddAffordances={[
-            { intent: 'geographic_presence', label: 'Add organization presence' },
-          ]}
-          onAddOrganization={() => undefined}
-          onAddCharacter={() => undefined}
+          peopleKindSlots={peopleKindSlots}
+          onAddOrganizationKind={() => undefined}
+          onAddCharacterKind={() => undefined}
         />
       </MemoryRouter>,
     )
@@ -81,8 +92,10 @@ describe('LocationConnectedPartiesSection', () => {
     expect(
       screen.getByText(LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations),
     ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Operates in' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Works here' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add organization presence' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Link character' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add worker' })).toBeInTheDocument()
   })
 
   it('invokes per-kind territorial add callbacks from slot actions', async () => {

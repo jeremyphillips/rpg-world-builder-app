@@ -2,14 +2,18 @@
 
 import * as React from 'react'
 
-import { Heading, SemanticText, Text } from '@rpg/ui'
+import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
+import { Button, Heading, SemanticText, Text } from '@rpg/ui'
 
 import {
   formatLocationConnectionsCount,
   ORGANIZATION_SECTION_LABELS,
   type OrganizationLocationConnectionsViewModel,
 } from '../lib/organization-display'
+import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
+import { resolveOrganizationForwardSurfaceCopy } from '../lib/organization-location-connection-surface-copy'
 import { OrganizationLocationConnectionRelationshipRow } from './organization-location-connection-relationship-row.client'
+import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
   'Could not load organization location connections.'
@@ -20,8 +24,6 @@ export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
 export const ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER =
   'Link this organization to locations where it has site presence, geographic activity, or territorial authority.'
 
-import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
-
 export type OrganizationLocationConnectionEditTarget = {
   connectionId: string
   locationId: string
@@ -30,6 +32,7 @@ export type OrganizationLocationConnectionEditTarget = {
 
 export type OrganizationLocationConnectionsSectionProps = {
   locationConnections: OrganizationLocationConnectionsViewModel
+  emptyKindSlots?: readonly OrganizationLocationConnectionKind[]
   canManage?: boolean
   showEmptySection?: boolean
   isPending?: boolean
@@ -38,13 +41,14 @@ export type OrganizationLocationConnectionsSectionProps = {
   mutationError?: string | null
   isMutationPending?: boolean
   pendingConnectionId?: string
-  addConnectionAction?: React.ReactNode
+  onAddKind?: (kind: OrganizationLocationConnectionKind) => void
   onEditConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
 }
 
 export function OrganizationLocationConnectionsSection({
   locationConnections,
+  emptyKindSlots = [],
   canManage = false,
   showEmptySection = true,
   isPending = false,
@@ -53,21 +57,19 @@ export function OrganizationLocationConnectionsSection({
   mutationError = null,
   isMutationPending = false,
   pendingConnectionId,
-  addConnectionAction,
+  onAddKind,
   onEditConnection,
   onRemoveConnection,
 }: OrganizationLocationConnectionsSectionProps) {
   const { previewItems, total, emptyText } = locationConnections
 
-  const groupedItems = React.useMemo(() => {
-    const groups = new Map<string, typeof previewItems>()
-    for (const item of previewItems) {
-      const existing = groups.get(item.familyLabel) ?? []
-      existing.push(item)
-      groups.set(item.familyLabel, existing)
-    }
-    return groups
-  }, [previewItems])
+  const groupedFamilies = React.useMemo(
+    () =>
+      groupOrganizationLocationConnections(previewItems, {
+        emptyKindSlots: canManage ? emptyKindSlots : undefined,
+      }),
+    [canManage, emptyKindSlots, previewItems],
+  )
 
   if (!showEmptySection && total === 0) {
     return null
@@ -75,16 +77,13 @@ export function OrganizationLocationConnectionsSection({
 
   return (
     <section aria-labelledby="organization-location-connections-heading" className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="space-y-1">
-          <Heading variant="group" as="h2" id="organization-location-connections-heading">
-            {ORGANIZATION_SECTION_LABELS.locationConnections}
-          </Heading>
-          {canManage ? (
-            <Text variant="muted">{ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER}</Text>
-          ) : null}
-        </div>
-        {canManage && addConnectionAction ? addConnectionAction : null}
+      <div className="space-y-1">
+        <Heading variant="group" as="h2" id="organization-location-connections-heading">
+          {ORGANIZATION_SECTION_LABELS.locationConnections}
+        </Heading>
+        {canManage ? (
+          <Text variant="muted">{ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER}</Text>
+        ) : null}
       </div>
 
       {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
@@ -93,33 +92,62 @@ export function OrganizationLocationConnectionsSection({
         <Text variant="muted">Loading…</Text>
       ) : isError ? (
         <Text variant="muted">{errorText}</Text>
-      ) : total === 0 ? (
+      ) : total === 0 && groupedFamilies.length === 0 ? (
         canManage ? (
           <Text variant="muted">{emptyText}</Text>
         ) : null
       ) : (
         <div className="space-y-6">
-          <Text variant="muted">{formatLocationConnectionsCount(total)}</Text>
-          {[...groupedItems.entries()].map(([familyLabel, items]) => (
-            <div key={familyLabel} className="space-y-2">
+          {total > 0 ? <Text variant="muted">{formatLocationConnectionsCount(total)}</Text> : null}
+          {groupedFamilies.map((familyGroup) => (
+            <div key={familyGroup.family} className="space-y-4">
               <Heading variant="label" as="h3">
-                {familyLabel}
+                {familyGroup.familyLabel}
               </Heading>
-              <ul className="space-y-2">
-                {items.map((item) => (
-                  <li key={item.connectionId}>
-                    <OrganizationLocationConnectionRelationshipRow
-                      item={item}
-                      canManage={canManage}
-                      isMutationPending={
-                        isMutationPending && pendingConnectionId === item.connectionId
-                      }
-                      onEditConnection={onEditConnection}
-                      onRemoveConnection={onRemoveConnection}
-                    />
-                  </li>
-                ))}
-              </ul>
+              {familyGroup.kindGroups.map((kindGroup) => {
+                const copy = resolveOrganizationForwardSurfaceCopy(kindGroup.kind)
+
+                return (
+                  <div key={kindGroup.kind} className="space-y-1">
+                    <Heading variant="label" as="h4">
+                      {kindGroup.kindLabel}
+                    </Heading>
+                    {kindGroup.items.length > 0 ? (
+                      <ul className="space-y-1">
+                        {kindGroup.items.map((item) => (
+                          <li key={item.connectionId}>
+                            <OrganizationLocationConnectionRelationshipRow
+                              item={item}
+                              canManage={canManage}
+                              isMutationPending={
+                                isMutationPending && pendingConnectionId === item.connectionId
+                              }
+                              onEditConnection={onEditConnection}
+                              onRemoveConnection={onRemoveConnection}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : canManage ? (
+                      <RelationshipEmptyInlineRow
+                        emptyLabel={copy.empty}
+                        addLabel={copy.add}
+                        onAdd={() => onAddKind?.(kindGroup.kind)}
+                      />
+                    ) : null}
+                    {canManage && kindGroup.items.length > 0 ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onAddKind?.(kindGroup.kind)}
+                      >
+                        {copy.add}
+                      </Button>
+                    ) : null}
+                  </div>
+                )
+              })}
             </div>
           ))}
         </div>

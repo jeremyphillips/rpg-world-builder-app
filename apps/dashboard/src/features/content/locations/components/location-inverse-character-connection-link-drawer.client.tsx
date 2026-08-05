@@ -22,6 +22,7 @@ import {
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
@@ -32,11 +33,15 @@ import {
   LOCATION_CONNECTION_KIND_FIELD_LABEL,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
+import {
+  resolveLocationInverseCharacterAddDrawerInstruction,
+  resolveLocationInverseCharacterAddDrawerTitle,
+  resolveLocationInverseCharacterAddSubmitLabel,
+  resolveTerritorialAuthorityLocationContext,
+} from '../lib/location-connection-surface-copy'
 import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
 
-export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_ADD_TITLE = 'Link character'
 export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE = 'Edit character connection'
-export const LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_ADD_LABEL = 'Link character'
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
 
@@ -44,6 +49,7 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'add' | 'edit'
+  addKind?: CharacterLocationConnectionKind
   location: Location
   characters: readonly LocationPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -60,7 +66,7 @@ export function LocationInverseCharacterConnectionLinkDrawer(
   props: LocationInverseCharacterConnectionLinkDrawerProps,
 ) {
   const remountKey = props.open
-    ? `${props.mode}:${props.initialConnection?.relationshipId ?? 'add'}`
+    ? `${props.mode}:${props.addKind ?? 'none'}:${props.initialConnection?.relationshipId ?? 'add'}`
     : 'closed'
 
   return <LocationInverseCharacterConnectionLinkDrawerContent key={remountKey} {...props} />
@@ -71,6 +77,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   open,
   onOpenChange,
   mode,
+  addKind,
   location,
   characters,
   connectedPartyRows,
@@ -78,11 +85,13 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   isSubmitting = false,
   onSubmit,
 }: LocationInverseCharacterConnectionLinkDrawerProps) {
+  const resolvedAddKind = mode === 'add' && addKind != null ? addKind : undefined
+
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(
     initialConnection?.characterId ?? null,
   )
   const [selectedKind, setSelectedKind] = React.useState<CharacterLocationConnectionKind | null>(
-    initialConnection?.kind ?? null,
+    resolvedAddKind ?? initialConnection?.kind ?? null,
   )
 
   const characterRows = React.useMemo(
@@ -107,19 +116,24 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   )
 
   const kindOptions = React.useMemo(() => {
-    if (!selectedCharacterId) return []
+    if (!selectedCharacterId || resolvedAddKind) return []
     const disabledKinds = new Set(
       eligibleKinds.filter((kind) =>
         existingKeys.has(subjectLocationConnectionKey(selectedCharacterId, kind)),
       ),
     )
     return buildCharacterLocationConnectionKindOptions(eligibleKinds, disabledKinds)
-  }, [eligibleKinds, existingKeys, selectedCharacterId])
+  }, [eligibleKinds, existingKeys, resolvedAddKind, selectedCharacterId])
 
-  const activeKind = resolveActiveConnectionKind(
-    selectedKind,
-    kindOptions,
-  ) as CharacterLocationConnectionKind | null
+  const activeKind = (() => {
+    if (resolvedAddKind) return resolvedAddKind
+    return resolveActiveConnectionKind(
+      selectedKind,
+      kindOptions,
+    ) as CharacterLocationConnectionKind | null
+  })()
+
+  const showKindStep = mode === 'add' && !resolvedAddKind && Boolean(selectedCharacterId)
 
   const canSubmit = Boolean(selectedCharacterId && activeKind && !isSubmitting)
 
@@ -129,9 +143,25 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   }
 
   const title =
-    mode === 'add'
-      ? LOCATION_INVERSE_CHARACTER_LINK_DRAWER_ADD_TITLE
-      : LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE
+    mode === 'add' && resolvedAddKind
+      ? resolveLocationInverseCharacterAddDrawerTitle(resolvedAddKind)
+      : mode === 'add'
+        ? 'Link character'
+        : LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE
+
+  const instructionCopy =
+    mode === 'add' && resolvedAddKind
+      ? resolveLocationInverseCharacterAddDrawerInstruction(resolvedAddKind)
+      : null
+
+  const submitLabel =
+    mode === 'add' && resolvedAddKind
+      ? resolveLocationInverseCharacterAddSubmitLabel(resolvedAddKind)
+      : mode === 'add'
+        ? 'Link character'
+        : 'Save connection'
+
+  const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
   return (
     <CatalogPickerSheet
@@ -144,27 +174,37 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       noResultsMessage="No matches for this search."
       noItemsMessage="No characters are available."
       headerBelowDescription={
-        selectedCharacterId ? (
-          <LocationConnectionKindStep
-            id="location-inverse-character-connection-kind"
-            label={LOCATION_CONNECTION_KIND_FIELD_LABEL}
-            options={kindOptions}
-            value={activeKind}
-            onValueChange={(value) => setSelectedKind(value as CharacterLocationConnectionKind)}
+        <div className="space-y-4">
+          <RelationshipDrawerContextHeader
+            context={resolveTerritorialAuthorityLocationContext(location)}
           />
-        ) : null
+          {instructionCopy ? (
+            <Text variant="muted" className="text-sm">
+              {instructionCopy}
+            </Text>
+          ) : null}
+          {showKindStep ? (
+            <LocationConnectionKindStep
+              id="location-inverse-character-connection-kind"
+              label={LOCATION_CONNECTION_KIND_FIELD_LABEL}
+              options={kindOptions}
+              value={activeKind}
+              onValueChange={(value) => setSelectedKind(value as CharacterLocationConnectionKind)}
+            />
+          ) : null}
+        </div>
       }
       emptyState={
-        !selectedCharacterId ? (
+        mode === 'add' && !selectedCharacterId ? (
           <Text variant="muted" className="text-sm" role="status">
             {LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE}
           </Text>
         ) : undefined
       }
       footer={
-        selectedCharacterId ? (
+        selectedCharacterId && activeKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-            {mode === 'add' ? LOCATION_INVERSE_CHARACTER_LINK_SUBMIT_ADD_LABEL : 'Save connection'}
+            {submitLabel}
           </Button>
         ) : undefined
       }
@@ -176,7 +216,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         const isSelected = selectedCharacterId === character.id
         const hasAvailableKind = characterInverseSubjectHasAvailableKind(
           character.id,
-          eligibleKinds,
+          availabilityKinds,
           existingKeys,
         )
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
@@ -199,11 +239,15 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
                 addLabel={isSelected ? 'Selected' : 'Select'}
                 onAdd={() => {
                   setSelectedCharacterId(character.id)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
                 onRemove={() => {
                   setSelectedCharacterId(null)
-                  setSelectedKind(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
                 }}
               />
             }
