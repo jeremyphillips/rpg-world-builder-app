@@ -77,7 +77,7 @@ export const CROSS_CONTENT_RELATIONSHIP_PROJECTIONS: Record<
     ownerField: 'territorialAuthority',
     capabilities: {
       forward: 'write',
-      inverse: 'read',
+      inverse: 'write',
     },
   },
 }

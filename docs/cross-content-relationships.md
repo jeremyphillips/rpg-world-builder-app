@@ -42,7 +42,7 @@ write affordances must gate on declared registry capability
 | -------------------------------- | -------------------- | --------------------- | ------- | ------- |
 | `class_skill_proficiency_choice` | `classes`            | `skill-proficiencies` | write   | read    |
 | `location_party_association`     | `locations`          | `organizations`       | write   | read    |
-| `region_territorial_authority`   | `locations` (region) | `organizations`       | write   | read    |
+| `region_territorial_authority`   | `locations` (region) | `organizations`       | write   | write   |
 
 UI inverse write controls must not ship while the registry declares
 `inverse: 'read'`.

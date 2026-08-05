@@ -4,6 +4,8 @@ import {
   type Organization,
 } from '@rpg/contracts'
 
+import type { OrganizationConnectedRegionRelationshipFamily } from '@rpg/contracts'
+
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 
 export const ORGANIZATION_SECTION_LABELS = {
@@ -23,8 +25,12 @@ export type OrganizationConnectedCharacterPreviewItem = {
 
 export type OrganizationConnectedRegionPreviewItem = {
   relationshipId: string
+  relationshipFamily: OrganizationConnectedRegionRelationshipFamily
+  relationshipKind: string
+  regionId: string
   card: { id: string; name: string; summary: string }
   detailHref: string
+  canEditTerritorial: boolean
 }
 
 export type OrganizationConnectedCharactersViewModel = {

@@ -7,14 +7,19 @@ import type { OrganizationConnectedRegionPreviewItem } from './organization-disp
 
 export function buildOrganizationConnectedRegionCards(
   connectedRegions: OrganizationConnectedRegionsResponse,
-  routeContext: { campaignId: string },
+  routeContext: { campaignId: string; canWriteInverseTerritorial?: boolean },
 ): {
   previewItems: OrganizationConnectedRegionPreviewItem[]
   total: number
 } {
+  const canWriteInverseTerritorial = routeContext.canWriteInverseTerritorial ?? false
+
   return {
     previewItems: connectedRegions.items.map((connectedRegion) => ({
       relationshipId: connectedRegion.relationshipId,
+      relationshipFamily: connectedRegion.relationshipFamily,
+      relationshipKind: connectedRegion.relationshipKind,
+      regionId: connectedRegion.region.id,
       card: {
         id: connectedRegion.region.id,
         name: connectedRegion.region.name,
@@ -24,6 +29,8 @@ export function buildOrganizationConnectedRegionCards(
         routeContext.campaignId,
         connectedRegion.region.id,
       ),
+      canEditTerritorial:
+        canWriteInverseTerritorial && connectedRegion.relationshipFamily === 'territorialAuthority',
     })),
     total: connectedRegions.total,
   }

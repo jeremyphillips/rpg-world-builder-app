@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
+import { registerCampaignMember } from '../../../test/helpers/campaign-membership'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -237,5 +238,52 @@ describe('territorial authority nested routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .send({ id: 'ta-governs', organizationId, kind: 'governs' })
       .expect(400)
+  })
+
+  it('requires owner/co-owner auth for territorial authority nested mutations', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'territorial-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const createOrgRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/organizations`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send(minimalOrganizationInput)
+      .expect(201)
+    const organizationId = createOrgRes.body.organizations.id as string
+
+    const createWorldRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ slug: 'auth-world', kind: 'world', name: 'Auth World' })
+      .expect(201)
+    const worldId = createWorldRes.body.locations.id as string
+
+    const createRegionRes = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'auth-region',
+        kind: 'region',
+        name: 'Auth Region',
+        parentLocationId: worldId,
+      })
+      .expect(201)
+    const regionId = createRegionRes.body.locations.id as string
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'territorial-member@example.com',
+      campaignRole: 'pc',
+    })
+
+    await member.agent
+      .post(territorialAuthoritiesPath(campaignId, regionId))
+      .set(CSRF_HEADER, member.csrfToken)
+      .send({ id: 'ta-governs', organizationId, kind: 'governs' })
+      .expect(403)
   })
 })

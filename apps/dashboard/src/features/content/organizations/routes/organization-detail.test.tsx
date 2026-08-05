@@ -30,6 +30,17 @@ vi.mock('../hooks/use-organization-connected-regions', () => ({
     error: null,
   })),
 }))
+vi.mock('../hooks/use-organization-territorial-authority-mutations', () => ({
+  useOrganizationTerritorialAuthorityMutations: vi.fn(() => ({
+    addTerritorialAuthority: vi.fn(),
+    updateTerritorialAuthorityKind: vi.fn(),
+    removeTerritorialAuthority: vi.fn(),
+    isPending: false,
+    pendingRelationshipId: undefined,
+    error: null,
+    resetErrors: vi.fn(),
+  })),
+}))
 vi.mock('../hooks/use-organization-connected-characters', () => ({
   useOrganizationConnectedCharacters: vi.fn(() => ({
     data: {

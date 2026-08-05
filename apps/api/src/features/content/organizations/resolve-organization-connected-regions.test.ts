@@ -94,7 +94,7 @@ describe('resolveOrganizationConnectedRegions', () => {
       ownerContentType: 'locations',
       targetContentType: 'organizations',
       ownerField: 'territorialAuthority',
-      capabilities: { forward: 'write', inverse: 'read' },
+      capabilities: { forward: 'write', inverse: 'write' },
     })
     expect(party).toMatchObject({
       ownerContentType: 'locations',

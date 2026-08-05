@@ -26,8 +26,8 @@ describe('cross-content relationship projection registry', () => {
     }
   })
 
-  it('keeps territorial authority inverse read-only until inverse writes ship', () => {
-    expect(canInverseWriteCrossContentRelationship('region_territorial_authority')).toBe(false)
+  it('keeps party association inverse read-only while enabling territorial inverse writes', () => {
+    expect(canInverseWriteCrossContentRelationship('region_territorial_authority')).toBe(true)
     expect(canInverseWriteCrossContentRelationship('location_party_association')).toBe(false)
     expect(canInverseWriteCrossContentRelationship('class_skill_proficiency_choice')).toBe(false)
   })
