@@ -149,7 +149,6 @@ export async function updateOrganizationLocationConnectionRecord(input: {
     )
   }
 
-  const nextLocationId = input.body.locationId ?? current.locationId
   const nextKind = input.body.kind ?? current.kind
   assertOrganizationLocationConnectionEligible(input.location, nextKind)
 
@@ -160,14 +159,6 @@ export async function updateOrganizationLocationConnectionRecord(input: {
       404,
       'not_found',
       `Location connection "${input.connectionId}" was not found on this organization.`,
-    )
-  }
-
-  if (connection.locationId !== nextLocationId) {
-    throw new HttpError(
-      400,
-      'validation_error',
-      'Location id changes require deleting and recreating the connection.',
     )
   }
 

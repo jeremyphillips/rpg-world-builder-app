@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import type { Organization } from '@rpg/contracts'
-import { ApiError } from '@rpg/contracts'
 import { RichTextContent } from '@rpg/ui'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/wide-page'
-import { useCanManageCampaign } from '@/features/campaign'
 import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
@@ -17,17 +15,10 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { OrganizationConnectedCharactersSection } from '../components/organization-connected-characters-section.client'
-import {
-  OrganizationLocationConnectionsSection,
-  ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR,
-  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
-} from '../components/organization-location-connections-section.client'
+import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
-import { useOrganizationLocationConnectionMutations } from '../hooks/use-organization-location-connection-mutations'
-import { useOrganizationLocationReferences } from '../hooks/use-organization-location-references'
 import { useOrganizations } from '../hooks/use-organizations'
 import { buildOrganizationConnectedCharacterCards } from '../lib/build-organization-connected-character-cards'
-import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import {
   buildOrganizationDetailViewModel,
   ORGANIZATION_EMPTY_SECTION_TEXT,
@@ -41,31 +32,11 @@ export function OrganizationDetailContent({
   campaignId: string
 }) {
   useSetBreadcrumbLabel(organization.name)
-  const canManage = useCanManageCampaign(campaignId)
   const connectedCharactersQuery = useOrganizationConnectedCharacters(campaignId, organization.id)
-  const locationReferencesQuery = useOrganizationLocationReferences(campaignId, organization.id)
-  const locationConnectionMutations = useOrganizationLocationConnectionMutations(
-    campaignId,
-    organization.id,
-  )
-
-  const mutationError =
-    locationConnectionMutations.error instanceof ApiError
-      ? locationConnectionMutations.error.message
-      : locationConnectionMutations.error
-        ? ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR
-        : null
 
   const viewModel = useMemo(() => {
     const connectedCharacters = connectedCharactersQuery.data
       ? buildOrganizationConnectedCharacterCards(connectedCharactersQuery.data, { campaignId })
-      : {
-          previewItems: [],
-          total: 0,
-        }
-
-    const locationConnections = locationReferencesQuery.data
-      ? buildOrganizationLocationConnectionCards(locationReferencesQuery.data, { campaignId })
       : {
           previewItems: [],
           total: 0,
@@ -78,16 +49,12 @@ export function OrganizationDetailContent({
         emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
       },
       {
-        ...locationConnections,
+        previewItems: [],
+        total: 0,
         emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
       },
     )
-  }, [campaignId, connectedCharactersQuery.data, locationReferencesQuery.data, organization])
-
-  const handleRemoveConnection = async (connectionId: string) => {
-    locationConnectionMutations.resetErrors()
-    await locationConnectionMutations.removeLocationConnection(connectionId)
-  }
+  }, [campaignId, connectedCharactersQuery.data, organization])
 
   return (
     <WidePage>
@@ -106,16 +73,9 @@ export function OrganizationDetailContent({
         }
       >
         <div className="space-y-8">
-          <OrganizationLocationConnectionsSection
-            locationConnections={viewModel.locationConnections}
-            canManage={canManage}
-            isPending={locationReferencesQuery.isPending}
-            isError={locationReferencesQuery.isError}
-            errorText={ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR}
-            mutationError={mutationError}
-            isMutationPending={locationConnectionMutations.isPending}
-            pendingConnectionId={locationConnectionMutations.pendingConnectionId}
-            onRemoveConnection={canManage ? handleRemoveConnection : undefined}
+          <OrganizationLocationConnectionsDetailSection
+            campaignId={campaignId}
+            organizationId={organization.id}
           />
           <OrganizationConnectedCharactersSection
             connectedCharacters={viewModel.connectedCharacters}

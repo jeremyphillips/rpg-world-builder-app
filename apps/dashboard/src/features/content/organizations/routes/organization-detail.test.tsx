@@ -4,11 +4,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR } from '../components/organization-location-connections-section.client'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import { CITY_COUNCIL } from '../fixtures'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
-import { useOrganizationLocationReferences } from '../hooks/use-organization-location-references'
 import { OrganizationDetailContent } from './organization-detail'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({
@@ -17,24 +15,8 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
-
-const mockUseOrganizationLocationReferences = vi.mocked(useOrganizationLocationReferences)
-vi.mock('../hooks/use-organization-location-references', () => ({
-  useOrganizationLocationReferences: vi.fn(() => ({
-    data: [],
-    isPending: false,
-    isError: false,
-    error: null,
-  })),
-}))
-vi.mock('../hooks/use-organization-location-connection-mutations', () => ({
-  useOrganizationLocationConnectionMutations: vi.fn(() => ({
-    removeLocationConnection: vi.fn(),
-    isPending: false,
-    pendingConnectionId: undefined,
-    error: null,
-    resetErrors: vi.fn(),
-  })),
+vi.mock('../components/organization-location-connections-detail-section.client', () => ({
+  OrganizationLocationConnectionsDetailSection: () => null,
 }))
 vi.mock('../hooks/use-organization-connected-characters', () => ({
   useOrganizationConnectedCharacters: vi.fn(() => ({
@@ -72,7 +54,6 @@ describe('OrganizationDetailContent', () => {
     renderDetail()
     expect(screen.getByText('Government')).toBeInTheDocument()
     expect(screen.getByText('The elected council governing the city.')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connected characters' })).toBeInTheDocument()
     expect(screen.getByText('1 connected character')).toBeInTheDocument()
     expect(screen.getByText('Circle Envoy')).toBeInTheDocument()
@@ -92,22 +73,6 @@ describe('OrganizationDetailContent', () => {
     expect(screen.getByText('Loading…')).toBeInTheDocument()
     expect(
       screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters),
-    ).not.toBeInTheDocument()
-  })
-
-  it('shows location connections load error separately from empty state', () => {
-    mockUseOrganizationLocationReferences.mockReturnValueOnce({
-      data: undefined,
-      isPending: false,
-      isError: true,
-      error: new Error('failed'),
-    } as ReturnType<typeof useOrganizationLocationReferences>)
-
-    renderDetail()
-
-    expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
-    expect(
-      screen.queryByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
     ).not.toBeInTheDocument()
   })
 

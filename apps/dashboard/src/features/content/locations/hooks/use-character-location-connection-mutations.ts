@@ -1,36 +1,32 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import type {
-  CreateOrganizationLocationConnectionInput,
-  OrganizationLocationConnectionKind,
-  UpdateOrganizationLocationConnectionInput,
+  CreateCharacterLocationConnectionInput,
+  CharacterLocationConnectionKind,
+  UpdateCharacterLocationConnectionInput,
 } from '@rpg/contracts'
 
 import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
 import {
-  createOrganizationLocationConnection,
-  deleteOrganizationLocationConnection,
-  updateOrganizationLocationConnection,
-} from '../api/organization-location-connection-client'
-import { organizationLocationReferencesQueryKey } from './use-organization-location-references'
+  createCharacterLocationConnection,
+  deleteCharacterLocationConnection,
+  updateCharacterLocationConnection,
+} from '../api/character-location-connection-client'
 
-export function useOrganizationLocationConnectionMutations(
-  campaignId: string,
-  organizationId: string,
-) {
+export function useCharacterLocationConnectionMutations(campaignId: string, characterId: string) {
   const queryClient = useQueryClient()
 
   const invalidate = async (locationIds: readonly string[] = []) => {
     await invalidateLocationConnectionQueries(queryClient, {
       campaignId,
-      organizationId,
+      characterId,
       locationIds,
     })
   }
 
   const createMutation = useMutation({
-    mutationFn: (input: CreateOrganizationLocationConnectionInput) =>
-      createOrganizationLocationConnection(campaignId, organizationId, input),
+    mutationFn: (input: CreateCharacterLocationConnectionInput) =>
+      createCharacterLocationConnection(campaignId, characterId, input),
     onSuccess: async (_result, variables) => {
       await invalidate([variables.locationId])
     },
@@ -42,9 +38,9 @@ export function useOrganizationLocationConnectionMutations(
       input,
     }: {
       connectionId: string
-      input: UpdateOrganizationLocationConnectionInput
+      input: UpdateCharacterLocationConnectionInput
       previousLocationId: string
-    }) => updateOrganizationLocationConnection(campaignId, organizationId, connectionId, input),
+    }) => updateCharacterLocationConnection(campaignId, characterId, connectionId, input),
     onSuccess: async (_result, variables) => {
       const nextLocationId = variables.input.locationId ?? variables.previousLocationId
       const locationIds =
@@ -57,18 +53,18 @@ export function useOrganizationLocationConnectionMutations(
 
   const deleteMutation = useMutation({
     mutationFn: ({ connectionId }: { connectionId: string; locationId: string }) =>
-      deleteOrganizationLocationConnection(campaignId, organizationId, connectionId),
+      deleteCharacterLocationConnection(campaignId, characterId, connectionId),
     onSuccess: async (_result, variables) => {
       await invalidate([variables.locationId])
     },
   })
 
   return {
-    addLocationConnection: (locationId: string, kind: OrganizationLocationConnectionKind) =>
+    addLocationConnection: (locationId: string, kind: CharacterLocationConnectionKind) =>
       createMutation.mutateAsync({ locationId, kind }),
     updateLocationConnection: (
       connectionId: string,
-      input: UpdateOrganizationLocationConnectionInput,
+      input: UpdateCharacterLocationConnectionInput,
       previousLocationId: string,
     ) => updateMutation.mutateAsync({ connectionId, input, previousLocationId }),
     removeLocationConnection: (connectionId: string, locationId: string) =>
@@ -85,6 +81,5 @@ export function useOrganizationLocationConnectionMutations(
       updateMutation.reset()
       deleteMutation.reset()
     },
-    referencesQueryKey: organizationLocationReferencesQueryKey(campaignId, organizationId),
   }
 }

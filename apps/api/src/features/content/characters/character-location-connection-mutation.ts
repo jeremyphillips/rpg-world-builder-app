@@ -149,7 +149,6 @@ export async function updateCharacterLocationConnectionRecord(input: {
     )
   }
 
-  const nextLocationId = input.body.locationId ?? current.locationId
   const nextKind = input.body.kind ?? current.kind
   assertCharacterLocationConnectionEligible(input.location, nextKind)
 
@@ -160,14 +159,6 @@ export async function updateCharacterLocationConnectionRecord(input: {
       404,
       'not_found',
       `Location connection "${input.connectionId}" was not found on this character.`,
-    )
-  }
-
-  if (connection.locationId !== nextLocationId) {
-    throw new HttpError(
-      400,
-      'validation_error',
-      'Location id changes require deleting and recreating the connection.',
     )
   }
 

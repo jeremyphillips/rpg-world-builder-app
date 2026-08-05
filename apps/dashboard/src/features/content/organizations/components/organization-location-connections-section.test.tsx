@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import {
@@ -54,6 +55,9 @@ describe('OrganizationLocationConnectionsSection', () => {
             total: 0,
             emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
           }}
+          canManage
+          showEmptySection
+          onAddConnection={() => undefined}
         />
       </MemoryRouter>,
     )
@@ -61,6 +65,22 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(
       screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Link location' })).toBeInTheDocument()
+
+    rerender(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={{
+            previewItems: [],
+            total: 0,
+            emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+          }}
+          showEmptySection={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('heading', { name: 'Location connections' })).not.toBeInTheDocument()
 
     rerender(
       <MemoryRouter>
@@ -73,6 +93,34 @@ describe('OrganizationLocationConnectionsSection', () => {
     )
 
     expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
+  })
+
+  it('invokes add and edit callbacks for managers', async () => {
+    const user = userEvent.setup()
+    const onAddConnection = vi.fn()
+    const onEditConnection = vi.fn()
+
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={sampleLocationConnections}
+          canManage
+          showEmptySection
+          onAddConnection={onAddConnection}
+          onEditConnection={onEditConnection}
+        />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Link location' }))
+    expect(onAddConnection).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByRole('button', { name: 'Edit Grey Coast Governs' }))
+    expect(onEditConnection).toHaveBeenCalledWith({
+      connectionId: 'conn-1',
+      locationId: 'region-1',
+      kind: 'governs',
+    })
   })
 
   it('has no axe accessibility violations', async () => {

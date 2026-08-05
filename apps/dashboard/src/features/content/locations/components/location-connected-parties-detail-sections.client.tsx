@@ -1,104 +1,92 @@
 'use client'
 
-import * as React from 'react'
-
-import { ApiError, canInverseWriteCrossContentRelationship } from '@rpg/contracts'
+import type { Location } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 
-import { useCanManageCampaign } from '@/features/campaign'
-
-import { deleteCharacterLocationConnection } from '../api/character-location-connection-client'
-import { deleteOrganizationLocationConnection } from '../../organizations/api/organization-location-connection-client'
+import { LocationConnectedPartiesDrawers } from './location-connected-parties-drawers.client'
 import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
-import { useLocationConnectedParties } from '../hooks/use-location-connected-parties'
-import { locationConnectedPartiesQueryKey } from '../hooks/use-location-connected-parties'
-import { useQueryClient } from '@tanstack/react-query'
+import { useLocationConnectedPartiesDetail } from '../hooks/use-location-connected-parties-detail.client'
 
-export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =
-  'Could not update connected parties for this location.'
+export { LOCATION_CONNECTED_PARTIES_MUTATION_ERROR } from '../hooks/use-location-connected-parties-detail.client'
 
+// fallow-ignore-next-line complexity
 export function LocationConnectedPartiesDetailSections({
   campaignId,
-  locationId,
+  location,
 }: {
   campaignId: string
-  locationId: string
+  location: Location
 }) {
-  const canManage = useCanManageCampaign(campaignId)
-  const canWriteInverse =
-    canManage && canInverseWriteCrossContentRelationship('character_location_connection')
-  const queryClient = useQueryClient()
-  const connectedPartiesQuery = useLocationConnectedParties(campaignId, locationId)
-  const [mutationError, setMutationError] = React.useState<string | null>(null)
-  const [pendingRelationshipId, setPendingRelationshipId] = React.useState<string>()
-  const [isMutationPending, setIsMutationPending] = React.useState(false)
+  const detail = useLocationConnectedPartiesDetail(campaignId, location)
 
-  const rows = connectedPartiesQuery.data?.items ?? []
-
-  const handleRemoveConnection = async (input: {
-    relationshipId: string
-    subjectType: 'character' | 'organization'
-    subjectId: string
-  }) => {
-    if (!canWriteInverse) return
-
-    setMutationError(null)
-    setPendingRelationshipId(input.relationshipId)
-    setIsMutationPending(true)
-
-    try {
-      if (input.subjectType === 'character') {
-        await deleteCharacterLocationConnection(campaignId, input.subjectId, input.relationshipId)
-      } else {
-        await deleteOrganizationLocationConnection(
-          campaignId,
-          input.subjectId,
-          input.relationshipId,
-        )
-      }
-
-      await queryClient.invalidateQueries({
-        queryKey: locationConnectedPartiesQueryKey(campaignId, locationId),
-      })
-    } catch (error) {
-      setMutationError(
-        error instanceof ApiError ? error.message : LOCATION_CONNECTED_PARTIES_MUTATION_ERROR,
-      )
-    } finally {
-      setIsMutationPending(false)
-      setPendingRelationshipId(undefined)
-    }
-  }
-
-  if (connectedPartiesQuery.isPending) {
+  if (detail.connectedPartiesQuery.isPending) {
     return <Text variant="muted">Loading connected parties…</Text>
   }
 
-  if (connectedPartiesQuery.isError) {
+  if (detail.connectedPartiesQuery.isError) {
     return <Text variant="muted">Could not load connected parties for this location.</Text>
+  }
+
+  if (!detail.showTerritorialSection && !detail.showPeopleSection) {
+    return null
+  }
+
+  const sharedSectionProps = {
+    campaignId,
+    rows: detail.rows,
+    canManage: detail.canWriteInverse,
+    isMutationPending: detail.isMutationPending,
+    pendingRelationshipId: detail.pendingRelationshipId,
+    onEditConnection: detail.canWriteInverse ? detail.handleEditConnection : undefined,
+    onRemoveConnection: detail.canWriteInverse ? detail.handleRemoveConnection : undefined,
+    canEditRow: detail.canEditRow,
+    canRemoveRow: detail.canEditRow,
   }
 
   return (
     <div className="space-y-8">
-      {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
-      <LocationConnectedPartiesSection
-        campaignId={campaignId}
-        sectionGroup="territorial_authority"
-        rows={rows}
-        canManage={canWriteInverse}
-        isMutationPending={isMutationPending}
-        pendingRelationshipId={pendingRelationshipId}
-        onRemoveConnection={canWriteInverse ? handleRemoveConnection : undefined}
-      />
-      <LocationConnectedPartiesSection
-        campaignId={campaignId}
-        sectionGroup="people_and_organizations"
-        rows={rows}
-        canManage={canWriteInverse}
-        isMutationPending={isMutationPending}
-        pendingRelationshipId={pendingRelationshipId}
-        onRemoveConnection={canWriteInverse ? handleRemoveConnection : undefined}
-      />
+      {detail.mutationError ? (
+        <SemanticText tone="destructive">{detail.mutationError}</SemanticText>
+      ) : null}
+
+      {detail.showTerritorialSection ? (
+        <LocationConnectedPartiesSection
+          {...sharedSectionProps}
+          sectionGroup="territorial_authority"
+          showEmptySection={
+            detail.canManage ||
+            detail.rows.some((row) => row.sectionGroup === 'territorial_authority')
+          }
+          onAddOrganization={
+            detail.canAddOrganization
+              ? () => detail.setOrganizationDrawerState({ mode: 'add' })
+              : undefined
+          }
+        />
+      ) : null}
+
+      {detail.showPeopleSection ? (
+        <LocationConnectedPartiesSection
+          {...sharedSectionProps}
+          sectionGroup="people_and_organizations"
+          showEmptySection={
+            detail.canManage ||
+            detail.rows.some((row) => row.sectionGroup === 'people_and_organizations')
+          }
+          onAddOrganization={
+            detail.canAddPeopleOrganization
+              ? () => detail.setOrganizationDrawerState({ mode: 'add' })
+              : undefined
+          }
+          onAddCharacter={
+            detail.canAddCharacter
+              ? () => detail.setCharacterDrawerState({ mode: 'add' })
+              : undefined
+          }
+        />
+      ) : null}
+
+      <LocationConnectedPartiesDrawers location={location} detail={detail} />
     </div>
   )
 }

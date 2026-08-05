@@ -114,6 +114,45 @@ describe('organization location connection nested routes', () => {
     expect(clearedOrganization?.connections?.locations).toEqual([])
   })
 
+  it('moves a connection to another location when PATCH changes locationId', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const { region } = await seedRegionLocation(campaignId)
+    const settlement = await createHomebrewContent(locationWriteConfig, campaignId, {
+      slug: 'org-conn-settlement',
+      kind: 'settlement',
+      name: 'Org Conn Settlement',
+      parentLocationId: region.id,
+    })
+
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaignId,
+      minimalOrganizationInput,
+    )
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-loc-move',
+        locationId: region.id,
+        kind: 'operates_in',
+      })
+      .expect(201)
+
+    await agent
+      .patch(locationConnectionsPath(campaignId, organization.id, 'org-loc-move'))
+      .set(CSRF_HEADER, csrfToken)
+      .send({ locationId: settlement.id })
+      .expect(200)
+
+    const updatedOrganization = await HomebrewOrganizationModel.findById(organization.id).lean()
+    expect(updatedOrganization?.connections?.locations).toEqual([
+      { id: 'org-loc-move', locationId: settlement.id, kind: 'operates_in' },
+    ])
+  })
+
   it('rejects region headquarters and duplicate location/kind pairs', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)

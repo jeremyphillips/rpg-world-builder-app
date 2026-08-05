@@ -3,11 +3,12 @@
 import * as React from 'react'
 
 import type { LocationConnectedPartyRow, LocationConnectedPartySectionGroup } from '@rpg/contracts'
-import { Badge, ContentCardRemoveButton, Heading, Text } from '@rpg/ui'
+import { Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
-import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
+import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
+import { LocationConnectedPartyRowCard } from './location-connected-party-row-card.client'
 
 export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
   LocationConnectedPartySectionGroup,
@@ -17,12 +18,28 @@ export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
   people_and_organizations: 'People & organizations',
 }
 
+export const LOCATION_CONNECTED_PARTIES_SECTION_HELPERS: Record<
+  LocationConnectedPartySectionGroup,
+  string
+> = {
+  territorial_authority: 'Organizations that govern, control, or claim this location.',
+  people_and_organizations:
+    'Characters and organizations with ownership, occupancy, operations, or geographic presence here.',
+}
+
 export const LOCATION_CONNECTED_PARTIES_EMPTY_TEXT: Record<
   LocationConnectedPartySectionGroup,
   string
 > = {
-  territorial_authority: 'No territorial authority relationships yet.',
-  people_and_organizations: 'No people or organization relationships yet.',
+  territorial_authority: 'No territorial authority linked yet.',
+  people_and_organizations: 'No people or organizations linked yet.',
+}
+
+export type LocationConnectedPartyEditTarget = {
+  relationshipId: string
+  subjectType: LocationConnectedPartyRow['subject']['type']
+  subjectId: string
+  kind: string
 }
 
 function subjectDetailHref(
@@ -44,13 +61,19 @@ export type LocationConnectedPartiesSectionProps = {
   sectionGroup: LocationConnectedPartySectionGroup
   rows: readonly LocationConnectedPartyRow[]
   canManage?: boolean
+  showEmptySection?: boolean
+  onAddOrganization?: () => void
+  onAddCharacter?: () => void
   isMutationPending?: boolean
   pendingRelationshipId?: string
+  onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
     relationshipId: string
     subjectType: LocationConnectedPartyRow['subject']['type']
     subjectId: string
   }) => Promise<void>
+  canEditRow?: (row: LocationConnectedPartyRow) => boolean
+  canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
 
 export function LocationConnectedPartiesSection({
@@ -58,9 +81,15 @@ export function LocationConnectedPartiesSection({
   sectionGroup,
   rows,
   canManage = false,
+  showEmptySection = true,
+  onAddOrganization,
+  onAddCharacter,
   isMutationPending = false,
   pendingRelationshipId,
+  onEditConnection,
   onRemoveConnection,
+  canEditRow,
+  canRemoveRow,
 }: LocationConnectedPartiesSectionProps) {
   const sectionRows = React.useMemo(
     () => rows.filter((row) => row.sectionGroup === sectionGroup),
@@ -77,9 +106,7 @@ export function LocationConnectedPartiesSection({
     return groups
   }, [sectionRows])
 
-  const showSection = sectionRows.length > 0 || sectionGroup === 'territorial_authority'
-
-  if (!showSection && sectionGroup === 'people_and_organizations') {
+  if (!showEmptySection && sectionRows.length === 0) {
     return null
   }
 
@@ -88,13 +115,15 @@ export function LocationConnectedPartiesSection({
       className="space-y-4"
       aria-labelledby={`location-connected-parties-${sectionGroup}-heading`}
     >
-      <Heading variant="label" as="h2" id={`location-connected-parties-${sectionGroup}-heading`}>
-        {LOCATION_CONNECTED_PARTIES_SECTION_LABELS[sectionGroup]}
-      </Heading>
+      <LocationConnectedPartiesSectionHeader
+        sectionGroup={sectionGroup}
+        canManage={canManage}
+        hasRows={sectionRows.length > 0}
+        onAddOrganization={onAddOrganization}
+        onAddCharacter={onAddCharacter}
+      />
 
-      {sectionRows.length === 0 ? (
-        <Text variant="muted">{LOCATION_CONNECTED_PARTIES_EMPTY_TEXT[sectionGroup]}</Text>
-      ) : (
+      {sectionRows.length > 0 ? (
         <div className="space-y-6">
           {[...groupedRows.entries()].map(([relationshipLabel, relationshipRows]) => (
             <div key={relationshipLabel} className="space-y-2">
@@ -105,35 +134,23 @@ export function LocationConnectedPartiesSection({
                 {relationshipRows.map((row) => {
                   const href = subjectDetailHref(campaignId, row.subject)
                   const isPending = pendingRelationshipId === row.relationshipId
+                  const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
+                  const rowCanRemove =
+                    canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
 
                   return (
                     <li key={row.relationshipId}>
-                      <ContentEntityCard
-                        heading={row.subject.name}
-                        subheading={subjectSummary(row.subject)}
+                      <LocationConnectedPartyRowCard
+                        campaignId={campaignId}
+                        row={row}
                         href={href}
-                        surface="outline"
-                        headingEndSlot={
-                          href ? <ContentEntityCardViewLink href={href} /> : undefined
-                        }
-                        endSlot={
-                          <div className="flex items-center gap-2">
-                            <Badge tone="neutral">{row.label}</Badge>
-                            {canManage && onRemoveConnection ? (
-                              <ContentCardRemoveButton
-                                label={`${row.subject.name} ${row.label}`}
-                                onRemove={() => {
-                                  if (isPending || isMutationPending) return
-                                  void onRemoveConnection({
-                                    relationshipId: row.relationshipId,
-                                    subjectType: row.subject.type,
-                                    subjectId: row.subject.id,
-                                  })
-                                }}
-                              />
-                            ) : null}
-                          </div>
-                        }
+                        subjectSummary={subjectSummary(row.subject)}
+                        canEdit={Boolean(rowCanEdit)}
+                        canRemove={Boolean(rowCanRemove)}
+                        isPending={isPending}
+                        isMutationPending={isMutationPending}
+                        onEditConnection={onEditConnection}
+                        onRemoveConnection={onRemoveConnection}
                       />
                     </li>
                   )
@@ -142,7 +159,7 @@ export function LocationConnectedPartiesSection({
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </section>
   )
 }

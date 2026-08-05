@@ -110,3 +110,47 @@ export function canInverseWriteCrossContentRelationship(
 ): boolean {
   return CROSS_CONTENT_RELATIONSHIP_PROJECTIONS[id].capabilities.inverse === 'write'
 }
+
+export const LOCATION_CONNECTION_CROSS_CONTENT_PROJECTION_IDS =
+  CROSS_CONTENT_RELATIONSHIP_PROJECTION_IDS.filter(
+    (id) => CROSS_CONTENT_RELATIONSHIP_PROJECTIONS[id].targetContentType === 'locations',
+  )
+
+export type LocationConnectionOwnerContentType = Extract<
+  CrossContentOwnerContentType,
+  'characters' | 'organizations'
+>
+
+const LOCATION_CONNECTION_PROJECTION_ID_BY_OWNER: Record<
+  LocationConnectionOwnerContentType,
+  Extract<
+    CrossContentRelationshipProjectionId,
+    'character_location_connection' | 'organization_location_connection'
+  >
+> = {
+  characters: 'character_location_connection',
+  organizations: 'organization_location_connection',
+}
+
+/** Resolves the registry projection id for a location-connection owner content type. */
+export function getLocationConnectionProjectionIdForOwner(
+  ownerContentType: LocationConnectionOwnerContentType,
+): CrossContentRelationshipProjectionId {
+  return LOCATION_CONNECTION_PROJECTION_ID_BY_OWNER[ownerContentType]
+}
+
+/** Whether inverse writes are enabled for the given location-connection owner type. */
+export function canInverseWriteLocationConnectionForOwner(
+  ownerContentType: LocationConnectionOwnerContentType,
+): boolean {
+  return canInverseWriteCrossContentRelationship(
+    getLocationConnectionProjectionIdForOwner(ownerContentType),
+  )
+}
+
+/** Whether any location-targeted projection allows inverse writes (section add affordances). */
+export function canInverseWriteAnyLocationConnection(): boolean {
+  return LOCATION_CONNECTION_CROSS_CONTENT_PROJECTION_IDS.some((id) =>
+    canInverseWriteCrossContentRelationship(id),
+  )
+}

@@ -59,10 +59,7 @@ export function LocationDetailContent({
         }
       >
         <div className="space-y-8">
-          <LocationConnectedPartiesDetailSections
-            campaignId={campaignId}
-            locationId={location.id}
-          />
+          <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
             headerActions={
