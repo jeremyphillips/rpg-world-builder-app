@@ -125,6 +125,7 @@ describe('buttonSizeToComboboxFieldSize', () => {
     expect(buttonSizeToComboboxFieldSize.sm).toBe('sm')
     expect(buttonSizeToComboboxFieldSize.default).toBe('md')
     expect(buttonSizeToComboboxFieldSize.lg).toBe('lg')
+    expect(buttonSizeToComboboxFieldSize['icon-lg']).toBe('lg')
   })
 })
 

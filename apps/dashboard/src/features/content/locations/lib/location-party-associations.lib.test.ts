@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createPopulatedStandaloneBuilderContextFixture,
+  createStandaloneBuilderCatalogIndexFixture,
+  makeCampaignNpcListItem,
+} from '@/features/character'
+import {
   appendLocationPartyAssociation,
   buildLocationPartyAddActionLabel,
   buildLocationPartyAssociationExactKeyFromSelection,
@@ -13,6 +18,9 @@ import {
   wouldDuplicateLocationPartyAssociation,
 } from './location-party-associations.lib'
 
+const context = createPopulatedStandaloneBuilderContextFixture()
+const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
 describe('location party associations lib', () => {
   it('merges campaign PCs and NPCs into a sorted lookup map', () => {
     const map = buildLocationPartyCharactersById(
@@ -24,13 +32,14 @@ describe('location party associations lib', () => {
           character: { id: 'pc-1', name: 'Aldric', summary: 'Fighter' },
         },
       ],
-      [{ character: { id: 'npc-1', name: 'Durnan' } }],
+      [makeCampaignNpcListItem({ character: { id: 'npc-1', name: 'Durnan' } })],
+      catalogIndex,
     )
 
     expect([...map.keys()]).toEqual(['pc-1', 'npc-1', 'pc-2'])
     expect(map.get('npc-1')).toMatchObject({
       name: 'Durnan',
-      summary: '',
+      summary: 'Dwarf · Level 1 Fighter',
       characterType: 'npc',
     })
   })
@@ -203,5 +212,27 @@ describe('location party associations lib', () => {
 
     expect(rows[0]?.partySummary).toBe('Dwarf · Level 4 Fighter')
     expect(rows[0]?.partyHref).toBe('/campaigns/camp_1/characters/char-1')
+  })
+
+  it('includes NPC party summary and npc detail href on association rows', () => {
+    const rows = buildLocationPartyAssociationRows({
+      associations: [
+        {
+          id: 'row-1',
+          kind: 'ownership',
+          party: { kind: 'character', characterId: 'npc-1' },
+        },
+      ],
+      campaignId: 'camp_1',
+      charactersById: buildLocationPartyCharactersById(
+        [],
+        [makeCampaignNpcListItem({ character: { id: 'npc-1', name: 'Durnan' } })],
+        catalogIndex,
+      ),
+      organizationsById: new Map(),
+    })
+
+    expect(rows[0]?.partySummary).toBe('Dwarf · Level 1 Fighter')
+    expect(rows[0]?.partyHref).toBe('/campaigns/camp_1/npcs/npc-1')
   })
 })

@@ -287,6 +287,22 @@
   /* Popover menus — minimum readable width when the trigger is fit-sized. */
   --popover-menu-min-width: 15.625rem; /* 250px */
 
+  /*
+   * Icon glyph scale — general UI SSOT (decorative, inline, control icons).
+   */
+  --icon-glyph-xs: 0.625rem;
+  --icon-glyph-sm: 0.75rem;
+  --icon-glyph-md: 0.875rem;
+  --icon-glyph-lg: 1rem;
+
+  /*
+   * Control action hit targets — generic control chrome (icon buttons, row actions).
+   * Field control bands remain in field-sizing; number-stepper aligns to field height.
+   */
+  --control-action-compact-height: 1.5rem;
+  --control-action-default-height: 2.25rem;
+  --control-action-lg-height: 2.5rem;
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
@@ -303,6 +319,49 @@
 
 @utility z-toast {
   z-index: var(--z-toast);
+}
+
+@utility h-control-action-compact {
+  height: var(--control-action-compact-height);
+}
+
+@utility min-h-control-action-compact {
+  min-height: var(--control-action-compact-height);
+}
+
+@utility size-control-action-compact {
+  width: var(--control-action-compact-height);
+  height: var(--control-action-compact-height);
+}
+
+@utility size-control-action-default {
+  width: var(--control-action-default-height);
+  height: var(--control-action-default-height);
+}
+
+@utility size-control-action-lg {
+  width: var(--control-action-lg-height);
+  height: var(--control-action-lg-height);
+}
+
+@utility size-icon-glyph-xs {
+  width: var(--icon-glyph-xs);
+  height: var(--icon-glyph-xs);
+}
+
+@utility size-icon-glyph-sm {
+  width: var(--icon-glyph-sm);
+  height: var(--icon-glyph-sm);
+}
+
+@utility size-icon-glyph-md {
+  width: var(--icon-glyph-md);
+  height: var(--icon-glyph-md);
+}
+
+@utility size-icon-glyph-lg {
+  width: var(--icon-glyph-lg);
+  height: var(--icon-glyph-lg);
 }
 
 @utility border-input {

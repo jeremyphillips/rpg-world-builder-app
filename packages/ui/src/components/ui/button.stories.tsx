@@ -15,7 +15,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: ['default', 'sm', 'lg', 'icon'],
+      options: ['default', 'sm', 'lg', 'icon', 'icon-lg'],
     },
     density: {
       control: 'select',
@@ -63,6 +63,14 @@ export const SmallCompact: Story = {
 
 export const Large: Story = {
   args: { size: 'lg' },
+}
+
+export const IconLarge: Story = {
+  render: () => (
+    <Button size="icon-lg" aria-label="Large icon action">
+      +
+    </Button>
+  ),
 }
 
 export const Disabled: Story = {

@@ -6,10 +6,10 @@ import type { Location, Organization } from '@rpg/contracts'
 import { Badge, Heading, Text } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character'
+import { useCampaignBuildContext, useNpcs } from '@/features/character'
 import { useOrganizations } from '@/features/content'
 
-import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
+import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 import {
   buildLocationPartyAssociationRows,
   buildLocationPartyCharactersById,
@@ -36,11 +36,12 @@ export function LocationPartyAssociationsDetailSection({
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(campaignId)
   const { data: npcs = [] } = useNpcs(campaignId)
+  const { catalogIndex } = useCampaignBuildContext(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
   const charactersById = React.useMemo(
-    () => buildLocationPartyCharactersById(campaignCharacters, npcs),
-    [campaignCharacters, npcs],
+    () => buildLocationPartyCharactersById(campaignCharacters, npcs, catalogIndex),
+    [campaignCharacters, catalogIndex, npcs],
   )
 
   const organizationsById = React.useMemo(
@@ -83,11 +84,17 @@ export function LocationPartyAssociationsDetailSection({
               <ul className="space-y-2">
                 {relationshipRows.map((row) => (
                   <li key={row.association.id}>
-                    <LocationLinkedEntityCard
-                      name={row.partyLabel}
+                    <ContentEntityCard
+                      heading={row.partyLabel}
                       href={row.partyHref}
-                      summaryLine={row.partySummary}
-                      meta={
+                      subheading={row.partySummary}
+                      surface="outline"
+                      headingEndSlot={
+                        row.partyHref ? (
+                          <ContentEntityCardViewLink href={row.partyHref} />
+                        ) : undefined
+                      }
+                      endSlot={
                         row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : undefined
                       }
                     />

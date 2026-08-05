@@ -9,12 +9,13 @@ import {
   type LocationPartyAssociationSemanticId,
   type LocationPartyRef,
 } from '@rpg/contracts'
-import { Badge, Button, Heading, InsetPanel, Text } from '@rpg/ui'
+import { Badge, Button, ContentCardRemoveButton, Heading, InsetPanel, Text } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character'
+import { useCampaignBuildContext, useNpcs } from '@/features/character'
 import { useOrganizations } from '@/features/content'
-import { BuilderInventoryRow } from '@/features/character'
+
+import { ContentEntityCard } from '../../lib/content-entity-card.client'
 
 import { LocationPartyPickerDrawer } from './location-party-picker-drawer.client'
 import {
@@ -60,11 +61,12 @@ function LocationPartyAssociationsSectionContent({
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(campaignId)
   const { data: npcs = [] } = useNpcs(campaignId)
+  const { catalogIndex } = useCampaignBuildContext(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
   const charactersById = React.useMemo(
-    () => buildLocationPartyCharactersById(campaignCharacters, npcs),
-    [campaignCharacters, npcs],
+    () => buildLocationPartyCharactersById(campaignCharacters, npcs, catalogIndex),
+    [campaignCharacters, catalogIndex, npcs],
   )
 
   const organizationsById = React.useMemo(
@@ -143,21 +145,21 @@ function LocationPartyAssociationsSectionContent({
               </Heading>
               <div className="space-y-2" aria-label={relationshipRows[0]?.semanticLabel}>
                 {relationshipRows.map((row) => (
-                  <BuilderInventoryRow
+                  <ContentEntityCard
                     key={row.association.id}
-                    itemLabel={`${row.semanticLabel}: ${row.partyLabel}`}
-                    label={<Text as="span">{row.partyLabel}</Text>}
-                    footer={
-                      row.partySummary ? (
-                        <Text variant="muted" className="text-sm">
-                          {row.partySummary}
-                        </Text>
-                      ) : undefined
+                    density="compact"
+                    surface="card"
+                    heading={row.partyLabel}
+                    subheading={row.partySummary}
+                    endSlot={
+                      <div className="flex items-center gap-2">
+                        {row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : null}
+                        <ContentCardRemoveButton
+                          label={`${row.semanticLabel}: ${row.partyLabel}`}
+                          onRemove={() => handleRemoveParty(row.association.id)}
+                        />
+                      </div>
                     }
-                    meta={
-                      row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : undefined
-                    }
-                    onRemove={() => handleRemoveParty(row.association.id)}
                   />
                 ))}
               </div>

@@ -198,3 +198,52 @@ Token tests in `packages/ui/src/styles/tokens/`:
 - Alpha utility ban (`alpha-utility-ban.test.ts`)
 
 `field-input-chrome.variants.test.ts` guards approved utility tokens for field shells.
+
+## Icon glyph & control action ladders
+
+Two independent SSOT axes in `@rpg/ui` — compose separately or use named pairings.
+
+### Glyph scale (general UI)
+
+Module: [`icon-glyph.variants.ts`](../src/components/ui/icon-glyph.variants.ts)
+
+| Step | px  | Utility              | Role                                             |
+| ---- | --- | -------------------- | ------------------------------------------------ |
+| xs   | 10  | `size-icon-glyph-xs` | Tertiary/decorative only — badge/chip sm leading |
+| sm   | 12  | `size-icon-glyph-sm` | Dense inline — semantic text, filter reset       |
+| md   | 14  | `size-icon-glyph-md` | Breadcrumbs, compact icon-button glyph (pairing) |
+| lg   | 16  | `size-icon-glyph-lg` | Menus, default button icons                      |
+
+Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
+`iconGlyphDirectChildClasses` on wrappers.
+
+### Hit-target scale (control chrome)
+
+Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts)
+
+| Step    | px  | Utility                       | Role                            |
+| ------- | --- | ----------------------------- | ------------------------------- |
+| compact | 24  | `size-control-action-compact` | Row actions, collapsible chrome |
+| default | 36  | `size-control-action-default` | Default icon buttons            |
+| lg      | 40  | `size-control-action-lg`      | Large icon buttons              |
+
+**Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
+buttons (align to field `h-8` / 32px), spinner sizing.
+
+### Named pairings
+
+| Recipe                                    | Hit     | Glyph |
+| ----------------------------------------- | ------- | ----- | ----------------------- |
+| `controlActionCompactIconClasses`         | compact | md    |
+| `controlActionCompactTextClasses`         | compact | —     |
+| `controlActionCompactTextWithIconClasses` | compact | sm    |
+| `controlActionDefaultIconClasses`         | default | lg    |
+| `controlActionLgIconClasses`              | lg      | lg    | Button `size="icon-lg"` |
+
+Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
+`control-action.variants.test.ts`.
+
+Storybook: **Design tokens → Icon glyph** and **Control action**.
+
+Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
+`size-*` in component implementations is forbidden (grandfather list until Phase 6 inline cleanup).

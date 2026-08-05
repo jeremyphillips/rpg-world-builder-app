@@ -42,6 +42,7 @@ export function formatCharacterSummaryFromCatalog(
   return formatCharacterSummary(resolveDashboardCharacterSummaryParts(character, catalogIndex))
 }
 
+/** Card view model for roster and campaign list surfaces — PCs and NPC list rows share this base. */
 export function buildCharacterCardViewModel(
   character: Pick<Character, 'id' | 'name' | 'classes' | 'species'> & {
     campaign?: { id: string; name: string }

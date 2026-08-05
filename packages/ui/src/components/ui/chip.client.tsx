@@ -6,6 +6,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import type { CompactLabelSize } from './compact-label.lib'
 import { chipRemoveButtonVariants, resolveCompactLabelClassName } from './compact-label.variants'
+import { chipLeadingIconGlyphClasses } from './icon-glyph.variants'
 
 export type { CompactLabelSize as ChipSize }
 
@@ -41,9 +42,7 @@ export type ChipRemovableProps = ChipBaseProps & {
 export type ChipProps = ChipSelectableProps | ChipRemovableProps
 
 function ChipLeadingCheck({ size }: { size: CompactLabelSize }) {
-  const iconClass = size === 'sm' ? 'size-2.5' : size === 'lg' ? 'size-3.5' : 'size-3'
-
-  return <Check aria-hidden className={cn('shrink-0', iconClass)} />
+  return <Check aria-hidden className={cn('shrink-0', chipLeadingIconGlyphClasses(size))} />
 }
 
 function SelectableChip({

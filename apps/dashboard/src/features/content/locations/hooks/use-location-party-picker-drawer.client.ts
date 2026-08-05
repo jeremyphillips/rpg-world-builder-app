@@ -9,8 +9,11 @@ import type {
 } from '@rpg/contracts'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { CATALOG_PICKER_COMMIT_SUCCESS_MS } from '@/features/character'
-import { useNpcs } from '@/features/character'
+import {
+  CATALOG_PICKER_COMMIT_SUCCESS_MS,
+  useCampaignBuildContext,
+  useNpcs,
+} from '@/features/character'
 import { useOrganizations } from '@/features/content'
 
 import {
@@ -84,11 +87,12 @@ export function useLocationPartyPickerDrawer(input: {
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(input.campaignId)
   const { data: npcs = [] } = useNpcs(input.campaignId)
+  const { catalogIndex } = useCampaignBuildContext(input.campaignId)
   const { data: organizations = [] } = useOrganizations(input.campaignId)
 
   const characters = React.useMemo(
-    () => [...buildLocationPartyCharactersById(campaignCharacters, npcs).values()],
-    [campaignCharacters, npcs],
+    () => [...buildLocationPartyCharactersById(campaignCharacters, npcs, catalogIndex).values()],
+    [campaignCharacters, catalogIndex, npcs],
   )
 
   const items = React.useMemo<LocationPartyPickerItem[]>(() => {

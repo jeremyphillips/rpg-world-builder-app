@@ -28,7 +28,7 @@ describe('Button', () => {
         Compact
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-6')
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-control-action-compact')
 
     rerender(
       <Button size="default" density="compact">
@@ -49,7 +49,20 @@ describe('Button', () => {
         <span aria-hidden>+</span>
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass('size-8')
+    expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass(
+      'size-control-action-compact',
+      '[&_svg]:size-icon-glyph-md',
+    )
+
+    rerender(
+      <Button size="icon-lg" aria-label="Large icon action">
+        <span aria-hidden>+</span>
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Large icon action' })).toHaveClass(
+      'size-control-action-lg',
+      '[&_svg]:size-icon-glyph-lg',
+    )
   })
 
   it('applies outline button chrome from token recipes', () => {

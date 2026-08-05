@@ -3,8 +3,9 @@ import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
 import type { BadgeAppearance, BadgeSize, BadgeTone } from './badge.variants'
-import { resolveCompactLabelClassName } from './compact-label.variants'
 import { compactLabelFilledFromAppearance } from './compact-label.lib'
+import { resolveCompactLabelClassName } from './compact-label.variants'
+import { badgeIconGlyphClasses } from './icon-glyph.variants'
 
 export {
   badgeVariants,
@@ -23,11 +24,8 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 function BadgeIconSlot({ icon, size }: { icon: React.ReactNode; size: BadgeSize }) {
-  const iconSizeClass =
-    size === 'sm' ? '[&_svg]:size-2.5' : size === 'lg' ? '[&_svg]:size-3.5' : '[&_svg]:size-3'
-
   return (
-    <span aria-hidden className={cn('inline-flex shrink-0 leading-none', iconSizeClass)}>
+    <span aria-hidden className={badgeIconGlyphClasses(size)}>
       {icon}
     </span>
   )

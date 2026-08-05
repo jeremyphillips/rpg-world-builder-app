@@ -10,9 +10,14 @@ import { LocationPartyAssociationsDetailSection } from './location-party-associa
 vi.mock('@/features/campaign', () => ({
   useCampaignCharacters: vi.fn(() => ({ data: [] })),
 }))
-vi.mock('@/features/character/npc/hooks/use-npcs', () => ({
-  useNpcs: vi.fn(() => ({ data: [] })),
-}))
+vi.mock('@/features/character', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/character')>()
+  return {
+    ...actual,
+    useCampaignBuildContext: vi.fn(() => ({ catalogIndex: undefined })),
+    useNpcs: vi.fn(() => ({ data: [] })),
+  }
+})
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({
     data: [{ id: 'org-realm', name: 'Realm Council', organizationKind: 'government' }],
@@ -55,5 +60,6 @@ describe('LocationPartyAssociationsDetailSection', () => {
     expect(screen.getByRole('heading', { name: LOCATION_PARTY_SECTION_LABEL })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Realm Council' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View' })).toBeInTheDocument()
   })
 })

@@ -67,7 +67,7 @@ describe('EquipmentInventoryManagePanel', () => {
 
     await user.click(screen.getByRole('button', { name: 'Manage' }))
     const releaseButton = screen.getByRole('button', { name: 'Release one' })
-    expect(releaseButton).toHaveClass('h-6')
+    expect(releaseButton).toHaveClass('h-control-action-compact')
     await user.click(releaseButton)
 
     expect(onReleaseGrant).toHaveBeenCalledWith({

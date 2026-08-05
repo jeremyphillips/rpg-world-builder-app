@@ -24,6 +24,6 @@ describe('fieldDigitWidthVariants', () => {
     expect(fieldDigitTrailingPaddingClasses.md).toBe('pr-6')
     expect(fieldDigitSizeClasses.md).toBe('pl-3 pr-6')
     expect(fieldDigitTrailingColumnClasses.md).toBe('w-5')
-    expect(fieldDigitTrailingIconClasses.md).toBe('[&_svg]:size-2.5')
+    expect(fieldDigitTrailingIconClasses.md).toBe('[&_svg]:size-icon-glyph-xs')
   })
 })

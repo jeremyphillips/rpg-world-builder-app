@@ -5,7 +5,6 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import { CharacterListCard } from './character-list-card.client'
-import { CharacterListCardPreview } from './character-list-card-preview.client'
 
 const sampleCard = {
   id: 'char-1',
@@ -95,45 +94,6 @@ describe('CharacterListCard', () => {
           detailHref="/characters/char-1"
           controllerLine={CHARACTER_CONTROLLER_DISPLAY.noPlayerAssigned}
           showCampaign={false}
-        />
-      </MemoryRouter>,
-    )
-
-    await expectNoAxeViolations(container)
-  })
-})
-
-describe('CharacterListCardPreview', () => {
-  it('renders preview cards and derives truncation copy from total', () => {
-    render(
-      <MemoryRouter>
-        <CharacterListCardPreview
-          items={[
-            {
-              card: sampleCard,
-              detailHref: '/characters/char-1',
-            },
-          ]}
-          total={3}
-        />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText('Verna')).toBeInTheDocument()
-    expect(screen.getByText('+ 2 more')).toBeInTheDocument()
-  })
-
-  it('has no axe accessibility violations', async () => {
-    const { container } = render(
-      <MemoryRouter>
-        <CharacterListCardPreview
-          items={[
-            {
-              card: sampleCard,
-              detailHref: '/characters/char-1',
-            },
-          ]}
-          total={1}
         />
       </MemoryRouter>,
     )

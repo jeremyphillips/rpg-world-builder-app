@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../lib/utils'
 import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
+import { iconGlyphDescendantClasses } from '../components/ui/icon-glyph.variants'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
@@ -41,7 +42,7 @@ export const filterBarControlVariants = cva('', {
   },
 })
 
-export const filterBarResetButtonClasses = 'gap-1 text-xs [&_svg]:size-3'
+export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescendantClasses.sm)
 
 export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
   variants: {

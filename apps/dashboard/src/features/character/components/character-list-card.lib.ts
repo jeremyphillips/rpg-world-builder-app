@@ -7,8 +7,3 @@ export type CharacterListCardData = {
     name: string
   }
 }
-
-export type CharacterListCardPreviewItem = {
-  card: CharacterListCardData
-  detailHref: string
-}

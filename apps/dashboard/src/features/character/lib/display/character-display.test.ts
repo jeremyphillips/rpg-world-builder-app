@@ -9,7 +9,7 @@ import {
   buildCharacterDetailViewModel,
   formatCharacterSummaryFromCatalog,
 } from './character-display'
-import { SAMPLE_PC } from '../character-fixtures'
+import { SAMPLE_PC, makeCampaignNpcListItem } from '../character-fixtures'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
@@ -70,6 +70,16 @@ describe('buildCharacterCardViewModel', () => {
     expect(buildCharacterCardViewModel(SAMPLE_PC, catalogIndex)).toEqual({
       id: 'char-sample-1',
       name: 'Verna',
+      summary: 'Dwarf · Level 1 Fighter',
+    })
+  })
+
+  it('maps campaign NPC list rows with the same summary formatter as PCs', () => {
+    const npc = makeCampaignNpcListItem().character
+
+    expect(buildCharacterCardViewModel(npc, catalogIndex)).toEqual({
+      id: 'npc-1',
+      name: 'Captain Aldric',
       summary: 'Dwarf · Level 1 Fighter',
     })
   })

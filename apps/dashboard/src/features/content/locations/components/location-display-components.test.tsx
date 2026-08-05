@@ -6,7 +6,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST } from '../fixtures'
 import { LocationDetailIdentity } from './location-detail-identity.client'
-import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
+import { ContentEntityCard } from '../../lib/content-entity-card.client'
 
 describe('LocationDetailIdentity', () => {
   it('renders identity rows and located-in links', () => {
@@ -43,14 +43,15 @@ describe('LocationDetailIdentity', () => {
   })
 })
 
-describe('LocationLinkedEntityCard', () => {
+describe('ContentEntityCard (location rows)', () => {
   it('renders linked title and summary line', () => {
     render(
       <MemoryRouter>
-        <LocationLinkedEntityCard
-          name="Dock Ward"
+        <ContentEntityCard
+          heading="Dock Ward"
           href="/campaigns/camp_1/locations/location-dock-ward"
-          summaryLine="District"
+          subheading="District"
+          surface="outline"
         />
       </MemoryRouter>,
     )
@@ -62,7 +63,7 @@ describe('LocationLinkedEntityCard', () => {
   it('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
-        <LocationLinkedEntityCard name="Dock Ward" summaryLine="District" />
+        <ContentEntityCard heading="Dock Ward" subheading="District" surface="outline" />
       </MemoryRouter>,
     )
 

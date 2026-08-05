@@ -8,7 +8,6 @@ import {
 } from '../lib/character-builder-fixtures'
 import { SAMPLE_PC } from '../lib/character-fixtures'
 import { CharacterListCard } from './character-list-card.client'
-import { CharacterListCardPreview } from './character-list-card-preview.client'
 
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(
   createPopulatedStandaloneBuilderContextFixture(),
@@ -70,26 +69,5 @@ export const PlayedByYou: Story = {
     showCampaign: false,
     controllerLine: CHARACTER_CONTROLLER_DISPLAY.playedByYou,
     rosterStatus: 'active',
-  },
-}
-
-export const Preview: StoryObj<typeof CharacterListCardPreview> = {
-  render: (args) => <CharacterListCardPreview {...args} />,
-  args: {
-    items: [
-      {
-        card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
-        detailHref: '/characters/char-sample-1',
-      },
-      {
-        card: {
-          id: 'char-2',
-          name: 'Circle Envoy',
-          summary: 'Human · Level 3 Rogue',
-        },
-        detailHref: '/campaigns/camp-1/npcs/char-2',
-      },
-    ],
-    total: 5,
   },
 }
