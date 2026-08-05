@@ -21,7 +21,7 @@ import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
-import { ContentEntityPickerRow } from '../../lib/content-entity-picker-row.client'
+import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
@@ -139,6 +139,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       onOpenChange={onOpenChange}
       title={title}
       {...catalogPickerShellProps()}
+      rowLayout="entity-card"
       searchPlaceholder="Search characters"
       noResultsMessage="No matches for this search."
       noItemsMessage="No characters are available."
@@ -181,7 +182,9 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityPickerRow
+          <ContentEntityCard
+            chrome="embedded"
+            density="compact"
             heading={character.name}
             subheading={
               hasAvailableKind

@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { CollapsibleListItem } from './collapsible-list-item'
-import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
+import type { CatalogPickerRowLayout, CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
 import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
@@ -18,6 +18,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemActions,
   renderItemDetails,
   rowPreset,
+  rowLayout,
   rowSurface = { elevation: 'flat' },
   toolbarCompact = false,
 }: {
@@ -29,6 +30,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
   rowPreset?: CollapsibleListItemShellPreset
+  rowLayout?: CatalogPickerRowLayout
   rowSurface?: SurfaceConfig
   toolbarCompact?: boolean
 }) {
@@ -43,6 +45,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
         preset={rowPreset}
+        rowLayout={rowLayout}
         surface={rowSurface}
         toolbarCompact={toolbarCompact}
         actionsAlign="center"
@@ -82,6 +85,7 @@ export function CatalogPickerSheetResults<TItem>({
               renderItemActions={rowProps.renderItemActions}
               renderItemDetails={rowProps.renderItemDetails}
               rowPreset={rowProps.rowPreset}
+              rowLayout={rowProps.rowLayout}
               rowSurface={rowProps.rowSurface}
               toolbarCompact={rowProps.toolbarCompact}
             />

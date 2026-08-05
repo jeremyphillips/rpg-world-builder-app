@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
+import type { CollapsibleListItemRowLayout } from './collapsible-list-item/collapsible-list-item.variants'
 import type { SurfaceConfig } from './visual-vocabulary.types'
 import type { CatalogToolbarTab, CatalogToolbarTabs } from './catalog-toolbar.types'
 
@@ -12,6 +13,8 @@ export type CatalogPickerSheetActionsHelpers = {
   resetSearchQuery: () => void
   resetActiveTab: () => void
 }
+
+export type CatalogPickerRowLayout = CollapsibleListItemRowLayout
 
 export type CatalogPickerSheetProps<TItem> = {
   open: boolean
@@ -67,6 +70,8 @@ export type CatalogPickerSheetProps<TItem> = {
   noItemsMessage?: string
   /** Collapsible row shell preset — equipment picker uses `catalog`. */
   rowPreset?: CollapsibleListItemShellPreset
+  /** Row host layout — `entity-card` drops catalog content inset for embedded entity cards. */
+  rowLayout?: CatalogPickerRowLayout
   /** Collapsible row surface config — defaults to flat canvas. */
   rowSurface?: SurfaceConfig
   /** Top-align caret/grip with the first header line for multi-line headers. */

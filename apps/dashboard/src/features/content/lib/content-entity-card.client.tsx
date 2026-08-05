@@ -3,13 +3,14 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  cn,
   ContentCard,
   ContentCardHeadingAction,
   ContentCardMedia,
   contentCardHeadingLinkVariants,
+  type ContentCardChrome,
   type ContentCardDensity,
   type ContentCardProps,
-  type ContentCardSurface,
 } from '@rpg/ui'
 
 import { getContentImageUrl } from './detail/content-image-url'
@@ -24,7 +25,10 @@ export type ContentEntityCardProps = {
   endSlot?: ReactNode
   footer?: ReactNode
   density?: ContentCardDensity
-  surface?: ContentCardSurface
+  /** Who draws the outer shell — card (`standalone`) or host (`embedded`). */
+  chrome?: ContentCardChrome
+  /** Presentational disabled state — host owns interaction disabling and ARIA. */
+  disabled?: boolean
   className?: string
 }
 
@@ -38,7 +42,8 @@ export function ContentEntityCard({
   endSlot,
   footer,
   density,
-  surface,
+  chrome,
+  disabled = false,
   className,
 }: ContentEntityCardProps) {
   const resolvedHeading = href ? (
@@ -65,11 +70,11 @@ export function ContentEntityCard({
     endSlot,
     footer,
     density,
-    surface,
-    className,
+    chrome,
+    className: cn(disabled && 'opacity-60', className),
   }
 
-  return <ContentCard {...cardProps} />
+  return <ContentCard {...cardProps} data-disabled={disabled ? true : undefined} />
 }
 
 export function ContentEntityCardViewLink({ href }: { href: string }) {

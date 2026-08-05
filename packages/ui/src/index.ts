@@ -412,8 +412,11 @@ export {
 } from './components/ui/content-card-parts.client'
 export {
   contentCardRootVariants,
+  contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
+  resolveContentCardDensityInsetClasses,
   type ContentCardDensity,
+  type ContentCardChrome,
   type ContentCardSurface,
 } from './components/ui/content-card.variants'
 export {
@@ -567,6 +570,7 @@ export {
   type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellProps,
   type CollapsibleListItemShellPreset,
+  type CollapsibleListItemRowLayout,
   type CollapsibleListItemToolbarProps,
 } from './components/ui/collapsible-list-item'
 export {
@@ -574,6 +578,7 @@ export {
   type CatalogPickerSheetProps,
   type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
+  type CatalogPickerRowLayout,
   type CatalogToolbarProps,
   type CatalogToolbarSearch,
   type CatalogToolbarTab,

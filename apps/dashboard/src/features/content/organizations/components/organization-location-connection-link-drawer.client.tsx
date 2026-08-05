@@ -13,7 +13,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { ContentEntityPickerRow } from '../../lib/content-entity-picker-row.client'
+import { ContentEntityCard } from '../../lib/content-entity-card.client'
 
 import {
   ORGANIZATION_DRAWER_EDIT_TITLES,
@@ -149,6 +149,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       onOpenChange={onOpenChange}
       title={title}
       {...catalogPickerShellProps()}
+      rowLayout="entity-card"
       searchPlaceholder={ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
       noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
@@ -203,7 +204,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityPickerRow
+          <ContentEntityCard
+            chrome="embedded"
+            density="compact"
             heading={location.name}
             subheading={hasAvailableKind ? getLocationKindLabel(location.kind) : fullyLinkedReason}
             imageKey={location.imageKey}

@@ -11,7 +11,9 @@ import {
   contentCardHeadingRowVariants,
   contentCardHeadingVariants,
   contentCardMetadataVariants,
+  contentCardRootVariants,
   contentCardSubheadingVariants,
+  resolveContentCardDensityInsetClasses,
 } from './content-card.variants'
 
 describe('ContentCard', () => {
@@ -62,7 +64,21 @@ describe('ContentCard', () => {
     expect(heading).toHaveClass(contentCardHeadingVariants({ density: 'comfortable' }))
     expect(subheading).toHaveClass(contentCardSubheadingVariants({ density: 'comfortable' }))
     expect(metadata).toHaveClass(contentCardMetadataVariants({ density: 'comfortable' }))
-    expect(container.querySelector('article')).toHaveClass('px-5')
+    expect(container.querySelector('article')).toHaveClass(
+      resolveContentCardDensityInsetClasses('comfortable'),
+    )
+  })
+
+  it('applies the same density inset for standalone and embedded chrome', () => {
+    const density = 'compact' as const
+    const inset = resolveContentCardDensityInsetClasses(density)
+    const standalone = contentCardRootVariants({ density, chrome: 'standalone' })
+    const embedded = contentCardRootVariants({ density, chrome: 'embedded' })
+
+    expect(standalone).toContain(inset)
+    expect(embedded).toContain(inset)
+    expect(standalone).toContain('border')
+    expect(embedded).not.toContain('border')
   })
 
   it('applies compact density classes when requested', () => {

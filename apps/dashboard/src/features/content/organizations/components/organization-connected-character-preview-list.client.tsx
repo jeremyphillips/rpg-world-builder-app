@@ -32,7 +32,6 @@ export function OrganizationConnectedCharacterPreviewList({
             <ContentEntityCard
               heading={card.name}
               subheading={card.summary}
-              surface="outline"
               headingEndSlot={<ContentEntityCardViewLink href={detailHref} />}
             />
           </li>

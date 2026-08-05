@@ -159,25 +159,29 @@ export const LongLinkedHeadingComfortable: Story = {
   ),
 }
 
-export const SurfaceOutline: Story = {
+export const ChromeStandalone: Story = {
+  name: 'Chrome standalone',
   args: {
-    surface: 'outline',
+    chrome: 'standalone',
     heading: 'Harbor District',
     subheading: 'Settlement overview',
   },
 }
 
-export const SurfaceCard: Story = {
+export const ChromeEmbedded: Story = {
+  name: 'Chrome embedded',
   args: {
-    surface: 'card',
+    chrome: 'embedded',
     heading: 'Harbor District',
     subheading: 'Settlement overview',
   },
 }
 
-export const SurfaceGhost: Story = {
+export const ChromeStandaloneFilled: Story = {
+  name: 'Chrome standalone (filled)',
   args: {
-    surface: 'ghost',
+    chrome: 'standalone',
+    className: 'bg-card',
     heading: 'Harbor District',
     subheading: 'Settlement overview',
   },
@@ -205,7 +209,8 @@ export const CompactRemoveAction: Story = {
   name: 'Compact remove action',
   args: {
     density: 'compact',
-    surface: 'card',
+    chrome: 'standalone',
+    className: 'bg-card',
     heading: 'Verna',
     subheading: 'Dwarf · Level 1 Fighter',
     endSlot: <ContentCardRemoveButton label="Verna" onRemove={() => undefined} />,

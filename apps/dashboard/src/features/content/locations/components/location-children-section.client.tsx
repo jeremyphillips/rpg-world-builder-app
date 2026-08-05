@@ -35,7 +35,6 @@ export function LocationChildrenSection({
                 heading={item.name}
                 href={item.href}
                 subheading={item.summaryLine}
-                surface="outline"
                 headingEndSlot={
                   item.href ? <ContentEntityCardViewLink href={item.href} /> : undefined
                 }

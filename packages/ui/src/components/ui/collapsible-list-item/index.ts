@@ -50,4 +50,5 @@ export type {
   CollapsibleListItemBodyProps,
   CollapsibleListItemDragHandleConfig,
   CollapsibleListItemProps,
+  CollapsibleListItemRowLayout,
 } from './collapsible-list-item.client'

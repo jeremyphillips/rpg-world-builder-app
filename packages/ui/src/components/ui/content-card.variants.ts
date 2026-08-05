@@ -6,21 +6,33 @@ import {
   controlActionCompactTextClasses,
 } from './control-action.variants'
 
+/** Entity-owned density inset — shared by standalone and embedded chrome. */
+export const contentCardDensityInsetVariants = cva('', {
+  variants: {
+    density: {
+      compact: 'px-4 py-3',
+      comfortable: 'px-5 py-3',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
 export const contentCardRootVariants = cva('rounded-md', {
   variants: {
     density: {
       compact: 'px-4 py-3',
       comfortable: 'px-5 py-3',
     },
-    surface: {
-      outline: 'border border-border',
-      card: 'border border-border bg-card',
-      ghost: '',
+    chrome: {
+      standalone: 'border border-border',
+      embedded: '',
     },
   },
   defaultVariants: {
     density: 'comfortable',
-    surface: 'outline',
+    chrome: 'standalone',
   },
 })
 
@@ -113,9 +125,14 @@ export const contentCardMediaVariants = cva('size-10 shrink-0 rounded-md object-
 export type ContentCardDensity = NonNullable<
   VariantProps<typeof contentCardRootVariants>['density']
 >
-export type ContentCardSurface = NonNullable<
-  VariantProps<typeof contentCardRootVariants>['surface']
->
+export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
+
+export function resolveContentCardDensityInsetClasses(density: ContentCardDensity): string {
+  return contentCardDensityInsetVariants({ density })
+}
+
+/** @deprecated Use {@link ContentCardChrome} — `outline` maps to `standalone`, `ghost` to `embedded`. */
+export type ContentCardSurface = 'outline' | 'card' | 'ghost'
 export type ContentCardHeadingRowRhythm = NonNullable<
   VariantProps<typeof contentCardHeadingRowVariants>['rhythm']
 >

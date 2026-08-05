@@ -41,7 +41,6 @@ export function LocationConnectedPartyRowCard({
       heading={row.subject.name}
       subheading={subjectSummary}
       href={href}
-      surface="outline"
       headingEndSlot={href ? <ContentEntityCardViewLink href={href} /> : undefined}
       endSlot={
         <div className="flex items-center gap-2">

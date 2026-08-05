@@ -24,6 +24,7 @@ export type {
   CatalogPickerSheetProps,
   CatalogPickerSheetActionsHelpers,
   CatalogPickerTab,
+  CatalogPickerRowLayout,
 } from './catalog-picker-sheet.types'
 export type {
   CatalogToolbarProps,
@@ -119,6 +120,7 @@ export function CatalogPickerSheet<TItem>({
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
   rowPreset,
+  rowLayout,
   rowSurface,
   toolbarCompact,
   sheetContentClassName,
@@ -163,6 +165,7 @@ export function CatalogPickerSheet<TItem>({
     renderItemDetails,
     getItemToolbarLabel,
     rowPreset,
+    rowLayout,
     rowSurface,
     toolbarCompact,
     rowBodyClassName,

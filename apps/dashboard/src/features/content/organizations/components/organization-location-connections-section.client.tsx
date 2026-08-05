@@ -121,7 +121,6 @@ export function OrganizationLocationConnectionsSection({
                       <ContentEntityCard
                         heading={item.card.name}
                         subheading={item.card.summary}
-                        surface="outline"
                         headingEndSlot={<ContentEntityCardViewLink href={item.detailHref} />}
                         endSlot={
                           <div className="flex items-center gap-2">

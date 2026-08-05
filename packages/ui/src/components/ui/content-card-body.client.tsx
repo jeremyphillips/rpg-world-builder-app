@@ -27,7 +27,7 @@ export type ContentCardBodyProps = {
   className?: string
 }
 
-/** Entity row layout without card shell padding or surface — for picker rows and card interiors. */
+/** @internal Layout-only entity row anatomy — use {@link ContentCard} or dashboard `ContentEntityCard`. */
 export function ContentCardBody({
   heading,
   subheading,

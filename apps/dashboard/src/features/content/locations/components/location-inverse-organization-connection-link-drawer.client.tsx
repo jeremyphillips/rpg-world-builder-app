@@ -18,7 +18,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { ContentEntityPickerRow } from '../../lib/content-entity-picker-row.client'
+import { ContentEntityCard } from '../../lib/content-entity-card.client'
 
 import {
   ORGANIZATION_DRAWER_EDIT_TITLES,
@@ -153,6 +153,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       onOpenChange={onOpenChange}
       title={title}
       {...catalogPickerShellProps()}
+      rowLayout="entity-card"
       searchPlaceholder="Search organizations"
       noResultsMessage="No matches for this search."
       noItemsMessage="No organizations are available."
@@ -197,7 +198,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityPickerRow
+          <ContentEntityCard
+            chrome="embedded"
+            density="compact"
             heading={organization.name}
             subheading={
               hasAvailableKind

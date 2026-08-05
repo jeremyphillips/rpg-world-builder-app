@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import { CatalogPickerSheet } from '@rpg/ui'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { ContentEntityCard, ContentEntityCardViewLink } from './content-entity-card.client'
@@ -26,6 +27,24 @@ describe('ContentEntityCard', () => {
     expect(screen.getByText('Settlement overview')).toBeInTheDocument()
   })
 
+  it('allows href in embedded chrome', () => {
+    render(
+      <MemoryRouter>
+        <ContentEntityCard
+          chrome="embedded"
+          density="compact"
+          heading="Harbor District"
+          href="/campaigns/camp-1/locations/harbor"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Harbor District' })).toHaveAttribute(
+      'href',
+      '/campaigns/camp-1/locations/harbor',
+    )
+  })
+
   it('renders artwork from imageKey via ContentCardMedia', () => {
     render(
       <MemoryRouter>
@@ -48,6 +67,69 @@ describe('ContentEntityCard', () => {
     expect(viewLink).toHaveClass('text-sm')
     expect(viewLink).toHaveClass('pr-0')
     expect(viewLink).toHaveClass('h-control-action-compact')
+  })
+
+  it('applies presentational disabled treatment only', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ContentEntityCard
+          chrome="embedded"
+          density="compact"
+          heading="Port City"
+          subheading="All site relationship types already linked."
+          disabled
+        />
+      </MemoryRouter>,
+    )
+
+    const article = container.querySelector('article')
+    expect(article).toHaveAttribute('data-disabled', 'true')
+    expect(article).toHaveClass('opacity-60')
+  })
+
+  it('renders endSlot in the standard card slot', () => {
+    render(
+      <MemoryRouter>
+        <ContentEntityCard
+          chrome="embedded"
+          density="compact"
+          heading="Grey Coast"
+          endSlot={<button type="button">Select</button>}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
+  it('embeds in entity-card picker rows without double-applying host content inset', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={() => undefined}
+        title="Locations"
+        rowPreset="catalog"
+        rowLayout="entity-card"
+        items={[{ id: 'loc-1', name: 'Grey Coast', kind: 'Region' }]}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.name}
+        renderItemHeader={(item) => (
+          <ContentEntityCard
+            chrome="embedded"
+            density="compact"
+            heading={item.name}
+            subheading={item.kind}
+            endSlot={<button type="button">Select</button>}
+          />
+        )}
+      />,
+    )
+
+    const rowShell = screen.getByRole('group')
+    expect(rowShell).toHaveClass('p-0')
+    expect(rowShell).not.toHaveClass('pl-2')
+    expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+    expect(screen.getByText('Grey Coast')).toBeInTheDocument()
   })
 
   it('has no axe accessibility violations', async () => {
