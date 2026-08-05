@@ -12,7 +12,7 @@ import {
 import { Badge, Button, ContentCardRemoveButton, Heading, InsetPanel, Text } from '@rpg/ui'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character'
+import { useCampaignBuildContext, useNpcs } from '@/features/character'
 import { useOrganizations } from '@/features/content'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
@@ -61,11 +61,12 @@ function LocationPartyAssociationsSectionContent({
 
   const { data: campaignCharacters = [] } = useCampaignCharacters(campaignId)
   const { data: npcs = [] } = useNpcs(campaignId)
+  const { catalogIndex } = useCampaignBuildContext(campaignId)
   const { data: organizations = [] } = useOrganizations(campaignId)
 
   const charactersById = React.useMemo(
-    () => buildLocationPartyCharactersById(campaignCharacters, npcs),
-    [campaignCharacters, npcs],
+    () => buildLocationPartyCharactersById(campaignCharacters, npcs, catalogIndex),
+    [campaignCharacters, catalogIndex, npcs],
   )
 
   const organizationsById = React.useMemo(

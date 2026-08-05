@@ -6,6 +6,9 @@ import {
   getOrganizationKindLabel,
   getPartyKindsForSemanticKey,
   LOCATION_PARTY_ASSOCIATION_SEMANTIC_ENTRIES,
+  type CampaignCharacterListItem,
+  type CampaignNpcListItem,
+  type CharacterBuildCatalogIndex,
   type LocationPartyAssociation,
   type LocationPartyAssociationSemanticId,
   type LocationPartyKind,
@@ -14,6 +17,7 @@ import {
 } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+import { buildCharacterCardViewModel } from '@/features/character'
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { getAvailableLocationPartyAssociationKinds } from './location-party-authoring-policy'
@@ -51,25 +55,11 @@ export type LocationPartyCharacterOption = {
   characterType: 'pc' | 'npc'
 }
 
-type CampaignCharacterListEntry = {
-  character: {
-    id: string
-    name: string
-    summary: string
-  }
-}
-
-type NpcListEntry = {
-  character: {
-    id: string
-    name: string
-  }
-}
-
 /** Merges open campaign PCs and NPCs into a sorted lookup for party association rows. */
 export function buildLocationPartyCharactersById(
-  campaignCharacters: readonly CampaignCharacterListEntry[],
-  npcs: readonly NpcListEntry[],
+  campaignCharacters: readonly Pick<CampaignCharacterListItem, 'character'>[],
+  npcs: readonly Pick<CampaignNpcListItem, 'character'>[],
+  catalogIndex: CharacterBuildCatalogIndex | null | undefined,
 ): Map<string, LocationPartyCharacterOption> {
   const entries: LocationPartyCharacterOption[] = [
     ...campaignCharacters.map(({ character }) => ({
@@ -81,7 +71,7 @@ export function buildLocationPartyCharactersById(
     ...npcs.map(({ character }) => ({
       id: character.id,
       name: character.name,
-      summary: '',
+      summary: catalogIndex ? buildCharacterCardViewModel(character, catalogIndex).summary : '',
       characterType: 'npc' as const,
     })),
   ].sort((left, right) => left.name.localeCompare(right.name))

@@ -19,9 +19,14 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: useCanManageCampaignMock,
   useCampaignCharacters: vi.fn(() => ({ data: [] })),
 }))
-vi.mock('@/features/character/npc/hooks/use-npcs', () => ({
-  useNpcs: vi.fn(() => ({ data: [] })),
-}))
+vi.mock('@/features/character', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/character')>()
+  return {
+    ...actual,
+    useCampaignBuildContext: vi.fn(() => ({ catalogIndex: undefined })),
+    useNpcs: vi.fn(() => ({ data: [] })),
+  }
+})
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({ data: [] })),
 }))
