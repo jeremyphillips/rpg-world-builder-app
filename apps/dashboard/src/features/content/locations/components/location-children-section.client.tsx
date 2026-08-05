@@ -3,7 +3,7 @@
 import { Heading, Text } from '@rpg/ui'
 
 import { LOCATION_SECTION_LABELS, type LocationChildrenViewModel } from '../lib/location-display'
-import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
+import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 
 export type LocationChildrenSectionProps = {
   childrenViewModel: LocationChildrenViewModel
@@ -31,10 +31,14 @@ export function LocationChildrenSection({
         <ul className="space-y-2">
           {items.map((item) => (
             <li key={item.id}>
-              <LocationLinkedEntityCard
-                name={item.name}
+              <ContentEntityCard
+                heading={item.name}
                 href={item.href}
-                summaryLine={item.summaryLine}
+                subheading={item.summaryLine}
+                surface="outline"
+                headingEndSlot={
+                  item.href ? <ContentEntityCardViewLink href={item.href} /> : undefined
+                }
               />
             </li>
           ))}

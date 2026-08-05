@@ -15,11 +15,7 @@ export {
 } from './api/ruleset-content-client'
 export { CharacterBuilderDraftRestore } from './components/character-builder-draft-restore.client'
 export { CharacterListCard } from './components/character-list-card.client'
-export { CharacterListCardPreview } from './components/character-list-card-preview.client'
-export type {
-  CharacterListCardData,
-  CharacterListCardPreviewItem,
-} from './components/character-list-card.lib'
+export type { CharacterListCardData } from './components/character-list-card.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
   useCampaignBuildContext,

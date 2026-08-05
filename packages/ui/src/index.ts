@@ -378,6 +378,27 @@ export {
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
 export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
+export { ContentCard, type ContentCardProps } from './components/ui/content-card.client'
+export {
+  ContentCardHeadingAction,
+  ContentCardIconAction,
+  type ContentCardHeadingActionProps,
+  type ContentCardIconActionProps,
+} from './components/ui/content-card-actions.client'
+export {
+  ContentCardMedia,
+  ContentCardRemoveButton,
+  CONTENT_CARD_REMOVE_LABEL_PREFIX,
+  formatContentCardRemoveLabel,
+  type ContentCardMediaProps,
+  type ContentCardRemoveButtonProps,
+} from './components/ui/content-card-parts.client'
+export {
+  contentCardRootVariants,
+  contentCardHeadingLinkVariants,
+  type ContentCardDensity,
+  type ContentCardSurface,
+} from './components/ui/content-card.variants'
 export {
   NotificationBell,
   type NotificationBellProps,

@@ -9,7 +9,7 @@ import { useCampaignCharacters } from '@/features/campaign'
 import { useNpcs } from '@/features/character'
 import { useOrganizations } from '@/features/content'
 
-import { LocationLinkedEntityCard } from './location-linked-entity-card.client'
+import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 import {
   buildLocationPartyAssociationRows,
   buildLocationPartyCharactersById,
@@ -83,11 +83,17 @@ export function LocationPartyAssociationsDetailSection({
               <ul className="space-y-2">
                 {relationshipRows.map((row) => (
                   <li key={row.association.id}>
-                    <LocationLinkedEntityCard
-                      name={row.partyLabel}
+                    <ContentEntityCard
+                      heading={row.partyLabel}
                       href={row.partyHref}
-                      summaryLine={row.partySummary}
-                      meta={
+                      subheading={row.partySummary}
+                      surface="outline"
+                      headingEndSlot={
+                        row.partyHref ? (
+                          <ContentEntityCardViewLink href={row.partyHref} />
+                        ) : undefined
+                      }
+                      endSlot={
                         row.partyUnresolved ? <Badge tone="warning">Unavailable</Badge> : undefined
                       }
                     />

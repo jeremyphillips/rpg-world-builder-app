@@ -78,7 +78,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
     )
 
     const releaseButton = screen.getByRole('button', { name: 'Release' })
-    expect(releaseButton).toHaveClass('h-6')
+    expect(releaseButton).toHaveClass('h-control-action-compact')
     expect(releaseButton).not.toHaveClass('bg-secondary')
     await user.click(releaseButton)
     expect(onReleaseGrant).toHaveBeenCalledWith({

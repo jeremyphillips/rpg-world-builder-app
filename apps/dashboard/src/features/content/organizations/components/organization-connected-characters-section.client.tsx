@@ -1,6 +1,5 @@
 'use client'
 
-import { CharacterListCardPreview } from '@/features/character'
 import { Heading, Text } from '@rpg/ui'
 
 import { ORGANIZATION_CONNECTED_CHARACTERS_LOAD_ERROR } from '../lib/organization-connected-characters.constants'
@@ -9,6 +8,7 @@ import {
   ORGANIZATION_SECTION_LABELS,
   type OrganizationConnectedCharactersViewModel,
 } from '../lib/organization-display'
+import { OrganizationConnectedCharacterPreviewList } from './organization-connected-character-preview-list.client'
 
 export type OrganizationConnectedCharactersSectionProps = {
   connectedCharacters: OrganizationConnectedCharactersViewModel
@@ -40,7 +40,7 @@ export function OrganizationConnectedCharactersSection({
       ) : (
         <div className="space-y-3">
           <Text variant="muted">{formatConnectedCharactersCount(total)}</Text>
-          <CharacterListCardPreview items={previewItems} total={total} />
+          <OrganizationConnectedCharacterPreviewList items={previewItems} total={total} />
         </div>
       )}
     </section>

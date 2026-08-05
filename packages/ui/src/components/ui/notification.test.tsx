@@ -50,7 +50,7 @@ describe('NotificationPopoverHeader', () => {
     expect(heading).toHaveClass('eyebrow-style-sm', 'text-muted-foreground')
 
     const action = screen.getByRole('button', { name: 'Mark all as read' })
-    expect(action).toHaveClass('h-6')
+    expect(action).toHaveClass('h-control-action-compact')
     expect(container.firstChild).toHaveClass('py-1')
   })
 })

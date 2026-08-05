@@ -1,5 +1,11 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import {
+  compactActionHeightClasses,
+  compactActionIconGlyphClasses,
+  compactActionSizeClasses,
+} from './compact-action.variants'
 import {
   outlineControlExpandedClasses,
   outlineControlShellClasses,
@@ -44,9 +50,17 @@ export const buttonVariants = cva(
       { size: 'lg', density: 'default', class: 'h-10' },
       { size: 'icon', density: 'default', class: 'size-9' },
       { size: 'default', density: 'compact', class: 'h-8 px-3 py-1' },
-      { size: 'sm', density: 'compact', class: 'h-6 px-2 py-0 [&_svg]:size-3' },
+      {
+        size: 'sm',
+        density: 'compact',
+        class: cn(compactActionHeightClasses, 'px-2 py-0', compactActionIconGlyphClasses),
+      },
       { size: 'lg', density: 'compact', class: 'h-9 px-5 py-1.5' },
-      { size: 'icon', density: 'compact', class: 'size-8 [&_svg]:size-3.5' },
+      {
+        size: 'icon',
+        density: 'compact',
+        class: cn(compactActionSizeClasses, compactActionIconGlyphClasses),
+      },
     ],
     defaultVariants: {
       variant: 'default',

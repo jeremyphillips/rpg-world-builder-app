@@ -55,5 +55,6 @@ describe('LocationPartyAssociationsDetailSection', () => {
     expect(screen.getByRole('heading', { name: LOCATION_PARTY_SECTION_LABEL })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Realm Council' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View' })).toBeInTheDocument()
   })
 })

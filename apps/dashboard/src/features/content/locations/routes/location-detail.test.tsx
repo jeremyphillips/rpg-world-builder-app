@@ -52,6 +52,7 @@ describe('LocationDetailContent', () => {
     expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contained locations' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View' })).toBeInTheDocument()
   })
 
   it('shows building archetype in identity metadata', () => {

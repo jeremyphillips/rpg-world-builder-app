@@ -69,7 +69,7 @@ describe('DataTableFilterRegion', () => {
 
     await user.click(screen.getByRole('button', { name: /Show more filters, 2 active/i }))
     expect(screen.getByText('Additional filters')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveClass('h-6')
+    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveClass('h-control-action-compact')
   })
 
   it('reserves stacked label height for the More filters rail', () => {

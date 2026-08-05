@@ -287,6 +287,12 @@
   /* Popover menus — minimum readable width when the trigger is fit-sized. */
   --popover-menu-min-width: 15.625rem; /* 250px */
 
+  /*
+   * Compact inline action height — Button sm+compact, ContentCard heading/icon actions,
+   * and other dense row controls (24px @ 16px root).
+   */
+  --control-action-compact-height: 1.5rem;
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-attention-ring: attention-ring 1.5s ease-out;
@@ -303,6 +309,19 @@
 
 @utility z-toast {
   z-index: var(--z-toast);
+}
+
+@utility h-control-action-compact {
+  height: var(--control-action-compact-height);
+}
+
+@utility min-h-control-action-compact {
+  min-height: var(--control-action-compact-height);
+}
+
+@utility size-control-action-compact {
+  width: var(--control-action-compact-height);
+  height: var(--control-action-compact-height);
 }
 
 @utility border-input {
