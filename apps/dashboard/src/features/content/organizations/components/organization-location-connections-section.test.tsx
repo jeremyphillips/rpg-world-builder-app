@@ -4,6 +4,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import type { Location } from '@rpg/contracts'
+
 import {
   OrganizationLocationConnectionsSection,
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
@@ -151,10 +153,10 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
   })
 
-  it('invokes family add and edit callbacks for managers', async () => {
+  it('invokes family add and change-kind callbacks for managers when alternatives exist', async () => {
     const user = userEvent.setup()
     const onAddFamily = vi.fn()
-    const onEditConnection = vi.fn()
+    const onChangeKindConnection = vi.fn()
 
     render(
       <MemoryRouter>
@@ -165,7 +167,31 @@ describe('OrganizationLocationConnectionsSection', () => {
           visibleFamilies={['site']}
           canAddToFamily={{ site: true }}
           onAddFamily={onAddFamily}
-          onEditConnection={onEditConnection}
+          onChangeKindConnection={onChangeKindConnection}
+          mutationContext={{
+            subjectOrganizationId: 'org-1',
+            locations: [
+              {
+                id: 'building-1',
+                campaignId: 'camp-1',
+                name: 'Royal Mint',
+                slug: 'royal-mint',
+                kind: 'structure',
+              },
+              {
+                id: 'building-2',
+                campaignId: 'camp-1',
+                name: 'Royal Palace',
+                slug: 'royal-palace',
+                kind: 'structure',
+              },
+            ] as Location[],
+            connections: [
+              { id: 'conn-1', locationId: 'building-1', kind: 'owns' },
+              { id: 'conn-2', locationId: 'building-2', kind: 'headquarters' },
+            ],
+            occupancyLoaded: true,
+          }}
         />
       </MemoryRouter>,
     )
@@ -174,8 +200,8 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(onAddFamily).toHaveBeenCalledWith('site')
 
     await user.click(screen.getByRole('button', { name: 'Actions for Royal Mint' }))
-    await user.click(screen.getByRole('menuitem', { name: 'Change connection type' }))
-    expect(onEditConnection).toHaveBeenCalledWith({
+    await user.click(screen.getByRole('menuitem', { name: 'Change relationship type' }))
+    expect(onChangeKindConnection).toHaveBeenCalledWith({
       connectionId: 'conn-1',
       locationId: 'building-1',
       kind: 'owns',

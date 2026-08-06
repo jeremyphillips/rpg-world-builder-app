@@ -54,6 +54,10 @@ export const LOCATION_CONNECTION_KIND_CHANGE_LABEL = 'Change connection type'
 
 export const ORGANIZATION_DRAWER_CHANGE_KIND_TITLE = 'Change connection type'
 
+export const ORGANIZATION_DRAWER_CHANGE_TARGET_TITLE = 'Change location'
+
+export const ORGANIZATION_DRAWER_CHANGE_TARGET_SUBMIT_LABEL = 'Save change'
+
 export const ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL = 'Save change'
 
 export const LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE = 'Change connection type'
@@ -365,6 +369,7 @@ export function organizationInverseSubjectHasAvailableKind(
     subjectOrganizationId: subjectId,
     connections,
     edgesAtLocation,
+    excludeConnectionId: excludeRelationshipId,
   })
 }
 

@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type {
   CharacterLocationConnectionKind,
+  Location,
   LocationConnectedPartyRow,
   LocationConnectedPartySectionGroup,
   OrganizationLocationConnectionKind,
@@ -35,8 +36,10 @@ export type LocationConnectedPartyEditTarget = {
 
 export type LocationConnectedPartiesSectionProps = {
   campaignId: string
+  location: Location
   sectionGroup: LocationConnectedPartySectionGroup
   rows: readonly LocationConnectedPartyRow[]
+  organizations?: readonly { id: string; name: string }[]
   peopleKindSlots?: readonly PeopleKindSlot[]
   canManage?: boolean
   showEmptySection?: boolean
@@ -61,8 +64,10 @@ export type LocationConnectedPartiesSectionProps = {
 
 export function LocationConnectedPartiesSection({
   campaignId,
+  location,
   sectionGroup,
   rows,
+  organizations = [],
   peopleKindSlots = [],
   canManage = false,
   showEmptySection = true,
@@ -83,6 +88,16 @@ export function LocationConnectedPartiesSection({
   const sectionRows = React.useMemo(
     () => rows.filter((row) => row.sectionGroup === sectionGroup),
     [rows, sectionGroup],
+  )
+
+  const peopleMutationContext = React.useMemo(
+    () => ({ location, rows: sectionRows }),
+    [location, sectionRows],
+  )
+
+  const territorialMutationContext = React.useMemo(
+    () => ({ location, rows, organizations }),
+    [location, organizations, rows],
   )
 
   if (!showEmptySection && sectionRows.length === 0) {
@@ -110,6 +125,8 @@ export function LocationConnectedPartiesSection({
         peopleKindSlots={peopleKindSlots}
         canManage={canManage}
         canAddToPeopleSection={canAddToPeopleSection}
+        peopleMutationContext={peopleMutationContext}
+        territorialMutationContext={territorialMutationContext}
         onAddPeopleSection={onAddPeopleSection}
         onAddTerritorialKind={onAddTerritorialKind}
         onEditConnection={onEditConnection}

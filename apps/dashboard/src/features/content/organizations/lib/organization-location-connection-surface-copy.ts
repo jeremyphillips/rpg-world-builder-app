@@ -107,11 +107,42 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   },
 } as const satisfies Record<OrganizationLocationConnectionKind, OrganizationForwardSurfaceCopy>
 
-export const ORGANIZATION_FORWARD_OVERFLOW = {
-  viewLocation: 'View location',
-  changeKind: 'Change connection type',
-  remove: 'Remove connection',
-} as const
+type OrganizationForwardOverflowLabels = {
+  viewLocation: string
+  changeKind: string
+  changeTarget: string
+  remove: string
+}
+
+export const ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY = {
+  site: {
+    viewLocation: 'View location',
+    changeKind: 'Change relationship type',
+    changeTarget: 'Change location',
+    remove: 'Remove relationship',
+  },
+  geographic_presence: {
+    viewLocation: 'View location',
+    changeKind: 'Change connection type',
+    changeTarget: 'Change location',
+    remove: 'Remove geographic presence',
+  },
+  territorial_authority: {
+    viewLocation: 'View location',
+    changeKind: 'Change authority type',
+    changeTarget: 'Change location',
+    remove: 'Remove authority',
+  },
+} as const satisfies Record<OrganizationLocationConnectionFamily, OrganizationForwardOverflowLabels>
+
+/** @deprecated Use resolveOrganizationForwardOverflowLabels(family) for family-aware copy. */
+export const ORGANIZATION_FORWARD_OVERFLOW = ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY.site
+
+export function resolveOrganizationForwardOverflowLabels(
+  family: OrganizationLocationConnectionFamily,
+): OrganizationForwardOverflowLabels {
+  return ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY[family]
+}
 
 export function resolveOrganizationForwardSurfaceCopy(
   kind: OrganizationLocationConnectionKind,

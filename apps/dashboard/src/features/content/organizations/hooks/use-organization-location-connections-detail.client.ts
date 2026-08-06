@@ -19,6 +19,8 @@ import {
   resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
+import { resolveRelationshipAlternatives } from '../../lib/relationship/relationship-alternatives'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'
@@ -26,6 +28,13 @@ import { buildOrganizationLocationConnectionCards } from '../lib/build-organizat
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import type { OrganizationLocationConnectionEditTarget } from '../components/organization-location-connections-section.client'
 import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
+import type { OrganizationLocationConnectionMutationContext } from '../components/organization-location-connection-relationship-row.client'
+
+type EditDrawerState = {
+  mode: Extract<OrganizationForwardDrawerMode, 'changeKind' | 'changeTarget'>
+  intent: OrganizationConnectionDrawerIntent
+  connection: OrganizationLocationConnectionEditTarget
+}
 
 type DrawerState =
   | {
@@ -33,11 +42,7 @@ type DrawerState =
       intent: OrganizationConnectionDrawerIntent
       kind?: OrganizationLocationConnectionKind
     }
-  | {
-      mode: 'changeKind'
-      intent: OrganizationConnectionDrawerIntent
-      connection: OrganizationLocationConnectionEditTarget
-    }
+  | EditDrawerState
 
 export function useOrganizationLocationConnectionsDetail(
   campaignId: string,
@@ -80,6 +85,36 @@ export function useOrganizationLocationConnectionsDetail(
     [locationReferencesQuery.data],
   )
 
+  const mutationContext = React.useMemo<OrganizationLocationConnectionMutationContext>(
+    () => ({
+      subjectOrganizationId: organizationId,
+      locations,
+      connections: existingConnections,
+      edgesByLocationId,
+      occupancyLoaded,
+    }),
+    [edgesByLocationId, existingConnections, locations, occupancyLoaded, organizationId],
+  )
+
+  const resolveDrawerAlternatives = React.useCallback(
+    (connection: OrganizationLocationConnectionEditTarget) =>
+      resolveRelationshipAlternatives({
+        surface: 'organization_forward',
+        canManage,
+        occupancyLoaded,
+        relationship: {
+          connectionId: connection.connectionId,
+          locationId: connection.locationId,
+          kind: connection.kind,
+          subjectOrganizationId: organizationId,
+        },
+        locations,
+        connections: existingConnections,
+        edgesByLocationId,
+      }).alternatives,
+    [canManage, edgesByLocationId, existingConnections, locations, occupancyLoaded, organizationId],
+  )
+
   const visibleFamilies = React.useMemo(
     () => resolveVisibleOrganizationConnectionFamilies(locations),
     [locations],
@@ -120,7 +155,7 @@ export function useOrganizationLocationConnectionsDetail(
     async (input: { locationId: string; kind: OrganizationLocationConnectionKind }) => {
       mutations.resetErrors()
 
-      if (drawerState?.mode === 'changeKind') {
+      if (drawerState?.mode === 'changeKind' || drawerState?.mode === 'changeTarget') {
         await mutations.updateLocationConnection(
           drawerState.connection.connectionId,
           {
@@ -154,10 +189,21 @@ export function useOrganizationLocationConnectionsDetail(
     setDrawerState({ mode: 'add', intent: organizationConnectionDrawerIntentFromFamily(family) })
   }, [])
 
-  const openEditDrawer = React.useCallback(
+  const openChangeKindDrawer = React.useCallback(
     (connection: OrganizationLocationConnectionEditTarget) => {
       setDrawerState({
         mode: 'changeKind',
+        intent: organizationDrawerIntentFromKind(connection.kind),
+        connection,
+      })
+    },
+    [],
+  )
+
+  const openChangeTargetDrawer = React.useCallback(
+    (connection: OrganizationLocationConnectionEditTarget) => {
+      setDrawerState({
+        mode: 'changeTarget',
         intent: organizationDrawerIntentFromKind(connection.kind),
         connection,
       })
@@ -173,6 +219,8 @@ export function useOrganizationLocationConnectionsDetail(
     occupancyLoaded,
     locationConnections,
     existingConnections,
+    mutationContext,
+    resolveDrawerAlternatives,
     visibleFamilies,
     canAddToFamily,
     locationReferencesQuery,
@@ -183,7 +231,8 @@ export function useOrganizationLocationConnectionsDetail(
     setDrawerState,
     openAddDrawer,
     openAddFamily,
-    openEditDrawer,
+    openChangeKindDrawer,
+    openChangeTargetDrawer,
     handleSubmit,
     handleRemoveConnection,
   }

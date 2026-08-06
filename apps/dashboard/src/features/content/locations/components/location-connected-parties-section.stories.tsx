@@ -3,6 +3,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
 
+import type { Location } from '@rpg/contracts'
+
+const sampleLocation = {
+  id: 'region-1',
+  campaignId: STORY_CAMPAIGN_ID,
+  name: 'Lankhmar',
+  slug: 'lankhmar',
+  kind: 'region',
+} as Location
+
 const meta = {
   title: 'Content/Locations/LocationConnectedPartiesSection',
   component: LocationConnectedPartiesSection,
@@ -38,6 +48,7 @@ const peopleKindSlots = [
 export const TerritorialAuthority: Story = {
   args: {
     campaignId: STORY_CAMPAIGN_ID,
+    location: sampleLocation,
     sectionGroup: 'territorial_authority',
     rows: sampleRows,
     canManage: true,
@@ -48,6 +59,7 @@ export const TerritorialAuthority: Story = {
 export const ManagerEmptyPeople: Story = {
   args: {
     campaignId: STORY_CAMPAIGN_ID,
+    location: sampleLocation,
     sectionGroup: 'people_and_organizations',
     rows: [],
     canManage: true,

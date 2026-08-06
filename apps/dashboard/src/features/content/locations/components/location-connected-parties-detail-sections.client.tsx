@@ -106,6 +106,8 @@ function LocationConnectedPartiesSections({
       {detail.showTerritorialSection ? (
         <LocationConnectedPartiesSection
           {...sharedSectionProps}
+          location={location}
+          organizations={detail.organizations}
           sectionGroup="territorial_authority"
           showEmptySection={
             detail.canManage ||
@@ -120,6 +122,8 @@ function LocationConnectedPartiesSections({
       {detail.showPeopleSection ? (
         <LocationConnectedPartiesSection
           {...sharedSectionProps}
+          location={location}
+          organizations={detail.organizations}
           sectionGroup="people_and_organizations"
           showEmptySection={
             detail.canManage ||

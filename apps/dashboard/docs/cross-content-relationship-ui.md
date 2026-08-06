@@ -65,14 +65,17 @@ Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** �
 
 ## Populated row vs empty container
 
-| Responsibility                           | Owner                                                                                                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Populated edge summary + overflow        | `CrossContentRelationshipRow`                                                                                           |
-| Overflow actions                         | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger)      |
-| Kind-group shell (header + kind rows)    | `RelationshipFieldGroup` + `RelationshipFieldGroupRow`                                                                  |
+| Responsibility                    | Owner                                                                                                              |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Populated edge summary + overflow | `CrossContentRelationshipRow`                                                                                      |
+| Overflow actions                  | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger) |
+
+Overflow mutation actions derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts), composed by the domain-agnostic [`buildRelationshipOverflowActions`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts). Each operation exposes `{ supported, availability }` where `availability` is `available | unavailable | unknown`. Emit a mutation action only when `supported && availability === 'available'` (remove/view: `supported` only). Drawers consume the same resolver output — do not recompute eligibility independently.
+
+| Kind-group shell (header + kind rows) | `RelationshipFieldGroup` + `RelationshipFieldGroupRow` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
-| Singleton slot empty state + add CTA     | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`)             |
-| Collection empty state + add CTA         | Feature row content via `RelationshipEmptyInlineRow`                                                                    |
+| Singleton slot empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`) |
+| Collection empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` |
 
 `CrossContentRelationshipRow` **never** accepts empty-state props.
 

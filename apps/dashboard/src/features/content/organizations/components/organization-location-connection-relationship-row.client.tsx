@@ -2,70 +2,130 @@
 
 import { useNavigate } from 'react-router-dom'
 
-import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
+import type {
+  Location,
+  OrganizationLocationConnectionEdgeAtLocation,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
+import {
+  isRelationshipMutationActionAvailable,
+  resolveRelationshipAlternatives,
+} from '../../lib/relationship/relationship-alternatives'
+import {
+  buildRelationshipOverflowActions,
+  type RelationshipOverflowActionId,
+} from '../../lib/relationship/resolve-relationship-overflow-actions'
 import type { OrganizationLocationConnectionPreviewItem } from '../lib/organization-display'
-import { ORGANIZATION_FORWARD_OVERFLOW } from '../lib/organization-location-connection-surface-copy'
+import { resolveOrganizationForwardOverflowLabels } from '../lib/organization-location-connection-surface-copy'
+
+export type OrganizationLocationConnectionMutationContext = {
+  subjectOrganizationId: string
+  locations: readonly Location[]
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >
+  occupancyLoaded?: boolean
+}
 
 export function buildOrganizationLocationConnectionOverflowActions(input: {
   item: OrganizationLocationConnectionPreviewItem
   canManage: boolean
   isMutationPending?: boolean
+  mutationContext: OrganizationLocationConnectionMutationContext
   navigate: (path: string) => void
-  onEditConnection?: (connection: {
+  onChangeKindConnection?: (connection: {
+    connectionId: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }) => void
+  onChangeTargetConnection?: (connection: {
     connectionId: string
     locationId: string
     kind: OrganizationLocationConnectionKind
   }) => void
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
-}): RelationshipOverflowAction[] {
-  const actions: RelationshipOverflowAction[] = [
-    {
-      id: 'view',
-      label: ORGANIZATION_FORWARD_OVERFLOW.viewLocation,
-      onSelect: () => input.navigate(input.item.detailHref),
+}) {
+  const resolved = resolveRelationshipAlternatives({
+    surface: 'organization_forward',
+    canManage: input.canManage,
+    occupancyLoaded: input.mutationContext.occupancyLoaded,
+    relationship: {
+      connectionId: input.item.connectionId,
+      locationId: input.item.locationId,
+      kind: input.item.kind,
+      subjectOrganizationId: input.mutationContext.subjectOrganizationId,
     },
-  ]
+    locations: input.mutationContext.locations,
+    connections: input.mutationContext.connections,
+    edgesByLocationId: input.mutationContext.edgesByLocationId,
+  })
 
-  if (input.canManage && input.onEditConnection) {
-    actions.push({
-      id: 'change-kind',
-      label: ORGANIZATION_FORWARD_OVERFLOW.changeKind,
-      onSelect: () =>
-        input.onEditConnection?.({
-          connectionId: input.item.connectionId,
-          locationId: input.item.locationId,
-          kind: input.item.kind,
-        }),
-    })
+  const labels = resolveOrganizationForwardOverflowLabels(input.item.family)
+  const connectionTarget = {
+    connectionId: input.item.connectionId,
+    locationId: input.item.locationId,
+    kind: input.item.kind,
   }
 
-  if (input.canManage && input.onRemoveConnection) {
-    actions.push({
-      id: 'remove',
-      label: ORGANIZATION_FORWARD_OVERFLOW.remove,
-      destructive: true,
-      onSelect: () => {
-        if (input.isMutationPending) return
-        void input.onRemoveConnection?.({
-          connectionId: input.item.connectionId,
-          locationId: input.item.locationId,
-        })
-      },
-    })
+  const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
+    view: () => input.navigate(input.item.detailHref),
   }
 
-  return actions
+  if (
+    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeKind') &&
+    input.onChangeKindConnection
+  ) {
+    handlers.changeKind = () => input.onChangeKindConnection?.(connectionTarget)
+  }
+
+  if (
+    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeTarget') &&
+    input.onChangeTargetConnection
+  ) {
+    handlers.changeTarget = () => input.onChangeTargetConnection?.(connectionTarget)
+  }
+
+  if (resolved.capabilities.remove?.supported && input.onRemoveConnection) {
+    handlers.remove = () => {
+      if (input.isMutationPending) return
+      void input.onRemoveConnection?.({
+        connectionId: input.item.connectionId,
+        locationId: input.item.locationId,
+      })
+    }
+  }
+
+  return buildRelationshipOverflowActions({
+    capabilities: resolved.capabilities,
+    labels: {
+      view: labels.viewLocation,
+      changeKind: labels.changeKind,
+      changeTarget: labels.changeTarget,
+      remove: labels.remove,
+    },
+    handlers,
+  })
 }
 
 export type OrganizationLocationConnectionRelationshipRowProps = {
   item: OrganizationLocationConnectionPreviewItem
   canManage: boolean
   isMutationPending?: boolean
-  onEditConnection?: (connection: {
+  mutationContext: OrganizationLocationConnectionMutationContext
+  onChangeKindConnection?: (connection: {
+    connectionId: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }) => void
+  onChangeTargetConnection?: (connection: {
     connectionId: string
     locationId: string
     kind: OrganizationLocationConnectionKind
@@ -77,7 +137,9 @@ export function OrganizationLocationConnectionRelationshipRow({
   item,
   canManage,
   isMutationPending = false,
-  onEditConnection,
+  mutationContext,
+  onChangeKindConnection,
+  onChangeTargetConnection,
   onRemoveConnection,
 }: OrganizationLocationConnectionRelationshipRowProps) {
   const navigate = useNavigate()
@@ -97,8 +159,10 @@ export function OrganizationLocationConnectionRelationshipRow({
         item,
         canManage,
         isMutationPending,
+        mutationContext,
         navigate,
-        onEditConnection,
+        onChangeKindConnection,
+        onChangeTargetConnection,
         onRemoveConnection,
       })}
       overflowTriggerLabel={`Actions for ${item.card.name}`}

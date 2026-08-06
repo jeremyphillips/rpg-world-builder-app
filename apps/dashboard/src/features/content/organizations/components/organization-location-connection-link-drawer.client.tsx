@@ -8,7 +8,11 @@ import type {
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getLocationKindLabel, getOrganizationKindLabel } from '@rpg/contracts'
+import {
+  getLocationKindLabel,
+  getOrganizationKindLabel,
+  getOrganizationLocationConnectionLabel,
+} from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -22,11 +26,17 @@ import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
 import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import {
+  RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
+  resolveRelationshipAlternatives,
+} from '../../lib/relationship/relationship-alternatives'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
   ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
   ORGANIZATION_DRAWER_CHANGE_KIND_TITLE,
+  ORGANIZATION_DRAWER_CHANGE_TARGET_SUBMIT_LABEL,
+  ORGANIZATION_DRAWER_CHANGE_TARGET_TITLE,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
@@ -38,10 +48,11 @@ import {
 } from '../../lib/location-connection-drawer-intent'
 import {
   buildOrganizationFamilyKindOptions,
-  buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
+  type LocationConnectionKindOption,
 } from '../../lib/location-connection-kind-options'
 import { organizationLocationConnectionHasAvailableKind } from '../../lib/location-connection-duplicate-keys'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 import {
   resolveOrganizationForwardAddDrawerInstruction,
   resolveOrganizationForwardAddDrawerTitle,
@@ -58,18 +69,21 @@ export const ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE =
 
 const ORGANIZATION_DRAWER_KIND_CHANGE_LABEL = 'Change'
 
-type OrganizationLocationDrawerMode = 'add' | 'changeKind'
-
 type ExistingConnection = {
   id: string
   locationId: string
   kind: OrganizationLocationConnectionKind
 }
 
+export type OrganizationLocationConnectionDrawerAlternatives = {
+  changeKind?: LocationConnectionKindOption[]
+  changeTarget?: Location[]
+}
+
 export type OrganizationLocationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  mode: OrganizationLocationDrawerMode
+  mode: OrganizationForwardDrawerMode
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
   organization: Pick<Organization, 'name' | 'organizationKind'>
@@ -81,6 +95,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   >
   occupancyLoaded?: boolean
   initialConnection?: ExistingConnection
+  drawerAlternatives?: OrganizationLocationConnectionDrawerAlternatives
   isSubmitting?: boolean
   onSubmit: (input: {
     locationId: string
@@ -102,11 +117,11 @@ function resolveDefaultAddKind(
 }
 
 function shouldShowFamilyKindStep(
-  mode: OrganizationLocationDrawerMode,
+  mode: OrganizationForwardDrawerMode,
   intent: OrganizationConnectionDrawerIntent,
   resolvedAddKind?: OrganizationLocationConnectionKind,
 ): boolean {
-  if (resolvedAddKind || mode === 'changeKind') {
+  if (resolvedAddKind || mode === 'changeKind' || mode === 'changeTarget') {
     return false
   }
   return resolveKindsForOrganizationDrawerIntent(intent).length > 1
@@ -136,6 +151,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   edgesByLocationId,
   occupancyLoaded = true,
   initialConnection,
+  drawerAlternatives,
   isSubmitting = false,
   onSubmit,
 }: OrganizationLocationConnectionLinkDrawerProps) {
@@ -143,14 +159,47 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const defaultAddKind = mode === 'add' ? resolveDefaultAddKind(intent) : null
 
   const [selectedLocationId, setSelectedLocationId] = React.useState<string | null>(
-    initialConnection?.locationId ?? null,
+    mode === 'changeTarget' ? null : (initialConnection?.locationId ?? null),
   )
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ?? defaultAddKind ?? initialConnection?.kind ?? null,
   )
 
-  const excludeConnectionId = mode === 'changeKind' ? initialConnection?.id : undefined
+  const excludeConnectionId =
+    mode === 'changeKind' || mode === 'changeTarget' ? initialConnection?.id : undefined
   const showKindStep = shouldShowFamilyKindStep(mode, intent, resolvedAddKind)
+
+  const mutationAlternatives = React.useMemo(() => {
+    if (drawerAlternatives) {
+      return drawerAlternatives
+    }
+    if ((mode === 'changeKind' || mode === 'changeTarget') && initialConnection && organizationId) {
+      return resolveRelationshipAlternatives({
+        surface: 'organization_forward',
+        canManage: true,
+        occupancyLoaded,
+        relationship: {
+          connectionId: initialConnection.id,
+          locationId: initialConnection.locationId,
+          kind: initialConnection.kind,
+          subjectOrganizationId: organizationId,
+        },
+        locations,
+        connections: existingConnections,
+        edgesByLocationId,
+      }).alternatives
+    }
+    return undefined
+  }, [
+    drawerAlternatives,
+    edgesByLocationId,
+    existingConnections,
+    initialConnection,
+    locations,
+    mode,
+    occupancyLoaded,
+    organizationId,
+  ])
 
   const kindOptions = React.useMemo(() => {
     if (!showKindStep) return []
@@ -174,10 +223,15 @@ function OrganizationLocationConnectionLinkDrawerContent({
     showKindStep,
   ])
 
+  const editKindOptions = mutationAlternatives?.changeKind ?? []
+  const changeTargetLocations = mutationAlternatives?.changeTarget ?? []
+
   const activeKind = (() => {
     if (resolvedAddKind) return resolvedAddKind
     if (defaultAddKind) return defaultAddKind
-    if (mode === 'changeKind') return selectedKind ?? initialConnection?.kind ?? null
+    if (mode === 'changeKind' || mode === 'changeTarget') {
+      return selectedKind ?? initialConnection?.kind ?? null
+    }
     return resolveActiveConnectionKind(
       selectedKind,
       kindOptions,
@@ -185,6 +239,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
   })()
 
   const eligibleLocations = React.useMemo(() => {
+    if (mode === 'changeTarget') {
+      return changeTargetLocations
+    }
     if (!activeKind) return []
     return filterLocationsForOrganizationKind(
       locations,
@@ -196,48 +253,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
     )
   }, [
     activeKind,
+    changeTargetLocations,
     edgesByLocationId,
     existingConnections,
     excludeConnectionId,
     locations,
-    organizationId,
-  ])
-
-  const selectedLocation = React.useMemo(
-    () => locations.find((location) => location.id === selectedLocationId) ?? null,
-    [locations, selectedLocationId],
-  )
-
-  const editKindOptions = React.useMemo(() => {
-    if (mode !== 'changeKind' || !selectedLocation) return []
-    return buildOrganizationLocationConnectionKindOptions({
-      locationId: selectedLocation.id,
-      kinds: resolveKindsForOrganizationDrawerIntent(intent).filter((kind) =>
-        locationEligibleForOrganizationKind(
-          selectedLocation,
-          kind,
-          organizationId,
-          existingConnections,
-          edgesByLocationId,
-          excludeConnectionId,
-        ),
-      ),
-      subjectOrganizationId: organizationId,
-      connections: existingConnections,
-      edgesAtLocation: resolveEdgesAtLocation(selectedLocation.id, edgesByLocationId),
-      excludeConnectionId,
-    })
-  }, [
-    edgesByLocationId,
-    existingConnections,
-    excludeConnectionId,
-    intent,
     mode,
     organizationId,
-    selectedLocation,
   ])
 
-  const showLocationPicker = mode === 'add' && Boolean(activeKind)
+  const lockedLocation = React.useMemo(
+    () =>
+      mode === 'changeKind'
+        ? (locations.find((location) => location.id === initialConnection?.locationId) ?? null)
+        : null,
+    [initialConnection?.locationId, locations, mode],
+  )
+
+  const showLocationPicker = (mode === 'add' && Boolean(activeKind)) || mode === 'changeTarget'
   const canSubmit = Boolean(selectedLocationId && activeKind && !isSubmitting)
 
   const handleKindChange = (value: string) => {
@@ -266,12 +299,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
     await onSubmit({ locationId: selectedLocationId, kind: activeKind })
   }
 
-  const title =
-    mode === 'add' && resolvedAddKind
-      ? resolveOrganizationForwardAddDrawerTitle(resolvedAddKind)
-      : mode === 'add'
-        ? ORGANIZATION_DRAWER_ADD_TITLES[intent]
-        : ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
+  const title = (() => {
+    if (mode === 'changeTarget') return ORGANIZATION_DRAWER_CHANGE_TARGET_TITLE
+    if (mode === 'add' && resolvedAddKind) {
+      return resolveOrganizationForwardAddDrawerTitle(resolvedAddKind)
+    }
+    if (mode === 'add') return ORGANIZATION_DRAWER_ADD_TITLES[intent]
+    return ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
+  })()
 
   const instructionCopy =
     mode === 'add' && resolvedAddKind
@@ -283,15 +318,28 @@ function OrganizationLocationConnectionLinkDrawerContent({
       ? resolveOrganizationForwardFamilyAddDrawerHelper(intent)
       : undefined
 
-  const submitLabel =
-    mode === 'add' && resolvedAddKind
-      ? resolveOrganizationForwardAddSubmitLabel(resolvedAddKind)
-      : mode === 'add'
-        ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
-        : ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
+  const submitLabel = (() => {
+    if (mode === 'changeTarget') return ORGANIZATION_DRAWER_CHANGE_TARGET_SUBMIT_LABEL
+    if (mode === 'add' && resolvedAddKind) {
+      return resolveOrganizationForwardAddSubmitLabel(resolvedAddKind)
+    }
+    if (mode === 'add') return ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
+    return ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
+  })()
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
   const organizationContext = `${organization.name} · ${getOrganizationKindLabel(organization.organizationKind)}`
+
+  const mutationEmptyMessage =
+    mode === 'changeTarget'
+      ? RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES.changeTarget
+      : mode === 'changeKind'
+        ? RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES.changeKind
+        : null
+
+  const showMutationEmptyState =
+    (mode === 'changeKind' && editKindOptions.length === 0) ||
+    (mode === 'changeTarget' && changeTargetLocations.length === 0)
 
   return (
     <CatalogPickerSheet
@@ -300,7 +348,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       title={title}
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
-      pickerEnabled={showLocationPicker}
+      pickerEnabled={showLocationPicker && !showMutationEmptyState}
       searchPlaceholder={ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
       noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
@@ -326,13 +374,25 @@ function OrganizationLocationConnectionLinkDrawerContent({
               changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
             />
           ) : null}
-          {mode === 'changeKind' && selectedLocation ? (
+          {mode === 'changeKind' && lockedLocation ? (
             <RelationshipDrawerSubjectField
               label={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
-              value={selectedLocation.name}
+              value={lockedLocation.name}
             />
           ) : null}
-          {mode === 'changeKind' && selectedLocation && editKindOptions.length > 0 ? (
+          {mode === 'changeKind' && activeKind ? (
+            <RelationshipDrawerSubjectField
+              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              value={getOrganizationLocationConnectionLabel(activeKind)}
+            />
+          ) : null}
+          {mode === 'changeTarget' && activeKind ? (
+            <RelationshipDrawerSubjectField
+              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              value={getOrganizationLocationConnectionLabel(activeKind)}
+            />
+          ) : null}
+          {mode === 'changeKind' && lockedLocation && editKindOptions.length > 0 ? (
             <LocationConnectionKindStep
               id="organization-location-connection-edit-kind"
               label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
@@ -345,7 +405,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
               defaultExpanded
             />
           ) : null}
-          {showLocationPicker ? (
+          {showLocationPicker && !showMutationEmptyState ? (
             <Heading variant="label" as="p">
               {ORGANIZATION_LOCATION_LINK_FIELD_LABEL}
             </Heading>
@@ -353,6 +413,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
           {!showLocationPicker && mode === 'add' && !activeKind ? (
             <Text variant="muted" className="text-sm" role="status">
               {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
+            </Text>
+          ) : null}
+          {showMutationEmptyState && mutationEmptyMessage ? (
+            <Text variant="muted" className="text-sm" role="status">
+              {mutationEmptyMessage}
             </Text>
           ) : null}
         </div>
@@ -365,13 +430,13 @@ function OrganizationLocationConnectionLinkDrawerContent({
         ) : undefined
       }
       footer={
-        (showLocationPicker || mode === 'changeKind') && activeKind ? (
+        !showMutationEmptyState && (showLocationPicker || mode === 'changeKind') && activeKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>
         ) : undefined
       }
-      items={showLocationPicker ? eligibleLocations : []}
+      items={showLocationPicker && !showMutationEmptyState ? eligibleLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
       getSearchText={buildLocationSearchText}

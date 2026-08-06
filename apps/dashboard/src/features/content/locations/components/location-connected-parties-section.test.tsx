@@ -11,6 +11,16 @@ import {
 } from './location-connected-parties-section.client'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 
+import type { Location } from '@rpg/contracts'
+
+const sampleLocation = {
+  id: 'region-1',
+  campaignId: STORY_CAMPAIGN_ID,
+  name: 'Lankhmar',
+  slug: 'lankhmar',
+  kind: 'region',
+} as Location
+
 const sampleRows = [
   {
     relationshipId: 'rel-org-1',
@@ -79,6 +89,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="people_and_organizations"
           rows={[]}
           showEmptySection={false}
@@ -96,6 +107,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="territorial_authority"
           rows={[]}
           canManage
@@ -117,6 +129,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="people_and_organizations"
           rows={[]}
           canManage
@@ -145,6 +158,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="people_and_organizations"
           rows={peopleOrganizationRows}
           canManage
@@ -172,6 +186,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="territorial_authority"
           rows={[]}
           canManage
@@ -190,6 +205,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="territorial_authority"
           rows={sampleRows}
           canManage
@@ -210,6 +226,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="territorial_authority"
           rows={sampleRows}
           canManage
@@ -234,6 +251,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="people_and_organizations"
           rows={peopleNpcRows}
           canManage
@@ -254,6 +272,7 @@ describe('LocationConnectedPartiesSection', () => {
       <MemoryRouter>
         <LocationConnectedPartiesSection
           campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
           sectionGroup="territorial_authority"
           rows={sampleRows}
           canManage

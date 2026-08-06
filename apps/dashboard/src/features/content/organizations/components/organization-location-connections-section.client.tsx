@@ -18,7 +18,10 @@ import {
   ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS,
 } from '../lib/build-organization-location-connection-cards'
 import { resolveOrganizationForwardFamilySurfaceCopy } from '../lib/organization-location-connection-surface-copy'
-import { OrganizationLocationConnectionRelationshipRow } from './organization-location-connection-relationship-row.client'
+import {
+  OrganizationLocationConnectionRelationshipRow,
+  type OrganizationLocationConnectionMutationContext,
+} from './organization-location-connection-relationship-row.client'
 import {
   RelationshipFieldGroup,
   RelationshipFieldGroupRow,
@@ -59,8 +62,10 @@ export type OrganizationLocationConnectionsSectionProps = {
   isMutationPending?: boolean
   pendingConnectionId?: string
   onAddFamily?: (family: OrganizationLocationConnectionFamily) => void
-  onEditConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
+  onChangeKindConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
+  onChangeTargetConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
+  mutationContext?: OrganizationLocationConnectionMutationContext
 }
 
 export function OrganizationLocationConnectionsSection({
@@ -76,8 +81,10 @@ export function OrganizationLocationConnectionsSection({
   isMutationPending = false,
   pendingConnectionId,
   onAddFamily,
-  onEditConnection,
+  onChangeKindConnection,
+  onChangeTargetConnection,
   onRemoveConnection,
+  mutationContext,
 }: OrganizationLocationConnectionsSectionProps) {
   const { previewItems, total, emptyText } = locationConnections
 
@@ -152,7 +159,15 @@ export function OrganizationLocationConnectionsSection({
                                 isMutationPending={
                                   isMutationPending && pendingConnectionId === item.connectionId
                                 }
-                                onEditConnection={onEditConnection}
+                                mutationContext={
+                                  mutationContext ?? {
+                                    subjectOrganizationId: '',
+                                    locations: [],
+                                    connections: [],
+                                  }
+                                }
+                                onChangeKindConnection={onChangeKindConnection}
+                                onChangeTargetConnection={onChangeTargetConnection}
                                 onRemoveConnection={onRemoveConnection}
                               />
                             </li>

@@ -9,6 +9,7 @@ import {
 } from './organization-location-connections-section.client'
 import { useOrganizationLocationConnectionsDetail } from '../hooks/use-organization-location-connections-detail.client'
 
+// fallow-ignore-next-line complexity
 export function OrganizationLocationConnectionsDetailSection({
   campaignId,
   organization,
@@ -33,8 +34,10 @@ export function OrganizationLocationConnectionsDetailSection({
         isMutationPending={detail.mutations.isPending}
         pendingConnectionId={detail.mutations.pendingConnectionId}
         onAddFamily={detail.canManage ? detail.openAddFamily : undefined}
-        onEditConnection={detail.canManage ? detail.openEditDrawer : undefined}
+        onChangeKindConnection={detail.canManage ? detail.openChangeKindDrawer : undefined}
+        onChangeTargetConnection={detail.canManage ? detail.openChangeTargetDrawer : undefined}
         onRemoveConnection={detail.canManage ? detail.handleRemoveConnection : undefined}
+        mutationContext={detail.mutationContext}
       />
 
       {detail.canManage && detail.drawerState ? (
@@ -53,12 +56,17 @@ export function OrganizationLocationConnectionsDetailSection({
           edgesByLocationId={detail.edgesByLocationId}
           occupancyLoaded={detail.occupancyLoaded}
           initialConnection={
-            detail.drawerState.mode === 'changeKind'
+            detail.drawerState.mode === 'changeKind' || detail.drawerState.mode === 'changeTarget'
               ? {
                   id: detail.drawerState.connection.connectionId,
                   locationId: detail.drawerState.connection.locationId,
                   kind: detail.drawerState.connection.kind,
                 }
+              : undefined
+          }
+          drawerAlternatives={
+            detail.drawerState.mode === 'changeKind' || detail.drawerState.mode === 'changeTarget'
+              ? detail.resolveDrawerAlternatives(detail.drawerState.connection)
               : undefined
           }
           isSubmitting={detail.mutations.isPending}

@@ -1,13 +1,20 @@
 'use client'
 
 import type {
+  Location,
   LocationConnectedPartyRow,
   LocationConnectedPartySectionGroup,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import { LocationPeopleAndOrganizationsSectionBody } from './location-people-and-organizations-section.client'
-import { LocationTerritorialAuthoritySectionBody } from './location-territorial-authority-section.client'
+import {
+  LocationPeopleAndOrganizationsSectionBody,
+  type LocationPeopleMutationContext,
+} from './location-people-and-organizations-section.client'
+import {
+  LocationTerritorialAuthoritySectionBody,
+  type LocationTerritorialMutationContext,
+} from './location-territorial-authority-section.client'
 import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
@@ -24,6 +31,8 @@ type LocationConnectedPartiesSectionBodyProps = {
   peopleKindSlots: readonly PeopleKindSlot[]
   canManage: boolean
   canAddToPeopleSection?: boolean
+  peopleMutationContext?: LocationPeopleMutationContext
+  territorialMutationContext?: LocationTerritorialMutationContext
   onAddPeopleSection?: () => void
   onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
@@ -46,6 +55,8 @@ export function LocationConnectedPartiesSectionBody({
   peopleKindSlots,
   canManage,
   canAddToPeopleSection,
+  peopleMutationContext,
+  territorialMutationContext,
   onAddPeopleSection,
   onAddTerritorialKind,
   onEditConnection,
@@ -66,10 +77,19 @@ export function LocationConnectedPartiesSectionBody({
         rows={sectionRows}
         canManage={canManage}
         showHelper={canManage}
+        mutationContext={
+          territorialMutationContext ?? {
+            location: { id: '', campaignId: '', name: '', slug: '', kind: 'region' } as Location,
+            rows: sectionRows,
+            organizations: [],
+          }
+        }
         onAddKind={onAddTerritorialKind}
         onChangeKind={onChangeTerritorialKind}
         onReplaceOrganization={onReplaceTerritorialOrganization}
         onRemoveConnection={onRemoveConnection}
+        canEditRow={canEditRow}
+        canRemoveRow={canRemoveRow}
       />
     )
   }
@@ -93,6 +113,12 @@ export function LocationConnectedPartiesSectionBody({
         canManage ? LOCATION_CONNECTED_PARTIES_SECTION_HELPERS.people_and_organizations : undefined
       }
       sectionEmpty={LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations}
+      mutationContext={
+        peopleMutationContext ?? {
+          location: { id: '', campaignId: '', name: '', slug: '', kind: 'region' } as Location,
+          rows: sectionRows,
+        }
+      }
       onAddPeopleSection={onAddPeopleSection}
       onEditConnection={onEditConnection}
       onRemoveConnection={onRemoveConnection}

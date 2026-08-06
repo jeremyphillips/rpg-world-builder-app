@@ -1,6 +1,11 @@
 'use client'
 
-import type { LocationConnectedPartyRow } from '@rpg/contracts'
+import type {
+  CharacterLocationConnectionKind,
+  Location,
+  LocationConnectedPartyRow,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,7 +15,14 @@ import {
   RelationshipFieldGroupRow,
 } from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
-import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
+import {
+  isRelationshipMutationActionAvailable,
+  resolveRelationshipAlternatives,
+} from '../../lib/relationship/relationship-alternatives'
+import {
+  buildRelationshipOverflowActions,
+  type RelationshipOverflowActionId,
+} from '../../lib/relationship/resolve-relationship-overflow-actions'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../lib/location-connection-surface-copy'
 import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
@@ -21,11 +33,18 @@ import {
 import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
+export type LocationPeopleMutationContext = {
+  location: Location
+  rows: readonly LocationConnectedPartyRow[]
+}
+
 function buildPeopleOverflowActions(input: {
   campaignId: string
   row: LocationConnectedPartyRow
-  canEdit: boolean
-  canRemove: boolean
+  canManage: boolean
+  canEditRow: boolean
+  canRemoveRow: boolean
+  mutationContext: LocationPeopleMutationContext
   navigate: (path: string) => void
   onEditConnection?: (target: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
@@ -33,50 +52,79 @@ function buildPeopleOverflowActions(input: {
     subjectType: LocationConnectedPartyRow['subject']['type']
     subjectId: string
   }) => void
-}): RelationshipOverflowAction[] {
+}) {
   const isOrganization = input.row.subject.type === 'organization'
   const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, input.row.subject)
 
-  const actions: RelationshipOverflowAction[] = [
-    {
-      id: 'view',
-      label: isOrganization
+  const resolved = isOrganization
+    ? resolveRelationshipAlternatives({
+        surface: 'location_inverse_organization',
+        canManage: input.canManage,
+        canEditRow: input.canEditRow,
+        canRemoveRow: input.canRemoveRow,
+        relationship: {
+          relationshipId: input.row.relationshipId,
+          locationId: input.mutationContext.location.id,
+          kind: input.row.kind as OrganizationLocationConnectionKind,
+          subjectOrganizationId: input.row.subject.id,
+          allowReplaceSubject: false,
+        },
+        location: input.mutationContext.location,
+        rows: input.mutationContext.rows,
+      })
+    : resolveRelationshipAlternatives({
+        surface: 'location_inverse_character',
+        canManage: input.canManage,
+        canEditRow: input.canEditRow,
+        canRemoveRow: input.canRemoveRow,
+        relationship: {
+          relationshipId: input.row.relationshipId,
+          locationId: input.mutationContext.location.id,
+          kind: input.row.kind as CharacterLocationConnectionKind,
+          subjectCharacterId: input.row.subject.id,
+        },
+        location: input.mutationContext.location,
+        rows: input.mutationContext.rows,
+      })
+
+  const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
+    view: () => input.navigate(detailHref),
+  }
+
+  if (
+    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeKind') &&
+    input.onEditConnection
+  ) {
+    handlers.changeKind = () =>
+      input.onEditConnection?.({
+        relationshipId: input.row.relationshipId,
+        subjectType: input.row.subject.type,
+        subjectId: input.row.subject.id,
+        kind: input.row.kind,
+      })
+  }
+
+  if (resolved.capabilities.remove?.supported && input.onRemoveConnection) {
+    handlers.remove = () => {
+      input.onRemoveConnection?.({
+        relationshipId: input.row.relationshipId,
+        subjectType: input.row.subject.type,
+        subjectId: input.row.subject.id,
+      })
+    }
+  }
+
+  return buildRelationshipOverflowActions({
+    capabilities: resolved.capabilities,
+    labels: {
+      view: isOrganization
         ? LOCATION_INVERSE_PEOPLE_OVERFLOW.viewOrganization
         : LOCATION_INVERSE_PEOPLE_OVERFLOW.viewCharacter,
-      onSelect: () => input.navigate(detailHref),
+      changeKind: LOCATION_INVERSE_PEOPLE_OVERFLOW.changeKind,
+      remove: LOCATION_INVERSE_PEOPLE_OVERFLOW.remove,
     },
-  ]
-
-  if (input.canEdit && input.onEditConnection) {
-    actions.push({
-      id: 'change-kind',
-      label: LOCATION_INVERSE_PEOPLE_OVERFLOW.changeKind,
-      onSelect: () =>
-        input.onEditConnection?.({
-          relationshipId: input.row.relationshipId,
-          subjectType: input.row.subject.type,
-          subjectId: input.row.subject.id,
-          kind: input.row.kind,
-        }),
-    })
-  }
-
-  if (input.canRemove && input.onRemoveConnection) {
-    actions.push({
-      id: 'remove',
-      label: LOCATION_INVERSE_PEOPLE_OVERFLOW.remove,
-      destructive: true,
-      onSelect: () => {
-        input.onRemoveConnection?.({
-          relationshipId: input.row.relationshipId,
-          subjectType: input.row.subject.type,
-          subjectId: input.row.subject.id,
-        })
-      },
-    })
-  }
-
-  return actions
+    handlers,
+  })
 }
 
 function rowsForSlot(
@@ -100,6 +148,7 @@ export type LocationPeopleAndOrganizationsSectionBodyProps = {
   headingId: string
   helper?: string
   sectionEmpty?: string
+  mutationContext: LocationPeopleMutationContext
   onAddPeopleSection?: () => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
@@ -122,6 +171,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
   headingId,
   helper,
   sectionEmpty,
+  mutationContext,
   onAddPeopleSection,
   onEditConnection,
   onRemoveConnection,
@@ -172,8 +222,10 @@ export function LocationPeopleAndOrganizationsSectionBody({
                             campaignId,
                             row,
                             navigate,
-                            canEdit: Boolean(rowCanEdit),
-                            canRemove: Boolean(rowCanRemove),
+                            canManage,
+                            canEditRow: Boolean(rowCanEdit),
+                            canRemoveRow: Boolean(rowCanRemove),
+                            mutationContext,
                             onEditConnection,
                             onRemoveConnection,
                           })}
