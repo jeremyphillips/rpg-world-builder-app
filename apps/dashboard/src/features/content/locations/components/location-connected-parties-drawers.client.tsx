@@ -67,7 +67,7 @@ function LocationConnectedCharacterDrawer({
       location={location}
       characters={detail.characterOptions}
       connectedPartyRows={detail.rows}
-      initialConnection={drawerState?.mode === 'edit' ? drawerState.connection : undefined}
+      initialConnection={drawerState?.mode === 'changeKind' ? drawerState.connection : undefined}
       isSubmitting={detail.isMutationPending}
       onSubmit={detail.handleCharacterSubmit}
     />

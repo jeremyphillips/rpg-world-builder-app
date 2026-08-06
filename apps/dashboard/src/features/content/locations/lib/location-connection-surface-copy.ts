@@ -161,6 +161,11 @@ export const LOCATION_INVERSE_PEOPLE_OVERFLOW = {
   remove: 'Remove connection',
 } as const
 
+export const LOCATION_INVERSE_ORGANIZATION_DRAWER = {
+  replaceTitle: 'Replace organization',
+  replaceSubmit: 'Replace organization',
+} as const
+
 export function resolveLocationInverseCharacterAddDrawerTitle(
   kind: CharacterLocationConnectionKind,
 ): string {

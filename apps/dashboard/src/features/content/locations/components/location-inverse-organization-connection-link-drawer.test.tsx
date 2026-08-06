@@ -30,6 +30,21 @@ function buildingLocation(): Location {
 
 const organizations = [CITY_COUNCIL]
 
+const headquartersRow = {
+  relationshipId: 'rel-hq',
+  subject: {
+    type: 'organization' as const,
+    id: CITY_COUNCIL.id,
+    name: CITY_COUNCIL.name,
+    slug: CITY_COUNCIL.slug,
+  },
+  kind: 'headquarters' as const,
+  label: 'Headquarters',
+  family: 'site' as const,
+  priority: 60,
+  sectionGroup: 'people_and_organizations' as const,
+}
+
 describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regression', () => {
   it('does not show a broad family kind selector for Add headquarters', () => {
     render(
@@ -75,8 +90,9 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   })
 })
 
-describe('LocationInverseOrganizationConnectionLinkDrawer change-kind edit', () => {
-  it('opens with collapsed kind summary and structured organization field', async () => {
+describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
+  it('opens with expanded kind choices, fixed organization, and no organization picker', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 
     render(
@@ -87,22 +103,47 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind edit', () 
         intent="site"
         location={buildingLocation()}
         organizations={organizations}
-        connectedPartyRows={[
-          {
-            relationshipId: 'rel-hq',
-            subject: {
-              type: 'organization',
-              id: CITY_COUNCIL.id,
-              name: CITY_COUNCIL.name,
-              slug: CITY_COUNCIL.slug,
-            },
-            kind: 'headquarters',
-            label: 'Headquarters',
-            family: 'site',
-            priority: 60,
-            sectionGroup: 'people_and_organizations',
-          },
-        ]}
+        connectedPartyRows={[headquartersRow]}
+        initialConnection={{
+          relationshipId: 'rel-hq',
+          organizationId: CITY_COUNCIL.id,
+          kind: 'headquarters',
+        }}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
+    expect(screen.getByText('Organization')).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
+    expect(screen.queryByPlaceholderText('Search organizations')).not.toBeInTheDocument()
+    expect(screen.queryByText('No organizations are available.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Save change' }))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      organizationId: CITY_COUNCIL.id,
+      kind: 'owns',
+    })
+  })
+})
+
+describe('LocationInverseOrganizationConnectionLinkDrawer replace organization', () => {
+  it('shows read-only relationship type and organization picker without kind controls', () => {
+    render(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="replaceOrganization"
+        intent="site"
+        location={buildingLocation()}
+        organizations={organizations}
+        connectedPartyRows={[headquartersRow]}
         initialConnection={{
           relationshipId: 'rel-hq',
           organizationId: CITY_COUNCIL.id,
@@ -112,15 +153,11 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind edit', () 
       />,
     )
 
-    expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
-    expect(screen.getByText('Organization')).toBeInTheDocument()
-    expect(screen.getByText('City Council')).toBeInTheDocument()
-    expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Headquarters' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Replace organization' })).toBeInTheDocument()
+    expect(screen.getByText('Relationship type')).toBeInTheDocument()
+    expect(screen.getByText('Headquarters')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Change connection type' }))
-    expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
+    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
   })
 })

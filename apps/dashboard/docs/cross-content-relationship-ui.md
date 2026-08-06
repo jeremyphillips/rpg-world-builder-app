@@ -93,20 +93,20 @@ Location **People & organizations** family-level adds follow the same sequence: 
 
 ## Add vs edit choice contract
 
-Add workflows begin **unresolved**. Edit / change-kind workflows begin **resolved**.
+Add workflows begin **unresolved**. Change-kind workflows begin **resolved** with eligible options expanded immediately.
 
-| Mode                   | Collapsible choice initial state | Current values                                                         |
-| ---------------------- | -------------------------------- | ---------------------------------------------------------------------- |
-| **Add**                | Expanded option list             | None — user must choose                                                |
-| **Edit / change kind** | Collapsed selected summary       | Hydrated from persisted relationship via the same control used to edit |
-| **Replace subject**    | Kind shown as read-only field    | Current subject pinned/selected in picker                              |
+| Mode                | Collapsible choice initial state | Current values                                                       |
+| ------------------- | -------------------------------- | -------------------------------------------------------------------- |
+| **Add**             | Expanded option list             | None — user must choose                                              |
+| **Change kind**     | Expanded with current selected   | Hydrated from persisted relationship; kind is the only mutable field |
+| **Replace subject** | Kind shown as read-only field    | Current subject pinned/selected in picker                            |
 
 Rules:
 
-- Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints and subjects with `RelationshipDrawerSubjectField` plus collapsed `LocationConnectionKindStep` summaries.
-- **Change** on a collapsed summary re-expands eligible options with the persisted value selected.
-- Change-kind drawers change **kind only** — do not also expose location/organization/character pickers unless the operation explicitly replaces the subject.
-- Reuse `CollapsibleRadioCardField` via `LocationConnectionKindStep`; do not fork collapsed-state markup inside relationship drawers.
+- Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints and subjects with `RelationshipDrawerSubjectField`.
+- **Change kind** opens with eligible options visible — do not require a second "Change" interaction.
+- Change-kind drawers change **kind only** — disable entity pickers (`pickerEnabled={false}` on `CatalogPickerSheet`) so search, empty states, and picker hooks do not mount.
+- Reuse `CollapsibleRadioCardField` via `LocationConnectionKindStep` with `defaultExpanded` for change-kind flows.
 
 ## Presentation policy
 

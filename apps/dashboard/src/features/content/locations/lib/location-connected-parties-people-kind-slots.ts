@@ -6,6 +6,7 @@ import {
   getCharacterLocationConnectionLabel,
   getOrganizationLocationConnectionFamily,
   getOrganizationLocationConnectionLabel,
+  getOrganizationLocationConnectionPriority,
 } from '@rpg/contracts'
 
 import {
@@ -107,7 +108,10 @@ export function buildPeopleKindSlots(input: {
     bindingsByHeading.set(heading, existing)
   }
 
-  for (const kind of input.organizationKinds) {
+  for (const kind of [...input.organizationKinds].sort(
+    (a, b) =>
+      getOrganizationLocationConnectionPriority(b) - getOrganizationLocationConnectionPriority(a),
+  )) {
     if (getOrganizationLocationConnectionFamily(kind) === 'territorial_authority') {
       continue
     }

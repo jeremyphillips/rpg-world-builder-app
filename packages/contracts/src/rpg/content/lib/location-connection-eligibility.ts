@@ -92,9 +92,9 @@ const LOCATION_CONNECTION_ELIGIBILITY_BY_PROFILE = {
       CHARACTER_KINDS.works_at,
     ],
     organizationKinds: [
+      ORGANIZATION_KINDS.headquarters,
       ORGANIZATION_KINDS.owns,
       ORGANIZATION_KINDS.tenant,
-      ORGANIZATION_KINDS.headquarters,
       ORGANIZATION_KINDS.operator,
     ],
   },
@@ -106,8 +106,8 @@ const LOCATION_CONNECTION_ELIGIBILITY_BY_PROFILE = {
       CHARACTER_KINDS.works_at,
     ],
     organizationKinds: [
-      ORGANIZATION_KINDS.owns,
       ORGANIZATION_KINDS.headquarters,
+      ORGANIZATION_KINDS.owns,
       ORGANIZATION_KINDS.operator,
     ],
   },
@@ -134,15 +134,15 @@ const LOCATION_CONNECTION_ELIGIBILITY_BY_PROFILE = {
       CHARACTER_KINDS.works_at,
     ],
     organizationKinds: [
+      ORGANIZATION_KINDS.headquarters,
       ORGANIZATION_KINDS.owns,
       ORGANIZATION_KINDS.tenant,
-      ORGANIZATION_KINDS.headquarters,
       ORGANIZATION_KINDS.operator,
     ],
   },
   interior: {
     characterKinds: [CHARACTER_KINDS.tenant, CHARACTER_KINDS.resides_at, CHARACTER_KINDS.works_at],
-    organizationKinds: [ORGANIZATION_KINDS.tenant, ORGANIZATION_KINDS.headquarters],
+    organizationKinds: [ORGANIZATION_KINDS.headquarters, ORGANIZATION_KINDS.tenant],
   },
 } as const satisfies Record<LocationConnectionProfile, LocationConnectionEligibility>
 

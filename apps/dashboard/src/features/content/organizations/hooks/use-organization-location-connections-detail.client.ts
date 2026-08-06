@@ -34,7 +34,7 @@ type DrawerState =
       kind?: OrganizationLocationConnectionKind
     }
   | {
-      mode: 'edit'
+      mode: 'changeKind'
       intent: OrganizationConnectionDrawerIntent
       connection: OrganizationLocationConnectionEditTarget
     }
@@ -120,7 +120,7 @@ export function useOrganizationLocationConnectionsDetail(
     async (input: { locationId: string; kind: OrganizationLocationConnectionKind }) => {
       mutations.resetErrors()
 
-      if (drawerState?.mode === 'edit') {
+      if (drawerState?.mode === 'changeKind') {
         await mutations.updateLocationConnection(
           drawerState.connection.connectionId,
           {
@@ -157,7 +157,7 @@ export function useOrganizationLocationConnectionsDetail(
   const openEditDrawer = React.useCallback(
     (connection: OrganizationLocationConnectionEditTarget) => {
       setDrawerState({
-        mode: 'edit',
+        mode: 'changeKind',
         intent: organizationDrawerIntentFromKind(connection.kind),
         connection,
       })

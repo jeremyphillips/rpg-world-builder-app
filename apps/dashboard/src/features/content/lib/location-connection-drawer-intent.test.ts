@@ -193,10 +193,10 @@ describe('location-connection-drawer-intent', () => {
 
   it('resolves all kinds for a drawer intent from contracts vocabulary', () => {
     expect(resolveKindsForOrganizationDrawerIntent('site')).toEqual([
+      'headquarters',
       'owns',
       'tenant',
       'operator',
-      'headquarters',
     ])
   })
 

@@ -11,6 +11,7 @@ import { RadioGroup } from './radio-group.client'
 import {
   radioCardBodyVariants,
   radioCardControlVariants,
+  radioCardDescriptionVariants,
   radioCardDetailsGridVariants,
   radioCardDetailsInlineSlotVariants,
   radioCardDetailsLinkVariants,
@@ -115,10 +116,7 @@ function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
   return (
     <div className={radioCardSummaryLinesVariants()}>
       {summaryLines.map((line) => (
-        <span
-          key={line}
-          className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}
-        >
+        <span key={line} className={radioCardSummaryVariants()}>
           {line}
         </span>
       ))}
@@ -190,14 +188,8 @@ function RadioCardSecondaryContent({
 }: RadioCardSecondaryContentProps) {
   return (
     <>
-      {description ? (
-        <span className={textVariants({ variant: 'small' })}>{description}</span>
-      ) : null}
-      {summaryText ? (
-        <span className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}>
-          {summaryText}
-        </span>
-      ) : null}
+      {description ? <span className={radioCardDescriptionVariants()}>{description}</span> : null}
+      {summaryText ? <span className={radioCardSummaryVariants()}>{summaryText}</span> : null}
       {summaryLines && summaryLines.length > 0 ? (
         <RadioCardSummaryLines summaryLines={summaryLines} />
       ) : null}

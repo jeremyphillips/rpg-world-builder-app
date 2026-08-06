@@ -183,14 +183,15 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
 
-  it('opens change-kind edit with collapsed relationship type and fixed location', async () => {
+  it('opens change-kind with expanded relationship type and fixed location', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 
     render(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
-        mode="edit"
+        mode="changeKind"
         intent="site"
         organization={organization}
         organizationId="org-1"
@@ -199,7 +200,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         edgesByLocationId={{}}
         occupancyLoaded
         initialConnection={{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }}
-        onSubmit={vi.fn()}
+        onSubmit={onSubmit}
       />,
     )
 
@@ -207,14 +208,20 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Location')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Headquarters' })).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search locations…' })).toBeDisabled()
-    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Change' }))
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
+    expect(screen.queryByRole('textbox', { name: 'Search locations…' })).not.toBeInTheDocument()
+    expect(screen.queryByText('No locations are available.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Save change' }))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      locationId: 'building-1',
+      kind: 'owns',
+    })
   })
 
   it('clears an incompatible selected location when changing kind', async () => {

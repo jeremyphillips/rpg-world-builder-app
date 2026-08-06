@@ -13,6 +13,8 @@ export type LocationConnectionKindStepProps = {
   value: string | null
   onValueChange: (value: string) => void
   changeLabel?: string
+  /** When true, eligible options render immediately instead of behind a collapsed summary. */
+  defaultExpanded?: boolean
 }
 
 function toRadioCardOptions(options: readonly LocationConnectionKindOption[]): RadioCardOption[] {
@@ -31,6 +33,7 @@ export function LocationConnectionKindStep({
   value,
   onValueChange,
   changeLabel = LOCATION_CONNECTION_KIND_CHANGE_LABEL,
+  defaultExpanded,
 }: LocationConnectionKindStepProps) {
   const enabledOptions = options.filter((option) => !option.disabled)
 
@@ -62,6 +65,7 @@ export function LocationConnectionKindStep({
       value={value ?? ''}
       options={toRadioCardOptions(options)}
       onValueChange={onValueChange}
+      defaultExpanded={defaultExpanded}
     />
   )
 }

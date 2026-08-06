@@ -14,9 +14,9 @@ describe('buildPeopleKindSlots', () => {
     })
 
     expect(slots.map((slot) => slot.heading)).toEqual([
+      'Headquarters',
       'Owner',
       'Tenant',
-      'Headquarters',
       'Operator',
       'Resident',
       'Works at',

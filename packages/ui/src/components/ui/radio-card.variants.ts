@@ -31,7 +31,7 @@ export const radioCardVariants = cva('', {
   },
   compoundVariants: [
     { variant: 'card', density: 'default', class: 'gap-2 p-4 sm:p-6' },
-    { variant: 'card', density: 'compact', class: 'gap-1 p-3' },
+    { variant: 'card', density: 'compact', class: 'gap-1 px-3 py-2.5' },
     { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],
@@ -51,7 +51,7 @@ export const radioCardShellVariants = cva(
     variants: {
       density: {
         default: 'p-4 sm:p-6',
-        compact: 'p-3',
+        compact: 'px-3 py-2.5',
       },
       selected: {
         true: 'border-card-selected-border bg-control-selected',
@@ -113,7 +113,7 @@ export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
       default: 'gap-2',
-      compact: 'gap-1',
+      compact: '',
     },
   },
   defaultVariants: {
@@ -149,7 +149,10 @@ export const radioCardTitleMetaVariants = cva('text-muted-foreground')
 
 export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
 
-export const radioCardSummaryVariants = cva('text-muted-foreground')
+/** Muted secondary copy under the card title (descriptions, summaries). */
+export const radioCardDescriptionVariants = cva('text-sm text-muted-foreground')
+
+export const radioCardSummaryVariants = cva(radioCardDescriptionVariants())
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
 
@@ -184,7 +187,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
   },
   compoundVariants: [
     { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-    { tone: 'divider', density: 'compact', class: 'mt-3 pt-3' },
+    { tone: 'divider', density: 'compact', class: 'mt-2.5 pt-2.5' },
     {
       tone: 'panel',
       density: 'default',
@@ -193,7 +196,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'compact',
-      class: '-mx-3 -mb-3 mt-3 rounded-b-card pb-3 pt-3',
+      class: '-mx-3 -mb-2.5 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
     },
   ],
   defaultVariants: {

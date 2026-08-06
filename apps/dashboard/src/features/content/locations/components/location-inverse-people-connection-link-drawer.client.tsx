@@ -303,6 +303,11 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           {instructionCopy}
         </Text>
       ) : null}
+      {!showEntityPicker ? (
+        <Text variant="muted" className="text-sm" role="status">
+          {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
+        </Text>
+      ) : null}
     </div>
   )
 
@@ -314,12 +319,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     rowLayout: 'entity-card' as const,
     headerBelowDescription,
     searchDisabled: !showEntityPicker,
+    pickerEnabled: showEntityPicker,
     noResultsMessage: 'No matches for this search.',
-    emptyState: !showEntityPicker ? (
-      <Text variant="muted" className="text-sm" role="status">
-        {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
-      </Text>
-    ) : undefined,
   }
 
   if (effectiveSubjectType === 'organization') {

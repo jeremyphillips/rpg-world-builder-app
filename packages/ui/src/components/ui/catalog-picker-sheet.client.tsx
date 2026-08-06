@@ -116,6 +116,7 @@ export function CatalogPickerSheet<TItem>({
   loading = false,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
   searchDisabled = false,
+  pickerEnabled = true,
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
@@ -219,28 +220,32 @@ export function CatalogPickerSheet<TItem>({
 
         {headerBelowDescription ? <div className="px-6 pb-4">{headerBelowDescription}</div> : null}
 
-        <CatalogToolbar
-          search={{
-            query: searchQuery,
-            onQueryChange: setSearchQuery,
-            placeholder: searchPlaceholder,
-            ariaLabel: searchPlaceholder,
-            disabled: searchDisabled,
-          }}
-          tabs={toolbarTabs}
-          primaryControls={primaryControls}
-          filterRow={renderedFilterRow}
-          actions={renderedActions}
-        />
+        {pickerEnabled ? (
+          <>
+            <CatalogToolbar
+              search={{
+                query: searchQuery,
+                onQueryChange: setSearchQuery,
+                placeholder: searchPlaceholder,
+                ariaLabel: searchPlaceholder,
+                disabled: searchDisabled,
+              }}
+              tabs={toolbarTabs}
+              primaryControls={primaryControls}
+              filterRow={renderedFilterRow}
+              actions={renderedActions}
+            />
 
-        <Sheet.Body
-          className={catalogPickerSheetBodyVariants({
-            hasFooter: Boolean(footer),
-            className: sheetBodyClassName,
-          })}
-        >
-          {bodyContent}
-        </Sheet.Body>
+            <Sheet.Body
+              className={catalogPickerSheetBodyVariants({
+                hasFooter: Boolean(footer),
+                className: sheetBodyClassName,
+              })}
+            >
+              {bodyContent}
+            </Sheet.Body>
+          </>
+        ) : null}
 
         {footer ? <Sheet.Footer>{footer}</Sheet.Footer> : null}
       </Sheet.Content>

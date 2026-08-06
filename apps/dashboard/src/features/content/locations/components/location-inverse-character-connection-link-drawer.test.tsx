@@ -15,14 +15,15 @@ const characters = [
 ]
 
 describe('LocationInverseCharacterConnectionLinkDrawer', () => {
-  it('opens change-kind edit with collapsed relationship type and structured character field', async () => {
+  it('opens change-kind with expanded relationship type and no character picker', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 
     render(
       <LocationInverseCharacterConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
-        mode="edit"
+        mode="changeKind"
         location={YAWNING_PORTAL}
         characters={characters}
         connectedPartyRows={[
@@ -47,7 +48,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
           characterId: 'npc-1',
           kind: 'works_at',
         }}
-        onSubmit={vi.fn()}
+        onSubmit={onSubmit}
       />,
     )
 
@@ -55,13 +56,18 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     expect(screen.getByText('Character')).toBeInTheDocument()
     expect(screen.getByText('Braggi')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Works at' })).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Connection type' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search characters')).toBeDisabled()
-    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Change connection type' }))
     expect(screen.getByRole('radiogroup', { name: 'Connection type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Works at/i })).toBeChecked()
+    expect(screen.queryByPlaceholderText('Search characters')).not.toBeInTheDocument()
+    expect(screen.queryByText('No characters are available.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /Resident/i }))
+    await user.click(screen.getByRole('button', { name: 'Save change' }))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      characterId: 'npc-1',
+      kind: 'resides_at',
+    })
   })
 })

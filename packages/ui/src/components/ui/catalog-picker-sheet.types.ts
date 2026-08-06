@@ -65,6 +65,8 @@ export type CatalogPickerSheetProps<TItem> = {
   searchPlaceholder?: string
   /** When true, search input is disabled (placeholder may still update). */
   searchDisabled?: boolean
+  /** When false, hides search toolbar and result list (header/footer-only flows). Defaults to true. */
+  pickerEnabled?: boolean
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string

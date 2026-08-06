@@ -79,7 +79,7 @@ type OrganizationDrawerState =
 type CharacterDrawerState =
   | { mode: 'add'; kind?: CharacterLocationConnectionKind }
   | {
-      mode: 'edit'
+      mode: 'changeKind'
       connection: {
         relationshipId: string
         characterId: string
@@ -137,7 +137,7 @@ async function upsertCharacterInverseConnection(input: {
   characterId: string
   kind: CharacterLocationConnectionKind
 }) {
-  if (input.drawerState.mode === 'edit') {
+  if (input.drawerState.mode === 'changeKind') {
     const { relationshipId, characterId: previousCharacterId } = input.drawerState.connection
 
     if (previousCharacterId === input.characterId) {
@@ -485,7 +485,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     }
 
     setCharacterDrawerState({
-      mode: 'edit',
+      mode: 'changeKind',
       connection: {
         relationshipId: target.relationshipId,
         characterId: target.subjectId,

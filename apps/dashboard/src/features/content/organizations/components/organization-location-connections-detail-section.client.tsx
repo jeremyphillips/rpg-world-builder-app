@@ -53,7 +53,7 @@ export function OrganizationLocationConnectionsDetailSection({
           edgesByLocationId={detail.edgesByLocationId}
           occupancyLoaded={detail.occupancyLoaded}
           initialConnection={
-            detail.drawerState.mode === 'edit'
+            detail.drawerState.mode === 'changeKind'
               ? {
                   id: detail.drawerState.connection.connectionId,
                   locationId: detail.drawerState.connection.locationId,

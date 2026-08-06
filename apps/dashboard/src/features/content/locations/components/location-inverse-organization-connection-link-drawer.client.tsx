@@ -49,6 +49,7 @@ import {
   resolveLocationInverseOrganizationAddDrawerTitle,
   resolveLocationInverseOrganizationAddSubmitLabel,
   TERRITORIAL_AUTHORITY_DRAWER,
+  LOCATION_INVERSE_ORGANIZATION_DRAWER,
   resolveTerritorialAuthorityLocationContext,
   resolveTerritorialAuthorityReplaceContext,
 } from '../lib/location-connection-surface-copy'
@@ -56,12 +57,11 @@ import {
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
 
-export type LocationInverseOrganizationDrawerMode = 'add' | 'changeKind' | 'replaceOrganization'
-
+import type { OrganizationInverseDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  mode: LocationInverseOrganizationDrawerMode
+  mode: OrganizationInverseDrawerMode
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
   location: Location
@@ -90,7 +90,7 @@ export function LocationInverseOrganizationConnectionLinkDrawer(
 }
 
 function hasResolvedAddKind(
-  mode: LocationInverseOrganizationDrawerMode,
+  mode: OrganizationInverseDrawerMode,
   addKind?: OrganizationLocationConnectionKind,
 ): addKind is OrganizationLocationConnectionKind {
   return mode === 'add' && addKind != null
@@ -231,8 +231,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (mode === 'changeKind') {
       return ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
     }
-    if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
-      return TERRITORIAL_AUTHORITY_DRAWER.replaceTitle
+    if (mode === 'replaceOrganization') {
+      return intent === 'territorial_authority'
+        ? TERRITORIAL_AUTHORITY_DRAWER.replaceTitle
+        : LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle
     }
     if (resolvedAddKind) {
       return resolveLocationInverseOrganizationAddDrawerTitle(resolvedAddKind)
@@ -249,8 +251,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (mode === 'changeKind') {
       return ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
     }
-    if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
-      return TERRITORIAL_AUTHORITY_DRAWER.replaceSubmit
+    if (mode === 'replaceOrganization') {
+      return intent === 'territorial_authority'
+        ? TERRITORIAL_AUTHORITY_DRAWER.replaceSubmit
+        : LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceSubmit
     }
     if (resolvedAddKind) {
       return resolveLocationInverseOrganizationAddSubmitLabel(resolvedAddKind)
@@ -290,9 +294,11 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       ? 'Authority type'
       : ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
 
+  const showOrganizationPicker = mode === 'add' || mode === 'replaceOrganization'
+
   const sortedOrganizations = React.useMemo(() => {
-    if (mode !== 'replaceOrganization' || !initialConnection) {
-      return organizations
+    if (!showOrganizationPicker || !initialConnection || mode !== 'replaceOrganization') {
+      return showOrganizationPicker ? organizations : []
     }
 
     const current = organizations.find(
@@ -303,7 +309,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     )
 
     return current ? [current, ...alternatives] : organizations
-  }, [initialConnection, mode, organizations])
+  }, [initialConnection, mode, organizations, showOrganizationPicker])
 
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
@@ -314,6 +320,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       title={title}
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
+      pickerEnabled={showOrganizationPicker}
       searchPlaceholder={
         intent === 'territorial_authority'
           ? TERRITORIAL_AUTHORITY_DRAWER.organizationSearchPlaceholder
@@ -354,6 +361,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               onValueChange={(value) =>
                 setSelectedKind(value as OrganizationLocationConnectionKind)
               }
+              defaultExpanded={mode === 'changeKind'}
             />
           ) : null}
           {mode === 'replaceOrganization' ? (
@@ -377,7 +385,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
           </Button>
         ) : undefined
       }
-      items={mode === 'changeKind' ? [] : sortedOrganizations}
+      items={showOrganizationPicker ? sortedOrganizations : []}
       getItemKey={(organization) => organization.id}
       getItemToolbarLabel={(organization) => organization.name}
       getSearchText={(organization) =>
