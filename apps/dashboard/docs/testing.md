@@ -124,6 +124,9 @@ has no canvas; contrast runs in Storybook's addon-a11y instead).
 
 ## Performance rules
 
+- Pre-commit runs `pnpm test:affected:local` with `TURBO_CONCURRENCY=2` and
+  `VITEST_MAX_WORKERS=4` to avoid CPU oversubscription on laptops. Uncapped:
+  `pnpm test:affected`.
 - Pure logic → `.test.ts` (node project). Don't pay for jsdom you don't use.
 - `const user = userEvent.setup()` once per test; never the bare global
   `userEvent.click(...)`.
