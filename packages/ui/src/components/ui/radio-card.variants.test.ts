@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  radioCardControlVariants,
   radioCardDescriptionVariants,
+  radioCardDetailsGridVariants,
   radioCardEmbeddedSlotVariants,
+  radioCardRootLayoutVariants,
   radioCardShellVariants,
   radioCardVariants,
 } from './radio-card.variants'
@@ -28,6 +31,12 @@ describe('radioCard surface establishment', () => {
     expect(radioCardShellVariants({ density: 'compact' })).toContain('py-2.5')
     expect(radioCardDescriptionVariants()).toContain('text-sm')
     expect(radioCardDescriptionVariants()).toContain('text-muted-foreground')
+  })
+
+  it('tightens compact horizontal rhythm with 4px gap and 16px controls', () => {
+    expect(radioCardRootLayoutVariants({ density: 'compact' })).toContain('gap-1')
+    expect(radioCardDetailsGridVariants({ density: 'compact' })).toContain('gap-x-1')
+    expect(radioCardControlVariants({ variant: 'card', density: 'compact' })).toContain('size-4')
   })
 
   it('does not establish a plane on divider embedded slots', () => {

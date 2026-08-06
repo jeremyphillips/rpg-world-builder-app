@@ -67,12 +67,12 @@ export const radioCardShellVariants = cva(
 
 /** Grid for radio + title row + right-aligned details link on one line. */
 export const radioCardDetailsGridVariants = cva(
-  'grid w-full grid-cols-[auto_1fr_auto] items-start gap-x-3',
+  'grid w-full grid-cols-[auto_1fr_auto] items-start',
   {
     variants: {
       density: {
-        default: 'gap-y-2',
-        compact: 'gap-y-1',
+        default: 'gap-x-3 gap-y-2',
+        compact: 'gap-x-1 gap-y-1',
       },
     },
     defaultVariants: {
@@ -98,9 +98,15 @@ export const radioCardControlVariants = cva(
         card: 'size-5',
         row: 'size-4',
       },
+      density: {
+        default: '',
+        compact: '',
+      },
     },
+    compoundVariants: [{ variant: 'card', density: 'compact', class: 'size-4' }],
     defaultVariants: {
       variant: 'card',
+      density: 'default',
     },
   },
 )
@@ -124,12 +130,12 @@ export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
 export const radioCardRootLayoutVariants = cva('flex items-start', {
   variants: {
     controlPosition: {
-      left: 'gap-4',
-      right: 'flex-row-reverse gap-4',
+      left: '',
+      right: 'flex-row-reverse',
     },
     density: {
-      default: '',
-      compact: 'gap-3',
+      default: 'gap-4',
+      compact: 'gap-1',
     },
   },
   defaultVariants: {
@@ -165,7 +171,7 @@ export const radioCardCompactPaddingRightClasses = 'pr-3'
  * Left inset aligning panel copy with the compact card body column
  * (shell padding + radio control + column gap).
  */
-export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1.25rem+0.75rem)]'
+export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.25rem)]'
 
 /** Panel horizontal padding: body-column inset left, shell padding right. */
 export const radioCardCompactPanelPaddingClasses = `${radioCardCompactBodyInsetClasses} ${radioCardCompactPaddingRightClasses}`
