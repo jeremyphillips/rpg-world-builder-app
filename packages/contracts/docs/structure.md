@@ -354,6 +354,13 @@ belongs in that registry.
 - `vocabularyTermLabel(term, { number, casing })` — title or sentence forms from curated fields
 - `vocabularyTermFieldCopy(term, { multiple? })` — default form `{ label, placeholder }`
 
+**Relationship descriptions** (`GameTermEntry.description` on connection kinds and similar
+cross-content edges) must be **perspective- and context-neutral**. They appear in kind
+pickers before either endpoint is selected (organization-forward add drawers, inverse
+change-kind flows, etc.). Avoid deictic phrasing such as “this location”, “here”, or
+“this organization” in canonical vocab; surface-specific instructional copy in apps may
+use those forms once an endpoint is fixed (see dashboard relationship copy modules).
+
 Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `get*Entry` / `get*Label` helpers. Open vocabulary sets define a `*_TERM` plus
 `vocabularyOptionIdSchema` and catalog seeds; see

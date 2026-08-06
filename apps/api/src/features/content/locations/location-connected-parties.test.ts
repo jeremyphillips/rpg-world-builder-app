@@ -95,7 +95,7 @@ describe('resolveLocationConnectedParties', () => {
           name: 'Beta NPC',
           characterType: 'npc',
         }),
-        label: 'Works here',
+        label: 'Works at',
       }),
     ])
   })

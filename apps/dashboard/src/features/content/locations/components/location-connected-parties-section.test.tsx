@@ -33,7 +33,7 @@ const peopleNpcRows = [
       characterType: 'npc' as const,
     },
     kind: 'works_at',
-    label: 'Works here',
+    label: 'Works at',
     family: 'presence',
     priority: 40,
     sectionGroup: 'people_and_organizations' as const,
@@ -46,7 +46,7 @@ const peopleKindSlots = [
     bindings: [{ subjectType: 'organization' as const, kind: 'operates_in' as const }],
   },
   {
-    heading: 'Works here',
+    heading: 'Works at',
     bindings: [{ subjectType: 'character' as const, kind: 'works_at' as const }],
   },
 ]
@@ -110,7 +110,7 @@ describe('LocationConnectedPartiesSection', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'People & organizations' })).toBeInTheDocument()
     expect(screen.getByText('Operates in')).toBeInTheDocument()
-    expect(screen.getByText('Works here')).toBeInTheDocument()
+    expect(screen.getByText('Works at')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add organization presence' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add worker' })).toBeInTheDocument()
   })

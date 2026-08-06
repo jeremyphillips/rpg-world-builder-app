@@ -19,7 +19,7 @@ describe('buildPeopleKindSlots', () => {
       'Headquarters',
       'Operator',
       'Resident',
-      'Works here',
+      'Works at',
     ])
 
     const ownerSlot = slots.find((slot) => slot.heading === 'Owner')

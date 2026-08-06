@@ -18,7 +18,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS: Record<
   OrganizationLocationConnectionFamily,
   string
 > = {
-  site: 'Site presence',
+  site: 'Sites & facilities',
   geographic_presence: 'Geographic presence',
   territorial_authority: 'Territorial authority',
 }

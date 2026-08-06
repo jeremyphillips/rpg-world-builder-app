@@ -21,7 +21,7 @@ export type OrganizationLocationConnectionFamilyCardinality =
 export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
   label: 'Organization location connection',
   description:
-    'How an organization relates to a location — site presence, geographic activity, or territorial authority.',
+    'How an organization relates to a location — sites and facilities, geographic activity, or territorial authority.',
   sentence: {
     singular: 'organization location connection',
     plural: 'organization location connections',
@@ -38,28 +38,28 @@ export type OrganizationLocationConnectionEntry = GameTermEntry & {
 export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   owns: {
     label: 'Owner',
-    description: 'Owns or holds title to this location.',
+    description: 'Owns or holds title to a property or site.',
     family: 'site',
     priority: 50,
     maxSubjectsPerLocation: null,
   },
   tenant: {
     label: 'Tenant',
-    description: 'Occupies or leases space here without owning the location.',
+    description: 'Occupies or leases space at a site without owning it.',
     family: 'site',
     priority: 40,
     maxSubjectsPerLocation: null,
   },
   operator: {
     label: 'Operator',
-    description: 'Runs or manages day-to-day operations at this location.',
+    description: 'Runs or manages day-to-day operations at a site.',
     family: 'site',
     priority: 30,
     maxSubjectsPerLocation: null,
   },
   headquarters: {
     label: 'Headquarters',
-    description: 'Primary designated location for an organization.',
+    description: 'A designated primary base or headquarters location for the organization.',
     family: 'site',
     priority: 20,
     maxSubjectsPerLocation: null,
@@ -67,14 +67,14 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   operates_in: {
     label: 'Operates in',
     description:
-      'Active organizational presence in this geographic area. Distinct from territorial authority (governs/controls/claims).',
+      'Active organizational presence in a geographic area. Distinct from territorial authority (governs/controls/claims).',
     family: 'geographic_presence',
     priority: 10,
     maxSubjectsPerLocation: null,
   },
   governs: {
     label: 'Governs',
-    description: 'Recognized political or administrative authority over this location.',
+    description: 'Recognized political or administrative authority over a territory or region.',
     family: 'territorial_authority',
     priority: 50,
     maxSubjectsPerLocation: 1,
@@ -82,7 +82,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   controls: {
     label: 'Controls',
     description:
-      'Effective or de facto control, including when control differs from the recognized government.',
+      'Effective or de facto control over a territory or region, including when control differs from the recognized government.',
     family: 'territorial_authority',
     priority: 40,
     maxSubjectsPerLocation: 1,
@@ -90,7 +90,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   claims: {
     label: 'Claims',
     description:
-      'Asserts a territorial claim without necessarily governing or controlling this location.',
+      'Asserts a territorial claim without necessarily governing or controlling the territory.',
     family: 'territorial_authority',
     priority: 30,
     maxSubjectsPerLocation: null,

@@ -43,6 +43,7 @@ import {
   resolveOrganizationForwardAddDrawerInstruction,
   resolveOrganizationForwardAddDrawerTitle,
   resolveOrganizationForwardAddSubmitLabel,
+  resolveOrganizationForwardFamilyAddDrawerHelper,
 } from '../lib/organization-location-connection-surface-copy'
 
 export const ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER = 'Search locations…'
@@ -272,6 +273,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
       ? resolveOrganizationForwardAddDrawerInstruction(resolvedAddKind)
       : null
 
+  const familyAddDrawerHelper =
+    mode === 'add' && !resolvedAddKind
+      ? resolveOrganizationForwardFamilyAddDrawerHelper(intent)
+      : undefined
+
   const submitLabel =
     mode === 'add' && resolvedAddKind
       ? resolveOrganizationForwardAddSubmitLabel(resolvedAddKind)
@@ -299,6 +305,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
+            </Text>
+          ) : familyAddDrawerHelper ? (
+            <Text variant="muted" className="text-sm">
+              {familyAddDrawerHelper}
             </Text>
           ) : null}
           {showKindStep ? (

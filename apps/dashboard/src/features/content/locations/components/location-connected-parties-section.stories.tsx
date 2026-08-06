@@ -30,7 +30,7 @@ const peopleKindSlots = [
     bindings: [{ subjectType: 'organization' as const, kind: 'operates_in' as const }],
   },
   {
-    heading: 'Works here',
+    heading: 'Works at',
     bindings: [{ subjectType: 'character' as const, kind: 'works_at' as const }],
   },
 ]

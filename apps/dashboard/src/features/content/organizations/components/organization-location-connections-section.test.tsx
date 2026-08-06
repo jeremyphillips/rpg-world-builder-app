@@ -17,12 +17,12 @@ const sampleLocationConnections = {
       locationId: 'building-1',
       kind: 'owns' as const,
       family: 'site' as const,
-      familyLabel: 'Site presence',
+      familyLabel: 'Sites & facilities',
       relationshipLabel: 'Owner',
       card: {
         id: 'building-1',
         name: 'Royal Mint',
-        summary: 'Site presence · Owner',
+        summary: 'Sites & facilities · Owner',
       },
       detailHref: '/campaigns/camp-1/locations/building-1',
       locationUnavailable: false,
@@ -32,12 +32,12 @@ const sampleLocationConnections = {
       locationId: 'building-2',
       kind: 'headquarters' as const,
       family: 'site' as const,
-      familyLabel: 'Site presence',
+      familyLabel: 'Sites & facilities',
       relationshipLabel: 'Headquarters',
       card: {
         id: 'building-2',
         name: 'Royal Palace',
-        summary: 'Site presence · Headquarters',
+        summary: 'Sites & facilities · Headquarters',
       },
       detailHref: '/campaigns/camp-1/locations/building-2',
       locationUnavailable: false,
@@ -58,7 +58,9 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
     expect(screen.getByText('2 location connections')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Site presence', level: 3 })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Sites & facilities', level: 3 }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Owns')).toBeInTheDocument()
     expect(screen.getByText('Headquarters')).toBeInTheDocument()
   })

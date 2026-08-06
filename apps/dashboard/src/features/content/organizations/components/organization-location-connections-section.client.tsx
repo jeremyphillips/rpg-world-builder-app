@@ -32,7 +32,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
   'Could not update location connections for this organization.'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER =
-  'Link this organization to locations where it has site presence, geographic activity, or territorial authority.'
+  'Link this organization to sites and facilities, geographic areas, or territories where it has presence or authority.'
 
 const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
   'territorial_authority',

@@ -72,8 +72,13 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByText('The Monarchy · Government')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        /Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters/i,
+      ),
+    ).toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
-    expect(screen.getByText(/Owns or holds title to this location/i)).toBeInTheDocument()
+    expect(screen.getByText(/Owns or holds title to a property or site/i)).toBeInTheDocument()
     expect(screen.getByText(ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE)).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))

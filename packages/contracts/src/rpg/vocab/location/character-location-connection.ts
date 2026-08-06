@@ -28,31 +28,31 @@ export type CharacterLocationConnectionEntry = GameTermEntry & {
 export const CHARACTER_LOCATION_CONNECTION_ENTRIES = {
   owns: {
     label: 'Owner',
-    description: 'Owns or holds title to this location.',
+    description: 'Owns or holds title to a property or site.',
     family: 'ownership',
     priority: 50,
   },
   tenant: {
     label: 'Tenant',
-    description: 'Occupies or leases space here without owning the location.',
+    description: 'Occupies or leases space at a site without owning it.',
     family: 'occupancy',
     priority: 40,
   },
   resides_at: {
     label: 'Resident',
-    description: 'Lives at this location.',
+    description: 'Lives at a site as a primary residence.',
     family: 'occupancy',
     priority: 30,
   },
   operator: {
     label: 'Operator',
-    description: 'Runs or manages day-to-day operations at this location.',
+    description: 'Runs or manages day-to-day operations at a site.',
     family: 'operation',
     priority: 20,
   },
   works_at: {
-    label: 'Works here',
-    description: 'Employed or regularly present at this location.',
+    label: 'Works at',
+    description: 'Employed or regularly present at a site.',
     family: 'operation',
     priority: 10,
   },

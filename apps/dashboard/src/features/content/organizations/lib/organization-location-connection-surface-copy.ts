@@ -14,12 +14,15 @@ type OrganizationForwardSurfaceCopy = {
 type OrganizationForwardFamilySurfaceCopy = {
   empty: string
   add: string
+  addDrawerHelper?: string
 }
 
 export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
   site: {
     empty: 'No site relationships linked.',
     add: 'Add site relationship',
+    addDrawerHelper:
+      'Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters.',
   },
   geographic_presence: {
     empty: 'No geographic presence linked.',
@@ -138,6 +141,14 @@ export function resolveOrganizationForwardFamilySurfaceCopy(
   family: OrganizationLocationConnectionFamily,
 ): OrganizationForwardFamilySurfaceCopy {
   return ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+}
+
+export function resolveOrganizationForwardFamilyAddDrawerHelper(
+  family: OrganizationLocationConnectionFamily,
+): string | undefined {
+  const copy: OrganizationForwardFamilySurfaceCopy =
+    ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+  return copy.addDrawerHelper
 }
 
 export function resolveOrganizationForwardKindHeading(

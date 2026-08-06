@@ -19,18 +19,19 @@ export const TERRITORIAL_AUTHORITY_ENTRIES = {
   governs: {
     label: 'Governs',
     description:
-      'Exercises political or administrative authority over this region. Distinct from property or title interest (party owner).',
+      'Exercises political or administrative authority over a territory or region. Distinct from property or title interest.',
     priority: 50,
   },
   controls: {
     label: 'Controls',
     description:
-      'Exercises territorial authority over this region. Distinct from operational presence or activity at a location (party operator).',
+      'Exercises territorial authority over a territory or region. Distinct from operational presence at a site.',
     priority: 40,
   },
   claims: {
     label: 'Claims',
-    description: 'Asserted but contested or incomplete territorial authority over this region.',
+    description:
+      'Asserted but contested or incomplete territorial authority over a territory or region.',
     priority: 30,
   },
 } as const satisfies Record<string, TerritorialAuthorityEntry>

@@ -107,6 +107,8 @@ Cross-org singleton territorial slots (`governs`, `controls`) require **server-b
 
 **Vocab owns:** kind label, kind description, semantic distinctions, `maxSubjectsPerLocation`.
 
+Canonical kind **descriptions** must stay perspective-neutral (no “this location” / “here”) because they render in kind pickers before an endpoint is fixed. See [packages/contracts/docs/structure.md](../../../packages/contracts/docs/structure.md#reference-vocabulary-gametermentry--vocabularyterm).
+
 **Dashboard owns:** section headings/helpers, drawer titles, action labels, empty-state copy, dynamic occupancy copy, confirmation copy, instructional workflow text.
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
