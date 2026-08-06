@@ -1,16 +1,22 @@
 'use client'
 
 import type { LocationConnectedPartyRow, OrganizationLocationConnectionKind } from '@rpg/contracts'
-import { Button, Heading } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
+import {
+  RelationshipFieldGroup,
+  RelationshipFieldGroupRow,
+} from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
 import {
   TERRITORIAL_AUTHORITY_OVERFLOW,
+  TERRITORIAL_AUTHORITY_SECTION_HEADING,
+  TERRITORIAL_AUTHORITY_SECTION_HELPER,
   TERRITORIAL_AUTHORITY_SLOT_COPY,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
@@ -21,6 +27,8 @@ const SINGLETON_KINDS = [
   'governs',
   'controls',
 ] as const satisfies readonly OrganizationLocationConnectionKind[]
+
+const TERRITORIAL_AUTHORITY_HEADING_ID = 'location-connected-parties-territorial_authority-heading'
 
 function buildTerritorialOverflowActions(input: {
   campaignId: string
@@ -92,75 +100,11 @@ function buildTerritorialOverflowActions(input: {
   return actions
 }
 
-type TerritorialAuthoritySlotProps = {
-  kind: (typeof SINGLETON_KINDS)[number]
-  row?: LocationConnectedPartyRow
-  canManage: boolean
-  campaignId: string
-  navigate: (path: string) => void
-  onAddKind?: (kind: OrganizationLocationConnectionKind) => void
-  onChangeKind?: (input: LocationConnectedPartyEditTarget) => void
-  onReplaceOrganization?: (input: LocationConnectedPartyEditTarget) => void
-  onRemoveConnection?: (input: {
-    relationshipId: string
-    subjectType: LocationConnectedPartyRow['subject']['type']
-    subjectId: string
-  }) => void
-}
-
-function TerritorialAuthoritySlot({
-  kind,
-  row,
-  canManage,
-  campaignId,
-  navigate,
-  onAddKind,
-  onChangeKind,
-  onReplaceOrganization,
-  onRemoveConnection,
-}: TerritorialAuthoritySlotProps) {
-  const copy = TERRITORIAL_AUTHORITY_SLOT_COPY[kind]
-
-  if (!row && !canManage) {
-    return null
-  }
-
-  return (
-    <div className="space-y-1">
-      <Heading variant="label" as="h3">
-        {copy.heading}
-      </Heading>
-      {row ? (
-        <CrossContentRelationshipRow
-          heading={row.subject.name}
-          href={ROUTES.content.organizations.detail(campaignId, row.subject.id)}
-          actions={buildTerritorialOverflowActions({
-            campaignId,
-            row,
-            navigate,
-            canEdit: canManage && Boolean(onChangeKind || onReplaceOrganization),
-            canRemove: canManage && Boolean(onRemoveConnection),
-            onChangeKind,
-            onReplaceOrganization,
-            onRemoveConnection,
-          })}
-          overflowTriggerLabel={`Actions for ${row.subject.name}`}
-        />
-      ) : canManage ? (
-        <RelationshipEmptyInlineRow
-          emptyLabel={copy.empty}
-          addLabel={copy.add}
-          onAdd={() => onAddKind?.(kind)}
-        />
-      ) : null}
-    </div>
-  )
-}
-
 type LocationTerritorialAuthoritySectionBodyProps = {
   campaignId: string
   rows: readonly LocationConnectedPartyRow[]
   canManage: boolean
+  showHelper?: boolean
   onAddKind?: (kind: OrganizationLocationConnectionKind) => void
   onChangeKind?: (input: LocationConnectedPartyEditTarget) => void
   onReplaceOrganization?: (input: LocationConnectedPartyEditTarget) => void
@@ -169,12 +113,45 @@ type LocationTerritorialAuthoritySectionBodyProps = {
     subjectType: LocationConnectedPartyRow['subject']['type']
     subjectId: string
   }) => void
+}
+
+function renderTerritorialRelationshipRow(input: {
+  campaignId: string
+  row: LocationConnectedPartyRow
+  canManage: boolean
+  navigate: (path: string) => void
+  onChangeKind?: (target: LocationConnectedPartyEditTarget) => void
+  onReplaceOrganization?: (target: LocationConnectedPartyEditTarget) => void
+  onRemoveConnection?: (input: {
+    relationshipId: string
+    subjectType: LocationConnectedPartyRow['subject']['type']
+    subjectId: string
+  }) => void
+}) {
+  return (
+    <CrossContentRelationshipRow
+      heading={input.row.subject.name}
+      href={ROUTES.content.organizations.detail(input.campaignId, input.row.subject.id)}
+      actions={buildTerritorialOverflowActions({
+        campaignId: input.campaignId,
+        row: input.row,
+        navigate: input.navigate,
+        canEdit: input.canManage && Boolean(input.onChangeKind || input.onReplaceOrganization),
+        canRemove: input.canManage && Boolean(input.onRemoveConnection),
+        onChangeKind: input.onChangeKind,
+        onReplaceOrganization: input.onReplaceOrganization,
+        onRemoveConnection: input.onRemoveConnection,
+      })}
+      overflowTriggerLabel={`Actions for ${input.row.subject.name}`}
+    />
+  )
 }
 
 export function LocationTerritorialAuthoritySectionBody({
   campaignId,
   rows,
   canManage,
+  showHelper = false,
   onAddKind,
   onChangeKind,
   onReplaceOrganization,
@@ -195,52 +172,73 @@ export function LocationTerritorialAuthoritySectionBody({
   }
 
   return (
-    <div className="space-y-5">
+    <RelationshipFieldGroup
+      heading={TERRITORIAL_AUTHORITY_SECTION_HEADING}
+      headingId={TERRITORIAL_AUTHORITY_HEADING_ID}
+      helper={showHelper ? TERRITORIAL_AUTHORITY_SECTION_HELPER : undefined}
+    >
       {SINGLETON_KINDS.map((kind) => {
         const row = kind === 'governs' ? governsRow : controlsRow
+        const copy = TERRITORIAL_AUTHORITY_SLOT_COPY[kind]
+
+        if (!row && !canManage) {
+          return null
+        }
+
         return (
-          <TerritorialAuthoritySlot
-            key={kind}
-            kind={kind}
-            row={row}
-            canManage={canManage}
-            campaignId={campaignId}
-            navigate={navigate}
-            onAddKind={onAddKind}
-            onChangeKind={onChangeKind}
-            onReplaceOrganization={onReplaceOrganization}
-            onRemoveConnection={onRemoveConnection}
-          />
+          <RelationshipFieldGroupRow key={kind} eyebrow={copy.heading}>
+            {row ? (
+              renderTerritorialRelationshipRow({
+                campaignId,
+                row,
+                canManage,
+                navigate,
+                onChangeKind,
+                onReplaceOrganization,
+                onRemoveConnection,
+              })
+            ) : canManage ? (
+              <RelationshipEmptyInlineRow
+                emptyLabel={copy.empty}
+                addLabel={copy.add}
+                onAdd={() => onAddKind?.(kind)}
+              />
+            ) : null}
+          </RelationshipFieldGroupRow>
         )
       })}
 
       {showClaimsGroup ? (
-        <div className="space-y-1">
-          <Heading variant="label" as="h3">
-            {TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}
-          </Heading>
+        <RelationshipFieldGroupRow eyebrow={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}>
           {claimRows.length > 0 ? (
-            <ul className="space-y-1">
-              {claimRows.map((row) => (
-                <li key={row.relationshipId}>
-                  <CrossContentRelationshipRow
-                    heading={row.subject.name}
-                    href={ROUTES.content.organizations.detail(campaignId, row.subject.id)}
-                    actions={buildTerritorialOverflowActions({
+            <div className="space-y-1">
+              <ul className="space-y-1">
+                {claimRows.map((row) => (
+                  <li key={row.relationshipId}>
+                    {renderTerritorialRelationshipRow({
                       campaignId,
                       row,
+                      canManage,
                       navigate,
-                      canEdit: canManage && Boolean(onChangeKind || onReplaceOrganization),
-                      canRemove: canManage && Boolean(onRemoveConnection),
                       onChangeKind,
                       onReplaceOrganization,
                       onRemoveConnection,
                     })}
-                    overflowTriggerLabel={`Actions for ${row.subject.name}`}
-                  />
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+              {canManage ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  density="compact"
+                  onClick={() => onAddKind?.('claims')}
+                >
+                  {TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add}
+                </Button>
+              ) : null}
+            </div>
           ) : canManage ? (
             <RelationshipEmptyInlineRow
               emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty}
@@ -248,13 +246,10 @@ export function LocationTerritorialAuthoritySectionBody({
               onAdd={() => onAddKind?.('claims')}
             />
           ) : null}
-          {canManage && claimRows.length > 0 ? (
-            <Button type="button" variant="outline" size="sm" onClick={() => onAddKind?.('claims')}>
-              {TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add}
-            </Button>
-          ) : null}
-        </div>
+        </RelationshipFieldGroupRow>
       ) : null}
-    </div>
+    </RelationshipFieldGroup>
   )
 }
+
+export { TERRITORIAL_AUTHORITY_HEADING_ID }

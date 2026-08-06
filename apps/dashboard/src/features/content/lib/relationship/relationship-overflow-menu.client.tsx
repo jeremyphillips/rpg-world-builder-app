@@ -30,7 +30,13 @@ export function RelationshipOverflowMenu({ actions, triggerLabel }: Relationship
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="ghost" size="icon" aria-label={triggerLabel}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          density="compact"
+          aria-label={triggerLabel}
+        >
           <MoreHorizontal aria-hidden />
         </Button>
       </DropdownMenuTrigger>

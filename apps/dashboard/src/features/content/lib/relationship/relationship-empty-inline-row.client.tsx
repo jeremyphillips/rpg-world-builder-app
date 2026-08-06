@@ -21,7 +21,7 @@ export function RelationshipEmptyInlineRow({
         {emptyLabel}
       </Text>
       {addLabel && onAdd ? (
-        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+        <Button type="button" variant="outline" size="sm" density="compact" onClick={onAdd}>
           {addLabel}
         </Button>
       ) : null}

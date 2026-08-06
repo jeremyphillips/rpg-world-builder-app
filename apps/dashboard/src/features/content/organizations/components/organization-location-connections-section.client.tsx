@@ -13,6 +13,10 @@ import {
 import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
 import { resolveOrganizationForwardSurfaceCopy } from '../lib/organization-location-connection-surface-copy'
 import { OrganizationLocationConnectionRelationshipRow } from './organization-location-connection-relationship-row.client'
+import {
+  RelationshipFieldGroup,
+  RelationshipFieldGroupRow,
+} from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
@@ -97,37 +101,49 @@ export function OrganizationLocationConnectionsSection({
           <Text variant="muted">{emptyText}</Text>
         ) : null
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {total > 0 ? <Text variant="muted">{formatLocationConnectionsCount(total)}</Text> : null}
           {groupedFamilies.map((familyGroup) => (
-            <div key={familyGroup.family} className="space-y-4">
-              <Heading variant="label" as="h3">
-                {familyGroup.familyLabel}
-              </Heading>
+            <RelationshipFieldGroup
+              key={familyGroup.family}
+              heading={familyGroup.familyLabel}
+              headingId={`organization-location-connections-${familyGroup.family}-heading`}
+              headingAs="h3"
+            >
               {familyGroup.kindGroups.map((kindGroup) => {
                 const copy = resolveOrganizationForwardSurfaceCopy(kindGroup.kind)
 
                 return (
-                  <div key={kindGroup.kind} className="space-y-1">
-                    <Heading variant="label" as="h4">
-                      {kindGroup.kindLabel}
-                    </Heading>
+                  <RelationshipFieldGroupRow key={kindGroup.kind} eyebrow={kindGroup.kindLabel}>
                     {kindGroup.items.length > 0 ? (
-                      <ul className="space-y-1">
-                        {kindGroup.items.map((item) => (
-                          <li key={item.connectionId}>
-                            <OrganizationLocationConnectionRelationshipRow
-                              item={item}
-                              canManage={canManage}
-                              isMutationPending={
-                                isMutationPending && pendingConnectionId === item.connectionId
-                              }
-                              onEditConnection={onEditConnection}
-                              onRemoveConnection={onRemoveConnection}
-                            />
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="space-y-1">
+                        <ul className="space-y-1">
+                          {kindGroup.items.map((item) => (
+                            <li key={item.connectionId}>
+                              <OrganizationLocationConnectionRelationshipRow
+                                item={item}
+                                canManage={canManage}
+                                isMutationPending={
+                                  isMutationPending && pendingConnectionId === item.connectionId
+                                }
+                                onEditConnection={onEditConnection}
+                                onRemoveConnection={onRemoveConnection}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                        {canManage ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            density="compact"
+                            onClick={() => onAddKind?.(kindGroup.kind)}
+                          >
+                            {copy.add}
+                          </Button>
+                        ) : null}
+                      </div>
                     ) : canManage ? (
                       <RelationshipEmptyInlineRow
                         emptyLabel={copy.empty}
@@ -135,20 +151,10 @@ export function OrganizationLocationConnectionsSection({
                         onAdd={() => onAddKind?.(kindGroup.kind)}
                       />
                     ) : null}
-                    {canManage && kindGroup.items.length > 0 ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onAddKind?.(kindGroup.kind)}
-                      >
-                        {copy.add}
-                      </Button>
-                    ) : null}
-                  </div>
+                  </RelationshipFieldGroupRow>
                 )
               })}
-            </div>
+            </RelationshipFieldGroup>
           ))}
         </div>
       )}

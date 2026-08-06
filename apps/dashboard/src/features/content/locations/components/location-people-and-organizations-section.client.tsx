@@ -5,12 +5,16 @@ import type {
   LocationConnectedPartyRow,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Button, Heading } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
+import {
+  RelationshipFieldGroup,
+  RelationshipFieldGroupRow,
+} from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
 import {
@@ -108,6 +112,10 @@ export type LocationPeopleAndOrganizationsSectionBodyProps = {
   rows: readonly LocationConnectedPartyRow[]
   kindSlots: readonly PeopleKindSlot[]
   canManage: boolean
+  heading: string
+  headingId: string
+  helper?: string
+  sectionEmpty?: string
   onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
   onAddCharacterKind?: (kind: CharacterLocationConnectionKind) => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
@@ -125,6 +133,10 @@ export function LocationPeopleAndOrganizationsSectionBody({
   rows,
   kindSlots,
   canManage,
+  heading,
+  headingId,
+  helper,
+  sectionEmpty,
   onAddOrganizationKind,
   onAddCharacterKind,
   onEditConnection,
@@ -152,47 +164,68 @@ export function LocationPeopleAndOrganizationsSectionBody({
   }
 
   return (
-    <div className="space-y-5">
+    <RelationshipFieldGroup heading={heading} headingId={headingId} helper={helper}>
+      {sectionEmpty ? (
+        <div className="border-b border-border-subtle px-4 py-2">
+          <Text variant="muted">{sectionEmpty}</Text>
+        </div>
+      ) : null}
       {visibleSlots.map((slot) => {
         const slotRows = rowsBySlot.get(peopleKindSlotKey(slot)) ?? []
         const copy = resolvePeopleKindCopy(slot)
 
         return (
-          <div key={peopleKindSlotKey(slot)} className="space-y-1">
-            <Heading variant="label" as="h3">
-              {slot.heading}
-            </Heading>
+          <RelationshipFieldGroupRow key={peopleKindSlotKey(slot)} eyebrow={slot.heading}>
             {slotRows.length > 0 ? (
-              <ul className="space-y-1">
-                {slotRows.map((row) => {
-                  const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
-                  const rowCanRemove =
-                    canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
+              <div className="space-y-1">
+                <ul className="space-y-1">
+                  {slotRows.map((row) => {
+                    const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
+                    const rowCanRemove =
+                      canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
 
-                  return (
-                    <li key={row.relationshipId}>
-                      <CrossContentRelationshipRow
-                        heading={row.subject.name}
-                        href={
-                          row.subject.type === 'organization'
-                            ? ROUTES.content.organizations.detail(campaignId, row.subject.id)
-                            : ROUTES.campaign.characters.detail(campaignId, row.subject.id)
-                        }
-                        actions={buildPeopleOverflowActions({
-                          campaignId,
-                          row,
-                          navigate,
-                          canEdit: Boolean(rowCanEdit),
-                          canRemove: Boolean(rowCanRemove),
-                          onEditConnection,
-                          onRemoveConnection,
-                        })}
-                        overflowTriggerLabel={`Actions for ${row.subject.name}`}
-                      />
-                    </li>
-                  )
-                })}
-              </ul>
+                    return (
+                      <li key={row.relationshipId}>
+                        <CrossContentRelationshipRow
+                          heading={row.subject.name}
+                          href={
+                            row.subject.type === 'organization'
+                              ? ROUTES.content.organizations.detail(campaignId, row.subject.id)
+                              : ROUTES.campaign.characters.detail(campaignId, row.subject.id)
+                          }
+                          actions={buildPeopleOverflowActions({
+                            campaignId,
+                            row,
+                            navigate,
+                            canEdit: Boolean(rowCanEdit),
+                            canRemove: Boolean(rowCanRemove),
+                            onEditConnection,
+                            onRemoveConnection,
+                          })}
+                          overflowTriggerLabel={`Actions for ${row.subject.name}`}
+                        />
+                      </li>
+                    )
+                  })}
+                </ul>
+                {canManage ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    density="compact"
+                    onClick={() => {
+                      if (slot.subjectType === 'organization') {
+                        onAddOrganizationKind?.(slot.kind)
+                      } else {
+                        onAddCharacterKind?.(slot.kind)
+                      }
+                    }}
+                  >
+                    {copy.add}
+                  </Button>
+                ) : null}
+              </div>
             ) : canManage ? (
               <RelationshipEmptyInlineRow
                 emptyLabel={copy.empty}
@@ -206,26 +239,10 @@ export function LocationPeopleAndOrganizationsSectionBody({
                 }}
               />
             ) : null}
-            {canManage && slotRows.length > 0 ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  if (slot.subjectType === 'organization') {
-                    onAddOrganizationKind?.(slot.kind)
-                  } else {
-                    onAddCharacterKind?.(slot.kind)
-                  }
-                }}
-              >
-                {copy.add}
-              </Button>
-            ) : null}
-          </div>
+          </RelationshipFieldGroupRow>
         )
       })}
-    </div>
+    </RelationshipFieldGroup>
   )
 }
 

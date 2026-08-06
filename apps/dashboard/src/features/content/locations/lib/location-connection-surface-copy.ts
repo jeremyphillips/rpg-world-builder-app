@@ -30,7 +30,7 @@ export const LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY = {
   },
   controls: {
     empty: 'No controlling organization.',
-    add: 'Add controlling organization',
+    add: 'Add organization',
     addDrawerTitle: 'Add controlling organization',
     addDrawerInstruction: 'Choose an organization with effective control of this location.',
     addSubmit: 'Add controlling organization',

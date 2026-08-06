@@ -38,16 +38,40 @@ Default populated row:
 
 `CrossContentRelationshipRow` accepts optional **`secondaryText`** when the feature decides disambiguation helps. Shared code must **not** auto-derive generic entity-type labels ("Organization", "Location", …).
 
-Compact list presentation — no card border/background on relationship rows.
+Compact list presentation — no card border/background on relationship rows. Row chrome uses compact action density (`Button density="compact"` on overflow triggers and inline add actions).
+
+## Field group layout
+
+Use **`RelationshipFieldGroup`** + **`RelationshipFieldGroupRow`** when a section groups multiple relationship kinds under one titled block (location Territorial Authority, People & organizations, organization forward family groups).
+
+```text
+┌ RelationshipFieldGroup (rounded-md border border-border-subtle) ─┐
+│ Header (bg-card px-4 py-2)                                       │
+│   Section title (Heading variant="label") + optional 14px helper   │
+├ Body (bg-sunken) ────────────────────────────────────────────────┤
+│ RelationshipFieldGroupRow (px-4 py-2, border-b between rows)     │
+│   Eyebrow size="sm" + row content                                │
+│ RelationshipFieldGroupRow …                                      │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+| When                                                                           | Header owner                                | Notes                                                                                                                       |
+| ------------------------------------------------------------------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Location inverse section (`territorial_authority`, `people_and_organizations`) | `RelationshipFieldGroup`                    | Skip `LocationConnectedPartiesSectionHeader`; keep outer `<section aria-labelledby>` pointing at the field-group heading id |
+| Organization forward family                                                    | `RelationshipFieldGroup` (`headingAs="h3"`) | Top-level **Location connections** `h2` + helper stays outside field groups                                                 |
+| Single-kind or non-grouped surfaces                                            | Feature section header                      | Bare row primitives only                                                                                                    |
+
+Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers.
 
 ## Populated row vs empty container
 
-| Responsibility                       | Owner                                                                                        |
-| ------------------------------------ | -------------------------------------------------------------------------------------------- |
-| Populated edge summary + overflow    | `CrossContentRelationshipRow`                                                                |
-| Overflow actions                     | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`) |
-| Singleton slot empty state + add CTA | Feature container (Location detail only; `maxSubjectsPerLocation === 1`)                     |
-| Collection empty state + add CTA     | Feature container via `RelationshipEmptyInlineRow`                                           |
+| Responsibility                        | Owner                                                                                                              |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Populated edge summary + overflow     | `CrossContentRelationshipRow`                                                                                      |
+| Overflow actions                      | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger) |
+| Kind-group shell (header + kind rows) | `RelationshipFieldGroup` + `RelationshipFieldGroupRow`                                                             |
+| Singleton slot empty state + add CTA  | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`)        |
+| Collection empty state + add CTA      | Feature row content via `RelationshipEmptyInlineRow`                                                               |
 
 `CrossContentRelationshipRow` **never** accepts empty-state props.
 
@@ -73,10 +97,11 @@ Use **direction-aware resolvers** in feature copy modules (for example [`locatio
 
 Before building a new cross-content relationship surface, evaluate:
 
-1. `CrossContentRelationshipRow` + `RelationshipOverflowMenu` for populated rows
-2. `RelationshipEmptyInlineRow` for inline empty + add
-3. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
-4. Direction-aware copy resolvers
+1. `RelationshipFieldGroup` + `RelationshipFieldGroupRow` when grouping kinds under a section title
+2. `CrossContentRelationshipRow` + `RelationshipOverflowMenu` for populated rows
+3. `RelationshipEmptyInlineRow` for inline empty + add
+4. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
+5. Direction-aware copy resolvers
 
 ## Non-adopters
 

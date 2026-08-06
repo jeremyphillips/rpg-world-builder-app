@@ -15,41 +15,18 @@ import {
 } from '@rpg/contracts'
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
+import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'
+import type { PeopleKindSlot } from './location-people-and-organizations-section.client'
 import {
-  LocationPeopleAndOrganizationsSectionBody,
-  type PeopleKindSlot,
-} from './location-people-and-organizations-section.client'
-import { LocationTerritorialAuthoritySectionBody } from './location-territorial-authority-section.client'
-import {
-  TERRITORIAL_AUTHORITY_SECTION_EMPTY,
-  TERRITORIAL_AUTHORITY_SECTION_HEADING,
-  TERRITORIAL_AUTHORITY_SECTION_HELPER,
-} from '../lib/location-connection-surface-copy'
+  resolveLocationConnectedPartiesSectionHeadingId,
+  usesFieldGroupHeader,
+} from '../lib/location-connected-parties-section-layout'
 
-export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
-  LocationConnectedPartySectionGroup,
-  string
-> = {
-  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_HEADING,
-  people_and_organizations: 'People & organizations',
-}
-
-export const LOCATION_CONNECTED_PARTIES_SECTION_HELPERS: Record<
-  LocationConnectedPartySectionGroup,
-  string
-> = {
-  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_HELPER,
-  people_and_organizations:
-    'Characters and organizations with ownership, occupancy, operations, or geographic presence here.',
-}
-
-export const LOCATION_CONNECTED_PARTIES_EMPTY_TEXT: Record<
-  LocationConnectedPartySectionGroup,
-  string
-> = {
-  territorial_authority: TERRITORIAL_AUTHORITY_SECTION_EMPTY,
-  people_and_organizations: 'No people or organizations linked yet.',
-}
+export {
+  LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
+  LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
+  LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
+} from '../lib/location-connected-parties-section-copy'
 
 export type LocationConnectedPartyEditTarget = {
   relationshipId: string
@@ -138,47 +115,36 @@ export function LocationConnectedPartiesSection({
     return null
   }
 
-  const hasPeopleContent =
-    sectionGroup === 'people_and_organizations' &&
-    (sectionRows.length > 0 || (canManage && peopleKindSlots.length > 0))
+  const sectionHeadingId = resolveLocationConnectedPartiesSectionHeadingId(sectionGroup)
+  const showFieldGroupHeader = usesFieldGroupHeader(sectionGroup)
 
   return (
-    <section
-      className="space-y-4"
-      aria-labelledby={`location-connected-parties-${sectionGroup}-heading`}
-    >
-      <LocationConnectedPartiesSectionHeader
-        sectionGroup={sectionGroup}
-        canManage={canManage}
-        hasRows={sectionRows.length > 0}
-      />
-
-      {sectionGroup === 'territorial_authority' ? (
-        sectionRows.length > 0 || canManage ? (
-          <LocationTerritorialAuthoritySectionBody
-            campaignId={campaignId}
-            rows={sectionRows}
-            canManage={canManage}
-            onAddKind={onAddTerritorialKind}
-            onChangeKind={onChangeTerritorialKind}
-            onReplaceOrganization={onReplaceTerritorialOrganization}
-            onRemoveConnection={onRemoveConnection}
-          />
-        ) : null
-      ) : hasPeopleContent ? (
-        <LocationPeopleAndOrganizationsSectionBody
-          campaignId={campaignId}
-          rows={sectionRows}
-          kindSlots={peopleKindSlots}
+    <section className="space-y-4" aria-labelledby={sectionHeadingId}>
+      {!showFieldGroupHeader ? (
+        <LocationConnectedPartiesSectionHeader
+          sectionGroup={sectionGroup}
           canManage={canManage}
-          onAddOrganizationKind={onAddOrganizationKind}
-          onAddCharacterKind={onAddCharacterKind}
-          onEditConnection={onEditConnection}
-          onRemoveConnection={onRemoveConnection}
-          canEditRow={canEditRow}
-          canRemoveRow={canRemoveRow}
+          hasRows={sectionRows.length > 0}
         />
       ) : null}
+
+      <LocationConnectedPartiesSectionBody
+        campaignId={campaignId}
+        sectionGroup={sectionGroup}
+        sectionRows={sectionRows}
+        sectionHeadingId={sectionHeadingId}
+        peopleKindSlots={peopleKindSlots}
+        canManage={canManage}
+        onAddOrganizationKind={onAddOrganizationKind}
+        onAddCharacterKind={onAddCharacterKind}
+        onAddTerritorialKind={onAddTerritorialKind}
+        onEditConnection={onEditConnection}
+        onChangeTerritorialKind={onChangeTerritorialKind}
+        onReplaceTerritorialOrganization={onReplaceTerritorialOrganization}
+        onRemoveConnection={onRemoveConnection}
+        canEditRow={canEditRow}
+        canRemoveRow={canRemoveRow}
+      />
     </section>
   )
 }

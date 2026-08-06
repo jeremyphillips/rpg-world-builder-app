@@ -13,13 +13,13 @@ describe('RelationshipEmptyInlineRow', () => {
     render(
       <RelationshipEmptyInlineRow
         emptyLabel="No controlling organization."
-        addLabel="Add controlling organization"
+        addLabel="Add organization"
         onAdd={onAdd}
       />,
     )
 
     expect(screen.getByText('No controlling organization.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Add controlling organization' }))
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
     expect(onAdd).toHaveBeenCalledOnce()
   })
 

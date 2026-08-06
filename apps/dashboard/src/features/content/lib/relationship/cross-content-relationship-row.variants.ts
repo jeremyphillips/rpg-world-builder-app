@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const crossContentRelationshipRowVariants = cva(
-  'flex items-center justify-between gap-4 py-1',
+  'flex items-center justify-between gap-4 py-0',
 )
 
 export const crossContentRelationshipRowContentVariants = cva('min-w-0 flex-1')

@@ -66,9 +66,10 @@ describe('LocationConnectedPartiesSection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Controls' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Claims' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Territorial Authority' })).toBeInTheDocument()
+    expect(screen.getByText('Governs')).toBeInTheDocument()
+    expect(screen.getByText('Controls')).toBeInTheDocument()
+    expect(screen.getByText('Claims')).toBeInTheDocument()
     expect(screen.getByText('No governing organization.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
@@ -92,8 +93,9 @@ describe('LocationConnectedPartiesSection', () => {
     expect(
       screen.getByText(LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Operates in' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Works here' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'People & organizations' })).toBeInTheDocument()
+    expect(screen.getByText('Operates in')).toBeInTheDocument()
+    expect(screen.getByText('Works here')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add organization presence' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add worker' })).toBeInTheDocument()
   })
@@ -115,7 +117,7 @@ describe('LocationConnectedPartiesSection', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Add controlling organization' }))
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
     expect(onAddTerritorialKind).toHaveBeenCalledWith('controls')
   })
 

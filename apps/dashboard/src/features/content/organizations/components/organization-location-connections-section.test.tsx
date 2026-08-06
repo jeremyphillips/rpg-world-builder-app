@@ -43,8 +43,10 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
     expect(screen.getByText('1 location connection')).toBeInTheDocument()
     expect(screen.getByText('Grey Coast')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Territorial authority' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Territorial authority', level: 3 }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Governs')).toBeInTheDocument()
   })
 
   it('renders section empty text when no kind slots exist', () => {
