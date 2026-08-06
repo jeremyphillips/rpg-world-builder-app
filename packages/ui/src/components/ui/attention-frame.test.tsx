@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   ATTENTION_FRAME_DURATION_MS,
@@ -84,7 +84,7 @@ describe('AttentionFrame', () => {
     expect(container.firstChild).not.toHaveClass('border-border')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     vi.useRealTimers()
     const { container } = render(
       <AttentionFrame active>

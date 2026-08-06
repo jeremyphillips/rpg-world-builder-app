@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
@@ -38,7 +38,7 @@ describe('NotificationInboxBody', () => {
     expect(screen.queryByText('Open')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <NotificationInboxBody
         isPending={false}

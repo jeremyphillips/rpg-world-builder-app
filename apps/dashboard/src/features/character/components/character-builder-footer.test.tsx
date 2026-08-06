@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { getBuilderChromeCopy } from '../lib/builder/builder-chrome-copy'
 import { CharacterBuilderFooter } from './character-builder-footer.client'
@@ -26,7 +26,7 @@ describe('CharacterBuilderFooter', () => {
     expect(screen.getByText(pcChrome.reviewFooterHint)).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations on review', async () => {
+  itAxe('has no axe accessibility violations on review', async () => {
     const { container } = render(
       <CharacterBuilderFooter
         currentStepId="review"

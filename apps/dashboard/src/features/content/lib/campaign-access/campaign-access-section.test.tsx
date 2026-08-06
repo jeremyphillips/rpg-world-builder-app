@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { ReactElement } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignAccessSection } from './campaign-access-section.client'
 import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
@@ -190,7 +190,7 @@ describe('CampaignAccessSection', () => {
     expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderSection(
       <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
     )

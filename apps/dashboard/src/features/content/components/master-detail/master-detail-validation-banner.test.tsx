@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../../lib/master-detail/master-detail-constants'
@@ -16,7 +16,7 @@ describe('MasterDetailValidationBanner', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE)
   })
 
-  it('has no axe accessibility violations when visible', async () => {
+  itAxe('has no axe accessibility violations when visible', async () => {
     const { container } = render(<MasterDetailValidationBanner visible />)
     await expectNoAxeViolations(container)
   })

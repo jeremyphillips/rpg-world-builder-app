@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { EquipmentCatalogItemHeader } from './equipment-catalog-item-header.client'
@@ -21,7 +21,7 @@ describe('EquipmentCatalogItemHeader', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentCatalogItemHeader
         name="Dagger"

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { equipmentSchema } from '@rpg/contracts'
 import type { ClassStored } from '@rpg/contracts'
@@ -161,7 +161,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     expect(screen.getByRole('button', { name: 'Switch package' })).toBeDisabled()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentPackageSwitchResolutionModal
         open

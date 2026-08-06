@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
@@ -76,7 +76,7 @@ describe('OrganizationDetailContent', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderDetail()
     await expectNoAxeViolations(container)
   })

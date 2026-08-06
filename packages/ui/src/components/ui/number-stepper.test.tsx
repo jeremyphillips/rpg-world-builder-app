@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { NumberStepper } from './number-stepper.client'
 
@@ -69,7 +69,7 @@ describe('NumberStepper', () => {
     expect(root).not.toHaveClass('border')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<Harness />)
     await expectNoAxeViolations(container)
   })

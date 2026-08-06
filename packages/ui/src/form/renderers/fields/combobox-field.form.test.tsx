@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import {
@@ -167,7 +167,7 @@ describe('Form combobox field', () => {
     await submitAndExpectPayload(user, onSubmit, { weapons: ['dagger'] })
   })
 
-  it('has no axe violations when rendered through the form renderer', async () => {
+  itAxe('has no axe violations when rendered through the form renderer', async () => {
     const { container } = render(
       <Form<MultiValues>
         schema={multiSchema}

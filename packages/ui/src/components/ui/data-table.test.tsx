@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import * as React from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { Column, ColumnDef } from '@tanstack/react-table'
 
 import {
@@ -159,7 +159,7 @@ describe('SortableHeader', () => {
     expect(toggleSorting).toHaveBeenCalledTimes(1)
   })
 
-  it('has no axe accessibility violations with info', async () => {
+  itAxe('has no axe accessibility violations with info', async () => {
     const { container } = render(
       <SortableHeader
         column={createSortableColumnMock()}
@@ -786,17 +786,17 @@ describe('DataTable — extended behavior', () => {
 // ---------------------------------------------------------------------------
 
 describe('DataTable — accessibility', () => {
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderTable()
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations with row selection enabled', async () => {
+  itAxe('has no axe violations with row selection enabled', async () => {
     const { container } = renderTable({ enableRowSelection: true })
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations with the column panel open', async () => {
+  itAxe('has no axe violations with the column panel open', async () => {
     const user = userEvent.setup()
     const { container } = renderTable()
     await user.click(screen.getByRole('button', { name: /columns/i }))

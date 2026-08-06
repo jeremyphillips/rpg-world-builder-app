@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi, afterEach } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
@@ -183,7 +183,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('has no axe accessibility violations when empty', async () => {
+  itAxe('has no axe accessibility violations when empty', async () => {
     const { container } = render(<SpellResolutionEditor formCtx={formCtx} />)
 
     await waitFor(() => {
@@ -193,7 +193,7 @@ describe('SpellResolutionEditor', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with eldritch blast fixture', async () => {
+  itAxe('has no axe accessibility violations with eldritch blast fixture', async () => {
     const { container } = render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -208,7 +208,7 @@ describe('SpellResolutionEditor', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with chill touch fixture', async () => {
+  itAxe('has no axe accessibility violations with chill touch fixture', async () => {
     const { container } = render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -240,7 +240,7 @@ describe('SpellResolutionEditor', () => {
     })
   })
 
-  it('has no axe accessibility violations with magic missile fixture', async () => {
+  itAxe('has no axe accessibility violations with magic missile fixture', async () => {
     const { container } = render(
       <SpellResolutionEditor
         formCtx={formCtx}
@@ -255,7 +255,7 @@ describe('SpellResolutionEditor', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with inflict wounds fixture', async () => {
+  itAxe('has no axe accessibility violations with inflict wounds fixture', async () => {
     const { container } = render(
       <SpellResolutionEditor
         formCtx={formCtx}

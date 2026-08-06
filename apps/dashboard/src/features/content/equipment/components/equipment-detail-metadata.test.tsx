@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { buildEquipmentDetailViewModel, EQUIPMENT_STAT_LABELS } from '../lib/equipment-display'
@@ -45,7 +45,7 @@ describe('EquipmentDetailMetadata', () => {
     expect(screen.getByText(/^Category/)).toHaveClass('text-sm')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<EquipmentDetailMetadata viewModel={longswordDetail} />)
 
     await expectNoAxeViolations(container)

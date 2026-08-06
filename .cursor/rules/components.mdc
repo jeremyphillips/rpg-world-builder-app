@@ -10,7 +10,8 @@ alwaysApply: false
   logic-bearing or interactive ones.
 - Client: `<name>.client.tsx` + `'use client'`. Server: `<name>.tsx` (no directive).
 - Use design-token classes — never hardcode colors or font sizes.
-- Accessibility is required: pass vitest-axe and the Storybook axe-playwright
-  check; no `eslint-plugin-jsx-a11y` violations; never suppress axe globally.
+- Accessibility is required: use `itAxe` for axe-only Vitest blocks (CI-only;
+  local `FORCE_AXE=1` to opt in), Storybook axe-playwright on PRs, and no
+  `eslint-plugin-jsx-a11y` violations; never suppress axe globally.
 
 Detail: [packages/ui/README.md](../../packages/ui/README.md) and [AGENTS.md](../../AGENTS.md).

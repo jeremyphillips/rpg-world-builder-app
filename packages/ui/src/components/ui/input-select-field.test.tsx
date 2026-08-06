@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import * as React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { InputSelectField, InputUnitField } from './input-select-field.client'
 
@@ -184,7 +184,7 @@ describe('InputSelectField', () => {
     expect(screen.getByRole('combobox', { name: 'Cost unit' })).toBeDisabled()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledField min={0} />)
     await expectNoAxeViolations(container)
   })
@@ -255,7 +255,7 @@ describe('InputUnitField', () => {
     expect(label).toHaveAttribute('for', 'walk-speed-value')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<ControlledUnitField />)
     await expectNoAxeViolations(container)
   })

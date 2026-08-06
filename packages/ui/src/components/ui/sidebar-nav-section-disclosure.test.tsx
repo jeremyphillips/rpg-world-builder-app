@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { render } from '@testing-library/react'
 
@@ -74,7 +74,7 @@ describe('SidebarNavSectionDisclosure', () => {
     expect(onExpandedChange).not.toHaveBeenCalled()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <SidebarNavSectionDisclosure label="Campaign" expanded onExpandedChange={() => undefined}>
         <a href="/campaigns/demo">Overview</a>

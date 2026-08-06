@@ -1,7 +1,7 @@
 import { beforeAll, afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
@@ -118,7 +118,7 @@ describe('IdentityStep', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Name is required.')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <IdentityStep
         draft={{

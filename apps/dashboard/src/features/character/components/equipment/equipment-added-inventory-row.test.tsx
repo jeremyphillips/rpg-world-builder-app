@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
@@ -138,7 +138,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
     expect(screen.queryByRole('button', { name: 'Release' })).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />,
     )

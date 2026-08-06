@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ActionDialogShell } from './action-dialog-shell.client'
@@ -52,7 +52,7 @@ describe('ActionDialogShell', () => {
     expect(document.querySelector('.bg-surface-subtle')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations in resolve phase', async () => {
+  itAxe('has no axe accessibility violations in resolve phase', async () => {
     const { container } = render(
       <ActionDialogShell
         open

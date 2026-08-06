@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { BacklogTicketCard } from './backlog-ticket-card'
 import { sampleTicket } from '../test-fixtures'
@@ -20,7 +20,7 @@ describe('BacklogTicketCard', () => {
     ).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithQuery(
       <BacklogTicketCard ticket={sampleTicket} onSelect={vi.fn()} />,
     )

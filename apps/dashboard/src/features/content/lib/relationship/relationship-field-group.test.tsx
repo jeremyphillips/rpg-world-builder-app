@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   RelationshipFieldGroup,
@@ -62,7 +62,7 @@ describe('RelationshipFieldGroup', () => {
     expect(rows?.[2]).toHaveClass('last:border-b-0')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <RelationshipFieldGroup
         heading="Territorial Authority"

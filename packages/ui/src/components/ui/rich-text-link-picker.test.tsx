@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -174,7 +174,7 @@ describe('RichTextLinkPicker', () => {
     expect(screen.getByRole('checkbox', { name: 'Open external link in new window' })).toBeChecked()
   })
 
-  it('has no axe accessibility violations on the internal tab', async () => {
+  itAxe('has no axe accessibility violations on the internal tab', async () => {
     const { container } = render(
       <RichTextLinkPicker
         open
@@ -187,7 +187,7 @@ describe('RichTextLinkPicker', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations on the external tab', async () => {
+  itAxe('has no axe accessibility violations on the external tab', async () => {
     const { container } = render(
       <RichTextLinkPicker
         open

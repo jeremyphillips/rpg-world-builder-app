@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { sampleEpic, sampleEpicTickets } from '../test-fixtures'
 import { EpicCard } from './epic-card'
@@ -93,7 +93,7 @@ describe('EpicCard', () => {
     expect(screen.getByText('End-to-end player character creation flows.')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <EpicCard epic={sampleEpic} counts={{ open: 1, blocked: 0, done: 0 }} recentlyActive={[]} />

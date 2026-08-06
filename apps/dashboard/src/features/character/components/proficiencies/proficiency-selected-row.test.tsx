@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { PROFICIENCY_STALE_REASON } from '@rpg/contracts'
 
@@ -60,7 +60,7 @@ describe('ProficiencySelectedRow', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const base = createProficienciesStepRogueFixture()
     const skillChoiceSetId = base.resolvedChoiceSets.find(
       (choiceSet) => choiceSet.choiceType === 'skillProficiency',

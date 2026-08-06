@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
 
@@ -18,7 +18,7 @@ describe('CharacterBuilderStepPanel', () => {
     expect(screen.getByText(/Spell selection is not required/i)).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<CharacterBuilderStepPanel stepId="equipment" status="deferred" />)
     await expectNoAxeViolations(container)
   })

@@ -3,7 +3,7 @@
  */
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -182,7 +182,7 @@ describe('FilterBar', () => {
     expect(onReset).toHaveBeenCalledTimes(1)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FilterSystemHarness initialState={{ search: 'fire', status: 'draft' }} />,
     )

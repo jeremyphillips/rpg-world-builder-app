@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ContentCardBody } from './content-card-body.client'
 
@@ -17,7 +17,7 @@ describe('ContentCardBody', () => {
     expect(screen.getByText('Harbor District')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ContentCardBody heading="Harbor District" endSlot={<button type="button">Select</button>} />,
     )

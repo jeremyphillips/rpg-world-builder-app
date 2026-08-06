@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   buildSeedCreatureTypeVocabulary,
@@ -87,7 +87,7 @@ describe('SpeciesDetailContent language affinities', () => {
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderSpeciesDetail(ELF)
 
     await expectNoAxeViolations(container)

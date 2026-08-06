@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FileDropzone } from './file-dropzone.client'
 
@@ -132,18 +132,18 @@ describe('FileDropzone', () => {
     expect(zone).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations (empty state)', async () => {
+  itAxe('has no axe accessibility violations (empty state)', async () => {
     const { container } = render(<FileDropzone value={[]} onChange={() => undefined} />)
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations (with files)', async () => {
+  itAxe('has no axe accessibility violations (with files)', async () => {
     const file = makeFile('hero.jpg', 'image/jpeg')
     const { container } = render(<FileDropzone value={[file]} onChange={() => undefined} />)
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations in disabled state', async () => {
+  itAxe('has no axe violations in disabled state', async () => {
     const { container } = render(<FileDropzone value={[]} onChange={() => undefined} disabled />)
     await expectNoAxeViolations(container)
   })

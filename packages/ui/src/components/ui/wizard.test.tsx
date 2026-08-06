@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Wizard, WizardFooter, useWizard, type WizardStepDef } from './wizard.client'
 
@@ -227,19 +227,19 @@ describe('useWizard guard', () => {
 // ---------------------------------------------------------------------------
 
 describe('Wizard accessibility', () => {
-  it('has no axe violations on step 1', async () => {
+  itAxe('has no axe violations on step 1', async () => {
     const { container } = renderWizard()
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations on step 2', async () => {
+  itAxe('has no axe violations on step 2', async () => {
     const user = userEvent.setup()
     const { container } = renderWizard()
     await user.click(screen.getByRole('button', { name: /next/i }))
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations on the review step', async () => {
+  itAxe('has no axe violations on the review step', async () => {
     const user = userEvent.setup()
     const { container } = renderWizard()
     await user.click(screen.getByRole('button', { name: /next/i }))

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FormSaveFooter } from './form-save-footer'
 
@@ -27,7 +27,7 @@ describe('FormSaveFooter', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <FormSaveFooter submitLabel="Save" isSuccess successMessage="Saved." />,
     )

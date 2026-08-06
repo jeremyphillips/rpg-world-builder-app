@@ -75,11 +75,32 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
 
 ## Accessibility
 
-Interactive components get an axe test (repo-wide WCAG 2.2 AA policy):
+Interactive components get a Vitest axe test (repo-wide WCAG 2.2 AA policy).
+**Axe runs in CI only** — local pre-commit skips it for speed; Storybook
+axe-playwright and eslint jsx-a11y still gate PRs.
+
+Dedicated axe-only blocks:
 
 ```ts
-await expectNoAxeViolations(container) // from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+
+itAxe('has no axe accessibility violations', async () => {
+  const { container } = render(<MyComponent />)
+  await expectNoAxeViolations(container)
+})
 ```
+
+Mixed behavior + axe in one block — keep `it` and call `expectNoAxeViolations`
+(it no-ops locally, runs in CI):
+
+```ts
+it('shows recoverable state and has no axe violations', async () => {
+  // behavior assertions…
+  await expectNoAxeViolations(container)
+})
+```
+
+Opt in locally: `FORCE_AXE=1 pnpm --filter @rpg/dashboard test`
 
 Do not call `axe.run` directly — the helper disables `color-contrast` (jsdom
 has no canvas; contrast runs in Storybook's addon-a11y instead).

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
@@ -31,7 +31,7 @@ describe('CharacterRelationshipIndicator', () => {
     expect(screen.getByRole('img', { name: 'Class of Aric' })).toBeInTheDocument()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderWithProviders(
       <div className="group">
         <CharacterRelationshipIndicator

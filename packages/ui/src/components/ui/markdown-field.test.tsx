@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { MarkdownField } from './markdown-field.client'
 
@@ -65,7 +65,7 @@ Body copy.`}
     expect(screen.getByText('HTML')).toHaveProperty('tagName', 'STRONG')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MarkdownField
         id="description"

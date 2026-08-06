@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ButtonDropdown } from './button-dropdown.client'
@@ -117,7 +117,7 @@ describe('ButtonDropdown', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,
     )

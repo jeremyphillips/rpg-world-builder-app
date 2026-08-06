@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { QueryClientProvider } from '@tanstack/react-query'
 import type { SessionUser } from '@rpg/contracts'
 
@@ -123,7 +123,7 @@ describe('ProfileSection', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Email already in use')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderSection()
     await screen.findByDisplayValue('Dungeon Master')
     await expectNoAxeViolations(container)

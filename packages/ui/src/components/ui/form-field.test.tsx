@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FormField } from './form-field'
 
@@ -70,7 +70,7 @@ describe('FormField', () => {
     ).toBeTruthy()
   })
 
-  it('has no axe accessibility violations with settings layout', async () => {
+  itAxe('has no axe accessibility violations with settings layout', async () => {
     const { container } = render(
       <FormField
         id="score"
@@ -127,7 +127,7 @@ describe('FormField', () => {
     expect(chromeShell?.contains(screen.getByText('Applied to every primary ability.'))).toBe(true)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FormField id="name" label="Name">
         <input id="name" />

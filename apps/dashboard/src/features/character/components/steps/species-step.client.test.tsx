@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useCallback, useMemo, useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   characterBuilderDependentChoiceMessages,
@@ -313,7 +313,7 @@ describe('SpeciesStep', () => {
     ).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const context = createElfContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),

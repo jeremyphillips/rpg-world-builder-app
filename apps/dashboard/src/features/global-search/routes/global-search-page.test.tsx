@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '@/test/render'
@@ -48,7 +48,7 @@ describe('GlobalSearchPage', () => {
     expect(screen.queryByRole('link', { name: /Fireball/i })).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderPage()
 
     await expectNoAxeViolations(container)

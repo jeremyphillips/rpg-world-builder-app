@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type FieldValues } from 'react-hook-form'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Form } from '@rpg/ui/form'
 import { z } from 'zod'
 
@@ -228,7 +228,7 @@ describe('ContentFormFooter', () => {
     expect(resetSpy).toHaveBeenCalled()
   })
 
-  it('has no axe violations in create mode', async () => {
+  itAxe('has no axe violations in create mode', async () => {
     const { container } = renderCreateFooter()
     await expectNoAxeViolations(container)
   })

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { NumberField } from './number-field'
 
@@ -22,7 +22,7 @@ describe('NumberField', () => {
     expect(screen.getByLabelText('Count')).toHaveAttribute('aria-invalid', 'true')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<NumberField id="count" label="Count" />)
     await expectNoAxeViolations(container)
   })
@@ -43,7 +43,7 @@ describe('NumberField', () => {
     expect(screen.getByText('Applied to every primary ability.')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations with settings layout', async () => {
+  itAxe('has no axe accessibility violations with settings layout', async () => {
     const { container } = render(
       <NumberField
         id="score"

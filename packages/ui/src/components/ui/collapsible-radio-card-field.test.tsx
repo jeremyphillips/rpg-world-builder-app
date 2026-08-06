@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CollapsibleRadioCardField } from './collapsible-radio-card-field'
 
@@ -110,7 +110,7 @@ describe('CollapsibleRadioCardField', () => {
     expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations in summary mode', async () => {
+  itAxe('has no axe accessibility violations in summary mode', async () => {
     const { container } = render(
       <CollapsibleRadioCardField
         id="connection-kind"

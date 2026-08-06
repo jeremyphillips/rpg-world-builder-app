@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CharacterDetailStatTile } from './character-detail-stat-tile.client'
 
@@ -46,7 +46,7 @@ describe('CharacterDetailStatTile', () => {
     expect(screen.getByText('—')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CharacterDetailStatTile label="Strength" value="15" footer={{ kind: 'meta', text: '+2' }} />,
     )

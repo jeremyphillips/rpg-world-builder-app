@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { StatusDot } from './status-dot'
 
@@ -22,7 +22,7 @@ describe('StatusDot', () => {
     expect(dot).toHaveClass('size-2.5')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<StatusDot tone="info" />)
     await expectNoAxeViolations(container)
   })

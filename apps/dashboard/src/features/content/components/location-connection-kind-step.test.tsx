@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../lib/location-connection-drawer-intent'
 import { LocationConnectionKindStep } from './location-connection-kind-step.client'
@@ -92,7 +92,7 @@ describe('LocationConnectionKindStep', () => {
     expect(screen.getByRole('radio', { name: /Controls/i })).toBeChecked()
   })
 
-  it('has no axe accessibility violations in summary mode', async () => {
+  itAxe('has no axe accessibility violations in summary mode', async () => {
     const { container } = render(
       <LocationConnectionKindStep
         id="connection-kind"

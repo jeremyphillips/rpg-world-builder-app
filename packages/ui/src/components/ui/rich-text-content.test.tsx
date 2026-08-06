@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RichTextContent } from './rich-text-content'
 
@@ -73,7 +73,7 @@ describe('RichTextContent', () => {
     expect(link).toHaveAttribute('data-link-kind', 'detail')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <RichTextContent html="<p>Trait description with a <a href='#'>link</a>.</p>" tone="muted" />,
     )

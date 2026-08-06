@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { CharacterClass } from '@rpg/contracts'
 
 import { pickClass } from '../../lib/fixtures/pick'
@@ -120,7 +120,7 @@ describe('ClassProgressionTable', () => {
     expect(level2Row?.textContent).toContain('Spellcasting')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<ClassProgressionTable characterClass={pickClass('bard')} />)
     await expectNoAxeViolations(container)
   })

@@ -1,1 +1,1 @@
-export { expectNoAxeViolations } from './axe'
+export { expectNoAxeViolations, itAxe, shouldRunAxe } from './axe'

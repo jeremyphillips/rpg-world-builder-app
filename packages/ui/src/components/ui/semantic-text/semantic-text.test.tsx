@@ -1,6 +1,6 @@
 import { TriangleAlert } from 'lucide-react'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { SemanticText } from './semantic-text'
@@ -63,7 +63,7 @@ describe('SemanticText', () => {
     expect(screen.getByTestId('icon')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <SemanticText tone="destructive" emphasis="high" icon={<TriangleAlert aria-hidden />}>
         Cannot afford

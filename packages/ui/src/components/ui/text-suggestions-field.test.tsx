@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { render, screen } from '@testing-library/react'
 import * as React from 'react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { TextSuggestionsField } from './text-suggestions-field.client'
 
@@ -202,7 +202,7 @@ describe('TextSuggestionsField', () => {
     expect(hint.compareDocumentPosition(recommended)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
-  it('passes axe checks', async () => {
+  itAxe('passes axe checks', async () => {
     const { container } = render(
       <TextSuggestionsField
         id="specialization"

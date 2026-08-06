@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
@@ -38,7 +38,7 @@ describe('CampaignOnboardingIncompleteAlert', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CampaignOnboardingIncompleteAlert campaign={incompleteCampaign} />,
     )

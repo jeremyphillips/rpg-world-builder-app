@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
@@ -28,7 +28,7 @@ describe('SpellResolutionSelectionModeSelect', () => {
     })
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<SelectionModeHarness />)
 
     await waitFor(() => {

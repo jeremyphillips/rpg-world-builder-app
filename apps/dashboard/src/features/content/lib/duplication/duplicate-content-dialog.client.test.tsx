@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { DuplicateContentDialog } from './duplicate-content-dialog.client'
 import { contentOverviewListQueryKey } from '../overview/content-overview-query-keys'
@@ -78,7 +78,7 @@ describe('DuplicateContentDialog', () => {
     expect(await screen.findByText('Edit destination')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when open', async () => {
+  itAxe('has no axe accessibility violations when open', async () => {
     const user = userEvent.setup()
     const { container } = renderDialog()
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ContentSource, ResolvedContentCampaignAccess } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ContentEditHeadingBadges } from './content-edit-heading-badges.client'
 
@@ -52,7 +52,7 @@ describe('ContentEditHeadingBadges', () => {
     expect(screen.queryByText('Inactive')).not.toBeInTheDocument()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderBadges({ source: 'homebrew', status: 'draft' })
     await expectNoAxeViolations(container)
   })

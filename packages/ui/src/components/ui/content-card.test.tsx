@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Badge } from './badge'
 import { ContentCardHeadingAction, ContentCardIconAction } from './content-card-actions.client'
@@ -186,7 +186,7 @@ describe('ContentCard', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ContentCard
         heading="Harbor District"

@@ -3,7 +3,7 @@
  */
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
@@ -115,7 +115,7 @@ describe('SpellResolutionOutcomeApplicationRow', () => {
     })
   })
 
-  it('has no axe accessibility violations for a complete row', async () => {
+  itAxe('has no axe accessibility violations for a complete row', async () => {
     const { container } = render(
       <ApplicationsListHarness defaultResolution={RESOLUTION_FORM_FIXTURES.eldritchBlast} />,
     )

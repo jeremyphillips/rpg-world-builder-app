@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 
@@ -28,7 +28,7 @@ describe('PersonalWorkspaceTopbarTitle', () => {
     ).toBeTruthy()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <PersonalWorkspaceTopbarTitle />

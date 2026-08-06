@@ -5,7 +5,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { DataTableFilterRegion } from './data-table-filter-region.client'
 
@@ -89,7 +89,7 @@ describe('DataTableFilterRegion', () => {
     expect(spacer).not.toHaveClass('leading-none')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <DataTableFilterRegion
         primaryFilters={<input aria-label="Search" />}

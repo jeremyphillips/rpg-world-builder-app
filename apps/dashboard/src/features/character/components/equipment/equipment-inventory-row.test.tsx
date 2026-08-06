@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { equipmentStepBardClassFixture } from '../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
@@ -157,7 +157,7 @@ describe('EquipmentInventoryRowItem', () => {
     expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(0)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentInventoryRowItem
         display={{ kind: 'single', row: editableStackableRow }}
@@ -169,7 +169,7 @@ describe('EquipmentInventoryRowItem', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with staged removal', async () => {
+  itAxe('has no axe accessibility violations with staged removal', async () => {
     const { container } = render(
       <EquipmentInventoryRowItem
         display={{ kind: 'single', row: editableStackableRow }}

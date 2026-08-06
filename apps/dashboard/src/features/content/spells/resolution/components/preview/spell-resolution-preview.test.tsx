@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { Form } from '@rpg/ui/form'
 import { z } from 'zod'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
@@ -78,7 +78,7 @@ describe('SpellResolutionPreview', () => {
     expect(screen.getByRole('status')).toHaveTextContent(/configure resolution/i)
   })
 
-  it('has no axe accessibility violations with eldritch blast fixture', async () => {
+  itAxe('has no axe accessibility violations with eldritch blast fixture', async () => {
     const { container } = render(
       <Form
         schema={previewSchema}
@@ -101,7 +101,7 @@ describe('SpellResolutionPreview', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with chill touch fixture', async () => {
+  itAxe('has no axe accessibility violations with chill touch fixture', async () => {
     const { container } = render(
       <Form
         schema={previewSchema}

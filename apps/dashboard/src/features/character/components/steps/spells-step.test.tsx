@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   buildCharacterPreview,
@@ -173,7 +173,7 @@ describe('SpellsStep', () => {
     expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations for a wizard draft', async () => {
+  itAxe('has no axe accessibility violations for a wizard draft', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: spellsStepWizardClass.id, level: 1 as const },

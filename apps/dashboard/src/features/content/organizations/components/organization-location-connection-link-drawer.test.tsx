@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import type { Location, Organization } from '@rpg/contracts'
 
@@ -237,7 +237,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations in kind summary mode', async () => {
+  itAxe('has no axe accessibility violations in kind summary mode', async () => {
     const user = userEvent.setup()
 
     const { container } = render(

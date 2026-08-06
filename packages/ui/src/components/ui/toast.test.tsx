@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ToastPresentation } from './toast.client'
 import { getToastState, resolveToastDuration, toast } from './toast-manager.client'
@@ -38,7 +38,7 @@ describe('ToastPresentation', () => {
     expect(onDismiss).toHaveBeenCalledOnce()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ToastPresentation
         tone="success"
@@ -123,7 +123,7 @@ describe('ToastProvider', () => {
     expect(await screen.findByText('Character saved')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations on the managed toast path', async () => {
+  itAxe('has no axe accessibility violations on the managed toast path', async () => {
     toast.dismissAll()
 
     const { container } = render(

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { sampleTicket } from '../test-fixtures'
 
@@ -32,7 +32,7 @@ describe('TicketMeta', () => {
     ).toHaveAttribute('href', `/bench/tickets/${sampleTicket.id}`)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <TicketMeta ticket={sampleTicket} detailHref={`/bench/tickets/${sampleTicket.id}`} />

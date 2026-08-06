@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
@@ -66,7 +66,7 @@ describe('Sheet', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when open', async () => {
+  itAxe('has no axe accessibility violations when open', async () => {
     const user = userEvent.setup()
     renderSheet()
     await user.click(screen.getByRole('button', { name: 'Open sheet' }))

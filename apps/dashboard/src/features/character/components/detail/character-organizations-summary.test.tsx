@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CITY_COUNCIL } from '@/features/content'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
@@ -42,7 +42,7 @@ describe('CharacterOrganizationsSummary', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <CharacterOrganizationsSummary

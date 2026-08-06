@@ -3,7 +3,7 @@
  */
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { NavSection } from './nav-section'
 
@@ -19,7 +19,7 @@ describe('NavSection', () => {
     expect(screen.getByRole('link', { name: 'Characters' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <NavSection label="Workspace">
         <a href="/characters">Characters</a>

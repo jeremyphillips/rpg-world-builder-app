@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
@@ -45,7 +45,7 @@ describe('NameGeneratorResultRow', () => {
     })
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<NameGeneratorResultRow result={FIXTURE_RESULT} rowKey="row-1" />)
 
     await expectNoAxeViolations(container)

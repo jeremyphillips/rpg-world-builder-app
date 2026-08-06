@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignOverviewInvitationsSection } from './campaign-overview-invitations-section'
 
@@ -36,7 +36,7 @@ describe('CampaignOverviewInvitationsSection', () => {
     expect(screen.queryByText(/^Sent /)).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderInvitations(
       <CampaignOverviewInvitationsSection campaignId="camp_1" invites={[]} />,
     )

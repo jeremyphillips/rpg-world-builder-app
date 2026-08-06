@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { buildLocationDetailViewModel } from '../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST } from '../fixtures'
@@ -27,7 +27,7 @@ describe('LocationDetailIdentity', () => {
     expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const identity = buildLocationDetailViewModel(HARBORFORD, {
       locations: LOCATIONS_LIST,
       campaignId: 'camp_1',
@@ -59,7 +59,7 @@ describe('ContentEntityCard (location rows)', () => {
     expect(screen.getByText('District')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <ContentEntityCard heading="Dock Ward" subheading="District" />

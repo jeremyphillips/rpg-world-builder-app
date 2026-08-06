@@ -304,10 +304,11 @@ index.ts            # barrel re-export
 3. Re-export it from `src/index.ts`.
 4. Add a co-located `<name>.stories.tsx` for **every** component (CSF3), and a
    co-located `<name>.test.tsx` for logic-bearing or interactive components. Every
-   UI/interactive component must pass vitest-axe and the Storybook test runner's
-   axe-playwright check, and introduce no `eslint-plugin-jsx-a11y` violations
-   (target WCAG 2.2 AA); never suppress axe rules globally. In tests, use
-   `expectNoAxeViolations(container)` from `@rpg/ui/test-utils` — it runs axe with
+   UI/interactive component must pass Vitest axe (CI-only via `itAxe` /
+   `expectNoAxeViolations`; local `FORCE_AXE=1` to opt in), Storybook
+   axe-playwright on PRs, and no `eslint-plugin-jsx-a11y` violations (target
+   WCAG 2.2 AA); never suppress axe rules globally. In tests, use `itAxe` for
+   axe-only blocks and `expectNoAxeViolations(container)` — it runs axe with
    `color-contrast` disabled (jsdom has no canvas; contrast is covered by
    Storybook's addon-a11y in a real browser).
 

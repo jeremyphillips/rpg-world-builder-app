@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
@@ -83,7 +83,7 @@ describe('Modal', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when open', async () => {
+  itAxe('has no axe accessibility violations when open', async () => {
     const user = userEvent.setup()
     renderModal()
     await user.click(screen.getByRole('button', { name: 'Open' }))
