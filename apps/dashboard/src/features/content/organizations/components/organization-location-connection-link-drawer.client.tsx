@@ -20,10 +20,13 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
-  ORGANIZATION_DRAWER_EDIT_TITLES,
+  ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
+  ORGANIZATION_DRAWER_CHANGE_KIND_TITLE,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
@@ -232,7 +235,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
     selectedLocation,
   ])
 
-  const showLocationPicker = Boolean(activeKind)
+  const showLocationPicker = mode === 'add' && Boolean(activeKind)
   const canSubmit = Boolean(selectedLocationId && activeKind && !isSubmitting)
 
   const handleKindChange = (value: string) => {
@@ -266,7 +269,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       ? resolveOrganizationForwardAddDrawerTitle(resolvedAddKind)
       : mode === 'add'
         ? ORGANIZATION_DRAWER_ADD_TITLES[intent]
-        : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
+        : ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
 
   const instructionCopy =
     mode === 'add' && resolvedAddKind
@@ -283,7 +286,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       ? resolveOrganizationForwardAddSubmitLabel(resolvedAddKind)
       : mode === 'add'
         ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
-        : 'Save connection'
+        : ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
   const organizationContext = `${organization.name} · ${getOrganizationKindLabel(organization.organizationKind)}`
@@ -321,7 +324,13 @@ function OrganizationLocationConnectionLinkDrawerContent({
               changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
             />
           ) : null}
-          {mode === 'edit' && selectedLocation && editKindOptions.length > 1 ? (
+          {mode === 'edit' && selectedLocation ? (
+            <RelationshipDrawerSubjectField
+              label={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
+              value={selectedLocation.name}
+            />
+          ) : null}
+          {mode === 'edit' && selectedLocation && editKindOptions.length > 0 ? (
             <LocationConnectionKindStep
               id="organization-location-connection-edit-kind"
               label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
@@ -341,14 +350,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
         </div>
       }
       emptyState={
-        !showLocationPicker ? (
+        !showLocationPicker && mode === 'add' ? (
           <Text variant="muted" className="text-sm" role="status">
             {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
           </Text>
         ) : undefined
       }
       footer={
-        showLocationPicker ? (
+        (showLocationPicker || mode === 'edit') && activeKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>

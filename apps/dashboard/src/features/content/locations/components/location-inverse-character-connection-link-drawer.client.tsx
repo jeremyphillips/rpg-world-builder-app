@@ -19,10 +19,14 @@ import {
 
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
+  LOCATION_INVERSE_CHARACTER_CHANGE_KIND_SUBMIT_LABEL,
+  LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { RELATIONSHIP_DRAWER_CHARACTER_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
@@ -41,7 +45,6 @@ import {
 } from '../lib/location-connection-surface-copy'
 import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
 
-export const LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE = 'Edit character connection'
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
 
@@ -116,24 +119,47 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   )
 
   const kindOptions = React.useMemo(() => {
-    if (!selectedCharacterId || resolvedAddKind) return []
+    if (resolvedAddKind) return []
+    const characterId = selectedCharacterId ?? initialConnection?.characterId
+    if (!characterId) return []
     const disabledKinds = new Set(
       eligibleKinds.filter((kind) =>
-        existingKeys.has(subjectLocationConnectionKey(selectedCharacterId, kind)),
+        existingKeys.has(subjectLocationConnectionKey(characterId, kind)),
       ),
     )
     return buildCharacterLocationConnectionKindOptions(eligibleKinds, disabledKinds)
-  }, [eligibleKinds, existingKeys, resolvedAddKind, selectedCharacterId])
+  }, [
+    eligibleKinds,
+    existingKeys,
+    initialConnection?.characterId,
+    resolvedAddKind,
+    selectedCharacterId,
+  ])
 
   const activeKind = (() => {
     if (resolvedAddKind) return resolvedAddKind
+    if (mode === 'edit') {
+      return selectedKind ?? initialConnection?.kind ?? null
+    }
     return resolveActiveConnectionKind(
       selectedKind,
       kindOptions,
     ) as CharacterLocationConnectionKind | null
   })()
 
-  const showKindStep = mode === 'add' && !resolvedAddKind && Boolean(selectedCharacterId)
+  const showKindStep =
+    (mode === 'edit' || (mode === 'add' && !resolvedAddKind)) &&
+    Boolean(selectedCharacterId ?? initialConnection?.characterId)
+
+  const lockedCharacter = React.useMemo(
+    () =>
+      mode === 'edit'
+        ? characters.find((character) => character.id === initialConnection?.characterId)
+        : undefined,
+    [characters, initialConnection?.characterId, mode],
+  )
+
+  const showCharacterPicker = mode === 'add'
 
   const canSubmit = Boolean(selectedCharacterId && activeKind && !isSubmitting)
 
@@ -147,7 +173,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       ? resolveLocationInverseCharacterAddDrawerTitle(resolvedAddKind)
       : mode === 'add'
         ? 'Link character'
-        : LOCATION_INVERSE_CHARACTER_LINK_DRAWER_EDIT_TITLE
+        : LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE
 
   const instructionCopy =
     mode === 'add' && resolvedAddKind
@@ -159,7 +185,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       ? resolveLocationInverseCharacterAddSubmitLabel(resolvedAddKind)
       : mode === 'add'
         ? 'Link character'
-        : 'Save connection'
+        : LOCATION_INVERSE_CHARACTER_CHANGE_KIND_SUBMIT_LABEL
 
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
@@ -171,6 +197,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
       searchPlaceholder="Search characters"
+      searchDisabled={!showCharacterPicker}
       noResultsMessage="No matches for this search."
       noItemsMessage="No characters are available."
       headerBelowDescription={
@@ -178,6 +205,12 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
           <RelationshipDrawerContextHeader
             context={resolveTerritorialAuthorityLocationContext(location)}
           />
+          {mode === 'edit' && lockedCharacter ? (
+            <RelationshipDrawerSubjectField
+              label={RELATIONSHIP_DRAWER_CHARACTER_FIELD_LABEL}
+              value={lockedCharacter.name}
+            />
+          ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
@@ -202,13 +235,13 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         ) : undefined
       }
       footer={
-        selectedCharacterId && activeKind ? (
+        activeKind && (mode === 'edit' || selectedCharacterId) ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>
         ) : undefined
       }
-      items={characters}
+      items={showCharacterPicker ? characters : []}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={(character) => [character.name, character.summary].join(' ')}

@@ -9,6 +9,7 @@ import {
   LocationConnectedPartiesSection,
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
 } from './location-connected-parties-section.client'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 
 const sampleRows = [
   {
@@ -19,6 +20,23 @@ const sampleRows = [
     family: 'territorial_authority',
     priority: 50,
     sectionGroup: 'territorial_authority' as const,
+  },
+]
+
+const peopleOrganizationRows = [
+  {
+    relationshipId: 'rel-org-hq',
+    subject: {
+      type: 'organization' as const,
+      id: 'org-guild',
+      name: "Thieves' Guild",
+      slug: 'thieves-guild',
+    },
+    kind: 'headquarters',
+    label: 'Headquarters',
+    family: 'site',
+    priority: 60,
+    sectionGroup: 'people_and_organizations' as const,
   },
 ]
 
@@ -41,6 +59,10 @@ const peopleNpcRows = [
 ]
 
 const peopleKindSlots = [
+  {
+    heading: 'Headquarters',
+    bindings: [{ subjectType: 'organization' as const, kind: 'headquarters' as const }],
+  },
   {
     heading: 'Operates in',
     bindings: [{ subjectType: 'organization' as const, kind: 'operates_in' as const }],
@@ -90,7 +112,7 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
 
-  it('shows per-kind people section scaffolding when empty', () => {
+  it('renders a family empty state without per-kind empty groups', () => {
     render(
       <MemoryRouter>
         <LocationConnectedPartiesSection
@@ -100,7 +122,8 @@ describe('LocationConnectedPartiesSection', () => {
           canManage
           showEmptySection
           peopleKindSlots={peopleKindSlots}
-          onAddPeopleKindSlot={() => undefined}
+          canAddToPeopleSection
+          onAddPeopleSection={() => undefined}
         />
       </MemoryRouter>,
     )
@@ -109,10 +132,36 @@ describe('LocationConnectedPartiesSection', () => {
       screen.getByText(LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations),
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'People & organizations' })).toBeInTheDocument()
-    expect(screen.getByText('Operates in')).toBeInTheDocument()
-    expect(screen.getByText('Works at')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add organization presence' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add worker' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: LOCATION_PEOPLE_SECTION_SURFACE_COPY.add }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Operates in')).not.toBeInTheDocument()
+    expect(screen.queryByText('Works at')).not.toBeInTheDocument()
+    expect(screen.queryByText('No owners linked.')).not.toBeInTheDocument()
+  })
+
+  it('renders only populated kind groups with a quiet family add action', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          sectionGroup="people_and_organizations"
+          rows={peopleOrganizationRows}
+          canManage
+          showEmptySection
+          peopleKindSlots={peopleKindSlots}
+          canAddToPeopleSection
+          onAddPeopleSection={() => undefined}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText("Thieves' Guild")).toBeInTheDocument()
+    expect(screen.getByText('Headquarters')).toBeInTheDocument()
+    expect(screen.queryByText('Operates in')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: `+ ${LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}` }),
+    ).toBeInTheDocument()
   })
 
   it('invokes per-kind territorial add callbacks from slot actions', async () => {

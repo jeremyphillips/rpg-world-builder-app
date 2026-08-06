@@ -52,6 +52,14 @@ export const LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON = 'Already linked'
 
 export const LOCATION_CONNECTION_KIND_CHANGE_LABEL = 'Change connection type'
 
+export const ORGANIZATION_DRAWER_CHANGE_KIND_TITLE = 'Change connection type'
+
+export const ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL = 'Change connection'
+
+export const LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE = 'Change connection type'
+
+export const LOCATION_INVERSE_CHARACTER_CHANGE_KIND_SUBMIT_LABEL = 'Change connection'
+
 export const ORGANIZATION_DRAWER_FULLY_LINKED_REASONS: Record<
   OrganizationConnectionDrawerIntent,
   string

@@ -18,6 +18,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
+import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
 import {
@@ -28,6 +29,12 @@ import {
   organizationInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
 import { buildSubjectLocationConnectionKeySet } from '../../lib/location-connection-duplicate-keys'
+import {
+  buildPeopleSectionKindOptions,
+  resolveActiveConnectionKind,
+  resolvePeopleKindSlotFromOptionValue,
+} from '../../lib/location-connection-kind-options'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
   resolveLocationInverseCharacterAddSubmitLabel,
@@ -51,7 +58,7 @@ import {
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  slot: PeopleKindSlot
+  kindSlots: readonly PeopleKindSlot[]
   location: Location
   organizations: readonly Organization[]
   characters: readonly LocationPartyCharacterOption[]
@@ -74,6 +81,8 @@ const SUBJECT_TYPE_SEGMENT_OPTIONS = [
   { value: 'organization' as const, label: 'Organization' },
 ]
 
+const PEOPLE_DRAWER_KIND_CHANGE_LABEL = 'Change'
+
 function resolveActiveBinding(
   slot: PeopleKindSlot,
   subjectType: PeopleConnectionSubjectType | null,
@@ -87,7 +96,7 @@ function resolveActiveBinding(
 export function LocationInversePeopleConnectionLinkDrawer(
   props: LocationInversePeopleConnectionLinkDrawerProps,
 ) {
-  const remountKey = props.open ? props.slot.heading : 'closed'
+  const remountKey = props.open ? `${props.location.id}:open` : 'closed'
   return <LocationInversePeopleConnectionLinkDrawerContent key={remountKey} {...props} />
 }
 
@@ -95,7 +104,7 @@ export function LocationInversePeopleConnectionLinkDrawer(
 function LocationInversePeopleConnectionLinkDrawerContent({
   open,
   onOpenChange,
-  slot,
+  kindSlots,
   location,
   organizations,
   characters,
@@ -106,33 +115,73 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onOrganizationSubmit,
   onCharacterSubmit,
 }: LocationInversePeopleConnectionLinkDrawerProps) {
-  const selectableSubjectTypes = React.useMemo(
+  const organizationIds = React.useMemo(
+    () => organizations.map((organization) => organization.id),
+    [organizations],
+  )
+  const characterIds = React.useMemo(
+    () => characters.map((character) => character.id),
+    [characters],
+  )
+
+  const kindOptions = React.useMemo(
     () =>
-      resolvePeopleKindSlotSelectableSubjectTypes({
-        slot,
+      buildPeopleSectionKindOptions({
+        kindSlots,
+        locationId: location.id,
+        rows: connectedPartyRows,
+        organizationIds,
+        characterIds,
         canAddOrganization,
         canAddCharacter,
       }),
-    [canAddCharacter, canAddOrganization, slot],
+    [
+      canAddCharacter,
+      canAddOrganization,
+      characterIds,
+      connectedPartyRows,
+      kindSlots,
+      location.id,
+      organizationIds,
+    ],
   )
 
-  const [subjectType, setSubjectType] = React.useState<PeopleConnectionSubjectType | null>(
-    selectableSubjectTypes[0] ?? null,
-  )
+  const [selectedSlotKey, setSelectedSlotKey] = React.useState<string | null>(null)
+  const [subjectTypeOverride, setSubjectTypeOverride] =
+    React.useState<PeopleConnectionSubjectType | null>(null)
   const [selectedOrganizationId, setSelectedOrganizationId] = React.useState<string | null>(null)
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(null)
 
-  React.useEffect(() => {
-    if (!open) {
-      return
-    }
-    setSubjectType(selectableSubjectTypes[0] ?? null)
+  const activeSlotKey = resolveActiveConnectionKind(selectedSlotKey, kindOptions)
+  const activeSlot = activeSlotKey
+    ? resolvePeopleKindSlotFromOptionValue(kindSlots, activeSlotKey)
+    : undefined
+
+  const selectableSubjectTypes = React.useMemo(
+    () =>
+      activeSlot
+        ? resolvePeopleKindSlotSelectableSubjectTypes({
+            slot: activeSlot,
+            canAddOrganization,
+            canAddCharacter,
+          })
+        : [],
+    [activeSlot, canAddCharacter, canAddOrganization],
+  )
+
+  const effectiveSubjectType = subjectTypeOverride ?? selectableSubjectTypes[0] ?? null
+  const showSubjectTypeSegment = Boolean(activeSlot && selectableSubjectTypes.length > 1)
+  const showEntityPicker = Boolean(activeSlot)
+  const effectiveBinding = activeSlot
+    ? resolveActiveBinding(activeSlot, effectiveSubjectType)
+    : undefined
+
+  const handleSlotKeyChange = (value: string) => {
+    setSelectedSlotKey(value)
+    setSubjectTypeOverride(null)
     setSelectedOrganizationId(null)
     setSelectedCharacterId(null)
-  }, [open, selectableSubjectTypes, slot.heading])
-
-  const activeBinding = resolveActiveBinding(slot, subjectType)
-  const showSubjectTypeSegment = selectableSubjectTypes.length > 1
+  }
 
   const orgRows = React.useMemo(
     () => connectedPartyRows.filter((row) => row.subject.type === 'organization'),
@@ -150,8 +199,9 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   )
 
   const organizationKind =
-    activeBinding?.subjectType === 'organization' ? activeBinding.kind : undefined
-  const characterKind = activeBinding?.subjectType === 'character' ? activeBinding.kind : undefined
+    effectiveBinding?.subjectType === 'organization' ? effectiveBinding.kind : undefined
+  const characterKind =
+    effectiveBinding?.subjectType === 'character' ? effectiveBinding.kind : undefined
 
   const organizationIntent = organizationKind
     ? organizationDrawerIntentFromKind(organizationKind)
@@ -177,31 +227,37 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     if (characterKind) {
       return resolveLocationInverseCharacterAddSubmitLabel(characterKind)
     }
-    return resolvePeopleKindSlotAddLabel(slot)
+    if (activeSlot) {
+      return resolvePeopleKindSlotAddLabel(activeSlot)
+    }
+    return LOCATION_PEOPLE_SECTION_SURFACE_COPY.add
   })()
 
   const canSubmit = Boolean(
     !isSubmitting &&
-    ((subjectType === 'organization' &&
+    ((effectiveSubjectType === 'organization' &&
       selectedOrganizationId &&
       organizationKind &&
       canAddOrganization) ||
-      (subjectType === 'character' && selectedCharacterId && characterKind && canAddCharacter)),
+      (effectiveSubjectType === 'character' &&
+        selectedCharacterId &&
+        characterKind &&
+        canAddCharacter)),
   )
 
   const handleSubmit = async () => {
-    if (subjectType === 'organization' && selectedOrganizationId && organizationKind) {
+    if (effectiveSubjectType === 'organization' && selectedOrganizationId && organizationKind) {
       await onOrganizationSubmit({ organizationId: selectedOrganizationId, kind: organizationKind })
       return
     }
 
-    if (subjectType === 'character' && selectedCharacterId && characterKind) {
+    if (effectiveSubjectType === 'character' && selectedCharacterId && characterKind) {
       await onCharacterSubmit({ characterId: selectedCharacterId, kind: characterKind })
     }
   }
 
   const handleSubjectTypeChange = (nextSubjectType: PeopleConnectionSubjectType) => {
-    setSubjectType(nextSubjectType)
+    setSubjectTypeOverride(nextSubjectType)
     setSelectedOrganizationId(null)
     setSelectedCharacterId(null)
   }
@@ -216,14 +272,24 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       <RelationshipDrawerContextHeader
         context={resolveTerritorialAuthorityLocationContext(location)}
       />
-      {showSubjectTypeSegment ? (
+      {kindOptions.length > 0 ? (
+        <LocationConnectionKindStep
+          id="location-people-connection-kind"
+          label={LOCATION_PEOPLE_SECTION_SURFACE_COPY.kindFieldLabel}
+          options={kindOptions}
+          value={activeSlotKey}
+          onValueChange={handleSlotKeyChange}
+          changeLabel={PEOPLE_DRAWER_KIND_CHANGE_LABEL}
+        />
+      ) : null}
+      {showSubjectTypeSegment && activeSlot ? (
         <div className="space-y-2">
           <Eyebrow size="sm" className="mb-0">
-            {resolvePeopleKindSlotSubjectTypeFieldLabel(slot)}
+            {resolvePeopleKindSlotSubjectTypeFieldLabel(activeSlot)}
           </Eyebrow>
           <SegmentedControl
-            aria-label={resolvePeopleKindSlotSubjectTypeFieldLabel(slot)}
-            value={subjectType}
+            aria-label={resolvePeopleKindSlotSubjectTypeFieldLabel(activeSlot)}
+            value={effectiveSubjectType}
             options={SUBJECT_TYPE_SEGMENT_OPTIONS.filter((option) =>
               selectableSubjectTypes.includes(option.value),
             )}
@@ -243,27 +309,33 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   const sharedSheetProps = {
     open,
     onOpenChange,
-    title: resolvePeopleKindSlotAddLabel(slot),
+    title: LOCATION_PEOPLE_SECTION_SURFACE_COPY.addDrawerTitle,
     ...catalogPickerShellProps(),
     rowLayout: 'entity-card' as const,
     headerBelowDescription,
+    searchDisabled: !showEntityPicker,
     noResultsMessage: 'No matches for this search.',
+    emptyState: !showEntityPicker ? (
+      <Text variant="muted" className="text-sm" role="status">
+        {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
+      </Text>
+    ) : undefined,
   }
 
-  if (subjectType === 'organization') {
+  if (effectiveSubjectType === 'organization') {
     return (
       <CatalogPickerSheet
         {...sharedSheetProps}
         searchPlaceholder="Search organizations"
         noItemsMessage="No organizations are available."
         footer={
-          selectedOrganizationId && organizationKind ? (
+          showEntityPicker && selectedOrganizationId && organizationKind ? (
             <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
               {submitLabel}
             </Button>
           ) : undefined
         }
-        items={organizations}
+        items={showEntityPicker ? organizations : []}
         getItemKey={(organization) => organization.id}
         getItemToolbarLabel={(organization) => organization.name}
         getSearchText={(organization) =>
@@ -315,13 +387,13 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       searchPlaceholder="Search characters"
       noItemsMessage="No characters are available."
       footer={
-        selectedCharacterId && characterKind ? (
+        showEntityPicker && selectedCharacterId && characterKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>
         ) : undefined
       }
-      items={characters}
+      items={showEntityPicker ? characters : []}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={(character) => [character.name, character.summary].join(' ')}

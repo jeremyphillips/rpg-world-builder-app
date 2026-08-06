@@ -19,8 +19,7 @@ export const LOCATION_CONNECTED_PARTIES_SECTION_HELPERS: Record<
   string
 > = {
   territorial_authority: TERRITORIAL_AUTHORITY_SECTION_HELPER,
-  people_and_organizations:
-    'Characters and organizations with ownership, occupancy, operations, or geographic presence here.',
+  people_and_organizations: 'Characters and organizations connected to this location.',
 }
 
 export const LOCATION_CONNECTED_PARTIES_EMPTY_TEXT: Record<
@@ -28,5 +27,12 @@ export const LOCATION_CONNECTED_PARTIES_EMPTY_TEXT: Record<
   string
 > = {
   territorial_authority: TERRITORIAL_AUTHORITY_SECTION_EMPTY,
-  people_and_organizations: 'No people or organizations linked yet.',
+  people_and_organizations: 'No people or organizations linked.',
 }
+
+export const LOCATION_PEOPLE_SECTION_SURFACE_COPY = {
+  add: 'Add relationship',
+  addDrawerTitle: 'Add relationship',
+  kindFieldLabel: 'Relationship type',
+  chooseKindMessage: 'Choose a relationship type to see eligible people and organizations.',
+} as const

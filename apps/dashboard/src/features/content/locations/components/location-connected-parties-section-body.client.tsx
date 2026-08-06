@@ -23,7 +23,8 @@ type LocationConnectedPartiesSectionBodyProps = {
   sectionHeadingId: string
   peopleKindSlots: readonly PeopleKindSlot[]
   canManage: boolean
-  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
+  canAddToPeopleSection?: boolean
+  onAddPeopleSection?: () => void
   onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onChangeTerritorialKind?: (input: LocationConnectedPartyEditTarget) => void
@@ -44,7 +45,8 @@ export function LocationConnectedPartiesSectionBody({
   sectionHeadingId,
   peopleKindSlots,
   canManage,
-  onAddPeopleKindSlot,
+  canAddToPeopleSection,
+  onAddPeopleSection,
   onAddTerritorialKind,
   onEditConnection,
   onChangeTerritorialKind,
@@ -84,17 +86,14 @@ export function LocationConnectedPartiesSectionBody({
       rows={sectionRows}
       kindSlots={peopleKindSlots}
       canManage={canManage}
+      canAddToSection={canAddToPeopleSection}
       heading={LOCATION_CONNECTED_PARTIES_SECTION_LABELS.people_and_organizations}
       headingId={sectionHeadingId}
       helper={
         canManage ? LOCATION_CONNECTED_PARTIES_SECTION_HELPERS.people_and_organizations : undefined
       }
-      sectionEmpty={
-        canManage && sectionRows.length === 0
-          ? LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations
-          : undefined
-      }
-      onAddPeopleKindSlot={onAddPeopleKindSlot}
+      sectionEmpty={LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations}
+      onAddPeopleSection={onAddPeopleSection}
       onEditConnection={onEditConnection}
       onRemoveConnection={onRemoveConnection}
       canEditRow={canEditRow}

@@ -183,6 +183,40 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
 
+  it('opens change-kind edit with collapsed relationship type and fixed location', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="edit"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[buildingLocation()]}
+        existingConnections={[{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
+    expect(screen.getByText('Location')).toBeInTheDocument()
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Headquarters' })).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search locations…' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
+  })
+
   it('clears an incompatible selected location when changing kind', async () => {
     const user = userEvent.setup()
 

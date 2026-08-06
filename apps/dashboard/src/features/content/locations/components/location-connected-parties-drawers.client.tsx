@@ -86,7 +86,7 @@ function LocationConnectedPeopleDrawer({ location, detail }: LocationConnectedPa
       onOpenChange={(open) => {
         if (!open) detail.setPeopleDrawerState(null)
       }}
-      slot={drawerState.slot}
+      kindSlots={detail.peopleKindSlots}
       location={location}
       organizations={detail.organizations}
       characters={detail.characterOptions}

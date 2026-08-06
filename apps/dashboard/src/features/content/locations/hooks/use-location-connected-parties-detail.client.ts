@@ -42,9 +42,9 @@ import {
   resolveTerritorialSectionOrganizationAddAffordances,
 } from '../../lib/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
+import { peopleSectionHasAvailableTarget } from '../../lib/location-connection-kind-options'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
-import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
@@ -88,7 +88,7 @@ type CharacterDrawerState =
     }
 
 type PeopleDrawerState = {
-  slot: PeopleKindSlot
+  mode: 'add'
 }
 
 async function upsertOrganizationInverseConnection(input: {
@@ -218,6 +218,41 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
         characterKinds: eligibility.characterKinds,
       }),
     [eligibility.characterKinds, eligibility.organizationKinds],
+  )
+
+  const organizationIds = React.useMemo(
+    () => (organizationsQuery.data ?? []).map((organization) => organization.id),
+    [organizationsQuery.data],
+  )
+
+  const characterIds = React.useMemo(
+    () => characterOptions.map((character) => character.id),
+    [characterOptions],
+  )
+
+  const canAddToPeopleSection = React.useMemo(
+    () =>
+      canWriteInverse &&
+      peopleSectionHasAvailableTarget({
+        kindSlots: peopleKindSlots,
+        locationId,
+        rows,
+        organizationIds,
+        characterIds,
+        canAddOrganization: canInverseWriteLocationConnectionForOwner('organizations'),
+        canAddCharacter:
+          canInverseWriteLocationConnectionForOwner('characters') &&
+          eligibility.characterKinds.length > 0,
+      }),
+    [
+      canWriteInverse,
+      characterIds,
+      eligibility.characterKinds.length,
+      locationId,
+      organizationIds,
+      peopleKindSlots,
+      rows,
+    ],
   )
 
   const invalidate = React.useCallback(
@@ -399,8 +434,8 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     setCharacterDrawerState({ mode: 'add', kind })
   }, [])
 
-  const openPeopleKindSlotAdd = React.useCallback((slot: PeopleKindSlot) => {
-    setPeopleDrawerState({ slot })
+  const openPeopleSectionAdd = React.useCallback(() => {
+    setPeopleDrawerState({ mode: 'add' })
   }, [])
 
   const handleChangeTerritorialKind = React.useCallback(
@@ -487,7 +522,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     openOrganizationAddKind,
     openTerritorialAddDrawer,
     openCharacterAddKind,
-    openPeopleKindSlotAdd,
+    openPeopleSectionAdd,
     handleRemoveConnection,
     handleOrganizationSubmit,
     handleCharacterSubmit,
@@ -514,6 +549,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     territorialOrganizationAddAffordances,
     peopleOrganizationAddAffordances,
     peopleKindSlots,
+    canAddToPeopleSection,
     canAddCharacter:
       canWriteInverse &&
       canInverseWriteLocationConnectionForOwner('characters') &&

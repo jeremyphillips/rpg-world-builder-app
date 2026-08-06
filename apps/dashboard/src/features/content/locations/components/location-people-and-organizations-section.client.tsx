@@ -1,8 +1,7 @@
 'use client'
 
 import type { LocationConnectedPartyRow } from '@rpg/contracts'
-import { Plus } from 'lucide-react'
-import { Button, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
@@ -12,19 +11,12 @@ import {
 } from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import type { RelationshipOverflowAction } from '../../lib/relationship/relationship-overflow-menu.client'
-import {
-  LOCATION_INVERSE_CHARACTER_SURFACE_COPY,
-  LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY,
-  LOCATION_INVERSE_PEOPLE_OVERFLOW,
-} from '../lib/location-connection-surface-copy'
-import type {
-  PeopleKindBinding,
-  PeopleKindSlot,
-} from '../lib/location-connected-parties-people-kind-slots'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
+import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../lib/location-connection-surface-copy'
+import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import {
   peopleKindBindingKey,
   peopleKindSlotKey,
-  resolvePeopleKindSlotAddLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
 import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
@@ -87,13 +79,6 @@ function buildPeopleOverflowActions(input: {
   return actions
 }
 
-function resolveBindingEmptyLabel(binding: PeopleKindBinding): string {
-  if (binding.subjectType === 'organization') {
-    return LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY[binding.kind].empty
-  }
-  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[binding.kind].empty
-}
-
 function rowsForSlot(
   slot: PeopleKindSlot,
   rowsByBinding: Map<string, LocationConnectedPartyRow[]>,
@@ -105,48 +90,17 @@ function rowsForSlot(
   return slotRows
 }
 
-function resolveSlotEmptyLabel(slot: PeopleKindSlot): string {
-  const binding = slot.bindings[0]
-  return binding ? resolveBindingEmptyLabel(binding) : ''
-}
-
-function PeopleKindSlotAddButton({
-  slot,
-  canManage,
-  onAddPeopleKindSlot,
-}: {
-  slot: PeopleKindSlot
-  canManage: boolean
-  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
-}) {
-  if (!canManage || !onAddPeopleKindSlot) {
-    return null
-  }
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      density="compact"
-      onClick={() => onAddPeopleKindSlot(slot)}
-    >
-      <Plus aria-hidden />
-      {resolvePeopleKindSlotAddLabel(slot)}
-    </Button>
-  )
-}
-
 export type LocationPeopleAndOrganizationsSectionBodyProps = {
   campaignId: string
   rows: readonly LocationConnectedPartyRow[]
   kindSlots: readonly PeopleKindSlot[]
   canManage: boolean
+  canAddToSection?: boolean
   heading: string
   headingId: string
   helper?: string
   sectionEmpty?: string
-  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
+  onAddPeopleSection?: () => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
     relationshipId: string
@@ -157,16 +111,18 @@ export type LocationPeopleAndOrganizationsSectionBodyProps = {
   canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
 
+// fallow-ignore-next-line complexity
 export function LocationPeopleAndOrganizationsSectionBody({
   campaignId,
   rows,
   kindSlots,
   canManage,
+  canAddToSection = false,
   heading,
   headingId,
   helper,
   sectionEmpty,
-  onAddPeopleKindSlot,
+  onAddPeopleSection,
   onEditConnection,
   onRemoveConnection,
   canEditRow,
@@ -182,29 +138,25 @@ export function LocationPeopleAndOrganizationsSectionBody({
     rowsByBinding.set(key, existing)
   }
 
-  const visibleSlots = kindSlots.filter((slot) => {
-    const slotRows = rowsForSlot(slot, rowsByBinding)
-    return slotRows.length > 0 || canManage
-  })
+  const populatedSlots = kindSlots.filter((slot) => rowsForSlot(slot, rowsByBinding).length > 0)
+  const hasRows = rows.length > 0
+  const showSection = hasRows || canManage
 
-  if (visibleSlots.length === 0) {
+  if (!showSection) {
     return null
   }
 
+  const familyAddEnabled = canManage && canAddToSection && Boolean(onAddPeopleSection)
+
   return (
     <RelationshipFieldGroup heading={heading} headingId={headingId} helper={helper}>
-      {sectionEmpty ? (
-        <div className="border-b border-border-subtle px-4 py-2">
-          <Text variant="muted">{sectionEmpty}</Text>
-        </div>
-      ) : null}
-      {visibleSlots.map((slot) => {
-        const slotRows = rowsForSlot(slot, rowsByBinding)
+      {hasRows ? (
+        <>
+          {populatedSlots.map((slot) => {
+            const slotRows = rowsForSlot(slot, rowsByBinding)
 
-        return (
-          <RelationshipFieldGroupRow key={peopleKindSlotKey(slot)} eyebrow={slot.heading}>
-            {slotRows.length > 0 ? (
-              <div className="space-y-1">
+            return (
+              <RelationshipFieldGroupRow key={peopleKindSlotKey(slot)} eyebrow={slot.heading}>
                 <ul className="space-y-1">
                   {slotRows.map((row) => {
                     const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
@@ -231,22 +183,32 @@ export function LocationPeopleAndOrganizationsSectionBody({
                     )
                   })}
                 </ul>
-                <PeopleKindSlotAddButton
-                  slot={slot}
-                  canManage={canManage}
-                  onAddPeopleKindSlot={onAddPeopleKindSlot}
-                />
-              </div>
-            ) : canManage ? (
-              <RelationshipEmptyInlineRow
-                emptyLabel={resolveSlotEmptyLabel(slot)}
-                addLabel={resolvePeopleKindSlotAddLabel(slot)}
-                onAdd={() => onAddPeopleKindSlot?.(slot)}
-              />
-            ) : null}
-          </RelationshipFieldGroupRow>
-        )
-      })}
+              </RelationshipFieldGroupRow>
+            )
+          })}
+          {familyAddEnabled ? (
+            <div className="px-4 py-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                density="compact"
+                onClick={onAddPeopleSection}
+              >
+                + {LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
+              </Button>
+            </div>
+          ) : null}
+        </>
+      ) : canManage ? (
+        <div className="px-4 py-2">
+          <RelationshipEmptyInlineRow
+            emptyLabel={sectionEmpty}
+            addLabel={familyAddEnabled ? LOCATION_PEOPLE_SECTION_SURFACE_COPY.add : undefined}
+            onAdd={familyAddEnabled ? onAddPeopleSection : undefined}
+          />
+        </div>
+      ) : null}
     </RelationshipFieldGroup>
   )
 }

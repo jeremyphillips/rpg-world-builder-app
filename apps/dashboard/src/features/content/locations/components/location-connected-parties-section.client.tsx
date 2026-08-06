@@ -42,7 +42,8 @@ export type LocationConnectedPartiesSectionProps = {
   showEmptySection?: boolean
   onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
   onAddCharacterKind?: (kind: CharacterLocationConnectionKind) => void
-  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
+  onAddPeopleSection?: () => void
+  canAddToPeopleSection?: boolean
   onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   isMutationPending?: boolean
   pendingRelationshipId?: string
@@ -67,7 +68,8 @@ export function LocationConnectedPartiesSection({
   showEmptySection = true,
   onAddOrganizationKind: _onAddOrganizationKind,
   onAddCharacterKind: _onAddCharacterKind,
-  onAddPeopleKindSlot,
+  onAddPeopleSection,
+  canAddToPeopleSection,
   onAddTerritorialKind,
   isMutationPending: _isMutationPending = false,
   pendingRelationshipId: _pendingRelationshipId,
@@ -107,7 +109,8 @@ export function LocationConnectedPartiesSection({
         sectionHeadingId={sectionHeadingId}
         peopleKindSlots={peopleKindSlots}
         canManage={canManage}
-        onAddPeopleKindSlot={onAddPeopleKindSlot}
+        canAddToPeopleSection={canAddToPeopleSection}
+        onAddPeopleSection={onAddPeopleSection}
         onAddTerritorialKind={onAddTerritorialKind}
         onEditConnection={onEditConnection}
         onChangeTerritorialKind={onChangeTerritorialKind}

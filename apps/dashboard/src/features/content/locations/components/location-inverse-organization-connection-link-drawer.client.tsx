@@ -20,9 +20,15 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import {
+  RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL,
+  RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL,
+} from '../../lib/relationship/relationship-drawer-field-labels'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 
 import {
-  ORGANIZATION_DRAWER_EDIT_TITLES,
+  ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
+  ORGANIZATION_DRAWER_CHANGE_KIND_TITLE,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
@@ -43,7 +49,6 @@ import {
   resolveLocationInverseOrganizationAddDrawerTitle,
   resolveLocationInverseOrganizationAddSubmitLabel,
   TERRITORIAL_AUTHORITY_DRAWER,
-  resolveTerritorialAuthorityChangeKindCurrent,
   resolveTerritorialAuthorityLocationContext,
   resolveTerritorialAuthorityReplaceContext,
 } from '../lib/location-connection-surface-copy'
@@ -113,7 +118,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       : null,
   )
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
-    resolvedAddKind ?? (mode === 'replaceOrganization' ? (initialConnection?.kind ?? null) : null),
+    resolvedAddKind ??
+      (mode === 'changeKind' || mode === 'replaceOrganization'
+        ? (initialConnection?.kind ?? null)
+        : null),
   )
 
   const orgRows = React.useMemo(
@@ -185,6 +193,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   const activeKind = (() => {
     if (resolvedAddKind) return resolvedAddKind
     if (mode === 'replaceOrganization' && initialConnection) return initialConnection.kind
+    if (mode === 'changeKind') {
+      return selectedKind ?? initialConnection?.kind ?? null
+    }
 
     return resolveActiveConnectionKind(
       selectedKind,
@@ -217,6 +228,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (mode === 'changeKind' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.changeKindTitle
     }
+    if (mode === 'changeKind') {
+      return ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
+    }
     if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.replaceTitle
     }
@@ -225,12 +239,15 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     }
     return mode === 'add'
       ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
-      : ORGANIZATION_DRAWER_EDIT_TITLES[intent]
+      : ORGANIZATION_DRAWER_CHANGE_KIND_TITLE
   })()
 
   const submitLabel = (() => {
     if (mode === 'changeKind' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.changeKindSubmit
+    }
+    if (mode === 'changeKind') {
+      return ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
     }
     if (mode === 'replaceOrganization' && intent === 'territorial_authority') {
       return TERRITORIAL_AUTHORITY_DRAWER.replaceSubmit
@@ -238,7 +255,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     if (resolvedAddKind) {
       return resolveLocationInverseOrganizationAddSubmitLabel(resolvedAddKind)
     }
-    return mode === 'add' ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent] : 'Save connection'
+    return mode === 'add'
+      ? ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS[intent]
+      : ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL
   })()
 
   const instructionCopy = resolvedAddKind
@@ -254,28 +273,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       )
     }
 
-    if (mode === 'changeKind' && initialConnection && lockedOrganization) {
-      if (intent === 'territorial_authority') {
-        return (
-          <RelationshipDrawerContextHeader
-            context={resolveTerritorialAuthorityLocationContext(location)}
-            current={resolveTerritorialAuthorityChangeKindCurrent({
-              organizationName: lockedOrganization.name,
-              kind: initialConnection.kind,
-            })}
-          />
-        )
-      }
-
-      return (
-        <RelationshipDrawerContextHeader
-          context={resolveTerritorialAuthorityLocationContext(location)}
-          current={`${lockedOrganization.name} · ${getOrganizationLocationConnectionLabel(initialConnection.kind)}`}
-        />
-      )
-    }
-
-    if (mode === 'add') {
+    if (mode === 'add' || mode === 'changeKind' || mode === 'replaceOrganization') {
       return (
         <RelationshipDrawerContextHeader
           context={resolveTerritorialAuthorityLocationContext(location)}
@@ -330,6 +328,18 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       headerBelowDescription={
         <div className="space-y-4">
           {contextHeader}
+          {mode === 'changeKind' && lockedOrganization ? (
+            <RelationshipDrawerSubjectField
+              label={RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL}
+              value={lockedOrganization.name}
+            />
+          ) : null}
+          {mode === 'replaceOrganization' && initialConnection ? (
+            <RelationshipDrawerSubjectField
+              label={RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL}
+              value={getOrganizationLocationConnectionLabel(initialConnection.kind)}
+            />
+          ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}

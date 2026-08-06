@@ -65,37 +65,80 @@ Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** �
 
 ## Populated row vs empty container
 
-| Responsibility                           | Owner                                                                                                              |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Populated edge summary + overflow        | `CrossContentRelationshipRow`                                                                                      |
-| Overflow actions                         | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger) |
-| Kind-group shell (header + kind rows)    | `RelationshipFieldGroup` + `RelationshipFieldGroupRow`                                                             |
-| Multi-subject kind add (org + character) | One inline add per row → `LocationInversePeopleConnectionLinkDrawer` with subject-type segment                     |
-| Singleton slot empty state + add CTA     | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`)        |
-| Collection empty state + add CTA         | Feature row content via `RelationshipEmptyInlineRow`                                                               |
+| Responsibility                           | Owner                                                                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Populated edge summary + overflow        | `CrossContentRelationshipRow`                                                                                           |
+| Overflow actions                         | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger)      |
+| Kind-group shell (header + kind rows)    | `RelationshipFieldGroup` + `RelationshipFieldGroupRow`                                                                  |
+| Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
+| Singleton slot empty state + add CTA     | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`)             |
+| Collection empty state + add CTA         | Feature row content via `RelationshipEmptyInlineRow`                                                                    |
 
 `CrossContentRelationshipRow` **never** accepts empty-state props.
 
 ## Drawer building blocks
 
-| Primitive                                        | Role                                                                                      |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `RelationshipDrawerContextHeader`                | Names the fixed endpoint (`{name} · {kind label}`) and optional current relationship line |
-| `LocationConnectionKindStep`                     | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)      |
-| Embedded `ContentEntityCard` + selection actions | Entity picker rows in drawers                                                             |
+| Primitive                                        | Role                                                                                  |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `RelationshipDrawerContextHeader`                | Names the fixed endpoint (`{name} · {kind label}`)                                    |
+| `RelationshipDrawerSubjectField`                 | Structured read-only subject/target label + value (Organization, Location, Character) |
+| `LocationConnectionKindStep`                     | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)  |
+| Embedded `ContentEntityCard` + selection actions | Entity picker rows in drawers                                                         |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
 When a **family-level** add action must choose among semantically meaningful kinds, use **`LocationConnectionKindStep`** (collapsing radio cards). After selection, collapse to the chosen kind so the remaining workflow receives visual priority. Do not fork collapse behavior inside relationship drawers.
 
-When a people-section kind slot supports **both** organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), use **one inline add action** per row and resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search.
+Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search.
+
+## Add vs edit choice contract
+
+Add workflows begin **unresolved**. Edit / change-kind workflows begin **resolved**.
+
+| Mode                   | Collapsible choice initial state | Current values                                                         |
+| ---------------------- | -------------------------------- | ---------------------------------------------------------------------- |
+| **Add**                | Expanded option list             | None — user must choose                                                |
+| **Edit / change kind** | Collapsed selected summary       | Hydrated from persisted relationship via the same control used to edit |
+| **Replace subject**    | Kind shown as read-only field    | Current subject pinned/selected in picker                              |
+
+Rules:
+
+- Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints and subjects with `RelationshipDrawerSubjectField` plus collapsed `LocationConnectionKindStep` summaries.
+- **Change** on a collapsed summary re-expands eligible options with the persisted value selected.
+- Change-kind drawers change **kind only** — do not also expose location/organization/character pickers unless the operation explicitly replaces the subject.
+- Reuse `CollapsibleRadioCardField` via `LocationConnectionKindStep`; do not fork collapsed-state markup inside relationship drawers.
+
+## Presentation policy
+
+Relationship direction does **not** determine whether empty kinds are displayed. Use dashboard presentation policy in [`relationship-group-presentation.ts`](../src/features/content/lib/relationship/relationship-group-presentation.ts):
+
+| Presentation           | When to use                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| **`meaningful_slots`** | Bounded role/status where absence communicates useful domain state (for example governs, controls) |
+| **`sparse_groups`**    | Optional/open-ended relationships where empty kinds would create checklist noise                   |
+
+| Section / family                     | Presentation                                                   |
+| ------------------------------------ | -------------------------------------------------------------- |
+| Location → Territorial Authority     | `meaningful_slots`                                             |
+| Location → People & organizations    | `sparse_groups`                                                |
+| Organization → Sites & facilities    | `sparse_groups`                                                |
+| Organization → Geographic presence   | `sparse_groups`                                                |
+| Organization → Territorial authority | `sparse_groups`                                                |
+| Character → Location connections     | Read-only merged connections list (not a relationship section) |
+
+**Meaningful slots** examples: Governs, Controls.
+
+**Sparse groups** examples: Owner, Tenant, Operator, Headquarters, Resident, Works at, Operates in.
+
+Only render per-kind empty copy for meaningful slots. Sparse groups use one family-level empty value (for example `No people or organizations linked.`) and a single family add action (`Add relationship` / `+ Add relationship`).
 
 ## Forward vs inverse display
 
 | Surface                                  | Empty slots                                                       | Add affordance                                              |
 | ---------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | **Organization forward** (subject-owned) | Family-level empty only — never per-kind empty groups             | One family-level add per populated or eligible-empty family |
-| **Location inverse** (target-owned)      | Per-kind empty rows when they communicate meaningful target state | Per-kind or direct-intent add actions                       |
+| **Location inverse — meaningful slots**  | Per-kind empty rows when they communicate meaningful target state | Per-kind or direct-intent add actions                       |
+| **Location inverse — sparse groups**     | One family-level empty row only                                   | One family-level add (`Add relationship`)                   |
 
 Populated forward families **always render**, even when no additional targets are currently available. Hide or disable only the family add affordance — not the populated groups.
 

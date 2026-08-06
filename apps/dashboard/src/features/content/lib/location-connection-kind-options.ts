@@ -1,6 +1,7 @@
 import type {
   CharacterLocationConnectionKind,
   Location,
+  LocationConnectedPartyRow,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -13,11 +14,16 @@ import {
   resolveOrganizationLocationConnectionLocationOccupant,
 } from '@rpg/contracts'
 
-import { isOrganizationLocationConnectionKindBlockedForLocation } from './location-connection-duplicate-keys'
 import {
+  buildSubjectLocationConnectionKeySet,
+  isOrganizationLocationConnectionKindBlockedForLocation,
+} from './location-connection-duplicate-keys'
+import {
+  characterInverseSubjectHasAvailableKind,
   organizationForwardKindHasAvailableLocation,
   LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
+  organizationInverseSubjectHasAvailableKind,
   resolveKindsForOrganizationDrawerIntent,
   type OrganizationConnectionDrawerIntent,
 } from './location-connection-drawer-intent'
@@ -25,6 +31,8 @@ import {
   resolveTerritorialKindOccupiedReason,
   TERRITORIAL_AUTHORITY_DRAWER,
 } from '../locations/lib/location-connection-surface-copy'
+import type { PeopleKindSlot } from '../locations/lib/location-connected-parties-people-kind-slots'
+import { peopleKindSlotKey } from '../locations/lib/location-connected-parties-people-kind-slots'
 
 export type LocationConnectionKindOption = {
   value: string
@@ -243,4 +251,123 @@ export function resolveActiveConnectionKind(
   }
 
   return null
+}
+
+export const PEOPLE_SECTION_KIND_FULLY_LINKED_REASON =
+  'All eligible people and organizations are already linked for this relationship type.'
+
+function resolvePeopleKindSlotDescription(slot: PeopleKindSlot): string {
+  const organizationBinding = slot.bindings.find(
+    (binding) => binding.subjectType === 'organization',
+  )
+  if (organizationBinding?.subjectType === 'organization') {
+    return ORGANIZATION_LOCATION_CONNECTION_ENTRIES[organizationBinding.kind].description
+  }
+
+  const characterBinding = slot.bindings.find((binding) => binding.subjectType === 'character')
+  if (characterBinding?.subjectType === 'character') {
+    return CHARACTER_LOCATION_CONNECTION_ENTRIES[characterBinding.kind].description
+  }
+
+  return ''
+}
+
+export function peopleKindSlotHasAvailableTarget(input: {
+  slot: PeopleKindSlot
+  locationId: string
+  rows: readonly LocationConnectedPartyRow[]
+  organizationIds: readonly string[]
+  characterIds: readonly string[]
+  canAddOrganization: boolean
+  canAddCharacter: boolean
+}): boolean {
+  const organizationRows = input.rows.filter((row) => row.subject.type === 'organization')
+  const characterRows = input.rows.filter((row) => row.subject.type === 'character')
+  const characterExistingKeys = buildSubjectLocationConnectionKeySet(characterRows)
+
+  for (const binding of input.slot.bindings) {
+    if (binding.subjectType === 'organization' && input.canAddOrganization) {
+      const hasOrganizationTarget = input.organizationIds.some((organizationId) =>
+        organizationInverseSubjectHasAvailableKind(
+          organizationId,
+          input.locationId,
+          [binding.kind],
+          organizationRows,
+        ),
+      )
+      if (hasOrganizationTarget) {
+        return true
+      }
+    }
+
+    if (binding.subjectType === 'character' && input.canAddCharacter) {
+      const hasCharacterTarget = input.characterIds.some((characterId) =>
+        characterInverseSubjectHasAvailableKind(characterId, [binding.kind], characterExistingKeys),
+      )
+      if (hasCharacterTarget) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+export function peopleSectionHasAvailableTarget(input: {
+  kindSlots: readonly PeopleKindSlot[]
+  locationId: string
+  rows: readonly LocationConnectedPartyRow[]
+  organizationIds: readonly string[]
+  characterIds: readonly string[]
+  canAddOrganization: boolean
+  canAddCharacter: boolean
+}): boolean {
+  return input.kindSlots.some((slot) =>
+    peopleKindSlotHasAvailableTarget({
+      slot,
+      locationId: input.locationId,
+      rows: input.rows,
+      organizationIds: input.organizationIds,
+      characterIds: input.characterIds,
+      canAddOrganization: input.canAddOrganization,
+      canAddCharacter: input.canAddCharacter,
+    }),
+  )
+}
+
+export function buildPeopleSectionKindOptions(input: {
+  kindSlots: readonly PeopleKindSlot[]
+  locationId: string
+  rows: readonly LocationConnectedPartyRow[]
+  organizationIds: readonly string[]
+  characterIds: readonly string[]
+  canAddOrganization: boolean
+  canAddCharacter: boolean
+}): LocationConnectionKindOption[] {
+  return input.kindSlots.map((slot) => {
+    const disabled = !peopleKindSlotHasAvailableTarget({
+      slot,
+      locationId: input.locationId,
+      rows: input.rows,
+      organizationIds: input.organizationIds,
+      characterIds: input.characterIds,
+      canAddOrganization: input.canAddOrganization,
+      canAddCharacter: input.canAddCharacter,
+    })
+
+    return {
+      value: peopleKindSlotKey(slot),
+      label: slot.heading,
+      description: resolvePeopleKindSlotDescription(slot),
+      disabled,
+      disabledReason: disabled ? PEOPLE_SECTION_KIND_FULLY_LINKED_REASON : undefined,
+    }
+  })
+}
+
+export function resolvePeopleKindSlotFromOptionValue(
+  kindSlots: readonly PeopleKindSlot[],
+  value: string,
+): PeopleKindSlot | undefined {
+  return kindSlots.find((slot) => peopleKindSlotKey(slot) === value)
 }

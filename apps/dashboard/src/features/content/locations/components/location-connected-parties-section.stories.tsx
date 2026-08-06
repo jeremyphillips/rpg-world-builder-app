@@ -53,6 +53,7 @@ export const ManagerEmptyPeople: Story = {
     canManage: true,
     showEmptySection: true,
     peopleKindSlots,
-    onAddPeopleKindSlot: () => undefined,
+    canAddToPeopleSection: true,
+    onAddPeopleSection: () => undefined,
   },
 }
