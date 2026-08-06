@@ -126,10 +126,7 @@ function LocationConnectedPartiesSections({
             detail.rows.some((row) => row.sectionGroup === 'people_and_organizations')
           }
           peopleKindSlots={detail.peopleKindSlots}
-          onAddOrganizationKind={
-            detail.canAddOrganizationInverse ? detail.openOrganizationAddKind : undefined
-          }
-          onAddCharacterKind={detail.canAddCharacter ? detail.openCharacterAddKind : undefined}
+          onAddPeopleKindSlot={detail.canWriteInverse ? detail.openPeopleKindSlotAdd : undefined}
         />
       ) : null}
 

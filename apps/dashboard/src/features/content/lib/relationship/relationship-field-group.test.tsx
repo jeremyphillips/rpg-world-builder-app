@@ -10,7 +10,7 @@ import { CrossContentRelationshipRow } from './cross-content-relationship-row.cl
 import { RelationshipEmptyInlineRow } from './relationship-empty-inline-row.client'
 
 describe('RelationshipFieldGroup', () => {
-  it('renders card header, sunken body, and padded kind rows', () => {
+  it('renders card header, subtle body, and padded kind rows', () => {
     const { container } = render(
       <RelationshipFieldGroup
         heading="Territorial Authority"
@@ -54,7 +54,7 @@ describe('RelationshipFieldGroup', () => {
     expect(header).toHaveClass('bg-card', 'px-4', 'py-2')
 
     const body = header?.nextElementSibling
-    expect(body).toHaveClass('bg-sunken')
+    expect(body).toHaveClass('bg-surface-subtle')
 
     const rows = body?.children
     expect(rows?.length).toBe(3)

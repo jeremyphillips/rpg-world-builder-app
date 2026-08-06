@@ -1,10 +1,7 @@
 'use client'
 
-import type {
-  CharacterLocationConnectionKind,
-  LocationConnectedPartyRow,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import type { LocationConnectedPartyRow } from '@rpg/contracts'
+import { Plus } from 'lucide-react'
 import { Button, Text } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
@@ -22,23 +19,16 @@ import {
   LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY,
   LOCATION_INVERSE_PEOPLE_OVERFLOW,
 } from '../lib/location-connection-surface-copy'
+import type {
+  PeopleKindBinding,
+  PeopleKindSlot,
+} from '../lib/location-connected-parties-people-kind-slots'
+import {
+  peopleKindBindingKey,
+  peopleKindSlotKey,
+  resolvePeopleKindSlotAddLabel,
+} from '../lib/location-connected-parties-people-kind-slots'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
-
-type PeopleKindSlot =
-  | {
-      subjectType: 'organization'
-      kind: OrganizationLocationConnectionKind
-      heading: string
-    }
-  | {
-      subjectType: 'character'
-      kind: CharacterLocationConnectionKind
-      heading: string
-    }
-
-function peopleKindSlotKey(slot: PeopleKindSlot): string {
-  return `${slot.subjectType}:${slot.kind}`
-}
 
 function buildPeopleOverflowActions(input: {
   campaignId: string
@@ -100,11 +90,54 @@ function buildPeopleOverflowActions(input: {
   return actions
 }
 
-function resolvePeopleKindCopy(slot: PeopleKindSlot): { empty: string; add: string } {
-  if (slot.subjectType === 'organization') {
-    return LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY[slot.kind]
+function resolveBindingEmptyLabel(binding: PeopleKindBinding): string {
+  if (binding.subjectType === 'organization') {
+    return LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY[binding.kind].empty
   }
-  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[slot.kind]
+  return LOCATION_INVERSE_CHARACTER_SURFACE_COPY[binding.kind].empty
+}
+
+function rowsForSlot(
+  slot: PeopleKindSlot,
+  rowsByBinding: Map<string, LocationConnectedPartyRow[]>,
+): LocationConnectedPartyRow[] {
+  const slotRows: LocationConnectedPartyRow[] = []
+  for (const binding of slot.bindings) {
+    slotRows.push(...(rowsByBinding.get(peopleKindBindingKey(binding)) ?? []))
+  }
+  return slotRows
+}
+
+function resolveSlotEmptyLabel(slot: PeopleKindSlot): string {
+  const binding = slot.bindings[0]
+  return binding ? resolveBindingEmptyLabel(binding) : ''
+}
+
+function PeopleKindSlotAddButton({
+  slot,
+  canManage,
+  onAddPeopleKindSlot,
+}: {
+  slot: PeopleKindSlot
+  canManage: boolean
+  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
+}) {
+  if (!canManage || !onAddPeopleKindSlot) {
+    return null
+  }
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      density="compact"
+      onClick={() => onAddPeopleKindSlot(slot)}
+    >
+      <Plus aria-hidden />
+      {resolvePeopleKindSlotAddLabel(slot)}
+    </Button>
+  )
 }
 
 export type LocationPeopleAndOrganizationsSectionBodyProps = {
@@ -116,14 +149,13 @@ export type LocationPeopleAndOrganizationsSectionBodyProps = {
   headingId: string
   helper?: string
   sectionEmpty?: string
-  onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
-  onAddCharacterKind?: (kind: CharacterLocationConnectionKind) => void
+  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onRemoveConnection?: (input: {
     relationshipId: string
     subjectType: LocationConnectedPartyRow['subject']['type']
     subjectId: string
-  }) => void
+  }) => Promise<void>
   canEditRow?: (row: LocationConnectedPartyRow) => boolean
   canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
@@ -137,8 +169,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
   headingId,
   helper,
   sectionEmpty,
-  onAddOrganizationKind,
-  onAddCharacterKind,
+  onAddPeopleKindSlot,
   onEditConnection,
   onRemoveConnection,
   canEditRow,
@@ -146,16 +177,16 @@ export function LocationPeopleAndOrganizationsSectionBody({
 }: LocationPeopleAndOrganizationsSectionBodyProps) {
   const navigate = useNavigate()
 
-  const rowsBySlot = new Map<string, LocationConnectedPartyRow[]>()
+  const rowsByBinding = new Map<string, LocationConnectedPartyRow[]>()
   for (const row of rows) {
     const key = `${row.subject.type}:${row.kind}`
-    const existing = rowsBySlot.get(key) ?? []
+    const existing = rowsByBinding.get(key) ?? []
     existing.push(row)
-    rowsBySlot.set(key, existing)
+    rowsByBinding.set(key, existing)
   }
 
   const visibleSlots = kindSlots.filter((slot) => {
-    const slotRows = rowsBySlot.get(peopleKindSlotKey(slot)) ?? []
+    const slotRows = rowsForSlot(slot, rowsByBinding)
     return slotRows.length > 0 || canManage
   })
 
@@ -171,8 +202,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
         </div>
       ) : null}
       {visibleSlots.map((slot) => {
-        const slotRows = rowsBySlot.get(peopleKindSlotKey(slot)) ?? []
-        const copy = resolvePeopleKindCopy(slot)
+        const slotRows = rowsForSlot(slot, rowsByBinding)
 
         return (
           <RelationshipFieldGroupRow key={peopleKindSlotKey(slot)} eyebrow={slot.heading}>
@@ -208,35 +238,17 @@ export function LocationPeopleAndOrganizationsSectionBody({
                     )
                   })}
                 </ul>
-                {canManage ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    density="compact"
-                    onClick={() => {
-                      if (slot.subjectType === 'organization') {
-                        onAddOrganizationKind?.(slot.kind)
-                      } else {
-                        onAddCharacterKind?.(slot.kind)
-                      }
-                    }}
-                  >
-                    {copy.add}
-                  </Button>
-                ) : null}
+                <PeopleKindSlotAddButton
+                  slot={slot}
+                  canManage={canManage}
+                  onAddPeopleKindSlot={onAddPeopleKindSlot}
+                />
               </div>
             ) : canManage ? (
               <RelationshipEmptyInlineRow
-                emptyLabel={copy.empty}
-                addLabel={copy.add}
-                onAdd={() => {
-                  if (slot.subjectType === 'organization') {
-                    onAddOrganizationKind?.(slot.kind)
-                  } else {
-                    onAddCharacterKind?.(slot.kind)
-                  }
-                }}
+                emptyLabel={resolveSlotEmptyLabel(slot)}
+                addLabel={resolvePeopleKindSlotAddLabel(slot)}
+                onAdd={() => onAddPeopleKindSlot?.(slot)}
               />
             ) : null}
           </RelationshipFieldGroupRow>
@@ -245,5 +257,3 @@ export function LocationPeopleAndOrganizationsSectionBody({
     </RelationshipFieldGroup>
   )
 }
-
-export type { PeopleKindSlot }

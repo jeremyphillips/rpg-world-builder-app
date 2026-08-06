@@ -26,14 +26,12 @@ const sampleRows = [
 
 const peopleKindSlots = [
   {
-    subjectType: 'organization' as const,
-    kind: 'operates_in' as const,
     heading: 'Operates in',
+    bindings: [{ subjectType: 'organization' as const, kind: 'operates_in' as const }],
   },
   {
-    subjectType: 'character' as const,
-    kind: 'works_at' as const,
     heading: 'Works here',
+    bindings: [{ subjectType: 'character' as const, kind: 'works_at' as const }],
   },
 ]
 
@@ -55,7 +53,6 @@ export const ManagerEmptyPeople: Story = {
     canManage: true,
     showEmptySection: true,
     peopleKindSlots,
-    onAddOrganizationKind: () => undefined,
-    onAddCharacterKind: () => undefined,
+    onAddPeopleKindSlot: () => undefined,
   },
 }

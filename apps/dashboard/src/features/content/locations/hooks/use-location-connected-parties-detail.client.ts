@@ -44,6 +44,7 @@ import {
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
+import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
@@ -85,6 +86,10 @@ type CharacterDrawerState =
         kind: CharacterLocationConnectionKind
       }
     }
+
+type PeopleDrawerState = {
+  slot: PeopleKindSlot
+}
 
 async function upsertOrganizationInverseConnection(input: {
   campaignId: string
@@ -175,6 +180,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     React.useState<OrganizationDrawerState | null>(null)
   const [characterDrawerState, setCharacterDrawerState] =
     React.useState<CharacterDrawerState | null>(null)
+  const [peopleDrawerState, setPeopleDrawerState] = React.useState<PeopleDrawerState | null>(null)
 
   const rows = connectedPartiesQuery.data?.items ?? []
   const sectionEligibility = React.useMemo(
@@ -318,6 +324,58 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [campaignId, characterDrawerState, invalidate, locationId, runMutation],
   )
 
+  const handlePeopleDrawerOrganizationSubmit = React.useCallback(
+    async (input: { organizationId: string; kind: OrganizationLocationConnectionKind }) => {
+      if (!canInverseWriteLocationConnectionForOwner('organizations') || !peopleDrawerState) {
+        return
+      }
+
+      await runMutation(async () => {
+        const result = await upsertOrganizationInverseConnection({
+          campaignId,
+          locationId,
+          drawerState: {
+            mode: 'add',
+            intent: organizationDrawerIntentFromKind(input.kind),
+            kind: input.kind,
+          },
+          organizationId: input.organizationId,
+          kind: input.kind,
+        })
+        for (const organizationId of result.organizationIds) {
+          await invalidate({ organizationId })
+        }
+      })
+
+      setPeopleDrawerState(null)
+    },
+    [campaignId, invalidate, locationId, peopleDrawerState, runMutation],
+  )
+
+  const handlePeopleDrawerCharacterSubmit = React.useCallback(
+    async (input: { characterId: string; kind: CharacterLocationConnectionKind }) => {
+      if (!canInverseWriteLocationConnectionForOwner('characters') || !peopleDrawerState) {
+        return
+      }
+
+      await runMutation(async () => {
+        const result = await upsertCharacterInverseConnection({
+          campaignId,
+          locationId,
+          drawerState: { mode: 'add', kind: input.kind },
+          characterId: input.characterId,
+          kind: input.kind,
+        })
+        for (const characterId of result.characterIds) {
+          await invalidate({ characterId })
+        }
+      })
+
+      setPeopleDrawerState(null)
+    },
+    [campaignId, invalidate, locationId, peopleDrawerState, runMutation],
+  )
+
   const openOrganizationAddDrawer = React.useCallback(
     (intent: OrganizationConnectionDrawerIntent) => {
       setOrganizationDrawerState({ mode: 'add', intent })
@@ -339,6 +397,10 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
 
   const openCharacterAddKind = React.useCallback((kind: CharacterLocationConnectionKind) => {
     setCharacterDrawerState({ mode: 'add', kind })
+  }, [])
+
+  const openPeopleKindSlotAdd = React.useCallback((slot: PeopleKindSlot) => {
+    setPeopleDrawerState({ slot })
   }, [])
 
   const handleChangeTerritorialKind = React.useCallback(
@@ -419,13 +481,18 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     setOrganizationDrawerState,
     characterDrawerState,
     setCharacterDrawerState,
+    peopleDrawerState,
+    setPeopleDrawerState,
     openOrganizationAddDrawer,
     openOrganizationAddKind,
     openTerritorialAddDrawer,
     openCharacterAddKind,
+    openPeopleKindSlotAdd,
     handleRemoveConnection,
     handleOrganizationSubmit,
     handleCharacterSubmit,
+    handlePeopleDrawerOrganizationSubmit,
+    handlePeopleDrawerCharacterSubmit,
     handleEditConnection,
     handleChangeTerritorialKind,
     handleReplaceTerritorialOrganization,

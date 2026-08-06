@@ -6,7 +6,7 @@ export const relationshipFieldGroupVariants = cva(
 
 export const relationshipFieldGroupHeaderVariants = cva('bg-card px-4 py-2')
 
-export const relationshipFieldGroupBodyVariants = cva('bg-sunken')
+export const relationshipFieldGroupBodyVariants = cva('bg-surface-subtle')
 
 export const relationshipFieldGroupRowVariants = cva(
   'border-b border-border-subtle px-4 py-2 last:border-b-0',

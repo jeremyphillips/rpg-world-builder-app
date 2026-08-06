@@ -1,17 +1,14 @@
 'use client'
 
 import type {
-  CharacterLocationConnectionKind,
   LocationConnectedPartyRow,
   LocationConnectedPartySectionGroup,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import {
-  LocationPeopleAndOrganizationsSectionBody,
-  type PeopleKindSlot,
-} from './location-people-and-organizations-section.client'
+import { LocationPeopleAndOrganizationsSectionBody } from './location-people-and-organizations-section.client'
 import { LocationTerritorialAuthoritySectionBody } from './location-territorial-authority-section.client'
+import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
@@ -26,8 +23,7 @@ type LocationConnectedPartiesSectionBodyProps = {
   sectionHeadingId: string
   peopleKindSlots: readonly PeopleKindSlot[]
   canManage: boolean
-  onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
-  onAddCharacterKind?: (kind: CharacterLocationConnectionKind) => void
+  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
   onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   onEditConnection?: (input: LocationConnectedPartyEditTarget) => void
   onChangeTerritorialKind?: (input: LocationConnectedPartyEditTarget) => void
@@ -48,8 +44,7 @@ export function LocationConnectedPartiesSectionBody({
   sectionHeadingId,
   peopleKindSlots,
   canManage,
-  onAddOrganizationKind,
-  onAddCharacterKind,
+  onAddPeopleKindSlot,
   onAddTerritorialKind,
   onEditConnection,
   onChangeTerritorialKind,
@@ -99,8 +94,7 @@ export function LocationConnectedPartiesSectionBody({
           ? LOCATION_CONNECTED_PARTIES_EMPTY_TEXT.people_and_organizations
           : undefined
       }
-      onAddOrganizationKind={onAddOrganizationKind}
-      onAddCharacterKind={onAddCharacterKind}
+      onAddPeopleKindSlot={onAddPeopleKindSlot}
       onEditConnection={onEditConnection}
       onRemoveConnection={onRemoveConnection}
       canEditRow={canEditRow}

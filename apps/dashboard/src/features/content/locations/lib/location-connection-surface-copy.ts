@@ -51,7 +51,7 @@ export const LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY = {
   },
   headquarters: {
     empty: 'No headquarters organization linked.',
-    add: 'Add headquarters organization',
+    add: 'Add organization',
     addDrawerTitle: 'Add headquarters organization',
     addDrawerInstruction: 'Choose the headquarters organization for this location.',
     addSubmit: 'Add headquarters organization',

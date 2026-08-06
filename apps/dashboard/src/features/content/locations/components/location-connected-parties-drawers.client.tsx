@@ -4,6 +4,7 @@ import type { Location } from '@rpg/contracts'
 
 import { LocationInverseCharacterConnectionLinkDrawer } from './location-inverse-character-connection-link-drawer.client'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
+import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
 import type { useLocationConnectedPartiesDetail } from '../hooks/use-location-connected-parties-detail.client'
 
 type DetailState = ReturnType<typeof useLocationConnectedPartiesDetail>
@@ -73,11 +74,38 @@ function LocationConnectedCharacterDrawer({
   )
 }
 
+function LocationConnectedPeopleDrawer({ location, detail }: LocationConnectedPartiesDrawersProps) {
+  const drawerState = detail.peopleDrawerState
+  if (!drawerState) {
+    return null
+  }
+
+  return (
+    <LocationInversePeopleConnectionLinkDrawer
+      open
+      onOpenChange={(open) => {
+        if (!open) detail.setPeopleDrawerState(null)
+      }}
+      slot={drawerState.slot}
+      location={location}
+      organizations={detail.organizations}
+      characters={detail.characterOptions}
+      connectedPartyRows={detail.rows}
+      canAddOrganization={detail.canAddOrganizationInverse}
+      canAddCharacter={detail.canAddCharacter}
+      isSubmitting={detail.isMutationPending}
+      onOrganizationSubmit={detail.handlePeopleDrawerOrganizationSubmit}
+      onCharacterSubmit={detail.handlePeopleDrawerCharacterSubmit}
+    />
+  )
+}
+
 export function LocationConnectedPartiesDrawers(props: LocationConnectedPartiesDrawersProps) {
   return (
     <>
       <LocationConnectedOrganizationDrawer {...props} />
       <LocationConnectedCharacterDrawer {...props} />
+      <LocationConnectedPeopleDrawer {...props} />
     </>
   )
 }

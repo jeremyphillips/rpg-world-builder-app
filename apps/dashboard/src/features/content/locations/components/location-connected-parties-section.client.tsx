@@ -8,19 +8,17 @@ import type {
   LocationConnectedPartySectionGroup,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import {
-  getCharacterLocationConnectionLabel,
-  getOrganizationLocationConnectionFamily,
-  getOrganizationLocationConnectionLabel,
-} from '@rpg/contracts'
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'
-import type { PeopleKindSlot } from './location-people-and-organizations-section.client'
+import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 import {
   resolveLocationConnectedPartiesSectionHeadingId,
   usesFieldGroupHeader,
 } from '../lib/location-connected-parties-section-layout'
+
+export { buildPeopleKindSlots } from '../lib/location-connected-parties-people-kind-slots'
+export type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
 
 export {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
@@ -44,6 +42,7 @@ export type LocationConnectedPartiesSectionProps = {
   showEmptySection?: boolean
   onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
   onAddCharacterKind?: (kind: CharacterLocationConnectionKind) => void
+  onAddPeopleKindSlot?: (slot: PeopleKindSlot) => void
   onAddTerritorialKind?: (kind: OrganizationLocationConnectionKind) => void
   isMutationPending?: boolean
   pendingRelationshipId?: string
@@ -59,34 +58,6 @@ export type LocationConnectedPartiesSectionProps = {
   canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
 
-export function buildPeopleKindSlots(input: {
-  organizationKinds: readonly OrganizationLocationConnectionKind[]
-  characterKinds: readonly CharacterLocationConnectionKind[]
-}): PeopleKindSlot[] {
-  const slots: PeopleKindSlot[] = []
-
-  for (const kind of input.organizationKinds) {
-    if (getOrganizationLocationConnectionFamily(kind) === 'territorial_authority') {
-      continue
-    }
-    slots.push({
-      subjectType: 'organization',
-      kind,
-      heading: getOrganizationLocationConnectionLabel(kind),
-    })
-  }
-
-  for (const kind of input.characterKinds) {
-    slots.push({
-      subjectType: 'character',
-      kind,
-      heading: getCharacterLocationConnectionLabel(kind),
-    })
-  }
-
-  return slots
-}
-
 export function LocationConnectedPartiesSection({
   campaignId,
   sectionGroup,
@@ -94,8 +65,9 @@ export function LocationConnectedPartiesSection({
   peopleKindSlots = [],
   canManage = false,
   showEmptySection = true,
-  onAddOrganizationKind,
-  onAddCharacterKind,
+  onAddOrganizationKind: _onAddOrganizationKind,
+  onAddCharacterKind: _onAddCharacterKind,
+  onAddPeopleKindSlot,
   onAddTerritorialKind,
   isMutationPending: _isMutationPending = false,
   pendingRelationshipId: _pendingRelationshipId,
@@ -135,8 +107,7 @@ export function LocationConnectedPartiesSection({
         sectionHeadingId={sectionHeadingId}
         peopleKindSlots={peopleKindSlots}
         canManage={canManage}
-        onAddOrganizationKind={onAddOrganizationKind}
-        onAddCharacterKind={onAddCharacterKind}
+        onAddPeopleKindSlot={onAddPeopleKindSlot}
         onAddTerritorialKind={onAddTerritorialKind}
         onEditConnection={onEditConnection}
         onChangeTerritorialKind={onChangeTerritorialKind}
