@@ -14,26 +14,41 @@ const sampleLocationConnections = {
   previewItems: [
     {
       connectionId: 'conn-1',
-      locationId: 'region-1',
-      kind: 'governs' as const,
-      family: 'territorial_authority' as const,
-      familyLabel: 'Territorial authority',
-      relationshipLabel: 'Governs',
+      locationId: 'building-1',
+      kind: 'owns' as const,
+      family: 'site' as const,
+      familyLabel: 'Site presence',
+      relationshipLabel: 'Owner',
       card: {
-        id: 'region-1',
-        name: 'Grey Coast',
-        summary: 'Territorial authority · Governs',
+        id: 'building-1',
+        name: 'Royal Mint',
+        summary: 'Site presence · Owner',
       },
-      detailHref: '/campaigns/camp-1/locations/region-1',
+      detailHref: '/campaigns/camp-1/locations/building-1',
+      locationUnavailable: false,
+    },
+    {
+      connectionId: 'conn-2',
+      locationId: 'building-2',
+      kind: 'headquarters' as const,
+      family: 'site' as const,
+      familyLabel: 'Site presence',
+      relationshipLabel: 'Headquarters',
+      card: {
+        id: 'building-2',
+        name: 'Royal Palace',
+        summary: 'Site presence · Headquarters',
+      },
+      detailHref: '/campaigns/camp-1/locations/building-2',
       locationUnavailable: false,
     },
   ],
-  total: 1,
+  total: 2,
   emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
 }
 
 describe('OrganizationLocationConnectionsSection', () => {
-  it('renders family and kind grouped location connection rows', () => {
+  it('renders family and populated kind grouped location connection rows', () => {
     render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection locationConnections={sampleLocationConnections} />
@@ -41,15 +56,14 @@ describe('OrganizationLocationConnectionsSection', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
-    expect(screen.getByText('1 location connection')).toBeInTheDocument()
-    expect(screen.getByText('Grey Coast')).toBeInTheDocument()
-    expect(
-      screen.getByRole('heading', { name: 'Territorial authority', level: 3 }),
-    ).toBeInTheDocument()
-    expect(screen.getByText('Governs')).toBeInTheDocument()
+    expect(screen.getByText('2 location connections')).toBeInTheDocument()
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Site presence', level: 3 })).toBeInTheDocument()
+    expect(screen.getByText('Owns')).toBeInTheDocument()
+    expect(screen.getByText('Headquarters')).toBeInTheDocument()
   })
 
-  it('renders section empty text when no kind slots exist', () => {
+  it('renders a family empty state without per-kind empty groups', () => {
     render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
@@ -60,35 +74,54 @@ describe('OrganizationLocationConnectionsSection', () => {
           }}
           canManage
           showEmptySection
+          visibleFamilies={['site']}
+          canAddToFamily={{ site: true }}
         />
       </MemoryRouter>,
     )
 
-    expect(
-      screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections),
-    ).toBeInTheDocument()
+    expect(screen.getByText('No site relationships linked.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add site relationship' })).toBeInTheDocument()
+    expect(screen.queryByText('No owned locations linked.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Owner')).not.toBeInTheDocument()
   })
 
-  it('renders per-kind empty slots and error states', () => {
-    const { rerender } = render(
+  it('keeps populated families visible when add is unavailable', () => {
+    render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
-          locationConnections={{
-            previewItems: [],
-            total: 0,
-            emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
-          }}
+          locationConnections={sampleLocationConnections}
           canManage
           showEmptySection
-          emptyKindSlots={['governs']}
+          visibleFamilies={['site']}
+          canAddToFamily={{ site: false }}
         />
       </MemoryRouter>,
     )
 
-    expect(screen.getByText('No governed locations linked.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add governed location' })).toBeInTheDocument()
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Add site relationship/i })).not.toBeInTheDocument()
+  })
 
-    rerender(
+  it('shows family add when populated and additional targets are available', () => {
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection
+          locationConnections={sampleLocationConnections}
+          canManage
+          showEmptySection
+          visibleFamilies={['site']}
+          canAddToFamily={{ site: true }}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('button', { name: '+ Add site relationship' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add owned location' })).not.toBeInTheDocument()
+  })
+
+  it('renders error states and hides section when showEmptySection is false', () => {
+    const { rerender } = render(
       <MemoryRouter>
         <OrganizationLocationConnectionsSection
           locationConnections={{
@@ -116,9 +149,9 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByText(ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR)).toBeInTheDocument()
   })
 
-  it('invokes per-kind add and edit callbacks for managers', async () => {
+  it('invokes family add and edit callbacks for managers', async () => {
     const user = userEvent.setup()
-    const onAddKind = vi.fn()
+    const onAddFamily = vi.fn()
     const onEditConnection = vi.fn()
 
     render(
@@ -127,22 +160,23 @@ describe('OrganizationLocationConnectionsSection', () => {
           locationConnections={sampleLocationConnections}
           canManage
           showEmptySection
-          emptyKindSlots={['controls']}
-          onAddKind={onAddKind}
+          visibleFamilies={['site']}
+          canAddToFamily={{ site: true }}
+          onAddFamily={onAddFamily}
           onEditConnection={onEditConnection}
         />
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Add controlled location' }))
-    expect(onAddKind).toHaveBeenCalledWith('controls')
+    await user.click(screen.getByRole('button', { name: '+ Add site relationship' }))
+    expect(onAddFamily).toHaveBeenCalledWith('site')
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Grey Coast' }))
+    await user.click(screen.getByRole('button', { name: 'Actions for Royal Mint' }))
     await user.click(screen.getByRole('menuitem', { name: 'Change connection type' }))
     expect(onEditConnection).toHaveBeenCalledWith({
       connectionId: 'conn-1',
-      locationId: 'region-1',
-      kind: 'governs',
+      locationId: 'building-1',
+      kind: 'owns',
     })
   })
 

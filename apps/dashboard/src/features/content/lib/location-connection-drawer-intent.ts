@@ -8,6 +8,8 @@ import type {
 } from '@rpg/contracts'
 import {
   getOrganizationLocationConnectionFamily,
+  getOrganizationLocationConnectionMaxSubjectsPerLocation,
+  ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
 
@@ -67,7 +69,7 @@ export const ORGANIZATION_DRAWER_KIND_FIELD_LABELS: Record<
 > = {
   territorial_authority: 'Authority type',
   geographic_presence: 'Connection type',
-  site: 'Connection type',
+  site: 'Relationship type',
 }
 
 export const ORGANIZATION_DRAWER_ADD_TITLES: Record<OrganizationConnectionDrawerIntent, string> = {
@@ -113,6 +115,172 @@ export function filterOrganizationKindsByFamily(
   family: OrganizationLocationConnectionFamily,
 ): OrganizationLocationConnectionKind[] {
   return kinds.filter((kind) => getOrganizationLocationConnectionFamily(kind) === family)
+}
+
+export function resolveKindsForOrganizationDrawerIntent(
+  intent: OrganizationConnectionDrawerIntent,
+): OrganizationLocationConnectionKind[] {
+  return (
+    Object.entries(ORGANIZATION_LOCATION_CONNECTION_ENTRIES) as [
+      OrganizationLocationConnectionKind,
+      (typeof ORGANIZATION_LOCATION_CONNECTION_ENTRIES)[OrganizationLocationConnectionKind],
+    ][]
+  )
+    .filter(([, entry]) => entry.family === intent)
+    .sort((a, b) => b[1].priority - a[1].priority)
+    .map(([kind]) => kind)
+}
+
+export function resolveEdgesAtLocation(
+  locationId: string,
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >,
+): readonly OrganizationLocationConnectionEdgeAtLocation[] | undefined {
+  if (!edgesByLocationId) {
+    return undefined
+  }
+  return edgesByLocationId[locationId]
+}
+
+export function locationEligibleForOrganizationKind(
+  location: Location,
+  kind: OrganizationLocationConnectionKind,
+  subjectOrganizationId: string,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >,
+  excludeConnectionId?: string,
+): boolean {
+  const intent = organizationDrawerIntentFromKind(kind)
+  if (!resolveOrganizationKindsForDrawerIntent(location, intent).includes(kind)) {
+    return false
+  }
+
+  const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+
+  return organizationLocationConnectionHasAvailableKind({
+    locationId: location.id,
+    kinds: [kind],
+    subjectOrganizationId,
+    connections,
+    edgesAtLocation,
+    excludeConnectionId,
+  })
+}
+
+export function filterLocationsForOrganizationKind(
+  locations: readonly Location[],
+  kind: OrganizationLocationConnectionKind,
+  subjectOrganizationId: string,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >,
+  excludeConnectionId?: string,
+): Location[] {
+  return locations.filter((location) =>
+    locationEligibleForOrganizationKind(
+      location,
+      kind,
+      subjectOrganizationId,
+      connections,
+      edgesByLocationId,
+      excludeConnectionId,
+    ),
+  )
+}
+
+export function organizationForwardKindHasAvailableLocation(
+  kind: OrganizationLocationConnectionKind,
+  locations: readonly Location[],
+  subjectOrganizationId: string,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >,
+  excludeConnectionId?: string,
+  occupancyLoaded = true,
+): boolean {
+  const maxSubjects = getOrganizationLocationConnectionMaxSubjectsPerLocation(kind)
+  if (maxSubjects === 1 && !occupancyLoaded) {
+    return locations.some((location) => {
+      const intent = organizationDrawerIntentFromKind(kind)
+      return resolveOrganizationKindsForDrawerIntent(location, intent).includes(kind)
+    })
+  }
+
+  return locations.some((location) =>
+    locationEligibleForOrganizationKind(
+      location,
+      kind,
+      subjectOrganizationId,
+      connections,
+      edgesByLocationId,
+      excludeConnectionId,
+    ),
+  )
+}
+
+export function organizationForwardFamilyHasAvailableTarget(
+  intent: OrganizationConnectionDrawerIntent,
+  locations: readonly Location[],
+  subjectOrganizationId: string,
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>,
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >,
+  excludeConnectionId?: string,
+  occupancyLoaded = true,
+): boolean {
+  return resolveKindsForOrganizationDrawerIntent(intent).some((kind) =>
+    organizationForwardKindHasAvailableLocation(
+      kind,
+      locations,
+      subjectOrganizationId,
+      connections,
+      edgesByLocationId,
+      excludeConnectionId,
+      occupancyLoaded,
+    ),
+  )
+}
+
+export function organizationConnectionDrawerIntentFromFamily(
+  family: OrganizationLocationConnectionFamily,
+): OrganizationConnectionDrawerIntent {
+  return family
+}
+
+export function resolveVisibleOrganizationConnectionFamilies(
+  locations: readonly Location[],
+): OrganizationLocationConnectionFamily[] {
+  const families: OrganizationLocationConnectionFamily[] = []
+  for (const intent of ['territorial_authority', 'geographic_presence', 'site'] as const) {
+    if (
+      locations.some((location) => locationEligibleForOrganizationDrawerIntent(location, intent))
+    ) {
+      families.push(intent)
+    }
+  }
+  return families
 }
 
 export function resolveOrganizationKindsForDrawerIntent(

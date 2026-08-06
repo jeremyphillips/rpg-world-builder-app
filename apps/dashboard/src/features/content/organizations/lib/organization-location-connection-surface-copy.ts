@@ -1,5 +1,7 @@
-import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
-import { getOrganizationLocationConnectionLabel } from '@rpg/contracts'
+import type {
+  OrganizationLocationConnectionFamily,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 
 type OrganizationForwardSurfaceCopy = {
   empty: string
@@ -8,6 +10,40 @@ type OrganizationForwardSurfaceCopy = {
   addDrawerInstruction: string
   addSubmit: string
 }
+
+type OrganizationForwardFamilySurfaceCopy = {
+  empty: string
+  add: string
+}
+
+export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
+  site: {
+    empty: 'No site relationships linked.',
+    add: 'Add site relationship',
+  },
+  geographic_presence: {
+    empty: 'No geographic presence linked.',
+    add: 'Add geographic presence',
+  },
+  territorial_authority: {
+    empty: 'No territorial authority linked.',
+    add: 'Add territorial authority',
+  },
+} as const satisfies Record<
+  OrganizationLocationConnectionFamily,
+  OrganizationForwardFamilySurfaceCopy
+>
+
+export const ORGANIZATION_FORWARD_KIND_HEADINGS = {
+  owns: 'Owns',
+  tenant: 'Tenants',
+  operator: 'Operates',
+  headquarters: 'Headquarters',
+  operates_in: 'Operates in',
+  governs: 'Governs',
+  controls: 'Controls',
+  claims: 'Claims',
+} as const satisfies Record<OrganizationLocationConnectionKind, string>
 
 export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   headquarters: {
@@ -98,8 +134,14 @@ export function resolveOrganizationForwardAddSubmitLabel(
   return ORGANIZATION_FORWARD_SURFACE_COPY[kind].addSubmit
 }
 
+export function resolveOrganizationForwardFamilySurfaceCopy(
+  family: OrganizationLocationConnectionFamily,
+): OrganizationForwardFamilySurfaceCopy {
+  return ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+}
+
 export function resolveOrganizationForwardKindHeading(
   kind: OrganizationLocationConnectionKind,
 ): string {
-  return getOrganizationLocationConnectionLabel(kind)
+  return ORGANIZATION_FORWARD_KIND_HEADINGS[kind]
 }

@@ -2,18 +2,24 @@
 
 import * as React from 'react'
 
-import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
+import type {
+  Organization,
+  OrganizationLocationConnectionFamily,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 import { ApiError } from '@rpg/contracts'
 
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useLocations } from '../../locations/hooks/use-locations'
 import {
-  locationEligibleForOrganizationDrawerIntent,
+  organizationConnectionDrawerIntentFromFamily,
+  organizationForwardFamilyHasAvailableTarget,
   organizationDrawerIntentFromKind,
-  resolveOrganizationKindsForDrawerIntent,
+  resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
+import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'
 import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
@@ -36,12 +42,18 @@ type DrawerState =
 export function useOrganizationLocationConnectionsDetail(
   campaignId: string,
   organizationId: string,
+  organization: Pick<Organization, 'name' | 'organizationKind'>,
 ) {
   const canManage = useCanManageCampaign(campaignId)
   const locationsQuery = useLocations(campaignId)
   const locationReferencesQuery = useOrganizationLocationReferences(campaignId, organizationId)
+  const edgesQuery = useCampaignOrganizationLocationConnectionEdges(campaignId, canManage)
   const mutations = useOrganizationLocationConnectionMutations(campaignId, organizationId)
   const [drawerState, setDrawerState] = React.useState<DrawerState | null>(null)
+
+  const locations = locationsQuery.data ?? []
+  const edgesByLocationId = edgesQuery.data
+  const occupancyLoaded = !canManage || !edgesQuery.isPending
 
   const locationConnections = React.useMemo(() => {
     if (!locationReferencesQuery.data) {
@@ -68,33 +80,34 @@ export function useOrganizationLocationConnectionsDetail(
     [locationReferencesQuery.data],
   )
 
-  const availableAddIntents = React.useMemo(() => {
-    const intents: OrganizationConnectionDrawerIntent[] = []
-    for (const intent of ['site', 'geographic_presence', 'territorial_authority'] as const) {
-      if (
-        (locationsQuery.data ?? []).some((location) =>
-          locationEligibleForOrganizationDrawerIntent(location, intent),
-        )
-      ) {
-        intents.push(intent)
-      }
-    }
-    return intents
-  }, [locationsQuery.data])
+  const visibleFamilies = React.useMemo(
+    () => resolveVisibleOrganizationConnectionFamilies(locations),
+    [locations],
+  )
 
-  const emptyKindSlots = React.useMemo(() => {
-    if (!canManage) return []
-
-    const kinds = new Set<OrganizationLocationConnectionKind>()
-    for (const location of locationsQuery.data ?? []) {
-      for (const intent of availableAddIntents) {
-        for (const kind of resolveOrganizationKindsForDrawerIntent(location, intent)) {
-          kinds.add(kind)
-        }
-      }
+  const canAddToFamily = React.useMemo(() => {
+    const result: Partial<Record<OrganizationLocationConnectionFamily, boolean>> = {}
+    for (const family of visibleFamilies) {
+      const intent = organizationConnectionDrawerIntentFromFamily(family)
+      result[family] = organizationForwardFamilyHasAvailableTarget(
+        intent,
+        locations,
+        organizationId,
+        existingConnections,
+        edgesByLocationId,
+        undefined,
+        occupancyLoaded,
+      )
     }
-    return [...kinds]
-  }, [availableAddIntents, canManage, locationsQuery.data])
+    return result
+  }, [
+    edgesByLocationId,
+    existingConnections,
+    locations,
+    occupancyLoaded,
+    organizationId,
+    visibleFamilies,
+  ])
 
   const mutationError =
     mutations.error instanceof ApiError
@@ -137,12 +150,8 @@ export function useOrganizationLocationConnectionsDetail(
     setDrawerState({ mode: 'add', intent })
   }, [])
 
-  const openAddKind = React.useCallback((kind: OrganizationLocationConnectionKind) => {
-    setDrawerState({
-      mode: 'add',
-      intent: organizationDrawerIntentFromKind(kind),
-      kind,
-    })
+  const openAddFamily = React.useCallback((family: OrganizationLocationConnectionFamily) => {
+    setDrawerState({ mode: 'add', intent: organizationConnectionDrawerIntentFromFamily(family) })
   }, [])
 
   const openEditDrawer = React.useCallback(
@@ -158,18 +167,22 @@ export function useOrganizationLocationConnectionsDetail(
 
   return {
     canManage,
-    locations: locationsQuery.data ?? [],
+    organization,
+    locations,
+    edgesByLocationId,
+    occupancyLoaded,
     locationConnections,
     existingConnections,
-    availableAddIntents,
-    emptyKindSlots,
+    visibleFamilies,
+    canAddToFamily,
     locationReferencesQuery,
+    edgesQuery,
     mutations,
     mutationError,
     drawerState,
     setDrawerState,
     openAddDrawer,
-    openAddKind,
+    openAddFamily,
     openEditDrawer,
     handleSubmit,
     handleRemoveConnection,

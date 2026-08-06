@@ -86,7 +86,22 @@ Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** �
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
+When a **family-level** add action must choose among semantically meaningful kinds, use **`LocationConnectionKindStep`** (collapsing radio cards). After selection, collapse to the chosen kind so the remaining workflow receives visual priority. Do not fork collapse behavior inside relationship drawers.
+
 When a people-section kind slot supports **both** organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), use **one inline add action** per row and resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search.
+
+## Forward vs inverse display
+
+| Surface                                  | Empty slots                                                       | Add affordance                                              |
+| ---------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------- |
+| **Organization forward** (subject-owned) | Family-level empty only — never per-kind empty groups             | One family-level add per populated or eligible-empty family |
+| **Location inverse** (target-owned)      | Per-kind empty rows when they communicate meaningful target state | Per-kind or direct-intent add actions                       |
+
+Populated forward families **always render**, even when no additional targets are currently available. Hide or disable only the family add affordance — not the populated groups.
+
+Forward kind eyebrows may use **direction-aware grammar** (for example `Owns`, `Operates`) via dashboard resolvers. Vocab still owns semantic descriptions used in drawers.
+
+Cross-org singleton territorial slots (`governs`, `controls`) require **server-backed occupancy** (`edgesByLocationId`) in organization forward drawers. Org-local connection lists alone are not authoritative for those kinds.
 
 ## Copy ownership
 

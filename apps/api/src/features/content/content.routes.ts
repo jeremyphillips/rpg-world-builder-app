@@ -15,6 +15,7 @@ import { listCharacterLocationReferences } from './locations/location-reference.
 import { listOrganizationLocationReferences } from './locations/organization-location-reference.controller'
 import { listLocationConnectedParties } from './locations/location-connected-parties.controller'
 import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
+import { listCampaignOrganizationLocationConnectionEdges } from './organizations/list-campaign-organization-location-connection-edges.controller'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
@@ -96,6 +97,13 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listOrganizationLocationReferences,
+)
+
+contentRouter.get(
+  '/organization-location-connection-edges',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listCampaignOrganizationLocationConnectionEdges,
 )
 
 contentRouter.get(

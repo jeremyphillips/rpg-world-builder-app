@@ -12,6 +12,7 @@ import {
 import { ROUTES } from '@/app/routes'
 
 import type { OrganizationLocationConnectionPreviewItem } from './organization-display'
+import { resolveOrganizationForwardKindHeading } from './organization-location-connection-surface-copy'
 
 export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS: Record<
   OrganizationLocationConnectionFamily,
@@ -56,9 +57,6 @@ function kindsForFamily(
 
 export function groupOrganizationLocationConnections(
   previewItems: readonly OrganizationLocationConnectionPreviewItem[],
-  options: {
-    emptyKindSlots?: readonly OrganizationLocationConnectionKind[]
-  } = {},
 ): OrganizationLocationConnectionFamilyGroup[] {
   const itemsByKind = new Map<
     OrganizationLocationConnectionKind,
@@ -71,13 +69,8 @@ export function groupOrganizationLocationConnections(
     itemsByKind.set(item.kind, existing)
   }
 
-  const kindsToShow = new Set<OrganizationLocationConnectionKind>([
-    ...itemsByKind.keys(),
-    ...(options.emptyKindSlots ?? []),
-  ])
-
   const familiesWithKinds = new Set<OrganizationLocationConnectionFamily>()
-  for (const kind of kindsToShow) {
+  for (const kind of itemsByKind.keys()) {
     familiesWithKinds.add(getOrganizationLocationConnectionFamily(kind))
   }
 
@@ -87,10 +80,10 @@ export function groupOrganizationLocationConnections(
     family,
     familyLabel: ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family],
     kindGroups: kindsForFamily(family)
-      .filter((kind) => kindsToShow.has(kind))
+      .filter((kind) => itemsByKind.has(kind))
       .map((kind) => ({
         kind,
-        kindLabel: getOrganizationLocationConnectionLabel(kind),
+        kindLabel: resolveOrganizationForwardKindHeading(kind),
         items: itemsByKind.get(kind) ?? [],
       })),
   }))

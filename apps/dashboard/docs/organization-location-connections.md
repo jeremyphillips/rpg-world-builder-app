@@ -37,3 +37,9 @@ Edit mode excludes the current connection row from blocking checks so authors ca
 - Schema enforcement: `organizationLocationConnectionsSchema` on organization save and nested API mutations (cross-org validated in API layer)
 
 Dashboard drawers delegate to these helpers through `location-connection-duplicate-keys`, `location-connection-drawer-intent`, and `location-connection-kind-options`.
+
+## Forward display
+
+Organization detail uses **family-level** empty states and one **Add {family}** action. Populated kind groups render only when they contain relationships. Forward kind eyebrows may differ grammatically from inverse vocab labels (see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)).
+
+Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).

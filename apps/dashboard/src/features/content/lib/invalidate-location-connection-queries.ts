@@ -5,6 +5,7 @@ import { characterLocationReferencesQueryKey } from '@/features/character'
 import { locationConnectedPartiesQueryKey } from '../locations/hooks/use-location-connected-parties'
 import { locationsQueryKey } from '../locations/hooks/use-locations'
 import { organizationLocationReferencesQueryKey } from '../organizations/hooks/use-organization-location-references'
+import { campaignOrganizationLocationConnectionEdgesQueryKey } from '../organizations/hooks/use-campaign-organization-location-connection-edges'
 
 export async function invalidateLocationConnectionQueries(
   queryClient: QueryClient,
@@ -17,6 +18,9 @@ export async function invalidateLocationConnectionQueries(
 ): Promise<void> {
   const invalidations: Promise<void>[] = [
     queryClient.invalidateQueries({ queryKey: locationsQueryKey(input.campaignId) }),
+    queryClient.invalidateQueries({
+      queryKey: campaignOrganizationLocationConnectionEdgesQueryKey(input.campaignId),
+    }),
   ]
 
   if (input.organizationId) {

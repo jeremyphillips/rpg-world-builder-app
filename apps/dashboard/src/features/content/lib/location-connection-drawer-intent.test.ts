@@ -4,13 +4,17 @@ import type { Location } from '@rpg/contracts'
 
 import {
   filterOrganizationKindsByFamily,
+  filterLocationsForOrganizationKind,
   organizationDrawerIntentFromKind,
+  organizationForwardKindHasAvailableLocation,
   organizationForwardLocationHasAvailableKind,
   organizationInverseSubjectHasAvailableKind,
+  resolveKindsForOrganizationDrawerIntent,
   resolveLocationInverseOrganizationAddAffordances,
   resolveOrganizationKindsForDrawerIntent,
   resolvePeopleSectionOrganizationAddAffordances,
   resolveTerritorialSectionOrganizationAddAffordances,
+  resolveVisibleOrganizationConnectionFamilies,
 } from './location-connection-drawer-intent'
 
 function regionLocation(overrides: Partial<Location> = {}): Location {
@@ -186,4 +190,84 @@ describe('location-connection-drawer-intent', () => {
       organizationInverseSubjectHasAvailableKind('org-1', 'region-1', eligibleKinds, rows, 'rel-1'),
     ).toBe(true)
   })
+
+  it('resolves all kinds for a drawer intent from contracts vocabulary', () => {
+    expect(resolveKindsForOrganizationDrawerIntent('site')).toEqual([
+      'owns',
+      'tenant',
+      'operator',
+      'headquarters',
+    ])
+  })
+
+  it('filters locations by selected kind using server-backed occupancy', () => {
+    const region = regionLocation()
+    const building = {
+      ...settlementLocation(),
+      id: 'building-1',
+      kind: 'structure',
+      structureType: 'building',
+    } as Location
+
+    const governsBlocked = filterLocationsForOrganizationKind([region], 'governs', 'org-1', [], {
+      [region.id]: [
+        {
+          organizationId: 'org-other',
+          connectionId: 'conn-other',
+          locationId: region.id,
+          kind: 'governs',
+        },
+      ],
+    })
+    expect(governsBlocked).toEqual([])
+
+    const ownsEligible = filterLocationsForOrganizationKind([building], 'owns', 'org-1', [], {})
+    expect(ownsEligible.map((location) => location.id)).toEqual(['building-1'])
+  })
+
+  it('does not treat org-local connections as authoritative for cross-org governs occupancy', () => {
+    const region = regionLocation()
+    expect(organizationForwardKindHasAvailableLocation('governs', [region], 'org-1', [], {})).toBe(
+      true,
+    )
+
+    expect(
+      organizationForwardKindHasAvailableLocation(
+        'governs',
+        [region],
+        'org-1',
+        [],
+        {
+          [region.id]: [
+            {
+              organizationId: 'org-other',
+              connectionId: 'conn-other',
+              locationId: region.id,
+              kind: 'governs',
+            },
+          ],
+        },
+        undefined,
+        true,
+      ),
+    ).toBe(false)
+  })
+
+  it('derives visible forward families from location profiles', () => {
+    expect(
+      resolveVisibleOrganizationConnectionFamilies([regionLocation(), buildingLocation()]),
+    ).toEqual(['territorial_authority', 'geographic_presence', 'site'])
+  })
 })
+
+function buildingLocation(overrides: Partial<Location> = {}): Location {
+  return {
+    id: 'building-1',
+    campaignId: 'camp-1',
+    name: 'Guildhall',
+    slug: 'guildhall',
+    kind: 'structure',
+    structureType: 'building',
+    ...overrides,
+  } as Location
+}

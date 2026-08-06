@@ -42,11 +42,12 @@ export const WithConnections: Story = {
     locationConnections: sampleLocationConnections,
     canManage: true,
     showEmptySection: true,
-    emptyKindSlots: ['controls', 'claims'],
+    visibleFamilies: ['territorial_authority', 'site'],
+    canAddToFamily: { territorial_authority: true, site: true },
   },
 }
 
-export const ManagerEmpty: Story = {
+export const ManagerEmptySiteFamily: Story = {
   args: {
     locationConnections: {
       previewItems: [],
@@ -55,7 +56,18 @@ export const ManagerEmpty: Story = {
     },
     canManage: true,
     showEmptySection: true,
-    emptyKindSlots: ['governs', 'operates_in', 'headquarters'],
+    visibleFamilies: ['site'],
+    canAddToFamily: { site: true },
+  },
+}
+
+export const PopulatedWithoutAdd: Story = {
+  args: {
+    locationConnections: sampleLocationConnections,
+    canManage: true,
+    showEmptySection: true,
+    visibleFamilies: ['territorial_authority'],
+    canAddToFamily: { territorial_authority: false },
   },
 }
 

@@ -1,5 +1,6 @@
 import type {
   CharacterLocationConnectionKind,
+  Location,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -13,7 +14,13 @@ import {
 } from '@rpg/contracts'
 
 import { isOrganizationLocationConnectionKindBlockedForLocation } from './location-connection-duplicate-keys'
-import { LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON } from './location-connection-drawer-intent'
+import {
+  organizationForwardKindHasAvailableLocation,
+  LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON,
+  ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
+  resolveKindsForOrganizationDrawerIntent,
+  type OrganizationConnectionDrawerIntent,
+} from './location-connection-drawer-intent'
 import {
   resolveTerritorialKindOccupiedReason,
   TERRITORIAL_AUTHORITY_DRAWER,
@@ -158,6 +165,47 @@ export function buildOrganizationLocationConnectionKindOptions(input: {
             edgesAtLocation: input.edgesAtLocation,
             excludeConnectionId: input.excludeConnectionId,
           })
+        : undefined,
+    }
+  })
+}
+
+export function buildOrganizationFamilyKindOptions(input: {
+  intent: OrganizationConnectionDrawerIntent
+  locations: readonly Location[]
+  subjectOrganizationId: string
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >
+  excludeConnectionId?: string
+  occupancyLoaded?: boolean
+}): LocationConnectionKindOption[] {
+  const occupancyLoaded = input.occupancyLoaded ?? true
+  const kinds = resolveKindsForOrganizationDrawerIntent(input.intent)
+
+  return kinds.map((kind) => {
+    const hasAvailableLocation = organizationForwardKindHasAvailableLocation(
+      kind,
+      input.locations,
+      input.subjectOrganizationId,
+      input.connections,
+      input.edgesByLocationId,
+      input.excludeConnectionId,
+      occupancyLoaded,
+    )
+
+    return {
+      value: kind,
+      label: getOrganizationLocationConnectionLabel(kind),
+      description: resolveOrganizationLocationConnectionKindDescription(kind),
+      disabled: !hasAvailableLocation,
+      disabledReason: !hasAvailableLocation
+        ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[input.intent]
         : undefined,
     }
   })

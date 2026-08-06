@@ -2,7 +2,10 @@
 
 import * as React from 'react'
 
-import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
+import type {
+  OrganizationLocationConnectionFamily,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 import { Button, Heading, SemanticText, Text } from '@rpg/ui'
 
 import {
@@ -10,8 +13,11 @@ import {
   ORGANIZATION_SECTION_LABELS,
   type OrganizationLocationConnectionsViewModel,
 } from '../lib/organization-display'
-import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
-import { resolveOrganizationForwardSurfaceCopy } from '../lib/organization-location-connection-surface-copy'
+import {
+  groupOrganizationLocationConnections,
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS,
+} from '../lib/build-organization-location-connection-cards'
+import { resolveOrganizationForwardFamilySurfaceCopy } from '../lib/organization-location-connection-surface-copy'
 import { OrganizationLocationConnectionRelationshipRow } from './organization-location-connection-relationship-row.client'
 import {
   RelationshipFieldGroup,
@@ -28,6 +34,12 @@ export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
 export const ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER =
   'Link this organization to locations where it has site presence, geographic activity, or territorial authority.'
 
+const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
+  'territorial_authority',
+  'geographic_presence',
+  'site',
+]
+
 export type OrganizationLocationConnectionEditTarget = {
   connectionId: string
   locationId: string
@@ -36,7 +48,8 @@ export type OrganizationLocationConnectionEditTarget = {
 
 export type OrganizationLocationConnectionsSectionProps = {
   locationConnections: OrganizationLocationConnectionsViewModel
-  emptyKindSlots?: readonly OrganizationLocationConnectionKind[]
+  visibleFamilies?: readonly OrganizationLocationConnectionFamily[]
+  canAddToFamily?: Readonly<Partial<Record<OrganizationLocationConnectionFamily, boolean>>>
   canManage?: boolean
   showEmptySection?: boolean
   isPending?: boolean
@@ -45,14 +58,15 @@ export type OrganizationLocationConnectionsSectionProps = {
   mutationError?: string | null
   isMutationPending?: boolean
   pendingConnectionId?: string
-  onAddKind?: (kind: OrganizationLocationConnectionKind) => void
+  onAddFamily?: (family: OrganizationLocationConnectionFamily) => void
   onEditConnection?: (connection: OrganizationLocationConnectionEditTarget) => void
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
 }
 
 export function OrganizationLocationConnectionsSection({
   locationConnections,
-  emptyKindSlots = [],
+  visibleFamilies = [],
+  canAddToFamily = {},
   canManage = false,
   showEmptySection = true,
   isPending = false,
@@ -61,19 +75,29 @@ export function OrganizationLocationConnectionsSection({
   mutationError = null,
   isMutationPending = false,
   pendingConnectionId,
-  onAddKind,
+  onAddFamily,
   onEditConnection,
   onRemoveConnection,
 }: OrganizationLocationConnectionsSectionProps) {
   const { previewItems, total, emptyText } = locationConnections
 
-  const groupedFamilies = React.useMemo(
-    () =>
-      groupOrganizationLocationConnections(previewItems, {
-        emptyKindSlots: canManage ? emptyKindSlots : undefined,
-      }),
-    [canManage, emptyKindSlots, previewItems],
+  const populatedFamilies = React.useMemo(
+    () => groupOrganizationLocationConnections(previewItems),
+    [previewItems],
   )
+
+  const populatedFamilyMap = React.useMemo(
+    () => new Map(populatedFamilies.map((familyGroup) => [familyGroup.family, familyGroup])),
+    [populatedFamilies],
+  )
+
+  const familiesToRender = React.useMemo(() => {
+    const familySet = new Set<OrganizationLocationConnectionFamily>([
+      ...populatedFamilies.map((familyGroup) => familyGroup.family),
+      ...(canManage ? visibleFamilies : []),
+    ])
+    return ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER.filter((family) => familySet.has(family))
+  }, [canManage, populatedFamilies, visibleFamilies])
 
   if (!showEmptySection && total === 0) {
     return null
@@ -96,27 +120,29 @@ export function OrganizationLocationConnectionsSection({
         <Text variant="muted">Loading…</Text>
       ) : isError ? (
         <Text variant="muted">{errorText}</Text>
-      ) : total === 0 && groupedFamilies.length === 0 ? (
+      ) : familiesToRender.length === 0 ? (
         canManage ? (
           <Text variant="muted">{emptyText}</Text>
         ) : null
       ) : (
         <div className="space-y-4">
           {total > 0 ? <Text variant="muted">{formatLocationConnectionsCount(total)}</Text> : null}
-          {groupedFamilies.map((familyGroup) => (
-            <RelationshipFieldGroup
-              key={familyGroup.family}
-              heading={familyGroup.familyLabel}
-              headingId={`organization-location-connections-${familyGroup.family}-heading`}
-              headingAs="h3"
-            >
-              {familyGroup.kindGroups.map((kindGroup) => {
-                const copy = resolveOrganizationForwardSurfaceCopy(kindGroup.kind)
+          {familiesToRender.map((family) => {
+            const familyGroup = populatedFamilyMap.get(family)
+            const familyCopy = resolveOrganizationForwardFamilySurfaceCopy(family)
+            const familyAddEnabled = canManage && Boolean(canAddToFamily[family])
 
-                return (
-                  <RelationshipFieldGroupRow key={kindGroup.kind} eyebrow={kindGroup.kindLabel}>
-                    {kindGroup.items.length > 0 ? (
-                      <div className="space-y-1">
+            return (
+              <RelationshipFieldGroup
+                key={family}
+                heading={ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family]}
+                headingId={`organization-location-connections-${family}-heading`}
+                headingAs="h3"
+              >
+                {familyGroup && familyGroup.kindGroups.length > 0 ? (
+                  <>
+                    {familyGroup.kindGroups.map((kindGroup) => (
+                      <RelationshipFieldGroupRow key={kindGroup.kind} eyebrow={kindGroup.kindLabel}>
                         <ul className="space-y-1">
                           {kindGroup.items.map((item) => (
                             <li key={item.connectionId}>
@@ -132,30 +158,34 @@ export function OrganizationLocationConnectionsSection({
                             </li>
                           ))}
                         </ul>
-                        {canManage ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            density="compact"
-                            onClick={() => onAddKind?.(kindGroup.kind)}
-                          >
-                            {copy.add}
-                          </Button>
-                        ) : null}
+                      </RelationshipFieldGroupRow>
+                    ))}
+                    {familyAddEnabled ? (
+                      <div className="px-4 py-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          density="compact"
+                          onClick={() => onAddFamily?.(family)}
+                        >
+                          + {familyCopy.add}
+                        </Button>
                       </div>
-                    ) : canManage ? (
-                      <RelationshipEmptyInlineRow
-                        emptyLabel={copy.empty}
-                        addLabel={copy.add}
-                        onAdd={() => onAddKind?.(kindGroup.kind)}
-                      />
                     ) : null}
-                  </RelationshipFieldGroupRow>
-                )
-              })}
-            </RelationshipFieldGroup>
-          ))}
+                  </>
+                ) : canManage ? (
+                  <div className="px-4 py-2">
+                    <RelationshipEmptyInlineRow
+                      emptyLabel={familyCopy.empty}
+                      addLabel={familyAddEnabled ? familyCopy.add : undefined}
+                      onAdd={familyAddEnabled ? () => onAddFamily?.(family) : undefined}
+                    />
+                  </div>
+                ) : null}
+              </RelationshipFieldGroup>
+            )
+          })}
         </div>
       )}
     </section>

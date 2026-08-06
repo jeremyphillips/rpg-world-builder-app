@@ -1,6 +1,6 @@
 'use client'
 
-import type { Location } from '@rpg/contracts'
+import type { Location, Organization } from '@rpg/contracts'
 
 import { OrganizationLocationConnectionLinkDrawer } from './organization-location-connection-link-drawer.client'
 import {
@@ -11,18 +11,19 @@ import { useOrganizationLocationConnectionsDetail } from '../hooks/use-organizat
 
 export function OrganizationLocationConnectionsDetailSection({
   campaignId,
-  organizationId,
+  organization,
 }: {
   campaignId: string
-  organizationId: string
+  organization: Organization
 }) {
-  const detail = useOrganizationLocationConnectionsDetail(campaignId, organizationId)
+  const detail = useOrganizationLocationConnectionsDetail(campaignId, organization.id, organization)
 
   return (
     <>
       <OrganizationLocationConnectionsSection
         locationConnections={detail.locationConnections}
-        emptyKindSlots={detail.emptyKindSlots}
+        visibleFamilies={detail.visibleFamilies}
+        canAddToFamily={detail.canAddToFamily}
         canManage={detail.canManage}
         showEmptySection={detail.canManage || detail.locationConnections.total > 0}
         isPending={detail.locationReferencesQuery.isPending}
@@ -31,7 +32,7 @@ export function OrganizationLocationConnectionsDetailSection({
         mutationError={detail.mutationError}
         isMutationPending={detail.mutations.isPending}
         pendingConnectionId={detail.mutations.pendingConnectionId}
-        onAddKind={detail.canManage ? detail.openAddKind : undefined}
+        onAddFamily={detail.canManage ? detail.openAddFamily : undefined}
         onEditConnection={detail.canManage ? detail.openEditDrawer : undefined}
         onRemoveConnection={detail.canManage ? detail.handleRemoveConnection : undefined}
       />
@@ -45,9 +46,12 @@ export function OrganizationLocationConnectionsDetailSection({
           mode={detail.drawerState.mode}
           intent={detail.drawerState.intent}
           addKind={detail.drawerState.mode === 'add' ? detail.drawerState.kind : undefined}
-          organizationId={organizationId}
+          organization={organization}
+          organizationId={organization.id}
           locations={detail.locations as Location[]}
           existingConnections={detail.existingConnections}
+          edgesByLocationId={detail.edgesByLocationId}
+          occupancyLoaded={detail.occupancyLoaded}
           initialConnection={
             detail.drawerState.mode === 'edit'
               ? {

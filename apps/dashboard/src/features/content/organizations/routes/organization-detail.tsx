@@ -75,7 +75,7 @@ export function OrganizationDetailContent({
         <div className="space-y-8">
           <OrganizationLocationConnectionsDetailSection
             campaignId={campaignId}
-            organizationId={organization.id}
+            organization={organization}
           />
           <OrganizationConnectedCharactersSection
             connectedCharacters={viewModel.connectedCharacters}
