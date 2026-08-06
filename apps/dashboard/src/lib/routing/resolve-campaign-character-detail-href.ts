@@ -1,4 +1,4 @@
-import type { ReferencingCharacterSummary } from '@rpg/contracts'
+import type { CharacterType } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
@@ -7,7 +7,10 @@ import { resolveCharacterDetailHref } from './resolve-character-detail-href'
 /** Resolves campaign-context detail links for mixed PC/NPC character summaries. */
 export function resolveCampaignCharacterDetailHref(
   routeContext: { campaignId: string },
-  member: Pick<ReferencingCharacterSummary, 'characterType' | 'character'>,
+  member: {
+    characterType: CharacterType
+    character: { id: string }
+  },
 ): string {
   if (member.characterType === 'npc') {
     return ROUTES.campaign.npcs.detail(routeContext.campaignId, member.character.id)

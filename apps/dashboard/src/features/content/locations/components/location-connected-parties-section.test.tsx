@@ -22,6 +22,24 @@ const sampleRows = [
   },
 ]
 
+const peopleNpcRows = [
+  {
+    relationshipId: 'rel-npc-1',
+    subject: {
+      type: 'character' as const,
+      id: 'npc-1',
+      name: 'Durnan',
+      slug: 'npc-1',
+      characterType: 'npc' as const,
+    },
+    kind: 'works_at',
+    label: 'Works here',
+    family: 'presence',
+    priority: 40,
+    sectionGroup: 'people_and_organizations' as const,
+  },
+]
+
 const peopleKindSlots = [
   {
     heading: 'Operates in',
@@ -160,6 +178,26 @@ describe('LocationConnectedPartiesSection', () => {
       subjectId: 'org-1',
       kind: 'governs',
     })
+  })
+
+  it('links NPC people rows to the npc detail route', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          sectionGroup="people_and_organizations"
+          rows={peopleNpcRows}
+          canManage
+          showEmptySection
+          peopleKindSlots={peopleKindSlots}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Durnan' })).toHaveAttribute(
+      'href',
+      `/campaigns/${STORY_CAMPAIGN_ID}/npcs/npc-1`,
+    )
   })
 
   it('has no axe accessibility violations', async () => {

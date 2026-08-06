@@ -90,7 +90,11 @@ describe('resolveLocationConnectedParties', () => {
       expect.objectContaining({
         relationshipId: 'char-loc-1',
         sectionGroup: 'people_and_organizations',
-        subject: expect.objectContaining({ type: 'character', name: 'Beta NPC' }),
+        subject: expect.objectContaining({
+          type: 'character',
+          name: 'Beta NPC',
+          characterType: 'npc',
+        }),
         label: 'Works here',
       }),
     ])

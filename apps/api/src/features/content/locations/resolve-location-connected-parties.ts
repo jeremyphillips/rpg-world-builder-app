@@ -1,5 +1,6 @@
 import type {
   CharacterLocationConnectionKind,
+  CharacterType,
   LocationConnectedPartyRow,
   OrganizationLocationConnection,
   PaginatedItems,
@@ -23,6 +24,7 @@ import { HomebrewOrganizationModel } from '../organizations/homebrew-organizatio
 type CharacterConnectionHit = {
   _id: unknown
   name: string
+  characterType: CharacterType
   connections?: {
     locations?: Array<{ id: string; locationId: string; kind: string }>
   }
@@ -64,6 +66,7 @@ function expandCharacterRows(
           id: subjectId,
           name: hit.name,
           slug: subjectId,
+          characterType: hit.characterType,
         },
         kind: connection.kind,
         label: getCharacterLocationConnectionLabel(kind),
@@ -162,7 +165,7 @@ export async function resolveLocationConnectedParties(input: {
     CharacterModel.find({
       'connections.locations.locationId': locationId,
     })
-      .select({ _id: 1, name: 1, connections: 1 })
+      .select({ _id: 1, name: 1, characterType: 1, connections: 1 })
       .lean<CharacterConnectionHit[]>(),
     HomebrewOrganizationModel.find({
       campaignId,

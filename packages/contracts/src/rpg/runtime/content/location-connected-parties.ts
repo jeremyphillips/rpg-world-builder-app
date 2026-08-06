@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { paginatedItemsSchema, type PaginatedItems } from '../../../lib/paginated-items'
+import { characterTypeSchema } from '../character/core'
 
 export const LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS = [
   'territorial_authority',
@@ -10,12 +11,21 @@ export const LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS = [
 export type LocationConnectedPartySectionGroup =
   (typeof LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS)[number]
 
-export const locationConnectedPartySubjectSchema = z.object({
-  type: z.enum(['character', 'organization']),
+const locationConnectedPartySubjectBaseSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   slug: z.string().min(1),
 })
+
+export const locationConnectedPartySubjectSchema = z.discriminatedUnion('type', [
+  locationConnectedPartySubjectBaseSchema.extend({
+    type: z.literal('character'),
+    characterType: characterTypeSchema,
+  }),
+  locationConnectedPartySubjectBaseSchema.extend({
+    type: z.literal('organization'),
+  }),
+])
 
 export type LocationConnectedPartySubject = z.infer<typeof locationConnectedPartySubjectSchema>
 

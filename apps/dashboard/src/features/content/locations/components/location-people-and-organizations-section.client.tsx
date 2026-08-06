@@ -5,8 +5,6 @@ import { Plus } from 'lucide-react'
 import { Button, Text } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
-import { ROUTES } from '@/app/routes'
-
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import {
   RelationshipFieldGroup,
@@ -28,6 +26,7 @@ import {
   peopleKindSlotKey,
   resolvePeopleKindSlotAddLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
+import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
 function buildPeopleOverflowActions(input: {
@@ -44,9 +43,7 @@ function buildPeopleOverflowActions(input: {
   }) => void
 }): RelationshipOverflowAction[] {
   const isOrganization = input.row.subject.type === 'organization'
-  const detailHref = isOrganization
-    ? ROUTES.content.organizations.detail(input.campaignId, input.row.subject.id)
-    : ROUTES.campaign.characters.detail(input.campaignId, input.row.subject.id)
+  const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, input.row.subject)
 
   const actions: RelationshipOverflowAction[] = [
     {
@@ -218,11 +215,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
                       <li key={row.relationshipId}>
                         <CrossContentRelationshipRow
                           heading={row.subject.name}
-                          href={
-                            row.subject.type === 'organization'
-                              ? ROUTES.content.organizations.detail(campaignId, row.subject.id)
-                              : ROUTES.campaign.characters.detail(campaignId, row.subject.id)
-                          }
+                          href={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
                           actions={buildPeopleOverflowActions({
                             campaignId,
                             row,
