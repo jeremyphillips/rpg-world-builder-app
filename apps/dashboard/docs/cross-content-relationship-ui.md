@@ -204,9 +204,19 @@ Fix inverse presentation **only where generic or family-level copy is incorrect 
 
 Location inverse is already fixed on the location endpoint; “choose an organization/character” is usually enough. Eligibility, occupancy, mutation alternatives, candidate derivation, and authorization stay outside presentation modules.
 
-### Future follow-up — location hierarchy inverse authoring
+### Location hierarchy inverse authoring
 
-Before adding parent-side child/reparent editing, review the existing **Current X → New X** replacement pattern (`RelationshipDrawerCurrentEntityField`, replacement field labels, searchable picker). Parent and child views must mutate one canonical hierarchy relationship (`child.parentLocationId`) — do not introduce a separately persisted `children[]`. Reuse or extract shared replacement presentation primitives if hierarchy would otherwise create a third local implementation. Keep hierarchy eligibility, cycle prevention, and candidate derivation domain-owned. This follow-up does **not** block inverse subject presentation cleanup.
+Location parent/child editing is **not** a typed-edge relationship. Contained locations and Located in are forward/inverse **projections** of one canonical edge: the child’s `parentLocationId`. There is no persisted `children[]`.
+
+| Surface                               | Affordance                                                                                                   | Mutation                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Child detail **Located in**           | **Change parent** / **Set parent** (managers; no clear; no View-parent overflow — breadcrumb links navigate) | `updateContent(..., { parentLocationId })` on the open location |
+| Parent detail **Contained locations** | Row overflow **View location** + **Move location** (managers); View link only for non-managers               | Same mutation on the **selected child**                         |
+| Header **Add location**               | Create-only child under this location (`?type=` + `?parent=`)                                                | Create, not reparent                                            |
+
+**Authority invariant:** breadcrumb ancestry is presentation only. Drawers resolve **Current parent** and submit targets from the subject’s persisted `parentLocationId` (looked up in the campaign locations list). Move must not treat the open parent detail id as Current when it disagrees with that field — refresh/block instead.
+
+**Shared Current→New chrome** lives in neutral [`entity-replacement/`](../src/features/content/lib/entity-replacement/) (`EntityReplacementSection`, current field, replacement labels). Relationship drawers (org forward change-target, location inverse replace-organization) **consume** that layer. Hierarchy must **not** depend on relationship-owned Current/New modules. Eligibility, cycle prevention, and candidates stay domain-owned (`validateLocationParentAssignment` + location-feature helpers). After parent mutation, invalidate/refetch the campaign locations list — do not hand-patch ancestry/children projections.
 
 ## Implementation guard
 
@@ -220,10 +230,10 @@ Before building a new cross-content relationship surface, evaluate:
 
 ## Non-adopters
 
-| Surface                                  | Reason                                 |
-| ---------------------------------------- | -------------------------------------- |
-| Organization connected-character preview | Entity membership, not typed edge      |
-| Location children hierarchy              | Parent/child structure, not typed edge |
+| Surface                                  | Reason                                                                 |
+| ---------------------------------------- | ---------------------------------------------------------------------- |
+| Organization connected-character preview | Entity membership, not typed edge                                      |
+| Location children hierarchy              | Parent/child structure, not typed edge — see hierarchy inverse section |
 
 ## Related
 

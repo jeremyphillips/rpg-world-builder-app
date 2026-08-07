@@ -40,3 +40,15 @@ export const SetParent: Story = {
     onSubmit: async () => undefined,
   },
 }
+
+export const MoveLocation: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    subject: YAWNING_PORTAL,
+    campaignLocations: [...LOCATIONS_LIST, PLANE],
+    surface: 'move',
+    expectedParentLocationId: YAWNING_PORTAL.parentLocationId,
+    onSubmit: async () => undefined,
+  },
+}

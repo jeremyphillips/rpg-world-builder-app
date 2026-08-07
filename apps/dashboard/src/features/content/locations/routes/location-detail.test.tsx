@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
@@ -104,6 +105,17 @@ describe('LocationDetailContent', () => {
     renderDetail(ALDERMERE)
 
     expect(screen.getByRole('button', { name: 'Set parent' })).toBeInTheDocument()
+  })
+
+  it('shows Contained Move overflow for managers instead of a View link', async () => {
+    const user = userEvent.setup()
+    useCanManageCampaignMock.mockReturnValue(true)
+    renderDetail(HARBORFORD)
+
+    expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Actions for Dock Ward' }))
+    expect(screen.getByRole('menuitem', { name: 'View location' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

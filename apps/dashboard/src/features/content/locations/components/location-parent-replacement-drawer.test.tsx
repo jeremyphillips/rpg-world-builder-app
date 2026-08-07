@@ -83,4 +83,27 @@ describe('LocationParentReplacementDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Select' }))
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
   })
+
+  it('uses Move chrome and blocks submit when expected parent mismatches authority', () => {
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        surface="move"
+        expectedParentLocationId="not-the-parent"
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Move Yawning Portal' })).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'This location’s parent no longer matches this page. Refresh the locations list and try again.',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Move location' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
+  })
 })

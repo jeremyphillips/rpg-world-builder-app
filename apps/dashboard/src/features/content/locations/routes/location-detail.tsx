@@ -70,6 +70,10 @@ export function LocationDetailContent({
           <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
+            canManage={canManage}
+            parentLocationId={location.id}
+            campaignId={campaignId}
+            campaignLocations={locations}
             headerActions={
               canManage ? (
                 <LocationAddChildMenu
