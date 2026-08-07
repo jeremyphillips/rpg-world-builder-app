@@ -33,9 +33,9 @@ describe('radioCard surface establishment', () => {
     expect(radioCardDescriptionVariants()).toContain('text-muted-foreground')
   })
 
-  it('tightens compact horizontal rhythm with 4px gap and 16px controls', () => {
-    expect(radioCardRootLayoutVariants({ density: 'compact' })).toContain('gap-1')
-    expect(radioCardDetailsGridVariants({ density: 'compact' })).toContain('gap-x-1')
+  it('uses compact horizontal rhythm with 12px gap and 16px controls', () => {
+    expect(radioCardRootLayoutVariants({ density: 'compact' })).toContain('gap-3')
+    expect(radioCardDetailsGridVariants({ density: 'compact' })).toContain('gap-x-3')
     expect(radioCardControlVariants({ variant: 'card', density: 'compact' })).toContain('size-4')
   })
 
