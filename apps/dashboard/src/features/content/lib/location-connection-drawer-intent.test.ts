@@ -72,14 +72,34 @@ describe('location-connection-drawer-intent', () => {
     ])
   })
 
-  it('exposes settlement governing org, headquarters, and presence affordances', () => {
+  it('exposes settlement governing org and presence affordances without site family add', () => {
     const settlementAffordances =
       resolveLocationInverseOrganizationAddAffordances(settlementLocation())
     expect(settlementAffordances.map((affordance) => affordance.label)).toEqual([
       'Add governing organization',
-      'Add headquarters',
       'Add organization presence',
     ])
+  })
+
+  it('derives change-target eligibility from the persisted kind, not drawer-intent kind union', () => {
+    const settlement = settlementLocation()
+    const guildhall = buildingLocation()
+    const mint = {
+      ...buildingLocation(),
+      id: 'building-2',
+      name: 'Silver Eel',
+      slug: 'silver-eel',
+    } as Location
+
+    const headquartersTargets = filterLocationsForOrganizationKind(
+      [settlement, guildhall, mint],
+      'headquarters',
+      'org-1',
+      [],
+      {},
+    )
+
+    expect(headquartersTargets.map((location) => location.id)).toEqual(['building-1', 'building-2'])
   })
 
   it('keeps territorial add available when only governs slot is occupied by another org', () => {

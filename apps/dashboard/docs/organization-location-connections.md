@@ -8,7 +8,7 @@ Each connection kind belongs to one of three families:
 
 | Family                  | Cardinality                                    | Example                                                                                              |
 | ----------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `site`                  | **one per kind** per organization + location   | `owns` + `headquarters` on the same settlement                                                       |
+| `site`                  | **one per kind** per organization + location   | `owns` + `headquarters` on the same building                                                         |
 | `geographic_presence`   | **one per family** per organization + location | `operates_in` at most once per org                                                                   |
 | `territorial_authority` | **kind-scoped** (see below)                    | `governs` and `controls` are singleton slots per location across orgs; `claims` allows multiple orgs |
 
@@ -37,6 +37,14 @@ Edit mode excludes the current connection row from blocking checks so authors ca
 - Schema enforcement: `organizationLocationConnectionsSchema` on organization save and nested API mutations (cross-org validated in API layer)
 
 Dashboard drawers delegate to these helpers through `location-connection-duplicate-keys`, `location-connection-drawer-intent`, and `location-connection-kind-options`.
+
+### Headquarters location policy
+
+`headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts).
+
+Mutation candidate filtering (add, change location, replace organization) always evaluates the **persisted or selected relationship kind**, never the union of kinds represented by a drawer intent family.
+
+> **Follow-up (out of scope):** legacy `location.partyAssociations` authoring may still expose headquarters on settlements through a separate edge model. Reconcile in a dedicated audit — do not conflate with `connections.locations` eligibility.
 
 ## Forward display
 

@@ -72,11 +72,7 @@ const LOCATION_CONNECTION_ELIGIBILITY_BY_PROFILE = {
   },
   settlement: {
     characterKinds: [CHARACTER_KINDS.resides_at],
-    organizationKinds: [
-      ORGANIZATION_KINDS.headquarters,
-      ORGANIZATION_KINDS.operates_in,
-      ORGANIZATION_KINDS.governs,
-    ],
+    organizationKinds: [ORGANIZATION_KINDS.operates_in, ORGANIZATION_KINDS.governs],
   },
   district: {
     characterKinds: [CHARACTER_KINDS.resides_at],
@@ -142,7 +138,7 @@ const LOCATION_CONNECTION_ELIGIBILITY_BY_PROFILE = {
   },
   interior: {
     characterKinds: [CHARACTER_KINDS.tenant, CHARACTER_KINDS.resides_at, CHARACTER_KINDS.works_at],
-    organizationKinds: [ORGANIZATION_KINDS.headquarters, ORGANIZATION_KINDS.tenant],
+    organizationKinds: [ORGANIZATION_KINDS.tenant],
   },
 } as const satisfies Record<LocationConnectionProfile, LocationConnectionEligibility>
 

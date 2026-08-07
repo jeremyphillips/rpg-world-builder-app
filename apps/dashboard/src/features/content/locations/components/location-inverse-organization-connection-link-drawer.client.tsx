@@ -328,7 +328,16 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     return current ? [current, ...alternatives] : organizations
   }, [initialConnection, mode, organizations, showOrganizationPicker])
 
-  const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
+  const availabilityKinds = React.useMemo(() => {
+    const kinds =
+      mode === 'replaceOrganization' && initialConnection
+        ? [initialConnection.kind]
+        : resolvedAddKind
+          ? [resolvedAddKind]
+          : eligibleKinds
+
+    return kinds.filter((kind) => eligibleKinds.includes(kind))
+  }, [eligibleKinds, initialConnection, mode, resolvedAddKind])
 
   return (
     <CatalogPickerSheet

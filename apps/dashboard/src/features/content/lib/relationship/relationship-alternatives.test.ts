@@ -92,6 +92,40 @@ describe('resolveRelationshipAlternatives', () => {
     expect(resolved.alternatives.changeKind?.length).toBeGreaterThan(0)
   })
 
+  it('limits headquarters changeTarget candidates to structure-family locations', () => {
+    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = buildingLocation({
+      id: 'building-2',
+      name: 'The Silver Eel',
+      slug: 'silver-eel',
+    })
+    const settlement = {
+      ...regionLocation(),
+      id: 'settlement-1',
+      kind: 'settlement' as const,
+      name: 'Ilthmar',
+      slug: 'ilthmar',
+    } as Location
+
+    const resolved = resolveRelationshipAlternatives({
+      surface: 'organization_forward',
+      canManage: true,
+      occupancyLoaded: true,
+      relationship: {
+        connectionId: 'conn-hq',
+        locationId: guildhouse.id,
+        kind: 'headquarters',
+        subjectOrganizationId: 'org-1',
+      },
+      locationCandidates: authoritativeLocations([guildhouse, silverEel, settlement]),
+      connections: [{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }],
+    })
+
+    expect(resolved.alternatives.changeTarget?.map((location) => location.id)).toEqual([
+      'building-2',
+    ])
+  })
+
   it('hides changeKind when location profile allows only the current kind', () => {
     const district = {
       ...regionLocation(),

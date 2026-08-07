@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
-import { CITY_COUNCIL } from '../../organizations/fixtures'
+import { CITY_COUNCIL, SILVER_CIRCLE } from '../../organizations/fixtures'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
 
 function settlementLocation(): Location {
@@ -14,6 +14,17 @@ function settlementLocation(): Location {
     name: 'Port City',
     slug: 'port-city',
     kind: 'settlement',
+  } as Location
+}
+
+function infrastructureLocation(): Location {
+  return {
+    id: 'infrastructure-1',
+    campaignId: 'camp-1',
+    name: 'City Waterworks',
+    slug: 'city-waterworks',
+    kind: 'structure',
+    structureType: 'infrastructure',
   } as Location
 }
 
@@ -160,5 +171,27 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
     expect(screen.getByText('City Council')).toBeInTheDocument()
+  })
+
+  it('evaluates replace-organization availability for the persisted kind, not site-family union', () => {
+    render(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="replaceOrganization"
+        intent="site"
+        location={infrastructureLocation()}
+        organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
+        connectedPartyRows={[headquartersRow]}
+        initialConnection={{
+          relationshipId: 'rel-hq',
+          organizationId: CITY_COUNCIL.id,
+          kind: 'headquarters',
+        }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Select' })).toBeDisabled()
   })
 })

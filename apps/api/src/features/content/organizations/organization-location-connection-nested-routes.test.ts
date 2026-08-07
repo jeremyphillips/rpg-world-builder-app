@@ -48,6 +48,15 @@ async function seedRegionLocation(campaignId: string) {
   return { world, region }
 }
 
+async function seedSettlementLocation(campaignId: string, regionId: string) {
+  return createHomebrewContent(locationWriteConfig, campaignId, {
+    slug: 'org-conn-settlement',
+    kind: 'settlement',
+    name: 'Org Conn Settlement',
+    parentLocationId: regionId,
+  })
+}
+
 describe('organization location connection nested routes', () => {
   it('mutates organization location connections and resolves references', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
@@ -214,10 +223,11 @@ describe('organization location connection nested routes', () => {
     ])
   })
 
-  it('rejects region headquarters and duplicate location/kind pairs', async () => {
+  it('rejects region and settlement headquarters and duplicate location/kind pairs', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
     const { region } = await seedRegionLocation(campaignId)
+    const settlement = await seedSettlementLocation(campaignId, region.id)
 
     const organization = await createHomebrewContent(
       organizationWriteConfig,
@@ -229,8 +239,18 @@ describe('organization location connection nested routes', () => {
       .post(locationConnectionsPath(campaignId, organization.id))
       .set(CSRF_HEADER, csrfToken)
       .send({
-        id: 'org-hq-reject',
+        id: 'org-hq-reject-region',
         locationId: region.id,
+        kind: 'headquarters',
+      })
+      .expect(400)
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-hq-reject-settlement',
+        locationId: settlement.id,
         kind: 'headquarters',
       })
       .expect(400)

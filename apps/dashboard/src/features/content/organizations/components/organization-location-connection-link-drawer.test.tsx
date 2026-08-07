@@ -281,6 +281,14 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('clears an incompatible selected location when changing kind', async () => {
     const user = userEvent.setup()
 
+    const infrastructureLocation = {
+      ...buildingLocation(),
+      id: 'infrastructure-1',
+      name: 'City Waterworks',
+      slug: 'city-waterworks',
+      structureType: 'infrastructure',
+    } as Location
+
     render(
       <OrganizationLocationConnectionLinkDrawer
         open
@@ -289,7 +297,76 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[settlementLocation(), buildingLocation()]}
+        locations={[infrastructureLocation, buildingLocation()]}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(
+      within(screen.getByText('City Waterworks').closest('article')!).getByRole('button', {
+        name: 'Select',
+      }),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
+
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.queryByText('City Waterworks')).not.toBeInTheDocument()
+  })
+
+  it('excludes settlements from headquarters changeTarget picker', () => {
+    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = buildingLocation({
+      id: 'building-2',
+      name: 'The Silver Eel',
+      slug: 'silver-eel',
+    })
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[guildhouse, settlementLocation(), silverEel]}
+        existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
+    expect(screen.queryByText('Port City')).not.toBeInTheDocument()
+    expect(screen.queryByText('Thieves Guildhouse')).not.toBeInTheDocument()
+  })
+
+  it('excludes settlements from headquarters add picker', async () => {
+    const user = userEvent.setup()
+    const silverEel = buildingLocation({
+      id: 'building-2',
+      name: 'The Silver Eel',
+      slug: 'silver-eel',
+    })
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[settlementLocation(), silverEel]}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -298,17 +375,9 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
-    await user.click(
-      within(screen.getByText('Port City').closest('article')!).getByRole('button', {
-        name: 'Select',
-      }),
-    )
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
-    await user.click(screen.getByRole('radio', { name: /Owner/i }))
-
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
-    expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
+    expect(screen.queryByText('Port City')).not.toBeInTheDocument()
   })
 
   it('shows search-empty messaging without disabling the selected kind', async () => {
