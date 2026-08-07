@@ -11,8 +11,9 @@ import { Badge } from '@rpg/ui'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import {
-  isRelationshipMutationActionAvailable,
+  isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
+  type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
 import {
   buildRelationshipOverflowActions,
@@ -23,7 +24,7 @@ import { resolveOrganizationForwardOverflowLabels } from '../lib/organization-lo
 
 export type OrganizationLocationConnectionMutationContext = {
   subjectOrganizationId: string
-  locations: readonly Location[]
+  locationCandidates: RelationshipCandidateSet<Location>
   connections: ReadonlyArray<{
     id?: string
     locationId: string
@@ -63,7 +64,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
       kind: input.item.kind,
       subjectOrganizationId: input.mutationContext.subjectOrganizationId,
     },
-    locations: input.mutationContext.locations,
+    locationCandidates: input.mutationContext.locationCandidates,
     connections: input.mutationContext.connections,
     edgesByLocationId: input.mutationContext.edgesByLocationId,
   })
@@ -80,14 +81,14 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   }
 
   if (
-    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeKind') &&
+    isRelationshipMutationActionVisible(resolved.capabilities, 'changeKind') &&
     input.onChangeKindConnection
   ) {
     handlers.changeKind = () => input.onChangeKindConnection?.(connectionTarget)
   }
 
   if (
-    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeTarget') &&
+    isRelationshipMutationActionVisible(resolved.capabilities, 'changeTarget') &&
     input.onChangeTargetConnection
   ) {
     handlers.changeTarget = () => input.onChangeTargetConnection?.(connectionTarget)

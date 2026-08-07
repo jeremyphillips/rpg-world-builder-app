@@ -16,7 +16,7 @@ import {
 } from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import {
-  isRelationshipMutationActionAvailable,
+  isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
 } from '../../lib/relationship/relationship-alternatives'
 import {
@@ -92,7 +92,7 @@ function buildPeopleOverflowActions(input: {
   }
 
   if (
-    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeKind') &&
+    isRelationshipMutationActionVisible(resolved.capabilities, 'changeKind') &&
     input.onEditConnection
   ) {
     handlers.changeKind = () =>

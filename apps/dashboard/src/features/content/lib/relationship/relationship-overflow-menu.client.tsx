@@ -14,6 +14,7 @@ export type RelationshipOverflowAction = {
   id: string
   label: string
   destructive?: boolean
+  disabled?: boolean
   onSelect: () => void
 }
 
@@ -44,6 +45,7 @@ export function RelationshipOverflowMenu({ actions, triggerLabel }: Relationship
         {actions.map((action) => (
           <DropdownMenuItem
             key={action.id}
+            disabled={action.disabled}
             className={action.destructive ? 'text-destructive focus:text-destructive' : undefined}
             onSelect={() => action.onSelect()}
           >

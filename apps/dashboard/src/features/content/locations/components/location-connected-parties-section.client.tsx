@@ -10,6 +10,8 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import type { RelationshipCandidateSet } from '../../lib/relationship/relationship-alternatives'
+
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'
 import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
@@ -39,7 +41,7 @@ export type LocationConnectedPartiesSectionProps = {
   location: Location
   sectionGroup: LocationConnectedPartySectionGroup
   rows: readonly LocationConnectedPartyRow[]
-  organizations?: readonly { id: string; name: string }[]
+  organizationCandidates?: RelationshipCandidateSet<{ id: string; name: string }>
   peopleKindSlots?: readonly PeopleKindSlot[]
   canManage?: boolean
   showEmptySection?: boolean
@@ -67,7 +69,7 @@ export function LocationConnectedPartiesSection({
   location,
   sectionGroup,
   rows,
-  organizations = [],
+  organizationCandidates,
   peopleKindSlots = [],
   canManage = false,
   showEmptySection = true,
@@ -96,8 +98,15 @@ export function LocationConnectedPartiesSection({
   )
 
   const territorialMutationContext = React.useMemo(
-    () => ({ location, rows, organizations }),
-    [location, organizations, rows],
+    () => ({
+      location,
+      rows,
+      organizationCandidates: organizationCandidates ?? {
+        items: [],
+        isAuthoritativeDomainSet: false,
+      },
+    }),
+    [location, organizationCandidates, rows],
   )
 
   if (!showEmptySection && sectionRows.length === 0) {

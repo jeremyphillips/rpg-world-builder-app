@@ -11,6 +11,7 @@ import {
   ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE,
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
 } from './organization-location-connection-link-drawer.client'
+import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship/relationship-alternatives'
 
 const organization: Pick<Organization, 'name' | 'organizationKind'> = {
   name: 'The Monarchy',
@@ -306,5 +307,31 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await expectNoAxeViolations(container)
+  })
+
+  it('does not show authoritative-empty for changeTarget when candidate set is partial', () => {
+    const current = regionLocation()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="geographic_presence"
+        organization={organization}
+        organizationId="org-1"
+        locations={[current]}
+        locationCandidates={{ items: [current], isAuthoritativeDomainSet: false }}
+        existingConnections={[{ id: 'conn-1', locationId: current.id, kind: 'operates_in' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-1', locationId: current.id, kind: 'operates_in' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.queryByText(RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES.changeTarget),
+    ).not.toBeInTheDocument()
   })
 })

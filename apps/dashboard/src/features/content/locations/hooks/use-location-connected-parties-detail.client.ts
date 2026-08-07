@@ -505,6 +505,16 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   return {
     connectedPartiesQuery,
     organizations: organizationsQuery.data ?? [],
+    organizationCandidates: {
+      items: (organizationsQuery.data ?? []).map((organization) => ({
+        id: organization.id,
+        name: organization.name,
+      })),
+      // GUARD: isAuthoritativeDomainSet means the ENTIRE domain, not "query succeeded".
+      // Correct today because useOrganizations calls the full-list API.
+      // REVISIT when organizations become paginated — isSuccess alone will NOT suffice.
+      isAuthoritativeDomainSet: organizationsQuery.isSuccess,
+    },
     characterOptions,
     rows,
     canManage,

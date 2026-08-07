@@ -162,7 +162,10 @@ export function OrganizationLocationConnectionsSection({
                                 mutationContext={
                                   mutationContext ?? {
                                     subjectOrganizationId: '',
-                                    locations: [],
+                                    locationCandidates: {
+                                      items: [],
+                                      isAuthoritativeDomainSet: false,
+                                    },
                                     connections: [],
                                   }
                                 }

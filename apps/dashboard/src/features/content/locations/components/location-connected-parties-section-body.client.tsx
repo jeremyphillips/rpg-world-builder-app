@@ -7,6 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import type { RelationshipCandidateSet } from '../../lib/relationship/relationship-alternatives'
 import {
   LocationPeopleAndOrganizationsSectionBody,
   type LocationPeopleMutationContext,
@@ -81,7 +82,10 @@ export function LocationConnectedPartiesSectionBody({
           territorialMutationContext ?? {
             location: { id: '', campaignId: '', name: '', slug: '', kind: 'region' } as Location,
             rows: sectionRows,
-            organizations: [],
+            organizationCandidates: {
+              items: [],
+              isAuthoritativeDomainSet: false,
+            } satisfies RelationshipCandidateSet<{ id: string; name: string }>,
           }
         }
         onAddKind={onAddTerritorialKind}

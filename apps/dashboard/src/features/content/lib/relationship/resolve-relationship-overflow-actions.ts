@@ -17,6 +17,8 @@ const MUTATION_ACTION_IDS = [
   'replaceSubject',
 ] as const satisfies readonly RelationshipOverflowActionId[]
 
+export const RELATIONSHIP_OVERFLOW_RESOLVING_LABEL = 'Checking availability…'
+
 export function isRelationshipMutationOverflowActionId(
   actionId: RelationshipOverflowActionId,
 ): actionId is (typeof MUTATION_ACTION_IDS)[number] {
@@ -24,11 +26,34 @@ export function isRelationshipMutationOverflowActionId(
 }
 
 function isAlternativeMutationVisible(operation?: RelationshipOperationState): boolean {
-  return Boolean(operation?.supported && operation.availability === 'available')
+  return Boolean(operation?.supported && operation.availability !== 'unavailable')
 }
 
 function isSupportedOperationVisible(operation?: RelationshipOperationState): boolean {
   return Boolean(operation?.supported)
+}
+
+function pushAlternativeMutationAction(
+  actions: RelationshipOverflowAction[],
+  input: {
+    id: RelationshipOverflowActionId
+    operation?: RelationshipOperationState
+    label: string
+    onSelect?: () => void
+  },
+): void {
+  if (!isAlternativeMutationVisible(input.operation) || !input.onSelect) {
+    return
+  }
+
+  actions.push({
+    id: input.id,
+    label: input.operation?.isResolving
+      ? `${input.label} — ${RELATIONSHIP_OVERFLOW_RESOLVING_LABEL}`
+      : input.label,
+    disabled: input.operation?.isResolving,
+    onSelect: input.onSelect,
+  })
 }
 
 /** Domain-agnostic: operation IDs + capability states + labels + handlers only. */
@@ -48,35 +73,26 @@ export function buildRelationshipOverflowActions(input: {
     })
   }
 
-  if (isAlternativeMutationVisible(input.capabilities.changeKind) && input.handlers.changeKind) {
-    actions.push({
-      id: 'changeKind',
-      label: input.labels.changeKind ?? 'Change connection type',
-      onSelect: input.handlers.changeKind,
-    })
-  }
+  pushAlternativeMutationAction(actions, {
+    id: 'changeKind',
+    operation: input.capabilities.changeKind,
+    label: input.labels.changeKind ?? 'Change connection type',
+    onSelect: input.handlers.changeKind,
+  })
 
-  if (
-    isAlternativeMutationVisible(input.capabilities.changeTarget) &&
-    input.handlers.changeTarget
-  ) {
-    actions.push({
-      id: 'changeTarget',
-      label: input.labels.changeTarget ?? 'Change location',
-      onSelect: input.handlers.changeTarget,
-    })
-  }
+  pushAlternativeMutationAction(actions, {
+    id: 'changeTarget',
+    operation: input.capabilities.changeTarget,
+    label: input.labels.changeTarget ?? 'Change location',
+    onSelect: input.handlers.changeTarget,
+  })
 
-  if (
-    isAlternativeMutationVisible(input.capabilities.replaceSubject) &&
-    input.handlers.replaceSubject
-  ) {
-    actions.push({
-      id: 'replaceSubject',
-      label: input.labels.replaceSubject ?? 'Replace',
-      onSelect: input.handlers.replaceSubject,
-    })
-  }
+  pushAlternativeMutationAction(actions, {
+    id: 'replaceSubject',
+    operation: input.capabilities.replaceSubject,
+    label: input.labels.replaceSubject ?? 'Replace',
+    onSelect: input.handlers.replaceSubject,
+  })
 
   if (isSupportedOperationVisible(input.capabilities.remove) && input.handlers.remove) {
     actions.push({

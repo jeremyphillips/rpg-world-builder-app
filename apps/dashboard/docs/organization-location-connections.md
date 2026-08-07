@@ -43,3 +43,5 @@ Dashboard drawers delegate to these helpers through `location-connection-duplica
 Organization detail uses **family-level** empty states and one **Add {family}** action. Populated kind groups render only when they contain relationships. Forward kind eyebrows may differ grammatically from inverse vocab labels (see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)).
 
 Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).
+
+Mutation overflow availability for change-target operations uses [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts) — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) for completeness invariants.

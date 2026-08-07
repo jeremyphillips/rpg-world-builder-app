@@ -29,7 +29,9 @@ import { RelationshipDrawerSubjectField } from '../../lib/relationship/relations
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
+  type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
+import { resolveRelationshipCandidateSet } from '../../lib/relationship/relationship-candidate-set'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
@@ -90,6 +92,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   organization: Pick<Organization, 'name' | 'organizationKind'>
   organizationId: string
   locations: readonly Location[]
+  locationCandidates?: RelationshipCandidateSet<Location>
   existingConnections: readonly ExistingConnection[]
   edgesByLocationId?: Readonly<
     Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
@@ -148,6 +151,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   organization,
   organizationId,
   locations,
+  locationCandidates: locationCandidatesInput,
   existingConnections,
   edgesByLocationId,
   occupancyLoaded = true,
@@ -156,6 +160,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
   isSubmitting = false,
   onSubmit,
 }: OrganizationLocationConnectionLinkDrawerProps) {
+  const locationCandidates = resolveRelationshipCandidateSet(
+    locationCandidatesInput ?? {
+      items: locations,
+      isAuthoritativeDomainSet: false,
+    },
+  )
+  const candidateLocations = locationCandidates.items
+
   const resolvedAddKind = mode === 'add' && addKind != null ? addKind : undefined
   const defaultAddKind = mode === 'add' ? resolveDefaultAddKind(intent) : null
 
@@ -185,18 +197,19 @@ function OrganizationLocationConnectionLinkDrawerContent({
           kind: initialConnection.kind,
           subjectOrganizationId: organizationId,
         },
-        locations,
+        locationCandidates,
         connections: existingConnections,
         edgesByLocationId,
       }).alternatives
     }
     return undefined
   }, [
+    candidateLocations,
     drawerAlternatives,
     edgesByLocationId,
     existingConnections,
     initialConnection,
-    locations,
+    locationCandidates,
     mode,
     occupancyLoaded,
     organizationId,
@@ -272,9 +285,37 @@ function OrganizationLocationConnectionLinkDrawerContent({
     ) as OrganizationLocationConnectionKind | null
   })()
 
+  const changeTargetScanLocations = React.useMemo(() => {
+    if (mode !== 'changeTarget' || !initialConnection) {
+      return []
+    }
+
+    if (changeTargetLocations.length > 0) {
+      return changeTargetLocations
+    }
+
+    return filterLocationsForOrganizationKind(
+      candidateLocations,
+      initialConnection.kind,
+      organizationId,
+      existingConnections,
+      edgesByLocationId,
+      excludeConnectionId,
+    ).filter((location) => location.id !== initialConnection.locationId)
+  }, [
+    candidateLocations,
+    changeTargetLocations,
+    edgesByLocationId,
+    excludeConnectionId,
+    existingConnections,
+    initialConnection,
+    mode,
+    organizationId,
+  ])
+
   const eligibleLocations = React.useMemo(() => {
     if (mode === 'changeTarget') {
-      return changeTargetLocations
+      return changeTargetScanLocations
     }
     if (!activeKind) return []
     return filterLocationsForOrganizationKind(
@@ -287,7 +328,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
     )
   }, [
     activeKind,
-    changeTargetLocations,
+    changeTargetScanLocations,
     edgesByLocationId,
     existingConnections,
     excludeConnectionId,
@@ -366,7 +407,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
 
   const showMutationEmptyState =
     (mode === 'changeKind' && changeKindGatingAlternates.length === 0) ||
-    (mode === 'changeTarget' && changeTargetLocations.length === 0)
+    (mode === 'changeTarget' &&
+      locationCandidates.isAuthoritativeDomainSet &&
+      changeTargetScanLocations.length === 0)
 
   return (
     <CatalogPickerSheet

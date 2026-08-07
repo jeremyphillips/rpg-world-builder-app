@@ -4,7 +4,8 @@ import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 
 import {
   assertRelationshipAlternativesMatchCapabilities,
-  isRelationshipMutationActionAvailable,
+  hasResolvedRelationshipMutationAlternative,
+  isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
 } from './relationship-alternatives'
 import {
@@ -35,6 +36,10 @@ function buildingLocation(overrides: Partial<Location> = {}): Location {
   } as Location
 }
 
+function authoritativeLocations(items: readonly Location[]) {
+  return { items, isAuthoritativeDomainSet: true as const }
+}
+
 describe('resolveRelationshipAlternatives', () => {
   it('marks single-kind geographic_presence changeKind unavailable while changeTarget can remain available', () => {
     const lankhmar = regionLocation()
@@ -50,7 +55,7 @@ describe('resolveRelationshipAlternatives', () => {
         kind: 'operates_in',
         subjectOrganizationId: 'org-1',
       },
-      locations: [lankhmar, otherRegion],
+      locationCandidates: authoritativeLocations([lankhmar, otherRegion]),
       connections: [{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }],
     })
 
@@ -79,7 +84,7 @@ describe('resolveRelationshipAlternatives', () => {
         kind: 'headquarters',
         subjectOrganizationId: 'org-1',
       },
-      locations: [guildhall],
+      locationCandidates: authoritativeLocations([guildhall]),
       connections: [{ id: 'conn-hq', locationId: guildhall.id, kind: 'headquarters' }],
     })
 
@@ -106,7 +111,7 @@ describe('resolveRelationshipAlternatives', () => {
         kind: 'operates_in',
         subjectOrganizationId: 'org-1',
       },
-      locations: [district],
+      locationCandidates: authoritativeLocations([district]),
       connections: [{ id: 'conn-1', locationId: district.id, kind: 'operates_in' }],
     })
 
@@ -114,7 +119,7 @@ describe('resolveRelationshipAlternatives', () => {
     expect(resolved.capabilities.changeTarget?.availability).toBe('unavailable')
   })
 
-  it('returns unknown availability for singleton kinds while occupancy is loading', () => {
+  it('returns unknown availability with isResolving for singleton kinds while occupancy is loading', () => {
     const kingdom = regionLocation()
 
     const resolved = resolveRelationshipAlternatives({
@@ -127,11 +132,59 @@ describe('resolveRelationshipAlternatives', () => {
         kind: 'governs',
         subjectOrganizationId: 'org-1',
       },
-      locations: [kingdom],
+      locationCandidates: authoritativeLocations([kingdom]),
       connections: [{ id: 'conn-governs', locationId: kingdom.id, kind: 'governs' }],
     })
 
+    expect(resolved.capabilities.changeTarget).toEqual({
+      supported: true,
+      availability: 'unknown',
+      isResolving: true,
+    })
+  })
+
+  it('returns unknown for changeTarget when candidate set is partial and has no local match', () => {
+    const lankhmar = regionLocation()
+
+    const resolved = resolveRelationshipAlternatives({
+      surface: 'organization_forward',
+      canManage: true,
+      occupancyLoaded: true,
+      relationship: {
+        connectionId: 'conn-1',
+        locationId: lankhmar.id,
+        kind: 'operates_in',
+        subjectOrganizationId: 'org-1',
+      },
+      locationCandidates: {
+        items: [lankhmar],
+        isAuthoritativeDomainSet: false,
+      },
+      connections: [{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }],
+    })
+
     expect(resolved.capabilities.changeTarget?.availability).toBe('unknown')
+    expect(resolved.capabilities.changeTarget?.isResolving).toBeUndefined()
+  })
+
+  it('returns unavailable for changeTarget when partial set is marked authoritative with no match', () => {
+    const lankhmar = regionLocation()
+
+    const resolved = resolveRelationshipAlternatives({
+      surface: 'organization_forward',
+      canManage: true,
+      occupancyLoaded: true,
+      relationship: {
+        connectionId: 'conn-1',
+        locationId: lankhmar.id,
+        kind: 'operates_in',
+        subjectOrganizationId: 'org-1',
+      },
+      locationCandidates: authoritativeLocations([lankhmar]),
+      connections: [{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }],
+    })
+
+    expect(resolved.capabilities.changeTarget?.availability).toBe('unavailable')
   })
 
   it('supports server availability snapshots without catalog scans', () => {
@@ -148,10 +201,10 @@ describe('resolveRelationshipAlternatives', () => {
         alternateKinds: ['operates_in'],
         alternateTargets: [{ id: 'region-2' }],
       },
-      locations: [
+      locationCandidates: authoritativeLocations([
         regionLocation(),
         regionLocation({ id: 'region-2', name: 'Other', slug: 'other' }),
-      ],
+      ]),
     })
 
     expect(resolved.capabilities.changeTarget?.availability).toBe('available')
@@ -185,10 +238,13 @@ describe('resolveRelationshipAlternatives', () => {
       },
       location: kingdom,
       rows,
-      organizations: [
-        { id: 'org-1', name: 'The Monarchy' },
-        { id: 'org-2', name: 'Merchant League' },
-      ],
+      organizationCandidates: {
+        items: [
+          { id: 'org-1', name: 'The Monarchy' },
+          { id: 'org-2', name: 'Merchant League' },
+        ],
+        isAuthoritativeDomainSet: true,
+      },
     })
 
     expect(resolved.capabilities.replaceSubject?.availability).toBe('available')
@@ -197,7 +253,7 @@ describe('resolveRelationshipAlternatives', () => {
 })
 
 describe('buildRelationshipOverflowActions', () => {
-  it('omits mutations while availability is unknown', () => {
+  it('shows mutations while availability is unknown', () => {
     const actions = buildRelationshipOverflowActions({
       capabilities: {
         view: { supported: true, availability: 'available' },
@@ -212,7 +268,20 @@ describe('buildRelationshipOverflowActions', () => {
       },
     })
 
-    expect(actions.map((action) => action.id)).toEqual(['view', 'remove'])
+    expect(actions.map((action) => action.id)).toEqual(['view', 'changeKind', 'remove'])
+  })
+
+  it('disables mutations while availability is resolving', () => {
+    const actions = buildRelationshipOverflowActions({
+      capabilities: {
+        changeTarget: { supported: true, availability: 'unknown', isResolving: true },
+      },
+      labels: { changeTarget: 'Change location' },
+      handlers: { changeTarget: () => undefined },
+    })
+
+    expect(actions[0]?.disabled).toBe(true)
+    expect(actions[0]?.label).toContain('Checking availability')
   })
 })
 
@@ -230,10 +299,10 @@ describe('architectural invariant: overflow mutations require alternatives', () 
           kind: 'operates_in' as const,
           subjectOrganizationId: 'org-1',
         },
-        locations: [
+        locationCandidates: authoritativeLocations([
           regionLocation(),
           regionLocation({ id: 'region-2', name: 'Other Region', slug: 'other-region' }),
-        ],
+        ]),
         connections: [{ id: 'conn-1', locationId: 'region-1', kind: 'operates_in' as const }],
       },
       labels: {
@@ -254,7 +323,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
           kind: 'headquarters' as const,
           subjectOrganizationId: 'org-1',
         },
-        locations: [buildingLocation()],
+        locationCandidates: authoritativeLocations([buildingLocation()]),
         connections: [{ id: 'conn-hq', locationId: 'building-1', kind: 'headquarters' as const }],
       },
       labels: {
@@ -266,7 +335,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
   ]
 
   it.each(fixtures)(
-    'every emitted mutation action has alternatives ($name)',
+    'every resolved mutation action has alternatives ($name)',
     ({ input, labels }) => {
       const resolved = resolveRelationshipAlternatives(input)
       const handlers = {
@@ -298,9 +367,13 @@ describe('architectural invariant: overflow mutations require alternatives', () 
           continue
         }
 
-        expect(isRelationshipMutationActionAvailable(resolved.capabilities, mutationActionId)).toBe(
+        expect(isRelationshipMutationActionVisible(resolved.capabilities, mutationActionId)).toBe(
           true,
         )
+
+        if (!hasResolvedRelationshipMutationAlternative(resolved.capabilities, mutationActionId)) {
+          continue
+        }
 
         if (mutationActionId === 'changeKind') {
           expect(resolved.alternatives.changeKind?.length).toBeGreaterThan(0)
@@ -314,4 +387,38 @@ describe('architectural invariant: overflow mutations require alternatives', () 
       }
     },
   )
+})
+
+describe('mutation availability chain', () => {
+  it('keeps changeTarget visible and avoids authoritative-empty drawer state for partial candidate sets', () => {
+    const lankhmar = regionLocation()
+    const resolved = resolveRelationshipAlternatives({
+      surface: 'organization_forward',
+      canManage: true,
+      occupancyLoaded: true,
+      relationship: {
+        connectionId: 'conn-1',
+        locationId: lankhmar.id,
+        kind: 'operates_in',
+        subjectOrganizationId: 'org-1',
+      },
+      locationCandidates: {
+        items: [lankhmar],
+        isAuthoritativeDomainSet: false,
+      },
+      connections: [{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }],
+    })
+
+    expect(resolved.capabilities.changeTarget?.availability).toBe('unknown')
+
+    const actions = buildRelationshipOverflowActions({
+      capabilities: resolved.capabilities,
+      labels: { changeTarget: 'Change location' },
+      handlers: { changeTarget: () => undefined },
+    })
+
+    expect(actions.some((action) => action.id === 'changeTarget')).toBe(true)
+    expect(actions.find((action) => action.id === 'changeTarget')?.disabled).not.toBe(true)
+    expect(resolved.alternatives.changeTarget).toBeUndefined()
+  })
 })

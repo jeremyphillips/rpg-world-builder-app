@@ -170,22 +170,25 @@ describe('OrganizationLocationConnectionsSection', () => {
           onChangeKindConnection={onChangeKindConnection}
           mutationContext={{
             subjectOrganizationId: 'org-1',
-            locations: [
-              {
-                id: 'building-1',
-                campaignId: 'camp-1',
-                name: 'Royal Mint',
-                slug: 'royal-mint',
-                kind: 'structure',
-              },
-              {
-                id: 'building-2',
-                campaignId: 'camp-1',
-                name: 'Royal Palace',
-                slug: 'royal-palace',
-                kind: 'structure',
-              },
-            ] as Location[],
+            locationCandidates: {
+              items: [
+                {
+                  id: 'building-1',
+                  campaignId: 'camp-1',
+                  name: 'Royal Mint',
+                  slug: 'royal-mint',
+                  kind: 'structure',
+                },
+                {
+                  id: 'building-2',
+                  campaignId: 'camp-1',
+                  name: 'Royal Palace',
+                  slug: 'royal-palace',
+                  kind: 'structure',
+                },
+              ] as Location[],
+              isAuthoritativeDomainSet: true,
+            },
             connections: [
               { id: 'conn-1', locationId: 'building-1', kind: 'owns' },
               { id: 'conn-2', locationId: 'building-2', kind: 'headquarters' },

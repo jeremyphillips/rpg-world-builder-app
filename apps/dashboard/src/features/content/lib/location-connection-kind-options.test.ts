@@ -155,7 +155,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
         kind: currentKind,
         subjectOrganizationId: 'org-1',
       },
-      locations: [location],
+      locationCandidates: { items: [location], isAuthoritativeDomainSet: true },
       connections: [{ id: 'conn-1', locationId: location.id, kind: currentKind }],
     })
 

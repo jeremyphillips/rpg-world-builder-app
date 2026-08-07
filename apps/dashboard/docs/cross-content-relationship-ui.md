@@ -70,7 +70,20 @@ Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** �
 | Populated edge summary + overflow | `CrossContentRelationshipRow`                                                                                      |
 | Overflow actions                  | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
-Overflow mutation actions derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts), composed by the domain-agnostic [`buildRelationshipOverflowActions`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts). Each operation exposes `{ supported, availability }` where `availability` is `available | unavailable | unknown`. Emit a mutation action only when `supported && availability === 'available'` (remove/view: `supported` only). Drawers consume the same resolver output — do not recompute eligibility independently.
+Overflow mutation actions derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts), composed by the domain-agnostic [`buildRelationshipOverflowActions`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
+
+Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
+
+Mutation capability must not depend on the current search/page/render subset.
+
+`unknown` is not a negative capability result. Structurally supported mutations remain visible when availability is unknown. Only an authoritative `unavailable` suppresses the action.
+
+- `unknown` + `isResolving`: authoritative answer expected shortly — visible, usually disabled.
+- `unknown` + `!isResolving`: client snapshot cannot answer — visible, enabled; drawer resolves on invoke.
+
+Structural impossibility (e.g. single-kind families with no registry alternates) resolves to `unavailable` directly and bypasses candidate-set completeness logic.
+
+[`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
 | Kind-group shell (header + kind rows) | `RelationshipFieldGroup` + `RelationshipFieldGroupRow` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |

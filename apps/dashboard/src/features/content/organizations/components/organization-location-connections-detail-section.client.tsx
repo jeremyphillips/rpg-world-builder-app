@@ -52,6 +52,7 @@ export function OrganizationLocationConnectionsDetailSection({
           organization={organization}
           organizationId={organization.id}
           locations={detail.locations as Location[]}
+          locationCandidates={detail.mutationContext.locationCandidates}
           existingConnections={detail.existingConnections}
           edgesByLocationId={detail.edgesByLocationId}
           occupancyLoaded={detail.occupancyLoaded}

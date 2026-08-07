@@ -23,7 +23,7 @@ describe('buildRelationshipOverflowActions', () => {
     expect(remove).toHaveBeenCalledOnce()
   })
 
-  it('shows alternative mutations only when availability is available', () => {
+  it('shows alternative mutations when availability is available or unknown', () => {
     const actions = buildRelationshipOverflowActions({
       capabilities: {
         changeKind: { supported: true, availability: 'available' },
@@ -42,6 +42,6 @@ describe('buildRelationshipOverflowActions', () => {
       },
     })
 
-    expect(actions.map((action) => action.id)).toEqual(['changeKind'])
+    expect(actions.map((action) => action.id)).toEqual(['changeKind', 'replaceSubject'])
   })
 })

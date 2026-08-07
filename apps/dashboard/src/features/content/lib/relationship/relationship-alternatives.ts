@@ -31,6 +31,14 @@ import {
   buildOrganizationLocationConnectionKindOptions,
   type LocationConnectionKindOption,
 } from '../location-connection-kind-options'
+import {
+  availabilityFromStructuralCount,
+  resolveCatalogMutationAvailability,
+  resolveRelationshipCandidateSet,
+  type RelationshipCandidateSet,
+} from './relationship-candidate-set'
+
+export type { RelationshipCandidateSet } from './relationship-candidate-set'
 
 export type AvailabilityState = 'available' | 'unavailable' | 'unknown'
 
@@ -39,6 +47,8 @@ export type RelationshipOperationState = {
   supported: boolean
   /** Whether >= 1 valid alternative exists. `unknown` while prerequisite data is loading. */
   availability: AvailabilityState
+  /** Transient authoritative data still loading. Only meaningful when availability === 'unknown'. */
+  isResolving?: boolean
 }
 
 export type RelationshipMutationCapabilities = {
@@ -93,7 +103,7 @@ type SharedAlternativesInput = {
 export type OrganizationForwardRelationshipAlternativesInput = SharedAlternativesInput & {
   surface: 'organization_forward'
   relationship: OrganizationForwardRelationshipSnapshot
-  locations?: readonly Location[]
+  locationCandidates?: RelationshipCandidateSet<Location>
   connections?: ReadonlyArray<{
     id?: string
     locationId: string
@@ -109,7 +119,7 @@ export type LocationInverseOrganizationRelationshipAlternativesInput = SharedAlt
   relationship: LocationInverseOrganizationRelationshipSnapshot
   location: Location
   rows?: readonly LocationConnectedPartyRow[]
-  organizations?: readonly { id: string; name: string }[]
+  organizationCandidates?: RelationshipCandidateSet<{ id: string; name: string }>
 }
 
 export type LocationInverseCharacterRelationshipAlternativesInput = SharedAlternativesInput & {
@@ -136,23 +146,6 @@ export const RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES = {
 
 function supportedOnly(supported: boolean): RelationshipOperationState {
   return { supported, availability: supported ? 'available' : 'unavailable' }
-}
-
-function availabilityFromCount(
-  supported: boolean,
-  count: number,
-  unknown: boolean,
-): RelationshipOperationState {
-  if (!supported) {
-    return { supported: false, availability: 'unavailable' }
-  }
-  if (unknown) {
-    return { supported: true, availability: 'unknown' }
-  }
-  return {
-    supported: true,
-    availability: count > 0 ? 'available' : 'unavailable',
-  }
 }
 
 function kindRequiresOccupancyData(kind: OrganizationLocationConnectionKind): boolean {
@@ -222,7 +215,8 @@ function resolveOrganizationForwardAlternatives(
   input: OrganizationForwardRelationshipAlternativesInput,
 ): RelationshipAlternatives {
   const { relationship, canManage, occupancyLoaded = true } = input
-  const locations = input.locations ?? []
+  const locationCandidates = resolveRelationshipCandidateSet(input.locationCandidates)
+  const locations = locationCandidates.items
   const connections = input.connections ?? []
   const currentLocation =
     locations.find((location) => location.id === relationship.locationId) ?? null
@@ -242,8 +236,8 @@ function resolveOrganizationForwardAlternatives(
       capabilities: {
         view,
         remove,
-        changeKind: availabilityFromCount(canManage, alternateKinds.length, false),
-        changeTarget: availabilityFromCount(canManage, alternateTargets.length, false),
+        changeKind: availabilityFromStructuralCount(canManage, alternateKinds.length, false),
+        changeTarget: availabilityFromStructuralCount(canManage, alternateTargets.length, false),
       },
       alternatives: {
         changeKind: alternateKinds.map((kind) => ({
@@ -259,10 +253,19 @@ function resolveOrganizationForwardAlternatives(
   const edgesAtLocation = resolveEdgesAtLocation(relationship.locationId, input.edgesByLocationId)
 
   let changeKindAlternates: OrganizationLocationConnectionKind[] = []
-  let changeKindUnknown = false
+  const changeKindPrerequisiteUnknown =
+    currentLocation != null &&
+    canManage &&
+    !occupancyLoaded &&
+    alternateKindsRequireOccupancyData([
+      relationship.kind,
+      ...resolveKindsForOrganizationDrawerIntent(
+        organizationDrawerIntentFromKind(relationship.kind),
+      ),
+    ])
 
-  if (currentLocation && canManage) {
-    const candidateKinds = resolveAlternateOrganizationKindsAtLocation({
+  if (currentLocation && canManage && !changeKindPrerequisiteUnknown) {
+    changeKindAlternates = resolveAlternateOrganizationKindsAtLocation({
       location: currentLocation,
       currentKind: relationship.kind,
       subjectOrganizationId: relationship.subjectOrganizationId,
@@ -270,39 +273,22 @@ function resolveOrganizationForwardAlternatives(
       edgesAtLocation,
       excludeConnectionId: relationship.connectionId,
     })
-
-    if (
-      !occupancyLoaded &&
-      alternateKindsRequireOccupancyData([
-        relationship.kind,
-        ...resolveKindsForOrganizationDrawerIntent(
-          organizationDrawerIntentFromKind(relationship.kind),
-        ),
-      ])
-    ) {
-      changeKindUnknown = true
-    } else {
-      changeKindAlternates = candidateKinds
-    }
   }
 
-  let changeTargetLocations: Location[] = []
-  let changeTargetUnknown = false
+  const changeTargetPrerequisiteUnknown =
+    canManage && !occupancyLoaded && kindRequiresOccupancyData(relationship.kind)
 
-  if (canManage) {
-    if (!occupancyLoaded && kindRequiresOccupancyData(relationship.kind)) {
-      changeTargetUnknown = true
-    } else {
-      changeTargetLocations = filterLocationsForOrganizationKind(
-        locations,
-        relationship.kind,
-        relationship.subjectOrganizationId,
-        connections,
-        input.edgesByLocationId,
-        relationship.connectionId,
-      ).filter((location) => location.id !== relationship.locationId)
-    }
-  }
+  const changeTargetLocations =
+    canManage && !changeTargetPrerequisiteUnknown
+      ? filterLocationsForOrganizationKind(
+          locations,
+          relationship.kind,
+          relationship.subjectOrganizationId,
+          connections,
+          input.edgesByLocationId,
+          relationship.connectionId,
+        ).filter((location) => location.id !== relationship.locationId)
+      : []
 
   const changeKindOptions =
     currentLocation && changeKindAlternates.length > 0
@@ -320,12 +306,17 @@ function resolveOrganizationForwardAlternatives(
     capabilities: {
       view,
       remove,
-      changeKind: availabilityFromCount(canManage, changeKindOptions.length, changeKindUnknown),
-      changeTarget: availabilityFromCount(
+      changeKind: availabilityFromStructuralCount(
         canManage,
-        changeTargetLocations.length,
-        changeTargetUnknown,
+        changeKindOptions.length,
+        changeKindPrerequisiteUnknown,
       ),
+      changeTarget: resolveCatalogMutationAvailability({
+        supported: canManage,
+        matchCount: changeTargetLocations.length,
+        isAuthoritativeDomainSet: locationCandidates.isAuthoritativeDomainSet,
+        prerequisiteUnknown: changeTargetPrerequisiteUnknown,
+      }),
     },
     alternatives: {
       changeKind: changeKindOptions.length > 0 ? changeKindOptions : undefined,
@@ -341,7 +332,8 @@ function resolveLocationInverseOrganizationAlternatives(
   const canEdit = Boolean(input.canEditRow ?? input.canManage)
   const canRemove = Boolean(input.canRemoveRow ?? input.canManage)
   const rows = input.rows ?? []
-  const organizations = input.organizations ?? []
+  const organizationCandidates = resolveRelationshipCandidateSet(input.organizationCandidates)
+  const organizations = organizationCandidates.items
   const { relationship, location } = input
 
   const view = supportedOnly(true)
@@ -371,9 +363,9 @@ function resolveLocationInverseOrganizationAlternatives(
       capabilities: {
         view,
         remove,
-        changeKind: availabilityFromCount(canEdit, alternateKinds.length, false),
+        changeKind: availabilityFromStructuralCount(canEdit, alternateKinds.length, false),
         changeTarget: { supported: false, availability: 'unavailable' },
-        replaceSubject: availabilityFromCount(
+        replaceSubject: availabilityFromStructuralCount(
           canEdit && Boolean(relationship.allowReplaceSubject),
           alternateSubjects.length,
           false,
@@ -458,13 +450,13 @@ function resolveLocationInverseOrganizationAlternatives(
     capabilities: {
       view,
       remove,
-      changeKind: availabilityFromCount(canEdit, changeKindOptions.length, false),
+      changeKind: availabilityFromStructuralCount(canEdit, changeKindOptions.length, false),
       changeTarget: { supported: false, availability: 'unavailable' },
-      replaceSubject: availabilityFromCount(
-        replaceSubjectSupported,
-        alternateSubjects.length,
-        false,
-      ),
+      replaceSubject: resolveCatalogMutationAvailability({
+        supported: replaceSubjectSupported,
+        matchCount: alternateSubjects.length,
+        isAuthoritativeDomainSet: organizationCandidates.isAuthoritativeDomainSet,
+      }),
     },
     alternatives: {
       changeKind: changeKindOptions.length > 0 ? changeKindOptions : undefined,
@@ -511,7 +503,7 @@ function resolveLocationInverseCharacterAlternatives(
     capabilities: {
       view,
       remove,
-      changeKind: availabilityFromCount(canEdit, changeKindOptions.length, false),
+      changeKind: availabilityFromStructuralCount(canEdit, changeKindOptions.length, false),
       changeTarget: { supported: false, availability: 'unavailable' },
       replaceSubject: { supported: false, availability: 'unavailable' },
     },
@@ -534,7 +526,17 @@ export function resolveRelationshipAlternatives(
   }
 }
 
-export function isRelationshipMutationActionAvailable(
+/** User may see or invoke the mutation — not authoritatively negative. */
+export function isRelationshipMutationActionVisible(
+  capabilities: RelationshipMutationCapabilities,
+  actionId: 'changeKind' | 'changeTarget' | 'replaceSubject',
+): boolean {
+  const operation = capabilities[actionId]
+  return Boolean(operation?.supported && operation.availability !== 'unavailable')
+}
+
+/** Materialized alternatives exist — does not govern invocation visibility. */
+export function hasResolvedRelationshipMutationAlternative(
   capabilities: RelationshipMutationCapabilities,
   actionId: 'changeKind' | 'changeTarget' | 'replaceSubject',
 ): boolean {
@@ -542,23 +544,26 @@ export function isRelationshipMutationActionAvailable(
   return Boolean(operation?.supported && operation.availability === 'available')
 }
 
+/** @deprecated Use {@link hasResolvedRelationshipMutationAlternative} or {@link isRelationshipMutationActionVisible}. */
+export const isRelationshipMutationActionAvailable = hasResolvedRelationshipMutationAlternative
+
 export function assertRelationshipAlternativesMatchCapabilities(
   capabilities: RelationshipMutationCapabilities,
   alternatives: RelationshipAlternatives['alternatives'],
 ): void {
-  if (isRelationshipMutationActionAvailable(capabilities, 'changeKind')) {
+  if (hasResolvedRelationshipMutationAlternative(capabilities, 'changeKind')) {
     if (!alternatives.changeKind?.length) {
       throw new Error('changeKind is available but alternatives.changeKind is empty')
     }
   }
 
-  if (isRelationshipMutationActionAvailable(capabilities, 'changeTarget')) {
+  if (hasResolvedRelationshipMutationAlternative(capabilities, 'changeTarget')) {
     if (!alternatives.changeTarget?.length) {
       throw new Error('changeTarget is available but alternatives.changeTarget is empty')
     }
   }
 
-  if (isRelationshipMutationActionAvailable(capabilities, 'replaceSubject')) {
+  if (hasResolvedRelationshipMutationAlternative(capabilities, 'replaceSubject')) {
     if (!alternatives.replaceSubject?.length) {
       throw new Error('replaceSubject is available but alternatives.replaceSubject is empty')
     }

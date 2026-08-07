@@ -17,8 +17,9 @@ import {
 } from '../../lib/relationship/relationship-field-group.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import {
-  isRelationshipMutationActionAvailable,
+  isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
+  type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
 import {
   buildRelationshipOverflowActions,
@@ -44,7 +45,7 @@ const TERRITORIAL_AUTHORITY_HEADING_ID = 'location-connected-parties-territorial
 export type LocationTerritorialMutationContext = {
   location: Location
   rows: readonly LocationConnectedPartyRow[]
-  organizations: readonly { id: string; name: string }[]
+  organizationCandidates: RelationshipCandidateSet<{ id: string; name: string }>
 }
 
 function buildTerritorialOverflowActions(input: {
@@ -77,7 +78,7 @@ function buildTerritorialOverflowActions(input: {
     },
     location: input.mutationContext.location,
     rows: input.mutationContext.rows,
-    organizations: input.mutationContext.organizations,
+    organizationCandidates: input.mutationContext.organizationCandidates,
   })
 
   const editTarget: LocationConnectedPartyEditTarget = {
@@ -94,14 +95,14 @@ function buildTerritorialOverflowActions(input: {
   }
 
   if (
-    isRelationshipMutationActionAvailable(resolved.capabilities, 'changeKind') &&
+    isRelationshipMutationActionVisible(resolved.capabilities, 'changeKind') &&
     input.onChangeKind
   ) {
     handlers.changeKind = () => input.onChangeKind?.(editTarget)
   }
 
   if (
-    isRelationshipMutationActionAvailable(resolved.capabilities, 'replaceSubject') &&
+    isRelationshipMutationActionVisible(resolved.capabilities, 'replaceSubject') &&
     input.onReplaceOrganization
   ) {
     handlers.replaceSubject = () => input.onReplaceOrganization?.(editTarget)

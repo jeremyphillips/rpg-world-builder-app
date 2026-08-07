@@ -88,12 +88,25 @@ export function useOrganizationLocationConnectionsDetail(
   const mutationContext = React.useMemo<OrganizationLocationConnectionMutationContext>(
     () => ({
       subjectOrganizationId: organizationId,
-      locations,
+      locationCandidates: {
+        items: locations,
+        // GUARD: isAuthoritativeDomainSet means the ENTIRE domain, not "query succeeded".
+        // Correct today because useLocations calls the full-list API.
+        // REVISIT when locations become paginated — isSuccess alone will NOT suffice.
+        isAuthoritativeDomainSet: locationsQuery.isSuccess,
+      },
       connections: existingConnections,
       edgesByLocationId,
       occupancyLoaded,
     }),
-    [edgesByLocationId, existingConnections, locations, occupancyLoaded, organizationId],
+    [
+      edgesByLocationId,
+      existingConnections,
+      locations,
+      locationsQuery.isSuccess,
+      occupancyLoaded,
+      organizationId,
+    ],
   )
 
   const resolveDrawerAlternatives = React.useCallback(
@@ -108,11 +121,22 @@ export function useOrganizationLocationConnectionsDetail(
           kind: connection.kind,
           subjectOrganizationId: organizationId,
         },
-        locations,
+        locationCandidates: {
+          items: locations,
+          isAuthoritativeDomainSet: locationsQuery.isSuccess,
+        },
         connections: existingConnections,
         edgesByLocationId,
       }).alternatives,
-    [canManage, edgesByLocationId, existingConnections, locations, occupancyLoaded, organizationId],
+    [
+      canManage,
+      edgesByLocationId,
+      existingConnections,
+      locations,
+      locationsQuery.isSuccess,
+      occupancyLoaded,
+      organizationId,
+    ],
   )
 
   const visibleFamilies = React.useMemo(
