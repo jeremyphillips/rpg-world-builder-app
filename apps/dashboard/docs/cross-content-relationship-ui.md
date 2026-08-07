@@ -94,13 +94,13 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 ## Drawer building blocks
 
-| Primitive                                        | Role                                                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| `RelationshipDrawerContextHeader`                | Names the fixed endpoint (`{name} · {kind label}`)                                    |
-| `RelationshipDrawerSubjectField`                 | Structured read-only subject/target label + value (Organization, Location, Character) |
-| `RelationshipDrawerCurrentEntityField`           | Read-only current entity summary for searchable replacement flows                     |
-| `LocationConnectionKindStep`                     | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)  |
-| Embedded `ContentEntityCard` + selection actions | Entity picker rows in drawers                                                         |
+| Primitive                                                    | Role                                                                                                           |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `RelationshipDrawerContextHeader`                            | Names the fixed endpoint (`{name} · {kind label}`)                                                             |
+| `RelationshipDrawerSubjectField`                             | Structured read-only subject/target label + value (Organization, Location, Character)                          |
+| `EntityReplacementCurrentField` / `EntityReplacementSection` | Read-only current entity summary + Current→New chrome for searchable replacement flows (`entity-replacement/`) |
+| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                           |
+| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                  |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
@@ -116,14 +116,14 @@ Add workflows begin **unresolved**. Change-kind workflows begin **resolved** wit
 | ------------------- | -------------------------------- | -------------------------------------------------------------------- |
 | **Add**             | Expanded option list             | None — user must choose                                              |
 | **Change kind**     | Expanded with current selected   | Hydrated from persisted relationship; kind is the only mutable field |
-| **Replace subject** | Kind shown as read-only field    | `RelationshipDrawerCurrentEntityField` + `New {subject}` picker      |
+| **Replace subject** | Kind shown as read-only field    | `EntityReplacementSection` + `New {subject}` picker                  |
 
 ## Current-value representation
 
-| Mutation control                     | Current value representation                                    |
-| ------------------------------------ | --------------------------------------------------------------- |
-| Finite radio/segmented/select choice | Selected state inside the control                               |
-| Searchable entity replacement        | `RelationshipDrawerCurrentEntityField` + `New {subject}` picker |
+| Mutation control                     | Current value representation                        |
+| ------------------------------------ | --------------------------------------------------- |
+| Finite radio/segmented/select choice | Selected state inside the control                   |
+| Searchable entity replacement        | `EntityReplacementSection` + `New {subject}` picker |
 
 Replacement UI must explicitly represent the persisted value independently of the replacement candidate set.
 

@@ -21,7 +21,7 @@ import {
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
+import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL,
   RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL,
@@ -77,7 +77,7 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
     organizationId: string
     kind: OrganizationLocationConnectionKind
   }
-  currentEndpoint?: RelationshipDrawerCurrentEntitySnapshot
+  currentEndpoint?: EntityReplacementCurrentSnapshot
   isSubmitting?: boolean
   onSubmit: (input: {
     organizationId: string

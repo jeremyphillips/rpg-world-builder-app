@@ -5,9 +5,9 @@ import {
   resolveOrganizationForwardCurrentLocationEndpoint,
 } from './resolve-relationship-drawer-current-endpoint'
 import {
-  RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
-  RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING,
-} from './relationship-drawer-current-entity'
+  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
+  ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
+} from '../entity-replacement/entity-replacement-current-entity'
 
 describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
   it('returns hydrated location snapshot from relationship references', () => {
@@ -55,7 +55,7 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
         ],
       }),
     ).toEqual({
-      heading: RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
+      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
       unavailable: true,
     })
   })
@@ -105,7 +105,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         rows: [],
       }),
     ).toEqual({
-      heading: RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING,
+      heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
       unavailable: true,
     })
   })

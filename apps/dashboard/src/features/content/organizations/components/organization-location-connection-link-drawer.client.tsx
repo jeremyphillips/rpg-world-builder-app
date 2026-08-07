@@ -25,7 +25,7 @@ import {
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
+import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import {
@@ -107,7 +107,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   >
   occupancyLoaded?: boolean
   initialConnection?: ExistingConnection
-  currentEndpoint?: RelationshipDrawerCurrentEntitySnapshot
+  currentEndpoint?: EntityReplacementCurrentSnapshot
   drawerAlternatives?: OrganizationLocationConnectionDrawerAlternatives
   isSubmitting?: boolean
   onSubmit: (input: {

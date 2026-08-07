@@ -16,7 +16,7 @@ import {
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
 } from './organization-location-connection-link-drawer.client'
 import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship/relationship-alternatives'
-import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
+import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../lib/entity-replacement/entity-replacement-current-entity'
 
 const organization: Pick<Organization, 'name' | 'organizationKind'> = {
   name: 'The Monarchy',
@@ -538,9 +538,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     expect(screen.getByText('Current location')).toBeInTheDocument()
     expect(screen.getByText('Unavailable location')).toBeInTheDocument()
-    expect(
-      screen.getByText(RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE),
-    ).toBeInTheDocument()
+    expect(screen.getByText(ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE)).toBeInTheDocument()
     expect(screen.queryByPlaceholderText('Search structures…')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Save change' })).not.toBeInTheDocument()
   })
