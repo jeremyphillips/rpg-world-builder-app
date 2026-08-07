@@ -57,20 +57,20 @@ import {
 import { organizationLocationConnectionHasAvailableKind } from '../../lib/location-connection-duplicate-keys'
 import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 import {
+  DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
   resolveOrganizationForwardAddDrawerInstruction,
   resolveOrganizationForwardAddDrawerTitle,
   resolveOrganizationForwardAddSubmitLabel,
+  resolveOrganizationForwardChangeTargetDrawerTitle,
   resolveOrganizationForwardFamilyAddDrawerHelper,
+  resolveOrganizationForwardTargetPresentation,
 } from '../lib/organization-location-connection-surface-copy'
 import {
-  filterLocationsByGeographicPresenceKindFilter,
-  GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_LABEL,
-  GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_OPTIONS,
-  type GeographicPresenceLocationKindFilter,
-} from '../lib/organization-geographic-presence-location-kind-filter'
-
-export const ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER = 'Search locations…'
-export const ORGANIZATION_LOCATION_LINK_FIELD_LABEL = 'Location'
+  filterLocationsByTargetBrowseScope,
+  ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
+  resolveTargetBrowseScopeOptions,
+  type OrganizationLocationTargetBrowseScope,
+} from '../lib/organization-location-target-browse-scope'
 export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search.'
 export const ORGANIZATION_LOCATION_LINK_NO_ITEMS = 'No locations are available.'
 export const ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE =
@@ -183,8 +183,8 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ?? defaultAddKind ?? initialConnection?.kind ?? null,
   )
-  const [locationKindFilter, setLocationKindFilter] =
-    React.useState<GeographicPresenceLocationKindFilter>('all')
+  const [locationBrowseScope, setLocationBrowseScope] =
+    React.useState<OrganizationLocationTargetBrowseScope>('all')
 
   const excludeConnectionId =
     mode === 'changeKind' || mode === 'changeTarget' ? initialConnection?.id : undefined
@@ -375,7 +375,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
     await onSubmit({ locationId: selectedLocationId, kind: activeKind })
   }
 
+  const targetPresentation = activeKind
+    ? resolveOrganizationForwardTargetPresentation(activeKind)
+    : DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION
+
   const title = (() => {
+    if (mode === 'changeTarget' && activeKind) {
+      return resolveOrganizationForwardChangeTargetDrawerTitle(activeKind)
+    }
     if (mode === 'changeTarget') return ORGANIZATION_DRAWER_CHANGE_TARGET_TITLE
     if (mode === 'add' && resolvedAddKind) {
       return resolveOrganizationForwardAddDrawerTitle(resolvedAddKind)
@@ -385,7 +392,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   })()
 
   const instructionCopy =
-    mode === 'add' && resolvedAddKind
+    mode === 'add' && resolvedAddKind && !targetPresentation.targetHelp
       ? resolveOrganizationForwardAddDrawerInstruction(resolvedAddKind)
       : null
 
@@ -419,14 +426,32 @@ function OrganizationLocationConnectionLinkDrawerContent({
       locationCandidates.isAuthoritativeDomainSet &&
       changeTargetScanLocations.length === 0)
 
-  const showGeographicPresenceLocationKindFilter =
-    intent === 'geographic_presence' && showLocationPicker && !showMutationEmptyState
+  const browseScopeOptions = React.useMemo(() => {
+    if (!targetPresentation.browseScopes?.length) {
+      return []
+    }
+    return resolveTargetBrowseScopeOptions(targetPresentation.browseScopes, eligibleLocations)
+  }, [eligibleLocations, targetPresentation.browseScopes])
+
+  const showTargetBrowseScopeControl =
+    browseScopeOptions.length > 0 && showLocationPicker && !showMutationEmptyState
+
+  React.useEffect(() => {
+    if (!showTargetBrowseScopeControl) {
+      return
+    }
+    const activeScope = browseScopeOptions.find((option) => option.value === locationBrowseScope)
+    if (activeScope?.disabled && locationBrowseScope !== 'all') {
+      setLocationBrowseScope('all')
+    }
+  }, [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl])
+
   const pickerLocations = React.useMemo(() => {
-    if (!showGeographicPresenceLocationKindFilter) {
+    if (!showTargetBrowseScopeControl) {
       return eligibleLocations
     }
-    return filterLocationsByGeographicPresenceKindFilter(eligibleLocations, locationKindFilter)
-  }, [eligibleLocations, locationKindFilter, showGeographicPresenceLocationKindFilter])
+    return filterLocationsByTargetBrowseScope(eligibleLocations, locationBrowseScope)
+  }, [eligibleLocations, locationBrowseScope, showTargetBrowseScopeControl])
 
   return (
     <CatalogPickerSheet
@@ -436,7 +461,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
       pickerEnabled={showLocationPicker && !showMutationEmptyState}
-      searchPlaceholder={ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER}
+      searchPlaceholder={targetPresentation.searchPlaceholder}
       noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
       noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
       headerBelowDescription={
@@ -489,14 +514,19 @@ function OrganizationLocationConnectionLinkDrawerContent({
           {showLocationPicker && !showMutationEmptyState ? (
             <div className="space-y-2">
               <Heading variant="label" as="p">
-                {ORGANIZATION_LOCATION_LINK_FIELD_LABEL}
+                {targetPresentation.targetLabel}
               </Heading>
-              {showGeographicPresenceLocationKindFilter ? (
+              {targetPresentation.targetHelp ? (
+                <Text variant="muted" className="text-sm">
+                  {targetPresentation.targetHelp}
+                </Text>
+              ) : null}
+              {showTargetBrowseScopeControl ? (
                 <SegmentedControl
-                  aria-label={GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_LABEL}
-                  value={locationKindFilter}
-                  options={GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_OPTIONS}
-                  onValueChange={setLocationKindFilter}
+                  aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
+                  value={locationBrowseScope}
+                  options={browseScopeOptions}
+                  onValueChange={setLocationBrowseScope}
                   fullWidth
                 />
               ) : null}
@@ -528,10 +558,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
           </Button>
         ) : undefined
       }
-      hasStructuredFilters={
-        showGeographicPresenceLocationKindFilter && locationKindFilter !== 'all'
-      }
-      toolbarStateKey={showGeographicPresenceLocationKindFilter ? locationKindFilter : undefined}
+      hasStructuredFilters={showTargetBrowseScopeControl && locationBrowseScope !== 'all'}
       items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}

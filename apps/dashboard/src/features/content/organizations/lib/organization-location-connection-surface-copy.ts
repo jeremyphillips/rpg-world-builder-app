@@ -3,12 +3,38 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import type { OrganizationLocationTargetBrowseScope } from './organization-location-target-browse-scope'
+
+export type OrganizationForwardTargetPresentationConfig = {
+  targetLabel?: string
+  targetHelp?: string
+  searchPlaceholder?: string
+  browseScopes?: readonly OrganizationLocationTargetBrowseScope[]
+}
+
+export type ResolvedOrganizationForwardTargetPresentation = {
+  targetLabel: string
+  targetHelp?: string
+  searchPlaceholder: string
+  browseScopes?: readonly OrganizationLocationTargetBrowseScope[]
+}
+
+export const DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION: ResolvedOrganizationForwardTargetPresentation =
+  {
+    targetLabel: 'Location',
+    searchPlaceholder: 'Search locations…',
+  }
+
+export const ORGANIZATION_FORWARD_DEFAULT_CHANGE_TARGET_DRAWER_TITLE = 'Change location'
+
 type OrganizationForwardSurfaceCopy = {
   empty: string
   add: string
   addDrawerTitle: string
   addDrawerInstruction: string
   addSubmit: string
+  targetPresentation?: OrganizationForwardTargetPresentationConfig
+  changeTargetDrawerTitle?: string
 }
 
 type OrganizationForwardFamilySurfaceCopy = {
@@ -55,6 +81,11 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add headquarters',
     addDrawerInstruction: 'Choose a location for this organization’s headquarters.',
     addSubmit: 'Add headquarters',
+    changeTargetDrawerTitle: 'Change headquarters location',
+    targetPresentation: {
+      targetHelp: 'Choose a structure for this headquarters.',
+      searchPlaceholder: 'Search structures…',
+    },
   },
   owns: {
     empty: 'No owned locations linked.',
@@ -83,6 +114,10 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add area of operation',
     addDrawerInstruction: 'Choose a geographic area where this organization operates.',
     addSubmit: 'Add area of operation',
+    targetPresentation: {
+      targetHelp: 'Choose a settlement or region where this organization is present.',
+      browseScopes: ['all', 'settlement', 'region'],
+    },
   },
   governs: {
     empty: 'No governed locations linked.',
@@ -105,7 +140,12 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerInstruction: 'Choose a location this organization claims.',
     addSubmit: 'Add claim',
   },
-} as const satisfies Record<OrganizationLocationConnectionKind, OrganizationForwardSurfaceCopy>
+} satisfies Record<OrganizationLocationConnectionKind, OrganizationForwardSurfaceCopy>
+
+const ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND: Record<
+  OrganizationLocationConnectionKind,
+  OrganizationForwardSurfaceCopy
+> = ORGANIZATION_FORWARD_SURFACE_COPY
 
 type OrganizationForwardOverflowLabels = {
   viewLocation: string
@@ -147,25 +187,50 @@ export function resolveOrganizationForwardOverflowLabels(
 export function resolveOrganizationForwardSurfaceCopy(
   kind: OrganizationLocationConnectionKind,
 ): OrganizationForwardSurfaceCopy {
-  return ORGANIZATION_FORWARD_SURFACE_COPY[kind]
+  return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind]
+}
+
+export function resolveOrganizationForwardTargetPresentation(
+  kind: OrganizationLocationConnectionKind,
+): ResolvedOrganizationForwardTargetPresentation {
+  const config = ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].targetPresentation
+
+  return {
+    targetLabel:
+      config?.targetLabel ?? DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.targetLabel,
+    targetHelp: config?.targetHelp,
+    searchPlaceholder:
+      config?.searchPlaceholder ??
+      DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.searchPlaceholder,
+    browseScopes: config?.browseScopes,
+  }
+}
+
+export function resolveOrganizationForwardChangeTargetDrawerTitle(
+  kind: OrganizationLocationConnectionKind,
+): string {
+  return (
+    ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].changeTargetDrawerTitle ??
+    ORGANIZATION_FORWARD_DEFAULT_CHANGE_TARGET_DRAWER_TITLE
+  )
 }
 
 export function resolveOrganizationForwardAddDrawerTitle(
   kind: OrganizationLocationConnectionKind,
 ): string {
-  return ORGANIZATION_FORWARD_SURFACE_COPY[kind].addDrawerTitle
+  return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].addDrawerTitle
 }
 
 export function resolveOrganizationForwardAddDrawerInstruction(
   kind: OrganizationLocationConnectionKind,
 ): string {
-  return ORGANIZATION_FORWARD_SURFACE_COPY[kind].addDrawerInstruction
+  return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].addDrawerInstruction
 }
 
 export function resolveOrganizationForwardAddSubmitLabel(
   kind: OrganizationLocationConnectionKind,
 ): string {
-  return ORGANIZATION_FORWARD_SURFACE_COPY[kind].addSubmit
+  return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].addSubmit
 }
 
 export function resolveOrganizationForwardFamilySurfaceCopy(

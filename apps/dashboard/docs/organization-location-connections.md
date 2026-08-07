@@ -42,6 +42,10 @@ Dashboard drawers delegate to these helpers through `location-connection-duplica
 
 `headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts).
 
+Each organization may have at most **one** headquarters connection across all locations (`maxSubjectsPerOrganization` on the kind vocab entry). Family add drawers keep headquarters visible when that slot is occupied and show `Already set at {locationName}.` as the unavailable reason.
+
+Picker copy for headquarters (field helper, search placeholder, change-location drawer title) lives in dashboard target presentation config — see [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+
 Mutation candidate filtering (add, change location, replace organization) always evaluates the **persisted or selected relationship kind**, never the union of kinds represented by a drawer intent family.
 
 > **Follow-up (out of scope):** legacy `location.partyAssociations` authoring may still expose headquarters on settlements through a separate edge model. Reconcile in a dedicated audit — do not conflate with `connections.locations` eligibility.

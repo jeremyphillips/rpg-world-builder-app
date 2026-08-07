@@ -7,6 +7,10 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { Location, Organization } from '@rpg/contracts'
 
 import {
+  DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
+  resolveOrganizationForwardTargetPresentation,
+} from '../lib/organization-location-connection-surface-copy'
+import {
   OrganizationLocationConnectionLinkDrawer,
   ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE,
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
@@ -100,6 +104,35 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
   })
 
+  it('shows a disabled headquarters option with the existing location reason in add site relationship', () => {
+    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[guildhouse, buildingLocation({ id: 'building-2', name: 'The Silver Eel' })]}
+        existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeDisabled()
+    expect(screen.getByText('Already set at Thieves Guildhouse.')).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        'A designated primary base or headquarters location for the organization.',
+      ),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Owner/i })).toBeEnabled()
+  })
+
   it('skips kind UI for geographic presence and shows the location picker immediately', () => {
     render(
       <OrganizationLocationConnectionLinkDrawer
@@ -123,6 +156,9 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Location type' })).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose a settlement or region where this organization is present.'),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
@@ -163,6 +199,60 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Northern March')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
     expect(screen.queryByText('Harbor Ward')).not.toBeInTheDocument()
+  })
+
+  it('preserves search query when switching geographic presence browse scopes', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="geographic_presence"
+        organization={organization}
+        organizationId="org-1"
+        locations={[regionLocation(), settlementLocation(), districtLocation()]}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const searchInput = screen.getByRole('textbox', {
+      name: DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.searchPlaceholder,
+    })
+    await user.type(searchInput, 'Port')
+    expect(searchInput).toHaveValue('Port')
+
+    await user.click(screen.getByRole('button', { name: 'Settlements' }))
+    expect(searchInput).toHaveValue('Port')
+
+    await user.click(screen.getByRole('button', { name: 'Regions' }))
+    expect(searchInput).toHaveValue('Port')
+  })
+
+  it('disables settlement browse scope when no eligible settlement candidates exist', () => {
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="geographic_presence"
+        organization={organization}
+        organizationId="org-1"
+        locations={[regionLocation()]}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'All' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Settlements' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Regions' })).toBeEnabled()
   })
 
   it('disables territorial singleton locations occupied by another organization', async () => {
@@ -263,7 +353,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
     expect(screen.getByRole('radio', { name: /Owner/i })).toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: 'Search locations…' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Search structures…' })).not.toBeInTheDocument()
     expect(screen.queryByText('No locations are available.')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
@@ -327,6 +417,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       name: 'The Silver Eel',
       slug: 'silver-eel',
     })
+    const headquartersPresentation = resolveOrganizationForwardTargetPresentation('headquarters')
 
     render(
       <OrganizationLocationConnectionLinkDrawer
@@ -345,6 +436,12 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       />,
     )
 
+    expect(screen.getByRole('dialog', { name: 'Change headquarters location' })).toBeInTheDocument()
+    expect(screen.getByText(headquartersPresentation.targetHelp!)).toBeInTheDocument()
+    expect(
+      screen.getByRole('textbox', { name: headquartersPresentation.searchPlaceholder }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Location type' })).not.toBeInTheDocument()
     expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
     expect(screen.queryByText('Thieves Guildhouse')).not.toBeInTheDocument()
@@ -376,6 +473,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
 
+    expect(screen.getByText('Choose a structure for this headquarters.')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search structures…' })).toBeInTheDocument()
     expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
   })
@@ -400,7 +499,12 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
-    await user.type(screen.getByRole('textbox', { name: 'Search locations…' }), 'zzzz-no-match')
+    await user.type(
+      screen.getByRole('textbox', {
+        name: DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION.searchPlaceholder,
+      }),
+      'zzzz-no-match',
+    )
 
     expect(screen.getByText(ORGANIZATION_LOCATION_LINK_NO_RESULTS)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()

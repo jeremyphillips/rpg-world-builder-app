@@ -168,9 +168,15 @@ Cross-org singleton territorial slots (`governs`, `controls`) require **server-b
 
 Canonical kind **descriptions** must stay perspective-neutral (no “this location” / “here”) because they render in kind pickers before an endpoint is fixed. See [packages/contracts/docs/structure.md](../../../packages/contracts/docs/structure.md#reference-vocabulary-gametermentry--vocabularyterm).
 
-**Dashboard owns:** section headings/helpers, drawer titles, action labels, empty-state copy, dynamic occupancy copy, confirmation copy, instructional workflow text.
+**Dashboard owns:** section headings/helpers, drawer titles, action labels, empty-state copy, dynamic occupancy copy, confirmation copy, instructional workflow text, and per-kind **target presentation** for relationship target pickers (field label, field helper, search placeholder, optional browse scopes).
+
+Organization forward target pickers use optional `targetPresentation` config and a separate optional `changeTargetDrawerTitle` in [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts). Resolvers return fully resolved presentation with generic defaults (`Location`, `Search locations…`). Mutation titles describe the edit action; target presentation describes how users browse valid targets.
+
+**Browse scope rule:** configured scopes remain visible for semantic stability. A scope is disabled when the post-eligibility candidate set contains zero locations for that scope. Scope availability is never derived from the active search query. Browse scopes organize display only — they never substitute for `@rpg/contracts` eligibility.
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
+
+> **Follow-up:** inverse location drawers need a parallel target-presentation pass when inverse pickers face the same kind-restricted scope problem. Do not generalize forward + inverse presentation configuration in one module until both surfaces are ready.
 
 ## Implementation guard
 
