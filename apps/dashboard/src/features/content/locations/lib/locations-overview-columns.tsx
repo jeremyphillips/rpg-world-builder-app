@@ -1,6 +1,6 @@
 import {
-  formatLocationDisplaySummary,
   locationDisplaySummarySortKey,
+  resolveLocationClassificationDisplay,
   resolveLocationDisplaySummary,
   type Location,
 } from '@rpg/contracts'
@@ -54,14 +54,14 @@ function buildLocationMiddleColumns(
       id: 'locationType',
       accessorFn: (row) => locationDisplaySummarySortKey(resolveLocationDisplaySummary(row)),
       header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-      cell: ({ row }) => formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original)),
+      cell: ({ row }) => resolveLocationClassificationDisplay(row.original).text,
       sortingFn: (left, right) =>
         compareLocationDisplaySortKeys(
           locationDisplaySummarySortKey(resolveLocationDisplaySummary(left.original)),
           locationDisplaySummarySortKey(resolveLocationDisplaySummary(right.original)),
         ),
       filterFn: (row, _columnId, filterValue) => {
-        const summary = formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original))
+        const summary = resolveLocationClassificationDisplay(row.original).text
         return summary.toLowerCase().includes(String(filterValue).toLowerCase())
       },
       meta: { label: 'Type', ...dataTableColumnChromeMeta('medium', 'meta') },

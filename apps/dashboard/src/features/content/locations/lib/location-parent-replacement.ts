@@ -1,5 +1,4 @@
 import {
-  getLocationKindLabel,
   validateLocationParentAssignment,
   getParentRequirement,
   type Location,
@@ -11,7 +10,12 @@ import { invalidateContentWriteQueries } from '../../lib/list/use-content-mutati
 import { locationsQueryKey } from '../hooks/use-locations'
 
 import { buildLocationHierarchyGraph } from './build-location-hierarchy-graph'
-import { buildLocationsById, LOCATION_UNKNOWN_ANCESTOR_LABEL } from './location-display'
+import {
+  buildLocationEntitySummaryVm,
+  buildLocationsById,
+  LOCATION_UNKNOWN_ANCESTOR_LABEL,
+  type LocationEntitySummaryVm,
+} from './location-display'
 
 export const LOCATION_PARENT_REPLACEMENT_ACTION_LABELS = {
   changeParent: 'Change parent',
@@ -28,6 +32,7 @@ export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
   heading: string
   subheading?: string
+  metadata?: string
   imageKey?: string
   unavailable?: boolean
 }
@@ -60,6 +65,7 @@ export function resolveLocationParentReplacementAction(input: {
 export function resolveLocationParentReplacementCurrentSnapshot(input: {
   subject: Pick<Location, 'parentLocationId'>
   locationsById: ReadonlyMap<string, Location>
+  campaignId: string
 }): LocationParentReplacementCurrentSnapshot | null {
   const parentLocationId = input.subject.parentLocationId
   if (!parentLocationId) {
@@ -75,11 +81,17 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
     }
   }
 
+  const summary = buildLocationEntitySummaryVm(parent, {
+    locationsById: input.locationsById,
+    campaignId: input.campaignId,
+  })
+
   return {
     parentLocationId,
-    heading: parent.name,
-    subheading: getLocationKindLabel(parent.kind),
-    imageKey: parent.imageKey,
+    heading: summary.name,
+    subheading: summary.classification.text,
+    metadata: summary.ancestry.items.length > 0 ? summary.ancestry.text : undefined,
+    imageKey: summary.imageKey,
   }
 }
 
@@ -110,6 +122,19 @@ export function buildEligibleLocationParentReplacementCandidates(input: {
       )
     })
     .sort((left, right) => left.name.localeCompare(right.name))
+}
+
+export function buildLocationParentReplacementCandidateSummaries(input: {
+  candidates: readonly Location[]
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
+}): LocationEntitySummaryVm[] {
+  return input.candidates.map((candidate) =>
+    buildLocationEntitySummaryVm(candidate, {
+      locationsById: input.locationsById,
+      campaignId: input.campaignId,
+    }),
+  )
 }
 
 export function hasLocationParentReplacementContextMismatch(input: {
@@ -155,18 +180,26 @@ export function invalidateLocationParentReplacementQueries(
 export function buildLocationParentReplacementContext(input: {
   subject: Location
   campaignLocations: readonly Location[]
+  campaignId: string
 }) {
   const locationsById = buildLocationsById(input.campaignLocations)
+  const candidates = buildEligibleLocationParentReplacementCandidates({
+    subject: input.subject,
+    campaignLocations: input.campaignLocations,
+  })
 
   return {
     mode: resolveLocationParentReplacementMode(input.subject),
     currentParent: resolveLocationParentReplacementCurrentSnapshot({
       subject: input.subject,
       locationsById,
+      campaignId: input.campaignId,
     }),
-    candidates: buildEligibleLocationParentReplacementCandidates({
-      subject: input.subject,
-      campaignLocations: input.campaignLocations,
+    candidates,
+    candidateSummaries: buildLocationParentReplacementCandidateSummaries({
+      candidates,
+      locationsById,
+      campaignId: input.campaignId,
     }),
   }
 }

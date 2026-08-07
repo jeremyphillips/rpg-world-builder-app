@@ -1,6 +1,7 @@
 export type EntityReplacementCurrentSnapshot = {
   heading: string
   subheading?: string
+  metadata?: string
   imageKey?: string
   unavailable?: boolean
 }

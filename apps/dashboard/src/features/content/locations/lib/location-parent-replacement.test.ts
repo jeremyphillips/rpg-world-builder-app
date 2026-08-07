@@ -79,6 +79,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       resolveLocationParentReplacementCurrentSnapshot({
         subject: ALDERMERE,
         locationsById: buildLocationsById(LOCATIONS_LIST),
+        campaignId: CAMPAIGN_ID,
       }),
     ).toBeNull()
   })
@@ -88,11 +89,13 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       resolveLocationParentReplacementCurrentSnapshot({
         subject: YAWNING_PORTAL,
         locationsById: buildLocationsById(LOCATIONS_LIST),
+        campaignId: CAMPAIGN_ID,
       }),
     ).toEqual({
       parentLocationId: DOCK_WARD.id,
       heading: DOCK_WARD.name,
       subheading: 'District',
+      metadata: 'Aldermere / Greyshore / Harborford',
     })
   })
 
@@ -106,6 +109,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       resolveLocationParentReplacementCurrentSnapshot({
         subject: staleParent,
         locationsById: buildLocationsById(LOCATIONS_LIST),
+        campaignId: CAMPAIGN_ID,
       }),
     ).toEqual({
       parentLocationId: 'missing-parent-id',
@@ -219,6 +223,7 @@ describe('buildLocationParentReplacementContext', () => {
     const context = buildLocationParentReplacementContext({
       subject: YAWNING_PORTAL,
       campaignLocations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
     })
 
     expect(context.mode).toBe('change')

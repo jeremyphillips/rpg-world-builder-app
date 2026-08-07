@@ -8,6 +8,7 @@ export type EntityReplacementCurrentFieldProps = {
   label: string
   heading: string
   subheading?: string
+  metadata?: string
   imageKey?: string
 }
 
@@ -15,6 +16,7 @@ export function EntityReplacementCurrentField({
   label,
   heading,
   subheading,
+  metadata,
   imageKey,
 }: EntityReplacementCurrentFieldProps) {
   return (
@@ -28,6 +30,7 @@ export function EntityReplacementCurrentField({
           density="compact"
           heading={heading}
           subheading={subheading}
+          metadata={metadata}
           imageKey={imageKey}
         />
       </InsetPanel>

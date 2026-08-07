@@ -38,6 +38,7 @@ export function EntityReplacementSection({
             label={labels.currentLabel}
             heading={current.heading}
             subheading={current.subheading}
+            metadata={current.metadata}
             imageKey={current.imageKey}
           />
           {current.unavailable ? (

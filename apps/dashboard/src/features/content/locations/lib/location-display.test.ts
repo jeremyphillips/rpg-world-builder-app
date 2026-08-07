@@ -8,6 +8,8 @@ import {
   buildChildSummariesByParentId,
   buildLocationChildren,
   buildLocationDetailViewModel,
+  buildLocationEntitySummarySearchText,
+  buildLocationEntitySummaryVm,
   buildLocationLocatedInSegments,
   buildLocationsById,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
@@ -81,6 +83,49 @@ describe('buildLocationChildren', () => {
     const children = buildLocationChildren(HARBORFORD.id, LOCATIONS_LIST, CAMPAIGN_ID)
     expect(children.map((child) => child.name)).toEqual(['Dock Ward'])
     expect(children[0]?.summaryLine).toBe('District')
+  })
+})
+
+describe('buildLocationEntitySummaryVm', () => {
+  it('projects classification and ancestry items with convenience text', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(summary.name).toBe('Yawning Portal')
+    expect(summary.classification.text).toBe('Building · Tavern')
+    expect(summary.ancestry.items.map((item) => item.name)).toEqual([
+      'Aldermere',
+      'Greyshore',
+      'Harborford',
+      'Dock Ward',
+    ])
+    expect(summary.ancestry.text).toBe('Aldermere / Greyshore / Harborford / Dock Ward')
+  })
+
+  it('omits ancestry convenience text when there are no ancestor items', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(ALDERMERE, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(summary.ancestry.items).toEqual([])
+    expect(summary.ancestry.text).toBe('')
+  })
+
+  it('builds search haystack from name, classification parts, and ancestor names', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntitySummarySearchText(summary)).toBe(
+      'Yawning Portal Building Tavern Aldermere Greyshore Harborford Dock Ward',
+    )
   })
 })
 

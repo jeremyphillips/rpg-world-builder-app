@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { buildingClassificationSchema } from './building-classification'
 import {
-  formatLocationDisplaySummary,
   locationDisplaySummarySortKey,
+  resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
 } from './location-display-summary'
 import type { Location } from './location'
-import { UNCLASSIFIED_STRUCTURE_LABEL } from '../../vocab/location/structure-type'
 
 const baseLocation = {
   rulesetId: 'srd-cc-5.2.1' as const,
@@ -70,9 +69,6 @@ describe('resolveLocationDisplaySummary', () => {
       classificationLabel: 'Guildhall',
       specializationLabel: 'Thieves',
     })
-    expect(formatLocationDisplaySummary(resolveLocationDisplaySummary(location))).toBe(
-      'Building · Guildhall · Thieves',
-    )
   })
 
   it('resolves interior subtype classification', () => {
@@ -87,9 +83,6 @@ describe('resolveLocationDisplaySummary', () => {
       typeLabel: 'Interior',
       classificationLabel: 'Chamber',
     })
-    expect(formatLocationDisplaySummary(resolveLocationDisplaySummary(location))).toBe(
-      'Interior · Chamber',
-    )
   })
 
   it('resolves fortification without classification', () => {
@@ -104,14 +97,92 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
-  it('resolves unclassified structure label', () => {
+  it('resolves untyped structure as the generic Structure kind label', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
-      typeLabel: UNCLASSIFIED_STRUCTURE_LABEL,
+      typeLabel: 'Structure',
+    })
+  })
+})
+
+describe('resolveLocationClassificationDisplay', () => {
+  it('omits specialization from compact classification text', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        archetype: 'guildhall',
+        specialization: 'Thieves',
+      }),
+    }
+
+    expect(resolveLocationClassificationDisplay(location)).toEqual({
+      parts: ['Building', 'Guildhall'],
+      text: 'Building · Guildhall',
+    })
+  })
+
+  it('returns Structure for untyped structures', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'structure',
+    }
+
+    expect(resolveLocationClassificationDisplay(location)).toEqual({
+      parts: ['Structure'],
+      text: 'Structure',
+    })
+  })
+
+  it('returns settlement, region, site, and fortification compact lines', () => {
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'settlement',
+        settlementType: 'city',
+        parentLocationId: 'loc_parent',
+      }),
+    ).toEqual({
+      parts: ['Settlement', 'City'],
+      text: 'Settlement · City',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'region',
+        classification: { kind: 'political', type: 'kingdom' },
+      }),
+    ).toEqual({
+      parts: ['Region', 'Kingdom'],
+      text: 'Region · Kingdom',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'site',
+        siteType: 'dungeon',
+      }),
+    ).toEqual({
+      parts: ['Site', 'Dungeon'],
+      text: 'Site · Dungeon',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'structure',
+        structureType: 'fortification',
+      }),
+    ).toEqual({
+      parts: ['Fortification'],
+      text: 'Fortification',
     })
   })
 })

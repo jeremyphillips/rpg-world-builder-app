@@ -34,7 +34,7 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
       }),
     ).toEqual({
       heading: "Thieves' Guildhouse",
-      subheading: 'Structure',
+      subheading: 'Building',
       imageKey: 'img-1',
     })
   })

@@ -9,7 +9,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
-  getLocationKindLabel,
+  resolveLocationClassificationDisplay,
   getOrganizationKindLabel,
   getOrganizationLocationConnectionLabel,
 } from '@rpg/contracts'
@@ -117,7 +117,8 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
 }
 
 function buildLocationSearchText(location: Location): string {
-  return [location.name, getLocationKindLabel(location.kind)].join(' ')
+  const classification = resolveLocationClassificationDisplay(location)
+  return [location.name, ...classification.parts].join(' ')
 }
 
 function resolveDefaultAddKind(
@@ -616,7 +617,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
             chrome="embedded"
             density="compact"
             heading={location.name}
-            subheading={kindAvailable ? getLocationKindLabel(location.kind) : fullyLinkedReason}
+            subheading={
+              kindAvailable
+                ? resolveLocationClassificationDisplay(location).text
+                : fullyLinkedReason
+            }
             imageKey={location.imageKey}
             disabled={!kindAvailable}
             endSlot={

@@ -9,10 +9,7 @@ import { getPlaneTypeLabel } from '../../vocab/location/plane-type'
 import { getRegionTypeLabelForKind } from '../../vocab/location/region-classification-definitions'
 import { getSettlementTypeLabel } from '../../vocab/location/settlement-type'
 import { getSiteTypeLabel } from '../../vocab/location/site-type'
-import {
-  getStructureTypeLabel,
-  UNCLASSIFIED_STRUCTURE_LABEL,
-} from '../../vocab/location/structure-type'
+import { getStructureTypeLabel } from '../../vocab/location/structure-type'
 import type { BuildingClassification } from './building-classification'
 import type { Location } from './location'
 
@@ -24,8 +21,13 @@ export type LocationDisplaySummary = {
   specializationLabel?: string
 }
 
+export type LocationClassificationDisplay = {
+  parts: readonly string[]
+  text: string
+}
+
 function resolveStructureTypeLabel(structureType: string | undefined): string {
-  if (!structureType) return UNCLASSIFIED_STRUCTURE_LABEL
+  if (!structureType) return getLocationKindLabel('structure')
   return getStructureTypeLabel(structureType)
 }
 
@@ -125,11 +127,19 @@ export function resolveLocationDisplaySummary(location: Location): LocationDispl
   }
 }
 
-/** Formats a compact type summary for tables and list secondary lines. */
-export function formatLocationDisplaySummary(summary: LocationDisplaySummary): string {
-  return [summary.typeLabel, summary.classificationLabel, summary.specializationLabel]
-    .filter((segment): segment is string => Boolean(segment))
-    .join(LOCATION_DISPLAY_SUMMARY_SEPARATOR)
+/** Resolves the compact classification line shared by tables, search, and pickers. */
+export function resolveLocationClassificationDisplay(
+  location: Location,
+): LocationClassificationDisplay {
+  const summary = resolveLocationDisplaySummary(location)
+  const parts = [summary.typeLabel, summary.classificationLabel].filter(
+    (segment): segment is string => Boolean(segment),
+  )
+
+  return {
+    parts,
+    text: parts.join(LOCATION_DISPLAY_SUMMARY_SEPARATOR),
+  }
 }
 
 /** Tuple accessor for stable Type-column sort and filter. */

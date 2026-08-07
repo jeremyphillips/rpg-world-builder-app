@@ -9,7 +9,6 @@ import {
   getInteriorSubtypeIds,
   getRegionTypeIds,
 } from '../../vocab/location'
-import { getStructureClassificationLabel } from './building-classification'
 import { locationBodySchema } from './location'
 
 describe('location classification registries', () => {
@@ -47,24 +46,6 @@ describe('getEffectiveBuildingFunctions', () => {
     expect(getEffectiveBuildingFunctions({ archetype: 'inn', functionOverride: 'care' })).toEqual([
       'care',
     ])
-  })
-})
-
-describe('getStructureClassificationLabel', () => {
-  it('composes building labels from archetype and optional specialization', () => {
-    expect(
-      getStructureClassificationLabel({
-        structureType: 'building',
-        classification: { archetype: 'inn' },
-      }),
-    ).toBe('Building · Inn')
-
-    expect(
-      getStructureClassificationLabel({
-        structureType: 'building',
-        classification: { archetype: 'inn', specialization: 'Coaching inn' },
-      }),
-    ).toBe('Building · Inn · Coaching inn')
   })
 })
 

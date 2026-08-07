@@ -3,7 +3,7 @@ import type {
   Organization,
   OrganizationLocationReferenceResolution,
 } from '@rpg/contracts'
-import { getLocationKindLabel, getOrganizationKindLabel } from '@rpg/contracts'
+import { resolveLocationClassificationDisplay, getOrganizationKindLabel } from '@rpg/contracts'
 
 import {
   ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
@@ -35,7 +35,7 @@ export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
 
   return {
     heading: reference.location.name,
-    subheading: getLocationKindLabel(reference.location.kind),
+    subheading: resolveLocationClassificationDisplay(reference.location).text,
     imageKey: reference.location.imageKey,
   }
 }

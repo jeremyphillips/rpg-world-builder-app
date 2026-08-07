@@ -3,7 +3,6 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import { getLocationKindLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
 
 import {
@@ -15,6 +14,10 @@ import {
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
+import {
+  buildLocationEntitySummarySearchText,
+  type LocationEntitySummaryVm,
+} from '../lib/location-display'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -53,16 +56,13 @@ export type LocationParentReplacementDrawerProps = {
   onSubmit: (newParentLocationId: string) => Promise<void>
 }
 
-function buildLocationSearchText(location: Location): string {
-  return [location.name, getLocationKindLabel(location.kind)].join(' ')
-}
-
 function toEntityReplacementCurrentSnapshot(
   current: LocationParentReplacementCurrentSnapshot,
 ): EntityReplacementCurrentSnapshot {
   return {
     heading: current.heading,
     subheading: current.subheading,
+    metadata: current.metadata,
     imageKey: current.imageKey,
     unavailable: current.unavailable,
   }
@@ -82,32 +82,33 @@ function resolveContextMismatch(input: {
 }
 
 function LocationParentReplacementCandidateRow({
-  location,
+  summary,
   selectedParentId,
   onSelect,
   onClear,
 }: {
-  location: Location
+  summary: LocationEntitySummaryVm
   selectedParentId: string | null
   onSelect: (locationId: string) => void
   onClear: () => void
 }) {
-  const isSelected = selectedParentId === location.id
+  const isSelected = selectedParentId === summary.id
   const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
   return (
     <ContentEntityCard
       chrome="embedded"
       density="compact"
-      heading={location.name}
-      subheading={getLocationKindLabel(location.kind)}
-      imageKey={location.imageKey}
+      heading={summary.name}
+      subheading={summary.classification.text}
+      metadata={summary.ancestry.items.length > 0 ? summary.ancestry.text : undefined}
+      imageKey={summary.imageKey}
       endSlot={
         <CatalogPickerSelectionActions
           phase={phase}
           canSelect
           addLabel={isSelected ? 'Selected' : 'Select'}
-          onAdd={() => onSelect(location.id)}
+          onAdd={() => onSelect(summary.id)}
           onRemove={onClear}
         />
       }
@@ -181,11 +182,12 @@ function LocationParentReplacementDrawerContent({
   const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null)
   const [parentBrowseScope, setParentBrowseScope] = React.useState<LocationParentBrowseScope>('all')
 
-  const { mode, currentParent, candidates } = React.useMemo(
+  const { mode, currentParent, candidates, candidateSummaries } = React.useMemo(
     () =>
       buildLocationParentReplacementContext({
         subject,
         campaignLocations,
+        campaignId: subject.campaignId ?? campaignLocations[0]?.campaignId ?? '',
       }),
     [campaignLocations, subject],
   )
@@ -210,11 +212,17 @@ function LocationParentReplacementDrawerContent({
 
   const pickerCandidates = React.useMemo(() => {
     if (!showParentBrowseScopeControl) {
-      return candidates
+      return candidateSummaries
     }
 
-    return filterLocationsByParentBrowseScope(candidates, parentBrowseScope)
-  }, [candidates, parentBrowseScope, showParentBrowseScopeControl])
+    const scopedCandidateIds = new Set(
+      filterLocationsByParentBrowseScope(candidates, parentBrowseScope).map(
+        (location) => location.id,
+      ),
+    )
+
+    return candidateSummaries.filter((summary) => scopedCandidateIds.has(summary.id))
+  }, [candidateSummaries, candidates, parentBrowseScope, showParentBrowseScopeControl])
 
   const handleSubmit = async () => {
     if (!selectedParentId || contextMismatch) return
@@ -261,7 +269,7 @@ function LocationParentReplacementDrawerContent({
         <LocationParentReplacementDrawerFooter
           contextMismatch={contextMismatch}
           pickerEnabled={pickerEnabled}
-          hasCandidates={candidates.length > 0}
+          hasCandidates={candidateSummaries.length > 0}
           canSubmit={canSubmit}
           isSubmitting={isSubmitting}
           surface={surface}
@@ -272,12 +280,12 @@ function LocationParentReplacementDrawerContent({
       }
       hasStructuredFilters={showParentBrowseScopeControl && parentBrowseScope !== 'all'}
       items={pickerEnabled ? pickerCandidates : []}
-      getItemKey={(location) => location.id}
-      getItemToolbarLabel={(location) => location.name}
-      getSearchText={buildLocationSearchText}
-      renderItemHeader={(location) => (
+      getItemKey={(summary) => summary.id}
+      getItemToolbarLabel={(summary) => summary.name}
+      getSearchText={buildLocationEntitySummarySearchText}
+      renderItemHeader={(summary) => (
         <LocationParentReplacementCandidateRow
-          location={location}
+          summary={summary}
           selectedParentId={selectedParentId}
           onSelect={setSelectedParentId}
           onClear={() => setSelectedParentId(null)}
