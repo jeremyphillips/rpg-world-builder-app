@@ -12,6 +12,7 @@ import { ApiError } from '@rpg/contracts'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { useLocations } from '../../locations/hooks/use-locations'
+import { buildLocationsById } from '../../locations/lib/location-display'
 import {
   organizationConnectionDrawerIntentFromFamily,
   organizationForwardFamilyHasAvailableTarget,
@@ -20,12 +21,14 @@ import {
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import { resolveRelationshipAlternatives } from '../../lib/relationship/relationship-alternatives'
-import { resolveOrganizationForwardCurrentLocationEndpoint } from '../../lib/relationship/resolve-relationship-drawer-current-endpoint'
 import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'
-import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
+import {
+  buildOrganizationLocationConnectionCards,
+  resolveOrganizationForwardCurrentLocationEndpoint,
+} from '../lib/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import type { OrganizationLocationConnectionEditTarget } from '../components/organization-location-connections-section.client'
 import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
@@ -58,6 +61,7 @@ export function useOrganizationLocationConnectionsDetail(
   const [drawerState, setDrawerState] = React.useState<DrawerState | null>(null)
 
   const locations = locationsQuery.data ?? []
+  const locationsById = React.useMemo(() => buildLocationsById(locations), [locations])
   const edgesByLocationId = edgesQuery.data
   const occupancyLoaded = !canManage || !edgesQuery.isPending
 
@@ -71,10 +75,13 @@ export function useOrganizationLocationConnectionsDetail(
     }
 
     return {
-      ...buildOrganizationLocationConnectionCards(locationReferencesQuery.data, { campaignId }),
+      ...buildOrganizationLocationConnectionCards(locationReferencesQuery.data, {
+        campaignId,
+        locationsById,
+      }),
       emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
     }
-  }, [campaignId, locationReferencesQuery.data])
+  }, [campaignId, locationReferencesQuery.data, locationsById])
 
   const existingConnections = React.useMemo(
     () =>
@@ -244,13 +251,16 @@ export function useOrganizationLocationConnectionsDetail(
     return resolveOrganizationForwardCurrentLocationEndpoint({
       connectionId: drawerState.connection.connectionId,
       locationReferences: locationReferencesQuery.data ?? [],
+      locationsById,
+      campaignId,
     })
-  }, [drawerState, locationReferencesQuery.data])
+  }, [campaignId, drawerState, locationReferencesQuery.data, locationsById])
 
   return {
     canManage,
     organization,
     locations,
+    locationsById,
     edgesByLocationId,
     occupancyLoaded,
     locationConnections,

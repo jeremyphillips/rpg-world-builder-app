@@ -1,65 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  resolveLocationInverseCurrentOrganizationEndpoint,
-  resolveOrganizationForwardCurrentLocationEndpoint,
-} from './resolve-relationship-drawer-current-endpoint'
-import {
-  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
-  ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
-} from '../entity-replacement/entity-replacement-current-entity'
-
-describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
-  it('returns hydrated location snapshot from relationship references', () => {
-    expect(
-      resolveOrganizationForwardCurrentLocationEndpoint({
-        connectionId: 'conn-1',
-        locationReferences: [
-          {
-            connection: {
-              id: 'conn-1',
-              locationId: 'loc-1',
-              kind: 'headquarters',
-            },
-            location: {
-              id: 'loc-1',
-              name: "Thieves' Guildhouse",
-              slug: 'thieves-guildhouse',
-              kind: 'structure',
-              structureType: 'building',
-              imageKey: 'img-1',
-            } as never,
-          },
-        ],
-      }),
-    ).toEqual({
-      heading: "Thieves' Guildhouse",
-      subheading: 'Building',
-      imageKey: 'img-1',
-    })
-  })
-
-  it('returns unavailable snapshot when persisted location reference is null', () => {
-    expect(
-      resolveOrganizationForwardCurrentLocationEndpoint({
-        connectionId: 'conn-1',
-        locationReferences: [
-          {
-            connection: {
-              id: 'conn-1',
-              locationId: 'loc-1',
-              kind: 'headquarters',
-            },
-            location: null,
-          },
-        ],
-      }),
-    ).toEqual({
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
-      unavailable: true,
-    })
-  })
-})
+import { resolveLocationInverseCurrentOrganizationEndpoint } from './resolve-relationship-drawer-current-endpoint'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING } from '../entity-replacement/entity-replacement-current-entity'
 
 describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
   it('returns hydrated organization snapshot from connected party row', () => {

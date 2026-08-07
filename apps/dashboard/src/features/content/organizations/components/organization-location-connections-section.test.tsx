@@ -11,41 +11,39 @@ import {
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
 } from './organization-location-connections-section.client'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
+import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
+import { buildLocationsById } from '../../locations/lib/location-display'
 
+function buildingLocation(overrides: Partial<Location> = {}): Location {
+  return {
+    id: 'building-1',
+    campaignId: 'camp-1',
+    name: 'Royal Mint',
+    slug: 'royal-mint',
+    kind: 'structure',
+    structureType: 'building',
+    ...overrides,
+  } as Location
+}
+
+const sampleLocations = [
+  buildingLocation(),
+  buildingLocation({ id: 'building-2', name: 'Royal Palace', slug: 'royal-palace' }),
+]
 const sampleLocationConnections = {
-  previewItems: [
-    {
-      connectionId: 'conn-1',
-      locationId: 'building-1',
-      kind: 'owns' as const,
-      family: 'site' as const,
-      familyLabel: 'Sites & facilities',
-      relationshipLabel: 'Owner',
-      card: {
-        id: 'building-1',
-        name: 'Royal Mint',
-        summary: 'Sites & facilities · Owner',
+  ...buildOrganizationLocationConnectionCards(
+    [
+      {
+        connection: { id: 'conn-1', locationId: 'building-1', kind: 'owns' },
+        location: sampleLocations[0]!,
       },
-      detailHref: '/campaigns/camp-1/locations/building-1',
-      locationUnavailable: false,
-    },
-    {
-      connectionId: 'conn-2',
-      locationId: 'building-2',
-      kind: 'headquarters' as const,
-      family: 'site' as const,
-      familyLabel: 'Sites & facilities',
-      relationshipLabel: 'Headquarters',
-      card: {
-        id: 'building-2',
-        name: 'Royal Palace',
-        summary: 'Sites & facilities · Headquarters',
+      {
+        connection: { id: 'conn-2', locationId: 'building-2', kind: 'headquarters' },
+        location: sampleLocations[1]!,
       },
-      detailHref: '/campaigns/camp-1/locations/building-2',
-      locationUnavailable: false,
-    },
-  ],
-  total: 2,
+    ],
+    { campaignId: 'camp-1', locationsById: buildLocationsById(sampleLocations) },
+  ),
   emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
 }
 

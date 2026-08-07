@@ -8,11 +8,7 @@ import type {
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import {
-  resolveLocationClassificationDisplay,
-  getOrganizationKindLabel,
-  getOrganizationLocationConnectionLabel,
-} from '@rpg/contracts'
+import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -34,6 +30,11 @@ import {
   type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
 import { resolveRelationshipCandidateSet } from '../../lib/relationship/relationship-candidate-set'
+import {
+  buildLocationEntitySummarySearchText,
+  buildLocationEntitySummaryVm,
+  type LocationEntitySummaryVm,
+} from '../../locations/lib/location-display'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
@@ -99,7 +100,9 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   addKind?: OrganizationLocationConnectionKind
   organization: Pick<Organization, 'name' | 'organizationKind'>
   organizationId: string
+  campaignId: string
   locations: readonly Location[]
+  locationsById: ReadonlyMap<string, Location>
   locationCandidates?: RelationshipCandidateSet<Location>
   existingConnections: readonly ExistingConnection[]
   edgesByLocationId?: Readonly<
@@ -114,11 +117,6 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
     locationId: string
     kind: OrganizationLocationConnectionKind
   }) => Promise<void>
-}
-
-function buildLocationSearchText(location: Location): string {
-  const classification = resolveLocationClassificationDisplay(location)
-  return [location.name, ...classification.parts].join(' ')
 }
 
 function resolveDefaultAddKind(
@@ -160,7 +158,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
   addKind,
   organization,
   organizationId,
+  campaignId,
   locations,
+  locationsById,
   locationCandidates: locationCandidatesInput,
   existingConnections,
   edgesByLocationId,
@@ -470,6 +470,20 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
   }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
 
+  const pickerLocationSummaries = React.useMemo(() => {
+    const summaries = new Map<string, LocationEntitySummaryVm>()
+    for (const location of pickerLocations) {
+      summaries.set(
+        location.id,
+        buildLocationEntitySummaryVm(location, {
+          locationsById,
+          campaignId,
+        }),
+      )
+    }
+    return summaries
+  }, [campaignId, locationsById, pickerLocations])
+
   return (
     <CatalogPickerSheet
       open={open}
@@ -598,8 +612,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
       items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
-      getSearchText={buildLocationSearchText}
+      getSearchText={(location) => {
+        const summary = pickerLocationSummaries.get(location.id)
+        return summary ? buildLocationEntitySummarySearchText(summary) : location.name
+      }}
       renderItemHeader={(location) => {
+        const summary = pickerLocationSummaries.get(location.id)
         const isSelected = selectedLocationId === location.id
         const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
         const kindAvailable =
@@ -616,11 +634,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={location.name}
-            subheading={
-              kindAvailable
-                ? resolveLocationClassificationDisplay(location).text
-                : fullyLinkedReason
+            heading={summary?.name ?? location.name}
+            subheading={kindAvailable ? summary?.classification.text : fullyLinkedReason}
+            metadata={
+              kindAvailable && summary && summary.ancestry.items.length > 0
+                ? summary.ancestry.text
+                : undefined
             }
             imageKey={location.imageKey}
             disabled={!kindAvailable}

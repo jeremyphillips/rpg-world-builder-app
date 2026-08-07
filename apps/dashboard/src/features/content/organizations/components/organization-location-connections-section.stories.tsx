@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { buildLocationsById } from '../../locations/lib/location-display'
+import { GREYSHORE } from '../../locations/fixtures'
+import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import {
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
@@ -16,24 +19,18 @@ export default meta
 type Story = StoryObj<typeof OrganizationLocationConnectionsSection>
 
 const sampleLocationConnections = {
-  previewItems: [
-    {
-      connectionId: 'conn-1',
-      locationId: 'region-1',
-      kind: 'governs' as const,
-      family: 'territorial_authority' as const,
-      familyLabel: 'Territorial authority',
-      relationshipLabel: 'Governs',
-      card: {
-        id: 'region-1',
-        name: 'Grey Coast',
-        summary: 'Territorial authority · Governs',
+  ...buildOrganizationLocationConnectionCards(
+    [
+      {
+        connection: { id: 'conn-1', locationId: GREYSHORE.id, kind: 'governs' },
+        location: GREYSHORE,
       },
-      detailHref: '/campaigns/camp-1/locations/region-1',
-      locationUnavailable: false,
+    ],
+    {
+      campaignId: 'camp-1',
+      locationsById: buildLocationsById([GREYSHORE]),
     },
-  ],
-  total: 1,
+  ),
   emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
 }
 

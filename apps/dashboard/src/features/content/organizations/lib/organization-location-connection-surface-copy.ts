@@ -63,18 +63,6 @@ export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
   OrganizationForwardFamilySurfaceCopy
 >
 
-/** Temporary parallel forward-edge presentation — migrate to `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`. */
-export const ORGANIZATION_FORWARD_KIND_HEADINGS = {
-  owns: 'Owns',
-  tenant: 'Tenants',
-  operator: 'Operates',
-  headquarters: 'Headquarters',
-  operates_in: 'Operates in',
-  governs: 'Governs',
-  controls: 'Controls',
-  claims: 'Claims',
-} as const satisfies Record<OrganizationLocationConnectionKind, string>
-
 export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   headquarters: {
     empty: 'No headquarters linked.',
@@ -246,10 +234,4 @@ export function resolveOrganizationForwardFamilyAddDrawerHelper(
   const copy: OrganizationForwardFamilySurfaceCopy =
     ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
   return copy.addDrawerHelper
-}
-
-export function resolveOrganizationForwardKindHeading(
-  kind: OrganizationLocationConnectionKind,
-): string {
-  return ORGANIZATION_FORWARD_KIND_HEADINGS[kind]
 }

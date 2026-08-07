@@ -77,7 +77,12 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   }
 
   const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
-    view: () => input.navigate(input.item.detailHref),
+    view: () => {
+      const href = input.item.target?.href
+      if (href) {
+        input.navigate(href)
+      }
+    },
   }
 
   if (
@@ -144,16 +149,20 @@ export function OrganizationLocationConnectionRelationshipRow({
   onRemoveConnection,
 }: OrganizationLocationConnectionRelationshipRowProps) {
   const navigate = useNavigate()
+  const targetName = item.target?.name ?? 'Unavailable location'
 
   return (
     <CrossContentRelationshipRow
-      heading={item.card.name}
-      href={item.detailHref}
+      heading={targetName}
+      href={item.target?.href}
+      secondaryText={item.target?.classification.text}
       metadata={
-        item.locationUnavailable ? (
+        item.target == null ? (
           <Badge tone="warning" className="mt-1">
             Unavailable
           </Badge>
+        ) : item.target.ancestry.items.length > 0 ? (
+          item.target.ancestry.text
         ) : undefined
       }
       actions={buildOrganizationLocationConnectionOverflowActions({
@@ -166,7 +175,7 @@ export function OrganizationLocationConnectionRelationshipRow({
         onChangeTargetConnection,
         onRemoveConnection,
       })}
-      overflowTriggerLabel={`Actions for ${item.card.name}`}
+      overflowTriggerLabel={`Actions for ${targetName}`}
     />
   )
 }

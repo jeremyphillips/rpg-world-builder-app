@@ -54,8 +54,21 @@ Organization detail uses **family-level** empty states and one **Add {family}** 
 
 Directional edge copy lives on connection kind entries in `@rpg/contracts`
 (`label`, optional `forwardLabel`, optional `inverseLabel`). Organization forward eyebrows
-still consume `ORGANIZATION_FORWARD_KIND_HEADINGS` as a temporary exception; follow-up
-work deletes that map and reads `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
+read `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
+
+## Location target display
+
+Organization→location existing-edge rows, change-target **Current** snapshots, and link-drawer
+candidates compose [`LocationEntitySummaryVm`](../src/features/content/locations/lib/location-display.ts)
+in the organization feature, then map to neutral row / `EntityReplacementCurrentSnapshot` fields.
+Generic relationship and entity-replacement modules stay **entity-agnostic** — they must not import
+location display helpers.
+
+- **Unresolved targets:** `target: null` is the sole failure state; UI derives unavailable chrome from that.
+- **Ancestry index:** the detail hook memoizes `locationsById` once and passes it into card builders, Current
+  snapshots, and picker summaries — builders must not rebuild the map per row.
+- **Density:** cross-content relationship rows keep identity, classification, and ancestry **stacked** so
+  external references stay scannable. Contained locations intentionally use compact inline density instead.
 
 Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).
 

@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 
 export const ORGANIZATION_SECTION_LABELS = {
   connectedCharacters: 'Connected characters',
@@ -34,11 +35,8 @@ export type OrganizationLocationConnectionPreviewItem = {
   locationId: string
   kind: OrganizationLocationConnectionKind
   family: OrganizationLocationConnectionFamily
-  familyLabel: string
-  relationshipLabel: string
-  card: { id: string; name: string; summary: string }
-  detailHref: string
-  locationUnavailable: boolean
+  /** null when the persisted location reference failed to resolve */
+  target: LocationEntitySummaryVm | null
 }
 
 export type OrganizationLocationConnectionsViewModel = {

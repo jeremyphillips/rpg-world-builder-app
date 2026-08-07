@@ -17,10 +17,21 @@ import {
 } from './organization-location-connection-link-drawer.client'
 import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship/relationship-alternatives'
 import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../lib/entity-replacement/entity-replacement-current-entity'
+import { buildLocationsById } from '../../locations/lib/location-display'
 
 const organization: Pick<Organization, 'name' | 'organizationKind'> = {
   name: 'The Monarchy',
   organizationKind: 'government',
+}
+
+const DRAWER_CAMPAIGN_ID = 'camp-1'
+
+function withOrganizationLocationDrawerIndex(locations: readonly Location[]) {
+  return {
+    campaignId: DRAWER_CAMPAIGN_ID,
+    locations,
+    locationsById: buildLocationsById(locations),
+  }
 }
 
 function buildingLocation(overrides: Partial<Location> = {}): Location {
@@ -80,7 +91,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -116,7 +127,10 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[guildhouse, buildingLocation({ id: 'building-2', name: 'The Silver Eel' })]}
+        {...withOrganizationLocationDrawerIndex([
+          guildhouse,
+          buildingLocation({ id: 'building-2', name: 'The Silver Eel' }),
+        ])}
         existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -143,7 +157,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organization={organization}
         organizationId="org-1"
-        locations={[regionLocation()]}
+        {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -177,7 +191,11 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organization={organization}
         organizationId="org-1"
-        locations={[regionLocation(), settlementLocation(), districtLocation()]}
+        {...withOrganizationLocationDrawerIndex([
+          regionLocation(),
+          settlementLocation(),
+          districtLocation(),
+        ])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -213,7 +231,11 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organization={organization}
         organizationId="org-1"
-        locations={[regionLocation(), settlementLocation(), districtLocation()]}
+        {...withOrganizationLocationDrawerIndex([
+          regionLocation(),
+          settlementLocation(),
+          districtLocation(),
+        ])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -243,7 +265,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organization={organization}
         organizationId="org-1"
-        locations={[regionLocation()]}
+        {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -267,7 +289,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="territorial_authority"
         organization={organization}
         organizationId="org-1"
-        locations={[regionLocation()]}
+        {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
         edgesByLocationId={{
           'region-1': [
@@ -305,7 +327,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
           intent="site"
           organization={organization}
           organizationId="org-1"
-          locations={[buildingLocation()]}
+          {...withOrganizationLocationDrawerIndex([buildingLocation()])}
           existingConnections={[]}
           edgesByLocationId={{}}
           occupancyLoaded
@@ -338,7 +360,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -388,7 +410,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[infrastructureLocation, buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([infrastructureLocation, buildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -430,7 +452,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[guildhouse, settlementLocation(), silverEel]}
+        {...withOrganizationLocationDrawerIndex([guildhouse, settlementLocation(), silverEel])}
         existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -489,7 +511,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[silverEel]}
+        {...withOrganizationLocationDrawerIndex([silverEel])}
         existingConnections={[
           { id: 'conn-hq', locationId: staleSettlement.id, kind: 'headquarters' },
         ]}
@@ -523,7 +545,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -559,7 +581,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[settlementLocation(), silverEel]}
+        {...withOrganizationLocationDrawerIndex([settlementLocation(), silverEel])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -586,7 +608,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -617,7 +639,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="site"
         organization={organization}
         organizationId="org-1"
-        locations={[buildingLocation()]}
+        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -640,7 +662,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organization={organization}
         organizationId="org-1"
-        locations={[current]}
+        {...withOrganizationLocationDrawerIndex([current])}
         locationCandidates={{ items: [current], isAuthoritativeDomainSet: false }}
         existingConnections={[{ id: 'conn-1', locationId: current.id, kind: 'operates_in' }]}
         edgesByLocationId={{}}

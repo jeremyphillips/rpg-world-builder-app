@@ -1,44 +1,10 @@
-import type {
-  LocationConnectedPartyRow,
-  Organization,
-  OrganizationLocationReferenceResolution,
-} from '@rpg/contracts'
-import { resolveLocationClassificationDisplay, getOrganizationKindLabel } from '@rpg/contracts'
+import type { LocationConnectedPartyRow, Organization } from '@rpg/contracts'
+import { getOrganizationKindLabel } from '@rpg/contracts'
 
 import {
-  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
   ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
   type EntityReplacementCurrentSnapshot,
 } from '../entity-replacement/entity-replacement-current-entity'
-
-export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
-  connectionId: string
-  locationReferences: readonly OrganizationLocationReferenceResolution[]
-}): EntityReplacementCurrentSnapshot {
-  const reference = input.locationReferences.find(
-    ({ connection }) => connection.id === input.connectionId,
-  )
-
-  if (!reference) {
-    return {
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
-      unavailable: true,
-    }
-  }
-
-  if (reference.location == null) {
-    return {
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
-      unavailable: true,
-    }
-  }
-
-  return {
-    heading: reference.location.name,
-    subheading: resolveLocationClassificationDisplay(reference.location).text,
-    imageKey: reference.location.imageKey,
-  }
-}
 
 export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   relationshipId: string
