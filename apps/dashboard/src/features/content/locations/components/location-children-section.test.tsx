@@ -75,6 +75,9 @@ describe('LocationChildrenSection', () => {
   it('shows heading links for non-managers without Move overflow', () => {
     renderSection({ canManage: false, parent: HARBORFORD })
 
+    const heading = screen.getByRole('heading', { name: 'Contained locations' })
+    const section = heading.closest('section')
+    expect(section).toHaveAttribute('aria-labelledby', 'location-children-heading')
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
     expect(screen.getByText('Locations directly within this location.')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()

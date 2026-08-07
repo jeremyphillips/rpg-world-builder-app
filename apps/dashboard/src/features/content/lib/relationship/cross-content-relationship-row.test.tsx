@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
@@ -11,6 +12,31 @@ describe('CrossContentRelationshipRow', () => {
 
     expect(screen.getByText('Grey Watch')).toBeInTheDocument()
     expect(screen.getByText('Military')).toBeInTheDocument()
+  })
+
+  it('composes DetailEntityRow link treatment and DetailOverflowMenu when href and actions are provided', () => {
+    render(
+      <MemoryRouter>
+        <CrossContentRelationshipRow
+          heading="The Monarchy"
+          href="/organizations/monarchy"
+          actions={[{ id: 'view', label: 'View organization', onSelect: vi.fn() }]}
+          overflowTriggerLabel="Relationship actions"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'The Monarchy' })).toHaveAttribute(
+      'href',
+      '/organizations/monarchy',
+    )
+    expect(screen.getByRole('button', { name: 'Relationship actions' })).toBeInTheDocument()
+  })
+
+  it('omits DetailOverflowMenu when actions are empty', () => {
+    render(<CrossContentRelationshipRow heading="The Monarchy" />)
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it('renders overflow actions from feature-supplied items', async () => {

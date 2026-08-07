@@ -44,6 +44,15 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/features/content/lib/detail/). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells.
 
+| Primitive              | Role                                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`   | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot` |
+| `DetailSectionRowList` | Dividers between direct children only — no row padding injection                             |
+| `DetailEntityRow`      | Compact row layout (`px-4 py-2`), heading link, subheading, optional `endSlot`               |
+| `DetailOverflowMenu`   | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`         |
+
+Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
+
 Use **`DetailSectionPanel`** + **`RelationshipFieldGroupRow`** when a section groups multiple relationship kinds under one titled block (location Territorial Authority, People & organizations, organization forward family groups).
 
 ```text
@@ -69,10 +78,10 @@ Kind labels inside a relationship panel use **`RelationshipFieldGroupRow` eyebro
 
 | Responsibility                    | Owner                                                                                                                  |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Populated edge summary + overflow | `CrossContentRelationshipRow`                                                                                          |
+| Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                      |
 | Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
-Overflow mutation actions derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts), composed by the domain-agnostic [`buildRelationshipOverflowActions`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
+Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 
 Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
 
@@ -188,7 +197,9 @@ Canonical kind **descriptions** must stay perspective-neutral (no “this locati
 
 Organization forward target pickers use optional `targetPresentation` config and a separate optional `changeTargetDrawerTitle` in [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts). Resolvers return fully resolved presentation with generic defaults (`Location`, `Search locations…`). Mutation titles describe the edit action; target presentation describes how users browse valid targets.
 
-**Browse scope rule:** configured scopes remain visible for semantic stability. A scope is disabled when the post-eligibility candidate set contains zero locations for that scope. Scope availability is never derived from the active search query. Browse scopes organize display only — they never substitute for `@rpg/contracts` eligibility.
+**Browse scope rule (organization forward):** configured scopes remain visible for semantic stability. A scope is disabled when the post-eligibility candidate set contains zero locations for that scope. Scope availability is never derived from the active search query. Browse scopes organize display only — they never substitute for `@rpg/contracts` eligibility.
+
+**Browse scope rule (location parent replacement):** parent drawer scopes are derived from the **eligible candidate universe** only — `All` plus one segment per browse family present in candidates. Do not render families with zero candidates as disabled stubs. Hide segmentation entirely when ≤1 family is present. Search text is preserved on scope change. Location kind families live in neutral [`location-kind-browse-families.ts`](../src/features/content/locations/lib/location-kind-browse-families.ts) (authoring type select + parent browse scope filtering).
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
 
@@ -218,6 +229,8 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 **Authority invariant:** breadcrumb ancestry is presentation only. Drawers resolve **Current parent** and submit targets from the subject’s persisted `parentLocationId` (looked up in the campaign locations list). Move must not treat the open parent detail id as Current when it disagrees with that field — refresh/block instead.
 
+**Parent replacement chrome:** `EntityReplacementSection` with `entityLabel="Parent"` renders **Current parent** / **New parent** labels. Task-oriented helper copy varies by surface (Move / Change / Set). Candidate browse scopes filter the eligible set before search — eligibility always runs first.
+
 **Shared Current→New chrome** lives in neutral [`entity-replacement/`](../src/features/content/lib/entity-replacement/) (`EntityReplacementSection`, current field, replacement labels). Relationship drawers (org forward change-target, location inverse replace-organization) **consume** that layer. Hierarchy must **not** depend on relationship-owned Current/New modules. Eligibility, cycle prevention, and candidates stay domain-owned (`validateLocationParentAssignment` + location-feature helpers). After parent mutation, invalidate/refetch the campaign locations list — do not hand-patch ancestry/children projections.
 
 ## Implementation guard
@@ -225,10 +238,11 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 Before building a new cross-content relationship surface, evaluate:
 
 1. `DetailSectionPanel` + `RelationshipFieldGroupRow` when grouping kinds under a section title
-2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows
-3. `RelationshipEmptyInlineRow` for inline empty + add
-4. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
-5. Direction-aware copy resolvers
+2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows (relationship layer composes detail primitives)
+3. `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
+4. `RelationshipEmptyInlineRow` for inline empty + add
+5. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
+6. Direction-aware copy resolvers
 
 ## Non-adopters
 
