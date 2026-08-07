@@ -7,6 +7,7 @@ import { cn, contentCardHeadingLinkVariants } from '@rpg/ui'
 
 import {
   detailEntityRowContentVariants,
+  detailEntityRowHeadingSuffixVariants,
   detailEntityRowHeadingVariants,
   detailEntityRowSubheadingVariants,
   detailEntityRowVariants,
@@ -15,6 +16,8 @@ import {
 export type DetailEntityRowProps = {
   heading: ReactNode
   href?: string
+  /** Muted classification text rendered inline after the heading (includes leading separator). */
+  headingSuffix?: ReactNode
   subheading?: ReactNode
   metadata?: ReactNode
   endSlot?: ReactNode
@@ -24,6 +27,7 @@ export type DetailEntityRowProps = {
 export function DetailEntityRow({
   heading,
   href,
+  headingSuffix,
   subheading,
   metadata,
   endSlot,
@@ -40,7 +44,12 @@ export function DetailEntityRow({
   return (
     <div className={cn(detailEntityRowVariants(), className)}>
       <div className={detailEntityRowContentVariants()}>
-        <div className={detailEntityRowHeadingVariants()}>{resolvedHeading}</div>
+        <div className={detailEntityRowHeadingVariants()}>
+          {resolvedHeading}
+          {headingSuffix ? (
+            <span className={detailEntityRowHeadingSuffixVariants()}>{headingSuffix}</span>
+          ) : null}
+        </div>
         {subheading ? <p className={detailEntityRowSubheadingVariants()}>{subheading}</p> : null}
         {metadata ? <div className={detailEntityRowSubheadingVariants()}>{metadata}</div> : null}
       </div>

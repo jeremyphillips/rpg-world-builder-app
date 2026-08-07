@@ -79,6 +79,9 @@ describe('LocationChildrenSection', () => {
     const section = heading.closest('section')
     expect(section).toHaveAttribute('aria-labelledby', 'location-children-heading')
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Dock Ward' }).parentElement).toHaveTextContent(
+      'Dock Ward · District',
+    )
     expect(screen.getByText('Locations directly within this location.')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Actions for Dock Ward' })).not.toBeInTheDocument()

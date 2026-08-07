@@ -17,7 +17,7 @@ export const Default: Story = {
   args: {
     heading: 'The Silver Eel',
     href: '/campaigns/demo/locations/silver-eel',
-    subheading: 'Building · Tavern',
+    headingSuffix: ' · Building · Tavern',
   },
 }
 
@@ -27,7 +27,7 @@ export const WithOverflow: Story = {
       <DetailEntityRow
         heading="The Silver Eel"
         href="/campaigns/demo/locations/silver-eel"
-        subheading="Building · Tavern"
+        headingSuffix=" · Building · Tavern"
         endSlot={
           <DetailOverflowMenu
             triggerLabel="Actions for The Silver Eel"
@@ -41,7 +41,7 @@ export const WithOverflow: Story = {
       <DetailEntityRow
         heading="Thieves' Guildhouse"
         href="/campaigns/demo/locations/guildhouse"
-        subheading="Building · Guildhall"
+        headingSuffix=" · Building · Guildhall"
         endSlot={
           <DetailOverflowMenu
             triggerLabel="Actions for Thieves' Guildhouse"

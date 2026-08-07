@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import type { Location } from '@rpg/contracts'
+import { LOCATION_DISPLAY_SUMMARY_SEPARATOR, type Location } from '@rpg/contracts'
 import { Text, toast } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
@@ -142,7 +142,7 @@ export function LocationChildrenSection({
                   key={item.id}
                   heading={item.name}
                   href={item.href}
-                  subheading={item.summaryLine}
+                  headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
                   endSlot={
                     canManage ? (
                       <DetailOverflowMenu
