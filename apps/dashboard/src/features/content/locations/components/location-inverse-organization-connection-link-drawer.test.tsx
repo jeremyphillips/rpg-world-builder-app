@@ -5,6 +5,10 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Location } from '@rpg/contracts'
 
 import { CITY_COUNCIL, SILVER_CIRCLE } from '../../organizations/fixtures'
+import {
+  LOCATION_INVERSE_ORGANIZATION_DRAWER,
+  TERRITORIAL_AUTHORITY_DRAWER,
+} from '../lib/location-connection-surface-copy'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
 
 function settlementLocation(): Location {
@@ -151,6 +155,72 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     subheading: 'Government',
     imageKey: CITY_COUNCIL.imageKey,
   }
+
+  it('uses site-family replace copy without territorial drawer strings', () => {
+    render(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="replaceOrganization"
+        intent="site"
+        location={buildingLocation()}
+        organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
+        connectedPartyRows={[headquartersRow]}
+        initialConnection={{
+          relationshipId: 'rel-hq',
+          organizationId: CITY_COUNCIL.id,
+          kind: 'headquarters',
+        }}
+        currentEndpoint={currentOrganizationEndpoint}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByRole('dialog', { name: LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper)).toBeInTheDocument()
+    expect(screen.getByText('Guildhall · Structure')).toBeInTheDocument()
+    expect(screen.queryByText('Guildhall · Structure · Headquarters')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults),
+    ).not.toBeInTheDocument()
+  })
+
+  it('uses territorial replace copy for territorial authority intent', () => {
+    render(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="replaceOrganization"
+        intent="territorial_authority"
+        location={settlementLocation()}
+        organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
+        connectedPartyRows={[
+          {
+            ...headquartersRow,
+            kind: 'governs',
+            label: 'Governs',
+            family: 'territorial_authority',
+            sectionGroup: 'territorial_authority',
+          },
+        ]}
+        initialConnection={{
+          relationshipId: 'rel-governs',
+          organizationId: CITY_COUNCIL.id,
+          kind: 'governs',
+        }}
+        currentEndpoint={currentOrganizationEndpoint}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.getByRole('dialog', { name: TERRITORIAL_AUTHORITY_DRAWER.replaceTitle }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
+    expect(screen.getByText('Port City · Settlement · Governs')).toBeInTheDocument()
+  })
 
   it('shows current and new organization fields with replacement picker', async () => {
     const user = userEvent.setup()

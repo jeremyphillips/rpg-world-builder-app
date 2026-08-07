@@ -15,6 +15,24 @@ const characters = [
 ]
 
 describe('LocationInverseCharacterConnectionLinkDrawer', () => {
+  it('uses inverse character search placeholder when adding with a resolved kind', () => {
+    render(
+      <LocationInverseCharacterConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        addKind="works_at"
+        location={YAWNING_PORTAL}
+        characters={characters}
+        connectedPartyRows={[]}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByPlaceholderText('Search characters…')).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
+  })
+
   it('opens change-kind with expanded relationship type and no character picker', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()

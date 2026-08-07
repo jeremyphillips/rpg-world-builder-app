@@ -190,7 +190,23 @@ Organization forward target pickers use optional `targetPresentation` config and
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
 
-Location inverse drawers use optional **subject** `targetPresentation` resolvers in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) (`targetLabel`, `targetHelp`, `searchPlaceholder`). Browse scopes remain **forward-only** — inverse pickers select a subject with a fixed location; HQ structure scoping stays in `@rpg/contracts` eligibility on that location. Do not merge forward and inverse presentation modules.
+Location inverse drawers resolve **subject** target presentation in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) (`resolveLocationInverseOrganizationTargetPresentation`, `resolveLocationInverseCharacterTargetPresentation`, `resolveLocationInverseOrganizationReplaceHelper`). Drawers consume **`searchPlaceholder`** and replace helpers where applicable; field labels use shared [`relationship-drawer-field-labels.ts`](../src/features/content/lib/relationship/relationship-drawer-field-labels.ts) constants when they already match resolver defaults.
+
+Browse scopes remain **forward-only** — inverse pickers select a subject with a fixed location; HQ structure scoping on inverse flows stays in `@rpg/contracts` eligibility on that location. Do not merge forward and inverse presentation modules.
+
+### Inverse presentation acceptance rule
+
+Fix inverse presentation **only where generic or family-level copy is incorrect or misleading**. Do **not**:
+
+- add per-kind overrides solely for forward/inverse symmetry
+- wire unused presentation fields (`targetLabel` / `targetHelp`) merely for completeness when constants already match defaults
+- invent HQ-style inverse `targetHelp`
+
+Location inverse is already fixed on the location endpoint; “choose an organization/character” is usually enough. Eligibility, occupancy, mutation alternatives, candidate derivation, and authorization stay outside presentation modules.
+
+### Future follow-up — location hierarchy inverse authoring
+
+Before adding parent-side child/reparent editing, review the existing **Current X → New X** replacement pattern (`RelationshipDrawerCurrentEntityField`, replacement field labels, searchable picker). Parent and child views must mutate one canonical hierarchy relationship (`child.parentLocationId`) — do not introduce a separately persisted `children[]`. Reuse or extract shared replacement presentation primitives if hierarchy would otherwise create a third local implementation. Keep hierarchy eligibility, cycle prevention, and candidate derivation domain-owned. This follow-up does **not** block inverse subject presentation cleanup.
 
 ## Implementation guard
 
