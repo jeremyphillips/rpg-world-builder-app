@@ -1,12 +1,6 @@
-export type RelationshipDrawerCurrentEntitySnapshot = {
-  heading: string
-  subheading?: string
-  imageKey?: string
-  unavailable?: boolean
-}
-
-export const RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING = 'Unavailable location' as const
-export const RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING =
-  'Unavailable organization' as const
-export const RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE =
-  'The current linked entity could not be loaded. Resolve the reference before changing the target.' as const
+export type { EntityReplacementCurrentSnapshot as RelationshipDrawerCurrentEntitySnapshot } from '../entity-replacement/entity-replacement-current-entity'
+export {
+  ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE as RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE,
+  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING as RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
+  ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING as RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING,
+} from '../entity-replacement/entity-replacement-current-entity'

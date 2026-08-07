@@ -6,29 +6,29 @@ import type {
 import { getLocationKindLabel, getOrganizationKindLabel } from '@rpg/contracts'
 
 import {
-  RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
-  RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING,
-  type RelationshipDrawerCurrentEntitySnapshot,
-} from './relationship-drawer-current-entity'
+  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
+  ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
+  type EntityReplacementCurrentSnapshot,
+} from '../entity-replacement/entity-replacement-current-entity'
 
 export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
   connectionId: string
   locationReferences: readonly OrganizationLocationReferenceResolution[]
-}): RelationshipDrawerCurrentEntitySnapshot {
+}): EntityReplacementCurrentSnapshot {
   const reference = input.locationReferences.find(
     ({ connection }) => connection.id === input.connectionId,
   )
 
   if (!reference) {
     return {
-      heading: RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
+      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
       unavailable: true,
     }
   }
 
   if (reference.location == null) {
     return {
-      heading: RELATIONSHIP_DRAWER_UNAVAILABLE_LOCATION_HEADING,
+      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
       unavailable: true,
     }
   }
@@ -44,12 +44,12 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   relationshipId: string
   rows: readonly LocationConnectedPartyRow[]
   organizations?: readonly Pick<Organization, 'id' | 'organizationKind' | 'imageKey'>[]
-}): RelationshipDrawerCurrentEntitySnapshot {
+}): EntityReplacementCurrentSnapshot {
   const row = input.rows.find(({ relationshipId }) => relationshipId === input.relationshipId)
 
   if (!row || row.subject.type !== 'organization') {
     return {
-      heading: RELATIONSHIP_DRAWER_UNAVAILABLE_ORGANIZATION_HEADING,
+      heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
       unavailable: true,
     }
   }

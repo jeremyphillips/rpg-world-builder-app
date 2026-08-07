@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { RelationshipDrawerCurrentEntityField } from './relationship-drawer-current-entity-field.client'
+import { EntityReplacementCurrentField } from './entity-replacement-current-field.client'
 
-describe('RelationshipDrawerCurrentEntityField', () => {
+describe('EntityReplacementCurrentField', () => {
   it('renders label, heading, and subheading', () => {
     render(
-      <RelationshipDrawerCurrentEntityField
+      <EntityReplacementCurrentField
         label="Current location"
         heading="Thieves' Guildhouse"
         subheading="Structure"

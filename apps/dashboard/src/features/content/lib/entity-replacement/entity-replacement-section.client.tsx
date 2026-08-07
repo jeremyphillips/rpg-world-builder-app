@@ -1,0 +1,67 @@
+'use client'
+
+import * as React from 'react'
+
+import { Heading, Text } from '@rpg/ui'
+
+import {
+  ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE,
+  type EntityReplacementCurrentSnapshot,
+} from './entity-replacement-current-entity'
+import { EntityReplacementCurrentField } from './entity-replacement-current-field.client'
+import { resolveReplacementFieldLabels } from './entity-replacement-field-labels'
+
+export type EntityReplacementSectionProps = {
+  entityLabel: string
+  current?: EntityReplacementCurrentSnapshot | null
+  showNewSection?: boolean
+  newHelper?: React.ReactNode
+  unavailableMessage?: string
+  children?: React.ReactNode
+}
+
+export function EntityReplacementSection({
+  entityLabel,
+  current,
+  showNewSection = true,
+  newHelper,
+  unavailableMessage = ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE,
+  children,
+}: EntityReplacementSectionProps) {
+  const labels = resolveReplacementFieldLabels(entityLabel)
+
+  return (
+    <>
+      {current ? (
+        <EntityReplacementCurrentField
+          label={labels.currentLabel}
+          heading={current.heading}
+          subheading={current.subheading}
+          imageKey={current.imageKey}
+        />
+      ) : null}
+      {current?.unavailable ? (
+        <Text variant="muted" className="text-sm" role="status">
+          {unavailableMessage}
+        </Text>
+      ) : null}
+      {showNewSection ? (
+        <div className="space-y-2">
+          <Heading variant="label" as="p">
+            {labels.newLabel}
+          </Heading>
+          {newHelper ? (
+            typeof newHelper === 'string' ? (
+              <Text variant="muted" className="text-sm">
+                {newHelper}
+              </Text>
+            ) : (
+              newHelper
+            )
+          ) : null}
+          {children}
+        </div>
+      ) : null}
+    </>
+  )
+}

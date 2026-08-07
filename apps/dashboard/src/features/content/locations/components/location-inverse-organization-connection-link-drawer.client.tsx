@@ -9,7 +9,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -19,14 +19,12 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import { RelationshipDrawerCurrentEntityField } from '../../lib/relationship/relationship-drawer-current-entity-field.client'
-import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
 import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
 import {
   RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL,
   RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL,
-  resolveReplacementFieldLabels,
 } from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 
@@ -231,11 +229,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       ? organizations.find((organization) => organization.id === initialConnection?.organizationId)
       : undefined
 
-  const replacementFieldLabels =
-    mode === 'replaceOrganization'
-      ? resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
-      : null
-
   const hasTargetChange =
     mode === 'replaceOrganization'
       ? selectedOrganizationId != null &&
@@ -391,22 +384,14 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               value={getOrganizationLocationConnectionLabel(initialConnection.kind)}
             />
           ) : null}
-          {mode === 'replaceOrganization' && currentEndpoint ? (
-            <RelationshipDrawerCurrentEntityField
-              label={
-                replacementFieldLabels?.currentLabel ??
-                resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
-                  .currentLabel
-              }
-              heading={currentEndpoint.heading}
-              subheading={currentEndpoint.subheading}
-              imageKey={currentEndpoint.imageKey}
+          {mode === 'replaceOrganization' ? (
+            <EntityReplacementSection
+              entityLabel={RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL}
+              current={currentEndpoint}
+              newHelper={resolveLocationInverseOrganizationReplaceHelper(
+                initialConnection?.kind ?? activeKind ?? 'operates_in',
+              )}
             />
-          ) : null}
-          {mode === 'replaceOrganization' && currentEndpoint?.unavailable ? (
-            <Text variant="muted" className="text-sm" role="status">
-              {RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE}
-            </Text>
           ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
@@ -424,20 +409,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               }
               defaultExpanded={mode === 'changeKind'}
             />
-          ) : null}
-          {mode === 'replaceOrganization' ? (
-            <div className="space-y-2">
-              <Heading variant="label" as="p">
-                {replacementFieldLabels?.newLabel ??
-                  resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
-                    .newLabel}
-              </Heading>
-              <Text variant="muted" className="text-sm">
-                {resolveLocationInverseOrganizationReplaceHelper(
-                  initialConnection?.kind ?? activeKind ?? 'operates_in',
-                )}
-              </Text>
-            </div>
           ) : null}
         </div>
       }

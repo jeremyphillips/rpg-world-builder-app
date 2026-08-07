@@ -23,14 +23,10 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import { RelationshipDrawerCurrentEntityField } from '../../lib/relationship/relationship-drawer-current-entity-field.client'
-import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
 import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
-import {
-  RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL,
-  resolveReplacementFieldLabels,
-} from '../../lib/relationship/relationship-drawer-field-labels'
+import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
@@ -394,11 +390,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
     ? resolveOrganizationForwardTargetPresentation(activeKind)
     : DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION
 
-  const replacementFieldLabels =
-    mode === 'changeTarget'
-      ? resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL)
-      : null
-  const targetFieldLabel = replacementFieldLabels?.newLabel ?? targetPresentation.targetLabel
+  const targetFieldLabel = targetPresentation.targetLabel
 
   const title = (() => {
     if (mode === 'changeTarget' && activeKind) {
@@ -522,21 +514,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
               value={getOrganizationLocationConnectionLabel(activeKind)}
             />
           ) : null}
-          {mode === 'changeTarget' && currentEndpoint ? (
-            <RelationshipDrawerCurrentEntityField
-              label={
-                replacementFieldLabels?.currentLabel ??
-                resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL).currentLabel
-              }
-              heading={currentEndpoint.heading}
-              subheading={currentEndpoint.subheading}
-              imageKey={currentEndpoint.imageKey}
-            />
-          ) : null}
-          {mode === 'changeTarget' && currentEndpoint?.unavailable ? (
-            <Text variant="muted" className="text-sm" role="status">
-              {RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE}
-            </Text>
+          {mode === 'changeTarget' &&
+          (currentEndpoint || (showLocationPicker && !showMutationEmptyState)) ? (
+            <EntityReplacementSection
+              entityLabel={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
+              current={currentEndpoint}
+              showNewSection={showLocationPicker && !showMutationEmptyState}
+              newHelper={targetPresentation.targetHelp}
+            >
+              {showTargetBrowseScopeControl ? (
+                <SegmentedControl
+                  aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
+                  value={locationBrowseScope}
+                  options={browseScopeOptions}
+                  onValueChange={setLocationBrowseScope}
+                  fullWidth
+                />
+              ) : null}
+            </EntityReplacementSection>
           ) : null}
           {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
             <LocationConnectionKindStep
@@ -551,7 +546,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
               defaultExpanded
             />
           ) : null}
-          {showLocationPicker && !showMutationEmptyState ? (
+          {showLocationPicker && !showMutationEmptyState && mode !== 'changeTarget' ? (
             <div className="space-y-2">
               <Heading variant="label" as="p">
                 {targetFieldLabel}
