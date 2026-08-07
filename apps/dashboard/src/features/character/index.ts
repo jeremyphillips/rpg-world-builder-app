@@ -56,6 +56,10 @@ export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,
 } from './hooks/use-character-organization-references'
+export {
+  characterLocationReferencesQueryKey,
+  useCharacterLocationReferences,
+} from './hooks/use-character-location-references'
 export { useCreateNpc } from './npc/hooks/use-create-npc'
 export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
 export {
@@ -65,6 +69,7 @@ export {
   normalizePartyController,
   normalizeListController,
   UNAVAILABLE_ORGANIZATION_LABEL,
+  UNAVAILABLE_LOCATION_LABEL,
   type CharacterDetailViewModel,
   type CharacterCardViewModel,
 } from './lib/display/character-display'

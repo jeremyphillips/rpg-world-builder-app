@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Wizard, type WizardStepDef } from '@rpg/ui'
 
 import { InviteMembersStep } from './invite-members-step'
@@ -27,7 +27,7 @@ describe('InviteMembersStep', () => {
     expect(screen.getByRole('button', { name: 'Create campaign' })).toBeInTheDocument()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderStep()
     await expectNoAxeViolations(container)
   })

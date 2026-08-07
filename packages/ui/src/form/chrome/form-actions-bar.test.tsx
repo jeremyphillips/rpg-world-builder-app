@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FormActionsBar } from './form-actions-bar'
 
@@ -29,7 +29,7 @@ describe('FormActionsBar', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <FormActionsBar formError="Could not save.">
         <button type="submit">Save</button>

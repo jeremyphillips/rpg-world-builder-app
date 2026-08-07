@@ -1,0 +1,47 @@
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+
+import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
+
+describe('CrossContentRelationshipRow', () => {
+  it('renders optional secondaryText when supplied', () => {
+    render(<CrossContentRelationshipRow heading="Grey Watch" secondaryText="Military" />)
+
+    expect(screen.getByText('Grey Watch')).toBeInTheDocument()
+    expect(screen.getByText('Military')).toBeInTheDocument()
+  })
+
+  it('renders overflow actions from feature-supplied items', async () => {
+    const user = userEvent.setup()
+    const onRemove = vi.fn()
+
+    render(
+      <CrossContentRelationshipRow
+        heading="The Monarchy"
+        actions={[
+          { id: 'remove', label: 'Remove authority', destructive: true, onSelect: onRemove },
+        ]}
+        overflowTriggerLabel="Relationship actions"
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Relationship actions' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Remove authority' }))
+    expect(onRemove).toHaveBeenCalledOnce()
+  })
+
+  itAxe('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <CrossContentRelationshipRow
+        heading="The Monarchy"
+        secondaryText="Government"
+        actions={[{ id: 'view', label: 'View organization', onSelect: () => undefined }]}
+        overflowTriggerLabel="Relationship actions"
+      />,
+    )
+
+    await expectNoAxeViolations(container)
+  })
+})

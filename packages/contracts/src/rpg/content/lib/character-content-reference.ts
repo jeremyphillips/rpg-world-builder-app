@@ -40,6 +40,11 @@ export const ORGANIZATION_CHARACTER_REFERENCE = createCharacterContentReferenceD
   matchKey: 'id',
 })
 
+export const LOCATION_CHARACTER_REFERENCE = createCharacterContentReferenceDescriptor({
+  path: 'connections.locations.locationId',
+  matchKey: 'id',
+})
+
 export const SKILL_PROFICIENCY_CHARACTER_REFERENCE = createCharacterContentReferenceDescriptor({
   path: 'proficiencies.skills.skill',
   matchKey: 'slug',

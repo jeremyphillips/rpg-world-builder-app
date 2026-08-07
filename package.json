@@ -19,6 +19,7 @@
     "lint:ci": "turbo run lint --filter='...[origin/main]'",
     "test": "turbo run test",
     "test:affected": "turbo run test --filter='...[HEAD]'",
+    "test:affected:local": "TURBO_CONCURRENCY=2 VITEST_MAX_WORKERS=4 turbo run test --filter='...[HEAD]'",
     "coverage": "vitest run --coverage",
     "typecheck": "turbo run typecheck",
     "typecheck:affected": "turbo run typecheck --filter='...[HEAD]'",

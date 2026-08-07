@@ -13,15 +13,19 @@ import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-i
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
   collapsibleListItemDraggingClasses,
-  collapsibleListItemHeaderRowClasses,
+  collapsibleListItemHeaderRowClassesForRowLayout,
   collapsibleListItemHeaderSummaryClasses,
   collapsibleListItemMainClasses,
   collapsibleListItemShellVariants,
   type CollapsibleListItemLeadingChromeOptions,
+  type CollapsibleListItemRowLayout,
   type CollapsibleListItemShellPreset,
 } from './collapsible-list-item.variants'
 
-export type { CollapsibleListItemShellPreset } from './collapsible-list-item.variants'
+export type {
+  CollapsibleListItemShellPreset,
+  CollapsibleListItemRowLayout,
+} from './collapsible-list-item.variants'
 
 export type CollapsibleListItemActionsAlign = 'start' | 'center'
 
@@ -33,6 +37,8 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   actionsAlign?: CollapsibleListItemActionsAlign
   /** Non-form shell presets — bypass surface/tone axes. */
   preset?: CollapsibleListItemShellPreset
+  /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
+  rowLayout?: CollapsibleListItemRowLayout
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   className?: string
@@ -60,6 +66,24 @@ function resolveShellChromeClasses({
   )
 }
 
+function resolveCollapsibleListItemShellLayout({
+  layout,
+  actionsAlign,
+  rowLayout,
+}: {
+  layout: NonNullable<CollapsibleListItemShellProps['layout']>
+  actionsAlign: CollapsibleListItemActionsAlign
+  rowLayout: CollapsibleListItemRowLayout
+}): 'default' | 'compactRow' | 'headerActions' | 'entityCardHeaderActions' {
+  if (layout === 'compactRow') {
+    return 'compactRow'
+  }
+  if (actionsAlign !== 'center') {
+    return 'default'
+  }
+  return rowLayout === 'entity-card' ? 'entityCardHeaderActions' : 'headerActions'
+}
+
 /** Grid shell — toolbar row + optional body + trailing actions rail. */
 export function CollapsibleListItemShell({
   titleId,
@@ -70,6 +94,7 @@ export function CollapsibleListItemShell({
   layout = 'default',
   actionsAlign = 'start',
   preset = 'default',
+  rowLayout = 'default',
   surface,
   tone,
   className,
@@ -86,8 +111,12 @@ export function CollapsibleListItemShell({
 
   const leadingChromeStyle = buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
 
-  const shellLayout =
-    layout === 'compactRow' ? 'compactRow' : actionsAlign === 'center' ? 'headerActions' : 'default'
+  const shellLayout = resolveCollapsibleListItemShellLayout({
+    layout,
+    actionsAlign,
+    rowLayout,
+  })
+  const headerRowClasses = collapsibleListItemHeaderRowClassesForRowLayout(rowLayout)
   const resolvedToolbar = toolbar ?? main
   const resolvedBody = toolbar !== undefined ? body : undefined
   const resolvedActions =
@@ -115,7 +144,7 @@ export function CollapsibleListItemShell({
         resolvedToolbar
       ) : actionsAlign === 'center' ? (
         <>
-          <div className={collapsibleListItemHeaderRowClasses}>
+          <div className={headerRowClasses}>
             <div className="min-w-0 flex-1">{resolvedToolbar}</div>
             {resolvedActions}
           </div>

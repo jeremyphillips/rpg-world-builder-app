@@ -47,6 +47,15 @@ export const collapsibleListItemChromeButtonClasses = cn(
 /** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
 export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
 
+/** Entity-card host — catalog shell keeps border/bg but drops content-area inset. */
+export const collapsibleListItemEntityCardShellPaddingClasses = 'p-0'
+
+/** Entity-card host header row — no duplicate vertical padding; entity card owns rhythm. */
+export const collapsibleListItemEntityCardHeaderRowClasses =
+  'flex w-full min-w-0 items-center gap-2'
+
+export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
+
 /** Catalog row chrome — picker/sheet row surface tone. */
 export const collapsibleListItemCatalogChromeClasses = 'border-border bg-catalog-picker-row-surface'
 
@@ -59,6 +68,14 @@ export const collapsibleListItemCatalogBodyClasses = cn(
   establishSurfaceCurrent('surface-muted'),
 )
 
+export function collapsibleListItemHeaderRowClassesForRowLayout(
+  rowLayout: CollapsibleListItemRowLayout = 'default',
+): string {
+  return rowLayout === 'entity-card'
+    ? collapsibleListItemEntityCardHeaderRowClasses
+    : collapsibleListItemHeaderRowClasses
+}
+
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
 export const collapsibleListItemShellVariants = cva(cn('relative rounded-md border'), {
   variants: {
@@ -69,6 +86,10 @@ export const collapsibleListItemShellVariants = cva(cn('relative rounded-md bord
       ),
       headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
       compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
+      entityCardHeaderActions: cn(
+        'flex flex-col',
+        collapsibleListItemEntityCardShellPaddingClasses,
+      ),
     },
     preset: {
       default: 'border-border',

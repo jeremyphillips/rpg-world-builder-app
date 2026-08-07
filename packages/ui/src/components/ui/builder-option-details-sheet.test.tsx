@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { BuilderOptionDetailsSheet } from './builder-option-details-sheet.client'
 import { Button } from './button.client'
@@ -81,7 +81,7 @@ describe('BuilderOptionDetailsSheet', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('has no axe accessibility violations when open', async () => {
+  itAxe('has no axe accessibility violations when open', async () => {
     const { container } = render(<BuilderOptionDetailsSheet {...baseProps} />)
     await expectNoAxeViolations(container)
   })
@@ -116,7 +116,7 @@ describe('BuilderOptionDetailsSheet', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when heritage summary lines are shown', async () => {
+  itAxe('has no axe accessibility violations when heritage summary lines are shown', async () => {
     const { container } = render(
       <BuilderOptionDetailsSheet
         {...baseProps}

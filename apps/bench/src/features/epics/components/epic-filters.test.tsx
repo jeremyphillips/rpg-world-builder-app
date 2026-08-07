@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { EpicFilters } from './epic-filters'
 
@@ -16,7 +16,7 @@ describe('EpicFilters', () => {
     expect(onChange).toHaveBeenCalledWith({})
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<EpicFilters filters={{}} onChange={() => {}} />)
     await expectNoAxeViolations(container)
   })

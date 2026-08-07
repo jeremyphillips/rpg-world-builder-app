@@ -55,7 +55,7 @@ const baseInput: CreateCharacterInput = {
     mounts: [],
   },
   wealth: { cp: 0, sp: 0, gp: 50, pp: 0 },
-  connections: { organizations: [] },
+  connections: { organizations: [], locations: [] },
   feats: [],
 }
 

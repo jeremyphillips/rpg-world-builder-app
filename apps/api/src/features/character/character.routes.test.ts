@@ -33,7 +33,7 @@ describe('character routes', () => {
     const { agent, csrfToken } = await registerAndLogin()
     const characterId = await createCharacter(agent, csrfToken, {
       ...minimalStandalonePcInput,
-      connections: { organizations: [{ organizationId: 'organization-1' }] },
+      connections: { organizations: [{ organizationId: 'organization-1' }], locations: [] },
     })
 
     const res = await agent.get(`/api/characters/${characterId}`).expect(200)
@@ -43,7 +43,7 @@ describe('character routes', () => {
       characterType: 'pc',
       name: 'Verna',
       rulesetId: 'srd-cc-5.2.1',
-      connections: { organizations: [{ organizationId: 'organization-1' }] },
+      connections: { organizations: [{ organizationId: 'organization-1' }], locations: [] },
     })
     expect(res.body.character.userId).toBeTruthy()
     expect(res.body.character.createdAt).toMatch(/^\d{4}-/)

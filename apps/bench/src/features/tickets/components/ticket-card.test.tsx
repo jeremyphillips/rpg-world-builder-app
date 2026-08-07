@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { sampleEpic } from '@/features/epics'
 
@@ -39,7 +39,7 @@ describe('TicketCard', () => {
     expect(document.querySelector('.text-destructive')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderCard({ ticket: sampleTicket, onSelect: vi.fn() })
     await expectNoAxeViolations(container)
   })

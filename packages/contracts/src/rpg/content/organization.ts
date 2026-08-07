@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { organizationKindSchema } from '../vocab/organization-kind'
+import { organizationConnectionsSchema } from './organization-connections'
 import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { contentBodyBaseSchema, contentMetaSchema } from './lib/envelope'
@@ -9,6 +10,7 @@ import { ORGANIZATION_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 /** Publish-complete organization body. */
 export const organizationBodySchema = contentBodyBaseSchema.extend({
   organizationKind: organizationKindSchema,
+  connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
 export type OrganizationBody = z.infer<typeof organizationBodySchema>

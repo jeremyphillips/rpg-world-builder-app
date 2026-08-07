@@ -2,7 +2,7 @@ import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
@@ -687,14 +687,14 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByLabelText('Detail')).toBeInTheDocument()
   })
 
-  it('has no axe violations with a populated array', async () => {
+  itAxe('has no axe violations with a populated array', async () => {
     const user = userEvent.setup()
     const { container } = renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations on an empty array', async () => {
+  itAxe('has no axe violations on an empty array', async () => {
     const { container } = renderForm()
     await expectNoAxeViolations(container)
   })

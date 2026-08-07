@@ -1008,14 +1008,14 @@ do not hardcode the display string:
 
 ## Design decisions to make for each new type
 
-| Decision                         | Guidance                                                                                                                                                                                                                          |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                          |
-| **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                          |
-| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as optional `heritage` on the species body (`content/species.ts`). |
-| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                      |
-| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                             |
-| **Dual-ownership fields?**       | If another type references this type's entities, keep the authoritative list on the owning type. Derive reverse views at read time when possible (see [Skill ↔ class association](#skill-class-association)).                     |
+| Decision                         | Guidance                                                                                                                                                                                                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                                                     |
+| **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                                                     |
+| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as optional `heritage` on the species body (`content/species.ts`).                            |
+| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                                                 |
+| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                                                        |
+| **Dual-ownership fields?**       | One authoritative owner per relationship; derive inverse views at read time. See [cross-content-relationships.md](./cross-content-relationships.md) and [Skill ↔ class association](#skill-class-association). Never mirror reciprocal arrays on both types. |
 
 ---
 
@@ -1102,11 +1102,11 @@ Class is the **single writer** for starting skill proficiency choices:
 
 ### Read paths
 
-- **Skill detail** — **Class skill choices** via `classesOfferingSkillChoice()` (inverse scan of class `characterCreation.proficiencies.skills.choices`).
-- **Class detail** — **Suggested proficiencies** from `skillSlugsFromClassChoices()` and `choices[0].choose`.
+- **Skill detail** — **Class skill choices** via `classesOfferingSkillChoice()` (inverse scan of class `characterCreation.proficiencies.skills.choices`; registry `class_skill_proficiency_choice`, inverse read-only).
+- **Class detail** — **Proficiency Choices** section via `classSkillChoiceDisplaySummary()` / `skillSlugsFromClassChoices()` (`choose` from the first meaningful package).
 - **`GET …/content/classes`** — returns stored class shape; no skill-list derivation at read time.
 
-Helpers: `skillSlugsFromClassChoices`, `classesOfferingSkillChoice`.
+Helpers: `skillSlugsFromClassChoices`, `classSkillChoiceDisplaySummary`, `classesOfferingSkillChoice`. Projection registry → [cross-content-relationships.md](./cross-content-relationships.md).
 
 ### Known gaps (revisit later)
 

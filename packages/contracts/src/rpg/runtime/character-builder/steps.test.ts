@@ -39,7 +39,7 @@ function makeCompleteDraft(): CharacterBuilderDraft {
       method: 'standard-array',
       scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
     },
-    connections: { organizations: [] },
+    connections: { organizations: [], locations: [] },
     choiceSelections: {},
     touchedStepIds: ['identity', 'species', 'class', 'abilities'],
   }
@@ -511,6 +511,7 @@ describe('resolveEffectiveBuilderSteps', () => {
     updatedAt: '2026-01-01T00:00:00.000Z',
     name: 'Lantern Guild',
     organizationKind: 'professional',
+    connections: { locations: [] },
   } satisfies Organization
 
   it('omits Connections when no organizations are selectable or selected', () => {
@@ -536,7 +537,7 @@ describe('resolveEffectiveBuilderSteps', () => {
 
   it('keeps Connections visible for recovery when the draft contains a stale selection', () => {
     const draft = makeDraft({
-      connections: { organizations: [{ organizationId: 'removed-organization' }] },
+      connections: { organizations: [{ organizationId: 'removed-organization' }], locations: [] },
     })
 
     expect(

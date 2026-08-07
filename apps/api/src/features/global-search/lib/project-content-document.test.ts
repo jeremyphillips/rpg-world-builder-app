@@ -50,27 +50,4 @@ describe('projectContentEntity', () => {
 
     expect(document.secondary).toBe('Building · Tavern')
   })
-
-  it('indexes party association semantic labels as location keyword fields', () => {
-    const document = projectContentEntity('locations', {
-      id: 'location-tavern',
-      name: 'Yawning Portal',
-      slug: 'yawning-portal',
-      source: 'homebrew',
-      status: 'published',
-      kind: 'structure',
-      structureType: 'building',
-      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
-      campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-      partyAssociations: [
-        {
-          id: 'assoc-owner',
-          kind: 'ownership',
-          party: { kind: 'organization', organizationId: 'org-1' },
-        },
-      ],
-    } as never)
-
-    expect(document.fields.some((field) => field.text === 'Owner')).toBe(true)
-  })
 })

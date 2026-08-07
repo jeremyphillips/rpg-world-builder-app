@@ -21,6 +21,7 @@ import {
   collapsibleListItemBodyClasses,
   resolveCollapsibleListItemDomIds,
   type CollapsibleListItemLeadingChromeOptions,
+  type CollapsibleListItemRowLayout,
 } from './collapsible-list-item.variants'
 import {
   buildCollapsibleListItemLeadingChrome,
@@ -28,6 +29,8 @@ import {
   resolveCollapsibleListItemDragHandleProps,
   type CollapsibleListItemDragHandleConfig,
 } from './collapsible-list-item-root.lib'
+
+export type { CollapsibleListItemRowLayout } from './collapsible-list-item.variants'
 
 export type { CollapsibleListItemDragHandleConfig } from './collapsible-list-item-root.lib'
 
@@ -43,6 +46,8 @@ export interface CollapsibleListItemProps {
   showDragHandle?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
   preset?: CollapsibleListItemShellPreset
+  /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
+  rowLayout?: CollapsibleListItemRowLayout
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   layout?: 'default' | 'compactRow'
@@ -71,6 +76,7 @@ interface CollapsibleListItemContextValue {
   gripVisible: boolean
   dragHandleProps?: CollapsibleListItemDragHandleProps
   preset: CollapsibleListItemShellPreset
+  rowLayout: CollapsibleListItemRowLayout
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   layout: 'default' | 'compactRow'
@@ -121,6 +127,7 @@ function CollapsibleListItemRoot({
   showDragHandle = false,
   dragHandleProps,
   preset = 'default',
+  rowLayout = 'default',
   surface,
   tone,
   layout = 'default',
@@ -165,6 +172,7 @@ function CollapsibleListItemRoot({
       gripVisible,
       dragHandleProps: resolvedDragHandleProps,
       preset,
+      rowLayout,
       surface,
       tone,
       layout,
@@ -184,6 +192,7 @@ function CollapsibleListItemRoot({
       gripVisible,
       resolvedDragHandleProps,
       preset,
+      rowLayout,
       surface,
       tone,
       layout,
@@ -205,6 +214,7 @@ function CollapsibleListItemRoot({
         layout={layout}
         actionsAlign={actionsAlign}
         preset={preset}
+        rowLayout={rowLayout}
         surface={surface}
         tone={tone}
         className={className}
@@ -279,6 +289,7 @@ function CollapsibleListItemCompoundRoot({
         props.dragHandleProps,
       ),
       preset: props.preset ?? 'default',
+      rowLayout: props.rowLayout ?? 'default',
       surface: props.surface,
       tone: props.tone,
       layout: props.layout ?? 'default',
@@ -299,6 +310,7 @@ function CollapsibleListItemCompoundRoot({
         dragging={contextValue.dragging}
         layout={contextValue.layout}
         preset={contextValue.preset}
+        rowLayout={contextValue.rowLayout}
         surface={contextValue.surface}
         tone={contextValue.tone}
         className={props.className}

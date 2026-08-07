@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
@@ -15,16 +15,8 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
-vi.mock('../hooks/use-organization-connected-regions', () => ({
-  useOrganizationConnectedRegions: vi.fn(() => ({
-    data: {
-      items: [],
-      total: 0,
-    },
-    isPending: false,
-    isError: false,
-    error: null,
-  })),
+vi.mock('../components/organization-location-connections-detail-section.client', () => ({
+  OrganizationLocationConnectionsDetailSection: () => null,
 }))
 vi.mock('../hooks/use-organization-connected-characters', () => ({
   useOrganizationConnectedCharacters: vi.fn(() => ({
@@ -62,7 +54,6 @@ describe('OrganizationDetailContent', () => {
     renderDetail()
     expect(screen.getByText('Government')).toBeInTheDocument()
     expect(screen.getByText('The elected council governing the city.')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Connected regions' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Connected characters' })).toBeInTheDocument()
     expect(screen.getByText('1 connected character')).toBeInTheDocument()
     expect(screen.getByText('Circle Envoy')).toBeInTheDocument()
@@ -85,7 +76,7 @@ describe('OrganizationDetailContent', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderDetail()
     await expectNoAxeViolations(container)
   })

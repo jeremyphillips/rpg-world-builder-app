@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { EmphasisDetailLine } from './emphasis-detail-line'
@@ -25,7 +25,7 @@ describe('EmphasisDetailLine', () => {
     expect(screen.queryByText('·')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EmphasisDetailLine
         primary="50 GP needed"

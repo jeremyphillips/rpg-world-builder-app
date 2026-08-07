@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 import { CAMPAIGN_SCOPE_FILTER_ID, INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
@@ -98,7 +98,7 @@ describe('MessagesCampaignScopeChrome', () => {
     expect(screen.getByText(INVALID_CAMPAIGN_SCOPE_COPY.invalidBody)).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <MessagesCampaignScopeChrome
         schema={schema}

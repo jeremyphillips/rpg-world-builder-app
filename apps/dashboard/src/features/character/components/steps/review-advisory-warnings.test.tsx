@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
 
@@ -22,7 +22,7 @@ describe('ReviewAdvisoryWarnings', () => {
     expect(screen.getByText('You have no martial weapons.')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ReviewAdvisoryWarnings warnings={['Your Constitution is low for Barbarian.']} />,
     )

@@ -2,7 +2,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ReactElement } from 'react'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   characterBuilderValidationMessages,
@@ -103,7 +103,7 @@ describe('CharacterBuilderShell', () => {
     expect(screen.getByRole('heading', { name: 'Species' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations once hydrated', async () => {
+  itAxe('has no axe accessibility violations once hydrated', async () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   createEmptyCharacterBuilderDraft,
@@ -115,7 +115,7 @@ describe('AbilitiesStep', () => {
     expect(screen.getByRole('alert').textContent).not.toMatch(/\{"f":/)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <AbilitiesStep
         context={context}

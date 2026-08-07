@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 
@@ -48,7 +48,7 @@ describe('Select', () => {
     expect(trigger.querySelector('[aria-hidden]')).toHaveClass('w-5')
   })
 
-  it('has no axe accessibility violations (closed)', async () => {
+  itAxe('has no axe accessibility violations (closed)', async () => {
     const { container } = renderSelect()
     await expectNoAxeViolations(container)
   })

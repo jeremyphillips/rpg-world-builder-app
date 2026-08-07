@@ -1,6 +1,7 @@
 import {
   CLASS_CHARACTER_REFERENCE,
   FEAT_CHARACTER_REFERENCE,
+  LOCATION_CHARACTER_REFERENCE,
   ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SPECIES_CHARACTER_REFERENCE,
@@ -14,8 +15,7 @@ import {
   indexCharacterEquipmentBlockersByContentId,
 } from './reference-sources/characters'
 import { indexLocationParentBlockersByContentId } from './reference-sources/locations'
-import { indexLocationPartyBlockersByContentId } from './reference-sources/location-party-associations'
-import { indexLocationTerritorialAuthorityBlockersByContentId } from './reference-sources/location-territorial-authority'
+import { indexOrganizationLocationBlockersByContentId } from './reference-sources/organizations'
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import type { ContentUsageSource } from './content-usage-source'
 
@@ -42,6 +42,7 @@ export const characterFeatSource = characterDescriptorSource(FEAT_CHARACTER_REFE
 export const characterOrganizationSource = characterDescriptorSource(
   ORGANIZATION_CHARACTER_REFERENCE,
 )
+export const characterLocationSource = characterDescriptorSource(LOCATION_CHARACTER_REFERENCE)
 export const characterSkillProficiencySource = characterDescriptorSource(
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
 )
@@ -56,16 +57,12 @@ export const characterEquipmentSource: ContentUsageSource = {
     }),
 }
 
+export const organizationLocationSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexOrganizationLocationBlockersByContentId(ctx),
+}
+
 export const locationParentReferenceSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexLocationParentBlockersByContentId(ctx),
-}
-
-export const locationPartyReferenceSource: ContentUsageSource = {
-  loadBlockerIndex: (ctx) => indexLocationPartyBlockersByContentId(ctx),
-}
-
-export const locationTerritorialAuthorityReferenceSource: ContentUsageSource = {
-  loadBlockerIndex: (ctx) => indexLocationTerritorialAuthorityBlockersByContentId(ctx),
 }
 
 export const campaignPrimaryWorldReferenceSource: ContentUsageSource = {

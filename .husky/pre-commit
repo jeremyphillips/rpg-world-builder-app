@@ -3,4 +3,4 @@ bash tools/hooks/regenerate-json-schemas.sh
 pnpm gate:fallow-health
 pnpm gate:fallow-dupes
 pnpm typecheck:affected
-pnpm test:affected
+pnpm test:affected:local

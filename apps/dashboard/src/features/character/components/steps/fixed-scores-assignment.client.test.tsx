@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
@@ -221,7 +221,7 @@ describe('FixedScoresAssignment', () => {
     expect(assignedScore).not.toHaveClass('bg-secondary')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderAssignment({ str: 15, con: 13 })
 
     await expectNoAxeViolations(container)

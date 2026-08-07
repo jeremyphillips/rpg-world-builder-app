@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ORIGIN_LANGUAGES_CHOICE_ID, type ChoiceSet } from '@rpg/contracts'
 
@@ -113,7 +113,7 @@ describe('ChoiceSetField', () => {
     expect(onValueChange).toHaveBeenCalledWith(['high-elf'])
   })
 
-  it('has no axe accessibility violations for multi-select chips', async () => {
+  itAxe('has no axe accessibility violations for multi-select chips', async () => {
     const { container } = render(
       <ChoiceSetField
         choiceSet={originLanguagesChoiceSet}
@@ -125,7 +125,7 @@ describe('ChoiceSetField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations for single-select cards', async () => {
+  itAxe('has no axe accessibility violations for single-select cards', async () => {
     const { container } = render(
       <ChoiceSetField
         choiceSet={heritageChoiceSet}
@@ -137,7 +137,7 @@ describe('ChoiceSetField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations for searchable pools', async () => {
+  itAxe('has no axe accessibility violations for searchable pools', async () => {
     const { container } = render(
       <ChoiceSetField choiceSet={toolPoolChoiceSet} value={[]} onValueChange={() => undefined} />,
     )

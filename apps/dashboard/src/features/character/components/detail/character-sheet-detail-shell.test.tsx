@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 
@@ -67,7 +67,7 @@ describe('CharacterSheetDetailShell', () => {
     )
   })
 
-  it('has no axe accessibility violations for campaign error state', async () => {
+  itAxe('has no axe accessibility violations for campaign error state', async () => {
     const { container } = render(
       <MemoryRouter>
         <CharacterSheetDetailShell

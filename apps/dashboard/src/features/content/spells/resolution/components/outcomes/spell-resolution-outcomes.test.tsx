@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Form } from '@rpg/ui/form'
 import { z } from 'zod'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
@@ -282,7 +282,7 @@ describe('SpellResolutionOutcomes', () => {
     })
   })
 
-  it('has no axe accessibility violations with eldritch blast fixture', async () => {
+  itAxe('has no axe accessibility violations with eldritch blast fixture', async () => {
     const { container } = renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
@@ -292,7 +292,7 @@ describe('SpellResolutionOutcomes', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with inflict wounds fixture', async () => {
+  itAxe('has no axe accessibility violations with inflict wounds fixture', async () => {
     const { container } = renderOutcomes(RESOLUTION_FORM_FIXTURES.inflictWounds)
 
     await waitFor(() => {

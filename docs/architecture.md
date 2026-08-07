@@ -163,6 +163,8 @@ Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/RE
   Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).
+  Cross-content relationship ownership, projections, and mutation rules →
+  [cross-content-relationships.md](./cross-content-relationships.md).
 - **`@rpg/name-generator-core`** and **`@rpg/name-generator-data`** provide the
   experimental name generator foundation (pure generation + lazy fixture data).
   Contracts live on the isolated `@rpg/contracts/name-generator` subpath — not

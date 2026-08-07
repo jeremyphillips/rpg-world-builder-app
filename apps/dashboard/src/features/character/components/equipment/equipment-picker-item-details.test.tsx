@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -190,7 +190,7 @@ describe('EquipmentPickerItemDetails', () => {
     expect(onCommit).toHaveBeenCalledTimes(1)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentPickerItemDetails
         equipment={longswordItem.equipment}

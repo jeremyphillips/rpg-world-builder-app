@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { DndContext } from '@dnd-kit/core'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
 import { FIXED_SCORES_DND_KINDS } from '../../lib/steps/fixed-scores-dnd.lib'
@@ -126,7 +126,7 @@ describe('ScoreToken', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderScoreToken(
       <div className="flex gap-4">
         <ScoreToken

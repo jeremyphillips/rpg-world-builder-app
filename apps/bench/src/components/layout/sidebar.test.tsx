@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { MemoryRouter } from 'react-router-dom'
 
 import { buildBenchSidebarSections } from './lib/build-bench-sidebar-sections'
@@ -25,7 +25,7 @@ describe('Sidebar', () => {
     }
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <Sidebar />

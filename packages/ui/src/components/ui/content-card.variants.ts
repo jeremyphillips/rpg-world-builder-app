@@ -6,25 +6,44 @@ import {
   controlActionCompactTextClasses,
 } from './control-action.variants'
 
-export const contentCardRootVariants = cva('flex gap-3 rounded-md', {
+/** Entity-owned density inset — shared by standalone and embedded chrome. */
+export const contentCardDensityInsetVariants = cva('', {
   variants: {
     density: {
       compact: 'px-4 py-3',
       comfortable: 'px-5 py-3',
     },
-    surface: {
-      outline: 'border border-border',
-      card: 'border border-border bg-card',
-      ghost: '',
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
+export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
+  variants: {
+    density: {
+      compact: 'px-4 py-3',
+      comfortable: 'px-5 py-3',
     },
+    chrome: {
+      standalone: 'border border-border',
+      embedded: '',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+    chrome: 'standalone',
+  },
+})
+
+export const contentCardBodyVariants = cva('flex min-w-0 w-full gap-3', {
+  variants: {
     rowAlign: {
       start: 'items-start',
       center: 'items-center',
     },
   },
   defaultVariants: {
-    density: 'comfortable',
-    surface: 'outline',
     rowAlign: 'start',
   },
 })
@@ -106,9 +125,14 @@ export const contentCardMediaVariants = cva('size-10 shrink-0 rounded-md object-
 export type ContentCardDensity = NonNullable<
   VariantProps<typeof contentCardRootVariants>['density']
 >
-export type ContentCardSurface = NonNullable<
-  VariantProps<typeof contentCardRootVariants>['surface']
->
+export type ContentCardChrome = NonNullable<VariantProps<typeof contentCardRootVariants>['chrome']>
+
+export function resolveContentCardDensityInsetClasses(density: ContentCardDensity): string {
+  return contentCardDensityInsetVariants({ density })
+}
+
+/** @deprecated Use {@link ContentCardChrome} — `outline` maps to `standalone`, `ghost` to `embedded`. */
+export type ContentCardSurface = 'outline' | 'card' | 'ghost'
 export type ContentCardHeadingRowRhythm = NonNullable<
   VariantProps<typeof contentCardHeadingRowVariants>['rhythm']
 >

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { Button } from './button.client'
@@ -43,7 +43,7 @@ describe('Alert', () => {
     expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <Alert
         variant="warning"

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import * as React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { NumberInput } from './number-input.client'
 
@@ -67,7 +67,7 @@ describe('NumberInput', () => {
     expect(screen.getByLabelText('Increment').closest('div')).toHaveClass('hidden')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <NumberInput aria-label="Count" defaultValue={3} min={1} max={10} />,
     )

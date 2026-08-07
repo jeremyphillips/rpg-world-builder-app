@@ -16,6 +16,7 @@ export const lanternGuild: Organization = {
   name: 'Lantern Guild',
   organizationKind: 'professional',
   description: '<p>Guides and cartographers who keep the old roads open.</p>',
+  connections: { locations: [] },
 }
 
 export const cityCouncil: Organization = {

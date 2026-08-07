@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defaultMulticlassingRules } from '@rpg/contracts'
 
@@ -92,7 +92,7 @@ describe('SpeciesRulesTab', () => {
     expect(screen.getByRole('heading', { name: 'Level limits' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when editable', async () => {
+  itAxe('has no axe accessibility violations when editable', async () => {
     const { container } = render(
       <TabShell
         formCtx={rulesCtx({

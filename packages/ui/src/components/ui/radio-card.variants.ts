@@ -31,7 +31,7 @@ export const radioCardVariants = cva('', {
   },
   compoundVariants: [
     { variant: 'card', density: 'default', class: 'gap-2 p-4 sm:p-6' },
-    { variant: 'card', density: 'compact', class: 'gap-1 p-3' },
+    { variant: 'card', density: 'compact', class: 'gap-1 px-3 py-2.5' },
     { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],
@@ -51,7 +51,7 @@ export const radioCardShellVariants = cva(
     variants: {
       density: {
         default: 'p-4 sm:p-6',
-        compact: 'p-3',
+        compact: 'px-3 py-2.5',
       },
       selected: {
         true: 'border-card-selected-border bg-control-selected',
@@ -67,12 +67,12 @@ export const radioCardShellVariants = cva(
 
 /** Grid for radio + title row + right-aligned details link on one line. */
 export const radioCardDetailsGridVariants = cva(
-  'grid w-full grid-cols-[auto_1fr_auto] items-start gap-x-3',
+  'grid w-full grid-cols-[auto_1fr_auto] items-start',
   {
     variants: {
       density: {
-        default: 'gap-y-2',
-        compact: 'gap-y-1',
+        default: 'gap-x-3 gap-y-2',
+        compact: 'gap-x-3 gap-y-1',
       },
     },
     defaultVariants: {
@@ -98,9 +98,15 @@ export const radioCardControlVariants = cva(
         card: 'size-5',
         row: 'size-4',
       },
+      density: {
+        default: '',
+        compact: '',
+      },
     },
+    compoundVariants: [{ variant: 'card', density: 'compact', class: 'size-4' }],
     defaultVariants: {
       variant: 'card',
+      density: 'default',
     },
   },
 )
@@ -113,7 +119,7 @@ export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
       default: 'gap-2',
-      compact: 'gap-1',
+      compact: '',
     },
   },
   defaultVariants: {
@@ -124,11 +130,11 @@ export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
 export const radioCardRootLayoutVariants = cva('flex items-start', {
   variants: {
     controlPosition: {
-      left: 'gap-4',
-      right: 'flex-row-reverse gap-4',
+      left: '',
+      right: 'flex-row-reverse',
     },
     density: {
-      default: '',
+      default: 'gap-4',
       compact: 'gap-3',
     },
   },
@@ -149,7 +155,10 @@ export const radioCardTitleMetaVariants = cva('text-muted-foreground')
 
 export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
 
-export const radioCardSummaryVariants = cva('text-muted-foreground')
+/** Muted secondary copy under the card title (descriptions, summaries). */
+export const radioCardDescriptionVariants = cva('text-sm text-muted-foreground')
+
+export const radioCardSummaryVariants = cva(radioCardDescriptionVariants())
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
 
@@ -162,7 +171,7 @@ export const radioCardCompactPaddingRightClasses = 'pr-3'
  * Left inset aligning panel copy with the compact card body column
  * (shell padding + radio control + column gap).
  */
-export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1.25rem+0.75rem)]'
+export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
 
 /** Panel horizontal padding: body-column inset left, shell padding right. */
 export const radioCardCompactPanelPaddingClasses = `${radioCardCompactBodyInsetClasses} ${radioCardCompactPaddingRightClasses}`
@@ -184,7 +193,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
   },
   compoundVariants: [
     { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-    { tone: 'divider', density: 'compact', class: 'mt-3 pt-3' },
+    { tone: 'divider', density: 'compact', class: 'mt-2.5 pt-2.5' },
     {
       tone: 'panel',
       density: 'default',
@@ -193,7 +202,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'compact',
-      class: '-mx-3 -mb-3 mt-3 rounded-b-card pb-3 pt-3',
+      class: '-mx-3 -mb-2.5 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
     },
   ],
   defaultVariants: {

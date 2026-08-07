@@ -1,31 +1,31 @@
 'use client'
 
-import type { ReactNode } from 'react'
-
 import { cn } from '../../lib/utils'
-import { resolveContentCardHeadingRowRhythm } from './content-card.lib'
+import { ContentCardBody, type ContentCardBodyProps } from './content-card-body.client'
 import {
-  contentCardHeadingEndSlotVariants,
-  contentCardHeadingRowVariants,
-  contentCardHeadingVariants,
-  contentCardMetadataVariants,
   contentCardRootVariants,
-  contentCardSubheadingVariants,
+  type ContentCardChrome,
   type ContentCardDensity,
   type ContentCardSurface,
 } from './content-card.variants'
 
-export type ContentCardProps = {
-  heading: ReactNode
-  subheading?: ReactNode
-  metadata?: ReactNode
-  media?: ReactNode
-  headingEndSlot?: ReactNode
-  endSlot?: ReactNode
-  footer?: ReactNode
+function resolveContentCardChrome(
+  chrome: ContentCardChrome | undefined,
+  surface: ContentCardSurface | undefined,
+): ContentCardChrome {
+  if (chrome) return chrome
+  if (surface === 'ghost') return 'embedded'
+  return 'standalone'
+}
+
+export type ContentCardProps = Omit<ContentCardBodyProps, 'rowAlign' | 'className'> & {
   density?: ContentCardDensity
+  /** Who draws the outer shell — card (`standalone`) or host (`embedded`). */
+  chrome?: ContentCardChrome
+  /** @deprecated Use `chrome` — `outline`/`card` → `standalone`, `ghost` → `embedded`. */
   surface?: ContentCardSurface
   className?: string
+  'data-disabled'?: boolean
 }
 
 // Future variants should be added only when demonstrated by a real ContentCard consumer.
@@ -38,45 +38,36 @@ export function ContentCard({
   endSlot,
   footer,
   density = 'comfortable',
-  surface = 'outline',
+  chrome,
+  surface,
   className,
+  'data-disabled': dataDisabled,
 }: ContentCardProps) {
   const hasSecondaryText = Boolean(subheading || metadata)
-  const headingRowRhythm = resolveContentCardHeadingRowRhythm({
-    hasSecondaryText,
-    hasHeadingEndSlot: Boolean(headingEndSlot),
-  })
+  const rowAlign = hasSecondaryText ? 'start' : 'center'
+  const resolvedChrome = resolveContentCardChrome(chrome, surface)
+  const filledSurface = surface === 'card' ? 'bg-card' : undefined
 
   return (
     <article
       className={cn(
-        contentCardRootVariants({
-          density,
-          surface,
-          rowAlign: hasSecondaryText ? 'start' : 'center',
-        }),
+        contentCardRootVariants({ density, chrome: resolvedChrome }),
+        filledSurface,
         className,
       )}
+      data-disabled={dataDisabled}
     >
-      {media ? <div className="shrink-0">{media}</div> : null}
-      <div className="min-w-0 flex-1">
-        <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
-          <div className={cn('min-w-0 flex-1', contentCardHeadingVariants({ density }))}>
-            {heading}
-          </div>
-          {headingEndSlot ? (
-            <div className={contentCardHeadingEndSlotVariants()}>{headingEndSlot}</div>
-          ) : null}
-        </div>
-        {subheading ? (
-          <div className={contentCardSubheadingVariants({ density })}>{subheading}</div>
-        ) : null}
-        {metadata ? (
-          <div className={contentCardMetadataVariants({ density })}>{metadata}</div>
-        ) : null}
-        {footer ? <div className="mt-2">{footer}</div> : null}
-      </div>
-      {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+      <ContentCardBody
+        heading={heading}
+        subheading={subheading}
+        metadata={metadata}
+        media={media}
+        headingEndSlot={headingEndSlot}
+        endSlot={endSlot}
+        footer={footer}
+        density={density}
+        rowAlign={rowAlign}
+      />
     </article>
   )
 }

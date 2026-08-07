@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { createProficienciesStepRogueFixture } from '../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencyGrantedRow } from './proficiency-granted-row.client'
@@ -17,7 +17,7 @@ describe('ProficiencyGrantedRow', () => {
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { model } = createProficienciesStepRogueFixture()
     const row = model.sections.find((section) => section.kind === 'tools')!.grantedRows[0]!
 

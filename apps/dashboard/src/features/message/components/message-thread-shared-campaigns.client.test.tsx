@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 import { renderWithProviders } from '@/test/render'
@@ -48,7 +48,7 @@ describe('MessageThreadSharedCampaigns', () => {
     expect(screen.queryByRole('link', { name: 'Storm King' })).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <MessageThreadSharedCampaigns
         sharedCampaigns={[

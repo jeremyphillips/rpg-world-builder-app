@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RichTextField } from './rich-text-field'
 
@@ -37,7 +37,7 @@ describe('RichTextField', () => {
     expect(screen.queryByText('Optional.')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<RichTextField id="bio" label="Biography" />)
     await expectNoAxeViolations(container)
   })

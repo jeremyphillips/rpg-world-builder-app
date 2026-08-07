@@ -6,7 +6,7 @@ import {
   CAMPAIGN_CHARACTER_ASSIGNMENT_ERROR_CODE,
   type CampaignEligibleCharacter,
 } from '@rpg/contracts'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignOnboardingExistingCharacterPanel } from './campaign-onboarding-existing-character-panel.client'
 
@@ -155,7 +155,7 @@ describe('CampaignOnboardingExistingCharacterPanel', () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it('has no axe accessibility violations in the loaded state', async () => {
+  itAxe('has no axe accessibility violations in the loaded state', async () => {
     const { container } = renderPanel()
 
     await expectNoAxeViolations(container)

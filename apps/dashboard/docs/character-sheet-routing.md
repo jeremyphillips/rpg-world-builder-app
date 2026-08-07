@@ -65,6 +65,8 @@ discover sheets through Party or direct links.
 - Onboarding and builder finalize → campaign detail after assignment.
 - Organization-connected character cards → `resolveCampaignCharacterDetailHref`
   (PC vs NPC).
+- Location connected-parties people rows → `resolveLocationConnectedPartySubjectHref`
+  (uses `characterType` from the projection subject).
 - Standalone bookmarks → redirect guard canonicalizes to campaign URL when
   applicable.
 - Admin user character list → standalone detail (admin is not a campaign

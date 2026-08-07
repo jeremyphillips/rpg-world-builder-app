@@ -8,13 +8,13 @@ import {
   characterEquipmentSource,
   characterFeatSource,
   characterOrganizationSource,
+  characterLocationSource,
   characterSkillProficiencySource,
   characterSpeciesSource,
   characterSpellSource,
   characterSubclassSource,
   locationParentReferenceSource,
-  locationPartyReferenceSource,
-  locationTerritorialAuthorityReferenceSource,
+  organizationLocationSource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -65,11 +65,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'organizations',
-    sources: [
-      { source: characterOrganizationSource, entry: true, batch: true },
-      { source: locationPartyReferenceSource, entry: true, batch: true },
-      { source: locationTerritorialAuthorityReferenceSource, entry: true, batch: true },
-    ],
+    sources: [{ source: characterOrganizationSource, entry: true, batch: true }],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'member' },
@@ -79,6 +75,8 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     sources: [
       { source: locationParentReferenceSource, entry: true, batch: true },
       { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
+      { source: characterLocationSource, entry: true, batch: true },
+      { source: organizationLocationSource, entry: true, batch: true },
     ],
     summaryLabels: { singular: 'location', plural: 'locations' },
     overviewUsageScope: 'complete',

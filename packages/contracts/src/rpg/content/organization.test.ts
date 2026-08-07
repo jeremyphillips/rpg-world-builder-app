@@ -27,6 +27,7 @@ describe('organization body contracts', () => {
     ).toEqual({
       name: 'The Lantern Guild',
       organizationKind: 'professional',
+      connections: { locations: [] },
     })
 
     expect(organizationBodySchema.safeParse({ name: 'The Lantern Guild' }).success).toBe(false)
@@ -111,6 +112,7 @@ describe('organization authoring inputs', () => {
   it('supports partial publish and draft updates', () => {
     expect(updateOrganizationInputSchema.parse({ organizationKind: 'academic' })).toEqual({
       organizationKind: 'academic',
+      connections: { locations: [] },
     })
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',

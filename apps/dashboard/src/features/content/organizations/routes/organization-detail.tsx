@@ -15,12 +15,10 @@ import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { OrganizationConnectedCharactersSection } from '../components/organization-connected-characters-section.client'
-import { OrganizationConnectedRegionsSection } from '../components/organization-connected-regions-section.client'
+import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
 import { useOrganizationConnectedCharacters } from '../hooks/use-organization-connected-characters'
-import { useOrganizationConnectedRegions } from '../hooks/use-organization-connected-regions'
 import { useOrganizations } from '../hooks/use-organizations'
 import { buildOrganizationConnectedCharacterCards } from '../lib/build-organization-connected-character-cards'
-import { buildOrganizationConnectedRegionCards } from '../lib/build-organization-connected-region-cards'
 import {
   buildOrganizationDetailViewModel,
   ORGANIZATION_EMPTY_SECTION_TEXT,
@@ -35,17 +33,10 @@ export function OrganizationDetailContent({
 }) {
   useSetBreadcrumbLabel(organization.name)
   const connectedCharactersQuery = useOrganizationConnectedCharacters(campaignId, organization.id)
-  const connectedRegionsQuery = useOrganizationConnectedRegions(campaignId, organization.id)
+
   const viewModel = useMemo(() => {
     const connectedCharacters = connectedCharactersQuery.data
       ? buildOrganizationConnectedCharacterCards(connectedCharactersQuery.data, { campaignId })
-      : {
-          previewItems: [],
-          total: 0,
-        }
-
-    const connectedRegions = connectedRegionsQuery.data
-      ? buildOrganizationConnectedRegionCards(connectedRegionsQuery.data, { campaignId })
       : {
           previewItems: [],
           total: 0,
@@ -58,11 +49,12 @@ export function OrganizationDetailContent({
         emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedCharacters,
       },
       {
-        ...connectedRegions,
-        emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.connectedRegions,
+        previewItems: [],
+        total: 0,
+        emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
       },
     )
-  }, [campaignId, connectedCharactersQuery.data, connectedRegionsQuery.data, organization])
+  }, [campaignId, connectedCharactersQuery.data, organization])
 
   return (
     <WidePage>
@@ -81,10 +73,9 @@ export function OrganizationDetailContent({
         }
       >
         <div className="space-y-8">
-          <OrganizationConnectedRegionsSection
-            connectedRegions={viewModel.connectedRegions}
-            isPending={connectedRegionsQuery.isPending}
-            isError={connectedRegionsQuery.isError}
+          <OrganizationLocationConnectionsDetailSection
+            campaignId={campaignId}
+            organization={organization}
           />
           <OrganizationConnectedCharactersSection
             connectedCharacters={viewModel.connectedCharacters}

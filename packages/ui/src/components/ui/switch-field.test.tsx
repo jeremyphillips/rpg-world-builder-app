@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { SwitchField } from './switch-field'
 
@@ -34,7 +34,7 @@ describe('SwitchField', () => {
     expect(screen.getByRole('switch', { name: 'Email reminders' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<SwitchField id="notify" label="Email reminders" />)
     await expectNoAxeViolations(container)
   })
@@ -112,7 +112,7 @@ describe('SwitchField', () => {
     ).toBeTruthy()
   })
 
-  it('has no axe accessibility violations with settings layout', async () => {
+  itAxe('has no axe accessibility violations with settings layout', async () => {
     const { container } = render(
       <SwitchField
         id="level-cap"

@@ -29,6 +29,9 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     ...(record.organizationKind !== undefined && {
       organizationKind: record.organizationKind,
     }),
+    connections: {
+      locations: record.connections?.locations ?? [],
+    },
   } as Organization
 }
 

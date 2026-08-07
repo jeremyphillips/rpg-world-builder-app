@@ -138,7 +138,7 @@ describe('validateCharacterBuild', () => {
 
     const stale = validateCharacterBuild(
       makeCompleteDraft({
-        connections: { organizations: [{ organizationId: 'removed-organization' }] },
+        connections: { organizations: [{ organizationId: 'removed-organization' }], locations: [] },
       }),
       builderTestContext,
       'finalSubmit',

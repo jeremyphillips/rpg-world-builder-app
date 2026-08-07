@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { TicketCreateDialog } from './ticket-create-dialog'
@@ -66,7 +66,7 @@ describe('TicketCreateDialog', () => {
     )
   })
 
-  it('has no axe accessibility violations when open', async () => {
+  itAxe('has no axe accessibility violations when open', async () => {
     const user = userEvent.setup()
     const { container } = renderDialog()
     await user.click(screen.getByRole('button', { name: 'New ticket' }))

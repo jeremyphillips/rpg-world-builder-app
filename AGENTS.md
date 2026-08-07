@@ -95,9 +95,9 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
 
 ## Accessibility
 
-Target WCAG 2.2 AA. Every UI/interactive component must pass vitest-axe
-assertions, the Storybook test runner's axe-playwright check, and introduce no
-`eslint-plugin-jsx-a11y` violations. Do not suppress axe rules globally.
+Target WCAG 2.2 AA. Vitest axe assertions (`itAxe` / `expectNoAxeViolations`)
+run in **CI only** (`CI=true` or local `FORCE_AXE=1`); Storybook's axe-playwright
+check and `eslint-plugin-jsx-a11y` run on every PR. Do not suppress axe rules globally.
 
 ## Design tokens
 

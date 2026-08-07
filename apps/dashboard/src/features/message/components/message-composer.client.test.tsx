@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
@@ -43,7 +43,7 @@ describe('MessageComposer', () => {
     expect(screen.getByRole('button', { name: MESSAGES_ACTION_COPY.send })).toBeDisabled()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <MessageComposer
         draft="Ready to send"

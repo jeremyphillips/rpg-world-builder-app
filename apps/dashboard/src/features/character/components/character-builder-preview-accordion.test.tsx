@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   buildCharacterPreview,
@@ -150,7 +150,7 @@ describe('CharacterBuilderPreviewAccordion', () => {
     expect(combatTrigger).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderAccordion({
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },

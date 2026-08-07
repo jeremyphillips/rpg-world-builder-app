@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { InsetPanel } from './inset-panel.client'
 import { insetPanelTextVariantBySize } from './inset-panel.variants'
@@ -59,7 +59,7 @@ describe('InsetPanel', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <InsetPanel borderStyle="dashed" surface={{ elevation: 'sunken' }} size="lg" align="center">
         <InsetPanel.Text>Accessible gate copy</InsetPanel.Text>

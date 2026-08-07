@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
@@ -181,12 +181,12 @@ describe('ClassCharacterCreationTab', () => {
     expect(chooseSpinbuttons.some((input) => input.getAttribute('value') === '4')).toBe(true)
   })
 
-  it('has no axe accessibility violations in the empty state', async () => {
+  itAxe('has no axe accessibility violations in the empty state', async () => {
     const { container } = render(<TabShell />)
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with monk starting equipment', async () => {
+  itAxe('has no axe accessibility violations with monk starting equipment', async () => {
     const { container } = render(
       <TabShell
         startingEquipment={monkStartingEquipment}
@@ -201,7 +201,7 @@ describe('ClassCharacterCreationTab', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with bard starting equipment', async () => {
+  itAxe('has no axe accessibility violations with bard starting equipment', async () => {
     const { container } = render(
       <TabShell
         startingEquipment={bardStartingEquipment}

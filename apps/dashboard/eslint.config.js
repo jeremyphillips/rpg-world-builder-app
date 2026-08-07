@@ -26,4 +26,29 @@ const dashboardStorybookRouterRule = {
   },
 }
 
-export default [...react, ...storybook.configs['flat/recommended'], dashboardStorybookRouterRule]
+const dashboardContentCardBodyGuard = {
+  files: ['src/features/content/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['ContentCardBody'],
+            message:
+              'Import ContentEntityCard instead of ContentCardBody. See apps/dashboard/docs/content-entity-card.md.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+export default [
+  ...react,
+  ...storybook.configs['flat/recommended'],
+  dashboardStorybookRouterRule,
+  dashboardContentCardBodyGuard,
+]

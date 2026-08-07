@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { createDefaultCampaignRosterState, createDefaultCharacterVitalState } from '@rpg/contracts'
 
 import { CampaignCharacterStatusSummary } from './campaign-character-status-summary.client'
@@ -18,7 +18,7 @@ describe('CampaignCharacterStatusSummary', () => {
     expect(getByText('Vital: Alive')).toBeInTheDocument()
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <CampaignCharacterStatusSummary
         vital={createDefaultCharacterVitalState()}

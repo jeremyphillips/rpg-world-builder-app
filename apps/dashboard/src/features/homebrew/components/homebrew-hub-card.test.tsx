@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { HomebrewHubCard } from './homebrew-hub-card'
 
 describe('HomebrewHubCard', () => {
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <HomebrewHubCard

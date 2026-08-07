@@ -1,7 +1,7 @@
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { TextField } from './text-field'
 
@@ -54,7 +54,7 @@ describe('TextField', () => {
     expect(screen.queryByRole('label')).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<TextField id="email" label="Email" type="email" />)
     await expectNoAxeViolations(container)
   })

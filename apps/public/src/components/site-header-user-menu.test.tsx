@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { SiteHeaderUserMenu } from './site-header-user-menu.client'
 
@@ -18,7 +18,7 @@ const user = {
 }
 
 describe('SiteHeaderUserMenu', () => {
-  it('has no axe violations when the menu is open', async () => {
+  itAxe('has no axe violations when the menu is open', async () => {
     const view = render(
       <SiteHeaderUserMenu user={user} activeCampaign={{ id: 'c1', name: 'Sunless Citadel' }} />,
     )

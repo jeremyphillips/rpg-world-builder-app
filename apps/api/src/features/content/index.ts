@@ -22,10 +22,6 @@ export { buildContentUsageResolverContext } from './lib/content-usage/content-us
 export { resolveContentUsageLookupKey } from './lib/content-usage/content-usage-resolvers'
 export { resolveViewerCharacterRelationships } from './lib/content-usage/resolve-viewer-character-relationships'
 export type { ContentUsageSurfaceKey } from './lib/content-usage/define-content-usage'
-export {
-  findLocationPartyBlockersForCharacter,
-  findLocationPartyBlockersForCharacterInCampaign,
-} from './lib/content-usage/reference-sources/location-party-associations'
 export { HomebrewLocationModel } from './locations/homebrew-location.model'
 export { locationWriteConfig } from './locations/locations.config'
 export { classContentConfig } from './classes/classes.config'

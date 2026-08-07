@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { PageHeader } from './page-header'
 
@@ -15,7 +15,7 @@ describe('PageHeader', () => {
     expect(screen.getByRole('button', { name: 'New' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<PageHeader heading="Campaign Settings" />)
     await expectNoAxeViolations(container)
   })

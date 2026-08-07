@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '../../test-utils'
+import { expectNoAxeViolations, itAxe } from '../../test-utils'
 
 import { FieldDerivedMetaProvider } from './field-derived-meta-context.client'
 import { FieldDerivedMeta } from './field-derived-meta.client'
@@ -45,7 +45,7 @@ describe('FieldDerivedMeta', () => {
     expect(document.getElementById('field-derived-meta')).toHaveTextContent('Care')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldDerivedMetaProvider
         meta={{ rows: [{ label: 'Typical uses', value: 'Lodging · Retail' }] }}

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -92,7 +92,7 @@ describe('MasterDetailEditorPanel', () => {
     expect(screen.queryByText(masterDetailEmptySelectionLabel('trait'))).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when a row is selected', async () => {
+  itAxe('has no axe accessibility violations when a row is selected', async () => {
     const { container } = render(
       <PanelShell
         editor={makeEditor()}

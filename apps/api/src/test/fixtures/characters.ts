@@ -52,6 +52,6 @@ export const minimalStandalonePcInput: CreateCharacterInput = {
     mounts: [],
   },
   wealth: { cp: 0, sp: 0, gp: 0, pp: 0 },
-  connections: { organizations: [] },
+  connections: { organizations: [], locations: [] },
   feats: [],
 }

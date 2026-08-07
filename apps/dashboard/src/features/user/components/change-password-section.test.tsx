@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { QueryClientProvider } from '@tanstack/react-query'
 
 import { renderWithDataRouter } from '@/lib/test-router'
@@ -98,7 +98,7 @@ describe('ChangePasswordSection', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Current password is incorrect')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderSection()
     await expectNoAxeViolations(container)
   })

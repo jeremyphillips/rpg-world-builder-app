@@ -9,7 +9,7 @@ describe('resolveCampaignCharacterDetailHref', () => {
         { campaignId: 'camp-1' },
         {
           characterType: 'pc',
-          character: { id: 'char-1', name: 'Verna', summary: 'Dwarf · Level 1 Fighter' },
+          character: { id: 'char-1' },
         },
       ),
     ).toBe('/campaigns/camp-1/characters/char-1')
@@ -21,7 +21,7 @@ describe('resolveCampaignCharacterDetailHref', () => {
         { campaignId: 'camp-1' },
         {
           characterType: 'npc',
-          character: { id: 'npc-1', name: 'Envoy', summary: 'Human · Level 3 Rogue' },
+          character: { id: 'npc-1' },
         },
       ),
     ).toBe('/campaigns/camp-1/npcs/npc-1')

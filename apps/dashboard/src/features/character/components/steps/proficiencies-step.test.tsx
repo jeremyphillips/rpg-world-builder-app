@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   characterBuilderStepReadinessMessages,
@@ -292,7 +292,7 @@ describe('ProficienciesStep', () => {
     expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
 
     const { container } = render(

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { pickSkillProficiency } from '../../lib/fixtures/pick'
@@ -16,7 +16,7 @@ describe('SkillProficiencyDetailMetadata', () => {
     expect(screen.getByText('Dexterity')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<SkillProficiencyDetailMetadata viewModel={stealth} />)
 
     await expectNoAxeViolations(container)

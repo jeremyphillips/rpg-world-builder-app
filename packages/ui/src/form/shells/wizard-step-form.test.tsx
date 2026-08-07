@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import { Wizard, type WizardStepDef } from '../../components/ui/wizard.client'
@@ -65,7 +65,7 @@ describe('WizardStepForm', () => {
     expect(await screen.findByLabelText('Name')).toHaveValue('Tasha')
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = renderWizard()
     await expectNoAxeViolations(container)
   })

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel.client'
@@ -125,7 +125,7 @@ describe('MasterDetailListPanel', () => {
     expect(onMove).toHaveBeenCalledWith(1, 0)
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<MasterDetailListPanel {...baseProps()} onMove={vi.fn()} />)
     await expectNoAxeViolations(container)
   })

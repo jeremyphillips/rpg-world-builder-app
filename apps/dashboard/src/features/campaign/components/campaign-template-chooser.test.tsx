@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { CampaignTemplate } from '@rpg/contracts'
 
 import {
@@ -53,7 +53,7 @@ describe('CampaignTemplateChooser', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/still create a blank campaign/i)
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <CampaignTemplateChooser
         templates={[template]}

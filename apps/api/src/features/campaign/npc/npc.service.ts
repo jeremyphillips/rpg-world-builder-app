@@ -18,7 +18,6 @@ import {
   updateCharacterVital,
 } from '../../character'
 import { HttpError } from '../../../lib/http-error'
-import { getCharacterDeletionBlockersForCampaign } from '../../character'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 import {
   createParticipation,
@@ -139,11 +138,6 @@ export async function deleteCampaignNpc(
 
   const participation = await findOpenParticipation({ campaignId, characterId: npcId })
   if (!participation) return { status: 'not_found' }
-
-  const blockers = await getCharacterDeletionBlockersForCampaign(campaignId, npcId)
-  if (blockers.length > 0) {
-    return { status: 'blocked', blockers }
-  }
 
   await deleteAllParticipationsForCharacter(npcId)
   const deleted = await deleteNpcById(npcId)

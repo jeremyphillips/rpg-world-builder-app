@@ -13,6 +13,16 @@ const homebrewOrganizationSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
     organizationKind: { type: String, enum: [...ORGANIZATION_KIND_IDS] },
+    connections: {
+      locations: [
+        {
+          _id: false,
+          id: { type: String, required: true },
+          locationId: { type: String, required: true },
+          kind: { type: String, required: true },
+        },
+      ],
+    },
   },
   { timestamps: true },
 )

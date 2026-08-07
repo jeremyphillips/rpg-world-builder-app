@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { SelectField } from './select-field'
 
@@ -52,7 +52,7 @@ describe('SelectField', () => {
     expect(screen.getByLabelText('Alignment')).toHaveAttribute('aria-invalid', 'true')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <SelectField id="alignment" label="Alignment" placeholder="Choose…" options={options} />,
     )
@@ -109,7 +109,7 @@ describe('SelectField', () => {
     expect(screen.getByRole('button', { name: 'About Choose level' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations with inline layout', async () => {
+  itAxe('has no axe accessibility violations with inline layout', async () => {
     const { container } = render(
       <SelectField
         id="level"

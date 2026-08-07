@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ContentCampaignAvailabilityAction } from './content-campaign-availability-action.client'
 import {
@@ -50,7 +50,7 @@ describe('ContentCampaignAvailabilityAction', () => {
     expect(onAvailableChange).toHaveBeenCalledWith(false)
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <ContentCampaignAvailabilityAction available onAvailableChange={vi.fn()} />,
     )

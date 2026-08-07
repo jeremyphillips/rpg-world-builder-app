@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RICH_TEXT_LINK_ATTRS } from '../../lib/rich-text-link-attrs'
 import { RichTextEditor } from './rich-text-editor.client'
@@ -92,7 +92,7 @@ describe('RichTextEditor', () => {
     await waitFor(() => expect(onChange).not.toHaveBeenCalled())
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<RichTextEditor aria-label="Biography" />)
     await expectNoAxeViolations(container)
   })
@@ -164,7 +164,7 @@ describe('RichTextEditor', () => {
     expect(html).toContain(`${RICH_TEXT_LINK_ATTRS.linkKind}="external"`)
   })
 
-  it('has no axe accessibility violations when linkable', async () => {
+  itAxe('has no axe accessibility violations when linkable', async () => {
     const { container } = render(
       <RichTextEditor aria-label="Biography" linkable internalLinkOptions={internalLinkOptions} />,
     )

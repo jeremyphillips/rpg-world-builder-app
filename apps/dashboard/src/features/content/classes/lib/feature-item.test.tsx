@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { FeatureItem } from './feature-item'
@@ -52,7 +52,7 @@ describe('FeatureItem', () => {
     ).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations for a single-paragraph feature', async () => {
+  itAxe('has no axe accessibility violations for a single-paragraph feature', async () => {
     const { container } = renderFeatureItem({
       level: 3,
       name: 'Bonus Proficiencies',
@@ -61,7 +61,7 @@ describe('FeatureItem', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations for a multi-paragraph feature', async () => {
+  itAxe('has no axe accessibility violations for a multi-paragraph feature', async () => {
     const { container } = renderFeatureItem({
       level: 1,
       name: 'Spellcasting',
@@ -71,7 +71,7 @@ describe('FeatureItem', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations for a heading-only feature', async () => {
+  itAxe('has no axe accessibility violations for a heading-only feature', async () => {
     const { container } = renderFeatureItem({
       level: 19,
       name: 'Epic Boon',

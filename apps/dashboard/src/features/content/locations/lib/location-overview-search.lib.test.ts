@@ -10,7 +10,6 @@ const baseLocation = {
   campaignId: 'camp_1',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
-  partyAssociations: [],
 }
 
 function buildingLocation(
@@ -38,7 +37,6 @@ describe('getLocationOverviewSearchText', () => {
       name: 'Sword Coast',
       kind: 'region',
       classification: { kind: 'geographic', type: 'coast' },
-      territorialAuthority: [],
     }
 
     expect(getLocationOverviewSearchText(region)).toEqual(['Sword Coast'])

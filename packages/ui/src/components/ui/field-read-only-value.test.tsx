@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FieldReadOnlyValue, FieldReadOnlyValueField } from './field-read-only-value.client'
 
@@ -20,7 +20,7 @@ describe('FieldReadOnlyValue', () => {
     expect(screen.getByText('Full effect')).toHaveAttribute('aria-labelledby', 'row-title')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FieldReadOnlyValueField id="amount" label="Amount" displayValue="Full effect" />,
     )

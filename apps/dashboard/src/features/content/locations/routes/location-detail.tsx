@@ -17,9 +17,8 @@ import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
+import { LocationConnectedPartiesDetailSections } from '../components/location-connected-parties-detail-sections.client'
 import { LocationDetailIdentity } from '../components/location-detail-identity.client'
-import { LocationPartyAssociationsDetailSection } from '../components/location-party-associations-detail-section.client'
-import { TerritorialAuthorityDetailSection } from '../components/territorial-authority-detail-section.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 
@@ -60,8 +59,7 @@ export function LocationDetailContent({
         }
       >
         <div className="space-y-8">
-          <TerritorialAuthorityDetailSection location={location} campaignId={campaignId} />
-          <LocationPartyAssociationsDetailSection location={location} campaignId={campaignId} />
+          <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
             headerActions={

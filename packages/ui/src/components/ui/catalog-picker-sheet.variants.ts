@@ -5,7 +5,17 @@ import { sheetBodyVariants } from './sheet.variants'
 
 export const catalogPickerSheetContentVariants = cva('max-w-[550px]')
 
-export const catalogPickerSheetBodyVariants = cva(cn(sheetBodyVariants(), 'pt-0'))
+export const catalogPickerSheetBodyVariants = cva(cn(sheetBodyVariants(), 'pt-0'), {
+  variants: {
+    hasFooter: {
+      true: 'pb-12',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    hasFooter: false,
+  },
+})
 
 export const catalogPickerSheetListVariants = cva('space-y-2')
 

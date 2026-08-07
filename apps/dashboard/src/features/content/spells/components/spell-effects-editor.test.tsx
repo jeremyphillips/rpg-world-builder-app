@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
@@ -33,7 +33,7 @@ describe('SpellEffectsEditor', () => {
     expect(screen.getByText('Partially modeled')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations when empty', async () => {
+  itAxe('has no axe accessibility violations when empty', async () => {
     const { container } = render(<SpellEffectsEditor formCtx={formCtx} />)
 
     await waitFor(() => {
@@ -43,7 +43,7 @@ describe('SpellEffectsEditor', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe accessibility violations with representative effects', async () => {
+  itAxe('has no axe accessibility violations with representative effects', async () => {
     const { container } = render(
       <SpellEffectsEditor
         formCtx={formCtx}

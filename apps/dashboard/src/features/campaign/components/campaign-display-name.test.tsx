@@ -4,7 +4,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignDisplayName } from './campaign-display-name'
 import { CampaignDisplayNameList } from './campaign-display-name-list.client'
@@ -39,7 +39,7 @@ describe('CampaignDisplayName', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'The Argent Road' })).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations for linked state', async () => {
+  itAxe('has no axe accessibility violations for linked state', async () => {
     const { container } = render(
       <MemoryRouter>
         <CampaignDisplayName

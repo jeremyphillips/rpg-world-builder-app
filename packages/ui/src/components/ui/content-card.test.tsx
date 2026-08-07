@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Badge } from './badge'
 import { ContentCardHeadingAction, ContentCardIconAction } from './content-card-actions.client'
@@ -11,7 +11,9 @@ import {
   contentCardHeadingRowVariants,
   contentCardHeadingVariants,
   contentCardMetadataVariants,
+  contentCardRootVariants,
   contentCardSubheadingVariants,
+  resolveContentCardDensityInsetClasses,
 } from './content-card.variants'
 
 describe('ContentCard', () => {
@@ -62,7 +64,27 @@ describe('ContentCard', () => {
     expect(heading).toHaveClass(contentCardHeadingVariants({ density: 'comfortable' }))
     expect(subheading).toHaveClass(contentCardSubheadingVariants({ density: 'comfortable' }))
     expect(metadata).toHaveClass(contentCardMetadataVariants({ density: 'comfortable' }))
-    expect(container.querySelector('article')).toHaveClass('px-5')
+    expect(container.querySelector('article')).toHaveClass(
+      resolveContentCardDensityInsetClasses('comfortable'),
+    )
+  })
+
+  it('applies full-width root sizing so embedded cards fill flex hosts', () => {
+    const { container } = render(<ContentCard chrome="embedded" heading="Harbor District" />)
+
+    expect(container.querySelector('article')).toHaveClass('w-full', 'min-w-0')
+  })
+
+  it('applies the same density inset for standalone and embedded chrome', () => {
+    const density = 'compact' as const
+    const inset = resolveContentCardDensityInsetClasses(density)
+    const standalone = contentCardRootVariants({ density, chrome: 'standalone' })
+    const embedded = contentCardRootVariants({ density, chrome: 'embedded' })
+
+    expect(standalone).toContain(inset)
+    expect(embedded).toContain(inset)
+    expect(standalone).toContain('border')
+    expect(embedded).not.toContain('border')
   })
 
   it('applies compact density classes when requested', () => {
@@ -164,7 +186,7 @@ describe('ContentCard', () => {
     )
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <ContentCard
         heading="Harbor District"

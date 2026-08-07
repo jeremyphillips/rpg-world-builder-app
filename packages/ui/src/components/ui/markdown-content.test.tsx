@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { MarkdownContent } from './markdown-content'
 
@@ -44,7 +44,7 @@ Hello **world**.`}
     expect(container.querySelector('script')).toBeNull()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MarkdownContent markdown="Trait description with a [link](/path)." tone="muted" />,
     )

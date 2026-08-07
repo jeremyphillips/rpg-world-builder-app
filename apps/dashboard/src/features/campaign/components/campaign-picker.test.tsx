@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 import { persistCampaignSelectionRemote } from '@rpg/api-client'
@@ -123,7 +123,7 @@ describe('CampaignPicker', () => {
     expect(persistCampaignSelectionRemoteMock).not.toHaveBeenCalled()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
       <CampaignPicker
         campaigns={[makeCampaignListItem({ identity: { name: 'Active Campaign' } })]}

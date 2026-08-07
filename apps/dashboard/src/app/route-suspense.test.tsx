@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Text } from '@rpg/ui'
 
 import { RouteSuspense } from './route-suspense'
@@ -15,7 +15,7 @@ describe('RouteSuspense', () => {
     expect(screen.getByText('Route content')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <RouteSuspense>
         <Text>Route content</Text>

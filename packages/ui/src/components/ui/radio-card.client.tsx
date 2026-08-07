@@ -11,6 +11,7 @@ import { RadioGroup } from './radio-group.client'
 import {
   radioCardBodyVariants,
   radioCardControlVariants,
+  radioCardDescriptionVariants,
   radioCardDetailsGridVariants,
   radioCardDetailsInlineSlotVariants,
   radioCardDetailsLinkVariants,
@@ -115,10 +116,7 @@ function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
   return (
     <div className={radioCardSummaryLinesVariants()}>
       {summaryLines.map((line) => (
-        <span
-          key={line}
-          className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}
-        >
+        <span key={line} className={radioCardSummaryVariants()}>
           {line}
         </span>
       ))}
@@ -129,19 +127,21 @@ function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
 function RadioCardControl({
   className,
   variant = 'card',
+  density = 'default',
 }: {
   className?: string
   variant?: RadioCardVariant
+  density?: RadioCardDensity
 }) {
+  const indicatorSize = variant === 'row' ? 'size-2.5' : density === 'compact' ? 'size-2' : 'size-3'
+
   return (
     <span
-      className={cn(radioCardControlVariants({ variant }), 'mt-0.5', className)}
+      className={cn(radioCardControlVariants({ variant, density }), 'mt-0.5', className)}
       aria-hidden="true"
     >
       <span className={radioCardIndicatorVariants()}>
-        <Circle
-          className={cn('fill-primary text-primary', variant === 'row' ? 'size-2.5' : 'size-3')}
-        />
+        <Circle className={cn('fill-primary text-primary', indicatorSize)} />
       </span>
     </span>
   )
@@ -190,14 +190,8 @@ function RadioCardSecondaryContent({
 }: RadioCardSecondaryContentProps) {
   return (
     <>
-      {description ? (
-        <span className={textVariants({ variant: 'small' })}>{description}</span>
-      ) : null}
-      {summaryText ? (
-        <span className={cn(textVariants({ variant: 'small' }), radioCardSummaryVariants())}>
-          {summaryText}
-        </span>
-      ) : null}
+      {description ? <span className={radioCardDescriptionVariants()}>{description}</span> : null}
+      {summaryText ? <span className={radioCardSummaryVariants()}>{summaryText}</span> : null}
       {summaryLines && summaryLines.length > 0 ? (
         <RadioCardSummaryLines summaryLines={summaryLines} />
       ) : null}
@@ -237,7 +231,7 @@ function RadioCardItemContent({
 
   return (
     <div className={radioCardRootLayoutVariants({ controlPosition, density })}>
-      <RadioCardControl variant={variant} />
+      <RadioCardControl variant={variant} density={density} />
       <div className={radioCardBodyVariants({ density })}>
         <RadioCardTitleRowContent
           label={label}
@@ -332,7 +326,7 @@ function RadioCardOptionWithDetails({
           disabled={option.disabled}
           className={cn(radioCardItemWithDetailsVariants(), 'group')}
         >
-          <RadioCardControl variant="card" className="col-start-1 row-start-1" />
+          <RadioCardControl variant="card" density={density} className="col-start-1 row-start-1" />
           <div
             className={cn(radioCardBodyVariants({ density }), 'col-start-2 row-start-1 min-w-0')}
           >

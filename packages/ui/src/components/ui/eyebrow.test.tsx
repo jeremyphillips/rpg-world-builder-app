@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Eyebrow } from './eyebrow'
 
@@ -55,7 +55,7 @@ describe('Eyebrow', () => {
     expect(screen.getByText('Navigation')).toHaveClass('px-3', 'pb-1', 'pt-3')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<Eyebrow>Section</Eyebrow>)
     await expectNoAxeViolations(container)
   })

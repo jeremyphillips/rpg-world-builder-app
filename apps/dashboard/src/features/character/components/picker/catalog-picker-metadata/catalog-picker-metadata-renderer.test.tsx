@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { CatalogPickerMetadataRenderer } from './catalog-picker-metadata-renderer.client'
@@ -103,7 +103,7 @@ describe('CatalogPickerMetadataRenderer', () => {
     expect(screen.getByText('Finesse · Light · Thrown')).toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CatalogPickerMetadataRenderer
         lines={[

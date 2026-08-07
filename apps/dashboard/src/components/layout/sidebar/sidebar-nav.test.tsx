@@ -4,7 +4,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
 import { useCampaignStore } from '@/features/campaign'
@@ -75,7 +75,7 @@ describe('SidebarNav', () => {
 })
 
 describe('GlobalSidebarNav axe', () => {
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(<SidebarNav />, { initialEntries: ['/characters'] })
 
     await expectNoAxeViolations(container)

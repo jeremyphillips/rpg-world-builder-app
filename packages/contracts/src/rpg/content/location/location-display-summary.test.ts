@@ -20,7 +20,6 @@ const baseLocation = {
   name: 'Test',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
-  partyAssociations: [],
 }
 
 describe('resolveLocationDisplaySummary', () => {
@@ -43,7 +42,6 @@ describe('resolveLocationDisplaySummary', () => {
       id: 'loc_region',
       kind: 'region',
       classification: { kind: 'political', type: 'kingdom' },
-      territorialAuthority: [],
     }
 
     expect(resolveLocationDisplaySummary(settlement)).toEqual({

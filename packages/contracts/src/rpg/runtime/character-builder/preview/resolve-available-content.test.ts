@@ -94,6 +94,7 @@ function makeOrganization(
     ...timestamps,
     name: slug,
     organizationKind: 'professional',
+    connections: { locations: [] },
     campaignAccess: {
       available: true,
       visibilityMode,

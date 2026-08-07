@@ -38,6 +38,7 @@ describe('finalizeNpcCharacterBuild', () => {
       updatedAt: '2026-07-28T12:00:00.000Z',
       name: 'Lantern Guild',
       organizationKind: 'professional' as const,
+      connections: { locations: [] },
     }
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -48,7 +49,7 @@ describe('finalizeNpcCharacterBuild', () => {
         method: 'standard-array' as const,
         scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
       },
-      connections: { organizations: [{ organizationId: organization.id }] },
+      connections: { organizations: [{ organizationId: organization.id }], locations: [] },
     }
     const input = finalizeNpcCharacterBuild(draft, {
       ...builderTestContext,
@@ -57,6 +58,7 @@ describe('finalizeNpcCharacterBuild', () => {
 
     expect(input.connections).toEqual({
       organizations: [{ organizationId: organization.id }],
+      locations: [],
     })
   })
 })

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CAMPAIGN_UNKNOWN_NAME, CAMPAIGNS_QUERY_ERROR_MESSAGE } from '../lib/campaign-display'
 import { campaignTopbarTitleLinkClasses } from './campaign-topbar-title.variants'
@@ -58,7 +58,7 @@ describe('CampaignTopbarTitle', () => {
     expect(screen.queryByText(CAMPAIGN_UNKNOWN_NAME)).not.toBeInTheDocument()
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
         <CampaignTopbarTitle campaignId="camp_1" name="The Argent Road" href="/campaigns/camp_1" />

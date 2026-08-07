@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { DiceFormulaField } from './dice-formula-field.client'
@@ -155,7 +155,7 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Multiplier')).toHaveValue(250)
   })
 
-  it('has no axe violations with multiply-only mode', async () => {
+  itAxe('has no axe violations with multiply-only mode', async () => {
     const { container } = render(
       <DiceFormulaField
         id="wealth-roll"
@@ -170,7 +170,7 @@ describe('DiceFormulaField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('has no axe violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <DiceFormulaField
         id="roll"

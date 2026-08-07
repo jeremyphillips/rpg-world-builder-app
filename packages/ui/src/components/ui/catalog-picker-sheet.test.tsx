@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { expectNoAxeViolations } from '@rpg/ui/test-utils'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogPickerSheet } from './catalog-picker-sheet.client'
@@ -284,7 +284,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No items match your search.')
   })
 
-  it('has no axe accessibility violations', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CatalogPickerSheet
         open
@@ -299,5 +299,25 @@ describe('CatalogPickerSheet', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('drops catalog content inset when rowLayout is entity-card', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        rowPreset="catalog"
+        rowLayout="entity-card"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    const rowShell = screen.getAllByRole('group')[0]
+    expect(rowShell).toHaveClass('p-0')
+    expect(rowShell).not.toHaveClass('pl-2')
   })
 })

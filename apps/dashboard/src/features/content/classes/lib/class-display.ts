@@ -4,7 +4,7 @@ import {
   getArmorCategoryEntry,
   getToolCategoryEntry,
   getWeaponCategoryEntry,
-  isMeaningfulProficiencyChoice,
+  classSkillChoiceDisplaySummary,
   isMeaningfulToolProficiencyChoice,
   getProficiencyDomainCompactLabel,
   type CharacterClass,
@@ -187,22 +187,6 @@ function buildGrantedProficiencyRows(
   return rows
 }
 
-function aggregateMeaningfulChoices(choices: readonly ProficiencyChoice[] | undefined) {
-  const meaningful = (choices ?? []).filter(isMeaningfulProficiencyChoice)
-  if (meaningful.length === 0) {
-    return { choose: 0, optionSlugs: [] as string[] }
-  }
-
-  const optionSlugs = [...new Set(meaningful.flatMap((choice) => choice.from))].sort((a, b) =>
-    a.localeCompare(b),
-  )
-
-  return {
-    choose: meaningful[0]!.choose,
-    optionSlugs,
-  }
-}
-
 function buildChoicePrefix(choose: number): string {
   return `Choose ${choose} from`
 }
@@ -234,9 +218,7 @@ function buildProficiencyChoiceRow({
 }
 
 function buildSkillsChoiceRow(characterClass: CharacterClass): ClassProficiencyChoiceRow {
-  const { choose, optionSlugs } = aggregateMeaningfulChoices(
-    characterClass.characterCreation?.proficiencies?.skills?.choices,
-  )
+  const { choose, optionSlugs } = classSkillChoiceDisplaySummary(characterClass)
 
   return buildProficiencyChoiceRow({
     id: 'skills',

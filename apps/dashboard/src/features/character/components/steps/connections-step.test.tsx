@@ -21,7 +21,7 @@ describe('ConnectionsStep', () => {
     const onDraftChange = vi.fn()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }] },
+      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
     }
 
     render(
@@ -35,7 +35,9 @@ describe('ConnectionsStep', () => {
 
     expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Remove Lantern Guild' }))
-    expect(onDraftChange).toHaveBeenCalledWith({ connections: { organizations: [] } })
+    expect(onDraftChange).toHaveBeenCalledWith({
+      connections: { organizations: [], locations: [] },
+    })
 
     await user.click(screen.getByRole('button', { name: 'Choose organizations' }))
     const addButtons = screen.getAllByRole('button', { name: 'Add' })
@@ -43,6 +45,7 @@ describe('ConnectionsStep', () => {
     expect(onDraftChange).toHaveBeenCalledWith({
       connections: {
         organizations: [{ organizationId: lanternGuild.id }, { organizationId: cityCouncil.id }],
+        locations: [],
       },
     })
   })
@@ -50,7 +53,7 @@ describe('ConnectionsStep', () => {
   it('shows stale selections as recoverable and has no axe violations', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: 'organization-missing' }] },
+      connections: { organizations: [{ organizationId: 'organization-missing' }], locations: [] },
     }
     const { container } = render(
       <ConnectionsStep
