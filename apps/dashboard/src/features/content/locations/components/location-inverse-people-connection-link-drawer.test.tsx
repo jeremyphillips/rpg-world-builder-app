@@ -58,7 +58,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('Yawning Portal · Structure')).toBeInTheDocument()
+    expect(screen.getByText('Yawning Portal · Building · Tavern')).toBeInTheDocument()
     expect(
       screen.getByText(LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage),
     ).toBeInTheDocument()

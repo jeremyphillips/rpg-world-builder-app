@@ -180,8 +180,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Guildhall · Structure')).toBeInTheDocument()
-    expect(screen.queryByText('Guildhall · Structure · Headquarters')).not.toBeInTheDocument()
+    expect(screen.getByText('Guildhall · Building')).toBeInTheDocument()
+    expect(screen.queryByText('Guildhall · Building · Headquarters')).not.toBeInTheDocument()
     expect(
       screen.queryByText(TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults),
     ).not.toBeInTheDocument()

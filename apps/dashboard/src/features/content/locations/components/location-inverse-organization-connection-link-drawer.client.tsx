@@ -44,7 +44,7 @@ import {
 } from '../../lib/location-connection-duplicate-keys'
 import {
   buildOrganizationLocationChangeKindOptions,
-  buildOrganizationLocationConnectionKindOptions,
+  buildOrganizationInverseLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
 import {
@@ -55,7 +55,7 @@ import {
   resolveLocationInverseOrganizationTargetPresentation,
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
-  resolveTerritorialAuthorityLocationContext,
+  resolveLocationConnectionContext,
   resolveTerritorialAuthorityReplaceContext,
 } from '../lib/location-connection-surface-copy'
 
@@ -187,8 +187,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       })
     }
 
-    return buildOrganizationLocationConnectionKindOptions({
-      locationId: location.id,
+    return buildOrganizationInverseLocationConnectionKindOptions({
+      location,
       kinds: eligibleKinds,
       subjectOrganizationId,
       connections,
@@ -307,9 +307,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
 
     if (mode === 'add' || mode === 'changeKind' || mode === 'replaceOrganization') {
       return (
-        <RelationshipDrawerContextHeader
-          context={resolveTerritorialAuthorityLocationContext(location)}
-        />
+        <RelationshipDrawerContextHeader context={resolveLocationConnectionContext(location)} />
       )
     }
 

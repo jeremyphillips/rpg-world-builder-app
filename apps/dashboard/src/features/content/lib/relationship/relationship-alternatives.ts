@@ -27,8 +27,8 @@ import {
   resolveOrganizationKindsForDrawerIntent,
 } from '../location-connection-drawer-intent'
 import {
-  buildCharacterLocationConnectionKindOptions,
-  buildOrganizationLocationConnectionKindOptions,
+  buildCharacterInverseLocationConnectionKindOptions,
+  buildOrganizationInverseLocationConnectionKindOptions,
   type LocationConnectionKindOption,
 } from '../location-connection-kind-options'
 import {
@@ -188,8 +188,8 @@ function resolveAlternateOrganizationKindsAtLocation(input: {
     )
 }
 
-function buildEnabledKindOptions(
-  locationId: string,
+function buildEnabledInverseKindOptions(
+  location: Location,
   kinds: readonly OrganizationLocationConnectionKind[],
   subjectOrganizationId: string,
   connections: ReadonlyArray<{
@@ -200,8 +200,8 @@ function buildEnabledKindOptions(
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[],
   excludeConnectionId?: string,
 ): LocationConnectionKindOption[] {
-  return buildOrganizationLocationConnectionKindOptions({
-    locationId,
+  return buildOrganizationInverseLocationConnectionKindOptions({
+    location,
     kinds,
     subjectOrganizationId,
     connections,
@@ -292,8 +292,8 @@ function resolveOrganizationForwardAlternatives(
 
   const changeKindOptions =
     currentLocation && changeKindAlternates.length > 0
-      ? buildEnabledKindOptions(
-          currentLocation.id,
+      ? buildEnabledInverseKindOptions(
+          currentLocation,
           changeKindAlternates,
           relationship.subjectOrganizationId,
           connections,
@@ -416,8 +416,8 @@ function resolveLocationInverseOrganizationAlternatives(
 
   const changeKindOptions =
     alternateKinds.length > 0
-      ? buildEnabledKindOptions(
-          relationship.locationId,
+      ? buildEnabledInverseKindOptions(
+          location,
           alternateKinds,
           relationship.subjectOrganizationId,
           inverseConnections,
@@ -494,9 +494,10 @@ function resolveLocationInverseCharacterAlternatives(
 
   const changeKindOptions =
     alternateKinds.length > 0
-      ? buildCharacterLocationConnectionKindOptions(alternateKinds).filter(
-          (option) => !option.disabled,
-        )
+      ? buildCharacterInverseLocationConnectionKindOptions({
+          location,
+          kinds: alternateKinds,
+        }).filter((option) => !option.disabled)
       : []
 
   return {

@@ -225,7 +225,13 @@ Show and omit modes share the same `RelationshipFieldGroupRow` → row list arch
 Forward kind eyebrows use **direction-aware grammar** (for example `Owns`, `Operates`) via
 `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
 Inverse existing-edge eyebrows and connected-parties labels use
-`get*ConnectionDisplayLabel(kind, 'inverse')`. Vocab still owns semantic descriptions used in drawers.
+`get*ConnectionDisplayLabel(kind, 'inverse')`.
+
+**Endpoint-fixed inverse kind pickers** (location inverse drawers, org change-kind at a fixed location) require a `Location` and use dashboard-owned contextual descriptions from [`location-inverse-relationship-description.ts`](../src/features/content/locations/lib/location-inverse-relationship-description.ts) with reference nouns from `resolveLocationReferenceNoun` in `@rpg/contracts`. Inverse radio labels use `get*ConnectionDisplayLabel(kind, 'inverse')`. Forward / non-contextual pickers keep neutral vocab `.description` and canonical labels.
+
+Drawer context headers use `resolveLocationConnectionContext(location)` — `${name} · ${resolveLocationClassificationDisplay(location).text}` — in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts).
+
+Vocab still owns perspective-neutral canonical descriptions for forward and non-contextual pickers.
 
 Cross-org singleton territorial slots (`governs`, `controls`) require **server-backed occupancy** (`edgesByLocationId`) in organization forward drawers. Org-local connection lists alone are not authoritative for those kinds.
 
@@ -238,7 +244,7 @@ Use `get*ConnectionLabel(kind)` for pickers and read-only kind fields. Use
 eyebrows and connected-parties API labels. Forward / inverse follow canonical edge
 ownership (organization or character → location), not which detail page is open.
 
-Canonical kind **descriptions** must stay perspective-neutral (no “this location” / “here”) because they render in kind pickers before an endpoint is fixed. See [packages/contracts/docs/structure.md](../../../packages/contracts/docs/structure.md#reference-vocabulary-gametermentry--vocabularyterm).
+Canonical kind **descriptions** must stay perspective-neutral (no “this location” / “here”) because they render in kind pickers before an endpoint is fixed. Endpoint-fixed inverse pickers compose contextual copy around `resolveLocationReferenceNoun(location)` instead — including explicit `resides_at` tiers (`Lives in this settlement.` vs `Lives at this building as a primary residence.`). See [packages/contracts/docs/structure.md](../../../packages/contracts/docs/structure.md#reference-vocabulary-gametermentry--vocabularyterm).
 
 **Dashboard owns:** section headings/helpers, drawer titles, action labels, empty-state copy, dynamic occupancy copy, confirmation copy, instructional workflow text, and per-kind **target presentation** for relationship target pickers (field label, field helper, search placeholder, optional browse scopes).
 

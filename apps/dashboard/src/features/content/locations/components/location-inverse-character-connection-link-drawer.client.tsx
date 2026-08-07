@@ -33,7 +33,7 @@ import {
   subjectLocationConnectionKey,
 } from '../../lib/location-connection-duplicate-keys'
 import {
-  buildCharacterLocationConnectionKindOptions,
+  buildCharacterInverseLocationConnectionKindOptions,
   LOCATION_CONNECTION_KIND_FIELD_LABEL,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -42,7 +42,7 @@ import {
   resolveLocationInverseCharacterAddDrawerTitle,
   resolveLocationInverseCharacterAddSubmitLabel,
   resolveLocationInverseCharacterTargetPresentation,
-  resolveTerritorialAuthorityLocationContext,
+  resolveLocationConnectionContext,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import {
@@ -134,7 +134,11 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         existingKeys.has(subjectLocationConnectionKey(characterId, kind)),
       ),
     )
-    return buildCharacterLocationConnectionKindOptions(eligibleKinds, disabledKinds)
+    return buildCharacterInverseLocationConnectionKindOptions({
+      location,
+      kinds: eligibleKinds,
+      disabledKinds,
+    })
   }, [
     eligibleKinds,
     existingKeys,
@@ -211,9 +215,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       noItemsMessage="No characters are available."
       headerBelowDescription={
         <div className="space-y-4">
-          <RelationshipDrawerContextHeader
-            context={resolveTerritorialAuthorityLocationContext(location)}
-          />
+          <RelationshipDrawerContextHeader context={resolveLocationConnectionContext(location)} />
           {mode === 'changeKind' && lockedCharacter ? (
             <RelationshipDrawerSubjectField
               label={RELATIONSHIP_DRAWER_CHARACTER_FIELD_LABEL}

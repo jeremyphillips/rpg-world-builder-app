@@ -42,7 +42,7 @@ import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddSubmitLabel,
   resolveLocationInverseOrganizationTargetPresentation,
-  resolveTerritorialAuthorityLocationContext,
+  resolveLocationConnectionContext,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import {
@@ -134,6 +134,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     () =>
       buildPeopleSectionKindOptions({
         kindSlots,
+        location,
         locationId: location.id,
         rows: connectedPartyRows,
         organizationIds,
@@ -147,7 +148,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       characterIds,
       connectedPartyRows,
       kindSlots,
-      location.id,
+      location,
       organizationIds,
     ],
   )
@@ -275,9 +276,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
 
   const headerBelowDescription = (
     <div className="space-y-4">
-      <RelationshipDrawerContextHeader
-        context={resolveTerritorialAuthorityLocationContext(location)}
-      />
+      <RelationshipDrawerContextHeader context={resolveLocationConnectionContext(location)} />
       {kindOptions.length > 0 ? (
         <LocationConnectionKindStep
           id="location-people-connection-kind"

@@ -6,7 +6,7 @@ export {
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
   TERRITORIAL_AUTHORITY_SLOT_COPY,
   resolveTerritorialAuthorityChangeKindCurrent,
-  resolveTerritorialAuthorityLocationContext,
+  resolveLocationConnectionContext,
   resolveTerritorialAuthorityReplaceContext,
   resolveTerritorialKindOccupiedReason,
   resolveTerritorialRemoveConfirmation,

@@ -6,6 +6,7 @@ import {
   resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
+  resolveLocationReferenceNoun,
 } from './location-display-summary'
 import type { Location } from './location'
 
@@ -129,6 +130,44 @@ describe('resolveLocationDisplaySummary', () => {
     expect(resolveLocationDisplaySummary(location)).toEqual({
       typeLabel: 'Structure',
     })
+  })
+})
+
+describe('resolveLocationReferenceNoun', () => {
+  it('returns lowercase prose nouns from the same type tier as classification', () => {
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'structure',
+        structureType: 'building',
+        classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+      }),
+    ).toBe('building')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'space',
+        classification: { type: 'chamber' },
+      }),
+    ).toBe('space')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'settlement',
+        settlementType: 'city',
+        parentLocationId: 'loc_parent',
+      }),
+    ).toBe('settlement')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'structure',
+      }),
+    ).toBe('structure')
   })
 })
 

@@ -33,6 +33,24 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
   })
 
+  it('shows compact classification context instead of raw kind label', () => {
+    render(
+      <LocationInverseCharacterConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        addKind="works_at"
+        location={YAWNING_PORTAL}
+        characters={characters}
+        connectedPartyRows={[]}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Yawning Portal · Building · Tavern')).toBeInTheDocument()
+    expect(screen.queryByText(/Yawning Portal · Structure/i)).not.toBeInTheDocument()
+  })
+
   it('opens change-kind with expanded relationship type and no character picker', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()

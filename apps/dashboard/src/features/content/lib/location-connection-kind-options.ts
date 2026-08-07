@@ -8,7 +8,9 @@ import type {
 import {
   CHARACTER_LOCATION_CONNECTION_ENTRIES,
   findOrganizationLocationConnectionOfKindForOrganization,
+  getCharacterLocationConnectionDisplayLabel,
   getCharacterLocationConnectionLabel,
+  getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionLabel,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
   organizationLocationConnectionAlreadySetAtReason,
@@ -35,6 +37,10 @@ import {
   resolveTerritorialKindOccupiedReason,
   TERRITORIAL_AUTHORITY_DRAWER,
 } from '../locations/lib/location-connection-surface-copy'
+import {
+  resolveInverseCharacterKindDescription,
+  resolveInverseOrganizationKindDescription,
+} from '../locations/lib/location-inverse-relationship-description'
 import type { PeopleKindSlot } from '../locations/lib/location-connected-parties-people-kind-slots'
 import { peopleKindSlotKey } from '../locations/lib/location-connected-parties-people-kind-slots'
 
@@ -160,8 +166,8 @@ export function buildOrganizationLocationChangeKindOptions(input: {
   const currentKindStale = !profileKinds.includes(input.currentKind)
   const kinds = currentKindStale ? [input.currentKind, ...profileKinds] : profileKinds
 
-  const options = buildOrganizationLocationConnectionKindOptions({
-    locationId: input.location.id,
+  const options = buildOrganizationInverseLocationConnectionKindOptions({
+    location: input.location,
     kinds,
     subjectOrganizationId: input.subjectOrganizationId,
     connections: input.connections,
@@ -249,6 +255,49 @@ export function buildOrganizationLocationConnectionKindOptions(input: {
       disabledReason: disabled
         ? resolveOrganizationLocationConnectionKindDisabledReason({
             locationId: input.locationId,
+            kind,
+            subjectOrganizationId: input.subjectOrganizationId,
+            connections,
+            edgesAtLocation: input.edgesAtLocation,
+            excludeConnectionId: input.excludeConnectionId,
+          })
+        : undefined,
+    }
+  })
+}
+
+export function buildOrganizationInverseLocationConnectionKindOptions(input: {
+  location: Location
+  kinds: readonly OrganizationLocationConnectionKind[]
+  subjectOrganizationId?: string
+  connections?: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
+  excludeConnectionId?: string
+}): LocationConnectionKindOption[] {
+  const connections = input.connections ?? []
+
+  return input.kinds.map((kind) => {
+    const disabled = isOrganizationLocationConnectionKindBlockedForLocation({
+      locationId: input.location.id,
+      kind,
+      subjectOrganizationId: input.subjectOrganizationId ?? '',
+      connections,
+      edgesAtLocation: input.edgesAtLocation,
+      excludeConnectionId: input.excludeConnectionId,
+    })
+
+    return {
+      value: kind,
+      label: getOrganizationLocationConnectionDisplayLabel(kind, 'inverse'),
+      description: resolveInverseOrganizationKindDescription(kind, input.location),
+      disabled,
+      disabledReason: disabled
+        ? resolveOrganizationLocationConnectionKindDisabledReason({
+            locationId: input.location.id,
             kind,
             subjectOrganizationId: input.subjectOrganizationId,
             connections,
@@ -375,6 +424,24 @@ export function buildCharacterLocationConnectionKindOptions(
   }))
 }
 
+export function buildCharacterInverseLocationConnectionKindOptions(input: {
+  location: Location
+  kinds: readonly CharacterLocationConnectionKind[]
+  disabledKinds?: ReadonlySet<CharacterLocationConnectionKind>
+}): LocationConnectionKindOption[] {
+  const disabledKinds = input.disabledKinds ?? new Set<CharacterLocationConnectionKind>()
+
+  return input.kinds.map((kind) => ({
+    value: kind,
+    label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
+    description: resolveInverseCharacterKindDescription(kind, input.location),
+    disabled: disabledKinds.has(kind),
+    disabledReason: disabledKinds.has(kind)
+      ? LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
+      : undefined,
+  }))
+}
+
 export function resolveActiveConnectionKind(
   selectedKind: string | null,
   kindOptions: readonly LocationConnectionKindOption[],
@@ -397,17 +464,17 @@ export function resolveActiveConnectionKind(
 export const PEOPLE_SECTION_KIND_FULLY_LINKED_REASON =
   'All eligible people and organizations are already linked for this relationship type.'
 
-function resolvePeopleKindSlotDescription(slot: PeopleKindSlot): string {
+function resolvePeopleKindSlotDescription(slot: PeopleKindSlot, location: Location): string {
   const organizationBinding = slot.bindings.find(
     (binding) => binding.subjectType === 'organization',
   )
   if (organizationBinding?.subjectType === 'organization') {
-    return ORGANIZATION_LOCATION_CONNECTION_ENTRIES[organizationBinding.kind].description
+    return resolveInverseOrganizationKindDescription(organizationBinding.kind, location)
   }
 
   const characterBinding = slot.bindings.find((binding) => binding.subjectType === 'character')
   if (characterBinding?.subjectType === 'character') {
-    return CHARACTER_LOCATION_CONNECTION_ENTRIES[characterBinding.kind].description
+    return resolveInverseCharacterKindDescription(characterBinding.kind, location)
   }
 
   return ''
@@ -477,6 +544,7 @@ export function peopleSectionHasAvailableTarget(input: {
 }
 
 export function buildPeopleSectionKindOptions(input: {
+  location: Location
   kindSlots: readonly PeopleKindSlot[]
   locationId: string
   rows: readonly LocationConnectedPartyRow[]
@@ -499,7 +567,7 @@ export function buildPeopleSectionKindOptions(input: {
     return {
       value: peopleKindSlotKey(slot),
       label: slot.heading,
-      description: resolvePeopleKindSlotDescription(slot),
+      description: resolvePeopleKindSlotDescription(slot, input.location),
       disabled,
       disabledReason: disabled ? PEOPLE_SECTION_KIND_FULLY_LINKED_REASON : undefined,
     }

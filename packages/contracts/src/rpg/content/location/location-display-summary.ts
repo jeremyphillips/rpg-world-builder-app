@@ -125,6 +125,11 @@ function resolveTypeLabel(location: Location): string {
   return getLocationKindLabel(location.kind)
 }
 
+/** Lowercase prose noun for inverse relationship copy — same type tier as compact classification. */
+export function resolveLocationReferenceNoun(location: Location): string {
+  return resolveTypeLabel(location).toLowerCase()
+}
+
 /** Resolves semantic display labels for a location without presentation field names. */
 export function resolveLocationDisplaySummary(location: Location): LocationDisplaySummary {
   return {
