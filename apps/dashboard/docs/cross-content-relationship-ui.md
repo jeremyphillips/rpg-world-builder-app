@@ -60,7 +60,7 @@ Use **`DetailSectionPanel`** + **`RelationshipFieldGroupRow`** when a section gr
 │ Header (bg-card px-4 py-2) — title, helper, optional headerEndSlot                      │
 ├ Body (bg-surface-subtle) ──────────────────────────────────────────────────────────────┤
 │ RelationshipFieldGroupRow (px-4 py-2, border-b between rows)                           │
-│   Eyebrow size="sm" + row content                                                      │
+│   optional Eyebrow size="sm" + row content (no chrome when eyebrow omitted)            │
 │ RelationshipFieldGroupRow …                                                            │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -72,7 +72,20 @@ Use **`DetailSectionPanel`** + **`RelationshipFieldGroupRow`** when a section gr
 | Single-kind or non-grouped surfaces                                            | Feature section header                                            | Bare row primitives only                                                                                        |
 | Location hierarchy (Contained locations)                                       | `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` | Not a typed-edge relationship — same panel/row chrome, hierarchy domain stays in feature code                   |
 
-Kind labels inside a relationship panel use **`RelationshipFieldGroupRow` eyebrows** — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers.
+Kind labels inside a relationship panel use **`RelationshipFieldGroupRow` eyebrows** when `kindHeading: 'show'` — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers. Omit the eyebrow prop entirely when the section heading is sufficient.
+
+### Organization→location compact rows
+
+Org forward location targets compose [`LocationEntitySummaryVm`](../src/features/content/locations/lib/location-display.ts) in the organization feature, then map to neutral `CrossContentRelationshipRow` props:
+
+```text
+{name link} · {classification}
+Located in {nearest direct parent}
+```
+
+- Classification renders via `headingSuffix` **outside** the entity link (same contract as contained locations).
+- Nearest-parent context uses the last ancestry segment only — not full `ancestry.text`.
+- Pickers and change-target **Current** may still show fuller classification + ancestry for disambiguation.
 
 ## Populated row vs empty container
 
@@ -182,6 +195,17 @@ Only render per-kind empty copy for meaningful slots. Sparse groups use one fami
 | **Location inverse — sparse groups**     | One family-level empty row only                                   | One family-level add (`Add relationship`)                   |
 
 Populated forward families **always render**, even when no additional targets are currently available. Hide or disable only the family add affordance — not the populated groups.
+
+### Single-kind section presentation
+
+Organization forward families may omit kind eyebrows only when **both** are true:
+
+1. The family configures exactly one semantic relationship kind, and
+2. The section heading fully communicates that relationship (for example **Areas of operation** for `operates_in`).
+
+Cardinality alone is insufficient — generic headings (for example character **Connections**) must keep kind context visible. `kindHeading: 'show' | 'omit'` lives in dashboard family presentation config ([`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts)); never derive from populated rows.
+
+Show and omit modes share the same `RelationshipFieldGroupRow` → row list architecture. When `kindHeading === 'omit'`, pass no eyebrow so the group renders **zero** reserved eyebrow chrome.
 
 Forward kind eyebrows use **direction-aware grammar** (for example `Owns`, `Operates`) via
 `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.

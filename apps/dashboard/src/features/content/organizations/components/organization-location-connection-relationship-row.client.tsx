@@ -150,19 +150,20 @@ export function OrganizationLocationConnectionRelationshipRow({
 }: OrganizationLocationConnectionRelationshipRowProps) {
   const navigate = useNavigate()
   const targetName = item.target?.name ?? 'Unavailable location'
+  const nearestParent = item.target?.ancestry.items.at(-1)
 
   return (
     <CrossContentRelationshipRow
       heading={targetName}
       href={item.target?.href}
-      secondaryText={item.target?.classification.text}
+      headingSuffix={item.target ? ` · ${item.target.classification.text}` : undefined}
       metadata={
         item.target == null ? (
           <Badge tone="warning" className="mt-1">
             Unavailable
           </Badge>
-        ) : item.target.ancestry.items.length > 0 ? (
-          item.target.ancestry.text
+        ) : nearestParent ? (
+          <span className="italic">Located in {nearestParent.name}</span>
         ) : undefined
       }
       actions={buildOrganizationLocationConnectionOverflowActions({

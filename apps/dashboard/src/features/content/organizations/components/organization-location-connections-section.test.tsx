@@ -65,6 +65,50 @@ describe('OrganizationLocationConnectionsSection', () => {
     expect(screen.getByText('Headquarters')).toBeInTheDocument()
   })
 
+  it('omits kind eyebrows for Areas of operation while keeping site kind labels', () => {
+    const operatesInConnections = {
+      ...buildOrganizationLocationConnectionCards(
+        [
+          {
+            connection: { id: 'conn-3', locationId: 'region-1', kind: 'operates_in' },
+            location: {
+              id: 'region-1',
+              campaignId: 'camp-1',
+              name: 'Northern March',
+              slug: 'northern-march',
+              kind: 'region',
+            } as Location,
+          },
+        ],
+        {
+          campaignId: 'camp-1',
+          locationsById: buildLocationsById([
+            {
+              id: 'region-1',
+              campaignId: 'camp-1',
+              name: 'Northern March',
+              slug: 'northern-march',
+              kind: 'region',
+            } as Location,
+          ]),
+        },
+      ),
+      emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+    }
+
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionsSection locationConnections={operatesInConnections} />
+      </MemoryRouter>,
+    )
+
+    expect(
+      screen.getByRole('heading', { name: 'Areas of operation', level: 3 }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+    expect(screen.queryByText('Operates in')).not.toBeInTheDocument()
+  })
+
   it('renders a family empty state without per-kind empty groups', () => {
     render(
       <MemoryRouter>

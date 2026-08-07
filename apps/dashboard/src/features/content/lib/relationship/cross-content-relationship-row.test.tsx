@@ -14,6 +14,23 @@ describe('CrossContentRelationshipRow', () => {
     expect(screen.getByText('Military')).toBeInTheDocument()
   })
 
+  it('passes headingSuffix outside the entity link', () => {
+    render(
+      <MemoryRouter>
+        <CrossContentRelationshipRow
+          heading="Yawning Portal"
+          href="/locations/yawning-portal"
+          headingSuffix=" · Building · Tavern"
+        />
+      </MemoryRouter>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Yawning Portal' })
+    expect(link).toHaveAttribute('href', '/locations/yawning-portal')
+    expect(link.closest('div')?.textContent).toContain(' · Building · Tavern')
+    expect(link.textContent).toBe('Yawning Portal')
+  })
+
   it('composes DetailEntityRow link treatment and DetailOverflowMenu when href and actions are provided', () => {
     render(
       <MemoryRouter>

@@ -13,11 +13,8 @@ import {
   ORGANIZATION_SECTION_LABELS,
   type OrganizationLocationConnectionsViewModel,
 } from '../lib/organization-display'
-import {
-  groupOrganizationLocationConnections,
-  ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS,
-} from '../lib/build-organization-location-connection-cards'
-import { resolveOrganizationForwardFamilySurfaceCopy } from '../lib/organization-location-connection-surface-copy'
+import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
+import { resolveOrganizationForwardFamilyPresentation } from '../lib/organization-location-connection-surface-copy'
 import {
   OrganizationLocationConnectionRelationshipRow,
   type OrganizationLocationConnectionMutationContext,
@@ -134,20 +131,25 @@ export function OrganizationLocationConnectionsSection({
           {total > 0 ? <Text variant="muted">{formatLocationConnectionsCount(total)}</Text> : null}
           {familiesToRender.map((family) => {
             const familyGroup = populatedFamilyMap.get(family)
-            const familyCopy = resolveOrganizationForwardFamilySurfaceCopy(family)
+            const familyPresentation = resolveOrganizationForwardFamilyPresentation(family)
             const familyAddEnabled = canManage && Boolean(canAddToFamily[family])
 
             return (
               <DetailSectionPanel
                 key={family}
-                heading={ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family]}
+                heading={familyPresentation.heading}
                 headingId={`organization-location-connections-${family}-heading`}
                 headingAs="h3"
               >
                 {familyGroup && familyGroup.kindGroups.length > 0 ? (
                   <>
                     {familyGroup.kindGroups.map((kindGroup) => (
-                      <RelationshipFieldGroupRow key={kindGroup.kind} eyebrow={kindGroup.kindLabel}>
+                      <RelationshipFieldGroupRow
+                        key={kindGroup.kind}
+                        eyebrow={
+                          familyGroup.kindHeading === 'show' ? kindGroup.kindLabel : undefined
+                        }
+                      >
                         <ul className="space-y-1">
                           {kindGroup.items.map((item) => (
                             <li key={item.connectionId}>
@@ -185,7 +187,7 @@ export function OrganizationLocationConnectionsSection({
                           density="compact"
                           onClick={() => onAddFamily?.(family)}
                         >
-                          + {familyCopy.add}
+                          + {familyPresentation.add}
                         </Button>
                       </div>
                     ) : null}
@@ -193,8 +195,8 @@ export function OrganizationLocationConnectionsSection({
                 ) : canManage ? (
                   <div className="px-4 py-2">
                     <RelationshipEmptyInlineRow
-                      emptyLabel={familyCopy.empty}
-                      addLabel={familyAddEnabled ? familyCopy.add : undefined}
+                      emptyLabel={familyPresentation.empty}
+                      addLabel={familyAddEnabled ? familyPresentation.add : undefined}
                       onAdd={familyAddEnabled ? () => onAddFamily?.(family) : undefined}
                     />
                   </div>

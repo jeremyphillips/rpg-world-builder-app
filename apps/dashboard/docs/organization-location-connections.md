@@ -52,6 +52,8 @@ Mutation candidate filtering (add, change location, replace organization) always
 
 Organization detail uses **family-level** empty states and one **Add {family}** action. Populated kind groups render only when they contain relationships. Forward kind eyebrows may differ grammatically from inverse vocab labels (see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)).
 
+**Areas of operation** (`geographic_presence` / `operates_in`) uses the section heading **Areas of operation** with kind eyebrows omitted — the heading fully names the sole relationship kind. Sites & facilities and Territorial authority keep directional kind eyebrows.
+
 Directional edge copy lives on connection kind entries in `@rpg/contracts`
 (`label`, optional `forwardLabel`, optional `inverseLabel`). Organization forward eyebrows
 read `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
@@ -67,8 +69,7 @@ location display helpers.
 - **Unresolved targets:** `target: null` is the sole failure state; UI derives unavailable chrome from that.
 - **Ancestry index:** the detail hook memoizes `locationsById` once and passes it into card builders, Current
   snapshots, and picker summaries — builders must not rebuild the map per row.
-- **Density:** cross-content relationship rows keep identity, classification, and ancestry **stacked** so
-  external references stay scannable. Contained locations intentionally use compact inline density instead.
+- **Density:** org→location relationship rows use a compact two-line projection (`name · classification` + optional `Located in {nearest parent}` via `headingSuffix`). Contained locations use a denser single-line inline suffix. Pickers and Current snapshots may show fuller ancestry for disambiguation.
 
 Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).
 

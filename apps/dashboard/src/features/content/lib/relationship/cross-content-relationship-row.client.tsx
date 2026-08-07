@@ -15,6 +15,8 @@ export type CrossContentRelationshipRowProps = {
   relationshipEyebrow?: ReactNode
   heading: ReactNode
   href?: string
+  /** Muted classification text inline after the heading (includes leading ` · ` separator). */
+  headingSuffix?: ReactNode
   /** @deprecated Use secondaryText — feature-supplied disambiguation only. */
   subheading?: ReactNode
   secondaryText?: ReactNode
@@ -28,6 +30,7 @@ export function CrossContentRelationshipRow({
   relationshipEyebrow,
   heading,
   href,
+  headingSuffix,
   subheading,
   secondaryText,
   metadata,
@@ -46,6 +49,7 @@ export function CrossContentRelationshipRow({
         className="px-0 py-0"
         heading={heading}
         href={href}
+        headingSuffix={headingSuffix}
         subheading={resolvedSecondaryText}
         metadata={metadata}
         endSlot={

@@ -21,15 +21,7 @@ import {
   type EntityReplacementCurrentSnapshot,
 } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import type { OrganizationLocationConnectionPreviewItem } from './organization-display'
-
-export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS: Record<
-  OrganizationLocationConnectionFamily,
-  string
-> = {
-  site: 'Sites & facilities',
-  geographic_presence: 'Geographic presence',
-  territorial_authority: 'Territorial authority',
-}
+import { ORGANIZATION_FORWARD_FAMILY_PRESENTATION } from './organization-location-connection-surface-copy'
 
 export type OrganizationLocationConnectionKindGroup = {
   kind: OrganizationLocationConnectionKind
@@ -40,6 +32,7 @@ export type OrganizationLocationConnectionKindGroup = {
 export type OrganizationLocationConnectionFamilyGroup = {
   family: OrganizationLocationConnectionFamily
   familyLabel: string
+  kindHeading: 'show' | 'omit'
   kindGroups: OrganizationLocationConnectionKindGroup[]
 }
 
@@ -84,17 +77,21 @@ export function groupOrganizationLocationConnections(
 
   return ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER.filter((family) =>
     familiesWithKinds.has(family),
-  ).map((family) => ({
-    family,
-    familyLabel: ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family],
-    kindGroups: kindsForFamily(family)
-      .filter((kind) => itemsByKind.has(kind))
-      .map((kind) => ({
-        kind,
-        kindLabel: getOrganizationLocationConnectionDisplayLabel(kind, 'forward'),
-        items: itemsByKind.get(kind) ?? [],
-      })),
-  }))
+  ).map((family) => {
+    const presentation = ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+    return {
+      family,
+      familyLabel: presentation.heading,
+      kindHeading: presentation.kindHeading,
+      kindGroups: kindsForFamily(family)
+        .filter((kind) => itemsByKind.has(kind))
+        .map((kind) => ({
+          kind,
+          kindLabel: getOrganizationLocationConnectionDisplayLabel(kind, 'forward'),
+          items: itemsByKind.get(kind) ?? [],
+        })),
+    }
+  })
 }
 
 export function mapLocationEntitySummaryToEntityReplacementCurrentSnapshot(

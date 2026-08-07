@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Location } from '@rpg/contracts'
 
 import { buildLocationsById } from '../../locations/lib/location-display'
-import { YAWNING_PORTAL, LOCATIONS_LIST } from '../../locations/fixtures'
+import { ALDERMERE, YAWNING_PORTAL, LOCATIONS_LIST } from '../../locations/fixtures'
 import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import { OrganizationLocationConnectionRelationshipRow } from './organization-location-connection-relationship-row.client'
 
@@ -38,7 +38,7 @@ const mutationContext = {
 }
 
 describe('OrganizationLocationConnectionRelationshipRow', () => {
-  it('renders classification and ancestry when target resolves', () => {
+  it('renders compact name link, classification suffix, and nearest-parent context', () => {
     render(
       <MemoryRouter>
         <OrganizationLocationConnectionRelationshipRow
@@ -49,9 +49,29 @@ describe('OrganizationLocationConnectionRelationshipRow', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
-    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
-    expect(screen.getByText('Aldermere / Greyshore / Harborford / Dock Ward')).toBeInTheDocument()
+    const link = screen.getByRole('link', { name: 'Yawning Portal' })
+    expect(link).toBeInTheDocument()
+    expect(link.textContent).toBe('Yawning Portal')
+    expect(link.parentElement).toHaveTextContent(' · Building · Tavern')
+    expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Aldermere / Greyshore / Harborford / Dock Ward'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('omits nearest-parent line for root locations', () => {
+    render(
+      <MemoryRouter>
+        <OrganizationLocationConnectionRelationshipRow
+          item={previewItemFor(ALDERMERE)}
+          canManage={false}
+          mutationContext={mutationContext}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Aldermere' })).toBeInTheDocument()
+    expect(screen.queryByText(/^Located in /)).not.toBeInTheDocument()
   })
 
   it('renders unavailable badge when target is null', () => {

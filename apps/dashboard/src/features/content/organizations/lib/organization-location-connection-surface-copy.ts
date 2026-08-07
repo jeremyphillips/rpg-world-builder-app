@@ -38,23 +38,31 @@ type OrganizationForwardSurfaceCopy = {
 }
 
 type OrganizationForwardFamilySurfaceCopy = {
+  heading: string
+  kindHeading: 'show' | 'omit'
   empty: string
   add: string
   addDrawerHelper?: string
 }
 
-export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
+export const ORGANIZATION_FORWARD_FAMILY_PRESENTATION = {
   site: {
+    heading: 'Sites & facilities',
+    kindHeading: 'show',
     empty: 'No site relationships linked.',
     add: 'Add site relationship',
     addDrawerHelper:
       'Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters.',
   },
   geographic_presence: {
-    empty: 'No geographic presence linked.',
-    add: 'Add geographic presence',
+    heading: 'Areas of operation',
+    kindHeading: 'omit',
+    empty: 'No areas of operation linked.',
+    add: 'Add area of operation',
   },
   territorial_authority: {
+    heading: 'Territorial authority',
+    kindHeading: 'show',
     empty: 'No territorial authority linked.',
     add: 'Add territorial authority',
   },
@@ -62,6 +70,9 @@ export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
   OrganizationLocationConnectionFamily,
   OrganizationForwardFamilySurfaceCopy
 >
+
+/** @deprecated Use ORGANIZATION_FORWARD_FAMILY_PRESENTATION or resolveOrganizationForwardFamilyPresentation. */
+export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = ORGANIZATION_FORWARD_FAMILY_PRESENTATION
 
 export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   headquarters: {
@@ -154,7 +165,7 @@ export const ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY = {
     viewLocation: 'View location',
     changeKind: 'Change connection type',
     changeTarget: 'Change location',
-    remove: 'Remove geographic presence',
+    remove: 'Remove area of operation',
   },
   territorial_authority: {
     viewLocation: 'View location',
@@ -222,10 +233,21 @@ export function resolveOrganizationForwardAddSubmitLabel(
   return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].addSubmit
 }
 
-export function resolveOrganizationForwardFamilySurfaceCopy(
+export function resolveOrganizationForwardFamilyPresentation(
   family: OrganizationLocationConnectionFamily,
 ): OrganizationForwardFamilySurfaceCopy {
-  return ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+  return ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+}
+
+export function resolveOrganizationForwardFamilySurfaceCopy(
+  family: OrganizationLocationConnectionFamily,
+): Pick<OrganizationForwardFamilySurfaceCopy, 'empty' | 'add' | 'addDrawerHelper'> {
+  const presentation = ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+  return {
+    empty: presentation.empty,
+    add: presentation.add,
+    addDrawerHelper: 'addDrawerHelper' in presentation ? presentation.addDrawerHelper : undefined,
+  }
 }
 
 export function resolveOrganizationForwardFamilyAddDrawerHelper(

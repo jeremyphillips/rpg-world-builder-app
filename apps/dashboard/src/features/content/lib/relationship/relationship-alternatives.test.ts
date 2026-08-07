@@ -342,7 +342,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
       labels: {
         view: 'View location',
         changeTarget: 'Change location',
-        remove: 'Remove geographic presence',
+        remove: 'Remove area of operation',
       },
     },
     {

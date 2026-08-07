@@ -130,6 +130,36 @@ describe('groupOrganizationLocationConnections', () => {
       'Governs',
     )
   })
+
+  it('marks geographic_presence for eyebrow omission while site keeps show', () => {
+    const locationsById = buildLocationsById([HARBORFORD, YAWNING_PORTAL])
+    const { previewItems } = buildOrganizationLocationConnectionCards(
+      [
+        {
+          connection: { id: 'conn-1', locationId: HARBORFORD.id, kind: 'operates_in' },
+          location: HARBORFORD,
+        },
+        {
+          connection: { id: 'conn-2', locationId: YAWNING_PORTAL.id, kind: 'headquarters' },
+          location: YAWNING_PORTAL,
+        },
+      ],
+      { campaignId: CAMPAIGN_ID, locationsById },
+    )
+
+    const groups = groupOrganizationLocationConnections(previewItems)
+    const geographic = groups.find((group) => group.family === 'geographic_presence')
+    const site = groups.find((group) => group.family === 'site')
+
+    expect(geographic).toMatchObject({
+      familyLabel: 'Areas of operation',
+      kindHeading: 'omit',
+    })
+    expect(site).toMatchObject({
+      familyLabel: 'Sites & facilities',
+      kindHeading: 'show',
+    })
+  })
 })
 
 describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
