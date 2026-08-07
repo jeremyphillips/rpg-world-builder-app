@@ -48,6 +48,7 @@ import {
 } from '../../lib/location-connection-drawer-intent'
 import {
   buildOrganizationFamilyKindOptions,
+  buildOrganizationLocationChangeKindOptions,
   resolveActiveConnectionKind,
   type LocationConnectionKindOption,
 } from '../../lib/location-connection-kind-options'
@@ -223,8 +224,41 @@ function OrganizationLocationConnectionLinkDrawerContent({
     showKindStep,
   ])
 
-  const editKindOptions = mutationAlternatives?.changeKind ?? []
+  const changeKindGatingAlternates = mutationAlternatives?.changeKind ?? []
   const changeTargetLocations = mutationAlternatives?.changeTarget ?? []
+
+  const lockedLocation = React.useMemo(
+    () =>
+      mode === 'changeKind'
+        ? (locations.find((location) => location.id === initialConnection?.locationId) ?? null)
+        : null,
+    [initialConnection?.locationId, locations, mode],
+  )
+
+  const changeKindPickerOptions = React.useMemo(() => {
+    if (mode !== 'changeKind' || !lockedLocation || !initialConnection) {
+      return []
+    }
+
+    return buildOrganizationLocationChangeKindOptions({
+      location: lockedLocation,
+      intent,
+      currentKind: initialConnection.kind,
+      subjectOrganizationId: organizationId,
+      connections: existingConnections,
+      edgesAtLocation: resolveEdgesAtLocation(lockedLocation.id, edgesByLocationId),
+      excludeConnectionId,
+    })
+  }, [
+    edgesByLocationId,
+    excludeConnectionId,
+    existingConnections,
+    initialConnection,
+    intent,
+    lockedLocation,
+    mode,
+    organizationId,
+  ])
 
   const activeKind = (() => {
     if (resolvedAddKind) return resolvedAddKind
@@ -262,16 +296,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
     organizationId,
   ])
 
-  const lockedLocation = React.useMemo(
-    () =>
-      mode === 'changeKind'
-        ? (locations.find((location) => location.id === initialConnection?.locationId) ?? null)
-        : null,
-    [initialConnection?.locationId, locations, mode],
-  )
-
   const showLocationPicker = (mode === 'add' && Boolean(activeKind)) || mode === 'changeTarget'
-  const canSubmit = Boolean(selectedLocationId && activeKind && !isSubmitting)
+  const hasChange = mode !== 'changeKind' || activeKind !== initialConnection?.kind
+  const canSubmit = Boolean(selectedLocationId && activeKind) && hasChange && !isSubmitting
 
   const handleKindChange = (value: string) => {
     const nextKind = value as OrganizationLocationConnectionKind
@@ -338,7 +365,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
         : null
 
   const showMutationEmptyState =
-    (mode === 'changeKind' && editKindOptions.length === 0) ||
+    (mode === 'changeKind' && changeKindGatingAlternates.length === 0) ||
     (mode === 'changeTarget' && changeTargetLocations.length === 0)
 
   return (
@@ -380,23 +407,17 @@ function OrganizationLocationConnectionLinkDrawerContent({
               value={lockedLocation.name}
             />
           ) : null}
-          {mode === 'changeKind' && activeKind ? (
-            <RelationshipDrawerSubjectField
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              value={getOrganizationLocationConnectionLabel(activeKind)}
-            />
-          ) : null}
           {mode === 'changeTarget' && activeKind ? (
             <RelationshipDrawerSubjectField
               label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
               value={getOrganizationLocationConnectionLabel(activeKind)}
             />
           ) : null}
-          {mode === 'changeKind' && lockedLocation && editKindOptions.length > 0 ? (
+          {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
             <LocationConnectionKindStep
               id="organization-location-connection-edit-kind"
               label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              options={editKindOptions}
+              options={changeKindPickerOptions}
               value={activeKind}
               onValueChange={(value) =>
                 setSelectedKind(value as OrganizationLocationConnectionKind)

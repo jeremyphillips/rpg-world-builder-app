@@ -207,16 +207,17 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
     expect(screen.getByText('Location')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
-    expect(screen.getByText('Headquarters')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
     expect(screen.getByRole('radio', { name: /Owner/i })).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: 'Search locations…' })).not.toBeInTheDocument()
     expect(screen.queryByText('No locations are available.')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeEnabled()
     await user.click(screen.getByRole('button', { name: 'Save change' }))
 
     expect(onSubmit).toHaveBeenCalledWith({

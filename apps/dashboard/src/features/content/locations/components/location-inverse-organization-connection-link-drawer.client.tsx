@@ -41,6 +41,7 @@ import {
   buildOrganizationLocationConnectionEdgesAtLocation,
 } from '../../lib/location-connection-duplicate-keys'
 import {
+  buildOrganizationLocationChangeKindOptions,
   buildOrganizationLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -170,6 +171,18 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       excludeRelationshipId,
     )
 
+    if (mode === 'changeKind' && initialConnection) {
+      return buildOrganizationLocationChangeKindOptions({
+        location,
+        intent,
+        currentKind: initialConnection.kind,
+        subjectOrganizationId,
+        connections,
+        edgesAtLocation,
+        excludeConnectionId: excludeRelationshipId,
+      })
+    }
+
     return buildOrganizationLocationConnectionKindOptions({
       locationId: location.id,
       kinds: eligibleKinds,
@@ -182,8 +195,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     edgesAtLocation,
     eligibleKinds,
     excludeRelationshipId,
-    initialConnection?.organizationId,
-    location.id,
+    initialConnection,
+    intent,
+    location,
     mode,
     orgRows,
     resolvedAddKind,
@@ -211,10 +225,13 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       ? organizations.find((organization) => organization.id === initialConnection?.organizationId)
       : undefined
 
+  const hasChange = mode !== 'changeKind' || activeKind !== initialConnection?.kind
   const canSubmit = Boolean(
     (mode === 'changeKind'
       ? activeKind && initialConnection?.organizationId
-      : selectedOrganizationId && activeKind) && !isSubmitting,
+      : selectedOrganizationId && activeKind) &&
+    hasChange &&
+    !isSubmitting,
   )
 
   const handleSubmit = async () => {

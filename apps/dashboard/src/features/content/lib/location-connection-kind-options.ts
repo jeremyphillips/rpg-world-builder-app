@@ -25,6 +25,7 @@ import {
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   organizationInverseSubjectHasAvailableKind,
   resolveKindsForOrganizationDrawerIntent,
+  resolveOrganizationKindsForDrawerIntent,
   type OrganizationConnectionDrawerIntent,
 } from './location-connection-drawer-intent'
 import {
@@ -133,6 +134,84 @@ function resolveOrganizationLocationConnectionKindDisabledReason(input: {
   }
 
   return LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
+}
+
+export const ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON =
+  'This connection type is no longer eligible at this location.' as const
+
+/** Full change-kind picker options at a fixed location — includes the persisted current kind. */
+export function buildOrganizationLocationChangeKindOptions(input: {
+  location: Location
+  intent: OrganizationConnectionDrawerIntent
+  currentKind: OrganizationLocationConnectionKind
+  subjectOrganizationId: string
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
+  excludeConnectionId?: string
+}): LocationConnectionKindOption[] {
+  const profileKinds = resolveOrganizationKindsForDrawerIntent(input.location, input.intent)
+  const currentKindStale = !profileKinds.includes(input.currentKind)
+  const kinds = currentKindStale ? [input.currentKind, ...profileKinds] : profileKinds
+
+  const options = buildOrganizationLocationConnectionKindOptions({
+    locationId: input.location.id,
+    kinds,
+    subjectOrganizationId: input.subjectOrganizationId,
+    connections: input.connections,
+    edgesAtLocation: input.edgesAtLocation,
+    excludeConnectionId: input.excludeConnectionId,
+  })
+
+  if (!currentKindStale) {
+    return options
+  }
+
+  return options.map((option) =>
+    option.value === input.currentKind
+      ? {
+          ...option,
+          disabled: true,
+          disabledReason: ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
+        }
+      : option,
+  )
+}
+
+export function assertChangeKindPickerIncludesCurrentKind(
+  options: readonly LocationConnectionKindOption[],
+  currentKind: OrganizationLocationConnectionKind,
+): void {
+  if (!options.some((option) => option.value === currentKind)) {
+    throw new Error(`Change-kind picker must include the persisted current kind (${currentKind}).`)
+  }
+}
+
+export function assertChangeKindGatingAlignsWithPicker(input: {
+  gatingAlternates: readonly LocationConnectionKindOption[] | undefined
+  pickerOptions: readonly LocationConnectionKindOption[]
+  currentKind: OrganizationLocationConnectionKind
+}): void {
+  assertChangeKindPickerIncludesCurrentKind(input.pickerOptions, input.currentKind)
+
+  const selectableNonCurrentKinds = input.pickerOptions.filter(
+    (option) => option.value !== input.currentKind && !option.disabled,
+  )
+
+  if ((input.gatingAlternates?.length ?? 0) > 0 && selectableNonCurrentKinds.length === 0) {
+    throw new Error(
+      'Change-kind gating reported alternates, but the picker has no selectable non-current kinds.',
+    )
+  }
+
+  if ((input.gatingAlternates?.length ?? 0) === 0 && selectableNonCurrentKinds.length > 0) {
+    throw new Error(
+      'Change-kind picker has selectable non-current kinds, but gating reported no alternates.',
+    )
+  }
 }
 
 export function buildOrganizationLocationConnectionKindOptions(input: {

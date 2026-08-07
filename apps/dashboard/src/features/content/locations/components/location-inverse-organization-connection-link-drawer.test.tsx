@@ -121,9 +121,10 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
     expect(screen.queryByPlaceholderText('Search organizations')).not.toBeInTheDocument()
     expect(screen.queryByText('No organizations are available.')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeEnabled()
     await user.click(screen.getByRole('button', { name: 'Save change' }))
 
     expect(onSubmit).toHaveBeenCalledWith({
