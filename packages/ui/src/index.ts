@@ -414,6 +414,7 @@ export {
   contentCardRootVariants,
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
+  contentCardMediaVariants,
   resolveContentCardDensityInsetClasses,
   type ContentCardDensity,
   type ContentCardChrome,

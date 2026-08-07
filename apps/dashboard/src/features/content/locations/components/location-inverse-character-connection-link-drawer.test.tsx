@@ -2,14 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
-import { buildLocationsById } from '../lib/location-display'
+import { YAWNING_PORTAL } from '../fixtures'
 import { LocationInverseCharacterConnectionLinkDrawer } from './location-inverse-character-connection-link-drawer.client'
-
-const DRAWER_LOCATION_CONTEXT = {
-  locationsById: buildLocationsById(LOCATIONS_LIST),
-  campaignId: 'camp_1',
-}
 
 const characters = [
   {
@@ -29,7 +23,6 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         mode="add"
         addKind="works_at"
         location={YAWNING_PORTAL}
-        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
@@ -40,7 +33,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
   })
 
-  it('shows compact classification context instead of raw kind label', () => {
+  it('does not show route subject context in add mode', () => {
     render(
       <LocationInverseCharacterConnectionLinkDrawer
         open
@@ -48,17 +41,15 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         mode="add"
         addKind="works_at"
         location={YAWNING_PORTAL}
-        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
       />,
     )
 
-    expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
-    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
-    expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
-    expect(screen.queryByText(/Yawning Portal · Structure/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('Yawning Portal')).not.toBeInTheDocument()
+    expect(screen.queryByText('Building · Tavern')).not.toBeInTheDocument()
+    expect(screen.queryByText('Located in Dock Ward')).not.toBeInTheDocument()
   })
 
   it('opens change-kind with expanded relationship type and no character picker', async () => {
@@ -71,7 +62,6 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeKind"
         location={YAWNING_PORTAL}
-        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[
           {
@@ -101,7 +91,6 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
 
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
     expect(screen.getByText('Braggi')).toBeInTheDocument()
-    expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Connection type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Works at/i })).toBeChecked()

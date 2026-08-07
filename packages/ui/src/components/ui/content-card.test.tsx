@@ -87,6 +87,25 @@ describe('ContentCard', () => {
     expect(embedded).not.toContain('border')
   })
 
+  it('renders compact mixed heading and metadata for picker rows', () => {
+    render(
+      <ContentCard
+        density="compact"
+        heading="Kingdom of Foo"
+        headingSuffix=" · Region · Kingdom"
+        metadata="Located in Nehwon"
+        endSlot={<button type="button">Select</button>}
+      />,
+    )
+
+    expect(screen.getByText('Kingdom of Foo')).toBeInTheDocument()
+    expect(screen.getByText('Region · Kingdom')).toBeInTheDocument()
+    expect(screen.getByText('Located in Nehwon')).toHaveClass(
+      contentCardMetadataVariants({ density: 'compact' }),
+    )
+    expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
   it('applies compact density classes when requested', () => {
     render(
       <ContentCard density="compact" heading="Harbor District" subheading="Settlement overview" />,

@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import type {
   Location,
-  Organization,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -18,11 +17,11 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { buildLocationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
-import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
@@ -35,7 +34,6 @@ import {
   buildLocationEntityContextPresentation,
   type LocationEntitySummaryVm,
 } from '../../locations/lib/location-display'
-import { buildOrganizationDrawerContextEntity } from '../lib/organization-display'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
@@ -66,6 +64,7 @@ import {
   resolveOrganizationForwardAddDrawerTitle,
   resolveOrganizationForwardAddSubmitLabel,
   resolveOrganizationForwardChangeTargetDrawerTitle,
+  resolveOrganizationForwardChangeTargetEntityLabel,
   resolveOrganizationForwardFamilyAddDrawerHelper,
   resolveOrganizationForwardTargetPresentation,
 } from '../lib/organization-location-connection-surface-copy'
@@ -99,7 +98,6 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   mode: OrganizationForwardDrawerMode
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
-  organization: Pick<Organization, 'name' | 'organizationKind'>
   organizationId: string
   campaignId: string
   locations: readonly Location[]
@@ -157,7 +155,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
   mode,
   intent,
   addKind,
-  organization,
   organizationId,
   campaignId,
   locations,
@@ -426,27 +423,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
   })()
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
-  const organizationContextEntity = toDrawerContextEntity(
-    buildOrganizationDrawerContextEntity(organization),
-  )
+  const changeTargetEntityLabel = resolveOrganizationForwardChangeTargetEntityLabel(intent)
 
   const drawerContextEntities = React.useMemo(() => {
-    if (mode === 'changeKind' && lockedLocation) {
-      return [
-        organizationContextEntity,
-        toDrawerContextEntity(
-          buildLocationEntityContextPresentation(
-            buildLocationEntitySummaryVm(lockedLocation, {
-              locationsById,
-              campaignId,
-            }),
-          ),
-        ),
-      ]
+    if (mode !== 'changeKind' || !lockedLocation) {
+      return []
     }
 
-    return [organizationContextEntity]
-  }, [campaignId, lockedLocation, locationsById, mode, organizationContextEntity])
+    return [
+      toDrawerContextEntity(
+        buildLocationEntityContextPresentation(
+          buildLocationEntitySummaryVm(lockedLocation, {
+            locationsById,
+            campaignId,
+          }),
+        ),
+      ),
+    ]
+  }, [campaignId, lockedLocation, locationsById, mode])
 
   const mutationEmptyMessage =
     mode === 'changeTarget'
@@ -541,7 +535,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
           {mode === 'changeTarget' &&
           (currentEndpoint || (showLocationPicker && !showMutationEmptyState)) ? (
             <EntityReplacementSection
-              entityLabel={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
+              entityLabel={changeTargetEntityLabel}
               current={currentEndpoint}
               showNewSection={showLocationPicker && !showMutationEmptyState}
               newHelper={targetPresentation.targetHelp}
@@ -643,13 +637,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={summary?.name ?? location.name}
-            subheading={kindAvailable ? summary?.classification.text : fullyLinkedReason}
-            metadata={
-              kindAvailable && summary && summary.ancestry.items.length > 0
-                ? summary.ancestry.text
-                : undefined
-            }
+            {...(summary
+              ? buildLocationPickerCardPresentation(summary)
+              : { heading: location.name })}
+            subheading={!kindAvailable ? fullyLinkedReason : undefined}
             imageKey={location.imageKey}
             disabled={!kindAvailable}
             endSlot={

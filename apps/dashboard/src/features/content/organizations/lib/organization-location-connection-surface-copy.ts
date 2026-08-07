@@ -3,6 +3,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import type { OrganizationConnectionDrawerIntent } from '../../lib/location-connection-drawer-intent'
 import type { OrganizationLocationTargetBrowseScope } from './organization-location-target-browse-scope'
 
 export type OrganizationForwardTargetPresentationConfig = {
@@ -114,8 +115,9 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add area of operation',
     addDrawerInstruction: 'Choose a geographic area where this organization operates.',
     addSubmit: 'Add area of operation',
+    changeTargetDrawerTitle: 'Change area of operation',
     targetPresentation: {
-      targetHelp: 'Choose a settlement or region where this organization is present.',
+      targetHelp: 'Choose a settlement or region for this area of operation.',
       browseScopes: ['all', 'settlement', 'region'],
     },
   },
@@ -125,6 +127,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add governed location',
     addDrawerInstruction: 'Choose a location this organization governs.',
     addSubmit: 'Add governed location',
+    changeTargetDrawerTitle: 'Change governed territory',
   },
   controls: {
     empty: 'No controlled locations linked.',
@@ -132,6 +135,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add controlled location',
     addDrawerInstruction: 'Choose a location this organization controls.',
     addSubmit: 'Add controlled location',
+    changeTargetDrawerTitle: 'Change controlled territory',
   },
   claims: {
     empty: 'No territorial claims linked.',
@@ -139,6 +143,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add claim',
     addDrawerInstruction: 'Choose a location this organization claims.',
     addSubmit: 'Add claim',
+    changeTargetDrawerTitle: 'Change claimed territory',
   },
 } satisfies Record<OrganizationLocationConnectionKind, OrganizationForwardSurfaceCopy>
 
@@ -164,13 +169,13 @@ export const ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY = {
   geographic_presence: {
     viewLocation: 'View location',
     changeKind: 'Change connection type',
-    changeTarget: 'Change location',
+    changeTarget: 'Change area',
     remove: 'Remove area of operation',
   },
   territorial_authority: {
     viewLocation: 'View location',
     changeKind: 'Change authority type',
-    changeTarget: 'Change location',
+    changeTarget: 'Change territory',
     remove: 'Remove authority',
   },
 } as const satisfies Record<OrganizationLocationConnectionFamily, OrganizationForwardOverflowLabels>
@@ -213,6 +218,12 @@ export function resolveOrganizationForwardChangeTargetDrawerTitle(
     ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].changeTargetDrawerTitle ??
     ORGANIZATION_FORWARD_DEFAULT_CHANGE_TARGET_DRAWER_TITLE
   )
+}
+
+export function resolveOrganizationForwardChangeTargetEntityLabel(
+  intent: OrganizationConnectionDrawerIntent,
+): string {
+  return intent === 'territorial_authority' ? 'Territory' : 'Location'
 }
 
 export function resolveOrganizationForwardAddDrawerTitle(

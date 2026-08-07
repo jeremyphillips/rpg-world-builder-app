@@ -49,7 +49,6 @@ export function OrganizationLocationConnectionsDetailSection({
           mode={detail.drawerState.mode}
           intent={detail.drawerState.intent}
           addKind={detail.drawerState.mode === 'add' ? detail.drawerState.kind : undefined}
-          organization={organization}
           organizationId={organization.id}
           campaignId={campaignId}
           locations={detail.locations as Location[]}

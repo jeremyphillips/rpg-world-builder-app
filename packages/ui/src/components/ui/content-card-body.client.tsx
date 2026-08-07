@@ -3,12 +3,12 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { ContentCardHeading } from './content-card-heading.client'
 import { resolveContentCardHeadingRowRhythm } from './content-card.lib'
 import {
   contentCardBodyVariants,
   contentCardHeadingEndSlotVariants,
   contentCardHeadingRowVariants,
-  contentCardHeadingVariants,
   contentCardMetadataVariants,
   contentCardSubheadingVariants,
   type ContentCardDensity,
@@ -16,6 +16,7 @@ import {
 
 export type ContentCardBodyProps = {
   heading: ReactNode
+  headingSuffix?: ReactNode
   subheading?: ReactNode
   metadata?: ReactNode
   media?: ReactNode
@@ -30,6 +31,7 @@ export type ContentCardBodyProps = {
 /** @internal Layout-only entity row anatomy — use {@link ContentCard} or dashboard `ContentEntityCard`. */
 export function ContentCardBody({
   heading,
+  headingSuffix,
   subheading,
   metadata,
   media,
@@ -48,12 +50,12 @@ export function ContentCardBody({
   })
 
   return (
-    <div className={cn(contentCardBodyVariants({ rowAlign }), className)}>
+    <div className={cn(contentCardBodyVariants({ density, rowAlign }), className)}>
       {media ? <div className="shrink-0">{media}</div> : null}
       <div className="min-w-0 flex-1">
         <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
-          <div className={cn('min-w-0 flex-1', contentCardHeadingVariants({ density }))}>
-            {heading}
+          <div className="min-w-0 flex-1">
+            <ContentCardHeading heading={heading} headingSuffix={headingSuffix} density={density} />
           </div>
           {headingEndSlot ? (
             <div className={contentCardHeadingEndSlotVariants()}>{headingEndSlot}</div>
@@ -67,7 +69,7 @@ export function ContentCardBody({
         ) : null}
         {footer ? <div className="mt-2">{footer}</div> : null}
       </div>
-      {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+      {endSlot ? <div className="shrink-0 self-center">{endSlot}</div> : null}
     </div>
   )
 }

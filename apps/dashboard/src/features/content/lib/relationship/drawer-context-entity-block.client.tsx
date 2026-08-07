@@ -36,6 +36,7 @@ function splitHeadingSuffix(headingSuffix: ReactNode): {
 
 export type DrawerContextEntityBlockProps = DrawerContextEntity & {
   className?: string
+  supportingTextSize?: 'sm' | 'xs'
 }
 
 export function DrawerContextEntityBlock({
@@ -44,6 +45,7 @@ export function DrawerContextEntityBlock({
   supportingText,
   href,
   className,
+  supportingTextSize,
 }: DrawerContextEntityBlockProps) {
   const resolvedHeading = href ? (
     <span className={drawerContextEntityHeadingNameVariants()}>
@@ -77,7 +79,9 @@ export function DrawerContextEntityBlock({
           : null}
       </div>
       {supportingText ? (
-        <p className={drawerContextEntitySupportingTextVariants()}>{supportingText}</p>
+        <p className={drawerContextEntitySupportingTextVariants({ size: supportingTextSize })}>
+          {supportingText}
+        </p>
       ) : null}
     </div>
   )

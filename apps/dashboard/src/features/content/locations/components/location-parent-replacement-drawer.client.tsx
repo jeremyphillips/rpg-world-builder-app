@@ -12,15 +12,13 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { buildLocationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   buildLocationEntitySummarySearchText,
   type LocationEntitySummaryVm,
 } from '../lib/location-display'
-import { buildLocationDrawerContextFromCampaignLocations } from '../lib/location-drawer-context.lib'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -100,9 +98,7 @@ function LocationParentReplacementCandidateRow({
     <ContentEntityCard
       chrome="embedded"
       density="compact"
-      heading={summary.name}
-      subheading={summary.classification.text}
-      metadata={summary.ancestry.items.length > 0 ? summary.ancestry.text : undefined}
+      {...buildLocationPickerCardPresentation(summary)}
       imageKey={summary.imageKey}
       endSlot={
         <CatalogPickerSelectionActions
@@ -172,7 +168,6 @@ export function LocationParentReplacementDrawer(props: LocationParentReplacement
 
 function LocationParentReplacementDrawerHeader({
   subject,
-  campaignLocations,
   surface,
   mode,
   currentParent,
@@ -182,7 +177,6 @@ function LocationParentReplacementDrawerHeader({
   onParentBrowseScopeChange,
 }: {
   subject: Location
-  campaignLocations: readonly Location[]
   surface: LocationParentReplacementDrawerSurface
   mode: LocationParentReplacementMode
   currentParent: LocationParentReplacementCurrentSnapshot | null
@@ -193,13 +187,6 @@ function LocationParentReplacementDrawerHeader({
 }) {
   return (
     <div className="space-y-4">
-      <DrawerContext
-        entities={[
-          toDrawerContextEntity(
-            buildLocationDrawerContextFromCampaignLocations(subject, campaignLocations),
-          ),
-        ]}
-      />
       <EntityReplacementSection
         entityLabel="Parent"
         current={currentParent ? toEntityReplacementCurrentSnapshot(currentParent) : null}
@@ -301,7 +288,6 @@ function LocationParentReplacementDrawerContent({
       headerBelowDescription={
         <LocationParentReplacementDrawerHeader
           subject={subject}
-          campaignLocations={campaignLocations}
           surface={surface}
           mode={mode}
           currentParent={currentParent}

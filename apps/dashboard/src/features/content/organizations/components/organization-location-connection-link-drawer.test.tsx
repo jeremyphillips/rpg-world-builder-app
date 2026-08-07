@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import type { Location, Organization } from '@rpg/contracts'
+import type { Location } from '@rpg/contracts'
 
 import {
   DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
@@ -18,11 +18,6 @@ import {
 import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship/relationship-alternatives'
 import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { buildLocationsById } from '../../locations/lib/location-display'
-
-const organization: Pick<Organization, 'name' | 'organizationKind'> = {
-  name: 'The Monarchy',
-  organizationKind: 'government',
-}
 
 const DRAWER_CAMPAIGN_ID = 'camp-1'
 
@@ -89,7 +84,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
@@ -99,8 +93,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('The Monarchy')).toBeInTheDocument()
-    expect(screen.getByText('Organization')).toBeInTheDocument()
     expect(
       screen.getByText(
         /Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters/i,
@@ -126,7 +118,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           guildhouse,
@@ -156,7 +147,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="geographic_presence"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
@@ -173,7 +163,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Location type' })).toBeInTheDocument()
     expect(
-      screen.getByText('Choose a settlement or region where this organization is present.'),
+      screen.getByText('Choose a settlement or region for this area of operation.'),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
@@ -190,7 +180,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="geographic_presence"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           regionLocation(),
@@ -230,7 +219,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="geographic_presence"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           regionLocation(),
@@ -264,7 +252,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="geographic_presence"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
@@ -288,7 +275,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="territorial_authority"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([regionLocation()])}
         existingConnections={[]}
@@ -326,7 +312,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
           onOpenChange={setOpen}
           mode="add"
           intent="site"
-          organization={organization}
           organizationId="org-1"
           {...withOrganizationLocationDrawerIndex([buildingLocation()])}
           existingConnections={[]}
@@ -359,7 +344,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeKind"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }]}
@@ -371,7 +355,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
-    expect(screen.getByText('The Monarchy')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
     expect(screen.queryByText('Location')).not.toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
@@ -410,7 +393,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([infrastructureLocation, buildingLocation()])}
         existingConnections={[]}
@@ -452,7 +434,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeTarget"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([guildhouse, settlementLocation(), silverEel])}
         existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
@@ -513,7 +494,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeTarget"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([silverEel])}
         existingConnections={[
@@ -549,7 +529,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeTarget"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }]}
@@ -585,7 +564,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([settlementLocation(), silverEel])}
         existingConnections={[]}
@@ -612,7 +590,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
@@ -643,7 +620,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="add"
         intent="site"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([buildingLocation()])}
         existingConnections={[]}
@@ -657,6 +633,106 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('shows area-of-operation changeTarget without organization context chrome', async () => {
+    const lankhmar = settlementLocation({ id: 'settlement-lankhmar', name: 'Lankhmar' })
+    const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
+    const portCity = settlementLocation()
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="geographic_presence"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([lankhmar, nehwon, portCity])}
+        existingConnections={[{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-1', locationId: lankhmar.id, kind: 'operates_in' }}
+        currentEndpoint={{
+          entity: {
+            heading: 'Lankhmar',
+            headingSuffix: ' · Settlement · City',
+            supportingText: 'Located in Nehwon',
+          },
+        }}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Change area of operation' })).toBeInTheDocument()
+    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
+    expect(screen.queryByText('The Monarchy')).not.toBeInTheDocument()
+    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('New location')).toBeInTheDocument()
+    expect(screen.getByText('Lankhmar')).toBeInTheDocument()
+    expect(screen.getByText('Settlement · City')).toBeInTheDocument()
+    expect(screen.getByText('Located in Nehwon')).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose a settlement or region for this area of operation.'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
+
+    await user.click(
+      within(screen.getByText('Port City').closest('article')!).getByRole('button', {
+        name: 'Select',
+      }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Save change' }))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      locationId: portCity.id,
+      kind: 'operates_in',
+    })
+  })
+
+  it('shows territorial changeTarget with territory replacement labels', () => {
+    const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
+    const kingdom = regionLocation({
+      id: 'region-kingdom',
+      name: 'Kingdom of Foo',
+      parentLocationId: nehwon.id,
+    })
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="territorial_authority"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([nehwon, kingdom, regionLocation()])}
+        existingConnections={[{ id: 'conn-1', locationId: kingdom.id, kind: 'governs' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-1', locationId: kingdom.id, kind: 'governs' }}
+        currentEndpoint={{
+          entity: {
+            heading: 'Kingdom of Foo',
+            headingSuffix: ' · Region · Kingdom',
+            supportingText: 'Located in Nehwon',
+          },
+        }}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Change governed territory' })).toBeInTheDocument()
+    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
+    expect(screen.queryByText('The Monarchy')).not.toBeInTheDocument()
+    expect(screen.getByText('Current territory')).toBeInTheDocument()
+    expect(screen.getByText('New territory')).toBeInTheDocument()
+    expect(screen.getByText('Kingdom of Foo')).toBeInTheDocument()
+    expect(screen.getByText('Region · Kingdom')).toBeInTheDocument()
+    expect(screen.getByText('Located in Nehwon')).toBeInTheDocument()
+  })
+
   it('does not show authoritative-empty for changeTarget when candidate set is partial', () => {
     const current = regionLocation()
 
@@ -666,7 +742,6 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeTarget"
         intent="geographic_presence"
-        organization={organization}
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([current])}
         locationCandidates={{ items: [current], isAuthoritativeDomainSet: false }}

@@ -182,9 +182,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Guildhall')).toBeInTheDocument()
-    expect(screen.getByText('Building')).toBeInTheDocument()
-    expect(screen.queryByText('Guildhall · Building · Headquarters')).not.toBeInTheDocument()
+    expect(screen.queryByText('Guildhall')).not.toBeInTheDocument()
+    expect(screen.queryByText('Building')).not.toBeInTheDocument()
     expect(
       screen.queryByText(TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults),
     ).not.toBeInTheDocument()
@@ -222,8 +221,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: TERRITORIAL_AUTHORITY_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Port City')).toBeInTheDocument()
-    expect(screen.getByText('Settlement')).toBeInTheDocument()
+    expect(screen.queryByText('Port City')).not.toBeInTheDocument()
+    expect(screen.queryByText('Settlement')).not.toBeInTheDocument()
   })
 
   it('shows current and new organization fields with replacement picker', async () => {

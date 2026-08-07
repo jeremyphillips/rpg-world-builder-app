@@ -18,4 +18,14 @@ export const drawerContextEntityHeadingSuffixVariants = cva(
   'min-w-0 flex-1 truncate font-normal text-muted-foreground',
 )
 
-export const drawerContextEntitySupportingTextVariants = cva('text-sm italic text-muted-foreground')
+export const drawerContextEntitySupportingTextVariants = cva('italic text-muted-foreground', {
+  variants: {
+    size: {
+      sm: 'text-sm',
+      xs: 'text-xs',
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+  },
+})

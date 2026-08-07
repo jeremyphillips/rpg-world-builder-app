@@ -20,8 +20,10 @@ import {
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
+import {
+  buildCharacterPickerCardPresentation,
+  buildOrganizationPickerCardPresentation,
+} from '../../lib/content-entity-picker-presentation.lib'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -44,12 +46,8 @@ import {
   resolveLocationInverseOrganizationAddSubmitLabel,
   resolveLocationInverseOrganizationTargetPresentation,
 } from '../lib/location-connection-surface-copy'
-import { buildLocationDrawerContextPresentation } from '../lib/location-drawer-context.lib'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
-import {
-  buildConnectedPartyCharacterPickerSearchText,
-  formatConnectedPartyCharacterPickerSubheading,
-} from '../lib/location-connected-party-character-options.lib'
+import { buildConnectedPartyCharacterPickerSearchText } from '../lib/location-connected-party-character-options.lib'
 import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
@@ -67,8 +65,6 @@ export type LocationInversePeopleConnectionLinkDrawerProps = {
   onOpenChange: (open: boolean) => void
   kindSlots: readonly PeopleKindSlot[]
   location: Location
-  locationsById?: ReadonlyMap<string, Location>
-  campaignId?: string
   organizations: readonly Organization[]
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -115,8 +111,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onOpenChange,
   kindSlots,
   location,
-  locationsById,
-  campaignId,
   organizations,
   characters,
   connectedPartyRows,
@@ -279,17 +273,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[organizationIntent]
       : 'All eligible connection types are already linked.'
 
-  const locationContextEntity = React.useMemo(
-    () =>
-      toDrawerContextEntity(
-        buildLocationDrawerContextPresentation(location, { locationsById, campaignId }),
-      ),
-    [campaignId, location, locationsById],
-  )
-
   const headerBelowDescription = (
     <div className="space-y-4">
-      <DrawerContext entities={[locationContextEntity]} />
       {kindOptions.length > 0 ? (
         <LocationConnectionKindStep
           id="location-people-connection-kind"
@@ -378,12 +363,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             <ContentEntityCard
               chrome="embedded"
               density="compact"
-              heading={organization.name}
-              subheading={
-                hasAvailableKind
-                  ? getOrganizationKindLabel(organization.organizationKind)
-                  : organizationFullyLinkedReason
-              }
+              {...buildOrganizationPickerCardPresentation(organization)}
+              subheading={!hasAvailableKind ? organizationFullyLinkedReason : undefined}
               imageKey={organization.imageKey}
               disabled={!hasAvailableKind}
               endSlot={
@@ -435,12 +416,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={character.name}
-            subheading={
-              hasAvailableKind
-                ? formatConnectedPartyCharacterPickerSubheading(character)
-                : CHARACTER_DRAWER_FULLY_LINKED_REASON
-            }
+            {...buildCharacterPickerCardPresentation(character)}
+            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
             disabled={!hasAvailableKind}
             endSlot={
               <CatalogPickerSelectionActions

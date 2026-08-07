@@ -31,7 +31,11 @@ export function EntityReplacementCurrentField({
               className="shrink-0"
             />
           ) : null}
-          <DrawerContextEntityBlock {...entity} className="min-w-0 flex-1" />
+          <DrawerContextEntityBlock
+            {...entity}
+            className="min-w-0 flex-1"
+            supportingTextSize="xs"
+          />
         </div>
       </InsetPanel>
     </div>

@@ -24,6 +24,7 @@ import {
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { buildCharacterPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
@@ -42,12 +43,10 @@ import {
   resolveLocationInverseCharacterAddSubmitLabel,
   resolveLocationInverseCharacterTargetPresentation,
 } from '../lib/location-connection-surface-copy'
-import { buildLocationDrawerContextPresentation } from '../lib/location-drawer-context.lib'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import {
   buildConnectedPartyCharacterEntitySummary,
   buildConnectedPartyCharacterPickerSearchText,
-  formatConnectedPartyCharacterPickerSubheading,
 } from '../lib/location-connected-party-character-options.lib'
 import { buildCharacterEntityContextPresentation } from '@/features/character'
 
@@ -62,8 +61,6 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   mode: Extract<RelationshipMutationMode, 'add' | 'changeKind'>
   addKind?: CharacterLocationConnectionKind
   location: Location
-  locationsById?: ReadonlyMap<string, Location>
-  campaignId?: string
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -92,8 +89,6 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   mode,
   addKind,
   location,
-  locationsById,
-  campaignId,
   characters,
   connectedPartyRows,
   initialConnection,
@@ -206,24 +201,18 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
   const drawerContextEntities = React.useMemo(() => {
-    const entities = [
-      toDrawerContextEntity(
-        buildLocationDrawerContextPresentation(location, { locationsById, campaignId }),
-      ),
-    ]
-
-    if (mode === 'changeKind' && lockedCharacter) {
-      entities.push(
-        toDrawerContextEntity(
-          buildCharacterEntityContextPresentation(
-            buildConnectedPartyCharacterEntitySummary(lockedCharacter),
-          ),
-        ),
-      )
+    if (mode !== 'changeKind' || !lockedCharacter) {
+      return []
     }
 
-    return entities
-  }, [campaignId, location, lockedCharacter, locationsById, mode])
+    return [
+      toDrawerContextEntity(
+        buildCharacterEntityContextPresentation(
+          buildConnectedPartyCharacterEntitySummary(lockedCharacter),
+        ),
+      ),
+    ]
+  }, [lockedCharacter, mode])
 
   return (
     <CatalogPickerSheet
@@ -289,12 +278,8 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={character.name}
-            subheading={
-              hasAvailableKind
-                ? formatConnectedPartyCharacterPickerSubheading(character)
-                : CHARACTER_DRAWER_FULLY_LINKED_REASON
-            }
+            {...buildCharacterPickerCardPresentation(character)}
+            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
             disabled={!hasAvailableKind}
             endSlot={
               <CatalogPickerSelectionActions

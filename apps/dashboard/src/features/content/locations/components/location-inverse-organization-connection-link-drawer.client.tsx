@@ -19,6 +19,7 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { buildOrganizationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -53,7 +54,6 @@ import {
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
 } from '../lib/location-connection-surface-copy'
-import { buildLocationDrawerContextPresentation } from '../lib/location-drawer-context.lib'
 import { buildOrganizationDrawerContextEntity } from '../../organizations/lib/organization-display'
 
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
@@ -67,8 +67,6 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
   location: Location
-  locationsById?: ReadonlyMap<string, Location>
-  campaignId?: string
   organizations: readonly Organization[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -109,8 +107,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   intent,
   addKind,
   location,
-  locationsById,
-  campaignId,
   organizations,
   connectedPartyRows,
   initialConnection,
@@ -297,24 +293,13 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     ? resolveLocationInverseOrganizationAddDrawerInstruction(resolvedAddKind)
     : null
 
-  const locationContextEntity = React.useMemo(
-    () =>
-      toDrawerContextEntity(
-        buildLocationDrawerContextPresentation(location, { locationsById, campaignId }),
-      ),
-    [campaignId, location, locationsById],
-  )
-
   const drawerContextEntities = React.useMemo(() => {
-    if (mode === 'changeKind' && lockedOrganization) {
-      return [
-        locationContextEntity,
-        toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization)),
-      ]
+    if (mode !== 'changeKind' || !lockedOrganization) {
+      return []
     }
 
-    return [locationContextEntity]
-  }, [locationContextEntity, lockedOrganization, mode])
+    return [toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization))]
+  }, [lockedOrganization, mode])
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
   const kindFieldLabel =
@@ -435,12 +420,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={organization.name}
-            subheading={
-              hasAvailableKind
-                ? getOrganizationKindLabel(organization.organizationKind)
-                : fullyLinkedReason
-            }
+            {...buildOrganizationPickerCardPresentation(organization)}
+            subheading={!hasAvailableKind ? fullyLinkedReason : undefined}
             imageKey={organization.imageKey}
             disabled={!hasAvailableKind}
             endSlot={
