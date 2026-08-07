@@ -10,11 +10,9 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
+import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import {
-  RelationshipFieldGroup,
-  RelationshipFieldGroupRow,
-} from '../../lib/relationship/relationship-field-group.client'
+import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import {
   isRelationshipMutationActionVisible,
@@ -218,7 +216,7 @@ export function LocationTerritorialAuthoritySectionBody({
   })
 
   return (
-    <RelationshipFieldGroup
+    <DetailSectionPanel
       heading={TERRITORIAL_AUTHORITY_SECTION_HEADING}
       headingId={TERRITORIAL_AUTHORITY_HEADING_ID}
       helper={showHelper ? TERRITORIAL_AUTHORITY_SECTION_HELPER : undefined}
@@ -298,7 +296,7 @@ export function LocationTerritorialAuthoritySectionBody({
           ) : null}
         </RelationshipFieldGroupRow>
       ) : null}
-    </RelationshipFieldGroup>
+    </DetailSectionPanel>
   )
 }
 

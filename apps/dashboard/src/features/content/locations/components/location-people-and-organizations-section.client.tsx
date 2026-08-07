@@ -9,11 +9,9 @@ import type {
 import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
+import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import {
-  RelationshipFieldGroup,
-  RelationshipFieldGroupRow,
-} from '../../lib/relationship/relationship-field-group.client'
+import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import {
   isRelationshipMutationActionVisible,
@@ -199,7 +197,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
   const familyAddEnabled = canManage && canAddToSection && Boolean(onAddPeopleSection)
 
   return (
-    <RelationshipFieldGroup heading={heading} headingId={headingId} helper={helper}>
+    <DetailSectionPanel heading={heading} headingId={headingId} helper={helper}>
       {hasRows ? (
         <>
           {populatedSlots.map((slot) => {
@@ -261,6 +259,6 @@ export function LocationPeopleAndOrganizationsSectionBody({
           />
         </div>
       ) : null}
-    </RelationshipFieldGroup>
+    </DetailSectionPanel>
   )
 }

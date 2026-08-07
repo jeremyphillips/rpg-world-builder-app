@@ -116,35 +116,40 @@ export function LocationConnectedPartiesSection({
   const sectionHeadingId = resolveLocationConnectedPartiesSectionHeadingId(sectionGroup)
   const showFieldGroupHeader = usesFieldGroupHeader(sectionGroup)
 
+  const body = (
+    <LocationConnectedPartiesSectionBody
+      campaignId={campaignId}
+      sectionGroup={sectionGroup}
+      sectionRows={sectionRows}
+      sectionHeadingId={sectionHeadingId}
+      peopleKindSlots={peopleKindSlots}
+      canManage={canManage}
+      canAddToPeopleSection={canAddToPeopleSection}
+      peopleMutationContext={peopleMutationContext}
+      territorialMutationContext={territorialMutationContext}
+      onAddPeopleSection={onAddPeopleSection}
+      onAddTerritorialKind={onAddTerritorialKind}
+      onEditConnection={onEditConnection}
+      onChangeTerritorialKind={onChangeTerritorialKind}
+      onReplaceTerritorialOrganization={onReplaceTerritorialOrganization}
+      onRemoveConnection={onRemoveConnection}
+      canEditRow={canEditRow}
+      canRemoveRow={canRemoveRow}
+    />
+  )
+
+  if (showFieldGroupHeader) {
+    return body
+  }
+
   return (
     <section className="space-y-4" aria-labelledby={sectionHeadingId}>
-      {!showFieldGroupHeader ? (
-        <LocationConnectedPartiesSectionHeader
-          sectionGroup={sectionGroup}
-          canManage={canManage}
-          hasRows={sectionRows.length > 0}
-        />
-      ) : null}
-
-      <LocationConnectedPartiesSectionBody
-        campaignId={campaignId}
+      <LocationConnectedPartiesSectionHeader
         sectionGroup={sectionGroup}
-        sectionRows={sectionRows}
-        sectionHeadingId={sectionHeadingId}
-        peopleKindSlots={peopleKindSlots}
         canManage={canManage}
-        canAddToPeopleSection={canAddToPeopleSection}
-        peopleMutationContext={peopleMutationContext}
-        territorialMutationContext={territorialMutationContext}
-        onAddPeopleSection={onAddPeopleSection}
-        onAddTerritorialKind={onAddTerritorialKind}
-        onEditConnection={onEditConnection}
-        onChangeTerritorialKind={onChangeTerritorialKind}
-        onReplaceTerritorialOrganization={onReplaceTerritorialOrganization}
-        onRemoveConnection={onRemoveConnection}
-        canEditRow={canEditRow}
-        canRemoveRow={canRemoveRow}
+        hasRows={sectionRows.length > 0}
       />
+      {body}
     </section>
   )
 }

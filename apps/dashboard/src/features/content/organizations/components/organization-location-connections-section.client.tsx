@@ -22,10 +22,8 @@ import {
   OrganizationLocationConnectionRelationshipRow,
   type OrganizationLocationConnectionMutationContext,
 } from './organization-location-connection-relationship-row.client'
-import {
-  RelationshipFieldGroup,
-  RelationshipFieldGroupRow,
-} from '../../lib/relationship/relationship-field-group.client'
+import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
+import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
@@ -140,7 +138,7 @@ export function OrganizationLocationConnectionsSection({
             const familyAddEnabled = canManage && Boolean(canAddToFamily[family])
 
             return (
-              <RelationshipFieldGroup
+              <DetailSectionPanel
                 key={family}
                 heading={ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family]}
                 headingId={`organization-location-connections-${family}-heading`}
@@ -201,7 +199,7 @@ export function OrganizationLocationConnectionsSection({
                     />
                   </div>
                 ) : null}
-              </RelationshipFieldGroup>
+              </DetailSectionPanel>
             )
           })}
         </div>

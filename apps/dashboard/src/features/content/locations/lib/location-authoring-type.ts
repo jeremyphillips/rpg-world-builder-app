@@ -16,6 +16,8 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption, SelectFieldOptionListItem } from '@rpg/ui/form'
 
+import { LOCATION_KIND_BROWSE_FAMILIES } from './location-kind-browse-families'
+
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 
 /** Generic unclassified structure — maps to `kind: 'structure'` with no `structureType`. */
@@ -250,45 +252,21 @@ function structureAuthoringTypeOption(
 
 /** Grouped location type options for the authoring select. */
 export function buildLocationAuthoringTypeOptions(): SelectFieldOptionListItem[] {
-  const worldAndRegions = [
-    'plane',
-    'world',
-    'region',
-  ] as const satisfies readonly NonStructureLocationKind[]
-  const settlements = [
-    'settlement',
-    'district',
-  ] as const satisfies readonly NonStructureLocationKind[]
-  const sites = ['site'] as const satisfies readonly NonStructureLocationKind[]
-  const interiors = ['interior'] as const satisfies readonly NonStructureLocationKind[]
+  return LOCATION_KIND_BROWSE_FAMILIES.map((family) => {
+    if (family.id === 'structures') {
+      return {
+        kind: 'group' as const,
+        label: family.label,
+        options: [...STRUCTURE_TYPE_IDS, UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE].map(
+          structureAuthoringTypeOption,
+        ),
+      }
+    }
 
-  return [
-    {
-      kind: 'group',
-      label: 'World & regions',
-      options: worldAndRegions.map(nonStructureKindOption),
-    },
-    {
-      kind: 'group',
-      label: 'Settlements',
-      options: settlements.map(nonStructureKindOption),
-    },
-    {
-      kind: 'group',
-      label: 'Sites',
-      options: sites.map(nonStructureKindOption),
-    },
-    {
-      kind: 'group',
-      label: 'Structures',
-      options: [...STRUCTURE_TYPE_IDS, UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE].map(
-        structureAuthoringTypeOption,
-      ),
-    },
-    {
-      kind: 'group',
-      label: 'Interiors',
-      options: interiors.map(nonStructureKindOption),
-    },
-  ]
+    return {
+      kind: 'group' as const,
+      label: family.label,
+      options: family.kinds.map((kind) => nonStructureKindOption(kind)),
+    }
+  })
 }

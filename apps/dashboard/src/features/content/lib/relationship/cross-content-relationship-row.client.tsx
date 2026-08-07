@@ -1,20 +1,15 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { cn, contentCardHeadingLinkVariants } from '@rpg/ui'
 
+import { cn } from '@rpg/ui'
+
+import { DetailEntityRow } from '../detail/detail-entity-row.client'
+import { detailEntityRowSubheadingVariants } from '../detail/detail-entity-row.variants'
 import {
-  crossContentRelationshipRowContentVariants,
-  crossContentRelationshipRowEyebrowVariants,
-  crossContentRelationshipRowHeadingVariants,
-  crossContentRelationshipRowSecondaryTextVariants,
-  crossContentRelationshipRowVariants,
-} from './cross-content-relationship-row.variants'
-import {
-  RelationshipOverflowMenu,
-  type RelationshipOverflowAction,
-} from './relationship-overflow-menu.client'
+  DetailOverflowMenu,
+  type DetailOverflowAction,
+} from '../detail/detail-overflow-menu.client'
 
 export type CrossContentRelationshipRowProps = {
   relationshipEyebrow?: ReactNode
@@ -24,7 +19,7 @@ export type CrossContentRelationshipRowProps = {
   subheading?: ReactNode
   secondaryText?: ReactNode
   metadata?: ReactNode
-  actions?: readonly RelationshipOverflowAction[]
+  actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
   className?: string
 }
@@ -41,33 +36,24 @@ export function CrossContentRelationshipRow({
   className,
 }: CrossContentRelationshipRowProps) {
   const resolvedSecondaryText = secondaryText ?? subheading
-  const resolvedHeading = href ? (
-    <Link to={href} className={contentCardHeadingLinkVariants()}>
-      {heading}
-    </Link>
-  ) : (
-    heading
-  )
 
   return (
-    <article className={cn(crossContentRelationshipRowVariants(), className)}>
-      <div className={crossContentRelationshipRowContentVariants()}>
-        {relationshipEyebrow ? (
-          <p className={crossContentRelationshipRowEyebrowVariants()}>{relationshipEyebrow}</p>
-        ) : null}
-        <p className={crossContentRelationshipRowHeadingVariants()}>{resolvedHeading}</p>
-        {resolvedSecondaryText ? (
-          <p className={crossContentRelationshipRowSecondaryTextVariants()}>
-            {resolvedSecondaryText}
-          </p>
-        ) : null}
-        {metadata ? (
-          <div className={crossContentRelationshipRowSecondaryTextVariants()}>{metadata}</div>
-        ) : null}
-      </div>
-      {actions.length > 0 ? (
-        <RelationshipOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
+    <div className={cn(className)}>
+      {relationshipEyebrow ? (
+        <p className={detailEntityRowSubheadingVariants()}>{relationshipEyebrow}</p>
       ) : null}
-    </article>
+      <DetailEntityRow
+        className="px-0 py-0"
+        heading={heading}
+        href={href}
+        subheading={resolvedSecondaryText}
+        metadata={metadata}
+        endSlot={
+          actions.length > 0 ? (
+            <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
+          ) : undefined
+        }
+      />
+    </div>
   )
 }

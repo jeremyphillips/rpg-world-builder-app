@@ -8,9 +8,9 @@ import { Heading, Text, toast } from '@rpg/ui'
 
 import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 import {
-  RelationshipOverflowMenu,
-  type RelationshipOverflowAction,
-} from '../../lib/relationship/relationship-overflow-menu.client'
+  DetailOverflowMenu,
+  type DetailOverflowAction,
+} from '../../lib/detail/detail-overflow-menu.client'
 import { LOCATION_SECTION_LABELS, type LocationChildrenViewModel } from '../lib/location-display'
 import {
   applyLocationParentReplacement,
@@ -115,7 +115,7 @@ export function LocationChildrenSection({
       ) : (
         <ul className="space-y-2">
           {items.map((item) => {
-            const actions: RelationshipOverflowAction[] = canManage
+            const actions: DetailOverflowAction[] = canManage
               ? [
                   {
                     id: 'view',
@@ -138,7 +138,7 @@ export function LocationChildrenSection({
                   subheading={item.summaryLine}
                   headingEndSlot={
                     canManage ? (
-                      <RelationshipOverflowMenu
+                      <DetailOverflowMenu
                         actions={actions}
                         triggerLabel={`Actions for ${item.name}`}
                       />

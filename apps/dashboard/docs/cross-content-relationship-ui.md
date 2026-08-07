@@ -40,35 +40,37 @@ Default populated row:
 
 Compact list presentation — no card border/background on relationship rows. Row chrome uses compact action density (`Button density="compact"` on overflow triggers and inline add actions).
 
-## Field group layout
+## Detail section layout
 
-Use **`RelationshipFieldGroup`** + **`RelationshipFieldGroupRow`** when a section groups multiple relationship kinds under one titled block (location Territorial Authority, People & organizations, organization forward family groups).
+Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/features/content/lib/detail/). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells.
+
+Use **`DetailSectionPanel`** + **`RelationshipFieldGroupRow`** when a section groups multiple relationship kinds under one titled block (location Territorial Authority, People & organizations, organization forward family groups).
 
 ```text
-┌ RelationshipFieldGroup (rounded-md border border-border-subtle) ─┐
-│ Header (bg-card px-4 py-2)                                       │
-│   Section title (Heading variant="label") + optional 14px helper   │
-├ Body (bg-surface-subtle) ────────────────────────────────────────┤
-│ RelationshipFieldGroupRow (px-4 py-2, border-b between rows)     │
-│   Eyebrow size="sm" + row content                                │
-│ RelationshipFieldGroupRow …                                      │
-└──────────────────────────────────────────────────────────────────┘
+┌ DetailSectionPanel (<section aria-labelledby>, rounded-md border border-border-subtle) ─┐
+│ Header (bg-card px-4 py-2) — title, helper, optional headerEndSlot                      │
+├ Body (bg-surface-subtle) ──────────────────────────────────────────────────────────────┤
+│ RelationshipFieldGroupRow (px-4 py-2, border-b between rows)                           │
+│   Eyebrow size="sm" + row content                                                      │
+│ RelationshipFieldGroupRow …                                                            │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| When                                                                           | Header owner                                | Notes                                                                                                                       |
-| ------------------------------------------------------------------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Location inverse section (`territorial_authority`, `people_and_organizations`) | `RelationshipFieldGroup`                    | Skip `LocationConnectedPartiesSectionHeader`; keep outer `<section aria-labelledby>` pointing at the field-group heading id |
-| Organization forward family                                                    | `RelationshipFieldGroup` (`headingAs="h3"`) | Top-level **Location connections** `h2` + helper stays outside field groups                                                 |
-| Single-kind or non-grouped surfaces                                            | Feature section header                      | Bare row primitives only                                                                                                    |
+| When                                                                           | Header owner                                                      | Notes                                                                                                           |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Location inverse section (`territorial_authority`, `people_and_organizations`) | `DetailSectionPanel`                                              | Skip `LocationConnectedPartiesSectionHeader`; panel owns `<section aria-labelledby>` — no outer section wrapper |
+| Organization forward family                                                    | `DetailSectionPanel` (`headingAs="h3"`)                           | Top-level **Location connections** `h2` + helper stays outside panels                                           |
+| Single-kind or non-grouped surfaces                                            | Feature section header                                            | Bare row primitives only                                                                                        |
+| Location hierarchy (Contained locations)                                       | `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` | Not a typed-edge relationship — same panel/row chrome, hierarchy domain stays in feature code                   |
 
-Kind labels inside a field group use **`RelationshipFieldGroupRow` eyebrows** — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers.
+Kind labels inside a relationship panel use **`RelationshipFieldGroupRow` eyebrows** — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers.
 
 ## Populated row vs empty container
 
-| Responsibility                    | Owner                                                                                                              |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Populated edge summary + overflow | `CrossContentRelationshipRow`                                                                                      |
-| Overflow actions                  | `RelationshipOverflowMenu` (action-agnostic; feature supplies `{ id, label, destructive? }`; compact icon trigger) |
+| Responsibility                    | Owner                                                                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Populated edge summary + overflow | `CrossContentRelationshipRow`                                                                                          |
+| Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
 Overflow mutation actions derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts), composed by the domain-agnostic [`buildRelationshipOverflowActions`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 
@@ -85,7 +87,7 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 [`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
-| Kind-group shell (header + kind rows) | `RelationshipFieldGroup` + `RelationshipFieldGroupRow` |
+| Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipFieldGroupRow` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
 | Singleton slot empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`) |
 | Collection empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` |
@@ -222,18 +224,18 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 Before building a new cross-content relationship surface, evaluate:
 
-1. `RelationshipFieldGroup` + `RelationshipFieldGroupRow` when grouping kinds under a section title
-2. `CrossContentRelationshipRow` + `RelationshipOverflowMenu` for populated rows
+1. `DetailSectionPanel` + `RelationshipFieldGroupRow` when grouping kinds under a section title
+2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows
 3. `RelationshipEmptyInlineRow` for inline empty + add
 4. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
 5. Direction-aware copy resolvers
 
 ## Non-adopters
 
-| Surface                                  | Reason                                                                 |
-| ---------------------------------------- | ---------------------------------------------------------------------- |
-| Organization connected-character preview | Entity membership, not typed edge                                      |
-| Location children hierarchy              | Parent/child structure, not typed edge — see hierarchy inverse section |
+| Surface                                  | Reason                                                                                                                |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Organization connected-character preview | Entity membership, not typed edge                                                                                     |
+| Location children hierarchy              | Parent/child structure, not typed edge — uses `DetailSectionPanel` + `DetailEntityRow`; see hierarchy inverse section |
 
 ## Related
 
