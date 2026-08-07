@@ -35,10 +35,8 @@ export function LocationConnectionKindStep({
   changeLabel = LOCATION_CONNECTION_KIND_CHANGE_LABEL,
   defaultExpanded,
 }: LocationConnectionKindStepProps) {
-  const enabledOptions = options.filter((option) => !option.disabled)
-
-  if (enabledOptions.length === 1) {
-    const resolved = enabledOptions[0]
+  if (options.length === 1) {
+    const resolved = options[0]
     if (!resolved) return null
 
     return (

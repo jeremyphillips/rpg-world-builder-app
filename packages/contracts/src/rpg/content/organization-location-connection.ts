@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import {
   getOrganizationLocationConnectionFamily,
+  getOrganizationLocationConnectionMaxSubjectsPerOrganization,
   organizationLocationConnectionKindSchema,
   type OrganizationLocationConnectionKind,
 } from '../vocab/location/organization-location-connection'
@@ -25,6 +26,7 @@ export const organizationLocationConnectionsSchema = z
     const seenIds = new Set<string>()
     const seenLocationKinds = new Set<string>()
     const seenLocationFamilies = new Set<string>()
+    const kindCounts = new Map<OrganizationLocationConnectionKind, number>()
 
     connections.forEach((connection, index) => {
       if (seenIds.has(connection.id)) {
@@ -59,7 +61,26 @@ export const organizationLocationConnectionsSchema = z
         }
         seenLocationFamilies.add(locationFamilyKey)
       }
+
+      kindCounts.set(connection.kind, (kindCounts.get(connection.kind) ?? 0) + 1)
     })
+
+    for (const [kind, count] of kindCounts) {
+      const maxSubjectsPerOrganization =
+        getOrganizationLocationConnectionMaxSubjectsPerOrganization(kind)
+      if (maxSubjectsPerOrganization !== null && count > maxSubjectsPerOrganization) {
+        const indexes = connections
+          .map((connection, index) => (connection.kind === kind ? index : -1))
+          .filter((index) => index >= 0)
+        for (const index of indexes) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Each organization may have at most ${maxSubjectsPerOrganization} ${kind} connection(s).`,
+            path: [index, 'kind'],
+          })
+        }
+      }
+    }
   })
 
 export type OrganizationLocationConnections = z.infer<typeof organizationLocationConnectionsSchema>

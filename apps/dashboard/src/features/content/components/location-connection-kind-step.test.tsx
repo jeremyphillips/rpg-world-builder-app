@@ -73,6 +73,41 @@ describe('LocationConnectionKindStep', () => {
     expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
+  it('shows disabled options with unavailable reasons instead of normal descriptions', () => {
+    render(
+      <LocationConnectionKindStep
+        id="connection-kind"
+        label="Relationship type"
+        options={[
+          {
+            value: 'headquarters',
+            label: 'Headquarters',
+            description: 'A designated primary base or headquarters location for the organization.',
+            disabled: true,
+            disabledReason: 'Already set at Thieves Guildhouse.',
+          },
+          {
+            value: 'owns',
+            label: 'Owner',
+            description: 'Owns or holds title to a property or site.',
+          },
+        ]}
+        value={null}
+        onValueChange={vi.fn()}
+        defaultExpanded
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeDisabled()
+    expect(screen.getByText('Already set at Thieves Guildhouse.')).toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        'A designated primary base or headquarters location for the organization.',
+      ),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Owner/i })).toBeEnabled()
+  })
+
   it('re-expands the chooser when Change is clicked', async () => {
     const user = userEvent.setup()
 

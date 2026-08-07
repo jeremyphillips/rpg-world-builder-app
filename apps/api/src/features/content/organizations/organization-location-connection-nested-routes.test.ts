@@ -57,6 +57,32 @@ async function seedSettlementLocation(campaignId: string, regionId: string) {
   })
 }
 
+async function seedBuildingLocation(campaignId: string, regionId: string) {
+  const settlement = await seedSettlementLocation(campaignId, regionId)
+  const district = await createHomebrewContent(locationWriteConfig, campaignId, {
+    slug: 'org-conn-district',
+    kind: 'district',
+    name: 'Org Conn District',
+    parentLocationId: settlement.id,
+  })
+  const building = await createHomebrewContent(locationWriteConfig, campaignId, {
+    slug: 'org-conn-building',
+    kind: 'structure',
+    structureType: 'building',
+    name: 'Org Conn Building',
+    parentLocationId: district.id,
+  })
+  const secondBuilding = await createHomebrewContent(locationWriteConfig, campaignId, {
+    slug: 'org-conn-building-2',
+    kind: 'structure',
+    structureType: 'building',
+    name: 'Org Conn Building Two',
+    parentLocationId: district.id,
+  })
+
+  return { settlement, district, building, secondBuilding }
+}
+
 describe('organization location connection nested routes', () => {
   it('mutates organization location connections and resolves references', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
@@ -272,6 +298,39 @@ describe('organization location connection nested routes', () => {
         id: 'org-loc-dup',
         locationId: region.id,
         kind: 'operates_in',
+      })
+      .expect(400)
+  })
+
+  it('rejects a second headquarters connection for the same organization at another location', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const { region } = await seedRegionLocation(campaignId)
+    const { building, secondBuilding } = await seedBuildingLocation(campaignId, region.id)
+
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaignId,
+      minimalOrganizationInput,
+    )
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-hq-first',
+        locationId: building.id,
+        kind: 'headquarters',
+      })
+      .expect(201)
+
+    await agent
+      .post(locationConnectionsPath(campaignId, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        id: 'org-hq-second',
+        locationId: secondBuilding.id,
+        kind: 'headquarters',
       })
       .expect(400)
   })

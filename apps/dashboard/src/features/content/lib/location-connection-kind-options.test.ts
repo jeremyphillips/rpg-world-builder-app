@@ -9,6 +9,7 @@ import {
 import {
   assertChangeKindGatingAlignsWithPicker,
   assertChangeKindPickerIncludesCurrentKind,
+  buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
@@ -53,6 +54,49 @@ function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
     sectionGroup: 'people_and_organizations',
   }
 }
+
+describe('buildOrganizationFamilyKindOptions', () => {
+  it('keeps an organization-wide headquarters slot visible but disabled with location-specific reason', () => {
+    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = buildingLocation({
+      id: 'building-2',
+      name: 'The Silver Eel',
+      slug: 'silver-eel',
+    })
+
+    const options = buildOrganizationFamilyKindOptions({
+      intent: 'site',
+      locations: [guildhouse, silverEel],
+      subjectOrganizationId: 'org-1',
+      connections: [{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }],
+      edgesByLocationId: {},
+      occupancyLoaded: true,
+    })
+
+    const headquarters = options.find((option) => option.value === 'headquarters')
+    expect(headquarters?.disabled).toBe(true)
+    expect(headquarters?.disabledReason).toBe('Already set at Thieves Guildhouse.')
+    expect(options.find((option) => option.value === 'owns')?.disabled).not.toBe(true)
+  })
+
+  it('enables headquarters when the organization has no existing headquarters connection', () => {
+    const guildhouse = buildingLocation()
+
+    const options = buildOrganizationFamilyKindOptions({
+      intent: 'site',
+      locations: [guildhouse],
+      subjectOrganizationId: 'org-1',
+      connections: [],
+      edgesByLocationId: {},
+      occupancyLoaded: true,
+    })
+
+    const headquarters = options.find((option) => option.value === 'headquarters')
+    expect(headquarters?.disabled).not.toBe(true)
+    expect(headquarters?.disabledReason).toBeUndefined()
+    expect(headquarters?.description).toContain('primary base')
+  })
+})
 
 describe('buildOrganizationLocationChangeKindOptions', () => {
   it('includes the persisted current kind in the picker options', () => {

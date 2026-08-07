@@ -1,6 +1,7 @@
 import {
   getOrganizationLocationConnectionFamily,
   getOrganizationLocationConnectionMaxSubjectsPerLocation,
+  getOrganizationLocationConnectionMaxSubjectsPerOrganization,
   ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY,
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionFamilyCardinality,
@@ -53,6 +54,43 @@ function connectionsForLocation(
   )
 }
 
+function connectionsForKind(
+  connections: readonly OrganizationLocationConnectionLike[],
+  kind: OrganizationLocationConnectionKind,
+  excludeConnectionId?: string,
+): OrganizationLocationConnectionLike[] {
+  return connections.filter(
+    (connection) =>
+      connection.kind === kind && (!excludeConnectionId || connection.id !== excludeConnectionId),
+  )
+}
+
+/** Whether a kind is blocked for the organization across all locations. */
+export function organizationLocationConnectionKindBlockedForOrganization(input: {
+  kind: OrganizationLocationConnectionKind
+  connections: readonly OrganizationLocationConnectionLike[]
+  excludeConnectionId?: string
+}): boolean {
+  const maxSubjects = getOrganizationLocationConnectionMaxSubjectsPerOrganization(input.kind)
+  if (maxSubjects === null) {
+    return false
+  }
+
+  return (
+    connectionsForKind(input.connections, input.kind, input.excludeConnectionId).length >=
+    maxSubjects
+  )
+}
+
+/** Returns the persisted connection occupying an organization-wide kind slot, if any. */
+export function findOrganizationLocationConnectionOfKindForOrganization(input: {
+  kind: OrganizationLocationConnectionKind
+  connections: readonly OrganizationLocationConnectionLike[]
+  excludeConnectionId?: string
+}): OrganizationLocationConnectionLike | undefined {
+  return connectionsForKind(input.connections, input.kind, input.excludeConnectionId)[0]
+}
+
 /** Whether a kind is blocked for one organization at a location (per-org connections only). */
 export function organizationLocationConnectionKindBlockedForOrganizationAtLocation(input: {
   locationId: string
@@ -90,6 +128,16 @@ export function organizationLocationConnectionKindBlockedForLocation(input: {
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
 }): boolean {
+  if (
+    organizationLocationConnectionKindBlockedForOrganization({
+      kind: input.kind,
+      connections: input.connections,
+      excludeConnectionId: input.excludeConnectionId,
+    })
+  ) {
+    return true
+  }
+
   if (
     organizationLocationConnectionKindBlockedForOrganizationAtLocation({
       locationId: input.locationId,

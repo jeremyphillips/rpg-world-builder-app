@@ -7,9 +7,12 @@ import type {
 } from '@rpg/contracts'
 import {
   CHARACTER_LOCATION_CONNECTION_ENTRIES,
+  findOrganizationLocationConnectionOfKindForOrganization,
   getCharacterLocationConnectionLabel,
   getOrganizationLocationConnectionLabel,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
+  organizationLocationConnectionAlreadySetAtReason,
+  organizationLocationConnectionKindBlockedForOrganization,
   organizationLocationConnectionKindBlockedForOrganizationAtLocation,
   resolveOrganizationLocationConnectionLocationOccupant,
 } from '@rpg/contracts'
@@ -257,6 +260,57 @@ export function buildOrganizationLocationConnectionKindOptions(input: {
   })
 }
 
+function resolveOrganizationFamilyKindUnavailableReason(input: {
+  kind: OrganizationLocationConnectionKind
+  intent: OrganizationConnectionDrawerIntent
+  locations: readonly Location[]
+  connections: ReadonlyArray<{
+    id?: string
+    locationId: string
+    kind: OrganizationLocationConnectionKind
+  }>
+  subjectOrganizationId: string
+  edgesByLocationId?: Readonly<
+    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
+  >
+  excludeConnectionId?: string
+  occupancyLoaded: boolean
+}): string | undefined {
+  const orgWideBlocked = organizationLocationConnectionKindBlockedForOrganization({
+    kind: input.kind,
+    connections: input.connections,
+    excludeConnectionId: input.excludeConnectionId,
+  })
+
+  const hasAvailableLocation = organizationForwardKindHasAvailableLocation(
+    input.kind,
+    input.locations,
+    input.subjectOrganizationId,
+    input.connections,
+    input.edgesByLocationId,
+    input.excludeConnectionId,
+    input.occupancyLoaded,
+  )
+
+  if (hasAvailableLocation) {
+    return undefined
+  }
+
+  if (orgWideBlocked) {
+    const existingConnection = findOrganizationLocationConnectionOfKindForOrganization({
+      kind: input.kind,
+      connections: input.connections,
+      excludeConnectionId: input.excludeConnectionId,
+    })
+    const locationName =
+      input.locations.find((location) => location.id === existingConnection?.locationId)?.name ??
+      'this location'
+    return organizationLocationConnectionAlreadySetAtReason(locationName)
+  }
+
+  return ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[input.intent]
+}
+
 export function buildOrganizationFamilyKindOptions(input: {
   intent: OrganizationConnectionDrawerIntent
   locations: readonly Location[]
@@ -285,15 +339,23 @@ export function buildOrganizationFamilyKindOptions(input: {
       input.excludeConnectionId,
       occupancyLoaded,
     )
+    const disabledReason = resolveOrganizationFamilyKindUnavailableReason({
+      kind,
+      intent: input.intent,
+      locations: input.locations,
+      connections: input.connections,
+      subjectOrganizationId: input.subjectOrganizationId,
+      edgesByLocationId: input.edgesByLocationId,
+      excludeConnectionId: input.excludeConnectionId,
+      occupancyLoaded,
+    })
 
     return {
       value: kind,
       label: getOrganizationLocationConnectionLabel(kind),
       description: resolveOrganizationLocationConnectionKindDescription(kind),
       disabled: !hasAvailableLocation,
-      disabledReason: !hasAvailableLocation
-        ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[input.intent]
-        : undefined,
+      disabledReason,
     }
   })
 }

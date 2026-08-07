@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   organizationLocationConnectionHasAvailableKindInFamily,
   organizationLocationConnectionKindBlockedForLocation,
+  organizationLocationConnectionKindBlockedForOrganization,
   organizationLocationConnectionKindBlockedForOrganizationAtLocation,
   organizationLocationConnectionKindSlotOccupiedAtLocation,
 } from './organization-location-connection-family-rules'
@@ -145,6 +146,37 @@ describe('organization location connection family rules', () => {
         locationId: 'loc-1',
         kind: 'governs',
         connections,
+      }),
+    ).toBe(false)
+  })
+
+  it('blocks a second headquarters connection for the same organization', () => {
+    const connections = [{ id: 'conn-hq', locationId: 'loc-1', kind: 'headquarters' as const }]
+
+    expect(
+      organizationLocationConnectionKindBlockedForOrganization({
+        kind: 'headquarters',
+        connections,
+      }),
+    ).toBe(true)
+    expect(
+      organizationLocationConnectionKindBlockedForLocation({
+        locationId: 'loc-2',
+        kind: 'headquarters',
+        subjectOrganizationId: 'org-1',
+        connections,
+      }),
+    ).toBe(true)
+  })
+
+  it('allows headquarters target changes while excluding the current connection', () => {
+    const connections = [{ id: 'conn-hq', locationId: 'loc-1', kind: 'headquarters' as const }]
+
+    expect(
+      organizationLocationConnectionKindBlockedForOrganization({
+        kind: 'headquarters',
+        connections,
+        excludeConnectionId: 'conn-hq',
       }),
     ).toBe(false)
   })
