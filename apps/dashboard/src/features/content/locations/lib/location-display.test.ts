@@ -184,6 +184,28 @@ describe('buildLocationDetailViewModel', () => {
     expect(viewModel.identity.rows[0]?.value).toBe('District')
   })
 
+  it('shows typed interior identity rows with flattened type label', () => {
+    const chamber: Location = {
+      ...DOCK_WARD,
+      id: 'location-chamber',
+      slug: 'chamber',
+      name: 'Hidden Chamber',
+      kind: 'interior',
+      interiorType: 'space',
+      classification: { type: 'chamber' },
+      parentLocationId: YAWNING_PORTAL.id,
+    }
+
+    const viewModel = buildLocationDetailViewModel(chamber, {
+      locations: [...LOCATIONS_LIST, chamber],
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type', 'Space type'])
+    expect(viewModel.identity.rows[0]?.value).toBe('Space')
+    expect(viewModel.identity.rows[1]?.value).toBe('Chamber')
+  })
+
   it('derives uncontained copy and parent replacement action for managers', () => {
     const rootViewModel = buildLocationDetailViewModel(ALDERMERE, {
       locations: LOCATIONS_LIST,

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildingClassificationSchema } from './building-classification'
 import {
-  locationDisplaySummarySortKey,
+  compareLocationClassificationParts,
   resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
@@ -71,7 +71,7 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
-  it('resolves interior subtype classification', () => {
+  it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'interior',
@@ -80,8 +80,31 @@ describe('resolveLocationDisplaySummary', () => {
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
-      typeLabel: 'Interior',
+      typeLabel: 'Space',
       classificationLabel: 'Chamber',
+    })
+  })
+
+  it('resolves interior type without subtype', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+      interiorType: 'passage',
+    }
+
+    expect(resolveLocationDisplaySummary(location)).toEqual({
+      typeLabel: 'Passage',
+    })
+  })
+
+  it('resolves untyped interior as the generic Interior kind label', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+    }
+
+    expect(resolveLocationDisplaySummary(location)).toEqual({
+      typeLabel: 'Interior',
     })
   })
 
@@ -139,7 +162,7 @@ describe('resolveLocationClassificationDisplay', () => {
     })
   })
 
-  it('returns settlement, region, site, and fortification compact lines', () => {
+  it('returns settlement, region, site, fortification, and interior compact lines', () => {
     expect(
       resolveLocationClassificationDisplay({
         ...baseLocation,
@@ -184,17 +207,72 @@ describe('resolveLocationClassificationDisplay', () => {
       parts: ['Fortification'],
       text: 'Fortification',
     })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'space',
+        classification: { type: 'chamber' },
+      }),
+    ).toEqual({
+      parts: ['Space', 'Chamber'],
+      text: 'Space · Chamber',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+      }),
+    ).toEqual({
+      parts: ['Interior'],
+      text: 'Interior',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'passage',
+        classification: { type: 'corridor' },
+      }),
+    ).toEqual({
+      parts: ['Passage', 'Corridor'],
+      text: 'Passage · Corridor',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'level',
+        classification: { type: 'floor' },
+      }),
+    ).toEqual({
+      parts: ['Level', 'Floor'],
+      text: 'Level · Floor',
+    })
   })
 })
 
-describe('locationDisplaySummarySortKey', () => {
-  it('returns tuple with empty strings for missing segments', () => {
+describe('compareLocationClassificationParts', () => {
+  it('returns zero when parts are equal', () => {
     expect(
-      locationDisplaySummarySortKey({
-        typeLabel: 'Building',
-        classificationLabel: 'Guildhall',
-      }),
-    ).toEqual(['Building', 'Guildhall', ''])
+      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Guildhall']),
+    ).toBe(0)
+  })
+
+  it('compares different second segments', () => {
+    expect(
+      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Tavern']),
+    ).toBeLessThan(0)
+  })
+
+  it('sorts shorter equal-prefix classifications first', () => {
+    expect(
+      compareLocationClassificationParts(['Building'], ['Building', 'Guildhall']),
+    ).toBeLessThan(0)
   })
 })
 
@@ -219,5 +297,16 @@ describe('resolveLocationDetailClassificationFieldLabel', () => {
     }
 
     expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Classification')
+  })
+
+  it('returns interior classification label', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+      interiorType: 'space',
+      classification: { type: 'chamber' },
+    }
+
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Space type')
   })
 })

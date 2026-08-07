@@ -1,4 +1,5 @@
 import { getBuildingArchetypeLabel } from '../../vocab/location/building-archetype'
+import { getInteriorTypeLabel } from '../../vocab/location/interior-type'
 import {
   getInteriorSubtypeLabel,
   INTERIOR_TYPE_DEFINITIONS,
@@ -115,6 +116,12 @@ function resolveTypeLabel(location: Location): string {
     return resolveStructureTypeLabel(location.structureType)
   }
 
+  if (location.kind === 'interior') {
+    return location.interiorType
+      ? getInteriorTypeLabel(location.interiorType)
+      : getLocationKindLabel('interior')
+  }
+
   return getLocationKindLabel(location.kind)
 }
 
@@ -142,11 +149,23 @@ export function resolveLocationClassificationDisplay(
   }
 }
 
-/** Tuple accessor for stable Type-column sort and filter. */
-export function locationDisplaySummarySortKey(
-  summary: LocationDisplaySummary,
-): readonly [string, string, string] {
-  return [summary.typeLabel, summary.classificationLabel ?? '', summary.specializationLabel ?? '']
+/**
+ * Lexicographic compare of classification parts for table sorting.
+ * Missing indices at a position are treated as empty strings, so equal-prefix
+ * classifications sort shorter-first (for example `Building` before `Building · Guildhall`).
+ */
+export function compareLocationClassificationParts(
+  left: readonly string[],
+  right: readonly string[],
+): number {
+  const maxLength = Math.max(left.length, right.length)
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const comparison = (left[index] ?? '').localeCompare(right[index] ?? '')
+    if (comparison !== 0) return comparison
+  }
+
+  return 0
 }
 
 /** Detail/read row label for the location classification field, when present. */
