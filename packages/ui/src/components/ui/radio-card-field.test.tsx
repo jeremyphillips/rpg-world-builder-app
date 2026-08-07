@@ -49,6 +49,14 @@ describe('RadioCardField', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
   })
 
+  it('stretches the card group to the full field width', () => {
+    const { container } = render(
+      <RadioCardField id="edition-preset" label="Edition preset" options={options} />,
+    )
+
+    expect(container.querySelector('[role="radiogroup"]')).toHaveClass('w-full')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <RadioCardField id="edition-preset" label="Edition preset" options={options} />,

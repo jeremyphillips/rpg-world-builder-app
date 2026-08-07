@@ -49,6 +49,7 @@ export function RadioCardField({
       width={width}
       labelHidden={labelHidden}
       chrome={chrome}
+      controlBand="content-sized"
     >
       {(labelId) => (
         <RadioCard
