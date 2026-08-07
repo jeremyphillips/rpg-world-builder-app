@@ -1,6 +1,7 @@
 import {
   formatLocationDisplaySummary,
   getLocationKindEntry,
+  getParentRequirement,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
   type Location,
@@ -9,6 +10,12 @@ import {
 } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+
+import {
+  resolveLocationParentReplacementAction,
+  type LocationParentReplacementAction,
+} from './location-parent-replacement'
+import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
 
 export const LOCATION_UNKNOWN_ANCESTOR_LABEL = 'Unknown location' as const
 
@@ -45,6 +52,8 @@ export type LocationDetailIdentityViewModel = {
   displaySummary: LocationDisplaySummary
   rows: LocationDetailIdentityRow[]
   locatedIn: LocationLocatedInSegment[]
+  locatedInFallbackLabel?: string
+  parentReplacementAction: LocationParentReplacementAction
 }
 
 export type LocationChildItem = {
@@ -211,16 +220,26 @@ export function buildLocationDetailViewModel(
   ctx: {
     locations: readonly Location[]
     campaignId: string
+    canManage?: boolean
   },
 ): LocationDetailViewModel {
   const locationsById = buildLocationsById(ctx.locations)
   const displaySummary = resolveLocationDisplaySummary(location)
+  const locatedIn = buildLocationLocatedInSegments(location, locationsById, ctx.campaignId)
+  const parentRequirement = getParentRequirement(location.kind)
 
   return {
     identity: {
       displaySummary,
       rows: buildLocationDetailIdentityRows(location),
-      locatedIn: buildLocationLocatedInSegments(location, locationsById, ctx.campaignId),
+      locatedIn,
+      locatedInFallbackLabel:
+        locatedIn.length === 0 && parentRequirement !== 'forbidden'
+          ? LOCATION_UNCONTAINED_LABEL
+          : undefined,
+      parentReplacementAction: ctx.canManage
+        ? resolveLocationParentReplacementAction({ subject: location, canManage: true })
+        : null,
     },
     description: location.description,
     children: {

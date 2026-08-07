@@ -1,0 +1,86 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
+
+import type { Location } from '@rpg/contracts'
+
+import { ALDERMERE, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
+import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
+
+describe('LocationParentReplacementDrawer', () => {
+  it('shows current parent from parentLocationId and gates submit until a different parent is selected', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Change parent location' })).toBeInTheDocument()
+    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('Dock Ward')).toBeInTheDocument()
+    expect(screen.getByText('New location')).toBeInTheDocument()
+    expect(screen.getByText('Choose a valid parent location.')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search locations…')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change parent location' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
+    expect(screen.getAllByText('Dock Ward')).toHaveLength(1)
+  })
+
+  it('opens set-parent chrome without a current parent summary', async () => {
+    const user = userEvent.setup()
+    const plane: Location = {
+      ...ALDERMERE,
+      id: 'location-plane',
+      slug: 'material-plane',
+      name: 'Material Plane',
+      kind: 'plane',
+    }
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={ALDERMERE}
+        campaignLocations={[...LOCATIONS_LIST, plane]}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Set parent location' })).toBeInTheDocument()
+    expect(screen.queryByText('Current location')).not.toBeInTheDocument()
+    expect(screen.getByText('New location')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Set parent location' })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('button', { name: 'Set parent location' })).toBeEnabled()
+  })
+
+  it('lists Harborford as a valid replacement parent for Yawning Portal', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Harborford')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
+  })
+})

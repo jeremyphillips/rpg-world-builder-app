@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
+import { ALDERMERE, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import { LOCATION_EMPTY_SECTION_TEXT } from '../lib/location-display'
 import { LocationDetailContent } from './location-detail'
 
@@ -35,18 +37,25 @@ vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
 }))
 
 function renderDetail(location = HARBORFORD) {
+  const queryClient = makeTestQueryClient()
   return render(
-    <MemoryRouter>
-      <LocationDetailContent
-        location={location}
-        campaignId={STORY_CAMPAIGN_ID}
-        locations={LOCATIONS_LIST}
-      />
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <LocationDetailContent
+          location={location}
+          campaignId={STORY_CAMPAIGN_ID}
+          locations={LOCATIONS_LIST}
+        />
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 
 describe('LocationDetailContent', () => {
+  beforeEach(() => {
+    useCanManageCampaignMock.mockReturnValue(false)
+  })
+
   it('renders identity metadata, located-in links, and contained locations', () => {
     renderDetail()
 
@@ -81,6 +90,20 @@ describe('LocationDetailContent', () => {
     renderDetail(HARBORFORD)
 
     expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
+  })
+
+  it('shows Change parent for managers on nested locations', () => {
+    useCanManageCampaignMock.mockReturnValue(true)
+    renderDetail(YAWNING_PORTAL)
+
+    expect(screen.getByRole('button', { name: 'Change parent' })).toBeInTheDocument()
+  })
+
+  it('shows Set parent for managers on uncontained optional roots', () => {
+    useCanManageCampaignMock.mockReturnValue(true)
+    renderDetail(ALDERMERE)
+
+    expect(screen.getByRole('button', { name: 'Set parent' })).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

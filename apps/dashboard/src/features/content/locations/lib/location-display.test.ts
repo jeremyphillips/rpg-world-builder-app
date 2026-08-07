@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
-import { DOCK_WARD, ALDERMERE, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
+import { ALDERMERE, DOCK_WARD, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   buildChildCountByParentId,
   buildChildSummariesByParentId,
@@ -12,6 +12,7 @@ import {
   buildLocationsById,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
+import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
 
 const CAMPAIGN_ID = 'camp_1'
 
@@ -136,5 +137,23 @@ describe('buildLocationDetailViewModel', () => {
 
     expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type'])
     expect(viewModel.identity.rows[0]?.value).toBe('District')
+  })
+
+  it('derives uncontained copy and parent replacement action for managers', () => {
+    const rootViewModel = buildLocationDetailViewModel(ALDERMERE, {
+      locations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
+      canManage: true,
+    })
+    const nestedViewModel = buildLocationDetailViewModel(YAWNING_PORTAL, {
+      locations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
+      canManage: true,
+    })
+
+    expect(rootViewModel.identity.locatedInFallbackLabel).toBe(LOCATION_UNCONTAINED_LABEL)
+    expect(rootViewModel.identity.parentReplacementAction).toBe('setParent')
+    expect(nestedViewModel.identity.locatedInFallbackLabel).toBeUndefined()
+    expect(nestedViewModel.identity.parentReplacementAction).toBe('changeParent')
   })
 })
