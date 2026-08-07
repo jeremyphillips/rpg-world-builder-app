@@ -13,7 +13,7 @@ import {
   getOrganizationKindLabel,
   getOrganizationLocationConnectionLabel,
 } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -62,6 +62,12 @@ import {
   resolveOrganizationForwardAddSubmitLabel,
   resolveOrganizationForwardFamilyAddDrawerHelper,
 } from '../lib/organization-location-connection-surface-copy'
+import {
+  filterLocationsByGeographicPresenceKindFilter,
+  GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_LABEL,
+  GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_OPTIONS,
+  type GeographicPresenceLocationKindFilter,
+} from '../lib/organization-geographic-presence-location-kind-filter'
 
 export const ORGANIZATION_LOCATION_LINK_SEARCH_PLACEHOLDER = 'Search locations…'
 export const ORGANIZATION_LOCATION_LINK_FIELD_LABEL = 'Location'
@@ -177,6 +183,8 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ?? defaultAddKind ?? initialConnection?.kind ?? null,
   )
+  const [locationKindFilter, setLocationKindFilter] =
+    React.useState<GeographicPresenceLocationKindFilter>('all')
 
   const excludeConnectionId =
     mode === 'changeKind' || mode === 'changeTarget' ? initialConnection?.id : undefined
@@ -411,6 +419,15 @@ function OrganizationLocationConnectionLinkDrawerContent({
       locationCandidates.isAuthoritativeDomainSet &&
       changeTargetScanLocations.length === 0)
 
+  const showGeographicPresenceLocationKindFilter =
+    intent === 'geographic_presence' && showLocationPicker && !showMutationEmptyState
+  const pickerLocations = React.useMemo(() => {
+    if (!showGeographicPresenceLocationKindFilter) {
+      return eligibleLocations
+    }
+    return filterLocationsByGeographicPresenceKindFilter(eligibleLocations, locationKindFilter)
+  }, [eligibleLocations, locationKindFilter, showGeographicPresenceLocationKindFilter])
+
   return (
     <CatalogPickerSheet
       open={open}
@@ -470,9 +487,20 @@ function OrganizationLocationConnectionLinkDrawerContent({
             />
           ) : null}
           {showLocationPicker && !showMutationEmptyState ? (
-            <Heading variant="label" as="p">
-              {ORGANIZATION_LOCATION_LINK_FIELD_LABEL}
-            </Heading>
+            <div className="space-y-2">
+              <Heading variant="label" as="p">
+                {ORGANIZATION_LOCATION_LINK_FIELD_LABEL}
+              </Heading>
+              {showGeographicPresenceLocationKindFilter ? (
+                <SegmentedControl
+                  aria-label={GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_LABEL}
+                  value={locationKindFilter}
+                  options={GEOGRAPHIC_PRESENCE_LOCATION_KIND_FILTER_OPTIONS}
+                  onValueChange={setLocationKindFilter}
+                  fullWidth
+                />
+              ) : null}
+            </div>
           ) : null}
           {!showLocationPicker && mode === 'add' && !activeKind ? (
             <Text variant="muted" className="text-sm" role="status">
@@ -500,7 +528,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
           </Button>
         ) : undefined
       }
-      items={showLocationPicker && !showMutationEmptyState ? eligibleLocations : []}
+      hasStructuredFilters={
+        showGeographicPresenceLocationKindFilter && locationKindFilter !== 'all'
+      }
+      toolbarStateKey={showGeographicPresenceLocationKindFilter ? locationKindFilter : undefined}
+      items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
       getSearchText={buildLocationSearchText}

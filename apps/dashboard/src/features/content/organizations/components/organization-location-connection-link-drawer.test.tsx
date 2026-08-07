@@ -52,6 +52,17 @@ function settlementLocation(overrides: Partial<Location> = {}): Location {
   } as Location
 }
 
+function districtLocation(overrides: Partial<Location> = {}): Location {
+  return {
+    id: 'district-1',
+    campaignId: 'camp-1',
+    name: 'Harbor Ward',
+    slug: 'harbor-ward',
+    kind: 'district',
+    ...overrides,
+  } as Location
+}
+
 describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('opens with collapsible kind cards and canonical descriptions for site family add', async () => {
     const user = userEvent.setup()
@@ -111,7 +122,47 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         name: /Connection type|Relationship type|Authority type/i,
       }),
     ).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Location type' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
     expect(screen.getByText('Northern March')).toBeInTheDocument()
+  })
+
+  it('filters geographic presence locations by settlement and region segments', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="geographic_presence"
+        organization={organization}
+        organizationId="org-1"
+        locations={[regionLocation(), settlementLocation(), districtLocation()]}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+    expect(screen.getByText('Port City')).toBeInTheDocument()
+    expect(screen.getByText('Harbor Ward')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Settlements' }))
+
+    expect(screen.queryByText('Northern March')).not.toBeInTheDocument()
+    expect(screen.getByText('Port City')).toBeInTheDocument()
+    expect(screen.getByText('Harbor Ward')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Regions' }))
+
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+    expect(screen.queryByText('Port City')).not.toBeInTheDocument()
+    expect(screen.queryByText('Harbor Ward')).not.toBeInTheDocument()
   })
 
   it('disables territorial singleton locations occupied by another organization', async () => {
