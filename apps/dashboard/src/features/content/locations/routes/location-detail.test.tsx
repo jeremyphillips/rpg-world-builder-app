@@ -31,7 +31,7 @@ vi.mock('@/features/character', async (importOriginal) => {
   }
 })
 vi.mock('../components/location-connected-parties-detail-sections.client', () => ({
-  LocationConnectedPartiesDetailSections: () => null,
+  LocationConnectedPartiesDetailSections: () => <section aria-label="Connected parties sections" />,
 }))
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({ data: [] })),
@@ -70,7 +70,19 @@ describe('LocationDetailContent', () => {
     expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Contained locations' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'View' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
+  })
+
+  it('renders contained locations before connected parties sections', () => {
+    renderDetail()
+
+    const containedHeading = screen.getByRole('heading', { name: 'Contained locations' })
+    const connectedPartiesSection = screen.getByLabelText('Connected parties sections')
+
+    expect(
+      containedHeading.compareDocumentPosition(connectedPartiesSection) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('shows building archetype in identity metadata', () => {
@@ -113,6 +125,7 @@ describe('LocationDetailContent', () => {
     renderDetail(HARBORFORD)
 
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Actions for Dock Ward' }))
     expect(screen.getByRole('menuitem', { name: 'View location' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()

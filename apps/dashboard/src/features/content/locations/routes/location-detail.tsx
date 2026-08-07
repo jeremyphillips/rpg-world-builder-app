@@ -67,7 +67,6 @@ export function LocationDetailContent({
         }
       >
         <div className="space-y-8">
-          <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
             canManage={canManage}
@@ -84,6 +83,7 @@ export function LocationDetailContent({
               ) : undefined
             }
           />
+          <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
         </div>
       </ContentDetailLayout>
     </WidePage>

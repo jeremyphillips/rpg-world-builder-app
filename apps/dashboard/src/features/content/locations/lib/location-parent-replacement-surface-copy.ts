@@ -11,7 +11,6 @@ export const LOCATION_PARENT_REPLACEMENT_DRAWER = {
   changeSubmit: 'Change parent location',
   setSubmit: 'Set parent location',
   moveSubmit: 'Move location',
-  newHelper: 'Choose a valid parent location.',
   searchPlaceholder: 'Search locations…',
   noResultsMessage: 'No matches for this search.',
   noItemsMessage: 'No valid parent locations are available.',
@@ -47,4 +46,20 @@ export function resolveLocationParentReplacementDrawerSubmitLabel(input: {
   return input.mode === 'change'
     ? LOCATION_PARENT_REPLACEMENT_DRAWER.changeSubmit
     : LOCATION_PARENT_REPLACEMENT_DRAWER.setSubmit
+}
+
+export function resolveLocationParentReplacementDrawerNewHelper(input: {
+  surface: LocationParentReplacementDrawerSurface
+  mode: 'change' | 'set'
+  subjectName: string
+}): string {
+  if (input.surface === 'move') {
+    return `Choose where to move ${input.subjectName}.`
+  }
+
+  if (input.mode === 'change') {
+    return 'Choose a new parent for this location.'
+  }
+
+  return 'Choose a parent for this location.'
 }

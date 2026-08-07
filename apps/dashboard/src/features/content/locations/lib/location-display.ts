@@ -24,6 +24,10 @@ export const LOCATION_SECTION_LABELS = {
   children: 'Contained locations',
 } as const
 
+export const LOCATION_SECTION_HELPERS = {
+  children: 'Locations directly within this location.',
+} as const
+
 export const LOCATION_EMPTY_SECTION_TEXT = {
   children: 'No contained locations yet.',
 } as const

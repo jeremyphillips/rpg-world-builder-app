@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
 import { getLocationKindLabel } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
 
 import {
   CatalogPickerSelectionActions,
@@ -15,7 +15,6 @@ import {
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -24,7 +23,15 @@ import {
   type LocationParentReplacementMode,
 } from '../lib/location-parent-replacement'
 import {
+  filterLocationsByParentBrowseScope,
+  LOCATION_PARENT_BROWSE_SCOPE_LABEL,
+  resolveParentBrowseScopeOptions,
+  shouldShowParentBrowseScopes,
+  type LocationParentBrowseScope,
+} from '../lib/location-parent-browse-scope'
+import {
   LOCATION_PARENT_REPLACEMENT_DRAWER,
+  resolveLocationParentReplacementDrawerNewHelper,
   resolveLocationParentReplacementDrawerSubmitLabel,
   resolveLocationParentReplacementDrawerTitle,
   type LocationParentReplacementDrawerSurface,
@@ -172,6 +179,7 @@ function LocationParentReplacementDrawerContent({
   onSubmit,
 }: LocationParentReplacementDrawerProps) {
   const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null)
+  const [parentBrowseScope, setParentBrowseScope] = React.useState<LocationParentBrowseScope>('all')
 
   const { mode, currentParent, candidates } = React.useMemo(
     () =>
@@ -191,6 +199,22 @@ function LocationParentReplacementDrawerContent({
       subject,
       selectedParentId,
     })
+
+  const browseScopeOptions = React.useMemo(
+    () => resolveParentBrowseScopeOptions(candidates),
+    [candidates],
+  )
+
+  const showParentBrowseScopeControl =
+    pickerEnabled && shouldShowParentBrowseScopes(browseScopeOptions)
+
+  const pickerCandidates = React.useMemo(() => {
+    if (!showParentBrowseScopeControl) {
+      return candidates
+    }
+
+    return filterLocationsByParentBrowseScope(candidates, parentBrowseScope)
+  }, [candidates, parentBrowseScope, showParentBrowseScopeControl])
 
   const handleSubmit = async () => {
     if (!selectedParentId || contextMismatch) return
@@ -214,25 +238,40 @@ function LocationParentReplacementDrawerContent({
       noItemsMessage={LOCATION_PARENT_REPLACEMENT_DRAWER.noItemsMessage}
       headerBelowDescription={
         <EntityReplacementSection
-          entityLabel={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
+          entityLabel="Parent"
           current={currentParent ? toEntityReplacementCurrentSnapshot(currentParent) : null}
-          newHelper={LOCATION_PARENT_REPLACEMENT_DRAWER.newHelper}
-        />
+          newHelper={resolveLocationParentReplacementDrawerNewHelper({
+            surface,
+            mode,
+            subjectName: subject.name,
+          })}
+        >
+          {showParentBrowseScopeControl ? (
+            <SegmentedControl
+              aria-label={LOCATION_PARENT_BROWSE_SCOPE_LABEL}
+              value={parentBrowseScope}
+              options={browseScopeOptions}
+              onValueChange={setParentBrowseScope}
+              fullWidth
+            />
+          ) : null}
+        </EntityReplacementSection>
       }
       footer={
         <LocationParentReplacementDrawerFooter
           contextMismatch={contextMismatch}
           pickerEnabled={pickerEnabled}
           hasCandidates={candidates.length > 0}
-          currentUnavailable={Boolean(currentParent?.unavailable)}
           canSubmit={canSubmit}
           isSubmitting={isSubmitting}
           surface={surface}
           mode={mode}
+          currentUnavailable={Boolean(currentParent?.unavailable)}
           onSubmit={() => void handleSubmit()}
         />
       }
-      items={pickerEnabled ? candidates : []}
+      hasStructuredFilters={showParentBrowseScopeControl && parentBrowseScope !== 'all'}
+      items={pickerEnabled ? pickerCandidates : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
       getSearchText={buildLocationSearchText}

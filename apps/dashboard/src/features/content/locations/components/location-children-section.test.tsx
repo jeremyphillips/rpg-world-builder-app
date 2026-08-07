@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Location } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
 
+import type * as RpgUi from '@rpg/ui'
+
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { DOCK_WARD, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
@@ -22,7 +24,7 @@ vi.mock('../../lib/list/content-client', () => ({
 }))
 
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof RpgUi>()
   return {
     ...actual,
     toast: {
@@ -70,11 +72,12 @@ describe('LocationChildrenSection', () => {
     vi.mocked(toast.warning).mockReset()
   })
 
-  it('shows View link for non-managers without Move overflow', () => {
+  it('shows heading links for non-managers without Move overflow', () => {
     renderSection({ canManage: false, parent: HARBORFORD })
 
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'View' })).toBeInTheDocument()
+    expect(screen.getByText('Locations directly within this location.')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Actions for Dock Ward' })).not.toBeInTheDocument()
   })
 
@@ -97,8 +100,9 @@ describe('LocationChildrenSection', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Move location' }))
 
     expect(screen.getByRole('dialog', { name: 'Move Yawning Portal' })).toBeInTheDocument()
-    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('Current parent')).toBeInTheDocument()
     expect(screen.getByText('Dock Ward')).toBeInTheDocument()
+    expect(screen.getByText('Choose where to move Yawning Portal.')).toBeInTheDocument()
     expect(screen.getByText('Harborford')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Move location' })).toBeDisabled()
   })

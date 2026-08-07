@@ -4,14 +4,20 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Location } from '@rpg/contracts'
-import { Heading, Text, toast } from '@rpg/ui'
+import { Text, toast } from '@rpg/ui'
 
-import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
+import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
+import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
+import { DetailSectionRowList } from '../../lib/detail/detail-section-row-list.client'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
 } from '../../lib/detail/detail-overflow-menu.client'
-import { LOCATION_SECTION_LABELS, type LocationChildrenViewModel } from '../lib/location-display'
+import {
+  LOCATION_SECTION_HELPERS,
+  LOCATION_SECTION_LABELS,
+  type LocationChildrenViewModel,
+} from '../lib/location-display'
 import {
   applyLocationParentReplacement,
   hasLocationParentReplacementContextMismatch,
@@ -102,56 +108,55 @@ export function LocationChildrenSection({
   }
 
   return (
-    <section aria-labelledby="location-children-heading" className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Heading variant="group" as="h2" id="location-children-heading">
-          {LOCATION_SECTION_LABELS.children}
-        </Heading>
-        {headerActions}
-      </div>
+    <>
+      <DetailSectionPanel
+        heading={LOCATION_SECTION_LABELS.children}
+        headingId="location-children-heading"
+        helper={LOCATION_SECTION_HELPERS.children}
+        headerEndSlot={headerActions}
+      >
+        {items.length === 0 ? (
+          <Text variant="muted" className="px-4 py-2">
+            {emptyText}
+          </Text>
+        ) : (
+          <DetailSectionRowList>
+            {items.map((item) => {
+              const actions: DetailOverflowAction[] = canManage
+                ? [
+                    {
+                      id: 'view',
+                      label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
+                      onSelect: () => navigate(item.href),
+                    },
+                    {
+                      id: 'move',
+                      label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
+                      onSelect: () => openMoveDrawer(item.id),
+                    },
+                  ]
+                : []
 
-      {items.length === 0 ? (
-        <Text variant="muted">{emptyText}</Text>
-      ) : (
-        <ul className="space-y-2">
-          {items.map((item) => {
-            const actions: DetailOverflowAction[] = canManage
-              ? [
-                  {
-                    id: 'view',
-                    label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
-                    onSelect: () => navigate(item.href),
-                  },
-                  {
-                    id: 'move',
-                    label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
-                    onSelect: () => openMoveDrawer(item.id),
-                  },
-                ]
-              : []
-
-            return (
-              <li key={item.id}>
-                <ContentEntityCard
+              return (
+                <DetailEntityRow
+                  key={item.id}
                   heading={item.name}
                   href={item.href}
                   subheading={item.summaryLine}
-                  headingEndSlot={
+                  endSlot={
                     canManage ? (
                       <DetailOverflowMenu
                         actions={actions}
                         triggerLabel={`Actions for ${item.name}`}
                       />
-                    ) : item.href ? (
-                      <ContentEntityCardViewLink href={item.href} />
                     ) : undefined
                   }
                 />
-              </li>
-            )
-          })}
-        </ul>
-      )}
+              )
+            })}
+          </DetailSectionRowList>
+        )}
+      </DetailSectionPanel>
 
       {moveSubject ? (
         <LocationParentReplacementDrawer
@@ -167,6 +172,6 @@ export function LocationChildrenSection({
           onSubmit={handleMoveSubmit}
         />
       ) : null}
-    </section>
+    </>
   )
 }

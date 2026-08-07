@@ -4,8 +4,40 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
-import { ALDERMERE, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
+import { ALDERMERE, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
+
+function createMultiFamilyCampaignLocations() {
+  const site = {
+    ...HARBORFORD,
+    id: 'location-site',
+    slug: 'harbor-site',
+    name: 'Harbor Site',
+    kind: 'site',
+  } as Location
+
+  const structureSibling = {
+    ...YAWNING_PORTAL,
+    id: 'location-other-structure',
+    slug: 'other-tavern',
+    name: 'Other Tavern',
+    parentLocationId: HARBORFORD.id,
+  } as Location
+
+  const interior = {
+    ...YAWNING_PORTAL,
+    id: 'location-interior',
+    slug: 'taproom',
+    name: 'Taproom',
+    kind: 'interior',
+    parentLocationId: YAWNING_PORTAL.id,
+  } as Location
+
+  return {
+    campaignLocations: [...LOCATIONS_LIST, site, structureSibling],
+    subject: interior,
+  }
+}
 
 describe('LocationParentReplacementDrawer', () => {
   it('shows current parent from parentLocationId and gates submit until a different parent is selected', async () => {
@@ -23,10 +55,10 @@ describe('LocationParentReplacementDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change parent location' })).toBeInTheDocument()
-    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('Current parent')).toBeInTheDocument()
     expect(screen.getByText('Dock Ward')).toBeInTheDocument()
-    expect(screen.getByText('New location')).toBeInTheDocument()
-    expect(screen.getByText('Choose a valid parent location.')).toBeInTheDocument()
+    expect(screen.getByText('New parent')).toBeInTheDocument()
+    expect(screen.getByText('Choose a new parent for this location.')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search locations…')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeDisabled()
     expect(screen.queryByRole('button', { name: 'Select' })).not.toBeDisabled()
@@ -58,8 +90,9 @@ describe('LocationParentReplacementDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Set parent location' })).toBeInTheDocument()
-    expect(screen.queryByText('Current location')).not.toBeInTheDocument()
-    expect(screen.getByText('New location')).toBeInTheDocument()
+    expect(screen.queryByText('Current parent')).not.toBeInTheDocument()
+    expect(screen.getByText('New parent')).toBeInTheDocument()
+    expect(screen.getByText('Choose a parent for this location.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Set parent location' })).toBeDisabled()
 
     await user.click(screen.getByRole('button', { name: 'Select' }))
@@ -84,6 +117,73 @@ describe('LocationParentReplacementDrawer', () => {
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
   })
 
+  it('shows candidate-universe browse scopes when multiple families are present', () => {
+    const { campaignLocations, subject } = createMultiFamilyCampaignLocations()
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={subject}
+        campaignLocations={campaignLocations}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sites' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Structures' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Settlements' })).not.toBeInTheDocument()
+  })
+
+  it('filters candidates by active browse scope', async () => {
+    const user = userEvent.setup()
+    const { campaignLocations, subject } = createMultiFamilyCampaignLocations()
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={subject}
+        campaignLocations={campaignLocations}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Harbor Site')).toBeInTheDocument()
+    expect(screen.getByText('Other Tavern')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Sites' }))
+
+    expect(screen.getByText('Harbor Site')).toBeInTheDocument()
+    expect(screen.queryByText('Other Tavern')).not.toBeInTheDocument()
+  })
+
+  it('preserves search query when switching parent browse scopes', async () => {
+    const user = userEvent.setup()
+    const { campaignLocations, subject } = createMultiFamilyCampaignLocations()
+
+    render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={vi.fn()}
+        subject={subject}
+        campaignLocations={campaignLocations}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const searchInput = screen.getByPlaceholderText('Search locations…')
+    await user.type(searchInput, 'Har')
+    expect(searchInput).toHaveValue('Har')
+
+    await user.click(screen.getByRole('button', { name: 'Sites' }))
+    expect(searchInput).toHaveValue('Har')
+
+    await user.click(screen.getByRole('button', { name: 'Structures' }))
+    expect(searchInput).toHaveValue('Har')
+  })
+
   it('uses Move chrome and blocks submit when expected parent mismatches authority', () => {
     render(
       <LocationParentReplacementDrawer
@@ -98,6 +198,7 @@ describe('LocationParentReplacementDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Move Yawning Portal' })).toBeInTheDocument()
+    expect(screen.getByText('Choose where to move Yawning Portal.')).toBeInTheDocument()
     expect(
       screen.getByText(
         'This location’s parent no longer matches this page. Refresh the locations list and try again.',
