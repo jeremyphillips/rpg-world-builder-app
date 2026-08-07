@@ -8,8 +8,8 @@ import type {
   Organization,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { getOrganizationKindLabel } from '@rpg/contracts'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -20,13 +20,10 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
-import {
-  RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL,
-  RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL,
-} from '../../lib/relationship/relationship-drawer-field-labels'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import { RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
 
 import {
   ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
@@ -55,9 +52,9 @@ import {
   resolveLocationInverseOrganizationTargetPresentation,
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
-  resolveLocationConnectionContext,
-  resolveTerritorialAuthorityReplaceContext,
 } from '../lib/location-connection-surface-copy'
+import { buildLocationDrawerContextPresentation } from '../lib/location-drawer-context.lib'
+import { buildOrganizationDrawerContextEntity } from '../../organizations/lib/organization-display'
 
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
@@ -70,6 +67,8 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
   location: Location
+  locationsById?: ReadonlyMap<string, Location>
+  campaignId?: string
   organizations: readonly Organization[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -110,6 +109,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   intent,
   addKind,
   location,
+  locationsById,
+  campaignId,
   organizations,
   connectedPartyRows,
   initialConnection,
@@ -296,23 +297,24 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     ? resolveLocationInverseOrganizationAddDrawerInstruction(resolvedAddKind)
     : null
 
-  const contextHeader = (() => {
-    if (mode === 'replaceOrganization' && initialConnection && intent === 'territorial_authority') {
-      return (
-        <RelationshipDrawerContextHeader
-          context={resolveTerritorialAuthorityReplaceContext(location, initialConnection.kind)}
-        />
-      )
+  const locationContextEntity = React.useMemo(
+    () =>
+      toDrawerContextEntity(
+        buildLocationDrawerContextPresentation(location, { locationsById, campaignId }),
+      ),
+    [campaignId, location, locationsById],
+  )
+
+  const drawerContextEntities = React.useMemo(() => {
+    if (mode === 'changeKind' && lockedOrganization) {
+      return [
+        locationContextEntity,
+        toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization)),
+      ]
     }
 
-    if (mode === 'add' || mode === 'changeKind' || mode === 'replaceOrganization') {
-      return (
-        <RelationshipDrawerContextHeader context={resolveLocationConnectionContext(location)} />
-      )
-    }
-
-    return null
-  })()
+    return [locationContextEntity]
+  }, [locationContextEntity, lockedOrganization, mode])
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
   const kindFieldLabel =
@@ -369,19 +371,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       noItemsMessage="No organizations are available."
       headerBelowDescription={
         <div className="space-y-4">
-          {contextHeader}
-          {mode === 'changeKind' && lockedOrganization ? (
-            <RelationshipDrawerSubjectField
-              label={RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL}
-              value={lockedOrganization.name}
-            />
-          ) : null}
-          {mode === 'replaceOrganization' && initialConnection ? (
-            <RelationshipDrawerSubjectField
-              label={RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL}
-              value={getOrganizationLocationConnectionLabel(initialConnection.kind)}
-            />
-          ) : null}
+          <DrawerContext entities={drawerContextEntities} />
           {mode === 'replaceOrganization' ? (
             <EntityReplacementSection
               entityLabel={RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL}

@@ -14,10 +14,13 @@ import {
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   buildLocationEntitySummarySearchText,
   type LocationEntitySummaryVm,
 } from '../lib/location-display'
+import { buildLocationDrawerContextFromCampaignLocations } from '../lib/location-drawer-context.lib'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -60,9 +63,7 @@ function toEntityReplacementCurrentSnapshot(
   current: LocationParentReplacementCurrentSnapshot,
 ): EntityReplacementCurrentSnapshot {
   return {
-    heading: current.heading,
-    subheading: current.subheading,
-    metadata: current.metadata,
+    entity: current.entity,
     imageKey: current.imageKey,
     unavailable: current.unavailable,
   }
@@ -169,6 +170,59 @@ export function LocationParentReplacementDrawer(props: LocationParentReplacement
   return <LocationParentReplacementDrawerContent key={remountKey} {...props} />
 }
 
+function LocationParentReplacementDrawerHeader({
+  subject,
+  campaignLocations,
+  surface,
+  mode,
+  currentParent,
+  showParentBrowseScopeControl,
+  browseScopeOptions,
+  parentBrowseScope,
+  onParentBrowseScopeChange,
+}: {
+  subject: Location
+  campaignLocations: readonly Location[]
+  surface: LocationParentReplacementDrawerSurface
+  mode: LocationParentReplacementMode
+  currentParent: LocationParentReplacementCurrentSnapshot | null
+  showParentBrowseScopeControl: boolean
+  browseScopeOptions: ReturnType<typeof resolveParentBrowseScopeOptions>
+  parentBrowseScope: LocationParentBrowseScope
+  onParentBrowseScopeChange: (value: LocationParentBrowseScope) => void
+}) {
+  return (
+    <div className="space-y-4">
+      <DrawerContext
+        entities={[
+          toDrawerContextEntity(
+            buildLocationDrawerContextFromCampaignLocations(subject, campaignLocations),
+          ),
+        ]}
+      />
+      <EntityReplacementSection
+        entityLabel="Parent"
+        current={currentParent ? toEntityReplacementCurrentSnapshot(currentParent) : null}
+        newHelper={resolveLocationParentReplacementDrawerNewHelper({
+          surface,
+          mode,
+          subjectName: subject.name,
+        })}
+      >
+        {showParentBrowseScopeControl ? (
+          <SegmentedControl
+            aria-label={LOCATION_PARENT_BROWSE_SCOPE_LABEL}
+            value={parentBrowseScope}
+            options={browseScopeOptions}
+            onValueChange={onParentBrowseScopeChange}
+            fullWidth
+          />
+        ) : null}
+      </EntityReplacementSection>
+    </div>
+  )
+}
+
 function LocationParentReplacementDrawerContent({
   open,
   onOpenChange,
@@ -245,25 +299,17 @@ function LocationParentReplacementDrawerContent({
       noResultsMessage={LOCATION_PARENT_REPLACEMENT_DRAWER.noResultsMessage}
       noItemsMessage={LOCATION_PARENT_REPLACEMENT_DRAWER.noItemsMessage}
       headerBelowDescription={
-        <EntityReplacementSection
-          entityLabel="Parent"
-          current={currentParent ? toEntityReplacementCurrentSnapshot(currentParent) : null}
-          newHelper={resolveLocationParentReplacementDrawerNewHelper({
-            surface,
-            mode,
-            subjectName: subject.name,
-          })}
-        >
-          {showParentBrowseScopeControl ? (
-            <SegmentedControl
-              aria-label={LOCATION_PARENT_BROWSE_SCOPE_LABEL}
-              value={parentBrowseScope}
-              options={browseScopeOptions}
-              onValueChange={setParentBrowseScope}
-              fullWidth
-            />
-          ) : null}
-        </EntityReplacementSection>
+        <LocationParentReplacementDrawerHeader
+          subject={subject}
+          campaignLocations={campaignLocations}
+          surface={surface}
+          mode={mode}
+          currentParent={currentParent}
+          showParentBrowseScopeControl={showParentBrowseScopeControl}
+          browseScopeOptions={browseScopeOptions}
+          parentBrowseScope={parentBrowseScope}
+          onParentBrowseScopeChange={setParentBrowseScope}
+        />
       }
       footer={
         <LocationParentReplacementDrawerFooter

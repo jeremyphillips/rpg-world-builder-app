@@ -36,9 +36,7 @@ export function EntityReplacementSection({
         <div className="mb-3">
           <EntityReplacementCurrentField
             label={labels.currentLabel}
-            heading={current.heading}
-            subheading={current.subheading}
-            metadata={current.metadata}
+            entity={current.entity}
             imageKey={current.imageKey}
           />
           {current.unavailable ? (

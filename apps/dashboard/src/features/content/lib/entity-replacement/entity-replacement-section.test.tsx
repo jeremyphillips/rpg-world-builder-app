@@ -9,8 +9,10 @@ describe('EntityReplacementSection', () => {
       <EntityReplacementSection
         entityLabel="Organization"
         current={{
-          heading: 'City Council',
-          subheading: 'Government',
+          entity: {
+            heading: 'City Council',
+            headingSuffix: ' · Government',
+          },
           unavailable: true,
         }}
         newHelper="Choose a different organization."
@@ -33,7 +35,12 @@ describe('EntityReplacementSection', () => {
     render(
       <EntityReplacementSection
         entityLabel="Location"
-        current={{ heading: 'Harborford', subheading: 'Settlement' }}
+        current={{
+          entity: {
+            heading: 'Harborford',
+            headingSuffix: ' · Settlement',
+          },
+        }}
         showNewSection={false}
       />,
     )

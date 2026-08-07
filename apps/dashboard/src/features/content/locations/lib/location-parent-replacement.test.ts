@@ -93,9 +93,11 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       }),
     ).toEqual({
       parentLocationId: DOCK_WARD.id,
-      heading: DOCK_WARD.name,
-      subheading: 'District',
-      metadata: 'Aldermere / Greyshore / Harborford',
+      entity: {
+        heading: DOCK_WARD.name,
+        headingSuffix: ' · District',
+        supportingText: 'Located in Harborford',
+      },
     })
   })
 
@@ -113,7 +115,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       }),
     ).toEqual({
       parentLocationId: 'missing-parent-id',
-      heading: LOCATION_UNKNOWN_ANCESTOR_LABEL,
+      entity: { heading: LOCATION_UNKNOWN_ANCESTOR_LABEL },
       unavailable: true,
     })
   })

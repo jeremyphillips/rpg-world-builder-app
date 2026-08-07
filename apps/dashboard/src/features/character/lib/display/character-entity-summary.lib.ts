@@ -102,6 +102,18 @@ export function formatCharacterMixedHeadingSuffix(
   return inlineSummary ? ` · ${inlineSummary}` : undefined
 }
 
+export function buildCharacterEntityContextPresentation(vm: CharacterEntitySummaryVm): {
+  heading: string
+  headingSuffix?: string
+  href?: string
+} {
+  return {
+    heading: vm.name,
+    headingSuffix: formatCharacterMixedHeadingSuffix(vm),
+    href: vm.href,
+  }
+}
+
 export function buildCharacterEntitySummarySearchText(vm: CharacterEntitySummaryVm): string {
   return [vm.name, formatCharacterInlineSummary(vm, { includeCharacterType: true })].join(' ')
 }

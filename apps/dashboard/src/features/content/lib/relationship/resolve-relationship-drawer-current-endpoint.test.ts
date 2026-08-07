@@ -33,8 +33,10 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         ],
       }),
     ).toEqual({
-      heading: 'City Council',
-      subheading: 'Government',
+      entity: {
+        heading: 'City Council',
+        headingSuffix: ' · Government',
+      },
       imageKey: 'img-1',
       unavailable: false,
     })
@@ -47,7 +49,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         rows: [],
       }),
     ).toEqual({
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING },
       unavailable: true,
     })
   })

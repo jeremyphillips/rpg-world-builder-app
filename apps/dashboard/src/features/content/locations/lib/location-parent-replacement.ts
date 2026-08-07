@@ -12,6 +12,7 @@ import { locationsQueryKey } from '../hooks/use-locations'
 import { buildLocationHierarchyGraph } from './build-location-hierarchy-graph'
 import {
   buildLocationEntitySummaryVm,
+  buildLocationEntityContextPresentation,
   buildLocationsById,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
   type LocationEntitySummaryVm,
@@ -28,11 +29,11 @@ export type LocationParentReplacementAction =
 
 export type LocationParentReplacementMode = 'change' | 'set'
 
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
-  heading: string
-  subheading?: string
-  metadata?: string
+  entity: DrawerContextEntityPresentation
   imageKey?: string
   unavailable?: boolean
 }
@@ -76,7 +77,7 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
   if (!parent) {
     return {
       parentLocationId,
-      heading: LOCATION_UNKNOWN_ANCESTOR_LABEL,
+      entity: { heading: LOCATION_UNKNOWN_ANCESTOR_LABEL },
       unavailable: true,
     }
   }
@@ -88,9 +89,7 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
 
   return {
     parentLocationId,
-    heading: summary.name,
-    subheading: summary.classification.text,
-    metadata: summary.ancestry.items.length > 0 ? summary.ancestry.text : undefined,
+    entity: buildLocationEntityContextPresentation(summary),
     imageKey: summary.imageKey,
   }
 }

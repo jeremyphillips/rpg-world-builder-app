@@ -3,7 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { YAWNING_PORTAL } from '../fixtures'
+import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
+import { buildLocationsById } from '../lib/location-display'
 import { CITY_COUNCIL } from '../../organizations/fixtures'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
@@ -28,6 +29,10 @@ const residentSlot = {
 
 const kindSlots = [ownerSlot, headquartersSlot, residentSlot]
 const location = YAWNING_PORTAL
+const drawerLocationContext = {
+  locationsById: buildLocationsById(LOCATIONS_LIST),
+  campaignId: 'camp_1',
+}
 
 const sampleOrganizations = [CITY_COUNCIL]
 
@@ -48,6 +53,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...drawerLocationContext}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -58,7 +64,9 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('Yawning Portal · Building · Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
+    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
     expect(
       screen.getByText(LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage),
     ).toBeInTheDocument()
@@ -79,6 +87,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...drawerLocationContext}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -105,6 +114,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...drawerLocationContext}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -129,6 +139,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={[ownerSlot]}
         location={location}
+        {...drawerLocationContext}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -151,6 +162,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...drawerLocationContext}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}

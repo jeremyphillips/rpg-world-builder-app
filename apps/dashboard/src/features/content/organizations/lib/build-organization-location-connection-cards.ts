@@ -14,6 +14,7 @@ import { ROUTES } from '@/app/routes'
 
 import {
   buildLocationEntitySummaryVm,
+  buildLocationEntityContextPresentation,
   type LocationEntitySummaryVm,
 } from '../../locations/lib/location-display'
 import {
@@ -98,9 +99,7 @@ export function mapLocationEntitySummaryToEntityReplacementCurrentSnapshot(
   vm: LocationEntitySummaryVm,
 ): EntityReplacementCurrentSnapshot {
   return {
-    heading: vm.name,
-    subheading: vm.classification.text,
-    metadata: vm.ancestry.items.length > 0 ? vm.ancestry.text : undefined,
+    entity: buildLocationEntityContextPresentation(vm),
     imageKey: vm.imageKey,
   }
 }
@@ -117,7 +116,7 @@ export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
 
   if (!reference?.location) {
     return {
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     }
   }

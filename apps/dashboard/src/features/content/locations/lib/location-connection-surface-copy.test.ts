@@ -6,12 +6,10 @@ import {
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
   TERRITORIAL_AUTHORITY_DRAWER,
   isTerritorialAuthorityKind,
-  resolveLocationConnectionContext,
   resolveLocationInverseCharacterTargetPresentation,
   resolveLocationInverseOrganizationReplaceHelper,
   resolveLocationInverseOrganizationTargetPresentation,
 } from './location-connection-surface-copy'
-import { YAWNING_PORTAL } from '../fixtures'
 
 describe('location-connection-surface-copy inverse target presentation', () => {
   it('resolves generic organization defaults for site and presence kinds', () => {
@@ -47,14 +45,6 @@ describe('location-connection-surface-copy inverse target presentation', () => {
     )
     expect(resolveLocationInverseCharacterTargetPresentation(undefined)).toEqual(
       DEFAULT_LOCATION_INVERSE_CHARACTER_TARGET_PRESENTATION,
-    )
-  })
-})
-
-describe('location-connection-surface-copy location connection context', () => {
-  it('uses compact classification text for fixed-location drawer headers', () => {
-    expect(resolveLocationConnectionContext(YAWNING_PORTAL)).toBe(
-      'Yawning Portal · Building · Tavern',
     )
   })
 })

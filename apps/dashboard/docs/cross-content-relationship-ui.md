@@ -85,7 +85,7 @@ Located in {nearest direct parent}
 
 - Classification renders via `headingSuffix` **outside** the entity link (same contract as contained locations).
 - Nearest-parent context uses the last ancestry segment only — not full `ancestry.text`.
-- Pickers and change-target **Current** may still show fuller classification + ancestry for disambiguation.
+- Pickers may still show fuller classification + ancestry for disambiguation; drawer **Current** and **DrawerContext** use compact name · classification + `Located in {nearestParent}` via [`buildLocationEntityContextPresentation`](../src/features/content/locations/lib/location-display.ts).
 
 ### Mixed PC/NPC character rows
 
@@ -133,13 +133,13 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 ## Drawer building blocks
 
-| Primitive                                                    | Role                                                                                                           |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `RelationshipDrawerContextHeader`                            | Names the fixed endpoint (`{name} · {kind label}`)                                                             |
-| `RelationshipDrawerSubjectField`                             | Structured read-only subject/target label + value (Organization, Location, Character)                          |
-| `EntityReplacementCurrentField` / `EntityReplacementSection` | Read-only current entity summary + Current→New chrome for searchable replacement flows (`entity-replacement/`) |
-| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                           |
-| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                  |
+| Primitive                                                    | Role                                                                                                             |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `DrawerContext`                                              | Lightweight fixed-endpoint composition (name · classification, Located in nearest parent) — no border/background |
+| `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                           |
+| `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows               |
+| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                             |
+| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                    |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
@@ -172,7 +172,7 @@ Current-value display is resolved from persisted/hydrated relationship data at d
 
 Rules:
 
-- Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints and subjects with `RelationshipDrawerSubjectField`.
+- Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints with **`DrawerContext`**; render replacement values in sunken **`EntityReplacementCurrentField`**.
 - **Change kind** opens with eligible options visible — do not require a second "Change" interaction.
 - Change-kind drawers change **kind only** — disable entity pickers (`pickerEnabled={false}` on `CatalogPickerSheet`) so search, empty states, and picker hooks do not mount.
 - Reuse `CollapsibleRadioCardField` via `LocationConnectionKindStep` with `defaultExpanded` for change-kind flows.
@@ -229,7 +229,17 @@ Inverse existing-edge eyebrows and connected-parties labels use
 
 **Endpoint-fixed inverse kind pickers** (location inverse drawers, org change-kind at a fixed location) require a `Location` and use dashboard-owned contextual descriptions from [`location-inverse-relationship-description.ts`](../src/features/content/locations/lib/location-inverse-relationship-description.ts) with reference nouns from `resolveLocationReferenceNoun` in `@rpg/contracts`. Inverse radio labels use `get*ConnectionDisplayLabel(kind, 'inverse')`. Forward / non-contextual pickers keep neutral vocab `.description` and canonical labels.
 
-Drawer context headers use `resolveLocationConnectionContext(location)` — `${name} · ${resolveLocationClassificationDisplay(location).text}` — in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts).
+Drawer fixed endpoints compose **`DrawerContext`** from feature projections:
+
+- Location: `buildLocationEntityContextPresentation(LocationEntitySummaryVm)` — heading, ` · ${classification.text}`, optional `Located in {nearestParent}` from `ancestry.items.at(-1)` (via [`formatLocatedInSupportingText`](../src/features/content/locations/lib/location-display.ts)).
+- Organization: `buildOrganizationDrawerContextEntity` — `{name} · Organization`.
+- Character: `buildCharacterEntityContextPresentation` when a summary VM is available.
+
+**DrawerContext** (lightweight, no chrome) names fixed endpoints for add flows and attribute mutations. **Sunken Current** (`EntityReplacementCurrentField`) hosts the same entity composition for replacement-only workflows.
+
+Endpoint ordering: location detail drawers lead with location; organization forward drawers lead with organization.
+
+Do not use standalone Organization / Location / Character **SubjectField** labels as endpoint chrome — reserve `RelationshipDrawerSubjectField` for genuine form values only.
 
 Vocab still owns perspective-neutral canonical descriptions for forward and non-contextual pickers.
 
@@ -294,7 +304,7 @@ Before building a new cross-content relationship surface, evaluate:
 2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows (relationship layer composes detail primitives)
 3. `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
 4. `RelationshipEmptyInlineRow` for inline empty + add
-5. `RelationshipDrawerContextHeader` + embedded entity picker + kind step (when needed)
+5. `DrawerContext` + embedded entity picker + kind step (when needed)
 6. Direction-aware copy resolvers
 7. Feature-owned entity summary VMs mapped to neutral row / Current fields (`LocationEntitySummaryVm` for org→location targets — generic relationship code never imports location display)
 

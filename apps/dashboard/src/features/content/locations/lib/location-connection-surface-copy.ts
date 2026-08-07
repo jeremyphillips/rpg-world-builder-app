@@ -1,12 +1,10 @@
 import type {
   CharacterLocationConnectionKind,
-  Location,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
   getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionLabel,
-  resolveLocationClassificationDisplay,
 } from '@rpg/contracts'
 
 export const TERRITORIAL_AUTHORITY_SECTION_HEADING = 'Territorial Authority'
@@ -264,24 +262,6 @@ export function resolveLocationInverseOrganizationAddSubmitLabel(
   kind: OrganizationLocationConnectionKind,
 ): string {
   return LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY[kind].addSubmit
-}
-
-export function resolveLocationConnectionContext(location: Location): string {
-  return `${location.name} · ${resolveLocationClassificationDisplay(location).text}`
-}
-
-export function resolveTerritorialAuthorityReplaceContext(
-  location: Location,
-  kind: OrganizationLocationConnectionKind,
-): string {
-  return `${resolveLocationConnectionContext(location)} · ${getOrganizationLocationConnectionDisplayLabel(kind, 'inverse')}`
-}
-
-export function resolveTerritorialAuthorityChangeKindCurrent(input: {
-  organizationName: string
-  kind: OrganizationLocationConnectionKind
-}): string {
-  return `${input.organizationName} · ${getOrganizationLocationConnectionDisplayLabel(input.kind, 'inverse')}`
 }
 
 export function resolveTerritorialKindOccupiedReason(input: {

@@ -15,16 +15,21 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
 
   if (!row || row.subject.type !== 'organization') {
     return {
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING },
       unavailable: true,
     }
   }
 
   const organization = input.organizations?.find(({ id }) => id === row.subject.id)
+  const kindLabel = organization
+    ? getOrganizationKindLabel(organization.organizationKind)
+    : undefined
 
   return {
-    heading: row.subject.name,
-    subheading: organization ? getOrganizationKindLabel(organization.organizationKind) : undefined,
+    entity: {
+      heading: row.subject.name,
+      headingSuffix: kindLabel ? ` · ${kindLabel}` : undefined,
+    },
     imageKey: organization?.imageKey,
     unavailable: organization == null,
   }

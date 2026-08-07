@@ -33,6 +33,8 @@ function LocationConnectedOrganizationDrawer({
       intent={drawerState.intent}
       addKind={drawerState.mode === 'add' ? drawerState.kind : undefined}
       location={location}
+      locationsById={detail.locationsById}
+      campaignId={detail.campaignId}
       organizations={detail.organizations}
       connectedPartyRows={detail.rows}
       initialConnection={
@@ -70,6 +72,8 @@ function LocationConnectedCharacterDrawer({
       mode={drawerState?.mode ?? 'add'}
       addKind={drawerState?.mode === 'add' ? drawerState.kind : undefined}
       location={location}
+      locationsById={detail.locationsById}
+      campaignId={detail.campaignId}
       characters={detail.characterOptions}
       connectedPartyRows={detail.rows}
       initialConnection={drawerState?.mode === 'changeKind' ? drawerState.connection : undefined}
@@ -93,6 +97,8 @@ function LocationConnectedPeopleDrawer({ location, detail }: LocationConnectedPa
       }}
       kindSlots={detail.peopleKindSlots}
       location={location}
+      locationsById={detail.locationsById}
+      campaignId={detail.campaignId}
       organizations={detail.organizations}
       characters={detail.characterOptions}
       connectedPartyRows={detail.rows}

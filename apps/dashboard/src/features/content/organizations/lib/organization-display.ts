@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 
 import type { CharacterEntitySummaryVm } from '@/features/character'
@@ -20,6 +21,17 @@ export const ORGANIZATION_EMPTY_SECTION_TEXT = {
   connectedCharacters: 'No connected characters yet.',
   locationConnections: 'No location connections yet.',
 } as const
+
+export const ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX = ' · Organization' as const
+
+export function buildOrganizationDrawerContextEntity(
+  organization: Pick<Organization, 'name'>,
+): DrawerContextEntityPresentation {
+  return {
+    heading: organization.name,
+    headingSuffix: ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX,
+  }
+}
 
 export type OrganizationConnectedCharacterPreviewItem = {
   summary: CharacterEntitySummaryVm

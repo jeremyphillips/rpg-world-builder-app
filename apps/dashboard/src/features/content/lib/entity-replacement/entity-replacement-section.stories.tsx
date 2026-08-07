@@ -15,8 +15,11 @@ export const LocationReplacement: Story = {
   args: {
     entityLabel: 'Location',
     current: {
-      heading: 'Dock Ward',
-      subheading: 'District',
+      entity: {
+        heading: 'Dock Ward',
+        headingSuffix: ' · District',
+        supportingText: 'Located in Harborford',
+      },
     },
     newHelper: 'Choose a valid parent location.',
   },
@@ -26,7 +29,9 @@ export const OrganizationReplacementUnavailable: Story = {
   args: {
     entityLabel: 'Organization',
     current: {
-      heading: 'Unavailable organization',
+      entity: {
+        heading: 'Unavailable organization',
+      },
       unavailable: true,
     },
     newHelper: 'Choose a different organization.',

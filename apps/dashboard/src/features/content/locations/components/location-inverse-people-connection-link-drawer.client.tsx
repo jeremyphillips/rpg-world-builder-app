@@ -20,7 +20,8 @@ import {
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -42,8 +43,8 @@ import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddSubmitLabel,
   resolveLocationInverseOrganizationTargetPresentation,
-  resolveLocationConnectionContext,
 } from '../lib/location-connection-surface-copy'
+import { buildLocationDrawerContextPresentation } from '../lib/location-drawer-context.lib'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import {
   buildConnectedPartyCharacterPickerSearchText,
@@ -66,6 +67,8 @@ export type LocationInversePeopleConnectionLinkDrawerProps = {
   onOpenChange: (open: boolean) => void
   kindSlots: readonly PeopleKindSlot[]
   location: Location
+  locationsById?: ReadonlyMap<string, Location>
+  campaignId?: string
   organizations: readonly Organization[]
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -112,6 +115,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onOpenChange,
   kindSlots,
   location,
+  locationsById,
+  campaignId,
   organizations,
   characters,
   connectedPartyRows,
@@ -274,9 +279,17 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[organizationIntent]
       : 'All eligible connection types are already linked.'
 
+  const locationContextEntity = React.useMemo(
+    () =>
+      toDrawerContextEntity(
+        buildLocationDrawerContextPresentation(location, { locationsById, campaignId }),
+      ),
+    [campaignId, location, locationsById],
+  )
+
   const headerBelowDescription = (
     <div className="space-y-4">
-      <RelationshipDrawerContextHeader context={resolveLocationConnectionContext(location)} />
+      <DrawerContext entities={[locationContextEntity]} />
       {kindOptions.length > 0 ? (
         <LocationConnectionKindStep
           id="location-people-connection-kind"

@@ -183,9 +183,11 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
         campaignId: CAMPAIGN_ID,
       }),
     ).toEqual({
-      heading: 'Yawning Portal',
-      subheading: 'Building · Tavern',
-      metadata: 'Aldermere / Greyshore / Harborford / Dock Ward',
+      entity: {
+        heading: 'Yawning Portal',
+        headingSuffix: ' · Building · Tavern',
+        supportingText: 'Located in Dock Ward',
+      },
       imageKey: YAWNING_PORTAL.imageKey,
     })
   })
@@ -208,7 +210,7 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
         campaignId: CAMPAIGN_ID,
       }),
     ).toEqual({
-      heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     })
   })

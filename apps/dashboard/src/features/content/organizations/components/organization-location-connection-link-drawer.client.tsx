@@ -8,7 +8,6 @@ import type {
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -20,10 +19,10 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
@@ -33,8 +32,10 @@ import { resolveRelationshipCandidateSet } from '../../lib/relationship/relation
 import {
   buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
+  buildLocationEntityContextPresentation,
   type LocationEntitySummaryVm,
 } from '../../locations/lib/location-display'
+import { buildOrganizationDrawerContextEntity } from '../lib/organization-display'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
@@ -425,7 +426,27 @@ function OrganizationLocationConnectionLinkDrawerContent({
   })()
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
-  const organizationContext = `${organization.name} · ${getOrganizationKindLabel(organization.organizationKind)}`
+  const organizationContextEntity = toDrawerContextEntity(
+    buildOrganizationDrawerContextEntity(organization),
+  )
+
+  const drawerContextEntities = React.useMemo(() => {
+    if (mode === 'changeKind' && lockedLocation) {
+      return [
+        organizationContextEntity,
+        toDrawerContextEntity(
+          buildLocationEntityContextPresentation(
+            buildLocationEntitySummaryVm(lockedLocation, {
+              locationsById,
+              campaignId,
+            }),
+          ),
+        ),
+      ]
+    }
+
+    return [organizationContextEntity]
+  }, [campaignId, lockedLocation, locationsById, mode, organizationContextEntity])
 
   const mutationEmptyMessage =
     mode === 'changeTarget'
@@ -497,7 +518,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
       headerBelowDescription={
         <div className="space-y-4">
-          <RelationshipDrawerContextHeader context={organizationContext} />
+          <DrawerContext entities={drawerContextEntities} />
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
@@ -515,18 +536,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
               value={activeKind}
               onValueChange={handleKindChange}
               changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
-            />
-          ) : null}
-          {mode === 'changeKind' && lockedLocation ? (
-            <RelationshipDrawerSubjectField
-              label={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
-              value={lockedLocation.name}
-            />
-          ) : null}
-          {mode === 'changeTarget' && activeKind ? (
-            <RelationshipDrawerSubjectField
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              value={getOrganizationLocationConnectionLabel(activeKind)}
             />
           ) : null}
           {mode === 'changeTarget' &&

@@ -151,8 +151,10 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
 
 describe('LocationInverseOrganizationConnectionLinkDrawer replace organization', () => {
   const currentOrganizationEndpoint = {
-    heading: CITY_COUNCIL.name,
-    subheading: 'Government',
+    entity: {
+      heading: CITY_COUNCIL.name,
+      headingSuffix: ' · Government',
+    },
     imageKey: CITY_COUNCIL.imageKey,
   }
 
@@ -180,7 +182,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Guildhall · Building')).toBeInTheDocument()
+    expect(screen.getByText('Guildhall')).toBeInTheDocument()
+    expect(screen.getByText('Building')).toBeInTheDocument()
     expect(screen.queryByText('Guildhall · Building · Headquarters')).not.toBeInTheDocument()
     expect(
       screen.queryByText(TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults),
@@ -219,7 +222,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: TERRITORIAL_AUTHORITY_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Port City · Settlement · Governed by')).toBeInTheDocument()
+    expect(screen.getByText('Port City')).toBeInTheDocument()
+    expect(screen.getByText('Settlement')).toBeInTheDocument()
   })
 
   it('shows current and new organization fields with replacement picker', async () => {
@@ -246,11 +250,10 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     )
 
     expect(screen.getByRole('dialog', { name: 'Replace organization' })).toBeInTheDocument()
-    expect(screen.getByText('Relationship type')).toBeInTheDocument()
-    expect(screen.getByText('Headquarters')).toBeInTheDocument()
     expect(screen.getByText('Current organization')).toBeInTheDocument()
     expect(screen.getByText('New organization')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Relationship type')).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
     expect(screen.getAllByText('City Council')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Replace organization' })).toBeDisabled()

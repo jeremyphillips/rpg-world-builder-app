@@ -10,6 +10,7 @@ import type {
 import { Badge } from '@rpg/ui'
 
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
+import { formatLocatedInSupportingText } from '../../locations/lib/location-display'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -163,7 +164,7 @@ export function OrganizationLocationConnectionRelationshipRow({
             Unavailable
           </Badge>
         ) : nearestParent ? (
-          <span className="italic">Located in {nearestParent.name}</span>
+          <span className="italic">{formatLocatedInSupportingText(nearestParent.name)}</span>
         ) : undefined
       }
       actions={buildOrganizationLocationConnectionOverflowActions({

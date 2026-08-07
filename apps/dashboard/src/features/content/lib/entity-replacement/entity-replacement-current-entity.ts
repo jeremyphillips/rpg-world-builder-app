@@ -1,7 +1,7 @@
+import type { DrawerContextEntityPresentation } from '../relationship/drawer-context.types'
+
 export type EntityReplacementCurrentSnapshot = {
-  heading: string
-  subheading?: string
-  metadata?: string
+  entity: DrawerContextEntityPresentation
   imageKey?: string
   unavailable?: boolean
 }

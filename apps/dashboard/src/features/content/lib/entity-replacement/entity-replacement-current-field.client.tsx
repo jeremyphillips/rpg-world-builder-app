@@ -1,22 +1,20 @@
 'use client'
 
-import { Heading, InsetPanel } from '@rpg/ui'
+import { ContentCardMedia, Heading, InsetPanel } from '@rpg/ui'
 
-import { ContentEntityCard } from '../content-entity-card.client'
+import { DrawerContextEntityBlock } from '../relationship/drawer-context-entity-block.client'
+import type { DrawerContextEntityPresentation } from '../relationship/drawer-context.types'
+import { getContentImageUrl } from '../detail/content-image-url'
 
 export type EntityReplacementCurrentFieldProps = {
   label: string
-  heading: string
-  subheading?: string
-  metadata?: string
+  entity: DrawerContextEntityPresentation
   imageKey?: string
 }
 
 export function EntityReplacementCurrentField({
   label,
-  heading,
-  subheading,
-  metadata,
+  entity,
   imageKey,
 }: EntityReplacementCurrentFieldProps) {
   return (
@@ -25,14 +23,16 @@ export function EntityReplacementCurrentField({
         {label}
       </Heading>
       <InsetPanel size="sm" className="p-0">
-        <ContentEntityCard
-          chrome="embedded"
-          density="compact"
-          heading={heading}
-          subheading={subheading}
-          metadata={metadata}
-          imageKey={imageKey}
-        />
+        <div className="flex items-start gap-3 p-3">
+          {imageKey ? (
+            <ContentCardMedia
+              src={getContentImageUrl(imageKey)}
+              alt={entity.heading}
+              className="shrink-0"
+            />
+          ) : null}
+          <DrawerContextEntityBlock {...entity} className="min-w-0 flex-1" />
+        </div>
       </InsetPanel>
     </div>
   )

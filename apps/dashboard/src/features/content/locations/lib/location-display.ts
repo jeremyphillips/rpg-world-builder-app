@@ -12,6 +12,8 @@ import {
 
 import { ROUTES } from '@/app/routes'
 
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,
@@ -34,6 +36,12 @@ export const LOCATION_EMPTY_SECTION_TEXT = {
 } as const
 
 export const LOCATION_ANCESTRY_TEXT_SEPARATOR = ' / ' as const
+
+export const LOCATED_IN_SUPPORTING_TEXT_PREFIX = 'Located in ' as const
+
+export function formatLocatedInSupportingText(parentName: string): string {
+  return `${LOCATED_IN_SUPPORTING_TEXT_PREFIX}${parentName}`
+}
 
 export type LocationLocatedInSegment = {
   id: string
@@ -185,6 +193,30 @@ export function buildLocationEntitySummaryVm(
       text: items.map((item) => item.name).join(LOCATION_ANCESTRY_TEXT_SEPARATOR),
     },
   }
+}
+
+export function buildLocationEntityContextPresentation(
+  vm: LocationEntitySummaryVm,
+): DrawerContextEntityPresentation {
+  const nearestParent = vm.ancestry.items.at(-1)
+
+  return {
+    heading: vm.name,
+    headingSuffix: vm.classification.text ? ` · ${vm.classification.text}` : undefined,
+    supportingText: nearestParent ? formatLocatedInSupportingText(nearestParent.name) : undefined,
+    href: vm.href,
+  }
+}
+
+export function buildLocationContextPresentationFromLocation(
+  location: Location,
+  ctx: {
+    locationsById: ReadonlyMap<string, Location>
+    campaignId: string
+    href?: string
+  },
+): DrawerContextEntityPresentation {
+  return buildLocationEntityContextPresentation(buildLocationEntitySummaryVm(location, ctx))
 }
 
 export function buildLocationEntitySummarySearchText(vm: LocationEntitySummaryVm): string {

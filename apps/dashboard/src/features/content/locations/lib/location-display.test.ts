@@ -8,10 +8,12 @@ import {
   buildChildSummariesByParentId,
   buildLocationChildren,
   buildLocationDetailViewModel,
+  buildLocationEntityContextPresentation,
   buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
   buildLocationLocatedInSegments,
   buildLocationsById,
+  formatLocatedInSupportingText,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
 import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
@@ -75,6 +77,36 @@ describe('buildLocationLocatedInSegments', () => {
         name: LOCATION_UNKNOWN_ANCESTOR_LABEL,
       },
     ])
+  })
+})
+
+describe('located-in presentation helpers', () => {
+  it('formats located-in supporting text', () => {
+    expect(formatLocatedInSupportingText('Dock Ward')).toBe('Located in Dock Ward')
+  })
+
+  it('projects location VM context with compact classification and nearest parent only', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntityContextPresentation(summary)).toEqual({
+      heading: 'Yawning Portal',
+      headingSuffix: ' · Building · Tavern',
+      supportingText: 'Located in Dock Ward',
+    })
+  })
+
+  it('omits supporting text for root locations', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(ALDERMERE, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntityContextPresentation(summary).supportingText).toBeUndefined()
   })
 })
 

@@ -2,8 +2,14 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { YAWNING_PORTAL } from '../fixtures'
+import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
+import { buildLocationsById } from '../lib/location-display'
 import { LocationInverseCharacterConnectionLinkDrawer } from './location-inverse-character-connection-link-drawer.client'
+
+const DRAWER_LOCATION_CONTEXT = {
+  locationsById: buildLocationsById(LOCATIONS_LIST),
+  campaignId: 'camp_1',
+}
 
 const characters = [
   {
@@ -23,6 +29,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         mode="add"
         addKind="works_at"
         location={YAWNING_PORTAL}
+        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
@@ -41,13 +48,16 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         mode="add"
         addKind="works_at"
         location={YAWNING_PORTAL}
+        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
       />,
     )
 
-    expect(screen.getByText('Yawning Portal · Building · Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
+    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
     expect(screen.queryByText(/Yawning Portal · Structure/i)).not.toBeInTheDocument()
   })
 
@@ -61,6 +71,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         onOpenChange={vi.fn()}
         mode="changeKind"
         location={YAWNING_PORTAL}
+        {...DRAWER_LOCATION_CONTEXT}
         characters={characters}
         connectedPartyRows={[
           {
@@ -89,8 +100,8 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
-    expect(screen.getByText('Character')).toBeInTheDocument()
     expect(screen.getByText('Braggi')).toBeInTheDocument()
+    expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Connection type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Works at/i })).toBeChecked()

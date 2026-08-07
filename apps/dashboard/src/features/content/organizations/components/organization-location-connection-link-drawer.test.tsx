@@ -99,7 +99,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('The Monarchy · Government')).toBeInTheDocument()
+    expect(screen.getByText('The Monarchy')).toBeInTheDocument()
+    expect(screen.getByText('Organization')).toBeInTheDocument()
     expect(
       screen.getByText(
         /Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters/i,
@@ -370,8 +371,9 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
-    expect(screen.getByText('Location')).toBeInTheDocument()
+    expect(screen.getByText('The Monarchy')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
+    expect(screen.queryByText('Location')).not.toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
@@ -458,8 +460,10 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         occupancyLoaded
         initialConnection={{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }}
         currentEndpoint={{
-          heading: 'Thieves Guildhouse',
-          subheading: 'Structure',
+          entity: {
+            heading: 'Thieves Guildhouse',
+            headingSuffix: ' · Structure',
+          },
         }}
         onSubmit={onSubmit}
       />,
@@ -469,7 +473,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Current location')).toBeInTheDocument()
     expect(screen.getByText('New location')).toBeInTheDocument()
     expect(screen.getByText('Thieves Guildhouse')).toBeInTheDocument()
-    expect(screen.getAllByText('Structure').length).toBeGreaterThan(0)
+    expect(screen.getByText('Structure')).toBeInTheDocument()
     expect(screen.getByText(headquartersPresentation.targetHelp!)).toBeInTheDocument()
     expect(
       screen.getByRole('textbox', { name: headquartersPresentation.searchPlaceholder }),
@@ -523,8 +527,10 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
           kind: 'headquarters',
         }}
         currentEndpoint={{
-          heading: 'Legacy Port HQ',
-          subheading: 'Settlement',
+          entity: {
+            heading: 'Legacy Port HQ',
+            headingSuffix: ' · Settlement',
+          },
         }}
         onSubmit={vi.fn()}
       />,
@@ -551,7 +557,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         occupancyLoaded
         initialConnection={{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }}
         currentEndpoint={{
-          heading: 'Unavailable location',
+          entity: { heading: 'Unavailable location' },
           unavailable: true,
         }}
         onSubmit={vi.fn()}

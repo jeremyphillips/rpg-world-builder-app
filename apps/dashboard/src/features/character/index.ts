@@ -70,6 +70,7 @@ export {
   buildCharacterEntitySummarySearchText,
   formatCharacterInlineSummary,
   formatCharacterMixedHeadingSuffix,
+  buildCharacterEntityContextPresentation,
   resolveCharacterControllerDisplay,
   normalizePartyController,
   normalizeListController,
