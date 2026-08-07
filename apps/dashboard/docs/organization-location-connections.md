@@ -52,6 +52,11 @@ Mutation candidate filtering (add, change location, replace organization) always
 
 Organization detail uses **family-level** empty states and one **Add {family}** action. Populated kind groups render only when they contain relationships. Forward kind eyebrows may differ grammatically from inverse vocab labels (see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)).
 
+Directional edge copy lives on connection kind entries in `@rpg/contracts`
+(`label`, optional `forwardLabel`, optional `inverseLabel`). Organization forward eyebrows
+still consume `ORGANIZATION_FORWARD_KIND_HEADINGS` as a temporary exception; follow-up
+work deletes that map and reads `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
+
 Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).
 
 Mutation overflow availability for change-target operations uses [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts) — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) for completeness invariants.

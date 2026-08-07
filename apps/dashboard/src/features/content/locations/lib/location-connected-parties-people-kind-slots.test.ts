@@ -14,12 +14,12 @@ describe('buildPeopleKindSlots', () => {
     })
 
     expect(slots.map((slot) => slot.heading)).toEqual([
-      'Headquarters',
+      'Headquarters of',
       'Owner',
       'Tenant',
       'Operator',
       'Resident',
-      'Works at',
+      'Works here',
     ])
 
     const ownerSlot = slots.find((slot) => slot.heading === 'Owner')
@@ -49,7 +49,7 @@ describe('buildPeopleKindSlots', () => {
 
     expect(slots).toEqual([
       {
-        heading: 'Operates in',
+        heading: 'Operating here',
         bindings: [{ subjectType: 'organization', kind: 'operates_in' }],
       },
     ])

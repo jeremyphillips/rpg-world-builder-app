@@ -26,7 +26,7 @@ const sampleRows = [
     relationshipId: 'rel-org-1',
     subject: { type: 'organization' as const, id: 'org-1', name: 'City Council', slug: 'council' },
     kind: 'governs',
-    label: 'Governs',
+    label: 'Governed by',
     family: 'territorial_authority',
     priority: 50,
     sectionGroup: 'territorial_authority' as const,
@@ -43,7 +43,7 @@ const peopleOrganizationRows = [
       slug: 'thieves-guild',
     },
     kind: 'headquarters',
-    label: 'Headquarters',
+    label: 'Headquarters of',
     family: 'site',
     priority: 60,
     sectionGroup: 'people_and_organizations' as const,
@@ -61,7 +61,7 @@ const peopleNpcRows = [
       characterType: 'npc' as const,
     },
     kind: 'works_at',
-    label: 'Works at',
+    label: 'Works here',
     family: 'presence',
     priority: 40,
     sectionGroup: 'people_and_organizations' as const,
@@ -70,15 +70,15 @@ const peopleNpcRows = [
 
 const peopleKindSlots = [
   {
-    heading: 'Headquarters',
+    heading: 'Headquarters of',
     bindings: [{ subjectType: 'organization' as const, kind: 'headquarters' as const }],
   },
   {
-    heading: 'Operates in',
+    heading: 'Operating here',
     bindings: [{ subjectType: 'organization' as const, kind: 'operates_in' as const }],
   },
   {
-    heading: 'Works at',
+    heading: 'Works here',
     bindings: [{ subjectType: 'character' as const, kind: 'works_at' as const }],
   },
 ]
@@ -117,9 +117,9 @@ describe('LocationConnectedPartiesSection', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Territorial Authority' })).toBeInTheDocument()
-    expect(screen.getByText('Governs')).toBeInTheDocument()
-    expect(screen.getByText('Controls')).toBeInTheDocument()
-    expect(screen.getByText('Claims')).toBeInTheDocument()
+    expect(screen.getByText('Governed by')).toBeInTheDocument()
+    expect(screen.getByText('Controlled by')).toBeInTheDocument()
+    expect(screen.getByText('Claimed by')).toBeInTheDocument()
     expect(screen.getByText('No governing organization.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
@@ -148,8 +148,8 @@ describe('LocationConnectedPartiesSection', () => {
     expect(
       screen.getByRole('button', { name: LOCATION_PEOPLE_SECTION_SURFACE_COPY.add }),
     ).toBeInTheDocument()
-    expect(screen.queryByText('Operates in')).not.toBeInTheDocument()
-    expect(screen.queryByText('Works at')).not.toBeInTheDocument()
+    expect(screen.queryByText('Operating here')).not.toBeInTheDocument()
+    expect(screen.queryByText('Works here')).not.toBeInTheDocument()
     expect(screen.queryByText('No owners linked.')).not.toBeInTheDocument()
   })
 
@@ -171,8 +171,8 @@ describe('LocationConnectedPartiesSection', () => {
     )
 
     expect(screen.getByText("Thieves' Guild")).toBeInTheDocument()
-    expect(screen.getByText('Headquarters')).toBeInTheDocument()
-    expect(screen.queryByText('Operates in')).not.toBeInTheDocument()
+    expect(screen.getByText('Headquarters of')).toBeInTheDocument()
+    expect(screen.queryByText('Operating here')).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: `+ ${LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}` }),
     ).toBeInTheDocument()

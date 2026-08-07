@@ -63,6 +63,7 @@ export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
   OrganizationForwardFamilySurfaceCopy
 >
 
+/** Temporary parallel forward-edge presentation — migrate to `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`. */
 export const ORGANIZATION_FORWARD_KIND_HEADINGS = {
   owns: 'Owns',
   tenant: 'Tenants',

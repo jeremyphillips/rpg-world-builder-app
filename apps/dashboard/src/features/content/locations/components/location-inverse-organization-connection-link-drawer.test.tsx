@@ -219,7 +219,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: TERRITORIAL_AUTHORITY_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Port City · Settlement · Governs')).toBeInTheDocument()
+    expect(screen.getByText('Port City · Settlement · Governed by')).toBeInTheDocument()
   })
 
   it('shows current and new organization fields with replacement picker', async () => {

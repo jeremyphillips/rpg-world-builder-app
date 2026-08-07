@@ -332,6 +332,9 @@ Every closed vocab module defines **two layers**:
 1. **`*_TERM`** — the taxonomy concept (`satisfies VocabularyTerm`).
 2. **`*_ENTRIES`** — per-value entries (`satisfies Record<string, GameTermEntry>`).
 
+Location connection kind entries may add optional `forwardLabel` / `inverseLabel` on top of
+`GameTermEntry` for direction-aware existing-edge display without changing the base shape.
+
 ```ts
 export const MAGIC_ITEM_RARITY_TERM = {
   label: 'Magic Item Rarity',
@@ -360,6 +363,14 @@ pickers before either endpoint is selected (organization-forward add drawers, in
 change-kind flows, etc.). Avoid deictic phrasing such as “this location”, “here”, or
 “this organization” in canonical vocab; surface-specific instructional copy in apps may
 use those forms once an endpoint is fixed (see dashboard relationship copy modules).
+
+**Directional edge display** on location connection kinds uses optional `forwardLabel` and
+`inverseLabel` on the vocab entry. Canonical `label` remains direction-free for pickers
+and read-only kind fields. Existing-edge eyebrows resolve via
+`getOrganizationLocationConnectionDisplayLabel(kind, direction)` and
+`getCharacterLocationConnectionDisplayLabel(kind, direction)` where `forward` follows
+subject-owned edge ownership and `inverse` follows the location-projected endpoint.
+Omitting an override is intentional — absence is a semantic decision, not missing config.
 
 Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `get*Entry` / `get*Label` helpers. Open vocabulary sets define a `*_TERM` plus

@@ -6,12 +6,12 @@ import type {
   PaginatedItems,
 } from '@rpg/contracts'
 import {
+  getCharacterLocationConnectionDisplayLabel,
   getCharacterLocationConnectionFamily,
-  getCharacterLocationConnectionLabel,
   getCharacterLocationConnectionPriority,
   getLocationConnectedPartySectionRank,
+  getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionFamily,
-  getOrganizationLocationConnectionLabel,
   getOrganizationLocationConnectionPriority,
   resolveLocationConnectedPartySectionGroup,
 } from '@rpg/contracts'
@@ -69,7 +69,7 @@ function expandCharacterRows(
           characterType: hit.characterType,
         },
         kind: connection.kind,
-        label: getCharacterLocationConnectionLabel(kind),
+        label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
         family,
         priority: getCharacterLocationConnectionPriority(kind),
         sectionGroup,
@@ -102,7 +102,7 @@ function expandOrganizationRows(
           slug: hit.slug,
         },
         kind: connection.kind,
-        label: getOrganizationLocationConnectionLabel(connection.kind),
+        label: getOrganizationLocationConnectionDisplayLabel(connection.kind, 'inverse'),
         family,
         priority: getOrganizationLocationConnectionPriority(connection.kind),
         sectionGroup,

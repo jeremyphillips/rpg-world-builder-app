@@ -183,15 +183,30 @@ Only render per-kind empty copy for meaningful slots. Sparse groups use one fami
 
 Populated forward families **always render**, even when no additional targets are currently available. Hide or disable only the family add affordance — not the populated groups.
 
-Forward kind eyebrows may use **direction-aware grammar** (for example `Owns`, `Operates`) via dashboard resolvers. Vocab still owns semantic descriptions used in drawers.
+Forward kind eyebrows may use **direction-aware grammar** (for example `Owns`, `Operates`) via
+`getOrganizationLocationConnectionDisplayLabel(kind, 'forward')` or, temporarily,
+`ORGANIZATION_FORWARD_KIND_HEADINGS` in
+[`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts).
+Inverse existing-edge eyebrows and connected-parties labels use
+`get*ConnectionDisplayLabel(kind, 'inverse')`. Vocab still owns semantic descriptions used in drawers.
 
 Cross-org singleton territorial slots (`governs`, `controls`) require **server-backed occupancy** (`edgesByLocationId`) in organization forward drawers. Org-local connection lists alone are not authoritative for those kinds.
 
 ## Copy ownership
 
-**Vocab owns:** kind label, kind description, semantic distinctions, `maxSubjectsPerLocation`.
+**Vocab owns:** canonical kind `label`, optional `forwardLabel` / `inverseLabel` for existing-edge eyebrows, kind description, semantic distinctions, `maxSubjectsPerLocation`.
+
+Use `get*ConnectionLabel(kind)` for pickers and read-only kind fields. Use
+`get*ConnectionDisplayLabel(kind, 'forward' | 'inverse')` for populated relationship row
+eyebrows and connected-parties API labels. Forward / inverse follow canonical edge
+ownership (organization or character → location), not which detail page is open.
 
 Canonical kind **descriptions** must stay perspective-neutral (no “this location” / “here”) because they render in kind pickers before an endpoint is fixed. See [packages/contracts/docs/structure.md](../../../packages/contracts/docs/structure.md#reference-vocabulary-gametermentry--vocabularyterm).
+
+**Temporary exception:** organization forward kind eyebrows may still read from
+`ORGANIZATION_FORWARD_KIND_HEADINGS` until that map is deleted in favor of
+`getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`. Contracts stores matching
+`forwardLabel` values so the follow-up is a consumer swap, not new copy invention.
 
 **Dashboard owns:** section headings/helpers, drawer titles, action labels, empty-state copy, dynamic occupancy copy, confirmation copy, instructional workflow text, and per-kind **target presentation** for relationship target pickers (field label, field helper, search placeholder, optional browse scopes).
 

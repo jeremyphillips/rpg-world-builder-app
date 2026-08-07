@@ -26,3 +26,7 @@ organizations link to locations through subject-owned
 Kind eligibility is enforced by `@rpg/contracts`
 [`location-connection-eligibility`](../../../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts)
 on the API; the dashboard derives picker options from the same resolver.
+
+Connected-parties row labels and inverse relationship eyebrows resolve direction-aware
+display copy from `@rpg/contracts` (`get*ConnectionDisplayLabel(..., 'inverse')`). Character
+detail location connection detail lines use `direction: 'forward'`.

@@ -3,7 +3,11 @@ import type {
   Location,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getLocationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
+import {
+  getLocationKindLabel,
+  getOrganizationLocationConnectionDisplayLabel,
+  getOrganizationLocationConnectionLabel,
+} from '@rpg/contracts'
 
 export const TERRITORIAL_AUTHORITY_SECTION_HEADING = 'Territorial Authority'
 
@@ -122,15 +126,15 @@ export const LOCATION_INVERSE_CHARACTER_SURFACE_COPY = {
 
 export const TERRITORIAL_AUTHORITY_SLOT_COPY = {
   governs: {
-    heading: getOrganizationLocationConnectionLabel('governs'),
+    heading: getOrganizationLocationConnectionDisplayLabel('governs', 'inverse'),
     ...LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY.governs,
   },
   controls: {
-    heading: getOrganizationLocationConnectionLabel('controls'),
+    heading: getOrganizationLocationConnectionDisplayLabel('controls', 'inverse'),
     ...LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY.controls,
   },
   claims: {
-    heading: getOrganizationLocationConnectionLabel('claims'),
+    heading: getOrganizationLocationConnectionDisplayLabel('claims', 'inverse'),
     ...LOCATION_INVERSE_ORGANIZATION_SURFACE_COPY.claims,
   },
 } as const
@@ -270,14 +274,14 @@ export function resolveTerritorialAuthorityReplaceContext(
   location: Location,
   kind: OrganizationLocationConnectionKind,
 ): string {
-  return `${resolveTerritorialAuthorityLocationContext(location)} · ${getOrganizationLocationConnectionLabel(kind)}`
+  return `${resolveTerritorialAuthorityLocationContext(location)} · ${getOrganizationLocationConnectionDisplayLabel(kind, 'inverse')}`
 }
 
 export function resolveTerritorialAuthorityChangeKindCurrent(input: {
   organizationName: string
   kind: OrganizationLocationConnectionKind
 }): string {
-  return `${input.organizationName} · ${getOrganizationLocationConnectionLabel(input.kind)}`
+  return `${input.organizationName} · ${getOrganizationLocationConnectionDisplayLabel(input.kind, 'inverse')}`
 }
 
 export function resolveTerritorialKindOccupiedReason(input: {
