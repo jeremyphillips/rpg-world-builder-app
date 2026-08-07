@@ -41,9 +41,10 @@ import {
   resolveLocationInverseCharacterAddDrawerInstruction,
   resolveLocationInverseCharacterAddDrawerTitle,
   resolveLocationInverseCharacterAddSubmitLabel,
+  resolveLocationInverseCharacterTargetPresentation,
   resolveTerritorialAuthorityLocationContext,
 } from '../lib/location-connection-surface-copy'
-import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
+import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
@@ -56,7 +57,7 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   mode: Extract<RelationshipMutationMode, 'add' | 'changeKind'>
   addKind?: CharacterLocationConnectionKind
   location: Location
-  characters: readonly LocationPartyCharacterOption[]
+  characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
     relationshipId: string
@@ -199,7 +200,9 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
       pickerEnabled={showCharacterPicker}
-      searchPlaceholder="Search characters"
+      searchPlaceholder={
+        resolveLocationInverseCharacterTargetPresentation(activeKind).searchPlaceholder
+      }
       noResultsMessage="No matches for this search."
       noItemsMessage="No characters are available."
       headerBelowDescription={

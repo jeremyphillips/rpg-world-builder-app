@@ -190,7 +190,7 @@ Organization forward target pickers use optional `targetPresentation` config and
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
 
-> **Follow-up:** inverse location drawers need a parallel target-presentation pass when inverse pickers face the same kind-restricted scope problem. Do not generalize forward + inverse presentation configuration in one module until both surfaces are ready.
+Location inverse drawers use optional **subject** `targetPresentation` resolvers in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) (`targetLabel`, `targetHelp`, `searchPlaceholder`). Browse scopes remain **forward-only** — inverse pickers select a subject with a fixed location; HQ structure scoping stays in `@rpg/contracts` eligibility on that location. Do not merge forward and inverse presentation modules.
 
 ## Implementation guard
 

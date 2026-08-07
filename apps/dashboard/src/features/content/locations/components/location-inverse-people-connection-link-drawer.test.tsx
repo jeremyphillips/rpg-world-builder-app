@@ -93,7 +93,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     expect(screen.getByText('Owner type')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Character' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Organization' })).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search characters')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search characters…')).toBeInTheDocument()
   })
 
   it('auto-resolves a single subject type after kind selection', async () => {
@@ -117,7 +117,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
     expect(screen.queryByText('Headquarters type')).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
   })
 
   it('switches picker copy when the subject type segment changes', async () => {
@@ -139,9 +139,9 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByPlaceholderText('Search characters')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search characters…')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Organization' }))
-    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

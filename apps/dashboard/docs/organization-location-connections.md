@@ -48,8 +48,6 @@ Picker copy for headquarters (field helper, search placeholder, change-location 
 
 Mutation candidate filtering (add, change location, replace organization) always evaluates the **persisted or selected relationship kind**, never the union of kinds represented by a drawer intent family.
 
-> **Follow-up (out of scope):** legacy `location.partyAssociations` authoring may still expose headquarters on settlements through a separate edge model. Reconcile in a dedicated audit — do not conflate with `connections.locations` eligibility.
-
 ## Forward display
 
 Organization detail uses **family-level** empty states and one **Add {family}** action. Populated kind groups render only when they contain relationships. Forward kind eyebrows may differ grammatically from inverse vocab labels (see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)).

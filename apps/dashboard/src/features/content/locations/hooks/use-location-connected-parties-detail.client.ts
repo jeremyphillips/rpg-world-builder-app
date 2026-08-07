@@ -45,7 +45,7 @@ import { toLocationConnectionEligibilityInput } from '../../lib/location-connect
 import { peopleSectionHasAvailableTarget } from '../../lib/location-connection-kind-options'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
-import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
+import { buildLocationConnectedPartyCharactersById } from '../lib/location-connected-party-character-options.lib'
 import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/resolve-relationship-drawer-current-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
@@ -189,7 +189,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [location],
   )
   const characterOptions = React.useMemo(() => {
-    const characters = buildLocationPartyCharactersById(
+    const characters = buildLocationConnectedPartyCharactersById(
       campaignCharactersQuery.data ?? [],
       npcsQuery.data ?? [],
       catalogIndex,

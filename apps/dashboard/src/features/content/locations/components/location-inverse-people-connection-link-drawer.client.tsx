@@ -38,11 +38,13 @@ import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
   resolveLocationInverseCharacterAddSubmitLabel,
+  resolveLocationInverseCharacterTargetPresentation,
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddSubmitLabel,
+  resolveLocationInverseOrganizationTargetPresentation,
   resolveTerritorialAuthorityLocationContext,
 } from '../lib/location-connection-surface-copy'
-import type { LocationPartyCharacterOption } from '../lib/location-party-associations.lib'
+import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
@@ -61,7 +63,7 @@ export type LocationInversePeopleConnectionLinkDrawerProps = {
   kindSlots: readonly PeopleKindSlot[]
   location: Location
   organizations: readonly Organization[]
-  characters: readonly LocationPartyCharacterOption[]
+  characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   canAddOrganization: boolean
   canAddCharacter: boolean
@@ -327,7 +329,9 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     return (
       <CatalogPickerSheet
         {...sharedSheetProps}
-        searchPlaceholder="Search organizations"
+        searchPlaceholder={
+          resolveLocationInverseOrganizationTargetPresentation(organizationKind).searchPlaceholder
+        }
         noItemsMessage="No organizations are available."
         footer={
           showEntityPicker && selectedOrganizationId && organizationKind ? (
@@ -385,7 +389,9 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   return (
     <CatalogPickerSheet
       {...sharedSheetProps}
-      searchPlaceholder="Search characters"
+      searchPlaceholder={
+        resolveLocationInverseCharacterTargetPresentation(characterKind).searchPlaceholder
+      }
       noItemsMessage="No characters are available."
       footer={
         showEntityPicker && selectedCharacterId && characterKind ? (

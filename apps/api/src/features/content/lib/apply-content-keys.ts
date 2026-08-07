@@ -20,33 +20,6 @@ function hasStableId(value: unknown): value is { id: string; name: string } {
   return hasName(value) && typeof value.id === 'string' && value.id.length > 0
 }
 
-type IdOnlyRow = { id?: string; [key: string]: unknown }
-
-function hasIdOnlyRow(value: unknown): value is IdOnlyRow {
-  return typeof value === 'object' && value !== null
-}
-
-function forceRegenerateIdOnlyArray(
-  rows: unknown[] | undefined,
-  destinationSlug: string,
-  pathPrefix: string,
-): unknown[] | undefined {
-  if (rows === undefined) return undefined
-
-  const usedIds = new Set<string>()
-  return rows.filter(hasIdOnlyRow).map((row, index) => {
-    const { id: _id, ...rest } = row
-    let id = deriveContentKey(`${destinationSlug}-${pathPrefix}-${index + 1}`)
-    if (usedIds.has(id)) {
-      let suffix = 2
-      while (usedIds.has(`${id}-${suffix}`)) suffix += 1
-      id = `${id}-${suffix}`
-    }
-    usedIds.add(id)
-    return { ...rest, id }
-  })
-}
-
 function stableIdentifiedArray(
   incoming: unknown[] | undefined,
   existing?: unknown[],
@@ -224,15 +197,6 @@ function regenerateResolutionPathForDuplicate(
   result.resolution = regenerateSpellResolution(result.resolution, destinationSlug)
 }
 
-function regenerateIdOnlyRelationshipPathForDuplicate(
-  result: Record<string, unknown>,
-  path: 'partyAssociations' | 'territorialAuthority',
-  destinationSlug: string,
-): void {
-  if (!(path in result) || !Array.isArray(result[path])) return
-  result[path] = forceRegenerateIdOnlyArray(result[path] as unknown[], destinationSlug, path)
-}
-
 function regenerateNestedPathForDuplicate(
   result: Record<string, unknown>,
   path: string,
@@ -250,11 +214,6 @@ function regenerateNestedPathForDuplicate(
 
   if (path === 'resolution') {
     regenerateResolutionPathForDuplicate(result, destinationSlug)
-    return
-  }
-
-  if (path === 'partyAssociations' || path === 'territorialAuthority') {
-    regenerateIdOnlyRelationshipPathForDuplicate(result, path, destinationSlug)
   }
 }
 

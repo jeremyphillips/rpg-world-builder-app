@@ -53,6 +53,8 @@ import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddDrawerTitle,
   resolveLocationInverseOrganizationAddSubmitLabel,
+  resolveLocationInverseOrganizationReplaceHelper,
+  resolveLocationInverseOrganizationTargetPresentation,
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
   resolveTerritorialAuthorityLocationContext,
@@ -355,6 +357,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     return kinds.filter((kind) => eligibleKinds.includes(kind))
   }, [eligibleKinds, initialConnection, mode, resolvedAddKind])
 
+  const organizationTargetPresentation = resolveLocationInverseOrganizationTargetPresentation(
+    activeKind ?? initialConnection?.kind ?? resolvedAddKind,
+  )
+
   return (
     <CatalogPickerSheet
       open={open}
@@ -363,11 +369,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       {...catalogPickerShellProps()}
       rowLayout="entity-card"
       pickerEnabled={showOrganizationPicker}
-      searchPlaceholder={
-        intent === 'territorial_authority'
-          ? TERRITORIAL_AUTHORITY_DRAWER.organizationSearchPlaceholder
-          : 'Search organizations'
-      }
+      searchPlaceholder={organizationTargetPresentation.searchPlaceholder}
       noResultsMessage={
         intent === 'territorial_authority'
           ? TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults
@@ -431,7 +433,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
                     .newLabel}
               </Heading>
               <Text variant="muted" className="text-sm">
-                {TERRITORIAL_AUTHORITY_DRAWER.replaceHelper}
+                {resolveLocationInverseOrganizationReplaceHelper(
+                  initialConnection?.kind ?? activeKind ?? 'operates_in',
+                )}
               </Text>
             </div>
           ) : null}

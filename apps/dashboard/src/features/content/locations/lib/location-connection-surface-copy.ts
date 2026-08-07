@@ -164,7 +164,61 @@ export const LOCATION_INVERSE_PEOPLE_OVERFLOW = {
 export const LOCATION_INVERSE_ORGANIZATION_DRAWER = {
   replaceTitle: 'Replace organization',
   replaceSubmit: 'Replace organization',
+  replaceHelper: 'Choose a different organization.',
 } as const
+
+export type LocationInverseTargetPresentationConfig = {
+  targetLabel?: string
+  targetHelp?: string
+  searchPlaceholder?: string
+}
+
+export type ResolvedLocationInverseTargetPresentation = {
+  targetLabel: string
+  targetHelp?: string
+  searchPlaceholder: string
+}
+
+export const DEFAULT_LOCATION_INVERSE_ORGANIZATION_TARGET_PRESENTATION: ResolvedLocationInverseTargetPresentation =
+  {
+    targetLabel: 'Organization',
+    searchPlaceholder: 'Search organizations…',
+  }
+
+export const DEFAULT_LOCATION_INVERSE_CHARACTER_TARGET_PRESENTATION: ResolvedLocationInverseTargetPresentation =
+  {
+    targetLabel: 'Character',
+    searchPlaceholder: 'Search characters…',
+  }
+
+export function resolveLocationInverseOrganizationTargetPresentation(
+  kind?: OrganizationLocationConnectionKind | null,
+): ResolvedLocationInverseTargetPresentation {
+  if (kind && isTerritorialAuthorityKind(kind)) {
+    return {
+      targetLabel: 'Organization',
+      searchPlaceholder: TERRITORIAL_AUTHORITY_DRAWER.organizationSearchPlaceholder,
+    }
+  }
+
+  return DEFAULT_LOCATION_INVERSE_ORGANIZATION_TARGET_PRESENTATION
+}
+
+export function resolveLocationInverseOrganizationReplaceHelper(
+  kind: OrganizationLocationConnectionKind,
+): string {
+  if (isTerritorialAuthorityKind(kind)) {
+    return TERRITORIAL_AUTHORITY_DRAWER.replaceHelper
+  }
+
+  return LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper
+}
+
+export function resolveLocationInverseCharacterTargetPresentation(
+  _kind?: CharacterLocationConnectionKind | null,
+): ResolvedLocationInverseTargetPresentation {
+  return DEFAULT_LOCATION_INVERSE_CHARACTER_TARGET_PRESENTATION
+}
 
 export function resolveLocationInverseCharacterAddDrawerTitle(
   kind: CharacterLocationConnectionKind,

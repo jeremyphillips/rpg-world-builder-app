@@ -85,7 +85,8 @@ PATCH  /api/campaigns/:campaignId/content/characters/:characterId/location-conne
 DELETE /api/campaigns/:campaignId/content/characters/:characterId/location-connections/:connectionId
 ```
 
-Organization nested routes follow the same pattern (shipped in a later PR).
+Organization nested routes follow the same pattern under
+`/api/campaigns/:campaignId/content/organizations/:organizationId/location-connections`.
 Full subject `PATCH` must delegate array changes to the same mutation primitive
 the nested routes use — not parallel validation paths.
 
@@ -128,8 +129,8 @@ will explicitly relax later.
 | **Inverse**             | Location connected-parties resolver (merged, server-side sort + pagination) |
 | **Usage**               | Character location refs registered on the locations usage surface           |
 
-Legacy location-owned `partyAssociations` and `territorialAuthority` fields are
-scheduled for removal once subject-owned connections ship.
+Location-owned `partyAssociations` and `territorialAuthority` fields have been
+removed. All relationship edges live on subject documents.
 
 ## What to reuse vs invent
 

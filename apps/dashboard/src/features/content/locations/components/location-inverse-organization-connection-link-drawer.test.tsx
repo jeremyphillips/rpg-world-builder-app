@@ -130,7 +130,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeChecked()
-    expect(screen.queryByPlaceholderText('Search organizations')).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
     expect(screen.queryByText('No organizations are available.')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
 
@@ -181,7 +181,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     expect(screen.getByText('Current organization')).toBeInTheDocument()
     expect(screen.getByText('New organization')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
     expect(screen.getAllByText('City Council')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Replace organization' })).toBeDisabled()
 

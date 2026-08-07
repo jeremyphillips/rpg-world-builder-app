@@ -8,7 +8,6 @@ import type {
 import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
-import { getCharacterLocationPartyDeletionBlockers } from './character-deletion.service'
 import {
   createPcRecord,
   deletePcForUser,
@@ -41,11 +40,6 @@ export async function deleteCharacterForUser(
   characterId: string,
   userId: string,
 ): Promise<ContentDeletionResult | { status: 'not_found' }> {
-  const blockers = await getCharacterLocationPartyDeletionBlockers(characterId)
-  if (blockers.length > 0) {
-    return { status: 'blocked', blockers }
-  }
-
   const deleted = await deletePcForUser(characterId, userId)
   if (!deleted) {
     return { status: 'not_found' }

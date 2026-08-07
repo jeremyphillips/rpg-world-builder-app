@@ -7,7 +7,6 @@ import { LOCATION_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
 import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 import { contentMetaSchema, slugSchema } from '../lib/envelope'
 import { locationBaseSchema } from './base'
-import { locationPartyAssociationsSchema } from './party-association'
 import { districtLocationKindFields } from './district-variant'
 import {
   interiorBodySchema,
@@ -123,7 +122,6 @@ const locationBaseDraftSchema = draftAuthoredContentBodySchema(
   LOCATION_CONTENT_TYPE_TERM.label,
 ).extend({
   parentLocationId: z.string().min(1).optional(),
-  partyAssociations: locationPartyAssociationsSchema,
 })
 
 const planeLocationBodyDraftFields = locationBaseDraftSchema.extend({
@@ -138,7 +136,6 @@ const worldLocationBodyDraftFields = locationBaseDraftSchema.extend({
 const regionLocationBodyDraftFields = locationBaseDraftSchema.extend({
   kind: z.literal('region'),
   classification: regionClassificationSchema.optional(),
-  territorialAuthority: regionLocationKindFields.territorialAuthority,
 })
 
 const settlementLocationBodyDraftFields = locationBaseDraftSchema.extend({

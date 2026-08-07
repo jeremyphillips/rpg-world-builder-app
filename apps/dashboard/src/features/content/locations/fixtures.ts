@@ -11,7 +11,6 @@ const baseLocation = {
   campaignId: STORY_CAMPAIGN_ID,
   createdAt: CONTENT_TIMESTAMP,
   updatedAt: CONTENT_TIMESTAMP,
-  partyAssociations: [],
 }
 
 export const ALDERMERE: Location = {
@@ -30,7 +29,6 @@ export const GREYSHORE: RegionLocation = {
   kind: 'region',
   classification: { kind: 'geographic', type: 'coast' },
   parentLocationId: ALDERMERE.id,
-  territorialAuthority: [],
 }
 
 export const HARBORFORD: Location = {

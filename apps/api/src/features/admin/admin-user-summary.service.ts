@@ -9,8 +9,7 @@ import type {
 
 import { CampaignMembershipModel } from '../campaign'
 import { CampaignInviteModel } from '../campaign-invite'
-import { CharacterModel, listCharactersForUser } from '../character'
-import { getCharacterLocationPartyDeletionBlockers } from '../character'
+import { CharacterModel } from '../character'
 import { countSuperadminsExcluding, type UserWithActivityTimestamps } from '../user'
 
 const EMPTY_CAMPAIGN_COUNTS: AdminUserCampaignCounts = {
@@ -154,15 +153,6 @@ export async function computeDeleteBlockers({
 
   if (await userOwnsCampaigns(targetUserId)) {
     blockers.push('owns_campaigns')
-  }
-
-  const characters = await listCharactersForUser(targetUserId)
-  for (const character of characters) {
-    const locationBlockers = await getCharacterLocationPartyDeletionBlockers(character.id)
-    if (locationBlockers.length > 0) {
-      blockers.push('character_referenced_by_locations')
-      break
-    }
   }
 
   return blockers

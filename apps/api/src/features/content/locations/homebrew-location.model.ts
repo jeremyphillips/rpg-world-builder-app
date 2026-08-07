@@ -56,8 +56,6 @@ const homebrewLocationSchema = new Schema(
     siteType: { type: String, enum: [...SITE_TYPE_IDS] },
     structureType: { type: String, enum: [...STRUCTURE_TYPE_IDS] },
     interiorType: { type: String, enum: [...INTERIOR_TYPE_IDS] },
-    partyAssociations: { type: [Schema.Types.Mixed], default: [] },
-    territorialAuthority: { type: [Schema.Types.Mixed], default: [] },
   },
   { timestamps: true },
 )

@@ -14,13 +14,9 @@ import type { ContentTypeConfig } from '../lib/content-type-config'
 import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewLocationModel, type HomebrewLocationSchemaType } from './homebrew-location.model'
 import { validateLocationHierarchy } from './validate-location-hierarchy'
-import { validateLocationPartyAssociations } from './validate-location-party-associations'
-import { validateTerritorialAuthority } from './validate-territorial-authority'
 
 async function validateLocationBeforeWrite(ctx: Parameters<typeof validateLocationHierarchy>[0]) {
   await validateLocationHierarchy(ctx)
-  await validateLocationPartyAssociations(ctx)
-  await validateTerritorialAuthority(ctx)
 }
 
 type HomebrewLocationRecord = HomebrewLocationSchemaType & { _id: unknown }
