@@ -8,11 +8,31 @@ import { cn, contentCardHeadingLinkVariants } from '@rpg/ui'
 import {
   detailEntityRowContentVariants,
   detailEntityRowHeadingNameVariants,
+  detailEntityRowHeadingSeparatorVariants,
   detailEntityRowHeadingSuffixVariants,
   detailEntityRowHeadingVariants,
   detailEntityRowSubheadingVariants,
   detailEntityRowVariants,
 } from './detail-entity-row.variants'
+
+const HEADING_SUFFIX_LEADING_SEPARATOR = ' · ' as const
+
+function splitHeadingSuffix(headingSuffix: ReactNode): {
+  hasLeadingSeparator: boolean
+  suffixText: ReactNode
+} {
+  if (
+    typeof headingSuffix === 'string' &&
+    headingSuffix.startsWith(HEADING_SUFFIX_LEADING_SEPARATOR)
+  ) {
+    return {
+      hasLeadingSeparator: true,
+      suffixText: headingSuffix.slice(HEADING_SUFFIX_LEADING_SEPARATOR.length),
+    }
+  }
+
+  return { hasLeadingSeparator: false, suffixText: headingSuffix }
+}
 
 export type DetailEntityRowProps = {
   heading: ReactNode
@@ -35,12 +55,11 @@ export function DetailEntityRow({
   className,
 }: DetailEntityRowProps) {
   const resolvedHeading = href ? (
-    <Link
-      to={href}
-      className={cn(contentCardHeadingLinkVariants(), detailEntityRowHeadingNameVariants())}
-    >
-      {heading}
-    </Link>
+    <span className={detailEntityRowHeadingNameVariants()}>
+      <Link to={href} className={contentCardHeadingLinkVariants()}>
+        {heading}
+      </Link>
+    </span>
   ) : (
     <span className={detailEntityRowHeadingNameVariants()}>{heading}</span>
   )
@@ -50,9 +69,25 @@ export function DetailEntityRow({
       <div className={detailEntityRowContentVariants()}>
         <div className={detailEntityRowHeadingVariants()}>
           {resolvedHeading}
-          {headingSuffix ? (
-            <span className={detailEntityRowHeadingSuffixVariants()}>{headingSuffix}</span>
-          ) : null}
+          {headingSuffix
+            ? (() => {
+                const { hasLeadingSeparator, suffixText } = splitHeadingSuffix(headingSuffix)
+
+                return (
+                  <>
+                    {hasLeadingSeparator ? (
+                      <span
+                        className={detailEntityRowHeadingSeparatorVariants()}
+                        aria-hidden="true"
+                      >
+                        ·
+                      </span>
+                    ) : null}
+                    <span className={detailEntityRowHeadingSuffixVariants()}>{suffixText}</span>
+                  </>
+                )
+              })()
+            : null}
         </div>
         {subheading ? <p className={detailEntityRowSubheadingVariants()}>{subheading}</p> : null}
         {metadata ? <div className={detailEntityRowSubheadingVariants()}>{metadata}</div> : null}

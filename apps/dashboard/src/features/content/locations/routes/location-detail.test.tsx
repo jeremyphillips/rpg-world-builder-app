@@ -73,14 +73,14 @@ describe('LocationDetailContent', () => {
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
   })
 
-  it('renders contained locations before connected parties sections', () => {
+  it('renders connected parties sections before contained locations', () => {
     renderDetail()
 
     const containedHeading = screen.getByRole('heading', { name: 'Contained locations' })
     const connectedPartiesSection = screen.getByLabelText('Connected parties sections')
 
     expect(
-      containedHeading.compareDocumentPosition(connectedPartiesSection) &
+      connectedPartiesSection.compareDocumentPosition(containedHeading) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
   })

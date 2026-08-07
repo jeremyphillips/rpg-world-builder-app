@@ -6,13 +6,9 @@ import type {
   OrganizationLocationConnectionFamily,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Button, Heading, SemanticText, Text } from '@rpg/ui'
+import { Button, SemanticText, Text } from '@rpg/ui'
 
-import {
-  formatLocationConnectionsCount,
-  ORGANIZATION_SECTION_LABELS,
-  type OrganizationLocationConnectionsViewModel,
-} from '../lib/organization-display'
+import type { OrganizationLocationConnectionsViewModel } from '../lib/organization-display'
 import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
 import { resolveOrganizationForwardFamilyPresentation } from '../lib/organization-location-connection-surface-copy'
 import {
@@ -28,9 +24,6 @@ export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
 
 export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
   'Could not update location connections for this organization.'
-
-export const ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER =
-  'Link this organization to sites and facilities, geographic areas, or territories where it has presence or authority.'
 
 const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
   'territorial_authority',
@@ -106,16 +99,7 @@ export function OrganizationLocationConnectionsSection({
   }
 
   return (
-    <section aria-labelledby="organization-location-connections-heading" className="space-y-4">
-      <div className="space-y-1">
-        <Heading variant="group" as="h2" id="organization-location-connections-heading">
-          {ORGANIZATION_SECTION_LABELS.locationConnections}
-        </Heading>
-        {canManage ? (
-          <Text variant="muted">{ORGANIZATION_LOCATION_CONNECTIONS_SECTION_HELPER}</Text>
-        ) : null}
-      </div>
-
+    <div className="space-y-4">
       {mutationError ? <SemanticText tone="destructive">{mutationError}</SemanticText> : null}
 
       {isPending ? (
@@ -128,7 +112,6 @@ export function OrganizationLocationConnectionsSection({
         ) : null
       ) : (
         <div className="space-y-4">
-          {total > 0 ? <Text variant="muted">{formatLocationConnectionsCount(total)}</Text> : null}
           {familiesToRender.map((family) => {
             const familyGroup = populatedFamilyMap.get(family)
             const familyPresentation = resolveOrganizationForwardFamilyPresentation(family)
@@ -206,6 +189,6 @@ export function OrganizationLocationConnectionsSection({
           })}
         </div>
       )}
-    </section>
+    </div>
   )
 }

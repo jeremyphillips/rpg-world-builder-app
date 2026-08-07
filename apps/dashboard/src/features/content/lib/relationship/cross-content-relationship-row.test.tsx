@@ -27,8 +27,9 @@ describe('CrossContentRelationshipRow', () => {
 
     const link = screen.getByRole('link', { name: 'Yawning Portal' })
     expect(link).toHaveAttribute('href', '/locations/yawning-portal')
-    expect(link.closest('div')?.textContent).toContain(' · Building · Tavern')
+    expect(link.closest('div')?.textContent).toContain('Building · Tavern')
     expect(link.textContent).toBe('Yawning Portal')
+    expect(link.closest('div')?.querySelector('[aria-hidden="true"]')).toHaveTextContent('·')
   })
 
   it('composes DetailEntityRow link treatment and DetailOverflowMenu when href and actions are provided', () => {

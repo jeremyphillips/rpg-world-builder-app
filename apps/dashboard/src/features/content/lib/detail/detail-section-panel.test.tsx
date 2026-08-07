@@ -31,7 +31,7 @@ describe('DetailSectionPanel', () => {
     expect(section).toHaveClass('rounded-md', 'border', 'border-border-subtle', 'overflow-hidden')
 
     const header = section?.firstElementChild
-    expect(header).toHaveClass('bg-card', 'px-4', 'py-2')
+    expect(header).toHaveClass('border-b', 'border-border-subtle', 'bg-card', 'px-4', 'py-2')
 
     const body = header?.nextElementSibling
     expect(body).toHaveClass('bg-surface-subtle')

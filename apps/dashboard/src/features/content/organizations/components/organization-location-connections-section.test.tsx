@@ -55,8 +55,6 @@ describe('OrganizationLocationConnectionsSection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('heading', { name: 'Location connections' })).toBeInTheDocument()
-    expect(screen.getByText('2 location connections')).toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: 'Sites & facilities', level: 3 }),
@@ -180,7 +178,7 @@ describe('OrganizationLocationConnectionsSection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.queryByRole('heading', { name: 'Location connections' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Royal Mint')).not.toBeInTheDocument()
 
     rerender(
       <MemoryRouter>

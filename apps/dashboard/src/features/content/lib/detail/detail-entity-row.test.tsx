@@ -21,11 +21,29 @@ describe('DetailEntityRow', () => {
       'href',
       '/locations/silver-eel',
     )
-    expect(screen.getByRole('link', { name: 'The Silver Eel' }).parentElement).toHaveTextContent(
-      'The Silver Eel · Building · Tavern',
-    )
+    expect(
+      screen.getByRole('link', { name: 'The Silver Eel' }).parentElement?.parentElement,
+    ).toHaveTextContent('The Silver Eel·Building · Tavern')
+    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
     expect(container.firstElementChild).toHaveClass('px-4', 'py-2')
+  })
+
+  it('keeps the leading separator visible beside a non-shrinking entity name', () => {
+    render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Braggi"
+          href="/characters/braggi"
+          headingSuffix=" · NPC · Human · Level 3 Fighter"
+        />
+      </MemoryRouter>,
+    )
+
+    const headingRow = screen.getByRole('link', { name: 'Braggi' }).parentElement?.parentElement
+    expect(headingRow).toHaveTextContent('Braggi·NPC · Human · Level 3 Fighter')
+    expect(screen.getByText('NPC · Human · Level 3 Fighter')).toBeInTheDocument()
+    expect(headingRow?.querySelector('[aria-hidden="true"]')).toHaveTextContent('·')
   })
 
   it('truncates the heading suffix before the entity name', () => {
@@ -40,9 +58,12 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    const suffix = container.querySelector('[class*="text-muted-foreground"]')
+    const suffix = container.querySelector('[class*="flex-1"][class*="truncate"]')
     expect(suffix).toHaveClass('truncate')
-    expect(screen.getByRole('link', { name: 'Verna Stormcaller' })).toHaveClass('shrink-0')
+    expect(screen.getByRole('link', { name: 'Verna Stormcaller' })).toHaveClass('text-link')
+    expect(screen.getByRole('link', { name: 'Verna Stormcaller' }).parentElement).toHaveClass(
+      'shrink-0',
+    )
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
   })
 

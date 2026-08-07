@@ -52,7 +52,11 @@ describe('OrganizationLocationConnectionRelationshipRow', () => {
     const link = screen.getByRole('link', { name: 'Yawning Portal' })
     expect(link).toBeInTheDocument()
     expect(link.textContent).toBe('Yawning Portal')
-    expect(link.parentElement).toHaveTextContent(' · Building · Tavern')
+    expect(link.parentElement?.parentElement).toHaveTextContent('Yawning Portal·Building · Tavern')
+    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
+    expect(
+      link.parentElement?.parentElement?.querySelector('[aria-hidden="true"]'),
+    ).toHaveTextContent('·')
     expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
     expect(
       screen.queryByText('Aldermere / Greyshore / Harborford / Dock Ward'),
