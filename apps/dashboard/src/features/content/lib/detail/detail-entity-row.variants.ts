@@ -4,8 +4,14 @@ export const detailEntityRowVariants = cva('flex items-center justify-between ga
 
 export const detailEntityRowContentVariants = cva('min-w-0 flex-1')
 
-export const detailEntityRowHeadingVariants = cva('truncate text-sm font-medium text-foreground')
+export const detailEntityRowHeadingVariants = cva('flex min-w-0 items-baseline gap-0 text-sm')
 
-export const detailEntityRowHeadingSuffixVariants = cva('font-normal text-muted-foreground')
+export const detailEntityRowHeadingNameVariants = cva(
+  'shrink-0 truncate font-medium text-foreground max-w-[60%]',
+)
+
+export const detailEntityRowHeadingSuffixVariants = cva(
+  'min-w-0 flex-1 truncate font-normal text-muted-foreground',
+)
 
 export const detailEntityRowSubheadingVariants = cva('text-xs text-muted-foreground')

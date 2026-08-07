@@ -30,7 +30,8 @@ export function formatCharacterClassSegment(
   return `${entry.name}${subclassPart}`
 }
 
-export function formatCharacterSummary(parts: CharacterSummaryParts): string {
+/** Display segments for species and advancement — not a mutation of domain parts. */
+export function formatCharacterSummarySegments(parts: CharacterSummaryParts): string[] {
   const segments: string[] = []
 
   if (parts.species?.name) {
@@ -39,7 +40,7 @@ export function formatCharacterSummary(parts: CharacterSummaryParts): string {
 
   const classes = parts.classes.filter((entry) => entry.name.trim().length > 0)
   if (classes.length === 0) {
-    return segments.join(CHARACTER_SUMMARY_SEPARATOR)
+    return segments
   }
 
   const totalLevel = classes.reduce((total, entry) => total + entry.level, 0)
@@ -56,5 +57,9 @@ export function formatCharacterSummary(parts: CharacterSummaryParts): string {
     )
   }
 
-  return segments.join(CHARACTER_SUMMARY_SEPARATOR)
+  return segments
+}
+
+export function formatCharacterSummary(parts: CharacterSummaryParts): string {
+  return formatCharacterSummarySegments(parts).join(CHARACTER_SUMMARY_SEPARATOR)
 }

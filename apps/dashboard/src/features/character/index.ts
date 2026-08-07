@@ -65,6 +65,11 @@ export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
 export {
   buildCharacterDetailViewModel,
   buildCharacterCardViewModel,
+  buildCharacterEntitySummaryVmFromCatalog,
+  buildCharacterEntitySummaryVmFromTransport,
+  buildCharacterEntitySummarySearchText,
+  formatCharacterInlineSummary,
+  formatCharacterMixedHeadingSuffix,
   resolveCharacterControllerDisplay,
   normalizePartyController,
   normalizeListController,
@@ -72,6 +77,7 @@ export {
   UNAVAILABLE_LOCATION_LABEL,
   type CharacterDetailViewModel,
   type CharacterCardViewModel,
+  type CharacterEntitySummaryVm,
 } from './lib/display/character-display'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export {

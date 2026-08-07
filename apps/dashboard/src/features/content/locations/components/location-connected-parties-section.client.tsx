@@ -15,6 +15,7 @@ import type { RelationshipCandidateSet } from '../../lib/relationship/relationsh
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'
 import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
+import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import {
   resolveLocationConnectedPartiesSectionHeadingId,
   usesFieldGroupHeader,
@@ -43,6 +44,7 @@ export type LocationConnectedPartiesSectionProps = {
   rows: readonly LocationConnectedPartyRow[]
   organizationCandidates?: RelationshipCandidateSet<{ id: string; name: string }>
   peopleKindSlots?: readonly PeopleKindSlot[]
+  charactersById?: ReadonlyMap<string, LocationConnectedPartyCharacterOption>
   canManage?: boolean
   showEmptySection?: boolean
   onAddOrganizationKind?: (kind: OrganizationLocationConnectionKind) => void
@@ -71,6 +73,7 @@ export function LocationConnectedPartiesSection({
   rows,
   organizationCandidates,
   peopleKindSlots = [],
+  charactersById = new Map(),
   canManage = false,
   showEmptySection = true,
   onAddOrganizationKind: _onAddOrganizationKind,
@@ -123,6 +126,7 @@ export function LocationConnectedPartiesSection({
       sectionRows={sectionRows}
       sectionHeadingId={sectionHeadingId}
       peopleKindSlots={peopleKindSlots}
+      charactersById={charactersById}
       canManage={canManage}
       canAddToPeopleSection={canAddToPeopleSection}
       peopleMutationContext={peopleMutationContext}

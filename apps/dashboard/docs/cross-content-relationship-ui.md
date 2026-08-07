@@ -87,6 +87,21 @@ Located in {nearest direct parent}
 - Nearest-parent context uses the last ancestry segment only — not full `ancestry.text`.
 - Pickers and change-target **Current** may still show fuller classification + ancestry for disambiguation.
 
+### Mixed PC/NPC character rows
+
+Undifferentiated character collections (location People & organizations character rows, location character pickers, organization connected-character preview, global search `typeLabel`) compose [`CharacterEntitySummaryVm`](../src/features/character/lib/display/character-entity-summary.lib.ts) and project mixed identity via `formatCharacterInlineSummary(vm, { includeCharacterType: true })`:
+
+```text
+{name link} · PC · Dwarf · Level 1 Fighter
+```
+
+- `identitySummary` stays type-free; PC/NPC belongs to the mixed projection helper, not the VM.
+- Transport-only sources omit `parts` — never synthesize empty structured parts when only `{ summary }` is known.
+- Global search uses `getCharacterTypeLabel` in the established `typeLabel` slot; `secondary` remains identity-only.
+- `DetailEntityRow` keeps the entity name non-shrinking; long suffix metadata truncates first so overflow menus stay visible.
+
+Homogeneous PC-only / NPC-only rosters and grouped PC/NPC sections do **not** repeat type on every row when surrounding chrome already communicates the distinction.
+
 ## Populated row vs empty container
 
 | Responsibility                    | Owner                                                                                                                  |

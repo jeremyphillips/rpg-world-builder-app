@@ -5,20 +5,21 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { OrganizationConnectedCharacterPreviewList } from './organization-connected-character-preview-list.client'
 
-const sampleCard = {
+const sampleSummary = {
   id: 'char-1',
   name: 'Verna',
-  summary: 'Dwarf · Level 1 Fighter',
-} as const
+  identitySummary: 'Dwarf · Level 1 Fighter',
+  characterType: { value: 'pc' as const, label: 'PC' },
+}
 
 describe('OrganizationConnectedCharacterPreviewList', () => {
-  it('renders preview rows, view links, and truncation copy from total', () => {
+  it('renders mixed PC/NPC preview rows, view links, and truncation copy from total', () => {
     render(
       <MemoryRouter>
         <OrganizationConnectedCharacterPreviewList
           items={[
             {
-              card: sampleCard,
+              summary: sampleSummary,
               detailHref: '/characters/char-1',
             },
           ]}
@@ -28,6 +29,7 @@ describe('OrganizationConnectedCharacterPreviewList', () => {
     )
 
     expect(screen.getByText('Verna')).toBeInTheDocument()
+    expect(screen.getByText('PC · Dwarf · Level 1 Fighter')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute('href', '/characters/char-1')
     expect(screen.getByText('+ 2 more')).toBeInTheDocument()
   })
@@ -38,7 +40,7 @@ describe('OrganizationConnectedCharacterPreviewList', () => {
         <OrganizationConnectedCharacterPreviewList
           items={[
             {
-              card: sampleCard,
+              summary: sampleSummary,
               detailHref: '/characters/char-1',
             },
           ]}

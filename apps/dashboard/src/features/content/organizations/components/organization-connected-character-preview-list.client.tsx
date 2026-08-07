@@ -2,6 +2,8 @@
 
 import { Text } from '@rpg/ui'
 
+import { formatCharacterInlineSummary } from '@/features/character'
+
 import { ContentEntityCard, ContentEntityCardViewLink } from '../../lib/content-entity-card.client'
 import type { OrganizationConnectedCharacterPreviewItem } from '../lib/organization-display'
 
@@ -27,11 +29,13 @@ export function OrganizationConnectedCharacterPreviewList({
   return (
     <div className="space-y-3">
       <ul className="space-y-2">
-        {items.map(({ card, detailHref }) => (
-          <li key={card.id}>
+        {items.map(({ summary, detailHref }) => (
+          <li key={summary.id}>
             <ContentEntityCard
-              heading={card.name}
-              subheading={card.summary}
+              heading={summary.name}
+              subheading={
+                formatCharacterInlineSummary(summary, { includeCharacterType: true }) || undefined
+              }
               headingEndSlot={<ContentEntityCardViewLink href={detailHref} />}
             />
           </li>

@@ -7,6 +7,7 @@ import { cn, contentCardHeadingLinkVariants } from '@rpg/ui'
 
 import {
   detailEntityRowContentVariants,
+  detailEntityRowHeadingNameVariants,
   detailEntityRowHeadingSuffixVariants,
   detailEntityRowHeadingVariants,
   detailEntityRowSubheadingVariants,
@@ -34,11 +35,14 @@ export function DetailEntityRow({
   className,
 }: DetailEntityRowProps) {
   const resolvedHeading = href ? (
-    <Link to={href} className={contentCardHeadingLinkVariants()}>
+    <Link
+      to={href}
+      className={cn(contentCardHeadingLinkVariants(), detailEntityRowHeadingNameVariants())}
+    >
       {heading}
     </Link>
   ) : (
-    heading
+    <span className={detailEntityRowHeadingNameVariants()}>{heading}</span>
   )
 
   return (

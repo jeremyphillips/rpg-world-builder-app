@@ -197,6 +197,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     return [...characters.values()]
   }, [campaignCharactersQuery.data, catalogIndex, npcsQuery.data])
 
+  const characterOptionsById = React.useMemo(
+    () => new Map(characterOptions.map((option) => [option.id, option])),
+    [characterOptions],
+  )
+
   const eligibility = React.useMemo(
     () => resolveLocationConnectionEligibility(toLocationConnectionEligibilityInput(location)),
     [location],
@@ -529,6 +534,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       isAuthoritativeDomainSet: organizationsQuery.isSuccess,
     },
     characterOptions,
+    characterOptionsById,
     rows,
     canManage,
     canWriteInverse,

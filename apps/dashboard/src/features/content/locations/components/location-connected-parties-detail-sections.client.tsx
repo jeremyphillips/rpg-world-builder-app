@@ -82,6 +82,7 @@ function LocationConnectedPartiesSections({
   const sharedSectionProps = {
     campaignId,
     rows: detail.rows,
+    charactersById: detail.characterOptionsById,
     canManage: detail.canWriteInverse,
     isMutationPending: detail.isMutationPending,
     pendingRelationshipId: detail.pendingRelationshipId,

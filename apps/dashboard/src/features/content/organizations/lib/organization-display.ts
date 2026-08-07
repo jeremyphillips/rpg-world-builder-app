@@ -9,6 +9,8 @@ import {
 import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 
+import type { CharacterEntitySummaryVm } from '@/features/character'
+
 export const ORGANIZATION_SECTION_LABELS = {
   connectedCharacters: 'Connected characters',
   locationConnections: 'Location connections',
@@ -20,7 +22,7 @@ export const ORGANIZATION_EMPTY_SECTION_TEXT = {
 } as const
 
 export type OrganizationConnectedCharacterPreviewItem = {
-  card: { id: string; name: string; summary: string }
+  summary: CharacterEntitySummaryVm
   detailHref: string
 }
 

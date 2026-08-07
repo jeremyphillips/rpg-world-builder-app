@@ -4,6 +4,7 @@ import {
   formatCharacterClassSegment,
   formatCharacterSpeciesSegment,
   formatCharacterSummary,
+  formatCharacterSummarySegments,
   type CharacterSummaryParts,
 } from './character-summary-format'
 
@@ -28,6 +29,25 @@ describe('formatCharacterClassSegment', () => {
     expect(formatCharacterClassSegment({ name: 'Rogue', level: 1 }, { includeLevel: true })).toBe(
       'Rogue 1',
     )
+  })
+})
+
+describe('formatCharacterSummarySegments', () => {
+  it('returns the same segments as formatCharacterSummary split on the separator', () => {
+    const parts: CharacterSummaryParts = {
+      species: { name: 'Dwarf' },
+      classes: [
+        { name: 'Fighter', level: 3 },
+        { name: 'Rogue', level: 1 },
+      ],
+    }
+
+    expect(formatCharacterSummarySegments(parts)).toEqual([
+      'Dwarf',
+      'Level 4',
+      'Fighter 3 / Rogue 1',
+    ])
+    expect(formatCharacterSummarySegments(parts).join(' · ')).toBe(formatCharacterSummary(parts))
   })
 })
 

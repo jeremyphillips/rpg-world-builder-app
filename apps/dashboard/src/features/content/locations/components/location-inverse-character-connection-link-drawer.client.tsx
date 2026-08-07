@@ -45,6 +45,10 @@ import {
   resolveTerritorialAuthorityLocationContext,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+import {
+  buildConnectedPartyCharacterPickerSearchText,
+  formatConnectedPartyCharacterPickerSubheading,
+} from '../lib/location-connected-party-character-options.lib'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
@@ -250,7 +254,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       items={showCharacterPicker ? characters : []}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
-      getSearchText={(character) => [character.name, character.summary].join(' ')}
+      getSearchText={buildConnectedPartyCharacterPickerSearchText}
       renderItemHeader={(character) => {
         const isSelected = selectedCharacterId === character.id
         const hasAvailableKind = characterInverseSubjectHasAvailableKind(
@@ -267,7 +271,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             heading={character.name}
             subheading={
               hasAvailableKind
-                ? character.summary || undefined
+                ? formatConnectedPartyCharacterPickerSubheading(character)
                 : CHARACTER_DRAWER_FULLY_LINKED_REASON
             }
             disabled={!hasAvailableKind}

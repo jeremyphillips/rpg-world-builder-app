@@ -28,6 +28,24 @@ describe('DetailEntityRow', () => {
     expect(container.firstElementChild).toHaveClass('px-4', 'py-2')
   })
 
+  it('truncates the heading suffix before the entity name', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Verna Stormcaller"
+          href="/characters/verna"
+          headingSuffix=" · PC · Elf (Drow) · Level 8 · Fighter 5 (Battle Master) / Rogue 3 (Assassin)"
+          endSlot={<button type="button">Actions</button>}
+        />
+      </MemoryRouter>,
+    )
+
+    const suffix = container.querySelector('[class*="text-muted-foreground"]')
+    expect(suffix).toHaveClass('truncate')
+    expect(screen.getByRole('link', { name: 'Verna Stormcaller' })).toHaveClass('shrink-0')
+    expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
+  })
+
   it('omits end slot when not provided', () => {
     render(
       <MemoryRouter>
