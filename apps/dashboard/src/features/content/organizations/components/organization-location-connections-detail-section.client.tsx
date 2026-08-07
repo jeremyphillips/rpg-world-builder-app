@@ -71,6 +71,11 @@ export function OrganizationLocationConnectionsDetailSection({
               : undefined
           }
           isSubmitting={detail.mutations.isPending}
+          currentEndpoint={
+            detail.drawerState.mode === 'changeTarget'
+              ? detail.changeTargetCurrentEndpoint
+              : undefined
+          }
           onSubmit={detail.handleSubmit}
         />
       ) : null}

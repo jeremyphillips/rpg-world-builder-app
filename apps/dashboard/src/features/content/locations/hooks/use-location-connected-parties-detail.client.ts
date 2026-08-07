@@ -46,6 +46,7 @@ import { peopleSectionHasAvailableTarget } from '../../lib/location-connection-k
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
 import { buildLocationPartyCharactersById } from '../lib/location-party-associations.lib'
+import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/resolve-relationship-drawer-current-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
 export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =
@@ -502,6 +503,18 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [],
   )
 
+  const replaceOrganizationCurrentEndpoint = React.useMemo(() => {
+    if (organizationDrawerState?.mode !== 'replaceOrganization') {
+      return undefined
+    }
+
+    return resolveLocationInverseCurrentOrganizationEndpoint({
+      relationshipId: organizationDrawerState.connection.relationshipId,
+      rows,
+      organizations: organizationsQuery.data ?? [],
+    })
+  }, [organizationDrawerState, organizationsQuery.data, rows])
+
   return {
     connectedPartiesQuery,
     organizations: organizationsQuery.data ?? [],
@@ -541,6 +554,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     handleEditConnection,
     handleChangeTerritorialKind,
     handleReplaceTerritorialOrganization,
+    replaceOrganizationCurrentEndpoint,
     canEditRow,
     showTerritorialSection: shouldShowLocationConnectedPartiesSection({
       section: 'territorialAuthority',

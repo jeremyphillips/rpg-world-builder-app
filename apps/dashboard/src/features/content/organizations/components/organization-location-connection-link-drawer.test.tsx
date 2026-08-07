@@ -16,6 +16,7 @@ import {
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
 } from './organization-location-connection-link-drawer.client'
 import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship/relationship-alternatives'
+import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
 
 const organization: Pick<Organization, 'name' | 'organizationKind'> = {
   name: 'The Monarchy',
@@ -410,7 +411,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.queryByText('City Waterworks')).not.toBeInTheDocument()
   })
 
-  it('excludes settlements from headquarters changeTarget picker', () => {
+  it('shows current and new location fields for headquarters changeTarget', async () => {
+    const user = userEvent.setup()
     const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
     const silverEel = buildingLocation({
       id: 'building-2',
@@ -418,6 +420,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       slug: 'silver-eel',
     })
     const headquartersPresentation = resolveOrganizationForwardTargetPresentation('headquarters')
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
 
     render(
       <OrganizationLocationConnectionLinkDrawer
@@ -432,19 +435,114 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         edgesByLocationId={{}}
         occupancyLoaded
         initialConnection={{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }}
-        onSubmit={vi.fn()}
+        currentEndpoint={{
+          heading: 'Thieves Guildhouse',
+          subheading: 'Structure',
+        }}
+        onSubmit={onSubmit}
       />,
     )
 
     expect(screen.getByRole('dialog', { name: 'Change headquarters location' })).toBeInTheDocument()
+    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('New location')).toBeInTheDocument()
+    expect(screen.getByText('Thieves Guildhouse')).toBeInTheDocument()
+    expect(screen.getAllByText('Structure').length).toBeGreaterThan(0)
     expect(screen.getByText(headquartersPresentation.targetHelp!)).toBeInTheDocument()
     expect(
       screen.getByRole('textbox', { name: headquartersPresentation.searchPlaceholder }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('group', { name: 'Location type' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Thieves Guildhouse')).toHaveLength(1)
     expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
-    expect(screen.queryByText('Thieves Guildhouse')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
+
+    await user.click(
+      within(screen.getByText('The Silver Eel').closest('article')!).getByRole('button', {
+        name: 'Select',
+      }),
+    )
+
+    expect(screen.getAllByText('Thieves Guildhouse')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Save change' })).toBeEnabled()
+    await user.click(screen.getByRole('button', { name: 'Save change' }))
+    expect(onSubmit).toHaveBeenCalledWith({
+      locationId: silverEel.id,
+      kind: 'headquarters',
+    })
+  })
+
+  it('shows stale current location even when it is not an eligible replacement', () => {
+    const staleSettlement = settlementLocation({ id: 'settlement-hq', name: 'Legacy Port HQ' })
+    const silverEel = buildingLocation({
+      id: 'building-2',
+      name: 'The Silver Eel',
+      slug: 'silver-eel',
+    })
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[silverEel]}
+        existingConnections={[
+          { id: 'conn-hq', locationId: staleSettlement.id, kind: 'headquarters' },
+        ]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{
+          id: 'conn-hq',
+          locationId: staleSettlement.id,
+          kind: 'headquarters',
+        }}
+        currentEndpoint={{
+          heading: 'Legacy Port HQ',
+          subheading: 'Settlement',
+        }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('Legacy Port HQ')).toBeInTheDocument()
+    expect(screen.getByText('Settlement')).toBeInTheDocument()
+    expect(screen.getByText('The Silver Eel')).toBeInTheDocument()
+  })
+
+  it('blocks changeTarget when the current endpoint is unavailable', () => {
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="changeTarget"
+        intent="site"
+        organization={organization}
+        organizationId="org-1"
+        locations={[buildingLocation()]}
+        existingConnections={[{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        initialConnection={{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }}
+        currentEndpoint={{
+          heading: 'Unavailable location',
+          unavailable: true,
+        }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Current location')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable location')).toBeInTheDocument()
+    expect(
+      screen.getByText(RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE),
+    ).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Search structures…')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save change' })).not.toBeInTheDocument()
   })
 
   it('excludes settlements from headquarters add picker', async () => {

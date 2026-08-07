@@ -24,7 +24,13 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import { RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
+import { RelationshipDrawerCurrentEntityField } from '../../lib/relationship/relationship-drawer-current-entity-field.client'
+import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
+import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
+import {
+  RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL,
+  resolveReplacementFieldLabels,
+} from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
@@ -105,6 +111,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   >
   occupancyLoaded?: boolean
   initialConnection?: ExistingConnection
+  currentEndpoint?: RelationshipDrawerCurrentEntitySnapshot
   drawerAlternatives?: OrganizationLocationConnectionDrawerAlternatives
   isSubmitting?: boolean
   onSubmit: (input: {
@@ -162,6 +169,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   edgesByLocationId,
   occupancyLoaded = true,
   initialConnection,
+  currentEndpoint,
   drawerAlternatives,
   isSubmitting = false,
   onSubmit,
@@ -345,8 +353,15 @@ function OrganizationLocationConnectionLinkDrawerContent({
     organizationId,
   ])
 
-  const showLocationPicker = (mode === 'add' && Boolean(activeKind)) || mode === 'changeTarget'
-  const hasChange = mode !== 'changeKind' || activeKind !== initialConnection?.kind
+  const showLocationPicker =
+    ((mode === 'add' && Boolean(activeKind)) || mode === 'changeTarget') &&
+    !currentEndpoint?.unavailable
+  const hasTargetChange =
+    mode === 'changeTarget'
+      ? selectedLocationId != null && selectedLocationId !== initialConnection?.locationId
+      : true
+  const hasChange =
+    (mode !== 'changeKind' || activeKind !== initialConnection?.kind) && hasTargetChange
   const canSubmit = Boolean(selectedLocationId && activeKind) && hasChange && !isSubmitting
 
   const handleKindChange = (value: string) => {
@@ -378,6 +393,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const targetPresentation = activeKind
     ? resolveOrganizationForwardTargetPresentation(activeKind)
     : DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION
+
+  const replacementFieldLabels =
+    mode === 'changeTarget'
+      ? resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL)
+      : null
+  const targetFieldLabel = replacementFieldLabels?.newLabel ?? targetPresentation.targetLabel
 
   const title = (() => {
     if (mode === 'changeTarget' && activeKind) {
@@ -436,22 +457,25 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const showTargetBrowseScopeControl =
     browseScopeOptions.length > 0 && showLocationPicker && !showMutationEmptyState
 
-  React.useEffect(() => {
+  const effectiveLocationBrowseScope = React.useMemo(() => {
     if (!showTargetBrowseScopeControl) {
-      return
+      return locationBrowseScope
     }
+
     const activeScope = browseScopeOptions.find((option) => option.value === locationBrowseScope)
     if (activeScope?.disabled && locationBrowseScope !== 'all') {
-      setLocationBrowseScope('all')
+      return 'all'
     }
+
+    return locationBrowseScope
   }, [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl])
 
   const pickerLocations = React.useMemo(() => {
     if (!showTargetBrowseScopeControl) {
       return eligibleLocations
     }
-    return filterLocationsByTargetBrowseScope(eligibleLocations, locationBrowseScope)
-  }, [eligibleLocations, locationBrowseScope, showTargetBrowseScopeControl])
+    return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
+  }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
 
   return (
     <CatalogPickerSheet
@@ -498,6 +522,22 @@ function OrganizationLocationConnectionLinkDrawerContent({
               value={getOrganizationLocationConnectionLabel(activeKind)}
             />
           ) : null}
+          {mode === 'changeTarget' && currentEndpoint ? (
+            <RelationshipDrawerCurrentEntityField
+              label={
+                replacementFieldLabels?.currentLabel ??
+                resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL).currentLabel
+              }
+              heading={currentEndpoint.heading}
+              subheading={currentEndpoint.subheading}
+              imageKey={currentEndpoint.imageKey}
+            />
+          ) : null}
+          {mode === 'changeTarget' && currentEndpoint?.unavailable ? (
+            <Text variant="muted" className="text-sm" role="status">
+              {RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE}
+            </Text>
+          ) : null}
           {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
             <LocationConnectionKindStep
               id="organization-location-connection-edit-kind"
@@ -514,7 +554,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
           {showLocationPicker && !showMutationEmptyState ? (
             <div className="space-y-2">
               <Heading variant="label" as="p">
-                {targetPresentation.targetLabel}
+                {targetFieldLabel}
               </Heading>
               {targetPresentation.targetHelp ? (
                 <Text variant="muted" className="text-sm">
@@ -558,7 +598,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
           </Button>
         ) : undefined
       }
-      hasStructuredFilters={showTargetBrowseScopeControl && locationBrowseScope !== 'all'}
+      hasStructuredFilters={showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all'}
       items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}

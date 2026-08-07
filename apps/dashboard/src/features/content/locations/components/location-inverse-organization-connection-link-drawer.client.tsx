@@ -9,7 +9,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationKindLabel, getOrganizationLocationConnectionLabel } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Heading, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -20,9 +20,13 @@ import {
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import { RelationshipDrawerCurrentEntityField } from '../../lib/relationship/relationship-drawer-current-entity-field.client'
+import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
+import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
 import {
   RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL,
   RELATIONSHIP_DRAWER_RELATIONSHIP_TYPE_FIELD_LABEL,
+  resolveReplacementFieldLabels,
 } from '../../lib/relationship/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 
@@ -73,6 +77,7 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
     organizationId: string
     kind: OrganizationLocationConnectionKind
   }
+  currentEndpoint?: RelationshipDrawerCurrentEntitySnapshot
   isSubmitting?: boolean
   onSubmit: (input: {
     organizationId: string
@@ -108,15 +113,14 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   organizations,
   connectedPartyRows,
   initialConnection,
+  currentEndpoint,
   isSubmitting = false,
   onSubmit,
 }: LocationInverseOrganizationConnectionLinkDrawerProps) {
   const resolvedAddKind = hasResolvedAddKind(mode, addKind) ? addKind : undefined
 
   const [selectedOrganizationId, setSelectedOrganizationId] = React.useState<string | null>(
-    mode === 'replaceOrganization' || mode === 'changeKind'
-      ? (initialConnection?.organizationId ?? null)
-      : null,
+    mode === 'changeKind' ? (initialConnection?.organizationId ?? null) : null,
   )
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ??
@@ -221,16 +225,28 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     mode === 'changeKind' || (mode === 'add' && !resolvedAddKind && selectedOrganizationId)
 
   const lockedOrganization =
-    mode === 'changeKind' || mode === 'replaceOrganization'
+    mode === 'changeKind'
       ? organizations.find((organization) => organization.id === initialConnection?.organizationId)
       : undefined
 
-  const hasChange = mode !== 'changeKind' || activeKind !== initialConnection?.kind
+  const replacementFieldLabels =
+    mode === 'replaceOrganization'
+      ? resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
+      : null
+
+  const hasTargetChange =
+    mode === 'replaceOrganization'
+      ? selectedOrganizationId != null &&
+        selectedOrganizationId !== initialConnection?.organizationId
+      : true
+  const hasChange =
+    (mode !== 'changeKind' || activeKind !== initialConnection?.kind) && hasTargetChange
   const canSubmit = Boolean(
     (mode === 'changeKind'
       ? activeKind && initialConnection?.organizationId
       : selectedOrganizationId && activeKind) &&
     hasChange &&
+    !currentEndpoint?.unavailable &&
     !isSubmitting,
   )
 
@@ -311,21 +327,21 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       ? 'Authority type'
       : ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
 
-  const showOrganizationPicker = mode === 'add' || mode === 'replaceOrganization'
+  const showOrganizationPicker =
+    (mode === 'add' || mode === 'replaceOrganization') && !currentEndpoint?.unavailable
 
-  const sortedOrganizations = React.useMemo(() => {
-    if (!showOrganizationPicker || !initialConnection || mode !== 'replaceOrganization') {
-      return showOrganizationPicker ? organizations : []
+  const replacementOrganizations = React.useMemo(() => {
+    if (!showOrganizationPicker) {
+      return []
     }
 
-    const current = organizations.find(
-      (organization) => organization.id === initialConnection.organizationId,
-    )
-    const alternatives = organizations.filter(
+    if (mode !== 'replaceOrganization' || !initialConnection) {
+      return organizations
+    }
+
+    return organizations.filter(
       (organization) => organization.id !== initialConnection.organizationId,
     )
-
-    return current ? [current, ...alternatives] : organizations
   }, [initialConnection, mode, organizations, showOrganizationPicker])
 
   const availabilityKinds = React.useMemo(() => {
@@ -373,6 +389,23 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               value={getOrganizationLocationConnectionLabel(initialConnection.kind)}
             />
           ) : null}
+          {mode === 'replaceOrganization' && currentEndpoint ? (
+            <RelationshipDrawerCurrentEntityField
+              label={
+                replacementFieldLabels?.currentLabel ??
+                resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
+                  .currentLabel
+              }
+              heading={currentEndpoint.heading}
+              subheading={currentEndpoint.subheading}
+              imageKey={currentEndpoint.imageKey}
+            />
+          ) : null}
+          {mode === 'replaceOrganization' && currentEndpoint?.unavailable ? (
+            <Text variant="muted" className="text-sm" role="status">
+              {RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE}
+            </Text>
+          ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
@@ -391,9 +424,16 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
             />
           ) : null}
           {mode === 'replaceOrganization' ? (
-            <Text variant="muted" className="text-sm">
-              {TERRITORIAL_AUTHORITY_DRAWER.replaceHelper}
-            </Text>
+            <div className="space-y-2">
+              <Heading variant="label" as="p">
+                {replacementFieldLabels?.newLabel ??
+                  resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL)
+                    .newLabel}
+              </Heading>
+              <Text variant="muted" className="text-sm">
+                {TERRITORIAL_AUTHORITY_DRAWER.replaceHelper}
+              </Text>
+            </div>
           ) : null}
         </div>
       }
@@ -405,44 +445,19 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         ) : undefined
       }
       footer={
-        (mode === 'changeKind' || selectedOrganizationId) && activeKind ? (
+        (mode === 'changeKind' || showOrganizationPicker) && activeKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>
         ) : undefined
       }
-      items={showOrganizationPicker ? sortedOrganizations : []}
+      items={showOrganizationPicker ? replacementOrganizations : []}
       getItemKey={(organization) => organization.id}
       getItemToolbarLabel={(organization) => organization.name}
       getSearchText={(organization) =>
         [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
       }
       renderItemHeader={(organization) => {
-        const isCurrentPinned =
-          mode === 'replaceOrganization' && organization.id === initialConnection?.organizationId
-
-        if (isCurrentPinned && lockedOrganization) {
-          return (
-            <ContentEntityCard
-              chrome="embedded"
-              density="compact"
-              heading={lockedOrganization.name}
-              subheading={getOrganizationKindLabel(lockedOrganization.organizationKind)}
-              imageKey={lockedOrganization.imageKey}
-              disabled
-              endSlot={
-                <CatalogPickerSelectionActions
-                  phase={resolveCatalogPickerRowActionPhase({ isSelected: true, isSuccess: false })}
-                  canSelect={false}
-                  addLabel={TERRITORIAL_AUTHORITY_DRAWER.replaceSelectedLabel}
-                  onAdd={() => undefined}
-                  onRemove={() => undefined}
-                />
-              }
-            />
-          )
-        }
-
         const isSelected = selectedOrganizationId === organization.id
         const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
           organization.id,

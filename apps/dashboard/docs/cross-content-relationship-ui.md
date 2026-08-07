@@ -98,6 +98,7 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
 | `RelationshipDrawerContextHeader`                | Names the fixed endpoint (`{name} · {kind label}`)                                    |
 | `RelationshipDrawerSubjectField`                 | Structured read-only subject/target label + value (Organization, Location, Character) |
+| `RelationshipDrawerCurrentEntityField`           | Read-only current entity summary for searchable replacement flows                     |
 | `LocationConnectionKindStep`                     | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)  |
 | Embedded `ContentEntityCard` + selection actions | Entity picker rows in drawers                                                         |
 
@@ -115,7 +116,20 @@ Add workflows begin **unresolved**. Change-kind workflows begin **resolved** wit
 | ------------------- | -------------------------------- | -------------------------------------------------------------------- |
 | **Add**             | Expanded option list             | None — user must choose                                              |
 | **Change kind**     | Expanded with current selected   | Hydrated from persisted relationship; kind is the only mutable field |
-| **Replace subject** | Kind shown as read-only field    | Current subject pinned/selected in picker                            |
+| **Replace subject** | Kind shown as read-only field    | `RelationshipDrawerCurrentEntityField` + `New {subject}` picker      |
+
+## Current-value representation
+
+| Mutation control                     | Current value representation                                    |
+| ------------------------------------ | --------------------------------------------------------------- |
+| Finite radio/segmented/select choice | Selected state inside the control                               |
+| Searchable entity replacement        | `RelationshipDrawerCurrentEntityField` + `New {subject}` picker |
+
+Replacement UI must explicitly represent the persisted value independently of the replacement candidate set.
+
+Do not make users infer the persisted value from an absent candidate, drawer title, or surrounding page context.
+
+Current-value display is resolved from persisted/hydrated relationship data at drawer open time ([`resolve-relationship-drawer-current-endpoint.ts`](../src/features/content/lib/relationship/resolve-relationship-drawer-current-endpoint.ts)). Candidate collections used for replacement pickers are not authoritative for current display. When the persisted endpoint cannot be resolved, surface an explicit unavailable state and block the replacement mutation — do not silently omit the Current field.
 
 Rules:
 

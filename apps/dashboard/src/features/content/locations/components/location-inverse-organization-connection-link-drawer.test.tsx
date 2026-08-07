@@ -146,6 +146,51 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
 })
 
 describe('LocationInverseOrganizationConnectionLinkDrawer replace organization', () => {
+  const currentOrganizationEndpoint = {
+    heading: CITY_COUNCIL.name,
+    subheading: 'Government',
+    imageKey: CITY_COUNCIL.imageKey,
+  }
+
+  it('shows current and new organization fields with replacement picker', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+    render(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="replaceOrganization"
+        intent="site"
+        location={buildingLocation()}
+        organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
+        connectedPartyRows={[headquartersRow]}
+        initialConnection={{
+          relationshipId: 'rel-hq',
+          organizationId: CITY_COUNCIL.id,
+          kind: 'headquarters',
+        }}
+        currentEndpoint={currentOrganizationEndpoint}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Replace organization' })).toBeInTheDocument()
+    expect(screen.getByText('Relationship type')).toBeInTheDocument()
+    expect(screen.getByText('Headquarters')).toBeInTheDocument()
+    expect(screen.getByText('Current organization')).toBeInTheDocument()
+    expect(screen.getByText('New organization')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
+    expect(screen.getAllByText('City Council')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Replace organization' })).toBeDisabled()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    expect(screen.getAllByText('City Council')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Replace organization' })).toBeEnabled()
+  })
+
   it('shows read-only relationship type and organization picker without kind controls', () => {
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -161,15 +206,11 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
           organizationId: CITY_COUNCIL.id,
           kind: 'headquarters',
         }}
+        currentEndpoint={currentOrganizationEndpoint}
         onSubmit={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole('dialog', { name: 'Replace organization' })).toBeInTheDocument()
-    expect(screen.getByText('Relationship type')).toBeInTheDocument()
-    expect(screen.getByText('Headquarters')).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search organizations')).toBeInTheDocument()
     expect(screen.getByText('City Council')).toBeInTheDocument()
   })
 
@@ -188,6 +229,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
           organizationId: CITY_COUNCIL.id,
           kind: 'headquarters',
         }}
+        currentEndpoint={currentOrganizationEndpoint}
         onSubmit={vi.fn()}
       />,
     )

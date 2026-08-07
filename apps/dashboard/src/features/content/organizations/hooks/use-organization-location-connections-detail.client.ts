@@ -20,6 +20,7 @@ import {
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/location-connection-drawer-intent'
 import { resolveRelationshipAlternatives } from '../../lib/relationship/relationship-alternatives'
+import { resolveOrganizationForwardCurrentLocationEndpoint } from '../../lib/relationship/resolve-relationship-drawer-current-endpoint'
 import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
@@ -235,6 +236,17 @@ export function useOrganizationLocationConnectionsDetail(
     [],
   )
 
+  const changeTargetCurrentEndpoint = React.useMemo(() => {
+    if (drawerState?.mode !== 'changeTarget') {
+      return undefined
+    }
+
+    return resolveOrganizationForwardCurrentLocationEndpoint({
+      connectionId: drawerState.connection.connectionId,
+      locationReferences: locationReferencesQuery.data ?? [],
+    })
+  }, [drawerState, locationReferencesQuery.data])
+
   return {
     canManage,
     organization,
@@ -257,6 +269,7 @@ export function useOrganizationLocationConnectionsDetail(
     openAddFamily,
     openChangeKindDrawer,
     openChangeTargetDrawer,
+    changeTargetCurrentEndpoint,
     handleSubmit,
     handleRemoveConnection,
   }

@@ -40,6 +40,11 @@ function LocationConnectedOrganizationDrawer({
           ? drawerState.connection
           : undefined
       }
+      currentEndpoint={
+        drawerState.mode === 'replaceOrganization'
+          ? detail.replaceOrganizationCurrentEndpoint
+          : undefined
+      }
       isSubmitting={detail.isMutationPending}
       onSubmit={detail.handleOrganizationSubmit}
     />
