@@ -33,17 +33,19 @@ export function EntityReplacementSection({
   return (
     <>
       {current ? (
-        <EntityReplacementCurrentField
-          label={labels.currentLabel}
-          heading={current.heading}
-          subheading={current.subheading}
-          imageKey={current.imageKey}
-        />
-      ) : null}
-      {current?.unavailable ? (
-        <Text variant="muted" className="text-sm" role="status">
-          {unavailableMessage}
-        </Text>
+        <div className="mb-3">
+          <EntityReplacementCurrentField
+            label={labels.currentLabel}
+            heading={current.heading}
+            subheading={current.subheading}
+            imageKey={current.imageKey}
+          />
+          {current.unavailable ? (
+            <Text variant="muted" className="mt-2 text-sm" role="status">
+              {unavailableMessage}
+            </Text>
+          ) : null}
+        </div>
       ) : null}
       {showNewSection ? (
         <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import { Heading } from '@rpg/ui'
+import { Heading, InsetPanel } from '@rpg/ui'
 
 import { ContentEntityCard } from '../content-entity-card.client'
 
@@ -22,13 +22,15 @@ export function EntityReplacementCurrentField({
       <Heading variant="label" as="p">
         {label}
       </Heading>
-      <ContentEntityCard
-        chrome="embedded"
-        density="compact"
-        heading={heading}
-        subheading={subheading}
-        imageKey={imageKey}
-      />
+      <InsetPanel size="sm" className="p-0">
+        <ContentEntityCard
+          chrome="embedded"
+          density="compact"
+          heading={heading}
+          subheading={subheading}
+          imageKey={imageKey}
+        />
+      </InsetPanel>
     </div>
   )
 }
