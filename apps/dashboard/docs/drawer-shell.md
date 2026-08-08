@@ -85,3 +85,48 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 | Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)          |
 
 Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+
+## Unsaved-changes leave guard
+
+Form shells (`ContentFormDrawer`, `ContentFormFooter`, page create/edit flows)
+share one leave-guard contract. Implementation lives in
+[`src/lib/form-unsaved-changes-guard.tsx`](../src/lib/form-unsaved-changes-guard.tsx)
+and [`src/lib/use-unsaved-changes-confirm.tsx`](../src/lib/use-unsaved-changes-confirm.tsx).
+
+### One controller per shell
+
+Each form shell mounts **one** `useUnsavedChangesConfirm` hook and **one**
+`ConfirmDialog`. Adapters (router blocker, sheet close bridge) call
+`request(continuation)` — they never render their own dialog.
+
+When a parent already owns the dialog, pass `discardGuard` into
+`FormUnsavedChangesGuard` with `renderDialog={false}`.
+
+### Dirty composition
+
+Leave dirtiness is composed via `composeFormLeaveDirty` in
+[`src/lib/form-leave-dirty.ts`](../src/lib/form-leave-dirty.ts):
+
+- body `dirtyFields` (via `hasDirtyFields`)
+- subclass unsaved edits (edit flows)
+- `extraUnsavedEdits` — **additive only**; never suppresses body dirtiness
+- campaign access draft state (drawer flows)
+
+### Pending blocks exit without discard UI
+
+When `pending` is true (submit in flight, save draft, etc.):
+
+- sheet/drawer close attempts are refused at the shell level
+- in-app route navigation is blocked but **does not** open the discard dialog
+
+### Trusted close / navigation
+
+After a successful create or save:
+
+- **drawer close** uses `runTrusted(continuation, { bypassRouter: false })` so
+  closing the sheet does not arm a router bypass
+- **post-create page navigation** uses `runTrusted(() => navigate(...))` (default
+  bypass) so the next route change proceeds even if the form is still dirty
+
+`consumeTrustedBypass` is consumed by the router adapter for that one-shot
+navigation only.

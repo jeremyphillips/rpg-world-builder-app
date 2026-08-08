@@ -145,6 +145,19 @@ function CleanFormWithExtraTrue() {
   )
 }
 
+function PendingForm() {
+  const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
+
+  return (
+    <FormProvider {...form}>
+      <FormUnsavedChangesGuard pending />
+      <label htmlFor="name">Name</label>
+      <input id="name" aria-label="Name" {...form.register('name')} />
+      <Link to="/away">Leave</Link>
+    </FormProvider>
+  )
+}
+
 function renderFormRoute(element: ReactElement) {
   return renderWithDataRouter(
     [
@@ -341,5 +354,16 @@ describe('FormUnsavedChangesGuard', () => {
     await user.click(await screen.findByRole('button', { name: 'Discard' }))
 
     expect(await screen.findByText('Start page')).toBeInTheDocument()
+  })
+
+  it('blocks navigation while pending without opening the discard dialog', async () => {
+    const user = userEvent.setup()
+    renderFormRoute(<PendingForm />)
+
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.queryByText('Away page')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Original')
   })
 })

@@ -12,7 +12,7 @@ import {
   useUnsavedChangesConfirm,
   type UnsavedChangesConfirmController,
 } from '@/lib/form-unsaved-changes-guard'
-import { hasDirtyFields } from '@/lib/form-dirty-state'
+import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
@@ -109,8 +109,9 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   const createPending = pending || saveDraftPending
   const { dirtyFields } = useFormState({ control: form.control })
   const subclassEdits = useSubclassUnsavedEditsBlocking()
-  const isDirty = hasDirtyFields(dirtyFields) || subclassEdits || Boolean(extraUnsavedEdits)
+  const isDirty = composeFormLeaveDirty({ dirtyFields, extraUnsavedEdits, subclassEdits })
   const discardGuard = useUnsavedChangesConfirm({ isDirty })
+  const leavePending = mode === 'create' ? createPending : pending
 
   useEffect(() => {
     onLeaveGuardReady?.({ runTrusted: discardGuard.runTrusted })
@@ -162,7 +163,11 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   return (
     <>
       {discardGuard.dialog}
-      <FormUnsavedChangesGuard discardGuard={discardGuard} renderDialog={false} />
+      <FormUnsavedChangesGuard
+        discardGuard={discardGuard}
+        pending={leavePending}
+        renderDialog={false}
+      />
       <FormFooterActions
         secondary={secondary}
         pending={pending}

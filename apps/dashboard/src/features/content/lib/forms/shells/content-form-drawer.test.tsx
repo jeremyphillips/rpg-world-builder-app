@@ -248,4 +248,96 @@ describe('ContentFormDrawer', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
+
+  it('closes only after onSubmit settles', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    let resolveSubmit: (() => void) | undefined
+    const onSubmit = vi.fn().mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSubmit = resolve
+      }),
+    )
+
+    renderDrawerRoutes(
+      <ContentFormDrawer
+        open
+        onOpenChange={onOpenChange}
+        title="Add item"
+        pending={false}
+        submitLabel="Create"
+        form={formProps}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+    expect(onOpenChange).not.toHaveBeenCalled()
+
+    resolveSubmit?.()
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('keeps the drawer open when onSubmit rejects', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const onSubmit = vi.fn().mockRejectedValue(new Error('Save failed'))
+
+    renderDrawerRoutes(
+      <ContentFormDrawer
+        open
+        onOpenChange={onOpenChange}
+        title="Add item"
+        pending={false}
+        submitLabel="Create"
+        form={formProps}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+    expect(onOpenChange).not.toHaveBeenCalled()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('blocks route navigation while pending without discard dialog', async () => {
+    const user = userEvent.setup()
+
+    function LeavePageButton() {
+      const navigate = useNavigate()
+      return (
+        <button type="button" onClick={() => navigate('/away')}>
+          Leave page
+        </button>
+      )
+    }
+
+    renderDrawerRoutes(
+      <>
+        <ContentFormDrawer
+          open
+          onOpenChange={() => undefined}
+          title="Add item"
+          pending
+          submitLabel="Create"
+          form={formProps}
+          onSubmit={vi.fn()}
+        />
+        <LeavePageButton />
+      </>,
+    )
+
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    fireEvent.click(screen.getByRole('button', { name: 'Leave page', hidden: true }))
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.queryByText('Away page')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Changed')
+  })
 })

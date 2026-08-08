@@ -71,6 +71,16 @@ describe('DrawerShell', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('suppresses aria-describedby when no description is provided', () => {
+    render(
+      <DrawerShell open onOpenChange={() => undefined} title="Add item">
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Add item' })).not.toHaveAttribute('aria-describedby')
+  })
+
   it('supports managed body mode for child-owned scroll regions', () => {
     render(
       <DrawerShell open bodyMode="managed" onOpenChange={() => undefined} title="Edit item">

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { ConfirmDialog } from '@rpg/ui'
 
 const DISCARD_CHANGES_HEADLINE = 'Discard changes?'
@@ -6,10 +6,15 @@ const DISCARD_CHANGES_DESCRIPTION = 'You have unsaved changes. Leaving now will 
 const DISCARD_CHANGES_CONFIRM_LABEL = 'Discard'
 const DISCARD_CHANGES_CANCEL_LABEL = 'Keep editing'
 
+export type RunTrustedOptions = {
+  /** When false, runs the continuation without arming a one-shot router bypass. */
+  bypassRouter?: boolean
+}
+
 export type UnsavedChangesConfirmController = {
   isDirty: boolean
   request: (continuation: () => void, onCancel?: () => void) => void
-  runTrusted: (continuation: () => void) => void
+  runTrusted: (continuation: () => void, options?: RunTrustedOptions) => void
   /** Consumes a one-shot router bypass issued by `runTrusted`. */
   consumeTrustedBypass: () => boolean
   dialog: ReactNode
@@ -25,6 +30,12 @@ export function useUnsavedChangesConfirm({
   const pendingCancelRef = useRef<(() => void) | null>(null)
   const trustedBypassRef = useRef(false)
 
+  useEffect(() => {
+    return () => {
+      trustedBypassRef.current = false
+    }
+  }, [])
+
   const request = useCallback(
     (continuation: () => void, onCancel?: () => void) => {
       if (!isDirty) {
@@ -38,8 +49,10 @@ export function useUnsavedChangesConfirm({
     [isDirty],
   )
 
-  const runTrusted = useCallback((continuation: () => void) => {
-    trustedBypassRef.current = true
+  const runTrusted = useCallback((continuation: () => void, options?: RunTrustedOptions) => {
+    if (options?.bypassRouter !== false) {
+      trustedBypassRef.current = true
+    }
     continuation()
   }, [])
 

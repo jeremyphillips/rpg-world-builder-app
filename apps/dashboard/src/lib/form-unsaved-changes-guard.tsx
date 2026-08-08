@@ -4,7 +4,7 @@ import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
 
 import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 
-import { hasDirtyFields } from './form-dirty-state'
+import { composeFormLeaveDirty } from './form-leave-dirty'
 import {
   useUnsavedChangesConfirm,
   type UnsavedChangesConfirmController,
@@ -13,19 +13,23 @@ import {
 function useComposedFormDirtyState(extraUnsavedEdits?: boolean) {
   const { dirtyFields } = useFormState()
   const subclassEdits = useSubclassUnsavedEditsBlocking()
-  return hasDirtyFields(dirtyFields) || subclassEdits || Boolean(extraUnsavedEdits)
+  return composeFormLeaveDirty({ dirtyFields, extraUnsavedEdits, subclassEdits })
 }
 
 function FormUnsavedChangesRouterAdapterInner({
   discardGuard,
+  pending = false,
 }: {
   discardGuard: UnsavedChangesConfirmController
+  pending?: boolean
 }) {
   const isDirtyRef = useRef(discardGuard.isDirty)
+  const pendingRef = useRef(pending)
   const discardGuardRef = useRef(discardGuard)
 
   useEffect(() => {
     isDirtyRef.current = discardGuard.isDirty
+    pendingRef.current = pending
     discardGuardRef.current = discardGuard
   })
 
@@ -46,7 +50,7 @@ function FormUnsavedChangesRouterAdapterInner({
       if (discardGuardRef.current.consumeTrustedBypass()) {
         return false
       }
-      return isDirtyRef.current
+      return pendingRef.current || isDirtyRef.current
     },
     [],
   )
@@ -55,10 +59,10 @@ function FormUnsavedChangesRouterAdapterInner({
   const handledBlockRef = useRef(false)
 
   useEffect(() => {
-    if (blocker.state === 'blocked' && !discardGuard.isDirty) {
+    if (blocker.state === 'blocked' && !discardGuard.isDirty && !pending) {
       blocker.reset?.()
     }
-  }, [blocker, discardGuard.isDirty])
+  }, [blocker, discardGuard.isDirty, pending])
 
   useEffect(() => {
     if (blocker.state !== 'blocked') {
@@ -68,11 +72,17 @@ function FormUnsavedChangesRouterAdapterInner({
     if (handledBlockRef.current) return
 
     handledBlockRef.current = true
+
+    if (pending) {
+      blocker.reset?.()
+      return
+    }
+
     discardGuard.request(
       () => blocker.proceed?.(),
       () => blocker.reset?.(),
     )
-  }, [blocker, discardGuard])
+  }, [blocker, discardGuard, pending])
 
   return null
 }
@@ -80,13 +90,41 @@ function FormUnsavedChangesRouterAdapterInner({
 function FormUnsavedChangesRouterAdapter({
   discardGuard,
   enabled = true,
+  pending,
 }: {
   discardGuard: UnsavedChangesConfirmController
   enabled?: boolean
+  pending?: boolean
 }) {
   const dataRouter = useContext(UNSAFE_DataRouterContext)
   if (!dataRouter || !enabled) return null
-  return <FormUnsavedChangesRouterAdapterInner discardGuard={discardGuard} />
+  return <FormUnsavedChangesRouterAdapterInner discardGuard={discardGuard} pending={pending} />
+}
+
+function FormUnsavedChangesGuardInternal({
+  extraUnsavedEdits,
+  enabled = true,
+  renderDialog = true,
+  pending,
+}: {
+  extraUnsavedEdits?: boolean
+  enabled?: boolean
+  renderDialog?: boolean
+  pending?: boolean
+}) {
+  const composedIsDirty = useComposedFormDirtyState(extraUnsavedEdits)
+  const discardGuard = useUnsavedChangesConfirm({ isDirty: composedIsDirty })
+
+  return (
+    <>
+      {renderDialog ? discardGuard.dialog : null}
+      <FormUnsavedChangesRouterAdapter
+        discardGuard={discardGuard}
+        enabled={enabled}
+        pending={pending}
+      />
+    </>
+  )
 }
 
 /** Blocks in-app navigation while the surrounding form is dirty; shows ConfirmDialog. */
@@ -95,6 +133,7 @@ export function FormUnsavedChangesGuard({
   discardGuard: externalDiscardGuard,
   enabled = true,
   renderDialog = true,
+  pending,
 }: {
   /** Additive extras beyond body dirtyFields and subclass edits — never suppresses body dirtiness. */
   extraUnsavedEdits?: boolean
@@ -102,16 +141,26 @@ export function FormUnsavedChangesGuard({
   enabled?: boolean
   /** When a parent shell already renders `discardGuard.dialog`, pass false. */
   renderDialog?: boolean
+  /** When true, blocks navigation without opening the discard dialog. */
+  pending?: boolean
 } = {}) {
-  const composedIsDirty = useComposedFormDirtyState(extraUnsavedEdits)
-  const internalDiscardGuard = useUnsavedChangesConfirm({ isDirty: composedIsDirty })
-  const discardGuard = externalDiscardGuard ?? internalDiscardGuard
+  if (externalDiscardGuard) {
+    return (
+      <FormUnsavedChangesRouterAdapter
+        discardGuard={externalDiscardGuard}
+        enabled={enabled}
+        pending={pending}
+      />
+    )
+  }
 
   return (
-    <>
-      {renderDialog && !externalDiscardGuard ? internalDiscardGuard.dialog : null}
-      <FormUnsavedChangesRouterAdapter discardGuard={discardGuard} enabled={enabled} />
-    </>
+    <FormUnsavedChangesGuardInternal
+      extraUnsavedEdits={extraUnsavedEdits}
+      enabled={enabled}
+      renderDialog={renderDialog}
+      pending={pending}
+    />
   )
 }
 

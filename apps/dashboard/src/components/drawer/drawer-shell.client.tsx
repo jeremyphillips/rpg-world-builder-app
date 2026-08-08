@@ -35,7 +35,7 @@ export function DrawerShell({
       <Sheet.Content
         surface="background"
         size="lg"
-        aria-describedby={description ? undefined : undefined}
+        {...(!description ? { 'aria-describedby': undefined } : {})}
       >
         <Sheet.Header headline={title} description={description} />
         <Sheet.Body className={drawerShellBodyVariants({ mode: bodyMode })}>{children}</Sheet.Body>

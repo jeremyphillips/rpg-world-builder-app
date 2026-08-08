@@ -9,7 +9,7 @@ import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
 import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
-import { hasDirtyFields } from '@/lib/form-dirty-state'
+import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
 
 export type ContentFormDrawerFormProps<TFormValues extends FieldValues> = {
@@ -50,8 +50,10 @@ function ContentFormDrawerLeaveGuard({
 }) {
   const { dirtyFields } = useFormState()
   const campaignAccess = useCampaignAccessForm()
-  const bodyDirty = hasDirtyFields(dirtyFields)
-  const isDirty = bodyDirty || campaignAccess.isDirty
+  const isDirty = composeFormLeaveDirty({
+    dirtyFields,
+    campaignAccessDirty: campaignAccess.isDirty,
+  })
   const discardGuard = useUnsavedChangesConfirm({ isDirty })
 
   React.useEffect(() => {
@@ -60,7 +62,9 @@ function ContentFormDrawerLeaveGuard({
         if (pending) return
         discardGuard.request(continuation)
       },
-      runTrustedClose: discardGuard.runTrusted,
+      runTrustedClose: (continuation) => {
+        discardGuard.runTrusted(continuation, { bypassRouter: false })
+      },
     }
     return () => {
       bridgeRef.current = null
@@ -70,7 +74,12 @@ function ContentFormDrawerLeaveGuard({
   return (
     <>
       {discardGuard.dialog}
-      <FormUnsavedChangesGuard discardGuard={discardGuard} enabled={open} renderDialog={false} />
+      <FormUnsavedChangesGuard
+        discardGuard={discardGuard}
+        enabled={open}
+        pending={pending}
+        renderDialog={false}
+      />
     </>
   )
 }
@@ -124,15 +133,25 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
         onOpenChange(true)
         return
       }
-      leaveBridgeRef.current?.requestClose(() => onOpenChange(false))
+      if (pending) return
+      const bridge = leaveBridgeRef.current
+      if (bridge) {
+        bridge.requestClose(() => onOpenChange(false))
+        return
+      }
+      onOpenChange(false)
     },
-    [onOpenChange],
+    [onOpenChange, pending],
   )
 
   const handleSubmit = React.useCallback(
     async (values: TFormValues, formInstance: UseFormReturn<TFormValues>) => {
-      await onSubmit(values, formInstance)
-      leaveBridgeRef.current?.runTrustedClose(() => onOpenChange(false))
+      try {
+        await onSubmit(values, formInstance)
+        leaveBridgeRef.current?.runTrustedClose(() => onOpenChange(false))
+      } catch {
+        // Rejection keeps the drawer open — caller surfaces formError.
+      }
     },
     [onOpenChange, onSubmit],
   )

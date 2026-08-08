@@ -57,9 +57,7 @@ export function VocabularyEntrySheet(props: VocabularyEntrySheetProps) {
           defaultValues: sheet.defaultValues,
           formKey: sheet.formKey,
         }}
-        onSubmit={(values) => {
-          void sheet.handleSubmit(values)
-        }}
+        onSubmit={(values) => sheet.handleSubmit(values)}
       />
 
       <VocabularyAvailabilityBlockedDialog
