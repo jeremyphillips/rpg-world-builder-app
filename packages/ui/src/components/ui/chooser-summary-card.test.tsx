@@ -67,6 +67,15 @@ describe('ChooserSummaryCard', () => {
     )
 
     const body = container.querySelector('article > div')
-    expect(body).toHaveClass('px-3', 'py-2.5', 'gap-1')
+    expect(body).toHaveClass('px-4', 'py-2.5', 'gap-1')
+
+    const primaryCopy = container.querySelector('article > div > div:last-child')
+    expect(primaryCopy).toHaveClass('gap-0')
+
+    const title = screen.getByRole('heading', { name: 'City' })
+    expect(title).toHaveClass('text-base')
+
+    const eyebrow = screen.getByText('Settlement type')
+    expect(eyebrow).toHaveClass('eyebrow-style-xs')
   })
 })

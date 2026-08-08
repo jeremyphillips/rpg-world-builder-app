@@ -5,7 +5,8 @@ import {
   radioCardDensityBodyLayoutVariants,
   radioCardDensityContentGapVariants,
   radioCardDescriptionVariants,
-  radioCardTitleVariants,
+  radioCardPrimaryCopyStackVariants,
+  radioCardSummaryTitleVariants,
 } from './radio-card.variants'
 
 /** Selected summary shell — additive primary border/ring, not details-option shell chrome. */
@@ -35,6 +36,8 @@ export const chooserSummaryCardEyebrowRowClasses =
 
 export const chooserSummaryCardChangeLinkClasses = 'h-auto px-0 text-xs'
 
-export const chooserSummaryCardTitleClasses = radioCardTitleVariants()
+export const chooserSummaryCardPrimaryCopyVariants = radioCardPrimaryCopyStackVariants
 
-export const chooserSummaryCardDescriptionClasses = radioCardDescriptionVariants()
+export const chooserSummaryCardTitleVariants = radioCardSummaryTitleVariants
+
+export const chooserSummaryCardDescriptionVariants = radioCardDescriptionVariants

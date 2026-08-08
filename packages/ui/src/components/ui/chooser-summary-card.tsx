@@ -7,10 +7,11 @@ import type { RadioCardDensity } from './radio-card.client'
 import {
   chooserSummaryCardBodyVariants,
   chooserSummaryCardChangeLinkClasses,
-  chooserSummaryCardDescriptionClasses,
+  chooserSummaryCardDescriptionVariants,
   chooserSummaryCardEyebrowRowClasses,
+  chooserSummaryCardPrimaryCopyVariants,
   chooserSummaryCardShellClasses,
-  chooserSummaryCardTitleClasses,
+  chooserSummaryCardTitleVariants,
 } from './chooser-summary-card.variants'
 
 export type ChooserSummaryCardProps = {
@@ -34,7 +35,7 @@ export function ChooserSummaryCard({
     <article className={chooserSummaryCardShellClasses}>
       <div className={chooserSummaryCardBodyVariants({ density })}>
         <div className={chooserSummaryCardEyebrowRowClasses}>
-          <Eyebrow>{eyebrow}</Eyebrow>
+          <Eyebrow size={density === 'compact' ? 'xs' : 'sm'}>{eyebrow}</Eyebrow>
           <Button
             type="button"
             variant="link"
@@ -45,14 +46,16 @@ export function ChooserSummaryCard({
             {changeLabel}
           </Button>
         </div>
-        <Text as="h3" className={chooserSummaryCardTitleClasses}>
-          {title}
-        </Text>
-        {description ? (
-          <Text as="p" className={chooserSummaryCardDescriptionClasses}>
-            {description}
+        <div className={chooserSummaryCardPrimaryCopyVariants({ density })}>
+          <Text as="h3" className={chooserSummaryCardTitleVariants({ density })}>
+            {title}
           </Text>
-        ) : null}
+          {description ? (
+            <Text as="p" className={chooserSummaryCardDescriptionVariants({ density })}>
+              {description}
+            </Text>
+          ) : null}
+        </div>
       </div>
     </article>
   )

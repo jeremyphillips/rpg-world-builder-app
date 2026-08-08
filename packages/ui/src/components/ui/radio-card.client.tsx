@@ -112,11 +112,17 @@ function RadioCardTitleMeta({ titleMeta }: { titleMeta: string }) {
   )
 }
 
-function RadioCardSummaryLines({ summaryLines }: { summaryLines: string[] }) {
+function RadioCardSummaryLines({
+  summaryLines,
+  density = 'default',
+}: {
+  summaryLines: string[]
+  density?: RadioCardDensity
+}) {
   return (
     <div className={radioCardSummaryLinesVariants()}>
       {summaryLines.map((line) => (
-        <span key={line} className={radioCardSummaryVariants()}>
+        <span key={line} className={radioCardSummaryVariants({ density })}>
           {line}
         </span>
       ))}
@@ -152,6 +158,7 @@ type RadioCardTitleRowContentProps = {
   titleMeta?: string
   badge?: string
   titleClassName?: string
+  density?: RadioCardDensity
 }
 
 function RadioCardTitleRowContent({
@@ -159,10 +166,11 @@ function RadioCardTitleRowContent({
   titleMeta,
   badge,
   titleClassName,
+  density = 'default',
 }: RadioCardTitleRowContentProps) {
   return (
     <div className={radioCardTitleRowVariants()}>
-      <span className={cn(radioCardTitleVariants(), titleClassName)}>{label}</span>
+      <span className={cn(radioCardTitleVariants({ density }), titleClassName)}>{label}</span>
       {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
       {badge ? (
         <Badge appearance="soft" tone="info" size="sm">
@@ -179,6 +187,7 @@ type RadioCardSecondaryContentProps = {
   summaryLines?: string[]
   meta?: string[]
   showMeta?: boolean
+  density?: RadioCardDensity
 }
 
 function RadioCardSecondaryContent({
@@ -187,13 +196,18 @@ function RadioCardSecondaryContent({
   summaryLines,
   meta,
   showMeta = false,
+  density = 'default',
 }: RadioCardSecondaryContentProps) {
   return (
     <>
-      {description ? <span className={radioCardDescriptionVariants()}>{description}</span> : null}
-      {summaryText ? <span className={radioCardSummaryVariants()}>{summaryText}</span> : null}
+      {description ? (
+        <span className={radioCardDescriptionVariants({ density })}>{description}</span>
+      ) : null}
+      {summaryText ? (
+        <span className={radioCardSummaryVariants({ density })}>{summaryText}</span>
+      ) : null}
       {summaryLines && summaryLines.length > 0 ? (
-        <RadioCardSummaryLines summaryLines={summaryLines} />
+        <RadioCardSummaryLines summaryLines={summaryLines} density={density} />
       ) : null}
       {showMeta && meta && meta.length > 0 ? (
         <ul className={radioCardMetaListVariants()} aria-hidden="true">
@@ -238,6 +252,7 @@ function RadioCardItemContent({
           titleMeta={titleMeta}
           badge={badge}
           titleClassName={titleClassName}
+          density={density}
         />
         <RadioCardSecondaryContent
           description={description}
@@ -245,6 +260,7 @@ function RadioCardItemContent({
           summaryLines={summaryLines}
           meta={meta}
           showMeta={!isCompact}
+          density={density}
         />
       </div>
     </div>
@@ -334,11 +350,13 @@ function RadioCardOptionWithDetails({
               label={option.label}
               titleMeta={option.titleMeta}
               badge={option.badge}
+              density={density}
             />
             <RadioCardSecondaryContent
               description={option.description}
               summaryText={summaryText}
               summaryLines={option.summaryLines}
+              density={density}
             />
           </div>
         </RadioGroupPrimitive.Item>

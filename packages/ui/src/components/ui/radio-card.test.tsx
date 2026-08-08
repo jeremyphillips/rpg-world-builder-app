@@ -208,7 +208,7 @@ describe('RadioCard', () => {
 
     const panel = container.querySelector('[class*="bg-surface-muted"]')
     expect(panel).toHaveTextContent('Configuration panel')
-    expect(panel?.className).toContain('-mx-3')
+    expect(panel?.className).toContain('-mx-4')
     expect(panel?.className).toContain('rounded-b-card')
   })
 
