@@ -16,9 +16,8 @@ import { ContentFormDrawer } from '../../lib/forms/shells/content-form-drawer.cl
 import { ContentFormOptionsGate } from '../../lib/forms/shells/content-form-shell-layout'
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
 import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
-import type { LocationAuthoringType } from '../lib/location-authoring-type'
 import {
-  buildLocationCreateInitialValues,
+  fixedCreateToInitialValues,
   formatLocationAuthoringTypeAddHeading,
 } from '../lib/location-create-shortcuts'
 import '../lib/location-form-def'
@@ -33,8 +32,7 @@ import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-
 export type LocationContainedCreateDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  authoringType: LocationAuthoringType
-  parentLocationId: string
+  fixedCreate: LocationFormCtx['fixedCreate'] & {}
   campaignId: string
 }
 
@@ -45,15 +43,13 @@ type LocationContainedCreateDrawerBodyProps = LocationContainedCreateDrawerProps
 function LocationContainedCreateDrawerBody({
   open,
   onOpenChange,
-  authoringType,
-  parentLocationId,
+  fixedCreate,
   campaignId,
   optionsCtx,
 }: LocationContainedCreateDrawerBodyProps) {
   const mutation = useContentWriteMutation(locationFormDef, campaignId)
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
 
-  const fixedCreate = { authoringType, parentLocationId }
   const locationCtx: LocationFormCtx = {
     ...optionsCtx,
     campaignId,
@@ -61,7 +57,7 @@ function LocationContainedCreateDrawerBody({
     entitySource: 'homebrew',
     fixedCreate,
   }
-  const formKey = `location-contained-create-${authoringType}-${parentLocationId}`
+  const formKey = `location-contained-create-${fixedCreate.authoringType}-${fixedCreate.parent?.locationId ?? 'overview'}-${fixedCreate.settlementType ?? 'none'}`
 
   const { onSubmit, formError } = useSubmitHandler(async (values) => {
     resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
@@ -106,7 +102,7 @@ function LocationContainedCreateDrawerBody({
         }
         onOpenChange(nextOpen)
       }}
-      title={formatLocationAuthoringTypeAddHeading(authoringType)}
+      title={formatLocationAuthoringTypeAddHeading(fixedCreate.authoringType)}
       pending={mutation.isPending}
       submitLabel={formatContentCreateActionLabel('locations')}
       formError={formError}
@@ -115,16 +111,13 @@ function LocationContainedCreateDrawerBody({
         schema: locationDraftFormSchema,
         defaultValues: {
           ...locationFormDef.createDefaultValues,
-          ...buildLocationCreateInitialValues({ authoringType, parentLocationId }),
+          ...fixedCreateToInitialValues(fixedCreate),
         },
         valueSyncs: locationFormValueSyncs,
         formKey,
         header: () => (
           <>
-            <LocationFixedCreateHiddenFields
-              authoringType={authoringType}
-              parentLocationId={parentLocationId}
-            />
+            <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
             <ContentFormHeader
               def={locationFormDef}
               ctx={locationCtx}

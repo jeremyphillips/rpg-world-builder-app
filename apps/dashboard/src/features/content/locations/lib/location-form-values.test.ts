@@ -98,7 +98,10 @@ describe('applyLocationFixedCreateContext', () => {
         authoringType: 'district',
         parentLocationId: 'location-stale-parent',
       } as LocationFormValues,
-      { authoringType: 'building', parentLocationId: DOCK_WARD.id },
+      {
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: DOCK_WARD.id },
+      },
     )
 
     const input = buildLocationCreateInput(overlaid)
@@ -109,5 +112,32 @@ describe('applyLocationFixedCreateContext', () => {
       parentLocationId: DOCK_WARD.id,
     })
     expect(input).not.toHaveProperty('authoringType')
+  })
+
+  it('does not overlay parent when overview fixed create leaves parent editable', () => {
+    const overlaid = applyLocationFixedCreateContext(
+      {
+        name: 'Harbor tavern',
+        authoringType: 'district',
+        parentLocationId: 'location-chosen-parent',
+      } as LocationFormValues,
+      { authoringType: 'building' },
+    )
+
+    expect(overlaid.authoringType).toBe('building')
+    expect(overlaid.parentLocationId).toBe('location-chosen-parent')
+  })
+
+  it('overlays fixed settlementType onto mutated form values', () => {
+    const overlaid = applyLocationFixedCreateContext(
+      {
+        name: 'New town',
+        authoringType: 'settlement',
+        settlementType: 'hamlet',
+      } as LocationFormValues,
+      { authoringType: 'settlement', settlementType: 'city' },
+    )
+
+    expect(overlaid.settlementType).toBe('city')
   })
 })

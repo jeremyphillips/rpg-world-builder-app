@@ -43,6 +43,8 @@ export interface ContentCreateShellProps {
   initialValues?: Record<string, unknown>
   /** Merged into the form layout context (e.g. family-scoped equipment kind). */
   formCtx?: Partial<ContentFormCtx>
+  /** Applied to form values immediately before serialization on create submit. */
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
 }
 
 interface ContentCreateFormBodyProps {
@@ -53,6 +55,7 @@ interface ContentCreateFormBodyProps {
   ctx: ContentFormCtx
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
 }
 
 function ContentCreateFormBody({
@@ -63,6 +66,7 @@ function ContentCreateFormBody({
   ctx,
   initialValues,
   formCtx,
+  prepareSubmitValues,
 }: ContentCreateFormBodyProps) {
   const navigate = useNavigate()
   const mutation = useContentWriteMutation(def, campaignId)
@@ -78,12 +82,13 @@ function ContentCreateFormBody({
     status: 'draft' | 'published',
     validationIntent: ContentValidationIntent,
   ) => {
+    const preparedValues = prepareSubmitValues?.(values) ?? values
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: def.routeKey,
       createInput: {
         ...def.toInput(
-          values,
+          preparedValues,
           {
             weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
             campaignRules: ctx.campaignRules,
@@ -165,6 +170,7 @@ interface ContentCreateFormProps {
   backHref: string
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
 }
 
 function ContentCreateForm({
@@ -174,6 +180,7 @@ function ContentCreateForm({
   backHref,
   initialValues,
   formCtx,
+  prepareSubmitValues,
 }: ContentCreateFormProps) {
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
@@ -192,6 +199,7 @@ function ContentCreateForm({
           }}
           initialValues={initialValues}
           formCtx={formCtx}
+          prepareSubmitValues={prepareSubmitValues}
         />
       )}
     </ContentFormOptionsGate>
@@ -213,6 +221,7 @@ export function ContentCreateShell({
   backHref,
   initialValues,
   formCtx,
+  prepareSubmitValues,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -231,6 +240,7 @@ export function ContentCreateShell({
             backHref={backHref}
             initialValues={initialValues}
             formCtx={formCtx}
+            prepareSubmitValues={prepareSubmitValues}
           />
         </ContentAuthoringGate>
       ) : (

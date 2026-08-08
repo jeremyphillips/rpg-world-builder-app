@@ -30,8 +30,10 @@ export const AddBuilding: Story = {
   args: {
     open: true,
     onOpenChange: () => undefined,
-    authoringType: 'building',
-    parentLocationId: HARBORFORD.id,
+    fixedCreate: {
+      authoringType: 'building',
+      parent: { kind: 'fixed', locationId: HARBORFORD.id },
+    },
     campaignId: STORY_CAMPAIGN_ID,
   },
 }
@@ -40,8 +42,23 @@ export const AddDistrict: Story = {
   args: {
     open: true,
     onOpenChange: () => undefined,
-    authoringType: 'district',
-    parentLocationId: HARBORFORD.id,
+    fixedCreate: {
+      authoringType: 'district',
+      parent: { kind: 'fixed', locationId: HARBORFORD.id },
+    },
+    campaignId: STORY_CAMPAIGN_ID,
+  },
+}
+
+export const AddSettlement: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    fixedCreate: {
+      authoringType: 'settlement',
+      parent: { kind: 'fixed', locationId: HARBORFORD.id },
+      settlementType: 'city',
+    },
     campaignId: STORY_CAMPAIGN_ID,
   },
 }

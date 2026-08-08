@@ -185,7 +185,10 @@ export function applyLocationFixedCreateContext(
   return {
     ...values,
     authoringType: fixedCreate.authoringType,
-    parentLocationId: fixedCreate.parentLocationId,
+    ...(fixedCreate.parent?.kind === 'fixed'
+      ? { parentLocationId: fixedCreate.parent.locationId }
+      : {}),
+    ...(fixedCreate.settlementType ? { settlementType: fixedCreate.settlementType } : {}),
   }
 }
 

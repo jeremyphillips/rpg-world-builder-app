@@ -93,21 +93,40 @@ serializes at the form boundary only — API payloads stay canonical.
 | Generic defensive wall  | Fortification          | —               | `kind: structure`, `structureType: fortification` |
 | Rare unclassified shell | Unclassified structure | —               | `kind: structure` (no `structureType`)            |
 
-Creation shortcuts (`?type=` on the create route, overview dropdown) prefill the full
-create form. Detail-page **Add location** opens the contained create drawer with a fixed
-child type and parent — neither path bypasses hierarchy validation or parent availability.
+Creation shortcuts use an authoritative fixed session on the create route:
+
+| URL                                                  | Meaning                                          |
+| ---------------------------------------------------- | ------------------------------------------------ |
+| `/locations/new`                                     | Unrestricted create                              |
+| `/locations/new?type=building`                       | Fixed Building session (type locked)             |
+| `/locations/new?type=settlement&settlementType=city` | Fixed Settlement + settlement type (after setup) |
+
+Overview promoted shortcuts run through `resolveLocationCreateSession` — Settlement opens a
+setup step first; other promoted types navigate directly to the fixed URL. The optional
+`?parent=` query param remains a soft initial value for the parent picker on the page
+(contained create passes fixed parent in-memory to the drawer instead).
+
+Detail-page **Add location** uses the same resolver; no-setup types open the contained
+create drawer immediately with `fixedCreate` (type and parent locked). Settlement runs
+setup first, then opens the drawer with completed fixed context.
+
+| Module                                 | Role                                                          |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `location-create-session.ts`           | `resolveLocationCreateSession`, `completeLocationCreateSetup` |
+| `location-create-shortcuts.ts`         | Fixed-session URL parse/serialize, child-type menus           |
+| `location-settlement-structure.lib.ts` | District vs direct-place partition helpers                    |
 
 ## Authoring modules
 
-| Module                                    | Role                                                                  |
-| ----------------------------------------- | --------------------------------------------------------------------- |
-| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity        |
-| `location-create-shortcuts.ts`            | Create-route prefill, promoted shortcuts, child-type menus            |
-| `location-classification-form-fields.ts`  | Archetype combobox, specialization, optional function-override select |
-| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                           |
-| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                           |
-| `location-form-sync.ts`                   | Clears specialization and override on archetype change                |
-| `location-overview-search.lib.ts`         | Overview name-search discovery strings                                |
-| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                               |
+| Module                                    | Role                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------- |
+| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity          |
+| `location-create-shortcuts.ts`            | Fixed-session URL parse/serialize, promoted shortcuts, child-type menus |
+| `location-classification-form-fields.ts`  | Archetype combobox, specialization, optional function-override select   |
+| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                             |
+| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                             |
+| `location-form-sync.ts`                   | Clears specialization and override on archetype change                  |
+| `location-overview-search.lib.ts`         | Overview name-search discovery strings                                  |
+| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                                 |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

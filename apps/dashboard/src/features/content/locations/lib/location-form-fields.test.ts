@@ -26,7 +26,10 @@ describe('buildLocationFields', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
-      fixedCreate: { authoringType: 'building', parentLocationId: 'location-parent' },
+      fixedCreate: {
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      },
     }
 
     const names = collectFieldNames(buildLocationFields(ctx))
@@ -43,7 +46,10 @@ describe('buildLocationFields', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
-      fixedCreate: { authoringType: 'region', parentLocationId: 'location-parent' },
+      fixedCreate: {
+        authoringType: 'region',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      },
     }
 
     const names = collectFieldNames(buildLocationFields(ctx))
@@ -56,7 +62,10 @@ describe('buildLocationFields', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
-      fixedCreate: { authoringType: 'interior', parentLocationId: 'location-parent' },
+      fixedCreate: {
+        authoringType: 'interior',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      },
     }
 
     const names = collectFieldNames(buildLocationFields(ctx))
@@ -69,7 +78,10 @@ describe('buildLocationFields', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
-      fixedCreate: { authoringType: 'district', parentLocationId: 'location-parent' },
+      fixedCreate: {
+        authoringType: 'district',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      },
     }
 
     const names = collectFieldNames(buildLocationFields(ctx))
@@ -81,6 +93,32 @@ describe('buildLocationFields', () => {
     expect(names).not.toContain('classification.kind')
     expect(names).not.toContain('interiorType')
     expect(names).not.toContain('planeType')
+  })
+
+  it('shows parent picker for overview fixed create with editable parent', () => {
+    const ctx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: { authoringType: 'building' },
+    }
+
+    const names = collectFieldNames(buildLocationFields(ctx))
+
+    expect(names).not.toContain('authoringType')
+    expect(names).toContain('parentLocationId')
+  })
+
+  it('omits settlementType when fixed on the session', () => {
+    const ctx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: { authoringType: 'settlement', settlementType: 'city' },
+    }
+
+    const names = collectFieldNames(buildLocationFields(ctx))
+
+    expect(names).not.toContain('settlementType')
+    expect(names).toContain('parentLocationId')
   })
 
   it('includes authoringType and parentLocationId for full create layout', () => {

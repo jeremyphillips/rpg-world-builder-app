@@ -187,7 +187,8 @@ describe('buildLocationDetailViewModel', () => {
       'Aldermere',
       'Greyshore',
     ])
-    expect(viewModel.children.items.map((child) => child.name)).toEqual(['Dock Ward'])
+    expect(viewModel.children.heading).toBe('City structure')
+    expect(viewModel.children.groups?.[0]?.items.map((child) => child.name)).toEqual(['Dock Ward'])
   })
 
   it('shows building archetype and specialization as separate identity rows', () => {

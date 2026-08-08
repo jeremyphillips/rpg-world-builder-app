@@ -108,8 +108,10 @@ function renderDrawer(onOpenChange = vi.fn()) {
         <LocationContainedCreateDrawer
           open
           onOpenChange={onOpenChange}
-          authoringType="building"
-          parentLocationId={HARBORFORD.id}
+          fixedCreate={{
+            authoringType: 'building',
+            parent: { kind: 'fixed', locationId: HARBORFORD.id },
+          }}
           campaignId={STORY_CAMPAIGN_ID}
         />
       </QueryClientProvider>,
