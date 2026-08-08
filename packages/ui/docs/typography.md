@@ -225,6 +225,12 @@ Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels;
 semantic aliases (`text-eyebrow-sm`) only when a composite is not appropriate; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
 
+Detail-page subgroup labels (for example Districts under City structure, or Governed by
+under Territorial Authority) use `<Eyebrow size="sm">` with the default muted tone.
+Pass **title-case** copy at the call site — the composite applies uppercase. Dashboard
+layout for those subgroups is `DetailSectionGroup` (see
+[cross-content-relationship-ui.md](../../../apps/dashboard/docs/cross-content-relationship-ui.md#detail-section-layout)).
+
 ## Internal primitives
 
 Library-owned copy (modal descriptions, field hints, dropzone helpers, data-table

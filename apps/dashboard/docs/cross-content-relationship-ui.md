@@ -44,35 +44,49 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/features/content/lib/detail/). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells.
 
-| Primitive              | Role                                                                                         |
-| ---------------------- | -------------------------------------------------------------------------------------------- |
-| `DetailSectionPanel`   | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot` |
-| `DetailSectionRowList` | Dividers between direct children only — no row padding injection                             |
-| `DetailEntityRow`      | Compact row layout (`px-4 py-2`), heading link, subheading, optional `endSlot`               |
-| `DetailOverflowMenu`   | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`         |
+### Heading vs eyebrow vs row title
+
+| Role                | Element                                  | Visual                                                     | Examples                                 |
+| ------------------- | ---------------------------------------- | ---------------------------------------------------------- | ---------------------------------------- |
+| Panel heading       | `Heading variant="label"` (`h2`/`h3`)    | `heading-style-label` — larger, not uppercase              | City structure, Territorial Authority    |
+| Eyebrow group label | `<Eyebrow size="sm">` (default `as="p"`) | `eyebrow-style-sm` + muted; CSS uppercases title-case copy | Districts, Direct locations, Governed by |
+| Row / item title    | link / heading in `DetailEntityRow`      | normal emphasis                                            | Dock Ward, org name                      |
+
+Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detail subgroup labels. Do **not** promote subgroup labels to `h3` unless Territorial Authority kind labels also become headings — today they stay out of the document outline.
+
+### Primitives
+
+| Primitive                   | Role                                                                                                            |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                    |
+| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`                           |
+| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                |
+| `DetailEntityRow`           | Compact row layout; default `inset="self"` (`px-4 py-2`); use `inset="parent"` inside `DetailSectionGroup`      |
+| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                            |
+| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`) — keep for relationship call-site API stability |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
-Use **`DetailSectionPanel`** + **`RelationshipFieldGroupRow`** when a section groups multiple relationship kinds under one titled block (location Territorial Authority, People & organizations, organization forward family groups).
+Use **`DetailSectionPanel`** + **`DetailSectionGroup`** (via `RelationshipFieldGroupRow` for typed edges) when a section groups multiple subgroups under one titled block (location Territorial Authority, People & organizations, organization forward family groups, City structure districts / direct places).
 
 ```text
 ┌ DetailSectionPanel (<section aria-labelledby>, rounded-md border border-border-subtle) ─┐
-│ Header (bg-card px-4 py-2) — title, helper, optional headerEndSlot                      │
+│ Header (bg-card px-4 py-2) — Heading variant="label", helper, optional headerEndSlot    │
 ├ Body (bg-surface-subtle) ──────────────────────────────────────────────────────────────┤
-│ RelationshipFieldGroupRow (px-4 py-2, border-b between rows)                           │
-│   optional Eyebrow size="sm" + row content (no chrome when eyebrow omitted)            │
-│ RelationshipFieldGroupRow …                                                            │
+│ DetailSectionGroup (px-4 py-2, border-b between groups)                                 │
+│   optional Eyebrow size="sm" + row content (no chrome when label omitted)               │
+│ DetailSectionGroup …                                                                    │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-| When                                                                           | Header owner                                                      | Notes                                                                                                           |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Location inverse section (`territorial_authority`, `people_and_organizations`) | `DetailSectionPanel`                                              | Skip `LocationConnectedPartiesSectionHeader`; panel owns `<section aria-labelledby>` — no outer section wrapper |
-| Organization forward family                                                    | `DetailSectionPanel` (`headingAs="h3"`)                           | Family panels only — no top-level section heading, helper, or count                                             |
-| Single-kind or non-grouped surfaces                                            | Feature section header                                            | Bare row primitives only                                                                                        |
-| Location hierarchy (Contained locations)                                       | `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` | Not a typed-edge relationship — same panel/row chrome, hierarchy domain stays in feature code                   |
+| When                                                                           | Header owner                                                                             | Notes                                                                                                           |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Location inverse section (`territorial_authority`, `people_and_organizations`) | `DetailSectionPanel`                                                                     | Skip `LocationConnectedPartiesSectionHeader`; panel owns `<section aria-labelledby>` — no outer section wrapper |
+| Organization forward family                                                    | `DetailSectionPanel` (`headingAs="h3"`)                                                  | Family panels only — no top-level section heading, helper, or count                                             |
+| Single-kind or non-grouped surfaces                                            | Feature section header                                                                   | Bare row primitives only                                                                                        |
+| Location hierarchy (Contained locations / City structure)                      | `DetailSectionPanel` + `DetailSectionGroup` + `DetailSectionRowList` + `DetailEntityRow` | Not a typed-edge relationship — same panel/group/row chrome, hierarchy domain stays in feature code             |
 
-Kind labels inside a relationship panel use **`RelationshipFieldGroupRow` eyebrows** when `kindHeading: 'show'` — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers. Omit the eyebrow prop entirely when the section heading is sufficient.
+Kind labels inside a relationship panel use **`RelationshipFieldGroupRow`** (`eyebrow`) when `kindHeading: 'show'` — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers. Omit the eyebrow prop entirely when the section heading is sufficient. Hierarchy sections pass the same labels through **`DetailSectionGroup`** `label` directly.
 
 ### Organization→location compact rows
 
@@ -124,7 +138,7 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 [`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
-| Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipFieldGroupRow` |
+| Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipFieldGroupRow` (`DetailSectionGroup`) |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
 | Singleton slot empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` (location detail only; `maxSubjectsPerLocation === 1`) |
 | Collection empty state + add CTA | Feature row content via `RelationshipEmptyInlineRow` |
@@ -319,9 +333,9 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 Before building a new cross-content relationship surface, evaluate:
 
-1. `DetailSectionPanel` + `RelationshipFieldGroupRow` when grouping kinds under a section title
+1. `DetailSectionPanel` + `DetailSectionGroup` / `RelationshipFieldGroupRow` when grouping kinds under a section title
 2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows (relationship layer composes detail primitives)
-3. `DetailSectionPanel` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
+3. `DetailSectionPanel` + `DetailSectionGroup` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
 4. `RelationshipEmptyInlineRow` for inline empty + add
 5. `DrawerContext` + embedded entity picker + kind step (when needed)
 6. Direction-aware copy resolvers
@@ -329,10 +343,10 @@ Before building a new cross-content relationship surface, evaluate:
 
 ## Non-adopters
 
-| Surface                                  | Reason                                                                                                                |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Organization connected-character preview | Entity membership, not typed edge                                                                                     |
-| Location children hierarchy              | Parent/child structure, not typed edge — uses `DetailSectionPanel` + `DetailEntityRow`; see hierarchy inverse section |
+| Surface                                  | Reason                                                                                                                                       |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Organization connected-character preview | Entity membership, not typed edge                                                                                                            |
+| Location children hierarchy              | Parent/child structure, not typed edge — uses `DetailSectionPanel` + `DetailSectionGroup` + `DetailEntityRow`; see hierarchy inverse section |
 
 ## Related
 

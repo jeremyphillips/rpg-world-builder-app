@@ -86,7 +86,7 @@ describe('LocationChildrenSection', () => {
   it('shows heading links for non-managers without Move overflow', () => {
     renderSection({ canManage: false, parent: HARBORFORD })
 
-    const heading = screen.getByRole('heading', { name: 'City structure' })
+    const heading = screen.getByRole('heading', { name: 'City structure', level: 2 })
     const section = heading.closest('section')
     expect(section).toHaveAttribute('aria-labelledby', 'location-children-heading')
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
@@ -98,6 +98,12 @@ describe('LocationChildrenSection', () => {
         'Districts organize neighborhoods; other locations can sit directly in the settlement.',
       ),
     ).toBeInTheDocument()
+
+    const districtsLabel = screen.getByText('Districts')
+    expect(districtsLabel.tagName).toBe('P')
+    expect(screen.queryByRole('heading', { name: 'Districts' })).not.toBeInTheDocument()
+    expect(screen.getByText('Direct locations').tagName).toBe('P')
+
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Actions for Dock Ward' })).not.toBeInTheDocument()
   })

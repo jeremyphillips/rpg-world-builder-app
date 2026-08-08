@@ -11,6 +11,7 @@ import {
 import { Text, toast } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
+import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { DetailSectionRowList } from '../../lib/detail/detail-section-row-list.client'
 import {
@@ -48,11 +49,13 @@ function LocationChildRows({
   canManage,
   onMove,
   onView,
+  inset = 'self',
 }: {
   items: LocationChildrenViewModel['items']
   canManage: boolean
   onMove: (childId: string) => void
   onView: (href: string) => void
+  inset?: 'self' | 'parent'
 }) {
   return (
     <DetailSectionRowList>
@@ -78,6 +81,7 @@ function LocationChildRows({
             heading={item.name}
             href={item.href}
             headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
+            inset={inset}
             endSlot={
               canManage ? (
                 <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
@@ -188,32 +192,28 @@ export function LocationChildrenSection({
         }
       >
         {groups ? (
-          <div className="space-y-6">
+          <>
             {!hasGroupedContent && !hasFlatContent ? (
               <Text variant="muted" className="px-4 py-2">
                 {emptyText}
               </Text>
             ) : null}
             {groups.map((group) => (
-              <div key={group.id} className="space-y-2">
-                <Text variant="emphasis" className="px-4">
-                  {group.label}
-                </Text>
+              <DetailSectionGroup key={group.id} label={group.label}>
                 {group.items.length === 0 ? (
-                  <Text variant="muted" className="px-4 py-2">
-                    {group.emptyText}
-                  </Text>
+                  <Text variant="muted">{group.emptyText}</Text>
                 ) : (
                   <LocationChildRows
                     items={group.items}
                     canManage={canManage}
                     onMove={openMoveDrawer}
                     onView={(href) => navigate(href)}
+                    inset="parent"
                   />
                 )}
-              </div>
+              </DetailSectionGroup>
             ))}
-          </div>
+          </>
         ) : !hasFlatContent ? (
           <Text variant="muted" className="px-4 py-2">
             {emptyText}
