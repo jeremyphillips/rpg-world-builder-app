@@ -26,6 +26,9 @@ import type { LocationFormValues } from '../lib/location-form-fields'
 import { locationDraftFormSchema } from '../lib/location-form-fields'
 import { locationFormValueSyncs } from '../lib/location-form-sync'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'
+import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
+
+const LOCATION_DRAWER_SHEET_CLASSES = 'bg-background max-w-[550px]'
 
 export type LocationContainedCreateDrawerProps = {
   open: boolean
@@ -110,6 +113,7 @@ function LocationContainedCreateDrawerBody({
         onOpenChange(nextOpen)
       }}
       title={formatLocationAuthoringTypeAddHeading(authoringType)}
+      sheetContentClassName={LOCATION_DRAWER_SHEET_CLASSES}
       pending={mutation.isPending}
       submitLabel={formatContentCreateActionLabel('locations')}
       formError={formError ?? campaignAccessDeferredError}
@@ -122,15 +126,21 @@ function LocationContainedCreateDrawerBody({
         valueSyncs: locationFormValueSyncs,
         formKey,
         header: () => (
-          <ContentFormHeader
-            def={locationFormDef}
-            ctx={locationCtx}
-            formKey={formKey}
-            campaignId={campaignId}
-            onCampaignAccessDraftChange={(patch) => {
-              campaignAccessDraftRef.current = patch
-            }}
-          />
+          <>
+            <LocationFixedCreateHiddenFields
+              authoringType={authoringType}
+              parentLocationId={parentLocationId}
+            />
+            <ContentFormHeader
+              def={locationFormDef}
+              ctx={locationCtx}
+              formKey={formKey}
+              campaignId={campaignId}
+              onCampaignAccessDraftChange={(patch) => {
+                campaignAccessDraftRef.current = patch
+              }}
+            />
+          </>
         ),
         fields: contentFormFields(locationFormDef, locationCtx),
       }}

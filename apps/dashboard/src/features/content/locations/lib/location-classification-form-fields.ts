@@ -153,6 +153,22 @@ function visibleWhenInteriorTypeSet() {
   }
 }
 
+import type { LocationAuthoringType } from './location-authoring-type'
+
+type FieldWithOptionalVisibility = {
+  visibility?: { visibleWhen: (watched: Record<string, unknown>) => boolean }
+}
+
+/** Keeps only fields whose visibility predicate passes for a fixed authoring type. */
+export function filterLocationFieldsForAuthoringType<T extends FieldWithOptionalVisibility>(
+  fields: readonly T[],
+  authoringType: LocationAuthoringType,
+): T[] {
+  return fields.filter(
+    (field) => !field.visibility || field.visibility.visibleWhen({ authoringType }),
+  )
+}
+
 /** Primary classification fields paired with Location type in the authoring row. */
 export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
   return [

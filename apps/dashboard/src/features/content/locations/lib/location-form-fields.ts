@@ -16,6 +16,7 @@ import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
+  filterLocationFieldsForAuthoringType,
 } from './location-classification-form-fields'
 import {
   buildLocationAuthoringTypeOptions,
@@ -84,13 +85,23 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const locationEntities = ctx.options?.locationEntities
-  const primaryClassificationFields = buildLocationPrimaryClassificationFields()
   const items: FormItem[] = []
 
   if (fixedCreate) {
-    if (primaryClassificationFields.length > 0) {
-      items.push({ kind: 'row', fields: primaryClassificationFields })
+    const primaryFields = filterLocationFieldsForAuthoringType(
+      buildLocationPrimaryClassificationFields(),
+      fixedCreate.authoringType,
+    )
+    if (primaryFields.length > 0) {
+      items.push({ kind: 'row', fields: primaryFields })
     }
+
+    items.push(
+      ...filterLocationFieldsForAuthoringType(
+        buildLocationClassificationFields(),
+        fixedCreate.authoringType,
+      ),
+    )
   } else {
     items.push({
       kind: 'row',
@@ -104,12 +115,14 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           width: '1/3',
         },
-        ...primaryClassificationFields,
+        ...buildLocationPrimaryClassificationFields(),
       ],
     })
   }
 
-  items.push(...buildLocationClassificationFields())
+  if (!fixedCreate) {
+    items.push(...buildLocationClassificationFields())
+  }
 
   if (!fixedCreate) {
     items.push({

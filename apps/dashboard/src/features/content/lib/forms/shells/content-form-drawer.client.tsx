@@ -25,6 +25,7 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   pending: boolean
   submitLabel: string
   formError?: string | null
+  sheetContentClassName?: string
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
 
@@ -58,6 +59,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   pending,
   submitLabel,
   formError = null,
+  sheetContentClassName,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
   const handleOpenChange = React.useCallback(
@@ -72,7 +74,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
 
   return (
     <Sheet.Root open={open} onOpenChange={handleOpenChange}>
-      <Sheet.Content aria-describedby={undefined}>
+      <Sheet.Content className={sheetContentClassName} aria-describedby={undefined}>
         <Sheet.Header headline={title} />
         {open ? (
           <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">

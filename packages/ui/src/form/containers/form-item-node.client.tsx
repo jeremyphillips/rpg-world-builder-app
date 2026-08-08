@@ -171,7 +171,7 @@ export function formItemKey(
 ): string {
   if ('name' in item && typeof item.name === 'string') {
     const leafType = 'type' in item && typeof item.type === 'string' ? item.type : undefined
-    const key = leafType ? `${item.name}-${leafType}` : item.name
+    const key = leafType ? `${item.name}-${leafType}-${index}` : `${item.name}-${index}`
     return prefixFormItemKey(namePrefix, key)
   }
 

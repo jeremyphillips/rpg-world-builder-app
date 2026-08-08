@@ -21,7 +21,7 @@ function collectFieldNames(items: FormItem[]): string[] {
 }
 
 describe('buildLocationFields', () => {
-  it('omits authoringType and parentLocationId when fixedCreate is set', () => {
+  it('includes type-specific classification fields for fixed building create', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
@@ -32,8 +32,20 @@ describe('buildLocationFields', () => {
 
     expect(names).not.toContain('authoringType')
     expect(names).not.toContain('parentLocationId')
-    expect(names).toContain('description')
     expect(names).toContain('classification.archetype')
+    expect(names).toContain('description')
+  })
+
+  it('omits classification fields for fixed district create', () => {
+    const ctx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: { authoringType: 'district', parentLocationId: 'location-parent' },
+    }
+
+    const names = collectFieldNames(buildLocationFields(ctx))
+
+    expect(names).toEqual(['description'])
   })
 
   it('includes authoringType and parentLocationId for full create layout', () => {
