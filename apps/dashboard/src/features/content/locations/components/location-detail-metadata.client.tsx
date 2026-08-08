@@ -36,6 +36,7 @@ export function LocationDetailMetadata({
       await applyLocationParentReplacement({
         campaignId,
         subjectId: location.id,
+        subjectKind: location.kind,
         newParentLocationId,
       })
       invalidateLocationParentReplacementQueries(queryClient, campaignId)
