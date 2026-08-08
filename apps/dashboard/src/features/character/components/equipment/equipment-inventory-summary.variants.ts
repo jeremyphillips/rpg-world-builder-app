@@ -41,7 +41,8 @@ export const equipmentInventoryRowClasses = 'overflow-visible py-1'
 
 export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'
 
-export const equipmentInventoryRowHeaderClasses = 'flex items-center justify-between gap-2'
+export const equipmentInventoryRowHeaderClasses =
+  'flex w-full min-w-0 items-center justify-between gap-2'
 
 export const equipmentInventoryRowActionsClasses = 'flex shrink-0 items-center'
 
@@ -49,10 +50,11 @@ export const equipmentInventoryRowDetailLineClasses = 'mt-0.5'
 
 export const equipmentInventoryRowPriceLineClasses = 'min-w-0 text-muted-foreground opacity-80'
 
-export const equipmentInventoryRowNameClasses = 'font-body-emphasis text-base text-foreground'
+export const equipmentInventoryRowNameClasses =
+  'min-w-0 truncate font-body-emphasis text-base text-foreground'
 
 export const equipmentInventoryRowStagedRemovalNameClasses =
-  'font-body-emphasis text-base text-muted-foreground line-through'
+  'min-w-0 truncate font-body-emphasis text-base text-muted-foreground line-through'
 
 export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
 

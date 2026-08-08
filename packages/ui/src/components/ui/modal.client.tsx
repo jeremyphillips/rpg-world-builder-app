@@ -9,13 +9,13 @@ import {
   DialogPanelHeader as ModalHeaderBase,
   dialogDismissHandlers,
 } from './dialog-parts.client'
-import { handleModalOpenAutoFocus } from './modal-focus.lib'
+import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import {
-  modalContentVariants,
-  modalBodyVariants,
-  modalOverlayVariants,
-  type ModalSize,
-} from './modal.variants'
+  dialogContentFocusShellClasses,
+  dialogPanelBodyVariants,
+  dialogPanelFooterClasses,
+} from './dialog-panel.variants'
+import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const ModalRoot = DialogPrimitive.Root
@@ -71,14 +71,15 @@ const ModalContent = React.forwardRef<
         <ModalOverlay />
         <DialogPrimitive.Content
           ref={composedRef}
-          className={cn(modalContentVariants({ size }), className)}
+          tabIndex={-1}
+          className={cn(modalContentVariants({ size }), dialogContentFocusShellClasses, className)}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
             onInteractOutside,
             onEscapeKeyDown,
           )}
-          onOpenAutoFocus={(event) => handleModalOpenAutoFocus(event, onOpenAutoFocus)}
+          onOpenAutoFocus={(event) => handleDialogOpenAutoFocus(event, onOpenAutoFocus)}
           {...props}
         >
           {portalProvider(
@@ -101,10 +102,15 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional supporting copy — maps to `Dialog.Description`. */
   description?: React.ReactNode
   headlineClassName?: string
+  /** Right-aligned slot on the title row (e.g. primary action). */
+  endSlot?: React.ReactNode
 }
 
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
-  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
+  (
+    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    ref,
+  ) => (
     <ModalHeaderBase
       ref={ref}
       className={className}
@@ -112,6 +118,7 @@ const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
       headline={headline}
       description={description}
       headlineClassName={headlineClassName}
+      endSlot={endSlot}
       {...props}
     >
       {children}
@@ -122,26 +129,23 @@ ModalHeader.displayName = 'Modal.Header'
 
 const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(modalBodyVariants(), className)} {...props} />
+    <div ref={ref} className={cn(dialogPanelBodyVariants(), className)} {...props} />
   ),
 )
 ModalBody.displayName = 'Modal.Body'
 
 const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('flex items-center justify-end gap-2 p-6 pt-0', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn(dialogPanelFooterClasses, className)} {...props} />
   ),
 )
 ModalFooter.displayName = 'Modal.Footer'
 
 /**
  * Compound, accessible modal built on Radix Dialog (focus trap, scroll lock,
- * portal, Esc/overlay close baked in). On open, auto-focus skips label info
- * tooltips and lands on the first meaningful field control.
+ * portal, Esc/overlay close baked in). On open, focus moves to the dialog
+ * panel; opt a child in with `data-dialog-initial-focus` when immediate typing
+ * is clearly intended.
  *
  * ```tsx
  * <Modal.Root open={open} onOpenChange={setOpen}>

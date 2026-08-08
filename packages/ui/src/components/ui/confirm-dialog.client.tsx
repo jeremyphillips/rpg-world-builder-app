@@ -5,6 +5,12 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 
 import { cn } from '../../lib/utils'
 import { Button, type ButtonProps } from './button.client'
+import {
+  dialogPanelActionRowClasses,
+  dialogContentFocusShellClasses,
+  dialogPanelSectionPaddingClasses,
+} from './dialog-panel.variants'
+import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { headingVariants } from './heading.variants'
 import { modalContentVariants, modalOverlayVariants } from './modal.variants'
 import { textVariants } from './text.variants'
@@ -30,6 +36,8 @@ export interface ConfirmDialogProps {
   onConfirm: () => void
   /** Invoked when the cancel button is pressed. */
   onCancel?: () => void
+  /** When true, open focus lands on the confirm button via `data-dialog-initial-focus`. */
+  focusConfirmOnOpen?: boolean
 }
 
 /**
@@ -50,13 +58,21 @@ export function ConfirmDialog({
   confirmVariant = 'default',
   onConfirm,
   onCancel,
+  focusConfirmOnOpen = false,
 }: ConfirmDialogProps) {
   return (
     <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialogPrimitive.Portal>
         <AlertDialogPrimitive.Overlay className={cn(modalOverlayVariants(), 'z-[60]')} />
         <AlertDialogPrimitive.Content
-          className={cn(modalContentVariants({ size: 'sm' }), 'z-[60] gap-4 p-6')}
+          tabIndex={-1}
+          className={cn(
+            modalContentVariants({ size: 'sm' }),
+            dialogPanelSectionPaddingClasses,
+            dialogContentFocusShellClasses,
+            'z-[60] gap-4',
+          )}
+          onOpenAutoFocus={handleDialogOpenAutoFocus}
         >
           <div className="flex flex-col space-y-1.5">
             <AlertDialogPrimitive.Title
@@ -70,14 +86,18 @@ export function ConfirmDialog({
               </AlertDialogPrimitive.Description>
             ) : null}
           </div>
-          <div className="flex items-center justify-end gap-2">
+          <div className={dialogPanelActionRowClasses}>
             <AlertDialogPrimitive.Cancel asChild>
               <Button variant="outline" onClick={onCancel}>
                 {cancelLabel}
               </Button>
             </AlertDialogPrimitive.Cancel>
             <AlertDialogPrimitive.Action asChild>
-              <Button variant={confirmVariant} onClick={onConfirm}>
+              <Button
+                variant={confirmVariant}
+                onClick={onConfirm}
+                {...(focusConfirmOnOpen ? { 'data-dialog-initial-focus': true } : {})}
+              >
                 {confirmLabel}
               </Button>
             </AlertDialogPrimitive.Action>

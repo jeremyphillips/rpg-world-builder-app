@@ -1,6 +1,10 @@
 import { cva } from 'class-variance-authority'
 
-export const catalogToolbarVariants = cva('space-y-4 px-6 pb-4')
+import { cn } from '../../lib/utils'
+import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
+
+/** Catalog toolbar inset matches dialog-panel section inset (picker chrome, not a parallel SSOT). */
+export const catalogToolbarVariants = cva(cn('space-y-4 pb-4', dialogPanelSectionInsetXClasses))
 
 export const catalogToolbarSearchRowVariants = cva('relative')
 

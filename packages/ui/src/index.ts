@@ -547,6 +547,15 @@ export {
   type ModalContentVariantProps,
   type ModalSize,
 } from './components/ui/modal.variants'
+export {
+  dialogPanelActionRowClasses,
+  dialogPanelBodyVariants,
+  dialogContentFocusShellClasses,
+  dialogPanelFooterClasses,
+  dialogPanelSectionInsetXClasses,
+  dialogPanelSectionPaddingClasses,
+} from './components/ui/dialog-panel.variants'
+export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
@@ -614,8 +623,11 @@ export {
 export {
   sheetBodyVariants,
   sheetContentVariants,
+  sheetFooterDockClasses,
   type SheetContentVariantProps,
   type SheetSide,
+  type SheetSize,
+  type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
 

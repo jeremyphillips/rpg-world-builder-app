@@ -4,7 +4,7 @@ import { Text } from '../../components/ui/text'
 import { cn } from '../../lib/utils'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
-import { FormActionsBar, type FormActionsBarVariant } from '../chrome/form-actions-bar'
+import { FormActionsBar } from '../chrome/form-actions-bar'
 import {
   formFooterSpacingClasses,
   formSheetScrollRegionClasses,
@@ -12,30 +12,37 @@ import {
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
+export interface FormFooterWrapperProps {
+  footer: React.ReactNode
+  formError: string | null
+}
+
 export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
   contentClassName?: string
-  isSheetDockedFooter: boolean
+  isOverlayComposedFooter: boolean
   stickyFooter: boolean
   formError?: string | null
   valueSyncs?: FormValueSync[]
   header?: ReactNode
+  contentWrapper?: (content: React.ReactNode) => React.ReactNode
 }
 
 export function FormShellFieldStack({
   formId,
   fields,
   contentClassName,
-  isSheetDockedFooter,
+  isOverlayComposedFooter,
   stickyFooter,
   formError,
   valueSyncs,
   header,
+  contentWrapper,
 }: FormShellFieldStackProps) {
   const stack = (
-    <FormRhythmStack className={isSheetDockedFooter ? undefined : contentClassName}>
-      {!stickyFooter && formError ? (
+    <FormRhythmStack className={isOverlayComposedFooter ? undefined : contentClassName}>
+      {!stickyFooter && !isOverlayComposedFooter && formError ? (
         <Text variant="destructive" role="alert">
           {formError}
         </Text>
@@ -48,32 +55,37 @@ export function FormShellFieldStack({
     </FormRhythmStack>
   )
 
-  if (!isSheetDockedFooter) {
-    return stack
-  }
+  const scrollWrappedStack = isOverlayComposedFooter ? (
+    <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+  ) : (
+    stack
+  )
 
-  return <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+  return contentWrapper ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
 }
 
 export type FormFooterRegionProps = {
   stickyFooter: boolean
   formError?: string | null
-  footerVariant: FormActionsBarVariant
   footer: ReactNode
+  footerWrapper?: (props: FormFooterWrapperProps) => ReactNode
 }
 
 export function FormFooterRegion({
   stickyFooter,
   formError,
-  footerVariant,
   footer,
+  footerWrapper,
 }: FormFooterRegionProps) {
+  if (footerWrapper) {
+    if (!footer && !formError) {
+      return null
+    }
+    return footerWrapper({ footer, formError: formError ?? null })
+  }
+
   if (stickyFooter) {
-    return (
-      <FormActionsBar formError={formError} variant={footerVariant}>
-        {footer}
-      </FormActionsBar>
-    )
+    return <FormActionsBar formError={formError}>{footer}</FormActionsBar>
   }
 
   if (!footer) {

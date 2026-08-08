@@ -6,8 +6,10 @@ import {
   radioCardDetailsGridVariants,
   radioCardEmbeddedSlotVariants,
   radioCardGroupGapVariants,
+  radioCardBodyVariants,
   radioCardRootLayoutVariants,
   radioCardShellVariants,
+  radioCardTitleVariants,
   radioCardVariants,
 } from './radio-card.variants'
 
@@ -27,11 +29,19 @@ describe('radioCard surface establishment', () => {
     expect(panel).toContain('bg-surface-muted')
   })
 
-  it('uses compact vertical padding and 14px muted descriptions', () => {
+  it('uses compact 10px/16px padding and density-owned typography', () => {
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('py-2.5')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('px-4')
     expect(radioCardShellVariants({ density: 'compact' })).toContain('py-2.5')
-    expect(radioCardDescriptionVariants()).toContain('text-sm')
-    expect(radioCardDescriptionVariants()).toContain('text-muted-foreground')
+    expect(radioCardShellVariants({ density: 'compact' })).toContain('px-4')
+    expect(radioCardTitleVariants({ density: 'compact' })).toContain('text-sm')
+    expect(radioCardDescriptionVariants({ density: 'compact' })).toContain('text-xs')
+    expect(radioCardDescriptionVariants({ density: 'compact' })).toContain('text-muted-foreground')
+    expect(radioCardDescriptionVariants({ density: 'default' })).toContain('text-sm')
+  })
+
+  it('removes compact title/description gap via shared body stack token', () => {
+    expect(radioCardBodyVariants({ density: 'compact' })).toContain('gap-0')
   })
 
   it('uses compact horizontal rhythm with 12px gap and 16px controls', () => {

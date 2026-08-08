@@ -7,6 +7,8 @@ import { z } from 'zod'
 import { Form } from './form.client'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
+import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
+import { cn } from '../../lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -198,15 +200,14 @@ describe('Form', () => {
     await submitAndExpectPayload(user, onSubmit, { name: 'Tasha', hasExtra: false })
   })
 
-  it('wraps sheet docked footers in a scroll region without growing the rhythm stack', () => {
+  it('wraps overlay composed footers in a scroll region without growing the rhythm stack', () => {
     const { container } = render(
       <Form<Values>
         schema={schema}
         fields={[{ type: 'text', name: 'name', label: 'Name' }]}
         onSubmit={vi.fn()}
-        stickyFooter
-        footerVariant="sheet"
-        contentClassName="px-6 pt-0"
+        footerWrapper={({ footer }) => <div data-testid="overlay-footer">{footer}</div>}
+        contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
         footer={<button type="submit">Save</button>}
       />,
     )
@@ -226,7 +227,8 @@ describe('Form', () => {
     expect(rhythmStack).not.toHaveClass('flex-1')
     expect(rhythmStack).not.toHaveClass('overflow-y-auto')
 
-    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('shrink-0')
+    expect(screen.getByTestId('overlay-footer')).toBeInTheDocument()
+    expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
   })
 
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {

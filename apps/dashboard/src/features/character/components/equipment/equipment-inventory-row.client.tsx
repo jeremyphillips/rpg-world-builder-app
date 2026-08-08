@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { Trash2 } from 'lucide-react'
 
-import { Badge, Text } from '@rpg/ui'
+import { Badge, Text, cn } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
@@ -123,7 +123,7 @@ function InventoryRowHeader({
 }) {
   return (
     <div className={equipmentInventoryRowHeaderClasses}>
-      <div className={builderInventoryRowMetaClasses}>
+      <div className={cn(builderInventoryRowMetaClasses, 'min-w-0 flex-1')}>
         <Text
           as="p"
           className={

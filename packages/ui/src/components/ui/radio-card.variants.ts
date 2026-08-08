@@ -19,7 +19,7 @@ export const radioCardDensityBodyLayoutVariants = cva('', {
   variants: {
     density: {
       default: 'p-4 sm:p-6',
-      compact: 'px-3 py-2.5',
+      compact: 'px-4 py-2.5',
     },
   },
   defaultVariants: {
@@ -159,7 +159,20 @@ export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
       default: 'gap-2',
-      compact: '',
+      compact: 'gap-0',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
+/** Shared vertical gap between option/summary title and description — one token for both surfaces. */
+export const radioCardPrimaryCopyStackVariants = cva('flex flex-col', {
+  variants: {
+    density: {
+      default: 'gap-2',
+      compact: 'gap-0',
     },
   },
   defaultVariants: {
@@ -186,7 +199,30 @@ export const radioCardRootLayoutVariants = cva('flex items-start', {
 
 export const radioCardMetaListVariants = cva('flex flex-wrap gap-1.5')
 
-export const radioCardTitleVariants = cva('text-md font-bold')
+export const radioCardTitleVariants = cva('font-bold', {
+  variants: {
+    density: {
+      default: 'text-md',
+      compact: 'text-sm',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
+/** Selected chooser summary title — compact steps up to 16px while option labels stay 14px. */
+export const radioCardSummaryTitleVariants = cva('font-bold', {
+  variants: {
+    density: {
+      default: 'text-md',
+      compact: 'text-base',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
 export const radioCardTitleRowVariants = cva('flex min-w-0 flex-wrap items-center gap-2')
 
@@ -196,22 +232,32 @@ export const radioCardTitleMetaVariants = cva('text-muted-foreground')
 export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
 
 /** Muted secondary copy under the card title (descriptions, summaries). */
-export const radioCardDescriptionVariants = cva('text-sm text-muted-foreground')
+export const radioCardDescriptionVariants = cva('text-muted-foreground', {
+  variants: {
+    density: {
+      default: 'text-sm',
+      compact: 'text-xs',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
-export const radioCardSummaryVariants = cva(radioCardDescriptionVariants())
+export const radioCardSummaryVariants = radioCardDescriptionVariants
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
 
 /** Horizontal padding shared by compact card shells and embedded configuration panels. */
-export const radioCardCompactPaddingXClasses = 'px-3'
+export const radioCardCompactPaddingXClasses = 'px-4'
 
-export const radioCardCompactPaddingRightClasses = 'pr-3'
+export const radioCardCompactPaddingRightClasses = 'pr-4'
 
 /**
  * Left inset aligning panel copy with the compact card body column
  * (shell padding + radio control + column gap).
  */
-export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
+export const radioCardCompactBodyInsetClasses = 'pl-[calc(1rem+1rem+0.75rem)]'
 
 /** Panel horizontal padding: body-column inset left, shell padding right. */
 export const radioCardCompactPanelPaddingClasses = `${radioCardCompactBodyInsetClasses} ${radioCardCompactPaddingRightClasses}`
@@ -242,7 +288,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'compact',
-      class: '-mx-3 -mb-2.5 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
+      class: '-mx-4 -mb-2.5 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
     },
   ],
   defaultVariants: {

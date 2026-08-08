@@ -18,6 +18,9 @@ export const modalOverlayVariants = cva(
  * The centered modal panel. `size` caps the max-width; the panel itself is
  * height-capped (`max-h-[85vh]`) and clips its overflow so the scrollable region
  * lives in `Modal.Body`, keeping the header/footer pinned.
+ *
+ * Surface is locked to `background` — no `surface` prop (do not add for API parity
+ * with Sheet). Size values/maps stay modality-owned (`ModalSize` ≠ `SheetSize`).
  */
 export const modalContentVariants = cva(
   cn(
@@ -38,8 +41,6 @@ export const modalContentVariants = cva(
     },
   },
 )
-
-export const modalBodyVariants = cva('overflow-y-auto p-6 pt-0 text-sm')
 
 export type ModalContentVariantProps = VariantProps<typeof modalContentVariants>
 export type ModalSize = NonNullable<ModalContentVariantProps['size']>

@@ -5,6 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
@@ -19,9 +20,11 @@ function renderModal(contentProps: Record<string, unknown> = {}) {
         <Modal.Header headline="Invite a player" description="They will receive an email." />
         <Modal.Body>Body content</Modal.Body>
         <Modal.Footer>
-          <Modal.Close asChild>
-            <Button>Cancel</Button>
-          </Modal.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button>Cancel</Button>
+            </Modal.Close>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>,
@@ -92,7 +95,7 @@ describe('Modal', () => {
     await expectNoAxeViolations(document.body)
   })
 
-  it('does not open label info tooltips on dialog auto-focus', async () => {
+  it('focuses the dialog panel on open without opening label info tooltips', async () => {
     const user = userEvent.setup()
     render(
       <Modal.Root>
@@ -115,9 +118,10 @@ describe('Modal', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Open' }))
-    await screen.findByRole('dialog')
+    const dialog = await screen.findByRole('dialog')
 
-    expect(document.getElementById('availability')).toHaveFocus()
+    expect(dialog).toHaveFocus()
+    expect(document.getElementById('availability')).not.toHaveFocus()
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 })

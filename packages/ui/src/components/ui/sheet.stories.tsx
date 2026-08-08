@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
 import { Input } from './input.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 
 const meta = {
   title: 'Primitives/Sheet',
@@ -29,10 +30,12 @@ export const RightSide: Story = {
           <Input aria-label="Id" placeholder="slug-id" />
         </Sheet.Body>
         <Sheet.Footer>
-          <Sheet.Close asChild>
-            <Button variant="outline">Cancel</Button>
-          </Sheet.Close>
-          <Button>Save</Button>
+          <div className={dialogPanelActionRowClasses}>
+            <Sheet.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Sheet.Close>
+            <Button>Save</Button>
+          </div>
         </Sheet.Footer>
       </Sheet.Content>
     </Sheet.Root>

@@ -13,6 +13,7 @@ import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal.client'
+import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -159,6 +160,31 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Rope')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Switch package' })).toBeDisabled()
+  })
+
+  it('keeps the purchased inventory list vertically scrollable without horizontal overflow', () => {
+    render(
+      <EquipmentPackageSwitchResolutionModal
+        open
+        catalogIndex={catalogIndex}
+        evaluation={evaluation}
+        draftQuantitiesByPurchaseId={{ 'purchase-rope': 62 }}
+        onOpenChange={vi.fn()}
+        onDraftQuantityChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+
+    const scrollRegion = screen
+      .getByRole('heading', { name: 'Purchased with starting gold' })
+      .closest('section')?.parentElement
+
+    expect(scrollRegion).not.toBeNull()
+    for (const className of equipmentPackageSwitchResolutionModalInventoryScrollClasses.split(
+      /\s+/,
+    )) {
+      expect(scrollRegion).toHaveClass(className)
+    }
   })
 
   itAxe('has no axe accessibility violations', async () => {

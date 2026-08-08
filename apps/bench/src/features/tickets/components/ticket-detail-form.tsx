@@ -3,7 +3,7 @@ import { useFormContext, type UseFormReturn } from 'react-hook-form'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
-import { Button, Sheet, Text, Textarea } from '@rpg/ui'
+import { Button, Sheet, Text, Textarea, dialogPanelActionRowClasses } from '@rpg/ui'
 import {
   FormFooterActions,
   TabbedForm,
@@ -167,13 +167,13 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       footerWrapper={
         isSheetLayout
           ? ({ footer: footerContent, formError: footerFormError }) => (
-              <Sheet.Footer className="flex-col items-stretch gap-3">
+              <Sheet.Footer>
                 {footerFormError ? (
                   <Text variant="destructive" role="alert">
                     {footerFormError}
                   </Text>
                 ) : null}
-                {footerContent}
+                <div className={dialogPanelActionRowClasses}>{footerContent}</div>
               </Sheet.Footer>
             )
           : undefined

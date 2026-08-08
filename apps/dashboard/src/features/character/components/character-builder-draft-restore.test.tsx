@@ -37,6 +37,7 @@ describe('CharacterBuilderDraftRestore', () => {
     render(<CharacterBuilderDraftRestore context={context as never} />)
 
     expect(screen.getByText('Continue your character?')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue previous draft' })).toHaveFocus()
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue previous draft' }))
     expect(continuePreviousDraft).toHaveBeenCalled()

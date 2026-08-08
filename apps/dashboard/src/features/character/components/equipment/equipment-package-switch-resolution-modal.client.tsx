@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
   EquipmentPackageSwitchBlockingReason,
   EquipmentPackageSwitchEvaluation,
 } from '@rpg/contracts'
-import { Modal } from '@rpg/ui'
+import { Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
@@ -50,10 +50,12 @@ export function EquipmentPackageSwitchResolutionModal({
   onDraftQuantityChange,
   onConfirm,
 }: EquipmentPackageSwitchResolutionModalProps) {
-  const headingRef = useRef<HTMLDivElement>(null)
-  const [returnFocusElement] = useState(() =>
-    typeof document === 'undefined' ? null : document.activeElement,
-  )
+  const [returnFocusElement] = useState(() => {
+    if (typeof document === 'undefined') return null
+    const active = document.activeElement
+    return active instanceof HTMLElement ? active : null
+  })
+
   const purchasedGroups = useMemo(
     () =>
       buildPackageSwitchDraftPurchasedGroups({
@@ -70,20 +72,6 @@ export function EquipmentPackageSwitchResolutionModal({
     isCommitting,
   })
 
-  useEffect(() => {
-    if (!open) return
-    headingRef.current?.focus()
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    return () => {
-      if (returnFocusElement instanceof HTMLElement) {
-        returnFocusElement.focus()
-      }
-    }
-  }, [open, returnFocusElement])
-
   const handleSetPurchaseQuantity = (
     target: EquipmentInventoryQuantityTarget,
     quantity: number,
@@ -98,10 +86,15 @@ export function EquipmentPackageSwitchResolutionModal({
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="lg">
+      <Modal.Content
+        size="lg"
+        onCloseAutoFocus={(event) => {
+          if (!(returnFocusElement instanceof HTMLElement)) return
+          event.preventDefault()
+          returnFocusElement.focus()
+        }}
+      >
         <Modal.Header
-          ref={headingRef}
-          tabIndex={-1}
           headline={modalState.title}
           description={modalState.description}
           headlineClassName={equipmentPackageSwitchResolutionModalHeadlineClasses}
@@ -119,14 +112,16 @@ export function EquipmentPackageSwitchResolutionModal({
           />
         </Modal.Body>
         <Modal.Footer>
-          <EquipmentPackageSwitchResolutionModalFooter
-            isBlocked={modalState.isBlocked}
-            confirmDisabled={modalState.confirmDisabled}
-            isCommitting={isCommitting}
-            helperMessage={modalState.helperMessage}
-            onCancel={() => onOpenChange(false)}
-            onConfirm={onConfirm}
-          />
+          <div className={dialogPanelActionRowClasses}>
+            <EquipmentPackageSwitchResolutionModalFooter
+              isBlocked={modalState.isBlocked}
+              confirmDisabled={modalState.confirmDisabled}
+              isCommitting={isCommitting}
+              helperMessage={modalState.helperMessage}
+              onCancel={() => onOpenChange(false)}
+              onConfirm={onConfirm}
+            />
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

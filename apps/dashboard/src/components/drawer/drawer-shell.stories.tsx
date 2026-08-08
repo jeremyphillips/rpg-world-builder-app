@@ -1,9 +1,17 @@
 import type { ComponentProps } from 'react'
-import { Button, Input, Text } from '@rpg/ui'
+import {
+  Button,
+  Input,
+  Text,
+  cn,
+  dialogPanelActionRowClasses,
+  dialogPanelSectionInsetXClasses,
+} from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
 import { DrawerShell } from './drawer-shell.client'
+import { drawerShellBodyVariants } from './drawer-shell.variants'
 
 const meta = {
   title: 'Layout/DrawerShell',
@@ -79,31 +87,34 @@ export const WithDescription: Story = {
 
 export const ManagedBody: Story = {
   render: () => (
-    <DrawerShellDemo
-      title="Managed form body"
-      bodyMode="managed"
-      footer={
-        <>
-          <DrawerShell.Close asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerShell.Close>
-          <Button>Save</Button>
-        </>
-      }
-    >
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto px-6">
-          {Array.from({ length: 18 }, (_, index) => (
-            <Text key={index} className="mb-4">
-              Managed scroll region row {index + 1}
-            </Text>
-          ))}
-        </div>
-        <div className="shrink-0 border-t border-border px-6 py-4">
+    <DrawerShellDemo title="Managed form body" bodyMode="composed">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
+          <div
+            className={cn(
+              'min-h-0 flex-1 overflow-y-auto',
+              dialogPanelSectionInsetXClasses,
+              'pt-0',
+            )}
+          >
+            {Array.from({ length: 18 }, (_, index) => (
+              <Text key={index} className="mb-4">
+                Managed scroll region row {index + 1}
+              </Text>
+            ))}
+          </div>
+        </DrawerShell.Body>
+        <DrawerShell.Footer>
           <Text variant="destructive" role="alert">
             Could not save item.
           </Text>
-        </div>
+          <div className={dialogPanelActionRowClasses}>
+            <DrawerShell.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerShell.Close>
+            <Button>Save</Button>
+          </div>
+        </DrawerShell.Footer>
       </div>
     </DrawerShellDemo>
   ),

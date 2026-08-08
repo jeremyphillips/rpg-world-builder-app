@@ -31,6 +31,7 @@ describe('ConfirmDialog', () => {
     renderConfirm()
     const dialog = screen.getByRole('alertdialog', { name: 'Delete campaign?' })
     expect(dialog).toHaveTextContent('This cannot be undone.')
+    expect(dialog).toHaveFocus()
   })
 
   it('fires onConfirm when the confirm button is pressed', async () => {
@@ -45,6 +46,12 @@ describe('ConfirmDialog', () => {
     const { onCancel } = renderConfirm()
     await user.click(screen.getByRole('button', { name: 'Keep' }))
     expect(onCancel).toHaveBeenCalledOnce()
+  })
+
+  it('focuses the confirm button when focusConfirmOnOpen is set', () => {
+    renderConfirm({ focusConfirmOnOpen: true })
+    expect(screen.getByRole('button', { name: 'Delete' })).toHaveFocus()
+    expect(screen.getByRole('alertdialog', { name: 'Delete campaign?' })).not.toHaveFocus()
   })
 
   itAxe('has no axe accessibility violations', async () => {

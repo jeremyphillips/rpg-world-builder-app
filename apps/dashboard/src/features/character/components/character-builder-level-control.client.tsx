@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   characterBuilderLevelMessages,
@@ -10,7 +10,15 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
-import { Badge, Button, InfoTooltip, Modal, SelectField, Text } from '@rpg/ui'
+import {
+  Badge,
+  Button,
+  InfoTooltip,
+  Modal,
+  SelectField,
+  Text,
+  dialogPanelActionRowClasses,
+} from '@rpg/ui'
 
 import {
   buildBuilderLevelSelectOptions,
@@ -32,13 +40,6 @@ export function CharacterBuilderLevelChangeConfirmationModal({
   onOpenChange,
   onConfirm,
 }: CharacterBuilderLevelChangeConfirmationModalProps) {
-  const headingRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    headingRef.current?.focus()
-  }, [open])
-
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="sm" aria-describedby="character-builder-level-change-description">
@@ -47,9 +48,6 @@ export function CharacterBuilderLevelChangeConfirmationModal({
           description={formatFieldMessage(
             characterBuilderLevelMessages.changeConfirmationDescription(),
           )}
-          headlineClassName="outline-none"
-          ref={headingRef}
-          tabIndex={-1}
         />
         <Modal.Body>
           <ul id="character-builder-level-change-description" className="list-disc space-y-1 pl-5">
@@ -63,12 +61,14 @@ export function CharacterBuilderLevelChangeConfirmationModal({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {formatFieldMessage(characterBuilderLevelMessages.changeCancelLabel())}
-          </Button>
-          <Button type="button" onClick={onConfirm}>
-            {formatFieldMessage(characterBuilderLevelMessages.changeConfirmLabel())}
-          </Button>
+          <div className={dialogPanelActionRowClasses}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {formatFieldMessage(characterBuilderLevelMessages.changeCancelLabel())}
+            </Button>
+            <Button type="button" onClick={onConfirm}>
+              {formatFieldMessage(characterBuilderLevelMessages.changeConfirmLabel())}
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

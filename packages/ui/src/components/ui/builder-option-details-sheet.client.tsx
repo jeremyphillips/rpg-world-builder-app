@@ -9,6 +9,7 @@ import { RichTextContent } from './rich-text-content'
 import { Sheet } from './sheet.client'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import {
   builderOptionDetailsMetadataListVariants,
   builderOptionDetailsSectionVariants,
@@ -185,7 +186,9 @@ export function BuilderOptionDetailsSheet({
           ))}
         </Sheet.Body>
         {primaryAction && primaryActionPlacement === 'footer' ? (
-          <Sheet.Footer>{primaryAction}</Sheet.Footer>
+          <Sheet.Footer>
+            <div className={dialogPanelActionRowClasses}>{primaryAction}</div>
+          </Sheet.Footer>
         ) : null}
       </Sheet.Content>
     </Sheet.Root>
