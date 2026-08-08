@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
+  areVisibilityDependenciesKnown,
   combineFieldVisibility,
   combineFieldVisibilityAll,
   resolveFieldHint,
@@ -26,6 +27,42 @@ describe('combineFieldVisibility', () => {
     expect(combined.visibleWhen({ mode: 'melee', properties: ['thrown'] })).toBe(true)
     expect(combined.visibleWhen({ mode: 'ranged', properties: [] })).toBe(true)
     expect(combined.visibleWhen({ mode: 'melee', properties: ['finesse'] })).toBe(false)
+  })
+})
+
+describe('areVisibilityDependenciesKnown', () => {
+  it('returns false when visibility is missing', () => {
+    expect(areVisibilityDependenciesKnown(undefined, ['authoringType'])).toBe(false)
+  })
+
+  it('returns false when dependsOn is missing', () => {
+    expect(
+      areVisibilityDependenciesKnown({ dependsOn: undefined as unknown as string[] }, [
+        'authoringType',
+      ]),
+    ).toBe(false)
+  })
+
+  it('returns true when declared deps are a subset of known keys', () => {
+    expect(
+      areVisibilityDependenciesKnown({ dependsOn: ['authoringType'] }, ['authoringType', 'mode']),
+    ).toBe(true)
+  })
+
+  it('returns true when declared deps exactly match known keys', () => {
+    expect(
+      areVisibilityDependenciesKnown({ dependsOn: ['authoringType'] }, ['authoringType']),
+    ).toBe(true)
+  })
+
+  it('returns true for empty dependsOn', () => {
+    expect(areVisibilityDependenciesKnown({ dependsOn: [] }, ['authoringType'])).toBe(true)
+  })
+
+  it('returns false when declared deps are not a subset of known keys', () => {
+    expect(
+      areVisibilityDependenciesKnown({ dependsOn: ['authoringType', 'foo'] }, ['authoringType']),
+    ).toBe(false)
   })
 })
 

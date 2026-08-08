@@ -93,9 +93,9 @@ serializes at the form boundary only — API payloads stay canonical.
 | Generic defensive wall  | Fortification          | —               | `kind: structure`, `structureType: fortification` |
 | Rare unclassified shell | Unclassified structure | —               | `kind: structure` (no `structureType`)            |
 
-Creation shortcuts (`?type=` on the create route, overview dropdown, detail-page
-**Add location** menu) only prefill the same form — they never bypass hierarchy
-validation or parent availability.
+Creation shortcuts (`?type=` on the create route, overview dropdown) prefill the full
+create form. Detail-page **Add location** opens the contained create drawer with a fixed
+child type and parent — neither path bypasses hierarchy validation or parent availability.
 
 ## Authoring modules
 

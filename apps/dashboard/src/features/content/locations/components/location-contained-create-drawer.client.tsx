@@ -1,12 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
+import { toast } from '@rpg/ui'
 
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
-import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../lib/campaign-access/campaign-access-labels'
+import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
+import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { formatContentCreateActionLabel } from '../../lib/content-type-labels'
 import { useContentWriteMutation } from '../../lib/list/use-content-mutations'
 import { contentFormFields, type ContentFormCtx } from '../../lib/forms/content-form-registry'
@@ -52,9 +54,6 @@ function LocationContainedCreateDrawerBody({
 }: LocationContainedCreateDrawerBodyProps) {
   const mutation = useContentWriteMutation(locationFormDef, campaignId)
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
-  const [campaignAccessDeferredError, setCampaignAccessDeferredError] = useState<string | null>(
-    null,
-  )
 
   const fixedCreate = { authoringType, parentLocationId }
   const locationCtx: LocationFormCtx = {
@@ -93,13 +92,13 @@ function LocationContainedCreateDrawerBody({
       pendingAccess: campaignAccessDraftRef.current,
     })
 
-    if (deferredAccessFailed) {
-      setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
-      return
-    }
-
-    notifyContentCreated('locations')
     onOpenChange(false)
+
+    if (deferredAccessFailed) {
+      toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
+    } else {
+      notifyContentCreated('locations')
+    }
   }, 'Could not create locations.')
 
   return (
@@ -107,7 +106,6 @@ function LocationContainedCreateDrawerBody({
       open={open}
       onOpenChange={(nextOpen) => {
         if (!nextOpen) {
-          setCampaignAccessDeferredError(null)
           campaignAccessDraftRef.current = null
         }
         onOpenChange(nextOpen)
@@ -116,7 +114,8 @@ function LocationContainedCreateDrawerBody({
       sheetContentClassName={LOCATION_DRAWER_SHEET_CLASSES}
       pending={mutation.isPending}
       submitLabel={formatContentCreateActionLabel('locations')}
-      formError={formError ?? campaignAccessDeferredError}
+      formError={formError}
+      wrapForm={(form) => <CampaignAccessFormProvider>{form}</CampaignAccessFormProvider>}
       form={{
         schema: locationDraftFormSchema,
         defaultValues: {

@@ -6,8 +6,6 @@ import type { ZodType } from 'zod'
 import { Button, Sheet } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
-import { CampaignAccessFormProvider } from '../../campaign-access/campaign-access-form-context.client'
-
 export type ContentFormDrawerFormProps<TFormValues extends FieldValues> = {
   schema: ZodType<TFormValues>
   fields: FormItem[]
@@ -26,6 +24,7 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   submitLabel: string
   formError?: string | null
   sheetContentClassName?: string
+  wrapForm?: (form: React.ReactNode) => React.ReactNode
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
 
@@ -60,6 +59,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   submitLabel,
   formError = null,
   sheetContentClassName,
+  wrapForm = (form) => form,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
   const handleOpenChange = React.useCallback(
@@ -78,7 +78,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
         <Sheet.Header headline={title} />
         {open ? (
           <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
-            <CampaignAccessFormProvider>
+            {wrapForm(
               <Form<TFormValues>
                 key={formId}
                 id={formId}
@@ -100,8 +100,8 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
                 footer={() => (
                   <ContentFormDrawerFooter pending={pending} submitLabel={submitLabel} />
                 )}
-              />
-            </CampaignAccessFormProvider>
+              />,
+            )}
           </Sheet.Body>
         ) : null}
       </Sheet.Content>

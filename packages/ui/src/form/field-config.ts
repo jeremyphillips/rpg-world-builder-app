@@ -175,6 +175,15 @@ export function combineFieldVisibilityAll(a: FieldVisibility, b: FieldVisibility
   }
 }
 
+/** True when every declared visibility dependency is present in `knownKeys`. */
+export function areVisibilityDependenciesKnown(
+  visibility: { dependsOn?: readonly string[] } | null | undefined,
+  knownKeys: readonly string[],
+): boolean {
+  if (!visibility?.dependsOn) return false
+  return visibility.dependsOn.every((dep) => knownKeys.includes(dep))
+}
+
 /**
  * Per-option enablement keyed on other field values. Disabled options stay
  * selectable in the current value but cannot be toggled on (tier-2 UX).

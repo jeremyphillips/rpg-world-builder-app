@@ -82,6 +82,7 @@ export {
   toOptions,
   combineFieldVisibility,
   combineFieldVisibilityAll,
+  areVisibilityDependenciesKnown,
   resolveDependentsVisibility,
   resolveFieldHint,
   normalizeFieldHint,

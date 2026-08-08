@@ -16,7 +16,15 @@ import {
   SITE_TYPE_IDS,
   type InteriorClassificationType,
 } from '@rpg/contracts'
-import type { FieldOption, FieldOptionAvailability, FormItem, RowFieldItem } from '@rpg/ui/form'
+import {
+  areVisibilityDependenciesKnown,
+  type FieldOption,
+  type FieldOptionAvailability,
+  type FormItem,
+  type RowFieldItem,
+} from '@rpg/ui/form'
+
+import type { LocationAuthoringType } from './location-authoring-type'
 
 import {
   buildBuildingArchetypeFieldOptions,
@@ -153,10 +161,11 @@ function visibleWhenInteriorTypeSet() {
   }
 }
 
-import type { LocationAuthoringType } from './location-authoring-type'
-
 type FieldWithOptionalVisibility = {
-  visibility?: { visibleWhen: (watched: Record<string, unknown>) => boolean }
+  visibility?: {
+    dependsOn?: string[]
+    visibleWhen: (watched: Record<string, unknown>) => boolean
+  }
 }
 
 /** Keeps only fields whose visibility predicate passes for a fixed authoring type. */
@@ -164,9 +173,11 @@ export function filterLocationFieldsForAuthoringType<T extends FieldWithOptional
   fields: readonly T[],
   authoringType: LocationAuthoringType,
 ): T[] {
-  return fields.filter(
-    (field) => !field.visibility || field.visibility.visibleWhen({ authoringType }),
-  )
+  return fields.filter((field) => {
+    if (!field.visibility) return true
+    if (!areVisibilityDependenciesKnown(field.visibility, ['authoringType'])) return true
+    return field.visibility.visibleWhen({ authoringType })
+  })
 }
 
 /** Primary classification fields paired with Location type in the authoring row. */
