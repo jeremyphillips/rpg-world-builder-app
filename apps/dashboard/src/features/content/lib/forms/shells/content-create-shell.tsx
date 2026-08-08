@@ -8,7 +8,7 @@ import { Heading, Text } from '@rpg/ui'
 import { useRef, useState } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
-import { allowFormNavigationOnce } from '@/lib/form-unsaved-changes-guard'
+import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { formatContentCreateActionLabel } from '../../content-type-labels'
@@ -71,6 +71,7 @@ function ContentCreateFormBody({
     null,
   )
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
+  const leaveGuardRef = useRef<Pick<UnsavedChangesConfirmController, 'runTrusted'> | null>(null)
 
   const createEntity = async (
     values: Record<string, unknown>,
@@ -101,8 +102,7 @@ function ContentCreateFormBody({
     }
 
     const editHref = resolveContentPostCreateEditHref(def, campaignId, created, formCtx)
-    allowFormNavigationOnce()
-    navigate(editHref)
+    leaveGuardRef.current?.runTrusted(() => navigate(editHref))
     if (!deferredAccessFailed) {
       notifyContentCreated(contentTypeKey)
     }
@@ -150,6 +150,9 @@ function ContentCreateFormBody({
         onSubmit={onPublish}
         onSaveDraft={onSaveDraft}
         saveDraftPending={saveDraftPending}
+        onLeaveGuardReady={(guard) => {
+          leaveGuardRef.current = guard
+        }}
       />
     </>
   )

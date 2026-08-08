@@ -90,8 +90,6 @@ function LocationContainedCreateDrawerBody({
       pendingAccess: campaignAccessDraftRef.current,
     })
 
-    onOpenChange(false)
-
     if (deferredAccessFailed) {
       toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
     } else {

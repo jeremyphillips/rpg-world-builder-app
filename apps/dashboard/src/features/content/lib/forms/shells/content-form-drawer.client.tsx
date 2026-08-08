@@ -2,11 +2,15 @@
 
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
+import { useFormState } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import { Button } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
+import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
+import { hasDirtyFields } from '@/lib/form-dirty-state'
+import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
 
 export type ContentFormDrawerFormProps<TFormValues extends FieldValues> = {
   schema: ZodType<TFormValues>
@@ -30,24 +34,72 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
 
+type ContentFormDrawerLeaveBridge = {
+  requestClose: (continuation: () => void) => void
+  runTrustedClose: (continuation: () => void) => void
+}
+
+function ContentFormDrawerLeaveGuard({
+  bridgeRef,
+  pending,
+  open,
+}: {
+  bridgeRef: React.MutableRefObject<ContentFormDrawerLeaveBridge | null>
+  pending: boolean
+  open: boolean
+}) {
+  const { dirtyFields } = useFormState()
+  const campaignAccess = useCampaignAccessForm()
+  const bodyDirty = hasDirtyFields(dirtyFields)
+  const isDirty = bodyDirty || campaignAccess.isDirty
+  const discardGuard = useUnsavedChangesConfirm({ isDirty })
+
+  React.useEffect(() => {
+    bridgeRef.current = {
+      requestClose: (continuation) => {
+        if (pending) return
+        discardGuard.request(continuation)
+      },
+      runTrustedClose: discardGuard.runTrusted,
+    }
+    return () => {
+      bridgeRef.current = null
+    }
+  }, [bridgeRef, discardGuard, pending])
+
+  return (
+    <>
+      {discardGuard.dialog}
+      <FormUnsavedChangesGuard discardGuard={discardGuard} enabled={open} renderDialog={false} />
+    </>
+  )
+}
+
 function ContentFormDrawerFooter({
   pending,
   submitLabel,
+  leaveBridgeRef,
+  open,
 }: {
   pending: boolean
   submitLabel: string
+  leaveBridgeRef: React.MutableRefObject<ContentFormDrawerLeaveBridge | null>
+  open: boolean
 }) {
   return (
-    <div className="flex w-full items-center justify-end gap-2">
-      <DrawerShell.Close asChild>
-        <Button type="button" variant="outline" disabled={pending}>
-          Cancel
+    <>
+      <ContentFormDrawerLeaveGuard bridgeRef={leaveBridgeRef} pending={pending} open={open} />
+      <div className="flex w-full items-center justify-end gap-2">
+        <DrawerShell.Close asChild>
+          <Button type="button" variant="outline" disabled={pending}>
+            Cancel
+          </Button>
+        </DrawerShell.Close>
+        <Button type="submit" disabled={pending}>
+          {submitLabel}
         </Button>
-      </DrawerShell.Close>
-      <Button type="submit" disabled={pending}>
-        {submitLabel}
-      </Button>
-    </div>
+      </div>
+    </>
   )
 }
 
@@ -64,12 +116,25 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   wrapForm = (form) => form,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
+  const leaveBridgeRef = React.useRef<ContentFormDrawerLeaveBridge | null>(null)
+
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
-      if (!nextOpen && pending) return
-      onOpenChange(nextOpen)
+      if (nextOpen) {
+        onOpenChange(true)
+        return
+      }
+      leaveBridgeRef.current?.requestClose(() => onOpenChange(false))
     },
-    [onOpenChange, pending],
+    [onOpenChange],
+  )
+
+  const handleSubmit = React.useCallback(
+    async (values: TFormValues, formInstance: UseFormReturn<TFormValues>) => {
+      await onSubmit(values, formInstance)
+      leaveBridgeRef.current?.runTrustedClose(() => onOpenChange(false))
+    },
+    [onOpenChange, onSubmit],
   )
 
   const formId = form.formKey ?? 'content-form-drawer'
@@ -99,10 +164,15 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
               footerVariant="sheet"
               formError={formError}
               header={form.header}
-              onSubmit={(values, form) => {
-                void onSubmit(values, form)
-              }}
-              footer={() => <ContentFormDrawerFooter pending={pending} submitLabel={submitLabel} />}
+              onSubmit={handleSubmit}
+              footer={() => (
+                <ContentFormDrawerFooter
+                  pending={pending}
+                  submitLabel={submitLabel}
+                  leaveBridgeRef={leaveBridgeRef}
+                  open={open}
+                />
+              )}
             />,
           )
         : null}
