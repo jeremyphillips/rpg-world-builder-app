@@ -1,14 +1,40 @@
+import { cva } from 'class-variance-authority'
+
+import { cn } from '../../lib/utils'
+import {
+  radioCardDensityBodyLayoutVariants,
+  radioCardDensityContentGapVariants,
+  radioCardDescriptionVariants,
+  radioCardTitleVariants,
+} from './radio-card.variants'
+
+/** Selected summary shell — additive primary border/ring, not details-option shell chrome. */
 export const chooserSummaryCardShellClasses =
   'w-full overflow-hidden rounded-card border border-border bg-card shadow-sm border-primary ring-1 ring-primary/20'
 
-export const chooserSummaryCardBodyClasses = 'px-4 py-4'
+export const chooserSummaryCardBodyVariants = cva('flex flex-col', {
+  variants: {
+    density: {
+      default: cn(
+        radioCardDensityBodyLayoutVariants({ density: 'default' }),
+        radioCardDensityContentGapVariants({ density: 'default' }),
+      ),
+      compact: cn(
+        radioCardDensityBodyLayoutVariants({ density: 'compact' }),
+        radioCardDensityContentGapVariants({ density: 'compact' }),
+      ),
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
 export const chooserSummaryCardEyebrowRowClasses =
-  'mb-1 flex flex-wrap items-center justify-between gap-2'
+  'flex flex-wrap items-center justify-between gap-2'
 
 export const chooserSummaryCardChangeLinkClasses = 'h-auto px-0 text-xs'
 
-export const chooserSummaryCardTitleClasses =
-  'mb-3 font-heading heading-style-subsection text-foreground'
+export const chooserSummaryCardTitleClasses = radioCardTitleVariants()
 
-export const chooserSummaryCardDescriptionClasses = 'text-md text-muted-foreground'
+export const chooserSummaryCardDescriptionClasses = radioCardDescriptionVariants()

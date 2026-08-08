@@ -26,6 +26,7 @@ export function CollapsibleRadioCardField({
   value,
   options,
   onValueChange,
+  density,
   ...radioFieldProps
 }: CollapsibleRadioCardFieldProps) {
   const [uncontrolledExpanded, setUncontrolledExpanded] = React.useState(
@@ -59,6 +60,7 @@ export function CollapsibleRadioCardField({
   if (showSummary && selectedOption) {
     return (
       <ChooserSummaryCard
+        density={density}
         eyebrow={summaryEyebrow}
         changeLabel={changeLabel}
         title={selectedOption.label}
@@ -71,6 +73,7 @@ export function CollapsibleRadioCardField({
   return (
     <RadioCardField
       {...radioFieldProps}
+      density={density}
       value={value}
       options={options}
       onValueChange={handleValueChange}

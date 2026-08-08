@@ -1,59 +1,60 @@
 'use client'
 
-import { useId, useState } from 'react'
-import { SETTLEMENT_TYPE_ENTRIES, SETTLEMENT_TYPE_IDS, type SettlementType } from '@rpg/contracts'
-import {
-  Button,
-  FieldLabelContent,
-  Modal,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@rpg/ui'
+import { useId, useMemo, useState } from 'react'
+import { CollapsibleRadioCardField, Button, Modal } from '@rpg/ui'
+import type { SettlementType } from '@rpg/contracts'
 
-import type { LocationCreateSetupResult } from '../lib/location-create-session'
+import type {
+  LocationCreateIntent,
+  LocationCreateSetupResult,
+} from '../lib/location-create-session'
+import {
+  buildSettlementTypeRadioOptions,
+  isSettlementType,
+  resolveSettlementCreateSetupDescription,
+  SETTLEMENT_CREATE_SETUP_CHANGE_LABEL,
+  SETTLEMENT_CREATE_SETUP_PROMPT,
+  SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW,
+} from '../lib/location-settlement-create-setup.lib'
 
 export type LocationSettlementCreateSetupProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  intent: LocationCreateIntent
   onComplete: (result: LocationCreateSetupResult) => void
 }
 
-/** Minimal settlement-type setup before a fixed settlement create session opens. */
+/** Settlement-type setup before a fixed settlement create session opens. */
 export function LocationSettlementCreateSetup({
   open,
   onOpenChange,
+  intent,
   onComplete,
 }: LocationSettlementCreateSetupProps) {
   const [settlementType, setSettlementType] = useState<SettlementType | ''>('')
   const fieldId = useId()
+  const options = useMemo(() => buildSettlementTypeRadioOptions(), [])
+  const description = resolveSettlementCreateSetupDescription(intent)
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="sm">
-        <Modal.Header
-          headline="New settlement"
-          description="Choose the settlement size before authoring. You can place it under a parent on the next screen."
-        />
-        <Modal.Body className="space-y-2">
-          <FieldLabelContent label="Settlement type" />
-          <Select
+        <Modal.Header headline="New settlement" description={description} />
+        <Modal.Body>
+          <CollapsibleRadioCardField
+            id={fieldId}
+            label={SETTLEMENT_CREATE_SETUP_PROMPT}
+            summaryEyebrow={SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW}
+            changeLabel={SETTLEMENT_CREATE_SETUP_CHANGE_LABEL}
+            density="compact"
             value={settlementType}
-            onValueChange={(value) => setSettlementType(value as SettlementType)}
-          >
-            <SelectTrigger id={fieldId} aria-label="Settlement type">
-              <SelectValue placeholder="Select settlement type…" />
-            </SelectTrigger>
-            <SelectContent>
-              {SETTLEMENT_TYPE_IDS.map((id) => (
-                <SelectItem key={id} value={id}>
-                  {SETTLEMENT_TYPE_ENTRIES[id].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            options={options}
+            onValueChange={(value) => {
+              if (isSettlementType(value)) {
+                setSettlementType(value)
+              }
+            }}
+          />
         </Modal.Body>
         <Modal.Footer>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

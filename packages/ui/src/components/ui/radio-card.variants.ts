@@ -14,6 +14,32 @@ const radioCardCardBase = cn(
   establishSurfaceCurrent('card'),
 )
 
+/** Density-owned card body padding — shared by radio options and chooser summaries. */
+export const radioCardDensityBodyLayoutVariants = cva('', {
+  variants: {
+    density: {
+      default: 'p-4 sm:p-6',
+      compact: 'px-3 py-2.5',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
+/** Density-owned vertical gap between card content blocks. */
+export const radioCardDensityContentGapVariants = cva('', {
+  variants: {
+    density: {
+      default: 'gap-2',
+      compact: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
 const radioCardRowBase =
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-row-selected aria-invalid:border aria-invalid:border-destructive'
 
@@ -30,8 +56,22 @@ export const radioCardVariants = cva('', {
     },
   },
   compoundVariants: [
-    { variant: 'card', density: 'default', class: 'gap-2 p-4 sm:p-6' },
-    { variant: 'card', density: 'compact', class: 'gap-1 px-3 py-2.5' },
+    {
+      variant: 'card',
+      density: 'default',
+      class: cn(
+        radioCardDensityContentGapVariants({ density: 'default' }),
+        radioCardDensityBodyLayoutVariants({ density: 'default' }),
+      ),
+    },
+    {
+      variant: 'card',
+      density: 'compact',
+      class: cn(
+        radioCardDensityContentGapVariants({ density: 'compact' }),
+        radioCardDensityBodyLayoutVariants({ density: 'compact' }),
+      ),
+    },
     { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
     { variant: 'row', density: 'compact', class: 'gap-0.5 px-0 py-2' },
   ],
@@ -50,8 +90,8 @@ export const radioCardShellVariants = cva(
   {
     variants: {
       density: {
-        default: 'p-4 sm:p-6',
-        compact: 'px-3 py-2.5',
+        default: radioCardDensityBodyLayoutVariants({ density: 'default' }),
+        compact: radioCardDensityBodyLayoutVariants({ density: 'compact' }),
       },
       selected: {
         true: 'border-card-selected-border bg-control-selected',

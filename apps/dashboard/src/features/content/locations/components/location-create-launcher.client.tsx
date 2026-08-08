@@ -31,6 +31,7 @@ export function useLocationCreateSessionLaunch(options: {
     setupIntent !== null ? (
       <LocationSettlementCreateSetup
         open
+        intent={setupIntent}
         onOpenChange={(open) => {
           if (!open) setSetupIntent(null)
         }}

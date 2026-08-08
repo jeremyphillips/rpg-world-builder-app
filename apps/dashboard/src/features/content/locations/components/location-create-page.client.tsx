@@ -54,6 +54,7 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
     return (
       <LocationSettlementCreateSetup
         open
+        intent={session.intent}
         onOpenChange={(open) => {
           if (!open) {
             navigate(ROUTES.content.locations.create(campaignId))

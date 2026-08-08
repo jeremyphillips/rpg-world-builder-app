@@ -3,8 +3,9 @@
 import { Button } from './button.client'
 import { Eyebrow } from './eyebrow'
 import { Text } from './text'
+import type { RadioCardDensity } from './radio-card.client'
 import {
-  chooserSummaryCardBodyClasses,
+  chooserSummaryCardBodyVariants,
   chooserSummaryCardChangeLinkClasses,
   chooserSummaryCardDescriptionClasses,
   chooserSummaryCardEyebrowRowClasses,
@@ -18,6 +19,7 @@ export type ChooserSummaryCardProps = {
   title: string
   description?: string
   onChange: () => void
+  density?: RadioCardDensity
 }
 
 export function ChooserSummaryCard({
@@ -26,10 +28,11 @@ export function ChooserSummaryCard({
   title,
   description,
   onChange,
+  density = 'default',
 }: ChooserSummaryCardProps) {
   return (
     <article className={chooserSummaryCardShellClasses}>
-      <div className={chooserSummaryCardBodyClasses}>
+      <div className={chooserSummaryCardBodyVariants({ density })}>
         <div className={chooserSummaryCardEyebrowRowClasses}>
           <Eyebrow>{eyebrow}</Eyebrow>
           <Button

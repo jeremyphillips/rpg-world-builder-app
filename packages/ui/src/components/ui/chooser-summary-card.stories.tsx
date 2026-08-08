@@ -20,6 +20,12 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+export const Compact: Story = {
+  args: {
+    density: 'compact',
+  },
+}
+
 export const WithoutDescription: Story = {
   args: {
     description: undefined,
