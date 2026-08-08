@@ -16,7 +16,6 @@ import { useCatalogPickerSheetState } from './catalog-picker-sheet.use.client'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetBodyVariants,
-  catalogPickerSheetContentVariants,
   catalogPickerSheetLoadingVariants,
 } from './catalog-picker-sheet.variants'
 
@@ -207,9 +206,7 @@ export function CatalogPickerSheet<TItem>({
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content
-        className={catalogPickerSheetContentVariants({ className: sheetContentClassName })}
-      >
+      <Sheet.Content surface="background" size="lg" className={sheetContentClassName}>
         <Sheet.Header
           headline={title}
           description={description}

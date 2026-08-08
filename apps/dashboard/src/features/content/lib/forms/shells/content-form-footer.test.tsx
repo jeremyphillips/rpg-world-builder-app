@@ -20,33 +20,40 @@ const createFields = [{ type: 'text' as const, name: 'name', label: 'Name', requ
 function renderCreateFooter({
   pending = false,
   defaultValues = { name: 'Fireball' },
+  extraUnsavedEdits,
 }: {
   pending?: boolean
   defaultValues?: FieldValues
+  extraUnsavedEdits?: boolean
 } = {}) {
-  return renderWithDataRouter([
-    {
-      path: '/',
-      element: (
-        <Form<CreateValues>
-          schema={createSchema}
-          fields={createFields}
-          defaultValues={defaultValues as CreateValues}
-          onSubmit={vi.fn()}
-          stickyFooter
-          footer={(form) => (
-            <ContentFormFooter
-              mode="create"
-              form={form}
-              backHref="/overview"
-              submitLabel="Create spell"
-              pending={pending}
-            />
-          )}
-        />
-      ),
-    },
-  ])
+  return renderWithDataRouter(
+    [
+      {
+        path: '/create',
+        element: (
+          <Form<CreateValues>
+            schema={createSchema}
+            fields={createFields}
+            defaultValues={defaultValues as CreateValues}
+            onSubmit={vi.fn()}
+            stickyFooter
+            footer={(form) => (
+              <ContentFormFooter
+                mode="create"
+                form={form}
+                backHref="/overview"
+                submitLabel="Create spell"
+                pending={pending}
+                extraUnsavedEdits={extraUnsavedEdits}
+              />
+            )}
+          />
+        ),
+      },
+      { path: '/overview', element: <div>Overview page</div> },
+    ],
+    { initialEntries: ['/create'] },
+  )
 }
 
 function renderEditFooter({ pending = false }: { pending?: boolean } = {}) {
@@ -231,6 +238,51 @@ describe('ContentFormFooter', () => {
   itAxe('has no axe violations in create mode', async () => {
     const { container } = renderCreateFooter()
     await expectNoAxeViolations(container)
+  })
+
+  it('prompts before cancel navigation when create body fields are dirty', async () => {
+    const user = userEvent.setup()
+    renderCreateFooter()
+
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Modified')
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(screen.queryByText('Overview page')).not.toBeInTheDocument()
+  })
+
+  it('allows cancel navigation when create fields are clean', async () => {
+    const user = userEvent.setup()
+    renderCreateFooter()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(await screen.findByText('Overview page')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('prompts on cancel when extraUnsavedEdits is true even if body fields are clean', async () => {
+    const user = userEvent.setup()
+    renderCreateFooter({ extraUnsavedEdits: true })
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+  })
+
+  it('allows cancel navigation after reverting dirty create fields', async () => {
+    const user = userEvent.setup()
+    renderCreateFooter()
+
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Modified')
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Fireball')
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(await screen.findByText('Overview page')).toBeInTheDocument()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 })
 

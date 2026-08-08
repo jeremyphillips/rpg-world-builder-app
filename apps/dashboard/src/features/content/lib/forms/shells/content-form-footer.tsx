@@ -1,11 +1,19 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
+import { useFormState } from 'react-hook-form'
 import { Button } from '@rpg/ui'
 import { FormFooterActions, useSchemaFormSubmit } from '@rpg/ui/form'
 
-import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
+import {
+  FormUnsavedChangesGuard,
+  useUnsavedChangesConfirm,
+  type UnsavedChangesConfirmController,
+} from '@/lib/form-unsaved-changes-guard'
+import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
+import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormActionState } from './use-content-form-action-state'
@@ -77,8 +85,10 @@ export interface ContentFormFooterProps<TFieldValues extends FieldValues> {
   saveDraftPending?: boolean
   /** Unified save session for edit mode — body + campaign access. */
   actionState?: ContentSaveActionState
-  /** Create-mode guard: campaign access draft differs from default. */
-  guardHasUnsavedEdits?: boolean
+  /** Additive leave-guard extras (e.g. campaign access draft on create). */
+  extraUnsavedEdits?: boolean
+  /** Called when the leave-guard controller is ready — use `runTrusted` after successful create. */
+  onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
 }
 
 export function ContentFormFooter<TFieldValues extends FieldValues>({
@@ -91,11 +101,22 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   onSaveDraft,
   saveDraftPending = false,
   actionState,
-  guardHasUnsavedEdits = false,
+  extraUnsavedEdits = false,
+  onLeaveGuardReady,
 }: ContentFormFooterProps<TFieldValues>) {
   const fallbackActionState = useContentFormActionState({ mode, pending })
   const resolvedActionState = actionState ?? fallbackActionState
   const createPending = pending || saveDraftPending
+  const { dirtyFields } = useFormState({ control: form.control })
+  const subclassEdits = useSubclassUnsavedEditsBlocking()
+  const isDirty = composeFormLeaveDirty({ dirtyFields, extraUnsavedEdits, subclassEdits })
+  const discardGuard = useUnsavedChangesConfirm({ isDirty })
+  const leavePending = mode === 'create' ? createPending : pending
+
+  useEffect(() => {
+    onLeaveGuardReady?.({ runTrusted: discardGuard.runTrusted })
+  }, [discardGuard.runTrusted, onLeaveGuardReady])
+
   const presentation = resolveContentFormFooterPresentation({
     mode,
     submitLabel,
@@ -141,8 +162,11 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
 
   return (
     <>
+      {discardGuard.dialog}
       <FormUnsavedChangesGuard
-        hasUnsavedEdits={resolvedActionState.hasUnsavedEdits || guardHasUnsavedEdits}
+        discardGuard={discardGuard}
+        pending={leavePending}
+        renderDialog={false}
       />
       <FormFooterActions
         secondary={secondary}

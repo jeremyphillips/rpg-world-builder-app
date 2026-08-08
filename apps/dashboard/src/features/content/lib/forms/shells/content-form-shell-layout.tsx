@@ -21,6 +21,7 @@ import {
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import type { CoordinatedSaveSavedEvent } from './use-content-save-session'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
+import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 
 export function ContentFormComingSoon() {
   return (
@@ -64,6 +65,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onCampaignAccessDraftChange?: (patch: ContentCampaignAccessPatch) => void
   onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
+  onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -89,6 +91,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onCampaignAccessDraftChange,
   onCampaignAccessPersisted,
   onSaved,
+  onLeaveGuardReady,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -127,6 +130,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
       onSaved={onSaved}
+      onLeaveGuardReady={onLeaveGuardReady}
       publishSchema={publishSchema}
       onPublish={onPublish}
       valueSyncs={valueSyncs}

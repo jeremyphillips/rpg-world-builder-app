@@ -5,6 +5,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event'
 import {
   FormProvider,
   useForm,
+  useFormState,
   useWatch,
   type DefaultValues,
   type FieldValues,
@@ -13,7 +14,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { z, type ZodType } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
-import { FormUnsavedChangesGuard, allowFormNavigationOnce } from './form-unsaved-changes-guard'
+import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from './form-unsaved-changes-guard'
+import { hasDirtyFields } from './form-dirty-state'
 import { renderWithDataRouter } from './test-router'
 
 interface TestValues {
@@ -82,26 +84,76 @@ function BackNavigationForm() {
   )
 }
 
+function PostSaveLeaveGuard({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  const { dirtyFields } = useFormState()
+  const discardGuard = useUnsavedChangesConfirm({
+    isDirty: hasDirtyFields(dirtyFields),
+  })
+
+  return (
+    <>
+      {discardGuard.dialog}
+      <FormUnsavedChangesGuard discardGuard={discardGuard} renderDialog={false} />
+      <button
+        type="button"
+        onClick={() => {
+          discardGuard.runTrusted(() => navigate('/away'))
+        }}
+      >
+        Save and leave
+      </button>
+    </>
+  )
+}
+
 function PostSaveNavigationForm() {
   const navigate = useNavigate()
   const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
 
   return (
     <FormProvider {...form}>
-      <FormUnsavedChangesGuard />
+      <PostSaveLeaveGuard navigate={navigate} />
       <label htmlFor="name">Name</label>
       <input id="name" aria-label="Name" {...form.register('name')} />
-      <button
-        type="button"
-        onClick={() => {
-          const values = form.getValues()
-          form.reset(values)
-          allowFormNavigationOnce()
-          navigate('/away')
-        }}
-      >
-        Save and leave
-      </button>
+    </FormProvider>
+  )
+}
+
+function DirtyFormWithExtraFalse() {
+  const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
+
+  return (
+    <FormProvider {...form}>
+      <FormUnsavedChangesGuard extraUnsavedEdits={false} />
+      <label htmlFor="name">Name</label>
+      <input id="name" aria-label="Name" {...form.register('name')} />
+      <Link to="/away">Leave</Link>
+    </FormProvider>
+  )
+}
+
+function CleanFormWithExtraTrue() {
+  const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
+
+  return (
+    <FormProvider {...form}>
+      <FormUnsavedChangesGuard extraUnsavedEdits />
+      <label htmlFor="name">Name</label>
+      <input id="name" aria-label="Name" {...form.register('name')} />
+      <Link to="/away">Leave</Link>
+    </FormProvider>
+  )
+}
+
+function PendingForm() {
+  const form = useForm<TestValues>({ defaultValues: { name: 'Original' } })
+
+  return (
+    <FormProvider {...form}>
+      <FormUnsavedChangesGuard pending />
+      <label htmlFor="name">Name</label>
+      <input id="name" aria-label="Name" {...form.register('name')} />
+      <Link to="/away">Leave</Link>
     </FormProvider>
   )
 }
@@ -247,7 +299,7 @@ describe('FormUnsavedChangesGuard', () => {
     await leaveAndExpectAwayWithoutPrompt(user)
   })
 
-  it('allows programmatic navigation immediately after reset when save bypass is set', async () => {
+  it('allows trusted navigation while the form is still dirty', async () => {
     const user = userEvent.setup()
     renderFormRoute(<PostSaveNavigationForm />)
 
@@ -256,6 +308,35 @@ describe('FormUnsavedChangesGuard', () => {
 
     expect(await screen.findByText('Away page')).toBeInTheDocument()
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('still prompts when extraUnsavedEdits is false but body fields are dirty', async () => {
+    const user = userEvent.setup()
+    renderFormRoute(<DirtyFormWithExtraFalse />)
+
+    await editNameToChanged(user)
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+  })
+
+  it('prompts when extraUnsavedEdits is true even if body fields are clean', async () => {
+    const user = userEvent.setup()
+    renderFormRoute(<CleanFormWithExtraTrue />)
+
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+  })
+
+  it('allows navigation after reverting dirty fields to their baseline', async () => {
+    const user = userEvent.setup()
+    renderDirtyForm()
+
+    await editNameToChanged(user)
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Original')
+    await leaveAndExpectAwayWithoutPrompt(user)
   })
 
   it('continues POP back navigation when the user confirms discard', async () => {
@@ -273,5 +354,16 @@ describe('FormUnsavedChangesGuard', () => {
     await user.click(await screen.findByRole('button', { name: 'Discard' }))
 
     expect(await screen.findByText('Start page')).toBeInTheDocument()
+  })
+
+  it('blocks navigation while pending without opening the discard dialog', async () => {
+    const user = userEvent.setup()
+    renderFormRoute(<PendingForm />)
+
+    await user.click(screen.getByRole('link', { name: 'Leave' }))
+
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.queryByText('Away page')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Original')
   })
 })

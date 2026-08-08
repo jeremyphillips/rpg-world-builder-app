@@ -10,7 +10,15 @@ import {
   dialogDismissHandlers,
 } from './dialog-parts.client'
 import { modalOverlayVariants } from './modal.variants'
-import { sheetBodyVariants, sheetContentVariants, type SheetSide } from './sheet.variants'
+import {
+  sheetBodyVariants,
+  sheetContentVariants,
+  sheetFooterChromeClasses,
+  sheetFooterLayoutClasses,
+  type SheetSide,
+  type SheetSize,
+  type SheetSurface,
+} from './sheet.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const SheetRoot = DialogPrimitive.Root
@@ -31,6 +39,8 @@ export interface SheetContentProps extends React.ComponentPropsWithoutRef<
   typeof DialogPrimitive.Content
 > {
   side?: SheetSide
+  surface?: SheetSurface
+  size?: SheetSize
   closeLabel?: string
   closeOnOutsideClick?: boolean
   closeOnEscape?: boolean
@@ -45,6 +55,8 @@ const SheetContent = React.forwardRef<
       className,
       children,
       side,
+      surface,
+      size,
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
@@ -61,7 +73,7 @@ const SheetContent = React.forwardRef<
         <SheetOverlay />
         <DialogPrimitive.Content
           ref={composedRef}
-          className={cn(sheetContentVariants({ side }), className)}
+          className={cn(sheetContentVariants({ side, surface, size }), className)}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
@@ -126,7 +138,7 @@ const SheetFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center justify-end gap-2 border-t p-6', className)}
+      className={cn(sheetFooterChromeClasses, sheetFooterLayoutClasses, className)}
       {...props}
     />
   ),

@@ -6,6 +6,9 @@ import type {
 } from '@rpg/contracts'
 import { FormItems } from '@rpg/ui/form'
 
+import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
+
+import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
 import { CampaignAccessSection } from '../../campaign-access/campaign-access-section.client'
 import { useContentSaveSession, type CoordinatedSaveSavedEvent } from './use-content-save-session'
 import { ContentFormFooter } from './content-form-footer'
@@ -60,6 +63,7 @@ export interface ContentFormFooterShellProps<TFormValues extends FieldValues = F
   saveDraftPending?: boolean
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => Promise<void>
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
+  onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
 }
 
 export function ContentFormSaveFooter<TFormValues extends FieldValues>({
@@ -72,7 +76,9 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
   saveDraftPending,
   onSubmit,
   onSaved,
+  onLeaveGuardReady,
 }: ContentFormFooterShellProps<TFormValues> & { form: UseFormReturn<TFormValues> }) {
+  const campaignAccess = useCampaignAccessForm()
   const actionState = useContentSaveSession({
     mode: formMode,
     pending: submitPending,
@@ -80,6 +86,8 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
     onSubmit,
     onSaved,
   })
+  const extraUnsavedEdits =
+    formMode === 'create' ? actionState.hasUnsavedEdits : campaignAccess.isDirty
 
   return (
     <ContentFormFooter
@@ -91,7 +99,8 @@ export function ContentFormSaveFooter<TFormValues extends FieldValues>({
       onSaveDraft={onSaveDraft}
       saveDraftPending={saveDraftPending}
       actionState={formMode === 'edit' ? actionState : undefined}
-      guardHasUnsavedEdits={formMode === 'create' ? actionState.hasUnsavedEdits : false}
+      extraUnsavedEdits={extraUnsavedEdits}
+      onLeaveGuardReady={onLeaveGuardReady}
     />
   )
 }

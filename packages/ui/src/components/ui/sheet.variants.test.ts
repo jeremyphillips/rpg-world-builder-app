@@ -10,7 +10,15 @@ describe('sheetContentVariants', () => {
     expect(sheetContentVariants({ side: 'left' })).toContain('border-card-border')
   })
 
-  it('establishes the card plane for surface-relative chrome', () => {
+  it('establishes the card plane for surface-relative chrome by default', () => {
     expect(sheetContentVariants()).toContain('[--surface-current:var(--card)]')
+  })
+
+  it('supports background surface and large application width', () => {
+    expect(sheetContentVariants({ surface: 'background' })).toContain('bg-background')
+    expect(sheetContentVariants({ surface: 'background' })).toContain(
+      '[--surface-current:var(--background)]',
+    )
+    expect(sheetContentVariants({ size: 'lg' })).toContain('max-w-[550px]')
   })
 })
