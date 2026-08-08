@@ -62,6 +62,16 @@ export function useComboboxControl({
     ? `${generatedId}-option-${filteredOptions[highlightedIndex]!.value}`
     : undefined
 
+  React.useEffect(() => {
+    if (!open || !activeOptionId) return
+    const listbox = listboxRef.current
+    if (!listbox) return
+    const option = listbox.querySelector<HTMLElement>(`#${CSS.escape(activeOptionId)}`)
+    if (option && 'scrollIntoView' in option && typeof option.scrollIntoView === 'function') {
+      option.scrollIntoView({ block: 'nearest' })
+    }
+  }, [open, activeOptionId, highlightedIndex])
+
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       setOpen(nextOpen)

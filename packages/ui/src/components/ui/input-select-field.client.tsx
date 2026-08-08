@@ -18,6 +18,7 @@ import {
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
 import { ComboboxSearchField } from './combobox-field-parts.client'
+import { PopoverLayerPortal } from './layer-portal-container.client'
 import { Input } from './input.client'
 import {
   filterInputSelectOptions,
@@ -190,7 +191,7 @@ function SearchableUnitSelect({
         </button>
       </PopoverPrimitive.Trigger>
 
-      <PopoverPrimitive.Portal>
+      <PopoverLayerPortal>
         <PopoverPrimitive.Content
           align="start"
           side="bottom"
@@ -230,7 +231,7 @@ function SearchableUnitSelect({
             )}
           </div>
         </PopoverPrimitive.Content>
-      </PopoverPrimitive.Portal>
+      </PopoverLayerPortal>
     </PopoverPrimitive.Root>
   )
 }
@@ -474,7 +475,14 @@ export function InputSelectField({
 
 export type InputUnitFieldProps = Omit<
   InputSelectFieldProps,
-  'unitMode' | 'fixedUnit' | 'options' | 'onUnitChange' | 'unit' | 'searchable' | 'unitPlaceholder' | 'unitDisabled'
+  | 'unitMode'
+  | 'fixedUnit'
+  | 'options'
+  | 'onUnitChange'
+  | 'unit'
+  | 'searchable'
+  | 'unitPlaceholder'
+  | 'unitDisabled'
 > & {
   /** Display text for the fixed unit suffix (e.g. `ft.`, `lb.`). */
   unit: string
@@ -482,13 +490,5 @@ export type InputUnitFieldProps = Omit<
 
 /** Grouped number/text input with a static unit label — shares InputSelectField tokens. */
 export function InputUnitField({ unit, ...props }: InputUnitFieldProps) {
-  return (
-    <InputSelectField
-      {...props}
-      unit=""
-      unitMode="label"
-      fixedUnit={unit}
-      options={[]}
-    />
-  )
+  return <InputSelectField {...props} unit="" unitMode="label" fixedUnit={unit} options={[]} />
 }

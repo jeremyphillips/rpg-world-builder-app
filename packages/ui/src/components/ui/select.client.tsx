@@ -6,6 +6,7 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
+import { SelectLayerPortal } from './layer-portal-container.client'
 import { fieldControlVariants, type FieldControlVariantProps } from './field-control.variants'
 import {
   fieldDigitSizeVariants,
@@ -119,7 +120,7 @@ const SelectContent = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
 >(({ className, children, position = 'popper', ...props }, ref) => (
-  <SelectPrimitive.Portal>
+  <SelectLayerPortal>
     <SelectPrimitive.Content
       ref={ref}
       position={position}
@@ -144,7 +145,7 @@ const SelectContent = React.forwardRef<
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
     </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
+  </SelectLayerPortal>
 ))
 SelectContent.displayName = SelectPrimitive.Content.displayName
 

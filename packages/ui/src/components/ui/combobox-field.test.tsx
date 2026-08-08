@@ -4,6 +4,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ComboboxField } from './combobox-field.client'
+import { LayerPortalContainerProvider } from './layer-portal-container.client'
 import { FieldRow } from './field-row'
 import { SelectField } from './select-field'
 
@@ -415,6 +416,27 @@ describe('ComboboxField', () => {
     expect(screen.getByLabelText('Archetype').closest('.grow-\\[8\\]')).toHaveClass('max-w-2/3')
     expect(controlShell).not.toBeNull()
     expect(controlShell).toContainElement(trigger)
+  })
+
+  it('portals the option list into a layer container when one is provided', async () => {
+    const user = userEvent.setup()
+    const layerContainer = document.createElement('div')
+    document.body.appendChild(layerContainer)
+
+    render(
+      <LayerPortalContainerProvider container={layerContainer}>
+        <ComboboxField
+          id="archetype"
+          label="Archetype"
+          options={weaponOptions}
+          multiple={false}
+          value=""
+        />
+      </LayerPortalContainerProvider>,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Archetype' }))
+    expect(layerContainer.querySelector('[role="listbox"]')).toBeInTheDocument()
   })
 
   it('has no accessibility violations when required and in error state', async () => {

@@ -5,6 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
+import { ComboboxField } from './combobox-field.client'
 
 function renderSheet(contentProps: Record<string, unknown> = {}) {
   return render(
@@ -64,6 +65,35 @@ describe('Sheet', () => {
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('hosts combobox popovers inside the sheet content layer', async () => {
+    const user = userEvent.setup()
+    const options = Array.from({ length: 20 }, (_, index) => ({
+      value: `option-${index}`,
+      label: `Option ${index}`,
+    }))
+
+    render(
+      <Sheet.Root defaultOpen>
+        <Sheet.Content>
+          <Sheet.Header headline="Create location" />
+          <Sheet.Body>
+            <ComboboxField
+              id="archetype"
+              label="Archetype"
+              options={options}
+              multiple={false}
+              value=""
+            />
+          </Sheet.Body>
+        </Sheet.Content>
+      </Sheet.Root>,
+    )
+
+    const dialog = screen.getByRole('dialog')
+    await user.click(screen.getByRole('combobox', { name: 'Archetype' }))
+    expect(dialog.querySelector('[role="listbox"]')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations when open', async () => {

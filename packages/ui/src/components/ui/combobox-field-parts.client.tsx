@@ -24,6 +24,7 @@ import {
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
+import { PopoverLayerPortal } from './layer-portal-container.client'
 
 interface ComboboxTriggerProps {
   listboxId: string
@@ -204,7 +205,7 @@ export function ComboboxPanel({
   onSelect,
 }: ComboboxPanelProps) {
   return (
-    <PopoverPrimitive.Portal>
+    <PopoverLayerPortal>
       <PopoverPrimitive.Content
         align="start"
         side="bottom"
@@ -263,7 +264,7 @@ export function ComboboxPanel({
           )}
         </div>
       </PopoverPrimitive.Content>
-    </PopoverPrimitive.Portal>
+    </PopoverLayerPortal>
   )
 }
 
