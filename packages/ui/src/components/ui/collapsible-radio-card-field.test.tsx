@@ -126,4 +126,41 @@ describe('CollapsibleRadioCardField', () => {
 
     await expectNoAxeViolations(container)
   })
+
+  it('preserves compact density through expand, select, collapse, and change', async () => {
+    const user = userEvent.setup()
+
+    function ControlledCompactField() {
+      const [value, setValue] = useState('')
+
+      return (
+        <CollapsibleRadioCardField
+          id="connection-kind"
+          label="Authority type"
+          summaryEyebrow="Authority type"
+          changeLabel="Change connection type"
+          density="compact"
+          options={options}
+          value={value}
+          onValueChange={setValue}
+        />
+      )
+    }
+
+    const { container } = render(<ControlledCompactField />)
+
+    const expandedOption = screen.getByRole('radio', { name: /Governs/i })
+    expect(expandedOption).toHaveClass('px-3', 'py-2.5')
+
+    await user.click(screen.getByRole('radio', { name: /Governs/i }))
+
+    const summaryBody = container.querySelector('article > div')
+    expect(summaryBody).toHaveClass('px-3', 'py-2.5', 'gap-1')
+
+    await user.click(screen.getByRole('button', { name: 'Change connection type' }))
+
+    const reExpandedOption = screen.getByRole('radio', { name: /Governs/i })
+    expect(reExpandedOption).toHaveClass('px-3', 'py-2.5')
+    expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
+  })
 })

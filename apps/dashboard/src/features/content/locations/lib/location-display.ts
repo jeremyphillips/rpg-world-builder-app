@@ -1,6 +1,7 @@
 import {
   getLocationKindEntry,
   getParentRequirement,
+  getSettlementTypeLabel,
   resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
@@ -19,6 +20,7 @@ import {
   type LocationParentReplacementAction,
 } from './location-parent-replacement'
 import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
+import { partitionSettlementChildLocations } from './location-settlement-structure.lib'
 
 export const LOCATION_UNKNOWN_ANCESTOR_LABEL = 'Unknown location' as const
 
@@ -29,10 +31,19 @@ export const LOCATION_SECTION_LABELS = {
 
 export const LOCATION_SECTION_HELPERS = {
   children: 'Locations directly within this location.',
+  settlementStructure:
+    'Districts organize neighborhoods; other locations can sit directly in the settlement.',
 } as const
 
 export const LOCATION_EMPTY_SECTION_TEXT = {
   children: 'No contained locations yet.',
+  settlementDistricts: 'No districts yet.',
+  settlementDirectPlaces: 'No direct locations yet.',
+} as const
+
+export const LOCATION_CHILDREN_GROUP_LABELS = {
+  districts: 'Districts',
+  directPlaces: 'Direct locations',
 } as const
 
 export const LOCATION_ANCESTRY_TEXT_SEPARATOR = ' / ' as const
@@ -86,8 +97,18 @@ export type LocationChildItem = {
   summaryLine: string
 }
 
-export type LocationChildrenViewModel = {
+export type LocationChildrenGroup = {
+  id: 'districts' | 'directPlaces'
+  label: string
   items: LocationChildItem[]
+  emptyText: string
+}
+
+export type LocationChildrenViewModel = {
+  heading: string
+  helper: string
+  items: LocationChildItem[]
+  groups?: LocationChildrenGroup[]
   emptyText: string
 }
 
@@ -232,13 +253,68 @@ export function buildLocationChildren(
 ): LocationChildItem[] {
   return locations
     .filter((location) => location.parentLocationId === locationId)
-    .map((location) => ({
-      id: location.id,
-      name: location.name,
-      href: ROUTES.content.locations.detail(campaignId, location.id),
-      summaryLine: resolveLocationClassificationDisplay(location).text,
-    }))
+    .map((location) => toLocationChildItem(location, campaignId))
     .sort((left, right) => left.name.localeCompare(right.name))
+}
+
+function toLocationChildItem(location: Location, campaignId: string): LocationChildItem {
+  return {
+    id: location.id,
+    name: location.name,
+    href: ROUTES.content.locations.detail(campaignId, location.id),
+    summaryLine: resolveLocationClassificationDisplay(location).text,
+  }
+}
+
+function buildSettlementStructureViewModel(
+  location: Location,
+  locations: readonly Location[],
+  campaignId: string,
+): LocationChildrenViewModel {
+  const childLocations = locations.filter((entry) => entry.parentLocationId === location.id)
+  const { districts, directPlaces } = partitionSettlementChildLocations(childLocations)
+  const settlementTypeLabel =
+    location.kind === 'settlement' && location.settlementType
+      ? getSettlementTypeLabel(location.settlementType)
+      : 'Settlement'
+
+  return {
+    heading: `${settlementTypeLabel} structure`,
+    helper: LOCATION_SECTION_HELPERS.settlementStructure,
+    items: [],
+    groups: [
+      {
+        id: 'districts',
+        label: LOCATION_CHILDREN_GROUP_LABELS.districts,
+        items: districts.map((entry) => toLocationChildItem(entry, campaignId)),
+        emptyText: LOCATION_EMPTY_SECTION_TEXT.settlementDistricts,
+      },
+      {
+        id: 'directPlaces',
+        label: LOCATION_CHILDREN_GROUP_LABELS.directPlaces,
+        items: directPlaces.map((entry) => toLocationChildItem(entry, campaignId)),
+        emptyText: LOCATION_EMPTY_SECTION_TEXT.settlementDirectPlaces,
+      },
+    ],
+    emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
+  }
+}
+
+function buildLocationChildrenViewModel(
+  location: Location,
+  locations: readonly Location[],
+  campaignId: string,
+): LocationChildrenViewModel {
+  if (location.kind === 'settlement' && location.settlementType) {
+    return buildSettlementStructureViewModel(location, locations, campaignId)
+  }
+
+  return {
+    heading: LOCATION_SECTION_LABELS.children,
+    helper: LOCATION_SECTION_HELPERS.children,
+    items: buildLocationChildren(location.id, locations, campaignId),
+    emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
+  }
 }
 
 export type LocationChildSummaryItem = {
@@ -307,10 +383,7 @@ export function buildLocationDetailViewModel(
         : null,
     },
     description: location.description,
-    children: {
-      items: buildLocationChildren(location.id, ctx.locations, ctx.campaignId),
-      emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
-    },
+    children: buildLocationChildrenViewModel(location, ctx.locations, ctx.campaignId),
   }
 }
 

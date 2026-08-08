@@ -38,6 +38,21 @@ export const LOCATION_AUTHORING_TYPE_IDS = [
 
 export type LocationAuthoringType = (typeof LOCATION_AUTHORING_TYPE_IDS)[number]
 
+/** Authoring types that require a setup step before opening create. */
+export const LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP = [
+  'settlement',
+] as const satisfies readonly LocationAuthoringType[]
+
+export type LocationAuthoringTypeWithCreateSetup =
+  (typeof LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP)[number]
+
+/** Whether typed create for this authoring type requires setup before a fixed session. */
+export function requiresLocationCreateSetup(
+  type: LocationAuthoringType,
+): type is LocationAuthoringTypeWithCreateSetup {
+  return (LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP as readonly string[]).includes(type)
+}
+
 function isStructureAuthoringType(
   type: LocationAuthoringType,
 ): type is StructureType | typeof UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE {

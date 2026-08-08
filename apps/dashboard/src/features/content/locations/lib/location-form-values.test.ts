@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { createLocationInputSchema } from '@rpg/contracts'
+import {
+  createLocationInputSchema,
+  defaultMulticlassingRules,
+  defaultSubclassingRules,
+} from '@rpg/contracts'
 
 import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
@@ -12,6 +16,22 @@ import {
   locationToFormValues,
 } from './location-form-values'
 import type { LocationFormValues } from './location-form-fields'
+import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
+import { locationFormDef } from './location-form-def'
+import type { LocationFormCtx } from './location-form-ctx'
+
+const baseLocationCreateCtx: LocationFormCtx = {
+  campaignId: 'campaign-1',
+  mode: 'create',
+  entitySource: 'homebrew',
+  campaignRules: {
+    maxCharacterLevel: 20,
+    standardMaxCharacterLevel: 20,
+    allowedCharacterCreatureTypes: ['humanoid'],
+    multiclassing: defaultMulticlassingRules(),
+    subclassing: defaultSubclassingRules(),
+  },
+}
 
 describe('locationToFormValues', () => {
   it('hydrates authoringType and omits canonical kind and structureType', () => {
@@ -98,7 +118,10 @@ describe('applyLocationFixedCreateContext', () => {
         authoringType: 'district',
         parentLocationId: 'location-stale-parent',
       } as LocationFormValues,
-      { authoringType: 'building', parentLocationId: DOCK_WARD.id },
+      {
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: DOCK_WARD.id },
+      },
     )
 
     const input = buildLocationCreateInput(overlaid)
@@ -109,5 +132,72 @@ describe('applyLocationFixedCreateContext', () => {
       parentLocationId: DOCK_WARD.id,
     })
     expect(input).not.toHaveProperty('authoringType')
+  })
+
+  it('does not overlay parent when overview fixed create leaves parent editable', () => {
+    const overlaid = applyLocationFixedCreateContext(
+      {
+        name: 'Harbor tavern',
+        authoringType: 'district',
+        parentLocationId: 'location-chosen-parent',
+      } as LocationFormValues,
+      { authoringType: 'building' },
+    )
+
+    expect(overlaid.authoringType).toBe('building')
+    expect(overlaid.parentLocationId).toBe('location-chosen-parent')
+  })
+
+  it('overlays fixed settlementType onto mutated form values', () => {
+    const overlaid = applyLocationFixedCreateContext(
+      {
+        name: 'New town',
+        authoringType: 'settlement',
+        settlementType: 'hamlet',
+      } as LocationFormValues,
+      { authoringType: 'settlement', settlementType: 'city' },
+    )
+
+    expect(overlaid.settlementType).toBe('city')
+  })
+})
+
+describe('fixed create publish preparation', () => {
+  it('overview building fixed session survives publish schema parse after overlay', () => {
+    const fixedCreate = { authoringType: 'building' as const }
+    const prepared = applyLocationFixedCreateContext(
+      {
+        name: 'Harbor tavern',
+        authoringType: 'district',
+        parentLocationId: DOCK_WARD.id,
+      } as LocationFormValues,
+      fixedCreate,
+    )
+
+    const ctx: LocationFormCtx = { ...baseLocationCreateCtx, fixedCreate }
+
+    expect(() =>
+      resolveContentFormSchema(locationFormDef, ctx, 'publish').parse(prepared),
+    ).not.toThrow()
+  })
+
+  it('overview settlement fixed session survives publish schema parse after overlay', () => {
+    const fixedCreate = { authoringType: 'settlement' as const, settlementType: 'city' as const }
+    const prepared = applyLocationFixedCreateContext(
+      {
+        name: 'New town',
+        authoringType: 'settlement',
+        settlementType: 'hamlet',
+        parentLocationId: DOCK_WARD.id,
+      } as LocationFormValues,
+      fixedCreate,
+    )
+
+    const ctx: LocationFormCtx = { ...baseLocationCreateCtx, fixedCreate }
+
+    expect(() =>
+      resolveContentFormSchema(locationFormDef, ctx, 'publish').parse(prepared),
+    ).not.toThrow()
+    expect(prepared.settlementType).toBe('city')
   })
 })

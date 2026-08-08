@@ -35,6 +35,7 @@ interface ContentSchemaFormShellProps<
   publishSchema?: ZodType<TFormValues>
   onPublish?: () => Promise<void>
   headerProps: ContentFormCampaignAccessProps
+  headerPrefix?: React.ReactNode
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
 }
@@ -100,6 +101,7 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
   publishSchema,
   onPublish,
   headerProps,
+  headerPrefix,
   fields,
   tabs,
   formMode,
@@ -127,7 +129,12 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
     () => (tabs ? tabs.flatMap((tab) => tab.fields) : (fields ?? [])),
     [fields, tabs],
   )
-  const header = () => <ContentFormHeader {...headerProps} formKey={formKey} />
+  const header = () => (
+    <>
+      {headerPrefix}
+      <ContentFormHeader {...headerProps} formKey={formKey} />
+    </>
+  )
   const footer = (form: UseFormReturn<TFormValues>) => (
     <ContentSchemaFormFooter
       form={form}

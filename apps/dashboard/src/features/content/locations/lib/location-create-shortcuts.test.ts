@@ -1,44 +1,95 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildLocationCreateHref,
   buildLocationCreateInitialValues,
+  buildLocationFixedCreateHref,
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
+  LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM,
   LOCATION_CREATE_TYPE_SEARCH_PARAM,
-  parseLocationCreatePrefill,
+  parseLocationCreateSessionFromSearchParams,
+  parseLocationCreateSoftParent,
 } from './location-create-shortcuts'
+import { completeLocationCreateSetup, fixedCreateFromIntent } from './location-create-session'
 
-describe('parseLocationCreatePrefill', () => {
-  it('accepts valid authoring types and parent ids', () => {
-    expect(
-      parseLocationCreatePrefill(
-        new URLSearchParams(
-          `${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building&${LOCATION_CREATE_PARENT_SEARCH_PARAM}=location-dock-ward`,
-        ),
-      ),
-    ).toEqual({
-      authoringType: 'building',
-      parentLocationId: 'location-dock-ward',
+describe('parseLocationCreateSessionFromSearchParams', () => {
+  it('returns unrestricted when type param is absent', () => {
+    expect(parseLocationCreateSessionFromSearchParams(new URLSearchParams())).toEqual({
+      kind: 'unrestricted',
     })
   })
 
-  it('ignores unknown or stale authoring types without error', () => {
-    expect(
-      parseLocationCreatePrefill(
-        new URLSearchParams(
-          `${LOCATION_CREATE_TYPE_SEARCH_PARAM}=inn&${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`,
-        ),
-      ),
-    ).toEqual({})
+  it('returns ready fixed building session for valid type param', () => {
+    const params = new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
+    const intent = { authoringType: 'building' as const }
+
+    expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
+      kind: 'ready',
+      fixedCreate: fixedCreateFromIntent(intent),
+    })
   })
 
-  it('ignores empty type values', () => {
+  it('returns needsSetup for settlement without settlementType', () => {
     expect(
-      parseLocationCreatePrefill(new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=`)),
-    ).toEqual({})
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=settlement`),
+      ),
+    ).toEqual({
+      kind: 'needsSetup',
+      intent: { authoringType: 'settlement' },
+    })
+  })
+
+  it('returns ready fixed settlement session when settlementType is present', () => {
+    const params = new URLSearchParams(
+      `${LOCATION_CREATE_TYPE_SEARCH_PARAM}=settlement&${LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM}=city`,
+    )
+    const intent = { authoringType: 'settlement' as const }
+
+    expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(intent, { settlementType: 'city' }),
+    })
+  })
+
+  it('ignores unknown type params safely', () => {
+    expect(
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=inn`),
+      ),
+    ).toEqual({ kind: 'unrestricted' })
+  })
+
+  it('round-trips fixed sessions through buildLocationFixedCreateHref', () => {
+    const href = buildLocationFixedCreateHref('campaign-1', {
+      authoringType: 'settlement',
+      settlementType: 'town',
+    })
+    const parsed = parseLocationCreateSessionFromSearchParams(
+      new URLSearchParams(href.split('?')[1]),
+    )
+
+    expect(parsed).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(
+        { authoringType: 'settlement' },
+        { settlementType: 'town' },
+      ),
+    })
+  })
+})
+
+describe('parseLocationCreateSoftParent', () => {
+  it('reads soft parent prefill independently of fixed session authority', () => {
+    expect(
+      parseLocationCreateSoftParent(
+        new URLSearchParams(
+          `${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building&${LOCATION_CREATE_PARENT_SEARCH_PARAM}=location-parent`,
+        ),
+      ),
+    ).toBe('location-parent')
   })
 })
 
@@ -66,6 +117,18 @@ describe('buildLocationCreateInitialValues', () => {
       parentLocationId: 'location-aldermere',
     })
   })
+
+  it('includes fixed settlement type in initial values', () => {
+    expect(
+      buildLocationCreateInitialValues({
+        authoringType: 'settlement',
+        settlementType: 'city',
+      }),
+    ).toEqual({
+      authoringType: 'settlement',
+      settlementType: 'city',
+    })
+  })
 })
 
 describe('formatLocationAuthoringTypeAddHeading', () => {
@@ -76,13 +139,23 @@ describe('formatLocationAuthoringTypeAddHeading', () => {
   })
 })
 
-describe('buildLocationCreateHref', () => {
-  it('builds create links with type and parent query params', () => {
+describe('buildLocationFixedCreateHref', () => {
+  it('builds fixed settlement links with settlementType', () => {
     expect(
-      buildLocationCreateHref('campaign-1', {
+      buildLocationFixedCreateHref('campaign-1', {
         authoringType: 'settlement',
-        parentLocationId: 'location-greyshore',
+        settlementType: 'city',
       }),
+    ).toBe('/campaigns/campaign-1/locations/new?type=settlement&settlementType=city')
+  })
+
+  it('builds fixed create links with type and soft parent query params', () => {
+    expect(
+      buildLocationFixedCreateHref(
+        'campaign-1',
+        { authoringType: 'settlement' },
+        'location-greyshore',
+      ),
     ).toBe('/campaigns/campaign-1/locations/new?type=settlement&parent=location-greyshore')
   })
 })

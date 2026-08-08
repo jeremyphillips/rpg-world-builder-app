@@ -3,9 +3,11 @@ import {
   LOCATION_KIND_ENTRIES,
   LOCATION_KIND_IDS,
   midSentenceLabel,
+  SETTLEMENT_TYPE_IDS,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
   type LocationKind,
+  type SettlementType,
   type StructureType,
 } from '@rpg/contracts'
 
@@ -15,11 +17,19 @@ import {
   LOCATION_AUTHORING_TYPE_IDS,
   UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
   UNCLASSIFIED_STRUCTURE_LABEL,
+  requiresLocationCreateSetup,
   type LocationAuthoringType,
 } from './location-authoring-type'
+import {
+  completeLocationCreateSetup,
+  fixedCreateFromIntent,
+  type LocationCreateIntent,
+} from './location-create-session'
+import type { LocationFixedCreateContext } from './location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
 export const LOCATION_CREATE_PARENT_SEARCH_PARAM = 'parent'
+export const LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM = 'settlementType'
 
 /** UI preference — promoted overview shortcuts referencing the authoring-type registry. */
 export const LOCATION_CREATE_PROMOTED_AUTHORING_TYPES = [
@@ -42,6 +52,11 @@ export const LOCATION_CHILD_AUTHORING_TYPE_MENU_ORDER = [
   'plane',
   'world',
 ] as const satisfies readonly LocationAuthoringType[]
+
+export type LocationCreateSessionParseResult =
+  | { kind: 'unrestricted' }
+  | { kind: 'needsSetup'; intent: LocationCreateIntent }
+  | { kind: 'ready'; fixedCreate: LocationFixedCreateContext }
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 
@@ -97,52 +112,88 @@ export function childAuthoringTypesForParentKind(
   return sortAuthoringTypes([...types])
 }
 
-export function buildLocationCreateHref(
+function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthoringType | undefined {
+  const typeParam = searchParams.get(LOCATION_CREATE_TYPE_SEARCH_PARAM)
+  if (!typeParam || !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(typeParam)) {
+    return undefined
+  }
+  return typeParam as LocationAuthoringType
+}
+
+function parseSettlementTypeParam(searchParams: URLSearchParams): SettlementType | undefined {
+  const settlementTypeParam = searchParams.get(LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM)
+  if (
+    !settlementTypeParam ||
+    !(SETTLEMENT_TYPE_IDS as readonly string[]).includes(settlementTypeParam)
+  ) {
+    return undefined
+  }
+  return settlementTypeParam as SettlementType
+}
+
+/**
+ * Parses create-route search params into an authoritative fixed session, setup gate, or
+ * unrestricted create. Uses the same setup rules as `resolveLocationCreateSession`.
+ */
+export function parseLocationCreateSessionFromSearchParams(
+  searchParams: URLSearchParams,
+): LocationCreateSessionParseResult {
+  const authoringType = parseAuthoringTypeParam(searchParams)
+  if (!authoringType) {
+    return { kind: 'unrestricted' }
+  }
+
+  const intent: LocationCreateIntent = { authoringType }
+
+  if (requiresLocationCreateSetup(authoringType)) {
+    const settlementType = parseSettlementTypeParam(searchParams)
+    if (!settlementType) {
+      return { kind: 'needsSetup', intent }
+    }
+
+    return {
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(intent, { settlementType }),
+    }
+  }
+
+  return {
+    kind: 'ready',
+    fixedCreate: fixedCreateFromIntent(intent),
+  }
+}
+
+/** Soft parent prefill for the create page — editable unless fixed in contained create. */
+export function parseLocationCreateSoftParent(searchParams: URLSearchParams): string | undefined {
+  const parentParam = searchParams.get(LOCATION_CREATE_PARENT_SEARCH_PARAM)
+  return parentParam || undefined
+}
+
+export function buildLocationFixedCreateHref(
   campaignId: string,
-  prefill?: {
-    authoringType?: LocationAuthoringType
-    parentLocationId?: string
-  },
+  fixedCreate: LocationFixedCreateContext,
+  softParentLocationId?: string,
 ): string {
   const base = ROUTES.content.locations.create(campaignId)
   const params = new URLSearchParams()
 
-  if (prefill?.authoringType) {
-    params.set(LOCATION_CREATE_TYPE_SEARCH_PARAM, prefill.authoringType)
+  params.set(LOCATION_CREATE_TYPE_SEARCH_PARAM, fixedCreate.authoringType)
+  if (fixedCreate.settlementType) {
+    params.set(LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM, fixedCreate.settlementType)
   }
-  if (prefill?.parentLocationId) {
-    params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, prefill.parentLocationId)
-  }
-
-  const query = params.toString()
-  return query ? `${base}?${query}` : base
-}
-
-/** Soft-validates create-route search params — unknown values are ignored. */
-export function parseLocationCreatePrefill(searchParams: URLSearchParams): {
-  authoringType?: LocationAuthoringType
-  parentLocationId?: string
-} {
-  const result: {
-    authoringType?: LocationAuthoringType
-    parentLocationId?: string
-  } = {}
-
-  const typeParam = searchParams.get(LOCATION_CREATE_TYPE_SEARCH_PARAM)
-  if (typeParam && (LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(typeParam)) {
-    result.authoringType = typeParam as LocationAuthoringType
+  if (softParentLocationId) {
+    params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, softParentLocationId)
   }
 
-  const parentParam = searchParams.get(LOCATION_CREATE_PARENT_SEARCH_PARAM)
-  if (parentParam) {
-    result.parentLocationId = parentParam
-  }
-
-  return result
+  return `${base}?${params.toString()}`
 }
 
 export function buildLocationCreateInitialValues(
-  prefill: ReturnType<typeof parseLocationCreatePrefill>,
+  prefill: {
+    authoringType?: LocationAuthoringType
+    parentLocationId?: string
+    settlementType?: SettlementType
+  },
   defaults?: { parentLocationId?: string },
 ): Record<string, unknown> | undefined {
   const parentLocationId = prefill.parentLocationId ?? defaults?.parentLocationId
@@ -154,6 +205,21 @@ export function buildLocationCreateInitialValues(
   if (prefill.authoringType) {
     initialValues.authoringType = prefill.authoringType
   }
+  if (prefill.settlementType) {
+    initialValues.settlementType = prefill.settlementType
+  }
 
   return Object.keys(initialValues).length > 0 ? initialValues : undefined
+}
+
+export function fixedCreateToInitialValues(
+  fixedCreate: LocationFixedCreateContext,
+  softParentLocationId?: string,
+): Record<string, unknown> | undefined {
+  return buildLocationCreateInitialValues({
+    authoringType: fixedCreate.authoringType,
+    settlementType: fixedCreate.settlementType,
+    parentLocationId:
+      fixedCreate.parent?.kind === 'fixed' ? fixedCreate.parent.locationId : softParentLocationId,
+  })
 }

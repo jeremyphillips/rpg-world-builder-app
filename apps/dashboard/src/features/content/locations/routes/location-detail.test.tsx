@@ -68,7 +68,7 @@ describe('LocationDetailContent', () => {
     expect(screen.queryByRole('heading', { name: 'Location path' })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Aldermere' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Greyshore' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Contained locations' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'City structure' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
   })
@@ -76,7 +76,7 @@ describe('LocationDetailContent', () => {
   it('renders contained locations before connected parties sections', () => {
     renderDetail()
 
-    const containedHeading = screen.getByRole('heading', { name: 'Contained locations' })
+    const containedHeading = screen.getByRole('heading', { name: 'City structure' })
     const connectedPartiesSection = screen.getByLabelText('Connected parties sections')
 
     expect(

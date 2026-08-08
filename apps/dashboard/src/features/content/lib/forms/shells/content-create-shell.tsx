@@ -5,7 +5,7 @@ import type {
   ContentValidationIntent,
 } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
@@ -43,6 +43,10 @@ export interface ContentCreateShellProps {
   initialValues?: Record<string, unknown>
   /** Merged into the form layout context (e.g. family-scoped equipment kind). */
   formCtx?: Partial<ContentFormCtx>
+  /** Applied to form values immediately before serialization on create submit. */
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  /** Rendered inside the form header before campaign-access chrome (e.g. fixed-field registration). */
+  formHeaderPrefix?: ReactNode
 }
 
 interface ContentCreateFormBodyProps {
@@ -53,6 +57,8 @@ interface ContentCreateFormBodyProps {
   ctx: ContentFormCtx
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  formHeaderPrefix?: ReactNode
 }
 
 function ContentCreateFormBody({
@@ -63,6 +69,8 @@ function ContentCreateFormBody({
   ctx,
   initialValues,
   formCtx,
+  prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateFormBodyProps) {
   const navigate = useNavigate()
   const mutation = useContentWriteMutation(def, campaignId)
@@ -78,12 +86,13 @@ function ContentCreateFormBody({
     status: 'draft' | 'published',
     validationIntent: ContentValidationIntent,
   ) => {
+    const preparedValues = prepareSubmitValues?.(values) ?? values
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: def.routeKey,
       createInput: {
         ...def.toInput(
-          values,
+          preparedValues,
           {
             weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
             campaignRules: ctx.campaignRules,
@@ -109,7 +118,8 @@ function ContentCreateFormBody({
   }
 
   const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {
-    resolveContentFormSchema(def, ctx, 'publish').parse(values)
+    const preparedValues = prepareSubmitValues?.(values) ?? values
+    resolveContentFormSchema(def, ctx, 'publish').parse(preparedValues)
     await createEntity(values, intentToStatus('publish'), 'publish')
   }, `Could not create ${def.routeKey}.`)
 
@@ -153,6 +163,7 @@ function ContentCreateFormBody({
         onLeaveGuardReady={(guard) => {
           leaveGuardRef.current = guard
         }}
+        formHeaderPrefix={formHeaderPrefix}
       />
     </>
   )
@@ -165,6 +176,8 @@ interface ContentCreateFormProps {
   backHref: string
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
+  prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  formHeaderPrefix?: ReactNode
 }
 
 function ContentCreateForm({
@@ -174,6 +187,8 @@ function ContentCreateForm({
   backHref,
   initialValues,
   formCtx,
+  prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateFormProps) {
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
@@ -192,6 +207,8 @@ function ContentCreateForm({
           }}
           initialValues={initialValues}
           formCtx={formCtx}
+          prepareSubmitValues={prepareSubmitValues}
+          formHeaderPrefix={formHeaderPrefix}
         />
       )}
     </ContentFormOptionsGate>
@@ -213,6 +230,8 @@ export function ContentCreateShell({
   backHref,
   initialValues,
   formCtx,
+  prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -231,6 +250,8 @@ export function ContentCreateShell({
             backHref={backHref}
             initialValues={initialValues}
             formCtx={formCtx}
+            prepareSubmitValues={prepareSubmitValues}
+            formHeaderPrefix={formHeaderPrefix}
           />
         </ContentAuthoringGate>
       ) : (

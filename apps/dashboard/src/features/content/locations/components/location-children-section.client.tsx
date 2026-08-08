@@ -17,11 +17,7 @@ import {
   DetailOverflowMenu,
   type DetailOverflowAction,
 } from '../../lib/detail/detail-overflow-menu.client'
-import {
-  LOCATION_SECTION_HELPERS,
-  LOCATION_SECTION_LABELS,
-  type LocationChildrenViewModel,
-} from '../lib/location-display'
+import type { LocationChildrenViewModel } from '../lib/location-display'
 import type { LocationAuthoringType } from '../lib/location-authoring-type'
 import {
   applyLocationParentReplacement,
@@ -32,7 +28,9 @@ import {
   LOCATION_PARENT_MOVE_ACTION_LABELS,
   LOCATION_PARENT_REPLACEMENT_DRAWER,
 } from '../lib/location-parent-replacement-surface-copy'
+import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
+import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
 import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
 
@@ -45,6 +43,53 @@ export type LocationChildrenSectionProps = {
   campaignLocations: readonly Location[]
 }
 
+function LocationChildRows({
+  items,
+  canManage,
+  onMove,
+  onView,
+}: {
+  items: LocationChildrenViewModel['items']
+  canManage: boolean
+  onMove: (childId: string) => void
+  onView: (href: string) => void
+}) {
+  return (
+    <DetailSectionRowList>
+      {items.map((item) => {
+        const actions: DetailOverflowAction[] = canManage
+          ? [
+              {
+                id: 'view',
+                label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
+                onSelect: () => onView(item.href),
+              },
+              {
+                id: 'move',
+                label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
+                onSelect: () => onMove(item.id),
+              },
+            ]
+          : []
+
+        return (
+          <DetailEntityRow
+            key={item.id}
+            heading={item.name}
+            href={item.href}
+            headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
+            endSlot={
+              canManage ? (
+                <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
+              ) : undefined
+            }
+          />
+        )
+      })}
+    </DetailSectionRowList>
+  )
+}
+
 export function LocationChildrenSection({
   childrenViewModel,
   canManage = false,
@@ -53,14 +98,15 @@ export function LocationChildrenSection({
   campaignId,
   campaignLocations,
 }: LocationChildrenSectionProps) {
-  const { items, emptyText } = childrenViewModel
+  const { heading, helper, items, groups, emptyText } = childrenViewModel
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [moveSubject, setMoveSubject] = React.useState<Location | null>(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [createIntent, setCreateIntent] = React.useState<{
-    authoringType: LocationAuthoringType
-  } | null>(null)
+  const [createFixedContext, setCreateFixedContext] =
+    React.useState<LocationFixedCreateContext | null>(null)
+
+  const { launch, setupHost } = useLocationCreateSessionLaunch(setCreateFixedContext)
 
   const refreshContainedLocations = React.useCallback(() => {
     invalidateLocationParentReplacementQueries(queryClient, campaignId)
@@ -118,72 +164,77 @@ export function LocationChildrenSection({
     }
   }
 
+  const handleSelectAuthoringType = (authoringType: LocationAuthoringType) => {
+    launch({ authoringType, parentLocationId })
+  }
+
+  const hasGroupedContent = groups?.some((group) => group.items.length > 0) ?? false
+  const hasFlatContent = items.length > 0
+
   return (
     <>
+      {setupHost}
       <DetailSectionPanel
-        heading={LOCATION_SECTION_LABELS.children}
+        heading={heading}
         headingId="location-children-heading"
-        helper={LOCATION_SECTION_HELPERS.children}
+        helper={helper}
         headerEndSlot={
           canManage ? (
             <LocationAddChildMenu
               parentKind={parentKind}
-              onSelectAuthoringType={(authoringType) => setCreateIntent({ authoringType })}
+              onSelectAuthoringType={handleSelectAuthoringType}
             />
           ) : undefined
         }
       >
-        {items.length === 0 ? (
+        {groups ? (
+          <div className="space-y-6">
+            {!hasGroupedContent && !hasFlatContent ? (
+              <Text variant="muted" className="px-4 py-2">
+                {emptyText}
+              </Text>
+            ) : null}
+            {groups.map((group) => (
+              <div key={group.id} className="space-y-2">
+                <Text variant="emphasis" className="px-4">
+                  {group.label}
+                </Text>
+                {group.items.length === 0 ? (
+                  <Text variant="muted" className="px-4 py-2">
+                    {group.emptyText}
+                  </Text>
+                ) : (
+                  <LocationChildRows
+                    items={group.items}
+                    canManage={canManage}
+                    onMove={openMoveDrawer}
+                    onView={(href) => navigate(href)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        ) : !hasFlatContent ? (
           <Text variant="muted" className="px-4 py-2">
             {emptyText}
           </Text>
         ) : (
-          <DetailSectionRowList>
-            {items.map((item) => {
-              const actions: DetailOverflowAction[] = canManage
-                ? [
-                    {
-                      id: 'view',
-                      label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
-                      onSelect: () => navigate(item.href),
-                    },
-                    {
-                      id: 'move',
-                      label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
-                      onSelect: () => openMoveDrawer(item.id),
-                    },
-                  ]
-                : []
-
-              return (
-                <DetailEntityRow
-                  key={item.id}
-                  heading={item.name}
-                  href={item.href}
-                  headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
-                  endSlot={
-                    canManage ? (
-                      <DetailOverflowMenu
-                        actions={actions}
-                        triggerLabel={`Actions for ${item.name}`}
-                      />
-                    ) : undefined
-                  }
-                />
-              )
-            })}
-          </DetailSectionRowList>
+          <LocationChildRows
+            items={items}
+            canManage={canManage}
+            onMove={openMoveDrawer}
+            onView={(href) => navigate(href)}
+          />
         )}
       </DetailSectionPanel>
 
-      {createIntent ? (
+      {createFixedContext ? (
         <LocationContainedCreateDrawer
           open
           onOpenChange={(open) => {
-            if (!open) setCreateIntent(null)
+            if (!open) setCreateFixedContext(null)
           }}
-          authoringType={createIntent.authoringType}
-          parentLocationId={parentLocationId}
+          fixedCreate={createFixedContext}
           campaignId={campaignId}
         />
       ) : null}

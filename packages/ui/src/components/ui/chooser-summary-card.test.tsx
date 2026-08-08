@@ -54,4 +54,19 @@ describe('ChooserSummaryCard', () => {
 
     await expectNoAxeViolations(container)
   })
+
+  it('applies compact density layout tokens on the summary body', () => {
+    const { container } = render(
+      <ChooserSummaryCard
+        eyebrow="Settlement type"
+        changeLabel="Change settlement type"
+        title="City"
+        density="compact"
+        onChange={vi.fn()}
+      />,
+    )
+
+    const body = container.querySelector('article > div')
+    expect(body).toHaveClass('px-3', 'py-2.5', 'gap-1')
+  })
 })

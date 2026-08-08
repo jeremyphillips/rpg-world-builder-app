@@ -7,7 +7,7 @@ import {
   slugSchema,
   validateLocationParentRequirement,
 } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import type { LocationFormCtx } from './location-form-ctx'
@@ -84,13 +84,21 @@ export { nameField as locationNameField }
 export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
+  const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
   const locationEntities = ctx.options?.locationEntities
   const items: FormItem[] = []
 
+  const omitFixedSettlementTypeFields = (fields: RowFieldItem[]): RowFieldItem[] => {
+    if (!fixedCreate?.settlementType) return fields
+    return fields.filter((field) => field.name !== 'settlementType')
+  }
+
   if (fixedCreate) {
-    const primaryFields = filterLocationFieldsForAuthoringType(
-      buildLocationPrimaryClassificationFields(),
-      fixedCreate.authoringType,
+    const primaryFields = omitFixedSettlementTypeFields(
+      filterLocationFieldsForAuthoringType(
+        buildLocationPrimaryClassificationFields(),
+        fixedCreate.authoringType,
+      ),
     )
     if (primaryFields.length > 0) {
       items.push({ kind: 'row', fields: primaryFields })
@@ -124,7 +132,7 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
     items.push(...buildLocationClassificationFields())
   }
 
-  if (!fixedCreate) {
+  if (!parentIsFixed) {
     items.push({
       type: 'select',
       name: 'parentLocationId',

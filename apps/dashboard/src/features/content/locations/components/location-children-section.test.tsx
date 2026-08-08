@@ -25,12 +25,12 @@ vi.mock('../../lib/list/content-client', () => ({
 
 vi.mock('./location-contained-create-drawer.client', () => ({
   LocationContainedCreateDrawer: ({
-    authoringType,
+    fixedCreate,
     open,
   }: {
-    authoringType: string
+    fixedCreate: { authoringType: string }
     open: boolean
-  }) => (open ? <div role="dialog">Create drawer: {authoringType}</div> : null),
+  }) => (open ? <div role="dialog">Create drawer: {fixedCreate.authoringType}</div> : null),
 }))
 
 vi.mock('@rpg/ui', async (importOriginal) => {
@@ -86,14 +86,18 @@ describe('LocationChildrenSection', () => {
   it('shows heading links for non-managers without Move overflow', () => {
     renderSection({ canManage: false, parent: HARBORFORD })
 
-    const heading = screen.getByRole('heading', { name: 'Contained locations' })
+    const heading = screen.getByRole('heading', { name: 'City structure' })
     const section = heading.closest('section')
     expect(section).toHaveAttribute('aria-labelledby', 'location-children-heading')
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
     const dockWardLink = screen.getByRole('link', { name: 'Dock Ward' })
     expect(dockWardLink.parentElement?.parentElement).toHaveTextContent('Dock Ward·District')
     expect(screen.getByText('District')).toBeInTheDocument()
-    expect(screen.getByText('Locations directly within this location.')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Districts organize neighborhoods; other locations can sit directly in the settlement.',
+      ),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Actions for Dock Ward' })).not.toBeInTheDocument()
   })
