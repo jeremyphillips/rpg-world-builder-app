@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import {
   characterBuilderLevelMessages,
@@ -40,13 +40,6 @@ export function CharacterBuilderLevelChangeConfirmationModal({
   onOpenChange,
   onConfirm,
 }: CharacterBuilderLevelChangeConfirmationModalProps) {
-  const headingRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    headingRef.current?.focus()
-  }, [open])
-
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="sm" aria-describedby="character-builder-level-change-description">
@@ -55,9 +48,6 @@ export function CharacterBuilderLevelChangeConfirmationModal({
           description={formatFieldMessage(
             characterBuilderLevelMessages.changeConfirmationDescription(),
           )}
-          headlineClassName="outline-none"
-          ref={headingRef}
-          tabIndex={-1}
         />
         <Modal.Body>
           <ul id="character-builder-level-change-description" className="list-disc space-y-1 pl-5">

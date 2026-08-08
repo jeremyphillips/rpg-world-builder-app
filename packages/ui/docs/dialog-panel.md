@@ -19,13 +19,13 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                              | Role                                                                  |
-| ---------------------------------- | --------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                         |
-| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                    |
-| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)     |
-| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t` + `px-6` + `py-4`; no fill) |
-| `dialogPanelActionRowClasses`      | Action row flex helper — child only, not on footer root               |
+| Token                              | Role                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                                             |
+| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                        |
+| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                         |
+| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill) |
+| `dialogPanelActionRowClasses`      | Action row flex helper — child only, not on footer root                                   |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -34,7 +34,7 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 ### Footer composition
 
 ```text
-dialogPanelFooterClasses     border-t + px-6 + py-4 column root; inherits panel surface
+dialogPanelFooterClasses     border-t border-border-faint + px-6 + py-4 column root; inherits panel surface
 dialogPanelActionRowClasses  child helper for button groups
 sheetFooterDockClasses       Sheet-only shrink-0 z-20 placement
 
@@ -56,6 +56,26 @@ Footer: separator + px-6 + py-4 (independently complete; no pt-0)
 
 Form drawer flows use `<Form footerWrapper>` → `DrawerShell.Footer` (or `Sheet.Footer`)
 so Form owns error + actions content while Sheet owns footer chrome + dock placement.
+
+## Initial focus
+
+Modal, Sheet, and ConfirmDialog share one open-focus policy via
+`dialog-focus.lib.ts`:
+
+- On open, focus moves to the **dialog panel** (`role="dialog"` /
+  `role="alertdialog"`), not an interactive descendant.
+- The panel Content uses `tabIndex={-1}` plus
+  `dialogContentFocusShellClasses` so programmatic panel focus does not show a
+  visible outline.
+- Opt in to a different first target with `data-dialog-initial-focus` on a
+  single intentional element (rename/email dialogs). Export:
+  `DIALOG_INITIAL_FOCUS_SELECTOR`.
+- Keep explicit targets rare — Form primitives must not auto-mark fields.
+- Close/return-focus remains Radix-owned unless a feature documents a custom
+  exception (e.g. equipment package switch modal).
+
+Consumer override: pass `onOpenAutoFocus` and call `preventDefault()` to skip
+the default panel policy.
 
 ## Size and surface (capability alignment)
 

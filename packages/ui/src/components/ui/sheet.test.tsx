@@ -70,6 +70,15 @@ describe('Sheet', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('focuses the dialog panel on open', async () => {
+    const user = userEvent.setup()
+    renderSheet()
+    await user.click(screen.getByRole('button', { name: 'Open sheet' }))
+    const dialog = await screen.findByRole('dialog')
+
+    expect(dialog).toHaveFocus()
+  })
+
   it('hosts combobox popovers inside the sheet content layer', async () => {
     const user = userEvent.setup()
     const options = Array.from({ length: 20 }, (_, index) => ({

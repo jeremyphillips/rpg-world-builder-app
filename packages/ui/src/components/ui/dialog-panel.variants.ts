@@ -28,7 +28,7 @@ export const dialogPanelBodyVariants = cva(
  * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.
  */
 export const dialogPanelFooterClasses = cn(
-  'flex flex-col border-t border-border',
+  'flex flex-col border-t border-border-faint',
   dialogPanelSectionInsetXClasses,
   'py-4',
 )
@@ -38,3 +38,7 @@ export const dialogPanelFooterClasses = cn(
  * Child helper under {@link dialogPanelFooterClasses}; not applied on the footer root.
  */
 export const dialogPanelActionRowClasses = 'flex items-center justify-end gap-2'
+
+/** Focusable dialog content shell — suppresses visible outlines when the panel receives focus. */
+export const dialogContentFocusShellClasses =
+  'outline-none focus:outline-none focus-visible:outline-none'

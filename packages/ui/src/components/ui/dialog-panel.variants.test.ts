@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  dialogContentFocusShellClasses,
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
   dialogPanelFooterClasses,
@@ -35,6 +36,11 @@ describe('dialog-panel variants', () => {
     expect(bodyClasses).not.toContain('flex-1')
   })
 
+  it('suppresses visible outlines on programmatic panel focus', () => {
+    expect(dialogContentFocusShellClasses).toContain('outline-none')
+    expect(dialogContentFocusShellClasses).toContain('focus-visible:outline-none')
+  })
+
   it('shares body padding with Sheet adding flex-1', () => {
     expect(sheetBodyVariants()).toContain('flex-1')
     expect(sheetBodyVariants()).toContain(dialogPanelSectionPaddingClasses)
@@ -45,6 +51,7 @@ describe('dialog-panel variants', () => {
 describe('overlay footer ownership boundaries', () => {
   it('keeps shared footer chrome free of fill, dock, and action-row concerns', () => {
     expect(dialogPanelFooterClasses).toContain('border-t')
+    expect(dialogPanelFooterClasses).toContain('border-border-faint')
     expect(dialogPanelFooterClasses).toContain('px-6')
     expect(dialogPanelFooterClasses).toContain('py-4')
     expect(dialogPanelFooterClasses).toContain('flex-col')

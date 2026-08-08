@@ -95,7 +95,7 @@ describe('Modal', () => {
     await expectNoAxeViolations(document.body)
   })
 
-  it('does not open label info tooltips on dialog auto-focus', async () => {
+  it('focuses the dialog panel on open without opening label info tooltips', async () => {
     const user = userEvent.setup()
     render(
       <Modal.Root>
@@ -118,9 +118,10 @@ describe('Modal', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Open' }))
-    await screen.findByRole('dialog')
+    const dialog = await screen.findByRole('dialog')
 
-    expect(document.getElementById('availability')).toHaveFocus()
+    expect(dialog).toHaveFocus()
+    expect(document.getElementById('availability')).not.toHaveFocus()
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 })

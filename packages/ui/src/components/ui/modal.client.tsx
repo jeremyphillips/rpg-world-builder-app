@@ -9,8 +9,12 @@ import {
   DialogPanelHeader as ModalHeaderBase,
   dialogDismissHandlers,
 } from './dialog-parts.client'
-import { handleModalOpenAutoFocus } from './modal-focus.lib'
-import { dialogPanelBodyVariants, dialogPanelFooterClasses } from './dialog-panel.variants'
+import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
+import {
+  dialogContentFocusShellClasses,
+  dialogPanelBodyVariants,
+  dialogPanelFooterClasses,
+} from './dialog-panel.variants'
 import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
@@ -67,14 +71,15 @@ const ModalContent = React.forwardRef<
         <ModalOverlay />
         <DialogPrimitive.Content
           ref={composedRef}
-          className={cn(modalContentVariants({ size }), className)}
+          tabIndex={-1}
+          className={cn(modalContentVariants({ size }), dialogContentFocusShellClasses, className)}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
             onInteractOutside,
             onEscapeKeyDown,
           )}
-          onOpenAutoFocus={(event) => handleModalOpenAutoFocus(event, onOpenAutoFocus)}
+          onOpenAutoFocus={(event) => handleDialogOpenAutoFocus(event, onOpenAutoFocus)}
           {...props}
         >
           {portalProvider(
@@ -138,8 +143,9 @@ ModalFooter.displayName = 'Modal.Footer'
 
 /**
  * Compound, accessible modal built on Radix Dialog (focus trap, scroll lock,
- * portal, Esc/overlay close baked in). On open, auto-focus skips label info
- * tooltips and lands on the first meaningful field control.
+ * portal, Esc/overlay close baked in). On open, focus moves to the dialog
+ * panel; opt a child in with `data-dialog-initial-focus` when immediate typing
+ * is clearly intended.
  *
  * ```tsx
  * <Modal.Root open={open} onOpenChange={setOpen}>

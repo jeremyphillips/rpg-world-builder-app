@@ -31,6 +31,7 @@ describe('ConfirmDialog', () => {
     renderConfirm()
     const dialog = screen.getByRole('alertdialog', { name: 'Delete campaign?' })
     expect(dialog).toHaveTextContent('This cannot be undone.')
+    expect(dialog).toHaveFocus()
   })
 
   it('fires onConfirm when the confirm button is pressed', async () => {

@@ -9,8 +9,9 @@ import {
   DialogPanelHeader as SheetHeaderBase,
   dialogDismissHandlers,
 } from './dialog-parts.client'
+import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { modalOverlayVariants } from './modal.variants'
-import { dialogPanelFooterClasses } from './dialog-panel.variants'
+import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dialog-panel.variants'
 import {
   sheetBodyVariants,
   sheetContentVariants,
@@ -60,6 +61,7 @@ const SheetContent = React.forwardRef<
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
+      onOpenAutoFocus,
       onInteractOutside,
       onEscapeKeyDown,
       ...props
@@ -73,13 +75,19 @@ const SheetContent = React.forwardRef<
         <SheetOverlay />
         <DialogPrimitive.Content
           ref={composedRef}
-          className={cn(sheetContentVariants({ side, surface, size }), className)}
+          tabIndex={-1}
+          className={cn(
+            sheetContentVariants({ side, surface, size }),
+            dialogContentFocusShellClasses,
+            className,
+          )}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
             onInteractOutside,
             onEscapeKeyDown,
           )}
+          onOpenAutoFocus={(event) => handleDialogOpenAutoFocus(event, onOpenAutoFocus)}
           {...props}
         >
           {portalProvider(

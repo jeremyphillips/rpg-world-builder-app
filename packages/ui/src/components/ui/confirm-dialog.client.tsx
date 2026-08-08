@@ -7,8 +7,10 @@ import { cn } from '../../lib/utils'
 import { Button, type ButtonProps } from './button.client'
 import {
   dialogPanelActionRowClasses,
+  dialogContentFocusShellClasses,
   dialogPanelSectionPaddingClasses,
 } from './dialog-panel.variants'
+import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { headingVariants } from './heading.variants'
 import { modalContentVariants, modalOverlayVariants } from './modal.variants'
 import { textVariants } from './text.variants'
@@ -60,11 +62,14 @@ export function ConfirmDialog({
       <AlertDialogPrimitive.Portal>
         <AlertDialogPrimitive.Overlay className={cn(modalOverlayVariants(), 'z-[60]')} />
         <AlertDialogPrimitive.Content
+          tabIndex={-1}
           className={cn(
             modalContentVariants({ size: 'sm' }),
             dialogPanelSectionPaddingClasses,
+            dialogContentFocusShellClasses,
             'z-[60] gap-4',
           )}
+          onOpenAutoFocus={handleDialogOpenAutoFocus}
         >
           <div className="flex flex-col space-y-1.5">
             <AlertDialogPrimitive.Title

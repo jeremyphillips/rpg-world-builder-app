@@ -550,10 +550,12 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
+export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {

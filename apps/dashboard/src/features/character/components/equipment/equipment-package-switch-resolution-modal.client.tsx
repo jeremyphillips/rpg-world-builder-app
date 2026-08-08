@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -50,7 +50,6 @@ export function EquipmentPackageSwitchResolutionModal({
   onDraftQuantityChange,
   onConfirm,
 }: EquipmentPackageSwitchResolutionModalProps) {
-  const headingRef = useRef<HTMLDivElement>(null)
   const [returnFocusElement] = useState(() =>
     typeof document === 'undefined' ? null : document.activeElement,
   )
@@ -69,11 +68,6 @@ export function EquipmentPackageSwitchResolutionModal({
     staleNotice,
     isCommitting,
   })
-
-  useEffect(() => {
-    if (!open) return
-    headingRef.current?.focus()
-  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -100,8 +94,6 @@ export function EquipmentPackageSwitchResolutionModal({
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="lg">
         <Modal.Header
-          ref={headingRef}
-          tabIndex={-1}
           headline={modalState.title}
           description={modalState.description}
           headlineClassName={equipmentPackageSwitchResolutionModalHeadlineClasses}
