@@ -1,7 +1,8 @@
 import { cn } from '../../lib/utils'
+import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
 import {
   sheetFooterChromeClasses,
-  sheetFooterFormPaddingClasses,
+  sheetFooterDockVerticalRhythmClasses,
 } from '../../components/ui/sheet.variants'
 
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
@@ -27,13 +28,14 @@ export const formStickyActionsBarClasses =
 export const formSheetScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
 
 /**
- * Sheet/drawer forms — docked footer with horizontal inset matching
- * `contentClassName="px-6"`. Pair with {@link formSheetScrollRegionClasses} inside
- * an `overflow-hidden` sheet body.
+ * Sheet/drawer forms — docked footer with horizontal inset from the canonical
+ * dialog-panel section inset (not a Form-owned padding SSOT). Pair with
+ * {@link formSheetScrollRegionClasses} inside an `overflow-hidden` sheet body.
  */
 export const formStickyActionsBarSheetClasses = cn(
   sheetFooterChromeClasses,
-  sheetFooterFormPaddingClasses,
+  dialogPanelSectionInsetXClasses,
+  sheetFooterDockVerticalRhythmClasses,
 )
 
 /** Transparent sticky actions bar surface — pair with `formStickyTabsTransparentClasses`. */

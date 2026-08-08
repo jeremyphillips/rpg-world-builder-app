@@ -5,6 +5,10 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 
 import { cn } from '../../lib/utils'
 import { Button, type ButtonProps } from './button.client'
+import {
+  dialogPanelActionRowClasses,
+  dialogPanelSectionPaddingClasses,
+} from './dialog-panel.variants'
 import { headingVariants } from './heading.variants'
 import { modalContentVariants, modalOverlayVariants } from './modal.variants'
 import { textVariants } from './text.variants'
@@ -56,7 +60,11 @@ export function ConfirmDialog({
       <AlertDialogPrimitive.Portal>
         <AlertDialogPrimitive.Overlay className={cn(modalOverlayVariants(), 'z-[60]')} />
         <AlertDialogPrimitive.Content
-          className={cn(modalContentVariants({ size: 'sm' }), 'z-[60] gap-4 p-6')}
+          className={cn(
+            modalContentVariants({ size: 'sm' }),
+            dialogPanelSectionPaddingClasses,
+            'z-[60] gap-4',
+          )}
         >
           <div className="flex flex-col space-y-1.5">
             <AlertDialogPrimitive.Title
@@ -70,7 +78,7 @@ export function ConfirmDialog({
               </AlertDialogPrimitive.Description>
             ) : null}
           </div>
-          <div className="flex items-center justify-end gap-2">
+          <div className={dialogPanelActionRowClasses}>
             <AlertDialogPrimitive.Cancel asChild>
               <Button variant="outline" onClick={onCancel}>
                 {cancelLabel}

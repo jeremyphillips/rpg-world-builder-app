@@ -11,11 +11,11 @@ import {
 } from './dialog-parts.client'
 import { handleModalOpenAutoFocus } from './modal-focus.lib'
 import {
-  modalContentVariants,
-  modalBodyVariants,
-  modalOverlayVariants,
-  type ModalSize,
-} from './modal.variants'
+  dialogPanelActionRowClasses,
+  dialogPanelBodyVariants,
+  dialogPanelSectionPaddingClasses,
+} from './dialog-panel.variants'
+import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const ModalRoot = DialogPrimitive.Root
@@ -101,10 +101,15 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Optional supporting copy — maps to `Dialog.Description`. */
   description?: React.ReactNode
   headlineClassName?: string
+  /** Right-aligned slot on the title row (e.g. primary action). */
+  endSlot?: React.ReactNode
 }
 
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
-  ({ className, kicker, headline, description, headlineClassName, children, ...props }, ref) => (
+  (
+    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    ref,
+  ) => (
     <ModalHeaderBase
       ref={ref}
       className={className}
@@ -112,6 +117,7 @@ const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
       headline={headline}
       description={description}
       headlineClassName={headlineClassName}
+      endSlot={endSlot}
       {...props}
     >
       {children}
@@ -122,7 +128,7 @@ ModalHeader.displayName = 'Modal.Header'
 
 const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(modalBodyVariants(), className)} {...props} />
+    <div ref={ref} className={cn(dialogPanelBodyVariants(), className)} {...props} />
   ),
 )
 ModalBody.displayName = 'Modal.Body'
@@ -131,7 +137,12 @@ const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex items-center justify-end gap-2 p-6 pt-0', className)}
+      className={cn(
+        dialogPanelActionRowClasses,
+        dialogPanelSectionPaddingClasses,
+        'pt-0',
+        className,
+      )}
       {...props}
     />
   ),

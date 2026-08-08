@@ -78,10 +78,6 @@ export type CatalogPickerSheetProps<TItem> = {
   rowSurface?: SurfaceConfig
   /** Top-align caret/grip with the first header line for multi-line headers. */
   toolbarCompact?: boolean
-  /** Optional class merged onto the sheet content panel. */
-  sheetContentClassName?: string
-  /** Optional class merged onto the scrollable sheet body. */
-  sheetBodyClassName?: string
   /** Optional class merged onto each collapsible row expanded body. */
   rowBodyClassName?: string
   /** Optional class merged onto each collapsible row shell (`role="group"`). */

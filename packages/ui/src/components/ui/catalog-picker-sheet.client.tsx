@@ -18,6 +18,8 @@ import {
   catalogPickerSheetBodyVariants,
   catalogPickerSheetLoadingVariants,
 } from './catalog-picker-sheet.variants'
+import { cn } from '../../lib/utils'
+import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
 
 export type {
   CatalogPickerSheetProps,
@@ -123,8 +125,6 @@ export function CatalogPickerSheet<TItem>({
   rowLayout,
   rowSurface,
   toolbarCompact,
-  sheetContentClassName,
-  sheetBodyClassName,
   rowBodyClassName,
   rowShellClassName,
 }: CatalogPickerSheetProps<TItem>) {
@@ -206,7 +206,7 @@ export function CatalogPickerSheet<TItem>({
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content surface="background" size="lg" className={sheetContentClassName}>
+      <Sheet.Content surface="background" size="lg">
         <Sheet.Header
           headline={title}
           description={description}
@@ -215,7 +215,11 @@ export function CatalogPickerSheet<TItem>({
           {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
         </Sheet.Header>
 
-        {headerBelowDescription ? <div className="px-6 pb-4">{headerBelowDescription}</div> : null}
+        {headerBelowDescription ? (
+          <div className={cn(dialogPanelSectionInsetXClasses, 'pb-4')}>
+            {headerBelowDescription}
+          </div>
+        ) : null}
 
         {pickerEnabled ? (
           <>
@@ -236,7 +240,6 @@ export function CatalogPickerSheet<TItem>({
             <Sheet.Body
               className={catalogPickerSheetBodyVariants({
                 hasFooter: Boolean(footer),
-                className: sheetBodyClassName,
               })}
             >
               {bodyContent}

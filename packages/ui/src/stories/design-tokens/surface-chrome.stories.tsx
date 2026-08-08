@@ -49,7 +49,12 @@ const OWNERSHIP_ROWS = [
   },
   { shell: 'Neutral Alert (default variant)', ownership: 'establishes', plane: '--surface-muted' },
   { shell: 'DataTable utility bar rows', ownership: 'establishes', plane: '--surface-subtle' },
-  { shell: 'Modal / Sheet / Toast', ownership: 'establishes', plane: '--card' },
+  {
+    shell: 'Modal / app Sheet (DrawerShell, CatalogPicker)',
+    ownership: 'establishes',
+    plane: '--background',
+  },
+  { shell: 'Sheet primitive default / Toast', ownership: 'establishes', plane: '--card' },
   { shell: 'Sidebar shell', ownership: 'establishes', plane: '--sidebar' },
   {
     shell: 'Elevation wash (subtle/muted/strong)',

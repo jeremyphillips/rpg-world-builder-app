@@ -4,7 +4,7 @@ import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Button } from '@rpg/ui'
+import { Button, dialogPanelSectionInsetXClasses, cn } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
@@ -176,7 +176,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
               fields={form.fields}
               defaultValues={form.defaultValues}
               valueSyncs={form.valueSyncs}
-              contentClassName="px-6 pt-0"
+              contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
               rhythm="comfortable"
               size="md"
               stickyFooter

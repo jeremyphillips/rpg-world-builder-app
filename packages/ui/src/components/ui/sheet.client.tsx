@@ -11,10 +11,13 @@ import {
 } from './dialog-parts.client'
 import { modalOverlayVariants } from './modal.variants'
 import {
+  dialogPanelActionRowClasses,
+  dialogPanelSectionPaddingClasses,
+} from './dialog-panel.variants'
+import {
   sheetBodyVariants,
   sheetContentVariants,
   sheetFooterChromeClasses,
-  sheetFooterLayoutClasses,
   type SheetSide,
   type SheetSize,
   type SheetSurface,
@@ -138,7 +141,12 @@ const SheetFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(sheetFooterChromeClasses, sheetFooterLayoutClasses, className)}
+      className={cn(
+        sheetFooterChromeClasses,
+        dialogPanelActionRowClasses,
+        dialogPanelSectionPaddingClasses,
+        className,
+      )}
       {...props}
     />
   ),

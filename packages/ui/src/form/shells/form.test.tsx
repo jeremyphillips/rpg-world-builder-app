@@ -7,6 +7,8 @@ import { z } from 'zod'
 import { Form } from './form.client'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
+import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
+import { cn } from '../../lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -206,7 +208,7 @@ describe('Form', () => {
         onSubmit={vi.fn()}
         stickyFooter
         footerVariant="sheet"
-        contentClassName="px-6 pt-0"
+        contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
         footer={<button type="submit">Save</button>}
       />,
     )

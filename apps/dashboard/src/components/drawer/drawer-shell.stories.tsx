@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { Button, Input, Text } from '@rpg/ui'
+import { Button, Input, Text, dialogPanelSectionInsetXClasses, cn } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
@@ -92,14 +92,16 @@ export const ManagedBody: Story = {
       }
     >
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="min-h-0 flex-1 overflow-y-auto px-6">
+        <div className={cn('min-h-0 flex-1 overflow-y-auto', dialogPanelSectionInsetXClasses)}>
           {Array.from({ length: 18 }, (_, index) => (
             <Text key={index} className="mb-4">
               Managed scroll region row {index + 1}
             </Text>
           ))}
         </div>
-        <div className="shrink-0 border-t border-border px-6 py-4">
+        <div
+          className={cn('shrink-0 border-t border-border py-4', dialogPanelSectionInsetXClasses)}
+        >
           <Text variant="destructive" role="alert">
             Could not save item.
           </Text>

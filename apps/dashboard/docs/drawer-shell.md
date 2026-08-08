@@ -9,14 +9,19 @@ read-only builder dossiers use allowlisted
 ## Ownership layers
 
 ```text
-@rpg/ui Sheet                 → primitive (side, close, overlay)
-@rpg/ui Sheet variants        → primitive-semantic only (surface, size)
-@rpg/ui shared footer chrome  → single token consumed by Sheet.Footer + FormActionsBar sheet
-dashboard DrawerShell         → only allowed app composition of Sheet for non-picker drawers
-ContentFormDrawer             → form workflow on DrawerShell
-CatalogPickerSheet            → picker workflow; same surface/size/footer tokens
-feature drawers               → content/workflow only
+@rpg/ui dialog-panel.variants  → shared section inset / body / action row
+@rpg/ui Sheet                  → primitive (side, close, overlay)
+@rpg/ui Sheet variants         → modality-owned (surface, size, dock chrome)
+@rpg/ui FormActionsBar sheet   → dock chrome + dialog-panel horizontal inset
+dashboard DrawerShell          → only allowed app composition of Sheet for non-picker drawers
+ContentFormDrawer              → form workflow on DrawerShell (bodyMode=managed)
+CatalogPickerSheet             → picker workflow; same surface/size tokens
+feature drawers                → content/workflow only
 ```
+
+Full dialog-panel ownership (Modal vs Sheet vs ConfirmDialog, size/surface
+capability alignment, escape-hatch policy):
+[`packages/ui/docs/dialog-panel.md`](../../../packages/ui/docs/dialog-panel.md).
 
 Implementation: [`src/components/drawer/`](../src/components/drawer/).
 
@@ -32,7 +37,8 @@ Implementation: [`src/components/drawer/`](../src/components/drawer/).
 
 **No `size` prop in v1.** Application width is fixed at 550px via `Sheet.Content`
 `size="lg"`. Add a DrawerShell size variant only when a second legitimate
-application width is product-justified.
+application width is product-justified. `SheetSize` and `ModalSize` stay
+modality-owned — shared prop _name_ is not shared physical width.
 
 **No `*ClassName` escape hatches.** New chrome needs a documented product use
 case and a shared token or DrawerShell variant — not local Tailwind overrides.
@@ -40,9 +46,11 @@ case and a shared token or DrawerShell variant — not local Tailwind overrides.
 ## Body modes
 
 - **`scrolling`** — default. `Sheet.Body` owns vertical overflow for informational
-  or custom content.
-- **`managed`** — body is a non-scrolling flex column. Pair with `<Form
+  or custom content (dialog-panel body padding).
+- **`managed`** — body is a non-scrolling flex column (`p-0`). Pair with `<Form
 stickyFooter footerVariant="sheet">` (see [`ContentFormDrawer`](../src/features/content/lib/forms/shells/content-form-drawer.client.tsx)).
+  The Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`
+  (canonical section inset — not a Form padding SSOT).
 
 ## Surface, width, and footer SSOT
 
@@ -52,12 +60,13 @@ Application drawers normalize on:
   allowlisted special sheets (`BuilderOptionDetailsSheet`, raw Sheet stories).
 - `size="lg"` — `max-w-[550px]` application width.
 
-Footer chrome (border, background, shrink, z-index) lives in
-[`sheet.variants.ts`](../../../packages/ui/src/components/ui/sheet.variants.ts)
-as `sheetFooterChromeClasses`, consumed by:
+Footer composition:
 
-- `Sheet.Footer` (+ layout/actions row classes)
-- `FormActionsBar` `variant="sheet"` (+ form horizontal inset)
+- Dock chrome: [`sheetFooterChromeClasses`](../../../packages/ui/src/components/ui/sheet.variants.ts)
+  (Sheet.Footer + FormActionsBar sheet)
+- Action row + section padding: dialog-panel tokens
+- Form sheet horizontal inset: `dialogPanelSectionInsetXClasses`
+- Form sheet vertical dock rhythm: `sheetFooterDockVerticalRhythmClasses`
 
 `CatalogPickerSheet` hardcodes the same `surface` / `size` on `Sheet.Content`.
 

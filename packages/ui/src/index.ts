@@ -547,6 +547,12 @@ export {
   type ModalContentVariantProps,
   type ModalSize,
 } from './components/ui/modal.variants'
+export {
+  dialogPanelActionRowClasses,
+  dialogPanelBodyVariants,
+  dialogPanelSectionInsetXClasses,
+  dialogPanelSectionPaddingClasses,
+} from './components/ui/dialog-panel.variants'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
@@ -614,8 +620,12 @@ export {
 export {
   sheetBodyVariants,
   sheetContentVariants,
+  sheetFooterChromeClasses,
+  sheetFooterDockVerticalRhythmClasses,
   type SheetContentVariantProps,
   type SheetSide,
+  type SheetSize,
+  type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
 

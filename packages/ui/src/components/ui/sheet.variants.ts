@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { dialogPanelBodyVariants } from './dialog-panel.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 
 /**
@@ -41,17 +42,18 @@ export const sheetContentVariants = cva(
   },
 )
 
-export const sheetBodyVariants = cva('flex-1 overflow-y-auto p-6 pt-0 text-sm')
+/** Sheet body — shared dialog-panel body + flex growth for edge panels. */
+export const sheetBodyVariants = cva(cn(dialogPanelBodyVariants(), 'flex-1'))
 
 /** Shared docked footer surface — consumed by Sheet.Footer and FormActionsBar sheet variant. */
 export const sheetFooterChromeClasses =
   'z-20 shrink-0 border-t border-border bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
-/** Sheet.Footer layout — action row alignment and inset. */
-export const sheetFooterLayoutClasses = 'flex items-center justify-end gap-2 p-6'
-
-/** Form sheet footer horizontal inset — pairs with {@link formSheetScrollRegionClasses}. */
-export const sheetFooterFormPaddingClasses = 'px-6 pt-4 pb-4'
+/**
+ * Dock vertical rhythm for FormActionsBar sheet footers.
+ * Horizontal inset comes from {@link dialogPanelSectionInsetXClasses}, not a Form padding SSOT.
+ */
+export const sheetFooterDockVerticalRhythmClasses = 'pt-4 pb-4'
 
 export type SheetContentVariantProps = VariantProps<typeof sheetContentVariants>
 export type SheetSide = NonNullable<SheetContentVariantProps['side']>
