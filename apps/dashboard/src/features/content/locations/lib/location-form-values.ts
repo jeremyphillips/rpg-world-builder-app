@@ -14,6 +14,7 @@ import {
   resolveLocationAuthoringType,
 } from './location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
+import type { LocationFixedCreateContext } from './location-form-ctx'
 
 export const locationCreateDefaultValues: Partial<LocationFormValues> = {}
 
@@ -173,6 +174,18 @@ export function locationToFormValues(entity: Location): Partial<LocationFormValu
     authoringType: resolveLocationAuthoringType(entity),
     parentLocationId: entity.parentLocationId,
     ...kindFormValueExtractors[entity.kind]?.(entity),
+  }
+}
+
+/** Overlays fixed create context onto form values immediately before serialization. */
+export function applyLocationFixedCreateContext(
+  values: LocationFormValues,
+  fixedCreate: LocationFixedCreateContext,
+): LocationFormValues {
+  return {
+    ...values,
+    authoringType: fixedCreate.authoringType,
+    parentLocationId: fixedCreate.parentLocationId,
   }
 }
 

@@ -23,6 +23,16 @@ vi.mock('../../lib/list/content-client', () => ({
   updateContent: mockUpdateContent,
 }))
 
+vi.mock('./location-contained-create-drawer.client', () => ({
+  LocationContainedCreateDrawer: ({
+    authoringType,
+    open,
+  }: {
+    authoringType: string
+    open: boolean
+  }) => (open ? <div role="dialog">Create drawer: {authoringType}</div> : null),
+}))
+
 vi.mock('@rpg/ui', async (importOriginal) => {
   const actual = await importOriginal<typeof RpgUi>()
   return {
@@ -56,6 +66,7 @@ function renderSection(input?: {
           childrenViewModel={childrenViewModel}
           canManage={input?.canManage ?? false}
           parentLocationId={input?.parentLocationId ?? parent.id}
+          parentKind={parent.kind}
           campaignId={STORY_CAMPAIGN_ID}
           campaignLocations={input?.campaignLocations ?? LOCATIONS_LIST}
         />
@@ -96,6 +107,16 @@ describe('LocationChildrenSection', () => {
     await user.click(screen.getByRole('button', { name: 'Actions for Yawning Portal' }))
     expect(screen.getByRole('menuitem', { name: 'View location' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()
+  })
+
+  it('opens the contained create drawer when a child type is selected', async () => {
+    const user = userEvent.setup()
+    renderSection({ canManage: true, parent: HARBORFORD })
+
+    await user.click(screen.getByRole('button', { name: /add location/i }))
+    await user.click(screen.getByRole('menuitem', { name: 'District' }))
+
+    expect(screen.getByText('Create drawer: district')).toBeInTheDocument()
   })
 
   it('opens Move drawer wired to the child id with Current from parentLocationId', async () => {
@@ -149,7 +170,7 @@ describe('LocationChildrenSection', () => {
         STORY_CAMPAIGN_ID,
         'locations',
         YAWNING_PORTAL.id,
-        { parentLocationId: HARBORFORD.id },
+        expect.objectContaining({ parentLocationId: HARBORFORD.id }),
       )
       expect(invalidateSpy).toHaveBeenCalled()
     })

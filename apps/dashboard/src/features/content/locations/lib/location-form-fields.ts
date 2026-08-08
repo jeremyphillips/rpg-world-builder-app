@@ -10,6 +10,7 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { LocationFormCtx } from './location-form-ctx'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
@@ -80,10 +81,18 @@ export type LocationFormValues = z.infer<typeof locationFormSchema>
 export { nameField as locationNameField }
 
 export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
+  const locationCtx = ctx as LocationFormCtx
+  const fixedCreate = locationCtx.fixedCreate
   const locationEntities = ctx.options?.locationEntities
+  const primaryClassificationFields = buildLocationPrimaryClassificationFields()
+  const items: FormItem[] = []
 
-  return [
-    {
+  if (fixedCreate) {
+    if (primaryClassificationFields.length > 0) {
+      items.push({ kind: 'row', fields: primaryClassificationFields })
+    }
+  } else {
+    items.push({
       kind: 'row',
       fields: [
         {
@@ -95,11 +104,15 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           width: '1/3',
         },
-        ...buildLocationPrimaryClassificationFields(),
+        ...primaryClassificationFields,
       ],
-    },
-    ...buildLocationClassificationFields(),
-    {
+    })
+  }
+
+  items.push(...buildLocationClassificationFields())
+
+  if (!fixedCreate) {
+    items.push({
       type: 'select',
       name: 'parentLocationId',
       label: 'Parent location',
@@ -107,9 +120,12 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       placeholder: LOCATION_SELECT_PLACEHOLDER,
       visibility: parentLocationFieldVisibility(),
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
-    },
-    descriptionField(ctx),
-  ]
+    })
+  }
+
+  items.push(descriptionField(ctx))
+
+  return items
 }
 
 /** Resolves canonical kind from form values for hierarchy helpers within the form layer. */

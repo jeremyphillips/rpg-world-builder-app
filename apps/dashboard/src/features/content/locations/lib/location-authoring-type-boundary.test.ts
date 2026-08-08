@@ -12,6 +12,8 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-create-shortcuts.ts',
   'location-create-shortcuts.test.ts',
   'location-form-fields.ts',
+  'location-form-fields.test.ts',
+  'location-form-ctx.ts',
   'location-form-values.ts',
   'location-form-values.test.ts',
   'location-form-sync.ts',
@@ -25,6 +27,11 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-create.tsx',
   'location-create-actions.client.tsx',
   'location-add-child-menu.client.tsx',
+  'location-add-child-menu.test.tsx',
+  'location-children-section.client.tsx',
+  'location-children-section.test.tsx',
+  'location-contained-create-drawer.client.tsx',
+  'location-contained-create-drawer.test.tsx',
 ])
 
 function collectSourceFiles(directory: string): string[] {

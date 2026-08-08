@@ -1,6 +1,5 @@
 'use client'
 
-import { Link } from 'react-router-dom'
 import type { LocationKind } from '@rpg/contracts'
 import {
   Button,
@@ -12,22 +11,20 @@ import {
 import { Plus } from 'lucide-react'
 
 import {
-  buildLocationCreateHref,
   childAuthoringTypesForParentKind,
   getLocationAuthoringTypeLabel,
 } from '../lib/location-create-shortcuts'
+import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
 export type LocationAddChildMenuProps = {
-  campaignId: string
-  parentLocationId: string
   parentKind: LocationKind
+  onSelectAuthoringType: (authoringType: LocationAuthoringType) => void
 }
 
 /** Detail-page menu of child location types derived from contracts hierarchy. */
 export function LocationAddChildMenu({
-  campaignId,
-  parentLocationId,
   parentKind,
+  onSelectAuthoringType,
 }: LocationAddChildMenuProps) {
   const childTypes = childAuthoringTypesForParentKind(parentKind)
 
@@ -45,15 +42,11 @@ export function LocationAddChildMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         {childTypes.map((authoringType) => (
-          <DropdownMenuItem key={authoringType} asChild>
-            <Link
-              to={buildLocationCreateHref(campaignId, {
-                authoringType,
-                parentLocationId,
-              })}
-            >
-              {getLocationAuthoringTypeLabel(authoringType)}
-            </Link>
+          <DropdownMenuItem
+            key={authoringType}
+            onSelect={() => onSelectAuthoringType(authoringType)}
+          >
+            {getLocationAuthoringTypeLabel(authoringType)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

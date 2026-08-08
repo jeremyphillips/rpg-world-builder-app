@@ -15,7 +15,6 @@ import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
-import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
 import { LocationConnectedPartiesDetailSections } from '../components/location-connected-parties-detail-sections.client'
 import { LocationDetailMetadata } from '../components/location-detail-metadata.client'
@@ -72,17 +71,9 @@ export function LocationDetailContent({
             childrenViewModel={viewModel.children}
             canManage={canManage}
             parentLocationId={location.id}
+            parentKind={location.kind}
             campaignId={campaignId}
             campaignLocations={locations}
-            headerActions={
-              canManage ? (
-                <LocationAddChildMenu
-                  campaignId={campaignId}
-                  parentLocationId={location.id}
-                  parentKind={location.kind}
-                />
-              ) : undefined
-            }
           />
         </div>
       </ContentDetailLayout>
