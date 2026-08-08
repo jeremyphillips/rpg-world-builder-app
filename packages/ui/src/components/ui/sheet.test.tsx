@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
 import { ComboboxField } from './combobox-field.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 
 function renderSheet(contentProps: Record<string, unknown> = {}) {
   return render(
@@ -17,9 +18,11 @@ function renderSheet(contentProps: Record<string, unknown> = {}) {
         <Sheet.Header headline="Edit entry" description="Update vocabulary details." />
         <Sheet.Body>Body content</Sheet.Body>
         <Sheet.Footer>
-          <Sheet.Close asChild>
-            <Button variant="outline">Cancel</Button>
-          </Sheet.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Sheet.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Sheet.Close>
+          </div>
         </Sheet.Footer>
       </Sheet.Content>
     </Sheet.Root>,

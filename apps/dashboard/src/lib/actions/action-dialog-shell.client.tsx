@@ -1,7 +1,7 @@
 'use client'
 
 import type { ActionTargetFailure } from '@rpg/contracts'
-import { Alert, Modal } from '@rpg/ui'
+import { Alert, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 
 import { ActionDialogShellFooter } from './action-dialog-shell-footer.client'
 import {
@@ -115,21 +115,23 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
         </Modal.Body>
 
         <Modal.Footer>
-          <ActionDialogShellFooter
-            phase={phase}
-            pending={pending}
-            confirmedCount={confirmedCount}
-            configureApplyDisabled={configureApplyDisabled}
-            configureApplyLabel={configureApplyLabel}
-            configureApplyHidden={configureApplyHidden}
-            resolveApplyLabel={resolveApplyLabel}
-            resolveApplyHidden={resolveApplyHidden}
-            onResolveBack={onResolveBack}
-            onCancel={handleCancel}
-            onConfigureApply={onConfigureApply}
-            onResolveConfirm={onResolveConfirm}
-            onRetryFailed={onRetryFailed}
-          />
+          <div className={dialogPanelActionRowClasses}>
+            <ActionDialogShellFooter
+              phase={phase}
+              pending={pending}
+              confirmedCount={confirmedCount}
+              configureApplyDisabled={configureApplyDisabled}
+              configureApplyLabel={configureApplyLabel}
+              configureApplyHidden={configureApplyHidden}
+              resolveApplyLabel={resolveApplyLabel}
+              resolveApplyHidden={resolveApplyHidden}
+              onResolveBack={onResolveBack}
+              onCancel={handleCancel}
+              onConfigureApply={onConfigureApply}
+              onResolveConfirm={onResolveConfirm}
+              onRetryFailed={onRetryFailed}
+            />
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

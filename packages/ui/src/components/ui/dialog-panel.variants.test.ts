@@ -3,14 +3,11 @@ import { describe, expect, it } from 'vitest'
 import {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './dialog-panel.variants'
-import {
-  sheetBodyVariants,
-  sheetFooterChromeClasses,
-  sheetFooterDockVerticalRhythmClasses,
-} from './sheet.variants'
+import { sheetBodyVariants, sheetFooterDockClasses } from './sheet.variants'
 
 describe('dialog-panel variants', () => {
   it('owns the canonical section inset vocabulary', () => {
@@ -45,17 +42,20 @@ describe('dialog-panel variants', () => {
   })
 })
 
-describe('sheet footer ownership boundaries', () => {
-  it('keeps dock chrome free of action-row and section-padding concerns', () => {
-    expect(sheetFooterChromeClasses).toContain('border-t')
-    expect(sheetFooterChromeClasses).toContain('shrink-0')
-    expect(sheetFooterChromeClasses).not.toMatch(/\bflex\b/)
-    expect(sheetFooterChromeClasses).not.toMatch(/\bp-6\b/)
-    expect(sheetFooterChromeClasses).not.toMatch(/\bpx-6\b/)
+describe('overlay footer ownership boundaries', () => {
+  it('keeps shared footer chrome free of fill, dock, and action-row concerns', () => {
+    expect(dialogPanelFooterClasses).toContain('border-t')
+    expect(dialogPanelFooterClasses).toContain('px-6')
+    expect(dialogPanelFooterClasses).toContain('py-4')
+    expect(dialogPanelFooterClasses).toContain('flex-col')
+    expect(dialogPanelFooterClasses).not.toMatch(/\bbg-/)
+    expect(dialogPanelFooterClasses).not.toMatch(/\bshrink-0\b/)
+    expect(dialogPanelFooterClasses).not.toMatch(/\bjustify-end\b/)
   })
 
-  it('keeps form dock vertical rhythm separate from horizontal section inset', () => {
-    expect(sheetFooterDockVerticalRhythmClasses).toBe('pt-4 pb-4')
-    expect(sheetFooterDockVerticalRhythmClasses).not.toMatch(/px-/)
+  it('keeps sheet dock placement separate from footer chrome', () => {
+    expect(sheetFooterDockClasses).toBe('shrink-0 z-20')
+    expect(sheetFooterDockClasses).not.toMatch(/border/)
+    expect(sheetFooterDockClasses).not.toMatch(/p[xytblr]?-/)
   })
 })

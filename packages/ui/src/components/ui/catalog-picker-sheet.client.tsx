@@ -19,7 +19,10 @@ import {
   catalogPickerSheetLoadingVariants,
 } from './catalog-picker-sheet.variants'
 import { cn } from '../../lib/utils'
-import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
+import {
+  dialogPanelActionRowClasses,
+  dialogPanelSectionInsetXClasses,
+} from './dialog-panel.variants'
 
 export type {
   CatalogPickerSheetProps,
@@ -247,7 +250,11 @@ export function CatalogPickerSheet<TItem>({
           </>
         ) : null}
 
-        {footer ? <Sheet.Footer>{footer}</Sheet.Footer> : null}
+        {footer ? (
+          <Sheet.Footer>
+            <div className={dialogPanelActionRowClasses}>{footer}</div>
+          </Sheet.Footer>
+        ) : null}
       </Sheet.Content>
     </Sheet.Root>
   )

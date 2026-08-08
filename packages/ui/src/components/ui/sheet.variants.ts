@@ -45,15 +45,8 @@ export const sheetContentVariants = cva(
 /** Sheet body — shared dialog-panel body + flex growth for edge panels. */
 export const sheetBodyVariants = cva(cn(dialogPanelBodyVariants(), 'flex-1'))
 
-/** Shared docked footer surface — consumed by Sheet.Footer and FormActionsBar sheet variant. */
-export const sheetFooterChromeClasses =
-  'z-20 shrink-0 border-t border-border bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
-
-/**
- * Dock vertical rhythm for FormActionsBar sheet footers.
- * Horizontal inset comes from {@link dialogPanelSectionInsetXClasses}, not a Form padding SSOT.
- */
-export const sheetFooterDockVerticalRhythmClasses = 'pt-4 pb-4'
+/** Sheet-owned dock placement — no border, padding, or fill (see dialog-panel footer chrome). */
+export const sheetFooterDockClasses = 'shrink-0 z-20'
 
 export type SheetContentVariantProps = VariantProps<typeof sheetContentVariants>
 export type SheetSide = NonNullable<SheetContentVariantProps['side']>

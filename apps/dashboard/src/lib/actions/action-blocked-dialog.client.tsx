@@ -1,7 +1,7 @@
 'use client'
 
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { Button, Modal } from '@rpg/ui'
+import { Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 
 import { ActionBlockerReferences } from './action-blocker-references.client'
 import { ACTION_DIALOG_MODAL_SIZE } from './action-dialog-shell.lib'
@@ -37,9 +37,11 @@ export function ActionBlockedDialog({
         </Modal.Body>
 
         <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {ACTION_CLOSE_LABEL}
-          </Button>
+          <div className={dialogPanelActionRowClasses}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {ACTION_CLOSE_LABEL}
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

@@ -9,12 +9,12 @@ read-only builder dossiers use allowlisted
 ## Ownership layers
 
 ```text
-@rpg/ui dialog-panel.variants  → shared section inset / body / action row
+@rpg/ui dialog-panel.variants  → shared section inset / body / footer chrome / action row
 @rpg/ui Sheet                  → primitive (side, close, overlay)
-@rpg/ui Sheet variants         → modality-owned (surface, size, dock chrome)
-@rpg/ui FormActionsBar sheet   → dock chrome + dialog-panel horizontal inset
+@rpg/ui Sheet variants         → modality-owned (surface, size, dock placement)
+@rpg/ui Form footerWrapper     → Form-owned error + actions content in overlay footers
 dashboard DrawerShell          → only allowed app composition of Sheet for non-picker drawers
-ContentFormDrawer              → form workflow on DrawerShell (bodyMode=managed)
+ContentFormDrawer              → form workflow on DrawerShell (bodyMode=composed)
 CatalogPickerSheet             → picker workflow; same surface/size tokens
 feature drawers                → content/workflow only
 ```
@@ -27,13 +27,15 @@ Implementation: [`src/components/drawer/`](../src/components/drawer/).
 
 ## API
 
-| Prop                | Role                                                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| `title`             | Required header headline                                                                  |
-| `description?`      | Optional header helper line (e.g. vocabulary create)                                      |
-| `bodyMode?`         | `scrolling` (default) — shell body scrolls; `managed` — child owns scroll + docked footer |
-| `footer?`           | Optional shell-owned `Sheet.Footer` actions                                               |
-| `DrawerShell.Close` | Re-export of `Sheet.Close` for cancel buttons                                             |
+| Prop                 | Role                                                                       |
+| -------------------- | -------------------------------------------------------------------------- |
+| `title`              | Required header headline                                                   |
+| `description?`       | Optional header helper line (e.g. vocabulary create)                       |
+| `bodyMode?`          | `scrolling` (default), `managed`, or `composed` — see Body modes           |
+| `footer?`            | Optional shell-owned `Sheet.Footer` actions (`scrolling` / `managed` only) |
+| `DrawerShell.Close`  | Re-export of `Sheet.Close` for cancel buttons                              |
+| `DrawerShell.Body`   | Re-export of `Sheet.Body` for composed Form `contentWrapper` flows         |
+| `DrawerShell.Footer` | Re-export of `Sheet.Footer` for composed Form `footerWrapper` flows        |
 
 **No `size` prop in v1.** Application width is fixed at 550px via `Sheet.Content`
 `size="lg"`. Add a DrawerShell size variant only when a second legitimate
@@ -47,10 +49,13 @@ case and a shared token or DrawerShell variant — not local Tailwind overrides.
 
 - **`scrolling`** — default. `Sheet.Body` owns vertical overflow for informational
   or custom content (dialog-panel body padding).
-- **`managed`** — body is a non-scrolling flex column (`p-0`). Pair with `<Form
-stickyFooter footerVariant="sheet">` (see [`ContentFormDrawer`](../src/features/content/lib/forms/shells/content-form-drawer.client.tsx)).
-  The Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`
-  (canonical section inset — not a Form padding SSOT).
+- **`managed`** — body is a non-scrolling flex column (`p-0`). Pair with a child that
+  owns its own scroll region inside the body.
+- **`composed`** — children render directly under `Sheet.Content` (no auto Body).
+  Use with `<Form contentWrapper footerWrapper>` so Form supplies
+  `DrawerShell.Body` + `DrawerShell.Footer` (see
+  [`ContentFormDrawer`](../src/features/content/lib/forms/shells/content-form-drawer.client.tsx)).
+  Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`.
 
 ## Surface, width, and footer SSOT
 
@@ -62,11 +67,11 @@ Application drawers normalize on:
 
 Footer composition:
 
-- Dock chrome: [`sheetFooterChromeClasses`](../../../packages/ui/src/components/ui/sheet.variants.ts)
-  (Sheet.Footer + FormActionsBar sheet)
-- Action row + section padding: dialog-panel tokens
-- Form sheet horizontal inset: `dialogPanelSectionInsetXClasses`
-- Form sheet vertical dock rhythm: `sheetFooterDockVerticalRhythmClasses`
+- Shared chrome: `dialogPanelFooterClasses` via `Sheet.Footer` / `DrawerShell.Footer`
+- Dock placement: `sheetFooterDockClasses` (Sheet-owned)
+- Action row: `dialogPanelActionRowClasses` — caller wraps button groups
+- Form drawer content: `<Form footerWrapper>` supplies error + actions; no parallel
+  FormActionsBar sheet chrome
 
 `CatalogPickerSheet` hardcodes the same `surface` / `size` on `Sheet.Content`.
 

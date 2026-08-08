@@ -4,10 +4,17 @@ import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Button, dialogPanelSectionInsetXClasses, cn } from '@rpg/ui'
+import {
+  Button,
+  Text,
+  cn,
+  dialogPanelActionRowClasses,
+  dialogPanelSectionInsetXClasses,
+} from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
+import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
 import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
@@ -84,34 +91,6 @@ function ContentFormDrawerLeaveGuard({
   )
 }
 
-function ContentFormDrawerFooter({
-  pending,
-  submitLabel,
-  leaveBridgeRef,
-  open,
-}: {
-  pending: boolean
-  submitLabel: string
-  leaveBridgeRef: React.MutableRefObject<ContentFormDrawerLeaveBridge | null>
-  open: boolean
-}) {
-  return (
-    <>
-      <ContentFormDrawerLeaveGuard bridgeRef={leaveBridgeRef} pending={pending} open={open} />
-      <div className="flex w-full items-center justify-end gap-2">
-        <DrawerShell.Close asChild>
-          <Button type="button" variant="outline" disabled={pending}>
-            Cancel
-          </Button>
-        </DrawerShell.Close>
-        <Button type="submit" disabled={pending}>
-          {submitLabel}
-        </Button>
-      </div>
-    </>
-  )
-}
-
 /** Neutral form workflow for contextual create/edit drawers. */
 export function ContentFormDrawer<TFormValues extends FieldValues>({
   open,
@@ -164,7 +143,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
-      bodyMode="managed"
+      bodyMode="composed"
     >
       {open
         ? wrapForm(
@@ -176,21 +155,46 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
               fields={form.fields}
               defaultValues={form.defaultValues}
               valueSyncs={form.valueSyncs}
+              className="flex min-h-0 flex-1 flex-col"
               contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
               rhythm="comfortable"
               size="md"
-              stickyFooter
-              footerVariant="sheet"
               formError={formError}
               header={form.header}
               onSubmit={handleSubmit}
+              contentWrapper={(content) => (
+                <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
+                  {content}
+                </DrawerShell.Body>
+              )}
+              footerWrapper={({ footer, formError: footerFormError }) => (
+                <>
+                  <ContentFormDrawerLeaveGuard
+                    bridgeRef={leaveBridgeRef}
+                    pending={pending}
+                    open={open}
+                  />
+                  <DrawerShell.Footer>
+                    {footerFormError ? (
+                      <Text variant="destructive" role="alert">
+                        {footerFormError}
+                      </Text>
+                    ) : null}
+                    <div className={dialogPanelActionRowClasses}>{footer}</div>
+                  </DrawerShell.Footer>
+                </>
+              )}
               footer={() => (
-                <ContentFormDrawerFooter
-                  pending={pending}
-                  submitLabel={submitLabel}
-                  leaveBridgeRef={leaveBridgeRef}
-                  open={open}
-                />
+                <>
+                  <DrawerShell.Close asChild>
+                    <Button type="button" variant="outline" disabled={pending}>
+                      Cancel
+                    </Button>
+                  </DrawerShell.Close>
+                  <Button type="submit" disabled={pending}>
+                    {submitLabel}
+                  </Button>
+                </>
               )}
             />,
           )

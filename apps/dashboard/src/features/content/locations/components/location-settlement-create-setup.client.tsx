@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useMemo, useState } from 'react'
-import { CollapsibleRadioCardField, Button, Modal } from '@rpg/ui'
+import { CollapsibleRadioCardField, Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 import type { SettlementType } from '@rpg/contracts'
 
 import type {
@@ -57,20 +57,22 @@ export function LocationSettlementCreateSetup({
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            disabled={!settlementType}
-            onClick={() => {
-              if (!settlementType) return
-              onComplete({ settlementType })
-              onOpenChange(false)
-            }}
-          >
-            Continue
-          </Button>
+          <div className={dialogPanelActionRowClasses}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={!settlementType}
+              onClick={() => {
+                if (!settlementType) return
+                onComplete({ settlementType })
+                onOpenChange(false)
+              }}
+            >
+              Continue
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

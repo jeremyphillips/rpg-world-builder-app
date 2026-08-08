@@ -8,7 +8,11 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { FormFooterRegion, FormShellFieldStack } from './form-shell-field-stack.client'
+import {
+  FormFooterRegion,
+  FormShellFieldStack,
+  type FormFooterWrapperProps,
+} from './form-shell-field-stack.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import type { ValidateSilently } from '../context/form-ui.context'
 import {
@@ -20,6 +24,8 @@ import {
 } from '../field-config'
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
+
+export type { FormFooterWrapperProps }
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -70,8 +76,16 @@ export interface FormProps<TFieldValues extends FieldValues> {
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
-  /** Footer chrome variant — use `sheet` inside drawers with `p-0` bodies. */
-  footerVariant?: 'default' | 'sheet'
+  /**
+   * Wrap scrollable field content (e.g. `<DrawerShell.Body>` in composed drawer flows).
+   * Pair with {@link footerWrapper} so footer chrome stays outside the scroll region.
+   */
+  contentWrapper?: (content: React.ReactNode) => React.ReactNode
+  /**
+   * Render the footer outside the sticky actions bar (e.g. `<DrawerShell.Footer>`).
+   * When set, overlay footer chrome is caller-owned; Form supplies error + actions as content.
+   */
+  footerWrapper?: (props: FormFooterWrapperProps) => React.ReactNode
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -113,7 +127,8 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
-  footerVariant = 'default',
+  contentWrapper,
+  footerWrapper,
   rhythm,
   size,
   valueSyncs,
@@ -147,7 +162,7 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
-  const isSheetDockedFooter = stickyFooter && footerVariant === 'sheet'
+  const isOverlayComposedFooter = Boolean(footerWrapper)
 
   return (
     <SchemaFormShell
@@ -161,22 +176,23 @@ export function Form<TFieldValues extends FieldValues>({
       validationPresentation={validationPresentation}
       validateSilently={validateSilently}
       onSubmit={onSubmit}
-      className={cn(isSheetDockedFooter && 'flex min-h-0 flex-1 flex-col', className)}
+      className={cn(isOverlayComposedFooter && 'flex min-h-0 flex-1 flex-col', className)}
     >
       <FormShellFieldStack
         formId={formId}
         fields={fields}
         contentClassName={contentClassName}
-        isSheetDockedFooter={isSheetDockedFooter}
+        isOverlayComposedFooter={isOverlayComposedFooter}
         stickyFooter={stickyFooter}
         formError={formError}
         valueSyncs={valueSyncs}
         header={resolvedHeader}
+        contentWrapper={contentWrapper}
       />
       <FormFooterRegion
         stickyFooter={stickyFooter}
         formError={formError}
-        footerVariant={footerVariant}
+        footerWrapper={footerWrapper}
         footer={resolvedFooter}
       />
     </SchemaFormShell>

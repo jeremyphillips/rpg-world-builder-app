@@ -6,6 +6,7 @@ import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { Input } from './input.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { useModal } from '../../hooks/use-modal'
 
 const meta = {
@@ -31,12 +32,14 @@ export const Basic: Story = {
         />
         <Modal.Body>Players you invite can view and edit shared session notes.</Modal.Body>
         <Modal.Footer>
-          <Modal.Close asChild>
-            <Button variant="outline">Cancel</Button>
-          </Modal.Close>
-          <Modal.Close asChild>
-            <Button>Send invite</Button>
-          </Modal.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Modal.Close>
+            <Modal.Close asChild>
+              <Button>Send invite</Button>
+            </Modal.Close>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>
@@ -56,9 +59,11 @@ export const Sizes: StoryObj = {
             <Modal.Header headline={`Size: ${size}`} description="The panel caps at this width." />
             <Modal.Body>Resize the viewport to see the responsive base width.</Modal.Body>
             <Modal.Footer>
-              <Modal.Close asChild>
-                <Button>Done</Button>
-              </Modal.Close>
+              <div className={dialogPanelActionRowClasses}>
+                <Modal.Close asChild>
+                  <Button>Done</Button>
+                </Modal.Close>
+              </div>
             </Modal.Footer>
           </Modal.Content>
         </Modal.Root>
@@ -81,12 +86,14 @@ export const ConfirmCancel: StoryObj = {
             <Modal.Header headline="Delete campaign?" description="This cannot be undone." />
             <Modal.Body>All sessions and notes will be permanently removed.</Modal.Body>
             <Modal.Footer>
-              <Button variant="outline" onClick={modal.handleCancel}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={modal.handleConfirm}>
-                Delete
-              </Button>
+              <div className={dialogPanelActionRowClasses}>
+                <Button variant="outline" onClick={modal.handleCancel}>
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={modal.handleConfirm}>
+                  Delete
+                </Button>
+              </div>
             </Modal.Footer>
           </Modal.Content>
         </Modal.Root>
@@ -109,9 +116,11 @@ export const NonDismissable: StoryObj = {
         />
         <Modal.Body>Overlay clicks and the Escape key are disabled while this is open.</Modal.Body>
         <Modal.Footer>
-          <Modal.Close asChild>
-            <Button>Finish</Button>
-          </Modal.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button>Finish</Button>
+            </Modal.Close>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>
@@ -141,17 +150,19 @@ export const GuardedClose: StoryObj = {
               />
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="outline" onClick={modal.requestClose}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  setValue('')
-                  modal.closeModal()
-                }}
-              >
-                Save
-              </Button>
+              <div className={dialogPanelActionRowClasses}>
+                <Button variant="outline" onClick={modal.requestClose}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setValue('')
+                    modal.closeModal()
+                  }}
+                >
+                  Save
+                </Button>
+              </div>
             </Modal.Footer>
           </Modal.Content>
         </Modal.Root>
@@ -190,9 +201,11 @@ export const LongContent: StoryObj = {
           ))}
         </Modal.Body>
         <Modal.Footer>
-          <Modal.Close asChild>
-            <Button>Close</Button>
-          </Modal.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button>Close</Button>
+            </Modal.Close>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

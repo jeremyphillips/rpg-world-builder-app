@@ -10,11 +10,7 @@ import {
   dialogDismissHandlers,
 } from './dialog-parts.client'
 import { handleModalOpenAutoFocus } from './modal-focus.lib'
-import {
-  dialogPanelActionRowClasses,
-  dialogPanelBodyVariants,
-  dialogPanelSectionPaddingClasses,
-} from './dialog-panel.variants'
+import { dialogPanelBodyVariants, dialogPanelFooterClasses } from './dialog-panel.variants'
 import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
@@ -135,16 +131,7 @@ ModalBody.displayName = 'Modal.Body'
 
 const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        dialogPanelActionRowClasses,
-        dialogPanelSectionPaddingClasses,
-        'pt-0',
-        className,
-      )}
-      {...props}
-    />
+    <div ref={ref} className={cn(dialogPanelFooterClasses, className)} {...props} />
   ),
 )
 ModalFooter.displayName = 'Modal.Footer'

@@ -167,7 +167,7 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       footerWrapper={
         isSheetLayout
           ? ({ footer: footerContent, formError: footerFormError }) => (
-              <Sheet.Footer className="flex-col items-stretch gap-3">
+              <Sheet.Footer>
                 {footerFormError ? (
                   <Text variant="destructive" role="alert">
                     {footerFormError}

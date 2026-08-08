@@ -1,5 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { Button, Modal } from '@rpg/ui'
+import { Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 
 import {
   formatContentDeletionBlockedDescription,
@@ -33,9 +33,11 @@ export function ContentDeletionBlockedDialog({
         <ContentUsageBlockedList blockers={blockers} />
 
         <Modal.Footer>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Close
-          </Button>
+          <div className={dialogPanelActionRowClasses}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

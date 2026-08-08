@@ -550,6 +550,7 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
@@ -620,8 +621,7 @@ export {
 export {
   sheetBodyVariants,
   sheetContentVariants,
-  sheetFooterChromeClasses,
-  sheetFooterDockVerticalRhythmClasses,
+  sheetFooterDockClasses,
   type SheetContentVariantProps,
   type SheetSide,
   type SheetSize,

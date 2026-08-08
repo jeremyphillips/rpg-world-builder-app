@@ -1,7 +1,7 @@
 // Public surface of the `@rpg/ui/form` subpath: the schema-driven, RHF-aware
 // form layer — the `<Form>` renderer plus the config types + pure helpers.
 
-export { Form, type FormProps } from './shells/form.client'
+export { Form, type FormFooterWrapperProps, type FormProps } from './shells/form.client'
 export {
   useSchemaFormSubmit,
   type SchemaFormSubmitHandler,

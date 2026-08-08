@@ -5,6 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
@@ -19,9 +20,11 @@ function renderModal(contentProps: Record<string, unknown> = {}) {
         <Modal.Header headline="Invite a player" description="They will receive an email." />
         <Modal.Body>Body content</Modal.Body>
         <Modal.Footer>
-          <Modal.Close asChild>
-            <Button>Cancel</Button>
-          </Modal.Close>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button>Cancel</Button>
+            </Modal.Close>
+          </div>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>,

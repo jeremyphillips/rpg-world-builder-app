@@ -8,9 +8,9 @@ scrim (`modalOverlayVariants` / `bg-overlay`).
 
 ```text
 dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT)
-dialog-panel.variants.ts    Section inset, body, action row
+dialog-panel.variants.ts    Section inset, body, footer chrome, action row helper
 modal.variants.ts           ModalSize + centered panel shell (background only)
-sheet.variants.ts           SheetSize, SheetSurface, dock chrome only
+sheet.variants.ts           SheetSize, SheetSurface, dock placement only
 Modal.*                     Centered behavior
 Sheet.*                     Edge behavior
 ConfirmDialog               AlertDialog; reuses modal panel + dialog-panel tokens
@@ -19,12 +19,13 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                              | Role                                                                    |
-| ---------------------------------- | ----------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                           |
-| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content / sheet form footers |
-| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)       |
-| `dialogPanelActionRowClasses`      | Action row flex only — no modality chrome                               |
+| Token                              | Role                                                                  |
+| ---------------------------------- | --------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                         |
+| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                    |
+| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)     |
+| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t` + `px-6` + `py-4`; no fill) |
+| `dialogPanelActionRowClasses`      | Action row flex helper — child only, not on footer root               |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -33,13 +34,28 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 ### Footer composition
 
 ```text
-Modal.Footer  = action row + section padding + pt-0
-Sheet.Footer  = sheetFooterChromeClasses + action row + section padding
-Form sheet bar = sheetFooterChromeClasses + section inset X + dock vertical rhythm
+dialogPanelFooterClasses     border-t + px-6 + py-4 column root; inherits panel surface
+dialogPanelActionRowClasses  child helper for button groups
+sheetFooterDockClasses       Sheet-only shrink-0 z-20 placement
+
+Modal.Footer  = dialogPanelFooterClasses
+Sheet.Footer  = dialogPanelFooterClasses + sheetFooterDockClasses
 ```
 
-Dock chrome (`sheetFooterChromeClasses`) and dock vertical rhythm
-(`sheetFooterDockVerticalRhythmClasses`) stay Sheet-owned.
+Overlay footer chrome does **not** set `bg-*`. The panel Content already established
+surface fill and `--surface-current`. Backdrop blur stays on page sticky
+`FormActionsBar` only — not on flex-docked overlay footers.
+
+Body / footer boundary:
+
+```text
+Header: p-6
+Body:   p-6 pt-0
+Footer: separator + px-6 + py-4 (independently complete; no pt-0)
+```
+
+Form drawer flows use `<Form footerWrapper>` → `DrawerShell.Footer` (or `Sheet.Footer`)
+so Form owns error + actions content while Sheet owns footer chrome + dock placement.
 
 ## Size and surface (capability alignment)
 
@@ -63,8 +79,8 @@ Sheet exposes `surface: 'card' | 'background'` (default `card`). App drawers
 DrawerShell `bodyMode`:
 
 - `scrolling` (default) — `Sheet.Body` scrolls with dialog-panel body padding
-- `managed` — body becomes `p-0 overflow-hidden`; child (Form) owns scroll + docked
-  footer and re-applies horizontal inset from `dialogPanelSectionInsetXClasses`
+- `managed` — body becomes `p-0 overflow-hidden`; child owns scroll inside the body
+- `composed` — no auto `Sheet.Body`; Form/feature supplies Body + Footer via wrappers
 
 This is scroll ownership, not a second spacing axis. Modal does not need `bodyMode`
 today (no form-in-modal sticky sheet pattern).

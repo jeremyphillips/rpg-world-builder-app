@@ -24,7 +24,17 @@ export const dialogPanelBodyVariants = cva(
 )
 
 /**
+ * Canonical overlay footer section chrome — separator, horizontal inset, vertical rhythm.
+ * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.
+ */
+export const dialogPanelFooterClasses = cn(
+  'flex flex-col border-t border-border',
+  dialogPanelSectionInsetXClasses,
+  'py-4',
+)
+
+/**
  * Footer / confirm action row layout only — no modality chrome or section padding.
- * Compose with section padding (and Sheet dock chrome) at the call site.
+ * Child helper under {@link dialogPanelFooterClasses}; not applied on the footer root.
  */
 export const dialogPanelActionRowClasses = 'flex items-center justify-end gap-2'
