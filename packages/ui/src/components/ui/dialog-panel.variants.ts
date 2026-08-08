@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+
 /**
  * Canonical dialog panel section inset. Shared by Modal/Sheet body+footer padding
  * and (via {@link dialogPanelSectionInsetXClasses}) managed Form horizontal inset.
@@ -17,7 +19,9 @@ export const dialogPanelSectionInsetXClasses = 'px-6'
  * Shared scrollable panel body. Sheet adds `flex-1` via `sheetBodyVariants`.
  * DrawerShell `bodyMode="managed"` opts out of this padding so the child re-owns inset.
  */
-export const dialogPanelBodyVariants = cva('overflow-y-auto p-6 pt-0 text-sm')
+export const dialogPanelBodyVariants = cva(
+  cn(dialogPanelSectionPaddingClasses, 'overflow-y-auto pt-0 text-sm'),
+)
 
 /**
  * Footer / confirm action row layout only — no modality chrome or section padding.

@@ -15,7 +15,12 @@ import {
 describe('dialog-panel variants', () => {
   it('owns the canonical section inset vocabulary', () => {
     expect(dialogPanelSectionPaddingClasses).toBe('p-6')
-    expect(dialogPanelSectionInsetXClasses).toBe('px-6')
+  })
+
+  it('keeps horizontal inset aligned with section padding scale', () => {
+    const paddingMatch = dialogPanelSectionPaddingClasses.match(/^p-(\d+(?:\.\d+)?)$/)
+    expect(paddingMatch).not.toBeNull()
+    expect(dialogPanelSectionInsetXClasses).toBe(`px-${paddingMatch![1]}`)
   })
 
   it('keeps action row layout-only (no padding or dock chrome)', () => {
@@ -25,12 +30,17 @@ describe('dialog-panel variants', () => {
     )
   })
 
+  it('composes body from section padding (not a parallel p-6 string)', () => {
+    const bodyClasses = dialogPanelBodyVariants()
+    expect(bodyClasses).toContain(dialogPanelSectionPaddingClasses)
+    expect(bodyClasses).toContain('overflow-y-auto')
+    expect(bodyClasses).toContain('pt-0')
+    expect(bodyClasses).not.toContain('flex-1')
+  })
+
   it('shares body padding with Sheet adding flex-1', () => {
-    expect(dialogPanelBodyVariants()).toContain('overflow-y-auto')
-    expect(dialogPanelBodyVariants()).toContain('p-6')
-    expect(dialogPanelBodyVariants()).toContain('pt-0')
-    expect(dialogPanelBodyVariants()).not.toContain('flex-1')
     expect(sheetBodyVariants()).toContain('flex-1')
+    expect(sheetBodyVariants()).toContain(dialogPanelSectionPaddingClasses)
     expect(sheetBodyVariants()).toContain('overflow-y-auto')
   })
 })

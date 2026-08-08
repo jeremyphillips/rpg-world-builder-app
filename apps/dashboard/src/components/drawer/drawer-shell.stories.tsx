@@ -1,5 +1,13 @@
 import type { ComponentProps } from 'react'
-import { Button, Input, Text, dialogPanelSectionInsetXClasses, cn } from '@rpg/ui'
+import {
+  Button,
+  Input,
+  Text,
+  cn,
+  dialogPanelSectionInsetXClasses,
+  sheetFooterChromeClasses,
+  sheetFooterDockVerticalRhythmClasses,
+} from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
@@ -100,7 +108,11 @@ export const ManagedBody: Story = {
           ))}
         </div>
         <div
-          className={cn('shrink-0 border-t border-border py-4', dialogPanelSectionInsetXClasses)}
+          className={cn(
+            sheetFooterChromeClasses,
+            dialogPanelSectionInsetXClasses,
+            sheetFooterDockVerticalRhythmClasses,
+          )}
         >
           <Text variant="destructive" role="alert">
             Could not save item.
