@@ -3,7 +3,11 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCATION_DISPLAY_SUMMARY_SEPARATOR, type Location } from '@rpg/contracts'
+import {
+  LOCATION_DISPLAY_SUMMARY_SEPARATOR,
+  type Location,
+  type LocationKind,
+} from '@rpg/contracts'
 import { Text, toast } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
@@ -18,6 +22,7 @@ import {
   LOCATION_SECTION_LABELS,
   type LocationChildrenViewModel,
 } from '../lib/location-display'
+import type { LocationAuthoringType } from '../lib/location-authoring-type'
 import {
   applyLocationParentReplacement,
   hasLocationParentReplacementContextMismatch,
@@ -27,22 +32,24 @@ import {
   LOCATION_PARENT_MOVE_ACTION_LABELS,
   LOCATION_PARENT_REPLACEMENT_DRAWER,
 } from '../lib/location-parent-replacement-surface-copy'
+import { LocationAddChildMenu } from './location-add-child-menu.client'
+import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
 
 export type LocationChildrenSectionProps = {
   childrenViewModel: LocationChildrenViewModel
-  headerActions?: React.ReactNode
   canManage?: boolean
   parentLocationId: string
+  parentKind: LocationKind
   campaignId: string
   campaignLocations: readonly Location[]
 }
 
 export function LocationChildrenSection({
   childrenViewModel,
-  headerActions,
   canManage = false,
   parentLocationId,
+  parentKind,
   campaignId,
   campaignLocations,
 }: LocationChildrenSectionProps) {
@@ -51,6 +58,9 @@ export function LocationChildrenSection({
   const queryClient = useQueryClient()
   const [moveSubject, setMoveSubject] = React.useState<Location | null>(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [createIntent, setCreateIntent] = React.useState<{
+    authoringType: LocationAuthoringType
+  } | null>(null)
 
   const refreshContainedLocations = React.useCallback(() => {
     invalidateLocationParentReplacementQueries(queryClient, campaignId)
@@ -98,6 +108,7 @@ export function LocationChildrenSection({
       await applyLocationParentReplacement({
         campaignId,
         subjectId: latestSubject.id,
+        subjectKind: latestSubject.kind,
         newParentLocationId,
       })
       invalidateLocationParentReplacementQueries(queryClient, campaignId)
@@ -113,7 +124,14 @@ export function LocationChildrenSection({
         heading={LOCATION_SECTION_LABELS.children}
         headingId="location-children-heading"
         helper={LOCATION_SECTION_HELPERS.children}
-        headerEndSlot={headerActions}
+        headerEndSlot={
+          canManage ? (
+            <LocationAddChildMenu
+              parentKind={parentKind}
+              onSelectAuthoringType={(authoringType) => setCreateIntent({ authoringType })}
+            />
+          ) : undefined
+        }
       >
         {items.length === 0 ? (
           <Text variant="muted" className="px-4 py-2">
@@ -157,6 +175,18 @@ export function LocationChildrenSection({
           </DetailSectionRowList>
         )}
       </DetailSectionPanel>
+
+      {createIntent ? (
+        <LocationContainedCreateDrawer
+          open
+          onOpenChange={(open) => {
+            if (!open) setCreateIntent(null)
+          }}
+          authoringType={createIntent.authoringType}
+          parentLocationId={parentLocationId}
+          campaignId={campaignId}
+        />
+      ) : null}
 
       {moveSubject ? (
         <LocationParentReplacementDrawer

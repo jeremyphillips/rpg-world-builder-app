@@ -72,9 +72,13 @@ export function formatCampaignAccessParticipantOptionLabel(
   return `${name} · ${playerDisplayName}`
 }
 
-/** Non-blocking create-time failure when the deferred campaign-access PATCH fails. */
+/** Inline create-time warning when the deferred campaign-access PATCH fails. */
 export const CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR =
-  'Item created, but campaign access could not be saved — set it on the edit page.'
+  'Item created, but campaign access could not be updated.'
+
+/** Toast warning when create succeeded but deferred campaign-access PATCH failed. */
+export const CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING =
+  'Location created, but campaign access could not be updated.'
 
 /** Collapsed disclosure action to expand settings. */
 export const CAMPAIGN_ACCESS_CHANGE_LABEL = 'Change'

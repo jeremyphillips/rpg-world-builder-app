@@ -16,6 +16,7 @@ import {
   modalOverlayVariants,
   type ModalSize,
 } from './modal.variants'
+import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const ModalRoot = DialogPrimitive.Root
 
@@ -61,27 +62,35 @@ const ModalContent = React.forwardRef<
       onEscapeKeyDown,
       ...props
     },
-    ref,
-  ) => (
-    <DialogPrimitive.Portal>
-      <ModalOverlay />
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(modalContentVariants({ size }), className)}
-        {...dialogDismissHandlers(
-          closeOnOutsideClick,
-          closeOnEscape,
-          onInteractOutside,
-          onEscapeKeyDown,
-        )}
-        onOpenAutoFocus={(event) => handleModalOpenAutoFocus(event, onOpenAutoFocus)}
-        {...props}
-      >
-        {children}
-        <DialogCloseButton closeLabel={closeLabel} />
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  ),
+    forwardedRef,
+  ) => {
+    const { composedRef, portalProvider } = useDialogLayerPortalContainer(forwardedRef)
+
+    return (
+      <DialogPrimitive.Portal>
+        <ModalOverlay />
+        <DialogPrimitive.Content
+          ref={composedRef}
+          className={cn(modalContentVariants({ size }), className)}
+          {...dialogDismissHandlers(
+            closeOnOutsideClick,
+            closeOnEscape,
+            onInteractOutside,
+            onEscapeKeyDown,
+          )}
+          onOpenAutoFocus={(event) => handleModalOpenAutoFocus(event, onOpenAutoFocus)}
+          {...props}
+        >
+          {portalProvider(
+            <>
+              {children}
+              <DialogCloseButton closeLabel={closeLabel} />
+            </>,
+          )}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    )
+  },
 )
 ModalContent.displayName = 'Modal.Content'
 

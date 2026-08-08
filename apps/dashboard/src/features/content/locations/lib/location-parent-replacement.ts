@@ -2,6 +2,7 @@ import {
   validateLocationParentAssignment,
   getParentRequirement,
   type Location,
+  type LocationKind,
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -162,9 +163,11 @@ export function canSubmitLocationParentReplacement(input: {
 export async function applyLocationParentReplacement(input: {
   campaignId: string
   subjectId: string
+  subjectKind: LocationKind
   newParentLocationId: string
 }): Promise<void> {
   await updateContent(input.campaignId, 'locations', input.subjectId, {
+    kind: input.subjectKind,
     parentLocationId: input.newParentLocationId,
   })
 }

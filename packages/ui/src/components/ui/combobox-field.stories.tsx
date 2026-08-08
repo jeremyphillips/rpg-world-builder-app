@@ -2,6 +2,8 @@ import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ComboboxField } from './combobox-field.client'
+import { Sheet } from './sheet.client'
+import { Button } from './button.client'
 
 const meta = {
   title: 'UI/ComboboxField',
@@ -167,5 +169,32 @@ export const CustomSelectedItems: Story = {
         </button>
       </div>
     ),
+  },
+}
+
+/** Regression: combobox list must scroll with wheel/trackpad inside a sheet drawer. */
+export const InsideSheet: Story = {
+  render: (args) => (
+    <Sheet.Root>
+      <Sheet.Trigger asChild>
+        <Button>Open sheet</Button>
+      </Sheet.Trigger>
+      <Sheet.Content className="max-w-[550px]">
+        <Sheet.Header headline="Create contained location" />
+        <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
+          <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-0">
+            <ComboboxField {...args} />
+          </div>
+        </Sheet.Body>
+      </Sheet.Content>
+    </Sheet.Root>
+  ),
+  args: {
+    id: 'archetype-sheet',
+    label: 'Archetype',
+    options: weaponOptions,
+    multiple: false,
+    value: '',
+    placeholder: 'Search building archetypes…',
   },
 }

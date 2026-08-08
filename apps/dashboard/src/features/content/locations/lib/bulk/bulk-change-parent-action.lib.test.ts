@@ -69,6 +69,7 @@ describe('bulk-change-parent-action.lib', () => {
     )
 
     expect(updateContent).toHaveBeenCalledWith(campaignId, 'locations', HARBORFORD.id, {
+      kind: 'settlement',
       parentLocationId: ALDERMERE.id,
     })
     expect(outcomes).toEqual([{ status: 'updated', targetId: HARBORFORD.id }])
@@ -84,6 +85,7 @@ describe('bulk-change-parent-action.lib', () => {
     )
 
     expect(updateContent).toHaveBeenCalledWith(campaignId, 'locations', HARBORFORD.id, {
+      kind: 'settlement',
       parentLocationId: null,
     })
   })

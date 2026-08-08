@@ -28,9 +28,8 @@ import { resolveContentPostCreateEditHref } from './content-form-navigation'
 
 import { resolveContentFormSchema } from './content-edit-load'
 import { intentToStatus } from './content-create-intent'
-import { updateRouteContentCampaignAccess } from '../../campaign-access/campaign-access-api'
+import { createWithDeferredCampaignAccess } from '../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../campaign-access/campaign-access-labels'
-import { isDefaultCampaignAccessPatch } from '../../campaign-access/campaign-access-state'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -78,31 +77,30 @@ function ContentCreateFormBody({
     status: 'draft' | 'published',
     validationIntent: ContentValidationIntent,
   ) => {
-    const saved = (await mutation.mutateAsync({
-      ...def.toInput(
-        values,
-        {
-          weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-          campaignRules: ctx.campaignRules,
-          equipmentKind: ctx.equipmentKind,
-        },
-        validationIntent,
-      ),
-      status,
-    })) as { id: string; kind?: unknown }
+    const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
+      campaignId,
+      routeKey: def.routeKey,
+      createInput: {
+        ...def.toInput(
+          values,
+          {
+            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+            campaignRules: ctx.campaignRules,
+            equipmentKind: ctx.equipmentKind,
+          },
+          validationIntent,
+        ),
+        status,
+      },
+      mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
+      pendingAccess: campaignAccessDraftRef.current,
+    })
 
-    const pendingAccess = campaignAccessDraftRef.current
-    let deferredAccessFailed = false
-    if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
-      try {
-        await updateRouteContentCampaignAccess(campaignId, def.routeKey, saved.id, pendingAccess)
-      } catch {
-        deferredAccessFailed = true
-        setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
-      }
+    if (deferredAccessFailed) {
+      setCampaignAccessDeferredError(CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR)
     }
 
-    const editHref = resolveContentPostCreateEditHref(def, campaignId, saved, formCtx)
+    const editHref = resolveContentPostCreateEditHref(def, campaignId, created, formCtx)
     allowFormNavigationOnce()
     navigate(editHref)
     if (!deferredAccessFailed) {

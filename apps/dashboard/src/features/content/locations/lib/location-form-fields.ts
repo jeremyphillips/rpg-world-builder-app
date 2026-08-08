@@ -10,11 +10,13 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { LocationFormCtx } from './location-form-ctx'
 import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
+  filterLocationFieldsForAuthoringType,
 } from './location-classification-form-fields'
 import {
   buildLocationAuthoringTypeOptions,
@@ -80,10 +82,28 @@ export type LocationFormValues = z.infer<typeof locationFormSchema>
 export { nameField as locationNameField }
 
 export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
+  const locationCtx = ctx as LocationFormCtx
+  const fixedCreate = locationCtx.fixedCreate
   const locationEntities = ctx.options?.locationEntities
+  const items: FormItem[] = []
 
-  return [
-    {
+  if (fixedCreate) {
+    const primaryFields = filterLocationFieldsForAuthoringType(
+      buildLocationPrimaryClassificationFields(),
+      fixedCreate.authoringType,
+    )
+    if (primaryFields.length > 0) {
+      items.push({ kind: 'row', fields: primaryFields })
+    }
+
+    items.push(
+      ...filterLocationFieldsForAuthoringType(
+        buildLocationClassificationFields(),
+        fixedCreate.authoringType,
+      ),
+    )
+  } else {
+    items.push({
       kind: 'row',
       fields: [
         {
@@ -97,9 +117,15 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
         },
         ...buildLocationPrimaryClassificationFields(),
       ],
-    },
-    ...buildLocationClassificationFields(),
-    {
+    })
+  }
+
+  if (!fixedCreate) {
+    items.push(...buildLocationClassificationFields())
+  }
+
+  if (!fixedCreate) {
+    items.push({
       type: 'select',
       name: 'parentLocationId',
       label: 'Parent location',
@@ -107,9 +133,12 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
       placeholder: LOCATION_SELECT_PLACEHOLDER,
       visibility: parentLocationFieldVisibility(),
       optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
-    },
-    descriptionField(ctx),
-  ]
+    })
+  }
+
+  items.push(descriptionField(ctx))
+
+  return items
 }
 
 /** Resolves canonical kind from form values for hierarchy helpers within the form layer. */

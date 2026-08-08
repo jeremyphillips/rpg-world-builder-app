@@ -11,6 +11,7 @@ import {
 } from './dialog-parts.client'
 import { modalOverlayVariants } from './modal.variants'
 import { sheetBodyVariants, sheetContentVariants, type SheetSide } from './sheet.variants'
+import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const SheetRoot = DialogPrimitive.Root
 
@@ -51,26 +52,34 @@ const SheetContent = React.forwardRef<
       onEscapeKeyDown,
       ...props
     },
-    ref,
-  ) => (
-    <DialogPrimitive.Portal>
-      <SheetOverlay />
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(sheetContentVariants({ side }), className)}
-        {...dialogDismissHandlers(
-          closeOnOutsideClick,
-          closeOnEscape,
-          onInteractOutside,
-          onEscapeKeyDown,
-        )}
-        {...props}
-      >
-        {children}
-        <DialogCloseButton closeLabel={closeLabel} />
-      </DialogPrimitive.Content>
-    </DialogPrimitive.Portal>
-  ),
+    forwardedRef,
+  ) => {
+    const { composedRef, portalProvider } = useDialogLayerPortalContainer(forwardedRef)
+
+    return (
+      <DialogPrimitive.Portal>
+        <SheetOverlay />
+        <DialogPrimitive.Content
+          ref={composedRef}
+          className={cn(sheetContentVariants({ side }), className)}
+          {...dialogDismissHandlers(
+            closeOnOutsideClick,
+            closeOnEscape,
+            onInteractOutside,
+            onEscapeKeyDown,
+          )}
+          {...props}
+        >
+          {portalProvider(
+            <>
+              {children}
+              <DialogCloseButton closeLabel={closeLabel} />
+            </>,
+          )}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    )
+  },
 )
 SheetContent.displayName = 'Sheet.Content'
 

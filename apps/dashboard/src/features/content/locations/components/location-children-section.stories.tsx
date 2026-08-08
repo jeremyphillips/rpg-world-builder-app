@@ -42,6 +42,7 @@ export const ContainedRows: Story = {
   args: {
     childrenViewModel: harborfordChildren,
     parentLocationId: HARBORFORD.id,
+    parentKind: HARBORFORD.kind,
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: false,
@@ -52,6 +53,7 @@ export const ManagedWithMove: Story = {
   args: {
     childrenViewModel: harborfordChildren,
     parentLocationId: HARBORFORD.id,
+    parentKind: HARBORFORD.kind,
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: true,
@@ -62,6 +64,7 @@ export const Empty: Story = {
   args: {
     childrenViewModel: emptyChildren,
     parentLocationId: YAWNING_PORTAL.id,
+    parentKind: YAWNING_PORTAL.kind,
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: true,

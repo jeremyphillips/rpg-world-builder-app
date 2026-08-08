@@ -266,10 +266,12 @@ describe('applyLocationParentReplacement', () => {
     await applyLocationParentReplacement({
       campaignId: CAMPAIGN_ID,
       subjectId: YAWNING_PORTAL.id,
+      subjectKind: YAWNING_PORTAL.kind,
       newParentLocationId: HARBORFORD.id,
     })
 
     expect(mockUpdateContent).toHaveBeenCalledWith(CAMPAIGN_ID, 'locations', YAWNING_PORTAL.id, {
+      kind: 'structure',
       parentLocationId: HARBORFORD.id,
     })
   })

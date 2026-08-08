@@ -6,7 +6,11 @@ import {
   canonicalFieldsForAuthoringType,
   resolveLocationAuthoringType,
 } from './location-authoring-type'
-import { buildLocationCreateInput, locationToFormValues } from './location-form-values'
+import {
+  buildLocationCreateInput,
+  applyLocationFixedCreateContext,
+  locationToFormValues,
+} from './location-form-values'
 import type { LocationFormValues } from './location-form-fields'
 
 describe('locationToFormValues', () => {
@@ -82,6 +86,28 @@ describe('buildLocationCreateInput', () => {
     )
 
     expect(input).not.toHaveProperty('kind')
+    expect(input).not.toHaveProperty('authoringType')
+  })
+})
+
+describe('applyLocationFixedCreateContext', () => {
+  it('overlays fixed authoringType and parent onto mutated form values', () => {
+    const overlaid = applyLocationFixedCreateContext(
+      {
+        name: 'Harbor tavern',
+        authoringType: 'district',
+        parentLocationId: 'location-stale-parent',
+      } as LocationFormValues,
+      { authoringType: 'building', parentLocationId: DOCK_WARD.id },
+    )
+
+    const input = buildLocationCreateInput(overlaid)
+
+    expect(input).toMatchObject({
+      kind: 'structure',
+      structureType: 'building',
+      parentLocationId: DOCK_WARD.id,
+    })
     expect(input).not.toHaveProperty('authoringType')
   })
 })

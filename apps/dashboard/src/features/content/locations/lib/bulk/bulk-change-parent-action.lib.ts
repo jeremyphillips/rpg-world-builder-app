@@ -183,7 +183,10 @@ export async function applyBulkChangeParentToTargets(
     const batch = applicableRows.slice(index, index + BULK_UPDATE_CONCURRENCY)
     const batchResults = await Promise.allSettled(
       batch.map(async (row) => {
-        await updateContent(campaignId, 'locations', row.id, patchBody)
+        await updateContent(campaignId, 'locations', row.id, {
+          kind: row.kind,
+          ...patchBody,
+        })
         return row
       }),
     )

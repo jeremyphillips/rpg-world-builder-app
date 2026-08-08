@@ -2,6 +2,7 @@ import {
   isValidParentKind,
   LOCATION_KIND_ENTRIES,
   LOCATION_KIND_IDS,
+  midSentenceLabel,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
   type LocationKind,
@@ -43,6 +44,11 @@ export const LOCATION_CHILD_AUTHORING_TYPE_MENU_ORDER = [
 ] as const satisfies readonly LocationAuthoringType[]
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
+
+/** Sheet title for contained create — e.g. "Add building", "Add district". */
+export function formatLocationAuthoringTypeAddHeading(type: LocationAuthoringType): string {
+  return `Add ${midSentenceLabel(getLocationAuthoringTypeLabel(type))}`
+}
 
 export function getLocationAuthoringTypeLabel(type: LocationAuthoringType): string {
   if (type === UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE) {
