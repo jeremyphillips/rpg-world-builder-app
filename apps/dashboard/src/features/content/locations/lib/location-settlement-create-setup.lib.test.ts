@@ -19,6 +19,7 @@ describe('buildSettlementTypeRadioOptions', () => {
     expect(city).toEqual({
       value: 'city',
       label: SETTLEMENT_TYPE_ENTRIES.city.label,
+      description: SETTLEMENT_TYPE_ENTRIES.city.description,
     })
   })
 })

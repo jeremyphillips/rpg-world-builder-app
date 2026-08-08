@@ -14,6 +14,7 @@ export function buildSettlementTypeRadioOptions(): RadioCardOption[] {
   return Object.entries(SETTLEMENT_TYPE_ENTRIES).map(([value, entry]) => ({
     value,
     label: entry.label,
+    description: entry.description,
   }))
 }
 

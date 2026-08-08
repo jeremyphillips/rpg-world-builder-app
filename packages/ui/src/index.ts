@@ -220,9 +220,11 @@ export {
 } from './components/ui/radio-group-field'
 export {
   radioCardCompactBodyInsetClasses,
+  radioCardCompactOptionBodyLayoutClasses,
   radioCardCompactPanelPaddingClasses,
   radioCardCompactPaddingRightClasses,
   radioCardCompactPaddingXClasses,
+  radioCardCompactSummaryBodyLayoutClasses,
 } from './components/ui/radio-card.variants'
 export {
   RadioCard,

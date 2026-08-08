@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
+  radioCardCompactSummaryBodyLayoutClasses,
   radioCardDensityBodyLayoutVariants,
   radioCardDensityContentGapVariants,
   radioCardDescriptionVariants,
@@ -21,7 +22,7 @@ export const chooserSummaryCardBodyVariants = cva('flex flex-col', {
         radioCardDensityContentGapVariants({ density: 'default' }),
       ),
       compact: cn(
-        radioCardDensityBodyLayoutVariants({ density: 'compact' }),
+        radioCardCompactSummaryBodyLayoutClasses,
         radioCardDensityContentGapVariants({ density: 'compact' }),
       ),
     },

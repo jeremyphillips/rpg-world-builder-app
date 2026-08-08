@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  radioCardCompactBodyInsetClasses,
   radioCardControlVariants,
   radioCardDescriptionVariants,
   radioCardDetailsGridVariants,
@@ -29,11 +30,13 @@ describe('radioCard surface establishment', () => {
     expect(panel).toContain('bg-surface-muted')
   })
 
-  it('uses compact 10px/16px padding and density-owned typography', () => {
+  it('uses compact option padding with control and density-owned typography', () => {
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('py-2.5')
-    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('px-4')
-    expect(radioCardShellVariants({ density: 'compact' })).toContain('py-2.5')
-    expect(radioCardShellVariants({ density: 'compact' })).toContain('px-4')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pl-3')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pr-4')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).not.toContain('px-4')
+    expect(radioCardShellVariants({ density: 'compact' })).toContain('pl-3')
+    expect(radioCardShellVariants({ density: 'compact' })).toContain('pr-4')
     expect(radioCardTitleVariants({ density: 'compact' })).toContain('text-sm')
     expect(radioCardDescriptionVariants({ density: 'compact' })).toContain('text-xs')
     expect(radioCardDescriptionVariants({ density: 'compact' })).toContain('text-muted-foreground')
@@ -48,6 +51,18 @@ describe('radioCard surface establishment', () => {
     expect(radioCardRootLayoutVariants({ density: 'compact' })).toContain('gap-3')
     expect(radioCardDetailsGridVariants({ density: 'compact' })).toContain('gap-x-3')
     expect(radioCardControlVariants({ variant: 'card', density: 'compact' })).toContain('size-4')
+  })
+
+  it('aligns compact embedded panel inset with 12px option shell padding', () => {
+    expect(radioCardCompactBodyInsetClasses).toBe('pl-[calc(0.75rem+1rem+0.75rem)]')
+    expect(radioCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-ml-3')
+    expect(radioCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-mr-4')
+  })
+
+  it('keeps comfortable density card padding unchanged', () => {
+    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('p-4')
+    expect(radioCardVariants({ variant: 'card', density: 'default' })).toContain('sm:p-6')
+    expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('pl-3')
   })
 
   it('does not establish a plane on divider embedded slots', () => {

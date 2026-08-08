@@ -16,6 +16,7 @@ import {
   SETTLEMENT_CREATE_SETUP_PROMPT,
   SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW,
 } from '../lib/location-settlement-create-setup.lib'
+import { locationSettlementCreateSetupModalBodyClasses } from './location-settlement-create-setup.variants'
 
 export type LocationSettlementCreateSetupProps = {
   open: boolean
@@ -40,7 +41,7 @@ export function LocationSettlementCreateSetup({
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size="sm">
         <Modal.Header headline="New settlement" description={description} />
-        <Modal.Body>
+        <Modal.Body className={locationSettlementCreateSetupModalBodyClasses}>
           <CollapsibleRadioCardField
             id={fieldId}
             label={SETTLEMENT_CREATE_SETUP_PROMPT}
