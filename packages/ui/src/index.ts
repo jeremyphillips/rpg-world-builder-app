@@ -397,6 +397,10 @@ export {
   type ContentCardBodyProps,
 } from './components/ui/content-card-body.client'
 export {
+  ContentCardHeading,
+  type ContentCardHeadingProps,
+} from './components/ui/content-card-heading.client'
+export {
   ContentCardHeadingAction,
   ContentCardIconAction,
   type ContentCardHeadingActionProps,

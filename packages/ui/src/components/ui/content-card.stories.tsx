@@ -69,6 +69,16 @@ export const HeadingWithSubheadingCompact: Story = {
   },
 }
 
+export const HeadingWithSuffixCompact: Story = {
+  name: 'Heading + suffix (compact)',
+  args: {
+    density: 'compact',
+    heading: 'Yawning Portal',
+    headingSuffix: ' · Building · Tavern',
+    subheading: 'Located in Dock Ward',
+  },
+}
+
 export const HeadingSubheadingWithHeadingEndSlotComfortable: Story = {
   name: 'Heading + subheading + headingEndSlot (comfortable)',
   parameters: {

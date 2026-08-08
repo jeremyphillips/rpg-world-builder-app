@@ -233,7 +233,26 @@ Drawer fixed endpoints compose **`DrawerContext`** from feature projections:
 
 - Location: `buildLocationEntityContextPresentation(LocationEntitySummaryVm)` — heading, ` · ${classification.text}`, optional `Located in {nearestParent}` from `ancestry.items.at(-1)` (via [`formatLocatedInSupportingText`](../src/features/content/locations/lib/location-display.ts)).
 - Organization: `buildOrganizationDrawerContextEntity` — `{name} · Organization`.
-- Character: `buildCharacterEntityContextPresentation` when a summary VM is available.
+- Character: `buildCharacterEntityContextPresentation` — `{name} · {PC|NPC}` with identity summary as supporting text (parity with location Located-in).
+
+**DrawerContext composition (all connection-drawer modes):**
+
+| Surface                    | Mode                      | Entities                                                     |
+| -------------------------- | ------------------------- | ------------------------------------------------------------ |
+| Location inverse org       | add / replaceOrganization | `[location]` (+ sunken Current org on replace)               |
+| Location inverse org       | changeKind                | `[location, organization]`                                   |
+| Location inverse character | add / changeKind          | `[location]` / `[location, character]`                       |
+| Location inverse people    | add                       | `[location]`                                                 |
+| Organization forward       | add / changeTarget        | `[organization]` (+ sunken Current location on changeTarget) |
+| Organization forward       | changeKind                | `[organization, location]`                                   |
+
+Locked relationship kinds on replace / changeTarget use read-only **`RelationshipDrawerSubjectField`** (not endpoint chrome).
+
+Organization forward relationship rows resolve target presentation via **`buildLocationEntityContextPresentation`** — no hand-rolled ` · ${classification}` or italic Located-in markup.
+
+Parent replacement (Move / Set / Change parent) omits subject **`DrawerContext`** when the drawer title already names the subject. Unavailable parent headings use **`ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING`**.
+
+Removed parallel string-context formatters (`RelationshipDrawerContextHeader`, `resolveLocationConnectionContext`, `location-drawer-context.lib.ts`) — drawers consume entity-context presentation helpers only.
 
 **DrawerContext** (lightweight, no chrome) names fixed endpoints for add flows and attribute mutations. **Sunken Current** (`EntityReplacementCurrentField`) hosts the same entity composition for replacement-only workflows.
 

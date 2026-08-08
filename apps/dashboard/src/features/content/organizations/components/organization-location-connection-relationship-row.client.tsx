@@ -9,8 +9,9 @@ import type {
 } from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import { formatLocatedInSupportingText } from '../../locations/lib/location-display'
+import { buildLocationEntityContextPresentation } from '../../locations/lib/location-display'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -150,21 +151,21 @@ export function OrganizationLocationConnectionRelationshipRow({
   onRemoveConnection,
 }: OrganizationLocationConnectionRelationshipRowProps) {
   const navigate = useNavigate()
-  const targetName = item.target?.name ?? 'Unavailable location'
-  const nearestParent = item.target?.ancestry.items.at(-1)
+  const presentation = item.target
+    ? buildLocationEntityContextPresentation(item.target)
+    : { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING }
 
   return (
     <CrossContentRelationshipRow
-      heading={targetName}
+      heading={presentation.heading}
       href={item.target?.href}
-      headingSuffix={item.target ? ` · ${item.target.classification.text}` : undefined}
+      headingSuffix={presentation.headingSuffix}
+      subheading={presentation.supportingText}
       metadata={
         item.target == null ? (
           <Badge tone="warning" className="mt-1">
             Unavailable
           </Badge>
-        ) : nearestParent ? (
-          <span className="italic">{formatLocatedInSupportingText(nearestParent.name)}</span>
         ) : undefined
       }
       actions={buildOrganizationLocationConnectionOverflowActions({
@@ -177,7 +178,7 @@ export function OrganizationLocationConnectionRelationshipRow({
         onChangeTargetConnection,
         onRemoveConnection,
       })}
-      overflowTriggerLabel={`Actions for ${targetName}`}
+      overflowTriggerLabel={`Actions for ${presentation.heading}`}
     />
   )
 }

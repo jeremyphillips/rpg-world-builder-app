@@ -22,11 +22,11 @@ import {
   resolveLocationParentReplacementCurrentSnapshot,
   resolveLocationParentReplacementMode,
 } from './location-parent-replacement'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   buildLocationChildren,
   buildLocationLocatedInSegments,
   buildLocationsById,
-  LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
 
 vi.mock('../../lib/list/content-client', () => ({
@@ -115,7 +115,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       }),
     ).toEqual({
       parentLocationId: 'missing-parent-id',
-      entity: { heading: LOCATION_UNKNOWN_ANCESTOR_LABEL },
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     })
   })

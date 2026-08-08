@@ -4,9 +4,11 @@ import * as React from 'react'
 
 import type {
   Location,
+  Organization,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
+import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -22,12 +24,14 @@ import { EntityReplacementSection } from '../../lib/entity-replacement/entity-re
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
 import { resolveRelationshipCandidateSet } from '../../lib/relationship/relationship-candidate-set'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 import {
   buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
@@ -68,6 +72,7 @@ import {
   resolveOrganizationForwardFamilyAddDrawerHelper,
   resolveOrganizationForwardTargetPresentation,
 } from '../lib/organization-location-connection-surface-copy'
+import { buildOrganizationDrawerContextEntity } from '../lib/organization-display'
 import {
   filterLocationsByTargetBrowseScope,
   ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
@@ -98,6 +103,7 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   mode: OrganizationForwardDrawerMode
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
+  organization: Pick<Organization, 'name'>
   organizationId: string
   campaignId: string
   locations: readonly Location[]
@@ -155,6 +161,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   mode,
   intent,
   addKind,
+  organization,
   organizationId,
   campaignId,
   locations,
@@ -426,21 +433,36 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const changeTargetEntityLabel = resolveOrganizationForwardChangeTargetEntityLabel(intent)
 
   const drawerContextEntities = React.useMemo(() => {
-    if (mode !== 'changeKind' || !lockedLocation) {
-      return []
+    const organizationEntity = toDrawerContextEntity(
+      buildOrganizationDrawerContextEntity(organization),
+    )
+
+    if (mode === 'add' || mode === 'changeTarget') {
+      return [organizationEntity]
     }
 
-    return [
-      toDrawerContextEntity(
-        buildLocationEntityContextPresentation(
-          buildLocationEntitySummaryVm(lockedLocation, {
-            locationsById,
-            campaignId,
-          }),
-        ),
-      ),
-    ]
-  }, [campaignId, lockedLocation, locationsById, mode])
+    if (mode === 'changeKind') {
+      const locationEntity = lockedLocation
+        ? toDrawerContextEntity(
+            buildLocationEntityContextPresentation(
+              buildLocationEntitySummaryVm(lockedLocation, {
+                locationsById,
+                campaignId,
+              }),
+            ),
+          )
+        : toDrawerContextEntity({ heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING })
+
+      return [organizationEntity, locationEntity]
+    }
+
+    return []
+  }, [campaignId, lockedLocation, locationsById, mode, organization])
+
+  const lockedKindLabel =
+    (mode === 'changeTarget' || mode === 'changeKind') && activeKind != null
+      ? getOrganizationLocationConnectionDisplayLabel(activeKind, 'forward')
+      : null
 
   const mutationEmptyMessage =
     mode === 'changeTarget'
@@ -513,6 +535,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
       headerBelowDescription={
         <div className="space-y-4">
           <DrawerContext entities={drawerContextEntities} />
+          {mode === 'changeTarget' && lockedKindLabel ? (
+            <RelationshipDrawerSubjectField
+              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              value={lockedKindLabel}
+            />
+          ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}

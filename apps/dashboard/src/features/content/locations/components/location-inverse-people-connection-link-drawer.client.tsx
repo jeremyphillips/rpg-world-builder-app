@@ -24,6 +24,8 @@ import {
   buildCharacterPickerCardPresentation,
   buildOrganizationPickerCardPresentation,
 } from '../../lib/content-entity-picker-presentation.lib'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -59,12 +61,15 @@ import {
   resolvePeopleKindSlotSelectableSubjectTypes,
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
+import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   kindSlots: readonly PeopleKindSlot[]
   location: Location
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
   organizations: readonly Organization[]
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -111,6 +116,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onOpenChange,
   kindSlots,
   location,
+  locationsById,
+  campaignId,
   organizations,
   characters,
   connectedPartyRows,
@@ -273,8 +280,18 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[organizationIntent]
       : 'All eligible connection types are already linked.'
 
+  const drawerContextEntities = React.useMemo(
+    () => [
+      toDrawerContextEntity(
+        buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
+      ),
+    ],
+    [campaignId, location, locationsById],
+  )
+
   const headerBelowDescription = (
     <div className="space-y-4">
+      <DrawerContext entities={drawerContextEntities} />
       {kindOptions.length > 0 ? (
         <LocationConnectionKindStep
           id="location-people-connection-kind"

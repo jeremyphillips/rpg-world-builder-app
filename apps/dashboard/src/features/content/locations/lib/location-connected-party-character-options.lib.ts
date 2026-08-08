@@ -8,7 +8,6 @@ import {
   buildCharacterCardViewModel,
   buildCharacterEntitySummaryVmFromTransport,
   buildCharacterEntitySummarySearchText,
-  formatCharacterInlineSummary,
 } from '@/features/character'
 
 export type LocationConnectedPartyCharacterOption = {
@@ -51,15 +50,6 @@ export function buildConnectedPartyCharacterEntitySummary(
     summary: option.summary,
     characterType: option.characterType,
   })
-}
-
-export function formatConnectedPartyCharacterPickerSubheading(
-  option: LocationConnectedPartyCharacterOption,
-): string | undefined {
-  const inline = formatCharacterInlineSummary(buildConnectedPartyCharacterEntitySummary(option), {
-    includeCharacterType: true,
-  })
-  return inline || undefined
 }
 
 export function buildConnectedPartyCharacterPickerSearchText(

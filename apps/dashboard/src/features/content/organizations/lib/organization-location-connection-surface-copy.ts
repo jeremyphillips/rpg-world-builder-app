@@ -72,6 +72,9 @@ export const ORGANIZATION_FORWARD_FAMILY_PRESENTATION = {
   OrganizationForwardFamilySurfaceCopy
 >
 
+export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] =
+  ['territorial_authority', 'geographic_presence', 'site']
+
 /** @deprecated Use ORGANIZATION_FORWARD_FAMILY_PRESENTATION or resolveOrganizationForwardFamilyPresentation. */
 export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = ORGANIZATION_FORWARD_FAMILY_PRESENTATION
 

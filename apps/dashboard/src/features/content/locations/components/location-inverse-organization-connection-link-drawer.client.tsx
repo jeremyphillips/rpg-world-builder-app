@@ -8,8 +8,11 @@ import type {
   Organization,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
+import {
+  getOrganizationKindLabel,
+  getOrganizationLocationConnectionDisplayLabel,
+} from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
-import { getOrganizationKindLabel } from '@rpg/contracts'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
@@ -24,7 +27,9 @@ import { EntityReplacementSection } from '../../lib/entity-replacement/entity-re
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
 
 import {
   ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
@@ -54,6 +59,7 @@ import {
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
 } from '../lib/location-connection-surface-copy'
+import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 import { buildOrganizationDrawerContextEntity } from '../../organizations/lib/organization-display'
 
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
@@ -67,6 +73,8 @@ export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
   location: Location
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
   organizations: readonly Organization[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -107,6 +115,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   intent,
   addKind,
   location,
+  locationsById,
+  campaignId,
   organizations,
   connectedPartyRows,
   initialConnection,
@@ -294,12 +304,27 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     : null
 
   const drawerContextEntities = React.useMemo(() => {
-    if (mode !== 'changeKind' || !lockedOrganization) {
-      return []
+    const locationEntity = toDrawerContextEntity(
+      buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
+    )
+
+    if (mode === 'add' || mode === 'replaceOrganization') {
+      return [locationEntity]
     }
 
-    return [toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization))]
-  }, [lockedOrganization, mode])
+    if (mode === 'changeKind') {
+      const organizationEntity = lockedOrganization
+        ? toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization))
+        : toDrawerContextEntity({ heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING })
+
+      return [locationEntity, organizationEntity]
+    }
+
+    return []
+  }, [campaignId, location, locationsById, lockedOrganization, mode])
+
+  const lockedKindLabel =
+    activeKind != null ? getOrganizationLocationConnectionDisplayLabel(activeKind, 'inverse') : null
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
   const kindFieldLabel =
@@ -357,6 +382,9 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       headerBelowDescription={
         <div className="space-y-4">
           <DrawerContext entities={drawerContextEntities} />
+          {mode === 'replaceOrganization' && lockedKindLabel ? (
+            <RelationshipDrawerSubjectField label={kindFieldLabel} value={lockedKindLabel} />
+          ) : null}
           {mode === 'replaceOrganization' ? (
             <EntityReplacementSection
               entityLabel={RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL}

@@ -3,36 +3,13 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-import { cn, contentCardHeadingLinkVariants } from '@rpg/ui'
+import { cn, ContentCardHeading, contentCardHeadingLinkVariants } from '@rpg/ui'
 
 import {
   detailEntityRowContentVariants,
-  detailEntityRowHeadingNameVariants,
-  detailEntityRowHeadingSeparatorVariants,
-  detailEntityRowHeadingSuffixVariants,
-  detailEntityRowHeadingVariants,
   detailEntityRowSubheadingVariants,
   detailEntityRowVariants,
 } from './detail-entity-row.variants'
-
-const HEADING_SUFFIX_LEADING_SEPARATOR = ' · ' as const
-
-function splitHeadingSuffix(headingSuffix: ReactNode): {
-  hasLeadingSeparator: boolean
-  suffixText: ReactNode
-} {
-  if (
-    typeof headingSuffix === 'string' &&
-    headingSuffix.startsWith(HEADING_SUFFIX_LEADING_SEPARATOR)
-  ) {
-    return {
-      hasLeadingSeparator: true,
-      suffixText: headingSuffix.slice(HEADING_SUFFIX_LEADING_SEPARATOR.length),
-    }
-  }
-
-  return { hasLeadingSeparator: false, suffixText: headingSuffix }
-}
 
 export type DetailEntityRowProps = {
   heading: ReactNode
@@ -42,6 +19,7 @@ export type DetailEntityRowProps = {
   subheading?: ReactNode
   metadata?: ReactNode
   endSlot?: ReactNode
+  inset?: 'self' | 'parent'
   className?: string
 }
 
@@ -52,43 +30,25 @@ export function DetailEntityRow({
   subheading,
   metadata,
   endSlot,
+  inset = 'self',
   className,
 }: DetailEntityRowProps) {
   const resolvedHeading = href ? (
-    <span className={detailEntityRowHeadingNameVariants()}>
-      <Link to={href} className={contentCardHeadingLinkVariants()}>
-        {heading}
-      </Link>
-    </span>
+    <Link to={href} className={contentCardHeadingLinkVariants()}>
+      {heading}
+    </Link>
   ) : (
-    <span className={detailEntityRowHeadingNameVariants()}>{heading}</span>
+    heading
   )
 
   return (
-    <div className={cn(detailEntityRowVariants(), className)}>
+    <div className={cn(detailEntityRowVariants({ inset }), className)}>
       <div className={detailEntityRowContentVariants()}>
-        <div className={detailEntityRowHeadingVariants()}>
-          {resolvedHeading}
-          {headingSuffix
-            ? (() => {
-                const { hasLeadingSeparator, suffixText } = splitHeadingSuffix(headingSuffix)
-
-                return (
-                  <>
-                    {hasLeadingSeparator ? (
-                      <span
-                        className={detailEntityRowHeadingSeparatorVariants()}
-                        aria-hidden="true"
-                      >
-                        ·
-                      </span>
-                    ) : null}
-                    <span className={detailEntityRowHeadingSuffixVariants()}>{suffixText}</span>
-                  </>
-                )
-              })()
-            : null}
-        </div>
+        <ContentCardHeading
+          heading={resolvedHeading}
+          headingSuffix={headingSuffix}
+          density="compact"
+        />
         {subheading ? <p className={detailEntityRowSubheadingVariants()}>{subheading}</p> : null}
         {metadata ? <div className={detailEntityRowSubheadingVariants()}>{metadata}</div> : null}
       </div>

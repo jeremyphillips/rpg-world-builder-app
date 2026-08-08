@@ -46,7 +46,7 @@ export function CrossContentRelationshipRow({
         <p className={detailEntityRowSubheadingVariants()}>{relationshipEyebrow}</p>
       ) : null}
       <DetailEntityRow
-        className="px-0 py-0"
+        inset="parent"
         heading={heading}
         href={href}
         headingSuffix={headingSuffix}

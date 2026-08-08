@@ -14,9 +14,9 @@ import {
   buildLocationEntitySummaryVm,
   buildLocationEntityContextPresentation,
   buildLocationsById,
-  LOCATION_UNKNOWN_ANCESTOR_LABEL,
   type LocationEntitySummaryVm,
 } from './location-display'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 
 export const LOCATION_PARENT_REPLACEMENT_ACTION_LABELS = {
   changeParent: 'Change parent',
@@ -77,7 +77,7 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
   if (!parent) {
     return {
       parentLocationId,
-      entity: { heading: LOCATION_UNKNOWN_ANCESTOR_LABEL },
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     }
   }

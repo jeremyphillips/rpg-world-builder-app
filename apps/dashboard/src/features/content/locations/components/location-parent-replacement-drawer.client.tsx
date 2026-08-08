@@ -117,7 +117,6 @@ function LocationParentReplacementDrawerFooter({
   contextMismatch,
   pickerEnabled,
   hasCandidates,
-  currentUnavailable,
   canSubmit,
   isSubmitting,
   surface,
@@ -127,7 +126,6 @@ function LocationParentReplacementDrawerFooter({
   contextMismatch: boolean
   pickerEnabled: boolean
   hasCandidates: boolean
-  currentUnavailable: boolean
   canSubmit: boolean
   isSubmitting: boolean
   surface: LocationParentReplacementDrawerSurface
@@ -147,14 +145,6 @@ function LocationParentReplacementDrawerFooter({
       <Button type="button" disabled={!canSubmit || isSubmitting} onClick={onSubmit}>
         {resolveLocationParentReplacementDrawerSubmitLabel({ surface, mode })}
       </Button>
-    )
-  }
-
-  if (currentUnavailable) {
-    return (
-      <Text variant="muted" className="text-sm" role="status">
-        Resolve the current parent reference before choosing a replacement.
-      </Text>
     )
   }
 
@@ -306,7 +296,6 @@ function LocationParentReplacementDrawerContent({
           isSubmitting={isSubmitting}
           surface={surface}
           mode={mode}
-          currentUnavailable={Boolean(currentParent?.unavailable)}
           onSubmit={() => void handleSubmit()}
         />
       }

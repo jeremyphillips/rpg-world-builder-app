@@ -15,33 +15,6 @@ export const LOCATION_KIND_BROWSE_FAMILY_LABELS = {
   interiors: 'Interiors',
 } as const satisfies Record<LocationKindBrowseFamily, string>
 
-const WORLD_AND_REGIONS_KINDS = new Set<LocationKind>(['plane', 'world', 'region'])
-const SETTLEMENT_KINDS = new Set<LocationKind>(['settlement', 'district'])
-const SITE_KINDS = new Set<LocationKind>(['site'])
-const STRUCTURE_KINDS = new Set<LocationKind>(['structure'])
-const INTERIOR_KINDS = new Set<LocationKind>(['interior'])
-
-export function resolveLocationKindBrowseFamily(
-  kind: LocationKind,
-): LocationKindBrowseFamily | undefined {
-  if (WORLD_AND_REGIONS_KINDS.has(kind)) {
-    return 'world_and_regions'
-  }
-  if (SETTLEMENT_KINDS.has(kind)) {
-    return 'settlements'
-  }
-  if (SITE_KINDS.has(kind)) {
-    return 'sites'
-  }
-  if (STRUCTURE_KINDS.has(kind)) {
-    return 'structures'
-  }
-  if (INTERIOR_KINDS.has(kind)) {
-    return 'interiors'
-  }
-  return undefined
-}
-
 export const LOCATION_KIND_BROWSE_FAMILIES = [
   {
     id: 'world_and_regions' as const,
@@ -69,6 +42,18 @@ export const LOCATION_KIND_BROWSE_FAMILIES = [
     kinds: ['interior'] as const satisfies readonly LocationKind[],
   },
 ] as const
+
+export function resolveLocationKindBrowseFamily(
+  kind: LocationKind,
+): LocationKindBrowseFamily | undefined {
+  for (const family of LOCATION_KIND_BROWSE_FAMILIES) {
+    if ((family.kinds as readonly LocationKind[]).includes(kind)) {
+      return family.id
+    }
+  }
+
+  return undefined
+}
 
 export function locationKindMatchesBrowseFamily(
   kind: LocationKind,

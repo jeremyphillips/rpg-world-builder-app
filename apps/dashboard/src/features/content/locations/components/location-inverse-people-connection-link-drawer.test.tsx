@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { YAWNING_PORTAL } from '../fixtures'
+import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
+import { buildLocationsById } from '../lib/location-display'
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../../organizations/fixtures'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
@@ -29,6 +31,11 @@ const residentSlot = {
 const kindSlots = [ownerSlot, headquartersSlot, residentSlot]
 const location = YAWNING_PORTAL
 
+const inverseDrawerContextProps = {
+  locationsById: buildLocationsById(LOCATIONS_LIST),
+  campaignId: STORY_CAMPAIGN_ID,
+}
+
 const sampleOrganizations = [CITY_COUNCIL]
 
 const sampleCharacters = [
@@ -48,6 +55,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...inverseDrawerContextProps}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -78,6 +86,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...inverseDrawerContextProps}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -104,6 +113,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...inverseDrawerContextProps}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -128,6 +138,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={[ownerSlot]}
         location={location}
+        {...inverseDrawerContextProps}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}
@@ -150,6 +161,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
         onOpenChange={() => undefined}
         kindSlots={kindSlots}
         location={location}
+        {...inverseDrawerContextProps}
         organizations={sampleOrganizations}
         characters={sampleCharacters}
         connectedPartyRows={[]}

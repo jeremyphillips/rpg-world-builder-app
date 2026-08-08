@@ -1,6 +1,8 @@
 import type { Organization } from '@rpg/contracts'
 import { getOrganizationKindLabel } from '@rpg/contracts'
 
+import { buildCharacterEntityContextPresentation } from '@/features/character'
+
 import {
   buildLocationEntityContextPresentation,
   type LocationEntitySummaryVm,
@@ -40,11 +42,13 @@ export function buildOrganizationPickerCardPresentation(
 export function buildCharacterPickerCardPresentation(
   character: LocationConnectedPartyCharacterOption,
 ): ContentEntityPickerCardPresentation {
-  const summary = buildConnectedPartyCharacterEntitySummary(character)
+  const presentation = buildCharacterEntityContextPresentation(
+    buildConnectedPartyCharacterEntitySummary(character),
+  )
 
   return {
-    heading: summary.name,
-    headingSuffix: ` · ${summary.characterType.label}`,
-    metadata: summary.identitySummary || undefined,
+    heading: presentation.heading,
+    headingSuffix: presentation.headingSuffix,
+    metadata: presentation.supportingText,
   }
 }

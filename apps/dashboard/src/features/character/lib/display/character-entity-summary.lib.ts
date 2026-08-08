@@ -105,11 +105,13 @@ export function formatCharacterMixedHeadingSuffix(
 export function buildCharacterEntityContextPresentation(vm: CharacterEntitySummaryVm): {
   heading: string
   headingSuffix?: string
+  supportingText?: string
   href?: string
 } {
   return {
     heading: vm.name,
-    headingSuffix: formatCharacterMixedHeadingSuffix(vm),
+    headingSuffix: ` · ${vm.characterType.label}`,
+    supportingText: vm.identitySummary || undefined,
     href: vm.href,
   }
 }

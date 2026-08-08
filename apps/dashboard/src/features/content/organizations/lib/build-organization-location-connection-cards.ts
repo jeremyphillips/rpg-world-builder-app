@@ -22,7 +22,10 @@ import {
   type EntityReplacementCurrentSnapshot,
 } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import type { OrganizationLocationConnectionPreviewItem } from './organization-display'
-import { ORGANIZATION_FORWARD_FAMILY_PRESENTATION } from './organization-location-connection-surface-copy'
+import {
+  ORGANIZATION_FORWARD_FAMILY_PRESENTATION,
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER,
+} from './organization-location-connection-surface-copy'
 
 export type OrganizationLocationConnectionKindGroup = {
   kind: OrganizationLocationConnectionKind
@@ -36,12 +39,6 @@ export type OrganizationLocationConnectionFamilyGroup = {
   kindHeading: 'show' | 'omit'
   kindGroups: OrganizationLocationConnectionKindGroup[]
 }
-
-const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
-  'territorial_authority',
-  'geographic_presence',
-  'site',
-]
 
 function kindsForFamily(
   family: OrganizationLocationConnectionFamily,

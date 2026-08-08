@@ -49,6 +49,7 @@ import {
   buildConnectedPartyCharacterPickerSearchText,
 } from '../lib/location-connected-party-character-options.lib'
 import { buildCharacterEntityContextPresentation } from '@/features/character'
+import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
@@ -61,6 +62,8 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   mode: Extract<RelationshipMutationMode, 'add' | 'changeKind'>
   addKind?: CharacterLocationConnectionKind
   location: Location
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -89,6 +92,8 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   mode,
   addKind,
   location,
+  locationsById,
+  campaignId,
   characters,
   connectedPartyRows,
   initialConnection,
@@ -201,18 +206,28 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
   const drawerContextEntities = React.useMemo(() => {
-    if (mode !== 'changeKind' || !lockedCharacter) {
-      return []
+    const locationEntity = toDrawerContextEntity(
+      buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
+    )
+
+    if (mode === 'add') {
+      return [locationEntity]
     }
 
-    return [
-      toDrawerContextEntity(
-        buildCharacterEntityContextPresentation(
-          buildConnectedPartyCharacterEntitySummary(lockedCharacter),
-        ),
-      ),
-    ]
-  }, [lockedCharacter, mode])
+    if (mode === 'changeKind') {
+      const characterEntity = lockedCharacter
+        ? toDrawerContextEntity(
+            buildCharacterEntityContextPresentation(
+              buildConnectedPartyCharacterEntitySummary(lockedCharacter),
+            ),
+          )
+        : null
+
+      return characterEntity ? [locationEntity, characterEntity] : [locationEntity]
+    }
+
+    return []
+  }, [campaignId, location, locationsById, lockedCharacter, mode])
 
   return (
     <CatalogPickerSheet

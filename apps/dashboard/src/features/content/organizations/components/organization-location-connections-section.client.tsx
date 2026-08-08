@@ -10,7 +10,10 @@ import { Button, SemanticText, Text } from '@rpg/ui'
 
 import type { OrganizationLocationConnectionsViewModel } from '../lib/organization-display'
 import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
-import { resolveOrganizationForwardFamilyPresentation } from '../lib/organization-location-connection-surface-copy'
+import {
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER,
+  resolveOrganizationForwardFamilyPresentation,
+} from '../lib/organization-location-connection-surface-copy'
 import {
   OrganizationLocationConnectionRelationshipRow,
   type OrganizationLocationConnectionMutationContext,
@@ -24,12 +27,6 @@ export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
 
 export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
   'Could not update location connections for this organization.'
-
-const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
-  'territorial_authority',
-  'geographic_presence',
-  'site',
-]
 
 export type OrganizationLocationConnectionEditTarget = {
   connectionId: string

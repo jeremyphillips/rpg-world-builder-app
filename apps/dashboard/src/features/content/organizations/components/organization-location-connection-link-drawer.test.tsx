@@ -23,6 +23,7 @@ const DRAWER_CAMPAIGN_ID = 'camp-1'
 
 function withOrganizationLocationDrawerIndex(locations: readonly Location[]) {
   return {
+    organization: { name: 'City Council' },
     campaignId: DRAWER_CAMPAIGN_ID,
     locations,
     locationsById: buildLocationsById(locations),
@@ -633,7 +634,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('shows area-of-operation changeTarget without organization context chrome', async () => {
+  it('shows area-of-operation changeTarget with organization context and location replacement', async () => {
     const lankhmar = settlementLocation({ id: 'settlement-lankhmar', name: 'Lankhmar' })
     const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
     const portCity = settlementLocation()
@@ -664,8 +665,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change area of operation' })).toBeInTheDocument()
-    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
-    expect(screen.queryByText('The Monarchy')).not.toBeInTheDocument()
+    expect(screen.getByText('Organization')).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.getByText('Current location')).toBeInTheDocument()
     expect(screen.getByText('New location')).toBeInTheDocument()
     expect(screen.getByText('Lankhmar')).toBeInTheDocument()
@@ -724,8 +725,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change governed territory' })).toBeInTheDocument()
-    expect(screen.queryByText('Organization')).not.toBeInTheDocument()
-    expect(screen.queryByText('The Monarchy')).not.toBeInTheDocument()
+    expect(screen.getByText('Organization')).toBeInTheDocument()
+    expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.getByText('Current territory')).toBeInTheDocument()
     expect(screen.getByText('New territory')).toBeInTheDocument()
     expect(screen.getByText('Kingdom of Foo')).toBeInTheDocument()
