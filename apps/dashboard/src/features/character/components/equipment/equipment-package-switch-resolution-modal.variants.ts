@@ -4,10 +4,11 @@ import { cva } from 'class-variance-authority'
 export const equipmentPackageSwitchResolutionModalHeadlineClasses =
   'outline-none heading-style-sheet-title'
 
-export const equipmentPackageSwitchResolutionModalBodyClasses = 'flex flex-col gap-4'
+export const equipmentPackageSwitchResolutionModalBodyClasses =
+  'flex min-h-0 min-w-0 flex-col gap-4'
 
 export const equipmentPackageSwitchResolutionModalInventoryScrollClasses =
-  'max-h-72 overflow-y-auto'
+  'max-h-72 min-w-0 overflow-y-auto overflow-x-hidden pe-3'
 
 export const equipmentPackageSwitchResolutionBudgetSummaryClasses =
   'rounded-lg border border-border bg-surface-muted p-4'

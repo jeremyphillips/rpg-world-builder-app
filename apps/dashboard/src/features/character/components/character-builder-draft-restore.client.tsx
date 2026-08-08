@@ -30,6 +30,7 @@ export function CharacterBuilderDraftRestore({ context }: CharacterBuilderDraftR
       cancelLabel={chrome.draftRestoreCancelLabel}
       onConfirm={continuePreviousDraft}
       onCancel={startOver}
+      focusConfirmOnOpen
     />
   )
 }

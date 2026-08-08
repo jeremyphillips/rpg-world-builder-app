@@ -36,6 +36,8 @@ export interface ConfirmDialogProps {
   onConfirm: () => void
   /** Invoked when the cancel button is pressed. */
   onCancel?: () => void
+  /** When true, open focus lands on the confirm button via `data-dialog-initial-focus`. */
+  focusConfirmOnOpen?: boolean
 }
 
 /**
@@ -56,6 +58,7 @@ export function ConfirmDialog({
   confirmVariant = 'default',
   onConfirm,
   onCancel,
+  focusConfirmOnOpen = false,
 }: ConfirmDialogProps) {
   return (
     <AlertDialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -90,7 +93,11 @@ export function ConfirmDialog({
               </Button>
             </AlertDialogPrimitive.Cancel>
             <AlertDialogPrimitive.Action asChild>
-              <Button variant={confirmVariant} onClick={onConfirm}>
+              <Button
+                variant={confirmVariant}
+                onClick={onConfirm}
+                {...(focusConfirmOnOpen ? { 'data-dialog-initial-focus': true } : {})}
+              >
                 {confirmLabel}
               </Button>
             </AlertDialogPrimitive.Action>

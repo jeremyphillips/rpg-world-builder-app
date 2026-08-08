@@ -48,6 +48,12 @@ describe('ConfirmDialog', () => {
     expect(onCancel).toHaveBeenCalledOnce()
   })
 
+  it('focuses the confirm button when focusConfirmOnOpen is set', () => {
+    renderConfirm({ focusConfirmOnOpen: true })
+    expect(screen.getByRole('button', { name: 'Delete' })).toHaveFocus()
+    expect(screen.getByRole('alertdialog', { name: 'Delete campaign?' })).not.toHaveFocus()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     renderConfirm()
     await expectNoAxeViolations(document.body)
