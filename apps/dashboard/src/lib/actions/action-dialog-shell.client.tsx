@@ -94,7 +94,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
       <Modal.Content size={ACTION_DIALOG_MODAL_SIZE} aria-busy={pending || undefined}>
-        <Modal.Header headline={resolvedHeadline} description={description} />
+        <Modal.Header className="mb-2" headline={resolvedHeadline} description={description} />
 
         <Modal.Body className="space-y-4">
           {shouldRenderActionConfigureBody(phase) ? configureSlot : null}

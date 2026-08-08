@@ -12,6 +12,8 @@ const OBSOLETE_FOOTER_PATTERNS = [
   'formStickyActionsBarSheetClasses',
   'footerVariant="sheet"',
   "footerVariant={'sheet'}",
+  'sheetContentClassName',
+  'sheetBodyClassName',
 ] as const
 
 const SCAN_ROOTS = [

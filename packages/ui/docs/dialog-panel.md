@@ -67,12 +67,14 @@ Modal, Sheet, and ConfirmDialog share one open-focus policy via
 - The panel Content uses `tabIndex={-1}` plus
   `dialogContentFocusShellClasses` so programmatic panel focus does not show a
   visible outline.
-- Opt in to a different first target with `data-dialog-initial-focus` on a
-  single intentional element (rename/email dialogs). Export:
-  `DIALOG_INITIAL_FOCUS_SELECTOR`.
+- Opt in to a different first target with `data-dialog-initial-focus` only when
+  immediate typing is clearly intended. Export: `DIALOG_INITIAL_FOCUS_SELECTOR`.
+- Rename/email modals (invite, duplicate, …) use **panel-first** by default — do
+  not auto-mark their fields.
 - Keep explicit targets rare — Form primitives must not auto-mark fields.
-- Close/return-focus remains Radix-owned unless a feature documents a custom
-  exception (e.g. equipment package switch modal).
+- Close/return-focus is Radix-owned via `onCloseAutoFocus` unless a feature
+  documents a custom exception (equipment package switch modal restores the
+  package trigger via `onCloseAutoFocus`).
 
 Consumer override: pass `onOpenAutoFocus` and call `preventDefault()` to skip
 the default panel policy.

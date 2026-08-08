@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -50,9 +50,12 @@ export function EquipmentPackageSwitchResolutionModal({
   onDraftQuantityChange,
   onConfirm,
 }: EquipmentPackageSwitchResolutionModalProps) {
-  const [returnFocusElement] = useState(() =>
-    typeof document === 'undefined' ? null : document.activeElement,
-  )
+  const [returnFocusElement] = useState(() => {
+    if (typeof document === 'undefined') return null
+    const active = document.activeElement
+    return active instanceof HTMLElement ? active : null
+  })
+
   const purchasedGroups = useMemo(
     () =>
       buildPackageSwitchDraftPurchasedGroups({
@@ -69,15 +72,6 @@ export function EquipmentPackageSwitchResolutionModal({
     isCommitting,
   })
 
-  useEffect(() => {
-    if (!open) return
-    return () => {
-      if (returnFocusElement instanceof HTMLElement) {
-        returnFocusElement.focus()
-      }
-    }
-  }, [open, returnFocusElement])
-
   const handleSetPurchaseQuantity = (
     target: EquipmentInventoryQuantityTarget,
     quantity: number,
@@ -92,7 +86,14 @@ export function EquipmentPackageSwitchResolutionModal({
 
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="lg">
+      <Modal.Content
+        size="lg"
+        onCloseAutoFocus={(event) => {
+          if (!(returnFocusElement instanceof HTMLElement)) return
+          event.preventDefault()
+          returnFocusElement.focus()
+        }}
+      >
         <Modal.Header
           headline={modalState.title}
           description={modalState.description}
