@@ -1,3 +1,9 @@
+import { cn } from '../../lib/utils'
+import {
+  sheetFooterChromeClasses,
+  sheetFooterFormPaddingClasses,
+} from '../../components/ui/sheet.variants'
+
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
 export const formStickyTabsClasses =
   'sticky top-0 z-20 bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
@@ -25,8 +31,10 @@ export const formSheetScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
  * `contentClassName="px-6"`. Pair with {@link formSheetScrollRegionClasses} inside
  * an `overflow-hidden` sheet body.
  */
-export const formStickyActionsBarSheetClasses =
-  'shrink-0 border-t border-border bg-background px-6 pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm z-20'
+export const formStickyActionsBarSheetClasses = cn(
+  sheetFooterChromeClasses,
+  sheetFooterFormPaddingClasses,
+)
 
 /** Transparent sticky actions bar surface — pair with `formStickyTabsTransparentClasses`. */
 export const formStickyActionsBarTransparentClasses =

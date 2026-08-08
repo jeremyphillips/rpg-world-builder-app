@@ -3,8 +3,10 @@
 import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Button, Sheet } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
+
+import { DrawerShell } from '@/components/drawer'
 
 export type ContentFormDrawerFormProps<TFormValues extends FieldValues> = {
   schema: ZodType<TFormValues>
@@ -19,11 +21,11 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
+  description?: React.ReactNode
   form: ContentFormDrawerFormProps<TFormValues>
   pending: boolean
   submitLabel: string
   formError?: string | null
-  sheetContentClassName?: string
   wrapForm?: (form: React.ReactNode) => React.ReactNode
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
@@ -37,11 +39,11 @@ function ContentFormDrawerFooter({
 }) {
   return (
     <div className="flex w-full items-center justify-end gap-2">
-      <Sheet.Close asChild>
+      <DrawerShell.Close asChild>
         <Button type="button" variant="outline" disabled={pending}>
           Cancel
         </Button>
-      </Sheet.Close>
+      </DrawerShell.Close>
       <Button type="submit" disabled={pending}>
         {submitLabel}
       </Button>
@@ -49,16 +51,16 @@ function ContentFormDrawerFooter({
   )
 }
 
-/** Neutral Sheet + Form chrome for contextual create/edit drawers. */
+/** Neutral form workflow for contextual create/edit drawers. */
 export function ContentFormDrawer<TFormValues extends FieldValues>({
   open,
   onOpenChange,
   title,
+  description,
   form,
   pending,
   submitLabel,
   formError = null,
-  sheetContentClassName,
   wrapForm = (form) => form,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
@@ -73,38 +75,37 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   const formId = form.formKey ?? 'content-form-drawer'
 
   return (
-    <Sheet.Root open={open} onOpenChange={handleOpenChange}>
-      <Sheet.Content className={sheetContentClassName} aria-describedby={undefined}>
-        <Sheet.Header headline={title} />
-        {open ? (
-          <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
-            {wrapForm(
-              <Form<TFormValues>
-                key={formId}
-                id={formId}
-                uiStateKey={formId}
-                schema={form.schema}
-                fields={form.fields}
-                defaultValues={form.defaultValues}
-                valueSyncs={form.valueSyncs}
-                contentClassName="px-6 pt-0"
-                rhythm="comfortable"
-                size="md"
-                stickyFooter
-                footerVariant="sheet"
-                formError={formError}
-                header={form.header}
-                onSubmit={(values, form) => {
-                  void onSubmit(values, form)
-                }}
-                footer={() => (
-                  <ContentFormDrawerFooter pending={pending} submitLabel={submitLabel} />
-                )}
-              />,
-            )}
-          </Sheet.Body>
-        ) : null}
-      </Sheet.Content>
-    </Sheet.Root>
+    <DrawerShell
+      open={open}
+      onOpenChange={handleOpenChange}
+      title={title}
+      description={description}
+      bodyMode="managed"
+    >
+      {open
+        ? wrapForm(
+            <Form<TFormValues>
+              key={formId}
+              id={formId}
+              uiStateKey={formId}
+              schema={form.schema}
+              fields={form.fields}
+              defaultValues={form.defaultValues}
+              valueSyncs={form.valueSyncs}
+              contentClassName="px-6 pt-0"
+              rhythm="comfortable"
+              size="md"
+              stickyFooter
+              footerVariant="sheet"
+              formError={formError}
+              header={form.header}
+              onSubmit={(values, form) => {
+                void onSubmit(values, form)
+              }}
+              footer={() => <ContentFormDrawerFooter pending={pending} submitLabel={submitLabel} />}
+            />,
+          )
+        : null}
+    </DrawerShell>
   )
 }

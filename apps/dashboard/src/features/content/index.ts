@@ -139,6 +139,11 @@ export {
   ContentCreateShell,
   ContentFormShellResolver,
 } from './lib/forms/shells/content-create-shell'
+export { ContentFormDrawer } from './lib/forms/shells/content-form-drawer.client'
+export type {
+  ContentFormDrawerFormProps,
+  ContentFormDrawerProps,
+} from './lib/forms/shells/content-form-drawer.client'
 export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
 export {
   buildGrantSummaryModel,

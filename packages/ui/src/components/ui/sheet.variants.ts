@@ -9,24 +9,51 @@ import { establishSurfaceCurrent } from './surface-current.lib'
  */
 export const sheetContentVariants = cva(
   cn(
-    'fixed z-50 flex h-full flex-col overflow-hidden bg-card text-card-foreground shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
-    establishSurfaceCurrent('card'),
+    'fixed z-50 flex h-full flex-col overflow-hidden shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
   ),
   {
     variants: {
       side: {
         right:
-          'inset-y-0 right-0 w-full max-w-md border-l border-card-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-        left: 'inset-y-0 left-0 w-full max-w-md border-r border-card-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+          'inset-y-0 right-0 w-full border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+        left: 'inset-y-0 left-0 w-full border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+      },
+      surface: {
+        card: cn(
+          'border-card-border bg-card text-card-foreground',
+          establishSurfaceCurrent('card'),
+        ),
+        background: cn(
+          'border-border bg-background text-foreground',
+          establishSurfaceCurrent('background'),
+        ),
+      },
+      size: {
+        md: 'max-w-md',
+        lg: 'max-w-[550px]',
       },
     },
     defaultVariants: {
       side: 'right',
+      surface: 'card',
+      size: 'md',
     },
   },
 )
 
 export const sheetBodyVariants = cva('flex-1 overflow-y-auto p-6 pt-0 text-sm')
 
+/** Shared docked footer surface — consumed by Sheet.Footer and FormActionsBar sheet variant. */
+export const sheetFooterChromeClasses =
+  'z-20 shrink-0 border-t border-border bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+
+/** Sheet.Footer layout — action row alignment and inset. */
+export const sheetFooterLayoutClasses = 'flex items-center justify-end gap-2 p-6'
+
+/** Form sheet footer horizontal inset — pairs with {@link formSheetScrollRegionClasses}. */
+export const sheetFooterFormPaddingClasses = 'px-6 pt-4 pb-4'
+
 export type SheetContentVariantProps = VariantProps<typeof sheetContentVariants>
 export type SheetSide = NonNullable<SheetContentVariantProps['side']>
+export type SheetSurface = NonNullable<SheetContentVariantProps['surface']>
+export type SheetSize = NonNullable<SheetContentVariantProps['size']>

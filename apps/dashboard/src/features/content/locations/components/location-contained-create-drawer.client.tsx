@@ -30,8 +30,6 @@ import { locationFormValueSyncs } from '../lib/location-form-sync'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'
 import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
 
-const LOCATION_DRAWER_SHEET_CLASSES = 'bg-background max-w-[550px]'
-
 export type LocationContainedCreateDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -111,7 +109,6 @@ function LocationContainedCreateDrawerBody({
         onOpenChange(nextOpen)
       }}
       title={formatLocationAuthoringTypeAddHeading(authoringType)}
-      sheetContentClassName={LOCATION_DRAWER_SHEET_CLASSES}
       pending={mutation.isPending}
       submitLabel={formatContentCreateActionLabel('locations')}
       formError={formError}

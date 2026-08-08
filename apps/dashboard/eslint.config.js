@@ -46,9 +46,30 @@ const dashboardContentCardBodyGuard = {
   },
 }
 
+const dashboardSheetImportGuard = {
+  files: ['src/features/**/*.{ts,tsx}', 'src/lib/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['Sheet'],
+            message:
+              'Use DrawerShell (or CatalogPickerSheet / BuilderOptionDetailsSheet). Raw Sheet chrome is reserved for DrawerShell. See apps/dashboard/docs/drawer-shell.md.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
   dashboardStorybookRouterRule,
   dashboardContentCardBodyGuard,
+  dashboardSheetImportGuard,
 ]

@@ -19,22 +19,22 @@ All three are thin wrappers over `@rpg/ui` **`CatalogPickerSheet`**, spreading
 
 ## Commonality matrix
 
-| Dimension                   | Equipment                       | Spells                   | Proficiencies         | Shared chrome                                                   |
-| --------------------------- | ------------------------------- | ------------------------ | --------------------- | --------------------------------------------------------------- |
-| Sheet shell                 | ✓                               | ✓                        | ✓                     | `CatalogPickerSheet` + `catalogPickerShellProps`                |
-| Search                      | Built-in sheet search           | Same                     | Same                  | `@rpg/ui`                                                       |
-| Structured filters          | Kind + affordable toggles       | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                 |
-| Sort                        | `CatalogSortControl`            | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                      |
-| Reset view / clear          | Dual-mode (clear vs reset)      | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot` |
-| Empty state panel           | Sheet defaults                  | Custom message           | Custom message        | **`CatalogPickerResultsState`**                                 |
-| Row add/remove              | Commerce / acquisition rail     | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`**     |
-| Row dimming / disabled note | Domain-specific (affordability) | Shared resolver state    | Shared resolver state | **`catalog-picker-row-state.lib.ts`**                           |
-| Empty-state kind/message    | —                               | Choice-set driven        | Choice-set driven     | **`catalog-picker-empty-state.lib.ts`**                         |
-| Recommendation tabs         | No                              | Yes                      | No                    | Spells only                                                     |
-| Workflow mode tabs          | Purchase / magic items          | Cantrips / prepared      | No                    | Equipment only                                                  |
-| Budget / price UI           | Yes                             | No                       | No                    | Equipment only                                                  |
-| Loading in drawer           | —                               | —                        | —                     | Unused (items resolved before open)                             |
-| Error in drawer             | —                               | —                        | —                     | Upstream step readiness gating                                  |
+| Dimension                   | Equipment                       | Spells                   | Proficiencies         | Shared chrome                                                                          |
+| --------------------------- | ------------------------------- | ------------------------ | --------------------- | -------------------------------------------------------------------------------------- |
+| Sheet shell                 | ✓                               | ✓                        | ✓                     | `CatalogPickerSheet` + `catalogPickerShellProps` (`surface="background"`, `size="lg"`) |
+| Search                      | Built-in sheet search           | Same                     | Same                  | `@rpg/ui`                                                                              |
+| Structured filters          | Kind + affordable toggles       | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                                        |
+| Sort                        | `CatalogSortControl`            | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                                             |
+| Reset view / clear          | Dual-mode (clear vs reset)      | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot`                        |
+| Empty state panel           | Sheet defaults                  | Custom message           | Custom message        | **`CatalogPickerResultsState`**                                                        |
+| Row add/remove              | Commerce / acquisition rail     | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`**                            |
+| Row dimming / disabled note | Domain-specific (affordability) | Shared resolver state    | Shared resolver state | **`catalog-picker-row-state.lib.ts`**                                                  |
+| Empty-state kind/message    | —                               | Choice-set driven        | Choice-set driven     | **`catalog-picker-empty-state.lib.ts`**                                                |
+| Recommendation tabs         | No                              | Yes                      | No                    | Spells only                                                                            |
+| Workflow mode tabs          | Purchase / magic items          | Cantrips / prepared      | No                    | Equipment only                                                                         |
+| Budget / price UI           | Yes                             | No                       | No                    | Equipment only                                                                         |
+| Loading in drawer           | —                               | —                        | —                     | Unused (items resolved before open)                                                    |
+| Error in drawer             | —                               | —                        | —                     | Upstream step readiness gating                                                         |
 
 ## Contracts vs dashboard ownership
 
