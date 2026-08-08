@@ -37,6 +37,7 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   pending: boolean
   submitLabel: string
   formError?: string | null
+  extraUnsavedEdits?: boolean
   wrapForm?: (form: React.ReactNode) => React.ReactNode
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
@@ -50,15 +51,18 @@ function ContentFormDrawerLeaveGuard({
   bridgeRef,
   pending,
   open,
+  extraUnsavedEdits,
 }: {
   bridgeRef: React.MutableRefObject<ContentFormDrawerLeaveBridge | null>
   pending: boolean
   open: boolean
+  extraUnsavedEdits?: boolean
 }) {
   const { dirtyFields } = useFormState()
   const campaignAccess = useCampaignAccessForm()
   const isDirty = composeFormLeaveDirty({
     dirtyFields,
+    extraUnsavedEdits,
     campaignAccessDirty: campaignAccess.isDirty,
   })
   const discardGuard = useUnsavedChangesConfirm({ isDirty })
@@ -101,6 +105,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   pending,
   submitLabel,
   formError = null,
+  extraUnsavedEdits = false,
   wrapForm = (form) => form,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
@@ -173,6 +178,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
                     bridgeRef={leaveBridgeRef}
                     pending={pending}
                     open={open}
+                    extraUnsavedEdits={extraUnsavedEdits}
                   />
                   <DrawerShell.Footer>
                     {footerFormError ? (

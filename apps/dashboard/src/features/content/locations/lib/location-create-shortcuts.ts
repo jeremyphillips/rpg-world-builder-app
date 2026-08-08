@@ -4,6 +4,7 @@ import {
   LOCATION_KIND_IDS,
   midSentenceLabel,
   SETTLEMENT_TYPE_IDS,
+  getSettlementTypeLabel,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
   type LocationKind,
@@ -59,6 +60,17 @@ export type LocationCreateSessionParseResult =
   | { kind: 'ready'; fixedCreate: LocationFixedCreateContext }
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
+
+/** Sheet title for contained create — settlement type label when fixed, else authoring type. */
+export function formatLocationFixedCreateAddHeading(
+  fixedCreate: LocationFixedCreateContext,
+): string {
+  if (fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType) {
+    return `Add ${midSentenceLabel(getSettlementTypeLabel(fixedCreate.settlementType))}`
+  }
+
+  return formatLocationAuthoringTypeAddHeading(fixedCreate.authoringType)
+}
 
 /** Sheet title for contained create — e.g. "Add building", "Add district". */
 export function formatLocationAuthoringTypeAddHeading(type: LocationAuthoringType): string {

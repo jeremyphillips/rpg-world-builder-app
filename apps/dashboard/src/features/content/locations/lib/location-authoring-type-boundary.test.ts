@@ -45,6 +45,11 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-children-section.test.tsx',
   'location-contained-create-drawer.client.tsx',
   'location-contained-create-drawer.test.tsx',
+  'location-form-fields.compose.test.ts',
+  'location-settlement-create-composition.lib.ts',
+  'location-settlement-create-composition.lib.test.ts',
+  'location-settlement-starting-districts-slot.client.tsx',
+  'settlement-create-composition-context.client.tsx',
 ])
 
 function collectSourceFiles(directory: string): string[] {

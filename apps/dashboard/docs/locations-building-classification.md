@@ -110,6 +110,31 @@ Detail-page **Add location** uses the same resolver; no-setup types open the con
 create drawer immediately with `fixedCreate` (type and parent locked). Settlement runs
 setup first, then opens the drawer with completed fixed context.
 
+### Contained settlement create — starting districts
+
+When the contained drawer opens for a fixed settlement session (after setup chooses
+`settlementType`), authors can optionally seed **starting districts** in the Structure
+group below description. Field order uses `composeLocationCreateBodyFields` with an
+`afterDescription` slot — overview create continues to call `buildLocationFields`
+directly and does not surface this UI.
+
+| Layer             | Module                                                   | Role                                                                                             |
+| ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Form placement    | `location-form-fields.ts`                                | `composeLocationCreateBodyFields`, presentation-only `buildSettlementStartingDistrictsFormItems` |
+| Interactive UI    | `location-settlement-starting-districts-slot.client.tsx` | Name rows, add/remove                                                                            |
+| Composition state | `settlement-create-composition-context.client.tsx`       | Empty baseline per open session                                                                  |
+| Workflow          | `location-settlement-create-composition.lib.ts`          | Validation, `buildStartingDistrictCreateInput`, `createSettlementWithStartingDistricts`          |
+
+Submit creates the settlement first, then sequentially POSTs each district as a child
+`kind: 'district'` Location with `parentLocationId` set to the new settlement. Partial
+district or deferred campaign-access failures surface as **one** aggregated warning toast;
+success still trusted-closes the drawer.
+
+**Campaign access:** starting districts inherit default public access — locations do not
+inherit parent/child access. A default-public district can appear in list/search while a
+restricted parent remains hidden. Session-access mirroring for composed districts is a
+follow-up candidate only.
+
 | Module                                 | Role                                                          |
 | -------------------------------------- | ------------------------------------------------------------- |
 | `location-create-session.ts`           | `resolveLocationCreateSession`, `completeLocationCreateSetup` |

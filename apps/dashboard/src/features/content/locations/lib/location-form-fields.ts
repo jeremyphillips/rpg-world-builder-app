@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   interiorTypeSchema,
   planeTypeSchema,
@@ -28,6 +29,8 @@ import {
   buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
+import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
+import type { SettlementStructureAuthoringGuidance } from './location-settlement-create-composition.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -147,6 +150,40 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   items.push(descriptionField(ctx))
 
   return items
+}
+
+export function composeLocationCreateBodyFields(
+  ctx: ContentFormCtx,
+  options?: { afterDescription?: FormItem[] },
+): FormItem[] {
+  const items = buildLocationFields(ctx)
+  if (options?.afterDescription?.length) {
+    items.push(...options.afterDescription)
+  }
+  return items
+}
+
+export const SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND = 'Structure' as const
+
+/** Presentation-only FormItems for optional starting districts — no composition state. */
+export function buildSettlementStartingDistrictsFormItems(
+  guidance: SettlementStructureAuthoringGuidance,
+): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      legend: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
+      description: `${guidance.helper} ${guidance.emphasis}`,
+      chrome: { variant: 'inset' },
+      fields: [
+        {
+          kind: 'slot',
+          name: 'startingDistricts',
+          render: () => createElement(LocationSettlementStartingDistrictsSlot),
+        },
+      ],
+    },
+  ]
 }
 
 /** Resolves canonical kind from form values for hierarchy helpers within the form layer. */

@@ -5,6 +5,7 @@ import {
   buildLocationFixedCreateHref,
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
+  formatLocationFixedCreateAddHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
   LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM,
@@ -136,6 +137,26 @@ describe('formatLocationAuthoringTypeAddHeading', () => {
     expect(formatLocationAuthoringTypeAddHeading('building')).toBe('Add building')
     expect(formatLocationAuthoringTypeAddHeading('district')).toBe('Add district')
     expect(formatLocationAuthoringTypeAddHeading('structure')).toBe('Add unclassified structure')
+  })
+})
+
+describe('formatLocationFixedCreateAddHeading', () => {
+  it('uses settlement type labels for fixed settlement create', () => {
+    expect(
+      formatLocationFixedCreateAddHeading({
+        authoringType: 'settlement',
+        settlementType: 'city',
+      }),
+    ).toBe('Add city')
+  })
+
+  it('falls back to authoring type labels for non-settlement fixed create', () => {
+    expect(
+      formatLocationFixedCreateAddHeading({
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      }),
+    ).toBe('Add building')
   })
 })
 
