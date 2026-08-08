@@ -4,8 +4,6 @@ import { geographicRegionTypeSchema } from '../../vocab/location/geographic-regi
 import { politicalRegionTypeSchema } from '../../vocab/location/political-region-type'
 import {
   getRegionTypeEntry,
-  getRegionTypeLabelForKind,
-  REGION_CLASSIFICATION_DEFINITIONS,
   type RegionClassificationKind,
 } from '../../vocab/location/region-classification-definitions'
 
@@ -25,13 +23,6 @@ export const regionClassificationSchema = z.discriminatedUnion('kind', [
 ])
 
 export type RegionClassification = z.infer<typeof regionClassificationSchema>
-
-/** Composes a display label from region classification registry entries. */
-export function getRegionClassificationLabel(classification: RegionClassification): string {
-  const familyLabel = REGION_CLASSIFICATION_DEFINITIONS[classification.kind].label
-  const typeLabel = getRegionTypeLabelForKind(classification.kind, classification.type)
-  return `${familyLabel} · ${typeLabel}`
-}
 
 /** Returns the type entry for a stored region classification, if known. */
 export function getRegionClassificationTypeEntry(classification: RegionClassification) {

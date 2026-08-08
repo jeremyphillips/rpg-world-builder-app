@@ -1,7 +1,6 @@
 import {
-  formatLocationDisplaySummary,
-  locationDisplaySummarySortKey,
-  resolveLocationDisplaySummary,
+  compareLocationClassificationParts,
+  resolveLocationClassificationDisplay,
   type Location,
 } from '@rpg/contracts'
 import { dataTableColumnChromeMeta, SortableHeader, type ColumnDef } from '@rpg/ui'
@@ -15,17 +14,6 @@ import { buildChildSummariesByParentId, type LocationChildSummaryItem } from './
 
 export type { LocationsOverviewFilterState } from './locations-overview-filter-schema'
 export { locationsFilterSchema } from './locations-overview-filter-schema'
-
-function compareLocationDisplaySortKeys(
-  left: readonly [string, string, string],
-  right: readonly [string, string, string],
-): number {
-  for (let index = 0; index < left.length; index += 1) {
-    const comparison = left[index]!.localeCompare(right[index]!)
-    if (comparison !== 0) return comparison
-  }
-  return 0
-}
 
 function buildParentNameById(locations: readonly Location[]): Map<string, string> {
   return new Map(locations.map((location) => [location.id, location.name]))
@@ -52,16 +40,20 @@ function buildLocationMiddleColumns(
   return [
     {
       id: 'locationType',
-      accessorFn: (row) => locationDisplaySummarySortKey(resolveLocationDisplaySummary(row)),
+      accessorFn: (row) => resolveLocationClassificationDisplay(row).text,
       header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
-      cell: ({ row }) => formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original)),
-      sortingFn: (left, right) =>
-        compareLocationDisplaySortKeys(
-          locationDisplaySummarySortKey(resolveLocationDisplaySummary(left.original)),
-          locationDisplaySummarySortKey(resolveLocationDisplaySummary(right.original)),
-        ),
+      cell: ({ row }) => resolveLocationClassificationDisplay(row.original).text,
+      sortingFn: (left, right) => {
+        const partsComparison = compareLocationClassificationParts(
+          resolveLocationClassificationDisplay(left.original).parts,
+          resolveLocationClassificationDisplay(right.original).parts,
+        )
+        if (partsComparison !== 0) return partsComparison
+
+        return left.original.name.localeCompare(right.original.name)
+      },
       filterFn: (row, _columnId, filterValue) => {
-        const summary = formatLocationDisplaySummary(resolveLocationDisplaySummary(row.original))
+        const summary = resolveLocationClassificationDisplay(row.original).text
         return summary.toLowerCase().includes(String(filterValue).toLowerCase())
       },
       meta: { label: 'Type', ...dataTableColumnChromeMeta('medium', 'meta') },

@@ -24,16 +24,16 @@ import {
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import { RELATIONSHIP_DRAWER_CHARACTER_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import { buildCharacterPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
   subjectLocationConnectionKey,
 } from '../../lib/location-connection-duplicate-keys'
 import {
-  buildCharacterLocationConnectionKindOptions,
+  buildCharacterInverseLocationConnectionKindOptions,
   LOCATION_CONNECTION_KIND_FIELD_LABEL,
   resolveActiveConnectionKind,
 } from '../../lib/location-connection-kind-options'
@@ -42,9 +42,14 @@ import {
   resolveLocationInverseCharacterAddDrawerTitle,
   resolveLocationInverseCharacterAddSubmitLabel,
   resolveLocationInverseCharacterTargetPresentation,
-  resolveTerritorialAuthorityLocationContext,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+import {
+  buildConnectedPartyCharacterEntitySummary,
+  buildConnectedPartyCharacterPickerSearchText,
+} from '../lib/location-connected-party-character-options.lib'
+import { buildCharacterEntityContextPresentation } from '@/features/character'
+import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
@@ -57,6 +62,8 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   mode: Extract<RelationshipMutationMode, 'add' | 'changeKind'>
   addKind?: CharacterLocationConnectionKind
   location: Location
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
@@ -85,6 +92,8 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   mode,
   addKind,
   location,
+  locationsById,
+  campaignId,
   characters,
   connectedPartyRows,
   initialConnection,
@@ -130,7 +139,11 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         existingKeys.has(subjectLocationConnectionKey(characterId, kind)),
       ),
     )
-    return buildCharacterLocationConnectionKindOptions(eligibleKinds, disabledKinds)
+    return buildCharacterInverseLocationConnectionKindOptions({
+      location,
+      kinds: eligibleKinds,
+      disabledKinds,
+    })
   }, [
     eligibleKinds,
     existingKeys,
@@ -192,6 +205,30 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
 
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
+  const drawerContextEntities = React.useMemo(() => {
+    const locationEntity = toDrawerContextEntity(
+      buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
+    )
+
+    if (mode === 'add') {
+      return [locationEntity]
+    }
+
+    if (mode === 'changeKind') {
+      const characterEntity = lockedCharacter
+        ? toDrawerContextEntity(
+            buildCharacterEntityContextPresentation(
+              buildConnectedPartyCharacterEntitySummary(lockedCharacter),
+            ),
+          )
+        : null
+
+      return characterEntity ? [locationEntity, characterEntity] : [locationEntity]
+    }
+
+    return []
+  }, [campaignId, location, locationsById, lockedCharacter, mode])
+
   return (
     <CatalogPickerSheet
       open={open}
@@ -207,15 +244,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       noItemsMessage="No characters are available."
       headerBelowDescription={
         <div className="space-y-4">
-          <RelationshipDrawerContextHeader
-            context={resolveTerritorialAuthorityLocationContext(location)}
-          />
-          {mode === 'changeKind' && lockedCharacter ? (
-            <RelationshipDrawerSubjectField
-              label={RELATIONSHIP_DRAWER_CHARACTER_FIELD_LABEL}
-              value={lockedCharacter.name}
-            />
-          ) : null}
+          <DrawerContext entities={drawerContextEntities} />
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
@@ -250,7 +279,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       items={showCharacterPicker ? characters : []}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
-      getSearchText={(character) => [character.name, character.summary].join(' ')}
+      getSearchText={buildConnectedPartyCharacterPickerSearchText}
       renderItemHeader={(character) => {
         const isSelected = selectedCharacterId === character.id
         const hasAvailableKind = characterInverseSubjectHasAvailableKind(
@@ -264,12 +293,8 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={character.name}
-            subheading={
-              hasAvailableKind
-                ? character.summary || undefined
-                : CHARACTER_DRAWER_FULLY_LINKED_REASON
-            }
+            {...buildCharacterPickerCardPresentation(character)}
+            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
             disabled={!hasAvailableKind}
             endSlot={
               <CatalogPickerSelectionActions

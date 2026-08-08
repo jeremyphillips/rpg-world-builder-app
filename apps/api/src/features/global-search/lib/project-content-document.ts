@@ -22,10 +22,9 @@ import {
   equipmentKindToFamilyPath,
   getContentTypeTerm,
   getCreatureSizeLabel,
-  formatLocationDisplaySummary,
+  resolveLocationClassificationDisplay,
   getFeatCategoryLabel,
   getOrganizationKindLabel,
-  resolveLocationDisplaySummary,
   getEquipmentSearchName,
   joinCompactSegments,
   stripHtmlTags,
@@ -183,7 +182,7 @@ function buildOrganizationTarget(organization: Organization): GlobalSearchTarget
 }
 
 function buildLocationSecondary(location: Location): string {
-  return formatLocationDisplaySummary(resolveLocationDisplaySummary(location))
+  return resolveLocationClassificationDisplay(location).text
 }
 
 function buildLocationFields(location: Location): GlobalSearchField[] {

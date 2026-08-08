@@ -19,6 +19,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
 import { useCampaignBuildContext, useNpcs } from '@/features/character'
 
+import { buildLocationsById } from '../lib/location-display'
+import { useLocations } from './use-locations'
 import {
   createCharacterLocationConnection,
   deleteCharacterLocationConnection,
@@ -169,6 +171,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   const canWriteInverse = canManage && canInverseWriteAnyLocationConnection()
   const queryClient = useQueryClient()
   const connectedPartiesQuery = useLocationConnectedParties(campaignId, locationId)
+  const locationsQuery = useLocations(campaignId)
+  const locationsById = React.useMemo(
+    () => buildLocationsById(locationsQuery.data ?? []),
+    [locationsQuery.data],
+  )
   const organizationsQuery = useOrganizations(campaignId)
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
@@ -196,6 +203,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     )
     return [...characters.values()]
   }, [campaignCharactersQuery.data, catalogIndex, npcsQuery.data])
+
+  const characterOptionsById = React.useMemo(
+    () => new Map(characterOptions.map((option) => [option.id, option])),
+    [characterOptions],
+  )
 
   const eligibility = React.useMemo(
     () => resolveLocationConnectionEligibility(toLocationConnectionEligibilityInput(location)),
@@ -529,7 +541,10 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       isAuthoritativeDomainSet: organizationsQuery.isSuccess,
     },
     characterOptions,
+    characterOptionsById,
     rows,
+    campaignId,
+    locationsById,
     canManage,
     canWriteInverse,
     mutationError,

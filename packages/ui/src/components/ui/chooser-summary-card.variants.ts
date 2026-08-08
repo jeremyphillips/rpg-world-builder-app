@@ -1,5 +1,5 @@
 export const chooserSummaryCardShellClasses =
-  'overflow-hidden rounded-card border border-border bg-card shadow-sm border-primary ring-1 ring-primary/20'
+  'w-full overflow-hidden rounded-card border border-border bg-card shadow-sm border-primary ring-1 ring-primary/20'
 
 export const chooserSummaryCardBodyClasses = 'px-4 py-4'
 

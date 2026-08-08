@@ -2,16 +2,21 @@ import { describe, expect, it } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
-import { DOCK_WARD, ALDERMERE, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
+import { ALDERMERE, DOCK_WARD, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   buildChildCountByParentId,
   buildChildSummariesByParentId,
   buildLocationChildren,
   buildLocationDetailViewModel,
+  buildLocationEntityContextPresentation,
+  buildLocationEntitySummarySearchText,
+  buildLocationEntitySummaryVm,
   buildLocationLocatedInSegments,
   buildLocationsById,
+  formatLocatedInSupportingText,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
+import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
 
 const CAMPAIGN_ID = 'camp_1'
 
@@ -75,11 +80,84 @@ describe('buildLocationLocatedInSegments', () => {
   })
 })
 
+describe('located-in presentation helpers', () => {
+  it('formats located-in supporting text', () => {
+    expect(formatLocatedInSupportingText('Dock Ward')).toBe('Located in Dock Ward')
+  })
+
+  it('projects location VM context with compact classification and nearest parent only', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntityContextPresentation(summary)).toEqual({
+      heading: 'Yawning Portal',
+      headingSuffix: ' · Building · Tavern',
+      supportingText: 'Located in Dock Ward',
+    })
+  })
+
+  it('omits supporting text for root locations', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(ALDERMERE, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntityContextPresentation(summary).supportingText).toBeUndefined()
+  })
+})
+
 describe('buildLocationChildren', () => {
   it('returns direct children sorted by name with compact summary lines', () => {
     const children = buildLocationChildren(HARBORFORD.id, LOCATIONS_LIST, CAMPAIGN_ID)
     expect(children.map((child) => child.name)).toEqual(['Dock Ward'])
     expect(children[0]?.summaryLine).toBe('District')
+  })
+})
+
+describe('buildLocationEntitySummaryVm', () => {
+  it('projects classification and ancestry items with convenience text', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(summary.name).toBe('Yawning Portal')
+    expect(summary.classification.text).toBe('Building · Tavern')
+    expect(summary.ancestry.items.map((item) => item.name)).toEqual([
+      'Aldermere',
+      'Greyshore',
+      'Harborford',
+      'Dock Ward',
+    ])
+    expect(summary.ancestry.text).toBe('Aldermere / Greyshore / Harborford / Dock Ward')
+  })
+
+  it('omits ancestry convenience text when there are no ancestor items', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(ALDERMERE, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(summary.ancestry.items).toEqual([])
+    expect(summary.ancestry.text).toBe('')
+  })
+
+  it('builds search haystack from name, classification parts, and ancestor names', () => {
+    const byId = buildLocationsById(LOCATIONS_LIST)
+    const summary = buildLocationEntitySummaryVm(YAWNING_PORTAL, {
+      locationsById: byId,
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(buildLocationEntitySummarySearchText(summary)).toBe(
+      'Yawning Portal Building Tavern Aldermere Greyshore Harborford Dock Ward',
+    )
   })
 })
 
@@ -136,5 +214,45 @@ describe('buildLocationDetailViewModel', () => {
 
     expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type'])
     expect(viewModel.identity.rows[0]?.value).toBe('District')
+  })
+
+  it('shows typed interior identity rows with flattened type label', () => {
+    const chamber: Location = {
+      ...DOCK_WARD,
+      id: 'location-chamber',
+      slug: 'chamber',
+      name: 'Hidden Chamber',
+      kind: 'interior',
+      interiorType: 'space',
+      classification: { type: 'chamber' },
+      parentLocationId: YAWNING_PORTAL.id,
+    }
+
+    const viewModel = buildLocationDetailViewModel(chamber, {
+      locations: [...LOCATIONS_LIST, chamber],
+      campaignId: CAMPAIGN_ID,
+    })
+
+    expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type', 'Space type'])
+    expect(viewModel.identity.rows[0]?.value).toBe('Space')
+    expect(viewModel.identity.rows[1]?.value).toBe('Chamber')
+  })
+
+  it('derives uncontained copy and parent replacement action for managers', () => {
+    const rootViewModel = buildLocationDetailViewModel(ALDERMERE, {
+      locations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
+      canManage: true,
+    })
+    const nestedViewModel = buildLocationDetailViewModel(YAWNING_PORTAL, {
+      locations: LOCATIONS_LIST,
+      campaignId: CAMPAIGN_ID,
+      canManage: true,
+    })
+
+    expect(rootViewModel.identity.locatedInFallbackLabel).toBe(LOCATION_UNCONTAINED_LABEL)
+    expect(rootViewModel.identity.parentReplacementAction).toBe('setParent')
+    expect(nestedViewModel.identity.locatedInFallbackLabel).toBeUndefined()
+    expect(nestedViewModel.identity.parentReplacementAction).toBe('changeParent')
   })
 })

@@ -32,18 +32,20 @@ describe('buildOrganizationConnectedCharacterCards', () => {
     ).toEqual({
       previewItems: [
         {
-          card: {
+          summary: {
             id: 'char-1',
             name: 'Verna',
-            summary: 'Dwarf · Level 1 Fighter',
+            identitySummary: 'Dwarf · Level 1 Fighter',
+            characterType: { value: 'pc', label: 'PC' },
           },
           detailHref: '/campaigns/camp-1/characters/char-1',
         },
         {
-          card: {
+          summary: {
             id: 'npc-1',
             name: 'Envoy',
-            summary: 'Human · Level 3 Rogue',
+            identitySummary: 'Human · Level 3 Rogue',
+            characterType: { value: 'npc', label: 'NPC' },
           },
           detailHref: '/campaigns/camp-1/npcs/npc-1',
         },

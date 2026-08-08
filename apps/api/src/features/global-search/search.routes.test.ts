@@ -98,7 +98,7 @@ describe('GET /api/campaigns/:campaignId/search/catalog', () => {
     )
     expect(pc).toMatchObject({
       filterGroup: 'characters',
-      typeLabel: 'Character',
+      typeLabel: 'PC',
       title: 'Indexed PC',
     })
   })

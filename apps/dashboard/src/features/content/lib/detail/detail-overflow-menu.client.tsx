@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@rpg/ui'
 
-export type RelationshipOverflowAction = {
+export type DetailOverflowAction = {
   id: string
   label: string
   destructive?: boolean
@@ -18,12 +18,12 @@ export type RelationshipOverflowAction = {
   onSelect: () => void
 }
 
-export type RelationshipOverflowMenuProps = {
-  actions: readonly RelationshipOverflowAction[]
+export type DetailOverflowMenuProps = {
+  actions: readonly DetailOverflowAction[]
   triggerLabel: string
 }
 
-export function RelationshipOverflowMenu({ actions, triggerLabel }: RelationshipOverflowMenuProps) {
+export function DetailOverflowMenu({ actions, triggerLabel }: DetailOverflowMenuProps) {
   if (actions.length === 0) {
     return null
   }

@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { buildingClassificationSchema } from './building-classification'
 import {
-  formatLocationDisplaySummary,
-  locationDisplaySummarySortKey,
+  compareLocationClassificationParts,
+  resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
+  resolveLocationReferenceNoun,
 } from './location-display-summary'
 import type { Location } from './location'
-import { UNCLASSIFIED_STRUCTURE_LABEL } from '../../vocab/location/structure-type'
 
 const baseLocation = {
   rulesetId: 'srd-cc-5.2.1' as const,
@@ -70,12 +70,9 @@ describe('resolveLocationDisplaySummary', () => {
       classificationLabel: 'Guildhall',
       specializationLabel: 'Thieves',
     })
-    expect(formatLocationDisplaySummary(resolveLocationDisplaySummary(location))).toBe(
-      'Building · Guildhall · Thieves',
-    )
   })
 
-  it('resolves interior subtype classification', () => {
+  it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'interior',
@@ -84,12 +81,32 @@ describe('resolveLocationDisplaySummary', () => {
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
-      typeLabel: 'Interior',
+      typeLabel: 'Space',
       classificationLabel: 'Chamber',
     })
-    expect(formatLocationDisplaySummary(resolveLocationDisplaySummary(location))).toBe(
-      'Interior · Chamber',
-    )
+  })
+
+  it('resolves interior type without subtype', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+      interiorType: 'passage',
+    }
+
+    expect(resolveLocationDisplaySummary(location)).toEqual({
+      typeLabel: 'Passage',
+    })
+  })
+
+  it('resolves untyped interior as the generic Interior kind label', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+    }
+
+    expect(resolveLocationDisplaySummary(location)).toEqual({
+      typeLabel: 'Interior',
+    })
   })
 
   it('resolves fortification without classification', () => {
@@ -104,26 +121,197 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
-  it('resolves unclassified structure label', () => {
+  it('resolves untyped structure as the generic Structure kind label', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
-      typeLabel: UNCLASSIFIED_STRUCTURE_LABEL,
+      typeLabel: 'Structure',
     })
   })
 })
 
-describe('locationDisplaySummarySortKey', () => {
-  it('returns tuple with empty strings for missing segments', () => {
+describe('resolveLocationReferenceNoun', () => {
+  it('returns lowercase prose nouns from the same type tier as classification', () => {
     expect(
-      locationDisplaySummarySortKey({
-        typeLabel: 'Building',
-        classificationLabel: 'Guildhall',
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'structure',
+        structureType: 'building',
+        classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
       }),
-    ).toEqual(['Building', 'Guildhall', ''])
+    ).toBe('building')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'space',
+        classification: { type: 'chamber' },
+      }),
+    ).toBe('space')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'settlement',
+        settlementType: 'city',
+        parentLocationId: 'loc_parent',
+      }),
+    ).toBe('settlement')
+
+    expect(
+      resolveLocationReferenceNoun({
+        ...baseLocation,
+        kind: 'structure',
+      }),
+    ).toBe('structure')
+  })
+})
+
+describe('resolveLocationClassificationDisplay', () => {
+  it('omits specialization from compact classification text', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        archetype: 'guildhall',
+        specialization: 'Thieves',
+      }),
+    }
+
+    expect(resolveLocationClassificationDisplay(location)).toEqual({
+      parts: ['Building', 'Guildhall'],
+      text: 'Building · Guildhall',
+    })
+  })
+
+  it('returns Structure for untyped structures', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'structure',
+    }
+
+    expect(resolveLocationClassificationDisplay(location)).toEqual({
+      parts: ['Structure'],
+      text: 'Structure',
+    })
+  })
+
+  it('returns settlement, region, site, fortification, and interior compact lines', () => {
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'settlement',
+        settlementType: 'city',
+        parentLocationId: 'loc_parent',
+      }),
+    ).toEqual({
+      parts: ['Settlement', 'City'],
+      text: 'Settlement · City',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'region',
+        classification: { kind: 'political', type: 'kingdom' },
+      }),
+    ).toEqual({
+      parts: ['Region', 'Kingdom'],
+      text: 'Region · Kingdom',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'site',
+        siteType: 'dungeon',
+      }),
+    ).toEqual({
+      parts: ['Site', 'Dungeon'],
+      text: 'Site · Dungeon',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'structure',
+        structureType: 'fortification',
+      }),
+    ).toEqual({
+      parts: ['Fortification'],
+      text: 'Fortification',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'space',
+        classification: { type: 'chamber' },
+      }),
+    ).toEqual({
+      parts: ['Space', 'Chamber'],
+      text: 'Space · Chamber',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+      }),
+    ).toEqual({
+      parts: ['Interior'],
+      text: 'Interior',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'passage',
+        classification: { type: 'corridor' },
+      }),
+    ).toEqual({
+      parts: ['Passage', 'Corridor'],
+      text: 'Passage · Corridor',
+    })
+
+    expect(
+      resolveLocationClassificationDisplay({
+        ...baseLocation,
+        kind: 'interior',
+        interiorType: 'level',
+        classification: { type: 'floor' },
+      }),
+    ).toEqual({
+      parts: ['Level', 'Floor'],
+      text: 'Level · Floor',
+    })
+  })
+})
+
+describe('compareLocationClassificationParts', () => {
+  it('returns zero when parts are equal', () => {
+    expect(
+      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Guildhall']),
+    ).toBe(0)
+  })
+
+  it('compares different second segments', () => {
+    expect(
+      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Tavern']),
+    ).toBeLessThan(0)
+  })
+
+  it('sorts shorter equal-prefix classifications first', () => {
+    expect(
+      compareLocationClassificationParts(['Building'], ['Building', 'Guildhall']),
+    ).toBeLessThan(0)
   })
 })
 
@@ -148,5 +336,16 @@ describe('resolveLocationDetailClassificationFieldLabel', () => {
     }
 
     expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Classification')
+  })
+
+  it('returns interior classification label', () => {
+    const location: Location = {
+      ...baseLocation,
+      kind: 'interior',
+      interiorType: 'space',
+      classification: { type: 'chamber' },
+    }
+
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Space type')
   })
 })

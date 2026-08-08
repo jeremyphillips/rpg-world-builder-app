@@ -9,7 +9,9 @@ import {
 import {
   assertChangeKindGatingAlignsWithPicker,
   assertChangeKindPickerIncludesCurrentKind,
+  buildCharacterInverseLocationConnectionKindOptions,
   buildOrganizationFamilyKindOptions,
+  buildOrganizationInverseLocationConnectionKindOptions,
   buildOrganizationLocationChangeKindOptions,
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
@@ -223,5 +225,42 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
     expect(pickerOptions.some((option) => option.value !== currentKind && !option.disabled)).toBe(
       true,
     )
+  })
+})
+
+describe('inverse location connection kind options', () => {
+  it('uses contextual descriptions and inverse labels at a fixed location', () => {
+    const location = buildingLocation()
+
+    const options = buildOrganizationInverseLocationConnectionKindOptions({
+      location,
+      kinds: ['headquarters', 'owns'],
+      connections: [],
+      edgesAtLocation: [],
+    })
+
+    expect(options).toEqual([
+      expect.objectContaining({
+        value: 'headquarters',
+        label: 'Headquarters of',
+        description: 'Uses this building as its primary headquarters.',
+      }),
+      expect.objectContaining({
+        value: 'owns',
+        label: 'Owner',
+        description: 'Owns or holds title to this building.',
+      }),
+    ])
+  })
+
+  it('requires location for character inverse kind options', () => {
+    const location = buildingLocation()
+    const options = buildCharacterInverseLocationConnectionKindOptions({
+      location,
+      kinds: ['works_at', 'resides_at'],
+    })
+
+    expect(options[0]?.description).toBe('Works at or is regularly present at this building.')
+    expect(options[1]?.description).toBe('Lives at this building as a primary residence.')
   })
 })

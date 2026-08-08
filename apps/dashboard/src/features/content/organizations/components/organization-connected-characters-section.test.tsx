@@ -10,10 +10,11 @@ import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 const sampleConnectedCharacters = {
   previewItems: [
     {
-      card: {
+      summary: {
         id: 'char-1',
         name: 'Verna',
-        summary: 'Dwarf · Level 1 Fighter',
+        identitySummary: 'Dwarf · Level 1 Fighter',
+        characterType: { value: 'pc' as const, label: 'PC' },
       },
       detailHref: '/campaigns/camp-1/characters/char-1',
     },

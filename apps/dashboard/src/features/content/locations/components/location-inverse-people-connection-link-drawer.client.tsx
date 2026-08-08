@@ -20,7 +20,12 @@ import {
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
+import {
+  buildCharacterPickerCardPresentation,
+  buildOrganizationPickerCardPresentation,
+} from '../../lib/content-entity-picker-presentation.lib'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -42,9 +47,9 @@ import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddSubmitLabel,
   resolveLocationInverseOrganizationTargetPresentation,
-  resolveTerritorialAuthorityLocationContext,
 } from '../lib/location-connection-surface-copy'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+import { buildConnectedPartyCharacterPickerSearchText } from '../lib/location-connected-party-character-options.lib'
 import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
@@ -56,12 +61,15 @@ import {
   resolvePeopleKindSlotSelectableSubjectTypes,
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
+import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   kindSlots: readonly PeopleKindSlot[]
   location: Location
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
   organizations: readonly Organization[]
   characters: readonly LocationConnectedPartyCharacterOption[]
   connectedPartyRows: readonly LocationConnectedPartyRow[]
@@ -108,6 +116,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onOpenChange,
   kindSlots,
   location,
+  locationsById,
+  campaignId,
   organizations,
   characters,
   connectedPartyRows,
@@ -130,6 +140,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     () =>
       buildPeopleSectionKindOptions({
         kindSlots,
+        location,
         locationId: location.id,
         rows: connectedPartyRows,
         organizationIds,
@@ -143,7 +154,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       characterIds,
       connectedPartyRows,
       kindSlots,
-      location.id,
+      location,
       organizationIds,
     ],
   )
@@ -269,11 +280,18 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       ? ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[organizationIntent]
       : 'All eligible connection types are already linked.'
 
+  const drawerContextEntities = React.useMemo(
+    () => [
+      toDrawerContextEntity(
+        buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
+      ),
+    ],
+    [campaignId, location, locationsById],
+  )
+
   const headerBelowDescription = (
     <div className="space-y-4">
-      <RelationshipDrawerContextHeader
-        context={resolveTerritorialAuthorityLocationContext(location)}
-      />
+      <DrawerContext entities={drawerContextEntities} />
       {kindOptions.length > 0 ? (
         <LocationConnectionKindStep
           id="location-people-connection-kind"
@@ -362,12 +380,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             <ContentEntityCard
               chrome="embedded"
               density="compact"
-              heading={organization.name}
-              subheading={
-                hasAvailableKind
-                  ? getOrganizationKindLabel(organization.organizationKind)
-                  : organizationFullyLinkedReason
-              }
+              {...buildOrganizationPickerCardPresentation(organization)}
+              subheading={!hasAvailableKind ? organizationFullyLinkedReason : undefined}
               imageKey={organization.imageKey}
               disabled={!hasAvailableKind}
               endSlot={
@@ -403,7 +417,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       items={showEntityPicker ? characters : []}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
-      getSearchText={(character) => [character.name, character.summary].join(' ')}
+      getSearchText={buildConnectedPartyCharacterPickerSearchText}
       renderItemHeader={(character) => {
         const isSelected = selectedCharacterId === character.id
         const hasAvailableKind =
@@ -419,12 +433,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={character.name}
-            subheading={
-              hasAvailableKind
-                ? character.summary || undefined
-                : CHARACTER_DRAWER_FULLY_LINKED_REASON
-            }
+            {...buildCharacterPickerCardPresentation(character)}
+            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
             disabled={!hasAvailableKind}
             endSlot={
               <CatalogPickerSelectionActions

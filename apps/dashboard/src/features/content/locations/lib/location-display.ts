@@ -1,14 +1,24 @@
 import {
-  formatLocationDisplaySummary,
   getLocationKindEntry,
+  getParentRequirement,
+  resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
   type Location,
+  type LocationClassificationDisplay,
   type LocationDisplaySummary,
   type LocationKind,
 } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
+
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+
+import {
+  resolveLocationParentReplacementAction,
+  type LocationParentReplacementAction,
+} from './location-parent-replacement'
+import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
 
 export const LOCATION_UNKNOWN_ANCESTOR_LABEL = 'Unknown location' as const
 
@@ -17,21 +27,41 @@ export const LOCATION_SECTION_LABELS = {
   children: 'Contained locations',
 } as const
 
+export const LOCATION_SECTION_HELPERS = {
+  children: 'Locations directly within this location.',
+} as const
+
 export const LOCATION_EMPTY_SECTION_TEXT = {
   children: 'No contained locations yet.',
 } as const
 
-/** @deprecated Use LocationLocatedInSegment — kept for LocationAncestry stories. */
-export type LocationAncestrySegment = {
-  id: string
-  name: string
-  href: string
+export const LOCATION_ANCESTRY_TEXT_SEPARATOR = ' / ' as const
+
+export const LOCATED_IN_SUPPORTING_TEXT_PREFIX = 'Located in ' as const
+
+export function formatLocatedInSupportingText(parentName: string): string {
+  return `${LOCATED_IN_SUPPORTING_TEXT_PREFIX}${parentName}`
 }
 
 export type LocationLocatedInSegment = {
   id: string
   name: string
   href?: string
+}
+
+export type LocationAncestorDisplayVm = LocationLocatedInSegment
+
+export type LocationEntitySummaryVm = {
+  id: string
+  name: string
+  href?: string
+  imageKey?: string
+  classification: LocationClassificationDisplay
+  ancestry: {
+    items: readonly LocationAncestorDisplayVm[]
+    /** Convenience only — never the SSOT for truncation/rich render */
+    text: string
+  }
 }
 
 export type LocationDetailIdentityRow = {
@@ -45,6 +75,8 @@ export type LocationDetailIdentityViewModel = {
   displaySummary: LocationDisplaySummary
   rows: LocationDetailIdentityRow[]
   locatedIn: LocationLocatedInSegment[]
+  locatedInFallbackLabel?: string
+  parentReplacementAction: LocationParentReplacementAction
 }
 
 export type LocationChildItem = {
@@ -140,14 +172,56 @@ export function buildLocationLocatedInSegments(
   return segments
 }
 
-/** @deprecated Use buildLocationLocatedInSegments. */
-export function buildLocationAncestrySegments(
+export function buildLocationEntitySummaryVm(
   location: Location,
-  locationsById: ReadonlyMap<string, Location>,
-  campaignId: string,
-): LocationAncestrySegment[] {
-  return buildLocationLocatedInSegments(location, locationsById, campaignId).flatMap((segment) =>
-    segment.href ? [{ id: segment.id, name: segment.name, href: segment.href }] : [],
+  ctx: {
+    locationsById: ReadonlyMap<string, Location>
+    campaignId: string
+    href?: string
+  },
+): LocationEntitySummaryVm {
+  const items = buildLocationLocatedInSegments(location, ctx.locationsById, ctx.campaignId)
+
+  return {
+    id: location.id,
+    name: location.name,
+    href: ctx.href,
+    imageKey: location.imageKey,
+    classification: resolveLocationClassificationDisplay(location),
+    ancestry: {
+      items,
+      text: items.map((item) => item.name).join(LOCATION_ANCESTRY_TEXT_SEPARATOR),
+    },
+  }
+}
+
+export function buildLocationEntityContextPresentation(
+  vm: LocationEntitySummaryVm,
+): DrawerContextEntityPresentation {
+  const nearestParent = vm.ancestry.items.at(-1)
+
+  return {
+    heading: vm.name,
+    headingSuffix: vm.classification.text ? ` · ${vm.classification.text}` : undefined,
+    supportingText: nearestParent ? formatLocatedInSupportingText(nearestParent.name) : undefined,
+    href: vm.href,
+  }
+}
+
+export function buildLocationContextPresentationFromLocation(
+  location: Location,
+  ctx: {
+    locationsById: ReadonlyMap<string, Location>
+    campaignId: string
+    href?: string
+  },
+): DrawerContextEntityPresentation {
+  return buildLocationEntityContextPresentation(buildLocationEntitySummaryVm(location, ctx))
+}
+
+export function buildLocationEntitySummarySearchText(vm: LocationEntitySummaryVm): string {
+  return [vm.name, ...vm.classification.parts, ...vm.ancestry.items.map((item) => item.name)].join(
+    ' ',
   )
 }
 
@@ -162,7 +236,7 @@ export function buildLocationChildren(
       id: location.id,
       name: location.name,
       href: ROUTES.content.locations.detail(campaignId, location.id),
-      summaryLine: formatLocationDisplaySummary(resolveLocationDisplaySummary(location)),
+      summaryLine: resolveLocationClassificationDisplay(location).text,
     }))
     .sort((left, right) => left.name.localeCompare(right.name))
 }
@@ -211,16 +285,26 @@ export function buildLocationDetailViewModel(
   ctx: {
     locations: readonly Location[]
     campaignId: string
+    canManage?: boolean
   },
 ): LocationDetailViewModel {
   const locationsById = buildLocationsById(ctx.locations)
   const displaySummary = resolveLocationDisplaySummary(location)
+  const locatedIn = buildLocationLocatedInSegments(location, locationsById, ctx.campaignId)
+  const parentRequirement = getParentRequirement(location.kind)
 
   return {
     identity: {
       displaySummary,
       rows: buildLocationDetailIdentityRows(location),
-      locatedIn: buildLocationLocatedInSegments(location, locationsById, ctx.campaignId),
+      locatedIn,
+      locatedInFallbackLabel:
+        locatedIn.length === 0 && parentRequirement !== 'forbidden'
+          ? LOCATION_UNCONTAINED_LABEL
+          : undefined,
+      parentReplacementAction: ctx.canManage
+        ? resolveLocationParentReplacementAction({ subject: location, canManage: true })
+        : null,
     },
     description: location.description,
     children: {

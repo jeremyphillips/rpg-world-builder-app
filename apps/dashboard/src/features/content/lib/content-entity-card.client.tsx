@@ -8,6 +8,7 @@ import {
   ContentCardHeadingAction,
   ContentCardMedia,
   contentCardHeadingLinkVariants,
+  contentCardMediaVariants,
   type ContentCardChrome,
   type ContentCardDensity,
   type ContentCardProps,
@@ -17,6 +18,7 @@ import { getContentImageUrl } from './detail/content-image-url'
 
 export type ContentEntityCardProps = {
   heading: ReactNode
+  headingSuffix?: ReactNode
   href?: string
   subheading?: ReactNode
   metadata?: ReactNode
@@ -34,6 +36,7 @@ export type ContentEntityCardProps = {
 
 export function ContentEntityCard({
   heading,
+  headingSuffix,
   href,
   subheading,
   metadata,
@@ -54,22 +57,26 @@ export function ContentEntityCard({
     heading
   )
 
+  const resolvedDensity = density ?? 'comfortable'
+
   const media = imageKey ? (
     <ContentCardMedia
       src={getContentImageUrl(imageKey)}
       alt={typeof heading === 'string' ? heading : ''}
+      className={contentCardMediaVariants({ density: resolvedDensity })}
     />
   ) : undefined
 
   const cardProps: ContentCardProps = {
     heading: resolvedHeading,
+    headingSuffix,
     subheading,
     metadata,
     media,
     headingEndSlot,
     endSlot,
     footer,
-    density,
+    density: resolvedDensity,
     chrome,
     className: cn(disabled && 'opacity-60', className),
   }

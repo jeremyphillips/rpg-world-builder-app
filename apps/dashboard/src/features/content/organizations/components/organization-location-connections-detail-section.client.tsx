@@ -51,7 +51,9 @@ export function OrganizationLocationConnectionsDetailSection({
           addKind={detail.drawerState.mode === 'add' ? detail.drawerState.kind : undefined}
           organization={organization}
           organizationId={organization.id}
+          campaignId={campaignId}
           locations={detail.locations as Location[]}
+          locationsById={detail.locationsById}
           locationCandidates={detail.mutationContext.locationCandidates}
           existingConnections={detail.existingConnections}
           edgesByLocationId={detail.edgesByLocationId}

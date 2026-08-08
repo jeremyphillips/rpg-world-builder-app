@@ -9,11 +9,14 @@ import type {
 import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
-import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import {
-  RelationshipFieldGroup,
-  RelationshipFieldGroupRow,
-} from '../../lib/relationship/relationship-field-group.client'
+  buildCharacterEntitySummaryVmFromTransport,
+  formatCharacterMixedHeadingSuffix,
+} from '@/features/character'
+
+import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
+import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
+import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
 import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
 import {
   isRelationshipMutationActionVisible,
@@ -30,6 +33,7 @@ import {
   peopleKindBindingKey,
   peopleKindSlotKey,
 } from '../lib/location-connected-parties-people-kind-slots'
+import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
@@ -138,10 +142,34 @@ function rowsForSlot(
   return slotRows
 }
 
+function resolveCharacterRowHeadingSuffix(
+  row: LocationConnectedPartyRow,
+  charactersById: ReadonlyMap<string, LocationConnectedPartyCharacterOption>,
+  campaignId: string,
+): string | undefined {
+  if (row.subject.type !== 'character') {
+    return undefined
+  }
+
+  const href = resolveLocationConnectedPartySubjectHref(campaignId, row.subject)
+  const option = charactersById.get(row.subject.id)
+
+  const summary = buildCharacterEntitySummaryVmFromTransport({
+    id: row.subject.id,
+    name: row.subject.name,
+    summary: option?.summary ?? '',
+    characterType: row.subject.characterType,
+    href,
+  })
+
+  return formatCharacterMixedHeadingSuffix(summary)
+}
+
 export type LocationPeopleAndOrganizationsSectionBodyProps = {
   campaignId: string
   rows: readonly LocationConnectedPartyRow[]
   kindSlots: readonly PeopleKindSlot[]
+  charactersById: ReadonlyMap<string, LocationConnectedPartyCharacterOption>
   canManage: boolean
   canAddToSection?: boolean
   heading: string
@@ -165,6 +193,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
   campaignId,
   rows,
   kindSlots,
+  charactersById,
   canManage,
   canAddToSection = false,
   heading,
@@ -199,7 +228,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
   const familyAddEnabled = canManage && canAddToSection && Boolean(onAddPeopleSection)
 
   return (
-    <RelationshipFieldGroup heading={heading} headingId={headingId} helper={helper}>
+    <DetailSectionPanel heading={heading} headingId={headingId} helper={helper}>
       {hasRows ? (
         <>
           {populatedSlots.map((slot) => {
@@ -212,12 +241,18 @@ export function LocationPeopleAndOrganizationsSectionBody({
                     const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
                     const rowCanRemove =
                       canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
+                    const headingSuffix = resolveCharacterRowHeadingSuffix(
+                      row,
+                      charactersById,
+                      campaignId,
+                    )
 
                     return (
                       <li key={row.relationshipId}>
                         <CrossContentRelationshipRow
                           heading={row.subject.name}
                           href={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
+                          headingSuffix={headingSuffix}
                           actions={buildPeopleOverflowActions({
                             campaignId,
                             row,
@@ -261,6 +296,6 @@ export function LocationPeopleAndOrganizationsSectionBody({
           />
         </div>
       ) : null}
-    </RelationshipFieldGroup>
+    </DetailSectionPanel>
   )
 }

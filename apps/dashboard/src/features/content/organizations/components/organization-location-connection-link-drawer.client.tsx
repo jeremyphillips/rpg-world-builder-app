@@ -8,11 +8,7 @@ import type {
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import {
-  getLocationKindLabel,
-  getOrganizationKindLabel,
-  getOrganizationLocationConnectionLabel,
-} from '@rpg/contracts'
+import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
 import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -23,21 +19,25 @@ import {
 } from '@/features/character'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { RelationshipDrawerContextHeader } from '../../lib/relationship/relationship-drawer-context-header.client'
-import { RelationshipDrawerCurrentEntityField } from '../../lib/relationship/relationship-drawer-current-entity-field.client'
-import { RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE } from '../../lib/relationship/relationship-drawer-current-entity'
-import type { RelationshipDrawerCurrentEntitySnapshot } from '../../lib/relationship/relationship-drawer-current-entity'
-import {
-  RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL,
-  resolveReplacementFieldLabels,
-} from '../../lib/relationship/relationship-drawer-field-labels'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import { buildLocationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
+import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
+import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
 } from '../../lib/relationship/relationship-alternatives'
 import { resolveRelationshipCandidateSet } from '../../lib/relationship/relationship-candidate-set'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import {
+  buildLocationEntitySummarySearchText,
+  buildLocationEntitySummaryVm,
+  buildLocationEntityContextPresentation,
+  type LocationEntitySummaryVm,
+} from '../../locations/lib/location-display'
 
 import {
   ORGANIZATION_DRAWER_ADD_TITLES,
@@ -68,9 +68,11 @@ import {
   resolveOrganizationForwardAddDrawerTitle,
   resolveOrganizationForwardAddSubmitLabel,
   resolveOrganizationForwardChangeTargetDrawerTitle,
+  resolveOrganizationForwardChangeTargetEntityLabel,
   resolveOrganizationForwardFamilyAddDrawerHelper,
   resolveOrganizationForwardTargetPresentation,
 } from '../lib/organization-location-connection-surface-copy'
+import { buildOrganizationDrawerContextEntity } from '../lib/organization-display'
 import {
   filterLocationsByTargetBrowseScope,
   ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
@@ -101,9 +103,11 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   mode: OrganizationForwardDrawerMode
   intent: OrganizationConnectionDrawerIntent
   addKind?: OrganizationLocationConnectionKind
-  organization: Pick<Organization, 'name' | 'organizationKind'>
+  organization: Pick<Organization, 'name'>
   organizationId: string
+  campaignId: string
   locations: readonly Location[]
+  locationsById: ReadonlyMap<string, Location>
   locationCandidates?: RelationshipCandidateSet<Location>
   existingConnections: readonly ExistingConnection[]
   edgesByLocationId?: Readonly<
@@ -111,17 +115,13 @@ export type OrganizationLocationConnectionLinkDrawerProps = {
   >
   occupancyLoaded?: boolean
   initialConnection?: ExistingConnection
-  currentEndpoint?: RelationshipDrawerCurrentEntitySnapshot
+  currentEndpoint?: EntityReplacementCurrentSnapshot
   drawerAlternatives?: OrganizationLocationConnectionDrawerAlternatives
   isSubmitting?: boolean
   onSubmit: (input: {
     locationId: string
     kind: OrganizationLocationConnectionKind
   }) => Promise<void>
-}
-
-function buildLocationSearchText(location: Location): string {
-  return [location.name, getLocationKindLabel(location.kind)].join(' ')
 }
 
 function resolveDefaultAddKind(
@@ -163,7 +163,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
   addKind,
   organization,
   organizationId,
+  campaignId,
   locations,
+  locationsById,
   locationCandidates: locationCandidatesInput,
   existingConnections,
   edgesByLocationId,
@@ -394,11 +396,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
     ? resolveOrganizationForwardTargetPresentation(activeKind)
     : DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION
 
-  const replacementFieldLabels =
-    mode === 'changeTarget'
-      ? resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL)
-      : null
-  const targetFieldLabel = replacementFieldLabels?.newLabel ?? targetPresentation.targetLabel
+  const targetFieldLabel = targetPresentation.targetLabel
 
   const title = (() => {
     if (mode === 'changeTarget' && activeKind) {
@@ -432,7 +430,39 @@ function OrganizationLocationConnectionLinkDrawerContent({
   })()
 
   const fullyLinkedReason = ORGANIZATION_DRAWER_FULLY_LINKED_REASONS[intent]
-  const organizationContext = `${organization.name} · ${getOrganizationKindLabel(organization.organizationKind)}`
+  const changeTargetEntityLabel = resolveOrganizationForwardChangeTargetEntityLabel(intent)
+
+  const drawerContextEntities = React.useMemo(() => {
+    const organizationEntity = toDrawerContextEntity(
+      buildOrganizationDrawerContextEntity(organization),
+    )
+
+    if (mode === 'add' || mode === 'changeTarget') {
+      return [organizationEntity]
+    }
+
+    if (mode === 'changeKind') {
+      const locationEntity = lockedLocation
+        ? toDrawerContextEntity(
+            buildLocationEntityContextPresentation(
+              buildLocationEntitySummaryVm(lockedLocation, {
+                locationsById,
+                campaignId,
+              }),
+            ),
+          )
+        : toDrawerContextEntity({ heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING })
+
+      return [organizationEntity, locationEntity]
+    }
+
+    return []
+  }, [campaignId, lockedLocation, locationsById, mode, organization])
+
+  const lockedKindLabel =
+    (mode === 'changeTarget' || mode === 'changeKind') && activeKind != null
+      ? getOrganizationLocationConnectionDisplayLabel(activeKind, 'forward')
+      : null
 
   const mutationEmptyMessage =
     mode === 'changeTarget'
@@ -477,6 +507,20 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
   }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
 
+  const pickerLocationSummaries = React.useMemo(() => {
+    const summaries = new Map<string, LocationEntitySummaryVm>()
+    for (const location of pickerLocations) {
+      summaries.set(
+        location.id,
+        buildLocationEntitySummaryVm(location, {
+          locationsById,
+          campaignId,
+        }),
+      )
+    }
+    return summaries
+  }, [campaignId, locationsById, pickerLocations])
+
   return (
     <CatalogPickerSheet
       open={open}
@@ -490,7 +534,13 @@ function OrganizationLocationConnectionLinkDrawerContent({
       noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
       headerBelowDescription={
         <div className="space-y-4">
-          <RelationshipDrawerContextHeader context={organizationContext} />
+          <DrawerContext entities={drawerContextEntities} />
+          {mode === 'changeTarget' && lockedKindLabel ? (
+            <RelationshipDrawerSubjectField
+              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              value={lockedKindLabel}
+            />
+          ) : null}
           {instructionCopy ? (
             <Text variant="muted" className="text-sm">
               {instructionCopy}
@@ -510,33 +560,24 @@ function OrganizationLocationConnectionLinkDrawerContent({
               changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
             />
           ) : null}
-          {mode === 'changeKind' && lockedLocation ? (
-            <RelationshipDrawerSubjectField
-              label={RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL}
-              value={lockedLocation.name}
-            />
-          ) : null}
-          {mode === 'changeTarget' && activeKind ? (
-            <RelationshipDrawerSubjectField
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              value={getOrganizationLocationConnectionLabel(activeKind)}
-            />
-          ) : null}
-          {mode === 'changeTarget' && currentEndpoint ? (
-            <RelationshipDrawerCurrentEntityField
-              label={
-                replacementFieldLabels?.currentLabel ??
-                resolveReplacementFieldLabels(RELATIONSHIP_DRAWER_LOCATION_FIELD_LABEL).currentLabel
-              }
-              heading={currentEndpoint.heading}
-              subheading={currentEndpoint.subheading}
-              imageKey={currentEndpoint.imageKey}
-            />
-          ) : null}
-          {mode === 'changeTarget' && currentEndpoint?.unavailable ? (
-            <Text variant="muted" className="text-sm" role="status">
-              {RELATIONSHIP_DRAWER_CURRENT_ENDPOINT_UNAVAILABLE_MESSAGE}
-            </Text>
+          {mode === 'changeTarget' &&
+          (currentEndpoint || (showLocationPicker && !showMutationEmptyState)) ? (
+            <EntityReplacementSection
+              entityLabel={changeTargetEntityLabel}
+              current={currentEndpoint}
+              showNewSection={showLocationPicker && !showMutationEmptyState}
+              newHelper={targetPresentation.targetHelp}
+            >
+              {showTargetBrowseScopeControl ? (
+                <SegmentedControl
+                  aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
+                  value={locationBrowseScope}
+                  options={browseScopeOptions}
+                  onValueChange={setLocationBrowseScope}
+                  fullWidth
+                />
+              ) : null}
+            </EntityReplacementSection>
           ) : null}
           {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
             <LocationConnectionKindStep
@@ -551,7 +592,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
               defaultExpanded
             />
           ) : null}
-          {showLocationPicker && !showMutationEmptyState ? (
+          {showLocationPicker && !showMutationEmptyState && mode !== 'changeTarget' ? (
             <div className="space-y-2">
               <Heading variant="label" as="p">
                 {targetFieldLabel}
@@ -602,8 +643,12 @@ function OrganizationLocationConnectionLinkDrawerContent({
       items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
       getItemKey={(location) => location.id}
       getItemToolbarLabel={(location) => location.name}
-      getSearchText={buildLocationSearchText}
+      getSearchText={(location) => {
+        const summary = pickerLocationSummaries.get(location.id)
+        return summary ? buildLocationEntitySummarySearchText(summary) : location.name
+      }}
       renderItemHeader={(location) => {
+        const summary = pickerLocationSummaries.get(location.id)
         const isSelected = selectedLocationId === location.id
         const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
         const kindAvailable =
@@ -620,8 +665,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
           <ContentEntityCard
             chrome="embedded"
             density="compact"
-            heading={location.name}
-            subheading={kindAvailable ? getLocationKindLabel(location.kind) : fullyLinkedReason}
+            {...(summary
+              ? buildLocationPickerCardPresentation(summary)
+              : { heading: location.name })}
+            subheading={!kindAvailable ? fullyLinkedReason : undefined}
             imageKey={location.imageKey}
             disabled={!kindAvailable}
             endSlot={

@@ -44,7 +44,7 @@ export const ORGANIZATION_FORWARD_CONNECTION_MENU_ITEMS: ReadonlyArray<{
   label: string
 }> = [
   { intent: 'site', label: 'Site relationship' },
-  { intent: 'geographic_presence', label: 'Geographic presence' },
+  { intent: 'geographic_presence', label: 'Areas of operation' },
   { intent: 'territorial_authority', label: 'Territorial authority' },
 ]
 
@@ -69,7 +69,7 @@ export const ORGANIZATION_DRAWER_FULLY_LINKED_REASONS: Record<
   string
 > = {
   territorial_authority: 'Territorial authority already linked.',
-  geographic_presence: 'Organization presence already linked.',
+  geographic_presence: 'Area of operation already linked.',
   site: 'All site relationship types already linked.',
 }
 
@@ -86,13 +86,13 @@ export const ORGANIZATION_DRAWER_KIND_FIELD_LABELS: Record<
 
 export const ORGANIZATION_DRAWER_ADD_TITLES: Record<OrganizationConnectionDrawerIntent, string> = {
   site: 'Add site relationship',
-  geographic_presence: 'Add geographic presence',
+  geographic_presence: 'Add area of operation',
   territorial_authority: 'Add territorial authority',
 }
 
 export const ORGANIZATION_DRAWER_EDIT_TITLES: Record<OrganizationConnectionDrawerIntent, string> = {
   site: 'Edit site relationship',
-  geographic_presence: 'Edit organization presence',
+  geographic_presence: 'Edit area of operation',
   territorial_authority: 'Edit territorial authority',
 }
 
@@ -101,7 +101,7 @@ export const ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS: Record<
   string
 > = {
   site: 'Add site relationship',
-  geographic_presence: 'Add geographic presence',
+  geographic_presence: 'Add area of operation',
   territorial_authority: 'Add territorial authority',
 }
 

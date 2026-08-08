@@ -147,4 +147,33 @@ describe('buildCharacterDetailViewModel', () => {
       },
     ])
   })
+
+  it('uses forward edge labels for character location connection detail', () => {
+    const viewModel = buildCharacterDetailViewModel({
+      character: SAMPLE_PC,
+      catalogIndex,
+      rules: context.characterCreationRules,
+      xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
+      locationReferences: [
+        {
+          connection: { id: 'loc-conn-1', locationId: 'loc-1', kind: 'resides_at' },
+          location: {
+            id: 'loc-1',
+            campaignId: 'campaign-1',
+            name: 'Harbor House',
+            slug: 'harbor-house',
+            kind: 'structure',
+          } as never,
+        },
+      ],
+    })
+
+    expect(viewModel.connections.items).toEqual([
+      {
+        id: 'location:loc-conn-1',
+        label: 'Harbor House',
+        detail: 'Resides at',
+      },
+    ])
+  })
 })

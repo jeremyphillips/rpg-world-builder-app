@@ -4,7 +4,11 @@ import type {
   CharacterBuildCatalogIndex,
 } from '@rpg/contracts'
 
-import { buildCharacterCardViewModel } from '@/features/character'
+import {
+  buildCharacterCardViewModel,
+  buildCharacterEntitySummaryVmFromTransport,
+  buildCharacterEntitySummarySearchText,
+} from '@/features/character'
 
 export type LocationConnectedPartyCharacterOption = {
   id: string
@@ -35,4 +39,21 @@ export function buildLocationConnectedPartyCharactersById(
   ].sort((left, right) => left.name.localeCompare(right.name))
 
   return new Map(entries.map((entry) => [entry.id, entry]))
+}
+
+export function buildConnectedPartyCharacterEntitySummary(
+  option: LocationConnectedPartyCharacterOption,
+) {
+  return buildCharacterEntitySummaryVmFromTransport({
+    id: option.id,
+    name: option.name,
+    summary: option.summary,
+    characterType: option.characterType,
+  })
+}
+
+export function buildConnectedPartyCharacterPickerSearchText(
+  option: LocationConnectedPartyCharacterOption,
+): string {
+  return buildCharacterEntitySummarySearchText(buildConnectedPartyCharacterEntitySummary(option))
 }

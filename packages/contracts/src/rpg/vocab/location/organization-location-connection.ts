@@ -28,9 +28,15 @@ export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
   },
 } as const satisfies VocabularyTerm
 
+export type RelationshipDisplayDirection = 'forward' | 'inverse'
+
 export type OrganizationLocationConnectionEntry = GameTermEntry & {
   readonly family: OrganizationLocationConnectionFamily
   readonly priority: number
+  /** Subject-owned edge eyebrow; falls back to `label`. */
+  readonly forwardLabel?: string
+  /** Location-projected edge eyebrow; falls back to `label`. */
+  readonly inverseLabel?: string
   /** Max organizations per location for this kind across the campaign; null = unlimited. */
   readonly maxSubjectsPerLocation: number | null
   /** Max connections of this kind per organization across all locations; null = unlimited. */
@@ -40,6 +46,7 @@ export type OrganizationLocationConnectionEntry = GameTermEntry & {
 export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   owns: {
     label: 'Owner',
+    forwardLabel: 'Owns',
     description: 'Owns or holds title to a property or site.',
     family: 'site',
     priority: 40,
@@ -48,6 +55,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   tenant: {
     label: 'Tenant',
+    forwardLabel: 'Tenants',
     description: 'Occupies or leases space at a site without owning it.',
     family: 'site',
     priority: 30,
@@ -56,6 +64,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   operator: {
     label: 'Operator',
+    forwardLabel: 'Operates',
     description: 'Runs or manages day-to-day operations at a site.',
     family: 'site',
     priority: 20,
@@ -64,6 +73,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   headquarters: {
     label: 'Headquarters',
+    inverseLabel: 'Headquarters of',
     description: 'A designated primary base or headquarters location for the organization.',
     family: 'site',
     priority: 50,
@@ -72,6 +82,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   operates_in: {
     label: 'Operates in',
+    inverseLabel: 'Operating here',
     description:
       'Active organizational presence in a geographic area. Distinct from territorial authority (governs/controls/claims).',
     family: 'geographic_presence',
@@ -81,6 +92,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   governs: {
     label: 'Governs',
+    inverseLabel: 'Governed by',
     description: 'Recognized political or administrative authority over a territory or region.',
     family: 'territorial_authority',
     priority: 50,
@@ -89,6 +101,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   controls: {
     label: 'Controls',
+    inverseLabel: 'Controlled by',
     description:
       'Effective or de facto control over a territory or region, including when control differs from the recognized government.',
     family: 'territorial_authority',
@@ -98,6 +111,7 @@ export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   },
   claims: {
     label: 'Claims',
+    inverseLabel: 'Claimed by',
     description:
       'Asserts a territorial claim without necessarily governing or controlling the territory.',
     family: 'territorial_authority',
@@ -125,9 +139,26 @@ export function getOrganizationLocationConnectionEntry(
   return ORGANIZATION_LOCATION_CONNECTION_ENTRIES[id as OrganizationLocationConnectionKind]
 }
 
-/** Returns the display label for an organization location connection kind. Falls back to the raw id. */
+/** Returns the canonical kind label for pickers and read-only kind fields. Falls back to the raw id. */
 export function getOrganizationLocationConnectionLabel(id: string): string {
   return getOrganizationLocationConnectionEntry(id)?.label ?? id
+}
+
+/** Returns the direction-aware edge display label for existing relationship rows. Falls back to the raw id. */
+export function getOrganizationLocationConnectionDisplayLabel(
+  id: string,
+  direction: RelationshipDisplayDirection,
+): string {
+  const entry = getOrganizationLocationConnectionEntry(id)
+  if (!entry) {
+    return id
+  }
+
+  if (direction === 'forward') {
+    return entry.forwardLabel ?? entry.label
+  }
+
+  return entry.inverseLabel ?? entry.label
 }
 
 /** In-family precedence for ordering connection rows — higher priority first. */

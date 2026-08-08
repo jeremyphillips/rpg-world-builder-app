@@ -1,5 +1,6 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
+import type { RelationshipDisplayDirection } from './organization-location-connection'
 
 export const CHARACTER_LOCATION_CONNECTION_FAMILY_IDS = [
   'ownership',
@@ -23,11 +24,16 @@ export const CHARACTER_LOCATION_CONNECTION_TERM = {
 export type CharacterLocationConnectionEntry = GameTermEntry & {
   readonly family: CharacterLocationConnectionFamily
   readonly priority: number
+  /** Subject-owned edge eyebrow; falls back to `label`. */
+  readonly forwardLabel?: string
+  /** Location-projected edge eyebrow; falls back to `label`. */
+  readonly inverseLabel?: string
 }
 
 export const CHARACTER_LOCATION_CONNECTION_ENTRIES = {
   owns: {
     label: 'Owner',
+    forwardLabel: 'Owns',
     description: 'Owns or holds title to a property or site.',
     family: 'ownership',
     priority: 50,
@@ -40,18 +46,21 @@ export const CHARACTER_LOCATION_CONNECTION_ENTRIES = {
   },
   resides_at: {
     label: 'Resident',
+    forwardLabel: 'Resides at',
     description: 'Lives at a site as a primary residence.',
     family: 'occupancy',
     priority: 30,
   },
   operator: {
     label: 'Operator',
+    forwardLabel: 'Operates',
     description: 'Runs or manages day-to-day operations at a site.',
     family: 'operation',
     priority: 20,
   },
   works_at: {
     label: 'Works at',
+    inverseLabel: 'Works here',
     description: 'Employed or regularly present at a site.',
     family: 'operation',
     priority: 10,
@@ -75,9 +84,26 @@ export function getCharacterLocationConnectionEntry(
   return CHARACTER_LOCATION_CONNECTION_ENTRIES[id as CharacterLocationConnectionKind]
 }
 
-/** Returns the display label for a character location connection kind. Falls back to the raw id. */
+/** Returns the canonical kind label for pickers and read-only kind fields. Falls back to the raw id. */
 export function getCharacterLocationConnectionLabel(id: string): string {
   return getCharacterLocationConnectionEntry(id)?.label ?? id
+}
+
+/** Returns the direction-aware edge display label for existing relationship rows. Falls back to the raw id. */
+export function getCharacterLocationConnectionDisplayLabel(
+  id: string,
+  direction: RelationshipDisplayDirection,
+): string {
+  const entry = getCharacterLocationConnectionEntry(id)
+  if (!entry) {
+    return id
+  }
+
+  if (direction === 'forward') {
+    return entry.forwardLabel ?? entry.label
+  }
+
+  return entry.inverseLabel ?? entry.label
 }
 
 /** In-family precedence for ordering connection rows — higher priority first. */

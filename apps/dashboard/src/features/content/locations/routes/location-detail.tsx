@@ -18,7 +18,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { LocationAddChildMenu } from '../components/location-add-child-menu.client'
 import { LocationChildrenSection } from '../components/location-children-section.client'
 import { LocationConnectedPartiesDetailSections } from '../components/location-connected-parties-detail-sections.client'
-import { LocationDetailIdentity } from '../components/location-detail-identity.client'
+import { LocationDetailMetadata } from '../components/location-detail-metadata.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 
@@ -38,8 +38,9 @@ export function LocationDetailContent({
       buildLocationDetailViewModel(location, {
         locations,
         campaignId,
+        canManage,
       }),
-    [campaignId, location, locations],
+    [campaignId, canManage, location, locations],
   )
 
   return (
@@ -51,7 +52,14 @@ export function LocationDetailContent({
         imageName={location.name}
         campaignId={campaignId}
         editHref={contentEditHref('locations', campaignId, location.id)}
-        metadata={<LocationDetailIdentity identity={viewModel.identity} />}
+        metadata={
+          <LocationDetailMetadata
+            location={location}
+            campaignId={campaignId}
+            locations={locations}
+            identity={viewModel.identity}
+          />
+        }
         descriptionContent={
           viewModel.description ? (
             <RichTextContent html={viewModel.description} size="md" tone="muted" />
@@ -62,6 +70,10 @@ export function LocationDetailContent({
           <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
           <LocationChildrenSection
             childrenViewModel={viewModel.children}
+            canManage={canManage}
+            parentLocationId={location.id}
+            campaignId={campaignId}
+            campaignLocations={locations}
             headerActions={
               canManage ? (
                 <LocationAddChildMenu

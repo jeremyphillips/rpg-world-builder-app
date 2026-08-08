@@ -1,4 +1,5 @@
 import { getBuildingArchetypeLabel } from '../../vocab/location/building-archetype'
+import { getInteriorTypeLabel } from '../../vocab/location/interior-type'
 import {
   getInteriorSubtypeLabel,
   INTERIOR_TYPE_DEFINITIONS,
@@ -9,10 +10,7 @@ import { getPlaneTypeLabel } from '../../vocab/location/plane-type'
 import { getRegionTypeLabelForKind } from '../../vocab/location/region-classification-definitions'
 import { getSettlementTypeLabel } from '../../vocab/location/settlement-type'
 import { getSiteTypeLabel } from '../../vocab/location/site-type'
-import {
-  getStructureTypeLabel,
-  UNCLASSIFIED_STRUCTURE_LABEL,
-} from '../../vocab/location/structure-type'
+import { getStructureTypeLabel } from '../../vocab/location/structure-type'
 import type { BuildingClassification } from './building-classification'
 import type { Location } from './location'
 
@@ -24,8 +22,13 @@ export type LocationDisplaySummary = {
   specializationLabel?: string
 }
 
+export type LocationClassificationDisplay = {
+  parts: readonly string[]
+  text: string
+}
+
 function resolveStructureTypeLabel(structureType: string | undefined): string {
-  if (!structureType) return UNCLASSIFIED_STRUCTURE_LABEL
+  if (!structureType) return getLocationKindLabel('structure')
   return getStructureTypeLabel(structureType)
 }
 
@@ -113,7 +116,18 @@ function resolveTypeLabel(location: Location): string {
     return resolveStructureTypeLabel(location.structureType)
   }
 
+  if (location.kind === 'interior') {
+    return location.interiorType
+      ? getInteriorTypeLabel(location.interiorType)
+      : getLocationKindLabel('interior')
+  }
+
   return getLocationKindLabel(location.kind)
+}
+
+/** Lowercase prose noun for inverse relationship copy — same type tier as compact classification. */
+export function resolveLocationReferenceNoun(location: Location): string {
+  return resolveTypeLabel(location).toLowerCase()
 }
 
 /** Resolves semantic display labels for a location without presentation field names. */
@@ -125,18 +139,38 @@ export function resolveLocationDisplaySummary(location: Location): LocationDispl
   }
 }
 
-/** Formats a compact type summary for tables and list secondary lines. */
-export function formatLocationDisplaySummary(summary: LocationDisplaySummary): string {
-  return [summary.typeLabel, summary.classificationLabel, summary.specializationLabel]
-    .filter((segment): segment is string => Boolean(segment))
-    .join(LOCATION_DISPLAY_SUMMARY_SEPARATOR)
+/** Resolves the compact classification line shared by tables, search, and pickers. */
+export function resolveLocationClassificationDisplay(
+  location: Location,
+): LocationClassificationDisplay {
+  const summary = resolveLocationDisplaySummary(location)
+  const parts = [summary.typeLabel, summary.classificationLabel].filter(
+    (segment): segment is string => Boolean(segment),
+  )
+
+  return {
+    parts,
+    text: parts.join(LOCATION_DISPLAY_SUMMARY_SEPARATOR),
+  }
 }
 
-/** Tuple accessor for stable Type-column sort and filter. */
-export function locationDisplaySummarySortKey(
-  summary: LocationDisplaySummary,
-): readonly [string, string, string] {
-  return [summary.typeLabel, summary.classificationLabel ?? '', summary.specializationLabel ?? '']
+/**
+ * Lexicographic compare of classification parts for table sorting.
+ * Missing indices at a position are treated as empty strings, so equal-prefix
+ * classifications sort shorter-first (for example `Building` before `Building · Guildhall`).
+ */
+export function compareLocationClassificationParts(
+  left: readonly string[],
+  right: readonly string[],
+): number {
+  const maxLength = Math.max(left.length, right.length)
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const comparison = (left[index] ?? '').localeCompare(right[index] ?? '')
+    if (comparison !== 0) return comparison
+  }
+
+  return 0
 }
 
 /** Detail/read row label for the location classification field, when present. */

@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { Location } from '@rpg/contracts'
 
+import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import { buildLocationsById } from '../lib/location-display'
 import { CITY_COUNCIL, SILVER_CIRCLE } from '../../organizations/fixtures'
 import {
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
@@ -45,6 +47,13 @@ function buildingLocation(): Location {
 
 const organizations = [CITY_COUNCIL]
 
+function drawerContextFor(location: Location) {
+  return {
+    locationsById: buildLocationsById([location]),
+    campaignId: STORY_CAMPAIGN_ID,
+  }
+}
+
 const headquartersRow = {
   relationshipId: 'rel-hq',
   subject: {
@@ -62,6 +71,8 @@ const headquartersRow = {
 
 describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regression', () => {
   it('does not show a broad family kind selector for Add headquarters', () => {
+    const location = settlementLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
@@ -69,7 +80,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
         mode="add"
         intent="site"
         addKind="headquarters"
-        location={settlementLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={organizations}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
@@ -85,6 +97,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   })
 
   it('does not show a broad family kind selector for Add owner on a building', () => {
+    const location = buildingLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
@@ -92,7 +106,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
         mode="add"
         intent="site"
         addKind="owns"
-        location={buildingLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={organizations}
         connectedPartyRows={[]}
         onSubmit={vi.fn()}
@@ -109,6 +124,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
   it('opens with expanded kind choices, fixed organization, and no organization picker', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
+    const location = buildingLocation()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -116,7 +132,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
         onOpenChange={vi.fn()}
         mode="changeKind"
         intent="site"
-        location={buildingLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={organizations}
         connectedPartyRows={[headquartersRow]}
         initialConnection={{
@@ -129,6 +146,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Change connection type' })).toBeInTheDocument()
+    expect(screen.getByText('Guildhall')).toBeInTheDocument()
     expect(screen.getByText('Organization')).toBeInTheDocument()
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
@@ -151,19 +169,24 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
 
 describe('LocationInverseOrganizationConnectionLinkDrawer replace organization', () => {
   const currentOrganizationEndpoint = {
-    heading: CITY_COUNCIL.name,
-    subheading: 'Government',
+    entity: {
+      heading: CITY_COUNCIL.name,
+      headingSuffix: ' · Government',
+    },
     imageKey: CITY_COUNCIL.imageKey,
   }
 
   it('uses site-family replace copy without territorial drawer strings', () => {
+    const location = buildingLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
         mode="replaceOrganization"
         intent="site"
-        location={buildingLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
         connectedPartyRows={[headquartersRow]}
         initialConnection={{
@@ -180,21 +203,24 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(LOCATION_INVERSE_ORGANIZATION_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Guildhall · Structure')).toBeInTheDocument()
-    expect(screen.queryByText('Guildhall · Structure · Headquarters')).not.toBeInTheDocument()
+    expect(screen.getByText('Guildhall')).toBeInTheDocument()
+    expect(screen.getByText('Headquarters of')).toBeInTheDocument()
     expect(
       screen.queryByText(TERRITORIAL_AUTHORITY_DRAWER.organizationNoResults),
     ).not.toBeInTheDocument()
   })
 
   it('uses territorial replace copy for territorial authority intent', () => {
+    const location = settlementLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
         mode="replaceOrganization"
         intent="territorial_authority"
-        location={settlementLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
         connectedPartyRows={[
           {
@@ -219,12 +245,14 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       screen.getByRole('dialog', { name: TERRITORIAL_AUTHORITY_DRAWER.replaceTitle }),
     ).toBeInTheDocument()
     expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
-    expect(screen.getByText('Port City · Settlement · Governs')).toBeInTheDocument()
+    expect(screen.getByText('Port City')).toBeInTheDocument()
+    expect(screen.getByText('Settlement')).toBeInTheDocument()
   })
 
   it('shows current and new organization fields with replacement picker', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
+    const location = buildingLocation()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -232,7 +260,8 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
         onOpenChange={vi.fn()}
         mode="replaceOrganization"
         intent="site"
-        location={buildingLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
         connectedPartyRows={[headquartersRow]}
         initialConnection={{
@@ -246,11 +275,10 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     )
 
     expect(screen.getByRole('dialog', { name: 'Replace organization' })).toBeInTheDocument()
-    expect(screen.getByText('Relationship type')).toBeInTheDocument()
-    expect(screen.getByText('Headquarters')).toBeInTheDocument()
     expect(screen.getByText('Current organization')).toBeInTheDocument()
     expect(screen.getByText('New organization')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
+    expect(screen.getByText('Relationship type')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
     expect(screen.getAllByText('City Council')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Replace organization' })).toBeDisabled()
@@ -262,13 +290,16 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   })
 
   it('shows read-only relationship type and organization picker without kind controls', () => {
+    const location = buildingLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
         mode="replaceOrganization"
         intent="site"
-        location={buildingLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={organizations}
         connectedPartyRows={[headquartersRow]}
         initialConnection={{
@@ -282,16 +313,20 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     )
 
     expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(screen.getByText('Headquarters of')).toBeInTheDocument()
   })
 
   it('evaluates replace-organization availability for the persisted kind, not site-family union', () => {
+    const location = infrastructureLocation()
+
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
         mode="replaceOrganization"
         intent="site"
-        location={infrastructureLocation()}
+        location={location}
+        {...drawerContextFor(location)}
         organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
         connectedPartyRows={[headquartersRow]}
         initialConnection={{

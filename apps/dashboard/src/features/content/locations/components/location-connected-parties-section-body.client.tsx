@@ -22,6 +22,7 @@ import {
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
 } from '../lib/location-connected-parties-section-copy'
+import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
 type LocationConnectedPartiesSectionBodyProps = {
@@ -30,6 +31,7 @@ type LocationConnectedPartiesSectionBodyProps = {
   sectionRows: readonly LocationConnectedPartyRow[]
   sectionHeadingId: string
   peopleKindSlots: readonly PeopleKindSlot[]
+  charactersById: ReadonlyMap<string, LocationConnectedPartyCharacterOption>
   canManage: boolean
   canAddToPeopleSection?: boolean
   peopleMutationContext?: LocationPeopleMutationContext
@@ -54,6 +56,7 @@ export function LocationConnectedPartiesSectionBody({
   sectionRows,
   sectionHeadingId,
   peopleKindSlots,
+  charactersById,
   canManage,
   canAddToPeopleSection,
   peopleMutationContext,
@@ -109,6 +112,7 @@ export function LocationConnectedPartiesSectionBody({
       campaignId={campaignId}
       rows={sectionRows}
       kindSlots={peopleKindSlots}
+      charactersById={charactersById}
       canManage={canManage}
       canAddToSection={canAddToPeopleSection}
       heading={LOCATION_CONNECTED_PARTIES_SECTION_LABELS.people_and_organizations}

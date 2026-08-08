@@ -1,27 +1,31 @@
 import type {
+  Location,
   OrganizationLocationConnectionFamily,
   OrganizationLocationConnectionKind,
   OrganizationLocationReferenceResolution,
 } from '@rpg/contracts'
 import {
+  getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionFamily,
-  getOrganizationLocationConnectionLabel,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
 } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import {
+  buildLocationEntitySummaryVm,
+  buildLocationEntityContextPresentation,
+  type LocationEntitySummaryVm,
+} from '../../locations/lib/location-display'
+import {
+  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
+  type EntityReplacementCurrentSnapshot,
+} from '../../lib/entity-replacement/entity-replacement-current-entity'
 import type { OrganizationLocationConnectionPreviewItem } from './organization-display'
-import { resolveOrganizationForwardKindHeading } from './organization-location-connection-surface-copy'
-
-export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS: Record<
-  OrganizationLocationConnectionFamily,
-  string
-> = {
-  site: 'Sites & facilities',
-  geographic_presence: 'Geographic presence',
-  territorial_authority: 'Territorial authority',
-}
+import {
+  ORGANIZATION_FORWARD_FAMILY_PRESENTATION,
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER,
+} from './organization-location-connection-surface-copy'
 
 export type OrganizationLocationConnectionKindGroup = {
   kind: OrganizationLocationConnectionKind
@@ -32,14 +36,9 @@ export type OrganizationLocationConnectionKindGroup = {
 export type OrganizationLocationConnectionFamilyGroup = {
   family: OrganizationLocationConnectionFamily
   familyLabel: string
+  kindHeading: 'show' | 'omit'
   kindGroups: OrganizationLocationConnectionKindGroup[]
 }
-
-const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] = [
-  'territorial_authority',
-  'geographic_presence',
-  'site',
-]
 
 function kindsForFamily(
   family: OrganizationLocationConnectionFamily,
@@ -76,22 +75,63 @@ export function groupOrganizationLocationConnections(
 
   return ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER.filter((family) =>
     familiesWithKinds.has(family),
-  ).map((family) => ({
-    family,
-    familyLabel: ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family],
-    kindGroups: kindsForFamily(family)
-      .filter((kind) => itemsByKind.has(kind))
-      .map((kind) => ({
-        kind,
-        kindLabel: resolveOrganizationForwardKindHeading(kind),
-        items: itemsByKind.get(kind) ?? [],
-      })),
-  }))
+  ).map((family) => {
+    const presentation = ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+    return {
+      family,
+      familyLabel: presentation.heading,
+      kindHeading: presentation.kindHeading,
+      kindGroups: kindsForFamily(family)
+        .filter((kind) => itemsByKind.has(kind))
+        .map((kind) => ({
+          kind,
+          kindLabel: getOrganizationLocationConnectionDisplayLabel(kind, 'forward'),
+          items: itemsByKind.get(kind) ?? [],
+        })),
+    }
+  })
+}
+
+export function mapLocationEntitySummaryToEntityReplacementCurrentSnapshot(
+  vm: LocationEntitySummaryVm,
+): EntityReplacementCurrentSnapshot {
+  return {
+    entity: buildLocationEntityContextPresentation(vm),
+    imageKey: vm.imageKey,
+  }
+}
+
+export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
+  connectionId: string
+  locationReferences: readonly OrganizationLocationReferenceResolution[]
+  locationsById: ReadonlyMap<string, Location>
+  campaignId: string
+}): EntityReplacementCurrentSnapshot {
+  const reference = input.locationReferences.find(
+    ({ connection }) => connection.id === input.connectionId,
+  )
+
+  if (!reference?.location) {
+    return {
+      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
+      unavailable: true,
+    }
+  }
+
+  return mapLocationEntitySummaryToEntityReplacementCurrentSnapshot(
+    buildLocationEntitySummaryVm(reference.location, {
+      locationsById: input.locationsById,
+      campaignId: input.campaignId,
+    }),
+  )
 }
 
 export function buildOrganizationLocationConnectionCards(
   locationReferences: readonly OrganizationLocationReferenceResolution[],
-  routeContext: { campaignId: string },
+  ctx: {
+    campaignId: string
+    locationsById: ReadonlyMap<string, Location>
+  },
 ): {
   previewItems: OrganizationLocationConnectionPreviewItem[]
   total: number
@@ -104,15 +144,14 @@ export function buildOrganizationLocationConnectionCards(
       locationId: connection.locationId,
       kind: connection.kind,
       family,
-      familyLabel: ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family],
-      relationshipLabel: getOrganizationLocationConnectionLabel(connection.kind),
-      card: {
-        id: connection.locationId,
-        name: location?.name ?? 'Unavailable location',
-        summary: `${ORGANIZATION_LOCATION_CONNECTION_FAMILY_LABELS[family]} · ${getOrganizationLocationConnectionLabel(connection.kind)}`,
-      },
-      detailHref: ROUTES.content.locations.detail(routeContext.campaignId, connection.locationId),
-      locationUnavailable: location == null,
+      target:
+        location == null
+          ? null
+          : buildLocationEntitySummaryVm(location, {
+              locationsById: ctx.locationsById,
+              campaignId: ctx.campaignId,
+              href: ROUTES.content.locations.detail(ctx.campaignId, connection.locationId),
+            }),
     }
   })
 

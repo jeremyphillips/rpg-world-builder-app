@@ -1,4 +1,4 @@
-import type { RelationshipOverflowAction } from './relationship-overflow-menu.client'
+import type { DetailOverflowAction } from '../detail/detail-overflow-menu.client'
 import type {
   RelationshipMutationCapabilities,
   RelationshipOperationState,
@@ -34,7 +34,7 @@ function isSupportedOperationVisible(operation?: RelationshipOperationState): bo
 }
 
 function pushAlternativeMutationAction(
-  actions: RelationshipOverflowAction[],
+  actions: DetailOverflowAction[],
   input: {
     id: RelationshipOverflowActionId
     operation?: RelationshipOperationState
@@ -62,8 +62,8 @@ export function buildRelationshipOverflowActions(input: {
   capabilities: RelationshipMutationCapabilities
   labels: Partial<Record<RelationshipOverflowActionId, string>>
   handlers: Partial<Record<RelationshipOverflowActionId, () => void>>
-}): RelationshipOverflowAction[] {
-  const actions: RelationshipOverflowAction[] = []
+}): DetailOverflowAction[] {
+  const actions: DetailOverflowAction[] = []
 
   if (isSupportedOperationVisible(input.capabilities.view) && input.handlers.view) {
     actions.push({

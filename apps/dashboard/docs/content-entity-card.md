@@ -24,7 +24,7 @@ Dashboard content features render catalog entities through **`ContentEntityCard`
 | `density`                      | Inset       | Heading / secondary typography |
 | ------------------------------ | ----------- | ------------------------------ |
 | `comfortable` (detail default) | `px-5 py-3` | base / sm                      |
-| `compact` (picker rows)        | `px-4 py-3` | sm / xs                        |
+| `compact` (picker rows)        | `px-3 py-2` | sm / xs                        |
 
 **One owner:** `ContentEntityCard.density` → `ContentCard.density`. Picker/list primitives must not expose entity density.
 
@@ -53,8 +53,8 @@ ContentEntityCard          chrome="standalone" density="comfortable"
 ```text
 CollapsibleListItem        rowLayout="entity-card" rowPreset="catalog"
   ContentEntityCard        chrome="embedded" density="compact"
-    px-4 py-3 (entity-owned)
-    heading / subheading / endSlot
+    px-3 py-2 (entity-owned)
+    heading / headingSuffix / metadata / endSlot
 ```
 
 Omit `href` at the drawer/picker layer for choose-and-submit flows. The card supports `href` in both chrome modes when navigation is intended.

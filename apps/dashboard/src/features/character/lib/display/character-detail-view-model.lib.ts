@@ -16,7 +16,7 @@ import {
   deriveCharacterProfile,
   formatSignedModifier,
   formatWeaponDamageWithModifier,
-  getCharacterLocationConnectionLabel,
+  getCharacterLocationConnectionDisplayLabel,
   getCharacterTotalLevel,
   getMovementModeLabel,
   getOrganizationKindLabel,
@@ -435,7 +435,7 @@ export function buildCharacterDetailViewModel({
     id: `location:${connection.id}`,
     label: location?.name ?? UNAVAILABLE_LOCATION_LABEL,
     detail: location
-      ? getCharacterLocationConnectionLabel(connection.kind)
+      ? getCharacterLocationConnectionDisplayLabel(connection.kind, 'forward')
       : 'This location is missing or no longer available.',
   }))
 

@@ -5,9 +5,6 @@ export {
   TERRITORIAL_AUTHORITY_SECTION_HEADING,
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
   TERRITORIAL_AUTHORITY_SLOT_COPY,
-  resolveTerritorialAuthorityChangeKindCurrent,
-  resolveTerritorialAuthorityLocationContext,
-  resolveTerritorialAuthorityReplaceContext,
   resolveTerritorialKindOccupiedReason,
   resolveTerritorialRemoveConfirmation,
 } from './location-connection-surface-copy'

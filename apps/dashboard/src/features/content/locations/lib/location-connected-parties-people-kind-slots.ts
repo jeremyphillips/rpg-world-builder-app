@@ -3,9 +3,9 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
-  getCharacterLocationConnectionLabel,
+  getCharacterLocationConnectionDisplayLabel,
+  getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionFamily,
-  getOrganizationLocationConnectionLabel,
   getOrganizationLocationConnectionPriority,
 } from '@rpg/contracts'
 
@@ -115,14 +115,14 @@ export function buildPeopleKindSlots(input: {
     if (getOrganizationLocationConnectionFamily(kind) === 'territorial_authority') {
       continue
     }
-    addBinding(getOrganizationLocationConnectionLabel(kind), {
+    addBinding(getOrganizationLocationConnectionDisplayLabel(kind, 'inverse'), {
       subjectType: 'organization',
       kind,
     })
   }
 
   for (const kind of input.characterKinds) {
-    addBinding(getCharacterLocationConnectionLabel(kind), {
+    addBinding(getCharacterLocationConnectionDisplayLabel(kind, 'inverse'), {
       subjectType: 'character',
       kind,
     })

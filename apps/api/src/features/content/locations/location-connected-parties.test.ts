@@ -85,7 +85,7 @@ describe('resolveLocationConnectedParties', () => {
         relationshipId: 'org-ta-1',
         sectionGroup: 'territorial_authority',
         subject: expect.objectContaining({ type: 'organization', name: 'Alpha Org' }),
-        label: 'Governs',
+        label: 'Governed by',
       }),
       expect.objectContaining({
         relationshipId: 'char-loc-1',
@@ -95,7 +95,7 @@ describe('resolveLocationConnectedParties', () => {
           name: 'Beta NPC',
           characterType: 'npc',
         }),
-        label: 'Works at',
+        label: 'Works here',
       }),
     ])
   })
@@ -143,7 +143,7 @@ describe('location connected parties routes', () => {
         expect.objectContaining({
           relationshipId: 'route-org-conn',
           sectionGroup: 'territorial_authority',
-          label: 'Claims',
+          label: 'Claimed by',
           subject: expect.objectContaining({
             type: 'organization',
             name: 'Route CP Org',

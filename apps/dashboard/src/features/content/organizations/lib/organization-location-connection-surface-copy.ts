@@ -3,6 +3,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import type { OrganizationConnectionDrawerIntent } from '../../lib/location-connection-drawer-intent'
 import type { OrganizationLocationTargetBrowseScope } from './organization-location-target-browse-scope'
 
 export type OrganizationForwardTargetPresentationConfig = {
@@ -38,23 +39,31 @@ type OrganizationForwardSurfaceCopy = {
 }
 
 type OrganizationForwardFamilySurfaceCopy = {
+  heading: string
+  kindHeading: 'show' | 'omit'
   empty: string
   add: string
   addDrawerHelper?: string
 }
 
-export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
+export const ORGANIZATION_FORWARD_FAMILY_PRESENTATION = {
   site: {
+    heading: 'Sites & facilities',
+    kindHeading: 'show',
     empty: 'No site relationships linked.',
     add: 'Add site relationship',
     addDrawerHelper:
       'Connect this organization to a specific site or facility it owns, occupies, operates, or uses as headquarters.',
   },
   geographic_presence: {
-    empty: 'No geographic presence linked.',
-    add: 'Add geographic presence',
+    heading: 'Areas of operation',
+    kindHeading: 'omit',
+    empty: 'No areas of operation linked.',
+    add: 'Add area of operation',
   },
   territorial_authority: {
+    heading: 'Territorial authority',
+    kindHeading: 'show',
     empty: 'No territorial authority linked.',
     add: 'Add territorial authority',
   },
@@ -63,16 +72,11 @@ export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = {
   OrganizationForwardFamilySurfaceCopy
 >
 
-export const ORGANIZATION_FORWARD_KIND_HEADINGS = {
-  owns: 'Owns',
-  tenant: 'Tenants',
-  operator: 'Operates',
-  headquarters: 'Headquarters',
-  operates_in: 'Operates in',
-  governs: 'Governs',
-  controls: 'Controls',
-  claims: 'Claims',
-} as const satisfies Record<OrganizationLocationConnectionKind, string>
+export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] =
+  ['territorial_authority', 'geographic_presence', 'site']
+
+/** @deprecated Use ORGANIZATION_FORWARD_FAMILY_PRESENTATION or resolveOrganizationForwardFamilyPresentation. */
+export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = ORGANIZATION_FORWARD_FAMILY_PRESENTATION
 
 export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   headquarters: {
@@ -114,8 +118,9 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add area of operation',
     addDrawerInstruction: 'Choose a geographic area where this organization operates.',
     addSubmit: 'Add area of operation',
+    changeTargetDrawerTitle: 'Change area of operation',
     targetPresentation: {
-      targetHelp: 'Choose a settlement or region where this organization is present.',
+      targetHelp: 'Choose a settlement or region for this area of operation.',
       browseScopes: ['all', 'settlement', 'region'],
     },
   },
@@ -125,6 +130,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add governed location',
     addDrawerInstruction: 'Choose a location this organization governs.',
     addSubmit: 'Add governed location',
+    changeTargetDrawerTitle: 'Change governed territory',
   },
   controls: {
     empty: 'No controlled locations linked.',
@@ -132,6 +138,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add controlled location',
     addDrawerInstruction: 'Choose a location this organization controls.',
     addSubmit: 'Add controlled location',
+    changeTargetDrawerTitle: 'Change controlled territory',
   },
   claims: {
     empty: 'No territorial claims linked.',
@@ -139,6 +146,7 @@ export const ORGANIZATION_FORWARD_SURFACE_COPY = {
     addDrawerTitle: 'Add claim',
     addDrawerInstruction: 'Choose a location this organization claims.',
     addSubmit: 'Add claim',
+    changeTargetDrawerTitle: 'Change claimed territory',
   },
 } satisfies Record<OrganizationLocationConnectionKind, OrganizationForwardSurfaceCopy>
 
@@ -164,13 +172,13 @@ export const ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY = {
   geographic_presence: {
     viewLocation: 'View location',
     changeKind: 'Change connection type',
-    changeTarget: 'Change location',
-    remove: 'Remove geographic presence',
+    changeTarget: 'Change area',
+    remove: 'Remove area of operation',
   },
   territorial_authority: {
     viewLocation: 'View location',
     changeKind: 'Change authority type',
-    changeTarget: 'Change location',
+    changeTarget: 'Change territory',
     remove: 'Remove authority',
   },
 } as const satisfies Record<OrganizationLocationConnectionFamily, OrganizationForwardOverflowLabels>
@@ -215,6 +223,12 @@ export function resolveOrganizationForwardChangeTargetDrawerTitle(
   )
 }
 
+export function resolveOrganizationForwardChangeTargetEntityLabel(
+  intent: OrganizationConnectionDrawerIntent,
+): string {
+  return intent === 'territorial_authority' ? 'Territory' : 'Location'
+}
+
 export function resolveOrganizationForwardAddDrawerTitle(
   kind: OrganizationLocationConnectionKind,
 ): string {
@@ -233,10 +247,21 @@ export function resolveOrganizationForwardAddSubmitLabel(
   return ORGANIZATION_FORWARD_SURFACE_COPY_BY_KIND[kind].addSubmit
 }
 
-export function resolveOrganizationForwardFamilySurfaceCopy(
+export function resolveOrganizationForwardFamilyPresentation(
   family: OrganizationLocationConnectionFamily,
 ): OrganizationForwardFamilySurfaceCopy {
-  return ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+  return ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+}
+
+export function resolveOrganizationForwardFamilySurfaceCopy(
+  family: OrganizationLocationConnectionFamily,
+): Pick<OrganizationForwardFamilySurfaceCopy, 'empty' | 'add' | 'addDrawerHelper'> {
+  const presentation = ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
+  return {
+    empty: presentation.empty,
+    add: presentation.add,
+    addDrawerHelper: 'addDrawerHelper' in presentation ? presentation.addDrawerHelper : undefined,
+  }
 }
 
 export function resolveOrganizationForwardFamilyAddDrawerHelper(
@@ -245,10 +270,4 @@ export function resolveOrganizationForwardFamilyAddDrawerHelper(
   const copy: OrganizationForwardFamilySurfaceCopy =
     ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
   return copy.addDrawerHelper
-}
-
-export function resolveOrganizationForwardKindHeading(
-  kind: OrganizationLocationConnectionKind,
-): string {
-  return ORGANIZATION_FORWARD_KIND_HEADINGS[kind]
 }

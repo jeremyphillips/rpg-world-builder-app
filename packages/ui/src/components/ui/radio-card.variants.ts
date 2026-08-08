@@ -212,7 +212,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
 })
 
 /** Vertical gap between sibling radio options in a group. */
-export const radioCardGroupGapVariants = cva('grid', {
+export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
   variants: {
     variant: {
       card: 'gap-3',

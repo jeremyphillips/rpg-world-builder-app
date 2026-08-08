@@ -5,6 +5,7 @@ import {
   radioCardDescriptionVariants,
   radioCardDetailsGridVariants,
   radioCardEmbeddedSlotVariants,
+  radioCardGroupGapVariants,
   radioCardRootLayoutVariants,
   radioCardShellVariants,
   radioCardVariants,
@@ -41,5 +42,12 @@ describe('radioCard surface establishment', () => {
 
   it('does not establish a plane on divider embedded slots', () => {
     expect(radioCardEmbeddedSlotVariants({ tone: 'divider' })).not.toContain('[--surface-current:')
+  })
+})
+
+describe('radioCard group layout', () => {
+  it('stretches card groups to the full field width', () => {
+    expect(radioCardGroupGapVariants({ variant: 'card' })).toContain('w-full')
+    expect(radioCardGroupGapVariants({ variant: 'card' })).toContain('min-w-0')
   })
 })

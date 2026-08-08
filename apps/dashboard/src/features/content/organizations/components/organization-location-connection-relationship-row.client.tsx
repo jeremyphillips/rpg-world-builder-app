@@ -9,7 +9,9 @@ import type {
 } from '@rpg/contracts'
 import { Badge } from '@rpg/ui'
 
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
+import { buildLocationEntityContextPresentation } from '../../locations/lib/location-display'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -77,7 +79,12 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   }
 
   const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
-    view: () => input.navigate(input.item.detailHref),
+    view: () => {
+      const href = input.item.target?.href
+      if (href) {
+        input.navigate(href)
+      }
+    },
   }
 
   if (
@@ -144,13 +151,18 @@ export function OrganizationLocationConnectionRelationshipRow({
   onRemoveConnection,
 }: OrganizationLocationConnectionRelationshipRowProps) {
   const navigate = useNavigate()
+  const presentation = item.target
+    ? buildLocationEntityContextPresentation(item.target)
+    : { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING }
 
   return (
     <CrossContentRelationshipRow
-      heading={item.card.name}
-      href={item.detailHref}
+      heading={presentation.heading}
+      href={item.target?.href}
+      headingSuffix={presentation.headingSuffix}
+      subheading={presentation.supportingText}
       metadata={
-        item.locationUnavailable ? (
+        item.target == null ? (
           <Badge tone="warning" className="mt-1">
             Unavailable
           </Badge>
@@ -166,7 +178,7 @@ export function OrganizationLocationConnectionRelationshipRow({
         onChangeTargetConnection,
         onRemoveConnection,
       })}
-      overflowTriggerLabel={`Actions for ${item.card.name}`}
+      overflowTriggerLabel={`Actions for ${presentation.heading}`}
     />
   )
 }
