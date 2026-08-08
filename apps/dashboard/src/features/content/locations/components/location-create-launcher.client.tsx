@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   completeLocationCreateSetup,
@@ -10,22 +10,24 @@ import {
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
 import { LocationSettlementCreateSetup } from './location-settlement-create-setup.client'
 
-export function useLocationCreateSessionLaunch(options: {
-  onReady: (fixedCreate: LocationFixedCreateContext) => void
-}) {
+export function useLocationCreateSessionLaunch(
+  onReady: (fixedCreate: LocationFixedCreateContext) => void,
+) {
   const [setupIntent, setSetupIntent] = useState<LocationCreateIntent | null>(null)
+  const onReadyRef = useRef(onReady)
 
-  const launch = useCallback(
-    (intent: LocationCreateIntent) => {
-      const session = resolveLocationCreateSession(intent)
-      if (session.status === 'needsSetup') {
-        setSetupIntent(intent)
-        return
-      }
-      options.onReady(session.fixedCreate)
-    },
-    [options],
-  )
+  useEffect(() => {
+    onReadyRef.current = onReady
+  }, [onReady])
+
+  const launch = useCallback((intent: LocationCreateIntent) => {
+    const session = resolveLocationCreateSession(intent)
+    if (session.status === 'needsSetup') {
+      setSetupIntent(intent)
+      return
+    }
+    onReadyRef.current(session.fixedCreate)
+  }, [])
 
   const setupHost =
     setupIntent !== null ? (
@@ -36,7 +38,7 @@ export function useLocationCreateSessionLaunch(options: {
           if (!open) setSetupIntent(null)
         }}
         onComplete={(result) => {
-          options.onReady(completeLocationCreateSetup(setupIntent, result))
+          onReadyRef.current(completeLocationCreateSetup(setupIntent, result))
           setSetupIntent(null)
         }}
       />

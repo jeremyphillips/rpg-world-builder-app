@@ -14,12 +14,11 @@ describe('buildSettlementTypeRadioOptions', () => {
     )
   })
 
-  it('includes labels and descriptions from entries', () => {
+  it('includes labels from entries', () => {
     const city = buildSettlementTypeRadioOptions().find((option) => option.value === 'city')
     expect(city).toEqual({
       value: 'city',
       label: SETTLEMENT_TYPE_ENTRIES.city.label,
-      description: SETTLEMENT_TYPE_ENTRIES.city.description,
     })
   })
 })
@@ -37,6 +36,6 @@ describe('resolveSettlementCreateSetupDescription', () => {
         authoringType: 'settlement',
         parentLocationId: HARBORFORD.id,
       }),
-    ).toBe('Choose the settlement size before authoring.')
+    ).toBe('Choose the settlement kind before authoring.')
   })
 })

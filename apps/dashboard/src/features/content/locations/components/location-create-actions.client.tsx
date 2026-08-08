@@ -32,10 +32,8 @@ export function LocationCreateActions({ campaignId }: LocationCreateActionsProps
   const createLabel = formatContentCreateHeading('locations')
   const createHref = ROUTES.content.locations.create(campaignId)
 
-  const { launch, setupHost } = useLocationCreateSessionLaunch({
-    onReady: (fixedCreate) => {
-      navigate(buildLocationFixedCreateHref(campaignId, fixedCreate))
-    },
+  const { launch, setupHost } = useLocationCreateSessionLaunch((fixedCreate) => {
+    navigate(buildLocationFixedCreateHref(campaignId, fixedCreate))
   })
 
   return (

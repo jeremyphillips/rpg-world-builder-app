@@ -20,7 +20,11 @@ import {
   requiresLocationCreateSetup,
   type LocationAuthoringType,
 } from './location-authoring-type'
-import type { LocationCreateIntent } from './location-create-session'
+import {
+  completeLocationCreateSetup,
+  fixedCreateFromIntent,
+  type LocationCreateIntent,
+} from './location-create-session'
 import type { LocationFixedCreateContext } from './location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
@@ -149,13 +153,13 @@ export function parseLocationCreateSessionFromSearchParams(
 
     return {
       kind: 'ready',
-      fixedCreate: { authoringType: 'settlement', settlementType },
+      fixedCreate: completeLocationCreateSetup(intent, { settlementType }),
     }
   }
 
   return {
     kind: 'ready',
-    fixedCreate: { authoringType },
+    fixedCreate: fixedCreateFromIntent(intent),
   }
 }
 
@@ -163,33 +167,6 @@ export function parseLocationCreateSessionFromSearchParams(
 export function parseLocationCreateSoftParent(searchParams: URLSearchParams): string | undefined {
   const parentParam = searchParams.get(LOCATION_CREATE_PARENT_SEARCH_PARAM)
   return parentParam || undefined
-}
-
-/** @deprecated Use parseLocationCreateSessionFromSearchParams for typed create authority. */
-export function parseLocationCreatePrefill(searchParams: URLSearchParams): {
-  authoringType?: LocationAuthoringType
-  parentLocationId?: string
-} {
-  const session = parseLocationCreateSessionFromSearchParams(searchParams)
-  const parentLocationId = parseLocationCreateSoftParent(searchParams)
-  const result: {
-    authoringType?: LocationAuthoringType
-    parentLocationId?: string
-  } = {}
-
-  if (session.kind === 'ready') {
-    result.authoringType = session.fixedCreate.authoringType
-    if (session.fixedCreate.settlementType) {
-      ;(result as { settlementType?: SettlementType }).settlementType =
-        session.fixedCreate.settlementType
-    }
-  }
-
-  if (parentLocationId) {
-    result.parentLocationId = parentLocationId
-  }
-
-  return result
 }
 
 export function buildLocationFixedCreateHref(
@@ -208,34 +185,6 @@ export function buildLocationFixedCreateHref(
     params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, softParentLocationId)
   }
 
-  return `${base}?${params.toString()}`
-}
-
-/** @deprecated Use buildLocationFixedCreateHref for typed fixed sessions. */
-export function buildLocationCreateHref(
-  campaignId: string,
-  prefill?: {
-    authoringType?: LocationAuthoringType
-    parentLocationId?: string
-    settlementType?: SettlementType
-  },
-): string {
-  if (prefill?.authoringType) {
-    return buildLocationFixedCreateHref(
-      campaignId,
-      {
-        authoringType: prefill.authoringType,
-        settlementType: prefill.settlementType,
-      },
-      prefill.parentLocationId,
-    )
-  }
-
-  const base = ROUTES.content.locations.create(campaignId)
-  if (!prefill?.parentLocationId) return base
-
-  const params = new URLSearchParams()
-  params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, prefill.parentLocationId)
   return `${base}?${params.toString()}`
 }
 

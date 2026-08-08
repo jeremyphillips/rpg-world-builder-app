@@ -5,7 +5,7 @@ import type {
   ContentValidationIntent,
 } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 
 import { NarrowPage } from '@/components/layout/narrow-page'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
@@ -45,6 +45,8 @@ export interface ContentCreateShellProps {
   formCtx?: Partial<ContentFormCtx>
   /** Applied to form values immediately before serialization on create submit. */
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  /** Rendered inside the form header before campaign-access chrome (e.g. fixed-field registration). */
+  formHeaderPrefix?: ReactNode
 }
 
 interface ContentCreateFormBodyProps {
@@ -56,6 +58,7 @@ interface ContentCreateFormBodyProps {
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  formHeaderPrefix?: ReactNode
 }
 
 function ContentCreateFormBody({
@@ -67,6 +70,7 @@ function ContentCreateFormBody({
   initialValues,
   formCtx,
   prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateFormBodyProps) {
   const navigate = useNavigate()
   const mutation = useContentWriteMutation(def, campaignId)
@@ -114,7 +118,8 @@ function ContentCreateFormBody({
   }
 
   const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {
-    resolveContentFormSchema(def, ctx, 'publish').parse(values)
+    const preparedValues = prepareSubmitValues?.(values) ?? values
+    resolveContentFormSchema(def, ctx, 'publish').parse(preparedValues)
     await createEntity(values, intentToStatus('publish'), 'publish')
   }, `Could not create ${def.routeKey}.`)
 
@@ -158,6 +163,7 @@ function ContentCreateFormBody({
         onLeaveGuardReady={(guard) => {
           leaveGuardRef.current = guard
         }}
+        formHeaderPrefix={formHeaderPrefix}
       />
     </>
   )
@@ -171,6 +177,7 @@ interface ContentCreateFormProps {
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
+  formHeaderPrefix?: ReactNode
 }
 
 function ContentCreateForm({
@@ -181,6 +188,7 @@ function ContentCreateForm({
   initialValues,
   formCtx,
   prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateFormProps) {
   return (
     <ContentFormOptionsGate campaignId={campaignId}>
@@ -200,6 +208,7 @@ function ContentCreateForm({
           initialValues={initialValues}
           formCtx={formCtx}
           prepareSubmitValues={prepareSubmitValues}
+          formHeaderPrefix={formHeaderPrefix}
         />
       )}
     </ContentFormOptionsGate>
@@ -222,6 +231,7 @@ export function ContentCreateShell({
   initialValues,
   formCtx,
   prepareSubmitValues,
+  formHeaderPrefix,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
 
@@ -241,6 +251,7 @@ export function ContentCreateShell({
             initialValues={initialValues}
             formCtx={formCtx}
             prepareSubmitValues={prepareSubmitValues}
+            formHeaderPrefix={formHeaderPrefix}
           />
         </ContentAuthoringGate>
       ) : (

@@ -10,14 +10,15 @@ import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
 import { LocationSettlementCreateSetup } from './location-settlement-create-setup.client'
 import {
   buildLocationFixedCreateHref,
-  fixedCreateToInitialValues,
   parseLocationCreateSessionFromSearchParams,
   parseLocationCreateSoftParent,
 } from '../lib/location-create-shortcuts'
 import { completeLocationCreateSetup } from '../lib/location-create-session'
+import { resolveLocationCreatePageModel } from '../lib/location-create-page.lib'
 import type { LocationFormCtx } from '../lib/location-form-ctx'
 import type { LocationFormValues } from '../lib/location-form-fields'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'
+import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
 import '../lib/location-form-def'
 
 export type LocationCreatePageProps = {
@@ -67,13 +68,11 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
     )
   }
 
-  const fixedCreate = session.kind === 'ready' ? session.fixedCreate : undefined
-  const initialValues = fixedCreate
-    ? fixedCreateToInitialValues(fixedCreate, softParentLocationId ?? primaryWorldId)
-    : softParentLocationId || primaryWorldId
-      ? { parentLocationId: softParentLocationId ?? primaryWorldId }
-      : undefined
-
+  const { fixedCreate, initialValues } = resolveLocationCreatePageModel(
+    session,
+    softParentLocationId,
+    primaryWorldId,
+  )
   const formCtx: LocationFormCtx | undefined = fixedCreate ? { fixedCreate } : undefined
 
   return (
@@ -88,6 +87,9 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
         fixedCreate
           ? (values) => applyLocationFixedCreateContext(values as LocationFormValues, fixedCreate)
           : undefined
+      }
+      formHeaderPrefix={
+        fixedCreate ? <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} /> : undefined
       }
     />
   )

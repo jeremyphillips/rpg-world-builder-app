@@ -106,9 +106,7 @@ export function LocationChildrenSection({
   const [createFixedContext, setCreateFixedContext] =
     React.useState<LocationFixedCreateContext | null>(null)
 
-  const { launch, setupHost } = useLocationCreateSessionLaunch({
-    onReady: setCreateFixedContext,
-  })
+  const { launch, setupHost } = useLocationCreateSessionLaunch(setCreateFixedContext)
 
   const refreshContainedLocations = React.useCallback(() => {
     invalidateLocationParentReplacementQueries(queryClient, campaignId)

@@ -31,6 +31,8 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-connected-party-character-options.lib.ts',
   'location-create.tsx',
   'location-create-page.client.tsx',
+  'location-create-page.lib.ts',
+  'location-create-page.lib.test.ts',
   'location-create-actions.client.tsx',
   'location-create-launcher.client.tsx',
   'location-settlement-create-setup.lib.ts',

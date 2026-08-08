@@ -14,16 +14,15 @@ export function buildSettlementTypeRadioOptions(): RadioCardOption[] {
   return Object.entries(SETTLEMENT_TYPE_ENTRIES).map(([value, entry]) => ({
     value,
     label: entry.label,
-    description: entry.description,
   }))
 }
 
 export function resolveSettlementCreateSetupDescription(intent: LocationCreateIntent): string {
   if (intent.parentLocationId != null) {
-    return 'Choose the settlement size before authoring.'
+    return 'Choose the settlement kind before authoring.'
   }
 
-  return 'Choose the settlement size before authoring. You can place it under a parent on the next screen.'
+  return 'Choose the settlement kind before authoring. You can place it under a parent on the next screen.'
 }
 
 export function isSettlementType(value: string): value is SettlementType {

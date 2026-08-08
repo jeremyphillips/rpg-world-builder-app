@@ -66,6 +66,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
   onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
+  formHeaderPrefix?: React.ReactNode
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -92,6 +93,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onCampaignAccessPersisted,
   onSaved,
   onLeaveGuardReady,
+  formHeaderPrefix,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const isSpellForm = def.routeKey === 'spells'
@@ -147,6 +149,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         onCampaignAccessDraftChange,
         onCampaignAccessPersisted,
       }}
+      headerPrefix={formHeaderPrefix}
     />
   )
 }

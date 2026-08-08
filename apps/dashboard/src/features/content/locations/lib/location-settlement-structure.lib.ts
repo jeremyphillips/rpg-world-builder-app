@@ -31,12 +31,12 @@ export function partitionSettlementChildLocations(locations: readonly Location[]
   return { districts, directPlaces }
 }
 
-/** Whether a child authoring type is typically added as a district under a settlement. */
+/** Whether a child authoring type is typically added as a district under a settlement. Deferred Add-IA menus do not consume this yet. */
 export function isDistrictAuthoringTypeForSettlement(authoringType: string): boolean {
   return authoringType === 'district'
 }
 
-/** Whether a child authoring type is typically added as a direct place under a settlement. */
+/** Whether a child authoring type is typically added as a direct place under a settlement. Deferred Add-IA menus do not consume this yet. */
 export function isDirectPlaceAuthoringTypeForSettlement(authoringType: string): boolean {
   return authoringType !== 'district'
 }
