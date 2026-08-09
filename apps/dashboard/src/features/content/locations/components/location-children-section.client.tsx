@@ -39,15 +39,14 @@ import {
   LOCATION_PARENT_MOVE_ACTION_LABELS,
   LOCATION_PARENT_REPLACEMENT_DRAWER,
 } from '../lib/location-parent-replacement-surface-copy'
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import type { LocationCreateIntent } from '../lib/location-create-session'
 import {
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
 } from '../lib/location-create-shortcuts'
 import { resolveStructureChildAuthoringOptions } from '../lib/location-structure.lib'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
-import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
-import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
+import { LocationCreateModal } from './location-create-modal.client'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
 
 export type LocationChildrenSectionProps = {
@@ -477,10 +476,7 @@ export function LocationChildrenSection({
   const queryClient = useQueryClient()
   const [moveSubject, setMoveSubject] = React.useState<Location | null>(null)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [createFixedContext, setCreateFixedContext] =
-    React.useState<LocationFixedCreateContext | null>(null)
-
-  const { launch, setupHost } = useLocationCreateSessionLaunch(setCreateFixedContext)
+  const [createIntent, setCreateIntent] = React.useState<LocationCreateIntent | null>(null)
 
   const refreshContainedLocations = React.useCallback(() => {
     invalidateLocationParentReplacementQueries(queryClient, campaignId)
@@ -542,7 +538,7 @@ export function LocationChildrenSection({
     authoringType: LocationAuthoringType,
     fixedParentLocationId: string = parentLocationId,
   ) => {
-    launch({
+    setCreateIntent({
       authoringType,
       parentLocationId: fixedParentLocationId,
       parentKind:
@@ -556,7 +552,6 @@ export function LocationChildrenSection({
 
   return (
     <>
-      {setupHost}
       <DetailSectionPanel
         heading={heading}
         headingId="location-children-heading"
@@ -593,13 +588,13 @@ export function LocationChildrenSection({
         )}
       </DetailSectionPanel>
 
-      {createFixedContext ? (
-        <LocationContainedCreateDrawer
+      {createIntent ? (
+        <LocationCreateModal
           open
           onOpenChange={(open) => {
-            if (!open) setCreateFixedContext(null)
+            if (!open) setCreateIntent(null)
           }}
-          fixedCreate={createFixedContext}
+          intent={createIntent}
           campaignId={campaignId}
         />
       ) : null}

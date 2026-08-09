@@ -2,6 +2,8 @@ export type CreateSetupChoiceSetSequenceItem = {
   id: string
   isComplete: boolean
   required?: boolean
+  /** Upstream choice-set ids — when any change, this set is cleared. */
+  dependsOn?: readonly string[]
 }
 
 export type ResolveCreateSetupActiveChoiceSetIdInput = {
@@ -84,4 +86,44 @@ export function resolveCreateSetupCanContinue({
 
 export function isCreateSetupChoiceSetComplete(value: string | null | undefined): boolean {
   return Boolean(value)
+}
+
+type ChoiceSetDependencyItem = {
+  id: string
+  dependsOn?: readonly string[]
+}
+
+/**
+ * Choice-set ids that must be cleared when `changedChoiceSetId` changes,
+ * including transitive dependents.
+ */
+export function resolveCreateSetupChoiceSetIdsToInvalidate({
+  choiceSets,
+  changedChoiceSetId,
+}: {
+  choiceSets: readonly ChoiceSetDependencyItem[]
+  changedChoiceSetId: string
+}): string[] {
+  const dependentsByUpstream = new Map<string, string[]>()
+  for (const choiceSet of choiceSets) {
+    for (const upstreamId of choiceSet.dependsOn ?? []) {
+      const list = dependentsByUpstream.get(upstreamId) ?? []
+      list.push(choiceSet.id)
+      dependentsByUpstream.set(upstreamId, list)
+    }
+  }
+
+  const invalidated = new Set<string>()
+  const queue = [changedChoiceSetId]
+  while (queue.length > 0) {
+    const current = queue.shift()
+    if (current == null) continue
+    for (const dependentId of dependentsByUpstream.get(current) ?? []) {
+      if (invalidated.has(dependentId)) continue
+      invalidated.add(dependentId)
+      queue.push(dependentId)
+    }
+  }
+
+  return [...invalidated]
 }

@@ -144,6 +144,13 @@ export type {
   ContentFormDrawerFormProps,
   ContentFormDrawerProps,
 } from './lib/forms/shells/content-form-drawer.client'
+export { ContentFormHost } from './lib/forms/shells/content-form-host.client'
+export type {
+  ContentFormHostChrome,
+  ContentFormHostFormProps,
+  ContentFormHostLeaveBridge,
+  ContentFormHostProps,
+} from './lib/forms/shells/content-form-host.client'
 export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
 export {
   buildGrantSummaryModel,

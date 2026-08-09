@@ -5,6 +5,7 @@ import {
   resolveCreateSetupActiveChoiceSetId,
   resolveCreateSetupCanContinue,
   resolveCreateSetupChoiceSetExpanded,
+  resolveCreateSetupChoiceSetIdsToInvalidate,
   resolveCreateSetupVisibleChoiceSetIds,
   type CreateSetupChoiceSetSequenceItem,
 } from './location-create-setup-sequence.lib'
@@ -201,6 +202,41 @@ describe('location-create-setup-sequence', () => {
       expect(isCreateSetupChoiceSetComplete('city')).toBe(true)
       expect(isCreateSetupChoiceSetComplete('')).toBe(false)
       expect(isCreateSetupChoiceSetComplete(null)).toBe(false)
+    })
+  })
+
+  describe('resolveCreateSetupChoiceSetIdsToInvalidate', () => {
+    it('clears direct dependents when an upstream id changes', () => {
+      expect(
+        resolveCreateSetupChoiceSetIdsToInvalidate({
+          choiceSets: [
+            { id: 'classification' },
+            { id: 'regionType', dependsOn: ['classification'] },
+          ],
+          changedChoiceSetId: 'classification',
+        }),
+      ).toEqual(['regionType'])
+    })
+
+    it('clears transitive dependents', () => {
+      expect(
+        resolveCreateSetupChoiceSetIdsToInvalidate({
+          choiceSets: [{ id: 'a' }, { id: 'b', dependsOn: ['a'] }, { id: 'c', dependsOn: ['b'] }],
+          changedChoiceSetId: 'a',
+        }),
+      ).toEqual(['b', 'c'])
+    })
+
+    it('returns an empty list when nothing depends on the changed id', () => {
+      expect(
+        resolveCreateSetupChoiceSetIdsToInvalidate({
+          choiceSets: [
+            { id: 'classification' },
+            { id: 'regionType', dependsOn: ['classification'] },
+          ],
+          changedChoiceSetId: 'regionType',
+        }),
+      ).toEqual([])
     })
   })
 })

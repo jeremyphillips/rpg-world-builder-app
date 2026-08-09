@@ -97,6 +97,7 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
           options: REGION_TYPE_OPTIONS,
           value: regionType,
           onValueChange: setRegionType,
+          dependsOn: ['classification'],
         },
       ]}
       onContinue={onContinue}
@@ -193,6 +194,21 @@ describe('LocationCreateSetupShell', () => {
       screen.getByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Kingdom' })).not.toBeInTheDocument()
+  })
+
+  it('clears dependsOn downstream values when an upstream choice changes', async () => {
+    const user = userEvent.setup()
+
+    render(<TwoChoiceSetupHarness />)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Kingdom' })).not.toBeInTheDocument()
   })
 })

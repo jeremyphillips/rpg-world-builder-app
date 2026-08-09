@@ -1,7 +1,7 @@
 'use client'
 
 import type { z } from 'zod'
-import { useRef, useState, type MutableRefObject } from 'react'
+import { useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
@@ -11,20 +11,19 @@ import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handl
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
 import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context.client'
-import { formatContentCreateActionLabel } from '../../lib/content-type-labels'
 import {
   invalidateContentFormDefQueries,
   useContentWriteMutation,
 } from '../../lib/list/use-content-mutations'
 import { contentFormFields, type ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { ContentFormDrawer } from '../../lib/forms/shells/content-form-drawer.client'
-import { ContentFormOptionsGate } from '../../lib/forms/shells/content-form-shell-layout'
+import {
+  ContentFormHost,
+  type ContentFormHostChrome,
+  type ContentFormHostLeaveBridge,
+} from '../../lib/forms/shells/content-form-host.client'
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
 import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
-import {
-  fixedCreateToInitialValues,
-  formatLocationFixedCreateAddHeading,
-} from '../lib/location-create-shortcuts'
+import { fixedCreateToInitialValues } from '../lib/location-create-shortcuts'
 import '../lib/location-form-def'
 import { locationFormDef } from '../lib/location-form-def'
 import type { LocationFormCtx } from '../lib/location-form-ctx'
@@ -43,6 +42,7 @@ import {
   resolveSettlementStructureAuthoringGuidance,
   validateSettlementCreateComposition,
 } from '../lib/location-settlement-create-composition.lib'
+import { LocationCreateDraftPrune } from './location-create-draft-prune.client'
 import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
 import {
   SettlementCreateCompositionProvider,
@@ -51,16 +51,22 @@ import {
 
 type LocationDraftFormValues = z.infer<typeof locationDraftFormSchema>
 
-export type LocationContainedCreateDrawerProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  fixedCreate: LocationFormCtx['fixedCreate'] & {}
+export type LocationCreateFormProps = {
+  fixedCreate: LocationFixedCreateContext
   campaignId: string
+  optionsCtx: ContentFormCtx
+  mounted: boolean
+  leaveGuardEnabled: boolean
+  leaveBridgeRef: MutableRefObject<ContentFormHostLeaveBridge | null>
+  chrome: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
+  onTrustedClose: () => void
+  /** Stable across setup revisits so draft/dirty survive phase swaps. */
+  formKey: string
+  /** When false, form stays mounted for dirty tracking but is not shown. */
+  visible?: boolean
 }
 
-type LocationContainedCreateDrawerBodyProps = LocationContainedCreateDrawerProps & {
-  optionsCtx: ContentFormCtx
-}
+type LocationCreateFormBodyProps = LocationCreateFormProps
 
 type FixedSettlementCreateContext = LocationFixedCreateContext & {
   settlementType: NonNullable<LocationFixedCreateContext['settlementType']>
@@ -72,11 +78,7 @@ function isSettlementWithStartingDistricts(
   return fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType != null
 }
 
-function buildLocationFormKey(fixedCreate: LocationFixedCreateContext): string {
-  return `location-contained-create-${fixedCreate.authoringType}-${fixedCreate.parent?.locationId ?? 'overview'}-${fixedCreate.settlementType ?? 'none'}`
-}
-
-type LocationContainedCreateDrawerShellProps = LocationContainedCreateDrawerBodyProps & {
+type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   campaignAccessDraftRef: MutableRefObject<ContentCampaignAccessPatch | null>
   fields: ReturnType<typeof contentFormFields>
   pending: boolean
@@ -85,19 +87,24 @@ type LocationContainedCreateDrawerShellProps = LocationContainedCreateDrawerBody
   formError?: string | null
 }
 
-function LocationContainedCreateDrawerShell({
-  open,
-  onOpenChange,
+function LocationCreateFormShell({
   fixedCreate,
   campaignId,
   optionsCtx,
+  mounted,
+  leaveGuardEnabled,
+  leaveBridgeRef,
+  chrome,
+  onTrustedClose,
+  formKey,
+  visible = true,
   campaignAccessDraftRef,
   fields,
   pending,
   extraUnsavedEdits,
   onSubmit,
   formError,
-}: LocationContainedCreateDrawerShellProps) {
+}: LocationCreateFormShellProps) {
   const locationCtx: LocationFormCtx = {
     ...optionsCtx,
     campaignId,
@@ -105,53 +112,55 @@ function LocationContainedCreateDrawerShell({
     entitySource: 'homebrew',
     fixedCreate,
   }
-  const formKey = buildLocationFormKey(fixedCreate)
 
+  // Keep a stable wrapper so toggling `visible` does not remount the form (dirty/leave bridge).
   return (
-    <ContentFormDrawer
-      open={open}
-      onOpenChange={(nextOpen) => {
-        if (!nextOpen) {
+    <div className={visible ? undefined : 'hidden'} aria-hidden={visible ? undefined : true}>
+      <ContentFormHost
+        mounted={mounted}
+        leaveGuardEnabled={leaveGuardEnabled}
+        pending={pending}
+        formError={formError}
+        extraUnsavedEdits={extraUnsavedEdits}
+        wrapForm={(form) => <CampaignAccessFormProvider>{form}</CampaignAccessFormProvider>}
+        form={{
+          schema: locationDraftFormSchema,
+          defaultValues: {
+            ...locationFormDef.createDefaultValues,
+            ...fixedCreateToInitialValues(fixedCreate),
+          },
+          valueSyncs: locationFormValueSyncs,
+          formKey,
+          header: () => (
+            <>
+              <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
+              <LocationCreateDraftPrune fixedCreate={fixedCreate} />
+              <ContentFormHeader
+                def={locationFormDef}
+                ctx={locationCtx}
+                formKey={formKey}
+                campaignId={campaignId}
+                onCampaignAccessDraftChange={(patch) => {
+                  campaignAccessDraftRef.current = patch
+                }}
+              />
+            </>
+          ),
+          fields,
+        }}
+        leaveBridgeRef={leaveBridgeRef}
+        chrome={typeof chrome === 'function' ? chrome({ pending }) : chrome}
+        onSubmit={onSubmit}
+        onTrustedClose={() => {
           campaignAccessDraftRef.current = null
-        }
-        onOpenChange(nextOpen)
-      }}
-      title={formatLocationFixedCreateAddHeading(fixedCreate)}
-      pending={pending}
-      submitLabel={formatContentCreateActionLabel('locations')}
-      formError={formError}
-      extraUnsavedEdits={extraUnsavedEdits}
-      wrapForm={(form) => <CampaignAccessFormProvider>{form}</CampaignAccessFormProvider>}
-      form={{
-        schema: locationDraftFormSchema,
-        defaultValues: {
-          ...locationFormDef.createDefaultValues,
-          ...fixedCreateToInitialValues(fixedCreate),
-        },
-        valueSyncs: locationFormValueSyncs,
-        formKey,
-        header: () => (
-          <>
-            <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
-            <ContentFormHeader
-              def={locationFormDef}
-              ctx={locationCtx}
-              formKey={formKey}
-              campaignId={campaignId}
-              onCampaignAccessDraftChange={(patch) => {
-                campaignAccessDraftRef.current = patch
-              }}
-            />
-          </>
-        ),
-        fields,
-      }}
-      onSubmit={onSubmit}
-    />
+          onTrustedClose()
+        }}
+      />
+    </div>
   )
 }
 
-function LocationGenericContainedCreateDrawerForm(props: LocationContainedCreateDrawerBodyProps) {
+function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
   const { campaignId, fixedCreate, optionsCtx } = props
   const mutation = useContentWriteMutation(locationFormDef, campaignId)
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
@@ -199,7 +208,7 @@ function LocationGenericContainedCreateDrawerForm(props: LocationContainedCreate
   }, 'Could not create locations.')
 
   return (
-    <LocationContainedCreateDrawerShell
+    <LocationCreateFormShell
       {...props}
       campaignAccessDraftRef={campaignAccessDraftRef}
       fields={contentFormFields(locationFormDef, locationCtx)}
@@ -210,8 +219,8 @@ function LocationGenericContainedCreateDrawerForm(props: LocationContainedCreate
   )
 }
 
-function LocationSettlementContainedCreateDrawerForm(
-  props: LocationContainedCreateDrawerBodyProps & { fixedCreate: FixedSettlementCreateContext },
+function LocationSettlementCreateForm(
+  props: LocationCreateFormBodyProps & { fixedCreate: FixedSettlementCreateContext },
 ) {
   const { campaignId, fixedCreate, optionsCtx } = props
   const queryClient = useQueryClient()
@@ -289,7 +298,7 @@ function LocationSettlementContainedCreateDrawerForm(
   }, 'Could not create locations.')
 
   return (
-    <LocationContainedCreateDrawerShell
+    <LocationCreateFormShell
       {...props}
       campaignAccessDraftRef={campaignAccessDraftRef}
       fields={fields}
@@ -301,34 +310,25 @@ function LocationSettlementContainedCreateDrawerForm(
   )
 }
 
-function LocationContainedCreateDrawerBody(props: LocationContainedCreateDrawerBodyProps) {
+function LocationCreateFormBody(props: LocationCreateFormBodyProps) {
   if (isSettlementWithStartingDistricts(props.fixedCreate)) {
     return (
       <SettlementCreateCompositionProvider
-        key={props.open ? buildLocationFormKey(props.fixedCreate) : 'closed'}
+        key={
+          props.mounted
+            ? `${props.formKey}-${props.fixedCreate.settlementType}`
+            : `${props.formKey}-closed`
+        }
       >
-        <LocationSettlementContainedCreateDrawerForm {...props} fixedCreate={props.fixedCreate} />
+        <LocationSettlementCreateForm {...props} fixedCreate={props.fixedCreate} />
       </SettlementCreateCompositionProvider>
     )
   }
 
-  return <LocationGenericContainedCreateDrawerForm {...props} />
+  return <LocationGenericCreateForm {...props} />
 }
 
-/** Contextual create drawer for contained locations — locks type and parent for the session. */
-export function LocationContainedCreateDrawer({
-  campaignId,
-  ...props
-}: LocationContainedCreateDrawerProps) {
-  return (
-    <ContentFormOptionsGate campaignId={campaignId}>
-      {(optionsCtx) => (
-        <LocationContainedCreateDrawerBody
-          campaignId={campaignId}
-          optionsCtx={optionsCtx}
-          {...props}
-        />
-      )}
-    </ContentFormOptionsGate>
-  )
+/** Domain create form body for LocationCreateModal (and future focused-edit drawers). */
+export function LocationCreateForm(props: LocationCreateFormProps): ReactNode {
+  return <LocationCreateFormBody {...props} />
 }

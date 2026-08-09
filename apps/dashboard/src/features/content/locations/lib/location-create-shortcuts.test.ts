@@ -6,6 +6,7 @@ import {
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
   formatLocationFixedCreateAddHeading,
+  formatLocationFixedCreateHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
   LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM,
@@ -219,6 +220,41 @@ describe('formatLocationFixedCreateAddHeading', () => {
         parent: { kind: 'fixed', locationId: 'location-parent' },
       }),
     ).toBe('Add building')
+  })
+})
+
+describe('formatLocationFixedCreateHeading', () => {
+  it('uses Create-prefix settlement and site type labels', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'settlement',
+        settlementType: 'city',
+      }),
+    ).toBe('Create city')
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'site',
+        siteType: 'landmark',
+      }),
+    ).toBe('Create landmark')
+  })
+
+  it('uses region type labels for fixed region create', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'region',
+        classification: { kind: 'political', type: 'duchy' },
+      }),
+    ).toBe('Create duchy')
+  })
+
+  it('falls back to authoring type labels', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      }),
+    ).toBe('Create building')
   })
 })
 

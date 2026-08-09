@@ -7,6 +7,7 @@ import {
   SETTLEMENT_TYPE_IDS,
   SITE_TYPE_IDS,
   getSettlementTypeLabel,
+  getRegionTypeLabelForKind,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
   isRegionClassificationKind,
@@ -87,6 +88,29 @@ export function formatLocationFixedCreateAddHeading(
   return formatLocationAuthoringTypeAddHeading(fixedCreate.authoringType, {
     parentKind: fixedCreate.parentKind,
   })
+}
+
+/** Modal details heading — Create-prefix via existing type label resolvers. */
+export function formatLocationFixedCreateHeading(fixedCreate: LocationFixedCreateContext): string {
+  if (fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType) {
+    return `Create ${midSentenceLabel(getSettlementTypeLabel(fixedCreate.settlementType))}`
+  }
+
+  if (fixedCreate.authoringType === 'site' && fixedCreate.siteType) {
+    return `Create ${midSentenceLabel(getSiteTypeLabel(fixedCreate.siteType))}`
+  }
+
+  if (fixedCreate.authoringType === 'region' && fixedCreate.classification) {
+    return `Create ${midSentenceLabel(
+      getRegionTypeLabelForKind(fixedCreate.classification.kind, fixedCreate.classification.type),
+    )}`
+  }
+
+  return `Create ${midSentenceLabel(
+    getLocationAuthoringTypeLabel(fixedCreate.authoringType, {
+      parentKind: fixedCreate.parentKind,
+    }),
+  )}`
 }
 
 /** Sheet title for contained create — e.g. "Add building", "Add subregion". */

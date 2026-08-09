@@ -23,18 +23,18 @@ vi.mock('../../lib/list/content-client', () => ({
   updateContent: mockUpdateContent,
 }))
 
-vi.mock('./location-contained-create-drawer.client', () => ({
-  LocationContainedCreateDrawer: ({
-    fixedCreate,
+vi.mock('./location-create-modal.client', () => ({
+  LocationCreateModal: ({
+    intent,
     open,
   }: {
-    fixedCreate: { authoringType: string; parent?: { locationId: string } }
+    intent: { authoringType: string; parentLocationId?: string }
     open: boolean
   }) =>
     open ? (
       <div role="dialog">
-        Create drawer: {fixedCreate.authoringType}
-        {fixedCreate.parent?.locationId ? ` parent=${fixedCreate.parent.locationId}` : null}
+        Create modal: {intent.authoringType}
+        {intent.parentLocationId ? ` parent=${intent.parentLocationId}` : null}
       </div>
     ) : null,
 }))
@@ -182,7 +182,7 @@ describe('LocationChildrenSection', () => {
 
     await user.click(addDistrict)
 
-    expect(screen.getByText(`Create drawer: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
+    expect(screen.getByText(`Create modal: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
   it('keeps Add district on empty Districts subgroup headers', () => {
@@ -224,7 +224,7 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByText('Add to Dock Ward')).toBeInTheDocument()
     await user.click(screen.getByRole('menuitem', { name: 'Building' }))
 
-    expect(screen.getByText(`Create drawer: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
+    expect(screen.getByText(`Create modal: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Hide locations in Dock Ward' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
   })
@@ -263,7 +263,7 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByRole('menuitem', { name: 'Site' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('menuitem', { name: 'Building' }))
-    expect(screen.getByText(`Create drawer: building parent=${HARBORFORD.id}`)).toBeInTheDocument()
+    expect(screen.getByText(`Create modal: building parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
   it('shows View location + Move location overflow for managers', async () => {
@@ -277,14 +277,14 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()
   })
 
-  it('opens the contained create drawer from structure panel Add location', async () => {
+  it('opens the contained create modal from structure panel Add location', async () => {
     const user = userEvent.setup()
     renderSection({ canManage: true, parent: DOCK_WARD })
 
     await user.click(screen.getByRole('button', { name: /^add location$/i }))
     await user.click(screen.getByRole('menuitem', { name: 'Building' }))
 
-    expect(screen.getByText(`Create drawer: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
+    expect(screen.getByText(`Create modal: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
   })
 
   it('opens Move drawer wired to the child id with Current from parentLocationId', async () => {

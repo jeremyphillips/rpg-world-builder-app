@@ -1,4 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, type ContentCampaignAccessPatch } from '@rpg/contracts'
@@ -12,8 +13,14 @@ import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
 import { HARBORFORD } from '../fixtures'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
-import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
+import {
+  SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
+  SETTLEMENT_CREATE_SETUP_PROMPT,
+} from '../lib/location-settlement-create-setup.lib'
+import { LocationCreateModal } from './location-create-modal.client'
 
 const mutateAsync = vi.fn()
 const updateRouteContentCampaignAccess = vi.fn()
@@ -46,7 +53,7 @@ vi.mock('../../lib/campaign-access/campaign-access-api', () => ({
 }))
 
 vi.mock('../../lib/forms/shells/content-form-shell-layout', () => ({
-  ContentFormOptionsGate: ({ children }: { children: (ctx: object) => React.ReactNode }) =>
+  ContentFormOptionsGate: ({ children }: { children: (ctx: object) => ReactNode }) =>
     children({
       campaignId: STORY_CAMPAIGN_ID,
       campaignRules: {},
@@ -111,23 +118,35 @@ vi.mock('@rpg/ui', async (importOriginal) => {
   }
 })
 
-function renderDrawer(
-  fixedCreate: {
-    authoringType: 'building' | 'settlement'
-    parent: { kind: 'fixed'; locationId: string }
-    settlementType?: 'city'
-  },
-  onOpenChange = vi.fn(),
-) {
+const buildingIntent = {
+  authoringType: 'building',
+  parentLocationId: HARBORFORD.id,
+  parentKind: HARBORFORD.kind,
+} as const satisfies LocationCreateIntent
+
+const settlementIntent = {
+  authoringType: 'settlement',
+  parentLocationId: HARBORFORD.id,
+  parentKind: HARBORFORD.kind,
+} as const satisfies LocationCreateIntent
+
+const regionIntent = {
+  authoringType: 'region',
+  parentLocationId: HARBORFORD.id,
+  parentKind: HARBORFORD.kind,
+} as const satisfies LocationCreateIntent
+
+function renderModal(intent: LocationCreateIntent, onOpenChange = vi.fn(), open = true) {
   const queryClient = makeTestQueryClient()
   return {
     onOpenChange,
+    queryClient,
     ...render(
       <QueryClientProvider client={queryClient}>
-        <LocationContainedCreateDrawer
-          open
+        <LocationCreateModal
+          open={open}
           onOpenChange={onOpenChange}
-          fixedCreate={fixedCreate}
+          intent={intent}
           campaignId={STORY_CAMPAIGN_ID}
         />
       </QueryClientProvider>,
@@ -135,12 +154,18 @@ function renderDrawer(
   }
 }
 
-async function submitDrawer(user: ReturnType<typeof userEvent.setup>) {
+async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('City') }))
+  await user.click(screen.getByRole('button', { name: 'Continue' }))
+  expect(await screen.findByRole('heading', { name: 'Create city' })).toBeInTheDocument()
+}
+
+async function submitCreateForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Harbor Inn')
   await user.click(screen.getByRole('button', { name: 'Create location' }))
 }
 
-describe('LocationContainedCreateDrawer', () => {
+describe('LocationCreateModal', () => {
   beforeEach(() => {
     mutateAsync.mockReset()
     updateRouteContentCampaignAccess.mockReset()
@@ -157,38 +182,62 @@ describe('LocationContainedCreateDrawer', () => {
     })
   })
 
-  it('renders the contextual add heading', () => {
-    renderDrawer({
-      authoringType: 'building',
-      parent: { kind: 'fixed', locationId: HARBORFORD.id },
-    })
-    expect(screen.getByRole('heading', { name: 'Add building' })).toBeInTheDocument()
+  it('renders the contextual create heading for building (no setup)', () => {
+    renderModal(buildingIntent)
+    expect(screen.getByRole('heading', { name: 'Create building' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
-  it('renders settlement-type add headings for fixed settlement create', () => {
-    renderDrawer({
-      authoringType: 'settlement',
-      settlementType: 'city',
-      parent: { kind: 'fixed', locationId: HARBORFORD.id },
-    })
-    expect(screen.getByRole('heading', { name: 'Add city' })).toBeInTheDocument()
+  it('renders settlement-type create headings after setup continue', async () => {
+    const user = userEvent.setup()
+    renderModal(settlementIntent)
+
+    expect(screen.getByRole('heading', { name: 'Create settlement' })).toBeInTheDocument()
+    await continueSettlementSetup(user)
+
+    expect(screen.getByRole('heading', { name: 'Create city' })).toBeInTheDocument()
     expect(screen.getByText('Structure')).toBeInTheDocument()
     expect(screen.getByText('No starting districts yet.')).toBeInTheDocument()
   })
 
-  it('creates with default campaign access draft without PATCH and closes the drawer', async () => {
+  it('keeps setup → details in the same modal with a compact settlement summary', async () => {
+    const user = userEvent.setup()
+    renderModal(settlementIntent)
+
+    expect(
+      screen.getByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
+    ).toBeInTheDocument()
+
+    await continueSettlementSetup(user)
+
+    expect(
+      screen.queryByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(SETTLEMENT_CREATE_SETUP_FIELD_LABEL)).toBeInTheDocument()
+    expect(screen.getByText('City')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+  })
+
+  it('omits Back and setup summary Change for no-setup building create', () => {
+    renderModal(buildingIntent)
+
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+  })
+
+  it('creates with default campaign access draft without PATCH and closes the modal', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    renderDrawer(
-      {
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(buildingIntent, onOpenChange)
 
     await user.click(screen.getByRole('button', { name: 'Use default campaign access' }))
-    await submitDrawer(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledOnce()
@@ -200,23 +249,17 @@ describe('LocationContainedCreateDrawer', () => {
     expect(toast.warning).not.toHaveBeenCalled()
   })
 
-  it('PATCHes campaign access after create when draft is non-default and closes the drawer', async () => {
+  it('PATCHes campaign access after create when draft is non-default and closes the modal', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    renderDrawer(
-      {
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(buildingIntent, onOpenChange)
     const pendingAccess = {
       ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
       available: false,
     }
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
-    await submitDrawer(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledOnce()
@@ -235,12 +278,9 @@ describe('LocationContainedCreateDrawer', () => {
 
   it('submits fixed building context without leaking incompatible form values', async () => {
     const user = userEvent.setup()
-    renderDrawer({
-      authoringType: 'building',
-      parent: { kind: 'fixed', locationId: HARBORFORD.id },
-    })
+    renderModal(buildingIntent)
 
-    await submitDrawer(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledOnce()
@@ -263,16 +303,10 @@ describe('LocationContainedCreateDrawer', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     updateRouteContentCampaignAccess.mockRejectedValue(new Error('network'))
-    renderDrawer(
-      {
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(buildingIntent, onOpenChange)
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
-    await submitDrawer(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledOnce()
@@ -286,16 +320,10 @@ describe('LocationContainedCreateDrawer', () => {
   it('uses the settlement workflow instead of the form mutation hook', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    renderDrawer(
-      {
-        authoringType: 'settlement',
-        settlementType: 'city',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(settlementIntent, onOpenChange)
 
-    await submitDrawer(user)
+    await continueSettlementSetup(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(createSettlementWithStartingDistricts).toHaveBeenCalledOnce()
@@ -307,19 +335,27 @@ describe('LocationContainedCreateDrawer', () => {
     expect(notifyContentCreated).toHaveBeenCalledWith('locations')
   })
 
-  it('prompts on cancel when starting-district composition is dirty', async () => {
+  it('prompts on close when starting-district composition is dirty', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    renderDrawer(
-      {
-        authoringType: 'settlement',
-        settlementType: 'city',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(settlementIntent, onOpenChange)
 
+    await continueSettlementSetup(user)
     await user.click(screen.getByRole('button', { name: 'Add district' }))
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('prompts when Cancel follows Back after dirty details edits', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    renderModal(settlementIntent, onOpenChange)
+
+    await continueSettlementSetup(user)
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Dockside')
+    await user.click(screen.getByRole('button', { name: 'Back' }))
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
@@ -329,18 +365,12 @@ describe('LocationContainedCreateDrawer', () => {
   it('closes without discard confirmation after successful settlement create with dirty composition', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    renderDrawer(
-      {
-        authoringType: 'settlement',
-        settlementType: 'city',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
-      onOpenChange,
-    )
+    renderModal(settlementIntent, onOpenChange)
 
+    await continueSettlementSetup(user)
     await user.click(screen.getByRole('button', { name: 'Add district' }))
     await user.type(screen.getByRole('textbox', { name: 'District name 1' }), 'Dock Ward')
-    await submitDrawer(user)
+    await submitCreateForm(user)
 
     await waitFor(() => {
       expect(createSettlementWithStartingDistricts).toHaveBeenCalledOnce()
@@ -350,36 +380,32 @@ describe('LocationContainedCreateDrawer', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 
-  it('resets starting-district composition when the drawer reopens', async () => {
+  it('resets starting-district composition when the modal reopens', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     const queryClient = makeTestQueryClient()
-    const fixedCreate = {
-      authoringType: 'settlement' as const,
-      settlementType: 'city' as const,
-      parent: { kind: 'fixed' as const, locationId: HARBORFORD.id },
-    }
 
     const { rerender } = render(
       <QueryClientProvider client={queryClient}>
-        <LocationContainedCreateDrawer
+        <LocationCreateModal
           open
           onOpenChange={onOpenChange}
-          fixedCreate={fixedCreate}
+          intent={settlementIntent}
           campaignId={STORY_CAMPAIGN_ID}
         />
       </QueryClientProvider>,
     )
 
+    await continueSettlementSetup(user)
     await user.click(screen.getByRole('button', { name: 'Add district' }))
     await user.type(screen.getByRole('textbox', { name: 'District name 1' }), 'Dock Ward')
 
     rerender(
       <QueryClientProvider client={queryClient}>
-        <LocationContainedCreateDrawer
+        <LocationCreateModal
           open={false}
           onOpenChange={onOpenChange}
-          fixedCreate={fixedCreate}
+          intent={settlementIntent}
           campaignId={STORY_CAMPAIGN_ID}
         />
       </QueryClientProvider>,
@@ -387,18 +413,81 @@ describe('LocationContainedCreateDrawer', () => {
 
     rerender(
       <QueryClientProvider client={queryClient}>
-        <LocationContainedCreateDrawer
+        <LocationCreateModal
           open
           onOpenChange={onOpenChange}
-          fixedCreate={fixedCreate}
+          intent={settlementIntent}
           campaignId={STORY_CAMPAIGN_ID}
         />
       </QueryClientProvider>,
     )
 
+    await continueSettlementSetup(user)
     expect(screen.getByText('No starting districts yet.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Close' }))
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
     expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('clears region type when classification changes via dependsOn', async () => {
+    const user = userEvent.setup()
+    renderModal(regionIntent)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+    const regionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
+    const firstRegionType = within(regionTypeGroup).getAllByRole('radio')[0]
+    expect(firstRegionType).toBeTruthy()
+    await user.click(firstRegionType!)
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
+
+    const clearedRegionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
+    expect(
+      within(clearedRegionTypeGroup).queryByRole('radio', { checked: true }),
+    ).not.toBeInTheDocument()
+    expect(
+      within(clearedRegionTypeGroup).getByRole('radio', {
+        name: (name) => name.startsWith('Continent'),
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  })
+
+  it('shows multi-line region summary Change, returns to terminal setup, and preserves Name', async () => {
+    const user = userEvent.setup()
+    renderModal(regionIntent)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+    const firstRegionType = within(
+      screen.getByRole('radiogroup', { name: 'Region type' }),
+    ).getAllByRole('radio')[0]
+    expect(firstRegionType).toBeTruthy()
+    const firstRegionTypeName = within(firstRegionType!).getByText(
+      /^(Realm|Kingdom|Empire|Country|State|Province|Territory|Duchy|County|Frontier)$/,
+    ).textContent
+    expect(firstRegionTypeName).toBeTruthy()
+    await user.click(firstRegionType!)
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText(`Political · ${firstRegionTypeName}`)).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Westmark')
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Political' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('radiogroup', {
+        name: (name) => name.startsWith('What kind of'),
+      }),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')
+    expect(screen.getByText(`Political · ${firstRegionTypeName}`)).toBeInTheDocument()
   })
 })

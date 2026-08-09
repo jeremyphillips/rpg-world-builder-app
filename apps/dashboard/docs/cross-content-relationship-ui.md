@@ -420,9 +420,9 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
 | Child detail **Located in**                               | **Change parent** / **Set parent** (managers; no clear; no View-parent overflow — breadcrumb links navigate) | `updateContent(..., { parentLocationId })` on the open location |
 | Parent detail **Contained locations**                     | Row overflow **View location** + **Move location** (managers); View link only for non-managers               | Same mutation on the **selected child**                         |
-| Contained locations header **Add location**               | Contained create drawer — fixed child type and parent (non-settlement parents)                               | Create, not reparent                                            |
+| Contained locations header **Add location**               | `LocationCreateModal` — fixed child type and parent (non-settlement parents)                                 | Create, not reparent                                            |
 | City structure **Add district** / Direct **Add location** | Subgroup header actions — District vs non-District children under the Settlement                             | Create, not reparent                                            |
-| City structure District row **+**                         | Contained create under that District                                                                         | Create, not reparent                                            |
+| City structure District row **+**                         | `LocationCreateModal` under that District                                                                    | Create, not reparent                                            |
 
 **Authority invariant:** breadcrumb ancestry is presentation only. Drawers resolve **Current parent** and submit targets from the subject’s persisted `parentLocationId` (looked up in the campaign locations list). Move must not treat the open parent detail id as Current when it disagrees with that field — refresh/block instead.
 

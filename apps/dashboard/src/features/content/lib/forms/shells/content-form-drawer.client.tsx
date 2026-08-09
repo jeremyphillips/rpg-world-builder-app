@@ -1,9 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
-import { useFormState } from 'react-hook-form'
-import type { ZodType } from 'zod'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import {
   Button,
   Text,
@@ -11,22 +9,17 @@ import {
   dialogPanelActionRowClasses,
   dialogPanelSectionInsetXClasses,
 } from '@rpg/ui'
-import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
 import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
-import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
-import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
-import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
+import {
+  ContentFormHost,
+  type ContentFormHostFormProps,
+  type ContentFormHostLeaveBridge,
+} from './content-form-host.client'
 
-export type ContentFormDrawerFormProps<TFormValues extends FieldValues> = {
-  schema: ZodType<TFormValues>
-  fields: FormItem[]
-  defaultValues?: DefaultValues<TFormValues>
-  header?: () => React.ReactNode
-  valueSyncs?: FormValueSync[]
-  formKey?: string
-}
+export type ContentFormDrawerFormProps<TFormValues extends FieldValues> =
+  ContentFormHostFormProps<TFormValues>
 
 export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   open: boolean
@@ -42,59 +35,6 @@ export type ContentFormDrawerProps<TFormValues extends FieldValues> = {
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
 }
 
-type ContentFormDrawerLeaveBridge = {
-  requestClose: (continuation: () => void) => void
-  runTrustedClose: (continuation: () => void) => void
-}
-
-function ContentFormDrawerLeaveGuard({
-  bridgeRef,
-  pending,
-  open,
-  extraUnsavedEdits,
-}: {
-  bridgeRef: React.MutableRefObject<ContentFormDrawerLeaveBridge | null>
-  pending: boolean
-  open: boolean
-  extraUnsavedEdits?: boolean
-}) {
-  const { dirtyFields } = useFormState()
-  const campaignAccess = useCampaignAccessForm()
-  const isDirty = composeFormLeaveDirty({
-    dirtyFields,
-    extraUnsavedEdits,
-    campaignAccessDirty: campaignAccess.isDirty,
-  })
-  const discardGuard = useUnsavedChangesConfirm({ isDirty })
-
-  React.useEffect(() => {
-    bridgeRef.current = {
-      requestClose: (continuation) => {
-        if (pending) return
-        discardGuard.request(continuation)
-      },
-      runTrustedClose: (continuation) => {
-        discardGuard.runTrusted(continuation, { bypassRouter: false })
-      },
-    }
-    return () => {
-      bridgeRef.current = null
-    }
-  }, [bridgeRef, discardGuard, pending])
-
-  return (
-    <>
-      {discardGuard.dialog}
-      <FormUnsavedChangesGuard
-        discardGuard={discardGuard}
-        enabled={open}
-        pending={pending}
-        renderDialog={false}
-      />
-    </>
-  )
-}
-
 /** Neutral form workflow for contextual create/edit drawers. */
 export function ContentFormDrawer<TFormValues extends FieldValues>({
   open,
@@ -106,10 +46,10 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   submitLabel,
   formError = null,
   extraUnsavedEdits = false,
-  wrapForm = (form) => form,
+  wrapForm = (formNode) => formNode,
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
-  const leaveBridgeRef = React.useRef<ContentFormDrawerLeaveBridge | null>(null)
+  const leaveBridgeRef = React.useRef<ContentFormHostLeaveBridge | null>(null)
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -128,20 +68,6 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
     [onOpenChange, pending],
   )
 
-  const handleSubmit = React.useCallback(
-    async (values: TFormValues, formInstance: UseFormReturn<TFormValues>) => {
-      try {
-        await onSubmit(values, formInstance)
-        leaveBridgeRef.current?.runTrustedClose(() => onOpenChange(false))
-      } catch {
-        // Rejection keeps the drawer open — caller surfaces formError.
-      }
-    },
-    [onOpenChange, onSubmit],
-  )
-
-  const formId = form.formKey ?? 'content-form-drawer'
-
   return (
     <DrawerShell
       open={open}
@@ -150,61 +76,48 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
       description={description}
       bodyMode="composed"
     >
-      {open
-        ? wrapForm(
-            <Form<TFormValues>
-              key={formId}
-              id={formId}
-              uiStateKey={formId}
-              schema={form.schema}
-              fields={form.fields}
-              defaultValues={form.defaultValues}
-              valueSyncs={form.valueSyncs}
-              className="flex min-h-0 flex-1 flex-col"
-              contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
-              rhythm="comfortable"
-              size="md"
-              formError={formError}
-              header={form.header}
-              onSubmit={handleSubmit}
-              contentWrapper={(content) => (
-                <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
-                  {content}
-                </DrawerShell.Body>
-              )}
-              footerWrapper={({ footer, formError: footerFormError }) => (
-                <>
-                  <ContentFormDrawerLeaveGuard
-                    bridgeRef={leaveBridgeRef}
-                    pending={pending}
-                    open={open}
-                    extraUnsavedEdits={extraUnsavedEdits}
-                  />
-                  <DrawerShell.Footer>
-                    {footerFormError ? (
-                      <Text variant="destructive" role="alert">
-                        {footerFormError}
-                      </Text>
-                    ) : null}
-                    <div className={dialogPanelActionRowClasses}>{footer}</div>
-                  </DrawerShell.Footer>
-                </>
-              )}
-              footer={() => (
-                <>
-                  <DrawerShell.Close asChild>
-                    <Button type="button" variant="outline" disabled={pending}>
-                      Cancel
-                    </Button>
-                  </DrawerShell.Close>
-                  <Button type="submit" disabled={pending}>
-                    {submitLabel}
-                  </Button>
-                </>
-              )}
-            />,
-          )
-        : null}
+      <ContentFormHost
+        mounted={open}
+        leaveGuardEnabled={open}
+        pending={pending}
+        formError={formError}
+        extraUnsavedEdits={extraUnsavedEdits}
+        wrapForm={wrapForm}
+        form={form}
+        leaveBridgeRef={leaveBridgeRef}
+        onSubmit={onSubmit}
+        onTrustedClose={() => onOpenChange(false)}
+        contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
+        chrome={{
+          contentWrapper: (content) => (
+            <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
+              {content}
+            </DrawerShell.Body>
+          ),
+          footerWrapper: ({ footer, formError: footerFormError }) => (
+            <DrawerShell.Footer>
+              {footerFormError ? (
+                <Text variant="destructive" role="alert">
+                  {footerFormError}
+                </Text>
+              ) : null}
+              <div className={dialogPanelActionRowClasses}>{footer}</div>
+            </DrawerShell.Footer>
+          ),
+          footer: () => (
+            <>
+              <DrawerShell.Close asChild>
+                <Button type="button" variant="outline" disabled={pending}>
+                  Cancel
+                </Button>
+              </DrawerShell.Close>
+              <Button type="submit" disabled={pending}>
+                {submitLabel}
+              </Button>
+            </>
+          ),
+        }}
+      />
     </DrawerShell>
   )
 }

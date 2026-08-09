@@ -67,8 +67,10 @@ Immediate children only. Expandable region rows split counts:
 ### Create setup
 
 Settlement, Region, and Site use the shared setup gate
-(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. URL resume
-params (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
+(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Detail Add
+location runs setup inside `LocationCreateModal`; overview/page create keeps the same
+setup libs and `dependsOn` rules via the setup shell. URL resume params
+(`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
 
 Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected

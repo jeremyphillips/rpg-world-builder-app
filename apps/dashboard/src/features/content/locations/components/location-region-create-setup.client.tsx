@@ -59,7 +59,6 @@ export function LocationRegionCreateSetup({
           value: classificationKind,
           onValueChange: (value) => {
             setClassificationKind(value as RegionClassificationKind | '')
-            setRegionType('')
           },
         },
         {
@@ -69,6 +68,7 @@ export function LocationRegionCreateSetup({
           options: typeOptions,
           value: regionType,
           onValueChange: setRegionType,
+          dependsOn: ['classification'],
         },
       ]}
       onContinue={() => {
