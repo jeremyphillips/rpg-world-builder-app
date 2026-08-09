@@ -32,22 +32,11 @@ PATCH /api/campaigns/:campaignId/content/locations/:subjectId
 
 City structure **Move** binds the row’s child `item.id` as `:subjectId`.
 
-## Validation and repair
+## Validation
 
 Non-draft writes merge the existing record with PATCH input, then revalidate the merged
 parent assignment. A published district whose parent is another district becomes
-**uneditable** until repaired (`invalid_parent_kind`).
-
-Before tightening the SSOT in a shared environment, audit and repair invalid published
-district nests:
-
-```bash
-# Dry run
-DRY_RUN=1 pnpm --filter @rpg/api exec tsx src/scripts/repair-district-under-district-parents.ts
-
-# Apply repairs (reparent to nearest settlement ancestor)
-pnpm --filter @rpg/api exec tsx src/scripts/repair-district-under-district-parents.ts
-```
+**uneditable** until reparented to a settlement (`invalid_parent_kind`).
 
 Draft writes skip hierarchy validation — incomplete/rootless draft districts remain
 allowed until publish.
