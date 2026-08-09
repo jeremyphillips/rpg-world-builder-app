@@ -56,14 +56,14 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 
 ### Primitives
 
-| Primitive                   | Role                                                                                                            |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                    |
-| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`                           |
-| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                |
-| `DetailEntityRow`           | Compact row layout; default `inset="self"` (`px-4 py-2`); use `inset="parent"` inside `DetailSectionGroup`      |
-| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                            |
-| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`) — keep for relationship call-site API stability |
+| Primitive                   | Role                                                                                                                                                                   |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                           |
+| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`                                                                                  |
+| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                                                                       |
+| `DetailEntityRow`           | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` for one-level expand previews |
+| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                   |
+| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`) — keep for relationship call-site API stability                                                        |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
@@ -115,6 +115,22 @@ Undifferentiated character collections (location People & organizations characte
 - `DetailEntityRow` keeps the entity name non-shrinking; long suffix metadata truncates first so overflow menus stay visible.
 
 Homogeneous PC-only / NPC-only rosters and grouped PC/NPC sections do **not** repeat type on every row when surrounding chrome already communicates the distinction.
+
+### Optional row disclosure
+
+`DetailEntityRow` accepts an optional `disclosure={{ label, content }}` prop for one-level expand previews (City structure district rows today). Contract:
+
+| Concern                 | Owner                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| Chevron expand/collapse | `DetailEntityRow` leading button (`Show …` / `Hide …` from semantic `label`)                           |
+| Title navigation        | Entity `href` link — independent from disclosure                                                       |
+| Overflow actions        | `endSlot` on the parent row only                                                                       |
+| Nested preview inset    | **Expanded region only** — features supply `content` without `pl-*` or disclosure-specific inset props |
+| List separators         | Parent `DetailSectionRowList` — disclosure wraps parent identity + expanded body as **one** list child |
+
+When `disclosure` is omitted, the row renders the same single-root flex layout as before (no empty leading column). Relationship rows stay unchanged until a feature opts in.
+
+Group-level disclosure (e.g. collapsing the entire `DISTRICTS · N` block) is a **separate** future capability on `DetailSectionGroup` — not part of row disclosure.
 
 ## Populated row vs empty container
 

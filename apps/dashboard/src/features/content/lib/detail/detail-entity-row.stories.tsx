@@ -55,3 +55,48 @@ export const WithOverflow: Story = {
     </DetailSectionRowList>
   ),
 }
+
+export const WithDisclosure: Story = {
+  render: () => (
+    <DetailSectionRowList>
+      <DetailEntityRow
+        heading="Dock Ward"
+        href="/campaigns/demo/locations/dock-ward"
+        headingSuffix=" · District · 2 locations"
+        disclosure={{
+          label: 'locations in Dock Ward',
+          content: (
+            <DetailSectionRowList>
+              <DetailEntityRow
+                heading="The Silver Eel"
+                href="/campaigns/demo/locations/silver-eel"
+                headingSuffix=" · Building · Tavern"
+                inset="parent"
+              />
+              <DetailEntityRow
+                heading="Thieves' Guildhouse"
+                href="/campaigns/demo/locations/guildhouse"
+                headingSuffix=" · Building · Guildhall"
+                inset="parent"
+              />
+            </DetailSectionRowList>
+          ),
+        }}
+        endSlot={
+          <DetailOverflowMenu
+            triggerLabel="Actions for Dock Ward"
+            actions={[
+              { id: 'view', label: 'View location', onSelect: () => undefined },
+              { id: 'move', label: 'Move location', onSelect: () => undefined },
+            ]}
+          />
+        }
+      />
+      <DetailEntityRow
+        heading="Scholar's Quarter"
+        href="/campaigns/demo/locations/scholars-quarter"
+        headingSuffix=" · District · 0 locations"
+      />
+    </DetailSectionRowList>
+  ),
+}

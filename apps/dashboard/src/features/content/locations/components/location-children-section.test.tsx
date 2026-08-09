@@ -91,8 +91,9 @@ describe('LocationChildrenSection', () => {
     expect(section).toHaveAttribute('aria-labelledby', 'location-children-heading')
     expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
     const dockWardLink = screen.getByRole('link', { name: 'Dock Ward' })
-    expect(dockWardLink.parentElement?.parentElement).toHaveTextContent('Dock Ward·District')
-    expect(screen.getByText('District')).toBeInTheDocument()
+    expect(dockWardLink.parentElement?.parentElement).toHaveTextContent(
+      /Dock Ward.*District.*1 location/,
+    )
     expect(
       screen.getByText(
         'Districts organize neighborhoods; other locations can sit directly in the settlement.',
@@ -106,6 +107,59 @@ describe('LocationChildrenSection', () => {
 
     expect(screen.queryByRole('link', { name: 'View' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Actions for Dock Ward' })).not.toBeInTheDocument()
+  })
+
+  it('shows district child counts and reveals immediate children on expand', async () => {
+    const user = userEvent.setup()
+    renderSection({ canManage: false, parent: HARBORFORD })
+
+    const dockWardRow = screen.getByRole('link', { name: 'Dock Ward' }).parentElement?.parentElement
+    expect(dockWardRow).toHaveTextContent(/1 location/)
+    expect(screen.queryByRole('link', { name: 'Yawning Portal' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
+
+    expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Actions for Yawning Portal' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows zero-child districts without a disclosure chevron', () => {
+    const marketWard: Location = {
+      ...DOCK_WARD,
+      id: 'location-market-ward',
+      slug: 'market-ward',
+      name: 'Market Ward',
+      parentLocationId: HARBORFORD.id,
+    }
+
+    const childrenViewModel = buildLocationDetailViewModel(HARBORFORD, {
+      locations: [...LOCATIONS_LIST, marketWard],
+      campaignId: STORY_CAMPAIGN_ID,
+    }).children
+
+    render(
+      <QueryClientProvider client={makeTestQueryClient()}>
+        <MemoryRouter>
+          <LocationChildrenSection
+            childrenViewModel={childrenViewModel}
+            canManage={false}
+            parentLocationId={HARBORFORD.id}
+            parentKind={HARBORFORD.kind}
+            campaignId={STORY_CAMPAIGN_ID}
+            campaignLocations={[...LOCATIONS_LIST, marketWard]}
+          />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+
+    const marketWardRow = screen.getByRole('link', { name: 'Market Ward' }).parentElement
+      ?.parentElement
+    expect(marketWardRow).toHaveTextContent(/0 locations/)
+    expect(
+      screen.queryByRole('button', { name: 'Show locations in Market Ward' }),
+    ).not.toBeInTheDocument()
   })
 
   it('shows View location + Move location overflow for managers', async () => {

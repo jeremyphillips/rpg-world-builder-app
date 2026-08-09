@@ -18,7 +18,12 @@ import {
   DetailOverflowMenu,
   type DetailOverflowAction,
 } from '../../lib/detail/detail-overflow-menu.client'
-import type { LocationChildrenViewModel } from '../lib/location-display'
+import type {
+  LocationChildItem,
+  LocationChildrenViewModel,
+  SettlementStructureDistrictItem,
+} from '../lib/location-display'
+import { formatLocationChildCount } from '../lib/location-display'
 import type { LocationAuthoringType } from '../lib/location-authoring-type'
 import {
   applyLocationParentReplacement,
@@ -44,6 +49,98 @@ export type LocationChildrenSectionProps = {
   campaignLocations: readonly Location[]
 }
 
+function buildChildRowActions(
+  item: LocationChildItem,
+  canManage: boolean,
+  onMove: (childId: string) => void,
+  onView: (href: string) => void,
+): DetailOverflowAction[] {
+  return canManage
+    ? [
+        {
+          id: 'view',
+          label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
+          onSelect: () => onView(item.href),
+        },
+        {
+          id: 'move',
+          label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
+          onSelect: () => onMove(item.id),
+        },
+      ]
+    : []
+}
+
+function LocationPreviewChildRows({
+  items,
+  inset = 'parent',
+}: {
+  items: LocationChildItem[]
+  inset?: 'self' | 'parent'
+}) {
+  return (
+    <DetailSectionRowList>
+      {items.map((item) => (
+        <DetailEntityRow
+          key={item.id}
+          heading={item.name}
+          href={item.href}
+          headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
+          inset={inset}
+        />
+      ))}
+    </DetailSectionRowList>
+  )
+}
+
+function SettlementDistrictRows({
+  items,
+  canManage,
+  onMove,
+  onView,
+  inset = 'parent',
+}: {
+  items: SettlementStructureDistrictItem[]
+  canManage: boolean
+  onMove: (childId: string) => void
+  onView: (href: string) => void
+  inset?: 'self' | 'parent'
+}) {
+  return (
+    <DetailSectionRowList>
+      {items.map(({ item, immediateChildren }) => {
+        const childCount = immediateChildren.length
+        const countPhrase = formatLocationChildCount(childCount)
+        const headingSuffix = `${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${countPhrase}`
+        const actions = buildChildRowActions(item, canManage, onMove, onView)
+
+        return (
+          <DetailEntityRow
+            key={item.id}
+            heading={item.name}
+            href={item.href}
+            headingSuffix={headingSuffix}
+            inset={inset}
+            disclosure={
+              childCount > 0
+                ? {
+                    label: `locations in ${item.name}`,
+                    content: <LocationPreviewChildRows items={immediateChildren} inset={inset} />,
+                  }
+                : undefined
+            }
+            endSlot={
+              canManage ? (
+                <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
+              ) : undefined
+            }
+          />
+        )
+      })}
+    </DetailSectionRowList>
+  )
+}
+
 function LocationChildRows({
   items,
   canManage,
@@ -60,20 +157,7 @@ function LocationChildRows({
   return (
     <DetailSectionRowList>
       {items.map((item) => {
-        const actions: DetailOverflowAction[] = canManage
-          ? [
-              {
-                id: 'view',
-                label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
-                onSelect: () => onView(item.href),
-              },
-              {
-                id: 'move',
-                label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
-                onSelect: () => onMove(item.id),
-              },
-            ]
-          : []
+        const actions = buildChildRowActions(item, canManage, onMove, onView)
 
         return (
           <DetailEntityRow
@@ -194,14 +278,24 @@ export function LocationChildrenSection({
         {groups ? (
           <>
             {!hasGroupedContent && !hasFlatContent ? (
-              <Text variant="muted" className="px-4 py-2">
+              <Text variant="muted" className="px-4 pb-2 pt-1 text-sm">
                 {emptyText}
               </Text>
             ) : null}
             {groups.map((group) => (
               <DetailSectionGroup key={group.id} label={group.label}>
                 {group.items.length === 0 ? (
-                  <Text variant="muted">{group.emptyText}</Text>
+                  <Text variant="muted" className="pt-1 text-sm">
+                    {group.emptyText}
+                  </Text>
+                ) : group.id === 'districts' ? (
+                  <SettlementDistrictRows
+                    items={group.items}
+                    canManage={canManage}
+                    onMove={openMoveDrawer}
+                    onView={(href) => navigate(href)}
+                    inset="parent"
+                  />
                 ) : (
                   <LocationChildRows
                     items={group.items}
@@ -215,7 +309,7 @@ export function LocationChildrenSection({
             ))}
           </>
         ) : !hasFlatContent ? (
-          <Text variant="muted" className="px-4 py-2">
+          <Text variant="muted" className="px-4 pb-2 pt-1 text-sm">
             {emptyText}
           </Text>
         ) : (

@@ -11,6 +11,8 @@ import {
   type LocationKind,
 } from '@rpg/contracts'
 
+import { formatDescriptorCount } from '@/lib/actions/action-count-grammar'
+
 import { ROUTES } from '@/app/routes'
 
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
@@ -97,11 +99,32 @@ export type LocationChildItem = {
   summaryLine: string
 }
 
-export type LocationChildrenGroup = {
-  id: 'districts' | 'directPlaces'
-  label: string
-  items: LocationChildItem[]
-  emptyText: string
+export type SettlementStructureDistrictItem = {
+  item: LocationChildItem
+  immediateChildren: LocationChildItem[]
+}
+
+export type LocationChildrenGroup =
+  | {
+      id: 'districts'
+      label: string
+      items: SettlementStructureDistrictItem[]
+      emptyText: string
+    }
+  | {
+      id: 'directPlaces'
+      label: string
+      items: LocationChildItem[]
+      emptyText: string
+    }
+
+export const LOCATION_CHILD_COUNT_DESCRIPTOR = {
+  nounSingular: 'location',
+  nounPlural: 'locations',
+} as const
+
+export function formatLocationChildCount(count: number): string {
+  return formatDescriptorCount(count, LOCATION_CHILD_COUNT_DESCRIPTOR)
 }
 
 export type LocationChildrenViewModel = {
@@ -266,12 +289,35 @@ function toLocationChildItem(location: Location, campaignId: string): LocationCh
   }
 }
 
+export function buildChildrenByParentId(locations: readonly Location[]): Map<string, Location[]> {
+  const childrenByParentId = new Map<string, Location[]>()
+
+  for (const location of locations) {
+    const parentId = location.parentLocationId
+    if (!parentId) continue
+
+    const bucket = childrenByParentId.get(parentId) ?? []
+    bucket.push(location)
+    childrenByParentId.set(parentId, bucket)
+  }
+
+  for (const [parentId, children] of childrenByParentId) {
+    childrenByParentId.set(
+      parentId,
+      [...children].sort((left, right) => left.name.localeCompare(right.name)),
+    )
+  }
+
+  return childrenByParentId
+}
+
 function buildSettlementStructureViewModel(
   location: Location,
   locations: readonly Location[],
   campaignId: string,
 ): LocationChildrenViewModel {
-  const childLocations = locations.filter((entry) => entry.parentLocationId === location.id)
+  const childrenByParentId = buildChildrenByParentId(locations)
+  const childLocations = childrenByParentId.get(location.id) ?? []
   const { districts, directPlaces } = partitionSettlementChildLocations(childLocations)
   const settlementTypeLabel =
     location.kind === 'settlement' && location.settlementType
@@ -286,7 +332,12 @@ function buildSettlementStructureViewModel(
       {
         id: 'districts',
         label: LOCATION_CHILDREN_GROUP_LABELS.districts,
-        items: districts.map((entry) => toLocationChildItem(entry, campaignId)),
+        items: districts.map((district) => ({
+          item: toLocationChildItem(district, campaignId),
+          immediateChildren: (childrenByParentId.get(district.id) ?? []).map((child) =>
+            toLocationChildItem(child, campaignId),
+          ),
+        })),
         emptyText: LOCATION_EMPTY_SECTION_TEXT.settlementDistricts,
       },
       {
