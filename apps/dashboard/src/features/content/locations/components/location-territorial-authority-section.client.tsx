@@ -6,6 +6,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
+import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
@@ -13,7 +14,7 @@ import { ROUTES } from '@/app/routes'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
+import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -146,6 +147,16 @@ type LocationTerritorialAuthoritySectionBodyProps = {
   canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
 
+/** Canonical labeled-group header action (same recipe as City structure subgroup actions). */
+function renderGroupAddAction(label: string, onAdd: () => void) {
+  return (
+    <Button type="button" variant="ghost" size="sm" density="compact" onClick={onAdd}>
+      <Plus aria-hidden />
+      {label}
+    </Button>
+  )
+}
+
 function renderTerritorialRelationshipRow(input: {
   campaignId: string
   row: LocationConnectedPartyRow
@@ -230,7 +241,15 @@ export function LocationTerritorialAuthoritySectionBody({
         }
 
         return (
-          <RelationshipFieldGroupRow key={kind} eyebrow={copy.heading}>
+          <RelationshipFieldGroupRow
+            key={kind}
+            eyebrow={copy.heading}
+            endSlot={
+              !row && canManage
+                ? renderGroupAddAction(copy.add, () => onAddKind?.(kind))
+                : undefined
+            }
+          >
             {row ? (
               renderTerritorialRelationshipRow({
                 campaignId,
@@ -243,57 +262,45 @@ export function LocationTerritorialAuthoritySectionBody({
                 onRemoveConnection,
                 ...resolveRowPermissions(row),
               })
-            ) : canManage ? (
-              <RelationshipEmptyInlineRow
-                emptyLabel={copy.empty}
-                addLabel={copy.add}
-                onAdd={() => onAddKind?.(kind)}
-              />
-            ) : null}
+            ) : (
+              <RelationshipContentRow emptyLabel={copy.empty} />
+            )}
           </RelationshipFieldGroupRow>
         )
       })}
 
       {showClaimsGroup ? (
-        <RelationshipFieldGroupRow eyebrow={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}>
+        <RelationshipFieldGroupRow
+          eyebrow={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}
+          endSlot={
+            canManage
+              ? renderGroupAddAction(TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add, () =>
+                  onAddKind?.('claims'),
+                )
+              : undefined
+          }
+        >
           {claimRows.length > 0 ? (
-            <div className="space-y-1">
-              <ul className="space-y-1">
-                {claimRows.map((row) => (
-                  <li key={row.relationshipId}>
-                    {renderTerritorialRelationshipRow({
-                      campaignId,
-                      row,
-                      canManage,
-                      navigate,
-                      mutationContext,
-                      onChangeKind,
-                      onReplaceOrganization,
-                      onRemoveConnection,
-                      ...resolveRowPermissions(row),
-                    })}
-                  </li>
-                ))}
-              </ul>
-              {canManage ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  density="compact"
-                  onClick={() => onAddKind?.('claims')}
-                >
-                  {TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add}
-                </Button>
-              ) : null}
-            </div>
-          ) : canManage ? (
-            <RelationshipEmptyInlineRow
-              emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty}
-              addLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add}
-              onAdd={() => onAddKind?.('claims')}
-            />
-          ) : null}
+            <ul className="space-y-1">
+              {claimRows.map((row) => (
+                <li key={row.relationshipId}>
+                  {renderTerritorialRelationshipRow({
+                    campaignId,
+                    row,
+                    canManage,
+                    navigate,
+                    mutationContext,
+                    onChangeKind,
+                    onReplaceOrganization,
+                    onRemoveConnection,
+                    ...resolveRowPermissions(row),
+                  })}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <RelationshipContentRow emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty} />
+          )}
         </RelationshipFieldGroupRow>
       ) : null}
     </DetailSectionPanel>

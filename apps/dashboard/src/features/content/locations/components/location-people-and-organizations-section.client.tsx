@@ -6,7 +6,6 @@ import type {
   LocationConnectedPartyRow,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -14,10 +13,11 @@ import {
   formatCharacterMixedHeadingSuffix,
 } from '@/features/character'
 
+import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
+import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -274,27 +274,22 @@ export function LocationPeopleAndOrganizationsSectionBody({
             )
           })}
           {familyAddEnabled ? (
-            <div className="px-4 py-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                density="compact"
-                onClick={onAddPeopleSection}
-              >
-                + {LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
-              </Button>
-            </div>
+            <DetailSectionGroup>
+              <RelationshipContentRow
+                addLabel={LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
+                onAdd={onAddPeopleSection}
+              />
+            </DetailSectionGroup>
           ) : null}
         </>
       ) : canManage ? (
-        <div className="px-4 py-2">
-          <RelationshipEmptyInlineRow
+        <DetailSectionGroup>
+          <RelationshipContentRow
             emptyLabel={sectionEmpty}
             addLabel={familyAddEnabled ? LOCATION_PEOPLE_SECTION_SURFACE_COPY.add : undefined}
             onAdd={familyAddEnabled ? onAddPeopleSection : undefined}
           />
-        </div>
+        </DetailSectionGroup>
       ) : null}
     </DetailSectionPanel>
   )

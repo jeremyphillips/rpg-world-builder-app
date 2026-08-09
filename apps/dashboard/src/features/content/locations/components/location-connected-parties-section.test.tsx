@@ -33,6 +33,23 @@ const sampleRows = [
   },
 ]
 
+const claimRows = [
+  {
+    relationshipId: 'rel-org-claim',
+    subject: {
+      type: 'organization' as const,
+      id: 'org-guild',
+      name: "Thieves' Guild",
+      slug: 'thieves-guild',
+    },
+    kind: 'claims',
+    label: 'Claimed by',
+    family: 'territorial_authority',
+    priority: 40,
+    sectionGroup: 'territorial_authority' as const,
+  },
+]
+
 const peopleOrganizationRows = [
   {
     relationshipId: 'rel-org-hq',
@@ -124,6 +141,59 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
 
+  it('mounts territorial add actions in the labeled group header, not the empty row', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
+          sectionGroup="territorial_authority"
+          rows={[]}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    const slots = [
+      {
+        eyebrow: 'Governed by',
+        add: 'Add governing organization',
+        empty: 'No governing organization.',
+      },
+      { eyebrow: 'Controlled by', add: 'Add organization', empty: 'No controlling organization.' },
+      { eyebrow: 'Claimed by', add: 'Add claim', empty: 'No organizations claim this location.' },
+    ]
+
+    for (const slot of slots) {
+      const addButton = screen.getByRole('button', { name: slot.add })
+      expect(screen.getByText(slot.eyebrow).parentElement).toContainElement(addButton)
+      expect(screen.getByText(slot.empty).parentElement).not.toContainElement(addButton)
+    }
+  })
+
+  it('keeps the claims add action in the group header when populated and hides singleton adds at capacity', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
+          sectionGroup="territorial_authority"
+          rows={[...sampleRows, ...claimRows]}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    const addClaim = screen.getByRole('button', { name: 'Add claim' })
+    expect(screen.getByText('Claimed by').parentElement).toContainElement(addClaim)
+    expect(screen.getByText("Thieves' Guild")).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Add governing organization' }),
+    ).not.toBeInTheDocument()
+  })
+
   it('renders a family empty state without per-kind empty groups', () => {
     render(
       <MemoryRouter>
@@ -174,7 +244,7 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.getByText('Headquarters of')).toBeInTheDocument()
     expect(screen.queryByText('Operating here')).not.toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: `+ ${LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}` }),
+      screen.getByRole('button', { name: LOCATION_PEOPLE_SECTION_SURFACE_COPY.add }),
     ).toBeInTheDocument()
   })
 
