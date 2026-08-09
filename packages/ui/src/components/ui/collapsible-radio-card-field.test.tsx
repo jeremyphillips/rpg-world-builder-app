@@ -205,7 +205,7 @@ describe('CollapsibleRadioCardField', () => {
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
 
     const summaryBody = container.querySelector('article > div')
-    expect(summaryBody).toHaveClass('px-4', 'py-2.5', 'gap-1')
+    expect(summaryBody).toHaveClass('px-4', 'py-2.5', 'gap-0')
 
     await user.click(screen.getByRole('button', { name: 'Change connection type' }))
 

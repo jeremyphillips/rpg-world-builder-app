@@ -67,7 +67,7 @@ describe('ChooserSummaryCard', () => {
     )
 
     const body = container.querySelector('article > div')
-    expect(body).toHaveClass('px-4', 'py-2.5', 'gap-1')
+    expect(body).toHaveClass('px-4', 'py-2.5', 'gap-0')
 
     const primaryCopy = container.querySelector('article > div > div:last-child')
     expect(primaryCopy).toHaveClass('gap-0')

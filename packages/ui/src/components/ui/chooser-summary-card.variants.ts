@@ -21,10 +21,7 @@ export const chooserSummaryCardBodyVariants = cva('flex flex-col', {
         radioCardDensityBodyLayoutVariants({ density: 'default' }),
         radioCardDensityContentGapVariants({ density: 'default' }),
       ),
-      compact: cn(
-        radioCardCompactSummaryBodyLayoutClasses,
-        radioCardDensityContentGapVariants({ density: 'compact' }),
-      ),
+      compact: cn(radioCardCompactSummaryBodyLayoutClasses, 'gap-0'),
     },
   },
   defaultVariants: {
