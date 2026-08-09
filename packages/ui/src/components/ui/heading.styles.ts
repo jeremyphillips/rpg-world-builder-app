@@ -4,6 +4,7 @@ export type HeadingStyleSpec = {
   variant: NonNullable<HeadingVariantProps['variant']>
   utility: string
   level: string
+  /** Base size in px. Responsive variants note desktop size in `useCase`. */
   px: number
   weight: number
   useCase: string
@@ -57,15 +58,23 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     level: '—',
     px: 19,
     weight: 600,
-    useCase: 'Card and modal titles (chrome)',
+    useCase: 'Card titles (chrome)',
   },
   {
-    variant: 'sheetTitle',
-    utility: 'heading-style-sheet-title',
-    level: 'h2',
-    px: 24,
+    variant: 'dialogTitle',
+    utility: 'heading-style-dialog-title',
+    level: '—',
+    px: 19,
     weight: 600,
-    useCase: 'Sheet/drawer titles (Sheet.Header default)',
+    useCase: 'Modal/Sheet titles — 19px mobile, 24px from md (DialogPanelHeader default)',
+  },
+  {
+    variant: 'confirmDialogTitle',
+    utility: 'heading-style-confirm-dialog-title',
+    level: '—',
+    px: 19,
+    weight: 600,
+    useCase: 'ConfirmDialog titles — 19px at all sizes',
   },
   {
     variant: 'sheetSection',
@@ -81,7 +90,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     level: '—',
     px: 16,
     weight: 600,
-    useCase: 'Confirm dialog titles',
+    useCase: 'Inline Alert titles',
   },
   {
     variant: 'nav',

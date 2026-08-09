@@ -29,15 +29,6 @@ export function resolveRegionCreateSetupPrompt(intent: LocationCreateIntent): st
   return `What kind of ${noun} are you creating?`
 }
 
-export function resolveRegionCreateSetupDescription(intent: LocationCreateIntent): string {
-  const noun = resolveRegionRelationshipLabel(intent.parentKind).toLowerCase()
-  if (intent.parentLocationId != null) {
-    return `Choose the ${noun} classification before authoring.`
-  }
-
-  return `Choose the ${noun} classification before authoring. You can place it under a parent on the next screen.`
-}
-
 export function buildRegionClassificationKindRadioOptions(): RadioCardOption[] {
   return REGION_CLASSIFICATION_KIND_IDS.map((kind) => ({
     value: kind,

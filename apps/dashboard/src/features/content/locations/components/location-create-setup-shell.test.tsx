@@ -55,7 +55,6 @@ function SingleChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () =>
       open
       onOpenChange={vi.fn()}
       headline="Create site"
-      description="Choose the type that best describes this place."
       choiceSets={[
         {
           id: 'siteType',
@@ -80,7 +79,6 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
       open
       onOpenChange={vi.fn()}
       headline="Create region"
-      description="Choose the region classification before authoring."
       choiceSets={[
         {
           id: 'classification',
@@ -106,6 +104,42 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
 }
 
 describe('LocationCreateSetupShell', () => {
+  it('omits the modal subhead by default', () => {
+    render(<SingleChoiceSetupHarness />)
+
+    expect(screen.getByRole('heading', { name: 'Create site' })).toBeInTheDocument()
+    expect(
+      screen.queryByText('Choose the type that best describes this place.'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('radiogroup', { name: 'What kind of site are you creating?' }),
+    ).toBeInTheDocument()
+  })
+
+  it('renders an opt-in subhead when provided', () => {
+    render(
+      <LocationCreateSetupShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create site"
+        subhead="Choose the options that best describe this site."
+        choiceSets={[
+          {
+            id: 'siteType',
+            fieldLabel: 'Site type',
+            prompt: 'What kind of site are you creating?',
+            options: SITE_OPTIONS,
+            value: '',
+            onValueChange: vi.fn(),
+          },
+        ]}
+        onContinue={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Choose the options that best describe this site.')).toBeInTheDocument()
+  })
+
   it('keeps a single choice set expanded after selection and omits summary chrome', async () => {
     const user = userEvent.setup()
     const onContinue = vi.fn()

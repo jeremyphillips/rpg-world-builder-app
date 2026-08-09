@@ -10,7 +10,6 @@ import type {
 import {
   buildSiteTypeRadioOptions,
   isSiteType,
-  resolveSiteCreateSetupDescription,
   SITE_CREATE_SETUP_FIELD_LABEL,
   SITE_CREATE_SETUP_HEADLINE,
   SITE_CREATE_SETUP_PROMPT,
@@ -28,19 +27,16 @@ export type LocationSiteCreateSetupProps = {
 export function LocationSiteCreateSetup({
   open,
   onOpenChange,
-  intent,
   onComplete,
 }: LocationSiteCreateSetupProps) {
   const [siteType, setSiteType] = useState<SiteType | ''>('')
   const options = useMemo(() => buildSiteTypeRadioOptions(), [])
-  const description = resolveSiteCreateSetupDescription(intent)
 
   return (
     <LocationCreateSetupShell
       open={open}
       onOpenChange={onOpenChange}
       headline={SITE_CREATE_SETUP_HEADLINE}
-      description={description}
       choiceSets={[
         {
           id: 'siteType',

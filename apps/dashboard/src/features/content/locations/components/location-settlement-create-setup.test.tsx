@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { HARBORFORD } from '../fixtures'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import {
   SETTLEMENT_CREATE_SETUP_HEADLINE,
@@ -36,7 +35,7 @@ describe('LocationSettlementCreateSetup', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  it('shows overview parent copy when intent has no fixed parent', () => {
+  it('omits the modal subhead by default', () => {
     render(
       <LocationSettlementCreateSetup
         open
@@ -46,20 +45,11 @@ describe('LocationSettlementCreateSetup', () => {
       />,
     )
 
-    expect(screen.getByText(/parent on the next screen/i)).toBeInTheDocument()
-  })
-
-  it('omits parent chooser copy for contained intents', () => {
-    render(
-      <LocationSettlementCreateSetup
-        open
-        intent={{ authoringType: 'settlement', parentLocationId: HARBORFORD.id }}
-        onOpenChange={vi.fn()}
-        onComplete={vi.fn()}
-      />,
-    )
-
+    expect(
+      screen.getByRole('heading', { name: SETTLEMENT_CREATE_SETUP_HEADLINE }),
+    ).toBeInTheDocument()
     expect(screen.queryByText(/parent on the next screen/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/before authoring/i)).not.toBeInTheDocument()
   })
 
   it('keeps the terminal choice set expanded after selection and completes on Continue', async () => {

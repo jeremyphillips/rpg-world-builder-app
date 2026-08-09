@@ -42,7 +42,7 @@ export interface DialogPanelHeaderProps extends React.HTMLAttributes<HTMLDivElem
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
-  /** Merged onto the dialog title element (overrides default heading styles). */
+  /** Merged onto the dialog title element (overrides the shared dialogTitle default). */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
   endSlot?: React.ReactNode
@@ -70,7 +70,7 @@ export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHea
       <div className="flex items-start justify-between gap-4">
         <DialogPrimitive.Title
           className={cn(
-            headlineClassName ?? headingVariants({ variant: 'card' }),
+            headlineClassName ?? headingVariants({ variant: 'dialogTitle' }),
             'min-w-0 flex-1',
           )}
         >

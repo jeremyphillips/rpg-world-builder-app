@@ -13,7 +13,7 @@ export type DrawerShellProps = {
   title: React.ReactNode
   children: React.ReactNode
   description?: React.ReactNode
-  /** Escape hatch — overrides the default sheet-title heading style (24px). */
+  /** Escape hatch — overrides the shared dialogTitle heading style. */
   titleClassName?: string
   footer?: React.ReactNode
   /**

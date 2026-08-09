@@ -34,7 +34,7 @@ describe('BuilderOptionDetailsSheet', () => {
     render(<BuilderOptionDetailsSheet {...baseProps} />)
     const dialog = screen.getByRole('dialog')
 
-    expect(screen.getByRole('heading', { name: 'Dwarf' })).toHaveClass('heading-style-sheet-title')
+    expect(screen.getByRole('heading', { name: 'Dwarf' })).toHaveClass('heading-style-dialog-title')
     expect(screen.getByText('Species')).toHaveClass('eyebrow-style-xs')
     expect(screen.queryByRole('heading', { name: 'Metadata' })).not.toBeInTheDocument()
     expect(screen.getByText('Creature Type')).toBeInTheDocument()

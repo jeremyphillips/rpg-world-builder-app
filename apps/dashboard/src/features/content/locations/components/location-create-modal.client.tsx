@@ -342,6 +342,18 @@ function useLocationCreateModalController({
   }
 }
 
+function resolveSetupPhaseHeader(args: {
+  phase: LocationCreateModalPhase
+  setupModel: LocationCreateModalSetupModel | null
+}): { description?: string; clearAriaDescribedBy: boolean } {
+  if (args.phase !== 'setup') return { clearAriaDescribedBy: false }
+  const description =
+    typeof args.setupModel?.subhead === 'string' ? args.setupModel.subhead : undefined
+  return { description, clearAriaDescribedBy: description == null }
+}
+
+// Orchestrator: setup ↔ details chrome; complexity is structural wiring, not logic density.
+// fallow-ignore-next-line complexity
 function LocationCreateModalSession({
   open,
   onOpenChange,
@@ -363,17 +375,22 @@ function LocationCreateModalSession({
   const showDetails = state.phase === 'details' && state.fixedCreate != null
   const showSetup = state.phase === 'setup' && setupModel != null
   const submitLabel = formatContentCreateActionLabel('locations')
+  const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
 
   return (
     <Modal.Root open={open} onOpenChange={handleOpenChange}>
-      <Modal.Content size="md" closeOnOutsideClick={false}>
+      <Modal.Content
+        size="md"
+        closeOnOutsideClick={false}
+        {...(setupHeader.clearAriaDescribedBy ? { 'aria-describedby': undefined } : {})}
+      >
         <Modal.Header
           headline={resolveModalHeadline({
             phase: state.phase,
             setupModel,
             fixedCreate: state.fixedCreate,
           })}
-          description={state.phase === 'setup' ? setupModel?.description : undefined}
+          description={setupHeader.description}
         />
 
         {showSetup ? (

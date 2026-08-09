@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import type { RadioCardOption } from '@rpg/ui'
 
+import { resolveLocationCreateSetupDefaultSubhead } from '../lib/location-create-setup-chrome.lib'
 import { LocationCreateSetupShell } from './location-create-setup-shell.client'
 
 const SITE_OPTIONS: RadioCardOption[] = [
@@ -52,7 +53,6 @@ const meta = {
     onOpenChange: fn(),
     onContinue: fn(),
     headline: 'Create site',
-    description: 'Choose the type that best describes this place.',
     choiceSets: [],
   },
 } satisfies Meta<typeof LocationCreateSetupShell>
@@ -68,7 +68,30 @@ export const SingleChoiceSet: Story = {
       <LocationCreateSetupShell
         {...args}
         headline="Create site"
-        description="Choose the type that best describes this place."
+        choiceSets={[
+          {
+            id: 'siteType',
+            fieldLabel: 'Site type',
+            prompt: 'What kind of site are you creating?',
+            options: SITE_OPTIONS,
+            value: siteType,
+            onValueChange: setSiteType,
+          },
+        ]}
+      />
+    )
+  },
+}
+
+export const WithDefaultSubhead: Story = {
+  render: (args) => {
+    const [siteType, setSiteType] = useState('')
+
+    return (
+      <LocationCreateSetupShell
+        {...args}
+        headline="Create site"
+        subhead={resolveLocationCreateSetupDefaultSubhead('site')}
         choiceSets={[
           {
             id: 'siteType',
@@ -93,7 +116,6 @@ export const TwoChoiceSets: Story = {
       <LocationCreateSetupShell
         {...args}
         headline="Create region"
-        description="Choose the region classification before authoring."
         choiceSets={[
           {
             id: 'classification',
@@ -110,6 +132,7 @@ export const TwoChoiceSets: Story = {
             options: REGION_TYPE_OPTIONS,
             value: regionType,
             onValueChange: setRegionType,
+            dependsOn: ['classification'],
           },
         ]}
       />

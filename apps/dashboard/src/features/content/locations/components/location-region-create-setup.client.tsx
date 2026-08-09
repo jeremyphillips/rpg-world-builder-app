@@ -14,7 +14,6 @@ import {
   REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
   REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
   REGION_CREATE_SETUP_TYPE_PROMPT,
-  resolveRegionCreateSetupDescription,
   resolveRegionCreateSetupHeadline,
   resolveRegionCreateSetupPrompt,
 } from '../lib/location-region-create-setup.lib'
@@ -49,7 +48,6 @@ export function LocationRegionCreateSetup({
       open={open}
       onOpenChange={onOpenChange}
       headline={resolveRegionCreateSetupHeadline(intent)}
-      description={resolveRegionCreateSetupDescription(intent)}
       choiceSets={[
         {
           id: 'classification',

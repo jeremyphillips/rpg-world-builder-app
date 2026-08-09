@@ -10,7 +10,6 @@ import type {
 import {
   buildSettlementTypeRadioOptions,
   isSettlementType,
-  resolveSettlementCreateSetupDescription,
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_HEADLINE,
   SETTLEMENT_CREATE_SETUP_PROMPT,
@@ -28,19 +27,16 @@ export type LocationSettlementCreateSetupProps = {
 export function LocationSettlementCreateSetup({
   open,
   onOpenChange,
-  intent,
   onComplete,
 }: LocationSettlementCreateSetupProps) {
   const [settlementType, setSettlementType] = useState<SettlementType | ''>('')
   const options = useMemo(() => buildSettlementTypeRadioOptions(), [])
-  const description = resolveSettlementCreateSetupDescription(intent)
 
   return (
     <LocationCreateSetupShell
       open={open}
       onOpenChange={onOpenChange}
       headline={SETTLEMENT_CREATE_SETUP_HEADLINE}
-      description={description}
       choiceSets={[
         {
           id: 'settlementType',

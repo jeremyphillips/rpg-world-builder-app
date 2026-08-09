@@ -34,14 +34,14 @@ describe('DrawerShell', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
-  it('defaults the title to the sheet-title heading style with a titleClassName escape hatch', () => {
+  it('defaults the title to the shared dialogTitle heading style with a titleClassName escape hatch', () => {
     const { rerender } = render(
       <DrawerShell open onOpenChange={() => undefined} title="Add item">
         <p>Drawer body</p>
       </DrawerShell>,
     )
 
-    expect(screen.getByText('Add item')).toHaveClass('heading-style-sheet-title')
+    expect(screen.getByText('Add item')).toHaveClass('heading-style-dialog-title')
 
     rerender(
       <DrawerShell
@@ -55,7 +55,7 @@ describe('DrawerShell', () => {
     )
 
     expect(screen.getByText('Add item')).toHaveClass('heading-style-card')
-    expect(screen.getByText('Add item')).not.toHaveClass('heading-style-sheet-title')
+    expect(screen.getByText('Add item')).not.toHaveClass('heading-style-dialog-title')
   })
 
   it('closes via DrawerShell.Close', async () => {

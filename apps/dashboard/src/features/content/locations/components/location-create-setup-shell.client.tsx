@@ -145,7 +145,11 @@ export type LocationCreateSetupShellProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   headline: string
-  description: string
+  /**
+   * Modal header subhead. Defaults to `false` (hidden). Pass a string for custom
+   * copy, or `resolveLocationCreateSetupDefaultSubhead(noun)` for the generic fallback.
+   */
+  subhead?: string | false
   choiceSets: LocationCreateSetupChoiceSet[]
   onContinue: () => void
   /** Escape hatch for extra validation beyond required choice-set completion. */
@@ -157,7 +161,7 @@ export function LocationCreateSetupShell({
   open,
   onOpenChange,
   headline,
-  description,
+  subhead = false,
   choiceSets,
   onContinue,
   additionalContinueConstraint = true,
@@ -176,9 +180,11 @@ export function LocationCreateSetupShell({
   const canContinue =
     resolveCreateSetupCanContinue({ choiceSets: sequenceItems }) && additionalContinueConstraint
 
+  const description = typeof subhead === 'string' ? subhead : undefined
+
   return (
     <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
+      <Modal.Content size="sm" {...(!description ? { 'aria-describedby': undefined } : {})}>
         <Modal.Header headline={headline} description={description} />
         <Modal.Body>
           <LocationCreateSetupPanel choiceSets={choiceSets} />

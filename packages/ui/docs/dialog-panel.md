@@ -7,13 +7,14 @@ scrim (`modalOverlayVariants` / `bg-overlay`).
 ## Ownership layers
 
 ```text
-dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT)
+dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT;
+                            shared dialogTitle headline default for Modal + Sheet)
 dialog-panel.variants.ts    Section inset, body, footer chrome, action row helper
 modal.variants.ts           ModalSize + centered panel shell (background only)
 sheet.variants.ts           SheetSize, SheetSurface, dock placement only
-Modal.*                     Centered behavior
-Sheet.*                     Edge behavior
-ConfirmDialog               AlertDialog; reuses modal panel + dialog-panel tokens
+Modal.*                     Centered behavior (thin Header — inherits dialogTitle)
+Sheet.*                     Edge behavior (thin Header — inherits dialogTitle)
+ConfirmDialog               AlertDialog; confirmDialogTitle (19px); reuses modal panel tokens
 dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 ```
 

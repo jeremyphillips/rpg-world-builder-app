@@ -58,7 +58,7 @@ export const Group: Story = {
   },
 }
 
-/** Card and modal titles. */
+/** Card titles (non-overlay chrome). */
 export const Card: Story = {
   args: {
     variant: 'card',
@@ -67,12 +67,30 @@ export const Card: Story = {
   },
 }
 
-/** Confirm dialog titles. */
+/** Modal/Sheet titles — 19px mobile, 24px from md. */
+export const DialogTitle: Story = {
+  args: {
+    variant: 'dialogTitle',
+    as: 'h2',
+    children: 'Create settlement',
+  },
+}
+
+/** ConfirmDialog titles — 19px at all sizes. */
+export const ConfirmDialogTitle: Story = {
+  args: {
+    variant: 'confirmDialogTitle',
+    as: 'h2',
+    children: 'Delete campaign?',
+  },
+}
+
+/** Inline Alert titles. */
 export const Alert: Story = {
   args: {
     variant: 'alert',
     as: 'h2',
-    children: 'Delete item?',
+    children: 'Something went wrong',
   },
 }
 

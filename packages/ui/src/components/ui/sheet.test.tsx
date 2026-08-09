@@ -60,13 +60,13 @@ describe('Sheet', () => {
     expect(dialog).toHaveTextContent('BENCH-001')
   })
 
-  it('defaults the headline to the sheet-title heading style', async () => {
+  it('defaults the headline to the shared dialogTitle heading style', async () => {
     const user = userEvent.setup()
     renderSheet()
     await user.click(screen.getByRole('button', { name: 'Open sheet' }))
 
     const headline = await screen.findByText('Edit entry')
-    expect(headline).toHaveClass('heading-style-sheet-title')
+    expect(headline).toHaveClass('heading-style-dialog-title')
   })
 
   it('overrides the headline style via headlineClassName', async () => {
@@ -86,7 +86,7 @@ describe('Sheet', () => {
 
     const headline = await screen.findByText('Edit entry')
     expect(headline).toHaveClass('heading-style-card')
-    expect(headline).not.toHaveClass('heading-style-sheet-title')
+    expect(headline).not.toHaveClass('heading-style-dialog-title')
   })
 
   it('closes via a Sheet.Close footer button', async () => {

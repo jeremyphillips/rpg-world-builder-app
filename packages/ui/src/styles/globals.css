@@ -212,8 +212,13 @@
   --text-heading-group--line-height: var(--text-heading-5--line-height);
   --text-heading-card: var(--text-heading-subsection);
   --text-heading-card--line-height: var(--text-heading-subsection--line-height);
-  --text-heading-sheet-title: var(--text-heading-3-md);
-  --text-heading-sheet-title--line-height: var(--text-heading-3-md--line-height);
+  /* Dialog/Modal/Sheet titles: 19px mobile → 24px from md. */
+  --text-heading-dialog-title: var(--text-heading-subsection);
+  --text-heading-dialog-title--line-height: var(--text-heading-subsection--line-height);
+  --text-heading-dialog-title-md: var(--text-heading-3-md);
+  --text-heading-dialog-title-md--line-height: var(--text-heading-3-md--line-height);
+  --text-heading-confirm-dialog-title: var(--text-heading-subsection);
+  --text-heading-confirm-dialog-title--line-height: var(--text-heading-subsection--line-height);
   --text-heading-sheet-section: var(--text-heading-3-md);
   --text-heading-sheet-section--line-height: var(--text-heading-3-md--line-height);
   --text-heading-compact: var(--text-heading-5);
@@ -552,9 +557,21 @@
   letter-spacing: var(--tracking-heading);
 }
 
-@utility heading-style-sheet-title {
-  font-size: var(--text-heading-sheet-title);
-  line-height: var(--text-heading-sheet-title--line-height);
+@utility heading-style-dialog-title {
+  font-size: var(--text-heading-dialog-title);
+  line-height: var(--text-heading-dialog-title--line-height);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+
+  @media (width >= 48rem) {
+    font-size: var(--text-heading-dialog-title-md);
+    line-height: var(--text-heading-dialog-title-md--line-height);
+  }
+}
+
+@utility heading-style-confirm-dialog-title {
+  font-size: var(--text-heading-confirm-dialog-title);
+  line-height: var(--text-heading-confirm-dialog-title--line-height);
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }

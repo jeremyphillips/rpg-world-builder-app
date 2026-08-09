@@ -9,14 +9,12 @@ import {
   REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
   REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
   REGION_CREATE_SETUP_TYPE_PROMPT,
-  resolveRegionCreateSetupDescription,
   resolveRegionCreateSetupHeadline,
   resolveRegionCreateSetupPrompt,
 } from './location-region-create-setup.lib'
 import {
   buildSettlementTypeRadioOptions,
   isSettlementType,
-  resolveSettlementCreateSetupDescription,
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_HEADLINE,
   SETTLEMENT_CREATE_SETUP_PROMPT,
@@ -24,7 +22,6 @@ import {
 import {
   buildSiteTypeRadioOptions,
   isSiteType,
-  resolveSiteCreateSetupDescription,
   SITE_CREATE_SETUP_FIELD_LABEL,
   SITE_CREATE_SETUP_HEADLINE,
   SITE_CREATE_SETUP_PROMPT,
@@ -56,7 +53,8 @@ export type LocationCreateModalSetupChoiceSetConfig = {
 
 export type LocationCreateModalSetupModel = {
   headline: string
-  description: string
+  /** Opt-in header subhead; omitted/false means no Modal description. */
+  subhead?: string | false
   choiceSets: LocationCreateModalSetupChoiceSetConfig[]
   canContinue: boolean
   complete: () => LocationCreateSetupResult | null
@@ -79,7 +77,6 @@ export function resolveLocationCreateModalSetupModel({
     const canContinue = Boolean(values.siteType)
     return {
       headline: SITE_CREATE_SETUP_HEADLINE,
-      description: resolveSiteCreateSetupDescription(intent),
       choiceSets: [
         {
           id: 'siteType',
@@ -110,7 +107,6 @@ export function resolveLocationCreateModalSetupModel({
     const canContinue = Boolean(values.settlementType)
     return {
       headline: SETTLEMENT_CREATE_SETUP_HEADLINE,
-      description: resolveSettlementCreateSetupDescription(intent),
       choiceSets: [
         {
           id: 'settlementType',
@@ -145,7 +141,6 @@ export function resolveLocationCreateModalSetupModel({
     const canContinue = Boolean(classification)
     return {
       headline: resolveRegionCreateSetupHeadline(intent),
-      description: resolveRegionCreateSetupDescription(intent),
       choiceSets: [
         {
           id: 'classification',
