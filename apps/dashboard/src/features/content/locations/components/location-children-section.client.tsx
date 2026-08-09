@@ -45,6 +45,7 @@ import {
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
 } from '../lib/location-create-shortcuts'
+import { resolveSettlementStructureChildAuthoringOptions } from '../lib/location-settlement-structure.lib'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
 import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
 import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
@@ -237,6 +238,98 @@ function LocationChildRows({
   )
 }
 
+type SettlementStructureGroupsProps = {
+  groups: NonNullable<LocationChildrenViewModel['groups']>
+  parentKind: LocationKind
+  canManage: boolean
+  onSelectAuthoringType: (
+    authoringType: LocationAuthoringType,
+    fixedParentLocationId?: string,
+  ) => void
+  onMove: (childId: string) => void
+  onView: (href: string) => void
+}
+
+function SettlementStructureGroups({
+  groups,
+  parentKind,
+  canManage,
+  onSelectAuthoringType,
+  onMove,
+  onView,
+}: SettlementStructureGroupsProps) {
+  const structureAuthoring = resolveSettlementStructureChildAuthoringOptions(
+    childAuthoringTypesForParentKind(parentKind),
+  )
+  const canAddDistrict = Boolean(canManage && structureAuthoring.district)
+  const canAddDirectLocation = canManage && structureAuthoring.direct.length > 0
+
+  const resolveGroupEndSlot = (groupId: string) => {
+    if (groupId === 'districts' && canAddDistrict) {
+      return (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          density="compact"
+          onClick={() => onSelectAuthoringType('district')}
+        >
+          <Plus aria-hidden />
+          {formatLocationAuthoringTypeAddHeading('district')}
+        </Button>
+      )
+    }
+
+    if (groupId === 'directPlaces' && canAddDirectLocation) {
+      return (
+        <LocationAddChildMenu
+          appearance="group"
+          parentKind={parentKind}
+          allowedAuthoringTypes={structureAuthoring.direct}
+          onSelectAuthoringType={onSelectAuthoringType}
+        />
+      )
+    }
+
+    return undefined
+  }
+
+  return (
+    <>
+      {groups.map((group) => (
+        <DetailSectionGroup
+          key={group.id}
+          label={group.label}
+          endSlot={resolveGroupEndSlot(group.id)}
+        >
+          {group.items.length === 0 ? (
+            <Text variant="muted" className="pt-1 text-sm">
+              {group.emptyText}
+            </Text>
+          ) : group.id === 'districts' ? (
+            <SettlementDistrictRows
+              items={group.items}
+              canManage={canManage}
+              onMove={onMove}
+              onView={onView}
+              onSelectAuthoringType={onSelectAuthoringType}
+              inset="parent"
+            />
+          ) : (
+            <LocationChildRows
+              items={group.items}
+              canManage={canManage}
+              onMove={onMove}
+              onView={onView}
+              inset="parent"
+            />
+          )}
+        </DetailSectionGroup>
+      ))}
+    </>
+  )
+}
+
 export function LocationChildrenSection({
   childrenViewModel,
   canManage = false,
@@ -318,10 +411,6 @@ export function LocationChildrenSection({
     launch({ authoringType, parentLocationId: fixedParentLocationId })
   }
 
-  const canAddDistrict =
-    canManage && childAuthoringTypesForParentKind(parentKind).includes('district')
-
-  const hasGroupedContent = groups?.some((group) => group.items.length > 0) ?? false
   const hasFlatContent = items.length > 0
 
   return (
@@ -332,7 +421,7 @@ export function LocationChildrenSection({
         headingId="location-children-heading"
         helper={helper}
         headerEndSlot={
-          canManage ? (
+          !groups && canManage ? (
             <LocationAddChildMenu
               parentKind={parentKind}
               onSelectAuthoringType={handleSelectAuthoringType}
@@ -341,56 +430,14 @@ export function LocationChildrenSection({
         }
       >
         {groups ? (
-          <>
-            {!hasGroupedContent && !hasFlatContent ? (
-              <Text variant="muted" className="px-4 pb-2 pt-1 text-sm">
-                {emptyText}
-              </Text>
-            ) : null}
-            {groups.map((group) => (
-              <DetailSectionGroup
-                key={group.id}
-                label={group.label}
-                endSlot={
-                  group.id === 'districts' && canAddDistrict ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      density="compact"
-                      onClick={() => handleSelectAuthoringType('district')}
-                    >
-                      <Plus className="size-3.5" aria-hidden />
-                      {formatLocationAuthoringTypeAddHeading('district')}
-                    </Button>
-                  ) : undefined
-                }
-              >
-                {group.items.length === 0 ? (
-                  <Text variant="muted" className="pt-1 text-sm">
-                    {group.emptyText}
-                  </Text>
-                ) : group.id === 'districts' ? (
-                  <SettlementDistrictRows
-                    items={group.items}
-                    canManage={canManage}
-                    onMove={openMoveDrawer}
-                    onView={(href) => navigate(href)}
-                    onSelectAuthoringType={handleSelectAuthoringType}
-                    inset="parent"
-                  />
-                ) : (
-                  <LocationChildRows
-                    items={group.items}
-                    canManage={canManage}
-                    onMove={openMoveDrawer}
-                    onView={(href) => navigate(href)}
-                    inset="parent"
-                  />
-                )}
-              </DetailSectionGroup>
-            ))}
-          </>
+          <SettlementStructureGroups
+            groups={groups}
+            parentKind={parentKind}
+            canManage={canManage}
+            onSelectAuthoringType={handleSelectAuthoringType}
+            onMove={openMoveDrawer}
+            onView={(href) => navigate(href)}
+          />
         ) : !hasFlatContent ? (
           <Text variant="muted" className="px-4 pb-2 pt-1 text-sm">
             {emptyText}

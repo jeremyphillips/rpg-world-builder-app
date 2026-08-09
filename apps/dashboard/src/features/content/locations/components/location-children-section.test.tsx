@@ -187,6 +187,34 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByText(`Create drawer: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
+  it('keeps Add district on empty Districts subgroup headers', () => {
+    const emptyHarborfordViewModel = buildLocationDetailViewModel(HARBORFORD, {
+      locations: [HARBORFORD],
+      campaignId: STORY_CAMPAIGN_ID,
+    }).children
+
+    render(
+      <QueryClientProvider client={makeTestQueryClient()}>
+        <MemoryRouter>
+          <LocationChildrenSection
+            childrenViewModel={emptyHarborfordViewModel}
+            canManage
+            parentLocationId={HARBORFORD.id}
+            parentKind={HARBORFORD.kind}
+            campaignId={STORY_CAMPAIGN_ID}
+            campaignLocations={[HARBORFORD]}
+          />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add district' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
+    expect(screen.getByText('No districts yet.')).toBeInTheDocument()
+    expect(screen.getByText('No direct locations yet.')).toBeInTheDocument()
+    expect(screen.queryByText('No contained locations yet.')).not.toBeInTheDocument()
+  })
+
   it('launches contained create under the district when row Add location chooses Building', async () => {
     const user = userEvent.setup()
     renderSection({ canManage: true, parent: HARBORFORD })
@@ -220,6 +248,24 @@ describe('LocationChildrenSection', () => {
     renderSection({ canManage: false, parent: HARBORFORD })
 
     expect(screen.queryByRole('button', { name: 'Add district' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add location' })).not.toBeInTheDocument()
+  })
+
+  it('omits panel-level Add location on City structure and scopes it to Direct locations', async () => {
+    const user = userEvent.setup()
+    renderSection({ canManage: true, parent: HARBORFORD })
+
+    expect(screen.getByRole('button', { name: 'Add district' })).toBeInTheDocument()
+    const addLocation = screen.getByRole('button', { name: 'Add location' })
+    expect(addLocation).toBeInTheDocument()
+
+    await user.click(addLocation)
+    expect(screen.queryByRole('menuitem', { name: 'District' })).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Building' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Site' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    expect(screen.getByText(`Create drawer: building parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
   it('shows View location + Move location overflow for managers', async () => {
@@ -233,14 +279,14 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()
   })
 
-  it('opens the contained create drawer when a child type is selected', async () => {
+  it('opens the contained create drawer from Contained locations panel Add location', async () => {
     const user = userEvent.setup()
-    renderSection({ canManage: true, parent: HARBORFORD })
+    renderSection({ canManage: true, parent: DOCK_WARD })
 
     await user.click(screen.getByRole('button', { name: /^add location$/i }))
-    await user.click(screen.getByRole('menuitem', { name: 'District' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
 
-    expect(screen.getByText(`Create drawer: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
+    expect(screen.getByText(`Create drawer: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
   })
 
   it('opens Move drawer wired to the child id with Current from parentLocationId', async () => {

@@ -40,7 +40,14 @@ export const InsidePanel: Story = {
           <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
         </DetailSectionRowList>
       </DetailSectionGroup>
-      <DetailSectionGroup label="Direct locations">
+      <DetailSectionGroup
+        label="Direct locations"
+        endSlot={
+          <button type="button" className="text-sm">
+            Add location
+          </button>
+        }
+      >
         <p className="text-sm text-muted-foreground">No direct locations yet.</p>
       </DetailSectionGroup>
     </DetailSectionPanel>

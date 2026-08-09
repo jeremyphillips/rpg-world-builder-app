@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import { HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../fixtures'
+import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
 import {
   isDirectPlaceAuthoringTypeForSettlement,
   isDistrictAuthoringTypeForSettlement,
   isSettlementDirectPlaceChild,
   isSettlementDistrictChild,
   partitionSettlementChildLocations,
+  resolveSettlementStructureChildAuthoringOptions,
 } from './location-settlement-structure.lib'
 
 describe('partitionSettlementChildLocations', () => {
@@ -36,6 +38,25 @@ describe('settlement child eligibility helpers', () => {
     expect(isDistrictAuthoringTypeForSettlement('district')).toBe(true)
     expect(isDirectPlaceAuthoringTypeForSettlement('building')).toBe(true)
     expect(isDirectPlaceAuthoringTypeForSettlement('district')).toBe(false)
+  })
+
+  it('projects canonical settlement eligibility into structure authoring options', () => {
+    const eligible = childAuthoringTypesForParentKind('settlement')
+    const options = resolveSettlementStructureChildAuthoringOptions(eligible)
+
+    expect(options.district).toBe('district')
+    expect(options.direct).not.toContain('district')
+    expect(options.direct).toEqual(eligible.filter((type) => type !== 'district'))
+    expect(options.direct).toEqual(
+      expect.arrayContaining(['building', 'site', 'fortification', 'structure']),
+    )
+  })
+
+  it('omits district when it is not in the eligible set', () => {
+    expect(resolveSettlementStructureChildAuthoringOptions(['building', 'site'])).toEqual({
+      district: undefined,
+      direct: ['building', 'site'],
+    })
   })
 })
 

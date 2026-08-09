@@ -98,11 +98,12 @@ describe('LocationDetailContent', () => {
     expect(screen.getByText(LOCATION_EMPTY_SECTION_TEXT.children)).toBeInTheDocument()
   })
 
-  it('shows add-location shortcuts for campaign managers', () => {
+  it('shows Direct locations Add location for campaign managers on City structure', () => {
     useCanManageCampaignMock.mockReturnValue(true)
     renderDetail(HARBORFORD)
 
     expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add district' })).toBeInTheDocument()
   })
 
   it('shows Change parent for managers on nested locations', () => {

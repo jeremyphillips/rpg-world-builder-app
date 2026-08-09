@@ -106,9 +106,12 @@ setup step first; other promoted types navigate directly to the fixed URL. The o
 `?parent=` query param remains a soft initial value for the parent picker on the page
 (contained create passes fixed parent in-memory to the drawer instead).
 
-Detail-page **Add location** uses the same resolver; no-setup types open the contained
+Detail-page **Add location** (Contained locations panel, City structure Direct locations
+subgroup, and District row `+`) uses the same resolver; no-setup types open the contained
 create drawer immediately with `fixedCreate` (type and parent locked). Settlement runs
-setup first, then opens the drawer with completed fixed context.
+setup first, then opens the drawer with completed fixed context. City structure partitions
+District vs direct choices from one canonical eligibility result — see
+[location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
 
 ### Contained settlement create — starting districts
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { Plus } from 'lucide-react'
+
 import { Button, Input, Text, cn, fieldArrayItemClasses, fieldLabelVariants } from '@rpg/ui'
 
 import { useSettlementCreateComposition } from './settlement-create-composition-context.client'
@@ -59,7 +61,8 @@ export function LocationSettlementStartingDistrictsSlot() {
           })}
         </ul>
       )}
-      <Button type="button" variant="outline" onClick={addDistrict}>
+      <Button type="button" variant="ghost" size="sm" density="compact" onClick={addDistrict}>
+        <Plus aria-hidden />
         {SETTLEMENT_STARTING_DISTRICTS_ADD_LABEL}
       </Button>
     </div>

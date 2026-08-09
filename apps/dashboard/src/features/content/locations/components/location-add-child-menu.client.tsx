@@ -19,7 +19,8 @@ import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
 type LocationAddChildMenuTriggerProps =
   | {
-      appearance?: 'labeled'
+      /** Compact ghost labeled trigger (panel or subgroup header). */
+      appearance?: 'labeled' | 'group'
       triggerLabel?: string
     }
   | {
@@ -30,6 +31,12 @@ type LocationAddChildMenuTriggerProps =
 export type LocationAddChildMenuProps = {
   parentKind: LocationKind
   onSelectAuthoringType: (authoringType: LocationAuthoringType) => void
+  /**
+   * Optional subset of types already resolved for this context (e.g. settlement direct
+   * places). Intersected with canonical `childAuthoringTypesForParentKind` — cannot widen
+   * eligibility beyond hierarchy SSOT.
+   */
+  allowedAuthoringTypes?: readonly LocationAuthoringType[]
   /** Optional context above type items (e.g. "Add to Dock Ward"). */
   menuHeading?: string
 } & LocationAddChildMenuTriggerProps
@@ -38,16 +45,22 @@ export type LocationAddChildMenuProps = {
 export function LocationAddChildMenu({
   parentKind,
   onSelectAuthoringType,
+  allowedAuthoringTypes,
   menuHeading,
   ...triggerProps
 }: LocationAddChildMenuProps) {
-  const childTypes = childAuthoringTypesForParentKind(parentKind)
+  const canonicalTypes = childAuthoringTypesForParentKind(parentKind)
+  const childTypes =
+    allowedAuthoringTypes === undefined
+      ? canonicalTypes
+      : canonicalTypes.filter((type) => allowedAuthoringTypes.includes(type))
 
   if (childTypes.length === 0) {
     return null
   }
 
   const appearance = triggerProps.appearance ?? 'labeled'
+  const labeledText = triggerProps.triggerLabel ?? 'Add location'
   const trigger =
     appearance === 'icon' ? (
       <Button
@@ -60,16 +73,16 @@ export function LocationAddChildMenu({
         <Plus aria-hidden />
       </Button>
     ) : (
-      <Button type="button" variant="outline" size="sm">
-        <Plus className="size-3.5" aria-hidden />
-        Add location
+      <Button type="button" variant="ghost" size="sm" density="compact">
+        <Plus aria-hidden />
+        {labeledText}
       </Button>
     )
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent align={appearance === 'icon' ? 'end' : 'start'}>
+      <DropdownMenuContent align="end">
         {menuHeading ? <DropdownMenuLabel>{menuHeading}</DropdownMenuLabel> : null}
         {childTypes.map((authoringType) => (
           <DropdownMenuItem
