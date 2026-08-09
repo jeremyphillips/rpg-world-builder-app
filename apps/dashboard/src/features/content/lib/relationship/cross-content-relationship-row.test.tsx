@@ -57,6 +57,31 @@ describe('CrossContentRelationshipRow', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('uses an explicit endSlot override instead of convenience overflow', () => {
+    render(
+      <CrossContentRelationshipRow
+        heading="The Monarchy"
+        actions={[{ id: 'view', label: 'View organization', onSelect: vi.fn() }]}
+        endSlot={<button type="button">Utility</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Utility' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Relationship actions' })).not.toBeInTheDocument()
+  })
+
+  it('suppresses trailing controls when endSlot is null', () => {
+    render(
+      <CrossContentRelationshipRow
+        heading="The Monarchy"
+        actions={[{ id: 'view', label: 'View organization', onSelect: vi.fn() }]}
+        endSlot={null}
+      />,
+    )
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
   it('renders overflow actions from feature-supplied items', async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()

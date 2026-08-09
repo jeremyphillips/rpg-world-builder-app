@@ -220,9 +220,12 @@ export {
 } from './components/ui/radio-group-field'
 export {
   radioCardCompactBodyInsetClasses,
+  radioCardCompactOptionBodyLayoutClasses,
   radioCardCompactPanelPaddingClasses,
   radioCardCompactPaddingRightClasses,
   radioCardCompactPaddingXClasses,
+  radioCardCompactSummaryBodyLayoutClasses,
+  radioCardCompactSummaryContentGapClasses,
 } from './components/ui/radio-card.variants'
 export {
   RadioCard,
@@ -574,7 +577,9 @@ export {
   CollapsibleListItemDragHandle,
   CollapsibleListItemShell,
   CollapsibleListItemToolbar,
+  buildCollapsibleListItemLeadingChromeStyle,
   collapsibleListItemBodyClasses,
+  collapsibleListItemChromeColumnClasses,
   type CollapsibleListItemActionsProps,
   type CollapsibleListItemBodyProps,
   type CollapsibleListItemCollapseButtonProps,

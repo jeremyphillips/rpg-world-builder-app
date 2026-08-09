@@ -103,18 +103,49 @@ Creation shortcuts use an authoritative fixed session on the create route:
 
 Overview promoted shortcuts run through `resolveLocationCreateSession` — Settlement opens a
 setup step first; other promoted types navigate directly to the fixed URL. The optional
-`?parent=` query param remains a soft initial value for the parent picker on the page
-(contained create passes fixed parent in-memory to the drawer instead).
+`?parent=` query param remains a soft initial value for the parent picker on the page.
 
-Detail-page **Add location** uses the same resolver; no-setup types open the contained
-create drawer immediately with `fixedCreate` (type and parent locked). Settlement runs
-setup first, then opens the drawer with completed fixed context.
+Detail-page **Add location** (Contained locations panel, City structure Direct locations
+subgroup, and District row `+`) opens `LocationCreateModal` (`size="md"`) for both
+setup-gated and ready authoring types — one continuous setup ↔ details transaction with
+no drawer handoff. City structure partitions District vs direct choices from one canonical
+eligibility result — see
+[location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
 
-| Module                                 | Role                                                          |
-| -------------------------------------- | ------------------------------------------------------------- |
-| `location-create-session.ts`           | `resolveLocationCreateSession`, `completeLocationCreateSetup` |
-| `location-create-shortcuts.ts`         | Fixed-session URL parse/serialize, child-type menus           |
-| `location-settlement-structure.lib.ts` | District vs direct-place partition helpers                    |
+### Contained settlement create — starting districts
+
+When the create modal reaches details for a fixed settlement session (after setup chooses
+`settlementType`), authors can optionally seed **starting districts** in the Structure
+group below description. Field order uses `composeLocationCreateBodyFields` with an
+`afterDescription` slot — overview create continues to call `buildLocationFields`
+directly and does not surface this UI.
+
+| Layer             | Module                                                   | Role                                                                                             |
+| ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Form placement    | `location-form-fields.ts`                                | `composeLocationCreateBodyFields`, presentation-only `buildSettlementStartingDistrictsFormItems` |
+| Interactive UI    | `location-settlement-starting-districts-slot.client.tsx` | Name rows, add/remove                                                                            |
+| Composition state | `settlement-create-composition-context.client.tsx`       | Empty baseline per open session                                                                  |
+| Workflow          | `location-settlement-create-composition.lib.ts`          | Validation, `buildStartingDistrictCreateInput`, `createSettlementWithStartingDistricts`          |
+
+Submit creates the settlement first, then sequentially POSTs each district as a child
+`kind: 'district'` Location with `parentLocationId` set to the new settlement. Partial
+district or deferred campaign-access failures surface as **one** aggregated warning toast;
+success still trusted-closes the modal.
+
+**Campaign access:** starting districts inherit default public access — locations do not
+inherit parent/child access. A default-public district can appear in list/search while a
+restricted parent remains hidden. Session-access mirroring for composed districts is a
+follow-up candidate only.
+
+| Module                                                                             | Role                                                                                                           |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `location-create-session.ts`                                                       | `resolveLocationCreateSession`, `completeLocationCreateSetup`                                                  |
+| `location-create-shortcuts.ts`                                                     | Fixed-session URL parse/serialize, child-type menus, Create/Add headings                                       |
+| `location-create-modal.client.tsx`                                                 | Contained create surface: setup ↔ details in one `md` modal; transaction dirty + draft prune                   |
+| `location-create-setup-shell.client.tsx` / `location-create-setup-sequence.lib.ts` | Shared setup chrome/panel: compact summaries, `dependsOn` invalidation, active-set expansion, derived Continue |
+| `location-settlement-structure.lib.ts`                                             | District vs direct-place partition helpers                                                                     |
+
+Create-setup choice collapse and selected-summary presentation are owned by the shared shell/sequence — Site, Settlement, and Region supply ordered choice-set definitions only (no per-type selected-card or collapse wiring).
 
 ## Authoring modules
 

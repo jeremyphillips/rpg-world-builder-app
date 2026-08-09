@@ -1,49 +1,68 @@
 import {
   getLocationKindEntry,
   getParentRequirement,
-  getSettlementTypeLabel,
   resolveLocationClassificationDisplay,
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
+  resolveLocationStructureHeadingNoun,
   type Location,
   type LocationClassificationDisplay,
   type LocationDisplaySummary,
   type LocationKind,
 } from '@rpg/contracts'
 
+import { formatDescriptorCount } from '@/lib/actions/action-count-grammar'
+
 import { ROUTES } from '@/app/routes'
 
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 
+import type { LocationAuthoringType } from './location-authoring-type'
+import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
+import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,
 } from './location-parent-replacement'
 import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
-import { partitionSettlementChildLocations } from './location-settlement-structure.lib'
+import {
+  formatLocationStructureSplitCount,
+  partitionLocationsByStructureGroup,
+  resolveLocationStructureProfile,
+  type LocationStructureGroupId,
+  type LocationStructureGroupProfile,
+} from './location-structure.lib'
 
 export const LOCATION_UNKNOWN_ANCESTOR_LABEL = 'Unknown location' as const
 
 export const LOCATION_SECTION_LABELS = {
   ancestry: 'Location path',
-  children: 'Contained locations',
 } as const
 
 export const LOCATION_SECTION_HELPERS = {
-  children: 'Locations directly within this location.',
-  settlementStructure:
-    'Districts organize neighborhoods; other locations can sit directly in the settlement.',
+  worldStructure: 'Regions and locations organized within this world.',
+  regionStructure: 'Subregions and locations organized within this region.',
+  settlementStructure: 'Districts and locations organized within this settlement.',
+  districtStructure: 'Locations organized within this district.',
+  siteStructure: 'Locations organized within this site.',
+  structureStructure: 'Locations organized within this structure.',
+  interiorStructure: 'Locations organized within this interior.',
+  genericStructure: 'Locations organized within this location.',
 } as const
 
 export const LOCATION_EMPTY_SECTION_TEXT = {
-  children: 'No contained locations yet.',
-  settlementDistricts: 'No districts yet.',
-  settlementDirectPlaces: 'No direct locations yet.',
+  children: 'No locations yet.',
+  districts: 'No districts yet.',
+  regions: 'No regions yet.',
+  subregions: 'No subregions yet.',
+  directLocations: 'No direct locations yet.',
 } as const
 
 export const LOCATION_CHILDREN_GROUP_LABELS = {
   districts: 'Districts',
-  directPlaces: 'Direct locations',
+  regions: 'Regions',
+  subregions: 'Subregions',
+  directLocations: 'Direct locations',
 } as const
 
 export const LOCATION_ANCESTRY_TEXT_SEPARATOR = ' / ' as const
@@ -97,11 +116,48 @@ export type LocationChildItem = {
   summaryLine: string
 }
 
+/**
+ * One Structure row. When `disclosure` is true, the row may expand to `children`
+ * (subject to `maxInlineDepth` already applied when building the VM).
+ */
+export type LocationStructureRowVm = {
+  item: LocationChildItem
+  kind: LocationKind
+  /** Preformatted immediate-child count phrase (split or single), when any. */
+  countPhrase?: string
+  /** When true, render a disclosure chevron; when false at depth cap, counts only. */
+  disclosure: boolean
+  children: LocationStructureRowVm[]
+  /** Parent kind for this row's children (this row's kind) — drives Subregion counts. */
+  childParentKind: LocationKind
+  /** Add-child menu under this row when structural (district/region). */
+  canAddChildren: boolean
+}
+
 export type LocationChildrenGroup = {
-  id: 'districts' | 'directPlaces'
+  id: LocationStructureGroupId
   label: string
-  items: LocationChildItem[]
   emptyText: string
+  /** Flat rows when the group is not expandable (e.g. directLocations). */
+  items: LocationChildItem[]
+  /** Expandable structural rows (districts / regions / subregions). */
+  expandableItems?: LocationStructureRowVm[]
+  /** Structural authoring type for the group header Add action, when applicable. */
+  structuralAuthoringType?: LocationAuthoringType
+  maxInlineDepth: number
+}
+
+export const LOCATION_CHILD_COUNT_DESCRIPTOR = {
+  nounSingular: 'location',
+  nounPlural: 'locations',
+} as const
+
+export function formatLocationChildCount(count: number): string {
+  return formatDescriptorCount(count, LOCATION_CHILD_COUNT_DESCRIPTOR)
+}
+
+function formatCountWithNoun(count: number, nounSingular: string, nounPlural: string): string {
+  return formatDescriptorCount(count, { nounSingular, nounPlural })
 }
 
 export type LocationChildrenViewModel = {
@@ -110,6 +166,12 @@ export type LocationChildrenViewModel = {
   items: LocationChildItem[]
   groups?: LocationChildrenGroup[]
   emptyText: string
+}
+
+/** @deprecated Use LocationStructureRowVm — kept for transitional imports. */
+export type SettlementStructureDistrictItem = {
+  item: LocationChildItem
+  immediateChildren: LocationChildItem[]
 }
 
 export type LocationDetailViewModel = {
@@ -266,36 +328,213 @@ function toLocationChildItem(location: Location, campaignId: string): LocationCh
   }
 }
 
-function buildSettlementStructureViewModel(
+export function buildChildrenByParentId(locations: readonly Location[]): Map<string, Location[]> {
+  const childrenByParentId = new Map<string, Location[]>()
+
+  for (const location of locations) {
+    const parentId = location.parentLocationId
+    if (!parentId) continue
+
+    const bucket = childrenByParentId.get(parentId) ?? []
+    bucket.push(location)
+    childrenByParentId.set(parentId, bucket)
+  }
+
+  for (const [parentId, children] of childrenByParentId) {
+    childrenByParentId.set(
+      parentId,
+      [...children].sort((left, right) => left.name.localeCompare(right.name)),
+    )
+  }
+
+  return childrenByParentId
+}
+
+function resolveStructureHelper(location: Location): string {
+  switch (location.kind) {
+    case 'world':
+      return LOCATION_SECTION_HELPERS.worldStructure
+    case 'region':
+      return LOCATION_SECTION_HELPERS.regionStructure
+    case 'settlement': {
+      const noun = resolveLocationStructureHeadingNoun(location).toLowerCase()
+      return `Districts and locations organized within this ${noun}.`
+    }
+    case 'district':
+      return LOCATION_SECTION_HELPERS.districtStructure
+    case 'site': {
+      const noun = resolveLocationStructureHeadingNoun(location).toLowerCase()
+      return `Locations organized within this ${noun}.`
+    }
+    case 'structure': {
+      const noun = resolveLocationStructureHeadingNoun(location).toLowerCase()
+      return `Locations organized within this ${noun}.`
+    }
+    case 'interior': {
+      const noun = resolveLocationStructureHeadingNoun(location).toLowerCase()
+      return `Locations organized within this ${noun}.`
+    }
+    default:
+      return LOCATION_SECTION_HELPERS.genericStructure
+  }
+}
+
+function formatStructureHeading(location: Location): string {
+  return `${resolveLocationStructureHeadingNoun(location)} structure`
+}
+
+function resolveGroupLabel(groupId: LocationStructureGroupId, parentKind: LocationKind): string {
+  if (groupId === 'regions' || groupId === 'subregions') {
+    return resolveRegionRelationshipLabelPlural(parentKind)
+  }
+  return LOCATION_CHILDREN_GROUP_LABELS[groupId]
+}
+
+function resolveGroupEmptyText(groupId: LocationStructureGroupId): string {
+  switch (groupId) {
+    case 'districts':
+      return LOCATION_EMPTY_SECTION_TEXT.districts
+    case 'regions':
+      return LOCATION_EMPTY_SECTION_TEXT.regions
+    case 'subregions':
+      return LOCATION_EMPTY_SECTION_TEXT.subregions
+    case 'directLocations':
+      return LOCATION_EMPTY_SECTION_TEXT.directLocations
+  }
+}
+
+function buildCountPhraseForRow(
+  location: Location,
+  immediateChildren: readonly Location[],
+): string | undefined {
+  if (location.kind === 'region') {
+    const phrase = formatLocationStructureSplitCount(
+      immediateChildren,
+      location.kind,
+      formatCountWithNoun,
+    )
+    return phrase || undefined
+  }
+
+  // Districts and other expandable structural rows keep an explicit zero count for gutter parity.
+  return formatLocationChildCount(immediateChildren.length)
+}
+
+/**
+ * Builds nested Structure rows. `depth` is the nested row level below the surface (1-based).
+ * Disclosure is allowed while `depth <= maxInlineDepth`.
+ */
+function buildStructureRowVm(
+  location: Location,
+  childrenByParentId: ReadonlyMap<string, Location[]>,
+  campaignId: string,
+  depth: number,
+  groupProfile: LocationStructureGroupProfile,
+): LocationStructureRowVm {
+  const immediateChildren = childrenByParentId.get(location.id) ?? []
+  const withinDepth = depth <= groupProfile.maxInlineDepth
+  const countPhrase = buildCountPhraseForRow(location, immediateChildren)
+
+  const childRows: LocationStructureRowVm[] = withinDepth
+    ? immediateChildren.map((child) => {
+        const childIsStructural =
+          groupProfile.childKind !== undefined && child.kind === groupProfile.childKind
+        const childDepth = depth + 1
+
+        if (childIsStructural && groupProfile.expandable) {
+          return buildStructureRowVm(
+            child,
+            childrenByParentId,
+            campaignId,
+            childDepth,
+            groupProfile,
+          )
+        }
+
+        return {
+          item: toLocationChildItem(child, campaignId),
+          kind: child.kind,
+          disclosure: false,
+          children: [],
+          childParentKind: location.kind,
+          canAddChildren: false,
+          countPhrase:
+            childIsStructural && childDepth > groupProfile.maxInlineDepth
+              ? buildCountPhraseForRow(child, childrenByParentId.get(child.id) ?? [])
+              : undefined,
+        }
+      })
+    : []
+
+  return {
+    item: toLocationChildItem(location, campaignId),
+    kind: location.kind,
+    countPhrase,
+    disclosure: withinDepth && immediateChildren.length > 0,
+    children: childRows,
+    childParentKind: location.kind,
+    canAddChildren: childAuthoringTypesForParentKind(location.kind).length > 0,
+  }
+}
+
+function buildGroupedStructureViewModel(
   location: Location,
   locations: readonly Location[],
   campaignId: string,
 ): LocationChildrenViewModel {
-  const childLocations = locations.filter((entry) => entry.parentLocationId === location.id)
-  const { districts, directPlaces } = partitionSettlementChildLocations(childLocations)
-  const settlementTypeLabel =
-    location.kind === 'settlement' && location.settlementType
-      ? getSettlementTypeLabel(location.settlementType)
-      : 'Settlement'
+  const profile = resolveLocationStructureProfile(location.kind)
+  if (!profile) {
+    return buildFlatStructureViewModel(location, locations, campaignId)
+  }
+
+  const childrenByParentId = buildChildrenByParentId(locations)
+  const childLocations = childrenByParentId.get(location.id) ?? []
+  const buckets = partitionLocationsByStructureGroup(childLocations, profile)
+
+  const groups = profile.groups.map((groupProfile) => {
+    const groupLocations = buckets[groupProfile.id] ?? []
+
+    if (groupProfile.expandable && groupProfile.childKind) {
+      return {
+        id: groupProfile.id,
+        label: resolveGroupLabel(groupProfile.id, location.kind),
+        emptyText: resolveGroupEmptyText(groupProfile.id),
+        items: [] as LocationChildItem[],
+        expandableItems: groupLocations.map((entry) =>
+          buildStructureRowVm(entry, childrenByParentId, campaignId, 1, groupProfile),
+        ),
+        structuralAuthoringType: groupProfile.childKind as LocationAuthoringType,
+        maxInlineDepth: groupProfile.maxInlineDepth,
+      } satisfies LocationChildrenGroup
+    }
+
+    return {
+      id: groupProfile.id,
+      label: resolveGroupLabel(groupProfile.id, location.kind),
+      emptyText: resolveGroupEmptyText(groupProfile.id),
+      items: groupLocations.map((entry) => toLocationChildItem(entry, campaignId)),
+      maxInlineDepth: groupProfile.maxInlineDepth,
+    } satisfies LocationChildrenGroup
+  })
 
   return {
-    heading: `${settlementTypeLabel} structure`,
-    helper: LOCATION_SECTION_HELPERS.settlementStructure,
+    heading: formatStructureHeading(location),
+    helper: resolveStructureHelper(location),
     items: [],
-    groups: [
-      {
-        id: 'districts',
-        label: LOCATION_CHILDREN_GROUP_LABELS.districts,
-        items: districts.map((entry) => toLocationChildItem(entry, campaignId)),
-        emptyText: LOCATION_EMPTY_SECTION_TEXT.settlementDistricts,
-      },
-      {
-        id: 'directPlaces',
-        label: LOCATION_CHILDREN_GROUP_LABELS.directPlaces,
-        items: directPlaces.map((entry) => toLocationChildItem(entry, campaignId)),
-        emptyText: LOCATION_EMPTY_SECTION_TEXT.settlementDirectPlaces,
-      },
-    ],
+    groups,
+    emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
+  }
+}
+
+function buildFlatStructureViewModel(
+  location: Location,
+  locations: readonly Location[],
+  campaignId: string,
+): LocationChildrenViewModel {
+  return {
+    heading: formatStructureHeading(location),
+    helper: resolveStructureHelper(location),
+    items: buildLocationChildren(location.id, locations, campaignId),
     emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
   }
 }
@@ -305,16 +544,11 @@ function buildLocationChildrenViewModel(
   locations: readonly Location[],
   campaignId: string,
 ): LocationChildrenViewModel {
-  if (location.kind === 'settlement' && location.settlementType) {
-    return buildSettlementStructureViewModel(location, locations, campaignId)
+  if (resolveLocationStructureProfile(location.kind)) {
+    return buildGroupedStructureViewModel(location, locations, campaignId)
   }
 
-  return {
-    heading: LOCATION_SECTION_LABELS.children,
-    helper: LOCATION_SECTION_HELPERS.children,
-    items: buildLocationChildren(location.id, locations, campaignId),
-    emptyText: LOCATION_EMPTY_SECTION_TEXT.children,
-  }
+  return buildFlatStructureViewModel(location, locations, campaignId)
 }
 
 export type LocationChildSummaryItem = {

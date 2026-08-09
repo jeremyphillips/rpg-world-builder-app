@@ -57,7 +57,11 @@ function LocationConnectedPartiesSections({
       subjectId: string
     }) => {
       const row = detail.rows.find((candidate) => candidate.relationshipId === input.relationshipId)
-      if (!row || row.sectionGroup !== 'territorial_authority') {
+      if (
+        !row ||
+        row.subjectType !== 'organization' ||
+        row.sectionGroup !== 'territorial_authority'
+      ) {
         await detail.handleRemoveConnection(input)
         return
       }
@@ -65,7 +69,7 @@ function LocationConnectedPartiesSections({
       setPendingRemove({
         ...input,
         organizationName: row.subject.name,
-        kind: row.kind as OrganizationLocationConnectionKind,
+        kind: row.kind,
       })
     },
     [detail],

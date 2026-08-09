@@ -197,12 +197,12 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   }
 
   const orgRows = React.useMemo(
-    () => connectedPartyRows.filter((row) => row.subject.type === 'organization'),
+    () => connectedPartyRows.filter((row) => row.subjectType === 'organization'),
     [connectedPartyRows],
   )
 
   const characterRows = React.useMemo(
-    () => connectedPartyRows.filter((row) => row.subject.type === 'character'),
+    () => connectedPartyRows.filter((row) => row.subjectType === 'character'),
     [connectedPartyRows],
   )
 

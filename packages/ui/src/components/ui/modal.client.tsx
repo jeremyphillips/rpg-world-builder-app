@@ -101,6 +101,7 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: React.ReactNode
   /** Optional supporting copy — maps to `Dialog.Description`. */
   description?: React.ReactNode
+  /** Escape hatch — overrides the shared dialogTitle default from DialogPanelHeader. */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
   endSlot?: React.ReactNode

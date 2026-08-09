@@ -11,6 +11,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         rows: [
           {
             relationshipId: 'rel-1',
+            subjectType: 'organization',
             subject: {
               id: 'org-1',
               name: 'City Council',

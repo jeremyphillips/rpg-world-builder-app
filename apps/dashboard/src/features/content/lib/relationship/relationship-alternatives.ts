@@ -397,13 +397,7 @@ function resolveLocationInverseOrganizationAlternatives(
     )
 
   const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
-    rows
-      .filter((row): row is typeof row & { relationshipId: string } => Boolean(row.relationshipId))
-      .map((row) => ({
-        subject: { id: row.subject.id, type: row.subject.type },
-        kind: row.kind,
-        relationshipId: row.relationshipId,
-      })),
+    rows,
     relationship.locationId,
   )
 

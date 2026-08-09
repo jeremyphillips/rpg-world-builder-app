@@ -49,6 +49,19 @@ describe('LOCATION_KIND_DEFINITIONS integrity', () => {
     expect(isValidParentKind('settlement', 'world')).toBe(true)
   })
 
+  it('allows settlement to parent district', () => {
+    expect(isValidParentKind('district', 'settlement')).toBe(true)
+  })
+
+  it('forbids district from parenting district', () => {
+    expect(isValidParentKind('district', 'district')).toBe(false)
+  })
+
+  it('allows district to parent structure and site place kinds', () => {
+    expect(isValidParentKind('structure', 'district')).toBe(true)
+    expect(isValidParentKind('site', 'district')).toBe(true)
+  })
+
   it('validates parent requirement presence per kind', () => {
     expect(validateLocationParentRequirement('plane', undefined)).toBeUndefined()
     expect(validateLocationParentRequirement('plane', 'parent-1')).toBeDefined()

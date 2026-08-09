@@ -30,11 +30,37 @@ export {
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
 } from '../lib/location-connected-parties-section-copy'
 
-export type LocationConnectedPartyEditTarget = {
-  relationshipId: string
-  subjectType: LocationConnectedPartyRow['subject']['type']
-  subjectId: string
-  kind: string
+export type LocationConnectedPartyEditTarget =
+  | {
+      relationshipId: string
+      subjectType: 'organization'
+      subjectId: string
+      kind: OrganizationLocationConnectionKind
+    }
+  | {
+      relationshipId: string
+      subjectType: 'character'
+      subjectId: string
+      kind: CharacterLocationConnectionKind
+    }
+
+/** Builds the typed edit target for a connected-party row, preserving the subject branch. */
+export function toLocationConnectedPartyEditTarget(
+  row: LocationConnectedPartyRow,
+): LocationConnectedPartyEditTarget {
+  return row.subjectType === 'organization'
+    ? {
+        relationshipId: row.relationshipId,
+        subjectType: 'organization',
+        subjectId: row.subject.id,
+        kind: row.kind,
+      }
+    : {
+        relationshipId: row.relationshipId,
+        subjectType: 'character',
+        subjectId: row.subject.id,
+        kind: row.kind,
+      }
 }
 
 export type LocationConnectedPartiesSectionProps = {

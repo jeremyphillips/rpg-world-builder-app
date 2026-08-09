@@ -22,7 +22,11 @@ export const ExtraSmall: Story = {
   },
 }
 
-/** Default — nav section labels, compact metadata. */
+/**
+ * Default — nav section labels, compact metadata.
+ * Detail-page subgroup labels (City structure districts, Territorial Authority kinds)
+ * also use `size="sm"` with title-case copy; CSS applies uppercase.
+ */
 export const Small: Story = {
   args: {
     size: 'sm',

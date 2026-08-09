@@ -12,6 +12,13 @@ import { RadioCardField, type RadioCardFieldProps } from './radio-card-field'
 export type CollapsibleRadioCardFieldProps = RadioCardFieldProps & {
   summaryEyebrow: string
   changeLabel: string
+  /**
+   * Collapsed summary description. `undefined` uses the selected option description;
+   * `false` omits it; a string overrides.
+   */
+  summaryDescription?: string | false
+  /** When true (default), selecting a value collapses to the summary. */
+  collapseAfterSelect?: boolean
   expanded?: boolean
   defaultExpanded?: boolean
   onExpandedChange?: (expanded: boolean) => void
@@ -20,6 +27,8 @@ export type CollapsibleRadioCardFieldProps = RadioCardFieldProps & {
 export function CollapsibleRadioCardField({
   summaryEyebrow,
   changeLabel,
+  summaryDescription,
+  collapseAfterSelect = true,
   expanded: expandedProp,
   defaultExpanded,
   onExpandedChange,
@@ -52,9 +61,18 @@ export function CollapsibleRadioCardField({
 
   const showSummary = shouldShowChooserSummary({ value, expanded }) && selectedOption
 
+  const resolvedSummaryDescription =
+    summaryDescription === false
+      ? undefined
+      : summaryDescription !== undefined
+        ? summaryDescription
+        : selectedOption?.description
+
   const handleValueChange = (nextValue: string) => {
     onValueChange?.(nextValue)
-    setExpanded(false)
+    if (collapseAfterSelect) {
+      setExpanded(false)
+    }
   }
 
   if (showSummary && selectedOption) {
@@ -64,7 +82,7 @@ export function CollapsibleRadioCardField({
         eyebrow={summaryEyebrow}
         changeLabel={changeLabel}
         title={selectedOption.label}
-        description={selectedOption.description}
+        description={resolvedSummaryDescription}
         onChange={() => setExpanded(true)}
       />
     )

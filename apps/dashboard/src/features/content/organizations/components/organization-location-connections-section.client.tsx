@@ -6,7 +6,7 @@ import type {
   OrganizationLocationConnectionFamily,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Button, SemanticText, Text } from '@rpg/ui'
+import { SemanticText, Text } from '@rpg/ui'
 
 import type { OrganizationLocationConnectionsViewModel } from '../lib/organization-display'
 import { groupOrganizationLocationConnections } from '../lib/build-organization-location-connection-cards'
@@ -18,9 +18,10 @@ import {
   OrganizationLocationConnectionRelationshipRow,
   type OrganizationLocationConnectionMutationContext,
 } from './organization-location-connection-relationship-row.client'
+import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
+import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
   'Could not load organization location connections.'
@@ -159,27 +160,22 @@ export function OrganizationLocationConnectionsSection({
                       </RelationshipFieldGroupRow>
                     ))}
                     {familyAddEnabled ? (
-                      <div className="px-4 py-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          density="compact"
-                          onClick={() => onAddFamily?.(family)}
-                        >
-                          + {familyPresentation.add}
-                        </Button>
-                      </div>
+                      <DetailSectionGroup>
+                        <RelationshipContentRow
+                          addLabel={familyPresentation.add}
+                          onAdd={() => onAddFamily?.(family)}
+                        />
+                      </DetailSectionGroup>
                     ) : null}
                   </>
                 ) : canManage ? (
-                  <div className="px-4 py-2">
-                    <RelationshipEmptyInlineRow
+                  <DetailSectionGroup>
+                    <RelationshipContentRow
                       emptyLabel={familyPresentation.empty}
                       addLabel={familyAddEnabled ? familyPresentation.add : undefined}
                       onAdd={familyAddEnabled ? () => onAddFamily?.(family) : undefined}
                     />
-                  </div>
+                  </DetailSectionGroup>
                 ) : null}
               </DetailSectionPanel>
             )

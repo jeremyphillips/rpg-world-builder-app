@@ -2,29 +2,28 @@
 
 import type { ReactNode } from 'react'
 
-import { cn, Eyebrow } from '@rpg/ui'
-
-import { relationshipFieldGroupRowVariants } from './relationship-field-group-row.variants'
+import { DetailSectionGroup } from '../detail/detail-section-group.client'
 
 export type RelationshipFieldGroupRowProps = {
   eyebrow?: string
+  endSlot?: ReactNode
   children: ReactNode
   className?: string
 }
 
+/**
+ * Typed-edge alias for {@link DetailSectionGroup}.
+ * Keeps the `eyebrow` prop name for relationship call sites; layout/typography live on the detail primitive.
+ */
 export function RelationshipFieldGroupRow({
   eyebrow,
+  endSlot,
   children,
   className,
 }: RelationshipFieldGroupRowProps) {
   return (
-    <div className={cn(relationshipFieldGroupRowVariants(), className)}>
-      {eyebrow ? (
-        <Eyebrow size="sm" className="mb-0">
-          {eyebrow}
-        </Eyebrow>
-      ) : null}
+    <DetailSectionGroup label={eyebrow} endSlot={endSlot} className={className}>
       {children}
-    </div>
+    </DetailSectionGroup>
   )
 }

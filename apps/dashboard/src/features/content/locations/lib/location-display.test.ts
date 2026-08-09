@@ -6,6 +6,7 @@ import { ALDERMERE, DOCK_WARD, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from
 import {
   buildChildCountByParentId,
   buildChildSummariesByParentId,
+  buildChildrenByParentId,
   buildLocationChildren,
   buildLocationDetailViewModel,
   buildLocationEntityContextPresentation,
@@ -173,6 +174,64 @@ describe('buildChildCountByParentId', () => {
   })
 })
 
+describe('buildChildrenByParentId', () => {
+  it('indexes direct children in one pass sorted by name', () => {
+    const index = buildChildrenByParentId(LOCATIONS_LIST)
+
+    expect(index.get(HARBORFORD.id)?.map((location) => location.name)).toEqual(['Dock Ward'])
+    expect(index.get(DOCK_WARD.id)?.map((location) => location.name)).toEqual(['Yawning Portal'])
+  })
+})
+
+describe('settlement structure district previews', () => {
+  it('counts immediate children only and omits grandchildren from district totals', () => {
+    const grandchild: Location = {
+      ...YAWNING_PORTAL,
+      id: 'location-hidden-chamber',
+      slug: 'hidden-chamber',
+      name: 'Hidden Chamber',
+      kind: 'interior',
+      interiorType: 'space',
+      classification: { type: 'chamber' },
+      parentLocationId: YAWNING_PORTAL.id,
+    }
+
+    const viewModel = buildLocationDetailViewModel(HARBORFORD, {
+      locations: [...LOCATIONS_LIST, grandchild],
+      campaignId: CAMPAIGN_ID,
+    })
+
+    const dockWard = viewModel.children.groups?.find((group) => group.id === 'districts')
+    expect(dockWard?.expandableItems?.[0]?.children.map((child) => child.item.name)).toEqual([
+      'Yawning Portal',
+    ])
+    expect(dockWard?.expandableItems?.[0]?.countPhrase).toBe('1 location')
+  })
+
+  it('includes zero-child districts with empty children and zero count', () => {
+    const emptyDistrict: Location = {
+      ...DOCK_WARD,
+      id: 'location-market-ward',
+      slug: 'market-ward',
+      name: 'Market Ward',
+      parentLocationId: HARBORFORD.id,
+    }
+
+    const viewModel = buildLocationDetailViewModel(HARBORFORD, {
+      locations: [...LOCATIONS_LIST, emptyDistrict],
+      campaignId: CAMPAIGN_ID,
+    })
+
+    const districtsGroup = viewModel.children.groups?.find((group) => group.id === 'districts')
+    const marketWard = districtsGroup?.expandableItems?.find(
+      (district) => district.item.name === 'Market Ward',
+    )
+    expect(marketWard?.children).toEqual([])
+    expect(marketWard?.countPhrase).toBe('0 locations')
+    expect(marketWard?.disclosure).toBe(false)
+  })
+})
+
 describe('buildLocationDetailViewModel', () => {
   it('includes identity rows, located-in segments, and children', () => {
     const viewModel = buildLocationDetailViewModel(HARBORFORD, {
@@ -188,7 +247,13 @@ describe('buildLocationDetailViewModel', () => {
       'Greyshore',
     ])
     expect(viewModel.children.heading).toBe('City structure')
-    expect(viewModel.children.groups?.[0]?.items.map((child) => child.name)).toEqual(['Dock Ward'])
+    const dockWard = viewModel.children.groups?.find((group) => group.id === 'districts')
+    expect(dockWard?.id).toBe('districts')
+
+    expect(dockWard?.expandableItems?.map((child) => child.item.name)).toEqual(['Dock Ward'])
+    expect(dockWard?.expandableItems?.[0]?.children.map((child) => child.item.name)).toEqual([
+      'Yawning Portal',
+    ])
   })
 
   it('shows building archetype and specialization as separate identity rows', () => {

@@ -303,4 +303,161 @@ describe('location content routes', () => {
       })
       .expect(400)
   })
+
+  it('rejects district-under-district parent assignments on publish', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const worldRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ slug: 'nest-world', kind: 'world', name: 'Nest World' })
+      .expect(201)
+
+    const settlementRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'nest-city',
+        kind: 'settlement',
+        name: 'Nest City',
+        settlementType: 'city',
+        parentLocationId: worldRes.body.locations.id,
+      })
+      .expect(201)
+
+    const districtRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'outer-district',
+        kind: 'district',
+        name: 'Outer District',
+        parentLocationId: settlementRes.body.locations.id,
+      })
+      .expect(201)
+
+    const siblingDistrictRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'sibling-district',
+        kind: 'district',
+        name: 'Sibling District',
+        parentLocationId: settlementRes.body.locations.id,
+      })
+      .expect(201)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'inner-district',
+        kind: 'district',
+        name: 'Inner District',
+        parentLocationId: districtRes.body.locations.id,
+      })
+      .expect(400)
+
+    await agent
+      .patch(
+        `/api/campaigns/${campaignId}/content/locations/${siblingDistrictRes.body.locations.id}`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        kind: 'district',
+        parentLocationId: districtRes.body.locations.id,
+      })
+      .expect(400)
+  })
+
+  it('changes only the moved child parentLocationId during hierarchy mutation', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const worldRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ slug: 'move-world', kind: 'world', name: 'Move World' })
+      .expect(201)
+
+    const settlementRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'move-city',
+        kind: 'settlement',
+        name: 'Move City',
+        settlementType: 'city',
+        parentLocationId: worldRes.body.locations.id,
+      })
+      .expect(201)
+
+    const parkRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'move-park',
+        kind: 'district',
+        name: 'Park',
+        parentLocationId: settlementRes.body.locations.id,
+      })
+      .expect(201)
+
+    const tenderloinRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'move-tenderloin',
+        kind: 'district',
+        name: 'Tenderloin',
+        parentLocationId: settlementRes.body.locations.id,
+      })
+      .expect(201)
+
+    const guildhouseRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'move-guildhouse',
+        kind: 'structure',
+        name: 'Guildhouse',
+        structureType: 'building',
+        classification: { archetype: 'guildhall' },
+        parentLocationId: parkRes.body.locations.id,
+      })
+      .expect(201)
+
+    const snapshotBefore = await agent
+      .get(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const hierarchySnapshot = (locations: Array<{ id: string; parentLocationId?: string }>) =>
+      Object.fromEntries(
+        locations.map((location) => [location.id, location.parentLocationId ?? null]),
+      )
+
+    const before = hierarchySnapshot(snapshotBefore.body.locations)
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/locations/${guildhouseRes.body.locations.id}`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        kind: 'structure',
+        parentLocationId: tenderloinRes.body.locations.id,
+      })
+      .expect(200)
+
+    const snapshotAfter = await agent
+      .get(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const after = hierarchySnapshot(snapshotAfter.body.locations)
+    const changedIds = Object.keys(before).filter((id) => before[id] !== after[id])
+
+    expect(changedIds).toEqual([guildhouseRes.body.locations.id])
+    expect(after[guildhouseRes.body.locations.id]).toBe(tenderloinRes.body.locations.id)
+  })
 })

@@ -43,6 +43,7 @@ function regionLocation(overrides: Partial<Location> = {}): Location {
 function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
   return {
     relationshipId: 'conn-1',
+    subjectType: 'organization',
     subject: {
       type: 'organization',
       id: organizationId,
@@ -146,12 +147,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
     const connectionId = 'conn-1'
     const row = headquartersRow(organizationId)
     const orgRows = [row]
-    const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
-      orgRows.filter((partyRow): partyRow is typeof partyRow & { relationshipId: string } =>
-        Boolean(partyRow.relationshipId),
-      ),
-      location.id,
-    )
+    const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(orgRows, location.id)
     const inverseConnections = buildOrganizationInverseLocationConnections(
       orgRows,
       location.id,

@@ -16,26 +16,28 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component           | `as`   | px   | Weight               | Use case                                                      |
-| ----------------------------- | ------ | ---- | -------------------- | ------------------------------------------------------------- |
-| `Heading` `display`           | `h1`   | 42   | 700                  | Hero, content detail entity titles                            |
-| `Heading` `page`              | `h1`   | 34   | 600                  | Route titles (`PageHeader`)                                   |
-| `Heading` `section`           | `h2`   | 28   | 300                  | Top-level in-page sections                                    |
-| `Heading` `subsection`        | `h3`   | 19   | 600                  | Nested blocks within a section                                |
-| `Heading` `group`             | `h4`   | 16   | 500                  | Headings inside subsections                                   |
-| `Heading` `card`              | Radix  | 19   | 600                  | `CardTitle`, `Modal.Header` (chrome)                          |
-| `Heading` `nav` / `brand`     | `span` | 16   | 600                  | Topbar title, sidebar product name                            |
-| `Heading` `alert`             | Radix  | 16   | 600                  | Confirm dialog title                                          |
-| `Heading` `label`             | `p`    | 16   | 500                  | Inline non-outline titles (trait names)                       |
-| `Text` `body`                 | `p`    | 16   | 400                  | Default foreground copy                                       |
-| `Text` `muted`                | `p`    | 16   | 400                  | Non-catalog plain copy (hints, errors)                        |
-| `Text` `small`                | `p`    | 15   | 400                  | Helper text, secondary metadata                               |
-| `Text` `caption`              | `p`    | 12   | 400                  | Form field hints                                              |
-| `Text` `lead`                 | `p`    | 18   | 400                  | Marketing subheads                                            |
-| `Text` `destructive`          | `p`    | 15   | 400                  | Inline errors — pair with `role="alert"`                      |
-| `Eyebrow` `xs` / `sm` / `md`  | `p`    | 9–13 | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary) |
-| `RichTextContent` `size="md"` | `div`  | 15   | 400                  | Catalog descriptions (TipTap / CMS HTML)                      |
-| `CardDescription`             | `div`  | 15   | 400                  | Card header secondary line                                    |
+| Variant / component            | `as`   | px    | Weight               | Use case                                                        |
+| ------------------------------ | ------ | ----- | -------------------- | --------------------------------------------------------------- |
+| `Heading` `display`            | `h1`   | 42    | 700                  | Hero, content detail entity titles                              |
+| `Heading` `page`               | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                     |
+| `Heading` `section`            | `h2`   | 28    | 300                  | Top-level in-page sections                                      |
+| `Heading` `subsection`         | `h3`   | 19    | 600                  | Nested blocks within a section                                  |
+| `Heading` `group`              | `h4`   | 16    | 500                  | Headings inside subsections                                     |
+| `Heading` `card`               | Radix  | 19    | 600                  | `CardTitle` (chrome)                                            |
+| `Heading` `dialogTitle`        | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+) |
+| `Heading` `confirmDialogTitle` | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                 |
+| `Heading` `nav` / `brand`      | `span` | 16    | 600                  | Topbar title, sidebar product name                              |
+| `Heading` `alert`              | Radix  | 16    | 600                  | Inline `Alert` titles                                           |
+| `Heading` `label`              | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                         |
+| `Text` `body`                  | `p`    | 16    | 400                  | Default foreground copy                                         |
+| `Text` `muted`                 | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                          |
+| `Text` `small`                 | `p`    | 15    | 400                  | Helper text, secondary metadata                                 |
+| `Text` `caption`               | `p`    | 12    | 400                  | Form field hints                                                |
+| `Text` `lead`                  | `p`    | 18    | 400                  | Marketing subheads                                              |
+| `Text` `destructive`           | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                        |
+| `Eyebrow` `xs` / `sm` / `md`   | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)   |
+| `RichTextContent` `size="md"`  | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                        |
+| `CardDescription`              | `div`  | 15    | 400                  | Card header secondary line                                      |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -225,6 +227,12 @@ Prefer `eyebrow-style-*` composites or `<Eyebrow>` for uppercase section labels;
 semantic aliases (`text-eyebrow-sm`) only when a composite is not appropriate; use
 `text-xs-meta` / `text-sm-meta` directly for role-based typography (e.g. data-table meta).
 
+Detail-page subgroup labels (for example Districts under City structure, or Governed by
+under Territorial Authority) use `<Eyebrow size="sm">` with the default muted tone.
+Pass **title-case** copy at the call site — the composite applies uppercase. Dashboard
+layout for those subgroups is `DetailSectionGroup` (see
+[cross-content-relationship-ui.md](../../../apps/dashboard/docs/cross-content-relationship-ui.md#detail-section-layout)).
+
 ## Internal primitives
 
 Library-owned copy (modal descriptions, field hints, dropzone helpers, data-table
@@ -235,10 +243,17 @@ When a Radix primitive requires a specific element (`Dialog.Title`,
 `AlertDialog.Description`), apply variant classes directly:
 
 ```tsx
-<DialogPrimitive.Title className={headingVariants({ variant: 'card' })}>
+<DialogPrimitive.Title className={headingVariants({ variant: 'dialogTitle' })}>
   {headline}
 </DialogPrimitive.Title>
 ```
+
+Dialog chrome defaults: standard `Modal.Header` and `Sheet.Header` titles inherit
+the shared `dialogTitle` style from `DialogPanelHeader` — **19px on mobile**,
+**24px from the `md` breakpoint (48rem)**. Compact `ConfirmDialog` titles use
+`confirmDialogTitle` (19px at all sizes) on a separate AlertDialog path.
+Both Modal and Sheet accept `headlineClassName` as the escape hatch for genuine
+deviations; do not pass a heading class merely to get normal overlay typography.
 
 ## Dashboard content routes
 

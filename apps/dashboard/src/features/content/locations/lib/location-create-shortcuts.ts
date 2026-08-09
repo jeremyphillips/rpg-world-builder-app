@@ -1,13 +1,21 @@
 import {
+  getSiteTypeLabel,
   isValidParentKind,
   LOCATION_KIND_ENTRIES,
   LOCATION_KIND_IDS,
   midSentenceLabel,
   SETTLEMENT_TYPE_IDS,
+  SITE_TYPE_IDS,
+  getSettlementTypeLabel,
+  getRegionTypeLabelForKind,
   STRUCTURE_TYPE_ENTRIES,
   STRUCTURE_TYPE_IDS,
+  isRegionClassificationKind,
+  getRegionTypeIds,
   type LocationKind,
+  type RegionClassification,
   type SettlementType,
+  type SiteType,
   type StructureType,
 } from '@rpg/contracts'
 
@@ -20,16 +28,21 @@ import {
   requiresLocationCreateSetup,
   type LocationAuthoringType,
 } from './location-authoring-type'
+import { resolveRegionRelationshipLabel } from './location-contextual-terminology.lib'
 import {
   completeLocationCreateSetup,
   fixedCreateFromIntent,
   type LocationCreateIntent,
+  type LocationCreateSetupResult,
 } from './location-create-session'
 import type { LocationFixedCreateContext } from './location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
 export const LOCATION_CREATE_PARENT_SEARCH_PARAM = 'parent'
 export const LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM = 'settlementType'
+export const LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM = 'siteType'
+export const LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM = 'regionClassificationKind'
+export const LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM = 'regionType'
 
 /** UI preference — promoted overview shortcuts referencing the authoring-type registry. */
 export const LOCATION_CREATE_PROMOTED_AUTHORING_TYPES = [
@@ -60,12 +73,45 @@ export type LocationCreateSessionParseResult =
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 
-/** Sheet title for contained create — e.g. "Add building", "Add district". */
-export function formatLocationAuthoringTypeAddHeading(type: LocationAuthoringType): string {
-  return `Add ${midSentenceLabel(getLocationAuthoringTypeLabel(type))}`
+/** Modal details heading — Create-prefix via existing type label resolvers. */
+export function formatLocationFixedCreateHeading(fixedCreate: LocationFixedCreateContext): string {
+  if (fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType) {
+    return `Create ${midSentenceLabel(getSettlementTypeLabel(fixedCreate.settlementType))}`
+  }
+
+  if (fixedCreate.authoringType === 'site' && fixedCreate.siteType) {
+    return `Create ${midSentenceLabel(getSiteTypeLabel(fixedCreate.siteType))}`
+  }
+
+  if (fixedCreate.authoringType === 'region' && fixedCreate.classification) {
+    return `Create ${midSentenceLabel(
+      getRegionTypeLabelForKind(fixedCreate.classification.kind, fixedCreate.classification.type),
+    )}`
+  }
+
+  return `Create ${midSentenceLabel(
+    getLocationAuthoringTypeLabel(fixedCreate.authoringType, {
+      parentKind: fixedCreate.parentKind,
+    }),
+  )}`
 }
 
-export function getLocationAuthoringTypeLabel(type: LocationAuthoringType): string {
+/** Sheet title for contained create — e.g. "Add building", "Add subregion". */
+export function formatLocationAuthoringTypeAddHeading(
+  type: LocationAuthoringType,
+  context: { parentKind?: LocationKind } = {},
+): string {
+  return `Add ${midSentenceLabel(getLocationAuthoringTypeLabel(type, context))}`
+}
+
+export function getLocationAuthoringTypeLabel(
+  type: LocationAuthoringType,
+  context: { parentKind?: LocationKind } = {},
+): string {
+  if (type === 'region') {
+    return resolveRegionRelationshipLabel(context.parentKind)
+  }
+
   if (type === UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE) {
     return UNCLASSIFIED_STRUCTURE_LABEL
   }
@@ -131,6 +177,53 @@ function parseSettlementTypeParam(searchParams: URLSearchParams): SettlementType
   return settlementTypeParam as SettlementType
 }
 
+function parseSiteTypeParam(searchParams: URLSearchParams): SiteType | undefined {
+  const siteTypeParam = searchParams.get(LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM)
+  if (!siteTypeParam || !(SITE_TYPE_IDS as readonly string[]).includes(siteTypeParam)) {
+    return undefined
+  }
+  return siteTypeParam as SiteType
+}
+
+function parseRegionClassificationParam(
+  searchParams: URLSearchParams,
+): RegionClassification | undefined {
+  const kindParam = searchParams.get(LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM)
+  const typeParam = searchParams.get(LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM)
+  if (!kindParam || !typeParam || !isRegionClassificationKind(kindParam)) {
+    return undefined
+  }
+
+  const typeIds = getRegionTypeIds(kindParam)
+  if (!(typeIds as readonly string[]).includes(typeParam)) {
+    return undefined
+  }
+
+  return { kind: kindParam, type: typeParam } as RegionClassification
+}
+
+function parseSetupResultFromSearchParams(
+  authoringType: LocationAuthoringType,
+  searchParams: URLSearchParams,
+): LocationCreateSetupResult | undefined {
+  if (authoringType === 'settlement') {
+    const settlementType = parseSettlementTypeParam(searchParams)
+    return settlementType ? { kind: 'settlement', settlementType } : undefined
+  }
+
+  if (authoringType === 'site') {
+    const siteType = parseSiteTypeParam(searchParams)
+    return siteType ? { kind: 'site', siteType } : undefined
+  }
+
+  if (authoringType === 'region') {
+    const classification = parseRegionClassificationParam(searchParams)
+    return classification ? { kind: 'region', classification } : undefined
+  }
+
+  return undefined
+}
+
 /**
  * Parses create-route search params into an authoritative fixed session, setup gate, or
  * unrestricted create. Uses the same setup rules as `resolveLocationCreateSession`.
@@ -146,14 +239,14 @@ export function parseLocationCreateSessionFromSearchParams(
   const intent: LocationCreateIntent = { authoringType }
 
   if (requiresLocationCreateSetup(authoringType)) {
-    const settlementType = parseSettlementTypeParam(searchParams)
-    if (!settlementType) {
+    const setupResult = parseSetupResultFromSearchParams(authoringType, searchParams)
+    if (!setupResult) {
       return { kind: 'needsSetup', intent }
     }
 
     return {
       kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(intent, { settlementType }),
+      fixedCreate: completeLocationCreateSetup(intent, setupResult),
     }
   }
 
@@ -181,6 +274,16 @@ export function buildLocationFixedCreateHref(
   if (fixedCreate.settlementType) {
     params.set(LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM, fixedCreate.settlementType)
   }
+  if (fixedCreate.siteType) {
+    params.set(LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM, fixedCreate.siteType)
+  }
+  if (fixedCreate.classification) {
+    params.set(
+      LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM,
+      fixedCreate.classification.kind,
+    )
+    params.set(LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM, fixedCreate.classification.type)
+  }
   if (softParentLocationId) {
     params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, softParentLocationId)
   }
@@ -193,6 +296,8 @@ export function buildLocationCreateInitialValues(
     authoringType?: LocationAuthoringType
     parentLocationId?: string
     settlementType?: SettlementType
+    siteType?: SiteType
+    classification?: RegionClassification
   },
   defaults?: { parentLocationId?: string },
 ): Record<string, unknown> | undefined {
@@ -208,6 +313,15 @@ export function buildLocationCreateInitialValues(
   if (prefill.settlementType) {
     initialValues.settlementType = prefill.settlementType
   }
+  if (prefill.siteType) {
+    initialValues.siteType = prefill.siteType
+  }
+  if (prefill.classification) {
+    initialValues.classification = {
+      kind: prefill.classification.kind,
+      type: prefill.classification.type,
+    }
+  }
 
   return Object.keys(initialValues).length > 0 ? initialValues : undefined
 }
@@ -219,6 +333,8 @@ export function fixedCreateToInitialValues(
   return buildLocationCreateInitialValues({
     authoringType: fixedCreate.authoringType,
     settlementType: fixedCreate.settlementType,
+    siteType: fixedCreate.siteType,
+    classification: fixedCreate.classification,
     parentLocationId:
       fixedCreate.parent?.kind === 'fixed' ? fixedCreate.parent.locationId : softParentLocationId,
   })

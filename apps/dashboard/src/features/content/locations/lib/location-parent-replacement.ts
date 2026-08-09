@@ -7,8 +7,7 @@ import {
 import type { QueryClient } from '@tanstack/react-query'
 
 import { updateContent } from '../../lib/list/content-client'
-import { invalidateContentWriteQueries } from '../../lib/list/use-content-mutations'
-import { locationsQueryKey } from '../hooks/use-locations'
+import { invalidateLocationHierarchyQueries } from './invalidate-location-hierarchy-queries'
 
 import { buildLocationHierarchyGraph } from './build-location-hierarchy-graph'
 import {
@@ -176,7 +175,7 @@ export function invalidateLocationParentReplacementQueries(
   queryClient: QueryClient,
   campaignId: string,
 ): void {
-  invalidateContentWriteQueries(queryClient, campaignId, locationsQueryKey)
+  invalidateLocationHierarchyQueries(queryClient, campaignId)
 }
 
 export function buildLocationParentReplacementContext(input: {

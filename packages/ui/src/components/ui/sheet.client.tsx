@@ -108,7 +108,7 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
-  /** Merged onto the dialog title element (overrides default heading styles). */
+  /** Escape hatch — overrides the shared dialogTitle default from DialogPanelHeader. */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
   endSlot?: React.ReactNode

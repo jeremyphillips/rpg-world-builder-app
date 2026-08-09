@@ -13,6 +13,7 @@ import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
 import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
 import { patchContentOverviewListLocationParent } from '@/features/content/lib/overview/content-overview-list-cache.lib'
 
+import { invalidateLocationHierarchyQueries } from '../invalidate-location-hierarchy-queries'
 import { formatBulkChangeParentSuccessToast } from './bulk-change-parent-labels'
 import {
   applyBulkChangeParentToTargets,
@@ -49,10 +50,10 @@ export function useBulkChangeParentAction({
   )
 
   const apply = useCallback(
-    async (targetIds: readonly string[], config: BulkChangeParentConfig) => {
+    async (subjectIds: readonly string[], config: BulkChangeParentConfig) => {
       const { outcomes, updates } = await applyBulkChangeParentToTargets(
         rows,
-        targetIds,
+        subjectIds,
         config,
         campaignId,
       )
@@ -65,9 +66,13 @@ export function useBulkChangeParentAction({
         }
       })
 
+      if (updates.length > 0) {
+        invalidateLocationHierarchyQueries(queryClient, campaignId)
+      }
+
       return outcomes
     },
-    [campaignId, rows, updateCachedParent],
+    [campaignId, queryClient, rows, updateCachedParent],
   )
 
   const notifyClose = useCallback(

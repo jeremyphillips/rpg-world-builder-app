@@ -61,6 +61,7 @@ function expandCharacterRows(
 
       return {
         relationshipId: connection.id,
+        subjectType: 'character' as const,
         subject: {
           type: 'character' as const,
           id: subjectId,
@@ -68,7 +69,7 @@ function expandCharacterRows(
           slug: subjectId,
           characterType: hit.characterType,
         },
-        kind: connection.kind,
+        kind,
         label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
         family,
         priority: getCharacterLocationConnectionPriority(kind),
@@ -95,6 +96,7 @@ function expandOrganizationRows(
 
       return {
         relationshipId: connection.id,
+        subjectType: 'organization' as const,
         subject: {
           type: 'organization' as const,
           id: subjectId,
@@ -135,14 +137,29 @@ function sortConnectedPartyRows(rows: readonly ConnectedPartySortRow[]): Connect
 }
 
 function toPublicRow(row: ConnectedPartySortRow): LocationConnectedPartyRow {
-  return {
+  const base = {
     relationshipId: row.relationshipId,
-    subject: row.subject,
-    kind: row.kind,
     label: row.label,
-    family: row.family,
     priority: row.priority,
     sectionGroup: row.sectionGroup,
+  }
+
+  if (row.subjectType === 'organization') {
+    return {
+      ...base,
+      subjectType: 'organization',
+      subject: row.subject,
+      kind: row.kind,
+      family: row.family,
+    }
+  }
+
+  return {
+    ...base,
+    subjectType: 'character',
+    subject: row.subject,
+    kind: row.kind,
+    family: row.family,
   }
 }
 

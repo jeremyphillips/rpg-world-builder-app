@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import type {
+  Location,
+  LocationConnectedPartyRow,
+  OrganizationLocationConnectionKind,
+} from '@rpg/contracts'
 
 import {
   filterOrganizationKindsByFamily,
@@ -37,6 +41,28 @@ function settlementLocation(overrides: Partial<Location> = {}): Location {
     kind: 'settlement',
     ...overrides,
   } as Location
+}
+
+function territorialRow(input: {
+  relationshipId: string
+  organizationId: string
+  kind: Extract<OrganizationLocationConnectionKind, 'governs' | 'controls' | 'claims'>
+}): LocationConnectedPartyRow {
+  return {
+    relationshipId: input.relationshipId,
+    subjectType: 'organization',
+    subject: {
+      type: 'organization',
+      id: input.organizationId,
+      name: input.organizationId,
+      slug: input.organizationId,
+    },
+    kind: input.kind,
+    label: input.kind,
+    family: 'territorial_authority',
+    priority: 50,
+    sectionGroup: 'territorial_authority',
+  }
 }
 
 describe('location-connection-drawer-intent', () => {
@@ -178,11 +204,7 @@ describe('location-connection-drawer-intent', () => {
 
   it('disables inverse organization rows when singleton slot is occupied by another org', () => {
     const rows = [
-      {
-        subject: { id: 'org-other', type: 'organization' as const },
-        kind: 'governs' as const,
-        relationshipId: 'rel-other',
-      },
+      territorialRow({ relationshipId: 'rel-other', organizationId: 'org-other', kind: 'governs' }),
     ]
 
     expect(organizationInverseSubjectHasAvailableKind('org-1', 'region-1', ['governs'], rows)).toBe(
@@ -199,11 +221,7 @@ describe('location-connection-drawer-intent', () => {
       'territorial_authority',
     )
     const rows = [
-      {
-        subject: { id: 'org-1', type: 'organization' as const },
-        kind: 'governs' as const,
-        relationshipId: 'rel-1',
-      },
+      territorialRow({ relationshipId: 'rel-1', organizationId: 'org-1', kind: 'governs' }),
     ]
 
     expect(

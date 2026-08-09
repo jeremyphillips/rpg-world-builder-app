@@ -162,6 +162,32 @@ describe('buildEligibleLocationParentReplacementCandidates', () => {
     expect(candidates.some((location) => location.id === DOCK_WARD.id)).toBe(false)
     expect(candidates.some((location) => location.id === YAWNING_PORTAL.id)).toBe(false)
   })
+
+  it('excludes district parents for a district subject', () => {
+    const park: Location = {
+      ...DOCK_WARD,
+      id: 'location-park',
+      slug: 'park',
+      name: 'Park',
+      parentLocationId: HARBORFORD.id,
+    }
+    const tenderloin: Location = {
+      ...DOCK_WARD,
+      id: 'location-tenderloin',
+      slug: 'tenderloin',
+      name: 'Tenderloin',
+      parentLocationId: park.id,
+    }
+    const campaignLocations = [...LOCATIONS_LIST, park, tenderloin]
+
+    const candidates = buildEligibleLocationParentReplacementCandidates({
+      subject: tenderloin,
+      campaignLocations,
+    })
+
+    expect(candidates.map((location) => location.id)).toEqual([HARBORFORD.id])
+    expect(candidates.some((location) => location.id === park.id)).toBe(false)
+  })
 })
 
 describe('hasLocationParentReplacementContextMismatch', () => {

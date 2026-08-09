@@ -35,6 +35,27 @@ export function LocationFixedCreateHiddenFields({
         shouldValidate: false,
       })
     }
+
+    if (fixedCreate.siteType) {
+      register('siteType')
+      setValue('siteType', fixedCreate.siteType, {
+        shouldDirty: false,
+        shouldValidate: false,
+      })
+    }
+
+    if (fixedCreate.classification) {
+      register('classification.kind')
+      register('classification.type')
+      setValue('classification.kind', fixedCreate.classification.kind, {
+        shouldDirty: false,
+        shouldValidate: false,
+      })
+      setValue('classification.type', fixedCreate.classification.type, {
+        shouldDirty: false,
+        shouldValidate: false,
+      })
+    }
   }, [fixedCreate, register, setValue])
 
   return null

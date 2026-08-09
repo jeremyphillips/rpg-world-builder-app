@@ -11,7 +11,7 @@ import {
 } from './location-connected-parties-section.client'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 
-import type { Location } from '@rpg/contracts'
+import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 
 const sampleLocation = {
   id: 'region-1',
@@ -21,23 +21,43 @@ const sampleLocation = {
   kind: 'region',
 } as Location
 
-const sampleRows = [
+const sampleRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-org-1',
-    subject: { type: 'organization' as const, id: 'org-1', name: 'City Council', slug: 'council' },
+    subjectType: 'organization',
+    subject: { type: 'organization', id: 'org-1', name: 'City Council', slug: 'council' },
     kind: 'governs',
     label: 'Governed by',
     family: 'territorial_authority',
     priority: 50,
-    sectionGroup: 'territorial_authority' as const,
+    sectionGroup: 'territorial_authority',
   },
 ]
 
-const peopleOrganizationRows = [
+const claimRows: LocationConnectedPartyRow[] = [
+  {
+    relationshipId: 'rel-org-claim',
+    subjectType: 'organization',
+    subject: {
+      type: 'organization',
+      id: 'org-guild',
+      name: "Thieves' Guild",
+      slug: 'thieves-guild',
+    },
+    kind: 'claims',
+    label: 'Claimed by',
+    family: 'territorial_authority',
+    priority: 40,
+    sectionGroup: 'territorial_authority',
+  },
+]
+
+const peopleOrganizationRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-org-hq',
+    subjectType: 'organization',
     subject: {
-      type: 'organization' as const,
+      type: 'organization',
       id: 'org-guild',
       name: "Thieves' Guild",
       slug: 'thieves-guild',
@@ -46,25 +66,26 @@ const peopleOrganizationRows = [
     label: 'Headquarters of',
     family: 'site',
     priority: 60,
-    sectionGroup: 'people_and_organizations' as const,
+    sectionGroup: 'people_and_organizations',
   },
 ]
 
-const peopleNpcRows = [
+const peopleNpcRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-npc-1',
+    subjectType: 'character',
     subject: {
-      type: 'character' as const,
+      type: 'character',
       id: 'npc-1',
       name: 'Durnan',
       slug: 'npc-1',
-      characterType: 'npc' as const,
+      characterType: 'npc',
     },
     kind: 'works_at',
     label: 'Works here',
-    family: 'presence',
+    family: 'operation',
     priority: 40,
-    sectionGroup: 'people_and_organizations' as const,
+    sectionGroup: 'people_and_organizations',
   },
 ]
 
@@ -124,6 +145,59 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.queryByRole('button', { name: 'Add authority' })).not.toBeInTheDocument()
   })
 
+  it('mounts territorial add actions in the labeled group header, not the empty row', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
+          sectionGroup="territorial_authority"
+          rows={[]}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    const slots = [
+      {
+        eyebrow: 'Governed by',
+        add: 'Add governing organization',
+        empty: 'No governing organization.',
+      },
+      { eyebrow: 'Controlled by', add: 'Add organization', empty: 'No controlling organization.' },
+      { eyebrow: 'Claimed by', add: 'Add claim', empty: 'No organizations claim this location.' },
+    ]
+
+    for (const slot of slots) {
+      const addButton = screen.getByRole('button', { name: slot.add })
+      expect(screen.getByText(slot.eyebrow).parentElement).toContainElement(addButton)
+      expect(screen.getByText(slot.empty).parentElement).not.toContainElement(addButton)
+    }
+  })
+
+  it('keeps the claims add action in the group header when populated and hides singleton adds at capacity', () => {
+    render(
+      <MemoryRouter>
+        <LocationConnectedPartiesSection
+          campaignId={STORY_CAMPAIGN_ID}
+          location={sampleLocation}
+          sectionGroup="territorial_authority"
+          rows={[...sampleRows, ...claimRows]}
+          canManage
+          showEmptySection
+        />
+      </MemoryRouter>,
+    )
+
+    const addClaim = screen.getByRole('button', { name: 'Add claim' })
+    expect(screen.getByText('Claimed by').parentElement).toContainElement(addClaim)
+    expect(screen.getByText("Thieves' Guild")).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Add governing organization' }),
+    ).not.toBeInTheDocument()
+  })
+
   it('renders a family empty state without per-kind empty groups', () => {
     render(
       <MemoryRouter>
@@ -174,7 +248,7 @@ describe('LocationConnectedPartiesSection', () => {
     expect(screen.getByText('Headquarters of')).toBeInTheDocument()
     expect(screen.queryByText('Operating here')).not.toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: `+ ${LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}` }),
+      screen.getByRole('button', { name: LOCATION_PEOPLE_SECTION_SURFACE_COPY.add }),
     ).toBeInTheDocument()
   })
 

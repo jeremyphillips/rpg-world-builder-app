@@ -112,6 +112,29 @@ describe('ContentFormDrawer', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
+  it('prompts before closing when extraUnsavedEdits is true even if body fields are clean', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    renderDrawerRoutes(
+      <ContentFormDrawer
+        open
+        onOpenChange={onOpenChange}
+        title="Add item"
+        pending={false}
+        submitLabel="Create"
+        extraUnsavedEdits
+        form={formProps}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
   it('closes the drawer when discard is confirmed', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
@@ -181,6 +204,31 @@ describe('ContentFormDrawer', () => {
 
     await user.clear(screen.getByRole('textbox', { name: 'Name' }))
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Changed')
+    await user.click(screen.getByRole('button', { name: 'Create' }))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('closes without discard confirmation when extraUnsavedEdits is true but submit succeeds', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+    renderDrawerRoutes(
+      <ContentFormDrawer
+        open
+        onOpenChange={onOpenChange}
+        title="Add item"
+        pending={false}
+        submitLabel="Create"
+        extraUnsavedEdits
+        form={formProps}
+        onSubmit={onSubmit}
+      />,
+    )
+
     await user.click(screen.getByRole('button', { name: 'Create' }))
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalled())

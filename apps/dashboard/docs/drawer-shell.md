@@ -14,7 +14,8 @@ read-only builder dossiers use allowlisted
 @rpg/ui Sheet variants         → modality-owned (surface, size, dock placement)
 @rpg/ui Form footerWrapper     → Form-owned error + actions content in overlay footers
 dashboard DrawerShell          → only allowed app composition of Sheet for non-picker drawers
-ContentFormDrawer              → form workflow on DrawerShell (bodyMode=composed)
+ContentFormDrawer              → DrawerShell + ContentFormHost (form workflow)
+LocationCreateModal            → Modal + ContentFormHost (create setup ↔ details)
 CatalogPickerSheet             → picker workflow; same surface/size tokens
 feature drawers                → content/workflow only
 ```
@@ -92,7 +93,7 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 
 | Surface                                   | Scaffold                                           |
 | ----------------------------------------- | -------------------------------------------------- |
-| Contained location create                 | `ContentFormDrawer` → `DrawerShell`                |
+| Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`          |
 | Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                |
 | Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)              |
 | Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()` |
@@ -102,10 +103,14 @@ Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-conten
 
 ## Unsaved-changes leave guard
 
-Form shells (`ContentFormDrawer`, `ContentFormFooter`, page create/edit flows)
-share one leave-guard contract. Implementation lives in
+Form shells (`ContentFormHost` / `ContentFormDrawer`, `ContentFormFooter`, page
+create/edit flows) share one leave-guard contract. Implementation lives in
 [`src/lib/form-unsaved-changes-guard.tsx`](../src/lib/form-unsaved-changes-guard.tsx)
 and [`src/lib/use-unsaved-changes-confirm.tsx`](../src/lib/use-unsaved-changes-confirm.tsx).
+
+**Ownership:** continuous **create** for locations uses `LocationCreateModal`
+(`ContentFormHost` in the details phase). **Focused edits** use
+`ContentFormDrawer` (`DrawerShell` + `ContentFormHost`).
 
 ### One controller per shell
 

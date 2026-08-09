@@ -5,6 +5,7 @@ import {
   buildLocationFixedCreateHref,
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
+  formatLocationFixedCreateHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
   LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM,
@@ -50,7 +51,29 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
 
     expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
       kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(intent, { settlementType: 'city' }),
+      fixedCreate: completeLocationCreateSetup(intent, {
+        kind: 'settlement',
+        settlementType: 'city',
+      }),
+    })
+  })
+
+  it('returns needsSetup for region and site without setup params', () => {
+    expect(
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=region`),
+      ),
+    ).toEqual({
+      kind: 'needsSetup',
+      intent: { authoringType: 'region' },
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=site`),
+      ),
+    ).toEqual({
+      kind: 'needsSetup',
+      intent: { authoringType: 'site' },
     })
   })
 
@@ -75,7 +98,37 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
       kind: 'ready',
       fixedCreate: completeLocationCreateSetup(
         { authoringType: 'settlement' },
-        { settlementType: 'town' },
+        { kind: 'settlement', settlementType: 'town' },
+      ),
+    })
+  })
+
+  it('round-trips site and region setup params', () => {
+    const siteHref = buildLocationFixedCreateHref('campaign-1', {
+      authoringType: 'site',
+      siteType: 'ruin',
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(new URLSearchParams(siteHref.split('?')[1])),
+    ).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(
+        { authoringType: 'site' },
+        { kind: 'site', siteType: 'ruin' },
+      ),
+    })
+
+    const regionHref = buildLocationFixedCreateHref('campaign-1', {
+      authoringType: 'region',
+      classification: { kind: 'geographic', type: 'coast' },
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(new URLSearchParams(regionHref.split('?')[1])),
+    ).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(
+        { authoringType: 'region' },
+        { kind: 'region', classification: { kind: 'geographic', type: 'coast' } },
       ),
     })
   })
@@ -137,6 +190,51 @@ describe('formatLocationAuthoringTypeAddHeading', () => {
     expect(formatLocationAuthoringTypeAddHeading('district')).toBe('Add district')
     expect(formatLocationAuthoringTypeAddHeading('structure')).toBe('Add unclassified structure')
   })
+
+  it('uses Subregion when parent kind is region', () => {
+    expect(formatLocationAuthoringTypeAddHeading('region')).toBe('Add region')
+    expect(formatLocationAuthoringTypeAddHeading('region', { parentKind: 'world' })).toBe(
+      'Add region',
+    )
+    expect(formatLocationAuthoringTypeAddHeading('region', { parentKind: 'region' })).toBe(
+      'Add subregion',
+    )
+  })
+})
+
+describe('formatLocationFixedCreateHeading', () => {
+  it('uses Create-prefix settlement and site type labels', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'settlement',
+        settlementType: 'city',
+      }),
+    ).toBe('Create city')
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'site',
+        siteType: 'landmark',
+      }),
+    ).toBe('Create landmark')
+  })
+
+  it('uses region type labels for fixed region create', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'region',
+        classification: { kind: 'political', type: 'duchy' },
+      }),
+    ).toBe('Create duchy')
+  })
+
+  it('falls back to authoring type labels', () => {
+    expect(
+      formatLocationFixedCreateHeading({
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+      }),
+    ).toBe('Create building')
+  })
 })
 
 describe('buildLocationFixedCreateHref', () => {
@@ -172,6 +270,13 @@ describe('childAuthoringTypesForParentKind', () => {
       'vessel',
       'structure',
     ])
+  })
+
+  it('does not allow districts to parent other districts', () => {
+    expect(childAuthoringTypesForParentKind('district')).not.toContain('district')
+    expect(childAuthoringTypesForParentKind('district')).toEqual(
+      expect.arrayContaining(['building', 'site', 'structure']),
+    )
   })
 
   it('lists promoted overview shortcuts from the registry ids', () => {

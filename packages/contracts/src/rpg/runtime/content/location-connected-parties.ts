@@ -1,6 +1,16 @@
 import { z } from 'zod'
 
 import { paginatedItemsSchema, type PaginatedItems } from '../../../lib/paginated-items'
+import {
+  CHARACTER_LOCATION_CONNECTION_FAMILY_IDS,
+  characterLocationConnectionKindSchema,
+  type CharacterLocationConnectionFamily,
+} from '../../vocab/location/character-location-connection'
+import {
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS,
+  organizationLocationConnectionKindSchema,
+  type OrganizationLocationConnectionFamily,
+} from '../../vocab/location/organization-location-connection'
 import { characterTypeSchema } from '../character/core'
 
 export const LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS = [
@@ -17,29 +27,58 @@ const locationConnectedPartySubjectBaseSchema = z.object({
   slug: z.string().min(1),
 })
 
-export const locationConnectedPartySubjectSchema = z.discriminatedUnion('type', [
-  locationConnectedPartySubjectBaseSchema.extend({
+const locationConnectedPartyCharacterSubjectSchema = locationConnectedPartySubjectBaseSchema.extend(
+  {
     type: z.literal('character'),
     characterType: characterTypeSchema,
-  }),
+  },
+)
+
+const locationConnectedPartyOrganizationSubjectSchema =
   locationConnectedPartySubjectBaseSchema.extend({
     type: z.literal('organization'),
-  }),
+  })
+
+export const locationConnectedPartySubjectSchema = z.discriminatedUnion('type', [
+  locationConnectedPartyCharacterSubjectSchema,
+  locationConnectedPartyOrganizationSubjectSchema,
 ])
 
 export type LocationConnectedPartySubject = z.infer<typeof locationConnectedPartySubjectSchema>
 
-export const locationConnectedPartyRowSchema = z.object({
+const locationConnectedPartyRowBaseSchema = z.object({
   relationshipId: z.string().min(1),
-  subject: locationConnectedPartySubjectSchema,
-  kind: z.string().min(1),
   label: z.string().min(1),
-  family: z.string().min(1),
   priority: z.number(),
   sectionGroup: z.enum(LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS),
 })
 
+export const locationConnectedPartyRowSchema = z.discriminatedUnion('subjectType', [
+  locationConnectedPartyRowBaseSchema.extend({
+    subjectType: z.literal('organization'),
+    subject: locationConnectedPartyOrganizationSubjectSchema,
+    kind: organizationLocationConnectionKindSchema,
+    family: z.enum(ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS),
+  }),
+  locationConnectedPartyRowBaseSchema.extend({
+    subjectType: z.literal('character'),
+    subject: locationConnectedPartyCharacterSubjectSchema,
+    kind: characterLocationConnectionKindSchema,
+    family: z.enum(CHARACTER_LOCATION_CONNECTION_FAMILY_IDS),
+  }),
+])
+
 export type LocationConnectedPartyRow = z.infer<typeof locationConnectedPartyRowSchema>
+
+export type LocationConnectedPartyOrganizationRow = Extract<
+  LocationConnectedPartyRow,
+  { subjectType: 'organization' }
+>
+
+export type LocationConnectedPartyCharacterRow = Extract<
+  LocationConnectedPartyRow,
+  { subjectType: 'character' }
+>
 
 export const locationConnectedPartiesResponseSchema = paginatedItemsSchema(
   locationConnectedPartyRowSchema,
@@ -49,7 +88,7 @@ export type LocationConnectedPartiesResponse = PaginatedItems<LocationConnectedP
 
 /** Maps a connection family to the location detail section group. */
 export function resolveLocationConnectedPartySectionGroup(
-  family: string,
+  family: OrganizationLocationConnectionFamily | CharacterLocationConnectionFamily,
 ): LocationConnectedPartySectionGroup {
   return family === 'territorial_authority' ? 'territorial_authority' : 'people_and_organizations'
 }

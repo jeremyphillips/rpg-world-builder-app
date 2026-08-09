@@ -49,6 +49,7 @@ describe('location connected parties section visibility', () => {
         rows: [
           {
             relationshipId: 'rel-1',
+            subjectType: 'organization',
             subject: { type: 'organization', id: 'org-1', name: 'Council', slug: 'council' },
             kind: 'governs',
             label: 'Governs',

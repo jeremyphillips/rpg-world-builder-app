@@ -14,12 +14,18 @@ const radioCardCardBase = cn(
   establishSurfaceCurrent('card'),
 )
 
-/** Density-owned card body padding — shared by radio options and chooser summaries. */
+/** Compact option shell — 12px left when decorative control is present, 16px right. */
+export const radioCardCompactOptionBodyLayoutClasses = 'pl-3 pr-4 py-2.5'
+
+/** Compact chooser summary — full 16px horizontal inset (no control column). */
+export const radioCardCompactSummaryBodyLayoutClasses = 'px-4 py-2.5'
+
+/** Density-owned card body padding — compact option cards only; summaries use {@link radioCardCompactSummaryBodyLayoutClasses}. */
 export const radioCardDensityBodyLayoutVariants = cva('', {
   variants: {
     density: {
       default: 'p-4 sm:p-6',
-      compact: 'px-4 py-2.5',
+      compact: radioCardCompactOptionBodyLayoutClasses,
     },
   },
   defaultVariants: {
@@ -39,6 +45,9 @@ export const radioCardDensityContentGapVariants = cva('', {
     density: 'default',
   },
 })
+
+/** Compact chooser summary — flush eyebrow→title (tighter than option-card content gap). */
+export const radioCardCompactSummaryContentGapClasses = 'gap-0'
 
 const radioCardRowBase =
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-row-selected aria-invalid:border aria-invalid:border-destructive'
@@ -248,16 +257,16 @@ export const radioCardSummaryVariants = radioCardDescriptionVariants
 
 export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
 
-/** Horizontal padding shared by compact card shells and embedded configuration panels. */
+/** Horizontal padding for compact chooser summaries and symmetric breakout contexts. */
 export const radioCardCompactPaddingXClasses = 'px-4'
 
 export const radioCardCompactPaddingRightClasses = 'pr-4'
 
 /**
  * Left inset aligning panel copy with the compact card body column
- * (shell padding + radio control + column gap).
+ * (option shell padding + radio control + column gap).
  */
-export const radioCardCompactBodyInsetClasses = 'pl-[calc(1rem+1rem+0.75rem)]'
+export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
 
 /** Panel horizontal padding: body-column inset left, shell padding right. */
 export const radioCardCompactPanelPaddingClasses = `${radioCardCompactBodyInsetClasses} ${radioCardCompactPaddingRightClasses}`
@@ -288,7 +297,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'compact',
-      class: '-mx-4 -mb-2.5 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
+      class: '-mb-2.5 -ml-3 -mr-4 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
     },
   ],
   defaultVariants: {

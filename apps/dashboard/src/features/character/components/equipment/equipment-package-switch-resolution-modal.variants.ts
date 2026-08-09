@@ -1,8 +1,7 @@
 import { cva } from 'class-variance-authority'
 
-/** Modal title — 24px (`heading-style-sheet-title`). */
-export const equipmentPackageSwitchResolutionModalHeadlineClasses =
-  'outline-none heading-style-sheet-title'
+/** Modal title — inherit shared dialogTitle; keep outline reset only. */
+export const equipmentPackageSwitchResolutionModalHeadlineClasses = 'outline-none'
 
 export const equipmentPackageSwitchResolutionModalBodyClasses =
   'flex min-h-0 min-w-0 flex-col gap-4'

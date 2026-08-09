@@ -1,12 +1,6 @@
 'use client'
 
-import type {
-  CharacterLocationConnectionKind,
-  Location,
-  LocationConnectedPartyRow,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
-import { Button } from '@rpg/ui'
+import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -14,10 +8,11 @@ import {
   formatCharacterMixedHeadingSuffix,
 } from '@/features/character'
 
+import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
 import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipEmptyInlineRow } from '../../lib/relationship/relationship-empty-inline-row.client'
+import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -35,7 +30,10 @@ import {
 } from '../lib/location-connected-parties-people-kind-slots'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
-import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
+import {
+  toLocationConnectedPartyEditTarget,
+  type LocationConnectedPartyEditTarget,
+} from './location-connected-parties-section.client'
 
 export type LocationPeopleMutationContext = {
   location: Location
@@ -57,39 +55,41 @@ function buildPeopleOverflowActions(input: {
     subjectId: string
   }) => void
 }) {
-  const isOrganization = input.row.subject.type === 'organization'
-  const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, input.row.subject)
+  const { row } = input
+  const isOrganization = row.subjectType === 'organization'
+  const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, row.subject)
 
-  const resolved = isOrganization
-    ? resolveRelationshipAlternatives({
-        surface: 'location_inverse_organization',
-        canManage: input.canManage,
-        canEditRow: input.canEditRow,
-        canRemoveRow: input.canRemoveRow,
-        relationship: {
-          relationshipId: input.row.relationshipId,
-          locationId: input.mutationContext.location.id,
-          kind: input.row.kind as OrganizationLocationConnectionKind,
-          subjectOrganizationId: input.row.subject.id,
-          allowReplaceSubject: false,
-        },
-        location: input.mutationContext.location,
-        rows: input.mutationContext.rows,
-      })
-    : resolveRelationshipAlternatives({
-        surface: 'location_inverse_character',
-        canManage: input.canManage,
-        canEditRow: input.canEditRow,
-        canRemoveRow: input.canRemoveRow,
-        relationship: {
-          relationshipId: input.row.relationshipId,
-          locationId: input.mutationContext.location.id,
-          kind: input.row.kind as CharacterLocationConnectionKind,
-          subjectCharacterId: input.row.subject.id,
-        },
-        location: input.mutationContext.location,
-        rows: input.mutationContext.rows,
-      })
+  const resolved =
+    row.subjectType === 'organization'
+      ? resolveRelationshipAlternatives({
+          surface: 'location_inverse_organization',
+          canManage: input.canManage,
+          canEditRow: input.canEditRow,
+          canRemoveRow: input.canRemoveRow,
+          relationship: {
+            relationshipId: row.relationshipId,
+            locationId: input.mutationContext.location.id,
+            kind: row.kind,
+            subjectOrganizationId: row.subject.id,
+            allowReplaceSubject: false,
+          },
+          location: input.mutationContext.location,
+          rows: input.mutationContext.rows,
+        })
+      : resolveRelationshipAlternatives({
+          surface: 'location_inverse_character',
+          canManage: input.canManage,
+          canEditRow: input.canEditRow,
+          canRemoveRow: input.canRemoveRow,
+          relationship: {
+            relationshipId: row.relationshipId,
+            locationId: input.mutationContext.location.id,
+            kind: row.kind,
+            subjectCharacterId: row.subject.id,
+          },
+          location: input.mutationContext.location,
+          rows: input.mutationContext.rows,
+        })
 
   const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
     view: () => input.navigate(detailHref),
@@ -99,20 +99,14 @@ function buildPeopleOverflowActions(input: {
     isRelationshipMutationActionVisible(resolved.capabilities, 'changeKind') &&
     input.onEditConnection
   ) {
-    handlers.changeKind = () =>
-      input.onEditConnection?.({
-        relationshipId: input.row.relationshipId,
-        subjectType: input.row.subject.type,
-        subjectId: input.row.subject.id,
-        kind: input.row.kind,
-      })
+    handlers.changeKind = () => input.onEditConnection?.(toLocationConnectedPartyEditTarget(row))
   }
 
   if (resolved.capabilities.remove?.supported && input.onRemoveConnection) {
     handlers.remove = () => {
       input.onRemoveConnection?.({
         relationshipId: input.row.relationshipId,
-        subjectType: input.row.subject.type,
+        subjectType: input.row.subjectType,
         subjectId: input.row.subject.id,
       })
     }
@@ -147,7 +141,7 @@ function resolveCharacterRowHeadingSuffix(
   charactersById: ReadonlyMap<string, LocationConnectedPartyCharacterOption>,
   campaignId: string,
 ): string | undefined {
-  if (row.subject.type !== 'character') {
+  if (row.subjectType !== 'character') {
     return undefined
   }
 
@@ -211,7 +205,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
 
   const rowsByBinding = new Map<string, LocationConnectedPartyRow[]>()
   for (const row of rows) {
-    const key = `${row.subject.type}:${row.kind}`
+    const key = `${row.subjectType}:${row.kind}`
     const existing = rowsByBinding.get(key) ?? []
     existing.push(row)
     rowsByBinding.set(key, existing)
@@ -274,27 +268,22 @@ export function LocationPeopleAndOrganizationsSectionBody({
             )
           })}
           {familyAddEnabled ? (
-            <div className="px-4 py-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                density="compact"
-                onClick={onAddPeopleSection}
-              >
-                + {LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
-              </Button>
-            </div>
+            <DetailSectionGroup>
+              <RelationshipContentRow
+                addLabel={LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
+                onAdd={onAddPeopleSection}
+              />
+            </DetailSectionGroup>
           ) : null}
         </>
       ) : canManage ? (
-        <div className="px-4 py-2">
-          <RelationshipEmptyInlineRow
+        <DetailSectionGroup>
+          <RelationshipContentRow
             emptyLabel={sectionEmpty}
             addLabel={familyAddEnabled ? LOCATION_PEOPLE_SECTION_SURFACE_COPY.add : undefined}
             onAdd={familyAddEnabled ? onAddPeopleSection : undefined}
           />
-        </div>
+        </DetailSectionGroup>
       ) : null}
     </DetailSectionPanel>
   )

@@ -69,3 +69,37 @@ export const Interactive: Story = {
     return <CollapsibleRadioCardField {...args} value={value} onValueChange={setValue} />
   },
 }
+
+export const CompactSummaryWithoutDescription: Story = {
+  render: (args) => {
+    const [value, setValue] = useState('governs')
+
+    return (
+      <CollapsibleRadioCardField
+        {...args}
+        value={value}
+        onValueChange={setValue}
+        summaryDescription={false}
+        defaultExpanded={false}
+      />
+    )
+  },
+}
+
+export const ControlledWithoutCollapseAfterSelect: Story = {
+  render: (args) => {
+    const [value, setValue] = useState('')
+    const [expanded, setExpanded] = useState(true)
+
+    return (
+      <CollapsibleRadioCardField
+        {...args}
+        value={value}
+        onValueChange={setValue}
+        collapseAfterSelect={false}
+        expanded={expanded}
+        onExpandedChange={setExpanded}
+      />
+    )
+  },
+}

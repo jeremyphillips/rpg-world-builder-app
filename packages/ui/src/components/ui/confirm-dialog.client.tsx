@@ -22,7 +22,7 @@ export interface ConfirmDialogProps {
   onOpenChange: (open: boolean) => void
   /** Required title — maps to `AlertDialog.Title`. */
   headline: React.ReactNode
-  /** Merged onto the title — defaults to alert heading (16px). */
+  /** Merged onto the title — defaults to confirmDialogTitle (19px). */
   headlineClassName?: string
   /** Optional supporting copy — maps to `AlertDialog.Description`. */
   description?: React.ReactNode
@@ -76,7 +76,7 @@ export function ConfirmDialog({
         >
           <div className="flex flex-col space-y-1.5">
             <AlertDialogPrimitive.Title
-              className={headlineClassName ?? headingVariants({ variant: 'alert' })}
+              className={headlineClassName ?? headingVariants({ variant: 'confirmDialogTitle' })}
             >
               {headline}
             </AlertDialogPrimitive.Title>

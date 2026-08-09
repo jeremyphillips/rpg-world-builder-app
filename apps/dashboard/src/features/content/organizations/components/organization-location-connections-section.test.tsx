@@ -160,7 +160,7 @@ describe('OrganizationLocationConnectionsSection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('button', { name: '+ Add site relationship' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add site relationship' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add owned location' })).not.toBeInTheDocument()
   })
 
@@ -239,7 +239,7 @@ describe('OrganizationLocationConnectionsSection', () => {
       </MemoryRouter>,
     )
 
-    await user.click(screen.getByRole('button', { name: '+ Add site relationship' }))
+    await user.click(screen.getByRole('button', { name: 'Add site relationship' }))
     expect(onAddFamily).toHaveBeenCalledWith('site')
 
     await user.click(screen.getByRole('button', { name: 'Actions for Royal Mint' }))

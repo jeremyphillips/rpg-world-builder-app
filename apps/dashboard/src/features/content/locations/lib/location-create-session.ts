@@ -1,4 +1,4 @@
-import type { SettlementType } from '@rpg/contracts'
+import type { LocationKind, RegionClassification, SettlementType, SiteType } from '@rpg/contracts'
 
 import { requiresLocationCreateSetup, type LocationAuthoringType } from './location-authoring-type'
 import type { LocationFixedCreateContext } from './location-form-ctx'
@@ -7,11 +7,14 @@ export type LocationCreateIntent = {
   authoringType: LocationAuthoringType
   /** Contained create supplies a fixed parent; overview typed create omits this. */
   parentLocationId?: string
+  /** Parent kind for contextual copy (Subregion vs Region) when known at launch. */
+  parentKind?: LocationKind
 }
 
-export type LocationCreateSetupResult = {
-  settlementType: SettlementType
-}
+export type LocationCreateSetupResult =
+  | { kind: 'settlement'; settlementType: SettlementType }
+  | { kind: 'region'; classification: RegionClassification }
+  | { kind: 'site'; siteType: SiteType }
 
 export type LocationCreateSession =
   | { status: 'needsSetup' }
@@ -36,6 +39,10 @@ export function fixedCreateFromIntent(intent: LocationCreateIntent): LocationFix
     fixedCreate.parent = { kind: 'fixed', locationId: intent.parentLocationId }
   }
 
+  if (intent.parentKind) {
+    fixedCreate.parentKind = intent.parentKind
+  }
+
   return fixedCreate
 }
 
@@ -44,8 +51,14 @@ export function completeLocationCreateSetup(
   intent: LocationCreateIntent,
   setupResult: LocationCreateSetupResult,
 ): LocationFixedCreateContext {
-  return {
-    ...fixedCreateFromIntent(intent),
-    settlementType: setupResult.settlementType,
+  const base = fixedCreateFromIntent(intent)
+
+  switch (setupResult.kind) {
+    case 'settlement':
+      return { ...base, settlementType: setupResult.settlementType }
+    case 'region':
+      return { ...base, classification: setupResult.classification }
+    case 'site':
+      return { ...base, siteType: setupResult.siteType }
   }
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   interiorTypeSchema,
   planeTypeSchema,
@@ -28,6 +29,8 @@ import {
   buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
+import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
+import type { SettlementStructureAuthoringGuidance } from './location-settlement-create-composition.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
@@ -81,6 +84,36 @@ export type LocationFormValues = z.infer<typeof locationFormSchema>
 
 export { nameField as locationNameField }
 
+function resolveOmittedFixedCreateFieldNames(
+  fixedCreate: LocationFormCtx['fixedCreate'],
+): ReadonlySet<string> {
+  const omitted = new Set<string>()
+  if (!fixedCreate) return omitted
+  if (fixedCreate.settlementType) omitted.add('settlementType')
+  if (fixedCreate.siteType) omitted.add('siteType')
+  if (fixedCreate.classification) {
+    omitted.add('classification.kind')
+    omitted.add('classification.type')
+  }
+  return omitted
+}
+
+function omitFixedCreateNamedFields<T>(
+  fields: readonly T[],
+  fixedCreate: LocationFormCtx['fixedCreate'],
+): T[] {
+  const omitted = resolveOmittedFixedCreateFieldNames(fixedCreate)
+  if (omitted.size === 0) return [...fields]
+
+  return fields.filter((field) => {
+    const name =
+      field && typeof field === 'object' && 'name' in field && typeof field.name === 'string'
+        ? field.name
+        : undefined
+    return !name || !omitted.has(name)
+  })
+}
+
 export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
@@ -88,26 +121,25 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationEntities = ctx.options?.locationEntities
   const items: FormItem[] = []
 
-  const omitFixedSettlementTypeFields = (fields: RowFieldItem[]): RowFieldItem[] => {
-    if (!fixedCreate?.settlementType) return fields
-    return fields.filter((field) => field.name !== 'settlementType')
-  }
-
   if (fixedCreate) {
-    const primaryFields = omitFixedSettlementTypeFields(
+    const primaryFields: RowFieldItem[] = omitFixedCreateNamedFields(
       filterLocationFieldsForAuthoringType(
         buildLocationPrimaryClassificationFields(),
         fixedCreate.authoringType,
       ),
+      fixedCreate,
     )
     if (primaryFields.length > 0) {
       items.push({ kind: 'row', fields: primaryFields })
     }
 
     items.push(
-      ...filterLocationFieldsForAuthoringType(
-        buildLocationClassificationFields(),
-        fixedCreate.authoringType,
+      ...omitFixedCreateNamedFields(
+        filterLocationFieldsForAuthoringType(
+          buildLocationClassificationFields(),
+          fixedCreate.authoringType,
+        ),
+        fixedCreate,
       ),
     )
   } else {
@@ -147,6 +179,40 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   items.push(descriptionField(ctx))
 
   return items
+}
+
+export function composeLocationCreateBodyFields(
+  ctx: ContentFormCtx,
+  options?: { afterDescription?: FormItem[] },
+): FormItem[] {
+  const items = buildLocationFields(ctx)
+  if (options?.afterDescription?.length) {
+    items.push(...options.afterDescription)
+  }
+  return items
+}
+
+export const SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND = 'Structure' as const
+
+/** Presentation-only FormItems for optional starting districts — no composition state. */
+export function buildSettlementStartingDistrictsFormItems(
+  guidance: SettlementStructureAuthoringGuidance,
+): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      legend: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
+      description: `${guidance.helper} ${guidance.emphasis}`,
+      chrome: { variant: 'inset' },
+      fields: [
+        {
+          kind: 'slot',
+          name: 'startingDistricts',
+          render: () => createElement(LocationSettlementStartingDistrictsSlot),
+        },
+      ],
+    },
+  ]
 }
 
 /** Resolves canonical kind from form values for hierarchy helpers within the form layer. */

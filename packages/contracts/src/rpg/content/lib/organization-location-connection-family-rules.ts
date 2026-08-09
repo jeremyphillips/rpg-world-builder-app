@@ -2,9 +2,9 @@ import {
   getOrganizationLocationConnectionFamily,
   getOrganizationLocationConnectionMaxSubjectsPerLocation,
   getOrganizationLocationConnectionMaxSubjectsPerOrganization,
-  ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY,
+  ORGANIZATION_LOCATION_CONNECTION_FAMILY_POLICY,
   type OrganizationLocationConnectionFamily,
-  type OrganizationLocationConnectionFamilyCardinality,
+  type OrganizationLocationConnectionFamilyExclusivity,
   type OrganizationLocationConnectionKind,
 } from '../../vocab/location/organization-location-connection'
 
@@ -21,13 +21,11 @@ export type OrganizationLocationConnectionLike = {
 
 export type { OrganizationLocationConnectionEdgeAtLocation }
 
-/** Returns the cardinality rule for a connection family, when one applies per-org. */
-export function getOrganizationLocationConnectionFamilyCardinality(
+/** Returns the exclusivity policy for a connection family — exhaustive, never undefined. */
+export function getOrganizationLocationConnectionFamilyExclusivity(
   family: OrganizationLocationConnectionFamily,
-): OrganizationLocationConnectionFamilyCardinality | undefined {
-  return ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY[
-    family as keyof typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY
-  ]
+): OrganizationLocationConnectionFamilyExclusivity {
+  return ORGANIZATION_LOCATION_CONNECTION_FAMILY_POLICY[family]
 }
 
 /** User-facing validation message when a one-per-family rule is violated. */
@@ -37,7 +35,8 @@ export function organizationLocationConnectionFamilyViolationMessage(
   switch (family) {
     case 'geographic_presence':
       return 'Each location may have at most one geographic presence connection.'
-    default:
+    case 'site':
+    case 'territorial_authority':
       return 'Each location may have at most one connection of this type family.'
   }
 }
@@ -100,23 +99,22 @@ export function organizationLocationConnectionKindBlockedForOrganizationAtLocati
 }): boolean {
   const { locationId, kind, connections, excludeConnectionId } = input
   const family = getOrganizationLocationConnectionFamily(kind)
-  const cardinality = getOrganizationLocationConnectionFamilyCardinality(family)
+  const exclusivity = getOrganizationLocationConnectionFamilyExclusivity(family)
   const existing = connectionsForLocation(connections, locationId, excludeConnectionId)
 
-  if (
-    cardinality === 'one_per_kind' ||
-    getOrganizationLocationConnectionMaxSubjectsPerLocation(kind) !== null
-  ) {
-    return existing.some((connection) => connection.kind === kind)
+  switch (exclusivity) {
+    case 'one_per_kind':
+      return existing.some((connection) => connection.kind === kind)
+    case 'one_per_family':
+      return existing.some(
+        (connection) => getOrganizationLocationConnectionFamily(connection.kind) === family,
+      )
+    case 'per_kind_slots':
+      return (
+        getOrganizationLocationConnectionMaxSubjectsPerLocation(kind) !== null &&
+        existing.some((connection) => connection.kind === kind)
+      )
   }
-
-  if (cardinality === 'one_per_family') {
-    return existing.some(
-      (connection) => getOrganizationLocationConnectionFamily(connection.kind) === family,
-    )
-  }
-
-  return false
 }
 
 /** Whether a kind is blocked for a subject at a location (per-org + cross-org occupancy). */

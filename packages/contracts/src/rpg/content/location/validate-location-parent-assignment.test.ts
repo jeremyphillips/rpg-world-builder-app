@@ -133,6 +133,27 @@ describe('validateLocationParentAssignment', () => {
     ])
   })
 
+  it('returns invalid_parent_kind when a district is placed under another district', () => {
+    const innerDistrict: LocationHierarchyNode = {
+      id: 'district-inner',
+      kind: 'district',
+      parentLocationId: 'district-1',
+    }
+
+    expect(
+      validateLocationParentAssignment({
+        locationId: 'district-inner',
+        locationKind: 'district',
+        proposedParentId: 'district-1',
+        locationsById: graph([world, region, settlement, district, innerDistrict]),
+      }),
+    ).toEqual([
+      expect.objectContaining({
+        code: LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES.invalid_parent_kind,
+      }),
+    ])
+  })
+
   it('returns descendant_parent for reassignment under an indirect descendant', () => {
     expect(
       validateLocationParentAssignment({

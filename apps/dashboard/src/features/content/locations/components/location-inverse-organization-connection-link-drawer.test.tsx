@@ -56,6 +56,7 @@ function drawerContextFor(location: Location) {
 
 const headquartersRow = {
   relationshipId: 'rel-hq',
+  subjectType: 'organization' as const,
   subject: {
     type: 'organization' as const,
     id: CITY_COUNCIL.id,

@@ -339,11 +339,7 @@ export function organizationInverseSubjectHasAvailableKind(
   subjectId: string,
   locationId: string,
   eligibleKinds: readonly OrganizationLocationConnectionKind[],
-  rows: ReadonlyArray<{
-    subject: { id: string; type?: string }
-    kind: string
-    relationshipId?: string
-  }>,
+  rows: readonly LocationConnectedPartyRow[],
   excludeRelationshipId?: string,
 ): boolean {
   const connections = buildOrganizationInverseLocationConnections(
@@ -352,16 +348,7 @@ export function organizationInverseSubjectHasAvailableKind(
     subjectId,
     excludeRelationshipId,
   )
-  const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(
-    rows
-      .filter((row): row is typeof row & { relationshipId: string } => Boolean(row.relationshipId))
-      .map((row) => ({
-        subject: { id: row.subject.id, type: row.subject.type ?? 'organization' },
-        kind: row.kind,
-        relationshipId: row.relationshipId,
-      })),
-    locationId,
-  )
+  const edgesAtLocation = buildOrganizationLocationConnectionEdgesAtLocation(rows, locationId)
 
   return organizationLocationConnectionHasAvailableKind({
     locationId,
