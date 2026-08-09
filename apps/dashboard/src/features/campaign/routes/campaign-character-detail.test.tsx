@@ -15,6 +15,13 @@ import { CampaignCharacterDetail } from './campaign-character-detail'
 vi.mock('../hooks/use-campaign-character-detail')
 vi.mock('../hooks/use-campaigns')
 vi.mock('../hooks/use-campaign-character-navigation-context')
+vi.mock('@/features/character', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/character')>()
+  return {
+    ...actual,
+    CharacterOrganizationMembershipsContainer: () => null,
+  }
+})
 
 import { useCampaignCharacterDetail as useCampaignCharacterDetailFn } from '../hooks/use-campaign-character-detail'
 import { useCampaigns as useCampaignsFn } from '../hooks/use-campaigns'

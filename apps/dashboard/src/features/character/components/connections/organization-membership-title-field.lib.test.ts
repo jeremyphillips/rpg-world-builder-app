@@ -1,0 +1,45 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  buildOrganizationMembershipTitleRadioOptions,
+  membershipRadioValueFromTitle,
+  titleFromMembershipRadioValue,
+} from './organization-membership-title-field.lib'
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
+
+describe('buildOrganizationMembershipTitleRadioOptions', () => {
+  it('includes No title and kind suggestions', () => {
+    const options = buildOrganizationMembershipTitleRadioOptions({ kind: 'professional' })
+    expect(options[0]).toEqual({
+      value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      label: 'No title',
+    })
+    expect(options.some((option) => option.value === 'Guildmaster')).toBe(true)
+  })
+
+  it('appends an unrecognized current value as a current-value option', () => {
+    const options = buildOrganizationMembershipTitleRadioOptions({
+      kind: 'professional',
+      currentValue: 'Custom Chronicler',
+    })
+    expect(options.at(-1)).toEqual({ value: 'Custom Chronicler', label: 'Custom Chronicler' })
+  })
+
+  it('does not duplicate a suggestion that matches the current value', () => {
+    const options = buildOrganizationMembershipTitleRadioOptions({
+      kind: 'professional',
+      currentValue: 'Guildmaster',
+    })
+    expect(options.filter((option) => option.value === 'Guildmaster')).toHaveLength(1)
+  })
+})
+
+describe('title radio value mapping', () => {
+  it('maps No title sentinel to undefined and back', () => {
+    expect(titleFromMembershipRadioValue(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)).toBeUndefined()
+    expect(membershipRadioValueFromTitle(undefined)).toBe(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    expect(membershipRadioValueFromTitle(null)).toBe(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    expect(membershipRadioValueFromTitle('Captain')).toBe('Captain')
+    expect(titleFromMembershipRadioValue('Captain')).toBe('Captain')
+  })
+})

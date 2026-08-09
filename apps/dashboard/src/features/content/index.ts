@@ -118,7 +118,12 @@ export {
 export { SpeciesCreate } from './species/routes/species-create'
 export { SpeciesEdit } from './species/routes/species-edit'
 export { FeatsOverview, FeatDetail, FeatCreate, FeatEdit, useFeats, featsQueryKey } from './feats'
-export { useOrganizations, organizationsQueryKey } from './organizations'
+export {
+  useOrganizations,
+  organizationsQueryKey,
+  organizationConnectedCharactersQueryKey,
+  useOrganizationConnectedCharacters,
+} from './organizations'
 export { useLocations, locationsQueryKey } from './locations'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'

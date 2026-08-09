@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { CampaignCharacterStatusSummary } from '@/features/character'
 import { CharacterDetailContent } from '@/features/character'
-import { CharacterOrganizationsSummary } from '@/features/character'
+import { CharacterOrganizationMembershipsContainer } from '@/features/character'
 import { CharacterSheetDetailShell } from '@/features/character'
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
@@ -35,12 +35,13 @@ export function CampaignCharacterDetail() {
             />
           }
           identitySupplement={
-            detail.organizationReferences ? (
-              <CharacterOrganizationsSummary
-                campaignId={campaignId!}
-                organizationReferences={detail.organizationReferences}
-              />
-            ) : null
+            <CharacterOrganizationMembershipsContainer
+              campaignId={campaignId!}
+              characterId={characterId!}
+              characterName={detail.viewModel.identity.name}
+              canEdit={detail.campaignCharacter.capabilities.canEdit}
+              subjectKind="pc"
+            />
           }
         />
       ) : null}

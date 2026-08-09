@@ -44,6 +44,7 @@ export { CharacterBuilderShell } from './components/character-builder-shell.clie
 export { CampaignCharacterStatusSummary } from './components/detail/campaign-character-status-summary.client'
 export { CharacterDetailContent } from './components/detail/character-detail-content.client'
 export { CharacterOrganizationsSummary } from './components/detail/character-organizations-summary.client'
+export { CharacterOrganizationMembershipsContainer } from './components/detail/character-organization-memberships-container.client'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRow } from './components/builder/builder-inventory-row.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'

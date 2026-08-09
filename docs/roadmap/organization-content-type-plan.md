@@ -420,13 +420,21 @@ pagination, and performance design.
 
 Bidirectional organization relationship display for campaign surfaces:
 
-- **Character → organization:** compact **Organizations** row below roster/vital
-  on campaign PC and NPC detail routes (saved-reference aware links).
+- **Character → organization:** compact **Organizations** block below roster/vital
+  on campaign PC and NPC detail routes. Memberships are editable when the viewer
+  has character-edit capability (PC `canEdit`) or campaign manage (NPC). Add /
+  edit title / remove use nested
+  `…/characters/:characterId/organization-memberships` mutations; the shared
+  organization picker and edit drawers stay persistence-neutral.
 - **Organization → characters:** **Connected characters** section on organization
   detail with server-paginated preview (`page=1`, `pageSize=4`), count copy
   (`N connected character(s)`), and plain `+ N more` truncation copy.
 
-**API:** `GET /api/campaigns/:campaignId/content/organizations/:organizationId/connected-characters`
+**API:**
+
+- `GET /api/campaigns/:campaignId/content/organizations/:organizationId/connected-characters`
+- `POST|PATCH|DELETE /api/campaigns/:campaignId/content/characters/:characterId/organization-memberships[/:organizationId]`
+  (member route + `canEdit` capability; PATCH `title: null` clears)
 
 **Participation scope (v1):** open campaign participations only — same participant
 scope as content usage blockers. Includes PCs and NPCs whose saved sheet still
@@ -489,6 +497,7 @@ Required behavior coverage:
 
 Update `docs/roadmap/content-types-roadmap.md` and character feature
 documentation when implementation lands. Character ↔ organization records are
-memberships (`organizationId` + optional descriptive `title`). Reverse
-connected-character preview remains read-only; titled roster UI can consume the
-same character-side field later.
+memberships (`organizationId` + optional descriptive `title`). Campaign character
+and NPC sheets can add, edit, and remove memberships under character-edit /
+campaign-manage policy. Reverse connected-character preview remains read-only on
+the organization; titled roster UI can consume the same character-side field later.

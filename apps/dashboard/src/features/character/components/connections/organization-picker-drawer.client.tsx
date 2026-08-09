@@ -2,13 +2,16 @@
 
 import * as React from 'react'
 
-import { getOrganizationKindLabel, resolveOrganizationMemberTitleSuggestions } from '@rpg/contracts'
-import { Badge, Button, CatalogPickerSheet, RadioGroupField, SelectField } from '@rpg/ui'
+import { getOrganizationKindLabel } from '@rpg/contracts'
+import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
+import { OrganizationMembershipTitleField } from './organization-membership-title-field.client'
+import { titleFromMembershipRadioValue } from './organization-membership-title-field.lib'
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 import {
   buildOrganizationPickerTypeOptions,
   filterAndSortOrganizationPickerItems,
@@ -17,7 +20,6 @@ import {
   ORGANIZATION_PICKER_VIEW_DEFAULTS,
 } from './organization-picker-drawer.lib'
 import {
-  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   ORGANIZATION_PICKER_ALL_TYPES,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
@@ -31,18 +33,7 @@ import { organizationPickerTypeControlClasses } from './organization-picker-draw
 
 export type { OrganizationPickerDrawerProps } from './organization-picker-drawer.types'
 
-function buildTitleRadioOptions(
-  organization: OrganizationPickerDrawerProps['items'][number]['organization'],
-) {
-  const suggestions = resolveOrganizationMemberTitleSuggestions({
-    kind: organization.organizationKind,
-    subtype: organization.organizationSubtype,
-  })
-  return [
-    { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },
-    ...suggestions.map((title) => ({ value: title, label: title })),
-  ]
-}
+const ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this organization membership.'
 
 export function OrganizationPickerDrawer({
   open,
@@ -55,23 +46,29 @@ export function OrganizationPickerDrawer({
   )
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+  const [pending, setPending] = React.useState(false)
+  const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const resetMembershipConfig = React.useCallback(() => {
     setExpandedItemId(null)
     setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    setSubmitError(null)
+    setPending(false)
   }, [])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
+      if (pending) return
       if (!nextOpen) resetMembershipConfig()
       onOpenChange(nextOpen)
     },
-    [onOpenChange, resetMembershipConfig],
+    [onOpenChange, pending, resetMembershipConfig],
   )
 
   const handleExpandedItemChange = React.useCallback((itemId: string | null) => {
     setExpandedItemId(itemId)
     setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    setSubmitError(null)
   }, [])
 
   const typeOptions = React.useMemo(
@@ -88,18 +85,31 @@ export function OrganizationPickerDrawer({
   )
 
   const commitMembership = React.useCallback(
-    (organizationId: string) => {
+    async (organizationId: string) => {
+      if (pending) return
+
+      const title = titleFromMembershipRadioValue(selectedTitle)
       const membership: OrganizationMembershipSelection = {
         organizationId,
-        ...(selectedTitle !== ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
-          ? { title: selectedTitle }
-          : {}),
+        ...(title !== undefined ? { title } : {}),
       }
-      onAdd(membership)
-      resetMembershipConfig()
-      onOpenChange(false)
+
+      setPending(true)
+      setSubmitError(null)
+      try {
+        await onAdd(membership)
+        resetMembershipConfig()
+        onOpenChange(false)
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE
+        setSubmitError(message)
+        setPending(false)
+      }
     },
-    [onAdd, onOpenChange, resetMembershipConfig, selectedTitle],
+    [onAdd, onOpenChange, pending, resetMembershipConfig, selectedTitle],
   )
 
   return (
@@ -184,19 +194,30 @@ export function OrganizationPickerDrawer({
         if (selected) return null
         return (
           <div className="flex flex-col gap-4">
-            <RadioGroupField
-              id={`organization-membership-title-${organization.id}`}
-              label="Title"
-              options={buildTitleRadioOptions(organization)}
+            <OrganizationMembershipTitleField
+              kind={organization.organizationKind}
+              subtype={organization.organizationSubtype}
               value={
                 expandedItemId === organization.id
                   ? selectedTitle
                   : ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
               }
               onValueChange={setSelectedTitle}
+              idPrefix={`organization-membership-${organization.id}`}
             />
+            {submitError && expandedItemId === organization.id ? (
+              <Text variant="destructive" role="alert">
+                {submitError}
+              </Text>
+            ) : null}
             <div className="flex justify-end">
-              <Button type="button" onClick={() => commitMembership(organization.id)}>
+              <Button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  void commitMembership(organization.id)
+                }}
+              >
                 Add organization
               </Button>
             </div>

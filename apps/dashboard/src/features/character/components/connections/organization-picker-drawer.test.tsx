@@ -122,4 +122,26 @@ describe('OrganizationPickerDrawer', () => {
     await user.keyboard('{Escape}')
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
+
+  it('keeps the drawer open with an error when onAdd rejects', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    const onAdd = vi.fn().mockRejectedValue(new Error('Membership failed'))
+
+    render(
+      <OrganizationPickerDrawer
+        open
+        onOpenChange={onOpenChange}
+        items={organizationPickerItems.map((item) => ({ ...item, selected: false }))}
+        onAdd={onAdd}
+      />,
+    )
+
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')
+    expect(onOpenChange).not.toHaveBeenCalledWith(false)
+    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+  })
 })
