@@ -7,7 +7,7 @@ import {
   type OrganizationLocationConnectionKind,
 } from '../vocab/location/organization-location-connection'
 import {
-  getOrganizationLocationConnectionFamilyCardinality,
+  getOrganizationLocationConnectionFamilyExclusivity,
   organizationLocationConnectionFamilyViolationMessage,
 } from './lib/organization-location-connection-family-rules'
 
@@ -49,8 +49,8 @@ export const organizationLocationConnectionsSchema = z
       seenLocationKinds.add(locationKindKey)
 
       const family = getOrganizationLocationConnectionFamily(connection.kind)
-      const familyCardinality = getOrganizationLocationConnectionFamilyCardinality(family)
-      if (familyCardinality === 'one_per_family') {
+      const familyExclusivity = getOrganizationLocationConnectionFamilyExclusivity(family)
+      if (familyExclusivity === 'one_per_family') {
         const locationFamilyKey = `${connection.locationId}:${family}`
         if (seenLocationFamilies.has(locationFamilyKey)) {
           ctx.addIssue({

@@ -78,6 +78,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
         connectedPartyRows={[
           {
             relationshipId: 'rel-1',
+            subjectType: 'character',
             subject: {
               type: 'character',
               id: 'npc-1',
@@ -87,7 +88,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
             },
             kind: 'works_at',
             label: 'Works at',
-            family: 'presence',
+            family: 'operation',
             priority: 40,
             sectionGroup: 'people_and_organizations',
           },

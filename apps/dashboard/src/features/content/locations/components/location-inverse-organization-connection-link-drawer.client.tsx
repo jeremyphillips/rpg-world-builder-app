@@ -152,13 +152,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   )
 
   const edgesAtLocation = React.useMemo(
-    () =>
-      buildOrganizationLocationConnectionEdgesAtLocation(
-        orgRows.filter((row): row is typeof row & { relationshipId: string } =>
-          Boolean(row.relationshipId),
-        ),
-        location.id,
-      ),
+    () => buildOrganizationLocationConnectionEdgesAtLocation(orgRows, location.id),
     [location.id, orgRows],
   )
 

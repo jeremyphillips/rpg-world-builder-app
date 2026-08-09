@@ -2,6 +2,7 @@
 
 import type {
   Location,
+  LocationConnectedPartyOrganizationRow,
   LocationConnectedPartyRow,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -49,7 +50,7 @@ export type LocationTerritorialMutationContext = {
 
 function buildTerritorialOverflowActions(input: {
   campaignId: string
-  row: LocationConnectedPartyRow
+  row: LocationConnectedPartyOrganizationRow
   canManage: boolean
   canEditRow: boolean
   canRemoveRow: boolean
@@ -71,7 +72,7 @@ function buildTerritorialOverflowActions(input: {
     relationship: {
       relationshipId: input.row.relationshipId,
       locationId: input.mutationContext.location.id,
-      kind: input.row.kind as OrganizationLocationConnectionKind,
+      kind: input.row.kind,
       subjectOrganizationId: input.row.subject.id,
       allowReplaceSubject: true,
     },
@@ -82,7 +83,7 @@ function buildTerritorialOverflowActions(input: {
 
   const editTarget: LocationConnectedPartyEditTarget = {
     relationshipId: input.row.relationshipId,
-    subjectType: input.row.subject.type,
+    subjectType: 'organization',
     subjectId: input.row.subject.id,
     kind: input.row.kind,
   }
@@ -159,7 +160,7 @@ function renderGroupAddAction(label: string, onAdd: () => void) {
 
 function renderTerritorialRelationshipRow(input: {
   campaignId: string
-  row: LocationConnectedPartyRow
+  row: LocationConnectedPartyOrganizationRow
   canManage: boolean
   canEditRow: boolean
   canRemoveRow: boolean
@@ -208,9 +209,12 @@ export function LocationTerritorialAuthoritySectionBody({
   canRemoveRow,
 }: LocationTerritorialAuthoritySectionBodyProps) {
   const navigate = useNavigate()
-  const governsRow = rows.find((row) => row.kind === 'governs')
-  const controlsRow = rows.find((row) => row.kind === 'controls')
-  const claimRows = rows.filter((row) => row.kind === 'claims')
+  const organizationRows = rows.filter(
+    (row): row is LocationConnectedPartyOrganizationRow => row.subjectType === 'organization',
+  )
+  const governsRow = organizationRows.find((row) => row.kind === 'governs')
+  const controlsRow = organizationRows.find((row) => row.kind === 'controls')
+  const claimRows = organizationRows.filter((row) => row.kind === 'claims')
   const showClaimsGroup = canManage || claimRows.length > 0
   const hasSingletonSlots = SINGLETON_KINDS.some((kind) => {
     const row = kind === 'governs' ? governsRow : controlsRow

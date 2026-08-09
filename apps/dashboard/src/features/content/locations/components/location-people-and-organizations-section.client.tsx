@@ -1,11 +1,6 @@
 'use client'
 
-import type {
-  CharacterLocationConnectionKind,
-  Location,
-  LocationConnectedPartyRow,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -35,7 +30,10 @@ import {
 } from '../lib/location-connected-parties-people-kind-slots'
 import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
 import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
-import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
+import {
+  toLocationConnectedPartyEditTarget,
+  type LocationConnectedPartyEditTarget,
+} from './location-connected-parties-section.client'
 
 export type LocationPeopleMutationContext = {
   location: Location
@@ -57,39 +55,41 @@ function buildPeopleOverflowActions(input: {
     subjectId: string
   }) => void
 }) {
-  const isOrganization = input.row.subject.type === 'organization'
-  const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, input.row.subject)
+  const { row } = input
+  const isOrganization = row.subjectType === 'organization'
+  const detailHref = resolveLocationConnectedPartySubjectHref(input.campaignId, row.subject)
 
-  const resolved = isOrganization
-    ? resolveRelationshipAlternatives({
-        surface: 'location_inverse_organization',
-        canManage: input.canManage,
-        canEditRow: input.canEditRow,
-        canRemoveRow: input.canRemoveRow,
-        relationship: {
-          relationshipId: input.row.relationshipId,
-          locationId: input.mutationContext.location.id,
-          kind: input.row.kind as OrganizationLocationConnectionKind,
-          subjectOrganizationId: input.row.subject.id,
-          allowReplaceSubject: false,
-        },
-        location: input.mutationContext.location,
-        rows: input.mutationContext.rows,
-      })
-    : resolveRelationshipAlternatives({
-        surface: 'location_inverse_character',
-        canManage: input.canManage,
-        canEditRow: input.canEditRow,
-        canRemoveRow: input.canRemoveRow,
-        relationship: {
-          relationshipId: input.row.relationshipId,
-          locationId: input.mutationContext.location.id,
-          kind: input.row.kind as CharacterLocationConnectionKind,
-          subjectCharacterId: input.row.subject.id,
-        },
-        location: input.mutationContext.location,
-        rows: input.mutationContext.rows,
-      })
+  const resolved =
+    row.subjectType === 'organization'
+      ? resolveRelationshipAlternatives({
+          surface: 'location_inverse_organization',
+          canManage: input.canManage,
+          canEditRow: input.canEditRow,
+          canRemoveRow: input.canRemoveRow,
+          relationship: {
+            relationshipId: row.relationshipId,
+            locationId: input.mutationContext.location.id,
+            kind: row.kind,
+            subjectOrganizationId: row.subject.id,
+            allowReplaceSubject: false,
+          },
+          location: input.mutationContext.location,
+          rows: input.mutationContext.rows,
+        })
+      : resolveRelationshipAlternatives({
+          surface: 'location_inverse_character',
+          canManage: input.canManage,
+          canEditRow: input.canEditRow,
+          canRemoveRow: input.canRemoveRow,
+          relationship: {
+            relationshipId: row.relationshipId,
+            locationId: input.mutationContext.location.id,
+            kind: row.kind,
+            subjectCharacterId: row.subject.id,
+          },
+          location: input.mutationContext.location,
+          rows: input.mutationContext.rows,
+        })
 
   const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {
     view: () => input.navigate(detailHref),
@@ -99,13 +99,7 @@ function buildPeopleOverflowActions(input: {
     isRelationshipMutationActionVisible(resolved.capabilities, 'changeKind') &&
     input.onEditConnection
   ) {
-    handlers.changeKind = () =>
-      input.onEditConnection?.({
-        relationshipId: input.row.relationshipId,
-        subjectType: input.row.subject.type,
-        subjectId: input.row.subject.id,
-        kind: input.row.kind,
-      })
+    handlers.changeKind = () => input.onEditConnection?.(toLocationConnectedPartyEditTarget(row))
   }
 
   if (resolved.capabilities.remove?.supported && input.onRemoveConnection) {

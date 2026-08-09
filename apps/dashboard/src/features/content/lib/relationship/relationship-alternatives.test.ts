@@ -251,6 +251,7 @@ describe('resolveRelationshipAlternatives', () => {
       {
         relationshipId: 'rel-1',
         sectionGroup: 'territorial_authority',
+        subjectType: 'organization',
         kind: 'governs',
         label: 'Governs',
         family: 'territorial_authority',

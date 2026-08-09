@@ -1,5 +1,7 @@
 import type {
   CharacterLocationConnectionKind,
+  LocationConnectedPartyOrganizationRow,
+  LocationConnectedPartyRow,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -86,41 +88,39 @@ export function organizationLocationConnectionHasAvailableKind(input: {
   return organizationLocationConnectionHasAvailableKindInFamily(input)
 }
 
+function organizationRowsOf(
+  rows: readonly LocationConnectedPartyRow[],
+): LocationConnectedPartyOrganizationRow[] {
+  return rows.filter(
+    (row): row is LocationConnectedPartyOrganizationRow => row.subjectType === 'organization',
+  )
+}
+
 export function buildOrganizationLocationConnectionEdgesAtLocation(
-  rows: ReadonlyArray<{
-    subject: { id: string; type: string; name?: string }
-    kind: string
-    relationshipId: string
-  }>,
+  rows: readonly LocationConnectedPartyRow[],
   locationId: string,
 ): OrganizationLocationConnectionEdgeAtLocation[] {
-  return rows
-    .filter((row) => row.subject.type === 'organization')
-    .map((row) => ({
-      organizationId: row.subject.id,
-      connectionId: row.relationshipId,
-      locationId,
-      kind: row.kind as OrganizationLocationConnectionKind,
-      subjectName: row.subject.name,
-    }))
+  return organizationRowsOf(rows).map((row) => ({
+    organizationId: row.subject.id,
+    connectionId: row.relationshipId,
+    locationId,
+    kind: row.kind,
+    subjectName: row.subject.name,
+  }))
 }
 
 export function buildOrganizationInverseLocationConnections(
-  rows: ReadonlyArray<{
-    subject: { id: string }
-    kind: string
-    relationshipId?: string
-  }>,
+  rows: readonly LocationConnectedPartyRow[],
   locationId: string,
   organizationId: string,
   excludeRelationshipId?: string,
 ): OrganizationLocationConnectionLike[] {
-  return rows
+  return organizationRowsOf(rows)
     .filter((row) => row.subject.id === organizationId)
     .map((row) => ({
       id: row.relationshipId,
       locationId,
-      kind: row.kind as OrganizationLocationConnectionKind,
+      kind: row.kind,
     }))
     .filter((connection) => !excludeRelationshipId || connection.id !== excludeRelationshipId)
 }

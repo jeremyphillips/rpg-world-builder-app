@@ -10,13 +10,27 @@ export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS = [
 export type OrganizationLocationConnectionFamily =
   (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS)[number]
 
-export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY = {
+export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_EXCLUSIVITY_IDS = [
+  /** Each kind in the family may appear at most once per location for one organization. */
+  'one_per_kind',
+  /** The whole family may appear at most once per location for one organization. */
+  'one_per_family',
+  /** No family-level rule — singleton behavior comes from per-kind max-subject limits. */
+  'per_kind_slots',
+] as const
+
+export type OrganizationLocationConnectionFamilyExclusivity =
+  (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_EXCLUSIVITY_IDS)[number]
+
+/** Exhaustive per-family exclusivity policy — every family must take an explicit stance. */
+export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_POLICY = {
   site: 'one_per_kind',
   geographic_presence: 'one_per_family',
-} as const
-
-export type OrganizationLocationConnectionFamilyCardinality =
-  (typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY)[keyof typeof ORGANIZATION_LOCATION_CONNECTION_FAMILY_CARDINALITY]
+  territorial_authority: 'per_kind_slots',
+} as const satisfies Record<
+  OrganizationLocationConnectionFamily,
+  OrganizationLocationConnectionFamilyExclusivity
+>
 
 export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
   label: 'Organization location connection',

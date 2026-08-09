@@ -11,7 +11,7 @@ import {
 } from './location-connected-parties-section.client'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 
-import type { Location } from '@rpg/contracts'
+import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 
 const sampleLocation = {
   id: 'region-1',
@@ -21,23 +21,25 @@ const sampleLocation = {
   kind: 'region',
 } as Location
 
-const sampleRows = [
+const sampleRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-org-1',
-    subject: { type: 'organization' as const, id: 'org-1', name: 'City Council', slug: 'council' },
+    subjectType: 'organization',
+    subject: { type: 'organization', id: 'org-1', name: 'City Council', slug: 'council' },
     kind: 'governs',
     label: 'Governed by',
     family: 'territorial_authority',
     priority: 50,
-    sectionGroup: 'territorial_authority' as const,
+    sectionGroup: 'territorial_authority',
   },
 ]
 
-const claimRows = [
+const claimRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-org-claim',
+    subjectType: 'organization',
     subject: {
-      type: 'organization' as const,
+      type: 'organization',
       id: 'org-guild',
       name: "Thieves' Guild",
       slug: 'thieves-guild',
@@ -46,15 +48,16 @@ const claimRows = [
     label: 'Claimed by',
     family: 'territorial_authority',
     priority: 40,
-    sectionGroup: 'territorial_authority' as const,
+    sectionGroup: 'territorial_authority',
   },
 ]
 
-const peopleOrganizationRows = [
+const peopleOrganizationRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-org-hq',
+    subjectType: 'organization',
     subject: {
-      type: 'organization' as const,
+      type: 'organization',
       id: 'org-guild',
       name: "Thieves' Guild",
       slug: 'thieves-guild',
@@ -63,25 +66,26 @@ const peopleOrganizationRows = [
     label: 'Headquarters of',
     family: 'site',
     priority: 60,
-    sectionGroup: 'people_and_organizations' as const,
+    sectionGroup: 'people_and_organizations',
   },
 ]
 
-const peopleNpcRows = [
+const peopleNpcRows: LocationConnectedPartyRow[] = [
   {
     relationshipId: 'rel-npc-1',
+    subjectType: 'character',
     subject: {
-      type: 'character' as const,
+      type: 'character',
       id: 'npc-1',
       name: 'Durnan',
       slug: 'npc-1',
-      characterType: 'npc' as const,
+      characterType: 'npc',
     },
     kind: 'works_at',
     label: 'Works here',
-    family: 'presence',
+    family: 'operation',
     priority: 40,
-    sectionGroup: 'people_and_organizations' as const,
+    sectionGroup: 'people_and_organizations',
   },
 ]
 

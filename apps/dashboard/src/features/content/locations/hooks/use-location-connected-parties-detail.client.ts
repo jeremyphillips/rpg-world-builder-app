@@ -456,11 +456,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       if (target.subjectType !== 'organization') return
       setOrganizationDrawerState({
         mode: 'changeKind',
-        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
+        intent: organizationDrawerIntentFromKind(target.kind),
         connection: {
           relationshipId: target.relationshipId,
           organizationId: target.subjectId,
-          kind: target.kind as OrganizationLocationConnectionKind,
+          kind: target.kind,
         },
       })
     },
@@ -472,11 +472,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       if (target.subjectType !== 'organization') return
       setOrganizationDrawerState({
         mode: 'replaceOrganization',
-        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
+        intent: organizationDrawerIntentFromKind(target.kind),
         connection: {
           relationshipId: target.relationshipId,
           organizationId: target.subjectId,
-          kind: target.kind as OrganizationLocationConnectionKind,
+          kind: target.kind,
         },
       })
     },
@@ -487,11 +487,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     if (target.subjectType === 'organization') {
       setOrganizationDrawerState({
         mode: 'changeKind',
-        intent: organizationDrawerIntentFromKind(target.kind as OrganizationLocationConnectionKind),
+        intent: organizationDrawerIntentFromKind(target.kind),
         connection: {
           relationshipId: target.relationshipId,
           organizationId: target.subjectId,
-          kind: target.kind as OrganizationLocationConnectionKind,
+          kind: target.kind,
         },
       })
       return
@@ -502,7 +502,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       connection: {
         relationshipId: target.relationshipId,
         characterId: target.subjectId,
-        kind: target.kind as CharacterLocationConnectionKind,
+        kind: target.kind,
       },
     })
   }, [])

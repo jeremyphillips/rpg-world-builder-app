@@ -4,13 +4,14 @@ Organization detail and location inverse drawers link organizations to locations
 
 ## Connection families
 
-Each connection kind belongs to one of three families:
+Each connection kind belongs to one of three families. Every family takes an explicit
+exclusivity stance in `ORGANIZATION_LOCATION_CONNECTION_FAMILY_POLICY` (`@rpg/contracts`):
 
-| Family                  | Cardinality                                    | Example                                                                                              |
-| ----------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `site`                  | **one per kind** per organization + location   | `owns` + `headquarters` on the same building                                                         |
-| `geographic_presence`   | **one per family** per organization + location | `operates_in` at most once per org                                                                   |
-| `territorial_authority` | **kind-scoped** (see below)                    | `governs` and `controls` are singleton slots per location across orgs; `claims` allows multiple orgs |
+| Family                  | Exclusivity policy | Meaning                                      | Example                                                                                              |
+| ----------------------- | ------------------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `site`                  | `one_per_kind`     | one per kind per organization + location     | `owns` + `headquarters` on the same building                                                         |
+| `geographic_presence`   | `one_per_family`   | one per family per organization + location   | `operates_in` at most once per org                                                                   |
+| `territorial_authority` | `per_kind_slots`   | no family rule — per-kind max-subject limits | `governs` and `controls` are singleton slots per location across orgs; `claims` allows multiple orgs |
 
 Cross-family combinations remain allowed (for example `operates_in` + `governs` on the same region).
 
@@ -31,6 +32,7 @@ Edit mode excludes the current connection row from blocking checks so authors ca
 
 ## SSOT
 
+- Family exclusivity: `ORGANIZATION_LOCATION_CONNECTION_FAMILY_POLICY` (exhaustive `Record` over families)
 - Kind metadata: `maxSubjectsPerLocation` on `ORGANIZATION_LOCATION_CONNECTION_ENTRIES`
 - Per-org blocking: `organizationLocationConnectionKindBlockedForOrganizationAtLocation`
 - Cross-org occupancy: `organizationLocationConnectionLocationSubjectBlocked`
