@@ -30,7 +30,7 @@ describe('organization picker library', () => {
     ).toEqual(['Lantern Guild'])
   })
 
-  it('builds only available type options and formats the selected summary', () => {
+  it('builds only available type options and formats the singular description', () => {
     expect(
       buildOrganizationPickerTypeOptions(
         organizationPickerItems.map(({ organization }) => organization),
@@ -41,7 +41,8 @@ describe('organization picker library', () => {
       { value: 'professional', label: 'Guild or professional' },
       { value: 'academic', label: 'Academic' },
     ])
-    expect(formatOrganizationPickerDescription(0)).toContain('Choose any')
-    expect(formatOrganizationPickerDescription(2)).toBe('2 organizations selected.')
+    expect(formatOrganizationPickerDescription()).toBe(
+      'Choose an organization connected to this character.',
+    )
   })
 })

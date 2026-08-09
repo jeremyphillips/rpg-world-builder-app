@@ -16,12 +16,15 @@ const context = createStandaloneBuilderContextFixture({
 })
 
 describe('ConnectionsStep', () => {
-  it('adds and removes narrow organization references', async () => {
+  it('adds titled memberships and removes them from the summary', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
+      connections: {
+        organizations: [{ organizationId: lanternGuild.id, title: 'Guildmaster' }],
+        locations: [],
+      },
     }
 
     render(
@@ -34,17 +37,30 @@ describe('ConnectionsStep', () => {
     )
 
     expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Remove Lantern Guild' }))
     expect(onDraftChange).toHaveBeenCalledWith({
       connections: { organizations: [], locations: [] },
     })
 
-    await user.click(screen.getByRole('button', { name: 'Choose organizations' }))
-    const addButtons = screen.getAllByRole('button', { name: 'Add' })
-    await user.click(addButtons[0]!)
+    await user.click(screen.getByRole('button', { name: '+ Add organization' }))
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(onDraftChange).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        connections: expect.objectContaining({
+          organizations: expect.arrayContaining([
+            expect.objectContaining({ organizationId: cityCouncil.id }),
+          ]),
+        }),
+      }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
     expect(onDraftChange).toHaveBeenCalledWith({
       connections: {
-        organizations: [{ organizationId: lanternGuild.id }, { organizationId: cityCouncil.id }],
+        organizations: [
+          { organizationId: lanternGuild.id, title: 'Guildmaster' },
+          { organizationId: cityCouncil.id },
+        ],
         locations: [],
       },
     })
@@ -81,5 +97,6 @@ describe('ConnectionsStep', () => {
     )
 
     expect(screen.getByText('No organizations selected yet.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
   })
 })

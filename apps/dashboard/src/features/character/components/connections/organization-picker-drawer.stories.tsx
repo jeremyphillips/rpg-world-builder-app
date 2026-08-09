@@ -11,9 +11,7 @@ const meta = {
     open: true,
     onOpenChange: () => undefined,
     items: organizationPickerItems,
-    selectedCount: 1,
     onAdd: () => undefined,
-    onRemove: () => undefined,
   },
 } satisfies Meta<typeof OrganizationPickerDrawer>
 
@@ -23,5 +21,5 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {}
 
 export const Empty: Story = {
-  args: { items: [], selectedCount: 0 },
+  args: { items: [] },
 }

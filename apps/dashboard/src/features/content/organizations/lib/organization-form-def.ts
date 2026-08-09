@@ -9,6 +9,7 @@ import {
   organizationNameField,
   type OrganizationFormValues,
 } from './organization-form-fields'
+import { organizationFormValueSyncs } from './organization-form-sync'
 import {
   buildOrganizationCreateInput,
   organizationCreateDefaultValues,
@@ -27,6 +28,7 @@ const organizationFormDef: ContentFormDef<
   nameField: organizationNameField,
   createDefaultValues: organizationCreateDefaultValues,
   buildFields: buildOrganizationFields,
+  valueSyncs: organizationFormValueSyncs,
   toFormValues: organizationToFormValues,
   toInput: buildOrganizationCreateInput,
   useListQuery: useOrganizations,

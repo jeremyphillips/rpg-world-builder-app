@@ -11,18 +11,52 @@ describe('characterConnectionsSchema', () => {
     })
   })
 
-  it('accepts unique organization references', () => {
+  it('accepts unique organization memberships with optional titles', () => {
     expect(
       characterConnectionsSchema.parse({
-        organizations: [{ organizationId: 'organization-1' }, { organizationId: 'organization-2' }],
+        organizations: [
+          { organizationId: 'organization-1' },
+          { organizationId: 'organization-2', title: 'Guildmaster' },
+        ],
       }),
     ).toEqual({
-      organizations: [{ organizationId: 'organization-1' }, { organizationId: 'organization-2' }],
+      organizations: [
+        { organizationId: 'organization-1' },
+        { organizationId: 'organization-2', title: 'Guildmaster' },
+      ],
       locations: [],
     })
   })
 
-  it('rejects empty and duplicate organization references', () => {
+  it('trims titles, rejects empty titles, and never invents Member', () => {
+    expect(
+      characterConnectionsSchema.parse({
+        organizations: [{ organizationId: 'organization-1', title: '  Master  ' }],
+      }).organizations[0],
+    ).toEqual({ organizationId: 'organization-1', title: 'Master' })
+
+    expect(
+      characterConnectionsSchema.safeParse({
+        organizations: [{ organizationId: 'organization-1', title: '   ' }],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      characterConnectionsSchema.parse({
+        organizations: [{ organizationId: 'organization-1' }],
+      }).organizations[0],
+    ).toEqual({ organizationId: 'organization-1' })
+  })
+
+  it('accepts arbitrary persisted title text that is not a suggestion', () => {
+    expect(
+      characterConnectionsSchema.parse({
+        organizations: [{ organizationId: 'organization-1', title: 'Custom Chronicler' }],
+      }).organizations[0]?.title,
+    ).toBe('Custom Chronicler')
+  })
+
+  it('rejects empty and duplicate organization memberships', () => {
     expect(
       characterConnectionsSchema.safeParse({
         organizations: [{ organizationId: '' }],

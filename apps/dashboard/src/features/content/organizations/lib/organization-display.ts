@@ -1,6 +1,8 @@
 import {
   getOrganizationKindEntry,
   getOrganizationKindLabel,
+  getOrganizationSubtypeEntry,
+  getOrganizationSubtypeLabel,
   type Organization,
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionKind,
@@ -80,13 +82,24 @@ export function buildOrganizationDetailViewModel(
   locationConnections: OrganizationLocationConnectionsViewModel,
 ): OrganizationDetailViewModel {
   const kindLabel = getOrganizationKindLabel(organization.organizationKind)
+  const subtype =
+    organization.organizationSubtype !== undefined
+      ? getOrganizationSubtypeEntry(organization.organizationKind, organization.organizationSubtype)
+      : undefined
+  const subtypeLabel =
+    organization.organizationSubtype !== undefined
+      ? getOrganizationSubtypeLabel(organization.organizationKind, organization.organizationSubtype)
+      : undefined
+
   return {
     statRows: [
       {
         label: 'Type',
-        value: kindLabel,
-        info: getOrganizationKindEntry(organization.organizationKind)?.description,
-        infoAriaLabel: `About ${kindLabel}`,
+        value: subtypeLabel ? `${kindLabel} · ${subtypeLabel}` : kindLabel,
+        info:
+          subtype?.description ??
+          getOrganizationKindEntry(organization.organizationKind)?.description,
+        infoAriaLabel: `About ${subtypeLabel ?? kindLabel}`,
       },
     ],
     description: organization.description || undefined,

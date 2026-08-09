@@ -7,12 +7,14 @@ import {
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type CharacterOrganizationConnection,
 } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, Button, InsetPanel, Text } from '@rpg/ui'
 
 import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
 import { OrganizationPickerDrawer } from '../connections/organization-picker-drawer.client'
+import type { OrganizationMembershipSelection } from '../connections/organization-picker-drawer.types'
 import {
   connectionsStepEmptyClasses,
   connectionsStepHeaderClasses,
@@ -27,6 +29,15 @@ export type ConnectionsStepProps = {
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
+function membershipSecondaryLabel(
+  membership: CharacterOrganizationConnection,
+  organizationKind: string | undefined,
+): string | null {
+  if (membership.title) return membership.title
+  if (organizationKind) return getOrganizationKindLabel(organizationKind)
+  return null
+}
+
 export function ConnectionsStep({
   context,
   draft,
@@ -38,8 +49,8 @@ export function ConnectionsStep({
     () => resolveAvailableContent(context).organizations,
     [context],
   )
-  const selectedIds = draft.connections.organizations.map(({ organizationId }) => organizationId)
-  const selectedIdSet = new Set(selectedIds)
+  const memberships = draft.connections.organizations
+  const selectedIdSet = new Set(memberships.map(({ organizationId }) => organizationId))
   const organizationsById = useMemo(
     () =>
       new Map(context.catalog.organizations.map((organization) => [organization.id, organization])),
@@ -54,22 +65,25 @@ export function ConnectionsStep({
     selected: selectedIdSet.has(organization.id),
   }))
 
-  const updateConnections = (organizationIds: readonly string[]) => {
+  const handleAdd = (membership: OrganizationMembershipSelection) => {
+    if (selectedIdSet.has(membership.organizationId)) return
     onDraftChange({
       connections: {
-        organizations: organizationIds.map((organizationId) => ({ organizationId })),
+        organizations: [...memberships, membership],
         locations: draft.connections.locations,
       },
     })
   }
 
-  const handleAdd = (organizationId: string) => {
-    if (selectedIdSet.has(organizationId)) return
-    updateConnections([...selectedIds, organizationId])
-  }
-
   const handleRemove = (organizationId: string) => {
-    updateConnections(selectedIds.filter((selectedId) => selectedId !== organizationId))
+    onDraftChange({
+      connections: {
+        organizations: memberships.filter(
+          (membership) => membership.organizationId !== organizationId,
+        ),
+        locations: draft.connections.locations,
+      },
+    })
   }
 
   return (
@@ -79,11 +93,11 @@ export function ConnectionsStep({
           Add organizations that shape this character’s loyalties, obligations, or history.
         </Text>
         <Button type="button" onClick={() => setPickerOpen(true)}>
-          Choose organizations
+          {memberships.length === 0 ? 'Add organization' : '+ Add organization'}
         </Button>
       </div>
 
-      {selectedIds.length === 0 ? (
+      {memberships.length === 0 ? (
         <InsetPanel
           borderStyle="dashed"
           surface={{}}
@@ -95,21 +109,22 @@ export function ConnectionsStep({
         </InsetPanel>
       ) : (
         <div className={connectionsStepListClasses} aria-label="Selected organizations">
-          {selectedIds.map((organizationId) => {
-            const organization = organizationsById.get(organizationId)
-            const unavailable = !availableIdSet.has(organizationId)
-            const label = organization?.name ?? organizationId
+          {memberships.map((membership) => {
+            const organization = organizationsById.get(membership.organizationId)
+            const unavailable = !availableIdSet.has(membership.organizationId)
+            const label = organization?.name ?? membership.organizationId
+            const secondary = membershipSecondaryLabel(membership, organization?.organizationKind)
 
             return (
               <BuilderInventoryRow
-                key={organizationId}
+                key={membership.organizationId}
                 itemLabel={label}
                 label={<Text as="span">{label}</Text>}
                 meta={
                   <>
-                    {organization ? (
+                    {secondary ? (
                       <Text as="span" variant="muted">
-                        {getOrganizationKindLabel(organization.organizationKind)}
+                        {secondary}
                       </Text>
                     ) : null}
                     {unavailable ? (
@@ -119,7 +134,7 @@ export function ConnectionsStep({
                     ) : null}
                   </>
                 }
-                onRemove={() => handleRemove(organizationId)}
+                onRemove={() => handleRemove(membership.organizationId)}
               />
             )
           })}
@@ -130,9 +145,7 @@ export function ConnectionsStep({
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         items={pickerItems}
-        selectedCount={selectedIds.length}
         onAdd={handleAdd}
-        onRemove={handleRemove}
       />
     </BuilderStepFrame>
   )
