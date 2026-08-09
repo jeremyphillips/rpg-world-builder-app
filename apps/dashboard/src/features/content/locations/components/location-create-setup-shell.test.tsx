@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { RadioCardOption } from '@rpg/ui'
 
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import { locationCreateSetupModalBodyClasses } from './location-create-setup.variants'
 import { LocationCreateSetupShell } from './location-create-setup-shell.client'
 
 const SITE_OPTIONS: RadioCardOption[] = [
@@ -130,6 +131,22 @@ describe('LocationCreateSetupShell', () => {
     await waitFor(() => {
       expect(onContinue).toHaveBeenCalledTimes(1)
     })
+  })
+
+  it('spaces choice-set sections with a 16px vertical gap', async () => {
+    const user = userEvent.setup()
+    render(<TwoChoiceSetupHarness />)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+
+    const summary = screen.getByRole('heading', { name: 'Political' }).closest('article')
+    expect(summary).not.toBeNull()
+
+    const choiceSetStack = summary?.parentElement
+    expect(choiceSetStack).toContainElement(screen.getByRole('radiogroup', { name: 'Region type' }))
+    expect(choiceSetStack?.className).toMatch(/\bflex-col\b/)
+    expect(choiceSetStack?.className).toMatch(/\bgap-4\b/)
+    expect(locationCreateSetupModalBodyClasses).toContain('gap-4')
   })
 
   it('collapses completed predecessors, reveals the next set, and uses compact Change', async () => {
