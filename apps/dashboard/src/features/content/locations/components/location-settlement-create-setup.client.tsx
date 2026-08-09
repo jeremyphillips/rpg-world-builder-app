@@ -1,7 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
-import { CollapsibleRadioCardField, Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { useMemo, useState } from 'react'
 import type { SettlementType } from '@rpg/contracts'
 
 import type {
@@ -12,11 +11,11 @@ import {
   buildSettlementTypeRadioOptions,
   isSettlementType,
   resolveSettlementCreateSetupDescription,
-  SETTLEMENT_CREATE_SETUP_CHANGE_LABEL,
+  SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
+  SETTLEMENT_CREATE_SETUP_HEADLINE,
   SETTLEMENT_CREATE_SETUP_PROMPT,
-  SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW,
 } from '../lib/location-settlement-create-setup.lib'
-import { locationSettlementCreateSetupModalBodyClasses } from './location-settlement-create-setup.variants'
+import { LocationCreateSetupShell } from './location-create-setup-shell.client'
 
 export type LocationSettlementCreateSetupProps = {
   open: boolean
@@ -33,49 +32,33 @@ export function LocationSettlementCreateSetup({
   onComplete,
 }: LocationSettlementCreateSetupProps) {
   const [settlementType, setSettlementType] = useState<SettlementType | ''>('')
-  const fieldId = useId()
   const options = useMemo(() => buildSettlementTypeRadioOptions(), [])
   const description = resolveSettlementCreateSetupDescription(intent)
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
-        <Modal.Header headline="New settlement" description={description} />
-        <Modal.Body className={locationSettlementCreateSetupModalBodyClasses}>
-          <CollapsibleRadioCardField
-            id={fieldId}
-            label={SETTLEMENT_CREATE_SETUP_PROMPT}
-            summaryEyebrow={SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW}
-            changeLabel={SETTLEMENT_CREATE_SETUP_CHANGE_LABEL}
-            density="compact"
-            value={settlementType}
-            options={options}
-            onValueChange={(value) => {
-              if (isSettlementType(value)) {
-                setSettlementType(value)
-              }
-            }}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={!settlementType}
-              onClick={() => {
-                if (!settlementType) return
-                onComplete({ kind: 'settlement', settlementType })
-                onOpenChange(false)
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+    <LocationCreateSetupShell
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={SETTLEMENT_CREATE_SETUP_HEADLINE}
+      description={description}
+      choiceSets={[
+        {
+          id: 'settlementType',
+          fieldLabel: SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
+          prompt: SETTLEMENT_CREATE_SETUP_PROMPT,
+          options,
+          value: settlementType,
+          onValueChange: (value) => {
+            if (isSettlementType(value)) {
+              setSettlementType(value)
+            }
+          },
+        },
+      ]}
+      onContinue={() => {
+        if (!settlementType) return
+        onComplete({ kind: 'settlement', settlementType })
+      }}
+    />
   )
 }

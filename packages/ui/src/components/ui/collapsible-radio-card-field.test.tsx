@@ -127,6 +127,56 @@ describe('CollapsibleRadioCardField', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('omits the summary description when summaryDescription is false', () => {
+    render(
+      <CollapsibleRadioCardField
+        id="connection-kind"
+        label="Authority type"
+        summaryEyebrow="Authority type"
+        changeLabel="Change connection type"
+        summaryDescription={false}
+        options={options}
+        value="governs"
+        defaultExpanded={false}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.queryByText('Exercises political authority over this region.'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('keeps the chooser expanded after select when collapseAfterSelect is false', async () => {
+    const user = userEvent.setup()
+
+    function ControlledField() {
+      const [value, setValue] = useState('')
+
+      return (
+        <CollapsibleRadioCardField
+          id="connection-kind"
+          label="Authority type"
+          summaryEyebrow="Authority type"
+          changeLabel="Change connection type"
+          collapseAfterSelect={false}
+          options={options}
+          value={value}
+          onValueChange={setValue}
+        />
+      )
+    }
+
+    render(<ControlledField />)
+
+    await user.click(screen.getByRole('radio', { name: /Governs/i }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Authority type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
+    expect(screen.queryByRole('button', { name: 'Change connection type' })).not.toBeInTheDocument()
+  })
+
   it('preserves compact density through expand, select, collapse, and change', async () => {
     const user = userEvent.setup()
 

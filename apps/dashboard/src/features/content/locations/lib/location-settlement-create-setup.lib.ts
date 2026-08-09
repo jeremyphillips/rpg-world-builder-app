@@ -5,9 +5,9 @@ import type { LocationCreateIntent } from '../lib/location-create-session'
 
 export const SETTLEMENT_CREATE_SETUP_PROMPT = 'What kind of settlement are you creating?' as const
 
-export const SETTLEMENT_CREATE_SETUP_CHANGE_LABEL = 'Change settlement type' as const
+export const SETTLEMENT_CREATE_SETUP_FIELD_LABEL = 'Settlement type' as const
 
-export const SETTLEMENT_CREATE_SETUP_SUMMARY_EYEBROW = SETTLEMENT_CREATE_SETUP_PROMPT
+export const SETTLEMENT_CREATE_SETUP_HEADLINE = 'Create settlement' as const
 
 /** Canonical settlement type options — labels and order from SETTLEMENT_TYPE_ENTRIES. */
 export function buildSettlementTypeRadioOptions(): RadioCardOption[] {

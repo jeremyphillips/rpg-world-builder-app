@@ -1,7 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
-import { CollapsibleRadioCardField, Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { useMemo, useState } from 'react'
 import type { RegionClassificationKind } from '@rpg/contracts'
 
 import type {
@@ -12,12 +11,14 @@ import {
   buildRegionClassificationKindRadioOptions,
   buildRegionTypeRadioOptions,
   parseRegionClassification,
-  resolveRegionCreateSetupChangeLabel,
+  REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
+  REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
+  REGION_CREATE_SETUP_TYPE_PROMPT,
   resolveRegionCreateSetupDescription,
   resolveRegionCreateSetupHeadline,
   resolveRegionCreateSetupPrompt,
 } from '../lib/location-region-create-setup.lib'
-import { locationCreateSetupModalBodyClasses } from './location-create-setup.variants'
+import { LocationCreateSetupShell } from './location-create-setup-shell.client'
 
 export type LocationRegionCreateSetupProps = {
   open: boolean
@@ -35,8 +36,6 @@ export function LocationRegionCreateSetup({
 }: LocationRegionCreateSetupProps) {
   const [classificationKind, setClassificationKind] = useState<RegionClassificationKind | ''>('')
   const [regionType, setRegionType] = useState('')
-  const kindFieldId = useId()
-  const typeFieldId = useId()
   const kindOptions = useMemo(() => buildRegionClassificationKindRadioOptions(), [])
   const typeOptions = useMemo(
     () => (classificationKind ? buildRegionTypeRadioOptions(classificationKind) : []),
@@ -46,58 +45,37 @@ export function LocationRegionCreateSetup({
   const classification = parseRegionClassification(classificationKind, regionType)
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
-        <Modal.Header
-          headline={resolveRegionCreateSetupHeadline(intent)}
-          description={resolveRegionCreateSetupDescription(intent)}
-        />
-        <Modal.Body className={locationCreateSetupModalBodyClasses}>
-          <CollapsibleRadioCardField
-            id={kindFieldId}
-            label={prompt}
-            summaryEyebrow={prompt}
-            changeLabel={resolveRegionCreateSetupChangeLabel(intent)}
-            density="compact"
-            value={classificationKind}
-            options={kindOptions}
-            onValueChange={(value) => {
-              setClassificationKind(value as RegionClassificationKind | '')
-              setRegionType('')
-            }}
-          />
-          {classificationKind ? (
-            <CollapsibleRadioCardField
-              id={typeFieldId}
-              label="Region type"
-              summaryEyebrow="Region type"
-              changeLabel="Change region type"
-              density="compact"
-              value={regionType}
-              options={typeOptions}
-              onValueChange={setRegionType}
-            />
-          ) : null}
-        </Modal.Body>
-        <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={!classification}
-              onClick={() => {
-                if (!classification) return
-                onComplete({ kind: 'region', classification })
-                onOpenChange(false)
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+    <LocationCreateSetupShell
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={resolveRegionCreateSetupHeadline(intent)}
+      description={resolveRegionCreateSetupDescription(intent)}
+      choiceSets={[
+        {
+          id: 'classification',
+          fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
+          prompt,
+          options: kindOptions,
+          value: classificationKind,
+          onValueChange: (value) => {
+            setClassificationKind(value as RegionClassificationKind | '')
+            setRegionType('')
+          },
+        },
+        {
+          id: 'regionType',
+          fieldLabel: REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
+          prompt: REGION_CREATE_SETUP_TYPE_PROMPT,
+          options: typeOptions,
+          value: regionType,
+          onValueChange: setRegionType,
+        },
+      ]}
+      onContinue={() => {
+        if (!classification) return
+        onComplete({ kind: 'region', classification })
+      }}
+      additionalContinueConstraint={Boolean(classification)}
+    />
   )
 }

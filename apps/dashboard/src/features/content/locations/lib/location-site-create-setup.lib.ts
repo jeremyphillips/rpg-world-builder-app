@@ -5,11 +5,11 @@ import type { LocationCreateIntent } from './location-create-session'
 
 export const SITE_CREATE_SETUP_PROMPT = 'What kind of site are you creating?' as const
 
-export const SITE_CREATE_SETUP_CHANGE_LABEL = 'Change site type' as const
-
-export const SITE_CREATE_SETUP_SUMMARY_EYEBROW = SITE_CREATE_SETUP_PROMPT
+export const SITE_CREATE_SETUP_FIELD_LABEL = 'Site type' as const
 
 export const SITE_CREATE_SETUP_HELPER = 'Choose the type that best describes this place.' as const
+
+export const SITE_CREATE_SETUP_HEADLINE = 'Create site' as const
 
 /** Canonical site type options — labels and descriptions from SITE_TYPE_ENTRIES. */
 export function buildSiteTypeRadioOptions(): RadioCardOption[] {

@@ -13,19 +13,20 @@ import type { RadioCardOption } from '@rpg/ui'
 import { resolveRegionRelationshipLabel } from './location-contextual-terminology.lib'
 import type { LocationCreateIntent } from './location-create-session'
 
+export const REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL = 'Classification' as const
+
+export const REGION_CREATE_SETUP_TYPE_FIELD_LABEL = 'Region type' as const
+
+export const REGION_CREATE_SETUP_TYPE_PROMPT = 'Region type' as const
+
 export function resolveRegionCreateSetupHeadline(intent: LocationCreateIntent): string {
   const noun = resolveRegionRelationshipLabel(intent.parentKind).toLowerCase()
-  return `New ${noun}`
+  return `Create ${noun}`
 }
 
 export function resolveRegionCreateSetupPrompt(intent: LocationCreateIntent): string {
   const noun = resolveRegionRelationshipLabel(intent.parentKind).toLowerCase()
   return `What kind of ${noun} are you creating?`
-}
-
-export function resolveRegionCreateSetupChangeLabel(intent: LocationCreateIntent): string {
-  const noun = resolveRegionRelationshipLabel(intent.parentKind).toLowerCase()
-  return `Change ${noun} classification`
 }
 
 export function resolveRegionCreateSetupDescription(intent: LocationCreateIntent): string {

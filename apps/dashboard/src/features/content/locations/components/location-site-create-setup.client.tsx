@@ -1,7 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
-import { CollapsibleRadioCardField, Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { useMemo, useState } from 'react'
 import type { SiteType } from '@rpg/contracts'
 
 import type {
@@ -12,11 +11,11 @@ import {
   buildSiteTypeRadioOptions,
   isSiteType,
   resolveSiteCreateSetupDescription,
-  SITE_CREATE_SETUP_CHANGE_LABEL,
+  SITE_CREATE_SETUP_FIELD_LABEL,
+  SITE_CREATE_SETUP_HEADLINE,
   SITE_CREATE_SETUP_PROMPT,
-  SITE_CREATE_SETUP_SUMMARY_EYEBROW,
 } from '../lib/location-site-create-setup.lib'
-import { locationCreateSetupModalBodyClasses } from './location-create-setup.variants'
+import { LocationCreateSetupShell } from './location-create-setup-shell.client'
 
 export type LocationSiteCreateSetupProps = {
   open: boolean
@@ -33,49 +32,33 @@ export function LocationSiteCreateSetup({
   onComplete,
 }: LocationSiteCreateSetupProps) {
   const [siteType, setSiteType] = useState<SiteType | ''>('')
-  const fieldId = useId()
   const options = useMemo(() => buildSiteTypeRadioOptions(), [])
   const description = resolveSiteCreateSetupDescription(intent)
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="sm">
-        <Modal.Header headline="Create site" description={description} />
-        <Modal.Body className={locationCreateSetupModalBodyClasses}>
-          <CollapsibleRadioCardField
-            id={fieldId}
-            label={SITE_CREATE_SETUP_PROMPT}
-            summaryEyebrow={SITE_CREATE_SETUP_SUMMARY_EYEBROW}
-            changeLabel={SITE_CREATE_SETUP_CHANGE_LABEL}
-            density="compact"
-            value={siteType}
-            options={options}
-            onValueChange={(value) => {
-              if (isSiteType(value)) {
-                setSiteType(value)
-              }
-            }}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={!siteType}
-              onClick={() => {
-                if (!siteType) return
-                onComplete({ kind: 'site', siteType })
-                onOpenChange(false)
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        </Modal.Footer>
-      </Modal.Content>
-    </Modal.Root>
+    <LocationCreateSetupShell
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={SITE_CREATE_SETUP_HEADLINE}
+      description={description}
+      choiceSets={[
+        {
+          id: 'siteType',
+          fieldLabel: SITE_CREATE_SETUP_FIELD_LABEL,
+          prompt: SITE_CREATE_SETUP_PROMPT,
+          options,
+          value: siteType,
+          onValueChange: (value) => {
+            if (isSiteType(value)) {
+              setSiteType(value)
+            }
+          },
+        },
+      ]}
+      onContinue={() => {
+        if (!siteType) return
+        onComplete({ kind: 'site', siteType })
+      }}
+    />
   )
 }
