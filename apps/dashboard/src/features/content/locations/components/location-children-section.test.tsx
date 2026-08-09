@@ -125,7 +125,7 @@ describe('LocationChildrenSection', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows zero-child districts without a disclosure chevron', () => {
+  it('shows zero-child districts with reserved disclosure gutter and no chevron', () => {
     const marketWard: Location = {
       ...DOCK_WARD,
       id: 'location-market-ward',
@@ -156,10 +156,36 @@ describe('LocationChildrenSection', () => {
 
     const marketWardRow = screen.getByRole('link', { name: 'Market Ward' }).parentElement
       ?.parentElement
+    const marketWardLink = screen.getByRole('link', { name: 'Market Ward' })
+    expect(marketWardLink.closest('[style]')).toBeInTheDocument()
     expect(marketWardRow).toHaveTextContent(/0 locations/)
     expect(
       screen.queryByRole('button', { name: 'Show locations in Market Ward' }),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows Add district on the Districts subgroup when settlement hierarchy allows it', async () => {
+    const user = userEvent.setup()
+    renderSection({ canManage: true, parent: HARBORFORD })
+
+    const addDistrict = screen.getByRole('button', { name: 'Add district' })
+    expect(addDistrict).toBeInTheDocument()
+
+    await user.click(addDistrict)
+
+    expect(screen.getByText('Create drawer: district')).toBeInTheDocument()
+  })
+
+  it('omits Add district when the parent kind cannot author districts', () => {
+    renderSection({ canManage: true, parent: DOCK_WARD })
+
+    expect(screen.queryByRole('button', { name: 'Add district' })).not.toBeInTheDocument()
+  })
+
+  it('omits Add district for non-managers even on settlements', () => {
+    renderSection({ canManage: false, parent: HARBORFORD })
+
+    expect(screen.queryByRole('button', { name: 'Add district' })).not.toBeInTheDocument()
   })
 
   it('shows View location + Move location overflow for managers', async () => {

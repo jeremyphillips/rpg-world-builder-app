@@ -28,7 +28,14 @@ export const Default: Story = {
 export const InsidePanel: Story = {
   render: () => (
     <DetailSectionPanel heading="City structure" headingId="city-structure-heading">
-      <DetailSectionGroup label="Districts">
+      <DetailSectionGroup
+        label="Districts"
+        endSlot={
+          <button type="button" className="text-sm">
+            Add district
+          </button>
+        }
+      >
         <DetailSectionRowList>
           <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
         </DetailSectionRowList>

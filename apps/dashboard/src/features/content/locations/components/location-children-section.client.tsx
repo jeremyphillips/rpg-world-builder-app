@@ -8,7 +8,8 @@ import {
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
-import { Text, toast } from '@rpg/ui'
+import { Button, Text, toast } from '@rpg/ui'
+import { Plus } from 'lucide-react'
 
 import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
 import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
@@ -35,6 +36,10 @@ import {
   LOCATION_PARENT_REPLACEMENT_DRAWER,
 } from '../lib/location-parent-replacement-surface-copy'
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import {
+  childAuthoringTypesForParentKind,
+  formatLocationAuthoringTypeAddHeading,
+} from '../lib/location-create-shortcuts'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
 import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
 import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
@@ -124,10 +129,11 @@ function SettlementDistrictRows({
             disclosure={
               childCount > 0
                 ? {
+                    mode: 'expandable',
                     label: `locations in ${item.name}`,
                     content: <LocationPreviewChildRows items={immediateChildren} inset={inset} />,
                   }
-                : undefined
+                : { mode: 'reserved' }
             }
             endSlot={
               canManage ? (
@@ -256,6 +262,9 @@ export function LocationChildrenSection({
     launch({ authoringType, parentLocationId })
   }
 
+  const canAddDistrict =
+    canManage && childAuthoringTypesForParentKind(parentKind).includes('district')
+
   const hasGroupedContent = groups?.some((group) => group.items.length > 0) ?? false
   const hasFlatContent = items.length > 0
 
@@ -283,7 +292,24 @@ export function LocationChildrenSection({
               </Text>
             ) : null}
             {groups.map((group) => (
-              <DetailSectionGroup key={group.id} label={group.label}>
+              <DetailSectionGroup
+                key={group.id}
+                label={group.label}
+                endSlot={
+                  group.id === 'districts' && canAddDistrict ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      density="compact"
+                      onClick={() => handleSelectAuthoringType('district')}
+                    >
+                      <Plus className="size-3.5" aria-hidden />
+                      {formatLocationAuthoringTypeAddHeading('district')}
+                    </Button>
+                  ) : undefined
+                }
+              >
                 {group.items.length === 0 ? (
                   <Text variant="muted" className="pt-1 text-sm">
                     {group.emptyText}

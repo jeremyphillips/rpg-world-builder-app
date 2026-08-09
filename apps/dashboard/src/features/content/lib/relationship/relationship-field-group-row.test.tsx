@@ -16,6 +16,19 @@ describe('RelationshipFieldGroupRow', () => {
     expect(screen.getByText('Row content')).toBeInTheDocument()
   })
 
+  it('delegates endSlot to DetailSectionGroup', () => {
+    render(
+      <RelationshipFieldGroupRow
+        eyebrow="Headquarters"
+        endSlot={<button type="button">Add link</button>}
+      >
+        <p>Row content</p>
+      </RelationshipFieldGroupRow>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add link' })).toBeInTheDocument()
+  })
+
   it('renders children without eyebrow chrome when eyebrow is omitted', () => {
     render(
       <RelationshipFieldGroupRow>

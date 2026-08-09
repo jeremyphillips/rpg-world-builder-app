@@ -19,11 +19,9 @@ import {
   detailEntityRowVariants,
 } from './detail-entity-row.variants'
 
-export type DetailEntityRowDisclosure = {
-  /** Semantic target for Show/Hide labels, e.g. "locations in Bar District". */
-  label: string
-  content: ReactNode
-}
+export type DetailEntityRowDisclosure =
+  | { mode: 'expandable'; label: string; content: ReactNode }
+  | { mode: 'reserved' }
 
 export type DetailEntityRowProps = {
   heading: ReactNode
@@ -66,6 +64,46 @@ function DetailEntityRowIdentity({
   )
 }
 
+function DetailEntityRowDisclosureColumn({
+  disclosure,
+  collapsed,
+  contentId,
+  onToggle,
+}: {
+  disclosure: DetailEntityRowDisclosure
+  collapsed: boolean
+  contentId: string
+  onToggle: () => void
+}) {
+  if (disclosure.mode === 'expandable') {
+    const toggleLabel = collapsed ? `Show ${disclosure.label}` : `Hide ${disclosure.label}`
+
+    return (
+      <div className={detailEntityRowDisclosureButtonColumnVariants()}>
+        <button
+          type="button"
+          className={detailEntityRowDisclosureButtonVariants()}
+          aria-expanded={!collapsed}
+          aria-controls={contentId}
+          aria-label={toggleLabel}
+          onClick={onToggle}
+        >
+          <ChevronDown
+            className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
+            aria-hidden
+          />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className={detailEntityRowDisclosureButtonColumnVariants()} aria-hidden>
+      <span className="block size-control-action-compact" />
+    </div>
+  )
+}
+
 export function DetailEntityRow({
   heading,
   href,
@@ -95,8 +133,6 @@ export function DetailEntityRow({
     )
   }
 
-  const toggleLabel = collapsed ? `Show ${disclosure.label}` : `Hide ${disclosure.label}`
-
   return (
     <div
       className={cn(detailEntityRowDisclosureItemVariants(), className)}
@@ -104,21 +140,12 @@ export function DetailEntityRow({
     >
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>
         <div className={detailEntityRowDisclosureIdentityVariants()}>
-          <div className={detailEntityRowDisclosureButtonColumnVariants()}>
-            <button
-              type="button"
-              className={detailEntityRowDisclosureButtonVariants()}
-              aria-expanded={!collapsed}
-              aria-controls={contentId}
-              aria-label={toggleLabel}
-              onClick={() => setCollapsed((current) => !current)}
-            >
-              <ChevronDown
-                className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
-                aria-hidden
-              />
-            </button>
-          </div>
+          <DetailEntityRowDisclosureColumn
+            disclosure={disclosure}
+            collapsed={collapsed}
+            contentId={contentId}
+            onToggle={() => setCollapsed((current) => !current)}
+          />
           <DetailEntityRowIdentity
             heading={heading}
             href={href}
@@ -129,7 +156,7 @@ export function DetailEntityRow({
         </div>
         {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
       </div>
-      {!collapsed ? (
+      {disclosure.mode === 'expandable' && !collapsed ? (
         <div id={contentId} className={detailEntityRowDisclosureContentVariants()}>
           {disclosure.content}
         </div>

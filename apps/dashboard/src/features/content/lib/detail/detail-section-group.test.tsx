@@ -36,6 +36,29 @@ describe('DetailSectionGroup', () => {
     expect(container.querySelector('.eyebrow-style-sm')).not.toBeInTheDocument()
   })
 
+  it('renders endSlot in the subgroup header without eligibility logic', () => {
+    render(
+      <DetailSectionGroup label="Districts" endSlot={<button type="button">Add district</button>}>
+        <p>Row content</p>
+      </DetailSectionGroup>,
+    )
+
+    expect(screen.getByText('Districts')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add district' })).toBeInTheDocument()
+    expect(screen.getByText('Row content')).toBeInTheDocument()
+  })
+
+  it('renders endSlot without a label when only trailing controls are needed', () => {
+    render(
+      <DetailSectionGroup endSlot={<button type="button">Add district</button>}>
+        <p>Row content</p>
+      </DetailSectionGroup>,
+    )
+
+    expect(screen.queryByText('Districts')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add district' })).toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <DetailSectionGroup label="Governed by">

@@ -64,6 +64,7 @@ export const WithDisclosure: Story = {
         href="/campaigns/demo/locations/dock-ward"
         headingSuffix=" · District · 2 locations"
         disclosure={{
+          mode: 'expandable',
           label: 'locations in Dock Ward',
           content: (
             <DetailSectionRowList>
@@ -96,6 +97,7 @@ export const WithDisclosure: Story = {
         heading="Scholar's Quarter"
         href="/campaigns/demo/locations/scholars-quarter"
         headingSuffix=" · District · 0 locations"
+        disclosure={{ mode: 'reserved' }}
       />
     </DetailSectionRowList>
   ),

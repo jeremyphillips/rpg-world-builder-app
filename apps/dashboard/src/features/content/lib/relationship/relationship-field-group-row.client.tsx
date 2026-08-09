@@ -6,6 +6,7 @@ import { DetailSectionGroup } from '../detail/detail-section-group.client'
 
 export type RelationshipFieldGroupRowProps = {
   eyebrow?: string
+  endSlot?: ReactNode
   children: ReactNode
   className?: string
 }
@@ -16,11 +17,12 @@ export type RelationshipFieldGroupRowProps = {
  */
 export function RelationshipFieldGroupRow({
   eyebrow,
+  endSlot,
   children,
   className,
 }: RelationshipFieldGroupRowProps) {
   return (
-    <DetailSectionGroup label={eyebrow} className={className}>
+    <DetailSectionGroup label={eyebrow} endSlot={endSlot} className={className}>
       {children}
     </DetailSectionGroup>
   )

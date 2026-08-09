@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import { DetailEntityRow } from './detail-entity-row.client'
+import { DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE } from './detail-entity-row.variants'
 import { DetailSectionRowList } from './detail-section-row-list.client'
 
 describe('DetailEntityRow', () => {
@@ -100,6 +101,7 @@ describe('DetailEntityRow', () => {
           heading="Dock Ward"
           href="/locations/dock-ward"
           disclosure={{
+            mode: 'expandable',
             label: 'locations in Dock Ward',
             content: <a href="/locations/yawning-portal">Yawning Portal</a>,
           }}
@@ -128,6 +130,7 @@ describe('DetailEntityRow', () => {
           href="/locations/dock-ward"
           endSlot={<button type="button">Actions</button>}
           disclosure={{
+            mode: 'expandable',
             label: 'locations in Dock Ward',
             content: <span>Preview child</span>,
           }}
@@ -154,6 +157,7 @@ describe('DetailEntityRow', () => {
           heading="Dock Ward"
           href="/locations/dock-ward"
           disclosure={{
+            mode: 'expandable',
             label: 'locations in Dock Ward',
             content: <span>Preview child</span>,
           }}
@@ -177,6 +181,7 @@ describe('DetailEntityRow', () => {
             heading="Dock Ward"
             href="/locations/dock-ward"
             disclosure={{
+              mode: 'expandable',
               label: 'locations in Dock Ward',
               content: (
                 <DetailSectionRowList>
@@ -201,5 +206,80 @@ describe('DetailEntityRow', () => {
     expect(expandedRegion?.previousElementSibling).not.toHaveClass('border-t')
     expect(expandedRegion).not.toHaveClass('border-t')
     expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
+  })
+
+  it('renders reserved disclosure with the same outer wrapper and column token as expandable', () => {
+    const { container: expandableContainer } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Dock Ward"
+          href="/locations/dock-ward"
+          disclosure={{
+            mode: 'expandable',
+            label: 'locations in Dock Ward',
+            content: <span>Preview child</span>,
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    const { container: reservedContainer } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Market Ward"
+          href="/locations/market-ward"
+          disclosure={{ mode: 'reserved' }}
+        />
+      </MemoryRouter>,
+    )
+
+    const expandableItem = expandableContainer.firstElementChild
+    const reservedItem = reservedContainer.firstElementChild
+
+    expect(expandableItem).toHaveStyle(DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE)
+    expect(reservedItem).toHaveStyle(DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE)
+    expect(expandableItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
+    expect(reservedItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
+  })
+
+  it('keeps reserved disclosure out of tab order with no expand affordance', () => {
+    render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Market Ward"
+          href="/locations/market-ward"
+          disclosure={{ mode: 'reserved' }}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /hide/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Market Ward' })).toBeInTheDocument()
+  })
+
+  it('keeps list separators between disclosure items when one row is reserved', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DetailSectionRowList>
+          <DetailEntityRow
+            heading="Market Ward"
+            href="/locations/market-ward"
+            disclosure={{ mode: 'reserved' }}
+          />
+          <DetailEntityRow
+            heading="Dock Ward"
+            href="/locations/dock-ward"
+            disclosure={{
+              mode: 'expandable',
+              label: 'locations in Dock Ward',
+              content: <span>Preview child</span>,
+            }}
+          />
+        </DetailSectionRowList>
+      </MemoryRouter>,
+    )
+
+    expect(container.firstElementChild?.children).toHaveLength(2)
   })
 })
