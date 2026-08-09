@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 
-import type { Location } from '@rpg/contracts'
+import { getErrorMessage, type Location } from '@rpg/contracts'
+import { toast } from '@rpg/ui'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { LocationDetailIdentity } from './location-detail-identity.client'
@@ -12,6 +13,7 @@ import {
   applyLocationParentReplacement,
   invalidateLocationParentReplacementQueries,
 } from '../lib/location-parent-replacement'
+import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../lib/location-parent-replacement-surface-copy'
 
 export type LocationDetailMetadataProps = {
   location: Location
@@ -41,6 +43,8 @@ export function LocationDetailMetadata({
       })
       invalidateLocationParentReplacementQueries(queryClient, campaignId)
       setParentReplacementOpen(false)
+    } catch (err) {
+      toast.error(getErrorMessage(err, LOCATION_PARENT_REPLACEMENT_DRAWER.submitFailedFallback))
     } finally {
       setIsSubmitting(false)
     }

@@ -195,9 +195,11 @@ export function applyLocationCreateModalSetupValueChange({
     return { ...values, settlementType: isSettlementType(nextValue) ? nextValue : '' }
   }
   if (choiceSetId === 'classification') {
+    // Clear dependsOn dependents atomically with the upstream change.
     return {
       ...values,
       classificationKind: nextValue as RegionClassificationKind | '',
+      regionType: '',
     }
   }
   if (choiceSetId === 'regionType') {

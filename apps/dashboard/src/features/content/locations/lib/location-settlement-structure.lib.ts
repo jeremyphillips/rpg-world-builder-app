@@ -5,8 +5,7 @@
 export {
   isDirectPlaceAuthoringTypeForSettlement,
   isDistrictAuthoringTypeForSettlement,
-  isSettlementDirectPlaceChild,
-  isSettlementDistrictChild,
-  partitionSettlementChildLocations,
-  resolveSettlementStructureChildAuthoringOptions,
+  partitionLocationsByStructureGroup,
+  resolveLocationStructureProfile,
+  resolveStructureChildAuthoringOptions,
 } from './location-structure.lib'

@@ -73,23 +73,6 @@ export type LocationCreateSessionParseResult =
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 
-/** Sheet title for contained create — settlement type label when fixed, else authoring type. */
-export function formatLocationFixedCreateAddHeading(
-  fixedCreate: LocationFixedCreateContext,
-): string {
-  if (fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType) {
-    return `Add ${midSentenceLabel(getSettlementTypeLabel(fixedCreate.settlementType))}`
-  }
-
-  if (fixedCreate.authoringType === 'site' && fixedCreate.siteType) {
-    return `Add ${midSentenceLabel(getSiteTypeLabel(fixedCreate.siteType))}`
-  }
-
-  return formatLocationAuthoringTypeAddHeading(fixedCreate.authoringType, {
-    parentKind: fixedCreate.parentKind,
-  })
-}
-
 /** Modal details heading — Create-prefix via existing type label resolvers. */
 export function formatLocationFixedCreateHeading(fixedCreate: LocationFixedCreateContext): string {
   if (fixedCreate.authoringType === 'settlement' && fixedCreate.settlementType) {

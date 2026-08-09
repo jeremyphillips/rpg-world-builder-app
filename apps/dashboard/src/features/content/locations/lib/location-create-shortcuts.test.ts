@@ -5,7 +5,6 @@ import {
   buildLocationFixedCreateHref,
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
-  formatLocationFixedCreateAddHeading,
   formatLocationFixedCreateHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
@@ -200,26 +199,6 @@ describe('formatLocationAuthoringTypeAddHeading', () => {
     expect(formatLocationAuthoringTypeAddHeading('region', { parentKind: 'region' })).toBe(
       'Add subregion',
     )
-  })
-})
-
-describe('formatLocationFixedCreateAddHeading', () => {
-  it('uses settlement type labels for fixed settlement create', () => {
-    expect(
-      formatLocationFixedCreateAddHeading({
-        authoringType: 'settlement',
-        settlementType: 'city',
-      }),
-    ).toBe('Add city')
-  })
-
-  it('falls back to authoring type labels for non-settlement fixed create', () => {
-    expect(
-      formatLocationFixedCreateAddHeading({
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: 'location-parent' },
-      }),
-    ).toBe('Add building')
   })
 })
 

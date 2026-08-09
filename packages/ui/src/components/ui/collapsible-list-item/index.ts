@@ -1,5 +1,6 @@
 export {
   COLLAPSIBLE_LIST_ITEM_CHROME_SIZE,
+  buildCollapsibleListItemLeadingChromeStyle,
   collapsibleListItemChromeColumnClasses,
   resolveCollapsibleListItemLeadingChrome,
   type CollapsibleListItemLeadingChromeOptions,

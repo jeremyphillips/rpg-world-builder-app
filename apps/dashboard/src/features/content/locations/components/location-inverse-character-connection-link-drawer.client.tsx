@@ -110,7 +110,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   )
 
   const characterRows = React.useMemo(
-    () => connectedPartyRows.filter((row) => row.subject.type === 'character'),
+    () => connectedPartyRows.filter((row) => row.subjectType === 'character'),
     [connectedPartyRows],
   )
 

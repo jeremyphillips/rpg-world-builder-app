@@ -68,8 +68,10 @@ Immediate children only. Expandable region rows split counts:
 
 Settlement, Region, and Site use the shared setup gate
 (`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Detail Add
-location runs setup inside `LocationCreateModal`; overview/page create keeps the same
-setup libs and `dependsOn` rules via the setup shell. URL resume params
+location runs setup inside `LocationCreateModal`; overview/page create uses
+`LocationCreateSetupHost` → `LocationCreateSetupSession`. Both consume
+`resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
+choice-set ids, `dependsOn`, continue, and complete. URL resume params
 (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
 
@@ -96,8 +98,10 @@ Structure **Move** binds the row’s child `item.id` as `:subjectId`.
 ## Validation
 
 Non-draft writes merge the existing record with PATCH input, then revalidate the merged
-parent assignment. A published district whose parent is another district becomes
-**uneditable** until reparented to a settlement (`invalid_parent_kind`).
+parent assignment. A published district whose parent is another district fails hierarchy
+validation (`invalid_parent_kind`) until reparented to a settlement — use Structure **Move**
+or Change parent. Detail edit chrome may still open; publish-complete hierarchy writes are
+what the API rejects.
 
 Draft writes skip hierarchy validation — incomplete/rootless draft districts remain
 allowed until publish.

@@ -46,6 +46,9 @@ export const radioCardDensityContentGapVariants = cva('', {
   },
 })
 
+/** Compact chooser summary — flush eyebrow→title (tighter than option-card content gap). */
+export const radioCardCompactSummaryContentGapClasses = 'gap-0'
+
 const radioCardRowBase =
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-row-selected aria-invalid:border aria-invalid:border-destructive'
 
@@ -256,10 +259,6 @@ export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-
 
 /** Horizontal padding for compact chooser summaries and symmetric breakout contexts. */
 export const radioCardCompactPaddingXClasses = 'px-4'
-
-export const radioCardCompactOptionPaddingLeftClasses = 'pl-3'
-
-export const radioCardCompactSummaryPaddingLeftClasses = 'pl-4'
 
 export const radioCardCompactPaddingRightClasses = 'pr-4'
 

@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import { DetailEntityRow } from './detail-entity-row.client'
-import { DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE } from './detail-entity-row.variants'
 import { DetailSectionRowList } from './detail-section-row-list.client'
 
 describe('DetailEntityRow', () => {
@@ -238,11 +237,21 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    const expandableItem = expandableContainer.firstElementChild
-    const reservedItem = reservedContainer.firstElementChild
+    const expandableItem = expandableContainer.firstElementChild as HTMLElement | null
+    const reservedItem = reservedContainer.firstElementChild as HTMLElement | null
 
-    expect(expandableItem).toHaveStyle(DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE)
-    expect(reservedItem).toHaveStyle(DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE)
+    expect(expandableItem?.style.getPropertyValue('--leading-chrome-size')).toBe(
+      'calc(var(--spacing)*6)',
+    )
+    expect(reservedItem?.style.getPropertyValue('--leading-chrome-size')).toBe(
+      'calc(var(--spacing)*6)',
+    )
+    expect(expandableItem?.style.getPropertyValue('--leading-chrome-gap')).toBe(
+      'calc(var(--spacing)*1)',
+    )
+    expect(expandableItem?.style.getPropertyValue('--content-column-indent')).toContain(
+      '--leading-chrome-size',
+    )
     expect(expandableItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
     expect(reservedItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
   })

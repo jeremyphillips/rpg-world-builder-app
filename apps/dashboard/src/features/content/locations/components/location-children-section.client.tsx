@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import {
+  getErrorMessage,
   LOCATION_DISPLAY_SUMMARY_SEPARATOR,
   type Location,
   type LocationKind,
@@ -529,6 +530,8 @@ export function LocationChildrenSection({
       })
       invalidateLocationParentReplacementQueries(queryClient, campaignId)
       setMoveSubject(null)
+    } catch (err) {
+      toast.error(getErrorMessage(err, LOCATION_PARENT_REPLACEMENT_DRAWER.submitFailedFallback))
     } finally {
       setIsSubmitting(false)
     }

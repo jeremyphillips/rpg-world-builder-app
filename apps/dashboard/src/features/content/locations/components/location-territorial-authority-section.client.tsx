@@ -112,7 +112,7 @@ function buildTerritorialOverflowActions(input: {
     handlers.remove = () => {
       input.onRemoveConnection?.({
         relationshipId: input.row.relationshipId,
-        subjectType: input.row.subject.type,
+        subjectType: input.row.subjectType,
         subjectId: input.row.subject.id,
       })
     }

@@ -198,42 +198,6 @@ export function formatLocationStructureSplitCount(
   return parts.join(' · ')
 }
 
-/** @deprecated Prefer {@link partitionLocationsByStructureGroup} — settlement-only alias. */
-export function isSettlementDistrictChild(location: Location): boolean {
-  return location.kind === 'district'
-}
-
-/** @deprecated Prefer structure profiles — settlement-only alias. */
-export function isSettlementDirectPlaceChild(location: Location): boolean {
-  return location.kind !== 'district'
-}
-
-/** @deprecated Prefer {@link partitionLocationsByStructureGroup}. */
-export function partitionSettlementChildLocations(locations: readonly Location[]): {
-  districts: Location[]
-  directLocations: Location[]
-} {
-  const { districts, directLocations } = partitionLocationsByStructureGroup(
-    locations,
-    SETTLEMENT_STRUCTURE_PROFILE,
-  )
-  return { districts, directLocations }
-}
-
-/** @deprecated Prefer {@link resolveStructureChildAuthoringOptions}. */
-export function resolveSettlementStructureChildAuthoringOptions(
-  eligibleTypes: readonly LocationAuthoringType[],
-): {
-  district?: 'district'
-  direct: LocationAuthoringType[]
-} {
-  const options = resolveStructureChildAuthoringOptions('settlement', eligibleTypes)
-  return {
-    district: options.structural === 'district' ? 'district' : undefined,
-    direct: options.direct,
-  }
-}
-
 export function isDistrictAuthoringTypeForSettlement(authoringType: string): boolean {
   return authoringType === 'district'
 }

@@ -509,7 +509,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
 
   const canEditRow = React.useCallback(
     (row: LocationConnectedPartyRow) =>
-      row.subject.type === 'character'
+      row.subjectType === 'character'
         ? canInverseWriteLocationConnectionForOwner('characters')
         : canInverseWriteLocationConnectionForOwner('organizations'),
     [],

@@ -5,18 +5,19 @@ import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
 import {
   isDirectPlaceAuthoringTypeForSettlement,
   isDistrictAuthoringTypeForSettlement,
-  isSettlementDirectPlaceChild,
-  isSettlementDistrictChild,
-  partitionSettlementChildLocations,
-  resolveSettlementStructureChildAuthoringOptions,
-} from './location-settlement-structure.lib'
+  partitionLocationsByStructureGroup,
+  resolveLocationStructureProfile,
+  resolveStructureChildAuthoringOptions,
+} from './location-structure.lib'
 
-describe('partitionSettlementChildLocations', () => {
+describe('partitionLocationsByStructureGroup (settlement)', () => {
   it('groups districts separately from direct places', () => {
-    const { districts, directLocations } = partitionSettlementChildLocations([
-      DOCK_WARD,
-      YAWNING_PORTAL,
-    ])
+    const profile = resolveLocationStructureProfile('settlement')
+    expect(profile).toBeDefined()
+    const { districts, directLocations } = partitionLocationsByStructureGroup(
+      [DOCK_WARD, YAWNING_PORTAL],
+      profile!,
+    )
 
     expect(districts.map((location) => location.id)).toEqual([DOCK_WARD.id])
     expect(directLocations.map((location) => location.id)).toEqual([YAWNING_PORTAL.id])
@@ -24,16 +25,6 @@ describe('partitionSettlementChildLocations', () => {
 })
 
 describe('settlement child eligibility helpers', () => {
-  it('identifies district children', () => {
-    expect(isSettlementDistrictChild(DOCK_WARD)).toBe(true)
-    expect(isSettlementDirectPlaceChild(DOCK_WARD)).toBe(false)
-  })
-
-  it('identifies direct place children', () => {
-    expect(isSettlementDirectPlaceChild(YAWNING_PORTAL)).toBe(true)
-    expect(isSettlementDistrictChild(YAWNING_PORTAL)).toBe(false)
-  })
-
   it('maps authoring types to district vs direct-place buckets', () => {
     expect(isDistrictAuthoringTypeForSettlement('district')).toBe(true)
     expect(isDirectPlaceAuthoringTypeForSettlement('building')).toBe(true)
@@ -42,9 +33,9 @@ describe('settlement child eligibility helpers', () => {
 
   it('projects canonical settlement eligibility into structure authoring options', () => {
     const eligible = childAuthoringTypesForParentKind('settlement')
-    const options = resolveSettlementStructureChildAuthoringOptions(eligible)
+    const options = resolveStructureChildAuthoringOptions('settlement', eligible)
 
-    expect(options.district).toBe('district')
+    expect(options.structural).toBe('district')
     expect(options.direct).not.toContain('district')
     expect(options.direct).toEqual(eligible.filter((type) => type !== 'district'))
     expect(options.direct).toEqual(
@@ -53,8 +44,8 @@ describe('settlement child eligibility helpers', () => {
   })
 
   it('omits district when it is not in the eligible set', () => {
-    expect(resolveSettlementStructureChildAuthoringOptions(['building', 'site'])).toEqual({
-      district: undefined,
+    expect(resolveStructureChildAuthoringOptions('settlement', ['building', 'site'])).toEqual({
+      structural: undefined,
       direct: ['building', 'site'],
     })
   })

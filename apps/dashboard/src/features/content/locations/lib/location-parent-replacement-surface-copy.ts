@@ -17,6 +17,7 @@ export const LOCATION_PARENT_REPLACEMENT_DRAWER = {
   mismatchStatus:
     'This location’s parent no longer matches this page. Refresh the locations list and try again.',
   mismatchToast: 'Contained locations are out of date. Refreshing…',
+  submitFailedFallback: 'Could not update parent location.',
 } as const
 
 export type LocationParentReplacementDrawerSurface = 'child' | 'move'

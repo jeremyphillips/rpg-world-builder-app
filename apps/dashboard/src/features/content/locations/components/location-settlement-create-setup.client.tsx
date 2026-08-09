@@ -1,20 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import type { SettlementType } from '@rpg/contracts'
-
 import type {
   LocationCreateIntent,
   LocationCreateSetupResult,
 } from '../lib/location-create-session'
-import {
-  buildSettlementTypeRadioOptions,
-  isSettlementType,
-  SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
-  SETTLEMENT_CREATE_SETUP_HEADLINE,
-  SETTLEMENT_CREATE_SETUP_PROMPT,
-} from '../lib/location-settlement-create-setup.lib'
-import { LocationCreateSetupShell } from './location-create-setup-shell.client'
+import { LocationCreateSetupSession } from './location-create-setup-session.client'
 
 export type LocationSettlementCreateSetupProps = {
   open: boolean
@@ -24,37 +14,6 @@ export type LocationSettlementCreateSetupProps = {
 }
 
 /** Settlement-type setup before a fixed settlement create session opens. */
-export function LocationSettlementCreateSetup({
-  open,
-  onOpenChange,
-  onComplete,
-}: LocationSettlementCreateSetupProps) {
-  const [settlementType, setSettlementType] = useState<SettlementType | ''>('')
-  const options = useMemo(() => buildSettlementTypeRadioOptions(), [])
-
-  return (
-    <LocationCreateSetupShell
-      open={open}
-      onOpenChange={onOpenChange}
-      headline={SETTLEMENT_CREATE_SETUP_HEADLINE}
-      choiceSets={[
-        {
-          id: 'settlementType',
-          fieldLabel: SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
-          prompt: SETTLEMENT_CREATE_SETUP_PROMPT,
-          options,
-          value: settlementType,
-          onValueChange: (value) => {
-            if (isSettlementType(value)) {
-              setSettlementType(value)
-            }
-          },
-        },
-      ]}
-      onContinue={() => {
-        if (!settlementType) return
-        onComplete({ kind: 'settlement', settlementType })
-      }}
-    />
-  )
+export function LocationSettlementCreateSetup(props: LocationSettlementCreateSetupProps) {
+  return <LocationCreateSetupSession {...props} />
 }

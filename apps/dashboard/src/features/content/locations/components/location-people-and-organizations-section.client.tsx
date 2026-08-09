@@ -106,7 +106,7 @@ function buildPeopleOverflowActions(input: {
     handlers.remove = () => {
       input.onRemoveConnection?.({
         relationshipId: input.row.relationshipId,
-        subjectType: input.row.subject.type,
+        subjectType: input.row.subjectType,
         subjectId: input.row.subject.id,
       })
     }
@@ -141,7 +141,7 @@ function resolveCharacterRowHeadingSuffix(
   charactersById: ReadonlyMap<string, LocationConnectedPartyCharacterOption>,
   campaignId: string,
 ): string | undefined {
-  if (row.subject.type !== 'character') {
+  if (row.subjectType !== 'character') {
     return undefined
   }
 
@@ -205,7 +205,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
 
   const rowsByBinding = new Map<string, LocationConnectedPartyRow[]>()
   for (const row of rows) {
-    const key = `${row.subject.type}:${row.kind}`
+    const key = `${row.subjectType}:${row.kind}`
     const existing = rowsByBinding.get(key) ?? []
     existing.push(row)
     rowsByBinding.set(key, existing)

@@ -4,12 +4,16 @@ import { ChevronDown } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-import { cn, ContentCardHeading, contentCardHeadingLinkVariants } from '@rpg/ui'
+import {
+  buildCollapsibleListItemLeadingChromeStyle,
+  cn,
+  ContentCardHeading,
+  contentCardHeadingLinkVariants,
+} from '@rpg/ui'
 
 import {
-  DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE,
   detailEntityRowContentVariants,
-  detailEntityRowDisclosureButtonColumnVariants,
+  detailEntityRowDisclosureButtonColumnClasses,
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
   detailEntityRowDisclosureIdentityVariants,
@@ -36,6 +40,11 @@ export type DetailEntityRowProps = {
   disclosure?: DetailEntityRowDisclosure
   className?: string
 }
+
+const DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE = buildCollapsibleListItemLeadingChromeStyle({
+  showDragHandle: false,
+  collapsible: true,
+})
 
 function DetailEntityRowIdentity({
   heading,
@@ -80,7 +89,7 @@ function DetailEntityRowDisclosureColumn({
     const toggleLabel = collapsed ? `Show ${disclosure.label}` : `Hide ${disclosure.label}`
 
     return (
-      <div className={detailEntityRowDisclosureButtonColumnVariants()}>
+      <div className={detailEntityRowDisclosureButtonColumnClasses}>
         <button
           type="button"
           className={detailEntityRowDisclosureButtonVariants()}
@@ -90,7 +99,7 @@ function DetailEntityRowDisclosureColumn({
           onClick={onToggle}
         >
           <ChevronDown
-            className={cn('size-4 transition-transform', collapsed && '-rotate-90')}
+            className={cn('transition-transform', collapsed && '-rotate-90')}
             aria-hidden
           />
         </button>
@@ -99,7 +108,7 @@ function DetailEntityRowDisclosureColumn({
   }
 
   return (
-    <div className={detailEntityRowDisclosureButtonColumnVariants()} aria-hidden>
+    <div className={detailEntityRowDisclosureButtonColumnClasses} aria-hidden>
       <span className="block size-control-action-compact" />
     </div>
   )

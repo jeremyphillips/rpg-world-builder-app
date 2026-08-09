@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Location } from '@rpg/contracts'
+import { ApiError } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
 
 import type * as RpgUi from '@rpg/ui'
@@ -46,6 +47,7 @@ vi.mock('@rpg/ui', async (importOriginal) => {
     toast: {
       ...actual.toast,
       warning: vi.fn(),
+      error: vi.fn(),
     },
   }
 })
@@ -342,5 +344,23 @@ describe('LocationChildrenSection', () => {
       )
       expect(invalidateSpy).toHaveBeenCalled()
     })
+  })
+
+  it('toasts and keeps the Move drawer open when submit fails', async () => {
+    const user = userEvent.setup()
+    mockUpdateContent.mockRejectedValue(
+      new ApiError(400, 'invalid_hierarchy', 'District cannot nest under another district.'),
+    )
+    renderSection({ canManage: true })
+
+    await user.click(screen.getByRole('button', { name: 'Actions for Yawning Portal' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Move location' }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('button', { name: 'Move location' }))
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('District cannot nest under another district.')
+    })
+    expect(screen.getByRole('dialog', { name: 'Move Yawning Portal' })).toBeInTheDocument()
   })
 })

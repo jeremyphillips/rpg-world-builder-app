@@ -206,7 +206,7 @@ Rules:
 
 When a detail section explicitly partitions children into structural groups, creation actions belong on the group that owns the destination rather than a generic panel-level action.
 
-City structure uses two subgroup header actions from one canonical eligibility pass (`childAuthoringTypesForParentKind` → `resolveSettlementStructureChildAuthoringOptions`):
+City structure uses two subgroup header actions from one canonical eligibility pass (`childAuthoringTypesForParentKind` → `resolveStructureChildAuthoringOptions`):
 
 | Group                | Action                                                                                               | Chrome                                     |
 | -------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------ |

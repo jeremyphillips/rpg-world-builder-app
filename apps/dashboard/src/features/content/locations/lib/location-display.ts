@@ -19,6 +19,7 @@ import type { DrawerContextEntityPresentation } from '../../lib/relationship/dra
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
+import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,
@@ -472,7 +473,7 @@ function buildStructureRowVm(
     disclosure: withinDepth && immediateChildren.length > 0,
     children: childRows,
     childParentKind: location.kind,
-    canAddChildren: location.kind === 'district' || location.kind === 'region',
+    canAddChildren: childAuthoringTypesForParentKind(location.kind).length > 0,
   }
 }
 
