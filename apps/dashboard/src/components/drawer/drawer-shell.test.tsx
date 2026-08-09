@@ -34,6 +34,30 @@ describe('DrawerShell', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
+  it('defaults the title to the sheet-title heading style with a titleClassName escape hatch', () => {
+    const { rerender } = render(
+      <DrawerShell open onOpenChange={() => undefined} title="Add item">
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByText('Add item')).toHaveClass('heading-style-sheet-title')
+
+    rerender(
+      <DrawerShell
+        open
+        onOpenChange={() => undefined}
+        title="Add item"
+        titleClassName="heading-style-card"
+      >
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByText('Add item')).toHaveClass('heading-style-card')
+    expect(screen.getByText('Add item')).not.toHaveClass('heading-style-sheet-title')
+  })
+
   it('closes via DrawerShell.Close', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()

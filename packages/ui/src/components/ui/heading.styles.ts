@@ -65,7 +65,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     level: 'h2',
     px: 24,
     weight: 600,
-    useCase: 'Builder option detail sheet entity title',
+    useCase: 'Sheet/drawer titles (Sheet.Header default)',
   },
   {
     variant: 'sheetSection',

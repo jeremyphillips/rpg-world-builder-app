@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import { Eyebrow } from './eyebrow'
 import { Heading } from './heading'
-import { headingVariants } from './heading.variants'
 import { RichTextContent } from './rich-text-content'
 import { Sheet } from './sheet.client'
 import { Text } from './text'
@@ -162,7 +161,6 @@ export function BuilderOptionDetailsSheet({
         <Sheet.Header
           kicker={eyebrow ? <Eyebrow size="xs">{eyebrow}</Eyebrow> : undefined}
           headline={title}
-          headlineClassName={headingVariants({ variant: 'sheetTitle' })}
           endSlot={showHeaderAction ? primaryAction : undefined}
         />
         <Sheet.Body className="space-y-6">

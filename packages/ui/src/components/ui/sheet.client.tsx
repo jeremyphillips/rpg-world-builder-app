@@ -9,6 +9,7 @@ import {
   DialogPanelHeader as SheetHeaderBase,
   dialogDismissHandlers,
 } from './dialog-parts.client'
+import { headingVariants } from './heading.variants'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { modalOverlayVariants } from './modal.variants'
 import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dialog-panel.variants'
@@ -108,7 +109,7 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
-  /** Merged onto the dialog title element (overrides default heading styles). */
+  /** Merged onto the dialog title element (overrides the `sheetTitle` default). */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
   endSlot?: React.ReactNode
@@ -125,7 +126,7 @@ const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
       kicker={kicker}
       headline={headline}
       description={description}
-      headlineClassName={headlineClassName}
+      headlineClassName={headlineClassName ?? headingVariants({ variant: 'sheetTitle' })}
       endSlot={endSlot}
       {...props}
     >

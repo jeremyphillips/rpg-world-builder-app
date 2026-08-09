@@ -246,6 +246,10 @@ When a Radix primitive requires a specific element (`Dialog.Title`,
 </DialogPrimitive.Title>
 ```
 
+Dialog chrome defaults: `Modal.Header` titles use `card` (19px); `Sheet.Header`
+titles default to `sheetTitle` (24px). Both accept `headlineClassName` as the
+escape hatch for genuine deviations.
+
 ## Dashboard content routes
 
 Content catalog detail routes under `apps/dashboard/src/features/content/**/routes/*-detail.tsx`

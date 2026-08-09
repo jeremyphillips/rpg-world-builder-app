@@ -60,6 +60,35 @@ describe('Sheet', () => {
     expect(dialog).toHaveTextContent('BENCH-001')
   })
 
+  it('defaults the headline to the sheet-title heading style', async () => {
+    const user = userEvent.setup()
+    renderSheet()
+    await user.click(screen.getByRole('button', { name: 'Open sheet' }))
+
+    const headline = await screen.findByText('Edit entry')
+    expect(headline).toHaveClass('heading-style-sheet-title')
+  })
+
+  it('overrides the headline style via headlineClassName', async () => {
+    const user = userEvent.setup()
+    render(
+      <Sheet.Root>
+        <Sheet.Trigger asChild>
+          <Button>Open sheet</Button>
+        </Sheet.Trigger>
+        <Sheet.Content>
+          <Sheet.Header headline="Edit entry" headlineClassName="heading-style-card" />
+          <Sheet.Body>Body content</Sheet.Body>
+        </Sheet.Content>
+      </Sheet.Root>,
+    )
+    await user.click(screen.getByRole('button', { name: 'Open sheet' }))
+
+    const headline = await screen.findByText('Edit entry')
+    expect(headline).toHaveClass('heading-style-card')
+    expect(headline).not.toHaveClass('heading-style-sheet-title')
+  })
+
   it('closes via a Sheet.Close footer button', async () => {
     const user = userEvent.setup()
     renderSheet()
