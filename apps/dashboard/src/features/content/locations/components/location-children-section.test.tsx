@@ -101,9 +101,7 @@ describe('LocationChildrenSection', () => {
       /Dock Ward.*District.*1 location/,
     )
     expect(
-      screen.getByText(
-        'Districts organize neighborhoods; other locations can sit directly in the settlement.',
-      ),
+      screen.getByText('Districts and locations organized within this city.'),
     ).toBeInTheDocument()
 
     const districtsLabel = screen.getByText('Districts')
@@ -212,7 +210,7 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByRole('button', { name: 'Add location' })).toBeInTheDocument()
     expect(screen.getByText('No districts yet.')).toBeInTheDocument()
     expect(screen.getByText('No direct locations yet.')).toBeInTheDocument()
-    expect(screen.queryByText('No contained locations yet.')).not.toBeInTheDocument()
+    expect(screen.queryByText('No locations yet.')).not.toBeInTheDocument()
   })
 
   it('launches contained create under the district when row Add location chooses Building', async () => {
@@ -279,7 +277,7 @@ describe('LocationChildrenSection', () => {
     expect(screen.getByRole('menuitem', { name: 'Move location' })).toBeInTheDocument()
   })
 
-  it('opens the contained create drawer from Contained locations panel Add location', async () => {
+  it('opens the contained create drawer from structure panel Add location', async () => {
     const user = userEvent.setup()
     renderSection({ canManage: true, parent: DOCK_WARD })
 

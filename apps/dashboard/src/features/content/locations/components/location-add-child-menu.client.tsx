@@ -89,7 +89,7 @@ export function LocationAddChildMenu({
             key={authoringType}
             onSelect={() => onSelectAuthoringType(authoringType)}
           >
-            {getLocationAuthoringTypeLabel(authoringType)}
+            {getLocationAuthoringTypeLabel(authoringType, { parentKind })}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

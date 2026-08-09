@@ -13,13 +13,13 @@ import {
 
 describe('partitionSettlementChildLocations', () => {
   it('groups districts separately from direct places', () => {
-    const { districts, directPlaces } = partitionSettlementChildLocations([
+    const { districts, directLocations } = partitionSettlementChildLocations([
       DOCK_WARD,
       YAWNING_PORTAL,
     ])
 
     expect(districts.map((location) => location.id)).toEqual([DOCK_WARD.id])
-    expect(directPlaces.map((location) => location.id)).toEqual([YAWNING_PORTAL.id])
+    expect(directLocations.map((location) => location.id)).toEqual([YAWNING_PORTAL.id])
   })
 })
 
@@ -71,7 +71,7 @@ describe('settlement structure on Harborford', () => {
     expect(viewModel.children.heading).toBe('City structure')
     expect(viewModel.children.groups?.map((group) => group.id)).toEqual([
       'districts',
-      'directPlaces',
+      'directLocations',
     ])
   })
 })

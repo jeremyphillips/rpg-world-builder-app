@@ -67,7 +67,7 @@ export function LocationSettlementCreateSetup({
               disabled={!settlementType}
               onClick={() => {
                 if (!settlementType) return
-                onComplete({ settlementType })
+                onComplete({ kind: 'settlement', settlementType })
                 onOpenChange(false)
               }}
             >

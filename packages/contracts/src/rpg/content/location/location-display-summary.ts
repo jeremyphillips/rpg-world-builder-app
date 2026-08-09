@@ -130,6 +130,22 @@ export function resolveLocationReferenceNoun(location: Location): string {
   return resolveTypeLabel(location).toLowerCase()
 }
 
+/**
+ * Noun for Structure panel headings (`${noun} structure`).
+ * Reuses the same type/classification resolution as {@link resolveLocationDisplaySummary}:
+ * settlement and site prefer their primary subtype label; other kinds use typeLabel
+ * (kind label, or structure/interior subtype already on typeLabel).
+ */
+export function resolveLocationStructureHeadingNoun(location: Location): string {
+  const summary = resolveLocationDisplaySummary(location)
+
+  if (location.kind === 'settlement' || location.kind === 'site') {
+    return summary.classificationLabel ?? summary.typeLabel
+  }
+
+  return summary.typeLabel
+}
+
 /** Resolves semantic display labels for a location without presentation field names. */
 export function resolveLocationDisplaySummary(location: Location): LocationDisplaySummary {
   return {

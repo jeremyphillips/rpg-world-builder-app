@@ -8,7 +8,7 @@ import {
   type LocationCreateIntent,
 } from '../lib/location-create-session'
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
-import { LocationSettlementCreateSetup } from './location-settlement-create-setup.client'
+import { LocationCreateSetupHost } from './location-create-setup-host.client'
 
 export function useLocationCreateSessionLaunch(
   onReady: (fixedCreate: LocationFixedCreateContext) => void,
@@ -31,8 +31,7 @@ export function useLocationCreateSessionLaunch(
 
   const setupHost =
     setupIntent !== null ? (
-      <LocationSettlementCreateSetup
-        open
+      <LocationCreateSetupHost
         intent={setupIntent}
         onOpenChange={(open) => {
           if (!open) setSetupIntent(null)

@@ -7,6 +7,7 @@ import {
   resolveLocationDetailClassificationFieldLabel,
   resolveLocationDisplaySummary,
   resolveLocationReferenceNoun,
+  resolveLocationStructureHeadingNoun,
 } from './location-display-summary'
 import type { Location } from './location'
 
@@ -52,6 +53,32 @@ describe('resolveLocationDisplaySummary', () => {
       typeLabel: 'Region',
       classificationLabel: 'Kingdom',
     })
+  })
+
+  it('resolves structure heading nouns from the display projection', () => {
+    const settlement: Location = {
+      ...baseLocation,
+      kind: 'settlement',
+      settlementType: 'city',
+      parentLocationId: 'loc_parent',
+    }
+    const region: Location = {
+      ...baseLocation,
+      id: 'loc_region',
+      kind: 'region',
+      classification: { kind: 'political', type: 'kingdom' },
+    }
+    const site: Location = {
+      ...baseLocation,
+      id: 'loc_site',
+      kind: 'site',
+      siteType: 'landmark',
+      parentLocationId: 'loc_parent',
+    }
+
+    expect(resolveLocationStructureHeadingNoun(settlement)).toBe('City')
+    expect(resolveLocationStructureHeadingNoun(region)).toBe('Region')
+    expect(resolveLocationStructureHeadingNoun(site)).toBe('Landmark')
   })
 
   it('resolves building archetype and specialization separately', () => {

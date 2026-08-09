@@ -42,7 +42,7 @@ describe('buildLocationFields', () => {
     expect(names).toContain('description')
   })
 
-  it('includes region classification fields for fixed region create', () => {
+  it('includes region classification fields for fixed region create without setup lock', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
@@ -56,6 +56,38 @@ describe('buildLocationFields', () => {
 
     expect(names).toContain('classification.kind')
     expect(names).toContain('classification.type')
+  })
+
+  it('omits region classification fields when classification is locked from setup', () => {
+    const ctx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: {
+        authoringType: 'region',
+        parent: { kind: 'fixed', locationId: 'location-parent' },
+        classification: { kind: 'geographic', type: 'coast' },
+      },
+    }
+
+    const names = collectFieldNames(buildLocationFields(ctx))
+
+    expect(names).not.toContain('classification.kind')
+    expect(names).not.toContain('classification.type')
+  })
+
+  it('omits siteType when locked from setup', () => {
+    const ctx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: {
+        authoringType: 'site',
+        siteType: 'landmark',
+      },
+    }
+
+    const names = collectFieldNames(buildLocationFields(ctx))
+
+    expect(names).not.toContain('siteType')
   })
 
   it('includes interior classification fields for fixed interior create', () => {

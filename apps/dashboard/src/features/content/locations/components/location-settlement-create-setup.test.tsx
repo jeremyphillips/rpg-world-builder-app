@@ -79,7 +79,7 @@ describe('LocationSettlementCreateSetup', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     await waitFor(() => {
-      expect(onComplete).toHaveBeenCalledWith({ settlementType: 'city' })
+      expect(onComplete).toHaveBeenCalledWith({ kind: 'settlement', settlementType: 'city' })
     })
   })
 

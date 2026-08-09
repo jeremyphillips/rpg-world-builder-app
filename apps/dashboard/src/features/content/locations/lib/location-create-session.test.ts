@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { HARBORFORD, DOCK_WARD } from '../fixtures'
+import { HARBORFORD, DOCK_WARD, ALDERMERE } from '../fixtures'
 import {
   completeLocationCreateSetup,
   fixedCreateFromIntent,
@@ -42,7 +42,7 @@ describe('completeLocationCreateSetup', () => {
     expect(
       completeLocationCreateSetup(
         { authoringType: 'settlement', parentLocationId: DOCK_WARD.id },
-        { settlementType: 'city' },
+        { kind: 'settlement', settlementType: 'city' },
       ),
     ).toEqual({
       authoringType: 'settlement',
@@ -55,6 +55,7 @@ describe('completeLocationCreateSetup', () => {
     const result = completeLocationCreateSetup(
       { authoringType: 'settlement' },
       {
+        kind: 'settlement',
         settlementType: 'town',
       },
     )
@@ -83,7 +84,10 @@ describe('parent/type distinction', () => {
 
   it('overview settlement after setup fixes settlementType but not parent', () => {
     expect(
-      completeLocationCreateSetup({ authoringType: 'settlement' }, { settlementType: 'city' }),
+      completeLocationCreateSetup(
+        { authoringType: 'settlement' },
+        { kind: 'settlement', settlementType: 'city' },
+      ),
     ).toEqual({
       authoringType: 'settlement',
       settlementType: 'city',
@@ -94,12 +98,45 @@ describe('parent/type distinction', () => {
     expect(
       completeLocationCreateSetup(
         { authoringType: 'settlement', parentLocationId: HARBORFORD.id },
-        { settlementType: 'metropolis' },
+        { kind: 'settlement', settlementType: 'metropolis' },
       ),
     ).toEqual({
       authoringType: 'settlement',
       parent: { kind: 'fixed', locationId: HARBORFORD.id },
       settlementType: 'metropolis',
+    })
+  })
+
+  it('returns needsSetup for region and site', () => {
+    expect(resolveLocationCreateSession({ authoringType: 'region' })).toEqual({
+      status: 'needsSetup',
+    })
+    expect(resolveLocationCreateSession({ authoringType: 'site' })).toEqual({
+      status: 'needsSetup',
+    })
+  })
+
+  it('locks region classification and site type from setup', () => {
+    expect(
+      completeLocationCreateSetup(
+        { authoringType: 'region', parentLocationId: ALDERMERE.id, parentKind: 'world' },
+        { kind: 'region', classification: { kind: 'political', type: 'kingdom' } },
+      ),
+    ).toEqual({
+      authoringType: 'region',
+      parent: { kind: 'fixed', locationId: ALDERMERE.id },
+      parentKind: 'world',
+      classification: { kind: 'political', type: 'kingdom' },
+    })
+
+    expect(
+      completeLocationCreateSetup(
+        { authoringType: 'site' },
+        { kind: 'site', siteType: 'landmark' },
+      ),
+    ).toEqual({
+      authoringType: 'site',
+      siteType: 'landmark',
     })
   })
 })

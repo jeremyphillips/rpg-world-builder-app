@@ -189,6 +189,15 @@ export function applyLocationFixedCreateContext(
       ? { parentLocationId: fixedCreate.parent.locationId }
       : {}),
     ...(fixedCreate.settlementType ? { settlementType: fixedCreate.settlementType } : {}),
+    ...(fixedCreate.siteType ? { siteType: fixedCreate.siteType } : {}),
+    ...(fixedCreate.classification
+      ? {
+          classification: {
+            kind: fixedCreate.classification.kind,
+            type: fixedCreate.classification.type,
+          },
+        }
+      : {}),
   }
 }
 

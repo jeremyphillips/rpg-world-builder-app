@@ -7,7 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
 import { useCampaigns } from '@/features/campaign'
 import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
-import { LocationSettlementCreateSetup } from './location-settlement-create-setup.client'
+import { LocationCreateSetupHost } from './location-create-setup-host.client'
 import {
   buildLocationFixedCreateHref,
   parseLocationCreateSessionFromSearchParams,
@@ -53,8 +53,7 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
 
   if (session.kind === 'needsSetup') {
     return (
-      <LocationSettlementCreateSetup
-        open
+      <LocationCreateSetupHost
         intent={session.intent}
         onOpenChange={(open) => {
           if (!open) {

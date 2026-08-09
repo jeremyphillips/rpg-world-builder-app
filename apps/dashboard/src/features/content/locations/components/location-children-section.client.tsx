@@ -27,9 +27,8 @@ import {
 import type {
   LocationChildItem,
   LocationChildrenViewModel,
-  SettlementStructureDistrictItem,
+  LocationStructureRowVm,
 } from '../lib/location-display'
-import { formatLocationChildCount } from '../lib/location-display'
 import type { LocationAuthoringType } from '../lib/location-authoring-type'
 import {
   applyLocationParentReplacement,
@@ -45,7 +44,7 @@ import {
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
 } from '../lib/location-create-shortcuts'
-import { resolveSettlementStructureChildAuthoringOptions } from '../lib/location-settlement-structure.lib'
+import { resolveStructureChildAuthoringOptions } from '../lib/location-structure.lib'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
 import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
 import { LocationContainedCreateDrawer } from './location-contained-create-drawer.client'
@@ -82,56 +81,40 @@ function buildChildRowActions(
     : []
 }
 
-function LocationPreviewChildRows({
-  items,
-  inset = 'parent',
-}: {
-  items: LocationChildItem[]
-  inset?: 'self' | 'parent'
-}) {
-  return (
-    <DetailSectionRowList>
-      {items.map((item, index) => (
-        <DetailEntityRow
-          key={item.id}
-          heading={item.name}
-          href={item.href}
-          headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
-          inset={inset}
-          className={detailEntityRowDisclosurePreviewRowVariants({
-            edge: resolveDetailEntityRowDisclosurePreviewRowEdge(index, items.length),
-          })}
-        />
-      ))}
-    </DetailSectionRowList>
-  )
+function resolveStructureRowHeadingSuffix(row: LocationStructureRowVm): string {
+  const parts = [row.item.summaryLine]
+  if (row.countPhrase) {
+    parts.push(row.countPhrase)
+  }
+  return `${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${parts.join(LOCATION_DISPLAY_SUMMARY_SEPARATOR)}`
 }
 
-function resolveDistrictRowEndSlot({
-  item,
+function resolveExpandableRowEndSlot({
+  row,
   canManage,
-  canAddChild,
   actions,
   onSelectAuthoringType,
 }: {
-  item: LocationChildItem
+  row: LocationStructureRowVm
   canManage: boolean
-  canAddChild: boolean
   actions: readonly DetailOverflowAction[]
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
 }) {
+  const canAddChild =
+    canManage && row.canAddChildren && childAuthoringTypesForParentKind(row.kind).length > 0
+
   const addMenu = canAddChild ? (
     <LocationAddChildMenu
       appearance="icon"
-      parentKind="district"
-      triggerLabel={`Add location to ${item.name}`}
-      menuHeading={`Add to ${item.name}`}
-      onSelectAuthoringType={(authoringType) => onSelectAuthoringType(authoringType, item.id)}
+      parentKind={row.kind}
+      triggerLabel={`Add location to ${row.item.name}`}
+      menuHeading={`Add to ${row.item.name}`}
+      onSelectAuthoringType={(authoringType) => onSelectAuthoringType(authoringType, row.item.id)}
     />
   ) : null
   const overflow =
     canManage && actions.length > 0 ? (
-      <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
+      <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${row.item.name}`} />
     ) : null
 
   if (addMenu && overflow) {
@@ -146,57 +129,207 @@ function resolveDistrictRowEndSlot({
   return addMenu ?? overflow ?? undefined
 }
 
-function SettlementDistrictRows({
-  items,
+function LocationStructurePreviewChildRows({
+  rows,
+  inset,
+}: {
+  rows: readonly LocationStructureRowVm[]
+  inset: 'self' | 'parent'
+}) {
+  return (
+    <DetailSectionRowList>
+      {rows.map((child, childIndex) => (
+        <DetailEntityRow
+          key={child.item.id}
+          heading={child.item.name}
+          href={child.item.href}
+          headingSuffix={resolveStructureRowHeadingSuffix(child)}
+          inset={inset}
+          className={detailEntityRowDisclosurePreviewRowVariants({
+            edge: resolveDetailEntityRowDisclosurePreviewRowEdge(childIndex, rows.length),
+          })}
+        />
+      ))}
+    </DetailSectionRowList>
+  )
+}
+
+function resolveStructureRowNestedContent({
+  row,
+  canManage,
+  onMove,
+  onView,
+  onSelectAuthoringType,
+  inset,
+}: {
+  row: LocationStructureRowVm
+  canManage: boolean
+  onMove: (childId: string) => void
+  onView: (href: string) => void
+  onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
+  inset: 'self' | 'parent'
+}): React.ReactNode {
+  if (row.children.length === 0) return null
+
+  if (row.disclosure) {
+    return (
+      <LocationStructureRows
+        rows={row.children}
+        canManage={canManage}
+        onMove={onMove}
+        onView={onView}
+        onSelectAuthoringType={onSelectAuthoringType}
+        inset={inset}
+      />
+    )
+  }
+
+  return <LocationStructurePreviewChildRows rows={row.children} inset={inset} />
+}
+
+function resolveStructureRowDisclosure(
+  row: LocationStructureRowVm,
+  nestedContent: React.ReactNode,
+) {
+  if (row.disclosure && nestedContent) {
+    return {
+      mode: 'expandable' as const,
+      label: `locations in ${row.item.name}`,
+      content: nestedContent,
+    }
+  }
+
+  if (row.canAddChildren) {
+    return { mode: 'reserved' as const }
+  }
+
+  return undefined
+}
+
+function resolveStructureRowEndSlot({
+  row,
+  canManage,
+  actions,
+  onSelectAuthoringType,
+}: {
+  row: LocationStructureRowVm
+  canManage: boolean
+  actions: readonly DetailOverflowAction[]
+  onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
+}) {
+  if (row.canAddChildren) {
+    return resolveExpandableRowEndSlot({
+      row,
+      canManage,
+      actions,
+      onSelectAuthoringType,
+    })
+  }
+
+  if (canManage && actions.length > 0) {
+    return <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${row.item.name}`} />
+  }
+
+  return undefined
+}
+
+function isStructurePreviewLeaf(row: LocationStructureRowVm): boolean {
+  return !row.disclosure && row.children.length === 0 && !row.canAddChildren
+}
+
+function LocationStructureRow({
+  row,
+  index,
+  rowCount,
+  canManage,
+  onMove,
+  onView,
+  onSelectAuthoringType,
+  inset,
+}: {
+  row: LocationStructureRowVm
+  index: number
+  rowCount: number
+  canManage: boolean
+  onMove: (childId: string) => void
+  onView: (href: string) => void
+  onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
+  inset: 'self' | 'parent'
+}) {
+  const actions = buildChildRowActions(row.item, canManage, onMove, onView)
+  const previewClassName = detailEntityRowDisclosurePreviewRowVariants({
+    edge: resolveDetailEntityRowDisclosurePreviewRowEdge(index, rowCount),
+  })
+
+  if (isStructurePreviewLeaf(row)) {
+    return (
+      <DetailEntityRow
+        heading={row.item.name}
+        href={row.item.href}
+        headingSuffix={resolveStructureRowHeadingSuffix(row)}
+        inset={inset}
+        className={previewClassName}
+      />
+    )
+  }
+
+  const nestedContent = resolveStructureRowNestedContent({
+    row,
+    canManage,
+    onMove,
+    onView,
+    onSelectAuthoringType,
+    inset,
+  })
+
+  return (
+    <DetailEntityRow
+      heading={row.item.name}
+      href={row.item.href}
+      headingSuffix={resolveStructureRowHeadingSuffix(row)}
+      inset={inset}
+      disclosure={resolveStructureRowDisclosure(row, nestedContent)}
+      endSlot={resolveStructureRowEndSlot({
+        row,
+        canManage,
+        actions,
+        onSelectAuthoringType,
+      })}
+      className={!row.disclosure && !row.canAddChildren ? previewClassName : undefined}
+    />
+  )
+}
+
+function LocationStructureRows({
+  rows,
   canManage,
   onMove,
   onView,
   onSelectAuthoringType,
   inset = 'parent',
 }: {
-  items: SettlementStructureDistrictItem[]
+  rows: readonly LocationStructureRowVm[]
   canManage: boolean
   onMove: (childId: string) => void
   onView: (href: string) => void
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
   inset?: 'self' | 'parent'
 }) {
-  const canAddChild = canManage && childAuthoringTypesForParentKind('district').length > 0
-
   return (
     <DetailSectionRowList>
-      {items.map(({ item, immediateChildren }) => {
-        const childCount = immediateChildren.length
-        const countPhrase = formatLocationChildCount(childCount)
-        const headingSuffix = `${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${countPhrase}`
-        const actions = buildChildRowActions(item, canManage, onMove, onView)
-
-        return (
-          <DetailEntityRow
-            key={item.id}
-            heading={item.name}
-            href={item.href}
-            headingSuffix={headingSuffix}
-            inset={inset}
-            disclosure={
-              childCount > 0
-                ? {
-                    mode: 'expandable',
-                    label: `locations in ${item.name}`,
-                    content: <LocationPreviewChildRows items={immediateChildren} inset={inset} />,
-                  }
-                : { mode: 'reserved' }
-            }
-            endSlot={resolveDistrictRowEndSlot({
-              item,
-              canManage,
-              canAddChild,
-              actions,
-              onSelectAuthoringType,
-            })}
-          />
-        )
-      })}
+      {rows.map((row, index) => (
+        <LocationStructureRow
+          key={row.item.id}
+          row={row}
+          index={index}
+          rowCount={rows.length}
+          canManage={canManage}
+          onMove={onMove}
+          onView={onView}
+          onSelectAuthoringType={onSelectAuthoringType}
+          inset={inset}
+        />
+      ))}
     </DetailSectionRowList>
   )
 }
@@ -238,7 +371,7 @@ function LocationChildRows({
   )
 }
 
-type SettlementStructureGroupsProps = {
+type LocationStructureGroupsProps = {
   groups: NonNullable<LocationChildrenViewModel['groups']>
   parentKind: LocationKind
   canManage: boolean
@@ -250,37 +383,42 @@ type SettlementStructureGroupsProps = {
   onView: (href: string) => void
 }
 
-function SettlementStructureGroups({
+function LocationStructureGroups({
   groups,
   parentKind,
   canManage,
   onSelectAuthoringType,
   onMove,
   onView,
-}: SettlementStructureGroupsProps) {
-  const structureAuthoring = resolveSettlementStructureChildAuthoringOptions(
+}: LocationStructureGroupsProps) {
+  const structureAuthoring = resolveStructureChildAuthoringOptions(
+    parentKind,
     childAuthoringTypesForParentKind(parentKind),
   )
-  const canAddDistrict = Boolean(canManage && structureAuthoring.district)
+  const canAddStructural = Boolean(canManage && structureAuthoring.structural)
   const canAddDirectLocation = canManage && structureAuthoring.direct.length > 0
 
-  const resolveGroupEndSlot = (groupId: string) => {
-    if (groupId === 'districts' && canAddDistrict) {
+  const resolveGroupEndSlot = (group: (typeof groups)[number]) => {
+    if (
+      group.structuralAuthoringType &&
+      canAddStructural &&
+      structureAuthoring.structural === group.structuralAuthoringType
+    ) {
       return (
         <Button
           type="button"
           variant="ghost"
           size="sm"
           density="compact"
-          onClick={() => onSelectAuthoringType('district')}
+          onClick={() => onSelectAuthoringType(group.structuralAuthoringType!)}
         >
           <Plus aria-hidden />
-          {formatLocationAuthoringTypeAddHeading('district')}
+          {formatLocationAuthoringTypeAddHeading(group.structuralAuthoringType, { parentKind })}
         </Button>
       )
     }
 
-    if (groupId === 'directPlaces' && canAddDirectLocation) {
+    if (group.id === 'directLocations' && canAddDirectLocation) {
       return (
         <LocationAddChildMenu
           appearance="group"
@@ -297,24 +435,20 @@ function SettlementStructureGroups({
   return (
     <>
       {groups.map((group) => (
-        <DetailSectionGroup
-          key={group.id}
-          label={group.label}
-          endSlot={resolveGroupEndSlot(group.id)}
-        >
-          {group.items.length === 0 ? (
-            <Text variant="muted" className="pt-1 text-sm">
-              {group.emptyText}
-            </Text>
-          ) : group.id === 'districts' ? (
-            <SettlementDistrictRows
-              items={group.items}
+        <DetailSectionGroup key={group.id} label={group.label} endSlot={resolveGroupEndSlot(group)}>
+          {group.expandableItems && group.expandableItems.length > 0 ? (
+            <LocationStructureRows
+              rows={group.expandableItems}
               canManage={canManage}
               onMove={onMove}
               onView={onView}
               onSelectAuthoringType={onSelectAuthoringType}
               inset="parent"
             />
+          ) : group.items.length === 0 ? (
+            <Text variant="muted" className="pt-1 text-sm">
+              {group.emptyText}
+            </Text>
           ) : (
             <LocationChildRows
               items={group.items}
@@ -408,7 +542,14 @@ export function LocationChildrenSection({
     authoringType: LocationAuthoringType,
     fixedParentLocationId: string = parentLocationId,
   ) => {
-    launch({ authoringType, parentLocationId: fixedParentLocationId })
+    launch({
+      authoringType,
+      parentLocationId: fixedParentLocationId,
+      parentKind:
+        fixedParentLocationId === parentLocationId
+          ? parentKind
+          : campaignLocations.find((location) => location.id === fixedParentLocationId)?.kind,
+    })
   }
 
   const hasFlatContent = items.length > 0
@@ -430,7 +571,7 @@ export function LocationChildrenSection({
         }
       >
         {groups ? (
-          <SettlementStructureGroups
+          <LocationStructureGroups
             groups={groups}
             parentKind={parentKind}
             canManage={canManage}

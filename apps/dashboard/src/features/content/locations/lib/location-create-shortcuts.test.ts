@@ -51,7 +51,29 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
 
     expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
       kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(intent, { settlementType: 'city' }),
+      fixedCreate: completeLocationCreateSetup(intent, {
+        kind: 'settlement',
+        settlementType: 'city',
+      }),
+    })
+  })
+
+  it('returns needsSetup for region and site without setup params', () => {
+    expect(
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=region`),
+      ),
+    ).toEqual({
+      kind: 'needsSetup',
+      intent: { authoringType: 'region' },
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(
+        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=site`),
+      ),
+    ).toEqual({
+      kind: 'needsSetup',
+      intent: { authoringType: 'site' },
     })
   })
 
@@ -76,7 +98,37 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
       kind: 'ready',
       fixedCreate: completeLocationCreateSetup(
         { authoringType: 'settlement' },
-        { settlementType: 'town' },
+        { kind: 'settlement', settlementType: 'town' },
+      ),
+    })
+  })
+
+  it('round-trips site and region setup params', () => {
+    const siteHref = buildLocationFixedCreateHref('campaign-1', {
+      authoringType: 'site',
+      siteType: 'ruin',
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(new URLSearchParams(siteHref.split('?')[1])),
+    ).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(
+        { authoringType: 'site' },
+        { kind: 'site', siteType: 'ruin' },
+      ),
+    })
+
+    const regionHref = buildLocationFixedCreateHref('campaign-1', {
+      authoringType: 'region',
+      classification: { kind: 'geographic', type: 'coast' },
+    })
+    expect(
+      parseLocationCreateSessionFromSearchParams(new URLSearchParams(regionHref.split('?')[1])),
+    ).toEqual({
+      kind: 'ready',
+      fixedCreate: completeLocationCreateSetup(
+        { authoringType: 'region' },
+        { kind: 'region', classification: { kind: 'geographic', type: 'coast' } },
       ),
     })
   })
@@ -137,6 +189,16 @@ describe('formatLocationAuthoringTypeAddHeading', () => {
     expect(formatLocationAuthoringTypeAddHeading('building')).toBe('Add building')
     expect(formatLocationAuthoringTypeAddHeading('district')).toBe('Add district')
     expect(formatLocationAuthoringTypeAddHeading('structure')).toBe('Add unclassified structure')
+  })
+
+  it('uses Subregion when parent kind is region', () => {
+    expect(formatLocationAuthoringTypeAddHeading('region')).toBe('Add region')
+    expect(formatLocationAuthoringTypeAddHeading('region', { parentKind: 'world' })).toBe(
+      'Add region',
+    )
+    expect(formatLocationAuthoringTypeAddHeading('region', { parentKind: 'region' })).toBe(
+      'Add subregion',
+    )
   })
 })
 

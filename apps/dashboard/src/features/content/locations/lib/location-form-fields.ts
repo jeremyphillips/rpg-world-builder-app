@@ -84,6 +84,36 @@ export type LocationFormValues = z.infer<typeof locationFormSchema>
 
 export { nameField as locationNameField }
 
+function resolveOmittedFixedCreateFieldNames(
+  fixedCreate: LocationFormCtx['fixedCreate'],
+): ReadonlySet<string> {
+  const omitted = new Set<string>()
+  if (!fixedCreate) return omitted
+  if (fixedCreate.settlementType) omitted.add('settlementType')
+  if (fixedCreate.siteType) omitted.add('siteType')
+  if (fixedCreate.classification) {
+    omitted.add('classification.kind')
+    omitted.add('classification.type')
+  }
+  return omitted
+}
+
+function omitFixedCreateNamedFields<T>(
+  fields: readonly T[],
+  fixedCreate: LocationFormCtx['fixedCreate'],
+): T[] {
+  const omitted = resolveOmittedFixedCreateFieldNames(fixedCreate)
+  if (omitted.size === 0) return [...fields]
+
+  return fields.filter((field) => {
+    const name =
+      field && typeof field === 'object' && 'name' in field && typeof field.name === 'string'
+        ? field.name
+        : undefined
+    return !name || !omitted.has(name)
+  })
+}
+
 export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
@@ -91,26 +121,25 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const locationEntities = ctx.options?.locationEntities
   const items: FormItem[] = []
 
-  const omitFixedSettlementTypeFields = (fields: RowFieldItem[]): RowFieldItem[] => {
-    if (!fixedCreate?.settlementType) return fields
-    return fields.filter((field) => field.name !== 'settlementType')
-  }
-
   if (fixedCreate) {
-    const primaryFields = omitFixedSettlementTypeFields(
+    const primaryFields: RowFieldItem[] = omitFixedCreateNamedFields(
       filterLocationFieldsForAuthoringType(
         buildLocationPrimaryClassificationFields(),
         fixedCreate.authoringType,
       ),
+      fixedCreate,
     )
     if (primaryFields.length > 0) {
       items.push({ kind: 'row', fields: primaryFields })
     }
 
     items.push(
-      ...filterLocationFieldsForAuthoringType(
-        buildLocationClassificationFields(),
-        fixedCreate.authoringType,
+      ...omitFixedCreateNamedFields(
+        filterLocationFieldsForAuthoringType(
+          buildLocationClassificationFields(),
+          fixedCreate.authoringType,
+        ),
+        fixedCreate,
       ),
     )
   } else {

@@ -7,6 +7,11 @@ All create, move, bulk, and parent-picker surfaces derive eligibility from that 
 ## Shape
 
 ```text
+World
+├─ Region
+│  ├─ Region (Subregion — derived UI role only)
+│  └─ Settlement / Site / …
+├─ Settlement / Site / … (direct)
 Settlement
 ├─ District
 │  └─ place locations (structure, site, …)
@@ -19,32 +24,58 @@ Settlement
 - **District may parent eligible place kinds** — structures, sites, and other kinds whose
   `allowedParents` include `district`.
 - **Settlement may also parent place kinds directly** — “Direct locations” in City structure.
+- **Region may parent Region** — nested regions remain `kind: 'region'`. UI copy uses
+  **Subregion** when the parent is a Region (derived relationship label only).
 
-## City structure authoring
+## Location structure authoring
 
-When a detail section partitions children into structural groups, creation actions belong to
-the group that owns the destination — not a generic panel-level action.
+Detail children render through one **Location → Structure** panel
+(`LocationChildrenSection` + `buildLocationChildrenViewModel`). Grouping is owned by
+structure profiles in `location-structure.lib.ts`:
 
 ```text
+World structure
+├─ Regions (+ Add region)
+│  └─ expandable region rows (maxInlineDepth: 2)
+└─ Direct locations (+ Add location)
+
+Region structure
+├─ Subregions (+ Add subregion)
+│  └─ expandable region rows (maxInlineDepth: 2)
+└─ Direct locations (+ Add location)
+
 City structure
-├─ Districts
-│  ├─ + Add district          → create District under this Settlement
-│  └─ District row +          → Add location inside that District
-└─ Direct locations
-   └─ + Add location          → non-District child under this Settlement
+├─ Districts (+ Add district)
+│  └─ expandable district rows (maxInlineDepth: 1)
+└─ Direct locations (+ Add location)
 ```
 
-Both subgroup actions derive from one `childAuthoringTypesForParentKind(settlement)` result,
-projected by `resolveSettlementStructureChildAuthoringOptions`:
+`maxInlineDepth: 2` means two nested row levels below the current detail surface may show
+a disclosure chevron. At the cap, rows still show immediate-child counts but no chevron —
+navigate to that location’s Structure panel for deeper hierarchy.
 
-- **District** → Add district (when eligible)
-- **everything else eligible** → Direct locations Add location menu
+### Counts
 
-Direct-location choices are that projection with District removed — not a separate hierarchy
-taxonomy. District is the only structural subdivision type requiring special UI treatment.
+Immediate children only. Expandable region rows split counts:
 
-The panel heading/helper stay informational. Flat **Contained locations** (non-settlement
-parents) still use a panel `headerEndSlot` Add location menu.
+- `N subregion(s)` — immediate children with `kind === 'region'` (noun depends on parent
+  context: Subregion under Region, Region under World)
+- `N location(s)` — immediate non-region children
+
+`2 subregions · 3 locations` means five immediate children (2 + 3).
+
+### Create setup
+
+Settlement, Region, and Site use the shared setup gate
+(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. URL resume
+params (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
+same shortcut contract.
+
+Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected
+by `resolveStructureChildAuthoringOptions`.
+
+The panel heading uses `` `${resolveLocationStructureHeadingNoun(location)} structure` ``
+from contracts display projection.
 
 ## Parent mutation ownership
 
@@ -58,7 +89,7 @@ PATCH /api/campaigns/:campaignId/content/locations/:subjectId
 { "kind": "<subjectKind>", "parentLocationId": "<destinationParentId>" }
 ```
 
-City structure **Move** binds the row’s child `item.id` as `:subjectId`.
+Structure **Move** binds the row’s child `item.id` as `:subjectId`.
 
 ## Validation
 

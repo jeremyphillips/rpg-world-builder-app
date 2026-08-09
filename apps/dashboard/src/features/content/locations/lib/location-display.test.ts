@@ -15,7 +15,6 @@ import {
   buildLocationLocatedInSegments,
   buildLocationsById,
   formatLocatedInSupportingText,
-  formatLocationChildCount,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
 import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
@@ -203,16 +202,13 @@ describe('settlement structure district previews', () => {
     })
 
     const dockWard = viewModel.children.groups?.find((group) => group.id === 'districts')
-    if (dockWard?.id !== 'districts') throw new Error('Expected districts group')
-    expect(dockWard.items[0]?.immediateChildren.map((child) => child.name)).toEqual([
+    expect(dockWard?.expandableItems?.[0]?.children.map((child) => child.item.name)).toEqual([
       'Yawning Portal',
     ])
-    expect(formatLocationChildCount(dockWard.items[0]?.immediateChildren.length ?? 0)).toBe(
-      '1 location',
-    )
+    expect(dockWard?.expandableItems?.[0]?.countPhrase).toBe('1 location')
   })
 
-  it('includes zero-child districts with empty immediateChildren', () => {
+  it('includes zero-child districts with empty children and zero count', () => {
     const emptyDistrict: Location = {
       ...DOCK_WARD,
       id: 'location-market-ward',
@@ -227,11 +223,12 @@ describe('settlement structure district previews', () => {
     })
 
     const districtsGroup = viewModel.children.groups?.find((group) => group.id === 'districts')
-    if (districtsGroup?.id !== 'districts') throw new Error('Expected districts group')
-
-    const marketWard = districtsGroup.items.find((district) => district.item.name === 'Market Ward')
-    expect(marketWard?.immediateChildren).toEqual([])
-    expect(formatLocationChildCount(marketWard?.immediateChildren.length ?? 0)).toBe('0 locations')
+    const marketWard = districtsGroup?.expandableItems?.find(
+      (district) => district.item.name === 'Market Ward',
+    )
+    expect(marketWard?.children).toEqual([])
+    expect(marketWard?.countPhrase).toBe('0 locations')
+    expect(marketWard?.disclosure).toBe(false)
   })
 })
 
@@ -252,10 +249,9 @@ describe('buildLocationDetailViewModel', () => {
     expect(viewModel.children.heading).toBe('City structure')
     const dockWard = viewModel.children.groups?.find((group) => group.id === 'districts')
     expect(dockWard?.id).toBe('districts')
-    if (dockWard?.id !== 'districts') return
 
-    expect(dockWard.items.map((child) => child.item.name)).toEqual(['Dock Ward'])
-    expect(dockWard.items[0]?.immediateChildren.map((child) => child.name)).toEqual([
+    expect(dockWard?.expandableItems?.map((child) => child.item.name)).toEqual(['Dock Ward'])
+    expect(dockWard?.expandableItems?.[0]?.children.map((child) => child.item.name)).toEqual([
       'Yawning Portal',
     ])
   })
