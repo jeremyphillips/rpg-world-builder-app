@@ -169,6 +169,11 @@ describe('DetailEntityRow', () => {
 
     const expandedRegion = container.querySelector('[id]')
     expect(expandedRegion).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(expandedRegion?.firstElementChild).toHaveClass(
+      'border-l',
+      'border-border-subtle',
+      'pl-3',
+    )
   })
 
   it('keeps parent and preview as one list child without an inner divider', async () => {

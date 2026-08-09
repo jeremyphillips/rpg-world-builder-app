@@ -1,6 +1,6 @@
 'use client'
 
-import { z } from 'zod'
+import type { z } from 'zod'
 import { useRef, useState, type MutableRefObject } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'

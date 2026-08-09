@@ -20,7 +20,9 @@ describe('location create bypass guard', () => {
 
   it('routes contained add selections through resolveLocationCreateSession launcher', () => {
     expect(childrenSource).toContain('useLocationCreateSessionLaunch')
-    expect(childrenSource).toContain('launch({ authoringType, parentLocationId })')
+    expect(childrenSource).toContain(
+      'launch({ authoringType, parentLocationId: fixedParentLocationId })',
+    )
     expect(childrenSource).not.toContain('setCreateIntent')
   })
 })

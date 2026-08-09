@@ -23,6 +23,13 @@ export type CrossContentRelationshipRowProps = {
   metadata?: ReactNode
   actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
+  /**
+   * Trailing controls override.
+   * - `undefined` — convenience overflow from `actions` when non-empty
+   * - `null` — no trailing controls
+   * - `ReactNode` — use as-is (compose via `DetailEntityRowActions` when needed)
+   */
+  endSlot?: ReactNode
   className?: string
 }
 
@@ -36,9 +43,16 @@ export function CrossContentRelationshipRow({
   metadata,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
+  endSlot,
   className,
 }: CrossContentRelationshipRowProps) {
   const resolvedSecondaryText = secondaryText ?? subheading
+  const resolvedEndSlot =
+    endSlot !== undefined ? (
+      endSlot
+    ) : actions.length > 0 ? (
+      <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
+    ) : undefined
 
   return (
     <div className={cn(className)}>
@@ -52,11 +66,7 @@ export function CrossContentRelationshipRow({
         headingSuffix={headingSuffix}
         subheading={resolvedSecondaryText}
         metadata={metadata}
-        endSlot={
-          actions.length > 0 ? (
-            <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
-          ) : undefined
-        }
+        endSlot={resolvedEndSlot}
       />
     </div>
   )

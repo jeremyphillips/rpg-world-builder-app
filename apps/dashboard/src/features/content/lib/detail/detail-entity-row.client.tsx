@@ -14,6 +14,7 @@ import {
   detailEntityRowDisclosureContentVariants,
   detailEntityRowDisclosureIdentityVariants,
   detailEntityRowDisclosureItemVariants,
+  detailEntityRowDisclosurePreviewGroupVariants,
   detailEntityRowDisclosureRowVariants,
   detailEntityRowSubheadingVariants,
   detailEntityRowVariants,
@@ -158,7 +159,9 @@ export function DetailEntityRow({
       </div>
       {disclosure.mode === 'expandable' && !collapsed ? (
         <div id={contentId} className={detailEntityRowDisclosureContentVariants()}>
-          {disclosure.content}
+          <div className={detailEntityRowDisclosurePreviewGroupVariants()}>
+            {disclosure.content}
+          </div>
         </div>
       ) : null}
     </div>

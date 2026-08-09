@@ -12,6 +12,11 @@ import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
 import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
+import { DetailEntityRowActions } from '../../lib/detail/detail-entity-row-actions.client'
+import {
+  detailEntityRowDisclosurePreviewRowVariants,
+  resolveDetailEntityRowDisclosurePreviewRowEdge,
+} from '../../lib/detail/detail-entity-row.variants'
 import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
 import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
 import { DetailSectionRowList } from '../../lib/detail/detail-section-row-list.client'
@@ -85,17 +90,59 @@ function LocationPreviewChildRows({
 }) {
   return (
     <DetailSectionRowList>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <DetailEntityRow
           key={item.id}
           heading={item.name}
           href={item.href}
           headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
           inset={inset}
+          className={detailEntityRowDisclosurePreviewRowVariants({
+            edge: resolveDetailEntityRowDisclosurePreviewRowEdge(index, items.length),
+          })}
         />
       ))}
     </DetailSectionRowList>
   )
+}
+
+function resolveDistrictRowEndSlot({
+  item,
+  canManage,
+  canAddChild,
+  actions,
+  onSelectAuthoringType,
+}: {
+  item: LocationChildItem
+  canManage: boolean
+  canAddChild: boolean
+  actions: readonly DetailOverflowAction[]
+  onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
+}) {
+  const addMenu = canAddChild ? (
+    <LocationAddChildMenu
+      appearance="icon"
+      parentKind="district"
+      triggerLabel={`Add location to ${item.name}`}
+      menuHeading={`Add to ${item.name}`}
+      onSelectAuthoringType={(authoringType) => onSelectAuthoringType(authoringType, item.id)}
+    />
+  ) : null
+  const overflow =
+    canManage && actions.length > 0 ? (
+      <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
+    ) : null
+
+  if (addMenu && overflow) {
+    return (
+      <DetailEntityRowActions>
+        {addMenu}
+        {overflow}
+      </DetailEntityRowActions>
+    )
+  }
+
+  return addMenu ?? overflow ?? undefined
 }
 
 function SettlementDistrictRows({
@@ -103,14 +150,18 @@ function SettlementDistrictRows({
   canManage,
   onMove,
   onView,
+  onSelectAuthoringType,
   inset = 'parent',
 }: {
   items: SettlementStructureDistrictItem[]
   canManage: boolean
   onMove: (childId: string) => void
   onView: (href: string) => void
+  onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
   inset?: 'self' | 'parent'
 }) {
+  const canAddChild = canManage && childAuthoringTypesForParentKind('district').length > 0
+
   return (
     <DetailSectionRowList>
       {items.map(({ item, immediateChildren }) => {
@@ -135,11 +186,13 @@ function SettlementDistrictRows({
                   }
                 : { mode: 'reserved' }
             }
-            endSlot={
-              canManage ? (
-                <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
-              ) : undefined
-            }
+            endSlot={resolveDistrictRowEndSlot({
+              item,
+              canManage,
+              canAddChild,
+              actions,
+              onSelectAuthoringType,
+            })}
           />
         )
       })}
@@ -258,8 +311,11 @@ export function LocationChildrenSection({
     }
   }
 
-  const handleSelectAuthoringType = (authoringType: LocationAuthoringType) => {
-    launch({ authoringType, parentLocationId })
+  const handleSelectAuthoringType = (
+    authoringType: LocationAuthoringType,
+    fixedParentLocationId: string = parentLocationId,
+  ) => {
+    launch({ authoringType, parentLocationId: fixedParentLocationId })
   }
 
   const canAddDistrict =
@@ -320,6 +376,7 @@ export function LocationChildrenSection({
                     canManage={canManage}
                     onMove={openMoveDrawer}
                     onView={(href) => navigate(href)}
+                    onSelectAuthoringType={handleSelectAuthoringType}
                     inset="parent"
                   />
                 ) : (

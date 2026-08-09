@@ -56,14 +56,15 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 
 ### Primitives
 
-| Primitive                   | Role                                                                                                                                                                  |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                          |
-| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                |
-| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                                                                      |
-| `DetailEntityRow`           | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`) |
-| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                  |
-| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`, forwards `endSlot`) — keep for relationship call-site API stability                                   |
+| Primitive                   | Role                                                                                                                                                                                     |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                             |
+| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                   |
+| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                                                                                         |
+| `DetailEntityRow`           | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot` |
+| `DetailEntityRowActions`    | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                |
+| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                     |
+| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`, forwards `endSlot`) — keep for relationship call-site API stability                                                      |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
@@ -132,13 +133,35 @@ type DetailEntityRowDisclosure =
 | `reserved`           | Same outer disclosure-item wrapper + leading column tokens; inert empty gutter — no chevron, no region |
 | omitted              | Ordinary single-root row — no leading gutter (Direct locations / relationship rows unchanged)          |
 | Title navigation     | Entity `href` link — independent from disclosure                                                       |
-| Overflow actions     | `endSlot` on the parent row only                                                                       |
+| Overflow / utility   | Parent-row `endSlot` only — compose via `DetailEntityRowActions` when both are present                 |
 | Nested preview inset | **Expanded region only** — features supply `content` without `pl-*` or disclosure-specific inset props |
 | List separators      | Parent `DetailSectionRowList` — disclosure wraps parent identity + expanded body as **one** list child |
 
 Both disclosure modes share the same chrome CSS variables; features must not recreate gutter padding locally.
 
 Group-level disclosure (e.g. collapsing the entire `DISTRICTS · N` block) is a **separate** future capability on `DetailSectionGroup` — not part of row disclosure and not an `endSlot` responsibility.
+
+### Row trailing controls
+
+```text
+[disclosure?] [identity / metadata] [DetailEntityRowActions: utility? overflow?]
+```
+
+| Concern                      | Owner                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| Where trailing controls live | `DetailEntityRow.endSlot` (omit entirely when no controls — no phantom gutter)        |
+| How multiple controls align  | `DetailEntityRowActions` (gap / align / shrink only)                                  |
+| Primary utility              | Feature — high-frequency contextual action (District icon `+` → Add location chooser) |
+| Overflow                     | `DetailOverflowMenu` — management / secondary actions                                 |
+| Control chrome               | Each primitive (`ghost` + `icon` + `compact` for icon buttons) — not the cluster      |
+
+Relationship rows opt in only when product semantics warrant a utility action. `CrossContentRelationshipRow`:
+
+- `endSlot === undefined` → convenience overflow from `actions`
+- `endSlot === null` → no trailing controls
+- `endSlot={node}` → use as-is (compose `DetailEntityRowActions` when needed)
+
+City structure District rows: icon `LocationAddChildMenu` (`appearance="icon"`, required `triggerLabel`, optional `menuHeading` like `Add to ${name}`) + overflow, launching contained create with the **district** as `parentLocationId`. Features must not recreate trailing icon spacing locally.
 
 ### Subgroup header actions
 

@@ -28,9 +28,15 @@ vi.mock('./location-contained-create-drawer.client', () => ({
     fixedCreate,
     open,
   }: {
-    fixedCreate: { authoringType: string }
+    fixedCreate: { authoringType: string; parent?: { locationId: string } }
     open: boolean
-  }) => (open ? <div role="dialog">Create drawer: {fixedCreate.authoringType}</div> : null),
+  }) =>
+    open ? (
+      <div role="dialog">
+        Create drawer: {fixedCreate.authoringType}
+        {fixedCreate.parent?.locationId ? ` parent=${fixedCreate.parent.locationId}` : null}
+      </div>
+    ) : null,
 }))
 
 vi.mock('@rpg/ui', async (importOriginal) => {
@@ -123,6 +129,11 @@ describe('LocationChildrenSection', () => {
     expect(
       screen.queryByRole('button', { name: 'Actions for Yawning Portal' }),
     ).not.toBeInTheDocument()
+
+    const previewGroup = screen
+      .getByRole('link', { name: 'Yawning Portal' })
+      .closest('[class*="border-l"]')
+    expect(previewGroup).toHaveClass('border-l', 'border-border-subtle', 'pl-3')
   })
 
   it('shows zero-child districts with reserved disclosure gutter and no chevron', () => {
@@ -173,7 +184,30 @@ describe('LocationChildrenSection', () => {
 
     await user.click(addDistrict)
 
-    expect(screen.getByText('Create drawer: district')).toBeInTheDocument()
+    expect(screen.getByText(`Create drawer: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
+  })
+
+  it('launches contained create under the district when row Add location chooses Building', async () => {
+    const user = userEvent.setup()
+    renderSection({ canManage: true, parent: HARBORFORD })
+
+    await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
+    expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Add location to Dock Ward' }))
+    expect(screen.getByText('Add to Dock Ward')).toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+
+    expect(screen.getByText(`Create drawer: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Hide locations in Dock Ward' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Yawning Portal' })).toBeInTheDocument()
+  })
+
+  it('keeps district overflow beside the Add location utility action', () => {
+    renderSection({ canManage: true, parent: HARBORFORD })
+
+    expect(screen.getByRole('button', { name: 'Add location to Dock Ward' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Actions for Dock Ward' })).toBeInTheDocument()
   })
 
   it('omits Add district when the parent kind cannot author districts', () => {
@@ -203,10 +237,10 @@ describe('LocationChildrenSection', () => {
     const user = userEvent.setup()
     renderSection({ canManage: true, parent: HARBORFORD })
 
-    await user.click(screen.getByRole('button', { name: /add location/i }))
+    await user.click(screen.getByRole('button', { name: /^add location$/i }))
     await user.click(screen.getByRole('menuitem', { name: 'District' }))
 
-    expect(screen.getByText('Create drawer: district')).toBeInTheDocument()
+    expect(screen.getByText(`Create drawer: district parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
   it('opens Move drawer wired to the child id with Current from parentLocationId', async () => {

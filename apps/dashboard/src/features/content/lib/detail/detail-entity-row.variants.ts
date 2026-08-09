@@ -58,3 +58,34 @@ export const detailEntityRowDisclosureButtonVariants = cva(
 )
 
 export const detailEntityRowDisclosureContentVariants = cva('pl-[var(--content-column-indent)]')
+
+/** Left rail wrapping disclosure preview child rows. */
+export const detailEntityRowDisclosurePreviewGroupVariants = cva(
+  'border-l border-border-subtle pl-3',
+)
+
+export type DetailEntityRowDisclosurePreviewRowEdge = 'first' | 'middle' | 'last' | 'only'
+
+export function resolveDetailEntityRowDisclosurePreviewRowEdge(
+  index: number,
+  total: number,
+): DetailEntityRowDisclosurePreviewRowEdge {
+  if (total <= 1) return 'only'
+  if (index === 0) return 'first'
+  if (index === total - 1) return 'last'
+  return 'middle'
+}
+
+export const detailEntityRowDisclosurePreviewRowVariants = cva('py-1', {
+  variants: {
+    edge: {
+      first: 'pt-0',
+      middle: '',
+      last: 'pb-0',
+      only: 'py-0',
+    },
+  },
+  defaultVariants: {
+    edge: 'middle',
+  },
+})
