@@ -195,6 +195,13 @@ describe('childAuthoringTypesForParentKind', () => {
     ])
   })
 
+  it('does not allow districts to parent other districts', () => {
+    expect(childAuthoringTypesForParentKind('district')).not.toContain('district')
+    expect(childAuthoringTypesForParentKind('district')).toEqual(
+      expect.arrayContaining(['building', 'site', 'structure']),
+    )
+  })
+
   it('lists promoted overview shortcuts from the registry ids', () => {
     expect(LOCATION_CREATE_PROMOTED_AUTHORING_TYPES).toEqual([
       'building',

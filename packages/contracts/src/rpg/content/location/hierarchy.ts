@@ -13,7 +13,7 @@ export const LOCATION_KIND_DEFINITIONS = {
   world: { allowedParents: ['plane'], parentRequirement: 'optional' },
   region: { allowedParents: ['world', 'region'], parentRequirement: 'required' },
   settlement: { allowedParents: ['world', 'region'], parentRequirement: 'required' },
-  district: { allowedParents: ['settlement', 'district'], parentRequirement: 'required' },
+  district: { allowedParents: ['settlement'], parentRequirement: 'required' },
   site: {
     allowedParents: ['world', 'region', 'settlement', 'district', 'site'],
     parentRequirement: 'required',

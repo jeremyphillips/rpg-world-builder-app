@@ -34,6 +34,7 @@ export type BulkChangeParentRow = {
 }
 
 function toTargetIdentity(row: BulkChangeParentRow): ActionTargetIdentity {
+  // Framework `targetId` is the action subject (child location), not the destination parent.
   return { targetId: row.id, targetName: row.name }
 }
 
@@ -155,16 +156,16 @@ export type BulkChangeParentApplyUpdate = {
 
 export async function applyBulkChangeParentToTargets(
   rows: readonly BulkChangeParentRow[],
-  targetIds: readonly string[],
+  subjectIds: readonly string[],
   config: BulkChangeParentConfig,
   campaignId: string,
 ): Promise<{
   outcomes: ActionApplyOutcome<LocationParentAssignmentBlocker, ActionTargetFailure>[]
   updates: BulkChangeParentApplyUpdate[]
 }> {
-  const targetIdSet = new Set(targetIds)
+  const subjectIdSet = new Set(subjectIds)
   const applicableRows = rows.filter(
-    (row) => targetIdSet.has(row.id) && !isBulkChangeParentNoOp(row, config),
+    (row) => subjectIdSet.has(row.id) && !isBulkChangeParentNoOp(row, config),
   )
 
   if (applicableRows.length === 0) {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DOCK_WARD, GREYSHORE, YAWNING_PORTAL } from '../fixtures'
+import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   buildParentLocationOptionAvailability,
   parentLocationFieldVisibility,
@@ -41,5 +41,15 @@ describe('buildParentLocationOptionAvailability', () => {
 
   it('rejects self as a parent option', () => {
     expect(enabledWhen({ authoringType: 'building' }, YAWNING_PORTAL.id)).toBe(false)
+  })
+
+  it('omits other districts as parent options for district authoring type', () => {
+    const districtEnabledWhen = buildParentLocationOptionAvailability(
+      [GREYSHORE, DOCK_WARD, HARBORFORD],
+      'location-new-district',
+    ).enabledWhen!
+
+    expect(districtEnabledWhen({ authoringType: 'district' }, HARBORFORD.id)).toBe(true)
+    expect(districtEnabledWhen({ authoringType: 'district' }, DOCK_WARD.id)).toBe(false)
   })
 })
