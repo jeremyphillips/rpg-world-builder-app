@@ -125,6 +125,10 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.automaticResolutionStalled',
     () => 'Could not automatically complete this character build.',
   ),
+  automaticConstraintUnsatisfiable: defineMessage<{ constraintLabel: string }>(
+    'validation.characterBuilder.automaticConstraintUnsatisfiable',
+    ({ constraintLabel }) => `Required ${constraintLabel} cannot be satisfied for this build.`,
+  ),
   magicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
     'validation.characterBuilder.magicItemGrantIncomplete',
     ({ rarityLabel, remaining }) =>

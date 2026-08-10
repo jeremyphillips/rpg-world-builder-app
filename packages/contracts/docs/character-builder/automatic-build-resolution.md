@@ -9,11 +9,14 @@ path as a manually built character.
 
 ## Modules
 
-| Export                          | Module                                     | Purpose                                                                  |
-| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| `automaticNpcBuildSeedSchema`   | `automatic/automatic-npc-build-seed.ts`    | Zod schema for the compact seed (name, species, class, level, alignment) |
-| `validateAutomaticNpcBuildSeed` | `automatic/automatic-npc-build-seed.ts`    | Seed content validation against the build context (UI-independent)       |
-| `resolveAutomaticNpcBuild`      | `automatic/resolve-automatic-npc-build.ts` | Seed + context → completed draft or structured failure                   |
+| Export                               | Module                                         | Purpose                                                                  |
+| ------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment) |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)       |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponId`, `requiredSpellId`)       |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                 |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                     |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure       |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -67,12 +70,44 @@ passed to finalize as engine options.
    returns `ok: false` with the existing `choice_set_unsatisfied` issue for
    the stuck ChoiceSet. No partial character is ever produced.
 
+## Constraints (Quick NPC requirements)
+
+Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:
+
+```ts
+resolveAutomaticNpcBuild({
+  seed,
+  constraints?: { requiredWeaponId?: string; requiredSpellId?: string },
+  context,
+})
+```
+
+| Layer                                                        | Role                                                                                    |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — options the UI may offer in requirement pickers                          |
+| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies |
+
+Picker eligibility does **not** imply build validity. When constraints cannot be
+satisfied (e.g. a required weapon is unreachable through any non-gold starting
+package, or a required spell is not selectable at the seed level), the resolver
+returns `ok: false` with `automatic_constraint_unsatisfiable` — it does not drop
+requirements to force success.
+
+Selection policy with constraints:
+
+- Required weapon/spell selections are applied **before** remaining first-eligible defaults.
+- Starting-equipment package ChoiceSets bias toward the first authored package that can produce the required weapon; gold-only packages never satisfy V1 weapon requirements.
+- Nested equipment pool picks prefer the required weapon when it appears in the pool.
+
 ## Determinism (V1)
 
-Same seed + same catalog ⇒ deep-equal draft. Ordering is owned by the
+Same seed + same constraints + same catalog ⇒ deep-equal draft. Ordering is owned by the
 registered resolvers (e.g. spells are name-sorted; class skills follow
 authored order) — never incidental object-key, Mongo, or API response order.
 Regression coverage includes a catalog-insertion-order inversion test.
+
+**Name generation is independent:** explicit Quick NPC name Generate may be random;
+do not treat name-generator non-determinism as a build-resolver failure in tests.
 
 Randomized or preset-driven generation later supplies richer seeds (or a
 pluggable selection policy) to this same entry point — do not introduce a

@@ -8,6 +8,7 @@ import {
   cn,
   dialogPanelActionRowClasses,
   dialogPanelSectionInsetXClasses,
+  usePendingAwareOpenChange,
 } from '@rpg/ui'
 
 import { DrawerShell } from '@/components/drawer'
@@ -50,6 +51,10 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
   onSubmit,
 }: ContentFormDrawerProps<TFormValues>) {
   const leaveBridgeRef = React.useRef<ContentFormHostLeaveBridge | null>(null)
+  const { handleOpenChange: dismissViaOpenChange, trustedClose } = usePendingAwareOpenChange({
+    pending,
+    onOpenChange,
+  })
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -60,12 +65,12 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
       if (pending) return
       const bridge = leaveBridgeRef.current
       if (bridge) {
-        bridge.requestClose(() => onOpenChange(false))
+        bridge.requestClose(trustedClose)
         return
       }
-      onOpenChange(false)
+      dismissViaOpenChange(false)
     },
-    [onOpenChange, pending],
+    [onOpenChange, pending, trustedClose, dismissViaOpenChange],
   )
 
   return (
@@ -86,7 +91,7 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
         form={form}
         leaveBridgeRef={leaveBridgeRef}
         onSubmit={onSubmit}
-        onTrustedClose={() => onOpenChange(false)}
+        onTrustedClose={trustedClose}
         contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
         chrome={{
           contentWrapper: (content) => (

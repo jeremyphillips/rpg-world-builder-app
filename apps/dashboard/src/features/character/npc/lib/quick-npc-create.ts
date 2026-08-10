@@ -3,6 +3,7 @@ import {
   finalizeNpcCharacterBuild,
   isCharacterBuildFinalizationError,
   resolveAutomaticNpcBuild,
+  type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -50,9 +51,14 @@ function withMembershipConnection(
 export function buildQuickNpcCreateInput(args: {
   seed: AutomaticNpcBuildSeed
   context: CharacterBuildContext
+  constraints?: AutomaticNpcBuildConstraints
   membership?: QuickNpcMembership
 }): CreateNpcRequestInput {
-  const resolution = resolveAutomaticNpcBuild(args.seed, args.context)
+  const resolution = resolveAutomaticNpcBuild({
+    seed: args.seed,
+    context: args.context,
+    ...(args.constraints ? { constraints: args.constraints } : {}),
+  })
   if (!resolution.ok) {
     throw new CharacterBuildFinalizationError(resolution.issues)
   }

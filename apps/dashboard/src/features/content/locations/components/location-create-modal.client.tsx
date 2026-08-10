@@ -8,6 +8,7 @@ import {
   cn,
   dialogPanelActionRowClasses,
   dialogPanelSectionInsetXClasses,
+  usePendingAwareOpenChange,
 } from '@rpg/ui'
 
 import type {
@@ -213,6 +214,7 @@ function LocationCreateModalDetailsForm({
   onBack,
   onCancel,
   onTrustedClose,
+  onPendingChange,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -227,6 +229,7 @@ function LocationCreateModalDetailsForm({
   onBack: () => void
   onCancel: () => void
   onTrustedClose: () => void
+  onPendingChange?: (pending: boolean) => void
 }) {
   return (
     <LocationCreateForm
@@ -239,6 +242,7 @@ function LocationCreateModalDetailsForm({
       formKey={formKey}
       visible={showDetails}
       onTrustedClose={onTrustedClose}
+      onPendingChange={onPendingChange}
       chrome={({ pending }) =>
         buildDetailsChrome({
           showDetails,
@@ -262,20 +266,26 @@ function useLocationCreateModalController({
   onOpenChange: (open: boolean) => void
 }) {
   const [state, setState] = React.useState(() => createInitialState(intent))
+  const [detailsPending, setDetailsPending] = React.useState(false)
   const leaveBridgeRef = React.useRef<ContentFormHostLeaveBridge | null>(null)
+  const { trustedClose } = usePendingAwareOpenChange({
+    pending: detailsPending,
+    onOpenChange,
+  })
 
   const setupModel = state.hadSetup
     ? resolveLocationCreateModalSetupModel({ intent, values: state.setupValues })
     : null
 
   const requestClose = React.useCallback(() => {
+    if (detailsPending) return
     const bridge = leaveBridgeRef.current
     if (bridge) {
-      bridge.requestClose(() => onOpenChange(false))
+      bridge.requestClose(trustedClose)
       return
     }
-    onOpenChange(false)
-  }, [onOpenChange])
+    trustedClose()
+  }, [detailsPending, trustedClose])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -339,6 +349,8 @@ function useLocationCreateModalController({
     handleContinueFromSetup,
     handleBackToSetup,
     setReopenChoiceSetId,
+    setDetailsPending,
+    trustedClose,
   }
 }
 
@@ -370,6 +382,8 @@ function LocationCreateModalSession({
     handleContinueFromSetup,
     handleBackToSetup,
     setReopenChoiceSetId,
+    setDetailsPending,
+    trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
@@ -420,7 +434,8 @@ function LocationCreateModalSession({
                 submitLabel={submitLabel}
                 onBack={handleBackToSetup}
                 onCancel={requestClose}
-                onTrustedClose={() => onOpenChange(false)}
+                onTrustedClose={trustedClose}
+                onPendingChange={setDetailsPending}
               />
             )}
           </ContentFormOptionsGate>

@@ -115,7 +115,7 @@ function fighterSeed(overrides: Partial<AutomaticNpcBuildSeed> = {}): AutomaticN
 describe('resolveAutomaticNpcBuild', () => {
   it('completes a fighter build with deterministic first-eligible selections', () => {
     const context = automaticTestContext()
-    const result = resolveAutomaticNpcBuild(fighterSeed(), context)
+    const result = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -153,7 +153,7 @@ describe('resolveAutomaticNpcBuild', () => {
 
   it('produces a draft that passes canonical finalization', () => {
     const context = automaticTestContext()
-    const result = resolveAutomaticNpcBuild(fighterSeed(), context)
+    const result = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -172,8 +172,8 @@ describe('resolveAutomaticNpcBuild', () => {
 
   it('is deterministic — same seed and content produce deep-equal drafts', () => {
     const context = automaticTestContext()
-    const first = resolveAutomaticNpcBuild(fighterSeed(), context)
-    const second = resolveAutomaticNpcBuild(fighterSeed(), context)
+    const first = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })
+    const second = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })
 
     expect(first.ok).toBe(true)
     expect(second).toEqual(first)
@@ -181,7 +181,10 @@ describe('resolveAutomaticNpcBuild', () => {
 
   it('resolves species heritage and syncs species.heritageId', () => {
     const context = automaticTestContext()
-    const result = resolveAutomaticNpcBuild(fighterSeed({ speciesId: elfSpecies.id }), context)
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ speciesId: elfSpecies.id }),
+      context,
+    })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -194,10 +197,10 @@ describe('resolveAutomaticNpcBuild', () => {
 
   it('never selects optional choice sets', () => {
     const context = automaticTestContext()
-    const result = resolveAutomaticNpcBuild(
-      fighterSeed({ speciesId: featChoiceSpecies.id }),
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ speciesId: featChoiceSpecies.id }),
       context,
-    )
+    })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -220,7 +223,7 @@ describe('resolveAutomaticNpcBuild', () => {
       speciesId: `${RULESET}:fixture-dwarf`,
       classId: wizardClass.id,
     })
-    const result = resolveAutomaticNpcBuild(seed, context)
+    const result = resolveAutomaticNpcBuild({ seed, context })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -253,8 +256,8 @@ describe('resolveAutomaticNpcBuild', () => {
       classId: wizardClass.id,
     })
 
-    const fromOriginal = resolveAutomaticNpcBuild(seed, context)
-    const fromReversed = resolveAutomaticNpcBuild(seed, reversedContext)
+    const fromOriginal = resolveAutomaticNpcBuild({ seed, context })
+    const fromReversed = resolveAutomaticNpcBuild({ seed, context: reversedContext })
 
     expect(fromOriginal.ok).toBe(true)
     if (!fromOriginal.ok || !fromReversed.ok) return
@@ -262,10 +265,10 @@ describe('resolveAutomaticNpcBuild', () => {
   })
 
   it('rejects a species id that is not campaign-available', () => {
-    const result = resolveAutomaticNpcBuild(
-      fighterSeed({ speciesId: 'srd-cc-5.2.1:not-a-species' }),
-      automaticTestContext(),
-    )
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ speciesId: 'srd-cc-5.2.1:not-a-species' }),
+      context: automaticTestContext(),
+    })
 
     expect(result).toMatchObject({
       ok: false,
@@ -274,10 +277,10 @@ describe('resolveAutomaticNpcBuild', () => {
   })
 
   it('rejects a class id that is not campaign-available', () => {
-    const result = resolveAutomaticNpcBuild(
-      fighterSeed({ classId: 'srd-cc-5.2.1:not-a-class' }),
-      automaticTestContext(),
-    )
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ classId: 'srd-cc-5.2.1:not-a-class' }),
+      context: automaticTestContext(),
+    })
 
     expect(result).toMatchObject({
       ok: false,
@@ -286,7 +289,10 @@ describe('resolveAutomaticNpcBuild', () => {
   })
 
   it('rejects a level above the campaign maximum', () => {
-    const result = resolveAutomaticNpcBuild(fighterSeed({ level: 99 }), automaticTestContext())
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ level: 99 }),
+      context: automaticTestContext(),
+    })
 
     expect(result).toMatchObject({
       ok: false,
@@ -296,10 +302,10 @@ describe('resolveAutomaticNpcBuild', () => {
 
   it('fails with the existing unsatisfied issue when a required choice set lacks options', () => {
     // storedFighter requires 2 skills but authors only one eligible option.
-    const result = resolveAutomaticNpcBuild(
-      fighterSeed({ classId: storedFighter.id }),
-      automaticTestContext(),
-    )
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ classId: storedFighter.id }),
+      context: automaticTestContext(),
+    })
 
     expect(result).toMatchObject({
       ok: false,
@@ -323,9 +329,12 @@ describe('resolveAutomaticNpcBuild', () => {
       },
     }
     const context = automaticTestContext()
-    const result = resolveAutomaticNpcBuild(fighterSeed({ classId: noPackagesFighter.id }), {
-      ...context,
-      catalog: { ...context.catalog, classes: [noPackagesFighter] },
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({ classId: noPackagesFighter.id }),
+      context: {
+        ...context,
+        catalog: { ...context.catalog, classes: [noPackagesFighter] },
+      },
     })
 
     expect(result.ok).toBe(true)
@@ -340,7 +349,7 @@ describe('resolveAutomaticNpcBuild', () => {
       classId: wizardClass.id,
       level: 5,
     })
-    const result = resolveAutomaticNpcBuild(seed, context)
+    const result = resolveAutomaticNpcBuild({ seed, context })
 
     expect(result.ok).toBe(true)
     if (!result.ok) return

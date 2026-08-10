@@ -635,6 +635,11 @@ export {
   type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
+export {
+  usePendingAwareOpenChange,
+  type UsePendingAwareOpenChangeOptions,
+  type UsePendingAwareOpenChangeReturn,
+} from './hooks/use-pending-aware-open-change.client'
 
 export {
   Wizard,
