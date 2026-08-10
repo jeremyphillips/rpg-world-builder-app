@@ -24,6 +24,17 @@ export const dialogPanelBodyVariants = cva(
 )
 
 /**
+ * Stable modal body shell — horizontal inset only. A flex child owns vertical
+ * scroll; omit bottom padding so content sits flush above the footer.
+ */
+export const dialogPanelStableBodyVariants = cva(
+  cn(
+    dialogPanelSectionInsetXClasses,
+    'flex min-h-0 flex-1 flex-col overflow-hidden pt-0 pb-0 text-sm',
+  ),
+)
+
+/**
  * Canonical overlay footer section chrome — separator, horizontal inset, vertical rhythm.
  * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.
  */

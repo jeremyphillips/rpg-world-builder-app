@@ -7,6 +7,7 @@ import {
   dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
+  dialogPanelStableBodyVariants,
 } from './dialog-panel.variants'
 import { sheetBodyVariants, sheetFooterDockClasses } from './sheet.variants'
 
@@ -34,6 +35,16 @@ describe('dialog-panel variants', () => {
     expect(bodyClasses).toContain('overflow-y-auto')
     expect(bodyClasses).toContain('pt-0')
     expect(bodyClasses).not.toContain('flex-1')
+  })
+
+  it('uses horizontal inset only on stable body without bottom padding', () => {
+    const stableBodyClasses = dialogPanelStableBodyVariants()
+    expect(stableBodyClasses).toContain(dialogPanelSectionInsetXClasses)
+    expect(stableBodyClasses).toContain('pb-0')
+    expect(stableBodyClasses).toContain('overflow-hidden')
+    expect(stableBodyClasses).toContain('flex-1')
+    expect(stableBodyClasses).not.toContain(dialogPanelSectionPaddingClasses)
+    expect(stableBodyClasses).not.toContain('overflow-y-auto')
   })
 
   it('suppresses visible outlines on programmatic panel focus', () => {

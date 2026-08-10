@@ -118,6 +118,16 @@ describe('QuickNpcCreateModal', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
+  it('wraps setup content in a scroll region inside the stable modal body', () => {
+    renderModal()
+
+    const speciesPrompt = screen.getByText('What species is this NPC?')
+    const scrollRegion = speciesPrompt.closest('.overflow-y-auto')
+
+    expect(scrollRegion).toBeTruthy()
+    expect(scrollRegion?.className).toContain('min-h-0')
+  })
+
   it('walks setup then authoring and returns to add on cancel', async () => {
     const user = userEvent.setup()
     const { props } = renderModal()

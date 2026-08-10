@@ -146,6 +146,9 @@ describe('Modal', () => {
     const body = await screen.findByTestId('modal-body')
     expect(body).toHaveClass('overflow-hidden')
     expect(body).toHaveClass('flex-1')
+    expect(body).toHaveClass('pb-0')
+    expect(body).toHaveClass('px-6')
+    expect(body).not.toHaveClass('overflow-y-auto')
   })
 
   it('applies the stable layout block-size token without changing default content layout', async () => {

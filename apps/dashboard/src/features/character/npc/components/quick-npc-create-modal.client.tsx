@@ -4,7 +4,11 @@ import * as React from 'react'
 
 import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
 import { Button, DialogPanelActionRow, Modal, usePendingAwareOpenChange } from '@rpg/ui'
-import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
+import {
+  FormShellFooterScope,
+  FormShellFooterSlot,
+  formSheetScrollRegionClasses,
+} from '@rpg/ui/form'
 
 import { CreateSetupPanel } from '@/lib/create-setup'
 
@@ -150,9 +154,11 @@ function QuickNpcCreateModalSession({
             }
           />
 
-          <Modal.Body stableBody className="flex min-h-0 flex-1 flex-col pt-0">
+          <Modal.Body stableBody>
             {state.phase === 'setup' ? (
-              <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
+              <div className={formSheetScrollRegionClasses}>
+                <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
+              </div>
             ) : (
               <QuickNpcAuthoringForm
                 key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}

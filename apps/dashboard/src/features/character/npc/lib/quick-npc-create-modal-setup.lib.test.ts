@@ -6,6 +6,7 @@ import {
 } from '../../lib/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
+  formatQuickNpcSetupCharacterSummary,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
 import { EMPTY_QUICK_NPC_SETUP_VALUES } from './quick-npc-form-fields'
@@ -59,5 +60,21 @@ describe('resolveQuickNpcSetupModel', () => {
         },
       }).canContinue,
     ).toBe(true)
+  })
+
+  it('formats the setup summary with the canonical character summary line', () => {
+    const values = {
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      classId: 'srd-cc-5.2.1:fighter',
+      level: 1,
+    }
+
+    expect(formatQuickNpcSetupCharacterSummary(values, context)).toBe('Dwarf · Level 1 Fighter')
+    expect(
+      resolveQuickNpcSetupModel({
+        context,
+        values,
+      }).summaryLine,
+    ).toBe('Dwarf · Level 1 Fighter')
   })
 })

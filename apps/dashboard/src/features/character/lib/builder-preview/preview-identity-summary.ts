@@ -91,6 +91,16 @@ export function getPreviewAlignmentLine(draft: CharacterBuilderDraft): string {
   return alignment ? getAlignmentLabel(alignment) : PREVIEW_CHOOSE_ALIGNMENT
 }
 
+/** Canonical roster/card summary for a partial builder draft (species + class/level). */
+export function formatBuilderDraftCharacterSummary(
+  draft: Pick<CharacterBuilderDraft, 'species' | 'class'>,
+  catalogIndex: CharacterBuildCatalogIndex,
+): string {
+  return formatCharacterSummary(
+    resolveBuilderCharacterSummaryParts(draft, createBuilderSummaryLabelLookup(catalogIndex)),
+  )
+}
+
 /** @internal Exported for adapter parity tests. */
 export function resolveBuilderPreviewSummaryParts(
   draft: CharacterBuilderDraft,

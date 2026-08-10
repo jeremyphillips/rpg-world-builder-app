@@ -553,6 +553,7 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelStableBodyVariants,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,

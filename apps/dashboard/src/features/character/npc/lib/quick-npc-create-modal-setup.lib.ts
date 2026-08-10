@@ -1,9 +1,11 @@
 import {
   getContentTypeTerm,
+  indexCharacterBuildCatalog,
   resolveBuilderLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
+import { formatBuilderDraftCharacterSummary } from '../../lib/builder-preview/preview-identity-summary'
 import {
   isCreateSetupChoiceComplete,
   isCreateSetupNumberComplete,
@@ -16,21 +18,28 @@ import { buildQuickNpcContentOptions, type QuickNpcSetupValues } from './quick-n
 
 export const QUICK_NPC_SETUP_HEADLINE = 'Create NPC' as const
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
-
-export type QuickNpcSetupSummaryEntry = {
-  fieldLabel: string
-  valueLabel: string
-}
+export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
 
 export type QuickNpcSetupModel = {
   speciesOptions: ReturnType<typeof buildQuickNpcContentOptions>['speciesOptions']
   classOptions: ReturnType<typeof buildQuickNpcContentOptions>['classOptions']
   canContinue: boolean
-  summaryEntries: QuickNpcSetupSummaryEntry[]
+  /** Canonical character summary (`formatCharacterSummary`) for the setup selection. */
+  summaryLine: string
 }
 
-function optionLabel(options: readonly { value: string; label: string }[], value: string): string {
-  return options.find((option) => option.value === value)?.label ?? value
+export function formatQuickNpcSetupCharacterSummary(
+  values: QuickNpcSetupValues,
+  context: CharacterBuildContext,
+): string {
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  return formatBuilderDraftCharacterSummary(
+    {
+      species: { speciesId: values.speciesId },
+      class: { classId: values.classId, level: values.level },
+    },
+    catalogIndex,
+  )
 }
 
 export function buildQuickNpcCreateSetupSets(args: {
@@ -108,30 +117,10 @@ export function resolveQuickNpcSetupModel(args: {
     isCreateSetupNumberComplete(level, levelConstraints.minLevel, levelConstraints.maxLevel) &&
     Boolean(speciesId && classId)
 
-  const summaryEntries: QuickNpcSetupSummaryEntry[] = []
-  if (speciesId) {
-    summaryEntries.push({
-      fieldLabel: getContentTypeTerm('species').label,
-      valueLabel: optionLabel(speciesOptions, speciesId),
-    })
-  }
-  if (classId) {
-    summaryEntries.push({
-      fieldLabel: getContentTypeTerm('classes').label,
-      valueLabel: optionLabel(classOptions, classId),
-    })
-  }
-  if (level >= levelConstraints.minLevel) {
-    summaryEntries.push({
-      fieldLabel: 'Level',
-      valueLabel: String(level),
-    })
-  }
-
   return {
     speciesOptions,
     classOptions,
     canContinue,
-    summaryEntries,
+    summaryLine: formatQuickNpcSetupCharacterSummary(args.values, args.context),
   }
 }

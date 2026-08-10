@@ -14,6 +14,7 @@ import {
   dialogContentFocusShellClasses,
   dialogPanelBodyVariants,
   dialogPanelFooterClasses,
+  dialogPanelStableBodyVariants,
 } from './dialog-panel.variants'
 import {
   modalContentVariants,
@@ -153,8 +154,7 @@ const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
     <div
       ref={ref}
       className={cn(
-        dialogPanelBodyVariants(),
-        stableBody && 'flex min-h-0 flex-1 flex-col overflow-hidden',
+        stableBody ? dialogPanelStableBodyVariants() : dialogPanelBodyVariants(),
         className,
       )}
       {...props}

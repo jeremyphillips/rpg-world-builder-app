@@ -31,7 +31,7 @@ describe('radioCard surface establishment', () => {
   })
 
   it('uses compact option padding with control and density-owned typography', () => {
-    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('py-2.5')
+    expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('py-2')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pl-3')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pr-4')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).not.toContain('px-4')
@@ -74,5 +74,10 @@ describe('radioCard group layout', () => {
   it('stretches card groups to the full field width', () => {
     expect(radioCardGroupGapVariants({ variant: 'card' })).toContain('w-full')
     expect(radioCardGroupGapVariants({ variant: 'card' })).toContain('min-w-0')
+  })
+
+  it('uses 8px gap between compact card options', () => {
+    expect(radioCardGroupGapVariants({ variant: 'card', density: 'compact' })).toContain('gap-2')
+    expect(radioCardGroupGapVariants({ variant: 'card', density: 'default' })).toContain('gap-3')
   })
 })

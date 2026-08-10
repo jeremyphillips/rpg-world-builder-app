@@ -1,7 +1,10 @@
 import type { EquipmentPickerCallout } from '../../components/equipment/equipment-picker-drawer.types'
 import { getEquipmentPickerCallout } from '../../components/equipment/equipment-picker-callout.lib'
-import { mapEquipmentCompactSummaryToMetadataLines } from '../../components/picker/catalog-picker-metadata'
-import { mapSpellPickerCompactSummaryToMetadataLines } from '../../components/picker/catalog-picker-metadata'
+import {
+  formatCatalogPickerMetadataLines,
+  mapEquipmentCompactSummaryToMetadataLines,
+  mapSpellPickerCompactSummaryToMetadataLines,
+} from '../../components/picker/catalog-picker-metadata'
 
 import type {
   QuickNpcSpellRequirementOption,
@@ -34,7 +37,7 @@ export function projectWeaponRequirementPreview(
 
   return {
     title: entry.row.name,
-    description: lines.length > 0 ? lines.join(' · ') : undefined,
+    description: lines.length > 0 ? formatCatalogPickerMetadataLines(lines) : undefined,
     callout: getEquipmentPickerCallout(entry.pickerItem, QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT),
   }
 }
@@ -43,8 +46,9 @@ export function projectWeaponRequirementPreview(
 export function projectSpellRequirementPreview(
   entry: QuickNpcSpellRequirementOption,
 ): SpellRequirementPreviewProjection {
+  const lines = mapSpellPickerCompactSummaryToMetadataLines(entry.compactSummary)
   return {
     title: entry.option.label,
-    description: mapSpellPickerCompactSummaryToMetadataLines(entry.compactSummary).join(' · '),
+    description: lines.length > 0 ? formatCatalogPickerMetadataLines(lines) : undefined,
   }
 }

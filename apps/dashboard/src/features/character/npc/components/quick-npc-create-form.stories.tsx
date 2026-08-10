@@ -40,11 +40,7 @@ const setup = {
   level: 1,
 }
 
-const setupSummary = [
-  { fieldLabel: 'Species', valueLabel: 'Dwarf' },
-  { fieldLabel: 'Class', valueLabel: 'Fighter' },
-  { fieldLabel: 'Level', valueLabel: '1' },
-]
+const setupSummaryLine = 'Dwarf · Level 1 Fighter'
 
 const meta = {
   title: 'Dashboard/Character/QuickNpcAuthoringForm',
@@ -55,7 +51,7 @@ const meta = {
     buildContext,
     organization,
     setup,
-    setupSummary,
+    setupSummaryLine,
     onCancel: () => undefined,
     onChangeSetup: () => undefined,
     onCreated: () => undefined,
