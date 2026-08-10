@@ -187,7 +187,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     const context = weaponConstraintContext()
     const result = resolveAutomaticNpcBuild({
       seed: weaponFighterSeed(),
-      constraints: { requiredWeaponId: longsword.id },
+      constraints: { requiredWeaponIds: [longsword.id], requiredSpellIds: [] },
       context,
     })
 
@@ -203,7 +203,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     const context = weaponConstraintContext()
     const result = resolveAutomaticNpcBuild({
       seed: weaponFighterSeed(),
-      constraints: { requiredWeaponId: greataxe.id },
+      constraints: { requiredWeaponIds: [greataxe.id], requiredSpellIds: [] },
       context,
     })
 
@@ -224,7 +224,10 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     const context = weaponConstraintContext()
     const result = resolveAutomaticNpcBuild({
       seed: weaponFighterSeed(),
-      constraints: { requiredWeaponId: `${RULESET}:unreachable-weapon` },
+      constraints: {
+        requiredWeaponIds: [`${RULESET}:unreachable-weapon`],
+        requiredSpellIds: [],
+      },
       context,
     })
 
@@ -247,7 +250,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
 
     const result = resolveAutomaticNpcBuild({
       seed,
-      constraints: { requiredSpellId },
+      constraints: { requiredWeaponIds: [], requiredSpellIds: [requiredSpellId] },
       context,
     })
 
@@ -263,13 +266,61 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     const context = weaponConstraintContext()
     const args = {
       seed: weaponFighterSeed(),
-      constraints: { requiredWeaponId: longsword.id },
+      constraints: { requiredWeaponIds: [longsword.id], requiredSpellIds: [] },
       context,
     }
     const first = resolveAutomaticNpcBuild(args)
     const second = resolveAutomaticNpcBuild(args)
 
     expect(first).toEqual(second)
+  })
+
+  it('produces identical builds for spell requirement order [A,B] and [B,A]', () => {
+    const context: CharacterBuildContext = { ...spellcastingTestContext, characterKind: 'npc' }
+    const seed = {
+      name: 'Arcane Guard',
+      speciesId: `${RULESET}:fixture-dwarf`,
+      classId: wizardClass.id,
+      level: 1 as const,
+      alignment: 'ln' as const,
+    }
+    const spellA = `${RULESET}:magic-missile`
+    const spellB = `${RULESET}:shield`
+
+    const first = resolveAutomaticNpcBuild({
+      seed,
+      constraints: { requiredWeaponIds: [], requiredSpellIds: [spellA, spellB] },
+      context,
+    })
+    const second = resolveAutomaticNpcBuild({
+      seed,
+      constraints: { requiredWeaponIds: [], requiredSpellIds: [spellB, spellA] },
+      context,
+    })
+
+    expect(first).toEqual(second)
+  })
+
+  it('fails when individually reachable weapons are jointly unsatisfiable', () => {
+    const context = weaponConstraintContext()
+    const weapons = listReachableStartingWeapons({
+      seed: { classId: weaponConstraintFighter.id },
+      context,
+    })
+    expect(weapons.map((weapon) => weapon.id)).toEqual(
+      expect.arrayContaining([longsword.id, greataxe.id]),
+    )
+
+    const result = resolveAutomaticNpcBuild({
+      seed: weaponFighterSeed(),
+      constraints: { requiredWeaponIds: [longsword.id, greataxe.id], requiredSpellIds: [] },
+      context,
+    })
+
+    expect(result).toMatchObject({
+      ok: false,
+      issues: [expect.objectContaining({ code: 'automatic_constraint_unsatisfiable' })],
+    })
   })
 })
 

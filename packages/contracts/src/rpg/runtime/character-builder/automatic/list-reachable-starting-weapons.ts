@@ -10,6 +10,8 @@ import {
 import { toEquipmentContentId } from '../../creature/equipment'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import { indexCharacterBuildCatalog } from '../context'
+import type { CharacterBuilderDraft } from '../draft/draft'
+import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import { resolveEquipmentPoolChoiceOptions } from '../resolvers/equipment/equipment-pool-choice-options'
 import { resolveClassToolProficiencyChoice } from '../resolvers/equipment/resolve-proficiency-linked-equipment-grant'
 import type { AutomaticNpcBuildSeed } from './automatic-npc-build-seed'
@@ -84,6 +86,61 @@ export function startingEquipmentOptionProvidesWeapon(args: {
     characterClass: args.characterClass,
     catalogIndex: args.catalogIndex,
   }).some((weapon) => weapon.id === args.weaponId)
+}
+
+function startingPackageGrantsWeaponDirectly(args: {
+  option: StartingEquipmentOption
+  weaponId: string
+  characterClass: CharacterClass
+}): boolean {
+  if (isStartingGoldOption(args.option)) return false
+
+  for (const item of args.option.items) {
+    if (item.kind !== 'grant') continue
+
+    if (isProficiencyLinkedStartingEquipmentGrant(item)) continue
+
+    const slug = startingEquipmentGrantEquipmentSlug(item)
+    if (!slug) continue
+    const equipmentId = toEquipmentContentId(args.characterClass.rulesetId, slug)
+    if (equipmentId === args.weaponId) return true
+  }
+
+  return false
+}
+
+/** Whether a resolved draft actually includes the required starting weapon. */
+export function isRequiredStartingWeaponSatisfiedInDraft(args: {
+  weaponId: string
+  draft: CharacterBuilderDraft
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+}): boolean {
+  for (const selections of Object.values(args.draft.choiceSelections)) {
+    if (selections?.includes(args.weaponId)) return true
+  }
+
+  const startingEquipment = args.characterClass.characterCreation?.startingEquipment
+  if (!startingEquipment) return false
+
+  const selectedPackageIds =
+    args.draft.choiceSelections[startingEquipmentChoiceSetId(args.characterClass.id)] ?? []
+
+  for (const packageId of selectedPackageIds) {
+    const option = startingEquipment.options.find((entry) => entry.id === packageId)
+    if (!option) continue
+    if (
+      startingPackageGrantsWeaponDirectly({
+        option,
+        weaponId: args.weaponId,
+        characterClass: args.characterClass,
+      })
+    ) {
+      return true
+    }
+  }
+
+  return false
 }
 
 /**

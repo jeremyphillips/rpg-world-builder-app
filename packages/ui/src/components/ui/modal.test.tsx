@@ -124,6 +124,28 @@ describe('Modal', () => {
     expect(document.getElementById('availability')).not.toHaveFocus()
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
+
+  it('applies stable body layout classes when stableBody is set', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header headline="Stable body" />
+          <Modal.Body stableBody data-testid="modal-body">
+            Scrollable region
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const body = await screen.findByTestId('modal-body')
+    expect(body).toHaveClass('overflow-hidden')
+    expect(body).toHaveClass('flex-1')
+  })
 })
 
 function GuardedModal({ shouldConfirmClose }: { shouldConfirmClose: boolean }) {

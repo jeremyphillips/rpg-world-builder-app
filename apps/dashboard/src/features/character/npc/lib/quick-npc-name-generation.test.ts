@@ -5,7 +5,7 @@ import {
   SPECIES_NAMING_UNSUPPORTED_REASON,
 } from '@rpg/name-generator-integrations'
 
-import * as NameGeneratorCore from '@rpg/name-generator-core'
+import type * as NameGeneratorCore from '@rpg/name-generator-core'
 
 import {
   createCampaignNpcBuilderContextFixture,

@@ -128,9 +128,25 @@ const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
 )
 ModalHeader.displayName = 'Modal.Header'
 
-const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(dialogPanelBodyVariants(), className)} {...props} />
+export interface ModalBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * When true, the body participates in a flex column layout so header/footer stay
+   * pinned while inner content (e.g. TabbedForm with stickyChrome) owns scrolling.
+   */
+  stableBody?: boolean
+}
+
+const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+  ({ className, stableBody, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        dialogPanelBodyVariants(),
+        stableBody && 'flex min-h-0 flex-1 flex-col overflow-hidden',
+        className,
+      )}
+      {...props}
+    />
   ),
 )
 ModalBody.displayName = 'Modal.Body'

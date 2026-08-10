@@ -32,11 +32,12 @@ import {
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   resolveQuickNpcMaxLevel,
-  resolveQuickNpcRequirementCategories,
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
+import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
 import { QuickNpcNameField } from './quick-npc-name-field.client'
+import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
 import { QuickNpcSetupSummary } from './quick-npc-setup-summary.client'
 
 export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
@@ -68,32 +69,39 @@ function buildAuthoringTabs(args: {
   organization: QuickNpcCreateFormOrganization
   configuredCount: number
 }) {
-  const requirementCategories = resolveQuickNpcRequirementCategories({
+  const optionSets = buildQuickNpcRequirementOptionSets({
     setup: args.setup,
     context: args.buildContext,
   })
+  const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
 
-  return buildQuickNpcTabs({
-    detailsFields: buildQuickNpcDetailsFields({
-      membership: {
-        kind: args.organization.organizationKind,
-        ...(args.organization.organizationSubtype !== undefined
-          ? { subtype: args.organization.organizationSubtype }
-          : {}),
-      },
-      nameFieldSlot: {
-        kind: 'slot',
-        name: '_quickNpcNameField',
-        render: () =>
-          createElement(QuickNpcNameField, {
-            speciesId: args.setup.speciesId,
-            buildContext: args.buildContext,
-          }),
-      },
+  return {
+    tabs: buildQuickNpcTabs({
+      detailsFields: buildQuickNpcDetailsFields({
+        membership: {
+          kind: args.organization.organizationKind,
+          ...(args.organization.organizationSubtype !== undefined
+            ? { subtype: args.organization.organizationSubtype }
+            : {}),
+        },
+        nameFieldSlot: {
+          kind: 'slot',
+          name: '_quickNpcNameField',
+          render: () =>
+            createElement(QuickNpcNameField, {
+              speciesId: args.setup.speciesId,
+              buildContext: args.buildContext,
+            }),
+        },
+      }),
+      requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
+      configuredCount: args.configuredCount,
+      requirementsHeader: hasRequirements ? (
+        <QuickNpcRequirementsFields optionSets={optionSets} />
+      ) : undefined,
     }),
-    requirementsFields: buildQuickNpcRequirementsFields(requirementCategories),
-    configuredCount: args.configuredCount,
-  })
+    hasRequirements,
+  }
 }
 
 function RequirementCountWatcher({
@@ -102,23 +110,23 @@ function RequirementCountWatcher({
   onConfiguredCountChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabValues>
-  fallback: Pick<QuickNpcAuthoringTabValues, 'requiredWeaponId' | 'requiredSpellId'>
+  fallback: Pick<QuickNpcAuthoringTabValues, 'requiredWeaponIds' | 'requiredSpellIds'>
   onConfiguredCountChange: (count: number) => void
 }) {
-  const requiredWeaponId = useWatch({
+  const requiredWeaponIds = useWatch({
     control: form.control,
-    name: 'requiredWeaponId',
-    defaultValue: fallback.requiredWeaponId,
+    name: 'requiredWeaponIds',
+    defaultValue: fallback.requiredWeaponIds,
   })
-  const requiredSpellId = useWatch({
+  const requiredSpellIds = useWatch({
     control: form.control,
-    name: 'requiredSpellId',
-    defaultValue: fallback.requiredSpellId,
+    name: 'requiredSpellIds',
+    defaultValue: fallback.requiredSpellIds,
   })
 
   const configuredCount = countQuickNpcConfiguredRequirements({
-    requiredWeaponId: requiredWeaponId ?? '',
-    requiredSpellId: requiredSpellId ?? '',
+    requiredWeaponIds: requiredWeaponIds ?? [],
+    requiredSpellIds: requiredSpellIds ?? [],
   })
 
   React.useEffect(() => {
@@ -163,7 +171,7 @@ export function QuickNpcAuthoringForm({
     [initialValues, setup],
   )
 
-  const tabs = React.useMemo(
+  const authoringModel = React.useMemo(
     () =>
       buildAuthoringTabs({
         setup,
@@ -175,8 +183,8 @@ export function QuickNpcAuthoringForm({
   )
 
   const requirementCategoryKey = React.useMemo(() => {
-    const categories = resolveQuickNpcRequirementCategories({ setup, context: buildContext })
-    return `${categories.weapons.length}:${categories.spells.length}`
+    const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
+    return `${optionSets.weapons.length}:${optionSets.spells.length}`
   }, [buildContext, setup])
 
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
@@ -220,12 +228,12 @@ export function QuickNpcAuthoringForm({
     <TabbedForm<QuickNpcAuthoringTabValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       schema={schema}
-      tabs={tabs}
+      tabs={authoringModel.tabs}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
       formError={formError ?? null}
       valueSyncs={valueSyncs}
-      stickyChrome={false}
+      stickyChrome
       header={(form) => (
         <>
           <RequirementCountWatcher

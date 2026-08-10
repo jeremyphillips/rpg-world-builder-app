@@ -10,12 +10,29 @@ import { renderWithProviders } from '@/test/render'
 
 import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
-vi.mock('../lib/quick-npc-form-fields', async (importOriginal) => {
+vi.mock('../lib/quick-npc-requirement-options.lib', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
-    resolveQuickNpcRequirementCategories: () => ({
-      weapons: [{ value: 'srd-cc-5.2.1:longsword', label: 'Longsword' }],
+    buildQuickNpcRequirementOptionSets: () => ({
+      weapons: [
+        {
+          option: { value: 'srd-cc-5.2.1:longsword', label: 'Longsword' },
+          pickerItem: {
+            equipment: { id: 'srd-cc-5.2.1:longsword', name: 'Longsword', kind: 'weapon' },
+            state: {
+              isProficient: true,
+              recommendation: { tier: 'neutral', reasons: [], specificity: 'exact' },
+            },
+          },
+          row: {
+            name: 'Longsword',
+            priceLabel: '15 gp',
+            kindLabel: 'Weapon',
+            comparisonGroups: [],
+          },
+        },
+      ],
       spells: [],
     }),
   }

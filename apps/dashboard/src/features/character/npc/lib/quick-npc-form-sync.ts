@@ -3,37 +3,42 @@ import type { FormValueSync } from '@rpg/ui/form'
 import {
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
-  resolveQuickNpcRequirementCategories,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
+import {
+  intersectQuickNpcRequirementIds,
+  resolveQuickNpcRequirementCategories,
+} from './quick-npc-requirement-options.lib'
 
-function clearInvalidRequirementSelections(
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((entry): entry is string => typeof entry === 'string')
+}
+
+function syncRequirementSelections(
   values: Record<string, unknown>,
   setup: QuickNpcSetupValues,
   context: Parameters<typeof resolveQuickNpcRequirementCategories>[0]['context'],
 ): Partial<Record<string, unknown>> | undefined {
   const categories = resolveQuickNpcRequirementCategories({ setup, context })
-  const patch: Partial<Record<string, unknown>> = {}
+  const reachableWeaponIds = new Set(categories.weapons.map((option) => option.value))
+  const reachableSpellIds = new Set(categories.spells.map((option) => option.value))
 
-  const weaponId = values[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]
-  if (
-    typeof weaponId === 'string' &&
-    weaponId !== '' &&
-    !categories.weapons.some((option) => option.value === weaponId)
-  ) {
-    patch[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME] = ''
+  const requiredWeaponIds = asStringArray(values[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME])
+  const requiredSpellIds = asStringArray(values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME])
+
+  const intersected = intersectQuickNpcRequirementIds({
+    requiredWeaponIds,
+    requiredSpellIds,
+    reachableWeaponIds,
+    reachableSpellIds,
+  })
+  if (!intersected) return undefined
+
+  return {
+    [QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]: intersected.requiredWeaponIds,
+    [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: intersected.requiredSpellIds,
   }
-
-  const spellId = values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]
-  if (
-    typeof spellId === 'string' &&
-    spellId !== '' &&
-    !categories.spells.some((option) => option.value === spellId)
-  ) {
-    patch[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME] = ''
-  }
-
-  return Object.keys(patch).length > 0 ? patch : undefined
 }
 
 export function createQuickNpcFormValueSyncs(
@@ -55,7 +60,7 @@ export function createQuickNpcFormValueSyncs(
           level: typeof values.level === 'number' ? values.level : 1,
         }
 
-        return clearInvalidRequirementSelections(values, setup, context)
+        return syncRequirementSelections(values, setup, context)
       },
     },
   ]

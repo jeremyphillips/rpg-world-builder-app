@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { z } from 'zod'
 
 import {
@@ -7,8 +9,6 @@ import {
   formatFieldMessage,
   getAlignmentLabel,
   getContentTypeTerm,
-  listReachableSpellOptions,
-  listReachableStartingWeapons,
   resolveAvailableContent,
   resolveBuilderMaxAllowedLevel,
   type AutomaticNpcBuildConstraints,
@@ -20,6 +20,11 @@ import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '
 
 import { buildOrganizationMembershipTitleRadioOptions } from '../../components/connections/organization-membership-title-field.lib'
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
+import {
+  buildQuickNpcConstraintsFromArrays,
+  countQuickNpcConfiguredRequirementsFromArrays,
+  type QuickNpcRequirementOptionSets,
+} from './quick-npc-requirement-options.lib'
 
 // ---------------------------------------------------------------------------
 // Quick NPC form — setup (species/class/level) plus authoring tabs for
@@ -29,8 +34,8 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 // ---------------------------------------------------------------------------
 
 export const QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME = 'membershipTitle'
-export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponId'
-export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellId'
+export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
+export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 
 export const QUICK_NPC_DETAILS_TAB_ID = 'details' as const
 export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
@@ -81,8 +86,8 @@ export function quickNpcAuthoringSchema(maxLevel: number) {
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
     membershipTitle: z.string(),
-    requiredWeaponId: z.string(),
-    requiredSpellId: z.string(),
+    requiredWeaponIds: z.array(z.string()),
+    requiredSpellIds: z.array(z.string()),
   })
 }
 
@@ -98,8 +103,8 @@ export function quickNpcAuthoringTabSchema() {
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
     membershipTitle: z.string(),
-    requiredWeaponId: z.string(),
-    requiredSpellId: z.string(),
+    requiredWeaponIds: z.array(z.string()),
+    requiredSpellIds: z.array(z.string()),
   })
 }
 
@@ -114,8 +119,8 @@ export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
   name: '',
   alignment: 'n',
   membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-  requiredWeaponId: '',
-  requiredSpellId: '',
+  requiredWeaponIds: [],
+  requiredSpellIds: [],
 }
 
 export const quickNpcAuthoringDefaultValues: QuickNpcAuthoringValues = {
@@ -146,24 +151,21 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
 }
 
 export function buildQuickNpcConstraints(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponId' | 'requiredSpellId'>,
+  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
 ): AutomaticNpcBuildConstraints | undefined {
-  const requiredWeaponId = values.requiredWeaponId.trim()
-  const requiredSpellId = values.requiredSpellId.trim()
-  if (!requiredWeaponId && !requiredSpellId) return undefined
-
-  return {
-    ...(requiredWeaponId ? { requiredWeaponId } : {}),
-    ...(requiredSpellId ? { requiredSpellId } : {}),
-  }
+  return buildQuickNpcConstraintsFromArrays({
+    requiredWeaponIds: values.requiredWeaponIds,
+    requiredSpellIds: values.requiredSpellIds,
+  })
 }
 
 export function countQuickNpcConfiguredRequirements(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponId' | 'requiredSpellId'>,
+  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
 ): number {
-  return (
-    Number(Boolean(values.requiredWeaponId.trim())) + Number(Boolean(values.requiredSpellId.trim()))
-  )
+  return countQuickNpcConfiguredRequirementsFromArrays({
+    requiredWeaponIds: values.requiredWeaponIds,
+    requiredSpellIds: values.requiredSpellIds,
+  })
 }
 
 export type QuickNpcContentOptions = {
@@ -204,29 +206,10 @@ export type QuickNpcRequirementCategories = {
   spells: FieldOption[]
 }
 
-export function resolveQuickNpcRequirementCategories(args: {
-  setup: QuickNpcSetupValues
-  context: CharacterBuildContext
-}): QuickNpcRequirementCategories {
-  const seed = {
-    classId: args.setup.classId,
-    level: args.setup.level,
-  }
+export type { QuickNpcRequirementOptionSets }
 
-  if (!seed.classId) {
-    return { weapons: [], spells: [] }
-  }
-
-  const weapons = listReachableStartingWeapons({ seed, context: args.context }).map((weapon) => ({
-    value: weapon.id,
-    label: weapon.label,
-  }))
-  const spells = listReachableSpellOptions({ seed, context: args.context }).map((spell) => ({
-    value: spell.id,
-    label: spell.label,
-  }))
-
-  return { weapons, spells }
+function formatRequirementsTabLabel(configuredCount: number): string {
+  return configuredCount > 0 ? `Requirements (${configuredCount})` : 'Requirements'
 }
 
 export type QuickNpcSetupFieldsArgs = QuickNpcContentOptions & {
@@ -312,44 +295,15 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): For
   ]
 }
 
-export function buildQuickNpcRequirementsFields(
-  categories: QuickNpcRequirementCategories,
-): FormItem[] {
-  const fields: FormItem[] = []
-
-  if (categories.weapons.length > 0) {
-    fields.push({
-      type: 'select',
-      name: QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
-      label: 'Starting weapon',
-      options: categories.weapons,
-      placeholder: 'No requirement',
-      width: 'full',
-    })
-  }
-
-  if (categories.spells.length > 0) {
-    fields.push({
-      type: 'select',
-      name: QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
-      label: 'Spell',
-      options: categories.spells,
-      placeholder: 'No requirement',
-      width: 'full',
-    })
-  }
-
-  return fields
-}
-
-function formatRequirementsTabLabel(configuredCount: number): string {
-  return configuredCount > 0 ? `Requirements (${configuredCount})` : 'Requirements'
+export function buildQuickNpcRequirementsFields(): FormItem[] {
+  return []
 }
 
 export function buildQuickNpcTabs(args: {
   detailsFields: FormItem[]
   requirementsFields: FormItem[]
   configuredCount: number
+  requirementsHeader?: ReactNode
 }): TabbedFormTab[] {
   const tabs: TabbedFormTab[] = [
     {
@@ -361,11 +315,12 @@ export function buildQuickNpcTabs(args: {
     },
   ]
 
-  if (args.requirementsFields.length > 0) {
+  if (args.requirementsFields.length > 0 || args.requirementsHeader) {
     tabs.push({
       id: QUICK_NPC_REQUIREMENTS_TAB_ID,
       label: formatRequirementsTabLabel(args.configuredCount),
       fields: args.requirementsFields,
+      ...(args.requirementsHeader ? { header: args.requirementsHeader } : {}),
     })
   }
 

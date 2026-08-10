@@ -156,8 +156,8 @@ function QuickNpcCreateModalSession({
       phase: 'authoring',
       setupValues: values,
       authoringValues: {
-        requiredWeaponId: '',
-        requiredSpellId: '',
+        requiredWeaponIds: [],
+        requiredSpellIds: [],
       },
     }))
   }, [])
@@ -168,8 +168,8 @@ function QuickNpcCreateModalSession({
       phase: 'setup',
       authoringValues: {
         ...current.authoringValues,
-        requiredWeaponId: '',
-        requiredSpellId: '',
+        requiredWeaponIds: [],
+        requiredSpellIds: [],
       },
     }))
   }, [])
@@ -203,7 +203,7 @@ function QuickNpcCreateModalSession({
           />
         ) : (
           <>
-            <Modal.Body className="pt-0">
+            <Modal.Body stableBody className="pt-0">
               <QuickNpcAuthoringForm
                 key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
                 campaignId={campaignId}

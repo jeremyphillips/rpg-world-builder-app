@@ -12,6 +12,7 @@ import {
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerCallout,
   type EquipmentPickerCalloutContext,
+  type EquipmentPickerCalloutSemanticStatus,
 } from './equipment-picker-drawer.types'
 
 const EQUIPMENT_CALLOUT_SOURCE_PRIORITY = {
@@ -209,6 +210,40 @@ function getProficiencyCautionCandidate(
   }
 }
 
+function resolveCalloutSemanticStatus(
+  candidate: EquipmentCalloutCandidate,
+): EquipmentPickerCalloutSemanticStatus | undefined {
+  switch (candidate.priority) {
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.disabledReason:
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.affordability:
+      return 'blocking'
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation:
+      return 'essential'
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.compatibility:
+      return 'compatibility'
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation:
+      return candidate.callout.label === EQUIPMENT_PICKER_STANDARD_GEAR_LABEL ? 'standard' : 'info'
+    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution:
+      return 'not_proficient'
+    default:
+      return undefined
+  }
+}
+
+function filterCandidatesByVisibleStatuses(
+  candidates: readonly EquipmentCalloutCandidate[],
+  context: EquipmentPickerCalloutContext,
+): EquipmentCalloutCandidate[] {
+  const visibleStatuses = context.visibleStatuses
+  if (!visibleStatuses || visibleStatuses.length === 0) return [...candidates]
+
+  const allowed = new Set(visibleStatuses)
+  return candidates.filter((candidate) => {
+    const status = resolveCalloutSemanticStatus(candidate)
+    return status !== undefined && allowed.has(status)
+  })
+}
+
 function collectEquipmentCalloutCandidates(
   item: EquipmentPickerItem,
   context: EquipmentPickerCalloutContext,
@@ -231,5 +266,9 @@ export function getEquipmentPickerCallout(
   item: EquipmentPickerItem,
   context: EquipmentPickerCalloutContext = {},
 ): EquipmentPickerCallout | undefined {
-  return selectHighestPriorityCallout(collectEquipmentCalloutCandidates(item, context))
+  const candidates = filterCandidatesByVisibleStatuses(
+    collectEquipmentCalloutCandidates(item, context),
+    context,
+  )
+  return selectHighestPriorityCallout(candidates)
 }

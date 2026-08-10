@@ -27,8 +27,8 @@ const validValues = {
   level: 3,
   alignment: 'ln',
   membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-  requiredWeaponId: '',
-  requiredSpellId: '',
+  requiredWeaponIds: [],
+  requiredSpellIds: [],
 }
 
 describe('quickNpcFormSchema', () => {
@@ -143,15 +143,15 @@ describe('buildQuickNpcFormFields', () => {
       level: 1,
       alignment: 'n',
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      requiredWeaponId: '',
-      requiredSpellId: '',
+      requiredWeaponIds: [],
+      requiredSpellIds: [],
     })
     expect(quickNpcAuthoringTabDefaultValues).toEqual({
       name: '',
       alignment: 'n',
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      requiredWeaponId: '',
-      requiredSpellId: '',
+      requiredWeaponIds: [],
+      requiredSpellIds: [],
     })
   })
 })
@@ -163,7 +163,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
       requirementsFields: [
         {
           type: 'select',
-          name: 'requiredWeaponId',
+          name: 'requiredWeaponIds',
           label: 'Starting weapon',
           options: [],
           width: 'full',
@@ -187,8 +187,8 @@ describe('buildQuickNpcTabs validation wiring', () => {
           name: 'Guard Captain',
           alignment: 'ln',
           membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-          requiredWeaponId: '',
-          requiredSpellId: '',
+          requiredWeaponIds: [],
+          requiredSpellIds: [],
         },
       ),
     ).toMatchObject({
@@ -202,26 +202,28 @@ describe('buildQuickNpcTabs validation wiring', () => {
 
 describe('buildQuickNpcConstraints', () => {
   it('omits empty requirement fields', () => {
-    expect(buildQuickNpcConstraints({ requiredWeaponId: '', requiredSpellId: '' })).toBeUndefined()
+    expect(
+      buildQuickNpcConstraints({ requiredWeaponIds: [], requiredSpellIds: [] }),
+    ).toBeUndefined()
   })
 
-  it('maps configured requirement ids', () => {
+  it('maps configured requirement id arrays', () => {
     expect(
       buildQuickNpcConstraints({
-        requiredWeaponId: 'srd-cc-5.2.1:longsword',
-        requiredSpellId: '',
+        requiredWeaponIds: ['srd-cc-5.2.1:longsword'],
+        requiredSpellIds: [],
       }),
-    ).toEqual({ requiredWeaponId: 'srd-cc-5.2.1:longsword' })
+    ).toEqual({ requiredWeaponIds: ['srd-cc-5.2.1:longsword'], requiredSpellIds: [] })
   })
 })
 
 describe('countQuickNpcConfiguredRequirements', () => {
-  it('counts only non-empty requirement ids', () => {
+  it('counts weapons and spells in configured arrays', () => {
     expect(
       countQuickNpcConfiguredRequirements({
-        requiredWeaponId: 'weapon-1',
-        requiredSpellId: '',
+        requiredWeaponIds: ['weapon-1'],
+        requiredSpellIds: ['spell-1'],
       }),
-    ).toBe(1)
+    ).toBe(2)
   })
 })

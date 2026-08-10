@@ -1,4 +1,5 @@
 import type { CharacterClass } from '../../../content/classes/class'
+import type { StartingEquipmentOption } from '../../../content/starting-equipment'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -8,7 +9,10 @@ import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
-import { startingEquipmentOptionProvidesWeapon } from './list-reachable-starting-weapons'
+import {
+  startingEquipmentOptionProvidesWeapon,
+  isRequiredStartingWeaponSatisfiedInDraft,
+} from './list-reachable-starting-weapons'
 
 function preferredConstraintOptionIds(
   choiceSet: ChoiceSet,
@@ -17,23 +21,44 @@ function preferredConstraintOptionIds(
   const preferred: string[] = []
   if (!constraints) return preferred
 
-  if (
-    constraints.requiredSpellId &&
-    (choiceSet.choiceType === 'spell' || choiceSet.choiceType === 'cantrip') &&
-    choiceSet.options.some((option) => option.id === constraints.requiredSpellId)
-  ) {
-    preferred.push(constraints.requiredSpellId)
+  for (const spellId of constraints.requiredSpellIds) {
+    if (
+      (choiceSet.choiceType === 'spell' || choiceSet.choiceType === 'cantrip') &&
+      choiceSet.options.some((option) => option.id === spellId)
+    ) {
+      preferred.push(spellId)
+    }
   }
 
-  if (
-    constraints.requiredWeaponId &&
-    choiceSet.choiceType === 'equipment' &&
-    choiceSet.options.some((option) => option.id === constraints.requiredWeaponId)
-  ) {
-    preferred.push(constraints.requiredWeaponId)
+  for (const weaponId of constraints.requiredWeaponIds) {
+    if (
+      choiceSet.choiceType === 'equipment' &&
+      choiceSet.options.some((option) => option.id === weaponId)
+    ) {
+      preferred.push(weaponId)
+    }
   }
 
-  return preferred
+  const canonicalOrder = choiceSet.options.map((option) => option.id)
+  return preferred.sort(
+    (left, right) => canonicalOrder.indexOf(left) - canonicalOrder.indexOf(right),
+  )
+}
+
+function startingPackageProvidesAllRequiredWeapons(args: {
+  option: StartingEquipmentOption
+  requiredWeaponIds: readonly string[]
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+}): boolean {
+  return args.requiredWeaponIds.every((weaponId) =>
+    startingEquipmentOptionProvidesWeapon({
+      option: args.option,
+      weaponId,
+      characterClass: args.characterClass,
+      catalogIndex: args.catalogIndex,
+    }),
+  )
 }
 
 function selectStartingEquipmentPackageIds(args: {
@@ -48,16 +73,16 @@ function selectStartingEquipmentPackageIds(args: {
   if (needed === 0) return []
 
   const startingEquipment = characterClass.characterCreation?.startingEquipment
-  if (!startingEquipment || !constraints.requiredWeaponId) return null
+  if (!startingEquipment || constraints.requiredWeaponIds.length === 0) return null
 
   const eligible = choiceSet.options
     .map((option) => option.id)
     .filter((optionId) => {
       const option = startingEquipment.options.find((entry) => entry.id === optionId)
       if (!option) return false
-      return startingEquipmentOptionProvidesWeapon({
+      return startingPackageProvidesAllRequiredWeapons({
         option,
-        weaponId: constraints.requiredWeaponId!,
+        requiredWeaponIds: constraints.requiredWeaponIds,
         characterClass,
         catalogIndex,
       })
@@ -83,7 +108,8 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
   const selectedIds = new Set(current)
 
   if (
-    constraints?.requiredWeaponId &&
+    constraints &&
+    constraints.requiredWeaponIds.length > 0 &&
     characterClass &&
     choiceSet.id === startingEquipmentChoiceSetId(characterClass.id)
   ) {
@@ -145,12 +171,29 @@ function weaponConstraintFailureIssue(
   choiceSet: ChoiceSet,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterBuildValidationIssue | undefined {
-  if (!constraints.requiredWeaponId || choiceSet.sourceType !== 'class') return undefined
+  if (constraints.requiredWeaponIds.length === 0 || choiceSet.sourceType !== 'class') {
+    return undefined
+  }
   const characterClass = catalogIndex.classes.get(choiceSet.sourceId)
   if (!characterClass || choiceSet.id !== startingEquipmentChoiceSetId(characterClass.id)) {
     return undefined
   }
-  const weapon = catalogIndex.equipment.get(constraints.requiredWeaponId)
+
+  const startingEquipment = characterClass.characterCreation?.startingEquipment
+  if (!startingEquipment) return undefined
+
+  const hasEligiblePackage = startingEquipment.options.some((option) =>
+    startingPackageProvidesAllRequiredWeapons({
+      option,
+      requiredWeaponIds: constraints.requiredWeaponIds,
+      characterClass,
+      catalogIndex,
+    }),
+  )
+  if (hasEligiblePackage) return undefined
+
+  const firstWeaponId = constraints.requiredWeaponIds[0]
+  const weapon = firstWeaponId ? catalogIndex.equipment.get(firstWeaponId) : undefined
   return constraintUnsatisfiableIssue(weapon?.name ?? 'weapon')
 }
 
@@ -159,9 +202,15 @@ function spellConstraintFailureIssue(
   choiceSet: ChoiceSet,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterBuildValidationIssue | undefined {
-  if (!constraints.requiredSpellId) return undefined
+  if (constraints.requiredSpellIds.length === 0) return undefined
   if (choiceSet.choiceType !== 'spell' && choiceSet.choiceType !== 'cantrip') return undefined
-  const spell = catalogIndex.spells.get(constraints.requiredSpellId)
+
+  const unsatisfiedSpellId = constraints.requiredSpellIds.find(
+    (spellId) => !choiceSet.options.some((option) => option.id === spellId),
+  )
+  if (!unsatisfiedSpellId) return undefined
+
+  const spell = catalogIndex.spells.get(unsatisfiedSpellId)
   const fallback = choiceSet.choiceType === 'cantrip' ? 'cantrip' : 'spell'
   return constraintUnsatisfiableIssue(spell?.name ?? fallback)
 }
@@ -179,4 +228,71 @@ export function automaticNpcConstraintFailureIssue(
   }
 
   return unsatisfiedChoiceSetIssue(choiceSet)
+}
+
+function collectChoiceSelectionIds(draft: CharacterBuilderDraft): Set<string> {
+  const selectedIds = new Set<string>()
+  for (const selections of Object.values(draft.choiceSelections)) {
+    for (const optionId of selections ?? []) {
+      selectedIds.add(optionId)
+    }
+  }
+  return selectedIds
+}
+
+function validateRequiredSpellsSatisfied(
+  selectedIds: ReadonlySet<string>,
+  requiredSpellIds: readonly string[],
+  catalogIndex: CharacterBuildCatalogIndex,
+): CharacterBuildValidationIssue | undefined {
+  for (const spellId of requiredSpellIds) {
+    if (selectedIds.has(spellId)) continue
+    const spell = catalogIndex.spells.get(spellId)
+    return constraintUnsatisfiableIssue(spell?.name ?? 'spell')
+  }
+  return undefined
+}
+
+function validateRequiredWeaponsSatisfied(
+  draft: CharacterBuilderDraft,
+  requiredWeaponIds: readonly string[],
+  catalogIndex: CharacterBuildCatalogIndex,
+): CharacterBuildValidationIssue | undefined {
+  const characterClass = catalogIndex.classes.get(draft.class.classId ?? '')
+  if (!characterClass) return undefined
+
+  for (const weaponId of requiredWeaponIds) {
+    if (
+      isRequiredStartingWeaponSatisfiedInDraft({
+        weaponId,
+        draft,
+        characterClass,
+        catalogIndex,
+      })
+    ) {
+      continue
+    }
+    const weapon = catalogIndex.equipment.get(weaponId)
+    return constraintUnsatisfiableIssue(weapon?.name ?? 'weapon')
+  }
+  return undefined
+}
+
+/** Verifies every hard requirement id appears in the resolved draft choice selections. */
+export function validateAutomaticNpcConstraintsSatisfied(
+  draft: CharacterBuilderDraft,
+  constraints: AutomaticNpcBuildConstraints | undefined,
+  catalogIndex: CharacterBuildCatalogIndex,
+): CharacterBuildValidationIssue | undefined {
+  if (!constraints) return undefined
+
+  const selectedIds = collectChoiceSelectionIds(draft)
+  const spellIssue = validateRequiredSpellsSatisfied(
+    selectedIds,
+    constraints.requiredSpellIds,
+    catalogIndex,
+  )
+  if (spellIssue) return spellIssue
+
+  return validateRequiredWeaponsSatisfied(draft, constraints.requiredWeaponIds, catalogIndex)
 }

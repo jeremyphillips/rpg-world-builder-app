@@ -74,8 +74,14 @@ organization detail **Members** section — no full builder route.
 open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.
 
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
-weapon/spell constraints), injects `connections.organizations`, then
+`requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `connections.organizations`, then
 `finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included.
+
+**Requirements tab:** multi-add combobox pickers compose canonical equipment/spell compact row VMs
+and equipment `not_proficient` callouts only (`visibleStatuses: ['not_proficient']` on the shared
+callout stack). Discovery lists individually reachable options; resolver authority decides joint
+satisfiability. Setup changes atomically intersect stale requirement ids with the reachable set.
+Name generation is independent of mechanical build determinism.
 Overlay policy: [drawer-shell.md](./drawer-shell.md#overlay-modality-policy). Resolver detail:
 [automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
 

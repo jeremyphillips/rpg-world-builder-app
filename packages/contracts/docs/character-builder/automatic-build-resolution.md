@@ -9,14 +9,14 @@ path as a manually built character.
 
 ## Modules
 
-| Export                               | Module                                         | Purpose                                                                  |
-| ------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment) |
-| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)       |
-| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponId`, `requiredSpellId`)       |
-| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                 |
-| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                     |
-| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure       |
+| Export                               | Module                                         | Purpose                                                                     |
+| ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment)    |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)          |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                    |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                        |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure          |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -77,27 +77,31 @@ Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:
 ```ts
 resolveAutomaticNpcBuild({
   seed,
-  constraints?: { requiredWeaponId?: string; requiredSpellId?: string },
+  constraints?: { requiredWeaponIds: string[]; requiredSpellIds: string[] },
   context,
 })
 ```
 
-| Layer                                                        | Role                                                                                    |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — options the UI may offer in requirement pickers                          |
-| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies |
+Constraint id arrays are **unordered sets** — canonicalize (sort + dedupe) before resolve.
+The resolver verifies every required id is satisfied in the resolved draft; individually
+reachable options that cannot be combined still fail with `automatic_constraint_unsatisfiable`.
+
+| Layer                                                        | Role                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — options the UI may offer in requirement pickers (including non-proficient weapons) |
+| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies           |
 
 Picker eligibility does **not** imply build validity. When constraints cannot be
-satisfied (e.g. a required weapon is unreachable through any non-gold starting
-package, or a required spell is not selectable at the seed level), the resolver
-returns `ok: false` with `automatic_constraint_unsatisfiable` — it does not drop
-requirements to force success.
+satisfied (e.g. required weapons are not jointly obtainable from starting packages and
+nested pools, or required spells exceed capacity), the resolver returns `ok: false` with
+`automatic_constraint_unsatisfiable` — it does not drop requirements to force success.
 
 Selection policy with constraints:
 
 - Required weapon/spell selections are applied **before** remaining first-eligible defaults.
-- Starting-equipment package ChoiceSets bias toward the first authored package that can produce the required weapon; gold-only packages never satisfy V1 weapon requirements.
-- Nested equipment pool picks prefer the required weapon when it appears in the pool.
+- Starting-equipment package ChoiceSets bias toward the first authored package that can produce **all** required weapons together; gold-only packages never satisfy V1 weapon requirements.
+- Nested equipment pool picks prefer required weapons when they appear in the pool.
+- Post-resolution validation ensures every `requiredWeaponIds` / `requiredSpellIds` entry is present in the built draft.
 
 ## Determinism (V1)
 

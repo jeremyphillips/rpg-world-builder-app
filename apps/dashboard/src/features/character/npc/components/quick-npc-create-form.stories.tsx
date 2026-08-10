@@ -96,8 +96,8 @@ export const ResolutionError: Story = {
       name: 'Stalled Recruit',
       alignment: 'ln',
       membershipTitle: 'Guildmaster',
-      requiredWeaponId: '',
-      requiredSpellId: '',
+      requiredWeaponIds: [],
+      requiredSpellIds: [],
     },
   },
   play: async ({ canvasElement }) => {

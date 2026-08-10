@@ -244,6 +244,29 @@ describe('equipment-picker-callout.lib', () => {
     })
   })
 
+  describe('visibleStatuses filter', () => {
+    it('shows only not_proficient when essential would otherwise win', () => {
+      const item: EquipmentPickerItem = {
+        ...equipmentPickerItemsFixture[0]!,
+        state: {
+          ...equipmentPickerItemsFixture[0]!.state,
+          isProficient: false,
+          recommendation: {
+            tier: 'essential',
+            reasons: ['classToolNeed'],
+            specificity: 'exact',
+          },
+        },
+      }
+
+      expect(getEquipmentPickerCallout(item, { visibleStatuses: ['not_proficient'] })).toEqual({
+        label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
+        intent: 'warning',
+        importance: 'medium',
+      })
+    })
+  })
+
   describe('priority resolution', () => {
     it('prefers affordability over proficiency caution', () => {
       const chainMail = equipmentPickerItemsFixture[1]!

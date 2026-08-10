@@ -26,8 +26,12 @@ import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 import {
   fillChoiceSetWithConstraintAwareSelection,
   automaticNpcConstraintFailureIssue,
+  validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
-import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
+import {
+  normalizeAutomaticNpcBuildConstraints,
+  type AutomaticNpcBuildConstraints,
+} from './automatic-npc-build-constraints'
 import {
   validateAutomaticNpcBuildSeed,
   type AutomaticNpcBuildSeed,
@@ -276,6 +280,8 @@ export function resolveAutomaticNpcBuild({
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
   if (seedIssues.length > 0) return { ok: false, issues: seedIssues }
 
+  const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
+
   let draft = seedDraft(seed, context)
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 
@@ -286,6 +292,15 @@ export function resolveAutomaticNpcBuild({
     if (!target) {
       const completion = completeMagicItemGrantSelections(draft, context)
       if (!completion.ok) return completion
+
+      const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
+        completion.draft,
+        normalizedConstraints,
+        catalogIndex,
+      )
+      if (constraintIssue) {
+        return { ok: false, issues: [constraintIssue] }
+      }
 
       return {
         ok: true,
@@ -304,14 +319,14 @@ export function resolveAutomaticNpcBuild({
     const next = fillChoiceSetWithConstraintAwareSelection({
       draft,
       choiceSet: target,
-      constraints,
+      constraints: normalizedConstraints,
       characterClass,
       catalogIndex,
     })
     if (next === null) {
       return {
         ok: false,
-        issues: [automaticNpcConstraintFailureIssue(constraints, target, catalogIndex)],
+        issues: [automaticNpcConstraintFailureIssue(normalizedConstraints, target, catalogIndex)],
       }
     }
     draft = applyChoiceSetSelection(target, next)
