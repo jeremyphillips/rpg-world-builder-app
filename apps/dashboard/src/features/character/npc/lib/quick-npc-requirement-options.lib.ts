@@ -1,20 +1,20 @@
 import {
-  NEUTRAL_EQUIPMENT_RECOMMENDATION,
-  assembleCharacterProficiencies,
   buildSpellPickerCompactSummary,
   compareEquipmentPickerItemsByRecommendation,
-  createEmptyCharacterBuilderDraft,
   indexCharacterBuildCatalog,
   listReachableSpellOptions,
-  listReachableStartingWeapons,
   normalizeAutomaticNpcBuildConstraints,
-  resolveEquipmentPickerItems,
+  resolveAvailableContent,
   type CharacterBuildContext,
   type EquipmentPickerItem,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
+import {
+  buildEquipmentPickerRecommendationContext,
+  buildMinimalCharacterBuilderDraftForRecommendations,
+} from '@/features/character/lib/equipment/equipment-picker-recommendation-context.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 
@@ -34,7 +34,19 @@ export type QuickNpcRequirementOptionSets = {
   spells: QuickNpcSpellRequirementOption[]
 }
 
-function buildQuickNpcWeaponRequirementOptions(args: {
+function sortPickerItems(
+  items: EquipmentPickerItem[],
+  browseSortContext: ReturnType<
+    typeof buildEquipmentPickerRecommendationContext
+  >['browseSortContext'],
+): EquipmentPickerItem[] {
+  return [...items].sort((left, right) =>
+    compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
+  )
+}
+
+/** Single resolver for campaign-available weapon requirement options. */
+export function resolveQuickNpcWeaponRequirementOptions(args: {
   setup: QuickNpcSetupValues
   context: CharacterBuildContext
 }): QuickNpcWeaponRequirementOption[] {
@@ -42,30 +54,33 @@ function buildQuickNpcWeaponRequirementOptions(args: {
   const characterClass = catalogIndex.classes.get(args.setup.classId)
   if (!characterClass) return []
 
-  const reachable = listReachableStartingWeapons({
-    seed: { classId: args.setup.classId },
-    context: args.context,
+  const equipment = resolveAvailableContent(args.context).equipment.filter(
+    (row) => row.kind === 'weapon',
+  )
+  const draft = buildMinimalCharacterBuilderDraftForRecommendations({
+    speciesId: args.setup.speciesId,
+    classId: args.setup.classId,
+    level: args.setup.level,
   })
-  const equipment = reachable
-    .map((weapon) => catalogIndex.equipment.get(weapon.id))
-    .filter((row): row is NonNullable<typeof row> => row !== undefined)
-
-  const draft = createEmptyCharacterBuilderDraft()
-  draft.class = { classId: args.setup.classId, level: args.setup.level }
-  draft.species = { speciesId: args.setup.speciesId }
-
-  const proficiencies = assembleCharacterProficiencies(draft, catalogIndex, [], characterClass)
-  const pickerItems = resolveEquipmentPickerItems({
+  const { items, browseSortContext } = buildEquipmentPickerRecommendationContext({
     equipment,
-    proficiencies,
-    recommendations: new Map(equipment.map((row) => [row.id, NEUTRAL_EQUIPMENT_RECOMMENDATION])),
+    draft,
+    characterClass,
+    catalogIndex,
   })
 
-  return [...pickerItems].sort(compareEquipmentPickerItemsByRecommendation).map((pickerItem) => ({
+  return sortPickerItems(items, browseSortContext).map((pickerItem) => ({
     option: { value: pickerItem.equipment.id, label: pickerItem.equipment.name },
     pickerItem,
     row: buildEquipmentPickerRowViewModel(pickerItem.equipment),
   }))
+}
+
+export function resolveQuickNpcWeaponValidIds(args: {
+  setup: QuickNpcSetupValues
+  context: CharacterBuildContext
+}): ReadonlySet<string> {
+  return new Set(resolveQuickNpcWeaponRequirementOptions(args).map((entry) => entry.option.value))
 }
 
 function buildQuickNpcSpellRequirementOptions(args: {
@@ -95,7 +110,7 @@ export function buildQuickNpcRequirementOptionSets(args: {
   context: CharacterBuildContext
 }): QuickNpcRequirementOptionSets {
   return {
-    weapons: buildQuickNpcWeaponRequirementOptions(args),
+    weapons: resolveQuickNpcWeaponRequirementOptions(args),
     spells: buildQuickNpcSpellRequirementOptions(args),
   }
 }
@@ -108,6 +123,17 @@ export function resolveQuickNpcRequirementCategories(args: {
   return {
     weapons: sets.weapons.map((entry) => entry.option),
     spells: sets.spells.map((entry) => entry.option),
+  }
+}
+
+export function resolveQuickNpcRequirementValidIds(args: {
+  setup: QuickNpcSetupValues
+  context: CharacterBuildContext
+}): { weaponIds: ReadonlySet<string>; spellIds: ReadonlySet<string> } {
+  const sets = buildQuickNpcRequirementOptionSets(args)
+  return {
+    weaponIds: new Set(sets.weapons.map((entry) => entry.option.value)),
+    spellIds: new Set(sets.spells.map((entry) => entry.option.value)),
   }
 }
 

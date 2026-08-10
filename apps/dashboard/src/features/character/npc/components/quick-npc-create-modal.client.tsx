@@ -181,7 +181,7 @@ function QuickNpcCreateModalSession({
 
   return (
     <Modal.Root open={open} onOpenChange={handleDismiss}>
-      <Modal.Content size="md" closeOnOutsideClick={false}>
+      <Modal.Content size="md" layout="stable" closeOnOutsideClick={false}>
         <Modal.Header
           headline={QUICK_NPC_CREATE_TITLE}
           description={

@@ -6,11 +6,6 @@ import { useFormContext } from 'react-hook-form'
 import { Button, ComboboxField } from '@rpg/ui'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
-import { EquipmentPickerItemHeader } from '../../components/equipment/equipment-picker-item-header.client'
-import { getEquipmentPickerCallout } from '../../components/equipment/equipment-picker-callout.lib'
-import { mapSpellPickerCompactSummaryToMetadataLines } from '../../components/picker/catalog-picker-metadata'
-import { SpellCatalogItemHeader } from '@/features/content'
-
 import {
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
@@ -21,10 +16,10 @@ import type {
   QuickNpcSpellRequirementOption,
   QuickNpcWeaponRequirementOption,
 } from '../lib/quick-npc-requirement-options.lib'
-
-const QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT = {
-  visibleStatuses: ['not_proficient'] as const,
-}
+import {
+  QuickNpcSpellRequirementPreview,
+  QuickNpcWeaponRequirementPreview,
+} from './quick-npc-requirement-preview.client'
 
 const QUICK_NPC_WEAPON_ADD_LABEL = '+ Add weapon'
 const QUICK_NPC_SPELL_ADD_LABEL = '+ Add spell'
@@ -47,49 +42,6 @@ function filterComboboxOptions(
   const normalized = query.trim().toLowerCase()
   if (!normalized) return available
   return available.filter((option) => option.label.toLowerCase().includes(normalized))
-}
-
-function WeaponRequirementSelectedRow({
-  entry,
-  onRemove,
-}: {
-  entry: QuickNpcWeaponRequirementOption
-  onRemove: () => void
-}) {
-  const callout = getEquipmentPickerCallout(entry.pickerItem, QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT)
-
-  return (
-    <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
-      <div className="min-w-0 flex-1">
-        <EquipmentPickerItemHeader item={entry.row} callout={callout} action={{ kind: 'none' }} />
-      </div>
-      <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-        {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
-      </Button>
-    </div>
-  )
-}
-
-function SpellRequirementSelectedRow({
-  entry,
-  onRemove,
-}: {
-  entry: QuickNpcSpellRequirementOption
-  onRemove: () => void
-}) {
-  return (
-    <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
-      <div className="min-w-0 flex-1">
-        <SpellCatalogItemHeader
-          name={entry.option.label}
-          metadataLines={mapSpellPickerCompactSummaryToMetadataLines(entry.compactSummary)}
-        />
-      </div>
-      <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-        {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
-      </Button>
-    </div>
-  )
 }
 
 function WeaponRequirementsField({ entries }: { entries: QuickNpcWeaponRequirementOption[] }) {
@@ -118,10 +70,24 @@ function WeaponRequirementsField({ entries }: { entries: QuickNpcWeaponRequireme
       resolveFilteredOptions={(panelOptions, query, selected) =>
         filterComboboxOptions(panelOptions, query, selected)
       }
+      renderOption={(option) => {
+        const entry = entryById.get(option.value)
+        if (!entry) return null
+        return <QuickNpcWeaponRequirementPreview entry={entry} />
+      }}
       renderSelectedItem={(option, { onRemove }) => {
         const entry = entryById.get(option.value)
         if (!entry) return null
-        return <WeaponRequirementSelectedRow entry={entry} onRemove={onRemove} />
+        return (
+          <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
+            <div className="min-w-0 flex-1">
+              <QuickNpcWeaponRequirementPreview entry={entry} />
+            </div>
+            <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+              {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
+            </Button>
+          </div>
+        )
       }}
     />
   )
@@ -153,10 +119,24 @@ function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirement
       resolveFilteredOptions={(panelOptions, query, selected) =>
         filterComboboxOptions(panelOptions, query, selected)
       }
+      renderOption={(option) => {
+        const entry = entryById.get(option.value)
+        if (!entry) return null
+        return <QuickNpcSpellRequirementPreview entry={entry} />
+      }}
       renderSelectedItem={(option, { onRemove }) => {
         const entry = entryById.get(option.value)
         if (!entry) return null
-        return <SpellRequirementSelectedRow entry={entry} onRemove={onRemove} />
+        return (
+          <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
+            <div className="min-w-0 flex-1">
+              <QuickNpcSpellRequirementPreview entry={entry} />
+            </div>
+            <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+              {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
+            </Button>
+          </div>
+        )
       }}
     />
   )

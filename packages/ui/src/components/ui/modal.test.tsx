@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
+import { modalStableBlockSizeClasses } from './modal.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
@@ -145,6 +146,25 @@ describe('Modal', () => {
     const body = await screen.findByTestId('modal-body')
     expect(body).toHaveClass('overflow-hidden')
     expect(body).toHaveClass('flex-1')
+  })
+
+  it('applies the stable layout block-size token without changing default content layout', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content layout="stable" data-testid="modal-content">
+          <Modal.Header headline="Stable layout" />
+          <Modal.Body>Short body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content.className).toContain(modalStableBlockSizeClasses)
   })
 })
 

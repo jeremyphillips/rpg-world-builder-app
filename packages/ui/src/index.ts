@@ -681,6 +681,7 @@ export {
   ComboboxField,
   type ComboboxFieldProps,
   type ComboboxFieldOption,
+  type ComboboxRenderOption,
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'

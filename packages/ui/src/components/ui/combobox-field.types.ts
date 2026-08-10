@@ -24,6 +24,18 @@ export type ComboboxRenderSelectedItem = (
   context: ComboboxSelectedItemRenderContext,
 ) => ReactNode
 
+export interface ComboboxOptionRenderContext {
+  selected: boolean
+  disabled: boolean
+  size: FieldSize
+}
+
+/** Content-only customization for dropdown option interiors. */
+export type ComboboxRenderOption = (
+  option: ComboboxFieldOption,
+  context: ComboboxOptionRenderContext,
+) => ReactNode
+
 /** Optional combobox panel resolver; defaults to {@link filterOptions} order when omitted. */
 export type ResolveComboboxFilteredOptions = (
   options: ComboboxFieldOption[],
@@ -47,6 +59,8 @@ export interface ComboboxFieldControlProps {
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Custom interior for dropdown options; primitive retains label-only fallback and a11y name. */
+  renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
 }

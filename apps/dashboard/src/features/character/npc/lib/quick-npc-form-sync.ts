@@ -7,7 +7,7 @@ import {
 } from './quick-npc-form-fields'
 import {
   intersectQuickNpcRequirementIds,
-  resolveQuickNpcRequirementCategories,
+  resolveQuickNpcRequirementValidIds,
 } from './quick-npc-requirement-options.lib'
 
 function asStringArray(value: unknown): string[] {
@@ -18,11 +18,10 @@ function asStringArray(value: unknown): string[] {
 function syncRequirementSelections(
   values: Record<string, unknown>,
   setup: QuickNpcSetupValues,
-  context: Parameters<typeof resolveQuickNpcRequirementCategories>[0]['context'],
+  context: Parameters<typeof resolveQuickNpcRequirementValidIds>[0]['context'],
 ): Partial<Record<string, unknown>> | undefined {
-  const categories = resolveQuickNpcRequirementCategories({ setup, context })
-  const reachableWeaponIds = new Set(categories.weapons.map((option) => option.value))
-  const reachableSpellIds = new Set(categories.spells.map((option) => option.value))
+  const { weaponIds: reachableWeaponIds, spellIds: reachableSpellIds } =
+    resolveQuickNpcRequirementValidIds({ setup, context })
 
   const requiredWeaponIds = asStringArray(values[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME])
   const requiredSpellIds = asStringArray(values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME])
@@ -42,7 +41,7 @@ function syncRequirementSelections(
 }
 
 export function createQuickNpcFormValueSyncs(
-  context: Parameters<typeof resolveQuickNpcRequirementCategories>[0]['context'],
+  context: Parameters<typeof resolveQuickNpcRequirementValidIds>[0]['context'],
 ): FormValueSync[] {
   return [
     {

@@ -86,10 +86,10 @@ Constraint id arrays are **unordered sets** — canonicalize (sort + dedupe) bef
 The resolver verifies every required id is satisfied in the resolved draft; individually
 reachable options that cannot be combined still fail with `automatic_constraint_unsatisfiable`.
 
-| Layer                                                        | Role                                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — options the UI may offer in requirement pickers (including non-proficient weapons) |
-| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies           |
+| Layer                                                        | Role                                                                                                                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — `listReachableSpellOptions` for spell requirement pickers; weapon pickers use campaign-available equipment via `resolveAvailableContent` |
+| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies                                                                 |
 
 Picker eligibility does **not** imply build validity. When constraints cannot be
 satisfied (e.g. required spells exceed capacity, or a required weapon is not

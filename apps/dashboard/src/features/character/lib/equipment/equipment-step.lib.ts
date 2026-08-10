@@ -1,9 +1,6 @@
 import {
-  assembleCharacterProficiencies,
   buildChoiceSetId,
-  characterPrefersMartialWeaponBrowseOrder,
   deriveEquipmentBudgetSummary,
-  deriveEquipmentRecommendations,
   equipmentPoolSummaryLabel,
   formatEquipmentBundleLabel,
   formatEquipmentInventoryPriceLine,
@@ -13,7 +10,6 @@ import {
   isStartingGoldOption,
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
-  resolveEquipmentPickerItems,
   resolveEquipmentPoolChoiceOptions,
   resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
@@ -54,6 +50,7 @@ import {
 } from '@rpg/contracts'
 
 import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
+import { buildEquipmentPickerRecommendationContext } from './equipment-picker-recommendation-context.lib'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -569,37 +566,23 @@ export function resolveEquipmentStepPickerItems(args: {
   context?: CharacterBuildContext
 }): EquipmentStepPickerItemsResult {
   const { draft, characterClass, catalogIndex, choiceSets, budget, context } = args
-  const proficiencies = assembleCharacterProficiencies(
-    draft,
-    catalogIndex,
-    choiceSets,
-    characterClass,
-  )
-  const recommendations = deriveEquipmentRecommendations({
-    characterClass,
-    catalogIndex,
-    proficiencies,
-    classLevel: draft.class.level,
-    draft,
-    choiceSets,
-  })
 
   const equipment = context
     ? resolveAvailableContent(context).equipment
     : [...catalogIndex.equipment.values()]
 
+  const recommendation = buildEquipmentPickerRecommendationContext({
+    equipment,
+    draft,
+    characterClass,
+    catalogIndex,
+    choiceSets,
+    budget,
+  })
+
   return {
-    items: enrichEquipmentPickerItemsWithSearchDocument(
-      resolveEquipmentPickerItems({
-        equipment,
-        proficiencies,
-        recommendations,
-        budget,
-      }),
-    ),
-    browseSortContext: {
-      preferMartialWeaponBrowseOrder: characterPrefersMartialWeaponBrowseOrder(proficiencies),
-    },
+    items: enrichEquipmentPickerItemsWithSearchDocument(recommendation.items),
+    browseSortContext: recommendation.browseSortContext,
   }
 }
 
