@@ -3,6 +3,7 @@ import type { CharacterBuilderDraft } from '../../draft/draft'
 const EMPTY_EQUIPMENT_DRAFT = {
   mode: 'package' as const,
   purchases: [],
+  grants: [],
   removedPackageItemKeys: [],
   customized: false,
   magicItemSelections: [],

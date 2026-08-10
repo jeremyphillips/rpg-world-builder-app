@@ -92,16 +92,18 @@ reachable options that cannot be combined still fail with `automatic_constraint_
 | `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies           |
 
 Picker eligibility does **not** imply build validity. When constraints cannot be
-satisfied (e.g. required weapons are not jointly obtainable from starting packages and
-nested pools, or required spells exceed capacity), the resolver returns `ok: false` with
-`automatic_constraint_unsatisfiable` — it does not drop requirements to force success.
+satisfied (e.g. required spells exceed capacity, or a required weapon is not
+campaign-available), the resolver returns `ok: false` with
+`automatic_constraint_unsatisfiable` — it does not drop requirements to force
+success.
 
 Selection policy with constraints:
 
 - Required weapon/spell selections are applied **before** remaining first-eligible defaults.
-- Starting-equipment package ChoiceSets bias toward the first authored package that can produce **all** required weapons together; gold-only packages never satisfy V1 weapon requirements.
+- Starting-equipment package ChoiceSets bias toward the first authored package that can produce **all** required weapons together when possible; gold-only packages never satisfy package bias alone.
 - Nested equipment pool picks prefer required weapons when they appear in the pool.
-- Post-resolution validation ensures every `requiredWeaponIds` / `requiredSpellIds` entry is present in the built draft.
+- Required weapons still missing from assembled inventory after package/pool resolution receive domain `ensureEquipmentGrant` rows (not purchases) when campaign-available — including at zero starting funds.
+- Post-resolution validation ensures every `requiredWeaponIds` / `requiredSpellIds` entry is present in assembled inventory / choice selections respectively.
 
 ## Determinism (V1)
 

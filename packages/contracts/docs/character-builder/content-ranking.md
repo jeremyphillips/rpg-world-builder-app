@@ -239,3 +239,20 @@ layer only.
 - Recommendations: `deriveEquipmentRecommendations` — tier/reason assignment only; no sort.
 - Budget: `deriveEquipmentBudgetSummary`, `maxAffordableEquipmentQuantity` (remaining-based).
 - Resolver catalog: [character-builder-resolvers.md](character-builder-resolvers.md).
+
+## Equipment availability vs acquisition vs affordability
+
+Three layers — do not collapse them in new code:
+
+| Layer                    | Question                                                   | Owner                                                                                      |
+| ------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Content availability** | Is this catalog row allowed in the campaign/build context? | `resolveAvailableContent` (SSOT)                                                           |
+| **Acquisition**          | How does the draft obtain the item?                        | Package, purchase, magic allowance, or domain `ensureEquipmentGrant` on `equipment.grants` |
+| **Affordability**        | Can starting wealth cover a **purchase**?                  | Purchase channel only (`resolveEquipmentPurchaseAvailability`, budget planners)            |
+
+- Content availability ≠ purchasable ≠ affordable.
+- Quick NPC / automatic resolution never uses `ignoreAffordability` or purchase-shaped fake grants.
+- Domain grants use durable `{ kind: 'grant' }` provenance on finalized inventory rows.
+- `deriveEquipmentDraftEntries` is the single inventory assembler — grant rows are ensure-at-least-N relative to other channels.
+
+**Named follow-up (`equipment-picker-availability-vm`):** the equipment purchase picker currently collapses unaffordable rows into disabled/unavailable (`isEquipmentPickerItemDisabled` in dashboard). A follow-up should expose distinct VM fields (`available`, `purchaseEligible`, `affordable`) without redesigning purchase math — not in the grant/availability pin PR.

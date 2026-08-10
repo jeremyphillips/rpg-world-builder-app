@@ -2,7 +2,9 @@ import type { ClassStored } from '../../../../content/classes/class'
 import type { Equipment } from '../../../../content/equipment'
 import {
   appendEquipmentEntry,
+  CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
   EMPTY_CHARACTER_EQUIPMENT,
+  inventoryBucketForEquipment,
   type CharacterEquipment,
   type CharacterEquipmentEntry,
 } from '../../../character/equipment-inventory'
@@ -30,6 +32,105 @@ import {
 } from '../../../../campaign/rules/starting-wealth'
 import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type { SystemRulesetId } from '../../../../primitives/ruleset'
+
+function grantSelectionSource(): CharacterSelectionSource[] {
+  return [{ kind: 'grant' }]
+}
+
+function mergeSelectionSources(
+  existing: CharacterSelectionSource[] | undefined,
+  additional: CharacterSelectionSource[],
+): CharacterSelectionSource[] {
+  const result = [...(existing ?? [])]
+  for (const source of additional) {
+    const duplicate = result.some(
+      (entry) =>
+        entry.kind === source.kind &&
+        entry.sourceId === source.sourceId &&
+        entry.grantId === source.grantId,
+    )
+    if (!duplicate) result.push(source)
+  }
+  return result
+}
+
+/** Total assembled quantity for one equipment id across inventory buckets. */
+export function inventoryQuantityForEquipmentId(
+  inventory: CharacterEquipment,
+  equipmentId: string,
+): number {
+  let total = 0
+  for (const bucket of CHARACTER_EQUIPMENT_INVENTORY_BUCKETS) {
+    for (const entry of inventory[bucket]) {
+      if (entry.equipmentId === equipmentId) total += entry.quantity
+    }
+  }
+  return total
+}
+
+/** Whether assembled inventory includes at least one row for the equipment id. */
+export function inventoryContainsEquipmentId(
+  inventory: CharacterEquipment,
+  equipmentId: string,
+): boolean {
+  return inventoryQuantityForEquipmentId(inventory, equipmentId) > 0
+}
+
+function appendGrantsFromDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  inventory: CharacterEquipment,
+): CharacterEquipment {
+  let result = inventory
+
+  for (const grant of draft.equipment?.grants ?? []) {
+    const equipment = catalogIndex.equipment.get(grant.equipmentId)
+    if (!equipment) continue
+    result = ensureGrantQuantityInInventory(result, equipment, grant.quantity)
+  }
+
+  return result
+}
+
+/**
+ * Ensures assembled quantity is at least `ensureQuantity`. Adds shortfall rows or
+ * merges grant provenance onto existing entries without double-counting package rows.
+ */
+function ensureGrantQuantityInInventory(
+  inventory: CharacterEquipment,
+  equipment: Equipment,
+  ensureQuantity: number,
+): CharacterEquipment {
+  const bucket = inventoryBucketForEquipment(equipment)
+  const sources = grantSelectionSource()
+  const currentQuantity = inventoryQuantityForEquipmentId(inventory, equipment.id)
+  const targetQuantity = Math.max(currentQuantity, ensureQuantity)
+  const shortfall = targetQuantity - currentQuantity
+  const existingIndex = inventory[bucket].findIndex((entry) => entry.equipmentId === equipment.id)
+
+  if (existingIndex >= 0) {
+    const existing = inventory[bucket][existingIndex]!
+    const updatedEntry: CharacterEquipmentEntry = {
+      ...existing,
+      quantity: existing.quantity + shortfall,
+      sources: mergeSelectionSources(existing.sources, sources),
+    }
+    return {
+      ...inventory,
+      [bucket]: inventory[bucket].map((entry, index) =>
+        index === existingIndex ? updatedEntry : entry,
+      ),
+    }
+  }
+
+  if (shortfall <= 0) return inventory
+
+  return appendEquipmentEntry(inventory, equipment, {
+    equipmentId: equipment.id,
+    quantity: shortfall,
+    sources,
+  })
+}
 
 type EquipmentDraftContext = {
   classId: string
@@ -243,8 +344,8 @@ function shouldIncludePackageItems(option: StartingEquipmentOption): boolean {
 }
 
 /**
- * Composes package items (minus removals), magic-item grant selections, and draft
- * purchases into inventory rows with selection sources.
+ * Composes package items (minus removals), magic-item grant selections, draft
+ * purchases, and ensure-at-least grants into inventory rows with selection sources.
  */
 export function deriveEquipmentDraftEntries(
   draft: CharacterBuilderDraft,
@@ -264,7 +365,7 @@ export function deriveEquipmentDraftEntries(
   const characterClass = catalogIndex.classes.get(context.classId)
   const rulesetId = options?.rulesetId ?? characterClass?.rulesetId
 
-  const withGrants =
+  const withMagicGrants =
     rulesetId !== undefined
       ? appendMagicItemGrantsFromDraft(
           draft,
@@ -275,5 +376,7 @@ export function deriveEquipmentDraftEntries(
         )
       : withPackage
 
-  return appendPurchasesFromDraft(draft, context, catalogIndex, withGrants)
+  const withPurchases = appendPurchasesFromDraft(draft, context, catalogIndex, withMagicGrants)
+
+  return appendGrantsFromDraft(draft, catalogIndex, withPurchases)
 }

@@ -20,6 +20,8 @@ export const CHARACTER_SELECTION_SOURCE_KINDS = [
   'startingWealthTier',
   'characterCreation',
   'manual',
+  /** Generic equipment grant — not purchase-shaped and not automation-coupled. */
+  'grant',
 ] as const
 
 export const characterSelectionSourceKindSchema = z.enum(CHARACTER_SELECTION_SOURCE_KINDS)
@@ -49,7 +51,7 @@ export const characterSelectionSourceSchema = z
     notes: z.string().optional(),
   })
   .superRefine((val, ctx) => {
-    if (val.kind !== 'manual' && val.sourceId === undefined) {
+    if (val.kind !== 'manual' && val.kind !== 'grant' && val.sourceId === undefined) {
       ctx.addIssue({
         code: 'custom',
         message: characterValidationMessages.selectionSourceIdRequired(),

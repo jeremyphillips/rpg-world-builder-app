@@ -1,18 +1,21 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { StartingEquipmentOption } from '../../../content/starting-equipment'
 import type { ChoiceSet } from '../choice-set'
-import type { CharacterBuildCatalogIndex } from '../context'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
+import { resolveAvailableContent } from '../preview/resolve-available-content'
 import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
-import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
 import {
-  startingEquipmentOptionProvidesWeapon,
-  isRequiredStartingWeaponSatisfiedInDraft,
-} from './list-reachable-starting-weapons'
+  deriveEquipmentDraftEntries,
+  inventoryContainsEquipmentId,
+} from '../resolvers/equipment/derive-equipment-draft-entries'
+import { ensureEquipmentGrant } from '../resolvers/equipment/ensure-equipment-grant'
+import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
+import { startingEquipmentOptionProvidesWeapon } from './list-reachable-starting-weapons'
 
 function preferredConstraintOptionIds(
   choiceSet: ChoiceSet,
@@ -88,8 +91,10 @@ function selectStartingEquipmentPackageIds(args: {
       })
     })
 
-  if (eligible.length === 0) return null
-  return eligible.slice(0, needed)
+  if (eligible.length > 0) return eligible.slice(0, needed)
+
+  const fallback = choiceSet.options.map((option) => option.id).slice(0, needed)
+  return fallback.length > 0 ? fallback : null
 }
 
 /**
@@ -258,24 +263,69 @@ function validateRequiredWeaponsSatisfied(
   requiredWeaponIds: readonly string[],
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterBuildValidationIssue | undefined {
-  const characterClass = catalogIndex.classes.get(draft.class.classId ?? '')
-  if (!characterClass) return undefined
+  const inventory = deriveEquipmentDraftEntries(draft, catalogIndex)
 
   for (const weaponId of requiredWeaponIds) {
-    if (
-      isRequiredStartingWeaponSatisfiedInDraft({
-        weaponId,
-        draft,
-        characterClass,
-        catalogIndex,
-      })
-    ) {
-      continue
-    }
+    if (inventoryContainsEquipmentId(inventory, weaponId)) continue
     const weapon = catalogIndex.equipment.get(weaponId)
     return constraintUnsatisfiableIssue(weapon?.name ?? 'weapon')
   }
   return undefined
+}
+
+type RequiredWeaponGrantCompletion =
+  | { ok: true; draft: CharacterBuilderDraft }
+  | { ok: false; issues: CharacterBuildValidationIssue[] }
+
+/**
+ * After package/pool bias, applies domain ensure grants for required weapons still
+ * missing from assembled inventory. Rejects campaign-unavailable ids before grant.
+ */
+export function applyRequiredWeaponEquipmentGrants(args: {
+  draft: CharacterBuilderDraft
+  constraints: AutomaticNpcBuildConstraints | undefined
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}): RequiredWeaponGrantCompletion {
+  const { draft, constraints, context, catalogIndex } = args
+  if (!constraints || constraints.requiredWeaponIds.length === 0) {
+    return { ok: true, draft }
+  }
+
+  const availableEquipmentIds = new Set(
+    resolveAvailableContent(context).equipment.map((equipment) => equipment.id),
+  )
+  let nextDraft = draft
+
+  for (const weaponId of constraints.requiredWeaponIds) {
+    if (!availableEquipmentIds.has(weaponId)) {
+      const weapon = catalogIndex.equipment.get(weaponId)
+      return {
+        ok: false,
+        issues: [constraintUnsatisfiableIssue(weapon?.name ?? 'weapon')],
+      }
+    }
+
+    const inventory = deriveEquipmentDraftEntries(nextDraft, catalogIndex)
+    if (inventoryContainsEquipmentId(inventory, weaponId)) continue
+
+    const grantResult = ensureEquipmentGrant({
+      draft: nextDraft,
+      equipmentId: weaponId,
+      quantity: 1,
+      catalogIndex,
+    })
+    if (!grantResult.ok) {
+      const weapon = catalogIndex.equipment.get(weaponId)
+      return {
+        ok: false,
+        issues: [constraintUnsatisfiableIssue(weapon?.name ?? 'weapon')],
+      }
+    }
+    nextDraft = grantResult.draft
+  }
+
+  return { ok: true, draft: nextDraft }
 }
 
 /** Verifies every hard requirement id appears in the resolved draft choice selections. */

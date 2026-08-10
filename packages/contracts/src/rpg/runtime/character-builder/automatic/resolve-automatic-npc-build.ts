@@ -26,6 +26,7 @@ import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 import {
   fillChoiceSetWithConstraintAwareSelection,
   automaticNpcConstraintFailureIssue,
+  applyRequiredWeaponEquipmentGrants,
   validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
 import {
@@ -293,8 +294,16 @@ export function resolveAutomaticNpcBuild({
       const completion = completeMagicItemGrantSelections(draft, context)
       if (!completion.ok) return completion
 
+      const grantCompletion = applyRequiredWeaponEquipmentGrants({
+        draft: completion.draft,
+        constraints: normalizedConstraints,
+        context,
+        catalogIndex,
+      })
+      if (!grantCompletion.ok) return grantCompletion
+
       const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
-        completion.draft,
+        grantCompletion.draft,
         normalizedConstraints,
         catalogIndex,
       )
@@ -304,8 +313,8 @@ export function resolveAutomaticNpcBuild({
 
       return {
         ok: true,
-        draft: completion.draft,
-        resolvedChoiceSets: resolveAvailableChoices(completion.draft, context),
+        draft: grantCompletion.draft,
+        resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
       }
     }
 

@@ -301,7 +301,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     expect(first).toEqual(second)
   })
 
-  it('fails when individually reachable weapons are jointly unsatisfiable', () => {
+  it('satisfies jointly required weapons via package bias plus domain grants', () => {
     const context = weaponConstraintContext()
     const weapons = listReachableStartingWeapons({
       seed: { classId: weaponConstraintFighter.id },
@@ -317,10 +317,55 @@ describe('resolveAutomaticNpcBuild constraints', () => {
       context,
     })
 
-    expect(result).toMatchObject({
-      ok: false,
-      issues: [expect.objectContaining({ code: 'automatic_constraint_unsatisfiable' })],
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(result.draft.equipment?.grants).toEqual(
+      expect.arrayContaining([{ equipmentId: longsword.id, quantity: 1 }]),
+    )
+    expect(result.draft.equipment?.purchases).toEqual([])
+  })
+
+  it('grants a required weapon when starting gold cannot purchase it', () => {
+    const goldOnlyFighter: ClassStored = {
+      ...weaponConstraintFighter,
+      characterCreation: {
+        proficiencies: weaponConstraintFighter.characterCreation!.proficiencies,
+        startingEquipment: {
+          choose: 1,
+          options: [{ id: 'starting-gold', label: 'Starting Gold', items: [], wealth: { gp: 0 } }],
+        },
+      },
+    }
+    const rapier = equipmentSchema.parse({
+      ...longsword,
+      id: `${RULESET}:rapier`,
+      slug: 'rapier',
+      name: 'Rapier',
+      cost: { amount: 25, currency: 'gp' },
+      properties: ['finesse'],
+      mastery: 'vex',
     })
+    const context: CharacterBuildContext = {
+      ...weaponConstraintContext(),
+      catalog: {
+        ...weaponConstraintContext().catalog,
+        classes: [goldOnlyFighter],
+        equipment: [...weaponConstraintContext().catalog.equipment, rapier],
+      },
+    }
+
+    const result = resolveAutomaticNpcBuild({
+      seed: { ...weaponFighterSeed(), classId: goldOnlyFighter.id },
+      constraints: { requiredWeaponIds: [rapier.id], requiredSpellIds: [] },
+      context,
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(result.draft.equipment?.grants).toEqual([{ equipmentId: rapier.id, quantity: 1 }])
+    expect(result.draft.equipment?.purchases).toEqual([])
   })
 })
 
