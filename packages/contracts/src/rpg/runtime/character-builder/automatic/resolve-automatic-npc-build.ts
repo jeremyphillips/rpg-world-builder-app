@@ -80,6 +80,10 @@ function seedDraft(
     species: { speciesId: seed.speciesId },
     class: { classId: seed.classId, level: seed.level },
     abilities: {
+      // Scores always come from the standard array, so the resolved method must
+      // stay compatible with standard-array values. `manual` accepts any scores;
+      // if point-buy/rolled methods ever resolve here, this pairing must be
+      // revisited or finalize will reject the draft.
       method: resolveAbilityGenerationMethod(abilityRules),
       scores: deriveDeterministicAbilityAssignment(
         characterClass?.primaryAbilities ?? [],

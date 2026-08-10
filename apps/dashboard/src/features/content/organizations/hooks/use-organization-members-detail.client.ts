@@ -55,9 +55,12 @@ export function useOrganizationMembersDetail(
   const membersQuery = useOrganizationMembers(campaignId, organizationId)
   const campaignCharactersQuery = useCampaignCharacters(canManage ? campaignId : undefined)
   const npcsQuery = useNpcs(canManage ? campaignId : undefined)
-  const { catalogIndex, context: npcBuildContext } = useCampaignNpcBuildContext(
-    canManage ? campaignId : undefined,
-  )
+  const {
+    catalogIndex,
+    context: npcBuildContext,
+    isError: npcBuildContextIsError,
+    unavailable: npcBuildContextUnavailable,
+  } = useCampaignNpcBuildContext(canManage ? campaignId : undefined)
 
   const [drawerState, setDrawerState] = React.useState<OrganizationMembersDrawerState | null>(null)
   const [mutationError, setMutationError] = React.useState<string | null>(null)
@@ -129,6 +132,25 @@ export function useOrganizationMembersDetail(
       await invalidate({ characterId: npc.character.id, subjectKind: 'npc' })
     },
     [invalidate],
+  )
+
+  /** Quick NPC creation context for the Add member drawer — buildContext is null until it resolves. */
+  const quickNpc = React.useMemo(
+    () => ({
+      campaignId,
+      buildContext: npcBuildContext,
+      buildContextFailed:
+        npcBuildContextIsError ||
+        (npcBuildContextUnavailable !== null && npcBuildContextUnavailable.kind !== 'loading'),
+      onCreated: handleQuickNpcCreated,
+    }),
+    [
+      campaignId,
+      handleQuickNpcCreated,
+      npcBuildContext,
+      npcBuildContextIsError,
+      npcBuildContextUnavailable,
+    ],
   )
 
   const editingRow = drawerState?.mode === 'edit' ? drawerState.row : null
@@ -234,8 +256,7 @@ export function useOrganizationMembersDetail(
     removingRow: drawerState?.mode === 'remove' ? drawerState.row : null,
     mutationError,
     pendingCharacterId,
-    /** Quick NPC creation context for the Add member drawer — null until the build context resolves. */
-    quickNpc: { campaignId, buildContext: npcBuildContext, onCreated: handleQuickNpcCreated },
+    quickNpc,
     openAddDrawer,
     openEditDrawer,
     openRemoveConfirm,

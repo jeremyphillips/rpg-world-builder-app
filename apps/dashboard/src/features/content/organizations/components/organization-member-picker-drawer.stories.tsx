@@ -43,3 +43,15 @@ export const WithQuickNpcCreation: Story = {
     },
   },
 }
+
+/** Build context failed to load — the footer shows a hint instead of the entry action. */
+export const QuickNpcCreationUnavailable: Story = {
+  args: {
+    quickNpc: {
+      campaignId: 'campaign-test-1',
+      buildContext: null,
+      buildContextFailed: true,
+      onCreated: () => undefined,
+    },
+  },
+}

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 
 import {
   createCampaignNpcBuilderContextFixture,
@@ -62,5 +63,43 @@ export const RestoredSession: Story = {
       alignment: 'ln',
       membershipTitle: 'Guildmaster',
     },
+  },
+}
+
+/** Class requiring two skills with only one authored option — automatic resolution cannot satisfy it. */
+const unsatisfiableClass = {
+  ...populatedBuilderCatalog.classes[0]!,
+  characterCreation: {
+    proficiencies: {
+      skills: {
+        choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
+      },
+    },
+  },
+}
+
+/** Submission fails automatic resolution — builder issues surface as the inline form error. */
+export const ResolutionError: Story = {
+  args: {
+    buildContext: createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [unsatisfiableClass],
+        organizations: buildContext.catalog.organizations,
+      },
+    }),
+    initialValues: {
+      name: 'Stalled Recruit',
+      speciesId: populatedBuilderCatalog.species[0]!.id,
+      classId: unsatisfiableClass.id,
+      level: 1,
+      alignment: 'ln',
+      membershipTitle: 'Guildmaster',
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Create NPC' }))
+    await expect(await canvas.findByRole('alert')).toHaveTextContent(/choose at least 2 options/i)
   },
 }

@@ -48,6 +48,8 @@ export type QuickNpcCreateFormProps = {
   /** Back to the picker view — receives current values for session preservation. */
   onBack: (values: QuickNpcFormValues) => void
   onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
+  /** Notified while creation is in flight — hosts should block dismissal until false. */
+  onPendingChange?: (pending: boolean) => void
 }
 
 /**
@@ -62,8 +64,13 @@ export function QuickNpcCreateForm({
   initialValues,
   onBack,
   onCreated,
+  onPendingChange,
 }: QuickNpcCreateFormProps) {
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
+
+  React.useEffect(() => {
+    onPendingChange?.(isPending)
+  }, [isPending, onPendingChange])
 
   const maxLevel = resolveQuickNpcMaxLevel(buildContext)
   const schema = React.useMemo(() => quickNpcFormSchema(maxLevel), [maxLevel])

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { CampaignNpcDetail, CharacterBuildContext, OrganizationKind } from '@rpg/contracts'
+import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
@@ -16,6 +16,7 @@ import {
   QUICK_NPC_CREATE_TITLE,
   QuickNpcCreateForm,
   titleFromMembershipRadioValue,
+  type QuickNpcCreateFormOrganization,
   type QuickNpcFormValues,
 } from '@/features/character'
 
@@ -33,6 +34,8 @@ export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters matc
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'
+export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE =
+  'Quick NPC creation is unavailable — campaign build data failed to load.'
 
 /** Campaign PC/NPC option plus whether the character already holds a membership here. */
 export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
@@ -50,6 +53,8 @@ export type OrganizationMemberPickerQuickNpc = {
   campaignId: string
   /** Null while the campaign build context loads — the entry action stays disabled. */
   buildContext: CharacterBuildContext | null
+  /** True when the build context failed to load — replaces the entry action with a hint. */
+  buildContextFailed?: boolean
   /** Called after atomic creation (membership included) — refresh reads only. */
   onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
 }
@@ -57,12 +62,7 @@ export type OrganizationMemberPickerQuickNpc = {
 export type OrganizationMemberPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  organization: {
-    id: string
-    name: string
-    organizationKind: OrganizationKind
-    organizationSubtype?: string
-  }
+  organization: QuickNpcCreateFormOrganization
   candidates: readonly OrganizationMemberPickerCandidate[]
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   /** Enables the "Create new NPC" shortcut view. */
@@ -90,6 +90,8 @@ export function OrganizationMemberPickerDrawer({
   const [view, setView] = React.useState<'picker' | 'quickNpc'>('picker')
   /** Per-session Quick NPC values — survive Back until the drawer closes or creation succeeds. */
   const [quickNpcValues, setQuickNpcValues] = React.useState<QuickNpcFormValues>()
+  /** Quick NPC creation in flight — blocks dismissal like the picker's own pending state. */
+  const [quickNpcPending, setQuickNpcPending] = React.useState(false)
 
   const resetMembershipConfig = React.useCallback(() => {
     setExpandedItemId(null)
@@ -101,18 +103,19 @@ export function OrganizationMemberPickerDrawer({
   const resetQuickNpcSession = React.useCallback(() => {
     setView('picker')
     setQuickNpcValues(undefined)
+    setQuickNpcPending(false)
   }, [])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
-      if (pending) return
+      if (pending || quickNpcPending) return
       if (!nextOpen) {
         resetMembershipConfig()
         resetQuickNpcSession()
       }
       onOpenChange(nextOpen)
     },
-    [onOpenChange, pending, resetMembershipConfig, resetQuickNpcSession],
+    [onOpenChange, pending, quickNpcPending, resetMembershipConfig, resetQuickNpcSession],
   )
 
   const handleQuickNpcBack = React.useCallback((values: QuickNpcFormValues) => {
@@ -201,19 +204,26 @@ export function OrganizationMemberPickerDrawer({
             initialValues={quickNpcValues}
             onBack={handleQuickNpcBack}
             onCreated={handleQuickNpcCreated}
+            onPendingChange={setQuickNpcPending}
           />
         ) : undefined
       }
       footer={
         quickNpc && !quickNpcActive ? (
-          <Button
-            type="button"
-            variant="outline"
-            disabled={quickNpc.buildContext == null}
-            onClick={() => setView('quickNpc')}
-          >
-            {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL}
-          </Button>
+          quickNpc.buildContextFailed ? (
+            <Text variant="destructive">
+              {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE}
+            </Text>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={quickNpc.buildContext == null}
+              onClick={() => setView('quickNpc')}
+            >
+              {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL}
+            </Button>
+          )
         ) : undefined
       }
       {...catalogPickerShellProps()}
