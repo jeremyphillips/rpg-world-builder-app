@@ -13,10 +13,10 @@ export function buildOrganizationMembershipTitleRadioOptions(input: {
     kind: input.kind,
     subtype: input.subtype,
   })
-  const suggestionValues = new Set<string>(suggestions)
+  const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [
     { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },
-    ...suggestions.map((title) => ({ value: title, label: title })),
+    ...suggestions.map((entry) => ({ value: entry.label, label: entry.label })),
   ]
 
   const current = input.currentValue?.trim()

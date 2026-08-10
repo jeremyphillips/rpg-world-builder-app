@@ -414,9 +414,9 @@ pagination, and performance design.
    Reconsider only when connection mechanics or repeated in-builder decisions
    make persistent preview materially useful.
 6. ~~Do not query or display reverse organization connected characters in V1.~~ Reverse
-   connected-character display shipped in the connected-characters UI slice (see §9).
+   membership display shipped as the organization **Members** roster (see §9).
 
-### 9. Connected-character relationship display — complete
+### 9. Members roster (character-owned membership inverse) — complete
 
 Bidirectional organization relationship display for campaign surfaces:
 
@@ -425,16 +425,25 @@ Bidirectional organization relationship display for campaign surfaces:
   has character-edit capability (PC `canEdit`) or campaign manage (NPC). Add /
   edit title / remove use nested
   `…/characters/:characterId/organization-memberships` mutations; the shared
-  organization picker and edit drawers stay persistence-neutral.
-- **Organization → characters:** **Connected characters** section on organization
-  detail with server-paginated preview (`page=1`, `pageSize=4`), count copy
-  (`N connected character(s)`), and plain `+ N more` truncation copy.
+  organization picker and edit drawers stamp title + presentation `priority`
+  through `resolveOrganizationMembershipMetadata` (no numeric priority UI).
+- **Organization → characters:** **Members** section on organization detail —
+  full sorted roster (title inline with name, PC/NPC identity line), editable for
+  campaign managers only. PC owners whose character is a member still see a
+  read-only roster here and edit from their character sheet.
 
 **API:**
 
-- `GET /api/campaigns/:campaignId/content/organizations/:organizationId/connected-characters`
+- `GET /api/campaigns/:campaignId/content/organizations/:organizationId/members`
+  (`OrganizationMemberSummary` with `membership: { title?, priority? }`; sorted by
+  priority descending, then locale name, then id)
 - `POST|PATCH|DELETE /api/campaigns/:campaignId/content/characters/:characterId/organization-memberships[/:organizationId]`
-  (member route + `canEdit` capability; PATCH `title: null` clears)
+  (member route + `canEdit` capability; PATCH requires explicit `title` and
+  `priority`, each `null` to clear)
+
+**Priority convention:** numeric presentation/order precedence (higher first).
+Persisted membership `priority` is authoritative and is never overwritten merely
+because the title matches vocabulary. Distinct from future modeled authority.
 
 **Participation scope (v1):** open campaign participations only — same participant
 scope as content usage blockers. Includes PCs and NPCs whose saved sheet still
@@ -442,10 +451,9 @@ stores `connections.organizations.organizationId`. Excludes characters without
 open participation. Does not re-apply catalog availability filters (stale/draft org
 refs still appear).
 
-**Infrastructure:** `CharacterContentReferenceDescriptor` and
-`resolveCharacterReferences` in the API content layer; transport DTOs
-`ReferencingCharacterSummary` and generic `{ items, total }` envelope in
-`@rpg/contracts`.
+**Infrastructure:** content-usage discovery remains the membership discovery
+mechanism; the members projection layer attaches title/priority from character-owned
+connections. Transport DTOs in `@rpg/contracts`.
 
 ## Verification
 
@@ -497,7 +505,9 @@ Required behavior coverage:
 
 Update `docs/roadmap/content-types-roadmap.md` and character feature
 documentation when implementation lands. Character ↔ organization records are
-memberships (`organizationId` + optional descriptive `title`). Campaign character
-and NPC sheets can add, edit, and remove memberships under character-edit /
-campaign-manage policy. Reverse connected-character preview remains read-only on
-the organization; titled roster UI can consume the same character-side field later.
+memberships (`organizationId` + optional descriptive `title` + optional
+presentation `priority`). Campaign character and NPC sheets can add, edit, and
+remove memberships under character-edit / campaign-manage policy. Organization
+detail **Members** is the inverse roster (manager-editable; read-only for other
+roles). Membership priority is presentation order only — distinct from future
+modeled authority.

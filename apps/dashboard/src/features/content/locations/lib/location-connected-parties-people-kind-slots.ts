@@ -3,6 +3,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
+  comparePriorityDescending,
   getCharacterLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionFamily,
@@ -108,9 +109,11 @@ export function buildPeopleKindSlots(input: {
     bindingsByHeading.set(heading, existing)
   }
 
-  for (const kind of [...input.organizationKinds].sort(
-    (a, b) =>
-      getOrganizationLocationConnectionPriority(b) - getOrganizationLocationConnectionPriority(a),
+  for (const kind of [...input.organizationKinds].sort((a, b) =>
+    comparePriorityDescending(
+      { priority: getOrganizationLocationConnectionPriority(a) },
+      { priority: getOrganizationLocationConnectionPriority(b) },
+    ),
   )) {
     if (getOrganizationLocationConnectionFamily(kind) === 'territorial_authority') {
       continue

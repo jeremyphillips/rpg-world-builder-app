@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { ReactNode } from 'react'
 
-import { organizationConnectedCharactersQueryKey } from '@/features/content'
+import { organizationMembersQueryKey } from '@/features/content'
 import { campaignCharacterQueryKey } from '@/features/campaign'
 
 import { characterOrganizationReferencesQueryKey } from './use-character-organization-references'
@@ -48,7 +48,7 @@ describe('useCharacterOrganizationMembershipMutations', () => {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   }
 
-  it('invalidates references, detail, and only the affected organization connected-characters key', async () => {
+  it('invalidates references, detail, and only the affected organization members key', async () => {
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
 
     const { result } = renderHook(
@@ -56,7 +56,7 @@ describe('useCharacterOrganizationMembershipMutations', () => {
       { wrapper },
     )
 
-    await result.current.addMembership({ organizationId: 'org-1', title: 'Boss' })
+    await result.current.addMembership({ organizationId: 'org-1', title: 'Boss', priority: 50 })
 
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({
@@ -66,15 +66,15 @@ describe('useCharacterOrganizationMembershipMutations', () => {
         queryKey: campaignCharacterQueryKey('camp-1', 'char-1'),
       })
       expect(invalidateSpy).toHaveBeenCalledWith({
-        queryKey: organizationConnectedCharactersQueryKey('camp-1', 'org-1'),
+        queryKey: organizationMembersQueryKey('camp-1', 'org-1'),
       })
     })
 
     invalidateSpy.mockClear()
-    await result.current.updateMembership('org-1', { title: null })
+    await result.current.updateMembership('org-1', { title: null, priority: null })
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({
-        queryKey: organizationConnectedCharactersQueryKey('camp-1', 'org-1'),
+        queryKey: organizationMembersQueryKey('camp-1', 'org-1'),
       })
     })
 
@@ -82,15 +82,19 @@ describe('useCharacterOrganizationMembershipMutations', () => {
     await result.current.removeMembership('org-1')
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({
-        queryKey: organizationConnectedCharactersQueryKey('camp-1', 'org-1'),
+        queryKey: organizationMembersQueryKey('camp-1', 'org-1'),
       })
     })
 
     expect(createMock).toHaveBeenCalledWith('camp-1', 'char-1', {
       organizationId: 'org-1',
       title: 'Boss',
+      priority: 50,
     })
-    expect(updateMock).toHaveBeenCalledWith('camp-1', 'char-1', 'org-1', { title: null })
+    expect(updateMock).toHaveBeenCalledWith('camp-1', 'char-1', 'org-1', {
+      title: null,
+      priority: null,
+    })
     expect(deleteMock).toHaveBeenCalledWith('camp-1', 'char-1', 'org-1')
   })
 })

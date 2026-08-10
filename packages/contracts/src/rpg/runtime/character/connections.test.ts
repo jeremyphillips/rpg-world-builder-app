@@ -11,18 +11,18 @@ describe('characterConnectionsSchema', () => {
     })
   })
 
-  it('accepts unique organization memberships with optional titles', () => {
+  it('accepts unique organization memberships with optional titles and priority', () => {
     expect(
       characterConnectionsSchema.parse({
         organizations: [
           { organizationId: 'organization-1' },
-          { organizationId: 'organization-2', title: 'Guildmaster' },
+          { organizationId: 'organization-2', title: 'Guildmaster', priority: 50 },
         ],
       }),
     ).toEqual({
       organizations: [
         { organizationId: 'organization-1' },
-        { organizationId: 'organization-2', title: 'Guildmaster' },
+        { organizationId: 'organization-2', title: 'Guildmaster', priority: 50 },
       ],
       locations: [],
     })

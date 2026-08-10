@@ -6,6 +6,7 @@ import type {
   PaginatedItems,
 } from '@rpg/contracts'
 import {
+  comparePriorityDescending,
   getCharacterLocationConnectionDisplayLabel,
   getCharacterLocationConnectionFamily,
   getCharacterLocationConnectionPriority,
@@ -41,7 +42,6 @@ type OrganizationConnectionHit = {
 
 type ConnectedPartySortRow = LocationConnectedPartyRow & {
   sortSectionRank: number
-  sortPriorityRank: number
   sortSubjectName: string
   sortSubjectId: string
 }
@@ -75,7 +75,6 @@ function expandCharacterRows(
         priority: getCharacterLocationConnectionPriority(kind),
         sectionGroup,
         sortSectionRank: getLocationConnectedPartySectionRank(sectionGroup),
-        sortPriorityRank: -getCharacterLocationConnectionPriority(kind),
         sortSubjectName: hit.name,
         sortSubjectId: subjectId,
       }
@@ -109,7 +108,6 @@ function expandOrganizationRows(
         priority: getOrganizationLocationConnectionPriority(connection.kind),
         sectionGroup,
         sortSectionRank: getLocationConnectedPartySectionRank(sectionGroup),
-        sortPriorityRank: -getOrganizationLocationConnectionPriority(connection.kind),
         sortSubjectName: hit.name,
         sortSubjectId: subjectId,
       }
@@ -121,7 +119,7 @@ function sortConnectedPartyRows(rows: readonly ConnectedPartySortRow[]): Connect
     const sectionCompare = left.sortSectionRank - right.sortSectionRank
     if (sectionCompare !== 0) return sectionCompare
 
-    const priorityCompare = left.sortPriorityRank - right.sortPriorityRank
+    const priorityCompare = comparePriorityDescending(left, right)
     if (priorityCompare !== 0) return priorityCompare
 
     const nameCompare = left.sortSubjectName.localeCompare(right.sortSubjectName, 'en', {

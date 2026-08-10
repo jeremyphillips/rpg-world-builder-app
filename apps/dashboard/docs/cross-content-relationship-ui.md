@@ -105,7 +105,7 @@ Located in {nearest direct parent}
 
 ### Mixed PC/NPC character rows
 
-Undifferentiated character collections (location People & organizations character rows, location character pickers, organization connected-character preview, global search `typeLabel`) compose [`CharacterEntitySummaryVm`](../src/features/character/lib/display/character-entity-summary.lib.ts) and project mixed identity via `formatCharacterInlineSummary(vm, { includeCharacterType: true })`:
+Undifferentiated character collections (location People & organizations character rows, location character pickers, organization Members roster, global search `typeLabel`) compose [`CharacterEntitySummaryVm`](../src/features/character/lib/display/character-entity-summary.lib.ts) and project mixed identity via `formatCharacterInlineSummary(vm, { includeCharacterType: true })`:
 
 ```text
 {name link} · PC · Dwarf · Level 1 Fighter
@@ -444,10 +444,28 @@ Before building a new cross-content relationship surface, evaluate:
 
 ## Non-adopters
 
-| Surface                                  | Reason                                                                                                                                       |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Organization connected-character preview | Entity membership, not typed edge                                                                                                            |
-| Location children hierarchy              | Parent/child structure, not typed edge — uses `DetailSectionPanel` + `DetailSectionGroup` + `DetailEntityRow`; see hierarchy inverse section |
+| Surface                     | Reason                                                                                                                                       |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Location children hierarchy | Parent/child structure, not typed edge — uses `DetailSectionPanel` + `DetailSectionGroup` + `DetailEntityRow`; see hierarchy inverse section |
+
+## Organization Members (character-owned membership inverse)
+
+The organization detail **Members** section is the organization-facing inverse of
+character-owned `connections.organizations` memberships — not a typed location-style
+edge. It reuses relationship primitives (`DetailSectionPanel`,
+`CrossContentRelationshipRow`, `RelationshipContentRow`, `DetailOverflowMenu`) and
+composes member metadata through existing content/slot props (no membership-specific
+props on shared primitives).
+
+- **Read:** `GET …/organizations/:organizationId/members` projects membership
+  `{ title?, priority? }` per row and sorts with the shared contracts roster helper.
+- **Write:** still character-scoped nested membership mutations; org-page Add / Edit /
+  Remove are gated to campaign managers (`useCanManageCampaign`). PC owners edit their
+  own membership from the character sheet.
+- **Priority:** numeric presentation/order precedence (higher sorts first). Explicit
+  persisted membership `priority` is authoritative; canonical titles fall back to
+  vocabulary entry priority. Priority is distinct from future modeled authority and
+  does not convey permission.
 
 ## Related
 

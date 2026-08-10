@@ -33,7 +33,7 @@ describe('organization subtype vocabulary', () => {
     expect(seen.size).toBe(ORGANIZATION_SUBTYPE_IDS.length)
   })
 
-  it('requires label, description, and non-empty ordered memberTitles on every subtype', () => {
+  it('requires label, description, and non-empty prioritized memberTitles on every subtype', () => {
     for (const kind of ORGANIZATION_KIND_IDS) {
       for (const id of getOrganizationSubtypeIds(kind)) {
         const entry = getOrganizationSubtypeEntry(kind, id)
@@ -41,6 +41,10 @@ describe('organization subtype vocabulary', () => {
         expect(entry?.description).toBeTruthy()
         expect(entry?.memberTitles.length).toBeGreaterThan(0)
         expect(entry?.memberTitles).toEqual([...entry!.memberTitles])
+        for (const title of entry!.memberTitles) {
+          expect(title.label.length).toBeGreaterThan(0)
+          expect(typeof title.priority).toBe('number')
+        }
       }
     }
   })

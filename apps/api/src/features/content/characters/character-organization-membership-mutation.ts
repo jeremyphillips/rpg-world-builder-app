@@ -93,13 +93,11 @@ function updateMembership(
     )
   }
 
-  const nextMembership =
-    patch.title === null
-      ? { organizationId }
-      : characterOrganizationConnectionSchema.parse({
-          organizationId,
-          title: patch.title,
-        })
+  const nextMembership = characterOrganizationConnectionSchema.parse({
+    organizationId,
+    ...(patch.title !== null ? { title: patch.title } : {}),
+    ...(patch.priority !== null ? { priority: patch.priority } : {}),
+  })
 
   const next = [...existing]
   next[index] = nextMembership

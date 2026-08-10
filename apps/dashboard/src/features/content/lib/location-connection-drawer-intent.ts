@@ -7,6 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
+  comparePriorityDescending,
   getOrganizationLocationConnectionFamily,
   getOrganizationLocationConnectionMaxSubjectsPerLocation,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
@@ -139,7 +140,7 @@ export function resolveKindsForOrganizationDrawerIntent(
     ][]
   )
     .filter(([, entry]) => entry.family === intent)
-    .sort((a, b) => b[1].priority - a[1].priority)
+    .sort((a, b) => comparePriorityDescending(a[1], b[1]))
     .map(([kind]) => kind)
 }
 

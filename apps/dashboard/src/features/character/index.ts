@@ -57,6 +57,28 @@ export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,
 } from './hooks/use-character-organization-references'
+export { EditOrganizationMembershipDrawer } from './components/connections/edit-organization-membership-drawer.client'
+export {
+  CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
+  formatRemoveMembershipHeadline,
+  type EditOrganizationMembershipDrawerCopy,
+  type EditOrganizationMembershipOrganization,
+} from './components/connections/edit-organization-membership-drawer.types'
+export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field.client'
+export {
+  membershipRadioValueFromTitle,
+  titleFromMembershipRadioValue,
+} from './components/connections/organization-membership-title-field.lib'
+export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './components/connections/organization-membership-title-field.types'
+export {
+  createCharacterOrganizationMembership,
+  deleteCharacterOrganizationMembership,
+  updateCharacterOrganizationMembership,
+} from './api/organization-membership-client'
+export {
+  invalidateCharacterOrganizationMembershipQueries,
+  type CharacterOrganizationMembershipSubjectKind,
+} from './lib/invalidate-character-organization-membership-queries'
 export {
   characterLocationReferencesQueryKey,
   useCharacterLocationReferences,

@@ -121,8 +121,8 @@ export { FeatsOverview, FeatDetail, FeatCreate, FeatEdit, useFeats, featsQueryKe
 export {
   useOrganizations,
   organizationsQueryKey,
-  organizationConnectedCharactersQueryKey,
-  useOrganizationConnectedCharacters,
+  organizationMembersQueryKey,
+  useOrganizationMembers,
 } from './organizations'
 export { useLocations, locationsQueryKey } from './locations'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'

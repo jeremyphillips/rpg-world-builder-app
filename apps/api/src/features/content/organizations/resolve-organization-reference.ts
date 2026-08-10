@@ -69,7 +69,7 @@ export async function resolveCharacterOrganizationReferences({
 
   const character = await CharacterModel.findById(characterId).select({ connections: 1 }).lean<{
     connections?: {
-      organizations?: { organizationId: string; title?: string }[]
+      organizations?: { organizationId: string; title?: string; priority?: number }[]
     }
   } | null>()
   if (!character) return null
@@ -89,9 +89,10 @@ export async function resolveCharacterOrganizationReferences({
     }),
   )
 
-  return references.map(({ organizationId, title }) => ({
+  return references.map(({ organizationId, title, priority }) => ({
     organizationId,
     ...(title !== undefined ? { title } : {}),
+    ...(priority !== undefined ? { priority } : {}),
     organization: organizationsById.get(organizationId) ?? null,
   }))
 }

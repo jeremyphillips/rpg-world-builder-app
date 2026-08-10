@@ -3,6 +3,8 @@ import { type RefinementCtx } from 'zod'
 import { closedSetEnum } from './enum-schema'
 import type { OrganizationKind } from './organization-kind'
 import { ORGANIZATION_KIND_IDS } from './organization-kind'
+import type { OrganizationMemberTitleEntry } from './organization-member-title-entry'
+import { organizationMemberTitleEntries } from './organization-member-title-entry'
 import type { GameTermEntry, VocabularyTerm } from './types'
 
 export const ORGANIZATION_SUBTYPE_TERM = {
@@ -16,7 +18,7 @@ export const ORGANIZATION_SUBTYPE_TERM = {
 
 /** Subtype entry — `memberTitles` is required so a new subtype cannot skip title vocabulary. */
 export type OrganizationSubtypeEntry = GameTermEntry & {
-  readonly memberTitles: readonly [string, ...string[]]
+  readonly memberTitles: readonly [OrganizationMemberTitleEntry, ...OrganizationMemberTitleEntry[]]
 }
 
 export const ORGANIZATION_SUBTYPES_BY_KIND = {
@@ -24,246 +26,510 @@ export const ORGANIZATION_SUBTYPES_BY_KIND = {
     monarchy: {
       label: 'Monarchy',
       description: 'A government organized around a monarch or royal house.',
-      memberTitles: ['Monarch', 'Regent', 'Chancellor', 'Chamberlain', 'Royal Advisor'],
+      memberTitles: organizationMemberTitleEntries(
+        'Monarch',
+        'Regent',
+        'Chancellor',
+        'Chamberlain',
+        'Royal Advisor',
+      ),
     },
     council: {
       label: 'Council',
       description: 'A governing body whose authority is exercised by a council.',
-      memberTitles: ['Chair', 'Councillor', 'Speaker', 'Delegate', 'Clerk'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Councillor',
+        'Speaker',
+        'Delegate',
+        'Clerk',
+      ),
     },
     assembly: {
       label: 'Assembly',
       description: 'A representative, deliberative, or legislative governing body.',
-      memberTitles: ['Speaker', 'Representative', 'Delegate', 'Councillor', 'Clerk'],
+      memberTitles: organizationMemberTitleEntries(
+        'Speaker',
+        'Representative',
+        'Delegate',
+        'Councillor',
+        'Clerk',
+      ),
     },
     administration: {
       label: 'Administration',
       description: 'A bureaucracy or administrative governing body.',
-      memberTitles: ['Governor', 'Administrator', 'Minister', 'Secretary', 'Official'],
+      memberTitles: organizationMemberTitleEntries(
+        'Governor',
+        'Administrator',
+        'Minister',
+        'Secretary',
+        'Official',
+      ),
     },
     magistracy: {
       label: 'Magistracy',
       description: 'A government organized around magistrates or appointed civic officers.',
-      memberTitles: ['Chief Magistrate', 'Magistrate', 'Prefect', 'Clerk', 'Bailiff'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chief Magistrate',
+        'Magistrate',
+        'Prefect',
+        'Clerk',
+        'Bailiff',
+      ),
     },
   },
   political: {
     party: {
       label: 'Party',
       description: 'An organized political party seeking or exercising influence.',
-      memberTitles: ['Chair', 'Representative', 'Organizer', 'Delegate', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Representative',
+        'Organizer',
+        'Delegate',
+        'Member',
+      ),
     },
     movement: {
       label: 'Movement',
       description: 'A political movement organized around a cause or program.',
-      memberTitles: ['Leader', 'Organizer', 'Advocate', 'Activist', 'Supporter'],
+      memberTitles: organizationMemberTitleEntries(
+        'Leader',
+        'Organizer',
+        'Advocate',
+        'Activist',
+        'Supporter',
+      ),
     },
     noble_bloc: {
       label: 'Noble bloc',
       description: 'A coalition of nobles or aristocratic houses pursuing shared interests.',
-      memberTitles: ['Patron', 'Noble', 'Representative', 'Retainer', 'Supporter'],
+      memberTitles: organizationMemberTitleEntries(
+        'Patron',
+        'Noble',
+        'Representative',
+        'Retainer',
+        'Supporter',
+      ),
     },
     court_faction: {
       label: 'Court faction',
       description: 'A political faction operating within a royal or ruling court.',
-      memberTitles: ['Patron', 'Courtier', 'Advisor', 'Agent', 'Supporter'],
+      memberTitles: organizationMemberTitleEntries(
+        'Patron',
+        'Courtier',
+        'Advisor',
+        'Agent',
+        'Supporter',
+      ),
     },
     advocacy_group: {
       label: 'Advocacy group',
       description: 'An organization pursuing influence around a particular cause or constituency.',
-      memberTitles: ['Chair', 'Advocate', 'Organizer', 'Representative', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Advocate',
+        'Organizer',
+        'Representative',
+        'Member',
+      ),
     },
   },
   religious: {
     church: {
       label: 'Church',
       description: 'An organized religious institution or congregation.',
-      memberTitles: ['High Priest', 'Priest', 'Deacon', 'Acolyte', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'High Priest',
+        'Priest',
+        'Deacon',
+        'Acolyte',
+        'Initiate',
+      ),
     },
     cult: {
       label: 'Cult',
       description:
         'A religious group centered on a particular deity, entity, mystery, or doctrine.',
-      memberTitles: ['Cult Leader', 'Priest', 'Disciple', 'Acolyte', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Cult Leader',
+        'Priest',
+        'Disciple',
+        'Acolyte',
+        'Initiate',
+      ),
     },
     temple: {
       label: 'Temple',
       description:
         'A religious institution organized around worship at or stewardship of a sacred site.',
-      memberTitles: ['High Priest', 'Priest', 'Keeper', 'Acolyte', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'High Priest',
+        'Priest',
+        'Keeper',
+        'Acolyte',
+        'Initiate',
+      ),
     },
     holy_order: {
       label: 'Holy order',
       description: 'A religious order organized around service, protection, or a sacred mission.',
-      memberTitles: ['Grand Master', 'Commander', 'Knight', 'Chaplain', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Grand Master',
+        'Commander',
+        'Knight',
+        'Chaplain',
+        'Initiate',
+      ),
     },
     monastic_order: {
       label: 'Monastic order',
       description: 'A religious community organized around monastic life or discipline.',
-      memberTitles: ['Abbot/Abbess', 'Prior', 'Monk/Nun', 'Novice', 'Oblate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Abbot/Abbess',
+        'Prior',
+        'Monk/Nun',
+        'Novice',
+        'Oblate',
+      ),
     },
   },
   military: {
     army: {
       label: 'Army',
       description: 'A formal military force.',
-      memberTitles: ['General', 'Commander', 'Captain', 'Officer', 'Soldier'],
+      memberTitles: organizationMemberTitleEntries(
+        'General',
+        'Commander',
+        'Captain',
+        'Officer',
+        'Soldier',
+      ),
     },
     guard: {
       label: 'Guard',
       description: 'A force responsible for protection, policing, or watch duties.',
-      memberTitles: ['Captain', 'Watch Commander', 'Sergeant', 'Guard', 'Recruit'],
+      memberTitles: organizationMemberTitleEntries(
+        'Captain',
+        'Watch Commander',
+        'Sergeant',
+        'Guard',
+        'Recruit',
+      ),
     },
     militia: {
       label: 'Militia',
       description: 'A locally raised or part-time armed force.',
-      memberTitles: ['Commander', 'Captain', 'Sergeant', 'Volunteer', 'Recruit'],
+      memberTitles: organizationMemberTitleEntries(
+        'Commander',
+        'Captain',
+        'Sergeant',
+        'Volunteer',
+        'Recruit',
+      ),
     },
     mercenary_company: {
       label: 'Mercenary company',
       description: 'A professional armed company serving for payment or contract.',
-      memberTitles: ['Company Commander', 'Captain', 'Lieutenant', 'Mercenary', 'Recruit'],
+      memberTitles: organizationMemberTitleEntries(
+        'Company Commander',
+        'Captain',
+        'Lieutenant',
+        'Mercenary',
+        'Recruit',
+      ),
     },
     martial_order: {
       label: 'Martial order',
       description: 'An organized martial brotherhood, knightly order, or similar force.',
-      memberTitles: ['Grand Master', 'Commander', 'Captain', 'Knight', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Grand Master',
+        'Commander',
+        'Captain',
+        'Knight',
+        'Initiate',
+      ),
     },
   },
   criminal: {
     syndicate: {
       label: 'Syndicate',
       description: 'A structured criminal network coordinating multiple operations.',
-      memberTitles: ['Boss', 'Underboss', 'Lieutenant', 'Enforcer', 'Associate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Boss',
+        'Underboss',
+        'Lieutenant',
+        'Enforcer',
+        'Associate',
+      ),
     },
     gang: {
       label: 'Gang',
       description: 'A localized or loosely structured criminal group.',
-      memberTitles: ['Boss', 'Lieutenant', 'Enforcer', 'Runner', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Boss',
+        'Lieutenant',
+        'Enforcer',
+        'Runner',
+        'Member',
+      ),
     },
     thieves_guild: {
       label: "Thieves' guild",
       description: 'An organized guild or network of thieves and related criminals.',
-      memberTitles: ['Guildmaster', 'Master Thief', 'Thief', 'Cutpurse', 'Apprentice'],
+      memberTitles: organizationMemberTitleEntries(
+        'Guildmaster',
+        'Master Thief',
+        'Thief',
+        'Cutpurse',
+        'Apprentice',
+      ),
     },
     smuggling_ring: {
       label: 'Smuggling ring',
       description: 'A network organized around moving illicit goods or people.',
-      memberTitles: ['Ringleader', 'Coordinator', 'Smuggler', 'Courier', 'Lookout'],
+      memberTitles: organizationMemberTitleEntries(
+        'Ringleader',
+        'Coordinator',
+        'Smuggler',
+        'Courier',
+        'Lookout',
+      ),
     },
     pirate_crew: {
       label: 'Pirate crew',
       description: 'A criminal organization operating as a pirate crew.',
-      memberTitles: ['Captain', 'Quartermaster', 'Boatswain', 'Crew', 'Swab'],
+      memberTitles: organizationMemberTitleEntries(
+        'Captain',
+        'Quartermaster',
+        'Boatswain',
+        'Crew',
+        'Swab',
+      ),
     },
   },
   commercial: {
     company: {
       label: 'Company',
       description: 'A general business or commercial enterprise.',
-      memberTitles: ['Director', 'Partner', 'Manager', 'Agent', 'Employee'],
+      memberTitles: organizationMemberTitleEntries(
+        'Director',
+        'Partner',
+        'Manager',
+        'Agent',
+        'Employee',
+      ),
     },
     merchant_house: {
       label: 'Merchant house',
       description: 'A merchant family or house operating as a commercial organization.',
-      memberTitles: ['House Head', 'Factor', 'Merchant', 'Agent', 'Clerk'],
+      memberTitles: organizationMemberTitleEntries(
+        'House Head',
+        'Factor',
+        'Merchant',
+        'Agent',
+        'Clerk',
+      ),
     },
     trading_consortium: {
       label: 'Trading consortium',
       description: 'Multiple merchants or interests organized around shared trade.',
-      memberTitles: ['Chair', 'Partner', 'Factor', 'Agent', 'Broker'],
+      memberTitles: organizationMemberTitleEntries('Chair', 'Partner', 'Factor', 'Agent', 'Broker'),
     },
     bank: {
       label: 'Bank',
       description: 'A financial institution dealing in deposits, lending, exchange, or credit.',
-      memberTitles: ['Director', 'Treasurer', 'Banker', 'Clerk', 'Agent'],
+      memberTitles: organizationMemberTitleEntries(
+        'Director',
+        'Treasurer',
+        'Banker',
+        'Clerk',
+        'Agent',
+      ),
     },
     cooperative: {
       label: 'Cooperative',
       description: 'A commercial organization jointly owned or operated by its members.',
-      memberTitles: ['Chair', 'Steward', 'Treasurer', 'Member', 'Worker'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Steward',
+        'Treasurer',
+        'Member',
+        'Worker',
+      ),
     },
   },
   professional: {
     craft_guild: {
       label: 'Craft guild',
       description: 'A guild organized around a particular craft.',
-      memberTitles: ['Guildmaster', 'Master', 'Journeyman', 'Apprentice', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Guildmaster',
+        'Master',
+        'Journeyman',
+        'Apprentice',
+        'Member',
+      ),
     },
     trade_guild: {
       label: 'Trade guild',
       description: 'A guild representing merchants or a particular trade.',
-      memberTitles: ['Guildmaster', 'Factor', 'Merchant', 'Broker', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Guildmaster',
+        'Factor',
+        'Merchant',
+        'Broker',
+        'Member',
+      ),
     },
     professional_association: {
       label: 'Professional association',
       description: 'An association of practitioners in a profession.',
-      memberTitles: ['President', 'Officer', 'Practitioner', 'Associate', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'President',
+        'Officer',
+        'Practitioner',
+        'Associate',
+        'Member',
+      ),
     },
     labor_association: {
       label: 'Labor association',
       description: 'An organization representing workers or labor interests.',
-      memberTitles: ['Chair', 'Steward', 'Organizer', 'Representative', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Steward',
+        'Organizer',
+        'Representative',
+        'Member',
+      ),
     },
     fellowship: {
       label: 'Fellowship',
       description: 'A professional or occupational fellowship organized around shared practice.',
-      memberTitles: ['Master', 'Fellow', 'Associate', 'Member', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'Master',
+        'Fellow',
+        'Associate',
+        'Member',
+        'Initiate',
+      ),
     },
   },
   academic: {
     school: {
       label: 'School',
       description: 'An institution primarily organized around instruction.',
-      memberTitles: ['Headmaster', 'Instructor', 'Tutor', 'Scholar', 'Student'],
+      memberTitles: organizationMemberTitleEntries(
+        'Headmaster',
+        'Instructor',
+        'Tutor',
+        'Scholar',
+        'Student',
+      ),
     },
     college: {
       label: 'College',
       description: 'A formal institution of higher learning.',
-      memberTitles: ['Rector', 'Dean', 'Professor', 'Scholar', 'Student'],
+      memberTitles: organizationMemberTitleEntries(
+        'Rector',
+        'Dean',
+        'Professor',
+        'Scholar',
+        'Student',
+      ),
     },
     academy: {
       label: 'Academy',
       description: 'An institution organized around specialized teaching or study.',
-      memberTitles: ['Chancellor', 'Master', 'Instructor', 'Scholar', 'Student'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chancellor',
+        'Master',
+        'Instructor',
+        'Scholar',
+        'Student',
+      ),
     },
     library: {
       label: 'Library',
       description:
         'An institution organized around collecting, preserving, or providing knowledge.',
-      memberTitles: ['Chief Librarian', 'Librarian', 'Archivist', 'Scholar', 'Assistant'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chief Librarian',
+        'Librarian',
+        'Archivist',
+        'Scholar',
+        'Assistant',
+      ),
     },
     learned_society: {
       label: 'Learned society',
       description: 'An association of scholars or researchers pursuing a field of study.',
-      memberTitles: ['President', 'Fellow', 'Scholar', 'Correspondent', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'President',
+        'Fellow',
+        'Scholar',
+        'Correspondent',
+        'Member',
+      ),
     },
   },
   community: {
     clan: {
       label: 'Clan',
       description: 'A community organization built around kinship or a shared lineage.',
-      memberTitles: ['Clan Chief', 'Elder', 'Champion', 'Retainer', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Clan Chief',
+        'Elder',
+        'Champion',
+        'Retainer',
+        'Member',
+      ),
     },
     neighborhood_association: {
       label: 'Neighborhood association',
       description: 'A group representing a neighborhood or local community.',
-      memberTitles: ['Chair', 'Steward', 'Organizer', 'Representative', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Steward',
+        'Organizer',
+        'Representative',
+        'Member',
+      ),
     },
     mutual_aid_group: {
       label: 'Mutual-aid group',
       description: 'A community organization providing reciprocal assistance.',
-      memberTitles: ['Coordinator', 'Steward', 'Organizer', 'Volunteer', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Coordinator',
+        'Steward',
+        'Organizer',
+        'Volunteer',
+        'Member',
+      ),
     },
     civic_association: {
       label: 'Civic association',
       description: 'A local organization pursuing civic or community interests.',
-      memberTitles: ['Chair', 'Officer', 'Organizer', 'Representative', 'Member'],
+      memberTitles: organizationMemberTitleEntries(
+        'Chair',
+        'Officer',
+        'Organizer',
+        'Representative',
+        'Member',
+      ),
     },
     social_club: {
       label: 'Social club',
       description: 'A community organized primarily around social membership or shared activity.',
-      memberTitles: ['President', 'Steward', 'Host', 'Member', 'Initiate'],
+      memberTitles: organizationMemberTitleEntries(
+        'President',
+        'Steward',
+        'Host',
+        'Member',
+        'Initiate',
+      ),
     },
   },
   /** No canonical subtypes yet — keep the kind exhaustiveness slot empty. */

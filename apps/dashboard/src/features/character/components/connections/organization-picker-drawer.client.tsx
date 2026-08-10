@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
@@ -27,6 +27,7 @@ import {
   ORGANIZATION_PICKER_TITLE,
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
+  type OrganizationPickerItem,
   type OrganizationPickerTypeFilter,
 } from './organization-picker-drawer.types'
 import { organizationPickerTypeControlClasses } from './organization-picker-drawer.variants'
@@ -85,13 +86,20 @@ export function OrganizationPickerDrawer({
   )
 
   const commitMembership = React.useCallback(
-    async (organizationId: string) => {
+    async (organization: OrganizationPickerItem['organization']) => {
       if (pending) return
 
-      const title = titleFromMembershipRadioValue(selectedTitle)
+      const { title, priority } = resolveOrganizationMembershipMetadata({
+        kind: organization.organizationKind,
+        ...(organization.organizationSubtype !== undefined
+          ? { subtype: organization.organizationSubtype }
+          : {}),
+        selectedTitle: titleFromMembershipRadioValue(selectedTitle),
+      })
       const membership: OrganizationMembershipSelection = {
-        organizationId,
+        organizationId: organization.id,
         ...(title !== undefined ? { title } : {}),
+        ...(priority !== undefined ? { priority } : {}),
       }
 
       setPending(true)
@@ -215,7 +223,7 @@ export function OrganizationPickerDrawer({
                 type="button"
                 disabled={pending}
                 onClick={() => {
-                  void commitMembership(organization.id)
+                  void commitMembership(organization)
                 }}
               >
                 Add organization

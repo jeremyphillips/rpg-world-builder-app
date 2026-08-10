@@ -1,5 +1,5 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import type { GameTermEntry, PrioritizedEntry, VocabularyTerm } from '../types'
 import type { RelationshipDisplayDirection } from './organization-location-connection'
 
 export const CHARACTER_LOCATION_CONNECTION_FAMILY_IDS = [
@@ -21,14 +21,14 @@ export const CHARACTER_LOCATION_CONNECTION_TERM = {
   },
 } as const satisfies VocabularyTerm
 
-export type CharacterLocationConnectionEntry = GameTermEntry & {
-  readonly family: CharacterLocationConnectionFamily
-  readonly priority: number
-  /** Subject-owned edge eyebrow; falls back to `label`. */
-  readonly forwardLabel?: string
-  /** Location-projected edge eyebrow; falls back to `label`. */
-  readonly inverseLabel?: string
-}
+export type CharacterLocationConnectionEntry = GameTermEntry &
+  PrioritizedEntry & {
+    readonly family: CharacterLocationConnectionFamily
+    /** Subject-owned edge eyebrow; falls back to `label`. */
+    readonly forwardLabel?: string
+    /** Location-projected edge eyebrow; falls back to `label`. */
+    readonly inverseLabel?: string
+  }
 
 export const CHARACTER_LOCATION_CONNECTION_ENTRIES = {
   owns: {

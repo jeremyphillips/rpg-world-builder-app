@@ -1,13 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import { getErrorMessage } from '@rpg/contracts'
+import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import type { Organization, OrganizationReferenceResolution } from '@rpg/contracts'
 
 import { useOrganizations } from '@/features/content'
 
-import type { EditOrganizationMembershipOrganization } from '../components/connections/edit-organization-membership-drawer.types'
-import type { OrganizationPickerItem } from '../components/connections/organization-picker-drawer.types'
+import {
+  formatRemoveMembershipHeadline,
+  type EditOrganizationMembershipOrganization,
+} from '../components/connections/edit-organization-membership-drawer.types'
+import type {
+  OrganizationMembershipSelection,
+  OrganizationPickerItem,
+} from '../components/connections/organization-picker-drawer.types'
 import { useCharacterOrganizationMembershipMutations } from './use-character-organization-membership-mutations'
 import { useCharacterOrganizationReferences } from './use-character-organization-references'
 import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'
@@ -72,10 +78,13 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     () => toPickerItems(organizationsQuery.data ?? [], memberships),
     [memberships, organizationsQuery.data],
   )
-  const editingOrganization = toEditableOrganization(editingMembership)
+  const editingOrganization = React.useMemo(
+    () => toEditableOrganization(editingMembership),
+    [editingMembership],
+  )
 
   const handleAdd = React.useCallback(
-    async (membership: { organizationId: string; title?: string }) => {
+    async (membership: OrganizationMembershipSelection) => {
       try {
         await mutations.addMembership(membership)
       } catch (error) {
@@ -87,16 +96,25 @@ export function useCharacterOrganizationMembershipsSheet(input: {
 
   const handleSave = React.useCallback(
     async (title?: string) => {
-      if (!editingMembership) return
+      if (!editingMembership || !editingOrganization) return
+      const metadata = resolveOrganizationMembershipMetadata({
+        kind: editingOrganization.organizationKind,
+        ...(editingOrganization.organizationSubtype !== undefined
+          ? { subtype: editingOrganization.organizationSubtype }
+          : {}),
+        selectedTitle: title,
+        currentMembership: editingMembership,
+      })
       try {
         await mutations.updateMembership(editingMembership.organizationId, {
-          title: title ?? null,
+          title: metadata.title ?? null,
+          priority: metadata.priority ?? null,
         })
       } catch (error) {
         rethrowCanonicalized(error, 'Could not update this organization membership.')
       }
     },
-    [editingMembership, mutations],
+    [editingMembership, editingOrganization, mutations],
   )
 
   const handleRemove = React.useCallback(async () => {
@@ -119,7 +137,10 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   }, [mutations, unresolvedToRemove])
 
   const unresolvedRemoveHeadline = unresolvedToRemove
-    ? `Remove ${characterName} from ${unresolvedToRemove.organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL}?`
+    ? formatRemoveMembershipHeadline(
+        characterName,
+        unresolvedToRemove.organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
+      )
     : ''
 
   return {

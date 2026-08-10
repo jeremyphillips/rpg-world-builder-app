@@ -33,12 +33,12 @@ function organizationReferencesPath(campaignId: string, characterId: string) {
   return `/api/campaigns/${campaignId}/content/organizations/references/${characterId}`
 }
 
-function connectedCharactersPath(campaignId: string, organizationId: string) {
-  return `/api/campaigns/${campaignId}/content/organizations/${organizationId}/connected-characters?page=1&pageSize=4`
+function membersPath(campaignId: string, organizationId: string) {
+  return `/api/campaigns/${campaignId}/content/organizations/${organizationId}/members?page=1&pageSize=50`
 }
 
 describe('character organization membership nested routes', () => {
-  it('mutates memberships, clears title with null, and reflects connected characters', async () => {
+  it('mutates memberships, clears title/priority with null, and reflects members roster', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
     const organization = await createHomebrewContent(
@@ -55,12 +55,13 @@ describe('character organization membership nested routes', () => {
     const createRes = await agent
       .post(membershipsPath(campaignId, npc.id))
       .set(CSRF_HEADER, csrfToken)
-      .send({ organizationId: organization.id, title: 'Boss' })
+      .send({ organizationId: organization.id, title: 'Boss', priority: 50 })
       .expect(201)
 
     expect(createRes.body.organizationMembership).toEqual({
       organizationId: organization.id,
       title: 'Boss',
+      priority: 50,
     })
 
     const referencesRes = await agent
@@ -70,6 +71,7 @@ describe('character organization membership nested routes', () => {
       {
         organizationId: organization.id,
         title: 'Boss',
+        priority: 50,
         organization: expect.objectContaining({
           id: organization.id,
           name: "Thieves' Guild",
@@ -77,15 +79,19 @@ describe('character organization membership nested routes', () => {
       },
     ])
 
-    const connectedRes = await agent
-      .get(connectedCharactersPath(campaignId, organization.id))
-      .expect(200)
-    expect(connectedRes.body.total).toBe(1)
+    const membersRes = await agent.get(membersPath(campaignId, organization.id)).expect(200)
+    expect(membersRes.body.total).toBe(1)
+    expect(membersRes.body.items[0]).toEqual(
+      expect.objectContaining({
+        character: expect.objectContaining({ id: npc.id }),
+        membership: { title: 'Boss', priority: 50 },
+      }),
+    )
 
     await agent
       .patch(membershipsPath(campaignId, npc.id, organization.id))
       .set(CSRF_HEADER, csrfToken)
-      .send({ title: null })
+      .send({ title: null, priority: null })
       .expect(200)
 
     const untitledCharacter = await CharacterModel.findById(npc.id).lean()
@@ -101,10 +107,51 @@ describe('character organization membership nested routes', () => {
     const clearedCharacter = await CharacterModel.findById(npc.id).lean()
     expect(clearedCharacter?.connections?.organizations).toEqual([])
 
-    const connectedAfter = await agent
-      .get(connectedCharactersPath(campaignId, organization.id))
+    const membersAfter = await agent.get(membersPath(campaignId, organization.id)).expect(200)
+    expect(membersAfter.body.total).toBe(0)
+  })
+
+  it('accepts legacy title-only records and round-trips priority on PATCH', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const organization = await createHomebrewContent(organizationWriteConfig, campaignId, {
+      ...minimalOrganizationInput,
+      slug: 'legacy-guild',
+      name: 'Legacy Guild',
+      organizationKind: 'professional',
+    })
+    const { character: npc } = await createCampaignNpc(campaignId, {
+      ...minimalNpcRequestInput,
+      name: 'Legacy Member',
+    })
+
+    await CharacterModel.collection.updateOne(
+      { _id: new Types.ObjectId(npc.id) },
+      {
+        $set: {
+          connections: {
+            organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
+          },
+        },
+      },
+    )
+
+    const membersRes = await agent.get(membersPath(campaignId, organization.id)).expect(200)
+    expect(membersRes.body.items[0].membership).toEqual({
+      title: 'Guildmaster',
+      priority: 50,
+    })
+
+    await agent
+      .patch(membershipsPath(campaignId, npc.id, organization.id))
+      .set(CSRF_HEADER, csrfToken)
+      .send({ title: 'Guildmaster', priority: 15 })
       .expect(200)
-    expect(connectedAfter.body.total).toBe(0)
+
+    const patched = await CharacterModel.findById(npc.id).lean()
+    expect(patched?.connections?.organizations).toEqual([
+      { organizationId: organization.id, title: 'Guildmaster', priority: 15 },
+    ])
   })
 
   it('rejects omitted PATCH title, duplicates, and missing organizations', async () => {
@@ -244,12 +291,12 @@ describe('character organization membership nested routes', () => {
     await agent
       .patch(membershipsPath(campaignId, npc.id, second.id))
       .set(CSRF_HEADER, csrfToken)
-      .send({ title: 'Captain' })
+      .send({ title: 'Captain', priority: 40 })
       .expect(200)
 
     const character = await CharacterModel.findById(npc.id).lean()
     expect(character?.connections?.organizations).toEqual([
-      { organizationId: second.id, title: 'Captain' },
+      { organizationId: second.id, title: 'Captain', priority: 40 },
     ])
   })
 })

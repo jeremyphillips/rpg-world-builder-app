@@ -65,6 +65,8 @@ export function ConnectionsStep({
     selected: selectedIdSet.has(organization.id),
   }))
 
+  // Title and priority arrive already stamped by the picker's shared metadata helper —
+  // the builder must not derive priority locally.
   const handleAdd = (membership: OrganizationMembershipSelection) => {
     if (selectedIdSet.has(membership.organizationId)) return
     onDraftChange({

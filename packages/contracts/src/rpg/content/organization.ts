@@ -59,6 +59,8 @@ export const organizationReferenceResolutionSchema = z.object({
   organizationId: z.string().min(1),
   /** Descriptive membership title when present on the character connection. */
   title: z.string().trim().min(1).max(80).optional(),
+  /** Presentation/order precedence when present on the character connection. */
+  priority: z.number().int().optional(),
   organization: z.union([organizationSchema, organizationDraftStoredSchema]).nullable(),
 })
 

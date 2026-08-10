@@ -304,7 +304,7 @@ Character (and future) usage discovery lives under
 - Purpose scopes — **overview batch is viewer-visible informational usage**; **mutation guards use authoritative campaign-wide usage**. Managers see equivalent counts on overview; non-managers may see a subset of character references. Labels/tooltips must not imply campaign-completeness for players.
 - `overviewUsageScope` is **metadata only** — it does not change which sources run. V1 character-only batch uses `characters` so overview chrome can say “My characters” for players and “All characters” for managers honestly.
 - Optional `resolveDeleteBlockers` / `resolveDemoteBlockers` remain **policy additive hooks** (extra rule blockers), not discovery overrides.
-- Org connected-characters pagination is a **rich adapter** over the same registration discovery stack (`authoritative_guard`), not a parallel matcher path.
+- Org members roster pagination is a **rich adapter** over the same registration discovery stack (`authoritative_guard`), not a parallel matcher path.
 
 List responses attach `usedBy` / optional `usedBySummary` plus response-level `usageSummaryLabels` / `overviewUsageScope` when the surface registers batch sources. Detail: `GET …/content/:type/:id/usage` (and nested subclass twin).
 

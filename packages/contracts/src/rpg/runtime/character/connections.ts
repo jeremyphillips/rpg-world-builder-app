@@ -7,6 +7,11 @@ export const characterOrganizationConnectionSchema = z.object({
   organizationId: z.string().min(1),
   /** Descriptive membership title — never invent `'Member'` for an untitled membership. */
   title: z.string().trim().min(1).max(80).optional(),
+  /**
+   * Presentation/order precedence for roster sorting. Higher sorts first.
+   * Distinct from authority — optional so legacy untitled/custom records stay valid.
+   */
+  priority: z.number().int().optional(),
 })
 
 export type CharacterOrganizationConnection = z.infer<typeof characterOrganizationConnectionSchema>

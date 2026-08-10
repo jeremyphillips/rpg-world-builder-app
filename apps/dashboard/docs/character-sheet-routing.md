@@ -155,7 +155,7 @@ header `identitySupplement` slot via
   the shared `OrganizationPickerDrawer`; edit/remove uses
   `EditOrganizationMembershipDrawer`. Mutations hit nested
   `…/organization-memberships` routes and invalidate org references, the sheet
-  detail query, and the affected organization’s connected-characters key.
+  detail query, and the affected organization’s members key.
 - **Standalone sheets** have no Organizations block (campaign-scoped orgs only).
 
 ## Error copy (route shells)

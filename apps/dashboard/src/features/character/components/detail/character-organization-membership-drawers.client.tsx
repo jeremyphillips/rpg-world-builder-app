@@ -3,7 +3,10 @@
 import { ConfirmDialog } from '@rpg/ui'
 
 import { EditOrganizationMembershipDrawer } from '../../components/connections/edit-organization-membership-drawer.client'
-import type { EditOrganizationMembershipOrganization } from '../../components/connections/edit-organization-membership-drawer.types'
+import {
+  CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
+  type EditOrganizationMembershipOrganization,
+} from '../../components/connections/edit-organization-membership-drawer.types'
 import { OrganizationPickerDrawer } from '../../components/connections/organization-picker-drawer.client'
 import type { OrganizationMembershipSelection } from '../../components/connections/organization-picker-drawer.types'
 import type { OrganizationPickerItem } from '../../components/connections/organization-picker-drawer.types'
@@ -70,8 +73,8 @@ export function CharacterOrganizationMembershipDrawers({
           open
           onOpenChange={onUnresolvedOpenChange}
           headline={unresolvedRemoveHeadline}
-          description="This removes the organization membership from the character sheet."
-          confirmLabel="Remove organization"
+          description={CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY.removeConfirmDescription}
+          confirmLabel={CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY.removeLabel}
           confirmVariant="destructive"
           onConfirm={() => {
             void onRemoveUnresolved()

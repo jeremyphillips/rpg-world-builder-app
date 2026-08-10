@@ -19,7 +19,11 @@ import {
   membershipRadioValueFromTitle,
   titleFromMembershipRadioValue,
 } from './organization-membership-title-field.lib'
-import type { EditOrganizationMembershipDrawerProps } from './edit-organization-membership-drawer.types'
+import {
+  CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
+  formatRemoveMembershipHeadline,
+  type EditOrganizationMembershipDrawerProps,
+} from './edit-organization-membership-drawer.types'
 
 export type { EditOrganizationMembershipDrawerProps } from './edit-organization-membership-drawer.types'
 
@@ -32,6 +36,7 @@ export function EditOrganizationMembershipDrawer({
   organization,
   characterName,
   currentTitle,
+  copy = CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   onSave,
   onRemove,
 }: EditOrganizationMembershipDrawerProps) {
@@ -93,7 +98,7 @@ export function EditOrganizationMembershipDrawer({
       <DrawerShell
         open={open}
         onOpenChange={handleOpenChange}
-        title="Edit organization membership"
+        title={copy.drawerTitle}
         description={`${organization.name} · ${kindLabel}`}
         bodyMode="composed"
       >
@@ -137,7 +142,7 @@ export function EditOrganizationMembershipDrawer({
               disabled={pending}
               onClick={() => setConfirmRemoveOpen(true)}
             >
-              Remove organization
+              {copy.removeLabel}
             </Button>
           </div>
         </DrawerShell.Footer>
@@ -146,9 +151,9 @@ export function EditOrganizationMembershipDrawer({
       <ConfirmDialog
         open={confirmRemoveOpen}
         onOpenChange={setConfirmRemoveOpen}
-        headline={`Remove ${characterName} from ${organization.name}?`}
-        description="This removes the organization membership from the character sheet."
-        confirmLabel="Remove organization"
+        headline={formatRemoveMembershipHeadline(characterName, organization.name)}
+        description={copy.removeConfirmDescription}
+        confirmLabel={copy.removeLabel}
         confirmVariant="destructive"
         onConfirm={() => {
           void handleRemove()

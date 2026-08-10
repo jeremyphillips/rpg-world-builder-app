@@ -38,11 +38,12 @@ describe('OrganizationPickerDrawer', () => {
     expect(onAdd).toHaveBeenCalledWith({
       organizationId: 'organization-lantern-guild',
       title: 'Guildmaster',
+      priority: 50,
     })
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('omits title when No title is selected', async () => {
+  it('omits title and priority when No title is selected', async () => {
     const user = userEvent.setup()
     const onAdd = vi.fn()
 

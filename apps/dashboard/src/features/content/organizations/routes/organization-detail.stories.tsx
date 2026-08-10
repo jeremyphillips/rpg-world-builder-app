@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CITY_COUNCIL, SILVER_CIRCLE } from '../fixtures'
-import { organizationConnectedCharactersQueryKey } from '../hooks/use-organization-connected-characters'
+import { organizationMembersQueryKey } from '../hooks/use-organization-members'
 import { organizationLocationReferencesQueryKey } from '../hooks/use-organization-location-references'
 import { OrganizationDetailContent } from './organization-detail'
 
@@ -19,22 +19,29 @@ const meta = {
         organizationLocationReferencesQueryKey(STORY_CAMPAIGN_ID, organization.id),
         [],
       )
-      queryClient.setQueryData(
-        organizationConnectedCharactersQueryKey(STORY_CAMPAIGN_ID, organization.id),
-        {
-          items: [
-            {
-              characterType: 'npc',
-              character: {
-                id: 'npc-story-1',
-                name: 'Circle Envoy',
-                summary: 'Human · Level 3 Rogue',
-              },
+      queryClient.setQueryData(organizationMembersQueryKey(STORY_CAMPAIGN_ID, organization.id), {
+        items: [
+          {
+            characterType: 'npc',
+            character: {
+              id: 'npc-story-1',
+              name: 'Circle Envoy',
+              summary: 'Human · Level 3 Rogue',
             },
-          ],
-          total: 1,
-        },
-      )
+            membership: { title: 'Speaker', priority: 50 },
+          },
+          {
+            characterType: 'pc',
+            character: {
+              id: 'pc-story-1',
+              name: 'Verna',
+              summary: 'Dwarf · Level 1 Fighter',
+            },
+            membership: {},
+          },
+        ],
+        total: 2,
+      })
 
       return (
         <QueryClientProvider client={queryClient}>

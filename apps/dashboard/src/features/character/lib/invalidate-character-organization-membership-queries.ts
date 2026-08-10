@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { campaignCharacterQueryKey } from '@/features/campaign'
-import { organizationConnectedCharactersQueryKey } from '@/features/content'
+import { organizationMembersQueryKey } from '@/features/content'
 
 import { npcQueryKey } from '../npc/hooks/use-npcs'
 import { characterOrganizationReferencesQueryKey } from '../hooks/use-character-organization-references'
@@ -40,7 +40,7 @@ export async function invalidateCharacterOrganizationMembershipQueries(
   for (const organizationId of input.organizationIds ?? []) {
     invalidations.push(
       queryClient.invalidateQueries({
-        queryKey: organizationConnectedCharactersQueryKey(input.campaignId, organizationId),
+        queryKey: organizationMembersQueryKey(input.campaignId, organizationId),
       }),
     )
   }
