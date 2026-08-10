@@ -35,6 +35,29 @@ export const dialogPanelStableBodyVariants = cva(
 )
 
 /**
+ * Bottom inset for inner scroll regions above a docked overlay footer — matches
+ * the section padding scale from {@link dialogPanelSectionPaddingClasses}.
+ */
+export const dialogPanelScrollRegionBottomInsetClasses = 'pb-6'
+
+/**
+ * Horizontal inset so `ring-2` + `ring-offset-2` focus rings stay inside
+ * `overflow-y-auto` scroll regions (see accordion section content pattern).
+ */
+export const dialogPanelScrollRegionFocusClearanceClasses = 'px-1'
+
+/**
+ * Inner scroll region for overlay shells with a docked footer (`stableBody`,
+ * external-footer forms). The shell stays `pb-0`; this token owns end-of-scroll
+ * clearance so the last block can scroll fully into view.
+ */
+export const dialogPanelScrollRegionClasses = cn(
+  'min-h-0 flex-1 overflow-y-auto',
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionFocusClearanceClasses,
+)
+
+/**
  * Canonical overlay footer section chrome — separator, horizontal inset, vertical rhythm.
  * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.
  */

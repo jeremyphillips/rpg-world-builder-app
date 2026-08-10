@@ -83,6 +83,7 @@ export {
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
   formTabPanelsBottomPaddingClasses,
+  formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
@@ -129,6 +130,7 @@ export {
   type FieldDerivedMetaConfig,
   type FieldDerivedMetaRow,
   type FormValueSync,
+  type TrailingFieldActionConfig,
   type TextFieldConfig,
   type TextSuggestionsFieldConfig,
   type NumberFieldConfig,

@@ -1,3 +1,5 @@
+import { dialogPanelScrollRegionClasses } from '../../components/ui/dialog-panel.variants'
+
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
 export const formStickyTabsClasses =
   'sticky top-0 z-20 bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
@@ -10,15 +12,21 @@ export const formStickyTabsTransparentClasses =
 /** removed pb-24 as it did not seem to be necessary */
 export const formTabPanelsBottomPaddingClasses = ''
 
+/**
+ * Tighter vertical gap between hoisted chrome and tab panels in `<TabbedForm>`.
+ * Overrides inherited `comfortable` rhythm (`gap-6`) on the outer rhythm stack only.
+ */
+export const formTabbedChromeRhythmStackClasses = 'gap-4'
+
 /** Sticky actions bar — save/cancel and form-level errors stay reachable on long forms. */
 export const formStickyActionsBarClasses =
   'sticky bottom-0 z-20 mt-6 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
 /**
- * Sheet/drawer scroll region — grows inside a flex column form; field rhythm stacks
- * stay natural height inside this wrapper (do not put `flex-1` on `FormRhythmStack`).
+ * Sheet/drawer/modal scroll region — grows inside a flex column shell with a docked
+ * footer. Composes {@link dialogPanelScrollRegionClasses} for end-of-scroll clearance.
  */
-export const formSheetScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
+export const formSheetScrollRegionClasses = dialogPanelScrollRegionClasses
 
 /** Transparent sticky actions bar surface — pair with `formStickyTabsTransparentClasses`. */
 export const formStickyActionsBarTransparentClasses =

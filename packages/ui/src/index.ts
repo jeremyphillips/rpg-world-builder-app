@@ -104,6 +104,11 @@ export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
+  InputActionGroup,
+  type InputActionGroupActionProps,
+  type InputActionGroupProps,
+} from './components/ui/input-action-group.client'
+export {
   NumberInput,
   type NumberInputDigits,
   type NumberInputProps,
@@ -138,10 +143,16 @@ export {
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
+  fieldGroupedControlActionPaddingClasses,
+  fieldGroupedControlGeometryClasses,
+  fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
+  fieldGroupedControlStartPaddingClasses,
   buttonSizeToComboboxFieldSize,
   fieldSizeToArrayAddButtonSize,
+  fieldSizeToAttachedButtonSize,
   resolveArrayAddButtonSize,
+  resolveAttachedButtonSize,
   fieldSizeToBadgeSize,
   fieldSizeToChipSize,
   fieldSizeTypographyClasses,
@@ -554,6 +565,8 @@ export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
   dialogPanelStableBodyVariants,
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionClasses,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,

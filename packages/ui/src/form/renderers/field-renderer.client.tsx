@@ -140,6 +140,7 @@ const fieldRenderers: {
       placeholder={config.placeholder}
       autoComplete={config.autoComplete}
       disabled={config.disabled}
+      trailingAction={config.trailingAction}
       ref={field.ref}
       value={field.value ?? ''}
       onChange={field.onChange}

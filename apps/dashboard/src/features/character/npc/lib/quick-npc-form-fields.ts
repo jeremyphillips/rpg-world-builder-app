@@ -14,7 +14,13 @@ import {
   type CharacterBuildContext,
   type OrganizationKind,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  toOptions,
+  type FieldOption,
+  type FormItem,
+  type TabbedFormTab,
+  type TrailingFieldActionConfig,
+} from '@rpg/ui/form'
 
 import { buildOrganizationMembershipTitleRadioOptions } from '../../components/connections/organization-membership-title-field.lib'
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
@@ -205,17 +211,20 @@ export type QuickNpcDetailsFieldsArgs = {
     kind: OrganizationKind
     subtype?: string
   }
-  nameFieldSlot?: FormItem
+  nameTrailingAction?: TrailingFieldActionConfig
+  nameHint?: string
 }
 
 export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): FormItem[] {
-  const nameField: FormItem = args.nameFieldSlot ?? {
+  const nameField: FormItem = {
     type: 'text',
     name: 'name',
     label: 'Name',
     placeholder: 'Enter a name',
     required: true,
     width: 'full',
+    ...(args.nameTrailingAction ? { trailingAction: args.nameTrailingAction } : {}),
+    ...(args.nameHint ? { hint: args.nameHint } : {}),
   }
 
   return [

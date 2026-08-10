@@ -126,6 +126,22 @@ describe('QuickNpcCreateModal', () => {
 
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
+    expect(scrollRegion?.className).toContain('pb-6')
+  })
+
+  it('wraps authoring content in a scroll region inside the stable modal body', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+
+    const changeSetup = screen.getByRole('button', { name: 'Change' })
+    const scrollRegion = changeSetup.closest('.overflow-y-auto')
+
+    expect(scrollRegion).toBeTruthy()
+    expect(scrollRegion?.className).toContain('min-h-0')
+    expect(scrollRegion?.className).toContain('pb-6')
+    expect(scrollRegion).toContainElement(screen.getByRole('tablist'))
   })
 
   it('walks setup then authoring and returns to add on cancel', async () => {

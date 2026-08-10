@@ -16,6 +16,11 @@ import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import {
+  formSheetScrollRegionClasses,
+  formTabbedChromeRhythmStackClasses,
+} from '../chrome/form-chrome.variants'
+import { cn } from '../../lib/utils'
+import {
   FormShellFooterPublisher,
   type FormShellFooterModel,
 } from '../chrome/form-shell-footer.context'
@@ -206,6 +211,23 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     />
   )
 
+  const externalFooterBody = (
+    <div className={formSheetScrollRegionClasses}>
+      <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+        {resolvedHeader}
+        {panels}
+        {validationSummary}
+      </FormRhythmStack>
+    </div>
+  )
+
+  const defaultBody = (
+    <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+      {resolvedHeader}
+      {contentWrapper ? contentWrapper(panels) : panels}
+    </FormRhythmStack>
+  )
+
   return (
     <TabbedFormChromeContext.Provider value={tabbedChrome}>
       <SchemaFormShell
@@ -226,16 +248,19 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         externalFooterPublisher={
           externalFooter ? <FormShellFooterPublisher model={externalFooterModel} /> : undefined
         }
-        className={resolveTabbedFormShellClassName(className, stickyChrome, externalFooter)}
+        className={cn(
+          externalFooter && 'flex min-h-0 flex-1 flex-col',
+          resolveTabbedFormShellClassName(className, stickyChrome, externalFooter),
+        )}
       >
         {valueSyncs && valueSyncs.length > 0 ? (
           <FormValueSyncEffects valueSyncs={valueSyncs} />
         ) : null}
-        <FormRhythmStack>
-          {resolvedHeader}
-          {contentWrapper ? contentWrapper(panels) : panels}
-          {externalFooter ? validationSummary : null}
-        </FormRhythmStack>
+        {externalFooter
+          ? contentWrapper
+            ? contentWrapper(externalFooterBody)
+            : externalFooterBody
+          : defaultBody}
         {!externalFooter ? (
           <TabbedFormFooterRegion
             hasFooterRegion={Boolean(formError || resolvedFooter)}

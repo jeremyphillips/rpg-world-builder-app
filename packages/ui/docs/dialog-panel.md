@@ -25,6 +25,8 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 | `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                                             |
 | `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                        |
 | `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                         |
+| `dialogPanelStableBodyVariants`    | Stable shell (`px-6`, `pb-0`) — child owns scroll                                         |
+| `dialogPanelScrollRegionClasses`   | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                      |
 | `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill) |
 | `dialogPanelActionRowClasses`      | Action row flex helper — prefer `DialogPanelActionRow` component                          |
 
@@ -106,6 +108,15 @@ DrawerShell `bodyMode`:
 - `scrolling` (default) — `Sheet.Body` scrolls with dialog-panel body padding
 - `managed` — body becomes `p-0 overflow-hidden`; child owns scroll inside the body
 - `composed` — no auto `Sheet.Body`; Form/feature supplies Body + Footer via wrappers
+
+Modal `stableBody` + docked `Modal.Footer`:
+
+- Shell: `dialogPanelStableBodyVariants` (`px-6`, `pb-0`, `overflow-hidden`)
+- Inner scroll: `dialogPanelScrollRegionClasses` (`overflow-y-auto` + `pb-6` + `px-1` focus clearance)
+- Form flows alias the same token as `formSheetScrollRegionClasses`
+
+Default scrolling body (`dialogPanelBodyVariants`) keeps end inset via `p-6`; only the
+stable/inner-scroll split moves bottom padding onto the scroll region.
 
 This is scroll ownership, not a second spacing axis. Modal does not need `bodyMode`
 today (no form-in-modal sticky sheet pattern).

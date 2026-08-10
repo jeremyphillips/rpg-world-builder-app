@@ -2,37 +2,40 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
-  fieldInputFocusWithinClasses,
+  fieldGroupedDividerClasses,
+  fieldGroupedInputColumnClasses,
+  fieldGroupedSegmentEndClasses,
+  fieldGroupedSegmentResetClasses,
+  fieldGroupedSegmentStartClasses,
+  fieldGroupedShellClasses,
+  fieldGroupedShellIntrinsicLayoutClasses,
+  fieldGroupedShellStretchLayoutClasses,
   fieldInputInvalidClasses,
   fieldInputInvalidSegmentClasses,
-  fieldInputShellClasses,
 } from './field-input-chrome.variants'
 import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 
-export const inputSelectGroupVariants = cva(
-  cn('grid items-center', fieldInputShellClasses, fieldInputFocusWithinClasses),
-  {
-    variants: {
-      layout: {
-        intrinsic: 'w-fit max-w-full grid-cols-[auto_1px_auto]',
-        stretch: 'w-full grid-cols-[1fr_1px_auto]',
-      },
-      invalid: {
-        true: cn(fieldInputInvalidClasses, fieldInputInvalidSegmentClasses),
-        false: '',
-      },
-      disabled: {
-        true: 'cursor-not-allowed opacity-50',
-        false: '',
-      },
+export const inputSelectGroupVariants = cva(fieldGroupedShellClasses, {
+  variants: {
+    layout: {
+      intrinsic: fieldGroupedShellIntrinsicLayoutClasses,
+      stretch: fieldGroupedShellStretchLayoutClasses,
     },
-    defaultVariants: {
-      layout: 'stretch',
-      invalid: false,
-      disabled: false,
+    invalid: {
+      true: cn(fieldInputInvalidClasses, fieldInputInvalidSegmentClasses),
+      false: '',
+    },
+    disabled: {
+      true: 'cursor-not-allowed opacity-50',
+      false: '',
     },
   },
-)
+  defaultVariants: {
+    layout: 'stretch',
+    invalid: false,
+    disabled: false,
+  },
+})
 
 /**
  * Size-only tokens shared by all segments. Uses `pl-*` (not `px-*`) so the
@@ -41,19 +44,24 @@ export const inputSelectGroupVariants = cva(
  */
 export const segmentSizeVariants = fieldGroupedControlSizeClasses
 
-/**
- * Appearance-only reset applied to every segment. Suppresses standalone field
- * chrome and individual focus rings so the group shell owns border and focus.
- */
-const segmentReset =
-  'border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-
 export const inputSelectValueSegmentVariants = cva('min-w-0', {
   variants: {
     size: {
-      sm: cn(segmentSizeVariants.sm, segmentReset, 'rounded-l-md rounded-r-none'),
-      md: cn(segmentSizeVariants.md, segmentReset, 'rounded-l-md rounded-r-none'),
-      lg: cn(segmentSizeVariants.lg, segmentReset, 'rounded-l-md rounded-r-none'),
+      sm: cn(
+        segmentSizeVariants.sm,
+        fieldGroupedSegmentResetClasses,
+        fieldGroupedSegmentStartClasses,
+      ),
+      md: cn(
+        segmentSizeVariants.md,
+        fieldGroupedSegmentResetClasses,
+        fieldGroupedSegmentStartClasses,
+      ),
+      lg: cn(
+        segmentSizeVariants.lg,
+        fieldGroupedSegmentResetClasses,
+        fieldGroupedSegmentStartClasses,
+      ),
     },
   },
   defaultVariants: {
@@ -66,18 +74,33 @@ export const inputSelectValueSegmentVariants = cva('min-w-0', {
  * overflow clipping (so the absolutely-positioned stepper column doesn't escape
  * the group shell). Width is owned by NumberInput's `digits` prop.
  */
-export const inputSelectValueWrapperVariants = cva('overflow-hidden rounded-l-md')
+export const inputSelectValueWrapperVariants = cva(fieldGroupedInputColumnClasses)
 
-export const inputSelectDividerVariants = cva('w-px shrink-0 self-stretch bg-border')
+export const inputSelectDividerVariants = cva(fieldGroupedDividerClasses)
 
 export const inputSelectUnitSegmentVariants = cva(
   'inline-flex shrink-0 items-center justify-between gap-1.5 text-left [&>span]:line-clamp-1 [&_svg]:shrink-0',
   {
     variants: {
       size: {
-        sm: cn(segmentSizeVariants.sm, segmentReset, 'rounded-l-none rounded-r-md pl-2 pr-2.5'),
-        md: cn(segmentSizeVariants.md, segmentReset, 'rounded-l-none rounded-r-md pl-2.5 pr-3.5'),
-        lg: cn(segmentSizeVariants.lg, segmentReset, 'rounded-l-none rounded-r-md pl-3 pr-4'),
+        sm: cn(
+          segmentSizeVariants.sm,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-2 pr-2.5',
+        ),
+        md: cn(
+          segmentSizeVariants.md,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-2.5 pr-3.5',
+        ),
+        lg: cn(
+          segmentSizeVariants.lg,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-3 pr-4',
+        ),
       },
       searchable: {
         true: '',
@@ -131,9 +154,24 @@ export const inputSelectUnitLabelSegmentVariants = cva(
   {
     variants: {
       size: {
-        sm: cn(segmentSizeVariants.sm, segmentReset, 'rounded-l-none rounded-r-md pl-2 pr-2'),
-        md: cn(segmentSizeVariants.md, segmentReset, 'rounded-l-none rounded-r-md pl-2.5 pr-2.5'),
-        lg: cn(segmentSizeVariants.lg, segmentReset, 'rounded-l-none rounded-r-md pl-3 pr-3'),
+        sm: cn(
+          segmentSizeVariants.sm,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-2 pr-2',
+        ),
+        md: cn(
+          segmentSizeVariants.md,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-2.5 pr-2.5',
+        ),
+        lg: cn(
+          segmentSizeVariants.lg,
+          fieldGroupedSegmentResetClasses,
+          fieldGroupedSegmentEndClasses,
+          'pl-3 pr-3',
+        ),
       },
     },
     defaultVariants: {

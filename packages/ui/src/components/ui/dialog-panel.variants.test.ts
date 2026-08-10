@@ -8,6 +8,8 @@ import {
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
   dialogPanelStableBodyVariants,
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionClasses,
 } from './dialog-panel.variants'
 import { sheetBodyVariants, sheetFooterDockClasses } from './sheet.variants'
 
@@ -45,6 +47,15 @@ describe('dialog-panel variants', () => {
     expect(stableBodyClasses).toContain('flex-1')
     expect(stableBodyClasses).not.toContain(dialogPanelSectionPaddingClasses)
     expect(stableBodyClasses).not.toContain('overflow-y-auto')
+  })
+
+  it('applies bottom inset on inner scroll regions above docked footers', () => {
+    expect(dialogPanelScrollRegionClasses).toContain('overflow-y-auto')
+    expect(dialogPanelScrollRegionClasses).toContain('min-h-0')
+    expect(dialogPanelScrollRegionClasses).toContain('flex-1')
+    expect(dialogPanelScrollRegionClasses).toContain(dialogPanelScrollRegionBottomInsetClasses)
+    expect(dialogPanelScrollRegionClasses).toContain('px-1')
+    expect(dialogPanelScrollRegionBottomInsetClasses).toBe('pb-6')
   })
 
   it('suppresses visible outlines on programmatic panel focus', () => {

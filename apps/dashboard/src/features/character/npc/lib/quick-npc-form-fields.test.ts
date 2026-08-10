@@ -154,9 +154,15 @@ describe('buildQuickNpcDetailsFields', () => {
 })
 
 describe('buildQuickNpcTabs validation wiring', () => {
-  it('declares explicit ownership for the slot-backed name field', () => {
+  it('declares explicit ownership for the name field with trailing action', () => {
     const tabs = buildQuickNpcTabs({
-      detailsFields: [{ kind: 'slot', name: '_quickNpcNameField', render: () => null }],
+      detailsFields: buildQuickNpcDetailsFields({
+        membership: { kind: 'professional' },
+        nameTrailingAction: {
+          label: 'Generate',
+          onAction: () => {},
+        },
+      }),
       requirementsFields: [
         {
           type: 'select',

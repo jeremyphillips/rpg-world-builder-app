@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { createElement } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 
 import {
@@ -11,7 +10,7 @@ import {
   type OrganizationKind,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
-import { FormShellSubmitButton, TabbedForm, formSheetScrollRegionClasses } from '@rpg/ui/form'
+import { FormShellSubmitButton, TabbedForm, type TabbedFormTab } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -34,8 +33,7 @@ import {
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
-import { QuickNpcNameField } from './quick-npc-name-field.client'
-import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
+import { QuickNpcAuthoringTabSynchronizer } from './quick-npc-authoring-tab-synchronizer.client'
 import { QuickNpcSetupSummary } from './quick-npc-setup-summary.client'
 
 export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
@@ -61,45 +59,31 @@ export type QuickNpcAuthoringFormProps = {
   onPendingChange?: (pending: boolean) => void
 }
 
-function buildAuthoringTabs(args: {
+function buildInitialAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   configuredCount: number
-}) {
+}): TabbedFormTab[] {
   const optionSets = buildQuickNpcRequirementOptionSets({
     setup: args.setup,
     context: args.buildContext,
   })
   const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
 
-  return {
-    tabs: buildQuickNpcTabs({
-      detailsFields: buildQuickNpcDetailsFields({
-        membership: {
-          kind: args.organization.organizationKind,
-          ...(args.organization.organizationSubtype !== undefined
-            ? { subtype: args.organization.organizationSubtype }
-            : {}),
-        },
-        nameFieldSlot: {
-          kind: 'slot',
-          name: '_quickNpcNameField',
-          render: () =>
-            createElement(QuickNpcNameField, {
-              speciesId: args.setup.speciesId,
-              buildContext: args.buildContext,
-            }),
-        },
-      }),
-      requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
-      configuredCount: args.configuredCount,
-      requirementsHeader: hasRequirements ? (
-        <QuickNpcRequirementsFields optionSets={optionSets} />
-      ) : undefined,
+  return buildQuickNpcTabs({
+    detailsFields: buildQuickNpcDetailsFields({
+      membership: {
+        kind: args.organization.organizationKind,
+        ...(args.organization.organizationSubtype !== undefined
+          ? { subtype: args.organization.organizationSubtype }
+          : {}),
+      },
     }),
-    hasRequirements,
-  }
+    requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
+    configuredCount: args.configuredCount,
+    requirementsHeader: hasRequirements ? undefined : undefined,
+  })
 }
 
 function RequirementCountWatcher({
@@ -151,6 +135,14 @@ export function QuickNpcAuthoringForm({
 }: QuickNpcAuthoringFormProps) {
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
   const [configuredCount, setConfiguredCount] = React.useState(0)
+  const [tabs, setTabs] = React.useState<TabbedFormTab[]>(() =>
+    buildInitialAuthoringTabs({
+      setup,
+      buildContext,
+      organization,
+      configuredCount: 0,
+    }),
+  )
 
   React.useEffect(() => {
     onPendingChange?.(isPending)
@@ -166,17 +158,6 @@ export function QuickNpcAuthoringForm({
       ...initialValues,
     }),
     [initialValues, setup],
-  )
-
-  const authoringModel = React.useMemo(
-    () =>
-      buildAuthoringTabs({
-        setup,
-        buildContext,
-        organization,
-        configuredCount,
-      }),
-    [buildContext, configuredCount, organization, setup],
   )
 
   const requirementCategoryKey = React.useMemo(() => {
@@ -225,17 +206,25 @@ export function QuickNpcAuthoringForm({
     <TabbedForm<QuickNpcAuthoringTabValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       schema={schema}
-      tabs={authoringModel.tabs}
+      tabs={tabs}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
       formError={formError ?? null}
       valueSyncs={valueSyncs}
       stickyChrome={false}
       externalFooter
-      className="flex min-h-0 flex-1 flex-col"
-      contentWrapper={(content) => <div className={formSheetScrollRegionClasses}>{content}</div>}
+      rhythm="comfortable"
+      size="md"
       header={(form) => (
         <>
+          <QuickNpcAuthoringTabSynchronizer
+            form={form}
+            setup={setup}
+            buildContext={buildContext}
+            organization={organization}
+            configuredCount={configuredCount}
+            onTabsChange={setTabs}
+          />
           <RequirementCountWatcher
             form={form}
             fallback={defaultValues}

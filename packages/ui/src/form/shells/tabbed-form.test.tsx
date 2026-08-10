@@ -132,7 +132,7 @@ describe('TabbedForm', () => {
     const header = screen.getByTestId('form-header')
     const rhythmStack = header.parentElement
 
-    expect(rhythmStack).toHaveClass('gap-6')
+    expect(rhythmStack).toHaveClass('gap-4')
     expect(rhythmStack).toContainElement(screen.getByRole('tablist'))
   })
 
@@ -223,6 +223,32 @@ describe('TabbedForm', () => {
     expect(screen.getByTestId('external-footer')).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
+  it('wraps external footer body content in a scroll region', () => {
+    render(
+      <FormShellFooterScope>
+        <TabbedForm<TestValues>
+          schema={schema}
+          tabs={tabs}
+          onSubmit={vi.fn()}
+          externalFooter
+          header={<p>Above tabs</p>}
+          footer={<button type="submit">Save changes</button>}
+        />
+        <footer>
+          <FormShellFooterSlot />
+        </footer>
+      </FormShellFooterScope>,
+    )
+
+    const aboveTabs = screen.getByText('Above tabs')
+    const scrollRegion = aboveTabs.closest('.overflow-y-auto')
+
+    expect(scrollRegion).toBeTruthy()
+    expect(scrollRegion?.className).toContain('min-h-0')
+    expect(scrollRegion?.className).toContain('pb-6')
+    expect(scrollRegion).toContainElement(screen.getByRole('tablist'))
   })
 
   it('submits via an external footer button associated with form id', async () => {
