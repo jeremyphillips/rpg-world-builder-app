@@ -16,15 +16,18 @@ import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import {
+  FormShellFooterPublisher,
+  type FormShellFooterModel,
+} from '../chrome/form-shell-footer.context'
+import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
   TabbedFormPanels,
   useTabbedFormSetup,
-  type TabbedFormFooterWrapperProps,
   type TabbedFormTab,
 } from './tabbed-form-panels.client'
 
-export type { TabbedFormFooterWrapperProps, TabbedFormTab }
+export type { TabbedFormTab }
 export { collectTabbedFormResolverItems } from './tabbed-form-panels.client'
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
@@ -88,14 +91,29 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Wrap tab chrome and panels (e.g. `<Sheet.Body>` in a drawer layout). */
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
   /**
-   * Render the footer outside the sticky actions bar (e.g. `<Sheet.Footer>`).
-   * When set, the internal sticky/inline footer chrome is not used.
+   * Publish footer semantics to a sibling {@link FormShellFooterSlot} inside overlay
+   * shell chrome. Requires an ancestor {@link FormShellFooterScope}.
    */
-  footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
+  externalFooter?: boolean
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
   /** See `FormProps['validationPresentation']`. */
   validationPresentation?: FormValidationPresentation
+}
+
+function buildExternalFooterModel(
+  formId: string,
+  formError: string | null | undefined,
+  footer: React.ReactNode,
+): FormShellFooterModel | null {
+  if (!footer && !formError) {
+    return null
+  }
+  return {
+    formId,
+    footer,
+    formError: formError ?? null,
+  }
 }
 
 /**
@@ -103,6 +121,7 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
  * `useForm` instance over a merged schema; the save button and any form-level
  * error are rendered outside the tab panels in a sticky actions bar by default.
  */
+// fallow-ignore-next-line complexity
 export function TabbedForm<TFieldValues extends FieldValues>({
   schema,
   tabs,
@@ -122,7 +141,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   stickyTabsClassName,
   stickyActionsBarClassName,
   contentWrapper,
-  footerWrapper,
+  externalFooter = false,
   valueSyncs,
   validationPresentation,
 }: TabbedFormProps<TFieldValues>) {
@@ -141,7 +160,6 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   )
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
-  const hasFooterRegion = Boolean(formError || resolvedFooter)
   const handleInvalidSubmit = React.useCallback(
     (
       invalidForm: UseFormReturn<TFieldValues>,
@@ -172,6 +190,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     />
   )
 
+  const externalFooterModel = externalFooter
+    ? buildExternalFooterModel(formId, formError, resolvedFooter)
+    : null
+
   const panels = (
     <TabbedFormPanels
       tabs={tabs}
@@ -180,7 +202,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       onActiveTabChange={setActiveTabId}
       stickyChrome={stickyChrome}
       stickyTabsClassName={stickyTabsClassName}
-      omitPanelBottomPadding={Boolean(footerWrapper)}
+      omitPanelBottomPadding={externalFooter}
     />
   )
 
@@ -200,7 +222,11 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         validateSilently={validateSilently as ValidateSilently}
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}
-        className={resolveTabbedFormShellClassName(className, stickyChrome, footerWrapper)}
+        externalFooter={externalFooter}
+        externalFooterPublisher={
+          externalFooter ? <FormShellFooterPublisher model={externalFooterModel} /> : undefined
+        }
+        className={resolveTabbedFormShellClassName(className, stickyChrome, externalFooter)}
       >
         {valueSyncs && valueSyncs.length > 0 ? (
           <FormValueSyncEffects valueSyncs={valueSyncs} />
@@ -208,16 +234,18 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         <FormRhythmStack>
           {resolvedHeader}
           {contentWrapper ? contentWrapper(panels) : panels}
+          {externalFooter ? validationSummary : null}
         </FormRhythmStack>
-        <TabbedFormFooterRegion
-          footerWrapper={footerWrapper}
-          hasFooterRegion={hasFooterRegion}
-          stickyChrome={stickyChrome}
-          stickyActionsBarClassName={stickyActionsBarClassName}
-          formError={formError}
-          validationSummary={validationSummary}
-          resolvedFooter={resolvedFooter}
-        />
+        {!externalFooter ? (
+          <TabbedFormFooterRegion
+            hasFooterRegion={Boolean(formError || resolvedFooter)}
+            stickyChrome={stickyChrome}
+            stickyActionsBarClassName={stickyActionsBarClassName}
+            formError={formError}
+            validationSummary={validationSummary}
+            resolvedFooter={resolvedFooter}
+          />
+        ) : null}
       </SchemaFormShell>
     </TabbedFormChromeContext.Provider>
   )

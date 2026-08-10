@@ -3,7 +3,8 @@
 import * as React from 'react'
 
 import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
-import { Button, Modal, dialogPanelActionRowClasses, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, DialogPanelActionRow, Modal, usePendingAwareOpenChange } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import { CreateSetupPanel } from '@/lib/create-setup'
 
@@ -51,59 +52,6 @@ function createInitialState(): QuickNpcCreateModalState {
     phase: 'setup',
     setupValues: { ...EMPTY_QUICK_NPC_SETUP_VALUES },
   }
-}
-
-function QuickNpcCreateModalSetupPhase({
-  buildContext,
-  setupValues,
-  onSetupValuesChange,
-  onContinue,
-  onCancel,
-}: {
-  buildContext: CharacterBuildContext
-  setupValues: QuickNpcSetupValues
-  onSetupValuesChange: (values: QuickNpcSetupValues) => void
-  onContinue: (values: QuickNpcSetupValues) => void
-  onCancel: () => void
-}) {
-  const setupSets = React.useMemo(
-    () =>
-      buildQuickNpcCreateSetupSets({
-        context: buildContext,
-        values: setupValues,
-        onValuesChange: onSetupValuesChange,
-      }),
-    [buildContext, setupValues, onSetupValuesChange],
-  )
-  const setupModel = React.useMemo(
-    () => resolveQuickNpcSetupModel({ context: buildContext, values: setupValues }),
-    [buildContext, setupValues],
-  )
-
-  return (
-    <>
-      <Modal.Body>
-        <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
-      </Modal.Body>
-      <Modal.Footer>
-        <div className={dialogPanelActionRowClasses}>
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            disabled={!setupModel.canContinue}
-            onClick={() => {
-              if (!setupModel.canContinue) return
-              onContinue(setupValues)
-            }}
-          >
-            Continue
-          </Button>
-        </div>
-      </Modal.Footer>
-    </>
-  )
 }
 
 function QuickNpcCreateModalSession({
@@ -179,47 +127,72 @@ function QuickNpcCreateModalSession({
     [onCreated, trustedClose],
   )
 
+  const setupSets = React.useMemo(
+    () =>
+      buildQuickNpcCreateSetupSets({
+        context: buildContext,
+        values: state.setupValues,
+        onValuesChange: handleSetupValuesChange,
+      }),
+    [buildContext, handleSetupValuesChange, state.setupValues],
+  )
+
   return (
     <Modal.Root open={open} onOpenChange={handleDismiss}>
-      <Modal.Content size="md" layout="stable" closeOnOutsideClick={false}>
-        <Modal.Header
-          headline={QUICK_NPC_CREATE_TITLE}
-          description={
-            state.phase === 'setup'
-              ? `Choose species, class, and level for a new member of ${organization.name}.`
-              : `Create a new NPC as a member of ${organization.name}.`
-          }
-        />
-
-        {state.phase === 'setup' ? (
-          <QuickNpcCreateModalSetupPhase
-            buildContext={buildContext}
-            setupValues={state.setupValues}
-            onSetupValuesChange={handleSetupValuesChange}
-            onContinue={handleContinueFromSetup}
-            onCancel={requestCancel}
+      <FormShellFooterScope>
+        <Modal.Content size="md" layout="stable" closeOnOutsideClick={false}>
+          <Modal.Header
+            headline={QUICK_NPC_CREATE_TITLE}
+            description={
+              state.phase === 'setup'
+                ? `Choose species, class, and level for a new member of ${organization.name}.`
+                : `Create a new NPC as a member of ${organization.name}.`
+            }
           />
-        ) : (
-          <>
-            <Modal.Body stableBody className="pt-0">
+
+          <Modal.Body stableBody className="flex min-h-0 flex-1 flex-col pt-0">
+            {state.phase === 'setup' ? (
+              <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
+            ) : (
               <QuickNpcAuthoringForm
                 key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
                 campaignId={campaignId}
                 buildContext={buildContext}
                 organization={organization}
                 setup={state.setupValues}
-                setupSummary={setupModel.summaryEntries}
+                setupSummaryLine={setupModel.summaryLine}
                 initialValues={state.authoringValues}
                 onCancel={requestCancel}
                 onChangeSetup={handleChangeSetup}
                 onCreated={handleAuthoringCreated}
                 onPendingChange={setAuthoringPending}
               />
-            </Modal.Body>
-            <Modal.Footer className="sr-only" aria-hidden />
-          </>
-        )}
-      </Modal.Content>
+            )}
+          </Modal.Body>
+
+          <Modal.Footer>
+            {state.phase === 'setup' ? (
+              <DialogPanelActionRow>
+                <Button type="button" variant="outline" onClick={requestCancel}>
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  disabled={!setupModel.canContinue}
+                  onClick={() => {
+                    if (!setupModel.canContinue) return
+                    handleContinueFromSetup(state.setupValues)
+                  }}
+                >
+                  Continue
+                </Button>
+              </DialogPanelActionRow>
+            ) : (
+              <FormShellFooterSlot />
+            )}
+          </Modal.Footer>
+        </Modal.Content>
+      </FormShellFooterScope>
     </Modal.Root>
   )
 }

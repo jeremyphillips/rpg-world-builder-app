@@ -13,6 +13,8 @@ import {
 } from '../../lib/character-builder-fixtures'
 import { createNpc } from '../api/npc-client'
 import type * as NpcClient from '../api/npc-client'
+import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
+
 import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
 vi.mock('../api/npc-client', async (importOriginal) => ({
@@ -84,11 +86,7 @@ function buildContextFixture(
   })
 }
 
-const setupSummary = [
-  { fieldLabel: 'Species', valueLabel: 'Dwarf' },
-  { fieldLabel: 'Class', valueLabel: 'Fighter' },
-  { fieldLabel: 'Level', valueLabel: '1' },
-]
+const setupSummaryLine = 'Dwarf · Level 1 Fighter'
 
 const npcDetail = {
   character: { id: 'npc-99', name: 'Guard Captain' },
@@ -101,14 +99,22 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
     buildContext: buildContextFixture(),
     organization,
     setup,
-    setupSummary,
+    setupSummaryLine,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
   }
 
-  return { props, ...renderWithProviders(<QuickNpcAuthoringForm {...props} />) }
+  return {
+    props,
+    ...renderWithProviders(
+      <FormShellFooterScope>
+        <QuickNpcAuthoringForm {...props} />
+        <FormShellFooterSlot />
+      </FormShellFooterScope>,
+    ),
+  }
 }
 
 async function fillAuthoringFields(user: ReturnType<typeof userEvent.setup>) {

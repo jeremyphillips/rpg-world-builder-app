@@ -3,9 +3,10 @@ import { useFormContext, type UseFormReturn } from 'react-hook-form'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { parseAcceptanceCriteria } from '@rpg/dev-bench-core'
-import { Button, Sheet, Text, Textarea, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Button, Sheet, Text, Textarea } from '@rpg/ui'
 import {
   FormFooterActions,
+  FormShellSubmitButton,
   TabbedForm,
   formStickyTabsTransparentClasses,
   type ComboboxRenderSelectedItem,
@@ -139,6 +140,14 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       isSuccess={isSuccess}
       submitLabel="Save ticket"
       successMessage="Ticket saved."
+      submitButton={
+        <FormShellSubmitButton
+          pending={isPending || form.formState.isSubmitting}
+          pendingLabel="Saving…"
+        >
+          Save ticket
+        </FormShellSubmitButton>
+      }
     />
   )
 
@@ -154,6 +163,7 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       formError={formError}
       className={isSheetLayout ? 'flex min-h-0 flex-1 flex-col' : undefined}
       stickyTabsClassName={isSheetLayout ? formStickyTabsTransparentClasses : undefined}
+      externalFooter={isSheetLayout}
       contentWrapper={
         isSheetLayout
           ? (content) => (
@@ -161,20 +171,6 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
                 <TicketMetaTimestamps ticket={ticket} />
                 {content}
               </Sheet.Body>
-            )
-          : undefined
-      }
-      footerWrapper={
-        isSheetLayout
-          ? ({ footer: footerContent, formError: footerFormError }) => (
-              <Sheet.Footer>
-                {footerFormError ? (
-                  <Text variant="destructive" role="alert">
-                    {footerFormError}
-                  </Text>
-                ) : null}
-                <div className={dialogPanelActionRowClasses}>{footerContent}</div>
-              </Sheet.Footer>
             )
           : undefined
       }

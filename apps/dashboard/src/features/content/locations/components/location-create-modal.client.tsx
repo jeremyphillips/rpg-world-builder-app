@@ -3,13 +3,13 @@
 import * as React from 'react'
 import {
   Button,
+  DialogPanelActionRow,
   Modal,
-  Text,
   cn,
-  dialogPanelActionRowClasses,
   dialogPanelSectionInsetXClasses,
   usePendingAwareOpenChange,
 } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import type {
   ContentFormHostChrome,
@@ -128,14 +128,14 @@ function LocationCreateModalSetupPhase({
         />
       </Modal.Body>
       <Modal.Footer>
-        <div className={dialogPanelActionRowClasses}>
+        <DialogPanelActionRow>
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
           <Button type="button" disabled={!canContinue} onClick={onContinue}>
             Continue
           </Button>
-        </div>
+        </DialogPanelActionRow>
       </Modal.Footer>
     </>
   )
@@ -159,8 +159,6 @@ function buildDetailsChrome({
   onCancel: () => void
 }): ContentFormHostChrome {
   return {
-    // Stable Modal.Body / Modal.Footer wrappers — swapping element types on
-    // phase change remounts the form and drops dirty + draft state.
     contentWrapper: (content) => (
       <Modal.Body
         className={cn(
@@ -176,16 +174,6 @@ function buildDetailsChrome({
         {content}
       </Modal.Body>
     ),
-    footerWrapper: ({ footer, formError }) => (
-      <Modal.Footer className={cn(!showDetails && 'hidden')} aria-hidden={!showDetails}>
-        {formError ? (
-          <Text variant="destructive" role="alert">
-            {formError}
-          </Text>
-        ) : null}
-        <div className={dialogPanelActionRowClasses}>{footer}</div>
-      </Modal.Footer>
-    ),
     footer: () => (
       <>
         {hadSetup ? (
@@ -197,9 +185,7 @@ function buildDetailsChrome({
             Cancel
           </Button>
         )}
-        <Button type="submit" disabled={pending}>
-          {submitLabel}
-        </Button>
+        <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
       </>
     ),
   }
@@ -424,26 +410,31 @@ function LocationCreateModalSession({
         ) : null}
 
         {state.detailsMounted && state.fixedCreate ? (
-          <ContentFormOptionsGate campaignId={campaignId}>
-            {(optionsCtx) => (
-              <LocationCreateModalDetailsForm
-                fixedCreate={state.fixedCreate!}
-                campaignId={campaignId}
-                optionsCtx={optionsCtx}
-                open={open}
-                leaveBridgeRef={leaveBridgeRef}
-                formKey={state.formKey}
-                showDetails={showDetails}
-                hadSetup={state.hadSetup}
-                setupModel={setupModel}
-                submitLabel={submitLabel}
-                onBack={handleBackToSetup}
-                onCancel={requestClose}
-                onTrustedClose={trustedClose}
-                onPendingChange={setDetailsPending}
-              />
-            )}
-          </ContentFormOptionsGate>
+          <FormShellFooterScope>
+            <ContentFormOptionsGate campaignId={campaignId}>
+              {(optionsCtx) => (
+                <LocationCreateModalDetailsForm
+                  fixedCreate={state.fixedCreate!}
+                  campaignId={campaignId}
+                  optionsCtx={optionsCtx}
+                  open={open}
+                  leaveBridgeRef={leaveBridgeRef}
+                  formKey={state.formKey}
+                  showDetails={showDetails}
+                  hadSetup={state.hadSetup}
+                  setupModel={setupModel}
+                  submitLabel={submitLabel}
+                  onBack={handleBackToSetup}
+                  onCancel={requestClose}
+                  onTrustedClose={trustedClose}
+                  onPendingChange={setDetailsPending}
+                />
+              )}
+            </ContentFormOptionsGate>
+            <Modal.Footer className={cn(!showDetails && 'hidden')} aria-hidden={!showDetails}>
+              <FormShellFooterSlot />
+            </Modal.Footer>
+          </FormShellFooterScope>
         ) : null}
       </Modal.Content>
     </Modal.Root>

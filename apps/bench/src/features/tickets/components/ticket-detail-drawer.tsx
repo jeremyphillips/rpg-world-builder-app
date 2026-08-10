@@ -1,5 +1,6 @@
 import { benchTicketPath } from '@/app/routes'
 import { Spinner, Text, Sheet } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import { useTicket } from '../hooks/use-ticket'
 import { TicketDetailForm } from './ticket-detail-form'
@@ -37,7 +38,14 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
             </Text>
           </Sheet.Body>
         ) : null}
-        {ticket ? <TicketDetailForm ticket={ticket} layout="sheet" /> : null}
+        {ticket ? (
+          <FormShellFooterScope>
+            <TicketDetailForm ticket={ticket} layout="sheet" />
+            <Sheet.Footer>
+              <FormShellFooterSlot />
+            </Sheet.Footer>
+          </FormShellFooterScope>
+        ) : null}
       </Sheet.Content>
     </Sheet.Root>
   )

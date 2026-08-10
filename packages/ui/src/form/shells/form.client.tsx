@@ -8,11 +8,7 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldStackRhythm } from '../../components/ui/field.variants'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import {
-  FormFooterRegion,
-  FormShellFieldStack,
-  type FormFooterWrapperProps,
-} from './form-shell-field-stack.client'
+import { FormFooterRegion, FormShellFieldStack } from './form-shell-field-stack.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import type { ValidateSilently } from '../context/form-ui.context'
 import {
@@ -24,8 +20,10 @@ import {
 } from '../field-config'
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
-
-export type { FormFooterWrapperProps }
+import {
+  FormShellFooterPublisher,
+  type FormShellFooterModel,
+} from '../chrome/form-shell-footer.context'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -78,14 +76,14 @@ export interface FormProps<TFieldValues extends FieldValues> {
   stickyFooter?: boolean
   /**
    * Wrap scrollable field content (e.g. `<DrawerShell.Body>` in composed drawer flows).
-   * Pair with {@link footerWrapper} so footer chrome stays outside the scroll region.
+   * Pair with {@link externalFooter} so footer content renders in overlay shell chrome.
    */
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
   /**
-   * Render the footer outside the sticky actions bar (e.g. `<DrawerShell.Footer>`).
-   * When set, overlay footer chrome is caller-owned; Form supplies error + actions as content.
+   * Publish footer semantics to a sibling {@link FormShellFooterSlot} inside overlay
+   * shell chrome. Requires an ancestor {@link FormShellFooterScope}.
    */
-  footerWrapper?: (props: FormFooterWrapperProps) => React.ReactNode
+  externalFooter?: boolean
   /**
    * Vertical gap between top-level fields/groups. Defaults to `comfortable`
    * (`gap-6`). Array sections default to `compact` regardless.
@@ -103,6 +101,21 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * badges on untouched rows appear only after the first failed submit.
    */
   validationPresentation?: FormValidationPresentation
+}
+
+function buildExternalFooterModel(
+  formId: string,
+  formError: string | null | undefined,
+  footer: React.ReactNode,
+): FormShellFooterModel | null {
+  if (!footer && !formError) {
+    return null
+  }
+  return {
+    formId,
+    footer,
+    formError: formError ?? null,
+  }
 }
 
 /**
@@ -128,7 +141,7 @@ export function Form<TFieldValues extends FieldValues>({
   mode,
   stickyFooter = false,
   contentWrapper,
-  footerWrapper,
+  externalFooter = false,
   rhythm,
   size,
   valueSyncs,
@@ -162,7 +175,9 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
-  const isOverlayComposedFooter = Boolean(footerWrapper)
+  const externalFooterModel = externalFooter
+    ? buildExternalFooterModel(formId, formError, resolvedFooter)
+    : null
 
   return (
     <SchemaFormShell
@@ -176,25 +191,30 @@ export function Form<TFieldValues extends FieldValues>({
       validationPresentation={validationPresentation}
       validateSilently={validateSilently}
       onSubmit={onSubmit}
-      className={cn(isOverlayComposedFooter && 'flex min-h-0 flex-1 flex-col', className)}
+      externalFooter={externalFooter}
+      externalFooterPublisher={
+        externalFooter ? <FormShellFooterPublisher model={externalFooterModel} /> : undefined
+      }
+      className={cn(externalFooter && 'flex min-h-0 flex-1 flex-col', className)}
     >
       <FormShellFieldStack
         formId={formId}
         fields={fields}
         contentClassName={contentClassName}
-        isOverlayComposedFooter={isOverlayComposedFooter}
+        externalFooter={externalFooter}
         stickyFooter={stickyFooter}
         formError={formError}
         valueSyncs={valueSyncs}
         header={resolvedHeader}
         contentWrapper={contentWrapper}
       />
-      <FormFooterRegion
-        stickyFooter={stickyFooter}
-        formError={formError}
-        footerWrapper={footerWrapper}
-        footer={resolvedFooter}
-      />
+      {!externalFooter ? (
+        <FormFooterRegion
+          stickyFooter={stickyFooter}
+          formError={formError}
+          footer={resolvedFooter}
+        />
+      ) : null}
     </SchemaFormShell>
   )
 }

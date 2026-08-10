@@ -11,10 +11,11 @@ tab and focuses its control, and the sticky footer shows a summary with **Review
 Inactive panels suppress per-field error text until their tab is active.
 
 **Sticky chrome** (default `stickyChrome={true}`): tab list `sticky top-0`; `FormActionsBar`
-sticky bottom with footer. Pass `stickyChrome={false}` for flat layout. Sheet/drawer pattern:
-use `footerWrapper` / `contentWrapper` instead of sticky bar inside scroll content. Overlay
-footers own chrome via `Sheet.Footer` / `DrawerShell.Footer`; wrap action buttons in
-`dialogPanelActionRowClasses` (Form error copy stays outside that row).
+sticky bottom with footer. Pass `stickyChrome={false}` for flat layout. Overlay pattern:
+use `externalFooter` with `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar
+inside scroll content. Overlay owners render shell chrome (`Modal.Footer`, `Sheet.Footer`,
+`DrawerShell.Footer`) and place `<FormShellFooterSlot />` inside for semantic footer content.
+Use `FormShellSubmitButton` for submit actions rendered outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
 

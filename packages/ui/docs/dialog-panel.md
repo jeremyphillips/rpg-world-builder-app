@@ -26,7 +26,7 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 | `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                        |
 | `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                         |
 | `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill) |
-| `dialogPanelActionRowClasses`      | Action row flex helper — child only, not on footer root                                   |
+| `dialogPanelActionRowClasses`      | Action row flex helper — prefer `DialogPanelActionRow` component                          |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -55,8 +55,10 @@ Body:   p-6 pt-0
 Footer: separator + px-6 + py-4 (independently complete; no pt-0)
 ```
 
-Form drawer flows use `<Form footerWrapper>` → `DrawerShell.Footer` (or `Sheet.Footer`)
-so Form owns error + actions content while Sheet owns footer chrome + dock placement.
+Form drawer flows use `<Form externalFooter>` with overlay-owned `DrawerShell.Footer` /
+`Sheet.Footer` wrapping `<FormShellFooterSlot />`. Semantic footer content (errors,
+validation summary, actions) is owned by `FormShellFooterContent`; shell primitives own
+section chrome only. Manual action rows use `DialogPanelActionRow`.
 
 ## Initial focus
 

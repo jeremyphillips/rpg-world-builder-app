@@ -10,8 +10,8 @@ import {
   type CharacterBuildContext,
   type OrganizationKind,
 } from '@rpg/contracts'
-import { Button, dialogPanelActionRowClasses } from '@rpg/ui'
-import { TabbedForm } from '@rpg/ui/form'
+import { Button } from '@rpg/ui'
+import { FormShellSubmitButton, TabbedForm, formSheetScrollRegionClasses } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
@@ -19,7 +19,6 @@ import { titleFromMembershipRadioValue } from '../../components/connections/orga
 import { useCreateNpc } from '../hooks/use-create-npc'
 import { isQuickNpcSetupStillValid } from '../lib/quick-npc-authoring-validation.lib'
 import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from '../lib/quick-npc-create'
-import type { QuickNpcSetupSummaryEntry } from '../lib/quick-npc-create-modal-setup.lib'
 import { createQuickNpcFormValueSyncs } from '../lib/quick-npc-form-sync'
 import {
   buildQuickNpcConstraints,
@@ -54,7 +53,7 @@ export type QuickNpcAuthoringFormProps = {
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   setup: QuickNpcSetupValues
-  setupSummary: readonly QuickNpcSetupSummaryEntry[]
+  setupSummaryLine: string
   initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
@@ -143,7 +142,7 @@ export function QuickNpcAuthoringForm({
   buildContext,
   organization,
   setup,
-  setupSummary,
+  setupSummaryLine,
   initialValues,
   onCancel,
   onChangeSetup,
@@ -231,7 +230,10 @@ export function QuickNpcAuthoringForm({
       onSubmit={onSubmit}
       formError={formError ?? null}
       valueSyncs={valueSyncs}
-      stickyChrome
+      stickyChrome={false}
+      externalFooter
+      className="flex min-h-0 flex-1 flex-col"
+      contentWrapper={(content) => <div className={formSheetScrollRegionClasses}>{content}</div>}
       header={(form) => (
         <>
           <RequirementCountWatcher
@@ -239,18 +241,18 @@ export function QuickNpcAuthoringForm({
             fallback={defaultValues}
             onConfiguredCountChange={setConfiguredCount}
           />
-          <QuickNpcSetupSummary entries={setupSummary} onChange={onChangeSetup} />
+          <QuickNpcSetupSummary summaryLine={setupSummaryLine} onChange={onChangeSetup} />
         </>
       )}
       footer={() => (
-        <div className={dialogPanelActionRowClasses}>
+        <>
           <Button type="button" variant="outline" disabled={isPending} onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isPending || isSuccess}>
+          <FormShellSubmitButton disabled={isPending || isSuccess}>
             {QUICK_NPC_CREATE_SUBMIT_LABEL}
-          </Button>
-        </div>
+          </FormShellSubmitButton>
+        </>
       )}
     />
   )

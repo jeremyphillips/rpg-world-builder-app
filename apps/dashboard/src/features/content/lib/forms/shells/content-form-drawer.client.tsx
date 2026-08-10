@@ -2,14 +2,8 @@
 
 import * as React from 'react'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
-import {
-  Button,
-  Text,
-  cn,
-  dialogPanelActionRowClasses,
-  dialogPanelSectionInsetXClasses,
-  usePendingAwareOpenChange,
-} from '@rpg/ui'
+import { Button, cn, dialogPanelSectionInsetXClasses, usePendingAwareOpenChange } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
 import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
@@ -81,48 +75,41 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
       description={description}
       bodyMode="composed"
     >
-      <ContentFormHost
-        mounted={open}
-        leaveGuardEnabled={open}
-        pending={pending}
-        formError={formError}
-        extraUnsavedEdits={extraUnsavedEdits}
-        wrapForm={wrapForm}
-        form={form}
-        leaveBridgeRef={leaveBridgeRef}
-        onSubmit={onSubmit}
-        onTrustedClose={trustedClose}
-        contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
-        chrome={{
-          contentWrapper: (content) => (
-            <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
-              {content}
-            </DrawerShell.Body>
-          ),
-          footerWrapper: ({ footer, formError: footerFormError }) => (
-            <DrawerShell.Footer>
-              {footerFormError ? (
-                <Text variant="destructive" role="alert">
-                  {footerFormError}
-                </Text>
-              ) : null}
-              <div className={dialogPanelActionRowClasses}>{footer}</div>
-            </DrawerShell.Footer>
-          ),
-          footer: () => (
-            <>
-              <DrawerShell.Close asChild>
-                <Button type="button" variant="outline" disabled={pending}>
-                  Cancel
-                </Button>
-              </DrawerShell.Close>
-              <Button type="submit" disabled={pending}>
-                {submitLabel}
-              </Button>
-            </>
-          ),
-        }}
-      />
+      <FormShellFooterScope>
+        <ContentFormHost
+          mounted={open}
+          leaveGuardEnabled={open}
+          pending={pending}
+          formError={formError}
+          extraUnsavedEdits={extraUnsavedEdits}
+          wrapForm={wrapForm}
+          form={form}
+          leaveBridgeRef={leaveBridgeRef}
+          onSubmit={onSubmit}
+          onTrustedClose={trustedClose}
+          contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
+          chrome={{
+            contentWrapper: (content) => (
+              <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
+                {content}
+              </DrawerShell.Body>
+            ),
+            footer: () => (
+              <>
+                <DrawerShell.Close asChild>
+                  <Button type="button" variant="outline" disabled={pending}>
+                    Cancel
+                  </Button>
+                </DrawerShell.Close>
+                <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
+              </>
+            ),
+          }}
+        />
+        <DrawerShell.Footer>
+          <FormShellFooterSlot />
+        </DrawerShell.Footer>
+      </FormShellFooterScope>
     </DrawerShell>
   )
 }

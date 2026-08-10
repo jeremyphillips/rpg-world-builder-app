@@ -27,10 +27,6 @@ export type ContentFormHostLeaveBridge = {
 
 export type ContentFormHostChrome = {
   contentWrapper: (content: React.ReactNode) => React.ReactNode
-  footerWrapper: (args: {
-    footer: React.ReactNode
-    formError: React.ReactNode | null
-  }) => React.ReactNode
   footer: () => React.ReactNode
 }
 
@@ -104,7 +100,8 @@ function ContentFormHostLeaveGuard({
 
 /**
  * Chrome-agnostic content form workflow: mount, leave-guard bridge, submit → trusted close.
- * Drawer/Modal supply body + footer containers via `chrome`.
+ * Overlay owners supply body via `chrome.contentWrapper` and render
+ * `<FormShellFooterSlot />` inside shell footer chrome.
  */
 export function ContentFormHost<TFormValues extends FieldValues>({
   mounted,
@@ -153,8 +150,8 @@ export function ContentFormHost<TFormValues extends FieldValues>({
       formError={formError}
       header={form.header}
       onSubmit={handleSubmit}
-      contentWrapper={chrome.contentWrapper}
-      footerWrapper={({ footer, formError: footerFormError }) => (
+      externalFooter
+      contentWrapper={(content) => (
         <>
           <ContentFormHostLeaveGuard
             bridgeRef={leaveBridgeRef}
@@ -162,7 +159,7 @@ export function ContentFormHost<TFormValues extends FieldValues>({
             leaveGuardEnabled={leaveGuardEnabled}
             extraUnsavedEdits={extraUnsavedEdits}
           />
-          {chrome.footerWrapper({ footer, formError: footerFormError })}
+          {chrome.contentWrapper(content)}
         </>
       )}
       footer={chrome.footer}

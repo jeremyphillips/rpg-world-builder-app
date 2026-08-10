@@ -8,6 +8,8 @@ import {
 } from '../../lib/character-builder-fixtures'
 import { renderWithProviders } from '@/test/render'
 
+import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
+
 import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
 vi.mock('../lib/quick-npc-requirement-options.lib', async (importOriginal) => {
@@ -89,6 +91,8 @@ const setup = {
   level: 1,
 }
 
+const setupSummaryLine = 'Dwarf · Level 1 Fighter'
+
 function renderAuthoringForm(
   overrides: Partial<React.ComponentProps<typeof QuickNpcAuthoringForm>> = {},
 ) {
@@ -97,18 +101,22 @@ function renderAuthoringForm(
     buildContext,
     organization,
     setup,
-    setupSummary: [
-      { fieldLabel: 'Species', valueLabel: 'Dwarf' },
-      { fieldLabel: 'Class', valueLabel: 'Fighter' },
-      { fieldLabel: 'Level', valueLabel: '1' },
-    ],
+    setupSummaryLine,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
   }
 
-  return { props, ...renderWithProviders(<QuickNpcAuthoringForm {...props} />) }
+  return {
+    props,
+    ...renderWithProviders(
+      <FormShellFooterScope>
+        <QuickNpcAuthoringForm {...props} />
+        <FormShellFooterSlot />
+      </FormShellFooterScope>,
+    ),
+  }
 }
 
 describe('QuickNpcAuthoringForm', () => {
