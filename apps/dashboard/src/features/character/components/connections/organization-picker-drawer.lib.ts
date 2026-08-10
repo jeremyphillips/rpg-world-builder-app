@@ -3,6 +3,7 @@ import { normalizeSearchQuery } from '@rpg/ui'
 
 import {
   ORGANIZATION_PICKER_ALL_TYPES,
+  ORGANIZATION_PICKER_DESCRIPTION,
   type OrganizationPickerItem,
   type OrganizationPickerTypeFilter,
 } from './organization-picker-drawer.types'
@@ -60,7 +61,6 @@ export function buildOrganizationPickerTypeOptions(
   ]
 }
 
-export function formatOrganizationPickerDescription(selectedCount: number): string {
-  if (selectedCount === 0) return 'Choose any organizations connected to this character.'
-  return `${selectedCount} ${selectedCount === 1 ? 'organization' : 'organizations'} selected.`
+export function formatOrganizationPickerDescription(): string {
+  return ORGANIZATION_PICKER_DESCRIPTION
 }

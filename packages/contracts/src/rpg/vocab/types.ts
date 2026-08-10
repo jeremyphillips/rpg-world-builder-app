@@ -14,6 +14,19 @@ export type GameTermEntry = {
 }
 
 /**
+ * Presentation/order precedence for vocabulary entries and roster rows.
+ * Higher sorts first. Does not convey authority or permission semantics.
+ */
+export type PrioritizedEntry = {
+  readonly priority: number
+}
+
+/** Descending priority comparator — higher priority sorts first. */
+export function comparePriorityDescending(a: PrioritizedEntry, b: PrioritizedEntry): number {
+  return b.priority - a.priority
+}
+
+/**
  * The taxonomy concept itself (`*_TERM`). Same shape as `GameTermEntry` today;
  * kept distinct so taxonomy-level metadata can diverge from option entries later.
  */

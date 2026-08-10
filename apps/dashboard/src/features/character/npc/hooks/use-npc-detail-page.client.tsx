@@ -20,11 +20,7 @@ export function useNpcDetailPage() {
   const canManage = useCanManageCampaign(campaignId)
   const npcQuery = useNpc(campaignId, npcId)
   const buildContextQuery = useCampaignBuildContext(campaignId)
-  const organizationReferencesQuery = useCharacterOrganizationReferences(
-    campaignId,
-    npcId,
-    canManage,
-  )
+  const organizationReferencesQuery = useCharacterOrganizationReferences(campaignId, npcId)
   const locationReferencesQuery = useCharacterLocationReferences(campaignId, npcId)
 
   const viewModel = useMemo(() => {

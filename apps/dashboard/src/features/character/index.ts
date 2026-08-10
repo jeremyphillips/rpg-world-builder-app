@@ -44,6 +44,7 @@ export { CharacterBuilderShell } from './components/character-builder-shell.clie
 export { CampaignCharacterStatusSummary } from './components/detail/campaign-character-status-summary.client'
 export { CharacterDetailContent } from './components/detail/character-detail-content.client'
 export { CharacterOrganizationsSummary } from './components/detail/character-organizations-summary.client'
+export { CharacterOrganizationMembershipsContainer } from './components/detail/character-organization-memberships-container.client'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRow } from './components/builder/builder-inventory-row.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
@@ -56,6 +57,28 @@ export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,
 } from './hooks/use-character-organization-references'
+export { EditOrganizationMembershipDrawer } from './components/connections/edit-organization-membership-drawer.client'
+export {
+  CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
+  formatRemoveMembershipHeadline,
+  type EditOrganizationMembershipDrawerCopy,
+  type EditOrganizationMembershipOrganization,
+} from './components/connections/edit-organization-membership-drawer.types'
+export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field.client'
+export {
+  membershipRadioValueFromTitle,
+  titleFromMembershipRadioValue,
+} from './components/connections/organization-membership-title-field.lib'
+export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './components/connections/organization-membership-title-field.types'
+export {
+  createCharacterOrganizationMembership,
+  deleteCharacterOrganizationMembership,
+  updateCharacterOrganizationMembership,
+} from './api/organization-membership-client'
+export {
+  invalidateCharacterOrganizationMembershipQueries,
+  type CharacterOrganizationMembershipSubjectKind,
+} from './lib/invalidate-character-organization-membership-queries'
 export {
   characterLocationReferencesQueryKey,
   useCharacterLocationReferences,

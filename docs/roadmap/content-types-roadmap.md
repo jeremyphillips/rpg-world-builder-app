@@ -45,7 +45,8 @@ and character display remain on the organization rollout roadmap.
 - associated cultures, faiths, or events
 - campaign-specific organizations
 
-Keep `organizationKind` as vocabulary.
+Keep `organizationKind` and optional `organizationSubtype` as vocabulary
+(kind-scoped subtypes + member-title suggestions).
 
 ### Faith or Religion
 
@@ -251,7 +252,7 @@ A practical first expansion beyond the existing rules catalog is:
 
 Use broad content types with vocabularies beneath them:
 
-- **Organization** — `organizationKind`
+- **Organization** — `organizationKind`, optional `organizationSubtype`
 - **Location** — `locationKind`
 - **Faith** — `faithKind`
 - **Deity** — `deityKind`, `divineRank`

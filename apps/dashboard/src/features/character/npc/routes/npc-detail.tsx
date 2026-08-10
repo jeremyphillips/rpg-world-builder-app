@@ -3,7 +3,7 @@ import { WidePage } from '@/components/layout/wide-page'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
-import { CharacterOrganizationsSummary } from '../../components/detail/character-organizations-summary.client'
+import { CharacterOrganizationMembershipsContainer } from '../../components/detail/character-organization-memberships-container.client'
 import { NpcStatusEditAction } from '../components/npc-status-edit-action.client'
 import { useNpcDetailPage } from '../hooks/use-npc-detail-page.client'
 
@@ -17,7 +17,6 @@ export function NpcDetail() {
     isError,
     isPending,
     npcDetail,
-    organizationReferences,
     viewModel,
   } = useNpcDetailPage()
 
@@ -49,12 +48,13 @@ export function NpcDetail() {
               ) : undefined
             }
             identitySupplement={
-              organizationReferences ? (
-                <CharacterOrganizationsSummary
-                  campaignId={campaignId}
-                  organizationReferences={organizationReferences}
-                />
-              ) : null
+              <CharacterOrganizationMembershipsContainer
+                campaignId={campaignId}
+                characterId={npcDetail.character.id}
+                characterName={viewModel.identity.name}
+                canEdit={canManage}
+                subjectKind="npc"
+              />
             }
             showDelete={canManage}
             deleteConfig={canManage ? deleteFlow.deleteConfig : undefined}

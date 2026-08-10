@@ -66,7 +66,7 @@ const BUILDER_STEP_METADATA = {
   },
   connections: {
     label: 'Connections',
-    description: 'Choose organizations connected to your character',
+    description: 'Choose an organization connected to your character',
     isApplicable: (context, draft) =>
       draft.connections.organizations.length > 0 ||
       resolveAvailableContent(context).organizations.length > 0,

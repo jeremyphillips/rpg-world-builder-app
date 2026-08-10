@@ -21,6 +21,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowLayout,
   rowSurface = { elevation: 'flat' },
   toolbarCompact = false,
+  expandedItemId,
+  onExpandedItemChange,
 }: {
   item: TItem
   itemKey: string
@@ -33,9 +35,13 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   rowLayout?: CatalogPickerRowLayout
   rowSurface?: SurfaceConfig
   toolbarCompact?: boolean
+  expandedItemId?: string | null
+  onExpandedItemChange?: (itemId: string | null) => void
 }) {
   const domIds = resolveCollapsibleListItemDomIds(itemKey)
   const hasDetails = Boolean(renderItemDetails)
+  const controlledExpansion = expandedItemId !== undefined
+  const isExpanded = controlledExpansion ? expandedItemId === itemKey : undefined
 
   return (
     <div data-picker-item-key={itemKey}>
@@ -51,6 +57,12 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         actionsAlign="center"
         collapsible={hasDetails}
         showDragHandle={false}
+        collapsed={controlledExpansion ? !isExpanded : undefined}
+        onToggleCollapse={
+          controlledExpansion && onExpandedItemChange
+            ? () => onExpandedItemChange(isExpanded ? null : itemKey)
+            : undefined
+        }
         header={renderItemHeader(item)}
         summary={renderItemSummary?.(item)}
         actions={renderItemActions?.(item)}
@@ -88,6 +100,8 @@ export function CatalogPickerSheetResults<TItem>({
               rowLayout={rowProps.rowLayout}
               rowSurface={rowProps.rowSurface}
               toolbarCompact={rowProps.toolbarCompact}
+              expandedItemId={rowProps.expandedItemId}
+              onExpandedItemChange={rowProps.onExpandedItemChange}
             />
           </div>
         )

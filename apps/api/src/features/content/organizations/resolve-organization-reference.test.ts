@@ -89,7 +89,7 @@ describe('resolveOrganizationReference', () => {
     await CharacterModel.findByIdAndUpdate(character.id, {
       connections: {
         organizations: [
-          { organizationId: organization.id },
+          { organizationId: organization.id, title: 'Guildmaster' },
           { organizationId: '000000000000000000000000' },
         ],
       },
@@ -104,6 +104,7 @@ describe('resolveOrganizationReference', () => {
     ).resolves.toEqual([
       {
         organizationId: organization.id,
+        title: 'Guildmaster',
         organization: expect.objectContaining({ id: organization.id, status: 'draft' }),
       },
       {

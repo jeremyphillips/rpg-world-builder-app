@@ -284,6 +284,50 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No items match your search.')
   })
 
+  it('supports exclusive controlled row expansion', async () => {
+    const user = userEvent.setup()
+    const onExpandedItemChange = vi.fn()
+
+    const { rerender } = render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        expandedItemId="alpha"
+        onExpandedItemChange={onExpandedItemChange}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        renderItemDetails={(item) => <p>{item.name} details</p>}
+      />,
+    )
+
+    expect(screen.getByText('Alpha Item details').parentElement).not.toHaveAttribute('hidden')
+    expect(screen.getByText('Beta Item details').parentElement).toHaveAttribute('hidden')
+
+    await user.click(screen.getByRole('button', { name: 'Expand beta' }))
+    expect(onExpandedItemChange).toHaveBeenCalledWith('beta')
+
+    rerender(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        expandedItemId="beta"
+        onExpandedItemChange={onExpandedItemChange}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        renderItemDetails={(item) => <p>{item.name} details</p>}
+      />,
+    )
+
+    expect(screen.getByText('Alpha Item details').parentElement).toHaveAttribute('hidden')
+    expect(screen.getByText('Beta Item details').parentElement).not.toHaveAttribute('hidden')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CatalogPickerSheet

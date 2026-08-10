@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   characterSummaryDtoSchema,
-  organizationConnectedCharactersResponseSchema,
+  organizationMemberSummarySchema,
+  organizationMembersResponseSchema,
   referencingCharacterSummarySchema,
 } from './referencing-character-summary'
 
@@ -37,9 +38,9 @@ describe('referencing character summary contracts', () => {
     })
   })
 
-  it('parses an organization connected-characters response envelope', () => {
+  it('parses an organization members response envelope', () => {
     expect(
-      organizationConnectedCharactersResponseSchema.parse({
+      organizationMembersResponseSchema.parse({
         items: [
           {
             characterType: 'pc',
@@ -48,6 +49,7 @@ describe('referencing character summary contracts', () => {
               name: 'Verna',
               summary: 'Dwarf · Level 1 Fighter',
             },
+            membership: { title: 'Captain', priority: 40 },
           },
         ],
         total: 2,
@@ -61,9 +63,26 @@ describe('referencing character summary contracts', () => {
             name: 'Verna',
             summary: 'Dwarf · Level 1 Fighter',
           },
+          membership: { title: 'Captain', priority: 40 },
         },
       ],
       total: 2,
+    })
+  })
+
+  it('accepts untitled membership rows', () => {
+    expect(
+      organizationMemberSummarySchema.parse({
+        characterType: 'npc',
+        character: {
+          id: 'npc-1',
+          name: 'Envoy',
+          summary: 'Human · Level 1 Rogue',
+        },
+        membership: {},
+      }),
+    ).toMatchObject({
+      membership: {},
     })
   })
 })

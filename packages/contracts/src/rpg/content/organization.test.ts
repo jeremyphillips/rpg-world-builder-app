@@ -33,6 +33,35 @@ describe('organization body contracts', () => {
     expect(organizationBodySchema.safeParse({ name: 'The Lantern Guild' }).success).toBe(false)
   })
 
+  it('allows optional subtype when valid for kind', () => {
+    expect(
+      organizationBodySchema.parse({
+        name: 'Crown of Lankhmar',
+        organizationKind: 'government',
+        organizationSubtype: 'monarchy',
+      }),
+    ).toMatchObject({
+      organizationKind: 'government',
+      organizationSubtype: 'monarchy',
+    })
+  })
+
+  it('rejects subtype without kind and cross-kind pairs', () => {
+    expect(
+      organizationBodySchema.safeParse({
+        name: 'Broken',
+        organizationKind: 'military',
+        organizationSubtype: 'monarchy',
+      }).success,
+    ).toBe(false)
+    expect(
+      organizationBodyDraftSchema.safeParse({
+        name: 'Broken',
+        organizationSubtype: 'monarchy',
+      }).success,
+    ).toBe(false)
+  })
+
   it('allows drafts without organizationKind and normalizes blank names', () => {
     expect(organizationBodyDraftSchema.parse({ name: '  ' })).toEqual({
       name: 'Untitled Organization',
@@ -82,6 +111,20 @@ describe('organization reference resolution', () => {
       }),
     ).toEqual({ organizationId: 'organization-missing', organization: null })
   })
+
+  it('carries an optional membership title', () => {
+    expect(
+      organizationReferenceResolutionSchema.parse({
+        organizationId: 'organization-1',
+        title: 'Guildmaster',
+        organization: null,
+      }),
+    ).toEqual({
+      organizationId: 'organization-1',
+      title: 'Guildmaster',
+      organization: null,
+    })
+  })
 })
 
 describe('organization authoring inputs', () => {
@@ -117,5 +160,14 @@ describe('organization authoring inputs', () => {
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',
     })
+  })
+
+  it('rejects cross-kind pairs when both fields are present in a partial update', () => {
+    expect(
+      updateOrganizationInputSchema.safeParse({
+        organizationKind: 'military',
+        organizationSubtype: 'monarchy',
+      }).success,
+    ).toBe(false)
   })
 })

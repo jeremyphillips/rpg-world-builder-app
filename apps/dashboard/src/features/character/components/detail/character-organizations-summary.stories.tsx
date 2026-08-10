@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { CITY_COUNCIL } from '@/features/content'
 
-import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
 import { CharacterOrganizationsSummary } from './character-organizations-summary.client'
 
 const meta = {
@@ -17,31 +16,35 @@ type Story = StoryObj<typeof CharacterOrganizationsSummary>
 export const WithLinks: Story = {
   args: {
     campaignId: 'camp-1',
-    organizationReferences: [
+    memberships: [
       {
         organizationId: CITY_COUNCIL.id,
+        title: 'Councillor',
         organization: CITY_COUNCIL,
       },
     ],
   },
 }
 
+export const EmptyEditable: Story = {
+  args: {
+    campaignId: 'camp-1',
+    memberships: [],
+    canEdit: true,
+    onAddOrganization: () => undefined,
+  },
+}
+
 export const WithUnavailableOrganization: Story = {
   args: {
     campaignId: 'camp-1',
-    organizationReferences: [
+    canEdit: true,
+    memberships: [
       {
         organizationId: 'org-missing',
         organization: null,
       },
     ],
+    onRemoveUnresolvedMembership: () => undefined,
   },
-  render: (args) => (
-    <>
-      <CharacterOrganizationsSummary {...args} />
-      <p className="mt-4 text-sm text-muted-foreground">
-        Unavailable label: {UNAVAILABLE_ORGANIZATION_LABEL}
-      </p>
-    </>
-  ),
 }

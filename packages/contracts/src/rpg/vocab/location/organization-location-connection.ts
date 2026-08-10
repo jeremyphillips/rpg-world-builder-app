@@ -1,5 +1,5 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import type { GameTermEntry, PrioritizedEntry, VocabularyTerm } from '../types'
 
 export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS = [
   'site',
@@ -44,18 +44,18 @@ export const ORGANIZATION_LOCATION_CONNECTION_TERM = {
 
 export type RelationshipDisplayDirection = 'forward' | 'inverse'
 
-export type OrganizationLocationConnectionEntry = GameTermEntry & {
-  readonly family: OrganizationLocationConnectionFamily
-  readonly priority: number
-  /** Subject-owned edge eyebrow; falls back to `label`. */
-  readonly forwardLabel?: string
-  /** Location-projected edge eyebrow; falls back to `label`. */
-  readonly inverseLabel?: string
-  /** Max organizations per location for this kind across the campaign; null = unlimited. */
-  readonly maxSubjectsPerLocation: number | null
-  /** Max connections of this kind per organization across all locations; null = unlimited. */
-  readonly maxSubjectsPerOrganization: number | null
-}
+export type OrganizationLocationConnectionEntry = GameTermEntry &
+  PrioritizedEntry & {
+    readonly family: OrganizationLocationConnectionFamily
+    /** Subject-owned edge eyebrow; falls back to `label`. */
+    readonly forwardLabel?: string
+    /** Location-projected edge eyebrow; falls back to `label`. */
+    readonly inverseLabel?: string
+    /** Max organizations per location for this kind across the campaign; null = unlimited. */
+    readonly maxSubjectsPerLocation: number | null
+    /** Max connections of this kind per organization across all locations; null = unlimited. */
+    readonly maxSubjectsPerOrganization: number | null
+  }
 
 export const ORGANIZATION_LOCATION_CONNECTION_ENTRIES = {
   owns: {

@@ -58,6 +58,9 @@ export type CatalogPickerSheetProps<TItem> = {
   ) => readonly TItem[]
   /** Domain-structured filters (category, affordability, etc.) — excludes search and tabs. */
   hasStructuredFilters?: boolean
+  /** When set with `onExpandedItemChange`, only that row is expanded (exclusive). */
+  expandedItemId?: string | null
+  onExpandedItemChange?: (itemId: string | null) => void
   headerExtra?: ReactNode
   footer?: ReactNode
   emptyState?: ReactNode

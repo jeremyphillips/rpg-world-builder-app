@@ -54,7 +54,7 @@ describe('finalizeCharacterBuild', () => {
     expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
   })
 
-  it('copies normalized selectable organization connections', () => {
+  it('copies normalized selectable organization memberships including titles', () => {
     const organization = {
       id: 'organization-lantern-guild',
       slug: 'lantern-guild',
@@ -70,7 +70,10 @@ describe('finalizeCharacterBuild', () => {
     }
     const input = finalizeCharacterBuild(
       makeCompleteDraft({
-        connections: { organizations: [{ organizationId: organization.id }], locations: [] },
+        connections: {
+          organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
+          locations: [],
+        },
       }),
       {
         ...builderTestContext,
@@ -79,7 +82,7 @@ describe('finalizeCharacterBuild', () => {
     )
 
     expect(input.connections).toEqual({
-      organizations: [{ organizationId: organization.id }],
+      organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
       locations: [],
     })
   })

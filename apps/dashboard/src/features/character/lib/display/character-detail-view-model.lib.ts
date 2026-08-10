@@ -421,15 +421,19 @@ export function buildCharacterDetailViewModel({
 }: CharacterDisplayInput): CharacterDetailViewModel {
   const level = getCharacterTotalLevel(character)
 
-  const organizationItems = organizationReferences.map(({ organizationId, organization }) => ({
-    id: `organization:${organizationId}`,
-    label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
-    detail: organization?.organizationKind
-      ? getOrganizationKindLabel(organization.organizationKind)
-      : organization
-        ? 'Type not set'
-        : 'This organization is missing or no longer available.',
-  }))
+  const organizationItems = organizationReferences.map(
+    ({ organizationId, organization, title }) => ({
+      id: `organization:${organizationId}`,
+      label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
+      detail: title
+        ? title
+        : organization?.organizationKind
+          ? getOrganizationKindLabel(organization.organizationKind)
+          : organization
+            ? 'Type not set'
+            : 'This organization is missing or no longer available.',
+    }),
+  )
 
   const locationItems = locationReferences.map(({ connection, location }) => ({
     id: `location:${connection.id}`,

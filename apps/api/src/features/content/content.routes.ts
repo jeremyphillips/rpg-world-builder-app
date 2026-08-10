@@ -8,13 +8,14 @@ import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
 import * as characterLocationConnectionController from './characters/character-location-connection.handlers'
+import * as characterOrganizationMembershipController from './characters/character-organization-membership.handlers'
 import * as organizationLocationConnectionController from './organizations/organization-location-connection.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
 import { listCharacterLocationReferences } from './locations/location-reference.controller'
 import { listOrganizationLocationReferences } from './locations/organization-location-reference.controller'
 import { listLocationConnectedParties } from './locations/location-connected-parties.controller'
-import { listOrganizationConnectedCharacters } from './organizations/organization-connected-characters.controller'
+import { listOrganizationMembers } from './organizations/organization-members.controller'
 import { listCampaignOrganizationLocationConnectionEdges } from './organizations/list-campaign-organization-location-connection-edges.controller'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
@@ -72,6 +73,27 @@ contentRouter.delete(
 )
 
 contentRouter.post(
+  '/characters/:characterId/organization-memberships',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  characterOrganizationMembershipController.createCharacterOrganizationMembershipItem,
+)
+
+contentRouter.patch(
+  '/characters/:characterId/organization-memberships/:organizationId',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  characterOrganizationMembershipController.updateCharacterOrganizationMembershipItem,
+)
+
+contentRouter.delete(
+  '/characters/:characterId/organization-memberships/:organizationId',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  characterOrganizationMembershipController.deleteCharacterOrganizationMembershipItem,
+)
+
+contentRouter.post(
   '/organizations/:organizationId/location-connections',
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
@@ -114,10 +136,10 @@ contentRouter.get(
 )
 
 contentRouter.get(
-  '/organizations/:organizationId/connected-characters',
+  '/organizations/:organizationId/members',
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
-  listOrganizationConnectedCharacters,
+  listOrganizationMembers,
 )
 
 contentRouter.post(

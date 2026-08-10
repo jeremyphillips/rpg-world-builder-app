@@ -130,6 +130,8 @@ export function CatalogPickerSheet<TItem>({
   toolbarCompact,
   rowBodyClassName,
   rowShellClassName,
+  expandedItemId,
+  onExpandedItemChange,
 }: CatalogPickerSheetProps<TItem>) {
   const {
     searchQuery,
@@ -173,6 +175,8 @@ export function CatalogPickerSheet<TItem>({
     toolbarCompact,
     rowBodyClassName,
     rowShellClassName,
+    expandedItemId,
+    onExpandedItemChange,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = loading ? (

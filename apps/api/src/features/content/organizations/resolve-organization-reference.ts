@@ -67,9 +67,11 @@ export async function resolveCharacterOrganizationReferences({
     throw new HttpError(403, 'forbidden', 'Not authorized to view this character reference.')
   }
 
-  const character = await CharacterModel.findById(characterId)
-    .select({ connections: 1 })
-    .lean<{ connections?: { organizations?: { organizationId: string }[] } } | null>()
+  const character = await CharacterModel.findById(characterId).select({ connections: 1 }).lean<{
+    connections?: {
+      organizations?: { organizationId: string; title?: string; priority?: number }[]
+    }
+  } | null>()
   if (!character) return null
 
   const references = character.connections?.organizations ?? []
@@ -87,8 +89,10 @@ export async function resolveCharacterOrganizationReferences({
     }),
   )
 
-  return ids.map((organizationId) => ({
+  return references.map(({ organizationId, title, priority }) => ({
     organizationId,
+    ...(title !== undefined ? { title } : {}),
+    ...(priority !== undefined ? { priority } : {}),
     organization: organizationsById.get(organizationId) ?? null,
   }))
 }

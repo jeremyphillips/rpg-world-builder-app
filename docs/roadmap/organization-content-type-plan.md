@@ -36,6 +36,8 @@ queries, relationship graphs, or organization-domain lifecycle fields.
 
 - `organizationKind` is explicit rather than `kind`; it remains unambiguous in
   envelopes, form rows, relationship records, and future discriminated unions.
+- Optional `organizationSubtype` is kind-scoped (`ORGANIZATION_SUBTYPES_BY_KIND`)
+  and validated as a kind/subtype pair. `other` has no canonical subtypes.
 - Draft inputs may omit `organizationKind`; publish inputs require it.
 - Organization supports the normal campaign-authored draft/publish, duplication,
   availability, and deletion workflows.
@@ -84,12 +86,17 @@ Use object records with a stable expansion path while keeping V1 narrow:
 ```ts
 type CharacterOrganizationConnection = {
   organizationId: string
+  title?: string
 }
 
 type CharacterConnections = {
   organizations: CharacterOrganizationConnection[]
 }
 ```
+
+Records are memberships. `title` is optional descriptive text (suggestions from
+`resolveOrganizationMemberTitleSuggestions`); untitled memberships omit the
+field — never persist `'Member'` to mean absence.
 
 The builder draft and persisted character both store:
 
@@ -101,7 +108,7 @@ connections: CharacterConnections
 organization snapshot. The array defaults to `[]` and is unique by
 `organizationId`.
 
-Future fields such as role, disposition, membership status, and notes are not
+Future fields such as disposition, membership status, and notes are not
 reserved in the schema until their semantics are defined.
 
 ### Catalog bundling
@@ -181,14 +188,13 @@ combobox. Follow the character content-picker architecture built around
 `CatalogPickerSheet`, shared row headers, selection actions, empty states,
 sorting helpers, and reset behavior.
 
-Picker V1 supports:
+Picker supports:
 
 - Search text: organization name and organization-kind label.
 - Visible row content: name and organization-kind label.
 - Structured filters: organization kind only.
-- Multiple add/remove selection.
-- Organization details in the drawer when the shared details pattern can be
-  reused without expanding V1 scope.
+- One membership per drawer invocation (expand → optional title → Add organization).
+- Already-added organizations shown as added (not addable twice).
 
 ### Optional step semantics
 
@@ -408,19 +414,36 @@ pagination, and performance design.
    Reconsider only when connection mechanics or repeated in-builder decisions
    make persistent preview materially useful.
 6. ~~Do not query or display reverse organization connected characters in V1.~~ Reverse
-   connected-character display shipped in the connected-characters UI slice (see §9).
+   membership display shipped as the organization **Members** roster (see §9).
 
-### 9. Connected-character relationship display — complete
+### 9. Members roster (character-owned membership inverse) — complete
 
 Bidirectional organization relationship display for campaign surfaces:
 
-- **Character → organization:** compact **Organizations** row below roster/vital
-  on campaign PC and NPC detail routes (saved-reference aware links).
-- **Organization → characters:** **Connected characters** section on organization
-  detail with server-paginated preview (`page=1`, `pageSize=4`), count copy
-  (`N connected character(s)`), and plain `+ N more` truncation copy.
+- **Character → organization:** compact **Organizations** block below roster/vital
+  on campaign PC and NPC detail routes. Memberships are editable when the viewer
+  has character-edit capability (PC `canEdit`) or campaign manage (NPC). Add /
+  edit title / remove use nested
+  `…/characters/:characterId/organization-memberships` mutations; the shared
+  organization picker and edit drawers stamp title + presentation `priority`
+  through `resolveOrganizationMembershipMetadata` (no numeric priority UI).
+- **Organization → characters:** **Members** section on organization detail —
+  full sorted roster (title inline with name, PC/NPC identity line), editable for
+  campaign managers only. PC owners whose character is a member still see a
+  read-only roster here and edit from their character sheet.
 
-**API:** `GET /api/campaigns/:campaignId/content/organizations/:organizationId/connected-characters`
+**API:**
+
+- `GET /api/campaigns/:campaignId/content/organizations/:organizationId/members`
+  (`OrganizationMemberSummary` with `membership: { title?, priority? }`; sorted by
+  priority descending, then locale name, then id)
+- `POST|PATCH|DELETE /api/campaigns/:campaignId/content/characters/:characterId/organization-memberships[/:organizationId]`
+  (member route + `canEdit` capability; PATCH requires explicit `title` and
+  `priority`, each `null` to clear)
+
+**Priority convention:** numeric presentation/order precedence (higher first).
+Persisted membership `priority` is authoritative and is never overwritten merely
+because the title matches vocabulary. Distinct from future modeled authority.
 
 **Participation scope (v1):** open campaign participations only — same participant
 scope as content usage blockers. Includes PCs and NPCs whose saved sheet still
@@ -428,10 +451,9 @@ stores `connections.organizations.organizationId`. Excludes characters without
 open participation. Does not re-apply catalog availability filters (stale/draft org
 refs still appear).
 
-**Infrastructure:** `CharacterContentReferenceDescriptor` and
-`resolveCharacterReferences` in the API content layer; transport DTOs
-`ReferencingCharacterSummary` and generic `{ items, total }` envelope in
-`@rpg/contracts`.
+**Infrastructure:** content-usage discovery remains the membership discovery
+mechanism; the members projection layer attaches title/priority from character-owned
+connections. Transport DTOs in `@rpg/contracts`.
 
 ## Verification
 
@@ -469,7 +491,8 @@ Required behavior coverage:
 ## Deferred
 
 - Organization hierarchy
-- Roles, ranks, reputation, disposition, and membership history
+- Authority / permissions ranks (numeric rank, grants) — descriptive membership
+  titles and kind-scoped subtypes are implemented
 - Leaders and reverse member directories (full list / expand affordance — detail preview only in v1)
 - Headquarters and controlled locations
 - Alliances, rivalries, and relationship graphs
@@ -478,8 +501,13 @@ Required behavior coverage:
 - Organization-domain active/disbanded/destroyed status
 - Bundled/SRD organization records
 - Permanent preview-rail organization display
+- Custom/creatable membership titles
 
 Update `docs/roadmap/content-types-roadmap.md` and character feature
-documentation when implementation lands. Reverse connected-character preview is
-implemented; full membership roster semantics remain deferred until connection
-schema encodes membership.
+documentation when implementation lands. Character ↔ organization records are
+memberships (`organizationId` + optional descriptive `title` + optional
+presentation `priority`). Campaign character and NPC sheets can add, edit, and
+remove memberships under character-edit / campaign-manage policy. Organization
+detail **Members** is the inverse roster (manager-editable; read-only for other
+roles). Membership priority is presentation order only — distinct from future
+modeled authority.

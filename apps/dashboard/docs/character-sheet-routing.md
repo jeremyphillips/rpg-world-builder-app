@@ -142,6 +142,22 @@ assignments** — not raw membership control ids or a fixed list link.
 See [Availability](./availability.md) for `viewerOnboardingState` on campaign
 list rows.
 
+## Organizations block (campaign sheets)
+
+Campaign PC and NPC sheets render a compact **Organizations** block in the
+header `identitySupplement` slot via
+`CharacterOrganizationMembershipsContainer`.
+
+- **Read:** memberships from `GET …/content/organizations/references/:characterId`
+  (title included when persisted). Untitled rows show the organization name only
+  — no kind fallback.
+- **Edit:** gated by PC `capabilities.canEdit` or NPC campaign manage. Add uses
+  the shared `OrganizationPickerDrawer`; edit/remove uses
+  `EditOrganizationMembershipDrawer`. Mutations hit nested
+  `…/organization-memberships` routes and invalidate org references, the sheet
+  detail query, and the affected organization’s members key.
+- **Standalone sheets** have no Organizations block (campaign-scoped orgs only).
+
 ## Error copy (route shells)
 
 User-visible messages come from API responses via `resolveQueryErrorLabel`.

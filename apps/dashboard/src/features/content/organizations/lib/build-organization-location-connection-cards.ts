@@ -5,6 +5,7 @@ import type {
   OrganizationLocationReferenceResolution,
 } from '@rpg/contracts'
 import {
+  comparePriorityDescending,
   getOrganizationLocationConnectionDisplayLabel,
   getOrganizationLocationConnectionFamily,
   ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
@@ -50,7 +51,7 @@ function kindsForFamily(
     ][]
   )
     .filter(([, entry]) => entry.family === family)
-    .sort((a, b) => b[1].priority - a[1].priority)
+    .sort((a, b) => comparePriorityDescending(a[1], b[1]))
     .map(([kind]) => kind)
 }
 
