@@ -27,6 +27,7 @@ import {
   getMagicItemRarityLabel,
   resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentAcquisitionPlan,
+  resolveAvailableContent,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantEligibility,
   type resolveMagicItemGrantProgressList,
@@ -564,8 +565,10 @@ export function resolveEquipmentStepPickerItems(args: {
   choiceSets: readonly ChoiceSet[]
   /** Resolved via `resolveEquipmentStepBudget` — must match drawer/header/purchase validation. */
   budget?: EquipmentBudgetSummary
+  /** When provided, picker universe is filtered through `resolveAvailableContent`. */
+  context?: CharacterBuildContext
 }): EquipmentStepPickerItemsResult {
-  const { draft, characterClass, catalogIndex, choiceSets, budget } = args
+  const { draft, characterClass, catalogIndex, choiceSets, budget, context } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
     catalogIndex,
@@ -581,10 +584,14 @@ export function resolveEquipmentStepPickerItems(args: {
     choiceSets,
   })
 
+  const equipment = context
+    ? resolveAvailableContent(context).equipment
+    : [...catalogIndex.equipment.values()]
+
   return {
     items: enrichEquipmentPickerItemsWithSearchDocument(
       resolveEquipmentPickerItems({
-        equipment: [...catalogIndex.equipment.values()],
+        equipment,
         proficiencies,
         recommendations,
         budget,

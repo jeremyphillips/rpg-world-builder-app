@@ -25,6 +25,10 @@ import {
   resolveEquipmentOwnedQuantity,
   type EquipmentPickerWorkflowMode,
 } from '../../lib/equipment/equipment-step.lib'
+import {
+  resolveEquipmentPickerPurchaseActionState,
+  type EquipmentPickerAvailabilityOptions,
+} from '../../lib/equipment/equipment-picker-availability.lib'
 import { compareName, scoreAndFilterPickerItems } from '../picker/catalog-picker-sort.lib'
 import {
   countCatalogPickerClearableCriteria,
@@ -442,26 +446,32 @@ export function sortEquipmentPickerItems(
   )
 }
 
-export function isEquipmentPickerItemDisabled(item: EquipmentPickerItem): boolean {
-  if (item.state.disabledReasons.length > 0) return true
-
-  const availability = item.state.purchaseAvailability
-  return availability.status === 'unavailable' || availability.status === 'unaffordable'
+export function isEquipmentPickerItemDisabled(
+  item: EquipmentPickerItem,
+  options?: EquipmentPickerAvailabilityOptions,
+): boolean {
+  return resolveEquipmentPickerPurchaseActionState(item, options).disabled
 }
 
 export function getEquipmentPickerDisabledNote(
   item: EquipmentPickerItem,
   budget?: EquipmentBudgetSummary,
+  options?: Pick<EquipmentPickerAvailabilityOptions, 'contentAvailable'>,
 ): string | undefined {
-  if (item.state.disabledReasons.length > 0) {
+  const action = resolveEquipmentPickerPurchaseActionState(item, {
+    budget,
+    contentAvailable: options?.contentAvailable,
+  })
+
+  if (action.reason === 'blocked') {
     return item.state.disabledReasons[0]
   }
 
-  if (item.state.purchaseAvailability.status === 'unavailable') {
+  if (action.reason === 'not_purchasable') {
     return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
   }
 
-  if (item.state.purchaseAvailability.status === 'unaffordable') {
+  if (action.reason === 'unaffordable') {
     return formatEquipmentUnaffordableReason(item, budget)
   }
 
@@ -473,6 +483,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   workflowMode: EquipmentPickerWorkflowMode
   draft?: CharacterBuilderDraft
   rowActionVm?: EquipmentPickerRowActionViewModel
+  budget?: EquipmentBudgetSummary
 }): EquipmentPickerItemHeaderPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
   const ownedQuantity = args.draft
@@ -481,11 +492,14 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
 
   if (!args.rowActionVm) {
     if (args.workflowMode === 'purchase') {
-      const disabled = isEquipmentPickerItemDisabled(args.item)
+      const action = resolveEquipmentPickerPurchaseActionState(args.item, {
+        budget: args.budget,
+        contentAvailable: true,
+      })
       return {
         summaryTrailingLabel: row.priceLabel || undefined,
         summaryTrailingTone: row.priceLabel ? 'default' : undefined,
-        action: disabled
+        action: action.disabled
           ? ownedQuantity > 0
             ? { kind: 'manage_only' }
             : { kind: 'add', disabled: true }

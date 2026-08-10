@@ -160,15 +160,25 @@ starting-unaffordable / remaining-affordable (`false` / `true`) pair cannot occu
 
 ## Dashboard disabled-note precedence
 
-In `equipment-picker-drawer.lib.ts`, `getEquipmentPickerDisabledNote` resolves in order:
+In `equipment-picker-drawer.lib.ts`, `getEquipmentPickerDisabledNote` maps
+`resolveEquipmentPickerPurchaseActionState` reasons to copy:
 
-1. `disabledReasons[0]` — structural restrictions (selection full, already granted, etc.)
-2. Remaining-budget failure — `!isWithinRemainingBudget` → `{cost} needed · {remaining} remaining` using `budget.remaining`
-3. `undefined`
+1. `blocked` — `disabledReasons[0]` (structural restrictions; not content availability)
+2. `not_purchasable` — not for sale / unsupported purchase channel
+3. `unaffordable` — `{cost} needed · {remaining} remaining` via `budget.remaining`
+4. `undefined` when purchase action is enabled
 
-`isEquipmentPickerItemDisabled` is `true` when `disabledReasons.length > 0` or
-`!isWithinRemainingBudget`. Starting-budget unaffordability alone does not disable
-purchase when a row is shown with `filterOutUnaffordable={false}`.
+Purchase add/disable uses `resolveEquipmentPickerPurchaseActionState` — not a
+collapsed `isEquipmentPickerItemDisabled` bit. Row availability fields live in
+`equipment-picker-availability.lib.ts`:
+
+| Field              | Meaning                                                                                  |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| `contentAvailable` | Campaign/content — wired via `resolveAvailableContent` in equipment-step picker assembly |
+| `purchaseEligible` | Purchase channel supported                                                               |
+| `affordable`       | Remaining budget covers qty=1 (`purchaseAvailability.status === 'available'`)            |
+
+`isAffordable` (starting budget) remains for browse ranking and `filterOutUnaffordable` only.
 
 ## Dashboard affordability filters
 
@@ -255,4 +265,6 @@ Three layers — do not collapse them in new code:
 - Domain grants use durable `{ kind: 'grant' }` provenance on finalized inventory rows.
 - `deriveEquipmentDraftEntries` is the single inventory assembler — grant rows are ensure-at-least-N relative to other channels.
 
-**Named follow-up (`equipment-picker-availability-vm`):** the equipment purchase picker currently collapses unaffordable rows into disabled/unavailable (`isEquipmentPickerItemDisabled` in dashboard). A follow-up should expose distinct VM fields (`available`, `purchaseEligible`, `affordable`) without redesigning purchase math — not in the grant/availability pin PR.
+Equipment picker row VMs (`equipment-picker-availability.lib.ts` in dashboard) expose
+`contentAvailable`, `purchaseEligible`, and `affordable` with purchase actions resolved
+via `resolveEquipmentPickerPurchaseActionState`.

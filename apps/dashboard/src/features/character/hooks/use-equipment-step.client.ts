@@ -229,9 +229,10 @@ export function useEquipmentStep(args: {
             catalogIndex,
             choiceSets: resolvedChoiceSets,
             budget,
+            context,
           })
         : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
-    [budget, catalogIndex, characterClass, draft, resolvedChoiceSets],
+    [budget, catalogIndex, characterClass, context, draft, resolvedChoiceSets],
   )
   const magicItemWorkflow = useEquipmentMagicItemWorkflow({
     draft,

@@ -40,11 +40,11 @@ All three are thin wrappers over `@rpg/ui` **`CatalogPickerSheet`**, spreading
 
 ### `@rpg/contracts` (domain affordances)
 
-| Domain        | Resolver                                                  | Provides                                                                 |
-| ------------- | --------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Equipment     | `resolveEquipmentPickerItems` + dashboard search assembly | Rows, affordability, recommendations, `searchDocument`, disabled reasons |
-| Spells        | `resolveSpellPickerItems`                                 | Rows, selection state, `compactSummary`, `searchText`                    |
-| Proficiencies | `resolveProficiencyPickerItems`                           | Rows, grants overlap, selection state, optional `compactSummary`         |
+| Domain        | Resolver                                                  | Provides                                                                                                                |
+| ------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Equipment     | `resolveEquipmentPickerItems` + dashboard search assembly | Rows, affordability, recommendations, `searchDocument`; purchase action via `resolveEquipmentPickerPurchaseActionState` |
+| Spells        | `resolveSpellPickerItems`                                 | Rows, selection state, `compactSummary`, `searchText`                                                                   |
+| Proficiencies | `resolveProficiencyPickerItems`                           | Rows, grants overlap, selection state, optional `compactSummary`                                                        |
 
 Row state for spells and proficiencies extends `PickerItemStateBase`
 (`resolvers/picker/picker-item-state.ts`): `canSelect`, `isAlreadySelected`,
