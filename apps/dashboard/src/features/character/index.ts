@@ -86,6 +86,13 @@ export {
 export { useCreateNpc } from './npc/hooks/use-create-npc'
 export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
 export {
+  QuickNpcCreateForm,
+  QUICK_NPC_CREATE_TITLE,
+  type QuickNpcCreateFormOrganization,
+  type QuickNpcCreateFormProps,
+} from './npc/components/quick-npc-create-form.client'
+export { type QuickNpcFormValues } from './npc/lib/quick-npc-form-fields'
+export {
   buildCharacterDetailViewModel,
   buildCharacterCardViewModel,
   buildCharacterEntitySummaryVmFromCatalog,

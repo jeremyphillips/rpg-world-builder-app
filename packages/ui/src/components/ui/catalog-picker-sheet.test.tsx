@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -343,6 +345,37 @@ describe('CatalogPickerSheet', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('replaces the picker body with bodyReplacement and preserves search state on return', async () => {
+    const user = userEvent.setup()
+
+    function sheetProps(bodyReplacement?: ReactNode) {
+      return {
+        open: true,
+        onOpenChange: vi.fn(),
+        title: 'Catalog',
+        items,
+        getItemKey: (item: DemoItem) => item.id,
+        getSearchText: (item: DemoItem) => item.searchText,
+        renderItemHeader: (item: DemoItem) => <span>{item.name}</span>,
+        bodyReplacement,
+      }
+    }
+
+    const { rerender } = render(<CatalogPickerSheet {...sheetProps()} />)
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
+
+    rerender(<CatalogPickerSheet {...sheetProps(<p>Inline create flow</p>)} />)
+    expect(screen.getByText('Inline create flow')).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Search catalog' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Beta Item')).not.toBeInTheDocument()
+
+    rerender(<CatalogPickerSheet {...sheetProps()} />)
+    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('rope')
+    expect(screen.getByText('Beta Item')).toBeInTheDocument()
+    expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
   })
 
   it('drops catalog content inset when rowLayout is entity-card', () => {

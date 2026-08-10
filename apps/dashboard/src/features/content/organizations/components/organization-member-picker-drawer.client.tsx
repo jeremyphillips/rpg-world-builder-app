@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { OrganizationKind } from '@rpg/contracts'
+import type { CampaignNpcDetail, CharacterBuildContext, OrganizationKind } from '@rpg/contracts'
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
@@ -13,7 +13,10 @@ import {
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   OrganizationMembershipTitleField,
+  QUICK_NPC_CREATE_TITLE,
+  QuickNpcCreateForm,
   titleFromMembershipRadioValue,
+  type QuickNpcFormValues,
 } from '@/features/character'
 
 import {
@@ -29,6 +32,7 @@ export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
 export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters match this search.'
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
+export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'
 
 /** Campaign PC/NPC option plus whether the character already holds a membership here. */
 export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
@@ -42,16 +46,27 @@ export type OrganizationMemberPickerCommit = {
   priority?: number
 }
 
+export type OrganizationMemberPickerQuickNpc = {
+  campaignId: string
+  /** Null while the campaign build context loads — the entry action stays disabled. */
+  buildContext: CharacterBuildContext | null
+  /** Called after atomic creation (membership included) — refresh reads only. */
+  onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
+}
+
 export type OrganizationMemberPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   organization: {
+    id: string
     name: string
     organizationKind: OrganizationKind
     organizationSubtype?: string
   }
   candidates: readonly OrganizationMemberPickerCandidate[]
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
+  /** Enables the "Create new NPC" shortcut view. */
+  quickNpc?: OrganizationMemberPickerQuickNpc
 }
 
 function formatCandidateIdentityLine(candidate: OrganizationMemberPickerCandidate): string {
@@ -66,11 +81,15 @@ export function OrganizationMemberPickerDrawer({
   organization,
   candidates,
   onAdd,
+  quickNpc,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [view, setView] = React.useState<'picker' | 'quickNpc'>('picker')
+  /** Per-session Quick NPC values — survive Back until the drawer closes or creation succeeds. */
+  const [quickNpcValues, setQuickNpcValues] = React.useState<QuickNpcFormValues>()
 
   const resetMembershipConfig = React.useCallback(() => {
     setExpandedItemId(null)
@@ -79,13 +98,36 @@ export function OrganizationMemberPickerDrawer({
     setPending(false)
   }, [])
 
+  const resetQuickNpcSession = React.useCallback(() => {
+    setView('picker')
+    setQuickNpcValues(undefined)
+  }, [])
+
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       if (pending) return
-      if (!nextOpen) resetMembershipConfig()
+      if (!nextOpen) {
+        resetMembershipConfig()
+        resetQuickNpcSession()
+      }
       onOpenChange(nextOpen)
     },
-    [onOpenChange, pending, resetMembershipConfig],
+    [onOpenChange, pending, resetMembershipConfig, resetQuickNpcSession],
+  )
+
+  const handleQuickNpcBack = React.useCallback((values: QuickNpcFormValues) => {
+    setQuickNpcValues(values)
+    setView('picker')
+  }, [])
+
+  const handleQuickNpcCreated = React.useCallback(
+    async (npc: CampaignNpcDetail) => {
+      await quickNpc?.onCreated(npc)
+      resetMembershipConfig()
+      resetQuickNpcSession()
+      onOpenChange(false)
+    },
+    [onOpenChange, quickNpc, resetMembershipConfig, resetQuickNpcSession],
   )
 
   const handleExpandedItemChange = React.useCallback((itemId: string | null) => {
@@ -137,12 +179,43 @@ export function OrganizationMemberPickerDrawer({
     ],
   )
 
+  const quickNpcBuildContext = view === 'quickNpc' ? (quickNpc?.buildContext ?? null) : null
+  const quickNpcActive = quickNpcBuildContext !== null
+
   return (
     <CatalogPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
-      title={ORGANIZATION_MEMBER_PICKER_TITLE}
-      description={`Choose a character to add to ${organization.name}.`}
+      title={quickNpcActive ? QUICK_NPC_CREATE_TITLE : ORGANIZATION_MEMBER_PICKER_TITLE}
+      description={
+        quickNpcActive
+          ? `Create a new NPC as a member of ${organization.name}.`
+          : `Choose a character to add to ${organization.name}.`
+      }
+      bodyReplacement={
+        quickNpc && quickNpcBuildContext ? (
+          <QuickNpcCreateForm
+            campaignId={quickNpc.campaignId}
+            buildContext={quickNpcBuildContext}
+            organization={organization}
+            initialValues={quickNpcValues}
+            onBack={handleQuickNpcBack}
+            onCreated={handleQuickNpcCreated}
+          />
+        ) : undefined
+      }
+      footer={
+        quickNpc && !quickNpcActive ? (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={quickNpc.buildContext == null}
+            onClick={() => setView('quickNpc')}
+          >
+            {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL}
+          </Button>
+        ) : undefined
+      }
       {...catalogPickerShellProps()}
       items={candidates}
       getItemKey={(candidate) => candidate.id}

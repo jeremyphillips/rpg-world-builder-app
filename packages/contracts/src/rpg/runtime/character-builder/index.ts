@@ -1,5 +1,7 @@
 export * from './ability/ability-generation'
 export * from './ability/ability-generation-methods'
+export * from './automatic/automatic-npc-build-seed'
+export * from './automatic/resolve-automatic-npc-build'
 export * from './ability/ability-score-recommendation-messages'
 export * from './ability/ability-score-recommendations'
 export * from './assembly/assemble-language-proficiencies'

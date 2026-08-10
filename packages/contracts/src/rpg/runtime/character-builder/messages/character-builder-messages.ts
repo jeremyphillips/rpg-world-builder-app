@@ -121,6 +121,10 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.finalizationFailed',
     () => 'Fix the highlighted issues before creating your character.',
   ),
+  automaticResolutionStalled: defineMessage(
+    'validation.characterBuilder.automaticResolutionStalled',
+    () => 'Could not automatically complete this character build.',
+  ),
   magicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
     'validation.characterBuilder.magicItemGrantIncomplete',
     ({ rarityLabel, remaining }) =>

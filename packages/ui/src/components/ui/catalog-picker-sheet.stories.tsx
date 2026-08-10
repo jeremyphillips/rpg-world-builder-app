@@ -108,6 +108,48 @@ export const Default: Story = {
   },
 }
 
+/** Inline create flow replacing the picker body — search/tab state stays mounted. */
+export const BodyReplacement: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Add gear',
+    items: demoItems,
+    getItemKey: (item) => item.id,
+    getSearchText: (item) => item.name,
+    renderItemHeader: (item) => <span>{item.name}</span>,
+  },
+  render: function Render(args) {
+    const [view, setView] = useState<'picker' | 'create'>('picker')
+
+    return (
+      <CatalogPickerSheet
+        {...args}
+        title={view === 'picker' ? 'Add gear' : 'Create gear'}
+        bodyReplacement={
+          view === 'create' ? (
+            <div className="flex flex-col gap-4">
+              <Text variant="muted">An inline create form renders here.</Text>
+              <div>
+                <Button type="button" variant="outline" onClick={() => setView('picker')}>
+                  Back
+                </Button>
+              </div>
+            </div>
+          ) : undefined
+        }
+        footer={
+          view === 'picker' ? (
+            <Button type="button" variant="outline" onClick={() => setView('create')}>
+              Create new gear
+            </Button>
+          ) : undefined
+        }
+      />
+    )
+  },
+}
+
 export const Loading: Story = {
   args: {
     open: true,

@@ -362,6 +362,49 @@ describe('organization members routes', () => {
     })
   })
 
+  it('lists an NPC created atomically with an organization membership connection (Quick NPC)', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    const createOrgRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/organizations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalOrganizationInput, organizationKind: 'professional' })
+      .expect(201)
+
+    const organizationId = createOrgRes.body.organizations.id as string
+
+    // One POST carries the membership in connections — no follow-up mutation.
+    await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        ...minimalNpcRequestInput,
+        name: 'Quick Envoy',
+        connections: {
+          organizations: [{ organizationId, title: 'Guildmaster', priority: 50 }],
+          locations: [],
+        },
+      })
+      .expect(201)
+
+    const membersRes = await agent
+      .get(membersPath(campaignId, organizationId))
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(membersRes.body).toEqual({
+      items: [
+        expect.objectContaining({
+          characterType: 'npc',
+          character: expect.objectContaining({ name: 'Quick Envoy' }),
+          membership: { title: 'Guildmaster', priority: 50 },
+        }),
+      ],
+      total: 1,
+    })
+  })
+
   it('returns 404 for a missing organization in the campaign', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)

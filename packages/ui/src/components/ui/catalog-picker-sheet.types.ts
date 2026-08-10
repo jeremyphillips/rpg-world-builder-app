@@ -70,6 +70,12 @@ export type CatalogPickerSheetProps<TItem> = {
   searchDisabled?: boolean
   /** When false, hides search toolbar and result list (header/footer-only flows). Defaults to true. */
   pickerEnabled?: boolean
+  /**
+   * When provided, replaces the search toolbar and result list with custom
+   * scrollable body content (e.g. an inline create flow) while keeping the
+   * sheet — and its search/tab state — mounted for the session.
+   */
+  bodyReplacement?: ReactNode
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
