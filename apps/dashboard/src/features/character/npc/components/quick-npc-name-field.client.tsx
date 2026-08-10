@@ -11,8 +11,9 @@ import {
   generateQuickNpcName,
   QUICK_NPC_GENERATE_NAME_LABEL,
   QUICK_NPC_NAME_GENERATION_FAILED,
+  resolveQuickNpcNameGenerationSupport,
 } from '../lib/quick-npc-name-generation'
-import type { QuickNpcAuthoringValues } from '../lib/quick-npc-form-fields'
+import type { QuickNpcAuthoringTabValues } from '../lib/quick-npc-form-fields'
 
 export function QuickNpcNameField({
   speciesId,
@@ -21,25 +22,32 @@ export function QuickNpcNameField({
   speciesId: string
   buildContext: CharacterBuildContext
 }) {
-  const form = useFormContext<QuickNpcAuthoringValues>()
+  const form = useFormContext<QuickNpcAuthoringTabValues>()
   const [pending, setPending] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
+  const generationSupport = React.useMemo(
+    () => resolveQuickNpcNameGenerationSupport({ speciesId, context: buildContext }),
+    [buildContext, speciesId],
+  )
+
   const handleGenerate = React.useCallback(async () => {
-    if (!speciesId || pending) return
+    if (!speciesId || pending || !generationSupport.enabled) return
     setPending(true)
     setError(null)
     try {
-      const name = await generateQuickNpcName({ speciesId, context: buildContext })
-      if (!name) {
-        setError(QUICK_NPC_NAME_GENERATION_FAILED)
+      const result = await generateQuickNpcName({ speciesId, context: buildContext })
+      if (!result.ok) {
+        setError(result.kind === 'unsupported' ? result.reason : QUICK_NPC_NAME_GENERATION_FAILED)
         return
       }
-      form.setValue('name', name, { shouldDirty: true, shouldValidate: true })
+      form.setValue('name', result.name, { shouldDirty: true, shouldValidate: true })
     } finally {
       setPending(false)
     }
-  }, [buildContext, form, pending, speciesId])
+  }, [buildContext, form, generationSupport.enabled, pending, speciesId])
+
+  const generateDisabled = !speciesId || pending || !generationSupport.enabled
 
   return (
     <div className="flex flex-col gap-2">
@@ -63,7 +71,8 @@ export function QuickNpcNameField({
           type="button"
           variant="outline"
           size="sm"
-          disabled={!speciesId || pending}
+          disabled={generateDisabled}
+          title={generationSupport.disabledReason}
           onClick={() => {
             void handleGenerate()
           }}
@@ -71,6 +80,9 @@ export function QuickNpcNameField({
           {QUICK_NPC_GENERATE_NAME_LABEL}
         </Button>
       </div>
+      {generationSupport.disabledReason && !generationSupport.enabled ? (
+        <Text variant="muted">{generationSupport.disabledReason}</Text>
+      ) : null}
       {error ? (
         <Text variant="destructive" role="alert">
           {error}

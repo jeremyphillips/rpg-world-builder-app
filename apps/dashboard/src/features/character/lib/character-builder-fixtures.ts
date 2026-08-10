@@ -70,7 +70,32 @@ const dwarfSpecies = {
   creatureType: 'humanoid',
   sizes: ['medium'],
   movement: { walk: 30 },
+  languageAffinities: ['dwarvish'],
   traits: [],
+  culture: {
+    naming: {
+      supported: true,
+      personalNameComponents: ['clan'],
+    },
+  },
+} as const satisfies Species
+
+/** Dwarf-shaped species without naming metadata — for unsupported-name-generation tests. */
+export const unsupportedNamingDwarfSpecies = {
+  ...dwarfSpecies,
+  id: 'srd-cc-5.2.1:dwarf-no-naming',
+  slug: 'dwarf-no-naming',
+  name: 'Dwarf (no naming)',
+  culture: undefined,
+} as const satisfies Species
+
+/** Homebrew species for naming-policy inheritance tests. */
+export const homebrewSpeciesFixture = {
+  ...dwarfSpecies,
+  id: 'homebrew:river-folk',
+  slug: 'river-folk',
+  name: 'River Folk',
+  source: 'homebrew',
 } as const satisfies Species
 
 const athleticsSkill = {

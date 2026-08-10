@@ -17,6 +17,7 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 import { useCreateNpc } from '../hooks/use-create-npc'
+import { isQuickNpcSetupStillValid } from '../lib/quick-npc-authoring-validation.lib'
 import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from '../lib/quick-npc-create'
 import type { QuickNpcSetupSummaryEntry } from '../lib/quick-npc-create-modal-setup.lib'
 import { createQuickNpcFormValueSyncs } from '../lib/quick-npc-form-sync'
@@ -27,11 +28,12 @@ import {
   buildQuickNpcSeed,
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
-  quickNpcAuthoringDefaultValues,
-  quickNpcAuthoringSchema,
+  mergeQuickNpcAuthoringValues,
+  quickNpcAuthoringTabDefaultValues,
+  quickNpcAuthoringTabSchema,
   resolveQuickNpcMaxLevel,
   resolveQuickNpcRequirementCategories,
-  type QuickNpcAuthoringValues,
+  type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import { QuickNpcNameField } from './quick-npc-name-field.client'
@@ -53,7 +55,7 @@ export type QuickNpcAuthoringFormProps = {
   organization: QuickNpcCreateFormOrganization
   setup: QuickNpcSetupValues
   setupSummary: readonly QuickNpcSetupSummaryEntry[]
-  initialValues?: Partial<QuickNpcAuthoringValues> | undefined
+  initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
   onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
@@ -99,8 +101,8 @@ function RequirementCountWatcher({
   fallback,
   onConfiguredCountChange,
 }: {
-  form: UseFormReturn<QuickNpcAuthoringValues>
-  fallback: Pick<QuickNpcAuthoringValues, 'requiredWeaponId' | 'requiredSpellId'>
+  form: UseFormReturn<QuickNpcAuthoringTabValues>
+  fallback: Pick<QuickNpcAuthoringTabValues, 'requiredWeaponId' | 'requiredSpellId'>
   onConfiguredCountChange: (count: number) => void
 }) {
   const requiredWeaponId = useWatch({
@@ -149,12 +151,12 @@ export function QuickNpcAuthoringForm({
   }, [isPending, onPendingChange])
 
   const maxLevel = resolveQuickNpcMaxLevel(buildContext)
-  const schema = React.useMemo(() => quickNpcAuthoringSchema(maxLevel), [maxLevel])
+  const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
   const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
 
   const defaultValues = React.useMemo(
     () => ({
-      ...quickNpcAuthoringDefaultValues,
+      ...quickNpcAuthoringTabDefaultValues,
       ...setup,
       ...initialValues,
     }),
@@ -177,8 +179,14 @@ export function QuickNpcAuthoringForm({
     return `${categories.weapons.length}:${categories.spells.length}`
   }, [buildContext, setup])
 
-  const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringValues>({
-    submit: async (values) => {
+  const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
+    submit: async (tabValues) => {
+      if (!isQuickNpcSetupStillValid(setup, buildContext, maxLevel)) {
+        onChangeSetup()
+        return
+      }
+
+      const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
         kind: organization.organizationKind,
         ...(organization.organizationSubtype !== undefined
@@ -209,7 +217,7 @@ export function QuickNpcAuthoringForm({
   })
 
   return (
-    <TabbedForm<QuickNpcAuthoringValues>
+    <TabbedForm<QuickNpcAuthoringTabValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       schema={schema}
       tabs={tabs}

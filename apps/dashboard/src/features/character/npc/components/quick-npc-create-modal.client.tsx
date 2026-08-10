@@ -11,7 +11,7 @@ import {
   buildQuickNpcSetupFields,
   quickNpcSetupSchema,
   resolveQuickNpcMaxLevel,
-  type QuickNpcAuthoringValues,
+  type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import {
@@ -43,7 +43,7 @@ type QuickNpcCreateModalPhase = 'setup' | 'authoring'
 type QuickNpcCreateModalState = {
   phase: QuickNpcCreateModalPhase
   setupValues: QuickNpcSetupValues
-  authoringValues?: Partial<QuickNpcAuthoringValues>
+  authoringValues?: Partial<QuickNpcAuthoringTabValues>
 }
 
 function createInitialState(): QuickNpcCreateModalState {

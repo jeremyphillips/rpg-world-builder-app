@@ -10,9 +10,13 @@ import {
   buildQuickNpcFormFields,
   buildQuickNpcSeed,
   buildQuickNpcConstraints,
+  buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
+  mergeQuickNpcAuthoringValues,
+  quickNpcAuthoringTabDefaultValues,
   quickNpcFormDefaultValues,
   quickNpcFormSchema,
+  QUICK_NPC_DETAILS_TAB_ID,
   QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
 } from './quick-npc-form-fields'
 
@@ -141,6 +145,57 @@ describe('buildQuickNpcFormFields', () => {
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       requiredWeaponId: '',
       requiredSpellId: '',
+    })
+    expect(quickNpcAuthoringTabDefaultValues).toEqual({
+      name: '',
+      alignment: 'n',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      requiredWeaponId: '',
+      requiredSpellId: '',
+    })
+  })
+})
+
+describe('buildQuickNpcTabs validation wiring', () => {
+  it('declares explicit ownership for the slot-backed name field', () => {
+    const tabs = buildQuickNpcTabs({
+      detailsFields: [{ kind: 'slot', name: '_quickNpcNameField', render: () => null }],
+      requirementsFields: [
+        {
+          type: 'select',
+          name: 'requiredWeaponId',
+          label: 'Starting weapon',
+          options: [],
+          width: 'full',
+        },
+      ],
+      configuredCount: 0,
+    })
+
+    const detailsTab = tabs.find((tab) => tab.id === QUICK_NPC_DETAILS_TAB_ID)
+    expect(detailsTab?.errorPaths).toEqual(['name'])
+    expect(detailsTab?.resolverFields).toEqual([
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ])
+  })
+
+  it('merges setup and tab values for create/finalize', () => {
+    expect(
+      mergeQuickNpcAuthoringValues(
+        { speciesId: 'species-1', classId: 'class-1', level: 2 },
+        {
+          name: 'Guard Captain',
+          alignment: 'ln',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          requiredWeaponId: '',
+          requiredSpellId: '',
+        },
+      ),
+    ).toMatchObject({
+      speciesId: 'species-1',
+      classId: 'class-1',
+      level: 2,
+      name: 'Guard Captain',
     })
   })
 })

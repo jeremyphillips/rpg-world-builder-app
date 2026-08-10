@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { TabbedFormTab } from '@rpg/ui/form'
 
-import { assertHeaderOnlyTabsHaveValidationWiring } from './tabbed-form-validation-test-utils'
+import {
+  assertHeaderOnlyTabsHaveValidationWiring,
+  assertTabErrorPathCoverage,
+} from './tabbed-form-validation-test-utils'
 
 describe('assertHeaderOnlyTabsHaveValidationWiring', () => {
   it('passes when header-only tabs declare errorPaths and resolverFields', () => {
@@ -30,9 +33,7 @@ describe('assertHeaderOnlyTabsHaveValidationWiring', () => {
       },
     ]
 
-    expect(() => assertHeaderOnlyTabsHaveValidationWiring(tabs)).toThrow(
-      /must declare errorPaths/,
-    )
+    expect(() => assertHeaderOnlyTabsHaveValidationWiring(tabs)).toThrow(/must declare errorPaths/)
   })
 
   it('respects exemptTabIds and skipHeaderOnlyValidationWiring', () => {
@@ -50,5 +51,38 @@ describe('assertHeaderOnlyTabsHaveValidationWiring', () => {
     expect(() =>
       assertHeaderOnlyTabsHaveValidationWiring(tabs, { exemptTabIds: ['subclasses'] }),
     ).not.toThrow()
+  })
+})
+
+describe('assertTabErrorPathCoverage', () => {
+  it('passes when slot-owned paths are declared on errorPaths and resolverFields', () => {
+    const tabs: TabbedFormTab[] = [
+      {
+        id: 'details',
+        label: 'Details',
+        fields: [{ kind: 'slot', name: '_nameSlot', render: () => null }],
+        errorPaths: ['name'],
+        resolverFields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+    ]
+
+    expect(() =>
+      assertTabErrorPathCoverage(tabs, { slotOwnedPaths: { details: ['name'] } }),
+    ).not.toThrow()
+  })
+
+  it('fails when resolverFields are missing for a slot-owned path', () => {
+    const tabs: TabbedFormTab[] = [
+      {
+        id: 'details',
+        label: 'Details',
+        fields: [{ kind: 'slot', name: '_nameSlot', render: () => null }],
+        errorPaths: ['name'],
+      },
+    ]
+
+    expect(() =>
+      assertTabErrorPathCoverage(tabs, { slotOwnedPaths: { details: ['name'] } }),
+    ).toThrow(/must declare resolverFields/)
   })
 })

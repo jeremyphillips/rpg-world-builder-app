@@ -1,17 +1,10 @@
 import type { Species } from '@rpg/contracts'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '@rpg/contracts'
-import { generateName, recommendConventions } from '@rpg/name-generator-core'
+import { generateName } from '@rpg/name-generator-core'
+import { loadNameCollection } from '@rpg/name-generator-data'
 import {
-  CULTURE_CONVENTION_BINDINGS,
-  getConvention,
-  HERITAGE_CULTURE_ALIASES,
-  listStaticConventions,
-  loadNameCollection,
-  STANDALONE_NAMING_CULTURES,
-} from '@rpg/name-generator-data'
-import {
-  resolveCampaignConventions,
-  resolveStandaloneConventions,
+  composeAvailableNamingConventions,
+  resolveSpeciesPersonNaming,
   type SpeciesCultureInput,
 } from '@rpg/name-generator-integrations'
 
@@ -19,7 +12,17 @@ export const QUICK_NPC_GENERATE_NAME_LABEL = 'Generate' as const
 export const QUICK_NPC_NAME_GENERATION_FAILED =
   'Could not generate a name for this species.' as const
 
-function toSpeciesCultureInput(species: Species): SpeciesCultureInput {
+export type QuickNpcNameGenerationSupport = {
+  enabled: boolean
+  disabledReason?: string
+}
+
+export type QuickNpcNameGenerationResult =
+  | { ok: true; name: string }
+  | { ok: false; kind: 'unsupported'; reason: string }
+  | { ok: false; kind: 'generation_failed' }
+
+export function toSpeciesCultureInput(species: Species): SpeciesCultureInput {
   return {
     id: species.id,
     slug: species.slug,
@@ -39,50 +42,62 @@ function toSpeciesCultureInput(species: Species): SpeciesCultureInput {
   }
 }
 
+export function resolveQuickNpcNameGenerationSupport(args: {
+  speciesId: string
+  context: CharacterBuildContext
+}): QuickNpcNameGenerationSupport {
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const species = catalogIndex.species.get(args.speciesId)
+  if (!species) {
+    return { enabled: false }
+  }
+
+  const speciesInput = toSpeciesCultureInput(species)
+  const { conventions } = composeAvailableNamingConventions([speciesInput])
+  const resolution = resolveSpeciesPersonNaming({ species: speciesInput, conventions })
+
+  if (!resolution.supported) {
+    return { enabled: false, disabledReason: resolution.reason }
+  }
+
+  return { enabled: true }
+}
+
 /**
  * Species-aware, user-triggered name generation for Quick NPC authoring.
- * Independent of automatic build determinism.
+ * Thin adapter over `@rpg/name-generator-integrations`.
  */
 export async function generateQuickNpcName(args: {
   speciesId: string
   context: CharacterBuildContext
-}): Promise<string | undefined> {
+}): Promise<QuickNpcNameGenerationResult> {
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const species = catalogIndex.species.get(args.speciesId)
-  if (!species) return undefined
+  if (!species) {
+    return { ok: false, kind: 'unsupported', reason: QUICK_NPC_NAME_GENERATION_FAILED }
+  }
 
   const speciesInput = toSpeciesCultureInput(species)
-  const staticConventions = listStaticConventions()
-  const campaignConventions = resolveCampaignConventions({
-    species: [speciesInput],
-    bindings: CULTURE_CONVENTION_BINDINGS,
-    heritageAliases: HERITAGE_CULTURE_ALIASES,
-  })
-  const standaloneConventions = resolveStandaloneConventions({
-    cultures: STANDALONE_NAMING_CULTURES,
-    bindings: CULTURE_CONVENTION_BINDINGS,
-  })
-  const conventions = [...campaignConventions, ...standaloneConventions, ...staticConventions]
-  const eligible = conventions.filter((convention) => convention.subjectKinds.includes('person'))
-  const matches = recommendConventions(
-    { subjectKind: 'person', speciesIds: [args.speciesId] },
-    eligible,
-  ).filter((match) =>
-    match.reasons.some(
-      (reason) => reason.kind === 'species' && reason.speciesId === args.speciesId,
-    ),
-  )
+  const { conventions, getConvention } = composeAvailableNamingConventions([speciesInput])
+  const resolution = resolveSpeciesPersonNaming({ species: speciesInput, conventions })
 
-  if (matches.length === 0) return undefined
+  if (!resolution.supported) {
+    return { ok: false, kind: 'unsupported', reason: resolution.reason }
+  }
 
-  const convention = getConvention(matches[0]!.conventionId)
-  if (!convention) return undefined
+  const convention = getConvention(resolution.conventionIds[0]!)
+  if (!convention) {
+    return { ok: false, kind: 'generation_failed' }
+  }
 
   try {
-    const collections = new Map<string, Awaited<ReturnType<typeof loadNameCollection>>>()
-    for (const collectionId of convention.collectionIds) {
-      collections.set(collectionId, await loadNameCollection(collectionId))
-    }
+    const collections = new Map(
+      await Promise.all(
+        convention.collectionIds.map(
+          async (collectionId) => [collectionId, await loadNameCollection(collectionId)] as const,
+        ),
+      ),
+    )
 
     const generated = generateName(
       convention,
@@ -97,8 +112,12 @@ export async function generateQuickNpcName(args: {
       new Set<string>(),
     )
 
-    return generated.value
+    if (!generated.value.trim()) {
+      return { ok: false, kind: 'generation_failed' }
+    }
+
+    return { ok: true, name: generated.value }
   } catch {
-    return undefined
+    return { ok: false, kind: 'generation_failed' }
   }
 }

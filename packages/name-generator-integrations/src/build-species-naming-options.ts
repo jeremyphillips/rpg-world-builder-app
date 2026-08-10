@@ -116,6 +116,19 @@ function getConventionIdsForCultures(
     .sort((left, right) => left.localeCompare(right))
 }
 
+export function getPersonConventionIdsForSpecies({
+  conventions,
+  species,
+  heritageAliases = [],
+}: {
+  conventions: readonly NamingConvention[]
+  species: SpeciesCultureInput
+  heritageAliases?: readonly HeritageCultureAlias[]
+}): string[] {
+  const cultureIds = deriveSpeciesNamingCultureIds({ species, heritageAliases })
+  return getConventionIdsForCultures(conventions, cultureIds, heritageAliases, species.id, 'person')
+}
+
 function hasPersonalConvention(
   conventions: readonly NamingConvention[],
   cultureIds: readonly string[],

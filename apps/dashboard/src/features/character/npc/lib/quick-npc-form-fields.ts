@@ -86,18 +86,49 @@ export function quickNpcAuthoringSchema(maxLevel: number) {
   })
 }
 
+/** TabbedForm schema — authoring tabs only; setup fields are validated separately. */
+export function quickNpcAuthoringTabSchema() {
+  return z.object({
+    name: z
+      .string()
+      .trim()
+      .min(1, formatFieldMessage(characterBuilderValidationMessages.nameRequired())),
+    alignment: z
+      .string()
+      .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
+      .pipe(alignmentSchema),
+    membershipTitle: z.string(),
+    requiredWeaponId: z.string(),
+    requiredSpellId: z.string(),
+  })
+}
+
+export type QuickNpcAuthoringTabValues = z.infer<ReturnType<typeof quickNpcAuthoringTabSchema>>
+
 export type QuickNpcAuthoringValues = z.infer<ReturnType<typeof quickNpcAuthoringSchema>>
 
 /** @deprecated Use QuickNpcAuthoringValues — kept for transitional imports. */
 export type QuickNpcFormValues = QuickNpcAuthoringValues
 
-export const quickNpcAuthoringDefaultValues: QuickNpcAuthoringValues = {
-  ...EMPTY_QUICK_NPC_SETUP_VALUES,
+export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
   name: '',
   alignment: 'n',
   membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   requiredWeaponId: '',
   requiredSpellId: '',
+}
+
+export const quickNpcAuthoringDefaultValues: QuickNpcAuthoringValues = {
+  ...EMPTY_QUICK_NPC_SETUP_VALUES,
+  ...quickNpcAuthoringTabDefaultValues,
+}
+
+/** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
+export function mergeQuickNpcAuthoringValues(
+  setup: QuickNpcSetupValues,
+  tab: QuickNpcAuthoringTabValues,
+): QuickNpcAuthoringValues {
+  return { ...setup, ...tab }
 }
 
 /** @deprecated Use quickNpcAuthoringDefaultValues */
@@ -325,6 +356,8 @@ export function buildQuickNpcTabs(args: {
       id: QUICK_NPC_DETAILS_TAB_ID,
       label: 'Details',
       fields: args.detailsFields,
+      errorPaths: ['name'],
+      resolverFields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
     },
   ]
 
