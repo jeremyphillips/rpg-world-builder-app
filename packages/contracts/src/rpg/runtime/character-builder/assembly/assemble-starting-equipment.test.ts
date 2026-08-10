@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
+import { standardStartingWealthTableId } from '../../../campaign/rules/starting-wealth'
 import { assembleStartingEquipment } from './assemble-starting-equipment'
 import { assembleCharacterProficiencies } from './assemble-proficiencies'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
@@ -9,6 +10,7 @@ import { indexCharacterBuildCatalog } from '../context'
 import { buildChoiceSetId } from '../choice-set'
 import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
 import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
+import { buildMagicItemAllowanceId } from '../equipment/magic-item-selection'
 import {
   fluteTool,
   luteTool,
@@ -381,5 +383,119 @@ describe('proficiency-linked starting equipment lifecycle', () => {
     expect(assembleStartingEquipment(drumDraft, catalogIndex).equipment.tools[0]?.equipmentId).toBe(
       drum.id,
     )
+  })
+
+  it('assembles magic-item grant selections when assembly options include starting wealth and ruleset', () => {
+    const commonPotion = equipmentSchema.parse({
+      id: `${RULESET}:potion-of-healing`,
+      slug: 'potion-of-healing',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Potion of Healing',
+      description: '',
+      cost: { amount: 50, currency: 'gp' },
+      kind: 'magic_item',
+      rarity: 'common',
+      magicItemCategory: 'potion',
+    })
+
+    const fighterWithGold: ClassStored = {
+      id: `${RULESET}:fighter`,
+      slug: 'fighter',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Fighter',
+      primaryAbilities: ['str'],
+      hitDie: 10,
+      proficiencies: {
+        savingThrows: ['str', 'con'],
+        armor: { categories: ['light'], items: [] },
+        weapons: { categories: ['simple'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      features: [],
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'starting-gold',
+              label: 'Starting Gold',
+              items: [],
+              wealth: { gp: 100 },
+            },
+          ],
+        },
+      },
+    }
+
+    const startingWealth = {
+      name: 'Standard',
+      scope: { kind: 'standard' as const },
+      tiers: [
+        {
+          id: 'hero',
+          label: 'Hero',
+          minLevel: 1,
+          maxLevel: 20,
+          includeNormalStartingEquipment: true,
+          bonusGold: null,
+          magicItemGrants: [{ rarity: 'common' as const, quantity: 1 }],
+        },
+      ],
+    }
+
+    const tableId = standardStartingWealthTableId(RULESET)
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: tableId,
+      tierId: 'hero',
+      rarity: 'common',
+    })
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterWithGold],
+      spells: [],
+      equipment: [commonPotion],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: fighterWithGold.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(fighterWithGold.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        magicItemSelections: [{ allowanceId, equipmentId: commonPotion.id, quantity: 1 }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const { equipment } = assembleStartingEquipment(draft, catalogIndex, {
+      startingWealth,
+      rulesetId: RULESET,
+    })
+
+    expect(equipment.magicItems).toEqual([
+      {
+        equipmentId: commonPotion.id,
+        quantity: 1,
+        sources: [{ kind: 'startingWealthTier', sourceId: tableId, grantId: allowanceId }],
+      },
+    ])
   })
 })

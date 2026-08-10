@@ -1,4 +1,5 @@
 import type { StartingWealthRules } from '../../../campaign/rules/starting-wealth'
+import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { Equipment } from '../../../content/equipment'
 import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
 import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
@@ -251,6 +252,17 @@ function emptyStartingEquipmentResult(): {
   return { equipment: EMPTY_CHARACTER_EQUIPMENT, wealth: characterWealthFromGrant(undefined) }
 }
 
+function resolveAssemblyRulesetId(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  rulesetId?: SystemRulesetId,
+): SystemRulesetId | undefined {
+  if (rulesetId) return rulesetId
+  const classId = draft.class.classId
+  if (!classId) return undefined
+  return catalogIndex.classes.get(classId)?.rulesetId
+}
+
 function assembleFromDraftEquipment(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -267,8 +279,13 @@ function assembleFromDraftEquipment(
         startingWealth: options?.startingWealth,
       })
 
+  const rulesetId = resolveAssemblyRulesetId(draft, catalogIndex, options?.rulesetId)
+
   return {
-    equipment: deriveEquipmentDraftEntries(draft, catalogIndex),
+    equipment: deriveEquipmentDraftEntries(draft, catalogIndex, {
+      startingWealth: options?.startingWealth,
+      rulesetId,
+    }),
     wealth: budget?.remaining ?? characterWealthFromGrant(undefined),
   }
 }
@@ -306,7 +323,10 @@ function assembleFromSelectedPackage(
 export type AssembleStartingEquipmentOptions = {
   /** Pre-resolved funding snapshot — tier rules are not re-resolved when provided. */
   funding?: ResolvedStartingEquipmentFunding
+  /** Campaign starting wealth — required for magic-grant assembly when draft equipment is present. */
   startingWealth?: StartingWealthRules
+  /** Canonical ruleset id from build context — prefer threading over catalog inference. */
+  rulesetId?: SystemRulesetId
 }
 
 /** Assembles finalized equipment and wealth from draft equipment decisions. */

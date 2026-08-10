@@ -136,6 +136,18 @@ export const characterBuilderValidationMessages = {
         ? `Choose 1 ${rarityLabel} magic item grant.`
         : `Choose ${remaining} ${rarityLabel} magic item grants.`,
   ),
+  equipmentPurchaseInvalidItem: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseInvalidItem',
+    () => 'Remove or replace a purchase that is not available for starting gold.',
+  ),
+  equipmentPurchaseInvalidQuantity: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseInvalidQuantity',
+    () => 'Fix purchase quantities so each item has at least one.',
+  ),
+  equipmentPurchaseOverBudget: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseOverBudget',
+    () => 'Reduce purchased equipment so it fits your starting gold.',
+  ),
 }
 
 // ---------------------------------------------------------------------------

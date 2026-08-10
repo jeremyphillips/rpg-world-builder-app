@@ -250,10 +250,11 @@ export function useEquipmentStep(args: {
             draft,
             catalogIndex,
             characterCreationRules: context.characterCreationRules,
+            rulesetId: context.rulesetId,
             budget,
           })
         : undefined,
-    [budget, catalogIndex, context.characterCreationRules, draft, showBudget],
+    [budget, catalogIndex, context.characterCreationRules, context.rulesetId, draft, showBudget],
   )
   const activePurchaseSourceMode = showBudget ? resolvePurchaseSourceMode() : undefined
   const ownedPurchaseQuantities = useMemo(

@@ -18,7 +18,10 @@ export function toCharacterDerivationInput(
 ): CharacterDerivationInput {
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
-  const { equipment } = assembleStartingEquipment(draft, catalogIndex)
+  const { equipment } = assembleStartingEquipment(draft, catalogIndex, {
+    startingWealth: rules.startingWealth,
+    rulesetId,
+  })
   const equippedArmor = resolveEquippedArmorFromInventory({
     equipment,
     catalog: catalogIndex.equipment,

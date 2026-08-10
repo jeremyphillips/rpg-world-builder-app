@@ -63,8 +63,13 @@ function resolveBuilderUnresolvedChoiceSetIds(
 function hasEquippedBodyArmor(
   catalogIndex: CharacterBuildCatalogIndex,
   draft: CharacterBuilderDraft,
+  rules: ResolvedCharacterCreationRules,
+  rulesetId: SystemRulesetId,
 ): boolean {
-  const { equipment } = assembleStartingEquipment(draft, catalogIndex)
+  const { equipment } = assembleStartingEquipment(draft, catalogIndex, {
+    startingWealth: rules.startingWealth,
+    rulesetId,
+  })
   return equipment.armor.some((entry) => {
     if (!entry.equipped) return false
     const item = catalogIndex.equipment.get(entry.equipmentId)
@@ -75,6 +80,8 @@ function hasEquippedBodyArmor(
 function resolveBuilderAdvisoryWarnings(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
+  rules: ResolvedCharacterCreationRules,
+  rulesetId: SystemRulesetId,
 ): string[] {
   const warnings: string[] = []
 
@@ -84,7 +91,7 @@ function resolveBuilderAdvisoryWarnings(
     (feature) => feature.id === 'unarmored-defense',
   )
 
-  if (unarmoredDefense && !hasEquippedBodyArmor(catalogIndex, draft)) {
+  if (unarmoredDefense && !hasEquippedBodyArmor(catalogIndex, draft, rules, rulesetId)) {
     warnings.push(
       formatFieldMessage(
         characterBuilderPreviewMessages.unarmoredDefenseNotModeled({
@@ -125,6 +132,6 @@ export function buildCharacterPreview(
     proficiencies: derivationInput.proficiencies,
     equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets),
     unresolvedChoiceSetIds: resolveBuilderUnresolvedChoiceSetIds(draft, choiceSets),
-    warnings: resolveBuilderAdvisoryWarnings(draft, catalogIndex),
+    warnings: resolveBuilderAdvisoryWarnings(draft, catalogIndex, rules, rulesetId),
   }
 }
