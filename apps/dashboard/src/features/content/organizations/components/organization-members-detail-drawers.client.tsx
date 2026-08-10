@@ -6,6 +6,7 @@ import { ConfirmDialog } from '@rpg/ui'
 import {
   EditOrganizationMembershipDrawer,
   formatRemoveMembershipHeadline,
+  QuickNpcCreateModal,
 } from '@/features/character'
 
 import type { useOrganizationMembersDetail } from '../hooks/use-organization-members-detail.client'
@@ -43,19 +44,39 @@ export function OrganizationMembersDetailDrawers({
   if (!detail.canManage) return null
 
   const editableOrganization = toEditableOrganization(organization)
+  const buildContext = detail.quickNpc.buildContext
 
   return (
     <>
       <OrganizationMemberPickerDrawer
-        open={detail.drawerState?.mode === 'add'}
+        open={detail.drawerState?.mode === 'add' || detail.drawerState?.mode === 'createNpc'}
         onOpenChange={(open) => {
           if (!open) detail.closeDrawer()
         }}
         organization={editableOrganization}
         candidates={detail.candidates}
         onAdd={detail.handleAddMember}
-        quickNpc={detail.quickNpc}
+        quickNpc={{
+          enabled: true,
+          buildContextFailed: detail.quickNpc.buildContextFailed,
+          buildContextReady: buildContext != null,
+        }}
+        onCreateNpc={detail.openCreateNpcModal}
       />
+
+      {buildContext && detail.drawerState?.mode === 'createNpc' ? (
+        <QuickNpcCreateModal
+          open
+          onOpenChange={(open) => {
+            if (!open) detail.cancelCreateNpcModal()
+          }}
+          campaignId={detail.quickNpc.campaignId}
+          buildContext={buildContext}
+          organization={editableOrganization}
+          onCancel={detail.cancelCreateNpcModal}
+          onCreated={detail.handleQuickNpcSuccess}
+        />
+      ) : null}
 
       {detail.editingRow ? (
         <EditOrganizationMembershipDrawer

@@ -9,6 +9,8 @@ import {
   buildQuickNpcContentOptions,
   buildQuickNpcFormFields,
   buildQuickNpcSeed,
+  buildQuickNpcConstraints,
+  countQuickNpcConfiguredRequirements,
   quickNpcFormDefaultValues,
   quickNpcFormSchema,
   QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
@@ -21,6 +23,8 @@ const validValues = {
   level: 3,
   alignment: 'ln',
   membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+  requiredWeaponId: '',
+  requiredSpellId: '',
 }
 
 describe('quickNpcFormSchema', () => {
@@ -133,7 +137,36 @@ describe('buildQuickNpcFormFields', () => {
       speciesId: '',
       classId: '',
       level: 1,
+      alignment: 'n',
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      requiredWeaponId: '',
+      requiredSpellId: '',
     })
+  })
+})
+
+describe('buildQuickNpcConstraints', () => {
+  it('omits empty requirement fields', () => {
+    expect(buildQuickNpcConstraints({ requiredWeaponId: '', requiredSpellId: '' })).toBeUndefined()
+  })
+
+  it('maps configured requirement ids', () => {
+    expect(
+      buildQuickNpcConstraints({
+        requiredWeaponId: 'srd-cc-5.2.1:longsword',
+        requiredSpellId: '',
+      }),
+    ).toEqual({ requiredWeaponId: 'srd-cc-5.2.1:longsword' })
+  })
+})
+
+describe('countQuickNpcConfiguredRequirements', () => {
+  it('counts only non-empty requirement ids', () => {
+    expect(
+      countQuickNpcConfiguredRequirements({
+        requiredWeaponId: 'weapon-1',
+        requiredSpellId: '',
+      }),
+    ).toBe(1)
   })
 })

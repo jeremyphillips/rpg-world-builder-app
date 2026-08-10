@@ -5,7 +5,7 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { QuickNpcCreateForm } from './quick-npc-create-form.client'
+import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
 const organization = {
   id: 'organization-lantern-guild',
@@ -34,39 +34,39 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
+const setup = {
+  speciesId: populatedBuilderCatalog.species[0]!.id,
+  classId: populatedBuilderCatalog.classes[0]!.id,
+  level: 1,
+}
+
+const setupSummary = [
+  { fieldLabel: 'Species', valueLabel: 'Dwarf' },
+  { fieldLabel: 'Class', valueLabel: 'Fighter' },
+  { fieldLabel: 'Level', valueLabel: '1' },
+]
+
 const meta = {
-  title: 'Dashboard/Character/QuickNpcCreateForm',
-  component: QuickNpcCreateForm,
+  title: 'Dashboard/Character/QuickNpcAuthoringForm',
+  component: QuickNpcAuthoringForm,
   parameters: { layout: 'padded' },
   args: {
     campaignId: 'campaign-test-1',
     buildContext,
     organization,
-    onBack: () => undefined,
+    setup,
+    setupSummary,
+    onCancel: () => undefined,
+    onChangeSetup: () => undefined,
     onCreated: () => undefined,
   },
-} satisfies Meta<typeof QuickNpcCreateForm>
+} satisfies Meta<typeof QuickNpcAuthoringForm>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
-/** Values restored after returning from the picker view in the same drawer session. */
-export const RestoredSession: Story = {
-  args: {
-    initialValues: {
-      name: 'Guild Quartermaster',
-      speciesId: populatedBuilderCatalog.species[0]!.id,
-      classId: populatedBuilderCatalog.classes[0]!.id,
-      level: 3,
-      alignment: 'ln',
-      membershipTitle: 'Guildmaster',
-    },
-  },
-}
-
-/** Class requiring two skills with only one authored option — automatic resolution cannot satisfy it. */
 const unsatisfiableClass = {
   ...populatedBuilderCatalog.classes[0]!,
   characterCreation: {
@@ -78,7 +78,6 @@ const unsatisfiableClass = {
   },
 }
 
-/** Submission fails automatic resolution — builder issues surface as the inline form error. */
 export const ResolutionError: Story = {
   args: {
     buildContext: createCampaignNpcBuilderContextFixture({
@@ -88,13 +87,17 @@ export const ResolutionError: Story = {
         organizations: buildContext.catalog.organizations,
       },
     }),
-    initialValues: {
-      name: 'Stalled Recruit',
+    setup: {
       speciesId: populatedBuilderCatalog.species[0]!.id,
       classId: unsatisfiableClass.id,
       level: 1,
+    },
+    initialValues: {
+      name: 'Stalled Recruit',
       alignment: 'ln',
       membershipTitle: 'Guildmaster',
+      requiredWeaponId: '',
+      requiredSpellId: '',
     },
   },
   play: async ({ canvasElement }) => {

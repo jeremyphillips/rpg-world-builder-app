@@ -13,7 +13,7 @@ import {
 } from '../../lib/character-builder-fixtures'
 import { createNpc } from '../api/npc-client'
 import type * as NpcClient from '../api/npc-client'
-import { QuickNpcCreateForm } from './quick-npc-create-form.client'
+import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
 vi.mock('../api/npc-client', async (importOriginal) => ({
   ...(await importOriginal<typeof NpcClient>()),
@@ -22,7 +22,6 @@ vi.mock('../api/npc-client', async (importOriginal) => ({
 
 const createNpcMock = vi.mocked(createNpc)
 
-// Radix Select requires pointer-capture and scroll APIs missing from jsdom.
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
     HTMLElement.prototype.hasPointerCapture = () => false
@@ -56,7 +55,6 @@ const organizationCatalogRow = {
   connections: { locations: [] },
 }
 
-/** Fighter variant whose skill choice the automatic resolver can satisfy. */
 const quickFighter = {
   ...populatedBuilderCatalog.classes[0]!,
   characterCreation: {
@@ -66,6 +64,12 @@ const quickFighter = {
       },
     },
   },
+}
+
+const setup = {
+  speciesId: populatedBuilderCatalog.species[0]!.id,
+  classId: quickFighter.id,
+  level: 1,
 }
 
 function buildContextFixture(
@@ -80,64 +84,61 @@ function buildContextFixture(
   })
 }
 
+const setupSummary = [
+  { fieldLabel: 'Species', valueLabel: 'Dwarf' },
+  { fieldLabel: 'Class', valueLabel: 'Fighter' },
+  { fieldLabel: 'Level', valueLabel: '1' },
+]
+
 const npcDetail = {
   character: { id: 'npc-99', name: 'Guard Captain' },
   participation: { id: 'participation-99' },
 } as unknown as CampaignNpcDetail
 
-function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcCreateForm>> = {}) {
+function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAuthoringForm>> = {}) {
   const props = {
     campaignId: CAMPAIGN_ID,
     buildContext: buildContextFixture(),
     organization,
-    onBack: vi.fn(),
+    setup,
+    setupSummary,
+    onCancel: vi.fn(),
+    onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
   }
 
-  return { props, ...renderWithProviders(<QuickNpcCreateForm {...props} />) }
+  return { props, ...renderWithProviders(<QuickNpcAuthoringForm {...props} />) }
 }
 
-async function selectOption(
-  user: ReturnType<typeof userEvent.setup>,
-  fieldName: RegExp,
-  optionName: RegExp,
-) {
-  await user.click(screen.getByRole('combobox', { name: fieldName }))
-  await user.click(screen.getByRole('option', { name: optionName }))
-}
-
-async function fillSeedFields(user: ReturnType<typeof userEvent.setup>) {
+async function fillAuthoringFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
-  await selectOption(user, /species/i, /dwarf/i)
-  await selectOption(user, /class/i, /fighter/i)
-  await selectOption(user, /alignment/i, /lawful neutral/i)
+  await user.click(screen.getByRole('combobox', { name: /alignment/i }))
+  await user.click(screen.getByRole('option', { name: /lawful neutral/i }))
 }
 
-describe('QuickNpcCreateForm', () => {
+describe('QuickNpcAuthoringForm', () => {
   beforeEach(() => {
     createNpcMock.mockReset()
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
-  it('renders seed fields and the canonical membership title options', () => {
+  it('renders the details tab with Neutral alignment default and membership title options', () => {
     renderForm()
 
     expect(screen.getByRole('textbox', { name: /name/i })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: /species/i })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: /class/i })).toBeInTheDocument()
-    expect(screen.getByRole('spinbutton', { name: /level/i })).toHaveValue(1)
     expect(screen.getByRole('combobox', { name: /alignment/i })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
     expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 
   it('creates the NPC atomically with the titled membership connection', async () => {
     const user = userEvent.setup()
     const { props } = renderForm()
 
-    await fillSeedFields(user)
+    await fillAuthoringFields(user)
     await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
@@ -156,50 +157,17 @@ describe('QuickNpcCreateForm', () => {
     ])
   })
 
-  it('omits title and priority when No title stays selected', async () => {
+  it('calls onChangeSetup from the setup summary Change action', async () => {
     const user = userEvent.setup()
     const { props } = renderForm()
 
-    await fillSeedFields(user)
-    await user.click(screen.getByRole('button', { name: 'Create NPC' }))
-
-    await waitFor(() => expect(props.onCreated).toHaveBeenCalled())
-    expect(createNpcMock.mock.calls[0]![1].connections.organizations).toEqual([
-      { organizationId: organization.id },
-    ])
-  })
-
-  it('lifts current values on Back for session preservation', async () => {
-    const user = userEvent.setup()
-    const { props } = renderForm()
-
-    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Half-entered')
-    await user.click(screen.getByRole('button', { name: 'Back' }))
-
-    expect(props.onBack).toHaveBeenCalledWith(expect.objectContaining({ name: 'Half-entered' }))
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    expect(props.onChangeSetup).toHaveBeenCalledTimes(1)
     expect(createNpcMock).not.toHaveBeenCalled()
-  })
-
-  it('restores initial values passed from a previous session', () => {
-    renderForm({
-      initialValues: {
-        name: 'Returning NPC',
-        speciesId: populatedBuilderCatalog.species[0]!.id,
-        classId: quickFighter.id,
-        level: 3,
-        alignment: 'ln',
-        membershipTitle: 'Guildmaster',
-      },
-    })
-
-    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Returning NPC')
-    expect(screen.getByRole('spinbutton', { name: /level/i })).toHaveValue(3)
-    expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeChecked()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {
     const user = userEvent.setup()
-    // Two skills required but only one authored option — automatic resolution stalls.
     const unsatisfiableFighter = {
       ...quickFighter,
       characterCreation: {
@@ -212,28 +180,15 @@ describe('QuickNpcCreateForm', () => {
     }
     const { props } = renderForm({
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
+      setup: { ...setup, classId: unsatisfiableFighter.id },
     })
 
-    await fillSeedFields(user)
+    await fillAuthoringFields(user)
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/choose at least 2 options/i)
     expect(createNpcMock).not.toHaveBeenCalled()
     expect(props.onCreated).not.toHaveBeenCalled()
-    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Guard Captain')
-  })
-
-  it('keeps values and shows the fallback error when the create request fails', async () => {
-    const user = userEvent.setup()
-    createNpcMock.mockRejectedValue(new Error('Could not create NPC.'))
-    const { props } = renderForm()
-
-    await fillSeedFields(user)
-    await user.click(screen.getByRole('button', { name: 'Create NPC' }))
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not create NPC.')
-    expect(props.onCreated).not.toHaveBeenCalled()
-    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Guard Captain')
   })
 
   itAxe('has no axe accessibility violations', async () => {
