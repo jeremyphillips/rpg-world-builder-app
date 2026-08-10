@@ -11,6 +11,7 @@ import { gnomePersonalDefinition } from './species/gnome/personal'
 import { gnomeSettlementDefinition } from './species/gnome/settlement'
 import { goliathPersonalDefinition } from './species/goliath/personal'
 import { halflingPersonalDefinition } from './species/halfling/personal'
+import { humanPersonalDefinition } from './species/human/personal'
 import { halflingSettlementDefinition } from './species/halfling/settlement'
 import { orcPersonalDefinition } from './species/orc/personal'
 import { tieflingPersonalDefinition } from './species/tiefling/personal'
@@ -23,6 +24,7 @@ export const CULTURE_CONVENTION_BINDINGS = {
   gnome: [gnomePersonalDefinition, gnomeSettlementDefinition],
   goliath: [goliathPersonalDefinition],
   halfling: [halflingPersonalDefinition, halflingSettlementDefinition],
+  human: [humanPersonalDefinition],
   orc: [orcPersonalDefinition],
   tiefling: [tieflingPersonalDefinition],
 } as const satisfies Record<string, readonly NamingConventionDefinition[]>

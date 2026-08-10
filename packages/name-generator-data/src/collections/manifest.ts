@@ -7,7 +7,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/elvish-given-pool.ts',
-    approximateResultCount: 30,
+    approximateResultCount: 300,
   },
   {
     id: 'elvish-family-pool',
@@ -15,7 +15,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/elvish-family-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'elvish-place-root-pool',
@@ -47,7 +47,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/draconic-dragonborn-given-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'draconic-dragonborn-clan-pool',
@@ -55,7 +55,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person', 'clan', 'family'],
     generatorKinds: ['sample'],
     assetPath: 'collections/draconic-dragonborn-clan-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'dwarven-given-pool',
@@ -63,7 +63,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/dwarven-given-pool.ts',
-    approximateResultCount: 30,
+    approximateResultCount: 300,
   },
   {
     id: 'dwarven-clan-pool',
@@ -71,7 +71,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person', 'clan', 'family'],
     generatorKinds: ['sample'],
     assetPath: 'collections/dwarven-clan-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'dwarven-settlement-pool',
@@ -87,7 +87,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/halfling-given-pool.ts',
-    approximateResultCount: 30,
+    approximateResultCount: 300,
   },
   {
     id: 'halfling-family-pool',
@@ -95,7 +95,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person', 'family'],
     generatorKinds: ['sample'],
     assetPath: 'collections/halfling-family-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'halfling-place-root-pool',
@@ -119,7 +119,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/infernal-tiefling-given-pool.ts',
-    approximateResultCount: 20,
+    approximateResultCount: 300,
   },
   {
     id: 'infernal-tiefling-virtue-pool',
@@ -127,7 +127,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/infernal-tiefling-virtue-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'gnomish-given-pool',
@@ -135,7 +135,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/gnomish-given-pool.ts',
-    approximateResultCount: 30,
+    approximateResultCount: 300,
   },
   {
     id: 'gnomish-family-pool',
@@ -143,7 +143,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person', 'family'],
     generatorKinds: ['sample'],
     assetPath: 'collections/gnomish-family-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'gnomish-place-root-pool',
@@ -167,7 +167,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/goliath-given-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'goliath-epithet-pool',
@@ -175,7 +175,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/goliath-epithet-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
   },
   {
     id: 'goliath-clan-pool',
@@ -183,7 +183,23 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person', 'clan', 'family'],
     generatorKinds: ['sample'],
     assetPath: 'collections/goliath-clan-pool.ts',
-    approximateResultCount: 10,
+    approximateResultCount: 300,
+  },
+  {
+    id: 'human-given-pool',
+    label: 'Human given names',
+    subjectKinds: ['person'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/human-given-pool.ts',
+    approximateResultCount: 300,
+  },
+  {
+    id: 'human-family-pool',
+    label: 'Human family names',
+    subjectKinds: ['person', 'family'],
+    generatorKinds: ['sample'],
+    assetPath: 'collections/human-family-pool.ts',
+    approximateResultCount: 300,
   },
   {
     id: 'orc-given-pool',
@@ -191,7 +207,7 @@ export const COLLECTION_MANIFEST_ENTRIES = [
     subjectKinds: ['person'],
     generatorKinds: ['sample'],
     assetPath: 'collections/orc-given-pool.ts',
-    approximateResultCount: 20,
+    approximateResultCount: 300,
   },
   {
     id: 'faction-descriptor-pool',

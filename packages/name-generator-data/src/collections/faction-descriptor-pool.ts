@@ -13,7 +13,7 @@ export const factionDescriptorPoolCollection = {
       {
         id: 'descriptor',
         role: 'descriptor',
-        values: ['Silent', 'Crimson', 'Iron', 'Veiled', 'Golden', 'Ashen', 'Night'],
+        values: ['Ashen', 'Crimson', 'Golden', 'Iron', 'Night', 'Silent', 'Veiled'],
       },
     ],
   },
