@@ -863,7 +863,8 @@
     ],
     "culture": {
       "naming": {
-        "supported": false
+        "supported": true,
+        "personalNameComponents": ["family"]
       }
     }
   },

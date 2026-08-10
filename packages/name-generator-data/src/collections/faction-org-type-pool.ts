@@ -13,7 +13,7 @@ export const factionOrgTypePoolCollection = {
       {
         id: 'organizationType',
         role: 'organizationType',
-        values: ['Guild', 'Brotherhood', 'Circle', 'Company', 'Order', 'Syndicate'],
+        values: ['Brotherhood', 'Circle', 'Company', 'Guild', 'Order', 'Syndicate'],
       },
     ],
   },

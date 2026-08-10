@@ -11,8 +11,8 @@ export const dwarvenSettlementPoolCollection = {
     type: 'compound',
     parts: [{ pool: 'root' }, { pool: 'suffix', separator: ' ' }],
     pools: {
-      root: ['Iron', 'Stone', 'Hammer', 'Anvil', 'Deep', 'Grim'],
-      suffix: ['hold', 'gate', 'heim', 'forge', 'delve', 'barrow'],
+      root: ['Anvil', 'Deep', 'Grim', 'Hammer', 'Iron', 'Stone'],
+      suffix: ['barrow', 'delve', 'forge', 'gate', 'heim', 'hold'],
     },
   },
   provenance: FIXTURE_COLLECTION_PROVENANCE.fictionalOriginal,

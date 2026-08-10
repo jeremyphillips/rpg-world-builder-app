@@ -14,7 +14,7 @@ export const elvishPlaceRootPoolCollection = {
       {
         id: 'placeRoot',
         role: 'placeRoot',
-        values: ['Ael', 'Cele', 'Mith', 'Sil', 'Ther', 'Lyr', 'Nim'],
+        values: ['Ael', 'Cele', 'Lyr', 'Mith', 'Nim', 'Sil', 'Ther'],
       },
     ],
   },

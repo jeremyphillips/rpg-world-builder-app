@@ -14,7 +14,7 @@ export const akanFamilyPoolCollection = {
         id: 'family',
         role: 'family',
         genderStyle: 'shared',
-        values: ['Mensah', 'Boateng', 'Owusu', 'Asante', 'Agyeman', 'Darko'],
+        values: ['Agyeman', 'Asante', 'Boateng', 'Darko', 'Mensah', 'Owusu'],
       },
     ],
   },

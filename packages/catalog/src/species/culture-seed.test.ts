@@ -28,7 +28,7 @@ describe('SRD species culture seeds', () => {
       halfling: ['family'],
       tiefling: ['virtue'],
       orc: undefined,
-      human: undefined,
+      human: ['family'],
     }
 
     for (const entry of species) {
