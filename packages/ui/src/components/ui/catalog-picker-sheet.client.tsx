@@ -116,6 +116,7 @@ export function CatalogPickerSheet<TItem>({
   hasStructuredFilters = false,
   headerExtra,
   footer,
+  bodyReplacement,
   emptyState,
   loading = false,
   searchPlaceholder = DEFAULT_SEARCH_PLACEHOLDER,
@@ -228,7 +229,15 @@ export function CatalogPickerSheet<TItem>({
           </div>
         ) : null}
 
-        {pickerEnabled ? (
+        {bodyReplacement !== undefined ? (
+          <Sheet.Body
+            className={catalogPickerSheetBodyVariants({
+              hasFooter: Boolean(footer),
+            })}
+          >
+            {bodyReplacement}
+          </Sheet.Body>
+        ) : pickerEnabled ? (
           <>
             <CatalogToolbar
               search={{

@@ -51,6 +51,7 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 | NPC build              | `/campaigns/:id/npcs/new`                        | build   | npc  | campaign   | campaign  |
 | NPC import             | `/campaigns/:id/npcs/import`                     | import  | npc  | campaign   | campaign  |
 | Campaign PC onboarding | `/campaigns/:id/onboarding`                      | build   | pc   | campaign   | user      |
+| Quick NPC (org member) | organization detail → Add member drawer          | build   | npc  | campaign   | campaign  |
 | PC detail              | `/characters/:characterId`                       | —       | pc   | —          | user      |
 | Campaign PC detail     | `/campaigns/:campaignId/characters/:characterId` | —       | pc   | —          | user      |
 | NPC detail             | `/campaigns/:id/npcs/:npcId`                     | —       | npc  | —          | campaign  |
@@ -93,6 +94,13 @@ PC vital PATCH is deferred — see
 | ----------------------------- | ----------------------------------------------------------------- |
 | `finalizeCharacterBuild()`    | Builder draft → `CreateCharacterInput` (PC)                       |
 | `finalizeNpcCharacterBuild()` | Builder draft → `CreateNpcRequestInput` (strips ownership fields) |
+
+Quick NPC skips the step-by-step builder: `resolveAutomaticNpcBuild()` completes
+a draft from a compact seed, the flow injects the organization membership into
+`connections.organizations`, and the same `finalizeNpcCharacterBuild()` performs
+the single authoritative `finalSubmit` validation. One `POST /api/campaigns/:id/npcs`
+creates the NPC with its membership — no follow-up mutation. Domain detail:
+[automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
 
 ## Import finalization
 

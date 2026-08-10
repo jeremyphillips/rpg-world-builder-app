@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import {
+  createCampaignNpcBuilderContextFixture,
+  populatedBuilderCatalog,
+} from '@/features/character'
+
 import { OrganizationMemberPickerDrawer } from './organization-member-picker-drawer.client'
 import {
   ORGANIZATION_MEMBER_PICKER_CANDIDATES,
@@ -26,4 +31,27 @@ export const Default: Story = {}
 
 export const NoCandidates: Story = {
   args: { candidates: [] },
+}
+
+/** With the Quick NPC shortcut wired — the footer offers "Create new NPC". */
+export const WithQuickNpcCreation: Story = {
+  args: {
+    quickNpc: {
+      campaignId: 'campaign-test-1',
+      buildContext: createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog }),
+      onCreated: () => undefined,
+    },
+  },
+}
+
+/** Build context failed to load — the footer shows a hint instead of the entry action. */
+export const QuickNpcCreationUnavailable: Story = {
+  args: {
+    quickNpc: {
+      campaignId: 'campaign-test-1',
+      buildContext: null,
+      buildContextFailed: true,
+      onCreated: () => undefined,
+    },
+  },
 }

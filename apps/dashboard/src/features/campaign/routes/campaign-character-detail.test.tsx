@@ -9,6 +9,7 @@ import {
 } from '@/features/character'
 import { buildCharacterDetailViewModel } from '@/features/character'
 import { SAMPLE_PC } from '@/features/character'
+import type * as CharacterFeature from '@/features/character'
 
 import { CampaignCharacterDetail } from './campaign-character-detail'
 
@@ -16,7 +17,7 @@ vi.mock('../hooks/use-campaign-character-detail')
 vi.mock('../hooks/use-campaigns')
 vi.mock('../hooks/use-campaign-character-navigation-context')
 vi.mock('@/features/character', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/character')>()
+  const actual = await importOriginal<typeof CharacterFeature>()
   return {
     ...actual,
     CharacterOrganizationMembershipsContainer: () => null,

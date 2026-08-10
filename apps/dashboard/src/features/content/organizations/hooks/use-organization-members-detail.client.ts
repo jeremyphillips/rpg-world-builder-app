@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { Organization } from '@rpg/contracts'
+import type { CampaignNpcDetail, Organization } from '@rpg/contracts'
 import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -55,7 +55,12 @@ export function useOrganizationMembersDetail(
   const membersQuery = useOrganizationMembers(campaignId, organizationId)
   const campaignCharactersQuery = useCampaignCharacters(canManage ? campaignId : undefined)
   const npcsQuery = useNpcs(canManage ? campaignId : undefined)
-  const { catalogIndex } = useCampaignNpcBuildContext(canManage ? campaignId : undefined)
+  const {
+    catalogIndex,
+    context: npcBuildContext,
+    isError: npcBuildContextIsError,
+    unavailable: npcBuildContextUnavailable,
+  } = useCampaignNpcBuildContext(canManage ? campaignId : undefined)
 
   const [drawerState, setDrawerState] = React.useState<OrganizationMembersDrawerState | null>(null)
   const [mutationError, setMutationError] = React.useState<string | null>(null)
@@ -115,10 +120,37 @@ export function useOrganizationMembersDetail(
           subjectKind: subjectKindFor(commit),
         })
       } catch (error) {
-        throw new Error(getErrorMessage(error, ORGANIZATION_MEMBER_ADD_FAILED))
+        throw new Error(getErrorMessage(error, ORGANIZATION_MEMBER_ADD_FAILED), { cause: error })
       }
     },
     [campaignId, invalidate, organizationId],
+  )
+
+  /** Quick NPC creation already wrote the membership atomically — refresh reads only. */
+  const handleQuickNpcCreated = React.useCallback(
+    async (npc: CampaignNpcDetail) => {
+      await invalidate({ characterId: npc.character.id, subjectKind: 'npc' })
+    },
+    [invalidate],
+  )
+
+  /** Quick NPC creation context for the Add member drawer — buildContext is null until it resolves. */
+  const quickNpc = React.useMemo(
+    () => ({
+      campaignId,
+      buildContext: npcBuildContext,
+      buildContextFailed:
+        npcBuildContextIsError ||
+        (npcBuildContextUnavailable !== null && npcBuildContextUnavailable.kind !== 'loading'),
+      onCreated: handleQuickNpcCreated,
+    }),
+    [
+      campaignId,
+      handleQuickNpcCreated,
+      npcBuildContext,
+      npcBuildContextIsError,
+      npcBuildContextUnavailable,
+    ],
   )
 
   const editingRow = drawerState?.mode === 'edit' ? drawerState.row : null
@@ -151,7 +183,7 @@ export function useOrganizationMembersDetail(
           subjectKind: subjectKindFor(editingRow),
         })
       } catch (error) {
-        throw new Error(getErrorMessage(error, UPDATE_MEMBERSHIP_FAILED))
+        throw new Error(getErrorMessage(error, UPDATE_MEMBERSHIP_FAILED), { cause: error })
       }
     },
     [
@@ -184,7 +216,7 @@ export function useOrganizationMembersDetail(
     try {
       await removeMember(editingRow)
     } catch (error) {
-      throw new Error(getErrorMessage(error, REMOVE_MEMBER_FAILED))
+      throw new Error(getErrorMessage(error, REMOVE_MEMBER_FAILED), { cause: error })
     }
   }, [editingRow, removeMember])
 
@@ -224,6 +256,7 @@ export function useOrganizationMembersDetail(
     removingRow: drawerState?.mode === 'remove' ? drawerState.row : null,
     mutationError,
     pendingCharacterId,
+    quickNpc,
     openAddDrawer,
     openEditDrawer,
     openRemoveConfirm,

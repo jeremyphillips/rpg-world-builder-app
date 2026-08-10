@@ -54,6 +54,7 @@ export function OrganizationMembersDetailDrawers({
         organization={editableOrganization}
         candidates={detail.candidates}
         onAdd={detail.handleAddMember}
+        quickNpc={detail.quickNpc}
       />
 
       {detail.editingRow ? (

@@ -106,6 +106,19 @@ function pairScoresToAbilitiesInOrder(
   return zipScoresToAbilitiesInOrder(abilities, sortedScores)
 }
 
+/**
+ * Deterministic full-pool assignment: abilities in class-priority order
+ * (primary abilities first, then remaining ABILITY_IDS) receive pool scores in
+ * descending order. Same inputs always produce the same assignment — used by
+ * automatic build resolution; the interactive auto-fill keeps its shuffle.
+ */
+export function deriveDeterministicAbilityAssignment(
+  primaryAbilities: readonly Ability[],
+  scorePool: readonly number[],
+): Partial<Record<Ability, number>> {
+  return pairScoresToAbilitiesInOrder(deriveAbilityAssignmentPriority(primaryAbilities), scorePool)
+}
+
 function removeScoresFromPool(
   pool: readonly number[],
   scoresToRemove: readonly number[],
