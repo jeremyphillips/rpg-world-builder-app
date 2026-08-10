@@ -557,9 +557,17 @@ export const ORGANIZATION_SUBTYPE_IDS = collectOrganizationSubtypeIds()
 
 export const organizationSubtypeSchema = closedSetEnum(ORGANIZATION_SUBTYPE_IDS)
 
-/** Returns subtype ids for an organization kind (empty for `other`). */
+function organizationSubtypesForKind(
+  kind: OrganizationKind,
+): Record<string, OrganizationSubtypeEntry> | undefined {
+  return ORGANIZATION_SUBTYPES_BY_KIND[kind as keyof typeof ORGANIZATION_SUBTYPES_BY_KIND]
+}
+
+/** Returns subtype ids for an organization kind (empty for `other` or unknown ids). */
 export function getOrganizationSubtypeIds(kind: OrganizationKind): readonly OrganizationSubtype[] {
-  return Object.keys(ORGANIZATION_SUBTYPES_BY_KIND[kind]) as OrganizationSubtype[]
+  const subtypesByKind = organizationSubtypesForKind(kind)
+  if (!subtypesByKind) return []
+  return Object.keys(subtypesByKind) as OrganizationSubtype[]
 }
 
 /** True when the subtype id is registered under the given kind. */
@@ -567,7 +575,9 @@ export function isOrganizationSubtypeValidForKind(
   kind: OrganizationKind,
   subtype: string,
 ): boolean {
-  return Object.prototype.hasOwnProperty.call(ORGANIZATION_SUBTYPES_BY_KIND[kind], subtype)
+  const subtypesByKind = organizationSubtypesForKind(kind)
+  if (!subtypesByKind) return false
+  return Object.prototype.hasOwnProperty.call(subtypesByKind, subtype)
 }
 
 /** Kind-scoped subtype entry lookup — never discovers parent kind from a flat id. */
@@ -575,8 +585,7 @@ export function getOrganizationSubtypeEntry(
   kind: OrganizationKind,
   subtype: string,
 ): OrganizationSubtypeEntry | undefined {
-  const map = ORGANIZATION_SUBTYPES_BY_KIND[kind] as Record<string, OrganizationSubtypeEntry>
-  return map[subtype]
+  return organizationSubtypesForKind(kind)?.[subtype]
 }
 
 /** Kind-scoped subtype label. Falls back to the raw id when unknown for that kind. */

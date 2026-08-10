@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   ORGANIZATION_KIND_ENTRIES,
   ORGANIZATION_KIND_IDS,
+  getOrganizationKindEntry,
   getOrganizationSubtypeIds,
   getOrganizationSubtypeLabel,
   organizationKindSchema,
@@ -26,7 +27,7 @@ function resolveOrganizationSubtypeFieldOptions(
   values: Record<string, unknown>,
 ): readonly FieldOption[] {
   const kind = values.organizationKind
-  if (typeof kind !== 'string') return []
+  if (typeof kind !== 'string' || getOrganizationKindEntry(kind) === undefined) return []
   return getOrganizationSubtypeIds(kind as OrganizationKind).map((id) => ({
     value: id,
     label: getOrganizationSubtypeLabel(kind as OrganizationKind, id),
@@ -38,11 +39,8 @@ function visibleWhenOrganizationSubtypeAvailable() {
     dependsOn: ['organizationKind'],
     visibleWhen: (watched: Record<string, unknown>) => {
       const kind = watched.organizationKind
-      return (
-        typeof kind === 'string' &&
-        kind !== 'other' &&
-        getOrganizationSubtypeIds(kind as OrganizationKind).length > 0
-      )
+      if (typeof kind !== 'string' || getOrganizationKindEntry(kind) === undefined) return false
+      return getOrganizationSubtypeIds(kind as OrganizationKind).length > 0
     },
   }
 }
