@@ -91,15 +91,53 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 
 ## Related surfaces
 
-| Surface                                   | Scaffold                                           |
-| ----------------------------------------- | -------------------------------------------------- |
-| Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`          |
-| Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                |
-| Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)              |
-| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()` |
-| Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)          |
+| Surface                                   | Scaffold                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`                                |
+| Quick NPC (org Add member)                | `OrganizationMemberPickerDrawer` + character-owned `QuickNpcCreateModal` |
+| Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
+| Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
+| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()`                       |
+| Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)                                |
 
 Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+
+## Overlay modality policy
+
+**Drawer = relationship; Modal = entity create.** Pickers and membership workflows stay in
+`DrawerShell` / `CatalogPickerSheet`. Continuous or multi-step **creation** flows use
+`Modal` + `ContentFormHost` (locations) or a feature-owned modal shell (Quick NPC).
+
+Do **not** embed entity creation inside a drawer body (`bodyReplacement`, stacked overlays).
+The parent hook owns exclusive overlay modes and passes context between shells:
+
+```text
+add (picker drawer)  →  createNpc (modal)  →  cancel returns to add  →  success closes all
+```
+
+Quick NPC: the organizations hook toggles `add` | `createNpc`; the character feature owns
+`QuickNpcCreateModal` (Setup, TabbedForm authoring, create). See
+[character-acquisition.md](./character-acquisition.md#quick-npc-organization-member).
+
+### Pending dismiss (`usePendingAwareOpenChange`)
+
+Form overlays that must block user dismiss while submit is in flight wire
+`usePendingAwareOpenChange` from `@rpg/ui`:
+
+```ts
+const { handleOpenChange, trustedClose } = usePendingAwareOpenChange({
+  pending,
+  allowDismissWhilePending, // optional opt-out
+  onOpenChange,
+})
+```
+
+- User dismiss (X, Escape, backdrop, Cancel → Root) is refused while `pending` (unless opt-out).
+- `trustedClose()` bypasses the guard for success or intentional parent close.
+- Dirty discard / leave-bridge stays shell-owned (`ContentFormHost`, `FormUnsavedChangesGuard`);
+  the helper owns **pending** Root behavior only.
+
+Wired today: `ContentFormDrawer`, `LocationCreateModal`, `QuickNpcCreateModal`.
 
 ## Unsaved-changes leave guard
 

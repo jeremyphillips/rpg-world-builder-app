@@ -147,4 +147,28 @@ describe('QuickNpcCreateModal', () => {
     await completeSetup(user)
     expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('')
   })
+
+  it('blocks cancel while creation is pending', async () => {
+    const user = userEvent.setup()
+    let resolveCreate: ((value: CampaignNpcDetail) => void) | undefined
+    createNpcMock.mockImplementation(
+      () =>
+        new Promise<CampaignNpcDetail>((resolve) => {
+          resolveCreate = resolve
+        }),
+    )
+
+    const { props } = renderModal()
+    await completeSetup(user)
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
+    await selectOption(user, /alignment/i, /lawful neutral/i)
+    await user.click(screen.getByRole('button', { name: 'Create NPC' }))
+
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(props.onCancel).not.toHaveBeenCalled()
+
+    resolveCreate?.(npcDetail)
+    await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
+  })
 })

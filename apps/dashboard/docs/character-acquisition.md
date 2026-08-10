@@ -51,13 +51,33 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 | NPC build              | `/campaigns/:id/npcs/new`                        | build   | npc  | campaign   | campaign  |
 | NPC import             | `/campaigns/:id/npcs/import`                     | import  | npc  | campaign   | campaign  |
 | Campaign PC onboarding | `/campaigns/:id/onboarding`                      | build   | pc   | campaign   | user      |
-| Quick NPC (org member) | organization detail → Add member drawer          | build   | npc  | campaign   | campaign  |
+| Quick NPC (org member) | organization detail → Add member drawer → modal  | build   | npc  | campaign   | campaign  |
 | PC detail              | `/characters/:characterId`                       | —       | pc   | —          | user      |
 | Campaign PC detail     | `/campaigns/:campaignId/characters/:characterId` | —       | pc   | —          | user      |
 | NPC detail             | `/campaigns/:id/npcs/:npcId`                     | —       | npc  | —          | campaign  |
 
 NPC authoring routes require campaign `owner` or `co-owner` (see campaign feature
 README). Default `/characters/*` never carries campaign id in the URL.
+
+### Quick NPC (organization member)
+
+Campaign managers create an NPC and stamp organization membership in one flow from the
+organization detail **Members** section — no full builder route.
+
+| Layer                                               | Responsibility                                                                                                    |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions |
+| `OrganizationMemberPickerDrawer`                    | Relationship picker; footer **Create new NPC** delegates to parent (no `bodyReplacement`)                         |
+| `QuickNpcCreateModal` (character feature)           | Setup (species/class/level) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create  |
+
+**Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays
+open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.
+
+**Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
+weapon/spell constraints), injects `connections.organizations`, then
+`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included.
+Overlay policy: [drawer-shell.md](./drawer-shell.md#overlay-modality-policy). Resolver detail:
+[automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
 
 ### Campaign-scoped PC detail
 

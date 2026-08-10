@@ -118,7 +118,8 @@ second assembly path.
 - **Quick NPC** (dashboard): `apps/dashboard/src/features/character/npc/lib/quick-npc-create.ts`
   wraps the resolver, injects the organization membership connection, and
   finalizes — one atomic `POST /api/campaigns/:id/npcs` carries the
-  membership in `connections.organizations`. Entry surface: the organization
-  Members "Add member" drawer (`OrganizationMemberPickerDrawer`), which swaps
-  its body for `QuickNpcCreateForm` while preserving both views' state for
-  the drawer session.
+  membership in `connections.organizations`. Entry surface: organization detail
+  → **Add member** drawer (`OrganizationMemberPickerDrawer`) → character-owned
+  `QuickNpcCreateModal` (Setup then TabbedForm authoring). The organizations hook
+  coordinates overlay modes only; it does not embed creation inside the drawer.
+  Dashboard policy: [character-acquisition.md](../../../../apps/dashboard/docs/character-acquisition.md#quick-npc-organization-member).

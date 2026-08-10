@@ -65,7 +65,6 @@ function buildAuthoringTabs(args: {
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   configuredCount: number
-  onNameGenerated: (name: string) => void
 }) {
   const requirementCategories = resolveQuickNpcRequirementCategories({
     setup: args.setup,
@@ -87,7 +86,6 @@ function buildAuthoringTabs(args: {
           createElement(QuickNpcNameField, {
             speciesId: args.setup.speciesId,
             buildContext: args.buildContext,
-            onNameGenerated: args.onNameGenerated,
           }),
       },
     }),
@@ -163,8 +161,6 @@ export function QuickNpcAuthoringForm({
     [initialValues, setup],
   )
 
-  const onNameGeneratedRef = React.useRef<(name: string) => void>(() => undefined)
-
   const tabs = React.useMemo(
     () =>
       buildAuthoringTabs({
@@ -172,9 +168,6 @@ export function QuickNpcAuthoringForm({
         buildContext,
         organization,
         configuredCount,
-        onNameGenerated: (name) => {
-          onNameGeneratedRef.current(name)
-        },
       }),
     [buildContext, configuredCount, organization, setup],
   )
@@ -225,21 +218,16 @@ export function QuickNpcAuthoringForm({
       formError={formError ?? null}
       valueSyncs={valueSyncs}
       stickyChrome={false}
-      header={(form) => {
-        onNameGeneratedRef.current = (name) => {
-          form.setValue('name', name, { shouldDirty: true, shouldValidate: true })
-        }
-        return (
-          <>
-            <RequirementCountWatcher
-              form={form}
-              fallback={defaultValues}
-              onConfiguredCountChange={setConfiguredCount}
-            />
-            <QuickNpcSetupSummary entries={setupSummary} onChange={onChangeSetup} />
-          </>
-        )
-      }}
+      header={(form) => (
+        <>
+          <RequirementCountWatcher
+            form={form}
+            fallback={defaultValues}
+            onConfiguredCountChange={setConfiguredCount}
+          />
+          <QuickNpcSetupSummary entries={setupSummary} onChange={onChangeSetup} />
+        </>
+      )}
       footer={() => (
         <div className={dialogPanelActionRowClasses}>
           <Button type="button" variant="outline" disabled={isPending} onClick={onCancel}>

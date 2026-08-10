@@ -5,22 +5,23 @@ import * as React from 'react'
 import type { CharacterBuildContext } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
+import { useFormContext } from 'react-hook-form'
 
 import {
   generateQuickNpcName,
   QUICK_NPC_GENERATE_NAME_LABEL,
   QUICK_NPC_NAME_GENERATION_FAILED,
 } from '../lib/quick-npc-name-generation'
+import type { QuickNpcAuthoringValues } from '../lib/quick-npc-form-fields'
 
 export function QuickNpcNameField({
   speciesId,
   buildContext,
-  onNameGenerated,
 }: {
   speciesId: string
   buildContext: CharacterBuildContext
-  onNameGenerated: (name: string) => void
 }) {
+  const form = useFormContext<QuickNpcAuthoringValues>()
   const [pending, setPending] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
@@ -34,11 +35,11 @@ export function QuickNpcNameField({
         setError(QUICK_NPC_NAME_GENERATION_FAILED)
         return
       }
-      onNameGenerated(name)
+      form.setValue('name', name, { shouldDirty: true, shouldValidate: true })
     } finally {
       setPending(false)
     }
-  }, [buildContext, onNameGenerated, pending, speciesId])
+  }, [buildContext, form, pending, speciesId])
 
   return (
     <div className="flex flex-col gap-2">
