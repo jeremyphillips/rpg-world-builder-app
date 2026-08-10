@@ -7,15 +7,15 @@ import {
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   buildQuickNpcContentOptions,
-  buildQuickNpcFormFields,
+  buildQuickNpcDetailsFields,
   buildQuickNpcSeed,
   buildQuickNpcConstraints,
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
   mergeQuickNpcAuthoringValues,
+  quickNpcAuthoringDefaultValues,
+  quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
-  quickNpcFormDefaultValues,
-  quickNpcFormSchema,
   QUICK_NPC_DETAILS_TAB_ID,
   QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
 } from './quick-npc-form-fields'
@@ -31,9 +31,9 @@ const validValues = {
   requiredSpellIds: [],
 }
 
-describe('quickNpcFormSchema', () => {
+describe('quickNpcAuthoringSchema', () => {
   it('accepts a complete quick NPC form payload', () => {
-    expect(quickNpcFormSchema(20).parse(validValues)).toMatchObject({
+    expect(quickNpcAuthoringSchema(20).parse(validValues)).toMatchObject({
       name: 'Guard Captain',
       level: 3,
       alignment: 'ln',
@@ -41,7 +41,7 @@ describe('quickNpcFormSchema', () => {
   })
 
   it('rejects missing required seed fields with builder messages', () => {
-    const result = quickNpcFormSchema(20).safeParse({
+    const result = quickNpcAuthoringSchema(20).safeParse({
       ...validValues,
       name: ' ',
       speciesId: '',
@@ -61,7 +61,7 @@ describe('quickNpcFormSchema', () => {
   })
 
   it('rejects a level above the campaign maximum', () => {
-    const result = quickNpcFormSchema(20).safeParse({ ...validValues, level: 21 })
+    const result = quickNpcAuthoringSchema(20).safeParse({ ...validValues, level: 21 })
 
     expect(result.success).toBe(false)
     const messages = result.success ? [] : result.error.issues.map((issue) => issue.message)
@@ -71,7 +71,7 @@ describe('quickNpcFormSchema', () => {
 
 describe('buildQuickNpcSeed', () => {
   it('maps form values to the automatic build seed without the membership title', () => {
-    const seed = buildQuickNpcSeed(quickNpcFormSchema(20).parse(validValues))
+    const seed = buildQuickNpcSeed(quickNpcAuthoringSchema(20).parse(validValues))
 
     expect(seed).toEqual({
       name: 'Guard Captain',
@@ -111,12 +111,9 @@ describe('buildQuickNpcContentOptions', () => {
   })
 })
 
-describe('buildQuickNpcFormFields', () => {
+describe('buildQuickNpcDetailsFields', () => {
   it('includes the canonical membership title radio with a No title default', () => {
-    const fields = buildQuickNpcFormFields({
-      speciesOptions: [],
-      classOptions: [],
-      maxLevel: 20,
+    const fields = buildQuickNpcDetailsFields({
       membership: { kind: 'professional' },
     })
 
@@ -136,7 +133,7 @@ describe('buildQuickNpcFormFields', () => {
   })
 
   it('has defaults for every schema key', () => {
-    expect(quickNpcFormDefaultValues).toMatchObject({
+    expect(quickNpcAuthoringDefaultValues).toMatchObject({
       name: '',
       speciesId: '',
       classId: '',

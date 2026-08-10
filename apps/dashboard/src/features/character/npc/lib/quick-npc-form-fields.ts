@@ -110,9 +110,6 @@ export type QuickNpcAuthoringTabValues = z.infer<ReturnType<typeof quickNpcAutho
 
 export type QuickNpcAuthoringValues = z.infer<ReturnType<typeof quickNpcAuthoringSchema>>
 
-/** @deprecated Use QuickNpcAuthoringValues — kept for transitional imports. */
-export type QuickNpcFormValues = QuickNpcAuthoringValues
-
 export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
   name: '',
   alignment: 'n',
@@ -133,9 +130,6 @@ export function mergeQuickNpcAuthoringValues(
 ): QuickNpcAuthoringValues {
   return { ...setup, ...tab }
 }
-
-/** @deprecated Use quickNpcAuthoringDefaultValues */
-export const quickNpcFormDefaultValues = quickNpcAuthoringDefaultValues
 
 /** Maps validated authoring values to the automatic build resolver seed. */
 export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpcBuildSeed {
@@ -277,23 +271,4 @@ export function buildQuickNpcTabs(args: {
   }
 
   return tabs
-}
-
-/** @deprecated Setup fields are composed via shared create-setup — use buildQuickNpcDetailsFields. */
-export type QuickNpcFormFieldsArgs = QuickNpcContentOptions & {
-  maxLevel: number
-  membership: {
-    kind: OrganizationKind
-    subtype?: string
-  }
-}
-
-/** @deprecated Setup fields are composed via shared create-setup — use buildQuickNpcDetailsFields. */
-export function buildQuickNpcFormFields(args: QuickNpcFormFieldsArgs): FormItem[] {
-  return buildQuickNpcDetailsFields({ membership: args.membership })
-}
-
-/** @deprecated Use quickNpcAuthoringSchema */
-export function quickNpcFormSchema(maxLevel: number) {
-  return quickNpcAuthoringSchema(maxLevel)
 }

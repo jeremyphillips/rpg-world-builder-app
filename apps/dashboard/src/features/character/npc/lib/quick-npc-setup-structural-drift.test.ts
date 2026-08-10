@@ -12,7 +12,7 @@ describe('quick-npc setup structural drift', () => {
 
     expect(source).toContain('CreateSetupPanel')
     expect(source).toContain('buildQuickNpcCreateSetupSets')
-    expect(source).not.toMatch(/buildQuickNpcSetupFields/)
+    expect(source).not.toMatch(/buildQuickNpcFormFields/)
     expect(source).not.toMatch(/<Form/)
     expect(source).not.toMatch(/from '@rpg\/ui\/form'/)
   })

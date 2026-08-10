@@ -32,8 +32,12 @@ import {
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
-import type { LocationCreateSetupChoiceSet } from './location-create-setup-shell.client'
-import { LocationCreateSetupPanel } from './location-create-setup-shell.client'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import {
+  buildLocationCreateSetupSets,
+  type LocationCreateSetupChoiceSet,
+} from '../lib/location-create-setup.lib'
+import { CreateSetupPanel } from '@/lib/create-setup'
 import { LocationCreateSetupSummary } from './location-create-setup-summary.client'
 import { LocationCreateForm } from './location-create-form.client'
 
@@ -116,10 +120,11 @@ function LocationCreateModalSetupPhase({
   return (
     <>
       <Modal.Body>
-        <LocationCreateSetupPanel
-          choiceSets={choiceSets}
-          reopenChoiceSetId={reopenChoiceSetId}
-          onReopenChoiceSetIdChange={onReopenChoiceSetIdChange}
+        <CreateSetupPanel
+          sets={buildLocationCreateSetupSets(choiceSets)}
+          changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+          reopenSetId={reopenChoiceSetId}
+          onReopenSetIdChange={onReopenChoiceSetIdChange}
         />
       </Modal.Body>
       <Modal.Footer>

@@ -21,7 +21,7 @@ Feature domain models (location intent, NPC build context) stay in feature `lib/
 
 ## Consumers
 
-- Location create setup — choice sets only via `LocationCreateSetupShell`
+- Location create setup — choice sets via `CreateSetupShell` and `buildLocationCreateSetupSets`
 - Quick NPC modal setup — Species → Level → Class
 
 Do not route setup through `FormItem` / `Form` — that layer is for tabbed authoring, not progressive create setup.

@@ -4,9 +4,11 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { RadioCardOption } from '@rpg/ui'
 
+import { CreateSetupShell, createSetupModalBodyClasses } from '@/lib/create-setup'
+
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
-import { locationCreateSetupModalBodyClasses } from './location-create-setup.variants'
-import { LocationCreateSetupShell } from './location-create-setup-shell.client'
+import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
+import type { LocationCreateSetupChoiceSet } from '../lib/location-create-setup.lib'
 
 const SITE_OPTIONS: RadioCardOption[] = [
   {
@@ -50,21 +52,24 @@ const REGION_TYPE_OPTIONS: RadioCardOption[] = [
 function SingleChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => void }) {
   const [siteType, setSiteType] = useState('')
 
+  const choiceSets: LocationCreateSetupChoiceSet[] = [
+    {
+      id: 'siteType',
+      fieldLabel: 'Site type',
+      prompt: 'What kind of site are you creating?',
+      options: SITE_OPTIONS,
+      value: siteType,
+      onValueChange: setSiteType,
+    },
+  ]
+
   return (
-    <LocationCreateSetupShell
+    <CreateSetupShell
       open
       onOpenChange={vi.fn()}
       headline="Create site"
-      choiceSets={[
-        {
-          id: 'siteType',
-          fieldLabel: 'Site type',
-          prompt: 'What kind of site are you creating?',
-          options: SITE_OPTIONS,
-          value: siteType,
-          onValueChange: setSiteType,
-        },
-      ]}
+      sets={buildLocationCreateSetupSets(choiceSets)}
+      changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
       onContinue={onContinue}
     />
   )
@@ -74,36 +79,39 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
   const [classification, setClassification] = useState('')
   const [regionType, setRegionType] = useState('')
 
+  const choiceSets: LocationCreateSetupChoiceSet[] = [
+    {
+      id: 'classification',
+      fieldLabel: 'Classification',
+      prompt: 'What kind of region are you creating?',
+      options: CLASSIFICATION_OPTIONS,
+      value: classification,
+      onValueChange: setClassification,
+    },
+    {
+      id: 'regionType',
+      fieldLabel: 'Region type',
+      prompt: 'Region type',
+      options: REGION_TYPE_OPTIONS,
+      value: regionType,
+      onValueChange: setRegionType,
+      dependsOn: ['classification'],
+    },
+  ]
+
   return (
-    <LocationCreateSetupShell
+    <CreateSetupShell
       open
       onOpenChange={vi.fn()}
       headline="Create region"
-      choiceSets={[
-        {
-          id: 'classification',
-          fieldLabel: 'Classification',
-          prompt: 'What kind of region are you creating?',
-          options: CLASSIFICATION_OPTIONS,
-          value: classification,
-          onValueChange: setClassification,
-        },
-        {
-          id: 'regionType',
-          fieldLabel: 'Region type',
-          prompt: 'Region type',
-          options: REGION_TYPE_OPTIONS,
-          value: regionType,
-          onValueChange: setRegionType,
-          dependsOn: ['classification'],
-        },
-      ]}
+      sets={buildLocationCreateSetupSets(choiceSets)}
+      changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
       onContinue={onContinue}
     />
   )
 }
 
-describe('LocationCreateSetupShell', () => {
+describe('location create setup', () => {
   it('omits the modal subhead by default', () => {
     render(<SingleChoiceSetupHarness />)
 
@@ -118,12 +126,12 @@ describe('LocationCreateSetupShell', () => {
 
   it('renders an opt-in subhead when provided', () => {
     render(
-      <LocationCreateSetupShell
+      <CreateSetupShell
         open
         onOpenChange={vi.fn()}
         headline="Create site"
         subhead="Choose the options that best describe this site."
-        choiceSets={[
+        sets={buildLocationCreateSetupSets([
           {
             id: 'siteType',
             fieldLabel: 'Site type',
@@ -132,7 +140,8 @@ describe('LocationCreateSetupShell', () => {
             value: '',
             onValueChange: vi.fn(),
           },
-        ]}
+        ])}
+        changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
         onContinue={vi.fn()}
       />,
     )
@@ -181,7 +190,7 @@ describe('LocationCreateSetupShell', () => {
     expect(choiceSetStack).toContainElement(screen.getByRole('radiogroup', { name: 'Region type' }))
     expect(choiceSetStack?.className).toMatch(/\bflex-col\b/)
     expect(choiceSetStack?.className).toMatch(/\bgap-4\b/)
-    expect(locationCreateSetupModalBodyClasses).toContain('gap-4')
+    expect(createSetupModalBodyClasses).toContain('gap-4')
   })
 
   it('collapses completed predecessors, reveals the next set, and uses compact Change', async () => {
