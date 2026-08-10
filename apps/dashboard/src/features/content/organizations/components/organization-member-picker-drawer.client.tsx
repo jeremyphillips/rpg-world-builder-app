@@ -157,23 +157,20 @@ export function OrganizationMemberPickerDrawer({
       onOpenChange={handleOpenChange}
       title={ORGANIZATION_MEMBER_PICKER_TITLE}
       description={`Choose a character to add to ${organization.name}.`}
-      footer={
-        quickNpc?.enabled ? (
-          quickNpc.buildContextFailed ? (
-            <Text variant="destructive">
-              {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE}
-            </Text>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!quickNpc.buildContextReady}
-              onClick={() => onCreateNpc?.()}
-            >
-              {ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL}
-            </Button>
-          )
-        ) : undefined
+      auxiliaryAction={
+        quickNpc?.enabled
+          ? quickNpc.buildContextFailed
+            ? {
+                state: 'unavailable',
+                message: ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE,
+              }
+            : {
+                state: 'action',
+                label: ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL,
+                onAction: () => onCreateNpc?.(),
+                disabled: !quickNpc.buildContextReady,
+              }
+          : undefined
       }
       {...catalogPickerShellProps()}
       items={candidates}

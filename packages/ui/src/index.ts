@@ -602,6 +602,7 @@ export {
   type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
   type CatalogPickerRowLayout,
+  type CatalogPickerAuxiliaryAction,
   type CatalogToolbarProps,
   type CatalogToolbarSearch,
   type CatalogToolbarTab,

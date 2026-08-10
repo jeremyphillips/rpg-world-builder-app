@@ -76,6 +76,19 @@ Footer composition:
 
 `CatalogPickerSheet` hardcodes the same `surface` / `size` on `Sheet.Content`.
 
+### CatalogPickerSheet slot policy
+
+| Slot              | Role                                                                | Examples                             |
+| ----------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| `auxiliaryAction` | Quiet **alternate acquisition** when the desired item may not exist | Create new NPC, Create location      |
+| `footer`          | **Concluding drawer action** for the current workflow               | Submit link, Done, Confirm selection |
+
+Rules:
+
+- Use `auxiliaryAction` for create/import entry between search and results — not `footer`.
+- Use `footer` for workflow completion — not alternate acquisition.
+- Search and `auxiliaryAction` stay fixed above the scrollable result list.
+
 ## ESLint boundary
 
 Production feature and `src/lib` code **must not** import `Sheet` from

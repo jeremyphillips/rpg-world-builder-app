@@ -67,7 +67,7 @@ organization detail **Members** section — no full builder route.
 | Layer                                               | Responsibility                                                                                                    |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions |
-| `OrganizationMemberPickerDrawer`                    | Relationship picker; footer **Create new NPC** delegates to parent (no `bodyReplacement`)                         |
+| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)              |
 | `QuickNpcCreateModal` (character feature)           | Setup (species/class/level) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create  |
 
 **Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays

@@ -116,6 +116,46 @@ describe('OrganizationMemberPickerDrawer', () => {
     expect(screen.getByText('No characters are available.')).toBeInTheDocument()
   })
 
+  it('shows Create new NPC in the empty catalog state when quick NPC creation is enabled', () => {
+    renderPicker({
+      candidates: [],
+      quickNpc: { enabled: true, buildContextReady: true },
+      onCreateNpc: vi.fn(),
+    })
+
+    expect(screen.getByRole('button', { name: 'Create new NPC' })).toBeInTheDocument()
+    expect(screen.getByText('No characters are available.')).toBeInTheDocument()
+  })
+
+  it('renders Create new NPC between search and results outside the scroll body', () => {
+    renderPicker({
+      quickNpc: { enabled: true, buildContextReady: true },
+      onCreateNpc: vi.fn(),
+    })
+
+    const search = screen.getByRole('textbox', { name: 'Search characters' })
+    const action = screen.getByRole('button', { name: 'Create new NPC' })
+    const result = screen.getByText('Verna')
+    const scrollBody = result.closest('.overflow-y-auto')
+
+    expect(search.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(action.compareDocumentPosition(result) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(scrollBody).toBeTruthy()
+    expect(scrollBody).not.toContainElement(action)
+  })
+
+  it('does not render Create new NPC in the sheet footer', () => {
+    renderPicker({
+      quickNpc: { enabled: true, buildContextReady: true },
+      onCreateNpc: vi.fn(),
+    })
+
+    const action = screen.getByRole('button', { name: 'Create new NPC' })
+    const footer = action.closest('[class*="border-t"]')
+
+    expect(footer).toBeNull()
+  })
+
   it('hides the Create new NPC action when quick NPC creation is not wired', () => {
     renderPicker()
     expect(screen.queryByRole('button', { name: 'Create new NPC' })).not.toBeInTheDocument()

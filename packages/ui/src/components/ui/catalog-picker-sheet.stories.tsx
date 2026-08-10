@@ -108,6 +108,85 @@ export const Default: Story = {
   },
 }
 
+/** Alternate acquisition entry between search and results — prefer over footer create buttons. */
+export const WithAuxiliaryAction: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Add member',
+    description: 'Choose a character to add.',
+    items: demoItems,
+    getItemKey: (item) => item.id,
+    getSearchText: (item) => item.name,
+    renderItemHeader: (item) => <span>{item.name}</span>,
+    auxiliaryAction: {
+      state: 'action',
+      label: 'Create new NPC',
+      onAction: () => undefined,
+    },
+  },
+}
+
+export const WithAuxiliaryActionEmpty: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Add member',
+    description: 'Choose a character to add.',
+    items: [],
+    getItemKey: () => 'empty',
+    getSearchText: () => '',
+    renderItemHeader: () => null,
+    noItemsMessage: 'No characters are available.',
+    auxiliaryAction: {
+      state: 'action',
+      label: 'Create new NPC',
+      onAction: () => undefined,
+    },
+  },
+}
+
+export const WithAuxiliaryActionUnavailable: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Add member',
+    description: 'Choose a character to add.',
+    items: demoItems,
+    getItemKey: (item) => item.id,
+    getSearchText: (item) => item.name,
+    renderItemHeader: (item) => <span>{item.name}</span>,
+    auxiliaryAction: {
+      state: 'unavailable',
+      message: 'Quick NPC creation is unavailable.',
+    },
+  },
+}
+
+/** Primitive contract: auxiliary acquisition + concluding footer coexist. */
+export const AuxiliaryActionWithFooter: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    title: 'Link location',
+    description: 'Choose a location to link.',
+    items: demoItems,
+    getItemKey: (item) => item.id,
+    getSearchText: (item) => item.name,
+    renderItemHeader: (item) => <span>{item.name}</span>,
+    auxiliaryAction: {
+      state: 'action',
+      label: 'Create location',
+      onAction: () => undefined,
+    },
+    footer: (
+      <Button type="button" disabled>
+        Link location
+      </Button>
+    ),
+  },
+}
+
 /** Inline create flow replacing the picker body — search/tab state stays mounted. */
 export const BodyReplacement: Story = {
   args: {
