@@ -84,8 +84,16 @@ async function selectOption(
 }
 
 async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
-  await selectOption(user, /species/i, /dwarf/i)
-  await selectOption(user, /class/i, /fighter/i)
+  const dwarfRadio = screen.queryByRole('radio', { name: /dwarf/i })
+  if (dwarfRadio) {
+    await user.click(dwarfRadio)
+  }
+
+  const fighterRadio = screen.queryByRole('radio', { name: /fighter/i })
+  if (fighterRadio?.getAttribute('aria-checked') !== 'true') {
+    await user.click(screen.getByRole('radio', { name: /fighter/i }))
+  }
+
   await user.click(screen.getByRole('button', { name: 'Continue' }))
 }
 

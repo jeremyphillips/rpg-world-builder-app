@@ -31,7 +31,6 @@ import {
   mergeQuickNpcAuthoringValues,
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
-  resolveQuickNpcMaxLevel,
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
@@ -158,7 +157,6 @@ export function QuickNpcAuthoringForm({
     onPendingChange?.(isPending)
   }, [isPending, onPendingChange])
 
-  const maxLevel = resolveQuickNpcMaxLevel(buildContext)
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
   const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
 
@@ -189,7 +187,7 @@ export function QuickNpcAuthoringForm({
 
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
     submit: async (tabValues) => {
-      if (!isQuickNpcSetupStillValid(setup, buildContext, maxLevel)) {
+      if (!isQuickNpcSetupStillValid(setup, buildContext)) {
         onChangeSetup()
         return
       }

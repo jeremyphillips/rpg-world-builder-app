@@ -18,7 +18,6 @@ describe('isQuickNpcSetupStillValid', () => {
           level: 1,
         },
         context,
-        20,
       ),
     ).toBe(true)
   })
@@ -32,7 +31,6 @@ describe('isQuickNpcSetupStillValid', () => {
           level: 1,
         },
         context,
-        20,
       ),
     ).toBe(false)
   })

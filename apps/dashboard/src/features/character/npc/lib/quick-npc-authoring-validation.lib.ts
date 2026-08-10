@@ -1,4 +1,8 @@
-import { resolveAvailableContent, type CharacterBuildContext } from '@rpg/contracts'
+import {
+  resolveAvailableContent,
+  resolveBuilderLevelConstraints,
+  type CharacterBuildContext,
+} from '@rpg/contracts'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 import { quickNpcSetupSchema } from './quick-npc-form-fields'
@@ -10,8 +14,8 @@ import { quickNpcSetupSchema } from './quick-npc-form-fields'
 export function isQuickNpcSetupStillValid(
   setup: QuickNpcSetupValues,
   context: CharacterBuildContext,
-  maxLevel: number,
 ): boolean {
+  const maxLevel = resolveBuilderLevelConstraints(context).maxLevel
   const parsed = quickNpcSetupSchema(maxLevel).safeParse(setup)
   if (!parsed.success) return false
 

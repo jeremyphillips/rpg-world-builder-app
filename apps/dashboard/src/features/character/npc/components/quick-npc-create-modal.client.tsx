@@ -4,17 +4,17 @@ import * as React from 'react'
 
 import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
 import { Button, Modal, dialogPanelActionRowClasses, usePendingAwareOpenChange } from '@rpg/ui'
-import { Form } from '@rpg/ui/form'
+
+import { CreateSetupPanel } from '@/lib/create-setup'
 
 import {
   EMPTY_QUICK_NPC_SETUP_VALUES,
-  buildQuickNpcSetupFields,
-  quickNpcSetupSchema,
-  resolveQuickNpcMaxLevel,
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import {
+  buildQuickNpcCreateSetupSets,
+  QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_HEADLINE,
   resolveQuickNpcSetupModel,
 } from '../lib/quick-npc-create-modal-setup.lib'
@@ -56,59 +56,52 @@ function createInitialState(): QuickNpcCreateModalState {
 function QuickNpcCreateModalSetupPhase({
   buildContext,
   setupValues,
+  onSetupValuesChange,
   onContinue,
   onCancel,
 }: {
   buildContext: CharacterBuildContext
   setupValues: QuickNpcSetupValues
+  onSetupValuesChange: (values: QuickNpcSetupValues) => void
   onContinue: (values: QuickNpcSetupValues) => void
   onCancel: () => void
 }) {
-  const maxLevel = resolveQuickNpcMaxLevel(buildContext)
-  const schema = React.useMemo(() => quickNpcSetupSchema(maxLevel), [maxLevel])
+  const setupSets = React.useMemo(
+    () =>
+      buildQuickNpcCreateSetupSets({
+        context: buildContext,
+        values: setupValues,
+        onValuesChange: onSetupValuesChange,
+      }),
+    [buildContext, setupValues, onSetupValuesChange],
+  )
   const setupModel = React.useMemo(
     () => resolveQuickNpcSetupModel({ context: buildContext, values: setupValues }),
     [buildContext, setupValues],
-  )
-  const fields = React.useMemo(
-    () =>
-      buildQuickNpcSetupFields({
-        speciesOptions: setupModel.speciesOptions,
-        classOptions: setupModel.classOptions,
-        maxLevel: setupModel.maxLevel,
-      }),
-    [setupModel.classOptions, setupModel.maxLevel, setupModel.speciesOptions],
   )
 
   return (
     <>
       <Modal.Body>
-        <Form<QuickNpcSetupValues>
-          schema={schema}
-          fields={fields}
-          defaultValues={setupValues}
-          onSubmit={onContinue}
-          footer={(form) => {
-            const values = form.watch()
-            const canContinue = resolveQuickNpcSetupModel({
-              context: buildContext,
-              values,
-            }).canContinue
-
-            return (
-              <div className={dialogPanelActionRowClasses}>
-                <Button type="button" variant="outline" onClick={onCancel}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={!canContinue}>
-                  Continue
-                </Button>
-              </div>
-            )
-          }}
-        />
+        <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
       </Modal.Body>
-      <Modal.Footer className="sr-only" aria-hidden />
+      <Modal.Footer>
+        <div className={dialogPanelActionRowClasses}>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            disabled={!setupModel.canContinue}
+            onClick={() => {
+              if (!setupModel.canContinue) return
+              onContinue(setupValues)
+            }}
+          >
+            Continue
+          </Button>
+        </div>
+      </Modal.Footer>
     </>
   )
 }
@@ -149,6 +142,10 @@ function QuickNpcCreateModalSession({
     },
     [onOpenChange, requestCancel],
   )
+
+  const handleSetupValuesChange = React.useCallback((setupValues: QuickNpcSetupValues) => {
+    setState((current) => ({ ...current, setupValues }))
+  }, [])
 
   const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {
     setState((current) => ({
@@ -198,6 +195,7 @@ function QuickNpcCreateModalSession({
           <QuickNpcCreateModalSetupPhase
             buildContext={buildContext}
             setupValues={state.setupValues}
+            onSetupValuesChange={handleSetupValuesChange}
             onContinue={handleContinueFromSetup}
             onCancel={requestCancel}
           />

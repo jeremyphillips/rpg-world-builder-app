@@ -8,9 +8,7 @@ import {
   characterBuilderValidationMessages,
   formatFieldMessage,
   getAlignmentLabel,
-  getContentTypeTerm,
   resolveAvailableContent,
-  resolveBuilderMaxAllowedLevel,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
@@ -193,10 +191,6 @@ export function buildQuickNpcContentOptions(
   }
 }
 
-export function resolveQuickNpcMaxLevel(context: CharacterBuildContext): number {
-  return resolveBuilderMaxAllowedLevel(context.characterCreationRules)
-}
-
 const ALIGNMENT_LABELS = Object.fromEntries(
   ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
 ) as Record<(typeof ALIGNMENTS)[number], string>
@@ -210,48 +204,6 @@ export type { QuickNpcRequirementOptionSets }
 
 function formatRequirementsTabLabel(configuredCount: number): string {
   return configuredCount > 0 ? `Requirements (${configuredCount})` : 'Requirements'
-}
-
-export type QuickNpcSetupFieldsArgs = QuickNpcContentOptions & {
-  maxLevel: number
-}
-
-export function buildQuickNpcSetupFields(args: QuickNpcSetupFieldsArgs): FormItem[] {
-  return [
-    {
-      type: 'select',
-      name: 'speciesId',
-      label: getContentTypeTerm('species').label,
-      options: args.speciesOptions,
-      placeholder: `Choose a ${getContentTypeTerm('species').label.toLowerCase()}`,
-      required: true,
-      width: 'full',
-    },
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'classId',
-          label: getContentTypeTerm('classes').label,
-          options: args.classOptions,
-          placeholder: `Choose a ${getContentTypeTerm('classes').label.toLowerCase()}`,
-          required: true,
-          width: '1/2',
-        },
-        {
-          type: 'number',
-          name: 'level',
-          label: 'Level',
-          required: true,
-          min: 1,
-          max: args.maxLevel,
-          digits: 2,
-          width: '1/2',
-        },
-      ],
-    },
-  ]
 }
 
 export type QuickNpcDetailsFieldsArgs = {
@@ -327,7 +279,7 @@ export function buildQuickNpcTabs(args: {
   return tabs
 }
 
-/** @deprecated Use buildQuickNpcSetupFields + buildQuickNpcDetailsFields */
+/** @deprecated Setup fields are composed via shared create-setup — use buildQuickNpcDetailsFields. */
 export type QuickNpcFormFieldsArgs = QuickNpcContentOptions & {
   maxLevel: number
   membership: {
@@ -336,12 +288,9 @@ export type QuickNpcFormFieldsArgs = QuickNpcContentOptions & {
   }
 }
 
-/** @deprecated Use buildQuickNpcSetupFields + buildQuickNpcDetailsFields */
+/** @deprecated Setup fields are composed via shared create-setup — use buildQuickNpcDetailsFields. */
 export function buildQuickNpcFormFields(args: QuickNpcFormFieldsArgs): FormItem[] {
-  return [
-    ...buildQuickNpcSetupFields(args),
-    ...buildQuickNpcDetailsFields({ membership: args.membership }),
-  ]
+  return buildQuickNpcDetailsFields({ membership: args.membership })
 }
 
 /** @deprecated Use quickNpcAuthoringSchema */
