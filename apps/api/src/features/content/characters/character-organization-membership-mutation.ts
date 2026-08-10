@@ -93,8 +93,11 @@ function updateMembership(
     )
   }
 
+  // The patch owns title/priority (null clears); any other membership fields the
+  // schema grows later are preserved rather than dropped by the rebuild.
+  const { title: _clearedTitle, priority: _clearedPriority, ...preserved } = existing[index]!
   const nextMembership = characterOrganizationConnectionSchema.parse({
-    organizationId,
+    ...preserved,
     ...(patch.title !== null ? { title: patch.title } : {}),
     ...(patch.priority !== null ? { priority: patch.priority } : {}),
   })

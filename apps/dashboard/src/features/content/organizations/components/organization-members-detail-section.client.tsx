@@ -19,6 +19,7 @@ export function OrganizationMembersDetailSection({
     <>
       <OrganizationMembersSection
         rows={detail.members.rows}
+        total={detail.members.total}
         emptyText={detail.emptyText}
         canManage={detail.canManage}
         isPending={detail.membersQuery.isPending}

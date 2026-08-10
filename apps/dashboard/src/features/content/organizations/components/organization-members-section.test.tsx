@@ -92,6 +92,15 @@ describe('OrganizationMembersSection', () => {
     expect(screen.getByText(ORGANIZATION_EMPTY_SECTION_TEXT.members)).toBeInTheDocument()
   })
 
+  it('notes when the roster exceeds the fetched page instead of truncating silently', () => {
+    const { unmount } = renderSection({ total: 120 })
+    expect(screen.getByText('Showing 2 of 120 members.')).toBeInTheDocument()
+    unmount()
+
+    renderSection({ total: ORGANIZATION_MEMBER_ROWS.length })
+    expect(screen.queryByText(/Showing \d+ of \d+ members\./)).not.toBeInTheDocument()
+  })
+
   it('renders loading and error copy in place of the roster', () => {
     const { unmount } = renderSection({ isPending: true })
     expect(screen.getByText('Loading…')).toBeInTheDocument()

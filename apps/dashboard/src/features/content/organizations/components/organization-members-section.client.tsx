@@ -10,6 +10,7 @@ import { RelationshipContentRow } from '../../lib/relationship/relationship-cont
 import type { OrganizationMemberRowVm } from '../lib/build-organization-member-rows'
 import { ORGANIZATION_SECTION_LABELS } from '../lib/organization-display'
 import {
+  formatOrganizationMembersOverflow,
   ORGANIZATION_MEMBER_EDIT_LABEL,
   ORGANIZATION_MEMBER_REMOVE_LABEL,
   ORGANIZATION_MEMBERS_ADD_LABEL,
@@ -20,6 +21,8 @@ export const ORGANIZATION_MEMBERS_HEADING_ID = 'organization-members-heading'
 
 export type OrganizationMembersSectionProps = {
   rows: readonly OrganizationMemberRowVm[]
+  /** Total members reported by the API — when it exceeds `rows`, an overflow note renders. */
+  total?: number
   emptyText: string
   /**
    * SURFACE POLICY — organization-page member editing is manager-only (owner/co-owner).
@@ -74,9 +77,91 @@ function buildMemberOverflowActions(input: {
   return actions
 }
 
+function OrganizationMemberRosterRow({
+  row,
+  canManage,
+  isPending,
+  onEditMembership,
+  onRemoveMember,
+}: {
+  row: OrganizationMemberRowVm
+  canManage: boolean
+  isPending: boolean
+  onEditMembership?: (row: OrganizationMemberRowVm) => void
+  onRemoveMember?: (row: OrganizationMemberRowVm) => void
+}) {
+  return (
+    <li>
+      <CrossContentRelationshipRow
+        heading={row.name}
+        href={row.detailHref}
+        headingSuffix={row.title ? ` · ${row.title}` : undefined}
+        secondaryText={row.identityLine || undefined}
+        actions={buildMemberOverflowActions({
+          row,
+          canManage,
+          isPending,
+          onEditMembership,
+          onRemoveMember,
+        })}
+        overflowTriggerLabel={`Actions for ${row.name}`}
+      />
+    </li>
+  )
+}
+
+function OrganizationMembersRosterBody({
+  rows,
+  total,
+  emptyText,
+  canManage,
+  pendingCharacterId,
+  onAddMember,
+  onEditMembership,
+  onRemoveMember,
+}: Required<Pick<OrganizationMembersSectionProps, 'rows' | 'emptyText' | 'canManage'>> &
+  Pick<
+    OrganizationMembersSectionProps,
+    'total' | 'pendingCharacterId' | 'onAddMember' | 'onEditMembership' | 'onRemoveMember'
+  >) {
+  const showContentRow = canManage || rows.length === 0
+
+  return (
+    <DetailSectionGroup>
+      {rows.length > 0 ? (
+        <ul className="space-y-1">
+          {rows.map((row) => (
+            <OrganizationMemberRosterRow
+              key={row.characterId}
+              row={row}
+              canManage={canManage}
+              isPending={pendingCharacterId === row.characterId}
+              onEditMembership={onEditMembership}
+              onRemoveMember={onRemoveMember}
+            />
+          ))}
+        </ul>
+      ) : null}
+
+      {total !== undefined && total > rows.length ? (
+        <Text variant="muted">{formatOrganizationMembersOverflow(rows.length, total)}</Text>
+      ) : null}
+
+      {showContentRow ? (
+        <RelationshipContentRow
+          emptyLabel={rows.length === 0 ? emptyText : undefined}
+          addLabel={canManage && onAddMember ? ORGANIZATION_MEMBERS_ADD_LABEL : undefined}
+          onAdd={canManage ? onAddMember : undefined}
+        />
+      ) : null}
+    </DetailSectionGroup>
+  )
+}
+
 /** Organization-facing roster of the character-owned organization memberships. */
 export function OrganizationMembersSection({
   rows,
+  total,
   emptyText,
   canManage = false,
   isPending = false,
@@ -88,8 +173,6 @@ export function OrganizationMembersSection({
   onEditMembership,
   onRemoveMember,
 }: OrganizationMembersSectionProps) {
-  const showContentRow = canManage || rows.length === 0
-
   return (
     <DetailSectionPanel
       heading={ORGANIZATION_SECTION_LABELS.members}
@@ -102,38 +185,16 @@ export function OrganizationMembersSection({
       ) : isError ? (
         <Text variant="muted">{errorText}</Text>
       ) : (
-        <DetailSectionGroup>
-          {rows.length > 0 ? (
-            <ul className="space-y-1">
-              {rows.map((row) => (
-                <li key={row.characterId}>
-                  <CrossContentRelationshipRow
-                    heading={row.name}
-                    href={row.detailHref}
-                    headingSuffix={row.title ? ` · ${row.title}` : undefined}
-                    secondaryText={row.identityLine || undefined}
-                    actions={buildMemberOverflowActions({
-                      row,
-                      canManage,
-                      isPending: pendingCharacterId === row.characterId,
-                      onEditMembership,
-                      onRemoveMember,
-                    })}
-                    overflowTriggerLabel={`Actions for ${row.name}`}
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : null}
-
-          {showContentRow ? (
-            <RelationshipContentRow
-              emptyLabel={rows.length === 0 ? emptyText : undefined}
-              addLabel={canManage && onAddMember ? ORGANIZATION_MEMBERS_ADD_LABEL : undefined}
-              onAdd={canManage ? onAddMember : undefined}
-            />
-          ) : null}
-        </DetailSectionGroup>
+        <OrganizationMembersRosterBody
+          rows={rows}
+          total={total}
+          emptyText={emptyText}
+          canManage={canManage}
+          pendingCharacterId={pendingCharacterId}
+          onAddMember={onAddMember}
+          onEditMembership={onEditMembership}
+          onRemoveMember={onRemoveMember}
+        />
       )}
     </DetailSectionPanel>
   )

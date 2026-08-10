@@ -25,10 +25,12 @@ import {
   type OrganizationMemberRowVm,
 } from '../lib/build-organization-member-rows'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
-import { ORGANIZATION_MEMBERS_MUTATION_ERROR } from '../lib/organization-members.constants'
+import {
+  ORGANIZATION_MEMBER_ADD_FAILED,
+  ORGANIZATION_MEMBERS_MUTATION_ERROR,
+} from '../lib/organization-members.constants'
 import { useOrganizationMembers } from './use-organization-members'
 
-const ADD_MEMBER_FAILED = 'Could not add this member.'
 const UPDATE_MEMBERSHIP_FAILED = 'Could not update this membership.'
 const REMOVE_MEMBER_FAILED = 'Could not remove this member.'
 
@@ -113,7 +115,7 @@ export function useOrganizationMembersDetail(
           subjectKind: subjectKindFor(commit),
         })
       } catch (error) {
-        throw new Error(getErrorMessage(error, ADD_MEMBER_FAILED))
+        throw new Error(getErrorMessage(error, ORGANIZATION_MEMBER_ADD_FAILED))
       }
     },
     [campaignId, invalidate, organizationId],

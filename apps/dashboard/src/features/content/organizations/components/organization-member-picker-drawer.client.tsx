@@ -21,6 +21,7 @@ import {
   buildConnectedPartyCharacterPickerSearchText,
   type LocationConnectedPartyCharacterOption,
 } from '../../locations/lib/location-connected-party-character-options.lib'
+import { ORGANIZATION_MEMBER_ADD_FAILED } from '../lib/organization-members.constants'
 
 export const ORGANIZATION_MEMBER_PICKER_TITLE = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SUBMIT_LABEL = 'Add member'
@@ -28,7 +29,6 @@ export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
 export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters match this search.'
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
-export const ORGANIZATION_MEMBER_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this member.'
 
 /** Campaign PC/NPC option plus whether the character already holds a membership here. */
 export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
@@ -121,7 +121,7 @@ export function OrganizationMemberPickerDrawer({
         const message =
           error instanceof Error && error.message.trim().length > 0
             ? error.message
-            : ORGANIZATION_MEMBER_PICKER_SUBMIT_FAILED_MESSAGE
+            : ORGANIZATION_MEMBER_ADD_FAILED
         setSubmitError(message)
         setPending(false)
       }

@@ -1,9 +1,20 @@
 import type { EditOrganizationMembershipDrawerCopy } from '@/features/character'
 
-/** Organization detail reads the full roster, not a truncated preview. */
+/**
+ * Roster page cap — the organization detail fetches a single page. Rosters larger
+ * than this render an overflow note (`formatOrganizationMembersOverflow`) instead
+ * of silently truncating.
+ */
 export const ORGANIZATION_MEMBERS_PAGE_SIZE = 50
 
+/** Overflow note when the roster exceeds the fetched page. */
+export function formatOrganizationMembersOverflow(shown: number, total: number): string {
+  return `Showing ${shown} of ${total} members.`
+}
+
 export const ORGANIZATION_MEMBERS_LOAD_ERROR = 'Could not load members for this organization.'
+
+export const ORGANIZATION_MEMBER_ADD_FAILED = 'Could not add this member.'
 
 export const ORGANIZATION_MEMBERS_MUTATION_ERROR = 'Could not update members for this organization.'
 
