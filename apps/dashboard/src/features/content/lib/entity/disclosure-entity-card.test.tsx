@@ -8,7 +8,7 @@ import {
   disclosureEntityCardBodyInlineEndClasses,
   disclosureEntityCardBodyInlineStartClasses,
 } from './disclosure-entity-card.variants'
-import { ENTITY_LEADING_OFFSET_VAR } from './entity-leading-rail.lib'
+import { ENTITY_BODY_INLINE_START_VAR, ENTITY_CONTENT_OFFSET_VAR } from './entity-leading-rail.lib'
 import { HARBOR_DISTRICT_ENTITY } from './entity.fixture'
 
 const mockDragHandleProps = {
@@ -69,12 +69,16 @@ describe('DisclosureEntityCard', () => {
     expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
-      '--leading-chrome-size',
+    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+      'calc(var(--spacing)*6)',
     )
+    expect(article.style.getPropertyValue(ENTITY_BODY_INLINE_START_VAR)).toBe(
+      'calc(var(--entity-density-inline) + var(--entity-content-offset))',
+    )
+    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*5)]')
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
-    expect(shell).toHaveClass('[--entity-density-inline:calc(var(--spacing)*5)]')
+    expect(shell.className).not.toContain('--entity-density-inline')
   })
 
   it('keeps body inline-end inset identical regardless of trailing action width', () => {
@@ -141,7 +145,9 @@ describe('DisclosureEntityCard', () => {
     )
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
-    expect(shell).toHaveClass('[--entity-density-inline:calc(var(--spacing)*3)]')
+    const article = container.querySelector('article') as HTMLElement
+    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*3)]')
+    expect(shell.className).not.toContain('--entity-density-inline')
     expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
   })
 
@@ -196,8 +202,8 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
-      '--leading-chrome-size',
+    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+      'calc(var(--spacing)*6)',
     )
     expect(screen.getByRole('button', { name: 'Expand Harbor District' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/drag to reorder/i)).not.toBeInTheDocument()
@@ -255,6 +261,70 @@ describe('DisclosureEntityCard', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
 
+  it('fills the header region so short-heading trailing aligns to column 3', () => {
+    const { container } = render(
+      <div className="w-[480px]">
+        <DisclosureEntityCard
+          itemId="short-heading"
+          toolbarAriaLabel="Harbor District"
+          entity={{ heading: 'Light' }}
+          density="compact"
+          trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+          defaultCollapsed={false}
+        >
+          <p>Body</p>
+        </DisclosureEntityCard>
+      </div>,
+    )
+
+    const headerWrap = screen
+      .getByText('Light', { selector: '.font-body-emphasis' })
+      .closest('[class*="px-[var(--entity-density-inline)]"]') as HTMLElement
+    const anatomy = headerWrap.querySelector('.grid') as HTMLElement
+    const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
+    const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
+
+    expect(headerWrap).toHaveClass('w-full', 'min-w-0')
+    expect(anatomy).toHaveClass('w-full', 'grid-cols-[auto_minmax(0,1fr)_auto]')
+    expect(content).toHaveClass('col-start-2')
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+    expect(trailing.compareDocumentPosition(content)).toBe(Node.DOCUMENT_POSITION_PRECEDING)
+  })
+
+  it('keeps trailing in column 3 when heading and description wrap', () => {
+    const { container } = render(
+      <div className="w-[320px]">
+        <DisclosureEntityCard
+          itemId="long-heading"
+          toolbarAriaLabel="Grants · Speak with Animals"
+          entity={{
+            heading: 'Speak with Animals',
+            classification: 'Spells',
+            description:
+              'Character has Speak with Animals always prepared and other long supporting copy that wraps across multiple lines in compact density.',
+          }}
+          density="compact"
+          dragHandleProps={mockDragHandleProps}
+          trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+          defaultCollapsed={false}
+        >
+          <p>Body</p>
+        </DisclosureEntityCard>
+      </div>,
+    )
+
+    const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
+    const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
+    const anatomy = content.parentElement as HTMLElement
+
+    expect(anatomy).toHaveClass('w-full')
+    expect(content).toHaveClass('col-start-2', 'min-w-0')
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+    expect(
+      screen.getByText(/Character has Speak with Animals always prepared/i),
+    ).toBeInTheDocument()
+  })
+
   it('does not merge legacy CLI body inset when rowLayout is entity-card', () => {
     const { container } = render(
       <DisclosureEntityCard
@@ -302,8 +372,8 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
-      'calc(2 * var(--leading-chrome-size)',
+    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+      'calc(2 * calc(var(--spacing)*6)',
     )
   })
 
@@ -320,8 +390,8 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
-      'calc(1 * var(--leading-chrome-size)',
+    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+      'calc(calc(var(--spacing)*6)',
     )
   })
 
@@ -339,7 +409,10 @@ describe('DisclosureEntityCard', () => {
     )
 
     const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]') as HTMLElement
-    expect(leadingSlot.querySelectorAll('.flex.shrink-0.items-center.gap-0')).toHaveLength(1)
+    const rail = leadingSlot.querySelector('.flex.shrink-0.items-center.gap-0') as HTMLElement
+    expect(rail).toBeTruthy()
+    expect(rail).toHaveClass('pe-[calc(var(--spacing)*3)]')
+    expect(leadingSlot.className).not.toMatch(/\bmr-/)
     expect(leadingSlot.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]')).toHaveLength(
       2,
     )

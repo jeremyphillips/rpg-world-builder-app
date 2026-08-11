@@ -83,7 +83,7 @@ describe('EntityItemAnatomy grid placement', () => {
     expect(anatomy.className).not.toMatch(/\bml-/)
   })
 
-  it('applies rail spacing only on present leading/trailing slots', () => {
+  it('applies content gap on the leading rail and trailing slot separation', () => {
     const { queryLeading, queryTrailing } = renderAnatomy({
       leadingUtilities: [<span>Grip</span>],
       trailing: {
@@ -92,7 +92,9 @@ describe('EntityItemAnatomy grid placement', () => {
       },
     })
 
-    expect(queryLeading()).toHaveClass('mr-2')
+    const rail = queryLeading()?.querySelector('.flex.shrink-0.items-center.gap-0')
+    expect(rail).toHaveClass('pe-[calc(var(--spacing)*2)]')
+    expect(queryLeading()?.className).not.toMatch(/\bmr-/)
     expect(queryTrailing()).toHaveClass('ml-2')
   })
 

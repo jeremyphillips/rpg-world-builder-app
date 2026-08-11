@@ -10,7 +10,7 @@ import {
 } from '@rpg/ui'
 
 import {
-  buildEntityLeadingOffsetStyle,
+  buildEntityContentOffsetStyle,
   resolveEntityLeadingUtilityCount,
 } from './entity-leading-rail.lib'
 import { EntityItemAnatomy } from './entity-item.client'
@@ -75,11 +75,14 @@ export function DisclosureEntityCard({
     dragHandle: showDragHandle,
     disclosure: true,
   })
-  const leadingOffsetStyle = buildEntityLeadingOffsetStyle(leadingUtilityCount)
+  const leadingOffsetStyle = buildEntityContentOffsetStyle({
+    count: leadingUtilityCount,
+    density,
+  })
 
   return (
     <article
-      className={disclosureEntityCardShellVariants({ disabled })}
+      className={disclosureEntityCardShellVariants({ density, disabled })}
       style={leadingOffsetStyle}
       data-disabled={disabled ? true : undefined}
     >
@@ -96,7 +99,7 @@ export function DisclosureEntityCard({
         actionsAlign="center"
         toolbarCompact
         toolbarLeadingChrome="none"
-        className={disclosureEntityCardListItemVariants({ density })}
+        className={disclosureEntityCardListItemVariants()}
         bodyClassName={disclosureEntityCardBodyWashVariants({ density })}
         header={
           <div className={disclosureEntityCardHeaderPaddingVariants({ density })}>

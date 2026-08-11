@@ -25,18 +25,8 @@ export const entityItemAnatomyVariants = cva(
   },
 )
 
-/** Leading rail track — only rendered when `leading` is set; spacing stays on this slot. */
-export const entityItemLeadingSlotVariants = cva('col-start-1 row-start-1 min-w-0', {
-  variants: {
-    density: {
-      compact: 'mr-2',
-      comfortable: 'mr-3',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+/** Leading rail track — contentGap lives on EntityLeadingRail padding-inline-end. */
+export const entityItemLeadingSlotVariants = cva('col-start-1 row-start-1 min-w-0')
 
 /** Content track — always column 2 so summary owns the flexible column. */
 export const entityItemContentVariants = cva('col-start-2 row-start-1 flex min-w-0', {

@@ -74,8 +74,8 @@ export function EntityItemAnatomy({
   return (
     <div className={entityItemAnatomyVariants({ density, rowAlign })}>
       {resolvedLeadingUtilities.length > 0 ? (
-        <div className={entityItemLeadingSlotVariants({ density })} data-entity-item-slot="leading">
-          <EntityLeadingRail>{resolvedLeadingUtilities}</EntityLeadingRail>
+        <div className={entityItemLeadingSlotVariants()} data-entity-item-slot="leading">
+          <EntityLeadingRail density={density}>{resolvedLeadingUtilities}</EntityLeadingRail>
         </div>
       ) : null}
       <div

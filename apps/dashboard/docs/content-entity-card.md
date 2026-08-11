@@ -55,22 +55,22 @@ drag chrome, or interactive-row fills.
 
 ### Ownership audit matrix
 
-| Concern                        | Target owner                 | Notes                                                                           |
-| ------------------------------ | ---------------------------- | ------------------------------------------------------------------------------- |
-| Card inset                     | CEC / DEC shell              | Density-aware px/py on surface wrappers                                         |
-| Section vs card inset          | Feature section / host       | e.g. equipment panel `px-4 py-4` is section padding, not card inset             |
-| Embedded row inset             | Host                         | SearchResultRow, master-detail list, catalog picker row                         |
-| EntityItem columns             | EntityItem anatomy           | leading → col 1; content → col 2; trailing → col 3                              |
-| Leading offset                 | Surface root                 | `--entity-leading-offset` on DEC `article`, CEC frame, or embedded `EntityItem` |
-| Trailing rail                  | EntityItem semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`               |
-| Disclosure behavior            | CollapsibleListItem          | Collapse state, ARIA, structural DOM                                            |
-| DEC header inset               | DEC                          | `disclosureEntityCardHeaderPaddingVariants`                                     |
-| DEC body inset                 | DEC                          | Body wash + inline start/end + block rhythm                                     |
-| CLI body spacing (entity-card) | **None**                     | `rowLayout="entity-card"` → structural wrapper only                             |
-| Drag chrome                    | Foundational UI              | `dragHandleVariants`, host reveal contract                                      |
-| Control/focus chrome           | Foundational UI              | `iconGhostControlVariants`, Button focus stack                                  |
-| Separators                     | Host                         | List/section separators, not EntityItem                                         |
-| Form-array styling             | DEC + form field rhythm      | Form owns registration; DEC owns card geometry                                  |
+| Concern                        | Target owner                 | Notes                                                               |
+| ------------------------------ | ---------------------------- | ------------------------------------------------------------------- |
+| Card inset                     | CEC / DEC shell              | Density-aware px/py on surface wrappers                             |
+| Section vs card inset          | Feature section / host       | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
+| Embedded row inset             | Host                         | SearchResultRow, master-detail list, catalog picker row             |
+| EntityItem columns             | EntityItem anatomy           | leading → col 1; content → col 2; trailing → col 3                  |
+| Leading content offset         | Surface root (when needed)   | `--entity-content-offset` on DEC `article`, DER disclosure root     |
+| Trailing rail                  | EntityItem semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`   |
+| Disclosure behavior            | CollapsibleListItem          | Collapse state, ARIA, structural DOM                                |
+| DEC header inset               | DEC                          | `disclosureEntityCardHeaderPaddingVariants`                         |
+| DEC body inset                 | DEC                          | Body wash + inline start/end + block rhythm                         |
+| CLI body spacing (entity-card) | **None**                     | `rowLayout="entity-card"` → structural wrapper only                 |
+| Drag chrome                    | Foundational UI              | `dragHandleVariants`, host reveal contract                          |
+| Control/focus chrome           | Foundational UI              | `iconGhostControlVariants`, Button focus stack                      |
+| Separators                     | Host                         | List/section separators, not EntityItem                             |
+| Form-array styling             | DEC + form field rhythm      | Form owns registration; DEC owns card geometry                      |
 
 ---
 
@@ -79,7 +79,7 @@ drag chrome, or interactive-row fills.
 ### Owns
 
 - Three-column placement (`leading` | content | trailing)
-- Leading-rail geometry and content-start alignment via `--entity-leading-offset` consumer
+- Leading-rail geometry via `EntityLeadingRail` (`utilityGap`, `contentGap`, `padding-inline-end`)
 - EntitySummary composition inside the content column
 - Semantic trailing seam (`action` | `indicator` | `group`)
 
@@ -103,7 +103,7 @@ drag chrome, or interactive-row fills.
 
 - Add `px-*` / `py-*` to anatomy or EntityItem root to fix host or card misalignment
 - Introduce parallel trailing APIs (`endSlot`, `headingEndSlot`) on entity surfaces
-- Publish `--entity-leading-offset` (surface root publishes once)
+- Publish `--entity-content-offset` (only surfaces with aligned sibling regions)
 
 Optional DOM children must never alter grid-track ownership: leading → column 1; content
 → column 2 always; trailing → column 3.
@@ -116,9 +116,9 @@ Optional DOM children must never alter grid-track ownership: leading → column 
 | `EntityItemAnatomy.leadingUtilities` | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
 | DEC / DER disclosure                 | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
 
-Surfaces publish `--entity-leading-offset` on their root from utility **count**.
-Anatomy consumes the var only; it never publishes offset. Do not use Fragments or nested
-rails to group multiple utilities — pass a deterministic array instead.
+Surfaces with disclosed sibling content publish `--entity-content-offset` on their root
+from utility **count** and **density**. Anatomy and `EntityLeadingRail` establish the
+coordinate physically; they never publish offset.
 
 **Combined DEC merge invariant:** `rowLayout="entity-card"` ⇒ CLI behavior-only (no body
 inset, no entity leading offset on shell) + exactly one Anatomy rail + DEC owns header/body
@@ -132,7 +132,7 @@ geometry and offset on `article`.
 
 - Card surface chrome (border, radius, background, disabled presentation)
 - Density-aware surface inset on the card frame
-- `--entity-leading-offset` publication on `EntityCardFrame`
+- `--leading-chrome-size` publication on `EntityCardFrame` when a leading utility is present
 
 ### Consumer supplies
 
@@ -170,9 +170,8 @@ DisclosureEntityCard (article)
 
 - Card surface chrome and disabled presentation on `article`
 - Density-aware **header** inset (`disclosureEntityCardHeaderPaddingVariants`)
-- `--entity-leading-offset` publication on `article`
-- Header/body divider and body wash
-- Complete **body** inset: inline-start = density + leading offset; inline-end = density; block rhythm via density
+- `--entity-density-inline` and `--entity-content-offset` publication on `article`
+- Complete **body** inset: inline-start = density + content offset; inline-end = density; block rhythm via density
 
 ### Consumer supplies
 
@@ -224,7 +223,7 @@ DEC `bodyClassName` owns all horizontal and block inset.
 
 - Entity-card header inset
 - Entity-card body inset
-- Entity leading offset (DEC `article` publishes `--entity-leading-offset`)
+- Entity content offset (DEC `article` publishes `--entity-content-offset`)
 
 Non-entity ArrayItem rows (`rowLayout="default"`) retain legacy content-column indent
 via CLI — that path is for anonymous form arrays, not entity-backed disclosure cards.
@@ -304,15 +303,31 @@ like `compact`.
 
 ---
 
-## Leading offset contract
+## Leading geometry contract
 
-Leading utilities (grip, disclosure caret, or a single host utility) determine
-content-start via `--entity-leading-offset`, published once on the surface root
-(DEC `article`, CEC `EntityCardFrame`, embedded `EntityItem` when no outer surface
-already published). `EntityItemAnatomy` and `EntityLeadingRail` consume the var only.
+Leading utilities (grip, disclosure caret, or a single host utility) share one geometry
+policy via `resolveEntityLeadingGeometry({ count, density })`:
 
-DEC body inline-start = density inset + `--entity-leading-offset`. Inline-end = density
-inset only — trailing header actions never change disclosed content end padding.
+- `utilityGap` — flex gap between adjacent utilities (0 when grip and caret touch)
+- `contentGap` — `padding-inline-end` on `EntityLeadingRail` before column 2
+- `contentOffset` — rendered rail width when count > 0
+
+`EntityLeadingRail` physically consumes `utilityGap` and `contentGap`. The leading slot
+does not add `mr-*` for content-start.
+
+**Publication rule:** publish `--entity-content-offset` only when content outside
+`EntityItemAnatomy` must align to column 2 (DEC disclosed body, DER disclosure body).
+CEC, master-detail, and embedded `EntityItem` hosts need anatomy layout only — CEC may
+publish `--leading-chrome-size` when a leading utility is present.
+
+DEC `article` publishes `--entity-density-inline` and `--entity-content-offset`. Body
+inline-start = density inset + content offset. Inline-end = density inset only.
+
+DER keeps host `px-4` on the header row; disclosed body uses host inset + content offset
+via `detailEntityRowDisclosureContentVariants` — host inset is not folded into the geometry
+helper.
+
+`--entity-leading-offset` remains a migration alias for `--entity-content-offset`.
 
 **Behavior** owns what a control does (collapse, drag). **Entity anatomy** owns where it
 lives. Do not use CLI `chromeCount` or `--content-column-indent` as a second entity

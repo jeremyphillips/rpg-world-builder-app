@@ -29,8 +29,8 @@ describe('entity item anatomy guard', () => {
     const decSource = readFileSync(join(ENTITY_ROOT, 'disclosure-entity-card.client.tsx'), 'utf8')
     const frameSource = readFileSync(join(ENTITY_ROOT, 'entity-card-frame.client.tsx'), 'utf8')
 
-    expect(decSource).toMatch(/buildEntityLeadingOffsetStyle/)
-    expect(frameSource).toMatch(/buildEntityLeadingOffsetStyle/)
+    expect(decSource).toMatch(/buildEntityContentOffsetStyle/)
+    expect(frameSource).toMatch(/buildEntityLeadingChromeSizeStyle/)
   })
 
   it('keeps explicit grid tracks without global horizontal gap', () => {

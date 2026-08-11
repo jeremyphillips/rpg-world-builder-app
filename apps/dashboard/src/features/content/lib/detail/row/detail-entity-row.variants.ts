@@ -1,8 +1,11 @@
 import { cva } from 'class-variance-authority'
 
-import { iconGhostControlVariants } from '@rpg/ui'
+import { cn, iconGhostControlVariants } from '@rpg/ui'
 
-import { ENTITY_LEADING_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
+import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
+
+/** Host-owned inline inset for self-contained relationship rows. */
+const DETAIL_ENTITY_ROW_HOST_INLINE_INSET = 'calc(var(--spacing)*4)'
 
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
@@ -36,9 +39,20 @@ export const detailEntityRowDisclosureButtonVariants = cva(
   iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
 )
 
-export const detailEntityRowDisclosureContentVariants = cva(
-  `pl-[var(${ENTITY_LEADING_OFFSET_VAR})]`,
-)
+export const detailEntityRowDisclosureContentVariants = cva('', {
+  variants: {
+    inset: {
+      self: cn(
+        'pr-4',
+        `pl-[calc(${DETAIL_ENTITY_ROW_HOST_INLINE_INSET}+var(${ENTITY_CONTENT_OFFSET_VAR}))]`,
+      ),
+      parent: `pl-[var(${ENTITY_CONTENT_OFFSET_VAR})]`,
+    },
+  },
+  defaultVariants: {
+    inset: 'self',
+  },
+})
 
 /** Left rail wrapping disclosure preview child rows. */
 export const detailEntityRowDisclosurePreviewGroupVariants = cva(

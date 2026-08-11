@@ -7,7 +7,7 @@ import { cn } from '@rpg/ui'
 
 import { EntityItemAnatomy } from '../../entity/entity-item.client'
 import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
-import { buildEntityLeadingOffsetStyle } from '../../entity/entity-leading-rail.lib'
+import { buildEntityContentOffsetStyle } from '../../entity/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
 import {
   detailEntityRowDisclosureButtonVariants,
@@ -37,7 +37,10 @@ export type DetailEntityRowProps = {
 
 const DETAIL_ENTITY_ROW_DENSITY = 'compact' as const
 
-const DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE = buildEntityLeadingOffsetStyle(1)
+const DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE = buildEntityContentOffsetStyle({
+  count: 1,
+  density: DETAIL_ENTITY_ROW_DENSITY,
+})
 
 function DetailEntityRowDisclosureUtility({
   disclosure,
@@ -154,7 +157,7 @@ export function DetailEntityRow({
         />
       </div>
       {disclosure.mode === 'expandable' && !collapsed ? (
-        <div id={contentId} className={detailEntityRowDisclosureContentVariants()}>
+        <div id={contentId} className={detailEntityRowDisclosureContentVariants({ inset })}>
           <div className={detailEntityRowDisclosurePreviewGroupVariants()}>
             {disclosure.content}
           </div>

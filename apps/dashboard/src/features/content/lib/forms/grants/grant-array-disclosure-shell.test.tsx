@@ -9,7 +9,7 @@ import { Form, type FormItem } from '@rpg/ui/form'
 
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/disclosure-entity-card.variants'
-import { ENTITY_LEADING_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
+import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -106,10 +106,20 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(
       screen.getByRole('button', { name: /Remove Grants · Speak with Animals/i }),
     ).toBeInTheDocument()
+    expect(
+      screen.queryAllByRole('button', { name: /Remove Grants · Speak with Animals/i }),
+    ).toHaveLength(1)
 
     const firstRow = screen
       .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
       .closest('[data-array-item-prefix]') as HTMLElement
+    const trailingSlot = firstRow.querySelector('[data-entity-item-slot="trailing"]')
+    expect(trailingSlot).toBeTruthy()
+    expect(
+      within(trailingSlot as HTMLElement).getByRole('button', {
+        name: /Remove Grants · Speak with Animals/i,
+      }),
+    ).toBeInTheDocument()
     const ability = within(firstRow).getByLabelText('Spellcasting ability')
     expect(ability.closest('[hidden]')).toBeTruthy()
 
@@ -124,11 +134,13 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(body?.className).not.toContain('content-inline-start')
 
     const article = firstRow.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
-      'calc(2 * var(--leading-chrome-size)',
+    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+      'calc(2 * calc(var(--spacing)*6)',
     )
+    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*3)]')
     const shell = firstRow.querySelector('[role="group"]') as HTMLElement
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
+    expect(shell.className).not.toContain('--entity-density-inline')
 
     const headerWrap = screen
       .getByText('Speak with Animals', { selector: '.font-body-emphasis' })

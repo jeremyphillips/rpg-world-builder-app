@@ -4,13 +4,13 @@ import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { buildEntityLeadingOffsetStyle } from './entity-leading-rail.lib'
+import { buildEntityLeadingChromeSizeStyle } from './entity-leading-rail.lib'
 import { entityCardFrameVariants } from './entity-card-frame.variants'
 
 type EntityCardFrameProps = {
   density?: ContentCardDensity
   disabled?: boolean
-  /** Occupied leading utilities (0–1) — publishes `--entity-leading-offset` on the shell. */
+  /** Occupied leading utilities (0–1) — publishes utility column size when present. */
   leadingUtilityCount?: number
   children: ReactNode
 }
@@ -22,12 +22,14 @@ export function EntityCardFrame({
   leadingUtilityCount = 0,
   children,
 }: EntityCardFrameProps) {
-  const leadingOffsetStyle = buildEntityLeadingOffsetStyle(leadingUtilityCount) as CSSProperties
+  const leadingChromeStyle = (
+    leadingUtilityCount > 0 ? buildEntityLeadingChromeSizeStyle() : undefined
+  ) as CSSProperties | undefined
 
   return (
     <article
       className={cn(entityCardFrameVariants({ density, disabled }))}
-      style={leadingOffsetStyle}
+      style={leadingChromeStyle}
       data-disabled={disabled ? true : undefined}
     >
       {children}
