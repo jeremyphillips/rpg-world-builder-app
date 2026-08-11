@@ -592,7 +592,9 @@ export {
   CollapsibleListItemActions,
   CollapsibleListItemBody,
   CollapsibleListItemCollapseButton,
+  CollapsibleListItemDisclosureTrigger,
   CollapsibleListItemDragHandle,
+  CollapsibleListItemDragHandleTrigger,
   CollapsibleListItemShell,
   CollapsibleListItemToolbar,
   buildCollapsibleListItemLeadingChromeStyle,
@@ -609,6 +611,7 @@ export {
   type CollapsibleListItemShellPreset,
   type CollapsibleListItemRowLayout,
   type CollapsibleListItemToolbarProps,
+  type CollapsibleListItemToolbarLeadingChromePlacement,
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,

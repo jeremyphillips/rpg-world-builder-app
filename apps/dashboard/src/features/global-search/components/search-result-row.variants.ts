@@ -8,8 +8,8 @@ export type SearchResultRowDensity = 'compact' | 'default'
 export const searchResultRowVariants = cva('relative block w-full text-left transition-colors', {
   variants: {
     borderless: {
-      true: 'border-b-0',
-      false: 'border-b border-border px-0 hover:bg-muted',
+      true: 'border-b-0 px-3',
+      false: 'border-b border-border px-3 hover:bg-muted sm:px-5',
     },
     density: {
       compact: '',

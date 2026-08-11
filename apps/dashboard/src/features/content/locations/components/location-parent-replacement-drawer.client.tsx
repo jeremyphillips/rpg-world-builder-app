@@ -98,15 +98,18 @@ function LocationParentReplacementCandidateRow({
     <EntityItem
       density="compact"
       entity={buildLocationPickerEntitySummary(summary, { imageKey: summary.imageKey })}
-      action={
-        <CatalogPickerSelectionActions
-          phase={phase}
-          canSelect
-          addLabel={isSelected ? 'Selected' : 'Select'}
-          onAdd={() => onSelect(summary.id)}
-          onRemove={onClear}
-        />
-      }
+      trailing={{
+        kind: 'action',
+        content: (
+          <CatalogPickerSelectionActions
+            phase={phase}
+            canSelect
+            addLabel={isSelected ? 'Selected' : 'Select'}
+            onAdd={() => onSelect(summary.id)}
+            onRemove={onClear}
+          />
+        ),
+      }}
     />
   )
 }

@@ -28,7 +28,7 @@ export function DrawerContextEntityBlock({
           classification: headingSuffix,
           description: supportingText,
         })}
-        href={href}
+        headingHref={href}
         density={DRAWER_CONTEXT_ENTITY_DENSITY}
       />
     </div>

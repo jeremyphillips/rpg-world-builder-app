@@ -4,40 +4,41 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { contentCardHeadingLinkVariants, type ContentCardDensity } from '@rpg/ui'
 
+import { EntityLeadingRail } from './entity-leading-rail.client'
+import { EntityItemTrailingSlot } from './entity-item-trailing.client'
+import type { EntityItemTrailing } from './entity-item-trailing.types'
 import { EntitySummary } from './entity-summary.client'
 import type { EntitySummaryModel } from './entity-summary.types'
 import {
-  entityItemActionVariants,
   entityItemAnatomyVariants,
-  entityItemLeadingVariants,
+  entityItemContentVariants,
   entityItemRootVariants,
 } from './entity-item.variants'
 
+export type { EntityItemTrailing } from './entity-item-trailing.types'
+
 export type EntityItemProps = {
   entity: EntitySummaryModel
-  href?: string
+  /** Links the entity heading only — not whole-row/card navigation. */
+  headingHref?: string
+  /** Exactly one leading utility when set — never a multi-control fragment. */
   leading?: ReactNode
-  action?: ReactNode
+  trailing?: EntityItemTrailing
   density?: ContentCardDensity
-}
-
-type EntityItemAnatomyProps = EntityItemProps & {
-  /** When false, skip entity-owned inset — used inside EntityCardFrame. */
-  applyInset?: boolean
 }
 
 function resolveLinkedHeading(
   entity: EntitySummaryModel,
-  href: string | undefined,
+  headingHref: string | undefined,
 ): EntitySummaryModel {
-  if (!href) {
+  if (!headingHref) {
     return entity
   }
 
   return {
     ...entity,
     heading: (
-      <Link to={href} className={contentCardHeadingLinkVariants()}>
+      <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
         {entity.heading}
       </Link>
     ),
@@ -46,12 +47,12 @@ function resolveLinkedHeading(
 
 export function EntityItemAnatomy({
   entity,
-  href,
+  headingHref,
   leading,
-  action,
+  trailing,
   density = 'comfortable',
-}: Omit<EntityItemAnatomyProps, 'applyInset'>) {
-  const resolvedEntity = resolveLinkedHeading(entity, href)
+}: EntityItemProps) {
+  const resolvedEntity = resolveLinkedHeading(entity, headingHref)
   const hasSecondaryText = Boolean(
     resolvedEntity.description || (resolvedEntity.status && resolvedEntity.status.length > 0),
   )
@@ -59,28 +60,30 @@ export function EntityItemAnatomy({
 
   return (
     <div className={entityItemAnatomyVariants({ density, rowAlign })}>
-      {leading ? <div className={entityItemLeadingVariants()}>{leading}</div> : null}
-      {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
-      <EntitySummary entity={resolvedEntity} density={density} />
-      {action ? <div className={entityItemActionVariants()}>{action}</div> : null}
+      {leading ? <EntityLeadingRail>{leading}</EntityLeadingRail> : null}
+      <div className={entityItemContentVariants({ density, rowAlign })}>
+        {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
+        <EntitySummary entity={resolvedEntity} density={density} />
+      </div>
+      <EntityItemTrailingSlot trailing={trailing} />
     </div>
   )
 }
 
 export function EntityItem({
   entity,
-  href,
+  headingHref,
   leading,
-  action,
+  trailing,
   density = 'comfortable',
 }: EntityItemProps) {
   return (
-    <div className={entityItemRootVariants({ density })}>
+    <div className={entityItemRootVariants()}>
       <EntityItemAnatomy
         entity={entity}
-        href={href}
+        headingHref={headingHref}
         leading={leading}
-        action={action}
+        trailing={trailing}
         density={density}
       />
     </div>

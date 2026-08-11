@@ -56,9 +56,9 @@ describe('entity surface closed API', () => {
   it('EntityItem accepts semantic seams', () => {
     expectTypeOf<EntityItemProps>().toMatchTypeOf<{
       entity: EntityItemProps['entity']
-      href?: string
+      headingHref?: string
       leading?: React.ReactNode
-      action?: React.ReactNode
+      trailing?: EntityItemProps['trailing']
       density?: EntityItemProps['density']
     }>()
   })

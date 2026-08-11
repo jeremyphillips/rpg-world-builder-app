@@ -16,7 +16,7 @@ type Story = StoryObj<typeof DetailEntityRow>
 export const Default: Story = {
   args: {
     heading: 'The Silver Eel',
-    href: '/campaigns/demo/locations/silver-eel',
+    headingHref: '/campaigns/demo/locations/silver-eel',
     headingSuffix: ' · Building · Tavern',
   },
 }
@@ -26,31 +26,37 @@ export const WithOverflow: Story = {
     <DetailSectionRowList separator="structural">
       <DetailEntityRow
         heading="The Silver Eel"
-        href="/campaigns/demo/locations/silver-eel"
+        headingHref="/campaigns/demo/locations/silver-eel"
         headingSuffix=" · Building · Tavern"
-        endSlot={
-          <DetailOverflowMenu
-            triggerLabel="Actions for The Silver Eel"
-            actions={[
-              { id: 'view', label: 'View location', onSelect: () => undefined },
-              { id: 'move', label: 'Move location', onSelect: () => undefined },
-            ]}
-          />
-        }
+        trailing={{
+          kind: 'action',
+          content: (
+            <DetailOverflowMenu
+              triggerLabel="Actions for The Silver Eel"
+              actions={[
+                { id: 'view', label: 'View location', onSelect: () => undefined },
+                { id: 'move', label: 'Move location', onSelect: () => undefined },
+              ]}
+            />
+          ),
+        }}
       />
       <DetailEntityRow
         heading="Thieves' Guildhouse"
-        href="/campaigns/demo/locations/guildhouse"
+        headingHref="/campaigns/demo/locations/guildhouse"
         headingSuffix=" · Building · Guildhall"
-        endSlot={
-          <DetailOverflowMenu
-            triggerLabel="Actions for Thieves' Guildhouse"
-            actions={[
-              { id: 'view', label: 'View location', onSelect: () => undefined },
-              { id: 'move', label: 'Move location', onSelect: () => undefined },
-            ]}
-          />
-        }
+        trailing={{
+          kind: 'action',
+          content: (
+            <DetailOverflowMenu
+              triggerLabel="Actions for Thieves' Guildhouse"
+              actions={[
+                { id: 'view', label: 'View location', onSelect: () => undefined },
+                { id: 'move', label: 'Move location', onSelect: () => undefined },
+              ]}
+            />
+          ),
+        }}
       />
     </DetailSectionRowList>
   ),
@@ -61,7 +67,7 @@ export const WithDisclosure: Story = {
     <DetailSectionRowList separator="structural">
       <DetailEntityRow
         heading="Dock Ward"
-        href="/campaigns/demo/locations/dock-ward"
+        headingHref="/campaigns/demo/locations/dock-ward"
         headingSuffix=" · District · 2 locations"
         disclosure={{
           mode: 'expandable',
@@ -70,32 +76,35 @@ export const WithDisclosure: Story = {
             <DetailSectionRowList separator="structural">
               <DetailEntityRow
                 heading="The Silver Eel"
-                href="/campaigns/demo/locations/silver-eel"
+                headingHref="/campaigns/demo/locations/silver-eel"
                 headingSuffix=" · Building · Tavern"
                 inset="parent"
               />
               <DetailEntityRow
                 heading="Thieves' Guildhouse"
-                href="/campaigns/demo/locations/guildhouse"
+                headingHref="/campaigns/demo/locations/guildhouse"
                 headingSuffix=" · Building · Guildhall"
                 inset="parent"
               />
             </DetailSectionRowList>
           ),
         }}
-        endSlot={
-          <DetailOverflowMenu
-            triggerLabel="Actions for Dock Ward"
-            actions={[
-              { id: 'view', label: 'View location', onSelect: () => undefined },
-              { id: 'move', label: 'Move location', onSelect: () => undefined },
-            ]}
-          />
-        }
+        trailing={{
+          kind: 'action',
+          content: (
+            <DetailOverflowMenu
+              triggerLabel="Actions for Dock Ward"
+              actions={[
+                { id: 'view', label: 'View location', onSelect: () => undefined },
+                { id: 'move', label: 'Move location', onSelect: () => undefined },
+              ]}
+            />
+          ),
+        }}
       />
       <DetailEntityRow
         heading="Scholar's Quarter"
-        href="/campaigns/demo/locations/scholars-quarter"
+        headingHref="/campaigns/demo/locations/scholars-quarter"
         headingSuffix=" · District · 0 locations"
         disclosure={{ mode: 'reserved' }}
       />

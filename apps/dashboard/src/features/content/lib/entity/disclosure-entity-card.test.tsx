@@ -8,6 +8,7 @@ import {
   disclosureEntityCardBodyInlineEndClasses,
   disclosureEntityCardBodyInlineStartClasses,
 } from './disclosure-entity-card.variants'
+import { ENTITY_LEADING_OFFSET_VAR } from './entity-leading-rail.lib'
 import { HARBOR_DISTRICT_ENTITY } from './entity.fixture'
 
 const mockDragHandleProps = {
@@ -34,7 +35,7 @@ describe('DisclosureEntityCard', () => {
           itemId="harbor"
           toolbarAriaLabel="Harbor District"
           entity={HARBOR_DISTRICT_ENTITY}
-          href="/campaigns/demo/locations/harbor"
+          headingHref="/campaigns/demo/locations/harbor"
         >
           <p>Expanded inventory details</p>
         </DisclosureEntityCard>
@@ -67,30 +68,34 @@ describe('DisclosureEntityCard', () => {
     expect(body).toHaveClass(disclosureEntityCardBodyInlineStartClasses)
     expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
 
-    const shell = container.querySelector('[role="group"]') as HTMLElement
-    expect(shell).toHaveClass('[--entity-content-indent:var(--content-column-indent)]')
-    expect(shell).toHaveClass('[--entity-density-inline:calc(var(--spacing)*5)]')
-    expect(shell.style.getPropertyValue('--content-column-indent')).toContain(
+    const article = container.querySelector('article') as HTMLElement
+    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
       '--leading-chrome-size',
     )
+
+    const shell = container.querySelector('[role="group"]') as HTMLElement
+    expect(shell).toHaveClass('[--entity-density-inline:calc(var(--spacing)*5)]')
   })
 
   it('keeps body inline-end inset identical regardless of trailing action width', () => {
     const cases = [
-      { id: 'none', action: undefined, label: 'Body none' },
+      { id: 'none', trailing: undefined, label: 'Body none' },
       {
         id: 'delete',
-        action: <button type="button">Remove</button>,
+        trailing: { kind: 'action' as const, content: <button type="button">Remove</button> },
         label: 'Body delete',
       },
       {
         id: 'add',
-        action: <button type="button">Add</button>,
+        trailing: { kind: 'action' as const, content: <button type="button">Add</button> },
         label: 'Body add',
       },
       {
         id: 'wide',
-        action: <button type="button">Add to inventory · 105 GP</button>,
+        trailing: {
+          kind: 'action' as const,
+          content: <button type="button">Add to inventory · 105 GP</button>,
+        },
         label: 'Body wide',
       },
     ] as const
@@ -103,7 +108,7 @@ describe('DisclosureEntityCard', () => {
             itemId={entry.id}
             toolbarAriaLabel={entry.id}
             entity={HARBOR_DISTRICT_ENTITY}
-            action={entry.action}
+            trailing={entry.trailing}
             density="compact"
             defaultCollapsed={false}
           >
@@ -128,7 +133,7 @@ describe('DisclosureEntityCard', () => {
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         density="compact"
-        action={<button type="button">Remove</button>}
+        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
         defaultCollapsed={false}
       >
         <p>Compact body</p>
@@ -190,8 +195,10 @@ describe('DisclosureEntityCard', () => {
       </DisclosureEntityCard>,
     )
 
-    const shell = container.querySelector('[role="group"]') as HTMLElement
-    expect(shell.style.getPropertyValue('--leading-chrome-count')).toBe('1')
+    const article = container.querySelector('article') as HTMLElement
+    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
+      '--leading-chrome-size',
+    )
     expect(screen.getByRole('button', { name: 'Expand Harbor District' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/drag to reorder/i)).not.toBeInTheDocument()
   })
@@ -232,21 +239,19 @@ describe('DisclosureEntityCard', () => {
     expect(article?.className).toContain('[--surface-current:var(--card)]')
   })
 
-  it('forwards action and leading seams to EntityItem anatomy', () => {
+  it('forwards trailing seam to EntityItem anatomy', () => {
     render(
       <DisclosureEntityCard
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
-        leading={<span data-testid="leading-seam">Grip</span>}
-        action={<button type="button">Remove</button>}
+        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
         defaultCollapsed={false}
       >
         <p>Expanded inventory details</p>
       </DisclosureEntityCard>,
     )
 
-    expect(screen.getByTestId('leading-seam')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
 })

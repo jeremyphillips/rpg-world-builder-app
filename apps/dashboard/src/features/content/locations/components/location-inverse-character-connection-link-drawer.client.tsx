@@ -295,25 +295,28 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             entity={buildCharacterPickerEntitySummary(character, {
               description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
             })}
-            action={
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => {
-                  setSelectedCharacterId(character.id)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-                onRemove={() => {
-                  setSelectedCharacterId(null)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={phase}
+                  canSelect={hasAvailableKind}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => {
+                    setSelectedCharacterId(character.id)
+                    if (!resolvedAddKind) {
+                      setSelectedKind(null)
+                    }
+                  }}
+                  onRemove={() => {
+                    setSelectedCharacterId(null)
+                    if (!resolvedAddKind) {
+                      setSelectedKind(null)
+                    }
+                  }}
+                />
+              ),
+            }}
           />
         )
       }}

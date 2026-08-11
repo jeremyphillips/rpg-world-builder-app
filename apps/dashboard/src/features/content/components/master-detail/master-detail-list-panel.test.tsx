@@ -81,9 +81,7 @@ describe('MasterDetailListPanel', () => {
     render(<MasterDetailListPanel {...baseProps()} items={errorItems} />)
 
     expect(screen.getByText('Has validation errors')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Has validation errors/ }),
-    ).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('button', { name: 'Rage' })).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('renders drag handles when onMove is provided and hides them for a single item', () => {

@@ -2,7 +2,7 @@
 
 import { Check, TriangleAlert } from 'lucide-react'
 
-import { Badge, Text } from '@rpg/ui'
+import { Badge } from '@rpg/ui'
 
 import { buildEquipmentPickerRowViewModel, EntityItem } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
@@ -60,29 +60,30 @@ export function EquipmentPickerItemRail({
           />
         ),
         status: [
-          ...(presentation.summaryTrailingLabel
-            ? [
-                <Text key="summary-trailing" variant="muted">
-                  {presentation.summaryTrailingLabel}
-                </Text>,
-              ]
-            : []),
           ...(callout ? [<EquipmentPickerCalloutBadge key="callout" callout={callout} />] : []),
         ],
       }}
       density="compact"
-      action={
+      trailing={
         presentation.action.kind === 'add' ||
-        (presentation.action.kind === 'manage_only' && ownedQuantity > 0) ? (
-          <EquipmentPickerCommerce
-            ownedQuantity={ownedQuantity}
-            showAdd={presentation.action.kind === 'add'}
-            disabled={presentation.action.kind === 'add' ? presentation.action.disabled : false}
-            buttonLabel={addButtonLabel}
-            isPending={isPending}
-            onAdd={() => commitQuantity(1)}
-          />
-        ) : undefined
+        (presentation.action.kind === 'manage_only' && ownedQuantity > 0)
+          ? {
+              kind: 'group',
+              primary: (
+                <EquipmentPickerCommerce
+                  ownedQuantity={ownedQuantity}
+                  showAdd={presentation.action.kind === 'add'}
+                  disabled={
+                    presentation.action.kind === 'add' ? presentation.action.disabled : false
+                  }
+                  buttonLabel={addButtonLabel}
+                  isPending={isPending}
+                  onAdd={() => commitQuantity(1)}
+                />
+              ),
+              secondary: presentation.summaryTrailingLabel,
+            }
+          : undefined
       }
     />
   )

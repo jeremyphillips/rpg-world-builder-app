@@ -3,12 +3,13 @@
 Entity identity uses one stack:
 
 ```text
-EntitySummaryModel → EntitySummary → EntityItem → embedded host | ContentEntityCard | DisclosureEntityCard
+EntitySummaryModel → EntitySummary → EntityItemAnatomy → embedded host | ContentEntityCard | DisclosureEntityCard
 ```
 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
-`EntityItem` adds optional heading navigation, leading controls, an action, and density.
+`EntityItem` adds optional heading navigation (`headingHref`), a single leading utility,
+semantic trailing (`action` | `indicator` | `group`), and density.
 
 ## Choose a surface
 
@@ -22,31 +23,36 @@ EntitySummaryModel → EntitySummary → EntityItem → embedded host | ContentE
 
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
-full-row navigation, omit `EntityItem.href`.
+full-row navigation, omit `EntityItem.headingHref`.
 
 ## Density
 
-`EntityItem` owns identity typography, rhythm, media/leading/action geometry, and its
-embedded density inset. `ContentEntityCard` and `DisclosureEntityCard` own their
-bordered shell and pass their density to the internal item.
+`EntityItemAnatomy` owns identity typography, rhythm, media/leading/trailing geometry.
+Embedded hosts own collection inset (horizontal padding, hover, separators).
+`ContentEntityCard` and `DisclosureEntityCard` own their bordered shell inset and pass
+density to the internal anatomy.
 
 Set density exactly once:
 
 - standalone cards: set it on CEC or DEC;
-- embedded hosts: set it on `EntityItem`;
+- embedded hosts: set it on `EntityItem` and add host-owned row inset;
 - never size a shell and nested item independently.
+
+## Leading offset contract
+
+Leading utilities (grip, disclosure caret, or a single host utility) determine
+content-start via `--entity-leading-offset`, published once on the surface root
+(DEC `article`, CEC `EntityCardFrame`, embedded `EntityItem` when no outer surface
+already published). `EntityItemAnatomy` and `EntityLeadingRail` consume the var only.
+
+DEC body inline-start = density inset + `--entity-leading-offset`. Inline-end = density
+inset only — trailing header actions never change disclosed content end padding.
 
 ## Disclosure content-column contract
 
-DEC owns the collapse caret, optional drag grip, header/body divider, body wash, and
-body alignment. Horizontal inset splits into two independent rules:
-
-- **inline start:** density inset + leading-chrome indent (`--entity-content-indent`)
-- **inline end:** density inset only (`--entity-density-inline`)
-
-Leading chrome changes where entity/domain content begins. Trailing header actions
-never change where disclosed content ends — delete, Add, commerce, and overflow
-controls must not drive body padding.
+DEC owns the collapse caret, optional drag grip (via `dragHandleProps`), header/body
+divider, body wash, and body alignment. CollapsibleListItem supplies disclosure
+behavior only; leading controls render in `EntityLeadingRail` inside anatomy.
 
 The divider and body wash remain edge-to-edge. Grip and caret columns share one
 `--leading-chrome-size`; consumers must not add compensating body or leading padding.
@@ -57,7 +63,15 @@ into the header. Body wash still uses `bg-surface-muted` on top of that card pla
 
 Feature code may lay out genuine domain content inside DEC children. It must not
 override entity heading typography, padding, border, radius, divider, alignment, or
-action placement.
+trailing placement.
+
+## Trailing kinds
+
+| Kind        | Use                                               |
+| ----------- | ------------------------------------------------- |
+| `action`    | Add, delete, overflow, selection controls         |
+| `indicator` | Destination chevrons, quiet `×qty` labels         |
+| `group`     | Commerce stacks (qty + Add, secondary price/meta) |
 
 ## Relationship rows
 
@@ -67,11 +81,11 @@ Typed cross-content edges on detail pages use `CrossContentRelationshipRow` → 
 
 `EntityItem`, CEC, and DEC deliberately expose no `className`, `style`, padding,
 inset, header/body, or divider styling props. Provide semantic data and controls
-through `entity`, `leading`, `action`, and DEC `children` only.
+through `entity`, `leading`, `trailing`, `headingHref`, and DEC `children` only.
 
-`ContentCardHeading`, `ContentCardBody`, and `EntityCardFrame` are internal
-implementation details. Feature code uses the entity surfaces above rather than
-composing those internals directly.
+`ContentCardHeading`, `ContentCardBody`, `EntityCardFrame`, `EntityItemAnatomy`, and
+`EntityLeadingRail` are internal implementation details. Feature code uses the entity
+surfaces above rather than composing those internals directly.
 
 ## Form arrays — form-owned ≠ form-styled
 

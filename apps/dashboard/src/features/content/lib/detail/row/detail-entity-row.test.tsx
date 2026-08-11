@@ -12,9 +12,9 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="The Silver Eel"
-          href="/locations/silver-eel"
+          headingHref="/locations/silver-eel"
           headingSuffix=" · Building · Tavern"
-          endSlot={<button type="button">Actions</button>}
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,
     )
@@ -36,7 +36,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Braggi"
-          href="/characters/braggi"
+          headingHref="/characters/braggi"
           headingSuffix=" · NPC · Human · Level 3 Fighter"
         />
       </MemoryRouter>,
@@ -53,9 +53,9 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Verna Stormcaller"
-          href="/characters/verna"
+          headingHref="/characters/verna"
           headingSuffix=" · PC · Elf (Drow) · Level 8 · Fighter 5 (Battle Master) / Rogue 3 (Assassin)"
-          endSlot={<button type="button">Actions</button>}
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,
     )
@@ -72,7 +72,7 @@ describe('DetailEntityRow', () => {
   it('omits end slot when not provided', () => {
     render(
       <MemoryRouter>
-        <DetailEntityRow heading="Harborford" href="/locations/harborford" />
+        <DetailEntityRow heading="Harborford" headingHref="/locations/harborford" />
       </MemoryRouter>,
     )
 
@@ -83,7 +83,7 @@ describe('DetailEntityRow', () => {
   it('renders an ordinary row without leading disclosure chrome when disclosure is omitted', () => {
     const { container } = render(
       <MemoryRouter>
-        <DetailEntityRow heading="Harborford" href="/locations/harborford" />
+        <DetailEntityRow heading="Harborford" headingHref="/locations/harborford" />
       </MemoryRouter>,
     )
 
@@ -98,7 +98,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -126,8 +126,8 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
-          endSlot={<button type="button">Actions</button>}
+          headingHref="/locations/dock-ward"
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -154,7 +154,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -183,18 +183,21 @@ describe('DetailEntityRow', () => {
         <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Dock Ward"
-            href="/locations/dock-ward"
+            headingHref="/locations/dock-ward"
             disclosure={{
               mode: 'expandable',
               label: 'locations in Dock Ward',
               content: (
                 <DetailSectionRowList separator="structural">
-                  <DetailEntityRow heading="Yawning Portal" href="/locations/yawning-portal" />
+                  <DetailEntityRow
+                    heading="Yawning Portal"
+                    headingHref="/locations/yawning-portal"
+                  />
                 </DetailSectionRowList>
               ),
             }}
           />
-          <DetailEntityRow heading="Market Ward" href="/locations/market-ward" />
+          <DetailEntityRow heading="Market Ward" headingHref="/locations/market-ward" />
         </DetailSectionRowList>
       </MemoryRouter>,
     )
@@ -217,7 +220,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -231,7 +234,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Market Ward"
-          href="/locations/market-ward"
+          headingHref="/locations/market-ward"
           disclosure={{ mode: 'reserved' }}
         />
       </MemoryRouter>,
@@ -261,7 +264,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Market Ward"
-          href="/locations/market-ward"
+          headingHref="/locations/market-ward"
           disclosure={{ mode: 'reserved' }}
         />
       </MemoryRouter>,
@@ -278,12 +281,12 @@ describe('DetailEntityRow', () => {
         <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Market Ward"
-            href="/locations/market-ward"
+            headingHref="/locations/market-ward"
             disclosure={{ mode: 'reserved' }}
           />
           <DetailEntityRow
             heading="Dock Ward"
-            href="/locations/dock-ward"
+            headingHref="/locations/dock-ward"
             disclosure={{
               mode: 'expandable',
               label: 'locations in Dock Ward',

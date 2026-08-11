@@ -1,19 +1,29 @@
 import { cva } from 'class-variance-authority'
 
-/** Entity-owned density inset for embedded hosts — standalone shells use EntityCardFrame instead. */
-export const entityItemRootVariants = cva('w-full min-w-0', {
-  variants: {
-    density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
+/** Embedded EntityItem host — anatomy only; collection inset owned by the host. */
+export const entityItemRootVariants = cva('w-full min-w-0')
+
+export const entityItemAnatomyVariants = cva(
+  'grid min-w-0 w-full grid-cols-[auto_minmax(0,1fr)_auto]',
+  {
+    variants: {
+      density: {
+        compact: 'gap-x-2 gap-y-1',
+        comfortable: 'gap-x-3 gap-y-1',
+      },
+      rowAlign: {
+        start: 'items-start',
+        center: 'items-center',
+      },
+    },
+    defaultVariants: {
+      density: 'comfortable',
+      rowAlign: 'start',
     },
   },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+)
 
-export const entityItemAnatomyVariants = cva('flex min-w-0 w-full', {
+export const entityItemContentVariants = cva('flex min-w-0', {
   variants: {
     density: {
       compact: 'gap-2',
@@ -29,10 +39,6 @@ export const entityItemAnatomyVariants = cva('flex min-w-0 w-full', {
     rowAlign: 'start',
   },
 })
-
-export const entityItemLeadingVariants = cva('shrink-0')
-
-export const entityItemActionVariants = cva('shrink-0 self-center')
 
 export const entitySummaryDescriptionVariants = cva('truncate text-muted-foreground', {
   variants: {

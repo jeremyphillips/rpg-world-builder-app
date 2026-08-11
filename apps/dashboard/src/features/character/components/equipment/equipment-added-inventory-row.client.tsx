@@ -64,19 +64,22 @@ function GrantOnlySingleReleaseRow({
         equipmentName: entry.equipmentName,
         detailLabel: entry.provenanceLabel,
       })}
-      action={
-        <EquipmentInventorySourceActionButton
-          onClick={() =>
-            onReleaseGrant({
-              allowanceId: removeTarget.allowanceId,
-              equipmentId: removeTarget.equipmentId,
-              quantity: 1,
-            })
-          }
-        >
-          {EQUIPMENT_INVENTORY_RELEASE_LABEL}
-        </EquipmentInventorySourceActionButton>
-      }
+      trailing={{
+        kind: 'action',
+        content: (
+          <EquipmentInventorySourceActionButton
+            onClick={() =>
+              onReleaseGrant({
+                allowanceId: removeTarget.allowanceId,
+                equipmentId: removeTarget.equipmentId,
+                quantity: 1,
+              })
+            }
+          >
+            {EQUIPMENT_INVENTORY_RELEASE_LABEL}
+          </EquipmentInventorySourceActionButton>
+        ),
+      }}
       density="compact"
     />
   )
@@ -127,11 +130,14 @@ function ManagedInventoryRow({
         equipmentName: entry.equipmentName,
         detailLabel: entry.provenanceLabel,
       })}
-      action={
-        <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-          Qty {totalQuantity}
-        </Text>
-      }
+      trailing={{
+        kind: 'indicator',
+        content: (
+          <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+            Qty {totalQuantity}
+          </Text>
+        ),
+      }}
       collapsed={!isOpen}
       onToggleCollapse={handleToggleCollapse}
       density="compact"

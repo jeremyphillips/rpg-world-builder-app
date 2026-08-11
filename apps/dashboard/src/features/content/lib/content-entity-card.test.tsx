@@ -13,12 +13,12 @@ import {
 } from './content-entity-card.client'
 
 describe('ContentEntityCard', () => {
-  it('wraps the heading in a link when href is provided', () => {
+  it('wraps the heading in a link when headingHref is provided', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
           entity={HARBOR_DISTRICT_ENTITY}
-          href="/campaigns/camp-1/locations/harbor"
+          headingHref="/campaigns/camp-1/locations/harbor"
         />
       </MemoryRouter>,
     )
@@ -73,12 +73,12 @@ describe('ContentEntityCard', () => {
     expect(article).toHaveClass('opacity-60')
   })
 
-  it('renders action in the standard card slot', () => {
+  it('renders trailing action in the standard card slot', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
           entity={HARBOR_DISTRICT_ENTITY}
-          action={<button type="button">Select</button>}
+          trailing={{ kind: 'action', content: <button type="button">Select</button> }}
         />
       </MemoryRouter>,
     )
@@ -91,7 +91,7 @@ describe('ContentEntityCard', () => {
       <MemoryRouter>
         <ContentEntityCard
           entity={HARBOR_DISTRICT_ENTITY}
-          href="/campaigns/camp-1/locations/harbor"
+          headingHref="/campaigns/camp-1/locations/harbor"
         />
       </MemoryRouter>,
     )
@@ -116,7 +116,7 @@ describe('EntityItem', () => {
           <EntityItem
             density="compact"
             entity={{ heading: item.name, classification: item.kind }}
-            action={<button type="button">Select</button>}
+            trailing={{ kind: 'action', content: <button type="button">Select</button> }}
           />
         )}
       />,

@@ -388,14 +388,17 @@ export function SpellPickerDrawer({
               ],
             }}
             density="compact"
-            action={
-              <CatalogPickerSelectionActions
-                selected={item.state.isAlreadySelected}
-                canSelect={item.state.canSelect}
-                onAdd={() => onSelectSpell(mode, item.spell.id)}
-                onRemove={() => onRemoveSpell(mode, item.spell.id)}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  selected={item.state.isAlreadySelected}
+                  canSelect={item.state.canSelect}
+                  onAdd={() => onSelectSpell(mode, item.spell.id)}
+                  onRemove={() => onRemoveSpell(mode, item.spell.id)}
+                />
+              ),
+            }}
           />
         )
       }}

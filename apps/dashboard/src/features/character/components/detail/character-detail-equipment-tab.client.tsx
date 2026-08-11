@@ -74,7 +74,10 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
               ]
             : undefined,
       }}
-      action={<CharacterEquipmentQuantityLabel quantity={card.quantity} />}
+      trailing={{
+        kind: 'indicator',
+        content: <CharacterEquipmentQuantityLabel quantity={card.quantity} />,
+      }}
       disabled={header.tone !== 'default'}
     >
       {card.status === 'resolved' ? (

@@ -1,6 +1,6 @@
-/** Outer row chrome shared by every list item. */
+/** Outer row chrome shared by every list item — host-owned inset for embedded EntityItem. */
 export const masterDetailListRowClasses =
-  'flex items-center gap-0 rounded-md border border-transparent hover:bg-row-hover'
+  'flex items-center gap-0 rounded-md border border-transparent px-3 py-2 hover:bg-row-hover'
 
 /** Enables hover/focus reveal for the drag handle in sortable rows. */
 export const masterDetailListRowSortableClasses = 'group'

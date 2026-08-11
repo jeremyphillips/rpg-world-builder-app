@@ -25,11 +25,14 @@ export const EmbeddedWithAction: Story = {
       <EntityItem
         entity={HARBOR_DISTRICT_ENTITY}
         density="compact"
-        action={
-          <button type="button" className="text-sm text-link">
-            Select
-          </button>
-        }
+        trailing={{
+          kind: 'action',
+          content: (
+            <button type="button" className="text-sm text-link">
+              Select
+            </button>
+          ),
+        }}
       />
     </div>
   ),
@@ -38,7 +41,10 @@ export const EmbeddedWithAction: Story = {
 export const ContentEntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
-      <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} href="/campaigns/demo/locations/harbor" />
+      <ContentEntityCard
+        entity={HARBOR_DISTRICT_ENTITY}
+        headingHref="/campaigns/demo/locations/harbor"
+      />
     </div>
   ),
 }

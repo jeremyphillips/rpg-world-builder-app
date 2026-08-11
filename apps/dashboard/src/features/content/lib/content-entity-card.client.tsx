@@ -6,9 +6,11 @@ import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityCardFrame } from './entity/entity-card-frame.client'
 import { EntityItemAnatomy } from './entity/entity-item.client'
+import type { EntityItemTrailing } from './entity/entity-item-trailing.types'
 import type { EntitySummaryModel } from './entity/entity-summary.types'
 
 export type { EntitySummaryModel } from './entity/entity-summary.types'
+export type { EntityItemTrailing } from './entity/entity-item-trailing.types'
 export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
 export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
@@ -16,24 +18,38 @@ export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel
-  action?: ReactNode
-  href?: string
+  /** Exactly one leading utility when set — never a multi-control fragment. */
+  leading?: ReactNode
+  trailing?: EntityItemTrailing
+  /** Links the entity heading only — not whole-row/card navigation. */
+  headingHref?: string
   density?: ContentCardDensity
   disabled?: boolean
 }
 
 export function ContentEntityCard({
   entity,
-  action,
-  href,
+  leading,
+  trailing,
+  headingHref,
   density,
   disabled = false,
 }: ContentEntityCardProps) {
   const resolvedDensity = density ?? 'comfortable'
 
   return (
-    <EntityCardFrame density={resolvedDensity} disabled={disabled}>
-      <EntityItemAnatomy entity={entity} href={href} action={action} density={resolvedDensity} />
+    <EntityCardFrame
+      density={resolvedDensity}
+      disabled={disabled}
+      leadingUtilityCount={leading ? 1 : 0}
+    >
+      <EntityItemAnatomy
+        entity={entity}
+        headingHref={headingHref}
+        leading={leading}
+        trailing={trailing}
+        density={resolvedDensity}
+      />
     </EntityCardFrame>
   )
 }

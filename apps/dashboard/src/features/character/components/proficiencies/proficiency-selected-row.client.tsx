@@ -37,7 +37,10 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
             ]
           : undefined,
       }}
-      action={<BuilderInventoryRemoveAction itemLabel={row.label} onRemove={onRemove} />}
+      trailing={{
+        kind: 'action',
+        content: <BuilderInventoryRemoveAction itemLabel={row.label} onRemove={onRemove} />,
+      }}
       density="compact"
     />
   )

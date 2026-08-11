@@ -445,25 +445,28 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               imageKey: organization.imageKey,
               description: !hasAvailableKind ? fullyLinkedReason : undefined,
             })}
-            action={
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => {
-                  setSelectedOrganizationId(organization.id)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-                onRemove={() => {
-                  setSelectedOrganizationId(null)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={phase}
+                  canSelect={hasAvailableKind}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => {
+                    setSelectedOrganizationId(organization.id)
+                    if (!resolvedAddKind) {
+                      setSelectedKind(null)
+                    }
+                  }}
+                  onRemove={() => {
+                    setSelectedOrganizationId(null)
+                    if (!resolvedAddKind) {
+                      setSelectedKind(null)
+                    }
+                  }}
+                />
+              ),
+            }}
           />
         )
       }}

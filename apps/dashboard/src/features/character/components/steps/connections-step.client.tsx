@@ -142,12 +142,15 @@ export function ConnectionsStep({
                   heading: label,
                   status: status.length > 0 ? status : undefined,
                 }}
-                action={
-                  <BuilderInventoryRemoveAction
-                    itemLabel={label}
-                    onRemove={() => handleRemove(membership.organizationId)}
-                  />
-                }
+                trailing={{
+                  kind: 'action',
+                  content: (
+                    <BuilderInventoryRemoveAction
+                      itemLabel={label}
+                      onRemove={() => handleRemove(membership.organizationId)}
+                    />
+                  ),
+                }}
                 density="compact"
               />
             )

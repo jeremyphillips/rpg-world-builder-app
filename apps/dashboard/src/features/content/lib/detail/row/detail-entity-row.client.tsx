@@ -6,6 +6,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { buildCollapsibleListItemLeadingChromeStyle, cn } from '@rpg/ui'
 
 import { EntityItemAnatomy } from '../../entity/entity-item.client'
+import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
 import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
 import {
   detailEntityRowDisclosureButtonColumnClasses,
@@ -23,12 +24,12 @@ export type DetailEntityRowDisclosure =
 
 export type DetailEntityRowProps = {
   heading: ReactNode
-  href?: string
+  headingHref?: string
   /** Muted classification text rendered inline after the heading (includes leading separator). */
   headingSuffix?: ReactNode
   subheading?: ReactNode
   metadata?: ReactNode
-  endSlot?: ReactNode
+  trailing?: EntityItemTrailing
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure
   className?: string
@@ -84,12 +85,12 @@ function DetailEntityRowDisclosureColumn({
 function DetailEntityRowIdentity(
   props: Pick<
     DetailEntityRowProps,
-    'heading' | 'href' | 'headingSuffix' | 'subheading' | 'metadata' | 'endSlot'
+    'heading' | 'headingHref' | 'headingSuffix' | 'subheading' | 'metadata' | 'trailing'
   > & {
     leading?: ReactNode
   },
 ) {
-  const { heading, href, headingSuffix, subheading, metadata, endSlot, leading } = props
+  const { heading, headingHref, headingSuffix, subheading, metadata, trailing, leading } = props
 
   return (
     <EntityItemAnatomy
@@ -99,9 +100,9 @@ function DetailEntityRowIdentity(
         description: subheading,
         status: metadata,
       })}
-      href={href}
+      headingHref={headingHref}
       leading={leading}
-      action={endSlot}
+      trailing={trailing}
       density={DETAIL_ENTITY_ROW_DENSITY}
     />
   )
@@ -109,11 +110,11 @@ function DetailEntityRowIdentity(
 
 export function DetailEntityRow({
   heading,
-  href,
+  headingHref,
   headingSuffix,
   subheading,
   metadata,
-  endSlot,
+  trailing,
   inset = 'self',
   disclosure,
   className,
@@ -126,11 +127,11 @@ export function DetailEntityRow({
       <div className={cn(detailEntityRowVariants({ inset }), className)}>
         <DetailEntityRowIdentity
           heading={heading}
-          href={href}
+          headingHref={headingHref}
           headingSuffix={headingSuffix}
           subheading={subheading}
           metadata={metadata}
-          endSlot={endSlot}
+          trailing={trailing}
         />
       </div>
     )
@@ -144,11 +145,11 @@ export function DetailEntityRow({
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>
         <DetailEntityRowIdentity
           heading={heading}
-          href={href}
+          headingHref={headingHref}
           headingSuffix={headingSuffix}
           subheading={subheading}
           metadata={metadata}
-          endSlot={endSlot}
+          trailing={trailing}
           leading={
             <DetailEntityRowDisclosureColumn
               disclosure={disclosure}

@@ -153,44 +153,6 @@ function MasterDetailListDragHandle({
   )
 }
 
-type MasterDetailListRowSelectButtonProps = {
-  item: MasterDetailListItem
-  index: number
-  isSelected: boolean
-  active: boolean
-  onSelect: (index: number) => void
-}
-
-function MasterDetailListRowSelectButton({
-  item,
-  index,
-  isSelected,
-  active: _active,
-  onSelect,
-}: MasterDetailListRowSelectButtonProps) {
-  return (
-    <button
-      type="button"
-      aria-current={isSelected ? 'true' : undefined}
-      aria-invalid={item.hasError ? true : undefined}
-      onClick={() => onSelect(index)}
-      className={masterDetailListRowSelectClasses}
-    >
-      <EntityItem
-        density="compact"
-        entity={{
-          heading: item.title,
-          classification: item.eyebrow,
-          status:
-            item.hasError || item.badges?.length
-              ? [<MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />]
-              : undefined,
-        }}
-      />
-    </button>
-  )
-}
-
 type MasterDetailListRowRemoveButtonProps = {
   title: string
   index: number
@@ -207,7 +169,7 @@ function MasterDetailListRowRemoveButton({
       type="button"
       variant="ghost"
       size="sm"
-      className="mr-1 size-8 shrink-0 p-0"
+      className="size-8 shrink-0 p-0"
       aria-label={`Remove ${title}`}
       onClick={() => onRemove(index)}
     >
@@ -231,23 +193,50 @@ function MasterDetailListRowContent({
 
   return (
     <div className={masterDetailListRowClassName(active, isSelected, showDragHandle)}>
-      {showDragHandle && dragHandleProps ? (
-        <MasterDetailListDragHandle
-          title={item.title}
-          isDragging={isDragging}
-          dragHandleProps={dragHandleProps}
-        />
-      ) : null}
-      <MasterDetailListRowSelectButton
-        item={item}
-        index={index}
-        isSelected={isSelected}
-        active={active}
-        onSelect={onSelect}
+      <EntityItem
+        density="compact"
+        leading={
+          showDragHandle && dragHandleProps ? (
+            <MasterDetailListDragHandle
+              title={item.title}
+              isDragging={isDragging}
+              dragHandleProps={dragHandleProps}
+            />
+          ) : undefined
+        }
+        trailing={
+          deletable
+            ? {
+                kind: 'action',
+                content: (
+                  <MasterDetailListRowRemoveButton
+                    title={item.title}
+                    index={index}
+                    onRemove={onRemove}
+                  />
+                ),
+              }
+            : undefined
+        }
+        entity={{
+          heading: (
+            <button
+              type="button"
+              aria-current={isSelected ? 'true' : undefined}
+              aria-invalid={item.hasError ? true : undefined}
+              onClick={() => onSelect(index)}
+              className={masterDetailListRowSelectClasses}
+            >
+              {item.title}
+            </button>
+          ),
+          classification: item.eyebrow,
+          status:
+            item.hasError || item.badges?.length
+              ? [<MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />]
+              : undefined,
+        }}
       />
-      {deletable ? (
-        <MasterDetailListRowRemoveButton title={item.title} index={index} onRemove={onRemove} />
-      ) : null}
     </div>
   )
 }

@@ -383,15 +383,18 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 imageKey: organization.imageKey,
                 description: !hasAvailableKind ? organizationFullyLinkedReason : undefined,
               })}
-              action={
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedOrganizationId(organization.id)}
-                  onRemove={() => setSelectedOrganizationId(null)}
-                />
-              }
+              trailing={{
+                kind: 'action',
+                content: (
+                  <CatalogPickerSelectionActions
+                    phase={phase}
+                    canSelect={hasAvailableKind}
+                    addLabel={isSelected ? 'Selected' : 'Select'}
+                    onAdd={() => setSelectedOrganizationId(organization.id)}
+                    onRemove={() => setSelectedOrganizationId(null)}
+                  />
+                ),
+              }}
             />
           )
         }}
@@ -434,15 +437,18 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             entity={buildCharacterPickerEntitySummary(character, {
               description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
             })}
-            action={
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedCharacterId(character.id)}
-                onRemove={() => setSelectedCharacterId(null)}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={phase}
+                  canSelect={hasAvailableKind}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedCharacterId(character.id)}
+                  onRemove={() => setSelectedCharacterId(null)}
+                />
+              ),
+            }}
           />
         )
       }}

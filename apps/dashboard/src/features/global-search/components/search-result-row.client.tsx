@@ -82,14 +82,19 @@ export function SearchResultRow({
               ? [<InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} />]
               : undefined,
           }}
-          action={
-            viewerCharacterRelationships ? (
-              <span className="pointer-events-auto relative z-10">
-                <CharacterRelationshipIndicator
-                  viewerCharacterRelationships={viewerCharacterRelationships}
-                />
-              </span>
-            ) : undefined
+          trailing={
+            viewerCharacterRelationships
+              ? {
+                  kind: 'action',
+                  content: (
+                    <span className="pointer-events-auto relative z-10">
+                      <CharacterRelationshipIndicator
+                        viewerCharacterRelationships={viewerCharacterRelationships}
+                      />
+                    </span>
+                  ),
+                }
+              : undefined
           }
         />
       </div>

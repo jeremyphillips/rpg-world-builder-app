@@ -18,12 +18,12 @@ describe('EntityItem', () => {
     expect(screen.getByText('Located in Grey Coast')).toBeInTheDocument()
   })
 
-  it('wraps the heading in a link when href is provided', () => {
+  it('wraps the heading in a link when headingHref is provided', () => {
     render(
       <MemoryRouter>
         <EntityItem
           entity={GREY_COAST_ENTITY}
-          href="/campaigns/demo/locations/grey-coast"
+          headingHref="/campaigns/demo/locations/grey-coast"
           density="compact"
         />
       </MemoryRouter>,
@@ -35,13 +35,13 @@ describe('EntityItem', () => {
     )
   })
 
-  it('renders leading and action seams', () => {
+  it('renders leading and trailing seams', () => {
     render(
       <MemoryRouter>
         <EntityItem
           entity={GREY_COAST_ENTITY}
           leading={<span data-testid="leading">Grip</span>}
-          action={<button type="button">Select</button>}
+          trailing={{ kind: 'action', content: <button type="button">Select</button> }}
           density="compact"
         />
       </MemoryRouter>,

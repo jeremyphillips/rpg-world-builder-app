@@ -1,14 +1,17 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
+import { buildEntityLeadingOffsetStyle } from './entity-leading-rail.lib'
 import { entityCardFrameVariants } from './entity-card-frame.variants'
 
 type EntityCardFrameProps = {
   density?: ContentCardDensity
   disabled?: boolean
+  /** Occupied leading utilities (0–1) — publishes `--entity-leading-offset` on the shell. */
+  leadingUtilityCount?: number
   children: ReactNode
 }
 
@@ -16,11 +19,15 @@ type EntityCardFrameProps = {
 export function EntityCardFrame({
   density = 'comfortable',
   disabled = false,
+  leadingUtilityCount = 0,
   children,
 }: EntityCardFrameProps) {
+  const leadingOffsetStyle = buildEntityLeadingOffsetStyle(leadingUtilityCount) as CSSProperties
+
   return (
     <article
       className={cn(entityCardFrameVariants({ density, disabled }))}
+      style={leadingOffsetStyle}
       data-disabled={disabled ? true : undefined}
     >
       {children}

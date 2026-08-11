@@ -195,8 +195,9 @@ export function OrganizationPickerDrawer({
               : undefined,
           }}
           density="compact"
-          action={
-            selected ? (
+          trailing={{
+            kind: 'action',
+            content: selected ? (
               <CatalogPickerSelectionActions
                 phase="success"
                 onAdd={() => undefined}
@@ -208,8 +209,8 @@ export function OrganizationPickerDrawer({
                 onAdd={() => handleExpandedItemChange(organization.id)}
                 onRemove={() => undefined}
               />
-            )
-          }
+            ),
+          }}
         />
       )}
       renderItemDetails={({ organization, selected }) => {

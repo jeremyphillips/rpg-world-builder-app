@@ -71,12 +71,15 @@ export function SpellChoiceSection({
             <li key={spell.id}>
               <ContentEntityCard
                 entity={{ heading: spell.label }}
-                action={
-                  <BuilderInventoryRemoveAction
-                    itemLabel={spell.label}
-                    onRemove={() => onRemove(spell.id)}
-                  />
-                }
+                trailing={{
+                  kind: 'action',
+                  content: (
+                    <BuilderInventoryRemoveAction
+                      itemLabel={spell.label}
+                      onRemove={() => onRemove(spell.id)}
+                    />
+                  ),
+                }}
                 density="compact"
               />
             </li>

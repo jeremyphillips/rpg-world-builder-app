@@ -44,4 +44,4 @@ export const equipmentInventoryRowActionsClasses = 'flex shrink-0 items-center'
 export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
 
 export const equipmentInventoryRowRemoveButtonClasses =
-  'mr-[-12px] flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'

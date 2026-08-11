@@ -172,14 +172,17 @@ export function ProficiencyPickerDrawer({
                 : undefined,
             }}
             density="compact"
-            action={
-              <CatalogPickerSelectionActions
-                selected={item.state.isAlreadySelected}
-                canSelect={item.state.canSelect}
-                onAdd={() => onSelectOption(item.optionId)}
-                onRemove={() => onRemoveOption(item.optionId)}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  selected={item.state.isAlreadySelected}
+                  canSelect={item.state.canSelect}
+                  onAdd={() => onSelectOption(item.optionId)}
+                  onRemove={() => onRemoveOption(item.optionId)}
+                />
+              ),
+            }}
           />
         )
       }}

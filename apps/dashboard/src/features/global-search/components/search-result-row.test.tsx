@@ -82,11 +82,9 @@ describe('SearchResultRow', () => {
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const row = rowShell(link)
 
-    expect(secondary).toHaveClass('text-sm')
-    expect(secondary).toHaveClass('truncate')
-    expect(row).toHaveClass('hover:bg-surface-subtle')
+    expect(row).toHaveClass('px-3')
     expect(row).not.toHaveClass('py-3')
-    expect(secondary.parentElement?.parentElement?.parentElement).toHaveClass('px-5', 'py-3')
+    expect(secondary).toHaveClass('text-sm', 'truncate')
   })
 
   it('passes compact density to EntityItem', () => {
@@ -102,10 +100,9 @@ describe('SearchResultRow', () => {
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
-    expect(secondary).toHaveClass('text-xs', 'truncate')
     const row = rowShell(screen.getByRole('link', { name: 'Fireball, Spell' }))
-    expect(row).toHaveClass('border-b-0', 'hover:bg-surface-subtle')
-    expect(secondary.parentElement?.parentElement?.parentElement).toHaveClass('px-3', 'py-2')
+    expect(row).toHaveClass('border-b-0', 'hover:bg-surface-subtle', 'px-3')
+    expect(secondary).toHaveClass('text-xs', 'truncate')
   })
 
   it('removes row borders when borderless for parent-owned list separators', () => {

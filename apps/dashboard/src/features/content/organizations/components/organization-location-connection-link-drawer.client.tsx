@@ -679,15 +679,18 @@ function OrganizationLocationConnectionLinkDrawerContent({
           <EntityItem
             density="compact"
             entity={entity}
-            action={
-              <CatalogPickerSelectionActions
-                phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                canSelect={kindAvailable}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedLocationId(location.id)}
-                onRemove={() => setSelectedLocationId(null)}
-              />
-            }
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
+                  canSelect={kindAvailable}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedLocationId(location.id)}
+                  onRemove={() => setSelectedLocationId(null)}
+                />
+              ),
+            }}
           />
         )
       }}

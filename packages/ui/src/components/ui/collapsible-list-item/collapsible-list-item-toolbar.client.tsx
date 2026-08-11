@@ -72,6 +72,8 @@ export function CollapsibleListItemCollapseButton({
   )
 }
 
+export type CollapsibleListItemToolbarLeadingChromePlacement = 'toolbar' | 'none'
+
 export interface CollapsibleListItemToolbarProps {
   titleId: string
   toolbarAriaLabel: string
@@ -83,6 +85,8 @@ export interface CollapsibleListItemToolbarProps {
   onToggleCollapse: () => void
   bodyId: string
   compact?: boolean
+  /** When `none`, grip/caret render outside the toolbar (e.g. EntityLeadingRail). */
+  leadingChromePlacement?: CollapsibleListItemToolbarLeadingChromePlacement
   header: React.ReactNode
   summary?: React.ReactNode
 }
@@ -99,18 +103,22 @@ export function CollapsibleListItemToolbar({
   onToggleCollapse,
   bodyId,
   compact = false,
+  leadingChromePlacement = 'toolbar',
   header,
   summary,
 }: CollapsibleListItemToolbarProps) {
+  const renderLeadingChromeInToolbar = leadingChromePlacement === 'toolbar'
   const headerContentClasses = cn(
     'flex min-w-0 min-h-0 flex-1',
     compact ? 'items-start' : 'items-center',
-    collapsibleListItemToolbarContentClasses(leadingChrome),
+    renderLeadingChromeInToolbar
+      ? collapsibleListItemToolbarContentClasses(leadingChrome)
+      : 'min-w-0',
   )
 
   const titleRow = (
     <div className={collapsibleListItemToolbarRowClasses({ ...leadingChrome, compact })}>
-      {gripVisible && dragHandleProps ? (
+      {renderLeadingChromeInToolbar && gripVisible && dragHandleProps ? (
         <div className={collapsibleListItemChromeColumnClasses}>
           <CollapsibleListItemDragHandle
             {...dragHandleProps}
@@ -119,7 +127,7 @@ export function CollapsibleListItemToolbar({
           />
         </div>
       ) : null}
-      {collapsible ? (
+      {renderLeadingChromeInToolbar && collapsible ? (
         <div className={collapsibleListItemChromeColumnClasses}>
           <CollapsibleListItemCollapseButton
             collapsed={collapsed}

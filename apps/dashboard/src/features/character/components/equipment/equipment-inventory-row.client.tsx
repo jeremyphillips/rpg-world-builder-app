@@ -117,7 +117,7 @@ export function EquipmentInventoryRowItem({
     return (
       <ContentEntityCard
         entity={entity}
-        action={actions}
+        trailing={{ kind: 'action', content: actions }}
         density="compact"
         disabled={row.stagedRemoval}
       />
@@ -133,15 +133,20 @@ export function EquipmentInventoryRowItem({
   return (
     <ContentEntityCard
       entity={entity}
-      action={
-        actionsRow ? (
-          <InventoryRowActions
-            row={actionsRow}
-            allowZeroQuantity={allowZeroQuantity}
-            onRemoveItem={onRemoveItem}
-            onSetPurchaseQuantity={onSetPurchaseQuantity}
-          />
-        ) : undefined
+      trailing={
+        actionsRow
+          ? {
+              kind: 'action',
+              content: (
+                <InventoryRowActions
+                  row={actionsRow}
+                  allowZeroQuantity={allowZeroQuantity}
+                  onRemoveItem={onRemoveItem}
+                  onSetPurchaseQuantity={onSetPurchaseQuantity}
+                />
+              ),
+            }
+          : undefined
       }
       density="compact"
     />

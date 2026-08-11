@@ -43,7 +43,10 @@ export const WithMetaAndRemove: Story = {
         </Badge>,
       ],
     },
-    action: <BuilderInventoryRemoveAction itemLabel="Stealth" onRemove={() => undefined} />,
+    trailing: {
+      kind: 'action',
+      content: <BuilderInventoryRemoveAction itemLabel="Stealth" onRemove={() => undefined} />,
+    },
     density: 'compact',
   },
 }

@@ -60,7 +60,10 @@ export function CampaignDestinationRow({
                 ]
               : undefined,
         }}
-        action={<ChevronRight aria-hidden className={campaignDestinationChevronClasses} />}
+        trailing={{
+          kind: 'indicator',
+          content: <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />,
+        }}
       />
     </Link>
   )

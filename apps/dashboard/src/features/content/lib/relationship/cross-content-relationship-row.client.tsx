@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 
 import { DetailEntityRow } from '../detail/row/detail-entity-row.client'
+import type { EntityItemTrailing } from '../entity/entity-item-trailing.types'
 import { detailEntityRowSubheadingVariants } from '../detail/row/detail-entity-row.variants'
 import {
   DetailOverflowMenu,
@@ -35,9 +36,9 @@ export type CrossContentRelationshipRowProps = {
    * Trailing controls override.
    * - `undefined` — convenience overflow from `actions` when non-empty
    * - `null` — no trailing controls
-   * - `ReactNode` — use as-is (compose via `DetailEntityRowActions` when needed)
+   * - `EntityItemTrailing` — semantic trailing rail content
    */
-  endSlot?: ReactNode
+  trailing?: EntityItemTrailing | null
   className?: string
 }
 
@@ -54,17 +55,20 @@ export function CrossContentRelationshipRow({
   badge,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
-  endSlot,
+  trailing,
   className,
 }: CrossContentRelationshipRowProps) {
   const resolvedDescription = description ?? secondaryText ?? subheading
   const resolvedStatus = status ?? badge ?? metadata
-  const resolvedEndSlot =
-    endSlot !== undefined ? (
-      endSlot
-    ) : actions.length > 0 ? (
-      <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
-    ) : undefined
+  const resolvedTrailing =
+    trailing !== undefined
+      ? (trailing ?? undefined)
+      : actions.length > 0
+        ? {
+            kind: 'action' as const,
+            content: <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />,
+          }
+        : undefined
 
   return (
     <div className={cn(className)}>
@@ -74,11 +78,11 @@ export function CrossContentRelationshipRow({
       <DetailEntityRow
         inset="parent"
         heading={heading}
-        href={href}
+        headingHref={href}
         headingSuffix={headingSuffix}
         subheading={resolvedDescription}
         metadata={resolvedStatus}
-        endSlot={resolvedEndSlot}
+        trailing={resolvedTrailing}
       />
     </div>
   )

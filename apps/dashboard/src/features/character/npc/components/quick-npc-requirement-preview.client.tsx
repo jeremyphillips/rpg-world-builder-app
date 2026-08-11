@@ -57,7 +57,7 @@ function RequirementPreviewCard({
         description: projection.description,
         status: callout ? [<RequirementCalloutBadge callout={callout} />] : undefined,
       }}
-      action={endSlot}
+      trailing={endSlot ? { kind: 'action', content: endSlot } : undefined}
       density="compact"
     />
   )

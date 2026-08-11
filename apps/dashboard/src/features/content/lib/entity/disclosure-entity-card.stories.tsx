@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 
+import type { EntityItemTrailing } from './entity-item-trailing.types'
 import { DisclosureEntityCard } from './disclosure-entity-card.client'
 import { HARBOR_DISTRICT_ENTITY } from './entity.fixture'
 
@@ -27,14 +28,12 @@ type Story = StoryObj<typeof meta>
 function DisclosureEntityCardDemo({
   density = 'comfortable',
   dragHandleProps,
-  leading,
-  action,
+  trailing,
   initialCollapsed = true,
 }: {
   density?: 'compact' | 'comfortable'
   dragHandleProps?: typeof mockDragHandleProps
-  leading?: ReactNode
-  action?: ReactNode
+  trailing?: EntityItemTrailing
   initialCollapsed?: boolean
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed)
@@ -45,18 +44,20 @@ function DisclosureEntityCardDemo({
         itemId="harbor-district"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
-        href="/campaigns/demo/locations/harbor"
+        headingHref="/campaigns/demo/locations/harbor"
         density={density}
         collapsed={collapsed}
         onToggleCollapse={() => setCollapsed((current) => !current)}
         dragHandleProps={dragHandleProps}
-        leading={leading}
-        action={
-          action ?? (
-            <button type="button" className="text-sm text-link">
-              Manage
-            </button>
-          )
+        trailing={
+          trailing ?? {
+            kind: 'action',
+            content: (
+              <button type="button" className="text-sm text-link">
+                Manage
+              </button>
+            ),
+          }
         }
       >
         <div className="space-y-2 text-sm text-muted-foreground">
@@ -92,20 +93,23 @@ export const BodyEndInsetInvariant: Story = {
     <div className="flex max-w-lg flex-col gap-4">
       {(
         [
-          { id: 'none', action: undefined, label: 'No trailing action' },
+          { id: 'none', trailing: undefined, label: 'No trailing action' },
           {
             id: 'delete',
-            action: <button type="button">Remove</button>,
+            trailing: { kind: 'action' as const, content: <button type="button">Remove</button> },
             label: 'Delete action',
           },
           {
             id: 'add',
-            action: <button type="button">Add</button>,
+            trailing: { kind: 'action' as const, content: <button type="button">Add</button> },
             label: 'Add action',
           },
           {
             id: 'wide',
-            action: <button type="button">Add to inventory · 105 GP</button>,
+            trailing: {
+              kind: 'action' as const,
+              content: <button type="button">Add to inventory · 105 GP</button>,
+            },
             label: 'Wider trailing action',
           },
         ] as const
@@ -121,7 +125,7 @@ export const BodyEndInsetInvariant: Story = {
           }}
           density="compact"
           defaultCollapsed={false}
-          action={entry.action}
+          trailing={entry.trailing}
         >
           <p className="bg-surface-subtle text-sm text-muted-foreground">
             Domain content — right edge uses density inset only.
@@ -146,7 +150,7 @@ export const PilotInventoryRow: Story = {
         }}
         density="compact"
         defaultCollapsed={false}
-        action={<button type="button">Remove</button>}
+        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
       >
         <dl className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div>

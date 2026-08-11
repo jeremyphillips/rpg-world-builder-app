@@ -49,7 +49,7 @@ describe('ContentEntityCard (location rows)', () => {
       <MemoryRouter>
         <ContentEntityCard
           entity={{ heading: 'Dock Ward', description: 'District' }}
-          href="/campaigns/camp_1/locations/location-dock-ward"
+          headingHref="/campaigns/camp_1/locations/location-dock-ward"
         />
       </MemoryRouter>,
     )

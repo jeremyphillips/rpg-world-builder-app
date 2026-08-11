@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
+import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/disclosure-entity-card.variants'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -115,9 +116,7 @@ describe('grant array DisclosureEntityCard shell', () => {
 
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
-    expect(body?.className).toContain(
-      'pl-[calc(var(--entity-density-inline)+var(--entity-content-indent))]',
-    )
+    expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
     expect(body?.className).toContain('pr-[var(--entity-density-inline)]')
     expect(body).toHaveClass('border-t')
 

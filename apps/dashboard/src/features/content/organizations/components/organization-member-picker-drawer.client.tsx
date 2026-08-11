@@ -204,8 +204,9 @@ export function OrganizationMemberPickerDrawer({
                 : undefined,
             }}
             density="compact"
-            action={
-              candidate.isMember ? (
+            trailing={{
+              kind: 'action',
+              content: candidate.isMember ? (
                 <CatalogPickerSelectionActions
                   phase="success"
                   successLabel={ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}
@@ -218,8 +219,8 @@ export function OrganizationMemberPickerDrawer({
                   onAdd={() => handleExpandedItemChange(candidate.id)}
                   onRemove={() => undefined}
                 />
-              )
-            }
+              ),
+            }}
           />
         )
       }}

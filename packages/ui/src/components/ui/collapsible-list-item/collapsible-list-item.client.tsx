@@ -16,6 +16,7 @@ import {
   CollapsibleListItemDragHandle,
   CollapsibleListItemToolbar,
   type CollapsibleListItemDragHandleProps,
+  type CollapsibleListItemToolbarLeadingChromePlacement,
 } from './collapsible-list-item-toolbar.client'
 import {
   collapsibleListItemBodyClasses,
@@ -53,6 +54,8 @@ export interface CollapsibleListItemProps {
   layout?: 'default' | 'compactRow'
   actionsAlign?: CollapsibleListItemActionsAlign
   toolbarCompact?: boolean
+  /** When `none`, disclosure/drag controls render in entity leading rail instead of toolbar. */
+  toolbarLeadingChrome?: CollapsibleListItemToolbarLeadingChromePlacement
   bodyClassName?: string
   dragging?: boolean
   itemPrefix?: string
@@ -133,6 +136,7 @@ function CollapsibleListItemRoot({
   layout = 'default',
   actionsAlign: actionsAlignProp,
   toolbarCompact = false,
+  toolbarLeadingChrome = 'toolbar',
   bodyClassName,
   dragging = false,
   itemPrefix,
@@ -230,6 +234,7 @@ function CollapsibleListItemRoot({
             onToggleCollapse={handleToggleCollapse}
             bodyId={resolvedBodyId}
             compact={toolbarCompact}
+            leadingChromePlacement={toolbarLeadingChrome}
             header={header}
             summary={actionsAlign === 'center' ? undefined : summary}
           />
@@ -351,7 +356,12 @@ function CollapsibleListItemCompoundToolbar({
 }
 
 function CollapsibleListItemCompoundCollapseButton() {
-  const context = useCollapsibleListItemContext('CollapsibleListItem.CollapseButton')
+  return <CollapsibleListItemDisclosureTrigger />
+}
+
+/** Composable disclosure trigger for entity leading rails — behavior only, no toolbar placement. */
+export function CollapsibleListItemDisclosureTrigger() {
+  const context = useCollapsibleListItemContext('CollapsibleListItemDisclosureTrigger')
 
   if (!context.collapsible) return null
 
@@ -363,6 +373,15 @@ function CollapsibleListItemCompoundCollapseButton() {
       onToggleCollapse={context.onToggleCollapse}
     />
   )
+}
+
+/** Composable drag grip for entity leading rails — behavior only, no toolbar placement. */
+export function CollapsibleListItemDragHandleTrigger() {
+  const context = useCollapsibleListItemContext('CollapsibleListItemDragHandleTrigger')
+
+  if (!context.gripVisible || !context.dragHandleProps) return null
+
+  return <CollapsibleListItemDragHandle {...context.dragHandleProps} />
 }
 
 function CollapsibleListItemCompoundHeader({
@@ -461,6 +480,8 @@ export function CollapsibleListItem(props: CollapsibleListItemProps) {
 CollapsibleListItem.Root = CollapsibleListItemCompoundRoot
 CollapsibleListItem.Toolbar = CollapsibleListItemCompoundToolbar
 CollapsibleListItem.CollapseButton = CollapsibleListItemCompoundCollapseButton
+CollapsibleListItem.DisclosureTrigger = CollapsibleListItemDisclosureTrigger
+CollapsibleListItem.DragHandleTrigger = CollapsibleListItemDragHandleTrigger
 CollapsibleListItem.Header = CollapsibleListItemCompoundHeader
 CollapsibleListItem.Body = CollapsibleListItemCompoundBody
 CollapsibleListItem.Actions = CollapsibleListItemCompoundActions
