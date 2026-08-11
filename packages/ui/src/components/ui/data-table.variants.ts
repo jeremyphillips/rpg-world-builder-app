@@ -76,7 +76,7 @@ export const dataTableRowVariants = cva(
     'group/row min-h-14 border-b border-border-subtle',
     interactiveRowVariants({
       interaction: 'hoverable',
-      hoverTone: 'row',
+      hoverFamily: 'selectable',
       selectedData: 'selected',
     }),
   ),

@@ -43,15 +43,11 @@ function InventoryRemoveIconButton({
   return (
     <button
       type="button"
-      className={iconGhostControlVariants({
-        size: 'comfortable',
-        hover: 'destructive',
-        layout: 'flex',
-      })}
+      className={iconGhostControlVariants({ hover: 'destructive', layout: 'flex' })}
       aria-label={removeLabel}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden className="size-3" />
+      <Trash2 aria-hidden />
     </button>
   )
 }

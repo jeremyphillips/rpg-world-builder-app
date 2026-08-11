@@ -88,12 +88,9 @@ const dashboardSemanticStyleLayerGuards = {
   files: ['src/features/**/*.variants.ts'],
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
-    // Host accents / products documented as do-not-abstract until follow-up.
+    // Host navigation accent — row hover stays local (F9); focus migrated (F6).
     'src/features/character/components/character-builder-shell.variants.ts',
     'src/features/character/components/steps/score-token.variants.ts',
-    'src/features/campaign/components/campaign-destination.variants.ts',
-    'src/features/character/components/equipment/equipment-acquisition-panel.variants.ts',
-    'src/features/character/components/equipment/equipment-picker-purchase.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [

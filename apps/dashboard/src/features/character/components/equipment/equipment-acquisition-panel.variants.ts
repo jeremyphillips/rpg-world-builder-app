@@ -1,3 +1,5 @@
+import { cn, interactiveFocusVariants } from '@rpg/ui'
+
 export const equipmentAcquisitionPanelBodyClasses = 'space-y-3'
 
 export const equipmentAcquisitionPanelDividerClasses = 'border-t border-border'
@@ -63,8 +65,10 @@ export const equipmentAcquisitionPanelCommitButtonClasses =
 
 export const equipmentAcquisitionPanelBlockerClasses = 'text-sm text-muted-foreground'
 
-export const equipmentInventoryDisclosureTriggerClasses =
-  'inline-flex shrink-0 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+export const equipmentInventoryDisclosureTriggerClasses = cn(
+  'inline-flex shrink-0 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm text-foreground underline-offset-4 hover:underline',
+  interactiveFocusVariants({ context: 'standalone' }),
+)
 
 export const equipmentAddedInventoryPanelFilledClasses = 'rounded-lg border border-border px-4 py-4'
 

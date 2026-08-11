@@ -1,3 +1,5 @@
+import { cn, interactiveFocusVariants } from '@rpg/ui'
+
 /** Route wrapper — fills the concentration viewport below padding. */
 export const characterBuilderRouteClasses =
   'mx-auto flex h-dvh max-w-screen-2xl min-h-0 flex-col px-6 py-8'
@@ -30,8 +32,11 @@ export const characterBuilderShellFooterClasses =
 
 export const characterBuilderStepRailClasses = 'space-y-1'
 
-export const characterBuilderStepRailItemClasses =
-  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+/** Host-owned navigation accent — row hover/focus only; selected left-rail stays local (F9). */
+export const characterBuilderStepRailItemClasses = cn(
+  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover',
+  interactiveFocusVariants({ context: 'standalone' }),
+)
 
 export const characterBuilderStepRailItemActiveClasses =
   'bg-row-selected before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary'

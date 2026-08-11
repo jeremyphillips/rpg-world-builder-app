@@ -42,7 +42,6 @@ export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
 export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
-  size: 'compact',
   hover: 'text',
   layout: 'flex',
 })

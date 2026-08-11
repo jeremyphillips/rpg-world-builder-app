@@ -5,20 +5,17 @@ import { controlActionCompactIconClasses } from './control-action.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 
 /**
- * Icon-only ghost control chrome — composes compact/comfortable hit targets with embedded focus.
- * Features compose semantic intent (hover tone, size); they do not assemble ring or geometry utilities.
+ * Icon-only ghost control chrome — compact control-action hit target with embedded focus.
+ * List-row removes use the default compact size; features must not assemble geometry utilities.
  */
 export const iconGhostControlVariants = cva(
   cn(
-    'shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground',
+    'inline-flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground',
+    controlActionCompactIconClasses,
     interactiveFocusVariants({ context: 'embedded' }),
   ),
   {
     variants: {
-      size: {
-        compact: controlActionCompactIconClasses,
-        comfortable: 'size-8',
-      },
       hover: {
         accent: 'hover:bg-control-hover hover:text-foreground',
         text: 'hover:text-foreground',
@@ -26,12 +23,11 @@ export const iconGhostControlVariants = cva(
         destructiveSubtle: 'hover:bg-destructive-subtle hover:text-destructive',
       },
       layout: {
-        inline: 'inline-flex',
+        inline: '',
         flex: 'flex',
       },
     },
     defaultVariants: {
-      size: 'compact',
       hover: 'text',
       layout: 'inline',
     },

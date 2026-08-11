@@ -1,10 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { dragSurfaceDraggingOpacityClasses } from './drag-surface.variants'
-
 /**
- * Orthogonal row interaction policy — capability (hover), semantic state, and drag feedback.
+ * Orthogonal row interaction policy — capability (hover), semantic state, and selection fills.
  * Hosts own layout, inset, separators, and left-rail accents; they compose this for fills only.
+ *
+ * Sortable drag opacity belongs on `dragSurfaceVariants`, not here.
  */
 export const interactiveRowVariants = cva('transition-colors', {
   variants: {
@@ -17,10 +17,10 @@ export const interactiveRowVariants = cva('transition-colors', {
       inactive: 'border-dashed border-border-subtle',
       disabled: 'pointer-events-none opacity-50',
     },
-    hoverTone: {
+    hoverFamily: {
       none: '',
-      row: '',
-      muted: '',
+      selectable: '',
+      navigation: '',
     },
     selected: {
       none: '',
@@ -36,21 +36,17 @@ export const interactiveRowVariants = cva('transition-colors', {
       selected: 'data-[state=selected]:bg-row-selected',
       checked: 'data-[state=checked]:bg-row-selected',
     },
-    dragging: {
-      true: dragSurfaceDraggingOpacityClasses,
-      false: '',
-    },
   },
   compoundVariants: [
     {
       interaction: 'hoverable',
-      hoverTone: 'row',
+      hoverFamily: 'selectable',
       selected: 'none',
       class: 'hover:bg-row-hover',
     },
     {
       interaction: 'hoverable',
-      hoverTone: 'muted',
+      hoverFamily: 'navigation',
       selected: 'none',
       class: 'hover:bg-muted',
     },
@@ -63,11 +59,10 @@ export const interactiveRowVariants = cva('transition-colors', {
   defaultVariants: {
     interaction: 'hoverable',
     state: 'default',
-    hoverTone: 'row',
+    hoverFamily: 'selectable',
     selected: 'none',
     selectedHover: 'none',
     selectedData: 'none',
-    dragging: false,
   },
 })
 

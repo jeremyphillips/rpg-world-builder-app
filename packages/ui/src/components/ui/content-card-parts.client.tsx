@@ -3,8 +3,7 @@
 import { Trash2 } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { ContentCardIconAction } from './content-card-actions.client'
-import { contentCardMediaVariants } from './content-card.variants'
+import { contentCardMediaVariants, contentCardRemoveButtonVariants } from './content-card.variants'
 
 export type ContentCardMediaProps = {
   src: string
@@ -43,13 +42,13 @@ export function ContentCardRemoveButton({
   className,
 }: ContentCardRemoveButtonProps) {
   return (
-    <ContentCardIconAction
+    <button
       type="button"
-      className={cn('hover:text-destructive', className)}
+      className={cn(contentCardRemoveButtonVariants(), className)}
       aria-label={removeAriaLabel ?? formatContentCardRemoveLabel(label)}
       onClick={onRemove}
     >
       <Trash2 aria-hidden />
-    </ContentCardIconAction>
+    </button>
   )
 }

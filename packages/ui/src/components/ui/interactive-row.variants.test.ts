@@ -3,26 +3,26 @@ import { describe, expect, it } from 'vitest'
 import { interactiveRowVariants } from './interactive-row.variants'
 
 describe('interactiveRowVariants', () => {
-  it('applies row hover for hoverable default rows', () => {
-    expect(interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'row' })).toContain(
-      'hover:bg-row-hover',
-    )
+  it('applies selectable row hover for editor/selection contexts', () => {
+    expect(
+      interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'selectable' }),
+    ).toContain('hover:bg-row-hover')
   })
 
-  it('preserves muted hover hosts without swapping to row-hover', () => {
-    expect(interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'muted' })).toContain(
-      'hover:bg-muted',
-    )
-    expect(interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'muted' })).not.toContain(
-      'hover:bg-row-hover',
-    )
+  it('applies navigation row hover for destination/link surfaces', () => {
+    expect(
+      interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'navigation' }),
+    ).toContain('hover:bg-muted')
+    expect(
+      interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'navigation' }),
+    ).not.toContain('hover:bg-row-hover')
   })
 
   it('encodes bordered selection with selected hover fill', () => {
     const classes = interactiveRowVariants({
       selected: 'bordered',
       selectedHover: 'row',
-      hoverTone: 'none',
+      hoverFamily: 'none',
     })
 
     expect(classes).toContain('border-row-selected-border')
@@ -40,8 +40,7 @@ describe('interactiveRowVariants', () => {
     )
   })
 
-  it('applies inactive and dragging axes independently', () => {
+  it('applies inactive state independently of hover family', () => {
     expect(interactiveRowVariants({ state: 'inactive' })).toContain('border-dashed')
-    expect(interactiveRowVariants({ dragging: true })).toContain('opacity-50')
   })
 })

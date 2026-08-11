@@ -28,25 +28,30 @@ maps belong at Layer 2 until a non-entity primitive proves a design-system-wide 
 
 Features do not assemble `focus-visible:ring-*` stacks.
 
-### `iconGhostControlVariants({ size, hover, layout })`
+### `iconGhostControlVariants({ hover, layout })`
 
-Icon-only ghost controls inside rows and cards. Composes internal control-action
-geometry with embedded focus. Prefer `Button size="icon" density="compact"` when a
-real button is the right surface.
+Compact (24px) icon-only ghost controls. Composes internal control-action geometry with
+embedded focus. List-row removes use this primitive — features must not size removes locally.
 
-### `interactiveRowVariants({ interaction, state, hoverTone, selected, … })`
+### `interactiveRowVariants({ interaction, state, hoverFamily, selected, … })`
 
 Orthogonal row fills — not layout:
 
-| Axis            | Values                                                                 |
-| --------------- | ---------------------------------------------------------------------- |
-| `interaction`   | `static` \| `hoverable`                                                |
-| `state`         | `default` \| `inactive` \| `disabled`                                  |
-| `hoverTone`     | `none` \| `row` \| `muted` (preserve divergent hosts during migration) |
-| `selected`      | `none` \| `bordered` \| `fill`                                         |
-| `selectedHover` | `none` \| `row`                                                        |
-| `selectedData`  | `none` \| `selected` \| `checked`                                      |
-| `dragging`      | `true` \| `false`                                                      |
+| Axis            | Values                                 |
+| --------------- | -------------------------------------- |
+| `interaction`   | `static` \| `hoverable`                |
+| `state`         | `default` \| `inactive` \| `disabled`  |
+| `hoverFamily`   | `none` \| `selectable` \| `navigation` |
+| `selected`      | `none` \| `bordered` \| `fill`         |
+| `selectedHover` | `none` \| `row`                        |
+| `selectedData`  | `none` \| `selected` \| `checked`      |
+
+| `hoverFamily` | Meaning                    | Hover token          |
+| ------------- | -------------------------- | -------------------- |
+| `selectable`  | Editor/selection list rows | `hover:bg-row-hover` |
+| `navigation`  | Destination/link hub rows  | `hover:bg-muted`     |
+
+Sortable drag opacity: `dragSurfaceVariants` on the wrapper — not `interactiveRowVariants`.
 
 Hosts keep inset, separators, border footprint, and left-rail accents locally.
 
@@ -54,7 +59,7 @@ Hosts keep inset, separators, border footprint, and left-rail accents locally.
 
 ```ts
 dragHandleVariants({ visibility: 'always' | 'hoverReveal', dragging?: boolean })
-dragSurfaceVariants({ dragging: boolean })
+dragSurfaceVariants({ dragging: boolean }) // sortable-row family only
 ```
 
 | Visibility    | Use when                                       |
@@ -62,15 +67,16 @@ dragSurfaceVariants({ dragging: boolean })
 | `always`      | Collapsible list items, array fields, DEC grip |
 | `hoverReveal` | Master-detail sortable rows                    |
 
+Both visibilities share compact control-action geometry and embedded focus. Hover-reveal
+adds opacity/group wiring only.
+
 **Hover-reveal host contract**
 
 - Host root includes `group` (or the agreed group name).
-- Handle uses `group-hover` / `group-focus-within` reveal; hosts do not invent
-  alternate opacity wiring.
-- Pass `dragging: true` on the handle (or compose `dragHandleVisibleWhileDraggingClasses`)
-  so the grip stays visible for the duration of an active drag.
+- Handle uses `group-hover` / `group-focus-within` reveal.
+- Pass `dragging: true` on the handle so the grip stays visible during an active drag.
 
-Host-local spacing (e.g. master-detail `ml-0.5`, CLI compact `-mt-1`) stays on the host.
+Bench/score-token whole-surface drag stays outside `dragSurfaceVariants`.
 
 ## Layer 2 presentation
 
@@ -83,20 +89,13 @@ Host-local spacing (e.g. master-detail `ml-0.5`, CLI compact `-mt-1`) stays on t
 
 - No feature `focus-visible:ring-*` assembly in `*.variants.ts` (use Layer 1 focus).
 - No deep imports of `control-action` geometry.
-- No new `*RemoveButtonClasses` constants — `Button` or `iconGhostControlVariants`.
+- No new `*RemoveButtonClasses` constants — `iconGhostControlVariants`.
 - No raw `hover:bg-row-*` / `border-row-selected-*` in feature variants — `interactiveRowVariants`.
-- No local `cursor-grab` drag-handle recipes (allowlisted score-token bench product only).
+- No local `cursor-grab` drag-handle recipes (score-token bench product only).
 
-Allowlisted host accents and products are documented inline in
-`apps/dashboard/eslint.config.js`.
+Allowlisted host accents: `character-builder-shell.variants.ts` (F9 navigation rail).
 
-## Follow-up normalization (separate pass)
+## Follow-up status
 
-Do not mix these with SSOT extraction:
-
-- Unify remove hit targets (equipment `size-8` vs compact 24px).
-- Unify list hover: `muted` → `row-hover` where product agrees.
-- Unify dragging opacity (50 vs 40).
-- Unify disabled shell opacity (60 vs 50).
-- Complete incomplete focus stacks (`ring-offset-background`).
-- Align master-detail grip metrics to collapsible-list-item after shared handle adoption.
+Normalization pass **F1/F2/F6/F7/F8/F10 complete.** Open investigations: **F4** (whole-surface
+drag contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.

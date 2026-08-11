@@ -56,7 +56,6 @@ export const arrayItemCollapseButtonClasses = collapsibleListItemCollapseButtonC
 
 /** Remove control — destructive hover; always last in the actions rail. */
 export const arrayItemRemoveButtonClasses = iconGhostControlVariants({
-  size: 'compact',
   hover: 'destructiveSubtle',
   layout: 'flex',
 })

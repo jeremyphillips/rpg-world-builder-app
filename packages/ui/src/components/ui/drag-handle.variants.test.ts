@@ -12,10 +12,12 @@ describe('dragHandleVariants', () => {
     expect(classes).not.toContain('opacity-0')
   })
 
-  it('applies hover-reveal wiring for master-detail hosts', () => {
+  it('uses compact geometry and embedded focus for hover-reveal hosts', () => {
     const classes = dragHandleVariants({ visibility: 'hoverReveal' })
 
-    expect(classes).toContain('size-6')
+    expect(classes).toContain('size-control-action-compact')
+    expect(classes).toContain('focus-visible:ring-2')
+    expect(classes).not.toContain('focus-visible:ring-offset-2')
     expect(classes).toContain('opacity-0')
     expect(classes).toContain('group-hover:opacity-100')
     expect(classes).toContain('group-focus-within:opacity-100')

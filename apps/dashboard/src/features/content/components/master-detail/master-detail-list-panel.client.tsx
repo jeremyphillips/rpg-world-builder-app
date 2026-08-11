@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { cn, Button, Text } from '@rpg/ui'
+import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
 import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
 import { EntityItem } from '../../lib/content-entity-card.client'
@@ -159,16 +159,14 @@ function MasterDetailListRowRemoveButton({
   onRemove,
 }: MasterDetailListRowRemoveButtonProps) {
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="sm"
-      className="size-8 shrink-0 p-0"
+      className={iconGhostControlVariants({ hover: 'destructiveSubtle', layout: 'flex' })}
       aria-label={`Remove ${title}`}
       onClick={() => onRemove(index)}
     >
-      <Trash2 className="size-4" aria-hidden />
-    </Button>
+      <Trash2 aria-hidden />
+    </button>
   )
 }
 

@@ -26,14 +26,11 @@ export function BuilderInventoryRemoveAction({
   return (
     <button
       type="button"
-      className={cn(
-        iconGhostControlVariants({ size: 'comfortable', hover: 'accent', layout: 'flex' }),
-        className,
-      )}
+      className={cn(iconGhostControlVariants({ hover: 'accent', layout: 'flex' }), className)}
       aria-label={removeAriaLabel ?? formatBuilderInventoryRemoveLabel(itemLabel)}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden className="size-4" />
+      <Trash2 aria-hidden />
     </button>
   )
 }

@@ -6,8 +6,12 @@ import { iconGhostControlVariants } from './icon-ghost-control.variants'
 /** Keeps hover-reveal handles visible for the duration of an active drag. */
 export const dragHandleVisibleWhileDraggingClasses = 'opacity-100'
 
+const dragHandleHoverRevealRevealClasses =
+  'opacity-0 transition-opacity duration-150 ease-in-out focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100'
+
 /**
  * Sortable grip chrome — always-visible (CLI/array) or hover-reveal (master-detail).
+ * Both visibilities share compact control-action geometry and embedded focus (F7).
  * Hosts with `hoverReveal` must provide a `group` (or agreed group name) on the row root.
  */
 export const dragHandleVariants = cva('', {
@@ -25,14 +29,17 @@ export const dragHandleVariants = cva('', {
     {
       visibility: 'always',
       class: cn(
-        iconGhostControlVariants({ size: 'compact', hover: 'text', layout: 'flex' }),
+        iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
         'cursor-grab active:cursor-grabbing',
       ),
     },
     {
       visibility: 'hoverReveal',
-      class:
-        'flex size-6 shrink-0 cursor-grab items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 ease-in-out hover:text-foreground focus-visible:opacity-100 active:cursor-grabbing group-focus-within:opacity-100 group-hover:opacity-100',
+      class: cn(
+        iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
+        'cursor-grab active:cursor-grabbing',
+        dragHandleHoverRevealRevealClasses,
+      ),
     },
   ],
   defaultVariants: {

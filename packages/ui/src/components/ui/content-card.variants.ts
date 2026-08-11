@@ -121,7 +121,11 @@ export const contentCardSubheadingVariants = supportingTextDensityVariants
 export const contentCardMetadataVariants = supportingTextDensityVariants
 
 export const contentCardIconActionVariants = cva(
-  iconGhostControlVariants({ size: 'compact', hover: 'accent', layout: 'inline' }),
+  iconGhostControlVariants({ hover: 'accent', layout: 'inline' }),
+)
+
+export const contentCardRemoveButtonVariants = cva(
+  iconGhostControlVariants({ hover: 'destructive', layout: 'inline' }),
 )
 
 /** Heading-row actions stay compact regardless of card density. Link actions use pr-0. */

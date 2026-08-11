@@ -1,5 +1,5 @@
 import type { ContentUsageSummaryLabels } from '@rpg/contracts'
-import { cn, Badge, Button, Text, interactiveRowVariants } from '@rpg/ui'
+import { cn, Badge, Button, Text, iconGhostControlVariants, interactiveRowVariants } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
 import {
@@ -76,16 +76,17 @@ function SubclassListRowDeleteControl({
   if (!deletable) return null
 
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="sm"
-      className="mr-1 size-8 shrink-0 p-0"
+      className={cn(
+        'mr-1',
+        iconGhostControlVariants({ hover: 'destructiveSubtle', layout: 'flex' }),
+      )}
       aria-label={`Delete ${item.name}`}
       onClick={() => onDeleteRequest(item.id)}
     >
-      <Trash2 className="size-4" aria-hidden />
-    </Button>
+      <Trash2 aria-hidden />
+    </button>
   )
 }
 
@@ -130,7 +131,7 @@ function SubclassListRow({
           onClick={() => onSelect(item.id)}
           className={cn(
             'min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm',
-            interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'row' }),
+            interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'selectable' }),
           )}
         >
           <span className="block truncate font-medium">{item.name || UNTITLED_SUBCLASS_LABEL}</span>

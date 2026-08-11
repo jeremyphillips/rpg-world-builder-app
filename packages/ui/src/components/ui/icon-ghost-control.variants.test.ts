@@ -4,7 +4,7 @@ import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
 describe('iconGhostControlVariants', () => {
   it('composes compact geometry with embedded focus', () => {
-    const classes = iconGhostControlVariants({ size: 'compact', hover: 'text', layout: 'flex' })
+    const classes = iconGhostControlVariants({ hover: 'text', layout: 'flex' })
 
     expect(classes).toContain('size-control-action-compact')
     expect(classes).toContain('focus-visible:ring-2')
@@ -12,21 +12,14 @@ describe('iconGhostControlVariants', () => {
     expect(classes).toContain('hover:text-foreground')
   })
 
-  it('supports comfortable hit targets and destructive hover tones', () => {
-    const classes = iconGhostControlVariants({
-      size: 'comfortable',
-      hover: 'destructive',
-      layout: 'flex',
-    })
-
-    expect(classes).toContain('size-8')
-    expect(classes).toContain('hover:text-destructive')
-  })
-
-  it('supports accent and destructive-subtle hover fills', () => {
-    expect(iconGhostControlVariants({ hover: 'accent' })).toContain('hover:bg-control-hover')
+  it('supports semantic destructive hover tones', () => {
+    expect(iconGhostControlVariants({ hover: 'destructive' })).toContain('hover:text-destructive')
     expect(iconGhostControlVariants({ hover: 'destructiveSubtle' })).toContain(
       'hover:bg-destructive-subtle',
     )
+  })
+
+  it('supports accent hover fill', () => {
+    expect(iconGhostControlVariants({ hover: 'accent' })).toContain('hover:bg-control-hover')
   })
 })

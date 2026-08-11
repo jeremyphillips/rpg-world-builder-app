@@ -37,7 +37,7 @@ export const detailEntityRowDisclosureRowVariants = cva(
 )
 
 export const detailEntityRowDisclosureButtonVariants = cva(
-  iconGhostControlVariants({ size: 'compact', hover: 'text', layout: 'flex' }),
+  iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
 )
 
 export const detailEntityRowDisclosureContentVariants = cva('pl-[var(--content-column-indent)]')

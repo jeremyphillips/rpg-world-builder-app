@@ -13,7 +13,7 @@ export const searchResultRowVariants = cva('relative block w-full text-left tran
       true: 'border-b-0 px-3',
       false: cn(
         'border-b border-border px-3 sm:px-5',
-        interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'muted' }),
+        interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'navigation' }),
       ),
     },
     density: {

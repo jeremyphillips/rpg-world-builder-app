@@ -16,7 +16,7 @@ export function masterDetailListRowSurfaceClasses(options: {
   return interactiveRowVariants({
     interaction: 'hoverable',
     state: active ? 'default' : 'inactive',
-    hoverTone: options.isSelected ? 'none' : 'row',
+    hoverFamily: options.isSelected ? 'none' : 'selectable',
     selected: options.isSelected ? 'bordered' : 'none',
     selectedHover: options.isSelected ? 'row' : 'none',
   })
