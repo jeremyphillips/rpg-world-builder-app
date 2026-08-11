@@ -330,6 +330,16 @@ export type OptionalDisclosureConfig = {
   expandWhenPopulated?: boolean
 }
 
+/** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
+export type TrailingFieldActionConfig = {
+  label: string
+  onAction: () => void | Promise<void>
+  disabled?: boolean
+  pending?: boolean
+  /** Caller-owned operation error — not RHF field validation. */
+  error?: string
+}
+
 export interface TextFieldConfig extends BaseFieldConfig {
   type: 'text'
   // TODO(text): add optionalDisclosure when OptionalFieldDisclosure supports single-line fields.
@@ -338,6 +348,7 @@ export interface TextFieldConfig extends BaseFieldConfig {
   inputType?: 'text' | 'email' | 'password' | 'url' | 'tel' | 'search'
   autoComplete?: string
   defaultValue?: string
+  trailingAction?: TrailingFieldActionConfig
 }
 
 export interface TextSuggestionsFieldConfig extends BaseFieldConfig {

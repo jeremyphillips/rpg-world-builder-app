@@ -19,6 +19,7 @@ import {
   type CharacterBuilderDraft,
   type Equipment,
   type ResolvedCharacterCreationRules,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 
 import type { EquipmentBudgetSummary } from './equipment-picker-drawer.types'
@@ -42,12 +43,16 @@ export function resolveEquipmentPickerCharacterPreviewContext(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   characterCreationRules: ResolvedCharacterCreationRules
+  rulesetId: SystemRulesetId
   budget?: EquipmentBudgetSummary
 }): EquipmentPickerCharacterPreviewContext | undefined {
-  const { draft, catalogIndex, characterCreationRules, budget } = args
+  const { draft, catalogIndex, characterCreationRules, rulesetId, budget } = args
   if (!draft.class.classId) return undefined
 
-  const { equipment } = assembleStartingEquipment(draft, catalogIndex)
+  const { equipment } = assembleStartingEquipment(draft, catalogIndex, {
+    startingWealth: characterCreationRules.startingWealth,
+    rulesetId,
+  })
   const equippedArmor = resolveEquippedArmorFromInventory({
     equipment,
     catalog: catalogIndex.equipment,

@@ -354,4 +354,94 @@ describe('deriveEquipmentDraftEntries', () => {
       },
     ])
   })
+
+  it('merges package and ensure grant for the same equipment without doubling quantity', () => {
+    const longsword = equipmentSchema.parse({
+      id: `${RULESET}:longsword`,
+      slug: 'longsword',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Longsword',
+      description: '',
+      cost: { amount: 15, currency: 'gp' },
+      weight: { value: 3, unit: 'lb' },
+      kind: 'weapon',
+      category: 'martial',
+      mode: 'melee',
+      damage: { dice: { count: 1, faces: 8 } },
+      damageType: 'slashing',
+      properties: [],
+      mastery: 'sap',
+    })
+
+    const swordClass: ClassStored = {
+      ...storedDruid,
+      id: `${RULESET}:sword-kit-class`,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'sword-kit',
+              label: 'Sword Kit',
+              items: [
+                {
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'longsword' },
+                  quantity: 1,
+                },
+              ],
+              wealth: { gp: 5 },
+            },
+          ],
+        },
+      },
+    }
+
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [swordClass],
+      spells: [],
+      equipment: [longsword],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: swordClass.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(swordClass.id)]: ['sword-kit'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        grants: [{ equipmentId: longsword.id, quantity: 1 }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, catalogIndex)
+
+    expect(equipment.weapons).toEqual([
+      {
+        equipmentId: longsword.id,
+        quantity: 1,
+        sources: [
+          {
+            kind: 'classStartingEquipment',
+            sourceId: swordClass.id,
+            grantId: 'sword-kit',
+          },
+          { kind: 'grant' },
+        ],
+      },
+    ])
+  })
 })

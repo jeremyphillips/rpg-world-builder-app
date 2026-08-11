@@ -453,4 +453,43 @@ describe('ComboboxField', () => {
     )
     await expectNoAxeViolations(container)
   })
+
+  it('preserves label-only option rendering when renderOption is omitted', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    const dagger = screen.getByRole('option', { name: 'Dagger' })
+    expect(within(dagger).getByText('Dagger')).toBeInTheDocument()
+    expect(dagger).not.toHaveAttribute('aria-label')
+  })
+
+  it('keeps accessible option naming when renderOption supplies decorative interior', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="spells"
+        label="Spells"
+        options={spellOptions}
+        multiple
+        value={[]}
+        renderOption={(option) => (
+          <span data-testid="custom-interior">{option.description ?? option.label}</span>
+        )}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Spells' }))
+    const fireBolt = screen.getByRole('option', { name: 'Fire Bolt' })
+    expect(fireBolt).toHaveAttribute('aria-label', 'Fire Bolt')
+    expect(within(fireBolt).getByTestId('custom-interior')).toBeInTheDocument()
+  })
 })

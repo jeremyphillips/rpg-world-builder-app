@@ -14,11 +14,11 @@ const radioCardCardBase = cn(
   establishSurfaceCurrent('card'),
 )
 
-/** Compact option shell — 12px left when decorative control is present, 16px right. */
-export const radioCardCompactOptionBodyLayoutClasses = 'pl-3 pr-4 py-2.5'
+/** Compact option shell — 12px left when decorative control is present, 16px right, 8px vertical. */
+export const radioCardCompactOptionBodyLayoutClasses = 'pl-3 pr-4 py-2'
 
-/** Compact chooser summary — full 16px horizontal inset (no control column). */
-export const radioCardCompactSummaryBodyLayoutClasses = 'px-4 py-2.5'
+/** Compact chooser summary — full 16px horizontal inset, 8px vertical (no control column). */
+export const radioCardCompactSummaryBodyLayoutClasses = 'px-4 py-2'
 
 /** Density-owned card body padding — compact option cards only; summaries use {@link radioCardCompactSummaryBodyLayoutClasses}. */
 export const radioCardDensityBodyLayoutVariants = cva('', {
@@ -288,7 +288,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
   },
   compoundVariants: [
     { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-    { tone: 'divider', density: 'compact', class: 'mt-2.5 pt-2.5' },
+    { tone: 'divider', density: 'compact', class: 'mt-2 pt-2' },
     {
       tone: 'panel',
       density: 'default',
@@ -297,7 +297,7 @@ export const radioCardEmbeddedSlotVariants = cva('', {
     {
       tone: 'panel',
       density: 'compact',
-      class: '-mb-2.5 -ml-3 -mr-4 mt-2.5 rounded-b-card pb-2.5 pt-2.5',
+      class: '-mb-2 -ml-3 -mr-4 mt-2 rounded-b-card pb-2 pt-2',
     },
   ],
   defaultVariants: {
@@ -310,11 +310,20 @@ export const radioCardEmbeddedSlotVariants = cva('', {
 export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
   variants: {
     variant: {
-      card: 'gap-3',
+      card: '',
       row: 'gap-1',
     },
+    density: {
+      default: '',
+      compact: '',
+    },
   },
+  compoundVariants: [
+    { variant: 'card', density: 'default', class: 'gap-3' },
+    { variant: 'card', density: 'compact', class: 'gap-2' },
+  ],
   defaultVariants: {
     variant: 'card',
+    density: 'default',
   },
 })

@@ -42,6 +42,8 @@ import {
   equipmentStepLeatherArmorFixture,
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
+  equipmentStepBattleaxeFixture,
+  createEquipmentStepContextFixture,
 } from './equipment-step.fixtures'
 
 function applyEquipmentStepPatch(
@@ -207,6 +209,62 @@ describe('equipment-step.lib', () => {
       itemsWithoutTierBonus.find((item) => item.equipment.id === equipmentStepBreastplateFixture.id)
         ?.state.isWithinRemainingBudget,
     ).toBe(false)
+  })
+
+  it('excludes campaign-blocked equipment from picker items when context is wired', () => {
+    const campaignBlockedBattleaxe = {
+      ...equipmentStepBattleaxeFixture,
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'dm_only' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'dm_only' as const,
+      },
+    }
+    const catalog = {
+      ...equipmentStepCatalogFixture,
+      equipment: [equipmentStepLeatherArmorFixture, campaignBlockedBattleaxe],
+    }
+    const catalogIndex = indexCharacterBuildCatalog(catalog)
+    const context = createEquipmentStepContextFixture({
+      catalogViewer: { kind: 'pc', characterIds: ['pc-1'] },
+      catalog,
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+
+    const withContext = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex,
+      choiceSets: [],
+      context,
+    })
+    const withoutContext = resolveEquipmentStepPickerItems({
+      draft,
+      characterClass: equipmentStepBardClassFixture,
+      catalogIndex,
+      choiceSets: [],
+    })
+
+    expect(withContext.items.map((item) => item.equipment.id)).toEqual([
+      equipmentStepLeatherArmorFixture.id,
+    ])
+    expect(withoutContext.items.map((item) => item.equipment.id)).toEqual(
+      expect.arrayContaining([equipmentStepLeatherArmorFixture.id, campaignBlockedBattleaxe.id]),
+    )
   })
 
   it('shows equipment shopping only on the gold path', () => {

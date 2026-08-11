@@ -14,8 +14,14 @@ import {
   dialogContentFocusShellClasses,
   dialogPanelBodyVariants,
   dialogPanelFooterClasses,
+  dialogPanelStableBodyVariants,
 } from './dialog-panel.variants'
-import { modalContentVariants, modalOverlayVariants, type ModalSize } from './modal.variants'
+import {
+  modalContentVariants,
+  modalOverlayVariants,
+  type ModalContentLayout,
+  type ModalSize,
+} from './modal.variants'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const ModalRoot = DialogPrimitive.Root
@@ -37,6 +43,8 @@ export interface ModalContentProps extends React.ComponentPropsWithoutRef<
 > {
   /** Width preset for the panel. */
   size?: ModalSize
+  /** `content` grows with children; `stable` reserves a fixed shell block-size. */
+  layout?: ModalContentLayout
   /** Accessible name for the built-in close (X) button. */
   closeLabel?: string
   /** Dismiss when clicking the overlay/outside the panel (default `true`). */
@@ -54,6 +62,7 @@ const ModalContent = React.forwardRef<
       className,
       children,
       size,
+      layout,
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
@@ -72,7 +81,11 @@ const ModalContent = React.forwardRef<
         <DialogPrimitive.Content
           ref={composedRef}
           tabIndex={-1}
-          className={cn(modalContentVariants({ size }), dialogContentFocusShellClasses, className)}
+          className={cn(
+            modalContentVariants({ size, layout }),
+            dialogContentFocusShellClasses,
+            className,
+          )}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
@@ -128,9 +141,24 @@ const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
 )
 ModalHeader.displayName = 'Modal.Header'
 
-const ModalBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(dialogPanelBodyVariants(), className)} {...props} />
+export interface ModalBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * When true, the body participates in a flex column layout so header/footer stay
+   * pinned while inner content (e.g. TabbedForm with stickyChrome) owns scrolling.
+   */
+  stableBody?: boolean
+}
+
+const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
+  ({ className, stableBody, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        stableBody ? dialogPanelStableBodyVariants() : dialogPanelBodyVariants(),
+        className,
+      )}
+      {...props}
+    />
   ),
 )
 ModalBody.displayName = 'Modal.Body'

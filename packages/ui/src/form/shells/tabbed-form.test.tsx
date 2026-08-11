@@ -6,6 +6,8 @@ import { z } from 'zod'
 
 import { TabbedForm } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
+import { FormShellSubmitButton } from '../chrome/form-shell-submit-button'
 import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
@@ -130,7 +132,7 @@ describe('TabbedForm', () => {
     const header = screen.getByTestId('form-header')
     const rhythmStack = header.parentElement
 
-    expect(rhythmStack).toHaveClass('gap-6')
+    expect(rhythmStack).toHaveClass('gap-4')
     expect(rhythmStack).toContainElement(screen.getByRole('tablist'))
   })
 
@@ -200,27 +202,91 @@ describe('TabbedForm', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
   })
 
-  it('renders footer via footerWrapper instead of the sticky actions bar', () => {
+  it('renders footer via externalFooter instead of the sticky actions bar', () => {
     render(
-      <TabbedForm<TestValues>
-        schema={schema}
-        tabs={tabs}
-        onSubmit={vi.fn()}
-        formError="Something went wrong."
-        footer={<button type="submit">Save changes</button>}
-        footerWrapper={({ footer, formError }) => (
-          <footer data-testid="external-footer">
-            {formError ? <p role="alert">{formError}</p> : null}
-            {footer}
-          </footer>
-        )}
-      />,
+      <FormShellFooterScope>
+        <TabbedForm<TestValues>
+          schema={schema}
+          tabs={tabs}
+          onSubmit={vi.fn()}
+          formError="Something went wrong."
+          externalFooter
+          footer={<button type="submit">Save changes</button>}
+        />
+        <footer data-testid="external-footer">
+          <FormShellFooterSlot />
+        </footer>
+      </FormShellFooterScope>,
     )
 
     expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
     expect(screen.getByTestId('external-footer')).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
+  })
+
+  it('wraps external footer body content in a scroll region', () => {
+    render(
+      <FormShellFooterScope>
+        <TabbedForm<TestValues>
+          schema={schema}
+          tabs={tabs}
+          onSubmit={vi.fn()}
+          externalFooter
+          header={<p>Above tabs</p>}
+          footer={<button type="submit">Save changes</button>}
+        />
+        <footer>
+          <FormShellFooterSlot />
+        </footer>
+      </FormShellFooterScope>,
+    )
+
+    const aboveTabs = screen.getByText('Above tabs')
+    const scrollRegion = aboveTabs.closest('.overflow-y-auto')
+
+    expect(scrollRegion).toBeTruthy()
+    expect(scrollRegion?.className).toContain('min-h-0')
+    expect(scrollRegion?.className).toContain('pb-6')
+    expect(scrollRegion).toContainElement(screen.getByRole('tablist'))
+  })
+
+  it('submits via an external footer button associated with form id', async () => {
+    const onSubmit = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <FormShellFooterScope>
+        <div data-testid="overlay-content">
+          <div data-testid="overlay-body">
+            <TabbedForm<TestValues>
+              id="external-footer-form"
+              schema={schema}
+              tabs={tabs}
+              onSubmit={onSubmit}
+              externalFooter
+              footer={() => <FormShellSubmitButton>Save changes</FormShellSubmitButton>}
+            />
+          </div>
+          <div data-testid="overlay-footer">
+            <FormShellFooterSlot />
+          </div>
+        </div>
+      </FormShellFooterScope>,
+    )
+
+    const content = screen.getByTestId('overlay-content')
+    const footer = screen.getByTestId('overlay-footer')
+    expect(content).toContainElement(screen.getByTestId('overlay-body'))
+    expect(content).toContainElement(footer)
+    expect(screen.getByTestId('overlay-body')).not.toContainElement(footer)
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+    expect(onSubmit).not.toHaveBeenCalled()
+
+    await user.type(screen.getByRole('textbox', { name: /Campaign name/i }), 'Mira')
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
   })
 
   it('wraps tab content with contentWrapper', () => {

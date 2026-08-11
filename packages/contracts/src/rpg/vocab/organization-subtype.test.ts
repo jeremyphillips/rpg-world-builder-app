@@ -22,6 +22,13 @@ describe('organization subtype vocabulary', () => {
     expect(ORGANIZATION_SUBTYPE_IDS).toHaveLength(45)
   })
 
+  it('returns empty results for unknown kind ids at runtime', () => {
+    expect(getOrganizationSubtypeIds('' as 'government')).toEqual([])
+    expect(getOrganizationSubtypeIds('not_a_kind' as 'government')).toEqual([])
+    expect(isOrganizationSubtypeValidForKind('' as 'government', 'monarchy')).toBe(false)
+    expect(getOrganizationSubtypeEntry('' as 'government', 'monarchy')).toBeUndefined()
+  })
+
   it('keeps subtype ids globally unique across kinds', () => {
     const seen = new Set<string>()
     for (const kind of ORGANIZATION_KIND_IDS) {

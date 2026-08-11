@@ -5,6 +5,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import { Form } from './form.client'
+import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
 import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
@@ -200,16 +201,21 @@ describe('Form', () => {
     await submitAndExpectPayload(user, onSubmit, { name: 'Tasha', hasExtra: false })
   })
 
-  it('wraps overlay composed footers in a scroll region without growing the rhythm stack', () => {
+  it('wraps external footers in a scroll region without growing the rhythm stack', () => {
     const { container } = render(
-      <Form<Values>
-        schema={schema}
-        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
-        onSubmit={vi.fn()}
-        footerWrapper={({ footer }) => <div data-testid="overlay-footer">{footer}</div>}
-        contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
-        footer={<button type="submit">Save</button>}
-      />,
+      <FormShellFooterScope>
+        <Form<Values>
+          schema={schema}
+          fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+          onSubmit={vi.fn()}
+          externalFooter
+          contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
+          footer={<button type="submit">Save</button>}
+        />
+        <div data-testid="overlay-footer">
+          <FormShellFooterSlot />
+        </div>
+      </FormShellFooterScope>,
     )
 
     const form = container.querySelector('form')
@@ -229,6 +235,7 @@ describe('Form', () => {
 
     expect(screen.getByTestId('overlay-footer')).toBeInTheDocument()
     expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {

@@ -36,6 +36,7 @@ const REMOVE_MEMBER_FAILED = 'Could not remove this member.'
 
 export type OrganizationMembersDrawerState =
   | { mode: 'add' }
+  | { mode: 'createNpc' }
   | { mode: 'edit'; row: OrganizationMemberRowVm }
   | { mode: 'remove'; row: OrganizationMemberRowVm }
 
@@ -235,6 +236,15 @@ export function useOrganizationMembersDetail(
   }, [drawerState, removeMember])
 
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
+  const openCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'createNpc' }), [])
+  const cancelCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
+  const handleQuickNpcSuccess = React.useCallback(
+    async (npc: CampaignNpcDetail) => {
+      await handleQuickNpcCreated(npc)
+      setDrawerState(null)
+    },
+    [handleQuickNpcCreated],
+  )
   const openEditDrawer = React.useCallback(
     (row: OrganizationMemberRowVm) => setDrawerState({ mode: 'edit', row }),
     [],
@@ -258,6 +268,9 @@ export function useOrganizationMembersDetail(
     pendingCharacterId,
     quickNpc,
     openAddDrawer,
+    openCreateNpcModal,
+    cancelCreateNpcModal,
+    handleQuickNpcSuccess,
     openEditDrawer,
     openRemoveConfirm,
     closeDrawer,

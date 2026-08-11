@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
+import { modalStableBlockSizeClasses } from './modal.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
@@ -123,6 +124,50 @@ describe('Modal', () => {
     expect(dialog).toHaveFocus()
     expect(document.getElementById('availability')).not.toHaveFocus()
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+  })
+
+  it('applies stable body layout classes when stableBody is set', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header headline="Stable body" />
+          <Modal.Body stableBody data-testid="modal-body">
+            Scrollable region
+          </Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const body = await screen.findByTestId('modal-body')
+    expect(body).toHaveClass('overflow-hidden')
+    expect(body).toHaveClass('flex-1')
+    expect(body).toHaveClass('pb-0')
+    expect(body).toHaveClass('px-6')
+    expect(body).not.toHaveClass('overflow-y-auto')
+  })
+
+  it('applies the stable layout block-size token without changing default content layout', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content layout="stable" data-testid="modal-content">
+          <Modal.Header headline="Stable layout" />
+          <Modal.Body>Short body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content.className).toContain(modalStableBlockSizeClasses)
   })
 })
 

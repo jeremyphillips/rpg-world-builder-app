@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import {
-  createCampaignNpcBuilderContextFixture,
-  populatedBuilderCatalog,
-} from '@/features/character'
-
 import { OrganizationMemberPickerDrawer } from './organization-member-picker-drawer.client'
 import {
   ORGANIZATION_MEMBER_PICKER_CANDIDATES,
@@ -37,10 +32,10 @@ export const NoCandidates: Story = {
 export const WithQuickNpcCreation: Story = {
   args: {
     quickNpc: {
-      campaignId: 'campaign-test-1',
-      buildContext: createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog }),
-      onCreated: () => undefined,
+      enabled: true,
+      buildContextReady: true,
     },
+    onCreateNpc: () => undefined,
   },
 }
 
@@ -48,10 +43,9 @@ export const WithQuickNpcCreation: Story = {
 export const QuickNpcCreationUnavailable: Story = {
   args: {
     quickNpc: {
-      campaignId: 'campaign-test-1',
-      buildContext: null,
+      enabled: true,
       buildContextFailed: true,
-      onCreated: () => undefined,
+      buildContextReady: false,
     },
   },
 }

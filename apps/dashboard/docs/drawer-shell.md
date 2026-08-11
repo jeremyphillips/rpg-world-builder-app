@@ -12,7 +12,7 @@ read-only builder dossiers use allowlisted
 @rpg/ui dialog-panel.variants  → shared section inset / body / footer chrome / action row
 @rpg/ui Sheet                  → primitive (side, close, overlay)
 @rpg/ui Sheet variants         → modality-owned (surface, size, dock placement)
-@rpg/ui Form footerWrapper     → Form-owned error + actions content in overlay footers
+@rpg/ui Form externalFooter   → publishes footer semantics to FormShellFooterSlot
 dashboard DrawerShell          → only allowed app composition of Sheet for non-picker drawers
 ContentFormDrawer              → DrawerShell + ContentFormHost (form workflow)
 LocationCreateModal            → Modal + ContentFormHost (create setup ↔ details)
@@ -36,7 +36,7 @@ Implementation: [`src/components/drawer/`](../src/components/drawer/).
 | `footer?`            | Optional shell-owned `Sheet.Footer` actions (`scrolling` / `managed` only) |
 | `DrawerShell.Close`  | Re-export of `Sheet.Close` for cancel buttons                              |
 | `DrawerShell.Body`   | Re-export of `Sheet.Body` for composed Form `contentWrapper` flows         |
-| `DrawerShell.Footer` | Re-export of `Sheet.Footer` for composed Form `footerWrapper` flows        |
+| `DrawerShell.Footer` | Re-export of `Sheet.Footer` for composed external-footer flows             |
 
 **No `size` prop in v1.** Application width is fixed at 550px via `Sheet.Content`
 `size="lg"`. Add a DrawerShell size variant only when a second legitimate
@@ -53,8 +53,8 @@ case and a shared token or DrawerShell variant — not local Tailwind overrides.
 - **`managed`** — body is a non-scrolling flex column (`p-0`). Pair with a child that
   owns its own scroll region inside the body.
 - **`composed`** — children render directly under `Sheet.Content` (no auto Body).
-  Use with `<Form contentWrapper footerWrapper>` so Form supplies
-  `DrawerShell.Body` + `DrawerShell.Footer` (see
+  Use with `<Form contentWrapper externalFooter>` and overlay-owned
+  `<DrawerShell.Footer><FormShellFooterSlot /></DrawerShell.Footer>` (see
   [`ContentFormDrawer`](../src/features/content/lib/forms/shells/content-form-drawer.client.tsx)).
   Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`.
 
@@ -70,11 +70,24 @@ Footer composition:
 
 - Shared chrome: `dialogPanelFooterClasses` via `Sheet.Footer` / `DrawerShell.Footer`
 - Dock placement: `sheetFooterDockClasses` (Sheet-owned)
-- Action row: `dialogPanelActionRowClasses` — caller wraps button groups
-- Form drawer content: `<Form footerWrapper>` supplies error + actions; no parallel
-  FormActionsBar sheet chrome
+- Action row: `DialogPanelActionRow` for manual footers; `FormShellFooterContent` for form flows
+- Form drawer content: `<Form externalFooter>` publishes semantics; overlay owner renders
+  `<FormShellFooterSlot />` inside `DrawerShell.Footer` — no parallel FormActionsBar sheet chrome
 
 `CatalogPickerSheet` hardcodes the same `surface` / `size` on `Sheet.Content`.
+
+### CatalogPickerSheet slot policy
+
+| Slot              | Role                                                                | Examples                             |
+| ----------------- | ------------------------------------------------------------------- | ------------------------------------ |
+| `auxiliaryAction` | Quiet **alternate acquisition** when the desired item may not exist | Create new NPC, Create location      |
+| `footer`          | **Concluding drawer action** for the current workflow               | Submit link, Done, Confirm selection |
+
+Rules:
+
+- Use `auxiliaryAction` for create/import entry between search and results — not `footer`.
+- Use `footer` for workflow completion — not alternate acquisition.
+- Search and `auxiliaryAction` stay fixed above the scrollable result list.
 
 ## ESLint boundary
 
@@ -91,15 +104,53 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 
 ## Related surfaces
 
-| Surface                                   | Scaffold                                           |
-| ----------------------------------------- | -------------------------------------------------- |
-| Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`          |
-| Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                |
-| Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)              |
-| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()` |
-| Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)          |
+| Surface                                   | Scaffold                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`                                |
+| Quick NPC (org Add member)                | `OrganizationMemberPickerDrawer` + character-owned `QuickNpcCreateModal` |
+| Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
+| Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
+| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()`                       |
+| Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)                                |
 
 Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+
+## Overlay modality policy
+
+**Drawer = relationship; Modal = entity create.** Pickers and membership workflows stay in
+`DrawerShell` / `CatalogPickerSheet`. Continuous or multi-step **creation** flows use
+`Modal` + `ContentFormHost` (locations) or a feature-owned modal shell (Quick NPC).
+
+Do **not** embed entity creation inside a drawer body (`bodyReplacement`, stacked overlays).
+The parent hook owns exclusive overlay modes and passes context between shells:
+
+```text
+add (picker drawer)  →  createNpc (modal)  →  cancel returns to add  →  success closes all
+```
+
+Quick NPC: the organizations hook toggles `add` | `createNpc`; the character feature owns
+`QuickNpcCreateModal` (Setup, TabbedForm authoring, create). See
+[character-acquisition.md](./character-acquisition.md#quick-npc-organization-member).
+
+### Pending dismiss (`usePendingAwareOpenChange`)
+
+Form overlays that must block user dismiss while submit is in flight wire
+`usePendingAwareOpenChange` from `@rpg/ui`:
+
+```ts
+const { handleOpenChange, trustedClose } = usePendingAwareOpenChange({
+  pending,
+  allowDismissWhilePending, // optional opt-out
+  onOpenChange,
+})
+```
+
+- User dismiss (X, Escape, backdrop, Cancel → Root) is refused while `pending` (unless opt-out).
+- `trustedClose()` bypasses the guard for success or intentional parent close.
+- Dirty discard / leave-bridge stays shell-owned (`ContentFormHost`, `FormUnsavedChangesGuard`);
+  the helper owns **pending** Root behavior only.
+
+Wired today: `ContentFormDrawer`, `LocationCreateModal`, `QuickNpcCreateModal`.
 
 ## Unsaved-changes leave guard
 

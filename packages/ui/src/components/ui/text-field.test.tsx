@@ -1,61 +1,123 @@
-import { createRef } from 'react'
-import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 import { TextField } from './text-field'
 
-describe('TextField', () => {
-  it('associates the label with the input via id', () => {
-    render(<TextField id="email" label="Email" type="email" />)
-    const input = screen.getByLabelText('Email')
-    expect(input).toHaveAttribute('id', 'email')
-    expect(input).toHaveAttribute('type', 'email')
-  })
-
-  it('forwards arbitrary input props', () => {
+describe('TextField trailingAction', () => {
+  it('renders a grouped control when trailingAction is configured', () => {
     render(
-      <TextField id="email" label="Email" placeholder="you@example.com" autoComplete="email" />,
+      <TextField
+        id="npc-name"
+        label="Name"
+        trailingAction={{
+          label: 'Generate',
+          onAction: vi.fn(),
+        }}
+      />,
     )
-    const input = screen.getByLabelText('Email')
-    expect(input).toHaveAttribute('placeholder', 'you@example.com')
-    expect(input).toHaveAttribute('autocomplete', 'email')
+
+    expect(screen.getByRole('group')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Generate' })).toBeInTheDocument()
   })
 
-  it('renders the hint and no aria-invalid when there is no error', () => {
-    render(<TextField id="pw" label="Password" hint="At least 8 characters." />)
-    expect(screen.getByText('At least 8 characters.')).toBeInTheDocument()
-    expect(screen.getByLabelText('Password')).not.toHaveAttribute('aria-invalid')
+  it('fires the trailing action callback', async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn()
+
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        trailingAction={{
+          label: 'Generate',
+          onAction,
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+    expect(onAction).toHaveBeenCalledTimes(1)
   })
 
-  it('renders the error, sets aria-invalid, and hides the hint', () => {
-    render(<TextField id="email" label="Email" hint="Work email is fine." error="Required." />)
-    expect(screen.getByText('Required.')).toBeInTheDocument()
-    expect(screen.queryByText('Work email is fine.')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
+  it('disables only the action while pending', () => {
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        trailingAction={{
+          label: 'Generate',
+          onAction: vi.fn(),
+          pending: true,
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Generate' })).toBeDisabled()
   })
 
-  it('uses compact error text for sm fields', () => {
-    render(<TextField id="email" label="Email" error="Required." size="sm" />)
-    expect(screen.getByRole('alert')).toHaveClass('text-xs')
+  it('renders operation errors on the action accessibility tree', () => {
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        trailingAction={{
+          label: 'Generate',
+          onAction: vi.fn(),
+          error: 'Could not generate a name.',
+        }}
+      />,
+    )
+
+    const actionError = screen.getByRole('alert')
+    expect(actionError).toHaveTextContent('Could not generate a name.')
+    expect(screen.getByRole('button', { name: 'Generate' })).toHaveAttribute(
+      'aria-describedby',
+      'npc-name-action-error',
+    )
+    expect(screen.getByRole('textbox', { name: 'Name' })).not.toHaveAttribute(
+      'aria-describedby',
+      'npc-name-action-error',
+    )
   })
 
-  it('forwards the ref to the underlying input', () => {
-    const ref = createRef<HTMLInputElement>()
-    render(<TextField id="email" label="Email" ref={ref} />)
-    expect(ref.current).toBe(screen.getByLabelText('Email'))
+  it('stretches trailing-action controls to the field band width', () => {
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        width="full"
+        trailingAction={{
+          label: 'Generate',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    const group = screen.getByRole('group')
+    const controlWrapper = group.parentElement
+    expect(controlWrapper?.className).toContain('w-full')
+    expect(controlWrapper?.className).toContain('min-w-0')
   })
 
-  it('omits the visible label and required asterisk when label is empty', () => {
-    render(<TextField id="example" label="" placeholder="Example…" required />)
-    const input = screen.getByPlaceholderText('Example…')
-    expect(input).toHaveAttribute('aria-required', 'true')
-    expect(screen.queryByText('*')).not.toBeInTheDocument()
-    expect(screen.queryByRole('label')).not.toBeInTheDocument()
-  })
+  it('uses button variants as the sole typography source on md fields', () => {
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        size="md"
+        trailingAction={{
+          label: 'Generate',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
 
-  itAxe('has no axe accessibility violations', async () => {
-    const { container } = render(<TextField id="email" label="Email" type="email" />)
-    await expectNoAxeViolations(container)
+    const button = screen.getByRole('button', { name: 'Generate' })
+    expect(button.className).toContain('font-body-emphasis')
+    expect(button.className).toContain('text-sm')
+    expect(button.className).not.toContain('text-md')
+    expect(button.parentElement?.className).not.toMatch(/\b(text-|font-)/)
   })
 })

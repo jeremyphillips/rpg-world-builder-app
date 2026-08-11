@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Search } from 'lucide-react'
+import { ChevronDown, Check, Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
@@ -11,7 +11,11 @@ import { fieldControlVariants } from './field-control.variants'
 import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
-import type { ComboboxFieldOption, ComboboxRenderSelectedItem } from './combobox-field.types'
+import type {
+  ComboboxFieldOption,
+  ComboboxRenderOption,
+  ComboboxRenderSelectedItem,
+} from './combobox-field.types'
 import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
@@ -23,6 +27,7 @@ import {
   comboboxSearchInputVariants,
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
+  comboboxOptionVariants,
 } from './combobox-field.variants'
 import { PopoverLayerPortal } from './layer-portal-container.client'
 
@@ -87,6 +92,8 @@ interface ComboboxOptionItemProps {
   isSelected: boolean
   isHighlighted: boolean
   isDisabled: boolean
+  size: FieldSize
+  renderOption?: ComboboxRenderOption
   onHighlight: () => void
   onSelect: () => void
 }
@@ -97,9 +104,40 @@ function ComboboxOptionItem({
   isSelected,
   isHighlighted,
   isDisabled,
+  size,
+  renderOption,
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
+  if (renderOption) {
+    return (
+      <button
+        id={optionId}
+        type="button"
+        role="option"
+        aria-selected={isSelected}
+        aria-label={option.label}
+        data-active={isHighlighted}
+        data-disabled={isDisabled}
+        disabled={isDisabled}
+        className={comboboxOptionVariants()}
+        onMouseEnter={onHighlight}
+        onClick={onSelect}
+      >
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="min-w-0 flex-1">
+            {renderOption(option, { selected: isSelected, disabled: isDisabled, size })}
+          </span>
+        </span>
+        {isSelected ? (
+          <Check className="size-4 shrink-0" aria-hidden />
+        ) : (
+          <span className="size-4 shrink-0" aria-hidden />
+        )}
+      </button>
+    )
+  }
+
   return (
     <ListboxOptionButton
       option={option}
@@ -172,6 +210,7 @@ interface ComboboxPanelProps {
   selected: string[]
   atMax: boolean
   generatedId: string
+  renderOption?: ComboboxRenderOption
   searchInputRef: React.RefObject<HTMLInputElement | null>
   listboxRef: React.RefObject<HTMLDivElement | null>
   onQueryChange: (value: string) => void
@@ -196,6 +235,7 @@ export function ComboboxPanel({
   selected,
   atMax,
   generatedId,
+  renderOption,
   searchInputRef,
   listboxRef,
   onQueryChange,
@@ -254,6 +294,8 @@ export function ComboboxPanel({
                   isSelected={isSelected}
                   isHighlighted={index === highlightedIndex}
                   isDisabled={isDisabled}
+                  size={size}
+                  renderOption={renderOption}
                   onHighlight={() => onHighlight(index)}
                   onSelect={() => onSelect(option.value)}
                 />

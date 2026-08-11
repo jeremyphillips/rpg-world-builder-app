@@ -16,6 +16,31 @@ export type CatalogPickerSheetActionsHelpers = {
 
 export type CatalogPickerRowLayout = CollapsibleListItemRowLayout
 
+/**
+ * Quiet alternate acquisition path when the desired catalog item may not exist.
+ *
+ * - `state: 'action'` — offered path; `disabled` means temporarily blocked (e.g. async
+ *   prerequisite loading).
+ * - `state: 'unavailable'` — path cannot be offered in the current state (e.g. prerequisite
+ *   failed).
+ *
+ * Rendered between search and results. Do not use for row submit or workflow completion —
+ * use row actions or `footer` instead.
+ */
+export type CatalogPickerAuxiliaryAction =
+  | {
+      state: 'action'
+      label: string
+      onAction: () => void
+      /** Action exists but is temporarily unavailable. */
+      disabled?: boolean
+    }
+  | {
+      state: 'unavailable'
+      /** Action cannot be offered for the current state. */
+      message: string
+    }
+
 export type CatalogPickerSheetProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -62,6 +87,15 @@ export type CatalogPickerSheetProps<TItem> = {
   expandedItemId?: string | null
   onExpandedItemChange?: (itemId: string | null) => void
   headerExtra?: ReactNode
+  /**
+   * Quiet alternate acquisition path (e.g. create entity) between search and results.
+   * Independent of search filtering and result selection.
+   */
+  auxiliaryAction?: CatalogPickerAuxiliaryAction
+  /**
+   * Concluding drawer action for the current picker workflow (submit, confirm, done).
+   * Do not use for alternate acquisition — use `auxiliaryAction` instead.
+   */
   footer?: ReactNode
   emptyState?: ReactNode
   loading?: boolean

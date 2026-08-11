@@ -110,9 +110,21 @@ export type NormalizedCharacterBuilderDraftEquipmentPurchase =
 
 export type CharacterBuilderDraftEquipmentPurchase = PersistedCharacterBuilderDraftEquipmentPurchase
 
+export const characterBuilderDraftEquipmentGrantSchema = z.object({
+  equipmentId: z.string().min(1),
+  /** Ensure-at-least quantity target — assembly computes shortfall vs other channels. */
+  quantity: z.number().int().min(1),
+})
+
+export type CharacterBuilderDraftEquipmentGrant = z.infer<
+  typeof characterBuilderDraftEquipmentGrantSchema
+>
+
 export const characterBuilderDraftEquipmentSchema = z.object({
   mode: characterBuilderDraftEquipmentModeSchema,
   purchases: z.array(characterBuilderDraftEquipmentPurchaseSchema).default([]),
+  /** Ensure-at-least equipment grants — domain acquisition channel, not purchase-shaped. */
+  grants: z.array(characterBuilderDraftEquipmentGrantSchema).optional(),
   /** Magic-item grant selections keyed by allowanceId + equipmentId (upserted). */
   magicItemSelections: z.array(magicItemGrantSelectionSchema).optional(),
   /**

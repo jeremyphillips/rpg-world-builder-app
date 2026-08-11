@@ -546,6 +546,7 @@ export function EquipmentPickerDrawer({
           workflowMode,
           draft,
           rowActionVm,
+          budget: effectiveBudget,
         })
         const ownedQuantity = draft
           ? resolveEquipmentOwnedQuantity({ equipmentId: item.equipment.id, draft })

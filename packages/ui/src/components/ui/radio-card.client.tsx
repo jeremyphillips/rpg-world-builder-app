@@ -406,7 +406,7 @@ function RadioCard({
 }: RadioCardProps) {
   return (
     <RadioGroup
-      className={cn(radioCardGroupGapVariants({ variant }), className)}
+      className={cn(radioCardGroupGapVariants({ variant, density }), className)}
       value={value}
       {...props}
     >

@@ -7,10 +7,16 @@ import {
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   buildQuickNpcContentOptions,
-  buildQuickNpcFormFields,
+  buildQuickNpcDetailsFields,
   buildQuickNpcSeed,
-  quickNpcFormDefaultValues,
-  quickNpcFormSchema,
+  buildQuickNpcConstraints,
+  buildQuickNpcTabs,
+  countQuickNpcConfiguredRequirements,
+  mergeQuickNpcAuthoringValues,
+  quickNpcAuthoringDefaultValues,
+  quickNpcAuthoringSchema,
+  quickNpcAuthoringTabDefaultValues,
+  QUICK_NPC_DETAILS_TAB_ID,
   QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
 } from './quick-npc-form-fields'
 
@@ -21,11 +27,13 @@ const validValues = {
   level: 3,
   alignment: 'ln',
   membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+  requiredWeaponIds: [],
+  requiredSpellIds: [],
 }
 
-describe('quickNpcFormSchema', () => {
+describe('quickNpcAuthoringSchema', () => {
   it('accepts a complete quick NPC form payload', () => {
-    expect(quickNpcFormSchema(20).parse(validValues)).toMatchObject({
+    expect(quickNpcAuthoringSchema(20).parse(validValues)).toMatchObject({
       name: 'Guard Captain',
       level: 3,
       alignment: 'ln',
@@ -33,7 +41,7 @@ describe('quickNpcFormSchema', () => {
   })
 
   it('rejects missing required seed fields with builder messages', () => {
-    const result = quickNpcFormSchema(20).safeParse({
+    const result = quickNpcAuthoringSchema(20).safeParse({
       ...validValues,
       name: ' ',
       speciesId: '',
@@ -53,7 +61,7 @@ describe('quickNpcFormSchema', () => {
   })
 
   it('rejects a level above the campaign maximum', () => {
-    const result = quickNpcFormSchema(20).safeParse({ ...validValues, level: 21 })
+    const result = quickNpcAuthoringSchema(20).safeParse({ ...validValues, level: 21 })
 
     expect(result.success).toBe(false)
     const messages = result.success ? [] : result.error.issues.map((issue) => issue.message)
@@ -63,7 +71,7 @@ describe('quickNpcFormSchema', () => {
 
 describe('buildQuickNpcSeed', () => {
   it('maps form values to the automatic build seed without the membership title', () => {
-    const seed = buildQuickNpcSeed(quickNpcFormSchema(20).parse(validValues))
+    const seed = buildQuickNpcSeed(quickNpcAuthoringSchema(20).parse(validValues))
 
     expect(seed).toEqual({
       name: 'Guard Captain',
@@ -103,12 +111,9 @@ describe('buildQuickNpcContentOptions', () => {
   })
 })
 
-describe('buildQuickNpcFormFields', () => {
+describe('buildQuickNpcDetailsFields', () => {
   it('includes the canonical membership title radio with a No title default', () => {
-    const fields = buildQuickNpcFormFields({
-      speciesOptions: [],
-      classOptions: [],
-      maxLevel: 20,
+    const fields = buildQuickNpcDetailsFields({
       membership: { kind: 'professional' },
     })
 
@@ -128,12 +133,100 @@ describe('buildQuickNpcFormFields', () => {
   })
 
   it('has defaults for every schema key', () => {
-    expect(quickNpcFormDefaultValues).toMatchObject({
+    expect(quickNpcAuthoringDefaultValues).toMatchObject({
       name: '',
       speciesId: '',
       classId: '',
       level: 1,
+      alignment: 'n',
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      requiredWeaponIds: [],
+      requiredSpellIds: [],
     })
+    expect(quickNpcAuthoringTabDefaultValues).toEqual({
+      name: '',
+      alignment: 'n',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      requiredWeaponIds: [],
+      requiredSpellIds: [],
+    })
+  })
+})
+
+describe('buildQuickNpcTabs validation wiring', () => {
+  it('declares explicit ownership for the name field with trailing action', () => {
+    const tabs = buildQuickNpcTabs({
+      detailsFields: buildQuickNpcDetailsFields({
+        membership: { kind: 'professional' },
+        nameTrailingAction: {
+          label: 'Generate',
+          onAction: () => {},
+        },
+      }),
+      requirementsFields: [
+        {
+          type: 'select',
+          name: 'requiredWeaponIds',
+          label: 'Starting weapon',
+          options: [],
+          width: 'full',
+        },
+      ],
+      configuredCount: 0,
+    })
+
+    const detailsTab = tabs.find((tab) => tab.id === QUICK_NPC_DETAILS_TAB_ID)
+    expect(detailsTab?.errorPaths).toEqual(['name'])
+    expect(detailsTab?.resolverFields).toEqual([
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ])
+  })
+
+  it('merges setup and tab values for create/finalize', () => {
+    expect(
+      mergeQuickNpcAuthoringValues(
+        { speciesId: 'species-1', classId: 'class-1', level: 2 },
+        {
+          name: 'Guard Captain',
+          alignment: 'ln',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          requiredWeaponIds: [],
+          requiredSpellIds: [],
+        },
+      ),
+    ).toMatchObject({
+      speciesId: 'species-1',
+      classId: 'class-1',
+      level: 2,
+      name: 'Guard Captain',
+    })
+  })
+})
+
+describe('buildQuickNpcConstraints', () => {
+  it('omits empty requirement fields', () => {
+    expect(
+      buildQuickNpcConstraints({ requiredWeaponIds: [], requiredSpellIds: [] }),
+    ).toBeUndefined()
+  })
+
+  it('maps configured requirement id arrays', () => {
+    expect(
+      buildQuickNpcConstraints({
+        requiredWeaponIds: ['srd-cc-5.2.1:longsword'],
+        requiredSpellIds: [],
+      }),
+    ).toEqual({ requiredWeaponIds: ['srd-cc-5.2.1:longsword'], requiredSpellIds: [] })
+  })
+})
+
+describe('countQuickNpcConfiguredRequirements', () => {
+  it('counts weapons and spells in configured arrays', () => {
+    expect(
+      countQuickNpcConfiguredRequirements({
+        requiredWeaponIds: ['weapon-1'],
+        requiredSpellIds: ['spell-1'],
+      }),
+    ).toBe(2)
   })
 })

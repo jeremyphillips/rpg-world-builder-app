@@ -1,3 +1,5 @@
+import { cn } from '../../lib/utils'
+
 /**
  * Shared chrome for text-like field controls and grouped field shells.
  * Border, fill, focus, invalid, readonly, and disabled treatments use
@@ -38,3 +40,35 @@ export const fieldInputPlaceholderClasses =
 /** Browser autofill often bypasses `bg-input` — pin fill to field-control bg. */
 export const fieldInputAutofillClasses =
   '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_var(--field-control-bg)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--field-control-fg)]'
+
+/** Grouped field shell base — border, fill, and focus-within ring on the outer wrapper. */
+export const fieldGroupedShellClasses = cn(
+  'grid items-center',
+  fieldInputShellClasses,
+  fieldInputFocusWithinClasses,
+)
+
+/** Stretch layout: input grows, trailing segment stays intrinsic width. */
+export const fieldGroupedShellStretchLayoutClasses = 'w-full grid-cols-[1fr_1px_auto]'
+
+/** Intrinsic layout: shell width follows segment content. */
+export const fieldGroupedShellIntrinsicLayoutClasses = 'w-fit max-w-full grid-cols-[auto_1px_auto]'
+
+/** Vertical divider between grouped segments. */
+export const fieldGroupedDividerClasses = 'w-px shrink-0 self-stretch bg-border'
+
+/**
+ * Suppresses standalone field chrome and per-segment focus rings so the group
+ * shell owns border and focus-within treatment.
+ */
+export const fieldGroupedSegmentResetClasses =
+  'border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
+
+/** Left segment corner radii (input/value column). */
+export const fieldGroupedSegmentStartClasses = 'rounded-l-md rounded-r-none'
+
+/** Right segment corner radii (unit/action column). */
+export const fieldGroupedSegmentEndClasses = 'rounded-l-none rounded-r-md'
+
+/** Clip overflow on the left segment column (e.g. nested stepper chrome). */
+export const fieldGroupedInputColumnClasses = 'min-w-0 overflow-hidden rounded-l-md'

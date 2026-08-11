@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { fn } from 'storybook/test'
 import type { RadioCardOption } from '@rpg/ui'
 
+import { CreateSetupShell } from '@/lib/create-setup'
+
 import { resolveLocationCreateSetupDefaultSubhead } from '../lib/location-create-setup-chrome.lib'
-import { LocationCreateSetupShell } from './location-create-setup-shell.client'
+import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
 
 const SITE_OPTIONS: RadioCardOption[] = [
   {
@@ -46,16 +48,16 @@ const REGION_TYPE_OPTIONS: RadioCardOption[] = [
 ]
 
 const meta = {
-  title: 'Content/Locations/LocationCreateSetupShell',
-  component: LocationCreateSetupShell,
+  title: 'Content/Locations/LocationCreateSetup',
+  component: CreateSetupShell,
   args: {
     open: true,
     onOpenChange: fn(),
     onContinue: fn(),
     headline: 'Create site',
-    choiceSets: [],
+    sets: [],
   },
-} satisfies Meta<typeof LocationCreateSetupShell>
+} satisfies Meta<typeof CreateSetupShell>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -65,10 +67,10 @@ export const SingleChoiceSet: Story = {
     const [siteType, setSiteType] = useState('')
 
     return (
-      <LocationCreateSetupShell
+      <CreateSetupShell
         {...args}
         headline="Create site"
-        choiceSets={[
+        sets={buildLocationCreateSetupSets([
           {
             id: 'siteType',
             fieldLabel: 'Site type',
@@ -77,7 +79,7 @@ export const SingleChoiceSet: Story = {
             value: siteType,
             onValueChange: setSiteType,
           },
-        ]}
+        ])}
       />
     )
   },
@@ -88,11 +90,11 @@ export const WithDefaultSubhead: Story = {
     const [siteType, setSiteType] = useState('')
 
     return (
-      <LocationCreateSetupShell
+      <CreateSetupShell
         {...args}
         headline="Create site"
         subhead={resolveLocationCreateSetupDefaultSubhead('site')}
-        choiceSets={[
+        sets={buildLocationCreateSetupSets([
           {
             id: 'siteType',
             fieldLabel: 'Site type',
@@ -101,7 +103,7 @@ export const WithDefaultSubhead: Story = {
             value: siteType,
             onValueChange: setSiteType,
           },
-        ]}
+        ])}
       />
     )
   },
@@ -113,10 +115,10 @@ export const TwoChoiceSets: Story = {
     const [regionType, setRegionType] = useState('')
 
     return (
-      <LocationCreateSetupShell
+      <CreateSetupShell
         {...args}
         headline="Create region"
-        choiceSets={[
+        sets={buildLocationCreateSetupSets([
           {
             id: 'classification',
             fieldLabel: 'Classification',
@@ -134,7 +136,7 @@ export const TwoChoiceSets: Story = {
             onValueChange: setRegionType,
             dependsOn: ['classification'],
           },
-        ]}
+        ])}
       />
     )
   },

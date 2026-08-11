@@ -12,16 +12,11 @@ import {
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
-export interface FormFooterWrapperProps {
-  footer: React.ReactNode
-  formError: string | null
-}
-
 export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
   contentClassName?: string
-  isOverlayComposedFooter: boolean
+  externalFooter: boolean
   stickyFooter: boolean
   formError?: string | null
   valueSyncs?: FormValueSync[]
@@ -33,7 +28,7 @@ export function FormShellFieldStack({
   formId,
   fields,
   contentClassName,
-  isOverlayComposedFooter,
+  externalFooter,
   stickyFooter,
   formError,
   valueSyncs,
@@ -41,8 +36,8 @@ export function FormShellFieldStack({
   contentWrapper,
 }: FormShellFieldStackProps) {
   const stack = (
-    <FormRhythmStack className={isOverlayComposedFooter ? undefined : contentClassName}>
-      {!stickyFooter && !isOverlayComposedFooter && formError ? (
+    <FormRhythmStack className={externalFooter ? undefined : contentClassName}>
+      {!stickyFooter && !externalFooter && formError ? (
         <Text variant="destructive" role="alert">
           {formError}
         </Text>
@@ -55,7 +50,7 @@ export function FormShellFieldStack({
     </FormRhythmStack>
   )
 
-  const scrollWrappedStack = isOverlayComposedFooter ? (
+  const scrollWrappedStack = externalFooter ? (
     <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
   ) : (
     stack
@@ -68,22 +63,9 @@ export type FormFooterRegionProps = {
   stickyFooter: boolean
   formError?: string | null
   footer: ReactNode
-  footerWrapper?: (props: FormFooterWrapperProps) => ReactNode
 }
 
-export function FormFooterRegion({
-  stickyFooter,
-  formError,
-  footer,
-  footerWrapper,
-}: FormFooterRegionProps) {
-  if (footerWrapper) {
-    if (!footer && !formError) {
-      return null
-    }
-    return footerWrapper({ footer, formError: formError ?? null })
-  }
-
+export function FormFooterRegion({ stickyFooter, formError, footer }: FormFooterRegionProps) {
   if (stickyFooter) {
     return <FormActionsBar formError={formError}>{footer}</FormActionsBar>
   }

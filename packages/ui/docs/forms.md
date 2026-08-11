@@ -91,6 +91,21 @@ not as the Create submit gate. Edit-mode footers use `dirtyFields` / `hasDirtyFi
 forms: resolver items include `collectTabbedFormResolverItems(tabs)` — not the visible `fields`
 tree used for issue grouping.
 
+### Text field trailing actions (`trailingAction`)
+
+Use `trailingAction` on `type: 'text'` when an operation directly populates or acts on that
+field value (e.g. Name → Generate). The renderer composes `InputActionGroup` and always sets
+`type="button"` on the attached action so it never submits the parent form.
+
+| Error kind                                    | Owner                                              |
+| --------------------------------------------- | -------------------------------------------------- |
+| Field validation (empty name, invalid format) | `Field.Error` / RHF — input `aria-describedby`     |
+| Attached operation failure (API/generation)   | `trailingAction.error` — action `aria-describedby` |
+
+Do not route operation failures through Zod/RHF just to display them. Use separate form-level
+actions (Save, Create, Reset) when the operation affects the workflow broadly, not a single
+field value.
+
 ## Field anatomy & the a11y contract
 
 Every field resolves to the same structure ([field.client.tsx](../src/components/ui/field.client.tsx)):

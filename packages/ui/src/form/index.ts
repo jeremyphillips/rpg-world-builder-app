@@ -1,7 +1,7 @@
 // Public surface of the `@rpg/ui/form` subpath: the schema-driven, RHF-aware
 // form layer — the `<Form>` renderer plus the config types + pure helpers.
 
-export { Form, type FormFooterWrapperProps, type FormProps } from './shells/form.client'
+export { Form, type FormProps } from './shells/form.client'
 export {
   useSchemaFormSubmit,
   type SchemaFormSubmitHandler,
@@ -51,7 +51,6 @@ export {
 export {
   TabbedForm,
   collectTabbedFormResolverItems,
-  type TabbedFormFooterWrapperProps,
   type TabbedFormProps,
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
@@ -59,6 +58,21 @@ export { useTabbedFormChrome } from './shells/tabbed-form-chrome.context'
 export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
 export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
 export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
+export {
+  FormShellFooterScope,
+  FormShellFooterSlot,
+  FormShellFooterContent,
+  FormShellFooterPublisher,
+  useFormShellFooterModel,
+  useFormShellFooterFormId,
+  type FormShellFooterModel,
+  type FormShellFooterContentProps,
+  type FormShellFooterPublisherProps,
+} from './chrome/form-shell-footer.context'
+export {
+  FormShellSubmitButton,
+  type FormShellSubmitButtonProps,
+} from './chrome/form-shell-submit-button'
 export {
   formActionsBarActionsRowClasses,
   formActionsBarLeadingGroupClasses,
@@ -69,6 +83,8 @@ export {
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
   formTabPanelsBottomPaddingClasses,
+  formTabbedChromeRhythmStackClasses,
+  formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 
@@ -114,6 +130,7 @@ export {
   type FieldDerivedMetaConfig,
   type FieldDerivedMetaRow,
   type FormValueSync,
+  type TrailingFieldActionConfig,
   type TextFieldConfig,
   type TextSuggestionsFieldConfig,
   type NumberFieldConfig,

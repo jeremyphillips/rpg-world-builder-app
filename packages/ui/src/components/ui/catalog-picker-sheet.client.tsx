@@ -6,6 +6,7 @@ import { InsetPanel } from './inset-panel.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
 import { CatalogToolbar } from './catalog-toolbar.client'
+import { CatalogPickerAuxiliaryActionSlot } from './catalog-picker-auxiliary-action.client'
 import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
 import {
   resolveCatalogPickerSheetFilterRow,
@@ -17,6 +18,7 @@ import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
 import {
   catalogPickerSheetBodyVariants,
   catalogPickerSheetLoadingVariants,
+  catalogPickerToolbarWithAuxiliaryActionVariants,
 } from './catalog-picker-sheet.variants'
 import { cn } from '../../lib/utils'
 import {
@@ -29,6 +31,7 @@ export type {
   CatalogPickerSheetActionsHelpers,
   CatalogPickerTab,
   CatalogPickerRowLayout,
+  CatalogPickerAuxiliaryAction,
 } from './catalog-picker-sheet.types'
 export type {
   CatalogToolbarProps,
@@ -115,6 +118,7 @@ export function CatalogPickerSheet<TItem>({
   transformVisibleItems,
   hasStructuredFilters = false,
   headerExtra,
+  auxiliaryAction,
   footer,
   bodyReplacement,
   emptyState,
@@ -240,6 +244,9 @@ export function CatalogPickerSheet<TItem>({
         ) : pickerEnabled ? (
           <>
             <CatalogToolbar
+              className={catalogPickerToolbarWithAuxiliaryActionVariants({
+                hasAuxiliaryAction: Boolean(auxiliaryAction),
+              })}
               search={{
                 query: searchQuery,
                 onQueryChange: setSearchQuery,
@@ -252,6 +259,8 @@ export function CatalogPickerSheet<TItem>({
               filterRow={renderedFilterRow}
               actions={renderedActions}
             />
+
+            {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
 
             <Sheet.Body
               className={catalogPickerSheetBodyVariants({

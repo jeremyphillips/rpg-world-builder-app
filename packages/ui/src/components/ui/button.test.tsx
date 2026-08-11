@@ -65,6 +65,17 @@ describe('Button', () => {
     )
   })
 
+  it('attached variant fills a segment instead of using standalone button height', () => {
+    render(
+      <Button variant="attached" size="default">
+        Generate
+      </Button>,
+    )
+    const button = screen.getByRole('button', { name: 'Generate' })
+    expect(button).toHaveClass('h-full', 'w-full', 'rounded-r-md')
+    expect(button).not.toHaveClass('h-9')
+  })
+
   it('applies outline button chrome from token recipes', () => {
     render(<Button variant="outline">Cancel</Button>)
     const button = screen.getByRole('button', { name: 'Cancel' })

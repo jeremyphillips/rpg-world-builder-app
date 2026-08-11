@@ -17,6 +17,7 @@ import { normalizeSelected } from './combobox-field.lib'
 import type {
   ComboboxFieldControlProps,
   ComboboxFieldOption,
+  ComboboxRenderOption,
   ComboboxRenderSelectedItem,
   ResolveComboboxFilteredOptions,
 } from './combobox-field.types'
@@ -27,6 +28,7 @@ import { useComboboxControl } from './use-combobox-control.client'
 
 export type {
   ComboboxFieldOption,
+  ComboboxRenderOption,
   ComboboxRenderSelectedItem,
   ComboboxSelectedItemRenderContext,
   ResolveComboboxFilteredOptions,
@@ -50,6 +52,8 @@ export interface ComboboxFieldProps extends SelectFieldValueProps, FieldChromePr
   enableSearch?: boolean
   /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Custom interior for dropdown options; primitive retains label-only fallback and a11y name. */
+  renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
   hintPosition?: FieldHintPosition
@@ -66,6 +70,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
     multiple,
     enableSearch = true,
     renderSelectedItem,
+    renderOption,
   } = props
   const control = useComboboxControl(props)
 
@@ -100,6 +105,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           generatedId={control.generatedId}
           searchInputRef={control.searchInputRef}
           listboxRef={control.listboxRef}
+          renderOption={renderOption}
           onQueryChange={control.handleQueryChange}
           onNavigationKeyDown={control.handleNavigationKeyDown}
           onOpenAutoFocus={control.focusPanelOnOpen}
@@ -146,6 +152,7 @@ export function ComboboxField({
   emptyMessage = 'No options found.',
   enableSearch = true,
   renderSelectedItem,
+  renderOption,
   resolveFilteredOptions,
   hintPosition,
   chrome,
@@ -188,6 +195,7 @@ export function ComboboxField({
             emptyMessage={emptyMessage}
             enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}
+            renderOption={renderOption}
             resolveFilteredOptions={resolveFilteredOptions}
           />
         }

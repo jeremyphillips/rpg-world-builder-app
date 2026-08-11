@@ -1,5 +1,6 @@
 import type { ChoiceSet, ChoiceSetOption } from '@rpg/contracts'
 import type { ComboboxFieldOption, RadioCardOption } from '@rpg/ui'
+import type { FieldOption } from '@rpg/ui/form'
 
 /** Option counts above this use the searchable combobox renderer (e.g. any-tool pools). */
 export const CHOICE_SET_COMBOBOX_OPTION_THRESHOLD = 12
@@ -42,6 +43,15 @@ export function mapChoiceSetOptionsToRadioCardOptions(
     value: option.id,
     label: option.label,
     description: option.description,
+  }))
+}
+
+export function mapFieldOptionsToRadioCardOptions(
+  options: readonly FieldOption[],
+): RadioCardOption[] {
+  return options.map((option) => ({
+    value: option.value,
+    label: option.label,
   }))
 }
 

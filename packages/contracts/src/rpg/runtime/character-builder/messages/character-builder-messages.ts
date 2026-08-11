@@ -125,12 +125,28 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.automaticResolutionStalled',
     () => 'Could not automatically complete this character build.',
   ),
+  automaticConstraintUnsatisfiable: defineMessage<{ constraintLabel: string }>(
+    'validation.characterBuilder.automaticConstraintUnsatisfiable',
+    ({ constraintLabel }) => `Required ${constraintLabel} cannot be satisfied for this build.`,
+  ),
   magicItemGrantIncomplete: defineMessage<{ rarityLabel: string; remaining: number }>(
     'validation.characterBuilder.magicItemGrantIncomplete',
     ({ rarityLabel, remaining }) =>
       remaining === 1
         ? `Choose 1 ${rarityLabel} magic item grant.`
         : `Choose ${remaining} ${rarityLabel} magic item grants.`,
+  ),
+  equipmentPurchaseInvalidItem: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseInvalidItem',
+    () => 'Remove or replace a purchase that is not available for starting gold.',
+  ),
+  equipmentPurchaseInvalidQuantity: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseInvalidQuantity',
+    () => 'Fix purchase quantities so each item has at least one.',
+  ),
+  equipmentPurchaseOverBudget: defineMessage(
+    'validation.characterBuilder.equipmentPurchaseOverBudget',
+    () => 'Reduce purchased equipment so it fits your starting gold.',
   ),
 }
 

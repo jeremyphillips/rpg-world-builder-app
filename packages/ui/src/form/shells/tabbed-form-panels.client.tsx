@@ -57,9 +57,13 @@ export function collectTabbedFormResolverItems(tabs: readonly TabbedFormTab[]): 
   return tabs.flatMap((tab) => [...tab.fields, ...(tab.resolverFields ?? [])])
 }
 
-export interface TabbedFormFooterWrapperProps {
-  footer: React.ReactNode
-  formError: string | null
+export interface TabbedFormFooterRegionProps {
+  hasFooterRegion: boolean
+  stickyChrome: boolean
+  stickyActionsBarClassName?: string
+  formError?: string | null
+  validationSummary?: React.ReactNode
+  resolvedFooter: React.ReactNode
 }
 
 interface UseTabbedFormSetupOptions<TFieldValues extends FieldValues> {
@@ -197,21 +201,16 @@ export function TabbedFormPanels({
   )
 }
 
-interface TabbedFormFooterRegionProps {
-  footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode
-  hasFooterRegion: boolean
-  stickyChrome: boolean
-  stickyActionsBarClassName?: string
-  formError?: string | null
-  validationSummary?: React.ReactNode
-  resolvedFooter: React.ReactNode
-}
+interface TabbedFormFooterRegionInternalProps extends TabbedFormFooterRegionProps {}
 
 function TabbedFormFlatFooter({
   formError,
   validationSummary,
   resolvedFooter,
-}: Pick<TabbedFormFooterRegionProps, 'formError' | 'validationSummary' | 'resolvedFooter'>) {
+}: Pick<
+  TabbedFormFooterRegionInternalProps,
+  'formError' | 'validationSummary' | 'resolvedFooter'
+>) {
   return (
     <>
       {formError ? (
@@ -226,19 +225,12 @@ function TabbedFormFlatFooter({
 }
 
 export function TabbedFormFooterRegion({
-  footerWrapper,
-  hasFooterRegion,
   stickyChrome,
   stickyActionsBarClassName,
   formError,
   validationSummary,
   resolvedFooter,
-}: TabbedFormFooterRegionProps) {
-  if (footerWrapper) {
-    if (!hasFooterRegion) return null
-    return footerWrapper({ footer: resolvedFooter, formError: formError ?? null })
-  }
-
+}: TabbedFormFooterRegionInternalProps) {
   if (stickyChrome) {
     return (
       <FormActionsBar
@@ -263,7 +255,7 @@ export function TabbedFormFooterRegion({
 export function resolveTabbedFormShellClassName(
   className: string | undefined,
   stickyChrome: boolean,
-  footerWrapper?: (props: TabbedFormFooterWrapperProps) => React.ReactNode,
+  externalFooter?: boolean,
 ): string | undefined {
-  return cn(footerWrapper ? undefined : stickyChrome ? undefined : 'space-y-6', className)
+  return cn(externalFooter ? undefined : stickyChrome ? undefined : 'space-y-6', className)
 }

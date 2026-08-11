@@ -397,4 +397,220 @@ describe('CatalogPickerSheet', () => {
     expect(rowShell).toHaveClass('p-0')
     expect(rowShell).not.toHaveClass('pl-2')
   })
+
+  it('does not reduce toolbar bottom padding when auxiliaryAction is absent', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+      />,
+    )
+
+    const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
+    expect(toolbar).toHaveClass('pb-4')
+    expect(toolbar).not.toHaveClass('pb-0')
+  })
+
+  it('reduces toolbar bottom padding when auxiliaryAction is present', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
+    expect(toolbar).toHaveClass('pb-0')
+    expect(toolbar).not.toHaveClass('pb-4')
+  })
+
+  it('renders auxiliaryAction after search and before results', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const action = screen.getByRole('button', { name: 'Create item' })
+    const result = screen.getByText('Alpha Item')
+
+    expect(search.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(action.compareDocumentPosition(result) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('keeps auxiliaryAction outside the scrollable body', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    const action = screen.getByRole('button', { name: 'Create item' })
+    const result = screen.getByText('Alpha Item')
+    const scrollBody = result.closest('.overflow-y-auto')
+
+    expect(scrollBody).toBeTruthy()
+    expect(scrollBody).not.toContainElement(action)
+  })
+
+  it('invokes auxiliaryAction onAction when clicked', async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn()
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction,
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create item' }))
+    expect(onAction).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps auxiliaryAction visible when results are empty or filtered out', async () => {
+    const user = userEvent.setup()
+
+    const { rerender } = render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={[] as DemoItem[]}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        noItemsMessage="No items available."
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Create item' })).toBeInTheDocument()
+    expect(screen.getByText('No items available.')).toBeInTheDocument()
+
+    rerender(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'zzz')
+    expect(screen.getByRole('button', { name: 'Create item' })).toBeInTheDocument()
+    expect(screen.getByText('No items match your search.')).toBeInTheDocument()
+  })
+
+  it('renders unavailable auxiliaryAction as hint text instead of a button', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'unavailable',
+          message: 'Creation is unavailable.',
+        }}
+      />,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: 'Creation is unavailable.' }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Creation is unavailable.')).toBeInTheDocument()
+  })
+
+  it('orders toolbar, auxiliaryAction, scroll body, and footer in the DOM', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'action',
+          label: 'Create item',
+          onAction: vi.fn(),
+        }}
+        footer={<button type="button">Submit</button>}
+      />,
+    )
+
+    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const action = screen.getByRole('button', { name: 'Create item' })
+    const result = screen.getByText('Alpha Item')
+    const footer = screen.getByRole('button', { name: 'Submit' })
+
+    expect(search.compareDocumentPosition(action) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(action.compareDocumentPosition(result) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(result.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
 })

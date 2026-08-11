@@ -16,6 +16,7 @@ import type {
 } from './types'
 import { validateChoiceSetsForStep } from './validate-choice-sets'
 import { validateEquipment } from './validate-equipment'
+import { validateEquipmentPurchases } from './validate-equipment-purchases'
 import {
   validateAbilities,
   validateClass,
@@ -154,6 +155,9 @@ export function validateCharacterBuild(
     return { ok: issues.length === 0, issues }
   }
 
-  const issues = validateAllSteps(draft, context, choiceSets, true)
+  const issues = [
+    ...validateAllSteps(draft, context, choiceSets, true),
+    ...validateEquipmentPurchases(draft, context),
+  ]
   return { ok: issues.length === 0, issues }
 }

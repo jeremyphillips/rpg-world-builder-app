@@ -24,6 +24,16 @@ import type { CharacterBuildValidationIssue } from '../validate/types'
 import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 
 import {
+  fillChoiceSetWithConstraintAwareSelection,
+  automaticNpcConstraintFailureIssue,
+  applyRequiredWeaponEquipmentGrants,
+  validateAutomaticNpcConstraintsSatisfied,
+} from './automatic-npc-build-constraint-selection'
+import {
+  normalizeAutomaticNpcBuildConstraints,
+  type AutomaticNpcBuildConstraints,
+} from './automatic-npc-build-constraints'
+import {
   validateAutomaticNpcBuildSeed,
   type AutomaticNpcBuildSeed,
 } from './automatic-npc-build-seed'
@@ -58,6 +68,12 @@ export type AutomaticNpcBuildFailure = {
 }
 
 export type AutomaticNpcBuildResult = AutomaticNpcBuildSuccess | AutomaticNpcBuildFailure
+
+export type ResolveAutomaticNpcBuildArgs = {
+  seed: AutomaticNpcBuildSeed
+  constraints?: AutomaticNpcBuildConstraints
+  context: CharacterBuildContext
+}
 
 /**
  * Safety guard against resolver bugs only — termination is progress-based
@@ -110,17 +126,6 @@ function findUnsatisfiedRequiredChoiceSet(
   )
 }
 
-function unsatisfiedChoiceSetIssue(choiceSet: ChoiceSet): CharacterBuildValidationIssue {
-  return validationIssue(
-    'choice_set_unsatisfied',
-    characterBuilderValidationMessages.choiceSetUnsatisfied({
-      label: choiceSet.label,
-      min: choiceSet.min,
-    }),
-    { stepId: getChoiceSetStepId(choiceSet), choiceSetId: choiceSet.id },
-  )
-}
-
 /**
  * Mirrors the builder's escape hatch: when the class's top-level starting
  * equipment ChoiceSet has no options, the build continues without starting
@@ -141,29 +146,11 @@ function heritageChoiceSetIdFor(choiceSet: ChoiceSet): string {
   return buildChoiceSetId('species', choiceSet.sourceId, 'heritage')
 }
 
-/**
- * Selects the first eligible options (canonical resolver-owned order) until
- * `min` is reached. Returns null when no new eligible option exists — the
- * no-progress failure condition.
- */
-function fillChoiceSetWithFirstEligible(
-  draft: CharacterBuilderDraft,
+function applyChoiceSetSelection(
   choiceSet: ChoiceSet,
-): CharacterBuilderDraft | null {
-  const current = draft.choiceSelections[choiceSet.id] ?? []
-  const selectedIds = new Set(current)
-  const additions = choiceSet.options
-    .map((option) => option.id)
-    .filter((optionId) => !selectedIds.has(optionId))
-    .slice(0, Math.max(0, choiceSet.min - current.length))
-
-  if (additions.length === 0) return null
-
-  const selections = [...current, ...additions]
-  const next: CharacterBuilderDraft = {
-    ...draft,
-    choiceSelections: { ...draft.choiceSelections, [choiceSet.id]: selections },
-  }
+  next: CharacterBuilderDraft,
+): CharacterBuilderDraft {
+  const selections = next.choiceSelections[choiceSet.id] ?? []
 
   // Heritage selections dual-write species.heritageId (mirrors the species step).
   if (choiceSet.sourceType === 'species' && choiceSet.id === heritageChoiceSetIdFor(choiceSet)) {
@@ -286,14 +273,18 @@ function completeMagicItemGrantSelections(
  * contextual patches such as connections — for the single authoritative
  * finalSubmit validation.
  */
-export function resolveAutomaticNpcBuild(
-  seed: AutomaticNpcBuildSeed,
-  context: CharacterBuildContext,
-): AutomaticNpcBuildResult {
+export function resolveAutomaticNpcBuild({
+  seed,
+  constraints,
+  context,
+}: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
   if (seedIssues.length > 0) return { ok: false, issues: seedIssues }
 
+  const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
+
   let draft = seedDraft(seed, context)
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
 
   for (let iteration = 0; iteration < AUTOMATIC_BUILD_ITERATION_CEILING; iteration += 1) {
     const choiceSets = resolveAvailableChoices(draft, context)
@@ -303,10 +294,27 @@ export function resolveAutomaticNpcBuild(
       const completion = completeMagicItemGrantSelections(draft, context)
       if (!completion.ok) return completion
 
+      const grantCompletion = applyRequiredWeaponEquipmentGrants({
+        draft: completion.draft,
+        constraints: normalizedConstraints,
+        context,
+        catalogIndex,
+      })
+      if (!grantCompletion.ok) return grantCompletion
+
+      const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
+        grantCompletion.draft,
+        normalizedConstraints,
+        catalogIndex,
+      )
+      if (constraintIssue) {
+        return { ok: false, issues: [constraintIssue] }
+      }
+
       return {
         ok: true,
-        draft: completion.draft,
-        resolvedChoiceSets: resolveAvailableChoices(completion.draft, context),
+        draft: grantCompletion.draft,
+        resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
       }
     }
 
@@ -315,11 +323,22 @@ export function resolveAutomaticNpcBuild(
       continue
     }
 
-    const next = fillChoiceSetWithFirstEligible(draft, target)
+    const characterClass =
+      target.sourceType === 'class' ? catalogIndex.classes.get(target.sourceId) : undefined
+    const next = fillChoiceSetWithConstraintAwareSelection({
+      draft,
+      choiceSet: target,
+      constraints: normalizedConstraints,
+      characterClass,
+      catalogIndex,
+    })
     if (next === null) {
-      return { ok: false, issues: [unsatisfiedChoiceSetIssue(target)] }
+      return {
+        ok: false,
+        issues: [automaticNpcConstraintFailureIssue(normalizedConstraints, target, catalogIndex)],
+      }
     }
-    draft = next
+    draft = applyChoiceSetSelection(target, next)
   }
 
   return {

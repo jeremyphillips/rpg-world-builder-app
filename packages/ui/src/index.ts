@@ -104,6 +104,11 @@ export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
+  InputActionGroup,
+  type InputActionGroupActionProps,
+  type InputActionGroupProps,
+} from './components/ui/input-action-group.client'
+export {
   NumberInput,
   type NumberInputDigits,
   type NumberInputProps,
@@ -138,10 +143,16 @@ export {
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
+  fieldGroupedControlActionPaddingClasses,
+  fieldGroupedControlGeometryClasses,
+  fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
+  fieldGroupedControlStartPaddingClasses,
   buttonSizeToComboboxFieldSize,
   fieldSizeToArrayAddButtonSize,
+  fieldSizeToAttachedButtonSize,
   resolveArrayAddButtonSize,
+  resolveAttachedButtonSize,
   fieldSizeToBadgeSize,
   fieldSizeToChipSize,
   fieldSizeTypographyClasses,
@@ -553,11 +564,18 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelStableBodyVariants,
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionClasses,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
+export {
+  DialogPanelActionRow,
+  type DialogPanelActionRowProps,
+} from './components/ui/dialog-panel-action-row.client'
 export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
@@ -598,6 +616,7 @@ export {
   type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
   type CatalogPickerRowLayout,
+  type CatalogPickerAuxiliaryAction,
   type CatalogToolbarProps,
   type CatalogToolbarSearch,
   type CatalogToolbarTab,
@@ -635,6 +654,11 @@ export {
   type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
+export {
+  usePendingAwareOpenChange,
+  type UsePendingAwareOpenChangeOptions,
+  type UsePendingAwareOpenChangeReturn,
+} from './hooks/use-pending-aware-open-change.client'
 
 export {
   Wizard,
@@ -676,6 +700,7 @@ export {
   ComboboxField,
   type ComboboxFieldProps,
   type ComboboxFieldOption,
+  type ComboboxRenderOption,
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'

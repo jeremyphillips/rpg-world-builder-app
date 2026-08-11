@@ -9,11 +9,14 @@ path as a manually built character.
 
 ## Modules
 
-| Export                          | Module                                     | Purpose                                                                  |
-| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| `automaticNpcBuildSeedSchema`   | `automatic/automatic-npc-build-seed.ts`    | Zod schema for the compact seed (name, species, class, level, alignment) |
-| `validateAutomaticNpcBuildSeed` | `automatic/automatic-npc-build-seed.ts`    | Seed content validation against the build context (UI-independent)       |
-| `resolveAutomaticNpcBuild`      | `automatic/resolve-automatic-npc-build.ts` | Seed + context → completed draft or structured failure                   |
+| Export                               | Module                                         | Purpose                                                                     |
+| ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment)    |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)          |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                    |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                        |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure          |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -67,12 +70,50 @@ passed to finalize as engine options.
    returns `ok: false` with the existing `choice_set_unsatisfied` issue for
    the stuck ChoiceSet. No partial character is ever produced.
 
+## Constraints (Quick NPC requirements)
+
+Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:
+
+```ts
+resolveAutomaticNpcBuild({
+  seed,
+  constraints?: { requiredWeaponIds: string[]; requiredSpellIds: string[] },
+  context,
+})
+```
+
+Constraint id arrays are **unordered sets** — canonicalize (sort + dedupe) before resolve.
+The resolver verifies every required id is satisfied in the resolved draft; individually
+reachable options that cannot be combined still fail with `automatic_constraint_unsatisfiable`.
+
+| Layer                                                        | Role                                                                                                                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `listReachableStartingWeapons` / `listReachableSpellOptions` | **Advisory** — `listReachableSpellOptions` for spell requirement pickers; weapon pickers use campaign-available equipment via `resolveAvailableContent` |
+| `resolveAutomaticNpcBuild`                                   | **Authority** — whether the full constraint set is satisfiable amid choice dependencies                                                                 |
+
+Picker eligibility does **not** imply build validity. When constraints cannot be
+satisfied (e.g. required spells exceed capacity, or a required weapon is not
+campaign-available), the resolver returns `ok: false` with
+`automatic_constraint_unsatisfiable` — it does not drop requirements to force
+success.
+
+Selection policy with constraints:
+
+- Required weapon/spell selections are applied **before** remaining first-eligible defaults.
+- Starting-equipment package ChoiceSets bias toward the first authored package that can produce **all** required weapons together when possible; gold-only packages never satisfy package bias alone.
+- Nested equipment pool picks prefer required weapons when they appear in the pool.
+- Required weapons still missing from assembled inventory after package/pool resolution receive domain `ensureEquipmentGrant` rows (not purchases) when campaign-available — including at zero starting funds.
+- Post-resolution validation ensures every `requiredWeaponIds` / `requiredSpellIds` entry is present in assembled inventory / choice selections respectively.
+
 ## Determinism (V1)
 
-Same seed + same catalog ⇒ deep-equal draft. Ordering is owned by the
+Same seed + same constraints + same catalog ⇒ deep-equal draft. Ordering is owned by the
 registered resolvers (e.g. spells are name-sorted; class skills follow
 authored order) — never incidental object-key, Mongo, or API response order.
 Regression coverage includes a catalog-insertion-order inversion test.
+
+**Name generation is independent:** explicit Quick NPC name Generate may be random;
+do not treat name-generator non-determinism as a build-resolver failure in tests.
 
 Randomized or preset-driven generation later supplies richer seeds (or a
 pluggable selection policy) to this same entry point — do not introduce a
@@ -83,7 +124,8 @@ second assembly path.
 - **Quick NPC** (dashboard): `apps/dashboard/src/features/character/npc/lib/quick-npc-create.ts`
   wraps the resolver, injects the organization membership connection, and
   finalizes — one atomic `POST /api/campaigns/:id/npcs` carries the
-  membership in `connections.organizations`. Entry surface: the organization
-  Members "Add member" drawer (`OrganizationMemberPickerDrawer`), which swaps
-  its body for `QuickNpcCreateForm` while preserving both views' state for
-  the drawer session.
+  membership in `connections.organizations`. Entry surface: organization detail
+  → **Add member** drawer (`OrganizationMemberPickerDrawer`) → character-owned
+  `QuickNpcCreateModal` (Setup then TabbedForm authoring). The organizations hook
+  coordinates overlay modes only; it does not embed creation inside the drawer.
+  Dashboard policy: [character-acquisition.md](../../../../apps/dashboard/docs/character-acquisition.md#quick-npc-organization-member).

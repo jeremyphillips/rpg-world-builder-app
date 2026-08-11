@@ -1,7 +1,7 @@
 'use client'
 
 import type { z } from 'zod'
-import { useRef, useState, type MutableRefObject, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
@@ -64,6 +64,7 @@ export type LocationCreateFormProps = {
   formKey: string
   /** When false, form stays mounted for dirty tracking but is not shown. */
   visible?: boolean
+  onPendingChange?: (pending: boolean) => void
 }
 
 type LocationCreateFormBodyProps = LocationCreateFormProps
@@ -98,6 +99,7 @@ function LocationCreateFormShell({
   onTrustedClose,
   formKey,
   visible = true,
+  onPendingChange,
   campaignAccessDraftRef,
   fields,
   pending,
@@ -105,6 +107,10 @@ function LocationCreateFormShell({
   onSubmit,
   formError,
 }: LocationCreateFormShellProps) {
+  useEffect(() => {
+    onPendingChange?.(pending)
+  }, [onPendingChange, pending])
+
   const locationCtx: LocationFormCtx = {
     ...optionsCtx,
     campaignId,

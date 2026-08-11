@@ -200,17 +200,17 @@ describe('CollapsibleRadioCardField', () => {
     const { container } = render(<ControlledCompactField />)
 
     const expandedOption = screen.getByRole('radio', { name: /Governs/i })
-    expect(expandedOption).toHaveClass('pl-3', 'pr-4', 'py-2.5')
+    expect(expandedOption).toHaveClass('pl-3', 'pr-4', 'py-2')
 
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
 
     const summaryBody = container.querySelector('article > div')
-    expect(summaryBody).toHaveClass('px-4', 'py-2.5', 'gap-0')
+    expect(summaryBody).toHaveClass('px-4', 'py-2', 'gap-0')
 
     await user.click(screen.getByRole('button', { name: 'Change connection type' }))
 
     const reExpandedOption = screen.getByRole('radio', { name: /Governs/i })
-    expect(reExpandedOption).toHaveClass('pl-3', 'pr-4', 'py-2.5')
+    expect(reExpandedOption).toHaveClass('pl-3', 'pr-4', 'py-2')
     expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
   })
 })

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useRef } from 'react'
-import { Button, Text, dialogPanelActionRowClasses, dialogPanelSectionInsetXClasses } from '@rpg/ui'
+import { Button, dialogPanelSectionInsetXClasses } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import type { ContentFormHostLeaveBridge } from '../../lib/forms/shells/content-form-host.client'
 import { ContentFormOptionsGate } from '../../lib/forms/shells/content-form-shell-layout'
@@ -36,41 +37,36 @@ function LocationCreateFormStory({
       {(optionsCtx) => (
         <div className="mx-auto max-w-lg rounded-lg border border-border bg-card shadow-sm">
           <div className="border-b border-border px-4 py-3 text-sm font-medium">Create form</div>
-          <LocationCreateForm
-            fixedCreate={fixedCreate}
-            campaignId={STORY_CAMPAIGN_ID}
-            optionsCtx={optionsCtx}
-            mounted
-            leaveGuardEnabled={false}
-            leaveBridgeRef={leaveBridgeRef}
-            formKey={`story-${authoringType}`}
-            onTrustedClose={() => undefined}
-            chrome={({ pending }) => ({
-              contentWrapper: (content) => (
-                <div className={dialogPanelSectionInsetXClasses}>{content}</div>
-              ),
-              footerWrapper: ({ footer, formError }) => (
-                <div className="border-t border-border px-4 py-3">
-                  {formError ? (
-                    <Text variant="destructive" role="alert">
-                      {formError}
-                    </Text>
-                  ) : null}
-                  <div className={dialogPanelActionRowClasses}>{footer}</div>
-                </div>
-              ),
-              footer: () => (
-                <>
-                  <Button type="button" variant="outline" disabled={pending}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={pending}>
-                    {formatContentCreateActionLabel('locations')}
-                  </Button>
-                </>
-              ),
-            })}
-          />
+          <FormShellFooterScope>
+            <LocationCreateForm
+              fixedCreate={fixedCreate}
+              campaignId={STORY_CAMPAIGN_ID}
+              optionsCtx={optionsCtx}
+              mounted
+              leaveGuardEnabled={false}
+              leaveBridgeRef={leaveBridgeRef}
+              formKey={`story-${authoringType}`}
+              onTrustedClose={() => undefined}
+              chrome={({ pending }) => ({
+                contentWrapper: (content) => (
+                  <div className={dialogPanelSectionInsetXClasses}>{content}</div>
+                ),
+                footer: () => (
+                  <>
+                    <Button type="button" variant="outline" disabled={pending}>
+                      Cancel
+                    </Button>
+                    <FormShellSubmitButton disabled={pending}>
+                      {formatContentCreateActionLabel('locations')}
+                    </FormShellSubmitButton>
+                  </>
+                ),
+              })}
+            />
+            <div className="border-t border-border px-4 py-3">
+              <FormShellFooterSlot />
+            </div>
+          </FormShellFooterScope>
         </div>
       )}
     </ContentFormOptionsGate>

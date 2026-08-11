@@ -77,7 +77,21 @@ export type EquipmentPickerCallout = {
 
 export type EquipmentPickerCalloutContext = {
   isGoldShoppingPath?: boolean
+  /**
+   * When set, only callouts whose semantic status is listed are eligible.
+   * Composition over rule-id filters — use to show proficiency warnings without
+   * Essential/Standard acquisition badges (e.g. Quick NPC Requirements).
+   */
+  visibleStatuses?: readonly EquipmentPickerCalloutSemanticStatus[]
 }
+
+export type EquipmentPickerCalloutSemanticStatus =
+  | 'not_proficient'
+  | 'essential'
+  | 'standard'
+  | 'blocking'
+  | 'compatibility'
+  | 'info'
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
