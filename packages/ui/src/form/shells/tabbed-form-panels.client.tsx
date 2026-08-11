@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/ta
 import { FormItems } from '../containers/form-items.client'
 import { ArrayItemPresentationContext } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
+import { resolveFormDensity } from '../form-density'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
@@ -162,7 +163,8 @@ export function TabbedFormPanels({
   stickyTabsClassName,
   omitPanelBottomPadding,
 }: TabbedFormPanelsProps) {
-  const { rhythm } = useFormSectionContext()
+  const { density } = useFormSectionContext()
+  const { rhythm } = resolveFormDensity(density)
   const { tabStates } = useTabbedFormTabValidationState(tabs)
   const tabStateById = React.useMemo(
     () => new Map(tabStates.map((state) => [state.tabId, state])),

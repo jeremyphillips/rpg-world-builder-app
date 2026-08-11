@@ -26,7 +26,7 @@ export const identityFields: FormItem[] = [
     type: 'text',
     name: 'name',
     label: 'Campaign name',
-    size: 'lg',
+    controlSizeOverride: 'lg',
     placeholder: 'Your campaign name',
     required: true,
   },

@@ -26,7 +26,7 @@ function SelectionModeStory({ defaultResolution }: SelectionModeStoryArgs) {
       fields={resolutionFields(formCtx)}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
-      rhythm="compact"
+      density="compact"
     />
   )
 }

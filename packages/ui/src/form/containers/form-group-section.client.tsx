@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { FieldGroup } from '../../components/ui/field-group'
-import { resolveFieldStackRhythm } from '../../components/ui/field.variants'
+import { resolveFormDensity } from '../form-density'
 import { cn } from '../../lib/utils'
 import {
   FormSectionContext,
@@ -40,14 +40,12 @@ export function GroupFieldSection({
   const { uiStateKey } = useFormUiContext()
   const { control } = useFormContext()
   const legendSize = item.legendSize ?? (parentContext.inGroup ? 'subsection' : 'section')
-  const groupRhythm = resolveFieldStackRhythm({
-    explicit: item.rhythm,
-    inherited: parentContext.rhythm,
-  })
+  const groupDensity = item.density ?? parentContext.density
+  const { rhythm: groupRhythm, size: groupSize } = resolveFormDensity(groupDensity)
   const childContext = React.useMemo(
     () =>
-      buildFormSectionChildContext(parentContext, depth, { rhythm: groupRhythm, inGroup: true }),
-    [parentContext, depth, groupRhythm],
+      buildFormSectionChildContext(parentContext, depth, { density: groupDensity, inGroup: true }),
+    [parentContext, depth, groupDensity],
   )
 
   return (
@@ -56,6 +54,7 @@ export function GroupFieldSection({
       legend={item.legend}
       legendSize={legendSize}
       rhythm={groupRhythm}
+      size={groupSize}
       description={item.description}
       className={cn(
         item.className,

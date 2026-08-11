@@ -4,16 +4,17 @@ import { FieldGroup } from '../../../components/ui/field-group'
 import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
 import { hasActiveFieldChrome } from '../../../components/ui/field-chrome.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
+import type { FieldRhythm } from '../../../components/ui/field.variants'
 import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
 import { Text } from '../../../components/ui/text'
-import { FormRhythmStack, type FormSectionContextValue } from '../../context/form-section.context'
+import { FormRhythmStack } from '../../context/form-section.context'
 import type { SlotConfig } from '../../field-config'
 
 export function buildSlotFieldBody(
   config: SlotConfig,
   content: ReactNode,
-  rhythm: FormSectionContextValue['rhythm'],
-  size: FormSectionContextValue['size'],
+  rhythm: FieldRhythm,
+  size: FieldSize,
 ): ReactNode | null {
   if (config.label) {
     return (

@@ -29,7 +29,6 @@ function buildNpcStatusEditorFields(): FormItem[] {
       name: 'rosterStatus',
       label: 'Roster status',
       width: 'full',
-      size: 'sm',
       options: CHARACTER_ROSTER_STATUSES.map((value) => ({
         value,
         label: CHARACTER_ROSTER_STATUS_ENTRIES[value].label,
@@ -40,7 +39,6 @@ function buildNpcStatusEditorFields(): FormItem[] {
       name: 'rosterNote',
       label: 'Roster note',
       width: 'full',
-      size: 'sm',
       rows: 3,
     },
     {
@@ -48,7 +46,6 @@ function buildNpcStatusEditorFields(): FormItem[] {
       name: 'vitalStatus',
       label: 'Vital status',
       width: 'full',
-      size: 'sm',
       options: CHARACTER_VITAL_STATUSES.map((value) => ({
         value,
         label: CHARACTER_VITAL_STATUS_ENTRIES[value].label,
@@ -59,7 +56,6 @@ function buildNpcStatusEditorFields(): FormItem[] {
       name: 'vitalNote',
       label: 'Vital note',
       width: 'full',
-      size: 'sm',
       rows: 3,
     },
   ]
@@ -111,12 +107,7 @@ export function NpcStatusEditor({
         <Modal.Body>
           <FormProvider {...form}>
             <form id={formId} onSubmit={(event) => void handleSubmit(event)} className="space-y-4">
-              <FormFieldStack
-                fields={STATUS_EDITOR_FIELDS}
-                idPrefix={formId}
-                size="md"
-                rhythm="comfortable"
-              />
+              <FormFieldStack fields={STATUS_EDITOR_FIELDS} idPrefix={formId} density="compact" />
               {roster.changedAt ? (
                 <Text variant="muted">
                   Roster updated {new Date(roster.changedAt).toLocaleString()}

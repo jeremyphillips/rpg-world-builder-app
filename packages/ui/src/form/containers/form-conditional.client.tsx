@@ -2,11 +2,8 @@
 
 import * as React from 'react'
 
-import {
-  fieldSeparatorVariants,
-  type FieldSeparator,
-  type FieldStackRhythm,
-} from '../../components/ui/field.variants'
+import { fieldSeparatorVariants, type FieldSeparator } from '../../components/ui/field.variants'
+import { resolveFormDensity } from '../form-density'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import type { FieldConfig, FieldVisibility } from '../field-config'
 import { useFormSectionContext } from '../context/form-section.context'
@@ -22,19 +19,13 @@ export function useVisibilityValues(
 
 export interface FieldSeparatorWrapperProps {
   separator?: FieldSeparator
-  /** Overrides inherited section rhythm — use when slot child context differs from the sibling stack. */
-  rhythm?: FieldStackRhythm
   children: React.ReactNode
 }
 
 /** Applies an optional trailing divider wrapper, inheriting stack rhythm from section context. */
-export function FieldSeparatorWrapper({
-  separator,
-  rhythm: rhythmOverride,
-  children,
-}: FieldSeparatorWrapperProps) {
-  const { rhythm: contextRhythm } = useFormSectionContext()
-  const rhythm = rhythmOverride ?? contextRhythm
+export function FieldSeparatorWrapper({ separator, children }: FieldSeparatorWrapperProps) {
+  const { density } = useFormSectionContext()
+  const { rhythm } = resolveFormDensity(density)
   if (!separator) return children
   return (
     <div data-field-separator="" className={fieldSeparatorVariants({ tone: separator, rhythm })}>

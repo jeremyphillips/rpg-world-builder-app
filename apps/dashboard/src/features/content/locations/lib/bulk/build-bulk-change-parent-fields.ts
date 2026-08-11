@@ -49,7 +49,6 @@ export function buildBulkChangeParentFields(campaignLocations: readonly Location
       label: BULK_CHANGE_PARENT_PARENT_FIELD_LABEL,
       placeholder: BULK_CHANGE_PARENT_PARENT_FIELD_PLACEHOLDER,
       width: 'full',
-      size: 'sm',
       options: [
         { value: BULK_CHANGE_PARENT_NONE_SENTINEL, label: BULK_CHANGE_PARENT_NONE_OPTION_LABEL },
         ...locationOptions,

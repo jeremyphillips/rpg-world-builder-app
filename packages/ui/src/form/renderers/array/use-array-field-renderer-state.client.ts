@@ -24,6 +24,7 @@ import {
 } from '../../config/array/array-item-config.lib'
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
+import { resolveFormDensity } from '../../form-density'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
@@ -54,7 +55,8 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { rhythm, size, depth, inRhythmStack } = useFormSectionContext()
+  const { density, depth, inRhythmStack } = useFormSectionContext()
+  const { rhythm, size } = resolveFormDensity(density)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
   const {

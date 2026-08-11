@@ -46,7 +46,7 @@ export function movementArrayField(): FormItem {
     legend: 'Movement',
     addAction: { label: 'Add speed', layout: 'inline', size: 'sm' },
     min: 1,
-    size: 'md',
+    density: 'comfortable',
     item: {
       variant: 'compact',
       inlineAlign: 'center',

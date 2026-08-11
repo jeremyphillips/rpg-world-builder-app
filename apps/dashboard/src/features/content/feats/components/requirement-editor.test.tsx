@@ -29,7 +29,7 @@ function EditorShell({
   const form = useForm({ defaultValues: { prerequisiteEditor } })
   return (
     <FormProvider {...form}>
-      <FormSectionProvider rhythm="compact">
+      <FormSectionProvider density="compact">
         <RequirementEditor name="prerequisiteEditor" />
       </FormSectionProvider>
     </FormProvider>

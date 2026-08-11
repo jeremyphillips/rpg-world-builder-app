@@ -145,8 +145,6 @@ export function ContentFormHost<TFormValues extends FieldValues>({
       valueSyncs={form.valueSyncs}
       className={formClassName}
       contentClassName={contentClassName}
-      rhythm="comfortable"
-      size="md"
       formError={formError}
       header={form.header}
       onSubmit={handleSubmit}

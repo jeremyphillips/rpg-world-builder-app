@@ -7,6 +7,7 @@ import {
   useFormSectionContext,
   type FormSectionContextValue,
 } from '../../context/form-section.context'
+import { resolveFormDensity } from '../../form-density'
 import type { SlotConfig } from '../../field-config'
 import {
   useVisibilityValues,
@@ -17,24 +18,20 @@ import { buildSlotFieldBody, wrapSlotFieldBody } from './slot-field-renderer.lib
 
 export interface SlotFieldRendererProps {
   config: SlotConfig
-  /** Sibling-stack rhythm for trailing separators — slots default child context to compact. */
-  stackRhythm?: FormSectionContextValue['rhythm']
-  /** Sibling-stack size for field chrome padding — slots default child context to `sm`. */
-  stackSize?: FormSectionContextValue['size']
 }
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
-export function SlotFieldRenderer({ config, stackRhythm, stackSize }: SlotFieldRendererProps) {
-  const { rhythm, size } = useFormSectionContext()
+export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
+  const { density } = useFormSectionContext()
+  const { rhythm, size } = resolveFormDensity(density)
   const content = config.render()
-  const chromeSize = stackSize ?? size
 
   const body = buildSlotFieldBody(config, content, rhythm, size)
   if (body == null) return null
 
   return (
-    <FieldSeparatorWrapper separator={config.separator} rhythm={stackRhythm}>
-      {wrapSlotFieldBody(body, config, chromeSize)}
+    <FieldSeparatorWrapper separator={config.separator}>
+      {wrapSlotFieldBody(body, config, size)}
     </FieldSeparatorWrapper>
   )
 }
@@ -48,17 +45,13 @@ interface SlotFormItemSectionProps {
 
 function SlotFormItemSectionInner({ item, parentContext, depth }: SlotFormItemSectionProps) {
   const slotChildContext = React.useMemo(
-    () => buildSlotSectionChildContext(parentContext, depth, item),
-    [parentContext, depth, item],
+    () => buildSlotSectionChildContext(parentContext, depth),
+    [parentContext, depth],
   )
 
   return (
     <FormSectionContext.Provider value={slotChildContext}>
-      <SlotFieldRenderer
-        config={item}
-        stackRhythm={parentContext.rhythm}
-        stackSize={parentContext.size}
-      />
+      <SlotFieldRenderer config={item} />
     </FormSectionContext.Provider>
   )
 }

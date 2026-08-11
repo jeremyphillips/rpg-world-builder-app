@@ -20,15 +20,15 @@ type Story = StoryObj
 
 function EditorStory({
   prerequisiteEditor = requirementEditorDefaultValue(),
-  size,
+  density,
 }: {
   prerequisiteEditor?: PrerequisiteEditorValue
-  size?: 'md'
+  density?: 'comfortable'
 }) {
   const form = useForm({ defaultValues: { prerequisiteEditor } })
   return (
     <FormProvider {...form}>
-      <FormSectionProvider rhythm="compact" size={size}>
+      <FormSectionProvider density={density ?? 'compact'}>
         <RequirementEditor name="prerequisiteEditor" />
       </FormSectionProvider>
     </FormProvider>
@@ -59,7 +59,7 @@ export const SpellRecall: Story = {
 export const MediumScale: Story = {
   render: () => (
     <EditorStory
-      size="md"
+      density="comfortable"
       prerequisiteEditor={requirementExpressionToEditor(GRAPPLER.prerequisite)}
     />
   ),

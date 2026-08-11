@@ -132,7 +132,6 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   const levelDigits = levelSelectDigits(ctx)
   const stack: DependentConfig = {
     kind: 'dependent',
-    rhythm: 'comfortable',
     controller: {
       type: 'switch',
       name: 'hasSpellcasting',

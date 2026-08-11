@@ -8,6 +8,7 @@ import {
   fieldArrayItemListClasses,
   FormSectionContext,
   registerArrayFieldMutators,
+  resolveFormDensity,
   useFormSectionContext,
 } from '@rpg/ui/form'
 
@@ -42,7 +43,7 @@ export function SpellResolutionOutcomeApplicationsList({
     () =>
       buildFormSectionChildContext(parentContext, parentContext.depth, {
         arrayItemSurface: { emphasis: 'subtle' },
-        size: 'sm',
+        density: 'compact',
       }),
     [parentContext],
   )
@@ -55,9 +56,10 @@ export function SpellResolutionOutcomeApplicationsList({
     })
   }, [form, fullName, fields, remove])
 
+  const { rhythm, size } = resolveFormDensity(listContext.density)
   const listClasses = fieldArrayItemListClasses({
-    rhythm: listContext.rhythm,
-    size: listContext.size,
+    rhythm,
+    size,
   })
 
   if (fields.length === 0) return null

@@ -1,17 +1,17 @@
 # Form containers
 
-Structural items in a `fields` config: groups, rows, stacks, arrays, and slots. Rhythm
-and size defaults: [forms hub — Form rhythm](../forms.md#form-rhythm).
+Structural items in a `fields` config: groups, rows, stacks, arrays, and slots. Density
+defaults: [forms hub — Form density](../forms.md#form-density).
 
 ## Overview
 
-| `kind`  | Semantics            | Rhythm default | Size default | Fieldset legend |
-| ------- | -------------------- | -------------- | ------------ | --------------- |
-| `group` | Named subsection     | inherits form  | inherits     | yes             |
-| `row`   | Horizontal siblings  | —              | per field    | no              |
-| `stack` | Layout-only column   | `compact`      | inherits     | no              |
-| `array` | `useFieldArray` list | `compact`      | `sm`         | yes (`array`)   |
-| `slot`  | Custom `render()` UI | `compact`      | `sm`         | optional label  |
+| `kind`  | Semantics            | Density boundary? | Default density | Fieldset legend |
+| ------- | -------------------- | ----------------- | --------------- | --------------- |
+| `group` | Named subsection     | yes (optional)    | inherit parent  | yes             |
+| `row`   | Horizontal siblings  | no                | inherit parent  | no              |
+| `stack` | Layout-only column   | no                | inherit parent  | no              |
+| `array` | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
+| `slot`  | Custom `render()` UI | no                | inherit parent  | optional label  |
 
 ## Component entry files
 
@@ -64,7 +64,7 @@ whose parent shell already spaces siblings use that pattern instead of `FormFiel
 `FieldGroup` (standalone) accepts the same `legendSize`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
-`rhythm` overrides inherited form rhythm.
+`density` on `GroupConfig` overrides inherited section density for the group subtree.
 
 ### Group `chrome`
 
@@ -73,7 +73,7 @@ exclusive** — omit for plain fieldset behavior.
 
 | `variant` | Use                                                                                                                                                                                                                                                                           |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inset`   | Left rail + indent on the **field stack** only — legend stays outside. Padding follows group `rhythm` (`compact`: 16px / 20px; `comfortable`: 16px / 32px; mobile / `sm+`). Tones: `border` (default), `primary`.                                                             |
+| `inset`   | Left rail + indent on the **field stack** only — legend stays outside. Padding follows group density (`compact`: 16px / 20px; `comfortable`: 16px / 32px; mobile / `sm+`). Tones: `border` (default), `primary`.                                                              |
 | `panel`   | Rounded border box around the **field stack** only. Default: `{ variant: 'panel' }` → subtle wash. `emphasis`: `subtle` (default), `default` (muted), `strong`. `elevation`: `flat` (default), `raised`. `tone`: semantic wash (`info`, `success`, `warning`, `destructive`). |
 | `outline` | Border-only box around the **field stack** — no background wash. `emphasis` maps to border ladder (`faint`, `subtle`, `default`, `strong`). `tone`: semantic border. `borderAccent`: `primary` for brand perimeter.                                                           |
 | `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                             |
@@ -154,7 +154,7 @@ controller field gates indented dependents:
   - `wrapper` — chrome on the dependents container; use for scalar dependents (selects, numbers).
   - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
   - Mixed dependents: only array item shells receive tone; scalars render without wash.
-- `rhythm`: `compact` (default) or `comfortable` for multi-field blocks.
+- Dependents inherit parent `density` — no `density` knob on `DependentConfig`.
 
 Pair dependent scalars with `labelPosition: 'settings'`.
 
@@ -269,7 +269,7 @@ See [Component entry files](#component-entry-files).
     fallback: (i) => `Trait ${i + 1}`,
     primaryField: 'name',
   },
-  // rhythm: 'comfortable', size: 'md', itemVariant: 'detailed', itemCollapsible: true,
+  // density: 'comfortable', itemVariant: 'detailed', itemCollapsible: true,
 }
 ```
 
@@ -303,8 +303,8 @@ pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside ne
 }
 ```
 
-**Legend scale:** `legendSize` defaults to `array`. With default `size: 'sm'`, legend is
-`text-sm`; pass `size: 'md'` for `text-field-array-legend` (18px).
+**Legend scale:** `legendSize` defaults to `array`. With `density: 'compact'`, legend is
+`text-sm`; `density: 'comfortable'` uses `text-field-array-legend` (18px).
 
 ### Collapse defaults and persistence
 
@@ -477,8 +477,9 @@ Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from 
 }
 ```
 
-`rhythm` and `size` mirror arrays (compact + `sm` at boundary). Slot components should
-call `useFormSectionContext()` and thread `size` / `rhythm` into hand-built controls.
+Slots inherit parent section `density`. Slot components should call
+`useFormSectionContext()` and resolve `resolveFormDensity(density)` when threading scale into
+hand-built controls.
 
 Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
 divider after the slot (same as leaf fields and rows).

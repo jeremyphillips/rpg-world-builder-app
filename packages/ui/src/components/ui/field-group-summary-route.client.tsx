@@ -4,12 +4,12 @@ import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { validateSummaryDisclosureRequirements } from './field-group-collapse.lib'
 import { SummaryDisclosureFieldGroupShell } from './field-group-summary-disclosure-shell.client'
-import type { FieldStackRhythm } from './field.variants'
+import type { FieldRhythm } from './field.variants'
 
 export type FieldGroupSummaryRouteProps = {
   id?: string
   legend?: string
-  rhythm: FieldStackRhythm
+  rhythm: FieldRhythm
   className?: string
   uiStateKey?: string
   collapseKey: string

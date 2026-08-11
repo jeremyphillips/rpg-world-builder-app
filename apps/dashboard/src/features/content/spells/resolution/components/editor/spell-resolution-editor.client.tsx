@@ -26,7 +26,7 @@ export function SpellResolutionEditor({ formCtx, defaultResolution }: SpellResol
       fields={resolutionFields(formCtx)}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
-      rhythm="compact"
+      density="compact"
     />
   )
 }

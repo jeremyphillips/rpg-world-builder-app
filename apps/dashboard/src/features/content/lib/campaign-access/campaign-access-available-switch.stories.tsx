@@ -57,7 +57,7 @@ function AvailableSwitchHarness({
       >
         <FormProvider {...form}>
           <FormUiProvider>
-            <FormSectionProvider size="md" rhythm="comfortable">
+            <FormSectionProvider density="comfortable">
               <CampaignAccessAvailableSwitch
                 label={CAMPAIGN_ACCESS_AVAILABLE_LABEL}
                 hint={CAMPAIGN_ACCESS_AVAILABLE_HINT}

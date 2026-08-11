@@ -19,6 +19,7 @@ import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
 import { MarkdownField } from '../../components/ui/markdown-field.client'
 import type { FieldHintPosition } from '../../components/ui/field.variants'
+import type { FieldSize } from '../../components/ui/field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
@@ -84,6 +85,7 @@ function parseNumber(raw: string): number | undefined {
 
 interface RenderArgs<K extends FieldType> {
   config: Extract<FieldConfig, { type: K }>
+  controlSize: FieldSize
   field: ControllerRenderProps
   id: string
   hint?: string
@@ -124,7 +126,7 @@ const fieldRenderers: {
     | 'textSuggestions'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
-  text: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  text: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <TextField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -135,7 +137,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       type={config.inputType}
       placeholder={config.placeholder}
       autoComplete={config.autoComplete}
@@ -147,7 +149,7 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  number: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  number: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <NumberField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -159,7 +161,7 @@ const fieldRenderers: {
       required={config.required}
       width={config.width}
       inputWidth={config.inputWidth}
-      size={config.size}
+      size={controlSize}
       placeholder={config.placeholder}
       disabled={config.disabled}
       step={config.step}
@@ -173,7 +175,7 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  textarea: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  textarea: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <TextareaField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -184,7 +186,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       placeholder={config.placeholder}
       rows={config.rows}
       disabled={config.disabled}
@@ -233,7 +235,15 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  checkbox: ({ config, field, id, hint, hintPosition: _hintPosition, ...validation }) => (
+  checkbox: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition: _hintPosition,
+    ...validation
+  }) => (
     <CheckboxField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -243,14 +253,14 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={(checked) => field.onChange(checked === true)}
       onBlur={field.onBlur}
     />
   ),
-  switch: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  switch: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <SwitchField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -262,14 +272,14 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       disabled={config.disabled}
       checked={field.value ?? false}
       onCheckedChange={field.onChange}
       onBlur={field.onBlur}
     />
   ),
-  json: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  json: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <LazyFieldSuspense>
       <LazyJsonField
         id={id}
@@ -281,7 +291,7 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
-        size={config.size}
+        size={controlSize}
         placeholder={config.placeholder}
         example={config.example}
         disabled={config.disabled}
@@ -291,7 +301,7 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  richtext: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  richtext: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <LazyFieldSuspense>
       <LazyRichTextField
         id={id}
@@ -303,7 +313,7 @@ const fieldRenderers: {
         info={config.info}
         required={config.required}
         width={config.width}
-        size={config.size}
+        size={controlSize}
         linkable={config.linkable}
         codeBlocks={config.codeBlocks}
         internalLinkOptions={config.internalLinkOptions}
@@ -315,7 +325,7 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  markdown: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  markdown: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <MarkdownField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -326,7 +336,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       rows={config.rows}
       placeholder={config.placeholder}
       disabled={config.disabled}
@@ -360,7 +370,7 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  chips: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  chips: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <ChipsField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -373,7 +383,7 @@ const fieldRenderers: {
       hintPosition={hintPosition}
       info={config.info}
       required={config.required}
-      size={config.size}
+      size={controlSize}
       chipSize={config.chipSize}
       width={config.width}
       disabled={config.disabled}
@@ -382,7 +392,7 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  combobox: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  combobox: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
     <ComboboxField
       id={id}
       {...pickFieldChromeProps(config)}
@@ -397,7 +407,7 @@ const fieldRenderers: {
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       disabled={config.disabled}
       value={field.value ?? fieldDefaultValue(config)}
       onChange={field.onChange}
@@ -464,14 +474,14 @@ function wrapFieldDerivedMetaPresentation(
  * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
-  const { size: inheritedSize } = useFormSectionContext()
+  const { density } = useFormSectionContext()
   const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
 
   const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
   const optionAvailability =
     config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(config, inheritedSize, dynamicValues, optionValues)
+  const resolved = resolveFieldRenderConfig(config, density, dynamicValues, optionValues)
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,
@@ -536,6 +546,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     <StandardFieldRenderer
       config={config}
       renderConfig={resolved.config as StandardFieldConfig}
+      controlSize={resolved.controlSize}
       hint={resolved.hint}
       hintPosition={resolved.hintPosition}
       fullName={fullName}
@@ -562,6 +573,7 @@ type StandardFieldConfig = Exclude<
 interface StandardFieldRendererProps {
   config: FieldConfig
   renderConfig: StandardFieldConfig
+  controlSize: FieldSize
   hint?: string
   hintPosition?: FieldHintPosition
   fullName: string
@@ -572,6 +584,7 @@ interface StandardFieldRendererProps {
 function StandardFieldRenderer({
   config,
   renderConfig,
+  controlSize,
   hint,
   hintPosition,
   fullName,
@@ -616,6 +629,7 @@ function StandardFieldRenderer({
   ) => React.ReactElement
   return render({
     config: renderConfig,
+    controlSize,
     field,
     id,
     hint,

@@ -182,8 +182,7 @@ export function BulkVocabularyAvailabilityDialog({
               },
             ]}
             idPrefix={formId}
-            size="md"
-            rhythm="comfortable"
+            density="compact"
           />
         </FormProvider>
       }

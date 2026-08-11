@@ -63,8 +63,7 @@ export function buildVocabularyEntrySheetFields(ctx: VocabularyEntrySheetFieldCt
     ...buildCampaignAvailabilityFields({
       groupId: ctx.groupId,
       pending: ctx.pending,
-      groupRhythm: 'comfortable',
-      switchSize: 'md',
+      groupDensity: 'comfortable',
       summaryDependsOn: ['available'],
       resolveSummary: (values) => resolveVocabularyAvailabilitySummary(Boolean(values.available)),
     }),

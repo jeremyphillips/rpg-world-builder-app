@@ -292,7 +292,7 @@ export function CampaignAccessSection({
     >
       <FormProvider {...form}>
         <FormUiProvider fields={renderedFields}>
-          <FormSectionProvider size="md" rhythm="comfortable" inRhythmStack>
+          <FormSectionProvider density="compact" inRhythmStack>
             {persistError ? (
               <Text variant="destructive" role="alert" className="mb-4">
                 {persistError}

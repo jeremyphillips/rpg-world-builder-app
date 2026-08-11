@@ -9,13 +9,8 @@ import {
 } from 'react-hook-form'
 
 import { FileFieldPropsProvider } from '../context/file-field-props.context'
-import {
-  DEFAULT_FORM_RHYTHM,
-  resolveFormFieldSize,
-  type FieldStackRhythm,
-} from '../../components/ui/field.variants'
-import type { FieldSize } from '../../components/ui/field.client'
 import { FormSectionContext } from '../context/form-section.context'
+import { DEFAULT_FORM_DENSITY, type FormDensity } from '../form-density'
 import {
   FormUiContext,
   FormUiProvider,
@@ -54,13 +49,8 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   fileFieldProps?: FileFieldPropsMap
   /** Scopes persisted form UI state to a stable form instance. */
   uiStateKey?: string
-  /** Vertical gap between top-level fields/groups. Defaults to `comfortable` (`gap-6`). */
-  rhythm?: FieldStackRhythm
-  /**
-   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
-   * `sm` and `comfortable` maps to `md`.
-   */
-  size?: FieldSize
+  /** Section density for top-level fields/groups. Defaults to `comfortable`. */
+  density?: FormDensity
   validationPresentation?: FormValidationPresentation
   /** Shared submit-attempt flag for tabbed layouts; see `FormUiProvider`. */
   hasAttemptedSubmit?: boolean
@@ -169,8 +159,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   fields,
   fileFieldProps,
   uiStateKey,
-  rhythm = DEFAULT_FORM_RHYTHM,
-  size,
+  density = DEFAULT_FORM_DENSITY,
   validationPresentation = 'progressive',
   hasAttemptedSubmit,
   onMarkSubmitAttempted,
@@ -182,11 +171,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   children,
   externalFooterPublisher,
 }: SchemaFormShellProps<TFieldValues>) {
-  const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
-  const sectionContext = React.useMemo(
-    () => ({ depth: 0, rhythm, size: resolvedSize }),
-    [rhythm, resolvedSize],
-  )
+  const sectionContext = React.useMemo(() => ({ depth: 0, density }), [density])
 
   return (
     <FormProvider {...form}>

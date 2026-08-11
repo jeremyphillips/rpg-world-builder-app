@@ -47,7 +47,7 @@ function narrativeArrayField(
     name: `narrative.${name}`,
     legend,
     min: 1,
-    size: 'md',
+    density: 'comfortable',
     fields: [
       {
         kind: 'row',

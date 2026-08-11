@@ -17,9 +17,8 @@ import {
   applyArrayFilterSelectOptions,
   useArrayFieldContext,
 } from '../../context/array-field.context'
-import { useFormSectionContext } from '../../context/form-section.context'
+import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
-import { resolveInheritedFieldSize } from '../../../components/ui/field.variants'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { LevelRangeFieldConfig } from '../../field-config'
 
@@ -93,11 +92,7 @@ export function LevelRangeFieldRenderer({
   const minId = `${id}-min`
   const maxId = `${id}-max`
 
-  const { size: inheritedSize } = useFormSectionContext()
-  const resolvedSize = resolveInheritedFieldSize({
-    explicit: config.size,
-    inherited: inheritedSize,
-  })
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const arrayContext = useArrayFieldContext()
   const { getValues, setValue } = useFormContext()
   const applyingCascadeRef = useRef(false)
@@ -205,7 +200,7 @@ export function LevelRangeFieldRenderer({
       info={config.info}
       required={config.required}
       disabled={config.disabled}
-      size={resolvedSize}
+      size={controlSize}
       width={config.width}
       digits={config.digits}
       onMinChange={onMinChange}

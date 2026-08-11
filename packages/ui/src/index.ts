@@ -365,7 +365,7 @@ export {
   type FieldLabelPosition,
   type FieldSeparator,
   type FieldStackLayout,
-  type FieldStackRhythm,
+  type FieldRhythm,
 } from './components/ui/field.variants'
 export {
   fieldControlBandVariants,

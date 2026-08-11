@@ -133,23 +133,38 @@ Centralized in `Field.Root` context:
 
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 
-## Form rhythm
+## Form density
 
-`<Form>` / `<TabbedForm>` accept `rhythm?: 'compact' | 'comfortable'` (default `comfortable`).
-Nested `kind: 'group'` inherits unless `GroupConfig.rhythm` overrides.
+`<Form>`, `<TabbedForm>`, and `FormFieldStack` accept `density?: 'comfortable' | 'compact'`
+(default `comfortable`). `FormDensity` maps to vertical sibling gap and control scale together
+via `resolveFormDensity` — do not set rhythm and size independently on shells.
 
-| Context                  | Default rhythm | Default size                         | Override                       |
-| ------------------------ | -------------- | ------------------------------------ | ------------------------------ |
-| Top-level form fields    | form rhythm    | `md` if comfortable, `sm` if compact | form `size` prop               |
-| `kind: 'array'`          | `compact`      | `sm`                                 | `ArrayConfig.rhythm` / `.size` |
-| `kind: 'slot'`           | `compact`      | `sm`                                 | `SlotConfig.rhythm` / `.size`  |
-| Array item nested groups | `compact`      | `sm`                                 | same as parent array section   |
+| Boundary                                                                    | May declare `density`? | Default when omitted |
+| --------------------------------------------------------------------------- | ---------------------- | -------------------- |
+| Form shells (`Form`, `TabbedForm`, `FormFieldStack`, `FormSectionProvider`) | yes                    | `comfortable`        |
+| `kind: 'group'`                                                             | yes                    | inherit parent       |
+| `kind: 'array'`                                                             | yes                    | `compact`            |
+| `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`                          | no                     | inherit parent       |
 
-Slot `render()` components should call `useFormSectionContext()` from `@rpg/ui/form` and
-thread `size` / `rhythm` into hand-built controls (e.g. `RequirementEditor`).
+| `density`     | Sibling gap | Control scale (`sm` / `md`) |
+| ------------- | ----------- | --------------------------- |
+| `comfortable` | `gap-6`     | `md`                        |
+| `compact`     | `gap-2`     | `sm`                        |
 
-**Array legends:** default `legendSize: 'array'`. With `size: 'sm'`, legend is `text-sm`;
-pass `size: 'md'` for `text-field-array-legend` (18px).
+**Leaf escape hatch:** `controlSizeOverride` on a field config changes control height only —
+not sibling rhythm. Rare; prefer section `density`. Production usage is intentionally
+count-guarded (campaign name `lg` today).
+
+**Control size resolution:** renderers must resolve scale only through `useFieldControlSize`
+(client) or `resolveFieldControlSize` (pure). Do not combine `controlSizeOverride` with
+`resolveFormDensity` directly in render paths.
+
+Slot `render()` components and hand-built editors should call `useFormSectionContext()` for
+`density`, then `resolveFormDensity(density)` when threading `rhythm` / `size` into primitives
+(e.g. `RequirementEditor` → `FieldGroup`).
+
+**Array legends:** default `legendSize: 'array'`. Legend typography follows resolved section
+control scale (`compact` → `text-sm`; `comfortable` → `text-field-array-legend`).
 
 Dense chip fields stack full-width — don't cram many options into a `FieldRow`.
 

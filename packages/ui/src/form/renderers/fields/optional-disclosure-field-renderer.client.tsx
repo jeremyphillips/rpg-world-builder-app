@@ -11,9 +11,9 @@ import { SelectField } from '../../../components/ui/select-field'
 import { TextareaField } from '../../../components/ui/textarea-field'
 import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
-import { resolveInheritedFieldSize } from '../../../components/ui/field.variants'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
+import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type {
   OptionalDisclosureConfig,
@@ -22,7 +22,6 @@ import type {
   TextSuggestionsFieldConfig,
 } from '../../field-config'
 import { fieldDefaultValue, resolveFieldHintPresentation } from '../../field-config'
-import { useFormSectionContext } from '../../context/form-section.context'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
@@ -49,6 +48,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
   hint,
   hintPosition,
 }: OptionalDisclosureTextareaRendererProps) {
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { ref: registerRef, value, onChange, onBlur } = field
   const [manualOpen, setManualOpen] = useState(false)
   const hasValue = Boolean(String(value ?? '').trim())
@@ -69,7 +69,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
       open={open}
       onOpenChange={setManualOpen}
       onRemove={handleRemove}
-      size={config.size}
+      size={controlSize}
     >
       <TextareaField
         id={id}
@@ -84,7 +84,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
         info={config.info}
         required={config.required}
         width={config.width}
-        size={config.size}
+        size={controlSize}
         placeholder={config.placeholder}
         rows={config.rows}
         disabled={config.disabled}
@@ -125,6 +125,7 @@ export function OptionalDisclosureSelectFieldRenderer({
   const chrome = pickSelectFieldChromeProps(state.renderConfig, {
     hint: state.hint,
     hintPosition: state.hintPosition,
+    size: state.controlSize,
   })
 
   const handleRemove = () => {
@@ -152,7 +153,7 @@ export function OptionalDisclosureSelectFieldRenderer({
       open={open}
       onOpenChange={setManualOpen}
       onRemove={handleRemove}
-      size={state.renderConfig.size}
+      size={state.controlSize}
     >
       <SelectField
         id={id}
@@ -188,7 +189,6 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   id,
   namePrefix,
 }: OptionalDisclosureTextSuggestionsFieldRendererProps) {
-  const { size: inheritedSize } = useFormSectionContext()
   const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
   const suggestionValuesKey = JSON.stringify(suggestionValues)
   const hintDependsOn =
@@ -196,7 +196,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
   const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
   const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const size = resolveInheritedFieldSize({ explicit: config.size, inherited: inheritedSize })
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
 
   const { field, fieldState } = useController({
     name: fullName,
@@ -251,7 +251,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
       open={open}
       onOpenChange={handleOpenChange}
       onRemove={handleRemove}
-      size={size}
+      size={controlSize}
     >
       <TextSuggestionsField
         id={id}
@@ -265,7 +265,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
         info={config.info}
         required={config.required}
         disabled={config.disabled}
-        size={size}
+        size={controlSize}
         width={config.width}
         value={field.value ?? fieldDefaultValue(config)}
         onValueChange={field.onChange}

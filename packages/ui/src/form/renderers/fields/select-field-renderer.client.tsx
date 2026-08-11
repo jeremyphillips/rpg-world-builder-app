@@ -24,6 +24,7 @@ export function SelectFieldRenderer({
   const chrome = pickSelectFieldChromeProps(state.renderConfig, {
     hint: state.hint,
     hintPosition: state.hintPosition,
+    size: state.controlSize,
   })
 
   if (state.isReadOnly) {

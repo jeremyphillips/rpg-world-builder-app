@@ -6,12 +6,12 @@ import { cn } from '../../lib/utils'
 import {
   fieldStackRhythmVariants,
   fieldToggleDependentIndentClasses,
-  type FieldRhythm,
 } from '../../components/ui/field.variants'
 import {
   DEFAULT_DEPENDENT_SURFACE,
   resolveFieldDependentsChromeClasses,
 } from '../../components/ui/field-dependent.variants'
+import { resolveFormDensity } from '../form-density'
 import {
   FormSectionContext,
   buildFormSectionChildContext,
@@ -60,10 +60,10 @@ export function DependentSection({
   renderNestedItems,
 }: DependentSectionProps) {
   const parentContext = useFormSectionContext()
-  const rhythm = item.rhythm ?? 'compact'
+  const { rhythm } = resolveFormDensity(parentContext.density)
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth, { rhythm }),
-    [parentContext, depth, rhythm],
+    () => buildFormSectionChildContext(parentContext, depth),
+    [parentContext, depth],
   )
   const controller = item.controller
   const dependents = item.dependents.fields
@@ -107,7 +107,7 @@ interface DependentFieldsRegionProps {
   surface?: DependentConfig['dependents']['surface']
   tone?: DependentConfig['dependents']['tone']
   scope?: DependentConfig['dependents']['scope']
-  rhythm: FieldRhythm
+  rhythm: ReturnType<typeof resolveFormDensity>['rhythm']
   parentContext: FormSectionContextValue
   dependents: GroupFieldItem[]
   idPrefix: string

@@ -2,25 +2,19 @@
 
 import * as React from 'react'
 
-import type { FieldSize } from '../../components/ui/field.client'
 import type { SemanticSurfaceTone } from '../../components/ui/field-dependent.variants'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
-import {
-  DEFAULT_FORM_FIELD_SIZE,
-  DEFAULT_FORM_RHYTHM,
-  fieldStackRhythmVariants,
-  resolveFormFieldSize,
-  type FieldStackRhythm,
-} from '../../components/ui/field.variants'
+import type { FieldSize } from '../../components/ui/field.client'
 import { cn } from '../../lib/utils'
+import { DEFAULT_FORM_DENSITY, resolveFormDensity, type FormDensity } from '../form-density'
+import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
 
 export interface FormSectionContextValue {
-  /** Nesting depth for section rhythm/size inheritance. */
+  /** Nesting depth for section density inheritance. */
   depth: number
-  /** Vertical gap between sibling fields/groups in the current section. */
-  rhythm: FieldStackRhythm
-  /** Control + label scale for leaf fields in this section. */
-  size: FieldSize
+  /** Section density — rhythm and control scale resolve via {@link resolveFormDensity}. */
+  density: FormDensity
   /** Surface config for array item shells — defaults to raised when unset. */
   arrayItemSurface?: SurfaceConfig
   /** Optional semantic wash for array item shells. */
@@ -33,8 +27,7 @@ export interface FormSectionContextValue {
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
   depth: 0,
-  rhythm: DEFAULT_FORM_RHYTHM,
-  size: DEFAULT_FORM_FIELD_SIZE,
+  density: DEFAULT_FORM_DENSITY,
 })
 
 export function useFormSectionContext(): FormSectionContextValue {
@@ -42,8 +35,7 @@ export function useFormSectionContext(): FormSectionContextValue {
 }
 
 export interface FormSectionContextOverrides {
-  rhythm?: FieldStackRhythm
-  size?: FieldSize
+  density?: FormDensity
   arrayItemSurface?: SurfaceConfig
   arrayItemTone?: SemanticSurfaceTone
   inGroup?: boolean
@@ -61,8 +53,7 @@ function inheritSectionContextFields(
   overrides?: FormSectionContextOverrides,
 ): Omit<FormSectionContextValue, 'depth'> {
   const inherited = {
-    rhythm: parent.rhythm,
-    size: parent.size,
+    density: parent.density,
     arrayItemSurface: parent.arrayItemSurface,
     arrayItemTone: parent.arrayItemTone,
     inGroup: parent.inGroup,
@@ -72,7 +63,7 @@ function inheritSectionContextFields(
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited
 }
 
-/** Child section context — inherits rhythm and size unless overridden. */
+/** Child section context — inherits density unless overridden. */
 export function buildFormSectionChildContext(
   parent: FormSectionContextValue,
   depth: number,
@@ -86,36 +77,24 @@ export function buildFormSectionChildContext(
 
 export interface FormRhythmStackProps {
   className?: string
-  /** Overrides inherited context rhythm for this stack only. */
-  rhythm?: FieldStackRhythm
   children: React.ReactNode
 }
 
-/** Flex column stack whose gap follows form section rhythm. */
-export function FormRhythmStack({ className, rhythm, children }: FormRhythmStackProps) {
+/** Flex column stack whose gap follows form section density. */
+export function FormRhythmStack({ className, children }: FormRhythmStackProps) {
   const parent = useFormSectionContext()
-  const resolved = rhythm ?? parent.rhythm
-  const value = React.useMemo(
-    () => ({ ...parent, rhythm: resolved, inRhythmStack: true }),
-    [parent, resolved],
-  )
+  const { rhythm } = resolveFormDensity(parent.density)
+  const value = React.useMemo(() => ({ ...parent, inRhythmStack: true }), [parent])
   return (
     <FormSectionContext.Provider value={value}>
-      <div className={cn(fieldStackRhythmVariants({ rhythm: resolved }), className)}>
-        {children}
-      </div>
+      <div className={cn(fieldStackRhythmVariants({ rhythm }), className)}>{children}</div>
     </FormSectionContext.Provider>
   )
 }
 
 export interface FormSectionProviderProps {
   children: React.ReactNode
-  rhythm?: FieldStackRhythm
-  /**
-   * Control + label scale. When omitted, `compact` rhythm maps to `sm` and
-   * `comfortable` maps to `md`.
-   */
-  size?: FieldSize
+  density?: FormDensity
   depth?: number
   /**
    * When true, top-level groups/arrays omit standalone bottom margin — a parent
@@ -124,18 +103,22 @@ export interface FormSectionProviderProps {
   inRhythmStack?: boolean
 }
 
-/** Supplies rhythm/size context for `FormItems` outside the schema-driven `<Form>`. */
+/** Supplies density context for `FormItems` outside the schema-driven `<Form>`. */
 export function FormSectionProvider({
   children,
-  rhythm = DEFAULT_FORM_RHYTHM,
-  size,
+  density = DEFAULT_FORM_DENSITY,
   depth = 0,
   inRhythmStack,
 }: FormSectionProviderProps) {
-  const resolvedSize = resolveFormFieldSize({ explicit: size, rhythm })
   const value = React.useMemo(
-    () => ({ depth, rhythm, size: resolvedSize, inRhythmStack }),
-    [depth, inRhythmStack, rhythm, resolvedSize],
+    () => ({ depth, density, inRhythmStack }),
+    [depth, density, inRhythmStack],
   )
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>
+}
+
+/** Resolves control scale from section context and an optional leaf override. */
+export function useFieldControlSize(controlSizeOverride?: FieldSize): FieldSize {
+  const { density } = useFormSectionContext()
+  return resolveFieldControlSize({ density, override: controlSizeOverride })
 }

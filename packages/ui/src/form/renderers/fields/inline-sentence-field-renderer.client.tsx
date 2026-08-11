@@ -24,6 +24,7 @@ import { resolveSelectPlaceholder } from '../../config/field-placeholder.lib'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../../field-config'
 import { resolveFieldHintPresentation } from '../../field-config'
+import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface InlineSentenceFieldRendererProps {
   config: InlineSentenceFieldConfig
@@ -104,6 +105,7 @@ export function InlineSentenceFieldRenderer({
   namePrefix,
   error,
 }: InlineSentenceFieldRendererProps) {
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const segmentVisibilityDeps = useMemo(
     () => inlineSentenceSegmentVisibilityDeps(config.segments),
     [config.segments],
@@ -222,7 +224,7 @@ export function InlineSentenceFieldRenderer({
       info={config.info}
       required={config.required}
       disabled={config.disabled}
-      size={config.size}
+      size={controlSize}
       width={config.width}
       hideLabel={config.hideLabel}
       chipSize={config.chipSize}

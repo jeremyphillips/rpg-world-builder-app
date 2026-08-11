@@ -42,8 +42,7 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   legend: string
   min?: number
   max?: number
-  rhythm?: LevelRangeArrayConfig['rhythm']
-  size?: LevelRangeArrayConfig['size']
+  density?: LevelRangeArrayConfig['density']
   itemHeader?: ArrayItemHeaderConfig
   itemVariant?: ArrayItemConfig['variant']
   itemSurface?: ArrayItemConfig['surface']
@@ -69,8 +68,7 @@ export function buildLevelRangeTiersArrayField(
     legend: options.legend,
     min: options.min,
     max: options.max,
-    rhythm: options.rhythm,
-    size: options.size,
+    density: options.density,
     item: {
       header: options.itemHeader,
       variant: options.itemVariant,

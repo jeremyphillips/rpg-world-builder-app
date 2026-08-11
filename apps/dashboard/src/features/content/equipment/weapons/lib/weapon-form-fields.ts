@@ -159,7 +159,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
                 name: 'versatileDamage',
                 label: 'Versatile dice',
                 modifierMode: 'none',
-                size: 'md',
                 width: 'auto',
                 countMin: 1,
                 visibility: visibleWhenVersatile(),

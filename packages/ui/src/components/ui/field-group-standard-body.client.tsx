@@ -18,7 +18,7 @@ import {
   fieldSetResetClasses,
   fieldStackRhythmVariants,
   type FieldGroupLegendSize,
-  type FieldStackRhythm,
+  type FieldRhythm,
 } from './field.variants'
 
 function useGroupCollapseState(options: {
@@ -53,7 +53,7 @@ export type StandardFieldGroupBodyProps = {
   description?: string
   legendSize: FieldGroupLegendSize
   legendTypography: string
-  rhythm: FieldStackRhythm
+  rhythm: FieldRhythm
   className?: string
   uiStateKey?: string
   collapseKey: string

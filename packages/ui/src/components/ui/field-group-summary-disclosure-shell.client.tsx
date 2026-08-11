@@ -11,13 +11,13 @@ import {
   fieldGroupBottomMarginClasses,
   fieldSetResetClasses,
   fieldStackRhythmVariants,
-  type FieldStackRhythm,
+  type FieldRhythm,
 } from './field.variants'
 
 export type SummaryDisclosureFieldGroupShellProps = {
   id?: string
   legend: string
-  rhythm: FieldStackRhythm
+  rhythm: FieldRhythm
   className?: string
   uiStateKey?: string
   collapseKey: string

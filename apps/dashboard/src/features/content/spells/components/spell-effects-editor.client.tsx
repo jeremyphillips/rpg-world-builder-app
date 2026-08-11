@@ -49,7 +49,7 @@ export function SpellEffectsEditor({ formCtx, defaultEffects = [] }: SpellEffect
       ]}
       defaultValues={{ effects: defaultEffects }}
       onSubmit={() => undefined}
-      rhythm="compact"
+      density="compact"
     />
   )
 }

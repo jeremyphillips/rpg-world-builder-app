@@ -49,7 +49,6 @@ export function buildBulkRosterStatusFields(): FormItem[] {
       name: 'rosterStatusOption',
       label: BULK_ROSTER_STATUS_FIELD_LABEL,
       width: 'full',
-      size: 'sm',
       options: buildBulkRosterStatusOptions(true),
     },
   ]

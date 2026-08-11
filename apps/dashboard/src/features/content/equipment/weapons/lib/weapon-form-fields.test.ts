@@ -144,7 +144,6 @@ describe('weapon kindFieldGroups', () => {
     ).toMatchObject({
       type: 'diceFormula',
       modifierMode: 'none',
-      size: 'md',
       width: 'auto',
     })
   })
