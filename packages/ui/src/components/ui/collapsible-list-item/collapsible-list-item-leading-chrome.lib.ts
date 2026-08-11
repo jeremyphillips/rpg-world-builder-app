@@ -94,3 +94,20 @@ export function buildCollapsibleListItemLeadingChromeStyle(
     [CONTENT_INLINE_START_VAR]: `calc(var(${SHELL_INLINE_START_VAR}) + var(${CONTENT_COLUMN_INDENT_VAR}))`,
   } as CSSProperties
 }
+
+/**
+ * Geometry tokens only — for entity-card hosts where an outer surface (DEC) owns
+ * header/body inset and `--entity-leading-offset`. Omits content-column indent vars.
+ */
+export function buildCollapsibleListItemGeometryStyle(
+  options: CollapsibleListItemLeadingChromeOptions,
+): CSSProperties {
+  const { chromeCount } = resolveCollapsibleListItemLeadingChrome(options)
+
+  return {
+    [LEADING_CHROME_SIZE_VAR]: collapsibleListItemLeadingChromeSizeValue,
+    [LEADING_CHROME_GAP_VAR]: collapsibleListItemLeadingChromeGapValue,
+    [LEADING_CHROME_COUNT_VAR]: chromeCount,
+    [ARRAY_ITEM_CHROME_COUNT_VAR]: chromeCount,
+  } as CSSProperties
+}

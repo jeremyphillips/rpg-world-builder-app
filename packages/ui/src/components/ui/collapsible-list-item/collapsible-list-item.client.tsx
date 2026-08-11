@@ -246,7 +246,7 @@ function CollapsibleListItemRoot({
               bodyId={resolvedBodyId}
               hidden={collapsed}
               className={cn(
-                collapsibleListItemBodyClasses({ ...leadingChrome, preset }),
+                collapsibleListItemBodyClasses({ ...leadingChrome, preset, rowLayout }),
                 bodyClassName,
               )}
             >
@@ -420,7 +420,11 @@ function CollapsibleListItemCompoundBody({
       bodyId={resolvedBodyId}
       hidden={isHidden}
       className={cn(
-        collapsibleListItemBodyClasses({ ...context.leadingChrome, preset: context.preset }),
+        collapsibleListItemBodyClasses({
+          ...context.leadingChrome,
+          preset: context.preset,
+          rowLayout: context.rowLayout,
+        }),
         className,
       )}
     >

@@ -254,4 +254,74 @@ describe('DisclosureEntityCard', () => {
 
     expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
   })
+
+  it('does not merge legacy CLI body inset when rowLayout is entity-card', () => {
+    const { container } = render(
+      <DisclosureEntityCard
+        itemId="harbor"
+        toolbarAriaLabel="Harbor District"
+        entity={HARBOR_DISTRICT_ENTITY}
+        dragHandleProps={mockDragHandleProps}
+        density="compact"
+        defaultCollapsed={false}
+      >
+        <p>Isolated body</p>
+      </DisclosureEntityCard>,
+    )
+
+    const body = bodyFor('Isolated body')
+    expect(body).toHaveClass(disclosureEntityCardBodyInlineStartClasses)
+    expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
+    expect(body.className).not.toContain('content-column-indent')
+    expect(body.className).not.toContain('content-inline-start')
+    expect(
+      body.className.split(/\s+/).filter((token) => token === 'pt-3').length,
+    ).toBeLessThanOrEqual(1)
+
+    const shell = container.querySelector('[role="group"]') as HTMLElement
+    expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
+    expect(shell.style.getPropertyValue('--content-inline-start')).toBe('')
+
+    const headerWrap = screen
+      .getByText('Harbor District', { selector: '.font-body-emphasis' })
+      .closest('[class*="--entity-density-inline"]') as HTMLElement
+    expect(headerWrap.className).toMatch(/px-\[var\(--entity-density-inline\)\]/)
+  })
+
+  it('matches leading offset to grip+caret count on the article root', () => {
+    const { container } = render(
+      <DisclosureEntityCard
+        itemId="harbor"
+        toolbarAriaLabel="Harbor District"
+        entity={HARBOR_DISTRICT_ENTITY}
+        dragHandleProps={mockDragHandleProps}
+        defaultCollapsed={false}
+      >
+        <p>Grip and caret body</p>
+      </DisclosureEntityCard>,
+    )
+
+    const article = container.querySelector('article') as HTMLElement
+    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
+      'calc(2 * var(--leading-chrome-size)',
+    )
+  })
+
+  it('matches leading offset to caret-only count on the article root', () => {
+    const { container } = render(
+      <DisclosureEntityCard
+        itemId="harbor"
+        toolbarAriaLabel="Harbor District"
+        entity={HARBOR_DISTRICT_ENTITY}
+        defaultCollapsed={false}
+      >
+        <p>Caret-only body</p>
+      </DisclosureEntityCard>,
+    )
+
+    const article = container.querySelector('article') as HTMLElement
+    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
+      'calc(1 * var(--leading-chrome-size)',
+    )
+  })
 })

@@ -81,6 +81,11 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
+`DetailEntityRow.endSlot` and section `headerEndSlot` are **detail-host** composition
+seams — not entity-surface trailing APIs. `EntityItem`, `ContentEntityCard`, and
+`DisclosureEntityCard` use semantic trailing (`action` | `indicator` | `group`) only.
+See [content-entity-card.md](./content-entity-card.md#trailing-kinds).
+
 Use **`DetailSectionPanel`** + **`RelationshipList`** for typed-edge relationship sections (location Territorial Authority, People & organizations, organization forward family groups, organization Members). Use **`DetailSectionPanel`** + **`DetailSectionGroup`** + **`DetailSectionRowList`** for hierarchy (City structure districts / direct places) — not `RelationshipList`.
 
 ```text

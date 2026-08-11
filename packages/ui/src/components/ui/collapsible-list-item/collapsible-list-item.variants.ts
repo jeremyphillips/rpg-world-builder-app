@@ -180,12 +180,23 @@ export function collapsibleListItemToolbarContentClasses(
 export type CollapsibleListItemBodyClassOptions =
   Partial<CollapsibleListItemLeadingChromeOptions> & {
     preset?: CollapsibleListItemShellPreset
+    rowLayout?: CollapsibleListItemRowLayout
   }
+
+/**
+ * Entity-card hosts — structural pass-through only. Outer surfaces (DEC) own all
+ * header/body inset; CLI supplies disclosure behavior and DOM structure.
+ */
+export const collapsibleListItemEntityCardBodyClasses = 'min-w-0'
 
 /** Aligns detailed item bodies with the toolbar content column. */
 export function collapsibleListItemBodyClasses(
   options: CollapsibleListItemBodyClassOptions = {},
 ): string {
+  if (options.rowLayout === 'entity-card') {
+    return collapsibleListItemEntityCardBodyClasses
+  }
+
   const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
     showDragHandle: options.showDragHandle ?? false,
     collapsible: options.collapsible ?? false,

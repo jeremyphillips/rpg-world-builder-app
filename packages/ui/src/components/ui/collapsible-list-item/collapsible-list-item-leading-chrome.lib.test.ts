@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildCollapsibleListItemGeometryStyle,
   buildCollapsibleListItemLeadingChromeStyle,
   CONTENT_COLUMN_INDENT_VAR,
   CONTENT_INLINE_START_VAR,
   LEADING_CHROME_COUNT_VAR,
+  LEADING_CHROME_SIZE_VAR,
   resolveCollapsibleListItemLeadingChrome,
+  SHELL_INLINE_START_VAR,
 } from './collapsible-list-item-leading-chrome.lib'
 
 describe('resolveCollapsibleListItemLeadingChrome', () => {
@@ -31,5 +34,18 @@ describe('buildCollapsibleListItemLeadingChromeStyle', () => {
     expect(style[CONTENT_COLUMN_INDENT_VAR]).toContain('var(--leading-chrome-size)')
     expect(style[CONTENT_INLINE_START_VAR]).toContain('var(--shell-inline-start)')
     expect(style[CONTENT_INLINE_START_VAR]).toContain(`var(${CONTENT_COLUMN_INDENT_VAR})`)
+  })
+
+  it('omits content-column indent vars for entity-card geometry style', () => {
+    const style = buildCollapsibleListItemGeometryStyle({
+      showDragHandle: true,
+      collapsible: true,
+    }) as Record<string, string | number>
+
+    expect(style[LEADING_CHROME_COUNT_VAR]).toBe(2)
+    expect(style[LEADING_CHROME_SIZE_VAR]).toContain('spacing')
+    expect(style[CONTENT_COLUMN_INDENT_VAR]).toBeUndefined()
+    expect(style[CONTENT_INLINE_START_VAR]).toBeUndefined()
+    expect(style[SHELL_INLINE_START_VAR]).toBeUndefined()
   })
 })

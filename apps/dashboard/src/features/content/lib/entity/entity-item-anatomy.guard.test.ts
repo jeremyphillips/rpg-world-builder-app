@@ -44,4 +44,13 @@ describe('entity item anatomy guard', () => {
     expect(variantsSource).toMatch(/col-start-3/)
     expect(anatomyBlock).not.toMatch(/\bgap-x-/)
   })
+
+  it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {
+    const decSource = readFileSync(join(ENTITY_ROOT, 'disclosure-entity-card.client.tsx'), 'utf8')
+
+    expect(decSource).toMatch(/rowLayout="entity-card"/)
+    expect(decSource).toMatch(/toolbarLeadingChrome="none"/)
+    expect(decSource).not.toMatch(/\bclassName=\{[^}]*px-/)
+    expect(decSource).not.toMatch(/\bclassName=\{[^}]*py-/)
+  })
 })

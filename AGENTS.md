@@ -96,7 +96,8 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   alignment, divider, or chrome overrides to `EntityItem`,
   `ContentEntityCard`, or `DisclosureEntityCard`. First determine whether the
   change belongs to the shared surface; genuine domain layout remains inside DEC
-  children. See [content-entity-card.md](apps/dashboard/docs/content-entity-card.md).
+  children. Ownership hierarchy and per-primitive contracts →
+  [content-entity-card.md](apps/dashboard/docs/content-entity-card.md).
 
 ## Accessibility
 

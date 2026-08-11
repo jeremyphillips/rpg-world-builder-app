@@ -9,6 +9,7 @@ import { Form, type FormItem } from '@rpg/ui/form'
 
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/disclosure-entity-card.variants'
+import { ENTITY_LEADING_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -119,6 +120,20 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
     expect(body?.className).toContain('pr-[var(--entity-density-inline)]')
     expect(body).toHaveClass('border-t')
+    expect(body?.className).not.toContain('content-column-indent')
+    expect(body?.className).not.toContain('content-inline-start')
+
+    const article = firstRow.querySelector('article') as HTMLElement
+    expect(article.style.getPropertyValue(ENTITY_LEADING_OFFSET_VAR)).toContain(
+      'calc(2 * var(--leading-chrome-size)',
+    )
+    const shell = firstRow.querySelector('[role="group"]') as HTMLElement
+    expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
+
+    const headerWrap = screen
+      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
+      .closest('[class*="--entity-density-inline"]') as HTMLElement
+    expect(headerWrap?.className).toMatch(/px-\[var\(--entity-density-inline\)\]/)
 
     await user.clear(ability)
     await user.type(ability, 'int')
