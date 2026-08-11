@@ -397,7 +397,7 @@ export function ArrayFieldItemContent({
       onFocusIssue={focusIssue}
       badgeProminence={badgeProminence}
       variant={variant}
-      embedded={Boolean(compactInlineRow)}
+      embedded={Boolean(compactInlineRow) || Boolean(itemConfig.renderShell)}
     />
   )
 
@@ -418,6 +418,24 @@ export function ArrayFieldItemContent({
         issueSummary={issueSummary}
       />
     )
+  }
+
+  if (itemConfig.renderShell) {
+    const summary = headerConfig.summary?.(itemValues, index, watchedSummaryContext) ?? undefined
+    return itemConfig.renderShell({
+      itemId,
+      itemPrefix,
+      titleId: chromeProps.titleId,
+      index,
+      header,
+      itemValues,
+      summary: summary || undefined,
+      collapsed,
+      onToggleCollapse,
+      dragHandleProps,
+      action: actionsRail,
+      children: fieldsNode,
+    })
   }
 
   return (

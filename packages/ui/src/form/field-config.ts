@@ -37,6 +37,7 @@ import type { SurfaceConfig } from '../components/ui/visual-vocabulary.types'
 import type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
+import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
 import type {
   FieldHintPosition,
   FieldGroupLegendSize,
@@ -1125,7 +1126,15 @@ export interface ArrayItemConfig {
   /** @default true */
   removable?: boolean
   removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
+  /**
+   * Replace default ArrayItem card chrome with a custom shell (e.g. entity
+   * DisclosureEntityCard). Form behavior stays array-owned; presentation does not.
+   * Ignored for compact inline rows.
+   */
+  renderShell?: (props: ArrayItemShellRenderProps) => ReactNode
 }
+
+export type { ArrayItemShellRenderProps }
 
 export type ArrayFilterSelectFn = (ctx: {
   arrayItems: unknown[]

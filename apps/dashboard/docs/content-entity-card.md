@@ -61,6 +61,17 @@ through `entity`, `leading`, `action`, and DEC `children` only.
 implementation details. Feature code uses the entity surfaces above rather than
 composing those internals directly.
 
+## Form arrays — form-owned ≠ form-styled
+
+Entity-backed grant / catalog arrays keep RHF registration, validation,
+append/remove/reorder, and dirty state in the form layer. Their **presentation**
+uses `ArrayItemConfig.renderShell` → `EntityDisclosureArrayItemShell` →
+`DisclosureEntityCard`, not the generic `ArrayItem` card chrome.
+
+Anonymous configuration arrays (modifiers, tags, wealth tiers without a catalog
+identity) stay on the default ArrayItem shell. Do not invent fake
+`EntitySummaryModel` rows for those.
+
 ## Disabled state
 
 CEC and DEC expose presentational disabled state. Hosts still own interactive

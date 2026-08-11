@@ -59,10 +59,33 @@ describe('entity surface architecture guard', () => {
         /(?:catalog|spell|equipment).*item-header\.client\.tsx$/i,
       )
       expect(
+        relativePath,
+        'grant-local card/header presentation components are forbidden',
+      ).not.toMatch(/(?:grant-card|grant-item-header)\.client\.tsx$/i)
+      expect(
         source,
         `${relativePath} must not target entity surfaces with descendants`,
       ).not.toMatch(/\[&_[^\]]*(?:entity-|EntityItem|ContentEntityCard|DisclosureEntityCard)/)
       expect(source, `${relativePath} must not use !important`).not.toMatch(/!important/)
+    }
+  })
+
+  it('keeps entity-backed grant arrays on DisclosureEntityCard shells', () => {
+    const grantFormFields = join(FEATURE_ROOT, 'content/lib/forms/grants/grant-form-fields.ts')
+    const startingEquipmentFields = join(
+      FEATURE_ROOT,
+      'content/classes/lib/character-creation/class-starting-equipment-form-fields.ts',
+    )
+
+    for (const path of [grantFormFields, startingEquipmentFields]) {
+      const relativePath = relative(FEATURE_ROOT, path)
+      const source = readFileSync(path, 'utf8')
+      expect(source, `${relativePath} must render entity-backed rows via DEC shell`).toMatch(
+        /renderShell/,
+      )
+      expect(source, `${relativePath} must not compose ArrayItemShell`).not.toMatch(
+        /\bArrayItemShell\b/,
+      )
     }
   })
 })
