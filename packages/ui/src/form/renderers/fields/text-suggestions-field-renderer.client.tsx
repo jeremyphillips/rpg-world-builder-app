@@ -12,8 +12,7 @@ import {
   resolveFieldHintPresentation,
   type TextSuggestionsFieldConfig,
 } from '../../field-config'
-import { resolveFormDensity } from '../../form-density'
-import { useFormSectionContext } from '../../context/form-section.context'
+import { useFieldControlSize } from '../../context/form-section.context'
 
 interface TextSuggestionsFieldRendererProps {
   config: TextSuggestionsFieldConfig
@@ -28,14 +27,13 @@ export function TextSuggestionsFieldRenderer({
   id,
   namePrefix,
 }: TextSuggestionsFieldRendererProps) {
-  const { density } = useFormSectionContext()
   const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
   const hintDependsOn =
     typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
   const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
   const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
   const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const controlSize = config.controlSizeOverride ?? resolveFormDensity(density).size
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
 
   const { field, fieldState } = useController({
     name: fullName,

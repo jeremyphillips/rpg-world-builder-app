@@ -11,9 +11,9 @@ import { SelectField } from '../../../components/ui/select-field'
 import { TextareaField } from '../../../components/ui/textarea-field'
 import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
-import { resolveFormDensity } from '../../form-density'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
+import { useFieldControlSize } from '../../context/form-section.context'
 import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type {
   OptionalDisclosureConfig,
@@ -22,7 +22,6 @@ import type {
   TextSuggestionsFieldConfig,
 } from '../../field-config'
 import { fieldDefaultValue, resolveFieldHintPresentation } from '../../field-config'
-import { useFormSectionContext } from '../../context/form-section.context'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
@@ -49,8 +48,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
   hint,
   hintPosition,
 }: OptionalDisclosureTextareaRendererProps) {
-  const { density } = useFormSectionContext()
-  const controlSize = config.controlSizeOverride ?? resolveFormDensity(density).size
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { ref: registerRef, value, onChange, onBlur } = field
   const [manualOpen, setManualOpen] = useState(false)
   const hasValue = Boolean(String(value ?? '').trim())
@@ -191,7 +189,6 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   id,
   namePrefix,
 }: OptionalDisclosureTextSuggestionsFieldRendererProps) {
-  const { density } = useFormSectionContext()
   const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
   const suggestionValuesKey = JSON.stringify(suggestionValues)
   const hintDependsOn =
@@ -199,7 +196,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
   const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
   const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const controlSize = config.controlSizeOverride ?? resolveFormDensity(density).size
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
 
   const { field, fieldState } = useController({
     name: fullName,

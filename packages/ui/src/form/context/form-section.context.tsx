@@ -8,6 +8,7 @@ import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSize } from '../../components/ui/field.client'
 import { cn } from '../../lib/utils'
 import { DEFAULT_FORM_DENSITY, resolveFormDensity, type FormDensity } from '../form-density'
+import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
 
 export interface FormSectionContextValue {
   /** Nesting depth for section density inheritance. */
@@ -116,7 +117,8 @@ export function FormSectionProvider({
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>
 }
 
-export function useFieldControlSize(config: { controlSizeOverride?: FieldSize }): FieldSize {
+/** Resolves control scale from section context and an optional leaf override. */
+export function useFieldControlSize(controlSizeOverride?: FieldSize): FieldSize {
   const { density } = useFormSectionContext()
-  return config.controlSizeOverride ?? resolveFormDensity(density).size
+  return resolveFieldControlSize({ density, override: controlSizeOverride })
 }

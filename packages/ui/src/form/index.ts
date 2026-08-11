@@ -33,6 +33,7 @@ export {
   resolveSectionDensity,
   type FormDensity,
 } from './form-density'
+export { resolveFieldControlSize } from './resolve-field-control-size.lib'
 export {
   ArrayItemPresentationContext,
   resolveErrorPlacement,

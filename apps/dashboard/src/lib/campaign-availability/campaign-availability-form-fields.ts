@@ -1,4 +1,4 @@
-import type { FormItem, FieldGroupSummary, FormDensity, FieldSize } from '@rpg/ui/form'
+import type { FormItem, FieldGroupSummary, FormDensity } from '@rpg/ui/form'
 
 import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
@@ -16,7 +16,6 @@ export type CampaignAvailabilityFieldCtx = {
   summaryDependsOn: string[]
   resolveSummary: (values: Record<string, unknown>) => FieldGroupSummary
   groupDensity?: FormDensity
-  switchControlSizeOverride?: FieldSize
   /** Override for content immediate-preflight switch slot. */
   availabilityField?: FormItem
 }
@@ -33,10 +32,7 @@ export function resolveVocabularyAvailabilitySummary(available: boolean): FieldG
   }
 }
 
-function defaultAvailabilitySwitchField(
-  pending: boolean,
-  controlSizeOverride?: FieldSize,
-): FormItem {
+function defaultAvailabilitySwitchField(pending: boolean): FormItem {
   return {
     type: 'switch',
     name: 'available',
@@ -45,7 +41,6 @@ function defaultAvailabilitySwitchField(
     info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
     labelPosition: 'settings',
     width: 'full',
-    ...(controlSizeOverride !== undefined ? { controlSizeOverride } : {}),
     disabled: pending,
   }
 }
@@ -72,10 +67,7 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
         summaryDependsOn: ctx.summaryDependsOn,
         resolveSummary: ctx.resolveSummary,
       },
-      fields: [
-        ctx.availabilityField ??
-          defaultAvailabilitySwitchField(ctx.pending, ctx.switchControlSizeOverride),
-      ],
+      fields: [ctx.availabilityField ?? defaultAvailabilitySwitchField(ctx.pending)],
     },
   ]
 }

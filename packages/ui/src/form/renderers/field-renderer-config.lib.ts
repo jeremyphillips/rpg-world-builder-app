@@ -9,7 +9,8 @@ import {
   resolveFieldHintPresentation,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
-import { resolveFormDensity, type FormDensity } from '../form-density'
+import type { FormDensity } from '../form-density'
+import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
 
 export function buildFieldRendererIds(
   config: FieldConfig,
@@ -52,7 +53,10 @@ export function resolveFieldRenderConfig(
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
 ): ResolvedFieldRenderConfig {
-  const controlSize = config.controlSizeOverride ?? resolveFormDensity(density).size
+  const controlSize = resolveFieldControlSize({
+    density,
+    override: config.controlSizeOverride,
+  })
   const hintPresentation = resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
 

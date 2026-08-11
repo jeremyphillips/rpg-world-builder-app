@@ -5,6 +5,10 @@ Section shells (`Form`, `TabbedForm`, `FormFieldStack`, `group`, `array`) own `d
 leaves inherit control scale from density. Rare leaf overrides use `controlSizeOverride`
 only. Decision rules live in the [forms hub](../forms.md#form-density).
 
+**Control size policy:** resolve scale only via `resolveFieldControlSize` (pure) or
+`useFieldControlSize` (context adapter). Renderers must not combine `controlSizeOverride`
+with `resolveFormDensity` directly.
+
 Source of truth: [`form-density.ts`](../../src/form/form-density.ts),
 [`field-stack.variants.ts`](../../src/components/ui/field-stack.variants.ts),
 [`field-sizing.variants.ts`](../../src/components/ui/field-sizing.variants.ts),

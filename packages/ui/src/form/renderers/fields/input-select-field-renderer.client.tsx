@@ -65,7 +65,7 @@ export function InputSelectFieldRenderer({
   hint,
   hintPosition,
 }: InputSelectFieldRendererProps) {
-  const controlSize = useFieldControlSize(config)
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const valueKey = config.valueKey ?? 'value'
   const unitKey = config.unitKey ?? 'unit'
   const valuePath = `${fullName}.${valueKey}`

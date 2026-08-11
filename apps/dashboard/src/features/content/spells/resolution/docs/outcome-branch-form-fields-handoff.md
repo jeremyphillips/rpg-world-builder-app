@@ -65,7 +65,6 @@ export function outcomeNoteFields(): FormItem[] {
       label: RESOLUTION_FIELD_LABELS.hitNote,
       rows: 3,
       width: 'full',
-      size: 'sm',
     },
   ]
 }

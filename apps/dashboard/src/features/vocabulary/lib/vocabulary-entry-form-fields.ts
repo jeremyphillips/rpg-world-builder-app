@@ -64,7 +64,6 @@ export function buildVocabularyEntrySheetFields(ctx: VocabularyEntrySheetFieldCt
       groupId: ctx.groupId,
       pending: ctx.pending,
       groupDensity: 'comfortable',
-      switchControlSizeOverride: 'md',
       summaryDependsOn: ['available'],
       resolveSummary: (values) => resolveVocabularyAvailabilitySummary(Boolean(values.available)),
     }),

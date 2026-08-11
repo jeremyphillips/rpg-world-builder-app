@@ -976,7 +976,7 @@ export interface DependentConfig {
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `legendSize`, `rhythm`, `chrome`, `disclosure`,
+ * Common options: `legend`, `fields`, `legendSize`, `density`, `chrome`, `disclosure`,
  * `description`, `visibility`.
  *
  * Nested groups inside another group often use `legendSize: 'subsection'`.

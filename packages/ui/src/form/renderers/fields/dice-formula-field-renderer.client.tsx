@@ -32,7 +32,7 @@ export function DiceFormulaFieldRenderer({
   hintPosition,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
-  const controlSize = useFieldControlSize(config)
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const currencyConfig = config.currencyUnit
   const currencyName =
     currencyConfig && namePrefix ? `${namePrefix}.${currencyConfig.name ?? 'currency'}` : undefined

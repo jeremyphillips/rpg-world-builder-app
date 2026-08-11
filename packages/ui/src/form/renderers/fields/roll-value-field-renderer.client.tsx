@@ -65,7 +65,7 @@ export function RollValueFieldRenderer({
   hint,
   hintPosition,
 }: RollValueFieldRendererProps) {
-  const controlSize = useFieldControlSize(config)
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const diceCount = useController({ name: subPath(fullName, 'dice.count') })
   const diceFaces = useController({ name: subPath(fullName, 'dice.faces') })
   const flatOperator = useController({ name: subPath(fullName, 'flatOperator') })

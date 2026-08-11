@@ -105,7 +105,7 @@ export function InlineSentenceFieldRenderer({
   namePrefix,
   error,
 }: InlineSentenceFieldRendererProps) {
-  const controlSize = useFieldControlSize(config)
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const segmentVisibilityDeps = useMemo(
     () => inlineSentenceSegmentVisibilityDeps(config.segments),
     [config.segments],
