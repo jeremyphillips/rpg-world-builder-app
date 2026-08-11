@@ -4,16 +4,21 @@ import { describe, expect, it } from 'vitest'
 import { CatalogPickerSheet } from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { ContentEntityCard, ContentEntityCardViewLink } from './content-entity-card.client'
+import { buildEntityMediaFromImageKey } from './entity/entity-media.lib'
+import { HARBOR_DISTRICT_ENTITY } from './entity/entity.fixture'
+import {
+  ContentEntityCard,
+  ContentEntityCardViewLink,
+  EntityItem,
+} from './content-entity-card.client'
 
 describe('ContentEntityCard', () => {
   it('wraps the heading in a link when href is provided', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
-          heading="Harbor District"
+          entity={HARBOR_DISTRICT_ENTITY}
           href="/campaigns/camp-1/locations/harbor"
-          subheading="Settlement overview"
         />
       </MemoryRouter>,
     )
@@ -24,31 +29,18 @@ describe('ContentEntityCard', () => {
     )
     expect(screen.getByRole('link', { name: 'Harbor District' })).toHaveClass('text-link')
     expect(screen.getByRole('link', { name: 'Harbor District' })).not.toHaveClass('hover:underline')
-    expect(screen.getByText('Settlement overview')).toBeInTheDocument()
+    expect(screen.getByText('Located in Grey Coast')).toBeInTheDocument()
   })
 
-  it('allows href in embedded chrome', () => {
+  it('renders artwork from entity media', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
-          chrome="embedded"
-          density="compact"
-          heading="Harbor District"
-          href="/campaigns/camp-1/locations/harbor"
+          entity={{
+            heading: 'Silver Circle',
+            media: buildEntityMediaFromImageKey('org/silver-circle.png', 'Silver Circle'),
+          }}
         />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByRole('link', { name: 'Harbor District' })).toHaveAttribute(
-      'href',
-      '/campaigns/camp-1/locations/harbor',
-    )
-  })
-
-  it('renders artwork from imageKey via ContentCardMedia', () => {
-    render(
-      <MemoryRouter>
-        <ContentEntityCard heading="Silver Circle" imageKey="org/silver-circle.png" />
       </MemoryRouter>,
     )
 
@@ -72,13 +64,7 @@ describe('ContentEntityCard', () => {
   it('applies presentational disabled treatment only', () => {
     const { container } = render(
       <MemoryRouter>
-        <ContentEntityCard
-          chrome="embedded"
-          density="compact"
-          heading="Port City"
-          subheading="All site relationship types already linked."
-          disabled
-        />
+        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} disabled />
       </MemoryRouter>,
     )
 
@@ -87,14 +73,12 @@ describe('ContentEntityCard', () => {
     expect(article).toHaveClass('opacity-60')
   })
 
-  it('renders endSlot in the standard card slot', () => {
+  it('renders action in the standard card slot', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
-          chrome="embedded"
-          density="compact"
-          heading="Grey Coast"
-          endSlot={<button type="button">Select</button>}
+          entity={HARBOR_DISTRICT_ENTITY}
+          action={<button type="button">Select</button>}
         />
       </MemoryRouter>,
     )
@@ -102,6 +86,21 @@ describe('ContentEntityCard', () => {
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
   })
 
+  itAxe('has no axe accessibility violations', async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ContentEntityCard
+          entity={HARBOR_DISTRICT_ENTITY}
+          href="/campaigns/camp-1/locations/harbor"
+        />
+      </MemoryRouter>,
+    )
+
+    await expectNoAxeViolations(container)
+  })
+})
+
+describe('EntityItem', () => {
   it('embeds in entity-card picker rows without double-applying host content inset', () => {
     render(
       <CatalogPickerSheet
@@ -114,12 +113,10 @@ describe('ContentEntityCard', () => {
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.name}
         renderItemHeader={(item) => (
-          <ContentEntityCard
-            chrome="embedded"
+          <EntityItem
             density="compact"
-            heading={item.name}
-            subheading={item.kind}
-            endSlot={<button type="button">Select</button>}
+            entity={{ heading: item.name, classification: item.kind }}
+            action={<button type="button">Select</button>}
           />
         )}
       />,
@@ -130,19 +127,5 @@ describe('ContentEntityCard', () => {
     expect(rowShell).not.toHaveClass('pl-2')
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
     expect(screen.getByText('Grey Coast')).toBeInTheDocument()
-  })
-
-  itAxe('has no axe accessibility violations', async () => {
-    const { container } = render(
-      <MemoryRouter>
-        <ContentEntityCard
-          heading="Harbor District"
-          href="/campaigns/camp-1/locations/harbor"
-          subheading="Settlement overview"
-        />
-      </MemoryRouter>,
-    )
-
-    await expectNoAxeViolations(container)
   })
 })

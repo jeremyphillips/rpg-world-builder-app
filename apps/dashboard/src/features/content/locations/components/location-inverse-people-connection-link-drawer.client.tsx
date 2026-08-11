@@ -19,10 +19,10 @@ import {
 } from '@/features/character'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { EntityItem } from '../../lib/content-entity-card.client'
 import {
-  buildCharacterPickerCardPresentation,
-  buildOrganizationPickerCardPresentation,
+  buildCharacterPickerEntitySummary,
+  buildOrganizationPickerEntitySummary,
 } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -377,14 +377,13 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
           return (
-            <ContentEntityCard
-              chrome="embedded"
+            <EntityItem
               density="compact"
-              {...buildOrganizationPickerCardPresentation(organization)}
-              subheading={!hasAvailableKind ? organizationFullyLinkedReason : undefined}
-              imageKey={organization.imageKey}
-              disabled={!hasAvailableKind}
-              endSlot={
+              entity={buildOrganizationPickerEntitySummary(organization, {
+                imageKey: organization.imageKey,
+                description: !hasAvailableKind ? organizationFullyLinkedReason : undefined,
+              })}
+              action={
                 <CatalogPickerSelectionActions
                   phase={phase}
                   canSelect={hasAvailableKind}
@@ -430,13 +429,12 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityCard
-            chrome="embedded"
+          <EntityItem
             density="compact"
-            {...buildCharacterPickerCardPresentation(character)}
-            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
-            disabled={!hasAvailableKind}
-            endSlot={
+            entity={buildCharacterPickerEntitySummary(character, {
+              description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
+            })}
+            action={
               <CatalogPickerSelectionActions
                 phase={phase}
                 canSelect={hasAvailableKind}

@@ -21,8 +21,8 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { buildOrganizationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { EntityItem } from '../../lib/content-entity-card.client'
+import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -439,14 +439,13 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityCard
-            chrome="embedded"
+          <EntityItem
             density="compact"
-            {...buildOrganizationPickerCardPresentation(organization)}
-            subheading={!hasAvailableKind ? fullyLinkedReason : undefined}
-            imageKey={organization.imageKey}
-            disabled={!hasAvailableKind}
-            endSlot={
+            entity={buildOrganizationPickerEntitySummary(organization, {
+              imageKey: organization.imageKey,
+              description: !hasAvailableKind ? fullyLinkedReason : undefined,
+            })}
+            action={
               <CatalogPickerSelectionActions
                 phase={phase}
                 canSelect={hasAvailableKind}

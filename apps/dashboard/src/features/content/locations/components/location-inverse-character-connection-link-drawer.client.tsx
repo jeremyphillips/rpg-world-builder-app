@@ -23,8 +23,8 @@ import {
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { buildCharacterPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { EntityItem } from '../../lib/content-entity-card.client'
+import { buildCharacterPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
@@ -290,13 +290,12 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityCard
-            chrome="embedded"
+          <EntityItem
             density="compact"
-            {...buildCharacterPickerCardPresentation(character)}
-            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
-            disabled={!hasAvailableKind}
-            endSlot={
+            entity={buildCharacterPickerEntitySummary(character, {
+              description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
+            })}
+            action={
               <CatalogPickerSelectionActions
                 phase={phase}
                 canSelect={hasAvailableKind}

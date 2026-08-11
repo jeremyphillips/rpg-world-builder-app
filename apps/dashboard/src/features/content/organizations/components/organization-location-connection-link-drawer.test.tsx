@@ -405,9 +405,12 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(
-      within(screen.getByText('City Waterworks').closest('article')!).getByRole('button', {
-        name: 'Select',
-      }),
+      within(screen.getByText('City Waterworks').closest('[data-picker-item-key]')!).getByRole(
+        'button',
+        {
+          name: 'Select',
+        },
+      ),
     )
 
     await user.click(screen.getByRole('button', { name: 'Change' }))
@@ -467,9 +470,12 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('button', { name: 'Save change' })).toBeDisabled()
 
     await user.click(
-      within(screen.getByText('The Silver Eel').closest('article')!).getByRole('button', {
-        name: 'Select',
-      }),
+      within(screen.getByText('The Silver Eel').closest('[data-picker-item-key]')!).getByRole(
+        'button',
+        {
+          name: 'Select',
+        },
+      ),
     )
 
     expect(screen.getAllByText('Thieves Guildhouse')).toHaveLength(1)
@@ -680,7 +686,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
 
     await user.click(
-      within(screen.getByText('Port City').closest('article')!).getByRole('button', {
+      within(screen.getByText('Port City').closest('[data-picker-item-key]')!).getByRole('button', {
         name: 'Select',
       }),
     )
