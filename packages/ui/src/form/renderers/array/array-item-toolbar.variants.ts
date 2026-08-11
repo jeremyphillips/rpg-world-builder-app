@@ -1,4 +1,5 @@
 import { cn } from '../../../lib/utils'
+import { iconGhostControlVariants } from '../../../components/ui/icon-ghost-control.variants'
 import {
   collapsibleListItemActionsRailClasses,
   collapsibleListItemBodyClasses,
@@ -54,10 +55,11 @@ export const arrayItemDragHandleClasses = collapsibleListItemDragHandleClasses
 export const arrayItemCollapseButtonClasses = collapsibleListItemCollapseButtonClasses
 
 /** Remove control — destructive hover; always last in the actions rail. */
-export const arrayItemRemoveButtonClasses = cn(
-  arrayItemChromeButtonClasses,
-  'text-muted-foreground hover:bg-destructive-subtle hover:text-destructive',
-)
+export const arrayItemRemoveButtonClasses = iconGhostControlVariants({
+  size: 'compact',
+  hover: 'destructiveSubtle',
+  layout: 'flex',
+})
 
 /** Column wrapper for the title row and optional summary row below it. */
 export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-0'

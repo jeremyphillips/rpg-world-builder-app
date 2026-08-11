@@ -102,6 +102,14 @@ export {
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
+export {
+  interactiveFocusVariants,
+  type InteractiveFocusVariantProps,
+} from './components/ui/interactive-focus.variants'
+export {
+  iconGhostControlVariants,
+  type IconGhostControlVariantProps,
+} from './components/ui/icon-ghost-control.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
   InputActionGroup,
@@ -433,6 +441,7 @@ export {
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
   contentCardMediaVariants,
+  supportingTextDensityVariants,
   resolveContentCardDensityInsetClasses,
   type ContentCardDensity,
   type ContentCardChrome,

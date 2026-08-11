@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { supportingTextDensityVariants } from '@rpg/ui'
+
 /** Embedded EntityItem host — anatomy only; collection inset owned by the host. */
 export const entityItemRootVariants = cva('w-full min-w-0')
 
@@ -40,28 +42,8 @@ export const entityItemContentVariants = cva('flex min-w-0', {
   },
 })
 
-export const entitySummaryDescriptionVariants = cva('truncate text-muted-foreground', {
-  variants: {
-    density: {
-      compact: 'text-xs',
-      comfortable: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const entitySummaryDescriptionVariants = supportingTextDensityVariants
 
-export const entitySummaryStatusVariants = cva('truncate text-muted-foreground', {
-  variants: {
-    density: {
-      compact: 'text-xs',
-      comfortable: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const entitySummaryStatusVariants = supportingTextDensityVariants
 
 export const entityItemStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')

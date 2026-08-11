@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, collapsibleListItemChromeColumnClasses } from '@rpg/ui'
+import { collapsibleListItemChromeColumnClasses, iconGhostControlVariants } from '@rpg/ui'
 
 export const detailEntityRowVariants = cva('flex items-center justify-between gap-4 py-1', {
   variants: {
@@ -37,10 +37,7 @@ export const detailEntityRowDisclosureRowVariants = cva(
 )
 
 export const detailEntityRowDisclosureButtonVariants = cva(
-  cn(
-    'flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    'size-control-action-compact [&_svg]:size-icon-glyph-md',
-  ),
+  iconGhostControlVariants({ size: 'compact', hover: 'text', layout: 'flex' }),
 )
 
 export const detailEntityRowDisclosureContentVariants = cva('pl-[var(--content-column-indent)]')

@@ -1,10 +1,8 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  controlActionCompactIconClasses,
-  controlActionCompactTextClasses,
-} from './control-action.variants'
+import { controlActionCompactTextClasses } from './control-action.variants'
+import { iconGhostControlVariants } from './icon-ghost-control.variants'
 
 /** Entity-owned density inset — shared by standalone and embedded chrome. */
 export const contentCardDensityInsetVariants = cva('', {
@@ -105,7 +103,8 @@ export const contentCardMixedHeadingSuffixVariants = cva(
   'min-w-0 flex-1 truncate font-normal text-muted-foreground',
 )
 
-export const contentCardSubheadingVariants = cva('truncate text-muted-foreground', {
+/** Layer-2 supporting copy density — shared by content-card and entity summary surfaces. */
+export const supportingTextDensityVariants = cva('truncate text-muted-foreground', {
   variants: {
     density: {
       compact: 'text-xs',
@@ -117,23 +116,12 @@ export const contentCardSubheadingVariants = cva('truncate text-muted-foreground
   },
 })
 
-export const contentCardMetadataVariants = cva('truncate text-muted-foreground', {
-  variants: {
-    density: {
-      compact: 'text-xs',
-      comfortable: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+export const contentCardSubheadingVariants = supportingTextDensityVariants
+
+export const contentCardMetadataVariants = supportingTextDensityVariants
 
 export const contentCardIconActionVariants = cva(
-  cn(
-    'inline-flex shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-control-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    controlActionCompactIconClasses,
-  ),
+  iconGhostControlVariants({ size: 'compact', hover: 'accent', layout: 'inline' }),
 )
 
 /** Heading-row actions stay compact regardless of card density. Link actions use pr-0. */

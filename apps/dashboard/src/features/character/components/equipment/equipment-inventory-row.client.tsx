@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react'
 
-import { Text } from '@rpg/ui'
+import { Text, iconGhostControlVariants } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import {
@@ -16,7 +16,6 @@ import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantit
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowQtyLabelClasses,
-  equipmentInventoryRowRemoveButtonClasses,
 } from './equipment-inventory-summary.variants'
 
 export type EquipmentInventoryRowProps = {
@@ -44,7 +43,11 @@ function InventoryRemoveIconButton({
   return (
     <button
       type="button"
-      className={equipmentInventoryRowRemoveButtonClasses}
+      className={iconGhostControlVariants({
+        size: 'comfortable',
+        hover: 'destructive',
+        layout: 'flex',
+      })}
       aria-label={removeLabel}
       onClick={onRemove}
     >

@@ -2,16 +2,13 @@
 
 import { Trash2 } from 'lucide-react'
 
-import { cn } from '@rpg/ui'
+import { cn, iconGhostControlVariants } from '@rpg/ui'
 
 export const BUILDER_INVENTORY_REMOVE_LABEL_PREFIX = 'Remove' as const
 
 export function formatBuilderInventoryRemoveLabel(label: string): string {
   return `${BUILDER_INVENTORY_REMOVE_LABEL_PREFIX} ${label}`
 }
-
-export const builderInventoryRemoveButtonClasses =
-  'flex size-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-control-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 type BuilderInventoryRemoveActionProps = {
   itemLabel: string
@@ -29,7 +26,10 @@ export function BuilderInventoryRemoveAction({
   return (
     <button
       type="button"
-      className={cn(builderInventoryRemoveButtonClasses, className)}
+      className={cn(
+        iconGhostControlVariants({ size: 'comfortable', hover: 'accent', layout: 'flex' }),
+        className,
+      )}
       aria-label={removeAriaLabel ?? formatBuilderInventoryRemoveLabel(itemLabel)}
       onClick={onRemove}
     >
