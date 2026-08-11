@@ -14,8 +14,8 @@ import {
   contentDetailRootClasses,
   contentDetailToolbarClasses,
 } from './content-detail-layout.variants'
-import { ContentStatRow } from './content-stat-row.client'
-import type { ContentStatRowData } from './content-stat-rows'
+import { ContentStatRow } from '../metadata/content-stat-row.client'
+import type { ContentStatRowData } from '../metadata/content-stat-rows'
 
 function ContentDetailStatRows({ statRows }: { statRows: ContentStatRowData[] }) {
   return (

@@ -6,7 +6,7 @@ import {
   getArmorCategoryLabel,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 import { titleCase } from '../../../lib/utils/title-case'
 
 /** Stat rows for armor equipment detail (excludes kind; includes cost). */

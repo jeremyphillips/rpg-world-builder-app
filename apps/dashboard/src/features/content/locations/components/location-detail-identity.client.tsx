@@ -3,12 +3,12 @@
 import { Link } from 'react-router-dom'
 import { Button, Text } from '@rpg/ui'
 
-import { ContentStatRow } from '../../lib/detail/content-stat-row.client'
+import { ContentStatRow } from '../../lib/detail/metadata/content-stat-row.client'
 import {
   contentStatRowLabelVariants,
   contentStatRowValueVariants,
   contentStatRowVariants,
-} from '../../lib/detail/content-stat-row.variants'
+} from '../../lib/detail/metadata/content-stat-row.variants'
 import { LOCATION_PARENT_REPLACEMENT_ACTION_LABELS } from '../lib/location-parent-replacement'
 import type { LocationDetailIdentityViewModel } from '../lib/location-display'
 

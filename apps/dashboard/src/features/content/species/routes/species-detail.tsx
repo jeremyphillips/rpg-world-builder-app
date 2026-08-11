@@ -22,11 +22,11 @@ import {
   type SpeciesDetailViewModel,
 } from '../lib/species-display'
 import { useSpecies } from '../hooks/use-species'
-import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
+import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
-import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
-import { contentEditHref } from '../../lib/detail/content-edit-href'
-import { getContentImageUrl } from '../../lib/detail/content-image-url'
+import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
+import { contentEditHref } from '../../lib/detail/page/content-edit-href'
+import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
 
 // ---------------------------------------------------------------------------

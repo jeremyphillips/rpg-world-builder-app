@@ -5,9 +5,9 @@ import { Plus } from 'lucide-react'
 
 import { Button, Eyebrow, Text, cn } from '@rpg/ui'
 
-import { detailSectionGroupHeaderVariants } from '../detail/detail-section-group.variants'
-import { detailRowListSeparatorVariants } from '../detail/detail-row-list.variants'
-import type { DetailOverflowAction } from '../detail/detail-overflow-menu.client'
+import { detailSectionGroupHeaderVariants } from '../detail/section/detail-section-group.variants'
+import { detailRowListSeparatorVariants } from '../detail/section/detail-row-list.variants'
+import type { DetailOverflowAction } from '../detail/row/detail-overflow-menu.client'
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
 import {
   relationshipListEmptyVariants,

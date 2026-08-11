@@ -18,7 +18,7 @@ import {
   OrganizationLocationConnectionListRow,
   type OrganizationLocationConnectionMutationContext,
 } from './organization-location-connection-relationship-row.client'
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
 import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =

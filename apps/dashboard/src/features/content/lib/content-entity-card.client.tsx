@@ -14,7 +14,7 @@ import {
   type ContentCardProps,
 } from '@rpg/ui'
 
-import { getContentImageUrl } from './detail/content-image-url'
+import { getContentImageUrl } from './detail/page/content-image-url'
 
 export type ContentEntityCardProps = {
   heading: ReactNode

@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import { DetailEntityRow } from './detail-entity-row.client'
-import { DetailSectionRowList } from './detail-section-row-list.client'
+import { DetailSectionRowList } from '../section/detail-section-row-list.client'
 
 describe('DetailEntityRow', () => {
   it('renders heading link, inline heading suffix, and end slot with row padding', () => {

@@ -171,7 +171,7 @@ import { WidePage } from '@/components/layout/wide-page'
 - [`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
   — managed catalog **list** recipe: `WidePage` + `PageHeader` + `PageLoadState`
   - campaign-manager "New" gating. Use for catalog list routes only.
-- [`ContentDetailLayout`](../src/features/content/lib/detail/content-detail-layout.tsx)
+- [`ContentDetailLayout`](../src/features/content/lib/detail/page/content-detail-layout.tsx)
   — catalog **detail** recipe inside `WidePage`: edit toolbar, full-width hero
   card (name + metadata + artwork), then a `narrowPageContentClasses` body column
   for description and sections. Pass static rows via `statRows` or hook-driven
@@ -183,7 +183,7 @@ import { WidePage } from '@/components/layout/wide-page'
 
 ```tsx
 import { WidePage } from '@/components/layout/wide-page'
-import { ContentDetailLayout } from '@/features/content/lib/detail/content-detail-layout'
+import { ContentDetailLayout } from '@/features/content/lib/detail/page/content-detail-layout'
 ;<WidePage spacing="relaxed">
   <ContentDetailLayout
     name={item.name}
@@ -304,7 +304,7 @@ Walk speed, weapon range, and spell distance use [`feetInputUnitField`](../src/f
 [`scalarUnitInputSelectField`](../src/features/content/lib/forms/fields/content-speed-form-fields.ts)
 (`fixedUnit: 'lb.'` when only one unit option).
 
-Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/detail/content-detail-resolver.tsx)
+Detail route shells use [`ContentDetailResolver`](../src/features/content/lib/detail/page/content-detail-resolver.tsx)
 for loading, error, and not-found states (parallel to
 [`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
 on list pages).

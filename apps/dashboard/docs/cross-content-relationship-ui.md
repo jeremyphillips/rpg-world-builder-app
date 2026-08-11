@@ -42,7 +42,7 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 ## Detail section layout
 
-Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/features/content/lib/detail/). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells.
+Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/features/content/lib/detail/) (`section/` + `row/`). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells. Catalog read routes use `detail/page/` and `detail/metadata/`.
 
 ### Heading vs eyebrow vs row title
 
@@ -240,10 +240,10 @@ Both actions remain in the subgroup header for empty and populated states. Direc
 
 ## Populated row vs empty container
 
-| Responsibility                    | Owner                                                                                                                  |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                      |
-| Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
+| Responsibility                    | Owner                                                                                                                      |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                          |
+| Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/row/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
 Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 
