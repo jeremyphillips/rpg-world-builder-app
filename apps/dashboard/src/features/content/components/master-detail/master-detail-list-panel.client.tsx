@@ -25,7 +25,6 @@ import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 import { EntityItem } from '../../lib/content-entity-card.client'
 import {
   masterDetailListDragHandleClasses,
-  masterDetailListDragHandleVisibleClasses,
   masterDetailListRowDraggingClasses,
   masterDetailListRowLayoutClasses,
   masterDetailListRowSelectClasses,
@@ -137,10 +136,7 @@ function MasterDetailListDragHandle({
   return (
     <button
       type="button"
-      className={cn(
-        masterDetailListDragHandleClasses,
-        isDragging && masterDetailListDragHandleVisibleClasses,
-      )}
+      className={masterDetailListDragHandleClasses(isDragging)}
       aria-label={`Drag to reorder ${title}`}
       onClick={(event) => event.stopPropagation()}
       {...dragHandleProps.attributes}

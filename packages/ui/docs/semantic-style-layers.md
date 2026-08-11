@@ -50,21 +50,27 @@ Orthogonal row fills — not layout:
 
 Hosts keep inset, separators, border footprint, and left-rail accents locally.
 
-### Drag (phase 2 — pending full migration)
+### Drag
 
 ```ts
-dragHandleVariants({ visibility: 'always' | 'hoverReveal' })
+dragHandleVariants({ visibility: 'always' | 'hoverReveal', dragging?: boolean })
 dragSurfaceVariants({ dragging: boolean })
 ```
+
+| Visibility    | Use when                                       |
+| ------------- | ---------------------------------------------- |
+| `always`      | Collapsible list items, array fields, DEC grip |
+| `hoverReveal` | Master-detail sortable rows                    |
 
 **Hover-reveal host contract**
 
 - Host root includes `group` (or the agreed group name).
 - Handle uses `group-hover` / `group-focus-within` reveal; hosts do not invent
   alternate opacity wiring.
-- While dragging, handle stays `opacity-100` even under `hoverReveal`.
+- Pass `dragging: true` on the handle (or compose `dragHandleVisibleWhileDraggingClasses`)
+  so the grip stays visible for the duration of an active drag.
 
-Master-detail list still carries a local grip stack until phase 2 lands.
+Host-local spacing (e.g. master-detail `ml-0.5`, CLI compact `-mt-1`) stays on the host.
 
 ## Layer 2 presentation
 
@@ -79,7 +85,7 @@ Master-detail list still carries a local grip stack until phase 2 lands.
 - No deep imports of `control-action` geometry.
 - No new `*RemoveButtonClasses` constants — `Button` or `iconGhostControlVariants`.
 - No raw `hover:bg-row-*` / `border-row-selected-*` in feature variants — `interactiveRowVariants`.
-- No local `cursor-grab` drag-handle recipes (allowlisted until drag phase completes).
+- No local `cursor-grab` drag-handle recipes (allowlisted score-token bench product only).
 
 Allowlisted host accents and products are documented inline in
 `apps/dashboard/eslint.config.js`.

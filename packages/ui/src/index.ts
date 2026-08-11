@@ -114,6 +114,16 @@ export {
   interactiveRowVariants,
   type InteractiveRowVariantProps,
 } from './components/ui/interactive-row.variants'
+export {
+  dragHandleVariants,
+  dragHandleVisibleWhileDraggingClasses,
+  type DragHandleVariantProps,
+} from './components/ui/drag-handle.variants'
+export {
+  dragSurfaceVariants,
+  dragSurfaceDraggingOpacityClasses,
+  type DragSurfaceVariantProps,
+} from './components/ui/drag-surface.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
   InputActionGroup,

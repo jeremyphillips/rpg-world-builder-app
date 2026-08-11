@@ -1,4 +1,4 @@
-import { interactiveRowVariants } from '@rpg/ui'
+import { cn, dragHandleVariants, dragSurfaceVariants, interactiveRowVariants } from '@rpg/ui'
 
 /** Outer row layout — host-owned inset for embedded EntityItem. */
 export const masterDetailListRowLayoutClasses =
@@ -22,15 +22,18 @@ export function masterDetailListRowSurfaceClasses(options: {
   })
 }
 
-/** Drag handle — hidden until row hover, focus, or active drag. Phase 2: dragHandleVariants. */
-export const masterDetailListDragHandleClasses =
-  'ml-0.5 flex size-6 shrink-0 cursor-grab items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 ease-in-out hover:text-foreground focus-visible:opacity-100 active:cursor-grabbing group-focus-within:opacity-100 group-hover:opacity-100'
+/** Host-local leading inset for the sortable grip column. */
+export const masterDetailListDragHandleInsetClasses = 'ml-0.5'
 
-/** Keeps the handle visible while a row is being dragged. */
-export const masterDetailListDragHandleVisibleClasses = 'opacity-100'
+export function masterDetailListDragHandleClasses(isDragging = false): string {
+  return cn(
+    masterDetailListDragHandleInsetClasses,
+    dragHandleVariants({ visibility: 'hoverReveal', dragging: isDragging }),
+  )
+}
 
 /** Selectable label region inside a row. */
 export const masterDetailListRowSelectClasses = 'min-w-0 flex-1 rounded-md text-left'
 
 /** Applied to the row wrapper while it is being dragged. */
-export const masterDetailListRowDraggingClasses = interactiveRowVariants({ dragging: true })
+export const masterDetailListRowDraggingClasses = dragSurfaceVariants({ dragging: true })

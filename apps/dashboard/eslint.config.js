@@ -94,8 +94,6 @@ const dashboardSemanticStyleLayerGuards = {
     'src/features/campaign/components/campaign-destination.variants.ts',
     'src/features/character/components/equipment/equipment-acquisition-panel.variants.ts',
     'src/features/character/components/equipment/equipment-picker-purchase.variants.ts',
-    // Drag handle migrates in semantic-style-layers phase 2.
-    'src/features/content/components/master-detail/master-detail-list-panel.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [
@@ -145,7 +143,6 @@ const dashboardDragHandleGuard = {
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
     'src/features/character/components/steps/score-token.variants.ts',
-    'src/features/content/components/master-detail/master-detail-list-panel.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [

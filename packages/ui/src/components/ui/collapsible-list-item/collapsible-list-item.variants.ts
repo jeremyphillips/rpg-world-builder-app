@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import { dragHandleVariants } from '../drag-handle.variants'
+import { dragSurfaceVariants } from '../drag-surface.variants'
 import { iconGhostControlVariants } from '../icon-ghost-control.variants'
 import { establishSurfaceCurrent } from '../surface-current.lib'
 import {
@@ -156,11 +158,7 @@ export function collapsibleListItemActionsRailClasses(
 
 /** Inline drag handle — first leading chrome column when sortable. */
 export function collapsibleListItemDragHandleClasses(options: { compact?: boolean } = {}): string {
-  return cn(
-    collapsibleListItemChromeButtonClasses,
-    'cursor-grab active:cursor-grabbing',
-    options.compact && '-mt-1',
-  )
+  return cn(dragHandleVariants({ visibility: 'always' }), options.compact && '-mt-1')
 }
 
 /** Collapse caret in detailed item headers. */
@@ -229,4 +227,4 @@ export function resolveCollapsibleListItemDomIds(itemId: string): {
 }
 
 /** Applied to the item wrapper while it is being dragged. */
-export const collapsibleListItemDraggingClasses = 'opacity-50'
+export const collapsibleListItemDraggingClasses = dragSurfaceVariants({ dragging: true })

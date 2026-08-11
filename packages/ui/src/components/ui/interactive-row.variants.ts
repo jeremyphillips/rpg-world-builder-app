@@ -1,5 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { dragSurfaceDraggingOpacityClasses } from './drag-surface.variants'
+
 /**
  * Orthogonal row interaction policy — capability (hover), semantic state, and drag feedback.
  * Hosts own layout, inset, separators, and left-rail accents; they compose this for fills only.
@@ -35,7 +37,7 @@ export const interactiveRowVariants = cva('transition-colors', {
       checked: 'data-[state=checked]:bg-row-selected',
     },
     dragging: {
-      true: 'opacity-50',
+      true: dragSurfaceDraggingOpacityClasses,
       false: '',
     },
   },
