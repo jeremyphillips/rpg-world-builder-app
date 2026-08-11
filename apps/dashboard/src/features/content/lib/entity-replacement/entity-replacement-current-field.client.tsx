@@ -4,7 +4,7 @@ import { ContentCardMedia, Heading, InsetPanel } from '@rpg/ui'
 
 import { DrawerContextEntityBlock } from '../relationship/drawer-context-entity-block.client'
 import type { DrawerContextEntityPresentation } from '../relationship/drawer-context.types'
-import { getContentImageUrl } from '../detail/content-image-url'
+import { getContentImageUrl } from '../detail/page/content-image-url'
 
 export type EntityReplacementCurrentFieldProps = {
   label: string

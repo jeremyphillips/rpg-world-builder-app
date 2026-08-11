@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { DetailEntityRow } from './detail-entity-row.client'
+import { DetailEntityRow } from '../row/detail-entity-row.client'
 import { DetailSectionGroup } from './detail-section-group.client'
 import { DetailSectionPanel } from './detail-section-panel.client'
 import { DetailSectionRowList } from './detail-section-row-list.client'
@@ -18,7 +18,7 @@ export const Default: Story = {
   args: {
     label: 'Districts',
     children: (
-      <DetailSectionRowList>
+      <DetailSectionRowList separator="structural">
         <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
       </DetailSectionRowList>
     ),
@@ -36,7 +36,7 @@ export const InsidePanel: Story = {
           </button>
         }
       >
-        <DetailSectionRowList>
+        <DetailSectionRowList separator="structural">
           <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
         </DetailSectionRowList>
       </DetailSectionGroup>

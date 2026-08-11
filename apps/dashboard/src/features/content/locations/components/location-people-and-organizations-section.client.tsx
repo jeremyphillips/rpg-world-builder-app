@@ -8,11 +8,8 @@ import {
   formatCharacterMixedHeadingSuffix,
 } from '@/features/character'
 
-import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
-import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
+import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -220,71 +217,70 @@ export function LocationPeopleAndOrganizationsSectionBody({
   }
 
   const familyAddEnabled = canManage && canAddToSection && Boolean(onAddPeopleSection)
+  const addAction = familyAddEnabled
+    ? { label: LOCATION_PEOPLE_SECTION_SURFACE_COPY.add, onSelect: onAddPeopleSection! }
+    : undefined
 
   return (
     <DetailSectionPanel heading={heading} headingId={headingId} helper={helper}>
-      {hasRows ? (
-        <>
-          {populatedSlots.map((slot) => {
-            const slotRows = rowsForSlot(slot, rowsByBinding)
+      <RelationshipList.Root itemCount={rows.length} emptyLabel={sectionEmpty} action={addAction}>
+        {populatedSlots.map((slot) => {
+          const slotRows = rowsForSlot(slot, rowsByBinding)
 
-            return (
-              <RelationshipFieldGroupRow key={peopleKindSlotKey(slot)} eyebrow={slot.heading}>
-                <ul className="space-y-1">
-                  {slotRows.map((row) => {
-                    const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
-                    const rowCanRemove =
-                      canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
-                    const headingSuffix = resolveCharacterRowHeadingSuffix(
-                      row,
-                      charactersById,
-                      campaignId,
-                    )
+          return (
+            <RelationshipList.Group
+              key={peopleKindSlotKey(slot)}
+              label={slot.heading}
+              itemCount={slotRows.length}
+            >
+              {slotRows.map((row) => {
+                const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
+                const rowCanRemove =
+                  canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
+                const headingSuffix = resolveCharacterRowHeadingSuffix(
+                  row,
+                  charactersById,
+                  campaignId,
+                )
+                const actions = buildPeopleOverflowActions({
+                  campaignId,
+                  row,
+                  navigate,
+                  canManage,
+                  canEditRow: Boolean(rowCanEdit),
+                  canRemoveRow: Boolean(rowCanRemove),
+                  mutationContext,
+                  onEditConnection,
+                  onRemoveConnection,
+                })
 
-                    return (
-                      <li key={row.relationshipId}>
-                        <CrossContentRelationshipRow
-                          heading={row.subject.name}
-                          href={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
-                          headingSuffix={headingSuffix}
-                          actions={buildPeopleOverflowActions({
-                            campaignId,
-                            row,
-                            navigate,
-                            canManage,
-                            canEditRow: Boolean(rowCanEdit),
-                            canRemoveRow: Boolean(rowCanRemove),
-                            mutationContext,
-                            onEditConnection,
-                            onRemoveConnection,
-                          })}
-                          overflowTriggerLabel={`Actions for ${row.subject.name}`}
-                        />
-                      </li>
-                    )
-                  })}
-                </ul>
-              </RelationshipFieldGroupRow>
-            )
-          })}
-          {familyAddEnabled ? (
-            <DetailSectionGroup>
-              <RelationshipContentRow
-                addLabel={LOCATION_PEOPLE_SECTION_SURFACE_COPY.add}
-                onAdd={onAddPeopleSection}
-              />
-            </DetailSectionGroup>
-          ) : null}
-        </>
-      ) : canManage ? (
-        <DetailSectionGroup>
-          <RelationshipContentRow
-            emptyLabel={sectionEmpty}
-            addLabel={familyAddEnabled ? LOCATION_PEOPLE_SECTION_SURFACE_COPY.add : undefined}
-            onAdd={familyAddEnabled ? onAddPeopleSection : undefined}
-          />
-        </DetailSectionGroup>
-      ) : null}
+                return (
+                  <RelationshipList.Row
+                    key={row.relationshipId}
+                    title={row.subject.name}
+                    href={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
+                    headingSuffix={headingSuffix}
+                    menu={
+                      actions.length > 0
+                        ? {
+                            label: `Actions for ${row.subject.name}`,
+                            items: actions.map((action) => ({
+                              id: action.id,
+                              label: action.label,
+                              destructive: action.destructive,
+                              disabled: action.disabled,
+                              onSelect: action.onSelect,
+                            })),
+                          }
+                        : undefined
+                    }
+                  />
+                )
+              })}
+            </RelationshipList.Group>
+          )
+        })}
+      </RelationshipList.Root>
     </DetailSectionPanel>
   )
 }

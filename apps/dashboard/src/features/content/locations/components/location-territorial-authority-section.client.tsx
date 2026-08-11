@@ -6,16 +6,12 @@ import type {
   LocationConnectedPartyRow,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
-import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
-import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
+import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -148,16 +144,6 @@ type LocationTerritorialAuthoritySectionBodyProps = {
   canRemoveRow?: (row: LocationConnectedPartyRow) => boolean
 }
 
-/** Canonical labeled-group header action (same recipe as City structure subgroup actions). */
-function renderGroupAddAction(label: string, onAdd: () => void) {
-  return (
-    <Button type="button" variant="ghost" size="sm" density="compact" onClick={onAdd}>
-      <Plus aria-hidden />
-      {label}
-    </Button>
-  )
-}
-
 function renderTerritorialRelationshipRow(input: {
   campaignId: string
   row: LocationConnectedPartyOrganizationRow
@@ -174,23 +160,37 @@ function renderTerritorialRelationshipRow(input: {
     subjectId: string
   }) => void
 }) {
+  const actions = buildTerritorialOverflowActions({
+    campaignId: input.campaignId,
+    row: input.row,
+    navigate: input.navigate,
+    canManage: input.canManage,
+    canEditRow: input.canEditRow,
+    canRemoveRow: input.canRemoveRow,
+    mutationContext: input.mutationContext,
+    onChangeKind: input.onChangeKind,
+    onReplaceOrganization: input.onReplaceOrganization,
+    onRemoveConnection: input.onRemoveConnection,
+  })
+
   return (
-    <CrossContentRelationshipRow
-      heading={input.row.subject.name}
+    <RelationshipList.Row
+      title={input.row.subject.name}
       href={ROUTES.content.organizations.detail(input.campaignId, input.row.subject.id)}
-      actions={buildTerritorialOverflowActions({
-        campaignId: input.campaignId,
-        row: input.row,
-        navigate: input.navigate,
-        canManage: input.canManage,
-        canEditRow: input.canEditRow,
-        canRemoveRow: input.canRemoveRow,
-        mutationContext: input.mutationContext,
-        onChangeKind: input.onChangeKind,
-        onReplaceOrganization: input.onReplaceOrganization,
-        onRemoveConnection: input.onRemoveConnection,
-      })}
-      overflowTriggerLabel={`Actions for ${input.row.subject.name}`}
+      menu={
+        actions.length > 0
+          ? {
+              label: `Actions for ${input.row.subject.name}`,
+              items: actions.map((action) => ({
+                id: action.id,
+                label: action.label,
+                destructive: action.destructive,
+                disabled: action.disabled,
+                onSelect: action.onSelect,
+              })),
+            }
+          : undefined
+      }
     />
   )
 }
@@ -230,31 +230,73 @@ export function LocationTerritorialAuthoritySectionBody({
     canRemoveRow: Boolean(canManage && (canRemoveRow?.(row) ?? true)),
   })
 
+  const totalRows = (governsRow ? 1 : 0) + (controlsRow ? 1 : 0) + claimRows.length
+  const visibleGroupCount =
+    SINGLETON_KINDS.filter((kind) => {
+      const row = kind === 'governs' ? governsRow : controlsRow
+      return row || canManage
+    }).length + (showClaimsGroup ? 1 : 0)
+  const rootItemCount = Math.max(totalRows, visibleGroupCount > 0 ? 1 : 0)
+
   return (
     <DetailSectionPanel
       heading={TERRITORIAL_AUTHORITY_SECTION_HEADING}
       headingId={TERRITORIAL_AUTHORITY_HEADING_ID}
       helper={showHelper ? TERRITORIAL_AUTHORITY_SECTION_HELPER : undefined}
     >
-      {SINGLETON_KINDS.map((kind) => {
-        const row = kind === 'governs' ? governsRow : controlsRow
-        const copy = TERRITORIAL_AUTHORITY_SLOT_COPY[kind]
+      <RelationshipList.Root itemCount={rootItemCount}>
+        {SINGLETON_KINDS.map((kind) => {
+          const row = kind === 'governs' ? governsRow : controlsRow
+          const copy = TERRITORIAL_AUTHORITY_SLOT_COPY[kind]
 
-        if (!row && !canManage) {
-          return null
-        }
+          if (!row && !canManage) {
+            return null
+          }
 
-        return (
-          <RelationshipFieldGroupRow
-            key={kind}
-            eyebrow={copy.heading}
-            endSlot={
-              !row && canManage
-                ? renderGroupAddAction(copy.add, () => onAddKind?.(kind))
+          return (
+            <RelationshipList.Group
+              key={kind}
+              label={copy.heading}
+              itemCount={row ? 1 : 0}
+              emptyLabel={copy.empty}
+              headerAction={
+                !row && canManage
+                  ? { label: copy.add, onSelect: () => onAddKind?.(kind) }
+                  : undefined
+              }
+            >
+              {row
+                ? renderTerritorialRelationshipRow({
+                    campaignId,
+                    row,
+                    canManage,
+                    navigate,
+                    mutationContext,
+                    onChangeKind,
+                    onReplaceOrganization,
+                    onRemoveConnection,
+                    ...resolveRowPermissions(row),
+                  })
+                : null}
+            </RelationshipList.Group>
+          )
+        })}
+
+        {showClaimsGroup ? (
+          <RelationshipList.Group
+            label={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}
+            itemCount={claimRows.length}
+            emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty}
+            headerAction={
+              canManage
+                ? {
+                    label: TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add,
+                    onSelect: () => onAddKind?.('claims'),
+                  }
                 : undefined
             }
           >
-            {row ? (
+            {claimRows.map((row) =>
               renderTerritorialRelationshipRow({
                 campaignId,
                 row,
@@ -265,48 +307,11 @@ export function LocationTerritorialAuthoritySectionBody({
                 onReplaceOrganization,
                 onRemoveConnection,
                 ...resolveRowPermissions(row),
-              })
-            ) : (
-              <RelationshipContentRow emptyLabel={copy.empty} />
+              }),
             )}
-          </RelationshipFieldGroupRow>
-        )
-      })}
-
-      {showClaimsGroup ? (
-        <RelationshipFieldGroupRow
-          eyebrow={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}
-          endSlot={
-            canManage
-              ? renderGroupAddAction(TERRITORIAL_AUTHORITY_SLOT_COPY.claims.add, () =>
-                  onAddKind?.('claims'),
-                )
-              : undefined
-          }
-        >
-          {claimRows.length > 0 ? (
-            <ul className="space-y-1">
-              {claimRows.map((row) => (
-                <li key={row.relationshipId}>
-                  {renderTerritorialRelationshipRow({
-                    campaignId,
-                    row,
-                    canManage,
-                    navigate,
-                    mutationContext,
-                    onChangeKind,
-                    onReplaceOrganization,
-                    onRemoveConnection,
-                    ...resolveRowPermissions(row),
-                  })}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <RelationshipContentRow emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty} />
-          )}
-        </RelationshipFieldGroupRow>
-      ) : null}
+          </RelationshipList.Group>
+        ) : null}
+      </RelationshipList.Root>
     </DetailSectionPanel>
   )
 }

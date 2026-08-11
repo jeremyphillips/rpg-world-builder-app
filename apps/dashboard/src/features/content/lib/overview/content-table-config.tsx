@@ -20,7 +20,7 @@ import type { ColumnDef } from '@rpg/ui'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
 
-import { getContentImageUrl } from '../detail/content-image-url'
+import { getContentImageUrl } from '../detail/page/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell.client'

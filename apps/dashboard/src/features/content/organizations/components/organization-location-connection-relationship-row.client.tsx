@@ -10,8 +10,7 @@ import type {
 import { Badge } from '@rpg/ui'
 
 import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
-import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import { buildLocationEntityContextPresentation } from '../../locations/lib/location-display'
+import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -21,6 +20,7 @@ import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
 } from '../../lib/relationship/resolve-relationship-overflow-actions'
+import { buildLocationEntityContextPresentation } from '../../locations/lib/location-display'
 import type { OrganizationLocationConnectionPreviewItem } from '../lib/organization-display'
 import { resolveOrganizationForwardOverflowLabels } from '../lib/organization-location-connection-surface-copy'
 
@@ -123,7 +123,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
   })
 }
 
-export type OrganizationLocationConnectionRelationshipRowProps = {
+export type OrganizationLocationConnectionListRowProps = {
   item: OrganizationLocationConnectionPreviewItem
   canManage: boolean
   isMutationPending?: boolean
@@ -141,7 +141,7 @@ export type OrganizationLocationConnectionRelationshipRowProps = {
   onRemoveConnection?: (input: { connectionId: string; locationId: string }) => Promise<void>
 }
 
-export function OrganizationLocationConnectionRelationshipRow({
+export function OrganizationLocationConnectionListRow({
   item,
   canManage,
   isMutationPending = false,
@@ -149,36 +149,50 @@ export function OrganizationLocationConnectionRelationshipRow({
   onChangeKindConnection,
   onChangeTargetConnection,
   onRemoveConnection,
-}: OrganizationLocationConnectionRelationshipRowProps) {
+}: OrganizationLocationConnectionListRowProps) {
   const navigate = useNavigate()
   const presentation = item.target
     ? buildLocationEntityContextPresentation(item.target)
     : { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING }
 
+  const actions = buildOrganizationLocationConnectionOverflowActions({
+    item,
+    canManage,
+    isMutationPending,
+    mutationContext,
+    navigate,
+    onChangeKindConnection,
+    onChangeTargetConnection,
+    onRemoveConnection,
+  })
+
   return (
-    <CrossContentRelationshipRow
-      heading={presentation.heading}
+    <RelationshipList.Row
+      title={presentation.heading}
       href={item.target?.href}
       headingSuffix={presentation.headingSuffix}
-      subheading={presentation.supportingText}
-      metadata={
+      description={presentation.supportingText}
+      badge={
         item.target == null ? (
           <Badge tone="warning" className="mt-1">
             Unavailable
           </Badge>
         ) : undefined
       }
-      actions={buildOrganizationLocationConnectionOverflowActions({
-        item,
-        canManage,
-        isMutationPending,
-        mutationContext,
-        navigate,
-        onChangeKindConnection,
-        onChangeTargetConnection,
-        onRemoveConnection,
-      })}
-      overflowTriggerLabel={`Actions for ${presentation.heading}`}
+      menu={
+        actions.length > 0
+          ? {
+              label: `Actions for ${presentation.heading}`,
+              items: actions.map((action) => ({
+                id: action.id,
+                label: action.label,
+                destructive: action.destructive,
+                disabled: action.disabled,
+                onSelect: action.onSelect,
+              })),
+            }
+          : undefined
+      }
     />
   )
 }

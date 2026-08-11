@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DetailEntityRow } from './detail-entity-row.client'
 import { DetailOverflowMenu } from './detail-overflow-menu.client'
-import { DetailSectionRowList } from './detail-section-row-list.client'
+import { DetailSectionRowList } from '../section/detail-section-row-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailEntityRow',
@@ -23,7 +23,7 @@ export const Default: Story = {
 
 export const WithOverflow: Story = {
   render: () => (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       <DetailEntityRow
         heading="The Silver Eel"
         href="/campaigns/demo/locations/silver-eel"
@@ -58,7 +58,7 @@ export const WithOverflow: Story = {
 
 export const WithDisclosure: Story = {
   render: () => (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       <DetailEntityRow
         heading="Dock Ward"
         href="/campaigns/demo/locations/dock-ward"
@@ -67,7 +67,7 @@ export const WithDisclosure: Story = {
           mode: 'expandable',
           label: 'locations in Dock Ward',
           content: (
-            <DetailSectionRowList>
+            <DetailSectionRowList separator="structural">
               <DetailEntityRow
                 heading="The Silver Eel"
                 href="/campaigns/demo/locations/silver-eel"

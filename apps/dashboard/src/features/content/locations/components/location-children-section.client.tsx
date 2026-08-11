@@ -12,19 +12,19 @@ import {
 import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
-import { DetailEntityRow } from '../../lib/detail/detail-entity-row.client'
-import { DetailEntityRowActions } from '../../lib/detail/detail-entity-row-actions.client'
+import { DetailEntityRow } from '../../lib/detail/row/detail-entity-row.client'
+import { DetailEntityRowActions } from '../../lib/detail/row/detail-entity-row-actions.client'
 import {
   detailEntityRowDisclosurePreviewRowVariants,
   resolveDetailEntityRowDisclosurePreviewRowEdge,
-} from '../../lib/detail/detail-entity-row.variants'
-import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
-import { DetailSectionRowList } from '../../lib/detail/detail-section-row-list.client'
+} from '../../lib/detail/row/detail-entity-row.variants'
+import { DetailSectionGroup } from '../../lib/detail/section/detail-section-group.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
+import { DetailSectionRowList } from '../../lib/detail/section/detail-section-row-list.client'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
-} from '../../lib/detail/detail-overflow-menu.client'
+} from '../../lib/detail/row/detail-overflow-menu.client'
 import type {
   LocationChildItem,
   LocationChildrenViewModel,
@@ -137,7 +137,7 @@ function LocationStructurePreviewChildRows({
   inset: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {rows.map((child, childIndex) => (
         <DetailEntityRow
           key={child.item.id}
@@ -316,7 +316,7 @@ function LocationStructureRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {rows.map((row, index) => (
         <LocationStructureRow
           key={row.item.id}
@@ -348,7 +348,7 @@ function LocationChildRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {items.map((item) => {
         const actions = buildChildRowActions(item, canManage, onMove, onView)
 

@@ -62,6 +62,14 @@ describe('OrganizationMembersSection', () => {
     expect(onRemoveMember).toHaveBeenCalledWith(ORGANIZATION_MEMBER_ROWS[0])
   })
 
+  it('renders the add action in the footer when the roster is populated', () => {
+    renderSection({ canManage: true, onAddMember: vi.fn() })
+
+    const addButton = screen.getByRole('button', { name: 'Add member' })
+    expect(addButton).toBeInTheDocument()
+    expect(addButton.closest('[data-slot="relationship-list-footer"]')).toBeInTheDocument()
+  })
+
   it('renders the add action for managers only', () => {
     const onAddMember = vi.fn()
     const { unmount } = renderSection({ canManage: true, onAddMember })

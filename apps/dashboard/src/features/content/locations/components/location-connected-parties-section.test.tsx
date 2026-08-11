@@ -171,8 +171,12 @@ describe('LocationConnectedPartiesSection', () => {
 
     for (const slot of slots) {
       const addButton = screen.getByRole('button', { name: slot.add })
-      expect(screen.getByText(slot.eyebrow).parentElement).toContainElement(addButton)
-      expect(screen.getByText(slot.empty).parentElement).not.toContainElement(addButton)
+      expect(
+        screen.getByText(slot.eyebrow).closest('[data-slot="relationship-list-group-header"]'),
+      ).toContainElement(addButton)
+      expect(
+        screen.getByText(slot.empty).closest('[data-slot="relationship-list-group-header"]'),
+      ).toBeNull()
     }
   })
 
@@ -191,7 +195,9 @@ describe('LocationConnectedPartiesSection', () => {
     )
 
     const addClaim = screen.getByRole('button', { name: 'Add claim' })
-    expect(screen.getByText('Claimed by').parentElement).toContainElement(addClaim)
+    expect(
+      screen.getByText('Claimed by').closest('[data-slot="relationship-list-group-header"]'),
+    ).toContainElement(addClaim)
     expect(screen.getByText("Thieves' Guild")).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Add governing organization' }),

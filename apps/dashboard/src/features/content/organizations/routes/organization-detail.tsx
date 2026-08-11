@@ -9,10 +9,10 @@ import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
 } from '@/features/content/lib/content-type-labels'
-import { contentEditHref } from '../../lib/detail/content-edit-href'
-import { ContentDetailLayout } from '../../lib/detail/content-detail-layout'
-import { ContentDetailResolver } from '../../lib/detail/content-detail-resolver'
-import { getContentImageUrl } from '../../lib/detail/content-image-url'
+import { contentEditHref } from '../../lib/detail/page/content-edit-href'
+import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
+import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
 import { OrganizationMembersDetailSection } from '../components/organization-members-detail-section.client'

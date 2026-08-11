@@ -17,7 +17,7 @@ import {
   type SpellTags,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import {
   formatCastingTime,
   formatSpellComponents,

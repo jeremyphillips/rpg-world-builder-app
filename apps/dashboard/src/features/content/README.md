@@ -35,7 +35,7 @@ lib/
   forms/            # registry + key helpers; shells/, fields/, grants/ subfolders
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge
-  detail/           # Detail layout, stat rows, edit href
+  detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
   utils/            # title-case and other small helpers

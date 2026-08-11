@@ -6,7 +6,7 @@ import {
   type MagicItemEquipment,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 
 /** Stat rows for magic item equipment detail (excludes kind and cost). */
 export function getMagicItemStatRows(item: MagicItemEquipment): ContentStatRowData[] {

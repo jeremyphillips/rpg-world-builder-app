@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
-import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 import { mountCapacitySpeedFields } from '../../../lib/forms/fields/content-speed-form-fields'
 
 /** Mount-specific form field group for the unified equipment form. */

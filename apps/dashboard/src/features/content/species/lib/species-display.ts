@@ -18,7 +18,7 @@ import {
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
 } from '../../lib/grant-display'
-import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
 export const SPECIES_STAT_LABELS = {
   creatureType: getVocabularyTermLabel(CREATURE_TYPE_TERM),

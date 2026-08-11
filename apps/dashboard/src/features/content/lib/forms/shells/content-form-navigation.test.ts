@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { contentEditHref } from '../../detail/content-edit-href'
+import { contentEditHref } from '../../detail/page/content-edit-href'
 import {
   resolveContentPostCreateEditHref,
   routeKeyToContentRouteSection,

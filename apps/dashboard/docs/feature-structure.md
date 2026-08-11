@@ -90,7 +90,7 @@ config; parent `lib/` is the shared layer only.
 | `forms/`         | `ContentFormDef` registry, create/edit shells (`shells/`), grant splits (`grants/`), shared field builders (`fields/`) |
 | `form-options/`  | Cross-type select options (levels, rich-text link targets)                                                             |
 | `overview/`      | List route shell, table column/filter builders, source badge                                                           |
-| `detail/`        | Detail layout/resolver, stat rows, edit href, image URL                                                                |
+| `detail/`        | Catalog detail pages (`page/`), hero metadata (`metadata/`), section chrome (`section/`), row chrome (`row/`)          |
 | `master-detail/` | Embedded array editor hooks, row meta, campaign availability, validation                                               |
 | `list/`          | Content list API/query factories, client, mutation hooks                                                               |
 | `utils/`         | Small shared helpers (e.g. `title-case`)                                                                               |

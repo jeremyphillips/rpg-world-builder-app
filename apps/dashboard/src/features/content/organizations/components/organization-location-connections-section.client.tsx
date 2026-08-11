@@ -15,13 +15,11 @@ import {
   resolveOrganizationForwardFamilyPresentation,
 } from '../lib/organization-location-connection-surface-copy'
 import {
-  OrganizationLocationConnectionRelationshipRow,
+  OrganizationLocationConnectionListRow,
   type OrganizationLocationConnectionMutationContext,
 } from './organization-location-connection-relationship-row.client'
-import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
-import { RelationshipFieldGroupRow } from '../../lib/relationship/relationship-field-group-row.client'
-import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
+import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
   'Could not load organization location connections.'
@@ -114,6 +112,14 @@ export function OrganizationLocationConnectionsSection({
             const familyGroup = populatedFamilyMap.get(family)
             const familyPresentation = resolveOrganizationForwardFamilyPresentation(family)
             const familyAddEnabled = canManage && Boolean(canAddToFamily[family])
+            const familyItemCount =
+              familyGroup?.kindGroups.reduce(
+                (count, kindGroup) => count + kindGroup.items.length,
+                0,
+              ) ?? 0
+            const addAction = familyAddEnabled
+              ? { label: familyPresentation.add, onSelect: () => onAddFamily?.(family) }
+              : undefined
 
             return (
               <DetailSectionPanel
@@ -122,61 +128,43 @@ export function OrganizationLocationConnectionsSection({
                 headingId={`organization-location-connections-${family}-heading`}
                 headingAs="h3"
               >
-                {familyGroup && familyGroup.kindGroups.length > 0 ? (
-                  <>
-                    {familyGroup.kindGroups.map((kindGroup) => (
-                      <RelationshipFieldGroupRow
-                        key={kindGroup.kind}
-                        eyebrow={
-                          familyGroup.kindHeading === 'show' ? kindGroup.kindLabel : undefined
-                        }
-                      >
-                        <ul className="space-y-1">
-                          {kindGroup.items.map((item) => (
-                            <li key={item.connectionId}>
-                              <OrganizationLocationConnectionRelationshipRow
-                                item={item}
-                                canManage={canManage}
-                                isMutationPending={
-                                  isMutationPending && pendingConnectionId === item.connectionId
-                                }
-                                mutationContext={
-                                  mutationContext ?? {
-                                    subjectOrganizationId: '',
-                                    locationCandidates: {
-                                      items: [],
-                                      isAuthoritativeDomainSet: false,
-                                    },
-                                    connections: [],
-                                  }
-                                }
-                                onChangeKindConnection={onChangeKindConnection}
-                                onChangeTargetConnection={onChangeTargetConnection}
-                                onRemoveConnection={onRemoveConnection}
-                              />
-                            </li>
-                          ))}
-                        </ul>
-                      </RelationshipFieldGroupRow>
-                    ))}
-                    {familyAddEnabled ? (
-                      <DetailSectionGroup>
-                        <RelationshipContentRow
-                          addLabel={familyPresentation.add}
-                          onAdd={() => onAddFamily?.(family)}
+                <RelationshipList.Root
+                  itemCount={familyItemCount}
+                  emptyLabel={familyPresentation.empty}
+                  action={addAction}
+                >
+                  {familyGroup?.kindGroups.map((kindGroup) => (
+                    <RelationshipList.Group
+                      key={kindGroup.kind}
+                      label={familyGroup.kindHeading === 'show' ? kindGroup.kindLabel : undefined}
+                      itemCount={kindGroup.items.length}
+                    >
+                      {kindGroup.items.map((item) => (
+                        <OrganizationLocationConnectionListRow
+                          key={item.connectionId}
+                          item={item}
+                          canManage={canManage}
+                          isMutationPending={
+                            isMutationPending && pendingConnectionId === item.connectionId
+                          }
+                          mutationContext={
+                            mutationContext ?? {
+                              subjectOrganizationId: '',
+                              locationCandidates: {
+                                items: [],
+                                isAuthoritativeDomainSet: false,
+                              },
+                              connections: [],
+                            }
+                          }
+                          onChangeKindConnection={onChangeKindConnection}
+                          onChangeTargetConnection={onChangeTargetConnection}
+                          onRemoveConnection={onRemoveConnection}
                         />
-                      </DetailSectionGroup>
-                    ) : null}
-                  </>
-                ) : canManage ? (
-                  <DetailSectionGroup>
-                    <RelationshipContentRow
-                      emptyLabel={familyPresentation.empty}
-                      addLabel={familyAddEnabled ? familyPresentation.add : undefined}
-                      onAdd={familyAddEnabled ? () => onAddFamily?.(family) : undefined}
-                    />
-                  </DetailSectionGroup>
-                ) : null}
+                      ))}
+                    </RelationshipList.Group>
+                  ))}
+                </RelationshipList.Root>
               </DetailSectionPanel>
             )
           })}

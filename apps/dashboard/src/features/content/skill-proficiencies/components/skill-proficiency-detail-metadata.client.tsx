@@ -2,7 +2,10 @@
 
 import { Heading, Text } from '@rpg/ui'
 
-import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/content-stat-row.client'
+import {
+  ContentStatRow,
+  type ContentStatRowSize,
+} from '../../lib/detail/metadata/content-stat-row.client'
 import { type SkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
 
 export type SkillProficiencyDetailMetadataProps = {

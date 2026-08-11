@@ -4,7 +4,7 @@ import {
   type ServiceEquipment,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 
 /** Stat rows for service equipment detail (excludes kind and cost). */
 export function getServiceStatRows(item: ServiceEquipment): ContentStatRowData[] {

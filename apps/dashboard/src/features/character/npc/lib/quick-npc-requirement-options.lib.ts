@@ -157,11 +157,11 @@ export function countQuickNpcConfiguredRequirementsFromArrays(args: {
 export function intersectQuickNpcRequirementIds(args: {
   requiredWeaponIds: readonly string[]
   requiredSpellIds: readonly string[]
-  reachableWeaponIds: ReadonlySet<string>
-  reachableSpellIds: ReadonlySet<string>
+  validWeaponIds: ReadonlySet<string>
+  validSpellIds: ReadonlySet<string>
 }): { requiredWeaponIds: string[]; requiredSpellIds: string[] } | undefined {
-  const requiredWeaponIds = args.requiredWeaponIds.filter((id) => args.reachableWeaponIds.has(id))
-  const requiredSpellIds = args.requiredSpellIds.filter((id) => args.reachableSpellIds.has(id))
+  const requiredWeaponIds = args.requiredWeaponIds.filter((id) => args.validWeaponIds.has(id))
+  const requiredSpellIds = args.requiredSpellIds.filter((id) => args.validSpellIds.has(id))
 
   if (
     requiredWeaponIds.length === args.requiredWeaponIds.length &&

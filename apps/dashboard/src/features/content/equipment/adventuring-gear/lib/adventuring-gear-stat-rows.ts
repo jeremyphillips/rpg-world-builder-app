@@ -5,7 +5,7 @@ import {
   type AdventuringGearEquipment,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 
 /** Stat rows for adventuring gear equipment detail (excludes kind and cost). */
 export function getAdventuringGearStatRows(item: AdventuringGearEquipment): ContentStatRowData[] {

@@ -12,7 +12,7 @@ import {
   type ProficiencyChoice,
 } from '@rpg/contracts'
 
-import type { ContentStatRowData } from '../../lib/detail/content-stat-rows'
+import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
 export const CLASS_STAT_LABELS = {
   hitDie: 'Hit Die',

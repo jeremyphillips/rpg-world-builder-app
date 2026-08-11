@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button, Heading, RichTextContent } from '@rpg/ui'
 
-import { withDashboardProviders } from '../../../../../.storybook/decorators'
+import { withDashboardProviders } from '../../../../../../.storybook/decorators'
 import { ContentDetailLayout } from './content-detail-layout'
 
 const meta = {

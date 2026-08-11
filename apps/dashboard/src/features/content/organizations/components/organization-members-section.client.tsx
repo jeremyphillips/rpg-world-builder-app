@@ -2,11 +2,9 @@
 
 import { SemanticText, Text } from '@rpg/ui'
 
-import { DetailSectionGroup } from '../../lib/detail/detail-section-group.client'
-import { DetailSectionPanel } from '../../lib/detail/detail-section-panel.client'
-import type { DetailOverflowAction } from '../../lib/detail/detail-overflow-menu.client'
-import { CrossContentRelationshipRow } from '../../lib/relationship/cross-content-relationship-row.client'
-import { RelationshipContentRow } from '../../lib/relationship/relationship-content-row.client'
+import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
+import type { DetailOverflowAction } from '../../lib/detail/row/detail-overflow-menu.client'
+import { RelationshipList } from '../../lib/relationship/relationship-list.client'
 import type { OrganizationMemberRowVm } from '../lib/build-organization-member-rows'
 import { ORGANIZATION_SECTION_LABELS } from '../lib/organization-display'
 import {
@@ -77,37 +75,19 @@ function buildMemberOverflowActions(input: {
   return actions
 }
 
-function OrganizationMemberRosterRow({
-  row,
-  canManage,
-  isPending,
-  onEditMembership,
-  onRemoveMember,
-}: {
-  row: OrganizationMemberRowVm
-  canManage: boolean
-  isPending: boolean
-  onEditMembership?: (row: OrganizationMemberRowVm) => void
-  onRemoveMember?: (row: OrganizationMemberRowVm) => void
-}) {
-  return (
-    <li>
-      <CrossContentRelationshipRow
-        heading={row.name}
-        href={row.detailHref}
-        headingSuffix={row.title ? ` · ${row.title}` : undefined}
-        secondaryText={row.identityLine || undefined}
-        actions={buildMemberOverflowActions({
-          row,
-          canManage,
-          isPending,
-          onEditMembership,
-          onRemoveMember,
-        })}
-        overflowTriggerLabel={`Actions for ${row.name}`}
-      />
-    </li>
-  )
+function toRowMenu(row: OrganizationMemberRowVm, actions: DetailOverflowAction[]) {
+  if (actions.length === 0) return undefined
+
+  return {
+    label: `Actions for ${row.name}`,
+    items: actions.map((action) => ({
+      id: action.id,
+      label: action.label,
+      destructive: action.destructive,
+      disabled: action.disabled,
+      onSelect: action.onSelect,
+    })),
+  }
 }
 
 function OrganizationMembersRosterBody({
@@ -124,37 +104,42 @@ function OrganizationMembersRosterBody({
     OrganizationMembersSectionProps,
     'total' | 'pendingCharacterId' | 'onAddMember' | 'onEditMembership' | 'onRemoveMember'
   >) {
-  const showContentRow = canManage || rows.length === 0
+  const addAction =
+    canManage && onAddMember
+      ? { label: ORGANIZATION_MEMBERS_ADD_LABEL, onSelect: onAddMember }
+      : undefined
 
   return (
-    <DetailSectionGroup>
-      {rows.length > 0 ? (
-        <ul className="space-y-1">
-          {rows.map((row) => (
-            <OrganizationMemberRosterRow
+    <RelationshipList.Root itemCount={rows.length} emptyLabel={emptyText} action={addAction}>
+      <RelationshipList.Group itemCount={rows.length}>
+        {rows.map((row) => {
+          const actions = buildMemberOverflowActions({
+            row,
+            canManage,
+            isPending: pendingCharacterId === row.characterId,
+            onEditMembership,
+            onRemoveMember,
+          })
+
+          return (
+            <RelationshipList.Row
               key={row.characterId}
-              row={row}
-              canManage={canManage}
-              isPending={pendingCharacterId === row.characterId}
-              onEditMembership={onEditMembership}
-              onRemoveMember={onRemoveMember}
+              title={row.name}
+              href={row.detailHref}
+              headingSuffix={row.title ? ` · ${row.title}` : undefined}
+              description={row.identityLine || undefined}
+              menu={toRowMenu(row, actions)}
             />
-          ))}
-        </ul>
-      ) : null}
+          )
+        })}
+      </RelationshipList.Group>
 
       {total !== undefined && total > rows.length ? (
-        <Text variant="muted">{formatOrganizationMembersOverflow(rows.length, total)}</Text>
+        <RelationshipList.Supplementary>
+          <Text variant="muted">{formatOrganizationMembersOverflow(rows.length, total)}</Text>
+        </RelationshipList.Supplementary>
       ) : null}
-
-      {showContentRow ? (
-        <RelationshipContentRow
-          emptyLabel={rows.length === 0 ? emptyText : undefined}
-          addLabel={canManage && onAddMember ? ORGANIZATION_MEMBERS_ADD_LABEL : undefined}
-          onAdd={canManage ? onAddMember : undefined}
-        />
-      ) : null}
-    </DetailSectionGroup>
+    </RelationshipList.Root>
   )
 }
 
