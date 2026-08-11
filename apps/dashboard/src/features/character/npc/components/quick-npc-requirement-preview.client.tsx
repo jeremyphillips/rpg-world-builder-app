@@ -2,7 +2,9 @@
 
 import { Check, TriangleAlert } from 'lucide-react'
 
-import { Badge, PreviewCard } from '@rpg/ui'
+import { Badge } from '@rpg/ui'
+
+import { EntityItem } from '@/features/content'
 
 import { getEquipmentCalloutPresentation } from '../../components/equipment/equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from '../../components/equipment/equipment-picker-drawer.types'
@@ -49,14 +51,14 @@ function RequirementPreviewCard({
   endSlot?: React.ReactNode
 }) {
   return (
-    <PreviewCard
-      title={projection.title}
-      description={projection.description}
-      footerSlot={callout ? <RequirementCalloutBadge callout={callout} /> : undefined}
-      endSlot={endSlot}
+    <EntityItem
+      entity={{
+        heading: projection.title,
+        description: projection.description,
+        status: callout ? [<RequirementCalloutBadge callout={callout} />] : undefined,
+      }}
+      action={endSlot}
       density="compact"
-      layout="list"
-      className="w-full border-0 bg-transparent p-0 shadow-none"
     />
   )
 }

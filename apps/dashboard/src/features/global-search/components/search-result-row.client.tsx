@@ -6,21 +6,14 @@ import {
   formatViewerCharacterRelationshipTooltip,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { InlineInactiveStatus, Text, cn } from '@rpg/ui'
+import { InlineInactiveStatus, cn } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
+import { EntityItem } from '@/features/content'
 
 import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
-import {
-  searchResultRowHeaderVariants,
-  searchResultRowSecondaryVariants,
-  searchResultRowTitleRowVariants,
-  searchResultRowTitleVariants,
-  searchResultRowTypeLabelVariants,
-  searchResultRowVariants,
-  type SearchResultRowDensity,
-} from './search-result-row.variants'
+import { searchResultRowVariants, type SearchResultRowDensity } from './search-result-row.variants'
 
 export type { SearchResultRowDensity }
 
@@ -79,27 +72,26 @@ export function SearchResultRow({
         aria-label={accessibleName}
       />
       <div className="pointer-events-none relative">
-        <div className={searchResultRowHeaderVariants()}>
-          <span className={searchResultRowTitleRowVariants()}>
-            <Text as="span" className={searchResultRowTitleVariants()}>
-              {title}
-            </Text>
-            {campaignUnavailable ? <InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} /> : null}
-            <span className="pointer-events-auto relative z-10">
-              <CharacterRelationshipIndicator
-                viewerCharacterRelationships={viewerCharacterRelationships}
-              />
-            </span>
-          </span>
-          <Text as="span" className={searchResultRowTypeLabelVariants()}>
-            {typeLabel}
-          </Text>
-        </div>
-        {secondary ? (
-          <Text as="p" variant="muted" className={searchResultRowSecondaryVariants({ density })}>
-            {secondary}
-          </Text>
-        ) : null}
+        <EntityItem
+          density={density === 'compact' ? 'compact' : 'comfortable'}
+          entity={{
+            heading: title,
+            classification: typeLabel,
+            description: secondary || undefined,
+            status: campaignUnavailable
+              ? [<InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} />]
+              : undefined,
+          }}
+          action={
+            viewerCharacterRelationships ? (
+              <span className="pointer-events-auto relative z-10">
+                <CharacterRelationshipIndicator
+                  viewerCharacterRelationships={viewerCharacterRelationships}
+                />
+              </span>
+            ) : undefined
+          }
+        />
       </div>
     </div>
   )

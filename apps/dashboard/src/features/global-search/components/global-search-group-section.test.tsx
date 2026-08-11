@@ -95,7 +95,8 @@ describe('GlobalSearchGroupSection', () => {
     expect(heading?.className).toContain('border-border-subtle')
     expect(heading).toHaveClass(globalSearchGroupContentInsetClasses)
     expect(list?.className).not.toContain('px-3')
-    expect(row).toHaveClass(globalSearchGroupContentInsetClasses)
+    expect(row).not.toHaveClass(globalSearchGroupContentInsetClasses)
+    expect(row.querySelector('.px-5')).toBeInTheDocument()
     expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('page'))
   })
 

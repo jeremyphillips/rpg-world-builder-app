@@ -19,19 +19,17 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { cn, Button, Eyebrow, Text } from '@rpg/ui'
+import { cn, Button, Text } from '@rpg/ui'
 import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
 
+import { EntityItem } from '../../lib/content-entity-card.client'
 import {
   masterDetailListDragHandleClasses,
   masterDetailListDragHandleVisibleClasses,
   masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
   masterDetailListRowInactiveClasses,
-  masterDetailListRowInactiveTitleClasses,
   masterDetailListRowSelectClasses,
-  masterDetailListRowSelectDefaultPaddingClasses,
-  masterDetailListRowSelectWithDragClasses,
   masterDetailListRowSortableClasses,
   masterDetailListRowSelectedClasses,
 } from './master-detail-list-panel.variants'
@@ -102,7 +100,7 @@ function MasterDetailListRowStatus({
   if (!hasError && !badges?.length) return null
 
   return (
-    <span className="mt-1 flex flex-wrap items-center gap-1">
+    <span className="flex flex-wrap items-center gap-1">
       {hasError ? (
         <>
           <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
@@ -160,7 +158,6 @@ type MasterDetailListRowSelectButtonProps = {
   index: number
   isSelected: boolean
   active: boolean
-  showDragHandle: boolean
   onSelect: (index: number) => void
 }
 
@@ -168,8 +165,7 @@ function MasterDetailListRowSelectButton({
   item,
   index,
   isSelected,
-  active,
-  showDragHandle,
+  active: _active,
   onSelect,
 }: MasterDetailListRowSelectButtonProps) {
   return (
@@ -178,27 +174,19 @@ function MasterDetailListRowSelectButton({
       aria-current={isSelected ? 'true' : undefined}
       aria-invalid={item.hasError ? true : undefined}
       onClick={() => onSelect(index)}
-      className={cn(
-        masterDetailListRowSelectClasses,
-        showDragHandle
-          ? masterDetailListRowSelectWithDragClasses
-          : masterDetailListRowSelectDefaultPaddingClasses,
-      )}
+      className={masterDetailListRowSelectClasses}
     >
-      {item.eyebrow ? (
-        <Eyebrow as="span" size="sm" className="block">
-          {item.eyebrow}
-        </Eyebrow>
-      ) : null}
-      <span
-        className={cn(
-          'block truncate font-medium',
-          !active && masterDetailListRowInactiveTitleClasses,
-        )}
-      >
-        {item.title}
-      </span>
-      <MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />
+      <EntityItem
+        density="compact"
+        entity={{
+          heading: item.title,
+          classification: item.eyebrow,
+          status:
+            item.hasError || item.badges?.length
+              ? [<MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />]
+              : undefined,
+        }}
+      />
     </button>
   )
 }
@@ -255,7 +243,6 @@ function MasterDetailListRowContent({
         index={index}
         isSelected={isSelected}
         active={active}
-        showDragHandle={showDragHandle}
         onSelect={onSelect}
       />
       {deletable ? (

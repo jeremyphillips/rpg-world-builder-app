@@ -6,7 +6,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
-import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
 import { SearchResultRow } from './search-result-row.client'
 
 function rowShell(link: HTMLElement): HTMLElement {
@@ -28,7 +27,7 @@ describe('SearchResultRow', () => {
     expect(link).toHaveAttribute('href', '/campaigns/c1/spells/fireball')
     expect(screen.getByText('3rd-level evocation')).toBeInTheDocument()
     expect(screen.getByText('Spell')).toBeInTheDocument()
-    expect(screen.getByText('Fireball')).toHaveClass('font-semibold')
+    expect(screen.getByText('Fireball')).toHaveClass('font-body-emphasis')
   })
 
   it('calls onActivate when clicked', async () => {
@@ -68,7 +67,7 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
-  it('uses text-xs secondary copy by default with roomier vertical rhythm', () => {
+  it('uses EntityItem typography and density for its identity content', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -83,13 +82,14 @@ describe('SearchResultRow', () => {
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const row = rowShell(link)
 
-    expect(secondary).toHaveClass('text-xs')
-    expect(secondary).not.toHaveClass('truncate')
-    expect(secondary).not.toHaveClass('mt-1')
-    expect(row).toHaveClass('py-3', globalSearchGroupContentInsetClasses, 'hover:bg-surface-subtle')
+    expect(secondary).toHaveClass('text-sm')
+    expect(secondary).toHaveClass('truncate')
+    expect(row).toHaveClass('hover:bg-surface-subtle')
+    expect(row).not.toHaveClass('py-3')
+    expect(secondary.parentElement?.parentElement?.parentElement).toHaveClass('px-5', 'py-3')
   })
 
-  it('uses compact density for tighter py and truncated secondary copy', () => {
+  it('passes compact density to EntityItem', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -104,12 +104,8 @@ describe('SearchResultRow', () => {
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
     expect(secondary).toHaveClass('text-xs', 'truncate')
     const row = rowShell(screen.getByRole('link', { name: 'Fireball, Spell' }))
-    expect(row).toHaveClass(
-      'py-2',
-      'border-b-0',
-      globalSearchGroupContentInsetClasses,
-      'hover:bg-surface-subtle',
-    )
+    expect(row).toHaveClass('border-b-0', 'hover:bg-surface-subtle')
+    expect(secondary.parentElement?.parentElement?.parentElement).toHaveClass('px-3', 'py-2')
   })
 
   it('removes row borders when borderless for parent-owned list separators', () => {
