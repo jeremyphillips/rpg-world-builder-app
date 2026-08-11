@@ -19,7 +19,7 @@ import {
 } from '../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import {
-  EquipmentInventoryManagePanel,
+  EquipmentInventoryManageDisclosureCard,
   createStorybookApplyMagicItemAcquisition,
 } from './equipment-inventory-manage-panel.client'
 
@@ -46,14 +46,16 @@ const rows: EquipmentInventoryRow[] = [
   },
 ]
 
-describe('EquipmentInventoryManagePanel', () => {
+describe('EquipmentInventoryManageDisclosureCard', () => {
   it('releases one grant copy from the manage panel', async () => {
     const user = userEvent.setup()
     const onReleaseGrant = vi.fn()
 
     render(
-      <EquipmentInventoryManagePanel
+      <EquipmentInventoryManageDisclosureCard
+        itemId="potion-of-healing"
         equipmentName="Potion of Healing"
+        provenanceLabel="2 Common choices"
         equipment={equipmentStepPotionOfHealingFixture}
         rows={rows}
         draft={createEmptyCharacterBuilderDraft()}
@@ -65,7 +67,7 @@ describe('EquipmentInventoryManagePanel', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Manage' }))
+    await user.click(screen.getByRole('button', { name: 'Expand Potion of Healing' }))
     const releaseButton = screen.getByRole('button', { name: 'Release one' })
     expect(releaseButton).toHaveClass('h-control-action-compact')
     await user.click(releaseButton)
@@ -107,8 +109,10 @@ describe('EquipmentInventoryManagePanel', () => {
     const context = createEquipmentStepContextWithMagicItemGrantsFixture()
 
     render(
-      <EquipmentInventoryManagePanel
+      <EquipmentInventoryManageDisclosureCard
+        itemId="potion-of-healing"
         equipmentName="Potion of Healing"
+        provenanceLabel="2 Common choices"
         equipment={equipmentStepPotionOfHealingFixture}
         rows={rows}
         draft={draft}
@@ -124,7 +128,7 @@ describe('EquipmentInventoryManagePanel', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Manage' }))
+    await user.click(screen.getByRole('button', { name: 'Expand Potion of Healing' }))
 
     expect(screen.getByRole('heading', { name: 'Next copy' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Use magic item choice' })).toBeInTheDocument()
@@ -154,8 +158,10 @@ describe('EquipmentInventoryManagePanel', () => {
     ]
 
     render(
-      <EquipmentInventoryManagePanel
+      <EquipmentInventoryManageDisclosureCard
+        itemId="potion-of-healing"
         equipmentName="Potion of Healing"
+        provenanceLabel="2 Common choices · Purchased"
         equipment={equipmentStepPotionOfHealingFixture}
         rows={mixedRows}
         draft={createEmptyCharacterBuilderDraft()}
@@ -167,7 +173,7 @@ describe('EquipmentInventoryManagePanel', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Manage' }))
+    await user.click(screen.getByRole('button', { name: 'Expand Potion of Healing' }))
 
     expect(screen.getByText('Common choices')).toBeInTheDocument()
     expect(screen.getByText('Purchased')).toBeInTheDocument()
@@ -176,8 +182,10 @@ describe('EquipmentInventoryManagePanel', () => {
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <EquipmentInventoryManagePanel
+      <EquipmentInventoryManageDisclosureCard
+        itemId="potion-of-healing"
         equipmentName="Potion of Healing"
+        provenanceLabel="2 Common choices"
         equipment={equipmentStepPotionOfHealingFixture}
         rows={rows}
         draft={createEmptyCharacterBuilderDraft()}

@@ -94,9 +94,8 @@ describe('EquipmentAddedInventoryRowItem', () => {
     render(<EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />)
 
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
-    const trigger = screen.getByRole('button', { name: 'Manage' })
+    const trigger = screen.getByRole('button', { name: 'Expand Potion of Healing' })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
-    expect(trigger).toHaveClass('text-xs')
 
     await user.click(trigger)
     const ownedHeadingRow = screen.getByRole('heading', { name: 'Owned copies' }).parentElement
@@ -133,7 +132,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
     )
 
     expect(screen.getByText('Qty 3')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Manage' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Expand Potion of Healing' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Release' })).not.toBeInTheDocument()
   })

@@ -46,7 +46,7 @@ export { CharacterDetailContent } from './components/detail/character-detail-con
 export { CharacterOrganizationsSummary } from './components/detail/character-organizations-summary.client'
 export { CharacterOrganizationMembershipsContainer } from './components/detail/character-organization-memberships-container.client'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
-export { BuilderInventoryRow } from './components/builder/builder-inventory-row.client'
+export { BuilderInventoryRemoveAction } from './components/builder/builder-inventory-remove-action.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
 export { CatalogPickerSelectionActions } from './components/picker/catalog-picker-selection-actions.client'
 export {

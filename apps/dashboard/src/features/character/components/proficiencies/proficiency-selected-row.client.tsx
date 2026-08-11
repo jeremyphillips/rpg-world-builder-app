@@ -3,7 +3,8 @@
 import type { ProficiencyChoiceSelectedRow } from '@rpg/contracts'
 import { Badge, Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
+import { ContentEntityCard } from '@/features/content'
+import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
 
 export const PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL = 'Stale' as const
 
@@ -14,18 +15,30 @@ export type ProficiencySelectedRowProps = {
 
 export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRowProps) {
   return (
-    <BuilderInventoryRow
-      label={<Text as="span">{row.label}</Text>}
-      itemLabel={row.label}
-      meta={
-        row.isStale ? (
-          <Badge appearance="neutral" tone="neutral" size="sm" title={row.staleReason}>
-            {PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL}
-          </Badge>
-        ) : undefined
-      }
-      sourceLabel={row.sourceLabel}
-      onRemove={onRemove}
+    <ContentEntityCard
+      entity={{
+        heading: row.label,
+        description: row.sourceLabel ? (
+          <Text as="span" variant="muted">
+            {row.sourceLabel}
+          </Text>
+        ) : undefined,
+        status: row.isStale
+          ? [
+              <Badge
+                key="stale"
+                appearance="neutral"
+                tone="neutral"
+                size="sm"
+                title={row.staleReason}
+              >
+                {PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL}
+              </Badge>,
+            ]
+          : undefined,
+      }}
+      action={<BuilderInventoryRemoveAction itemLabel={row.label} onRemove={onRemove} />}
+      density="compact"
     />
   )
 }

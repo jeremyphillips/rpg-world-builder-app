@@ -3,6 +3,7 @@
 import type { ChoiceSet } from '@rpg/contracts'
 import { Button, Heading, Text } from '@rpg/ui'
 
+import { ContentEntityCard } from '@/features/content'
 import {
   formatChoiceSetDrawerTriggerLabel,
   formatSpellSelectionCounter,
@@ -10,7 +11,7 @@ import {
   resolveSelectedSpellLabels,
 } from '../../lib/spells/spells-step.lib'
 import { shouldShowSelectionFullNotice } from '../../lib/choice-sets/selection-counter.lib'
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
+import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
 import {
   spellChoiceSectionClasses,
   spellChoiceSectionCounterRowClasses,
@@ -68,14 +69,15 @@ export function SpellChoiceSection({
         <ul className={spellChoiceSectionSelectedListClasses}>
           {selectedSpells.map((spell) => (
             <li key={spell.id}>
-              <BuilderInventoryRow
-                label={
-                  <Text as="span" variant="body">
-                    {spell.label}
-                  </Text>
+              <ContentEntityCard
+                entity={{ heading: spell.label }}
+                action={
+                  <BuilderInventoryRemoveAction
+                    itemLabel={spell.label}
+                    onRemove={() => onRemove(spell.id)}
+                  />
                 }
-                itemLabel={spell.label}
-                onRemove={() => onRemove(spell.id)}
+                density="compact"
               />
             </li>
           ))}

@@ -3,7 +3,7 @@
 // Future: generalize shared frame with SpellChoiceSection → BuilderChoiceSection<T>
 // (header, counter, selection-full, over-selection, selected list, drawer trigger).
 // Shared drawer trigger: formatChoiceSetDrawerTriggerLabel (Add vs Manage when full).
-// Proficiencies adds sourceLabel per row via BuilderInventoryRow; spells lack source today.
+// Proficiencies adds sourceLabel per row via ContentEntityCard; spells lack source today.
 // Extract when aligning spell selected rows (post-MVP polish).
 
 import { formatProficiencyChoiceEmptyMessage, type ProficiencyChoiceSummary } from '@rpg/contracts'

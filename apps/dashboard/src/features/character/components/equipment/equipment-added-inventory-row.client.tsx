@@ -1,8 +1,6 @@
 'use client'
 
-import { useCallback, useId, useState } from 'react'
-
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useCallback, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -10,47 +8,28 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
-import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
-
+import { ContentEntityCard, DisclosureEntityCard } from '@/features/content'
 import {
-  EQUIPMENT_INVENTORY_DONE_LABEL,
-  EQUIPMENT_INVENTORY_MANAGE_LABEL,
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../lib/equipment/equipment-step.lib'
+import { EquipmentInventorySourceActionButton } from './equipment-inventory-source-action-button.client'
 import { EquipmentInventoryManagePanelBody } from './equipment-inventory-manage-panel.client'
-import {
-  equipmentAddedInventoryManageActionsClasses,
-  equipmentAddedInventoryManageDetailLineClasses,
-  equipmentAddedInventoryManageHeaderClasses,
-  equipmentAddedInventoryManageMetaClasses,
-  equipmentAddedInventoryManagePanelContentClasses,
-  equipmentAddedInventoryManageTriggerClasses,
-} from './equipment-acquisition-panel.variants'
 import {
   groupEquipmentInventoryRowsForDisplay,
   type AddedEquipmentEntryViewModel,
 } from './equipment-inventory-summary.lib'
+import { buildEquipmentInventoryRowEntity } from './equipment-inventory-entity.lib'
 import { EquipmentInventoryRowItem } from './equipment-inventory-row.client'
 import {
   grantedQuantity,
   resolveDistinctAcquisitionSourceKinds,
   usesInlineManagement,
 } from './equipment-inventory-manage.lib'
-import { equipmentInventoryManageRowClasses } from './equipment-inventory-manage-panel.variants'
-import {
-  equipmentInventoryRowActionsClasses,
-  equipmentInventoryRowClasses,
-  equipmentInventoryRowDetailLineClasses,
-  equipmentInventoryRowHeaderClasses,
-  equipmentInventoryRowNameClasses,
-  equipmentInventoryRowPriceLineClasses,
-  equipmentInventoryRowQtyLabelClasses,
-} from './equipment-inventory-summary.variants'
-import { builderInventoryRowMetaClasses } from '../builder/builder-inventory-row.variants'
+import { equipmentInventoryRowQtyLabelClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentAddedInventoryRowItemProps = {
   entry: AddedEquipmentEntryViewModel
@@ -67,18 +46,6 @@ export type EquipmentAddedInventoryRowItemProps = {
   onOpenChange?: (open: boolean) => void
 }
 
-function InventoryRowDetailLine({ label, className }: { label?: string; className?: string }) {
-  if (!label) return null
-
-  return (
-    <div className={className ?? equipmentInventoryRowDetailLineClasses}>
-      <Text as="p" variant="caption" className={equipmentInventoryRowPriceLineClasses}>
-        {label}
-      </Text>
-    </div>
-  )
-}
-
 function GrantOnlySingleReleaseRow({
   entry,
   onReleaseGrant,
@@ -92,29 +59,26 @@ function GrantOnlySingleReleaseRow({
   const removeTarget = row.removeTarget
 
   return (
-    <article className={equipmentInventoryRowClasses}>
-      <div className={equipmentInventoryRowHeaderClasses}>
-        <div className={builderInventoryRowMetaClasses}>
-          <Text as="p" className={equipmentInventoryRowNameClasses}>
-            {entry.equipmentName}
-          </Text>
-        </div>
-        <div className={equipmentInventoryRowActionsClasses}>
-          <EquipmentInventorySourceActionButton
-            onClick={() =>
-              onReleaseGrant({
-                allowanceId: removeTarget.allowanceId,
-                equipmentId: removeTarget.equipmentId,
-                quantity: 1,
-              })
-            }
-          >
-            {EQUIPMENT_INVENTORY_RELEASE_LABEL}
-          </EquipmentInventorySourceActionButton>
-        </div>
-      </div>
-      <InventoryRowDetailLine label={entry.provenanceLabel} />
-    </article>
+    <ContentEntityCard
+      entity={buildEquipmentInventoryRowEntity({
+        equipmentName: entry.equipmentName,
+        detailLabel: entry.provenanceLabel,
+      })}
+      action={
+        <EquipmentInventorySourceActionButton
+          onClick={() =>
+            onReleaseGrant({
+              allowanceId: removeTarget.allowanceId,
+              equipmentId: removeTarget.equipmentId,
+              quantity: 1,
+            })
+          }
+        >
+          {EQUIPMENT_INVENTORY_RELEASE_LABEL}
+        </EquipmentInventorySourceActionButton>
+      }
+      density="compact"
+    />
   )
 }
 
@@ -143,78 +107,47 @@ function ManagedInventoryRow({
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
-  const contentId = useId()
   const [internalOpen, setInternalOpen] = useState(false)
   const isOpen = open ?? internalOpen
   const equipment = entry.rows.find((row) => row.equipment)?.equipment
 
-  const handleOpenChange = useCallback(
-    (next: boolean) => {
-      if (onOpenChange) onOpenChange(next)
-      else setInternalOpen(next)
-    },
-    [onOpenChange],
-  )
+  const handleToggleCollapse = useCallback(() => {
+    const next = !isOpen
+    if (onOpenChange) onOpenChange(next)
+    else setInternalOpen(next)
+  }, [isOpen, onOpenChange])
 
   if (!equipment) return null
 
   return (
-    <article className={equipmentInventoryRowClasses}>
-      <Collapsible
-        className={equipmentInventoryManageRowClasses}
-        open={isOpen}
-        onOpenChange={handleOpenChange}
-      >
-        <div className={equipmentAddedInventoryManageMetaClasses}>
-          <div className={equipmentAddedInventoryManageHeaderClasses}>
-            <div className={builderInventoryRowMetaClasses}>
-              <Text as="p" className={equipmentInventoryRowNameClasses}>
-                {entry.equipmentName}
-              </Text>
-            </div>
-            <div className={equipmentAddedInventoryManageActionsClasses}>
-              <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-                Qty {totalQuantity}
-              </Text>
-              <CollapsibleTrigger asChild>
-                <button
-                  type="button"
-                  className={equipmentAddedInventoryManageTriggerClasses}
-                  aria-controls={contentId}
-                >
-                  {isOpen ? EQUIPMENT_INVENTORY_DONE_LABEL : EQUIPMENT_INVENTORY_MANAGE_LABEL}
-                  {isOpen ? (
-                    <ChevronUp aria-hidden className="size-3.5" />
-                  ) : (
-                    <ChevronDown aria-hidden className="size-3.5" />
-                  )}
-                </button>
-              </CollapsibleTrigger>
-            </div>
-          </div>
-          <InventoryRowDetailLine
-            label={entry.provenanceLabel}
-            className={equipmentAddedInventoryManageDetailLineClasses}
-          />
-        </div>
-        <CollapsibleContent
-          id={contentId}
-          className={equipmentAddedInventoryManagePanelContentClasses}
-        >
-          <EquipmentInventoryManagePanelBody
-            equipment={equipment}
-            rows={entry.rows}
-            draft={draft}
-            context={context}
-            catalogIndex={catalogIndex}
-            budget={budget}
-            onReleaseGrant={onReleaseGrant}
-            onRemovePurchase={onRemovePurchase}
-            onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
-          />
-        </CollapsibleContent>
-      </Collapsible>
-    </article>
+    <DisclosureEntityCard
+      itemId={entry.equipmentId}
+      toolbarAriaLabel={entry.equipmentName}
+      entity={buildEquipmentInventoryRowEntity({
+        equipmentName: entry.equipmentName,
+        detailLabel: entry.provenanceLabel,
+      })}
+      action={
+        <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+          Qty {totalQuantity}
+        </Text>
+      }
+      collapsed={!isOpen}
+      onToggleCollapse={handleToggleCollapse}
+      density="compact"
+    >
+      <EquipmentInventoryManagePanelBody
+        equipment={equipment}
+        rows={entry.rows}
+        draft={draft}
+        context={context}
+        catalogIndex={catalogIndex}
+        budget={budget}
+        onReleaseGrant={onReleaseGrant}
+        onRemovePurchase={onRemovePurchase}
+        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+      />
+    </DisclosureEntityCard>
   )
 }
 

@@ -1,46 +1,49 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ContentEntityCard } from '@/features/content'
 import { Badge, Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from './builder-inventory-row.client'
+import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action.client'
 
 const meta = {
-  title: 'Character Builder/BuilderInventoryRow',
-  component: BuilderInventoryRow,
+  title: 'Character Builder/BuilderSelectedEntityCard',
+  component: ContentEntityCard,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof BuilderInventoryRow>
+} satisfies Meta<typeof ContentEntityCard>
 
 export default meta
-type Story = StoryObj<typeof BuilderInventoryRow>
+type Story = StoryObj<typeof meta>
 
 export const Granted: Story = {
   args: {
-    label: <Text as="span">DEX · Dexterity</Text>,
-    itemLabel: 'DEX · Dexterity',
-    sourceLabel: 'Granted by Rogue',
+    entity: {
+      heading: 'DEX · Dexterity',
+      description: (
+        <Text as="span" variant="muted">
+          Granted by Rogue
+        </Text>
+      ),
+    },
+    density: 'compact',
   },
 }
 
 export const WithMetaAndRemove: Story = {
   args: {
-    label: <Text as="span">Stealth</Text>,
-    itemLabel: 'Stealth',
-    meta: (
-      <Badge appearance="neutral" tone="neutral" size="sm">
-        Stale
-      </Badge>
-    ),
-    sourceLabel: 'Chosen from Rogue Skills',
-    onRemove: () => undefined,
-  },
-}
-
-export const Dense: Story = {
-  args: {
-    variant: 'dense',
-    label: <Text as="span">Rations</Text>,
-    itemLabel: 'Rations',
-    provenance: <Text variant="caption">Purchased with starting gold · 5 SP each</Text>,
-    onRemove: () => undefined,
+    entity: {
+      heading: 'Stealth',
+      description: (
+        <Text as="span" variant="muted">
+          Chosen from Rogue Skills
+        </Text>
+      ),
+      status: [
+        <Badge key="stale" appearance="neutral" tone="neutral" size="sm">
+          Stale
+        </Badge>,
+      ],
+    },
+    action: <BuilderInventoryRemoveAction itemLabel="Stealth" onRemove={() => undefined} />,
+    density: 'compact',
   },
 }

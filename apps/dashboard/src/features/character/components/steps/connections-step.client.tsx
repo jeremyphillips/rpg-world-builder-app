@@ -12,7 +12,8 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, Button, InsetPanel, Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
+import { ContentEntityCard } from '@/features/content'
+import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
 import { OrganizationPickerDrawer } from '../connections/organization-picker-drawer.client'
 import type { OrganizationMembershipSelection } from '../connections/organization-picker-drawer.types'
 import {
@@ -117,26 +118,37 @@ export function ConnectionsStep({
             const label = organization?.name ?? membership.organizationId
             const secondary = membershipSecondaryLabel(membership, organization?.organizationKind)
 
+            const status = [
+              ...(secondary
+                ? [
+                    <Text key="secondary" as="span" variant="muted">
+                      {secondary}
+                    </Text>,
+                  ]
+                : []),
+              ...(unavailable
+                ? [
+                    <Badge key="unavailable" tone="warning">
+                      {organization ? 'Unavailable' : 'Missing organization'}
+                    </Badge>,
+                  ]
+                : []),
+            ]
+
             return (
-              <BuilderInventoryRow
+              <ContentEntityCard
                 key={membership.organizationId}
-                itemLabel={label}
-                label={<Text as="span">{label}</Text>}
-                meta={
-                  <>
-                    {secondary ? (
-                      <Text as="span" variant="muted">
-                        {secondary}
-                      </Text>
-                    ) : null}
-                    {unavailable ? (
-                      <Badge tone="warning">
-                        {organization ? 'Unavailable' : 'Missing organization'}
-                      </Badge>
-                    ) : null}
-                  </>
+                entity={{
+                  heading: label,
+                  status: status.length > 0 ? status : undefined,
+                }}
+                action={
+                  <BuilderInventoryRemoveAction
+                    itemLabel={label}
+                    onRemove={() => handleRemove(membership.organizationId)}
+                  />
                 }
-                onRemove={() => handleRemove(membership.organizationId)}
+                density="compact"
               />
             )
           })}
