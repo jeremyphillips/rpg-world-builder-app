@@ -36,9 +36,22 @@ Default populated row:
 [entity title]                                      [⋯]
 ```
 
-`CrossContentRelationshipRow` accepts optional **`secondaryText`** when the feature decides disambiguation helps. Shared code must **not** auto-derive generic entity-type labels ("Organization", "Location", …).
+`CrossContentRelationshipRow` accepts optional **`description`** when the feature decides disambiguation helps. Shared code must **not** auto-derive generic entity-type labels ("Organization", "Location", …).
 
 Compact list presentation — no card border/background on relationship rows. Row chrome uses compact action density (`Button density="compact"` on overflow triggers and inline add actions).
+
+### Entity summary field mapping (detail / relationship lane)
+
+Detail and relationship rows compose **`EntityItem`** (via `DetailEntityRow` or embedded `EntityItemAnatomy`) using the shared **`EntitySummaryModel`** vocabulary:
+
+| Row / drawer prop                              | Entity summary field | Notes                                                               |
+| ---------------------------------------------- | -------------------- | ------------------------------------------------------------------- |
+| `heading` / `title`                            | `heading`            | Entity name                                                         |
+| `headingSuffix` / `classification`             | `classification`     | Inline muted kind/context after the title (may include leading `·`) |
+| `description` / `secondaryText` / `subheading` | `description`        | Second-line disambiguation (e.g. Located in …)                      |
+| `status` / `badge` / `metadata`                | `status`             | Trailing metadata such as availability badges                       |
+
+`RelationshipList.Row` and `CrossContentRelationshipRow` map these props internally — features should prefer `classification`, `description`, and `status` on new call sites. Navigation (`href`) stays on the surface, not the model.
 
 ## Detail section layout
 
@@ -50,21 +63,21 @@ Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/f
 | ------------------- | ---------------------------------------- | ---------------------------------------------------------- | ---------------------------------------- |
 | Panel heading       | `Heading variant="label"` (`h2`/`h3`)    | `heading-style-label` — larger, not uppercase              | City structure, Territorial Authority    |
 | Eyebrow group label | `<Eyebrow size="sm">` (default `as="p"`) | `eyebrow-style-sm` + muted; CSS uppercases title-case copy | Districts, Direct locations, Governed by |
-| Row / item title    | link / heading in `DetailEntityRow`      | normal emphasis                                            | Dock Ward, org name                      |
+| Row / item title    | `EntityItem` inside `DetailEntityRow`    | normal emphasis                                            | Dock Ward, org name                      |
 
 Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detail subgroup labels. Do **not** promote subgroup labels to `h3` unless Territorial Authority kind labels also become headings — today they stay out of the document outline.
 
 ### Primitives
 
-| Primitive                | Role                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DetailSectionPanel`     | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                                      |
-| `DetailSectionGroup`     | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                            |
-| `DetailSectionRowList`   | Dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>`)                                                                         |
-| `DetailEntityRow`        | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot`          |
-| `DetailEntityRowActions` | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                         |
-| `DetailOverflowMenu`     | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                              |
-| `RelationshipList`       | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props |
+| Primitive                | Role                                                                                                                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DetailSectionPanel`     | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                                                       |
+| `DetailSectionGroup`     | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                                             |
+| `DetailSectionRowList`   | Dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>`)                                                                                          |
+| `DetailEntityRow`        | Thin shell around compact `EntityItem` (`py-1` inset); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot` |
+| `DetailEntityRowActions` | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                                          |
+| `DetailOverflowMenu`     | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                                               |
+| `RelationshipList`       | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props                  |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
@@ -269,13 +282,13 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 ## Drawer building blocks
 
-| Primitive                                                    | Role                                                                                                             |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `DrawerContext`                                              | Lightweight fixed-endpoint composition (name · classification, Located in nearest parent) — no border/background |
-| `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                           |
-| `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows               |
-| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                             |
-| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                    |
+| Primitive                                                    | Role                                                                                                        |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `DrawerContext`                                              | Lightweight fixed-endpoint composition (`EntityItem` identity, no border/background) — no border/background |
+| `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                      |
+| `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows          |
+| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                        |
+| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                               |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 

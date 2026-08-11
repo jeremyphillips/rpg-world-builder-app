@@ -34,10 +34,18 @@ export type RelationshipRowMenuItem = {
 export type RelationshipListRowProps = {
   title: ReactNode
   href?: string
+  /** Inline classification after the title — maps to entity summary `classification`. */
   headingSuffix?: ReactNode
-  metadata?: ReactNode
+  /** @deprecated Use `classification` — alias for headingSuffix. */
+  classification?: ReactNode
+  /** Feature-supplied disambiguation below the title — maps to entity summary `description`. */
   description?: ReactNode
+  /** Trailing metadata such as badges — maps to entity summary `status`. */
+  status?: ReactNode
+  /** @deprecated Use `status` */
   badge?: ReactNode
+  /** @deprecated Use `status` */
+  metadata?: ReactNode
   menu?: {
     label: string
     items: readonly RelationshipRowMenuItem[]
@@ -201,12 +209,15 @@ function RelationshipListRow({
   title,
   href,
   headingSuffix,
-  metadata,
+  classification,
   description,
+  status,
   badge,
+  metadata,
   menu,
 }: RelationshipListRowProps) {
-  const resolvedMetadata = badge ?? metadata
+  const resolvedClassification = classification ?? headingSuffix
+  const resolvedStatus = status ?? badge ?? metadata
   const actions = menu ? toOverflowActions(menu.items) : []
 
   return (
@@ -214,9 +225,9 @@ function RelationshipListRow({
       <CrossContentRelationshipRow
         heading={title}
         href={href}
-        headingSuffix={headingSuffix}
-        secondaryText={description}
-        metadata={resolvedMetadata}
+        headingSuffix={resolvedClassification}
+        description={description}
+        status={resolvedStatus}
         actions={actions}
         overflowTriggerLabel={menu?.label ?? 'Relationship actions'}
       />

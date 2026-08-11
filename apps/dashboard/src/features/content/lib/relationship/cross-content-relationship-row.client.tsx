@@ -17,10 +17,18 @@ export type CrossContentRelationshipRowProps = {
   href?: string
   /** Muted classification text inline after the heading (includes leading ` · ` separator). */
   headingSuffix?: ReactNode
-  /** @deprecated Use secondaryText — feature-supplied disambiguation only. */
+  /** @deprecated Use description — feature-supplied disambiguation only. */
   subheading?: ReactNode
-  secondaryText?: ReactNode
+  /** Feature-supplied disambiguation rendered below the heading row. */
+  description?: ReactNode
+  /** @deprecated Use status — trailing metadata such as badges. */
   metadata?: ReactNode
+  /** Trailing metadata such as badges — maps to entity summary `status`. */
+  status?: ReactNode
+  /** @deprecated Use description */
+  secondaryText?: ReactNode
+  /** @deprecated Use status */
+  badge?: ReactNode
   actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
   /**
@@ -39,14 +47,18 @@ export function CrossContentRelationshipRow({
   href,
   headingSuffix,
   subheading,
-  secondaryText,
+  description,
   metadata,
+  status,
+  secondaryText,
+  badge,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
   endSlot,
   className,
 }: CrossContentRelationshipRowProps) {
-  const resolvedSecondaryText = secondaryText ?? subheading
+  const resolvedDescription = description ?? secondaryText ?? subheading
+  const resolvedStatus = status ?? badge ?? metadata
   const resolvedEndSlot =
     endSlot !== undefined ? (
       endSlot
@@ -64,8 +76,8 @@ export function CrossContentRelationshipRow({
         heading={heading}
         href={href}
         headingSuffix={headingSuffix}
-        subheading={resolvedSecondaryText}
-        metadata={metadata}
+        subheading={resolvedDescription}
+        metadata={resolvedStatus}
         endSlot={resolvedEndSlot}
       />
     </div>

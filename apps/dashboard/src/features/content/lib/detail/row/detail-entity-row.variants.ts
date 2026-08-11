@@ -14,8 +14,6 @@ export const detailEntityRowVariants = cva('flex items-center justify-between ga
   },
 })
 
-export const detailEntityRowContentVariants = cva('min-w-0 flex-1')
-
 export const detailEntityRowSubheadingVariants = cva('text-xs text-muted-foreground')
 
 /** One caret column — shared column class from `@rpg/ui` collapsible leading chrome. */
@@ -36,10 +34,6 @@ export const detailEntityRowDisclosureRowVariants = cva(
       inset: 'self',
     },
   },
-)
-
-export const detailEntityRowDisclosureIdentityVariants = cva(
-  'flex min-w-0 flex-1 items-center gap-[var(--leading-chrome-gap)]',
 )
 
 export const detailEntityRowDisclosureButtonVariants = cva(
