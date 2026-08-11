@@ -137,13 +137,13 @@ inherit parent/child access. A default-public district can appear in list/search
 restricted parent remains hidden. Session-access mirroring for composed districts is a
 follow-up candidate only.
 
-| Module                                                                             | Role                                                                                                           |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `location-create-session.ts`                                                       | `resolveLocationCreateSession`, `completeLocationCreateSetup`                                                  |
-| `location-create-shortcuts.ts`                                                     | Fixed-session URL parse/serialize, child-type menus, Create/Add headings                                       |
-| `location-create-modal.client.tsx`                                                 | Contained create surface: setup ↔ details in one `md` modal; transaction dirty + draft prune                   |
-| `location-create-setup-shell.client.tsx` / `location-create-setup-sequence.lib.ts` | Shared setup chrome/panel: compact summaries, `dependsOn` invalidation, active-set expansion, derived Continue |
-| `location-settlement-structure.lib.ts`                                             | District vs direct-place partition helpers                                                                     |
+| Module                                                                    | Role                                                                                                                                                                             |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `location-create-session.ts`                                              | `resolveLocationCreateSession`, `completeLocationCreateSetup`                                                                                                                    |
+| `location-create-shortcuts.ts`                                            | Fixed-session URL parse/serialize, child-type menus, Create/Add headings                                                                                                         |
+| `location-create-modal.client.tsx`                                        | Contained create surface: setup ↔ details in one `md` modal; transaction dirty + draft prune                                                                                     |
+| `@/lib/create-setup` (`CreateSetupPanel`, `create-setup-sequence.lib.ts`) | Shared setup chrome/panel: compact summaries, `dependsOn` invalidation, active-set expansion, derived Continue — see [create-setup README](../../src/lib/create-setup/README.md) |
+| `location-settlement-structure.lib.ts`                                    | District vs direct-place partition helpers                                                                                                                                       |
 
 Create-setup choice collapse and selected-summary presentation are owned by the shared shell/sequence — Site, Settlement, and Region supply ordered choice-set definitions only (no per-type selected-card or collapse wiring).
 

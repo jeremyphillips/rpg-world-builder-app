@@ -10,12 +10,18 @@ import {
   type OrganizationKind,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
-import { FormShellSubmitButton, TabbedForm, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  FormShellSubmitButton,
+  TabbedForm,
+  type TabbedFormTab,
+  type TrailingFieldActionConfig,
+} from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 import { useCreateNpc } from '../hooks/use-create-npc'
+import { useQuickNpcNameTrailingAction } from '../hooks/use-quick-npc-name-trailing-action.client'
 import { isQuickNpcSetupStillValid } from '../lib/quick-npc-authoring-validation.lib'
 import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from '../lib/quick-npc-create'
 import { createQuickNpcFormValueSyncs } from '../lib/quick-npc-form-sync'
@@ -32,8 +38,12 @@ import {
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
+import {
+  QUICK_NPC_GENERATE_NAME_LABEL,
+  resolveQuickNpcNameGenerationSupport,
+} from '../lib/quick-npc-name-generation'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
-import { QuickNpcAuthoringTabSynchronizer } from './quick-npc-authoring-tab-synchronizer.client'
+import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
 import { QuickNpcSetupSummary } from './quick-npc-setup-summary.client'
 
 export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
@@ -59,31 +69,100 @@ export type QuickNpcAuthoringFormProps = {
   onPendingChange?: (pending: boolean) => void
 }
 
-function buildInitialAuthoringTabs(args: {
+function resolveMembership(organization: QuickNpcCreateFormOrganization) {
+  return {
+    kind: organization.organizationKind,
+    ...(organization.organizationSubtype !== undefined
+      ? { subtype: organization.organizationSubtype }
+      : {}),
+  }
+}
+
+function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   configuredCount: number
+  nameTrailingAction?: TrailingFieldActionConfig
+  nameHint?: string
 }): TabbedFormTab[] {
   const optionSets = buildQuickNpcRequirementOptionSets({
     setup: args.setup,
     context: args.buildContext,
   })
   const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
+  const generationSupport = resolveQuickNpcNameGenerationSupport({
+    speciesId: args.setup.speciesId,
+    context: args.buildContext,
+  })
+
+  const nameTrailingAction =
+    args.nameTrailingAction ??
+    ({
+      label: QUICK_NPC_GENERATE_NAME_LABEL,
+      onAction: () => {},
+      disabled: !args.setup.speciesId || !generationSupport.enabled,
+    } satisfies TrailingFieldActionConfig)
+
+  const nameHint =
+    args.nameHint ??
+    (generationSupport.disabledReason && !generationSupport.enabled
+      ? generationSupport.disabledReason
+      : undefined)
 
   return buildQuickNpcTabs({
     detailsFields: buildQuickNpcDetailsFields({
-      membership: {
-        kind: args.organization.organizationKind,
-        ...(args.organization.organizationSubtype !== undefined
-          ? { subtype: args.organization.organizationSubtype }
-          : {}),
-      },
+      membership: resolveMembership(args.organization),
+      nameTrailingAction,
+      nameHint,
     }),
     requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
     configuredCount: args.configuredCount,
-    requirementsHeader: hasRequirements ? undefined : undefined,
+    requirementsHeader: hasRequirements ? (
+      <QuickNpcRequirementsFields optionSets={optionSets} />
+    ) : undefined,
   })
+}
+
+function QuickNpcAuthoringTabsSync({
+  form,
+  setup,
+  buildContext,
+  organization,
+  configuredCount,
+  onTabsChange,
+}: {
+  form: UseFormReturn<QuickNpcAuthoringTabValues>
+  setup: QuickNpcSetupValues
+  buildContext: CharacterBuildContext
+  organization: QuickNpcCreateFormOrganization
+  configuredCount: number
+  onTabsChange: (tabs: TabbedFormTab[]) => void
+}) {
+  const { trailingAction, nameHint } = useQuickNpcNameTrailingAction({
+    speciesId: setup.speciesId,
+    buildContext,
+    form,
+  })
+
+  const tabs = React.useMemo(
+    () =>
+      buildQuickNpcAuthoringTabs({
+        setup,
+        buildContext,
+        organization,
+        configuredCount,
+        nameTrailingAction: trailingAction,
+        nameHint,
+      }),
+    [buildContext, configuredCount, nameHint, organization, setup, trailingAction],
+  )
+
+  React.useLayoutEffect(() => {
+    onTabsChange(tabs)
+  }, [onTabsChange, tabs])
+
+  return null
 }
 
 function RequirementCountWatcher({
@@ -136,7 +215,7 @@ export function QuickNpcAuthoringForm({
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
   const [configuredCount, setConfiguredCount] = React.useState(0)
   const [tabs, setTabs] = React.useState<TabbedFormTab[]>(() =>
-    buildInitialAuthoringTabs({
+    buildQuickNpcAuthoringTabs({
       setup,
       buildContext,
       organization,
@@ -217,7 +296,7 @@ export function QuickNpcAuthoringForm({
       size="md"
       header={(form) => (
         <>
-          <QuickNpcAuthoringTabSynchronizer
+          <QuickNpcAuthoringTabsSync
             form={form}
             setup={setup}
             buildContext={buildContext}

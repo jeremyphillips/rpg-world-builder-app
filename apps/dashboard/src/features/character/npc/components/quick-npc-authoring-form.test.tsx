@@ -41,6 +41,15 @@ vi.mock('../lib/quick-npc-requirement-options.lib', async (importOriginal) => {
 })
 
 const createNpcMock = vi.hoisted(() => vi.fn())
+const generateQuickNpcNameMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../lib/quick-npc-name-generation', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    generateQuickNpcName: generateQuickNpcNameMock,
+  }
+})
 
 vi.mock('../hooks/use-create-npc', () => ({
   useCreateNpc: () => ({
@@ -122,6 +131,23 @@ function renderAuthoringForm(
 describe('QuickNpcAuthoringForm', () => {
   beforeEach(() => {
     createNpcMock.mockReset()
+    generateQuickNpcNameMock.mockReset()
+    generateQuickNpcNameMock.mockResolvedValue({ ok: true, name: 'Thorin Stonehelm' })
+  })
+
+  it('populates the name field when Generate is clicked', async () => {
+    const user = userEvent.setup()
+    renderAuthoringForm()
+
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Thorin Stonehelm')
+    })
+    expect(generateQuickNpcNameMock).toHaveBeenCalledWith({
+      speciesId: setup.speciesId,
+      context: buildContext,
+    })
   })
 
   it('shows a Details tab badge when Requirements is active and name is invalid', async () => {
