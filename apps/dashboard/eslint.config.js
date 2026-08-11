@@ -26,9 +26,13 @@ const dashboardStorybookRouterRule = {
   },
 }
 
-const dashboardContentCardBodyGuard = {
-  files: ['src/features/content/**/*.{ts,tsx}'],
-  ignores: ['**/*.{test,integration.test}.{ts,tsx}'],
+const dashboardEntitySurfaceImportGuard = {
+  files: ['src/features/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/lib/content-entity-card.client.tsx',
+    'src/features/content/lib/entity/entity-summary.client.tsx',
+  ],
   rules: {
     'no-restricted-imports': [
       'error',
@@ -36,9 +40,15 @@ const dashboardContentCardBodyGuard = {
         paths: [
           {
             name: '@rpg/ui',
+            importNames: ['ContentCardHeading'],
+            message:
+              'Entity identity must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
+          },
+          {
+            name: '@rpg/ui',
             importNames: ['ContentCardBody'],
             message:
-              'Import ContentEntityCard instead of ContentCardBody. See apps/dashboard/docs/content-entity-card.md.',
+              'Entity presentation must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
           },
         ],
       },
@@ -70,6 +80,6 @@ export default [
   ...react,
   ...storybook.configs['flat/recommended'],
   dashboardStorybookRouterRule,
-  dashboardContentCardBodyGuard,
+  dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,
 ]

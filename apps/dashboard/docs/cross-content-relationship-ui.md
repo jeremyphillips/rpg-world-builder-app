@@ -4,12 +4,12 @@ Dashboard surfaces that show **typed edges** between catalog entities (organizat
 
 ## Entity vs edge
 
-| Surface                                        | Primitive                                                             | Example                        |
-| ---------------------------------------------- | --------------------------------------------------------------------- | ------------------------------ |
-| Pick an entity in a drawer                     | `ContentEntityCard` (`chrome="embedded"`) + catalog selection actions | Choose an organization to link |
-| Show a persisted relationship on a detail page | `CrossContentRelationshipRow`                                         | The Monarchy                   |
+| Surface                                        | Primitive                                                                   | Example                        |
+| ---------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------ |
+| Pick an entity in a drawer                     | Embedded `EntityItem` or `DisclosureEntityCard` + catalog selection actions | Choose an organization to link |
+| Show a persisted relationship on a detail page | `CrossContentRelationshipRow`                                               | The Monarchy                   |
 
-Do **not** use `ContentEntityCard` as the default relationship row. Kind labels belong in slot/collection headings or optional row eyebrows — not as entity badges duplicating the slot.
+Do **not** use `ContentEntityCard` as the default relationship row. Kind labels belong in slot/collection headings or optional row classification — not as entity badges duplicating the slot.
 
 ## Cardinality: dedupe vs UI slots
 
