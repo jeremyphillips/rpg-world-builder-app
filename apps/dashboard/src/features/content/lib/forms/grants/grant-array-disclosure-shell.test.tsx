@@ -115,7 +115,10 @@ describe('grant array DisclosureEntityCard shell', () => {
 
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
-    expect(body).toHaveClass('pl-[var(--entity-content-indent)]')
+    expect(body?.className).toContain(
+      'pl-[calc(var(--entity-density-inline)+var(--entity-content-indent))]',
+    )
+    expect(body?.className).toContain('pr-[var(--entity-density-inline)]')
     expect(body).toHaveClass('border-t')
 
     await user.clear(ability)

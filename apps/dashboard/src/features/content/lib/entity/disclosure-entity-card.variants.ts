@@ -2,9 +2,25 @@ import { cva } from 'class-variance-authority'
 
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
-/** Bordered disclosure shell — shares entity card chrome; internal list item is borderless. */
+/**
+ * Density-owned horizontal inset shared by DEC header edges and body inline-end.
+ * Leading chrome only extends the body/header content *start* — never the end.
+ */
+export const DISCLOSURE_ENTITY_DENSITY_INLINE_VAR = '--entity-density-inline'
+
+/** Body content start: density inset + leading-chrome indent. */
+export const disclosureEntityCardBodyInlineStartClasses =
+  'pl-[calc(var(--entity-density-inline)+var(--entity-content-indent))]'
+
+/** Body content end: density inset only — independent of trailing actions. */
+export const disclosureEntityCardBodyInlineEndClasses = 'pr-[var(--entity-density-inline)]'
+
+/** Bordered disclosure shell — owns card plane so nested form hosts cannot bleed fill. */
 export const disclosureEntityCardShellVariants = cva(
-  'w-full min-w-0 overflow-hidden rounded-md border border-border',
+  cn(
+    'w-full min-w-0 overflow-hidden rounded-md border border-border bg-card',
+    establishSurfaceCurrent('card'),
+  ),
   {
     variants: {
       disabled: {
@@ -18,18 +34,31 @@ export const disclosureEntityCardShellVariants = cva(
   },
 )
 
-/** Strip CollapsibleListItem outer chrome — EntityCard-style shell owns border/radius. */
-export const disclosureEntityCardListItemClasses = cn(
-  'border-0 rounded-none shadow-none',
-  '[--entity-content-indent:var(--content-column-indent)]',
+/**
+ * Strip CollapsibleListItem outer chrome and publish DEC layout tokens.
+ * `--entity-content-indent` tracks leading chrome; `--entity-density-inline` is density-only.
+ */
+export const disclosureEntityCardListItemVariants = cva(
+  cn('border-0 rounded-none shadow-none', '[--entity-content-indent:var(--content-column-indent)]'),
+  {
+    variants: {
+      density: {
+        compact: '[--entity-density-inline:calc(var(--spacing)*3)]',
+        comfortable: '[--entity-density-inline:calc(var(--spacing)*5)]',
+      },
+    },
+    defaultVariants: {
+      density: 'comfortable',
+    },
+  },
 )
 
-/** Density-aware header inset inside the borderless collapsible shell. */
+/** Density-aware header inset — same inline token as body end edge. */
 export const disclosureEntityCardHeaderPaddingVariants = cva('min-w-0', {
   variants: {
     density: {
-      compact: 'px-3 py-2',
-      comfortable: 'px-5 py-3',
+      compact: 'px-[var(--entity-density-inline)] py-2',
+      comfortable: 'px-[var(--entity-density-inline)] py-3',
     },
   },
   defaultVariants: {
@@ -37,12 +66,16 @@ export const disclosureEntityCardHeaderPaddingVariants = cva('min-w-0', {
   },
 })
 
-/** Full-bleed expanded body wash — divider spans shell edge; alignment uses entity content indent. */
+/**
+ * Full-bleed expanded body wash — divider/wash span shell edge.
+ * Inline-start = density inset + leading indent; inline-end = density inset only.
+ */
 export const disclosureEntityCardBodyWashVariants = cva(
   cn(
     'border-t border-border-subtle bg-surface-muted',
     establishSurfaceCurrent('surface-muted'),
-    'pl-[var(--entity-content-indent)]',
+    disclosureEntityCardBodyInlineStartClasses,
+    disclosureEntityCardBodyInlineEndClasses,
   ),
   {
     variants: {

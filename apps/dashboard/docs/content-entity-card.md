@@ -39,9 +39,21 @@ Set density exactly once:
 ## Disclosure content-column contract
 
 DEC owns the collapse caret, optional drag grip, header/body divider, body wash, and
-body alignment. Its `--entity-content-indent` aligns header identity and disclosed
-body content. Grip and caret columns use the same `--leading-chrome-size`; consumers
-must not add compensating body or leading padding.
+body alignment. Horizontal inset splits into two independent rules:
+
+- **inline start:** density inset + leading-chrome indent (`--entity-content-indent`)
+- **inline end:** density inset only (`--entity-density-inline`)
+
+Leading chrome changes where entity/domain content begins. Trailing header actions
+never change where disclosed content ends — delete, Add, commerce, and overflow
+controls must not drive body padding.
+
+The divider and body wash remain edge-to-edge. Grip and caret columns share one
+`--leading-chrome-size`; consumers must not add compensating body or leading padding.
+
+The outer DEC shell owns `bg-card` / `--surface-current: card` so nested form hosts
+(for example grant arrays inside feature `ArrayItem` shells) cannot bleed parent fill
+into the header. Body wash still uses `bg-surface-muted` on top of that card plane.
 
 Feature code may lay out genuine domain content inside DEC children. It must not
 override entity heading typography, padding, border, radius, divider, alignment, or

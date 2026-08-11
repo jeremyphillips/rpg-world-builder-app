@@ -12,7 +12,7 @@ import type { EntitySummaryModel } from './entity-summary.types'
 import {
   disclosureEntityCardBodyWashVariants,
   disclosureEntityCardHeaderPaddingVariants,
-  disclosureEntityCardListItemClasses,
+  disclosureEntityCardListItemVariants,
   disclosureEntityCardShellVariants,
 } from './disclosure-entity-card.variants'
 
@@ -67,7 +67,7 @@ export function DisclosureEntityCard({
         rowLayout="entity-card"
         actionsAlign="center"
         toolbarCompact
-        className={disclosureEntityCardListItemClasses}
+        className={disclosureEntityCardListItemVariants({ density })}
         bodyClassName={disclosureEntityCardBodyWashVariants({ density })}
         header={
           <div className={disclosureEntityCardHeaderPaddingVariants({ density })}>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { DisclosureEntityCard } from './disclosure-entity-card.client'
 import { HARBOR_DISTRICT_ENTITY } from './entity.fixture'
@@ -28,11 +28,13 @@ function DisclosureEntityCardDemo({
   density = 'comfortable',
   dragHandleProps,
   leading,
+  action,
   initialCollapsed = true,
 }: {
   density?: 'compact' | 'comfortable'
   dragHandleProps?: typeof mockDragHandleProps
-  leading?: React.ReactNode
+  leading?: ReactNode
+  action?: ReactNode
   initialCollapsed?: boolean
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed)
@@ -50,9 +52,11 @@ function DisclosureEntityCardDemo({
         dragHandleProps={dragHandleProps}
         leading={leading}
         action={
-          <button type="button" className="text-sm text-link">
-            Manage
-          </button>
+          action ?? (
+            <button type="button" className="text-sm text-link">
+              Manage
+            </button>
+          )
         }
       >
         <div className="space-y-2 text-sm text-muted-foreground">
@@ -80,6 +84,52 @@ export const GripAndCaretExpanded: Story = {
 
 export const Collapsed: Story = {
   render: () => <DisclosureEntityCardDemo />,
+}
+
+export const BodyEndInsetInvariant: Story = {
+  name: 'Body end inset invariant (trailing actions)',
+  render: () => (
+    <div className="flex max-w-lg flex-col gap-4">
+      {(
+        [
+          { id: 'none', action: undefined, label: 'No trailing action' },
+          {
+            id: 'delete',
+            action: <button type="button">Remove</button>,
+            label: 'Delete action',
+          },
+          {
+            id: 'add',
+            action: <button type="button">Add</button>,
+            label: 'Add action',
+          },
+          {
+            id: 'wide',
+            action: <button type="button">Add to inventory · 105 GP</button>,
+            label: 'Wider trailing action',
+          },
+        ] as const
+      ).map((entry) => (
+        <DisclosureEntityCard
+          key={entry.id}
+          itemId={entry.id}
+          toolbarAriaLabel={entry.label}
+          entity={{
+            heading: entry.label,
+            classification: 'Compact',
+            description: 'Body inline-end inset must match across these rows.',
+          }}
+          density="compact"
+          defaultCollapsed={false}
+          action={entry.action}
+        >
+          <p className="bg-surface-subtle text-sm text-muted-foreground">
+            Domain content — right edge uses density inset only.
+          </p>
+        </DisclosureEntityCard>
+      ))}
+    </div>
+  ),
 }
 
 export const PilotInventoryRow: Story = {
