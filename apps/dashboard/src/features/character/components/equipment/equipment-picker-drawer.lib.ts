@@ -37,8 +37,8 @@ import {
 } from '../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
 import {
-  resolveEquipmentPickerItemHeaderPresentation,
-  type EquipmentPickerItemHeaderPresentation,
+  resolveEquipmentPickerItemPresentation,
+  type EquipmentPickerItemPresentation,
 } from './equipment-picker-item-header.lib'
 import {
   EQUIPMENT_PICKER_KIND_ALL,
@@ -484,7 +484,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   draft?: CharacterBuilderDraft
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
-}): EquipmentPickerItemHeaderPresentation {
+}): EquipmentPickerItemPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
   const ownedQuantity = args.draft
     ? resolveEquipmentOwnedQuantity({ equipmentId: args.item.equipment.id, draft: args.draft })
@@ -510,7 +510,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
     return { action: { kind: 'none' } }
   }
 
-  return resolveEquipmentPickerItemHeaderPresentation({
+  return resolveEquipmentPickerItemPresentation({
     equipment: args.item.equipment,
     row,
     workflowMode: args.workflowMode,

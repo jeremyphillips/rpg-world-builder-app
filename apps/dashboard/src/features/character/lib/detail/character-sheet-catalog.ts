@@ -16,9 +16,6 @@ import {
 } from '@rpg/contracts'
 
 import type { CatalogMetadataLine } from '@/features/content'
-import type { EquipmentCatalogItemHeaderTone } from '@/features/content'
-import type { SpellCatalogItemHeaderTone } from '@/features/content'
-import type { SpellMarker } from '@/features/content'
 
 import { formatContentReferenceLabel } from '../display/format-content-reference-label'
 import {
@@ -49,6 +46,9 @@ import {
  * - Header mappers own presentation-only fields; card types own sheet/builder data.
  */
 export type { CharacterSheetItemSource }
+
+type CatalogItemTone = 'default' | 'muted' | 'unavailable'
+type SpellMarker = string
 
 type CharacterSheetEquipmentCardExtra = {
   bucket: CharacterEquipmentInventoryBucket
@@ -91,12 +91,12 @@ export type CharacterSheetSpellCardResolved = Extract<
 
 export type CharacterSheetSpellCardMissing = Extract<CharacterSheetSpellCard, { status: 'missing' }>
 
-export type EquipmentCatalogHeaderModel = CatalogHeaderModelBase<EquipmentCatalogItemHeaderTone> & {
+export type EquipmentCatalogHeaderModel = CatalogHeaderModelBase<CatalogItemTone> & {
   sourceLabel?: string
   equipped: boolean
 }
 
-export type SpellCatalogHeaderModel = CatalogHeaderModelBase<SpellCatalogItemHeaderTone> & {
+export type SpellCatalogHeaderModel = CatalogHeaderModelBase<CatalogItemTone> & {
   markers: readonly SpellMarker[]
   footerLabels: readonly string[]
 }

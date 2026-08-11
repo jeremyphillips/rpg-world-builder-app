@@ -5,7 +5,8 @@ import * as React from 'react'
 import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
+import { EntityItem } from '@/features/content'
+import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
@@ -168,19 +169,33 @@ export function OrganizationPickerDrawer({
         ),
       }}
       renderItemHeader={({ organization, selected }) => (
-        <CatalogPickerItemHeader
-          name={organization.name}
-          metadataLines={[
-            {
-              segments: [
-                {
-                  type: 'text',
-                  text: getOrganizationKindLabel(organization.organizationKind),
-                },
-              ],
-            },
-          ]}
-          actions={
+        <EntityItem
+          entity={{
+            heading: organization.name,
+            description: (
+              <CatalogPickerMetadataRenderer
+                lines={[
+                  {
+                    segments: [
+                      {
+                        type: 'text',
+                        text: getOrganizationKindLabel(organization.organizationKind),
+                      },
+                    ],
+                  },
+                ]}
+              />
+            ),
+            status: selected
+              ? [
+                  <Badge key="added" tone="success">
+                    Added
+                  </Badge>,
+                ]
+              : undefined,
+          }}
+          density="compact"
+          action={
             selected ? (
               <CatalogPickerSelectionActions
                 phase="success"
@@ -195,7 +210,6 @@ export function OrganizationPickerDrawer({
               />
             )
           }
-          footer={selected ? <Badge tone="success">Added</Badge> : undefined}
         />
       )}
       renderItemDetails={({ organization, selected }) => {

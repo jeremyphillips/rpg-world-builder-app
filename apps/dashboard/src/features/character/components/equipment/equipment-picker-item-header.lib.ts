@@ -11,17 +11,17 @@ import {
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
 } from './equipment-picker-drawer.types'
 
-export type EquipmentPickerHeaderAction =
+export type EquipmentPickerAction =
   | { kind: 'add'; disabled: boolean }
   | { kind: 'manage_only' }
   | { kind: 'none' }
 
 export type EquipmentPickerSummaryTrailingTone = 'default' | 'muted' | 'blocked'
 
-export type EquipmentPickerItemHeaderPresentation = {
+export type EquipmentPickerItemPresentation = {
   summaryTrailingLabel?: string
   summaryTrailingTone?: EquipmentPickerSummaryTrailingTone
-  action: EquipmentPickerHeaderAction
+  action: EquipmentPickerAction
 }
 
 type EquipmentAcquisitionBlocker = NonNullable<
@@ -52,7 +52,7 @@ export function formatEquipmentPickerHeaderTrailingLabel(args: {
 function resolveHeaderAction(args: {
   canAdd: boolean
   ownedQuantity: number
-}): EquipmentPickerHeaderAction {
+}): EquipmentPickerAction {
   if (args.canAdd) return { kind: 'add', disabled: false }
   if (args.ownedQuantity > 0) return { kind: 'manage_only' }
   return { kind: 'none' }
@@ -62,7 +62,7 @@ function resolveMagicItemGrantTrailing(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
   row: EquipmentPickerRowViewModel
   equipment: Equipment
-}): Pick<EquipmentPickerItemHeaderPresentation, 'summaryTrailingLabel' | 'summaryTrailingTone'> {
+}): Pick<EquipmentPickerItemPresentation, 'summaryTrailingLabel' | 'summaryTrailingTone'> {
   const { plan, capabilities } = args.rowActionVm
   const grantQuantity = plan.grantAllocations.reduce(
     (sum, allocation) => sum + allocation.quantity,
@@ -100,7 +100,7 @@ function resolvePurchasePresentation(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }>
   row: EquipmentPickerRowViewModel
   ownedQuantity: number
-}): EquipmentPickerItemHeaderPresentation {
+}): EquipmentPickerItemPresentation {
   const { availability, disabled } = args.rowActionVm
 
   if (availability.status === 'unavailable') {
@@ -114,7 +114,7 @@ function resolvePurchasePresentation(args: {
   }
 
   const trailingLabel = args.row.priceLabel || undefined
-  const action: EquipmentPickerHeaderAction = disabled
+  const action: EquipmentPickerAction = disabled
     ? { kind: 'add', disabled: true }
     : { kind: 'add', disabled: false }
 
@@ -133,13 +133,13 @@ function resolvePurchasePresentation(args: {
   }
 }
 
-export function resolveEquipmentPickerItemHeaderPresentation(args: {
+export function resolveEquipmentPickerItemPresentation(args: {
   equipment: Equipment
   row: EquipmentPickerRowViewModel
   workflowMode: EquipmentPickerWorkflowMode
   rowActionVm: EquipmentPickerRowActionViewModel
   ownedQuantity: number
-}): EquipmentPickerItemHeaderPresentation {
+}): EquipmentPickerItemPresentation {
   const { equipment, row, workflowMode, rowActionVm, ownedQuantity } = args
 
   if (workflowMode === 'purchase' && rowActionVm.kind === 'purchase') {

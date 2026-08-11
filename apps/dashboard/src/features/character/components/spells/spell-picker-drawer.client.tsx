@@ -11,7 +11,7 @@ import {
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
-import { SpellCatalogItemHeader } from '@/features/content'
+import { CatalogMetadataRenderer, EntityItem } from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
@@ -27,7 +27,6 @@ import {
   formatSpellPickerSelectionMetadata,
   getSpellPickerDisabledNote,
   itemsForSpellPickerMode,
-  isSpellPickerRowDimmed,
   resolveActivePreparedLevelSuffix,
   resolveInitialSpellPickerMode,
   resolveSpellPickerEmptyStateKind,
@@ -368,16 +367,28 @@ export function SpellPickerDrawer({
         const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
         return (
-          <SpellCatalogItemHeader
-            name={item.spell.name}
-            metadataLines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
-            markers={[
-              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
-              ...markers,
-            ]}
-            tone={isSpellPickerRowDimmed(item) ? 'muted' : 'default'}
-            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
-            actions={
+          <EntityItem
+            entity={{
+              heading: item.spell.name,
+              description: (
+                <CatalogMetadataRenderer
+                  lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
+                />
+              ),
+              status: [
+                ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
+                ...markers,
+                ...(disabledNote
+                  ? [
+                      <Text key="disabled-note" variant="muted">
+                        {disabledNote}
+                      </Text>,
+                    ]
+                  : []),
+              ],
+            }}
+            density="compact"
+            action={
               <CatalogPickerSelectionActions
                 selected={item.state.isAlreadySelected}
                 canSelect={item.state.canSelect}

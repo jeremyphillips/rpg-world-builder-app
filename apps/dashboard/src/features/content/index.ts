@@ -33,6 +33,15 @@ export {
   type CatalogMetadataLine,
 } from './components/catalog'
 export {
+  ContentEntityCard,
+  DisclosureEntityCard,
+  EntityItem,
+  EntitySummary,
+  type ContentEntityCardProps,
+  type DisclosureEntityCardProps,
+  type EntitySummaryModel,
+} from './lib/content-entity-card.client'
+export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
   CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
@@ -48,9 +57,6 @@ export {
   formatUnavailableMatchesLine,
 } from './lib/campaign-access/campaign-access-table-labels'
 export { CITY_COUNCIL, SILVER_CIRCLE, ORGANIZATIONS_LIST } from './organizations/fixtures'
-export type { EquipmentCatalogItemHeaderTone } from './equipment/components/equipment-catalog-item-header.client'
-export type { SpellCatalogItemHeaderTone } from './spells/components/spell-catalog-item-header.client'
-
 export { ClassesOverview, ClassDetail, useClasses, classesQueryKey } from './classes'
 export { ClassCreate } from './classes/routes/class-create'
 export { ClassEdit } from './classes/routes/class-edit'
@@ -70,7 +76,6 @@ export {
   type EquipmentDetailViewModel,
   type EquipmentPickerRowViewModel,
   EquipmentDetailMetadata,
-  EquipmentCatalogItemHeader,
 } from './equipment'
 export { EquipmentEdit } from './equipment/routes/equipment-edit'
 export {
@@ -135,11 +140,6 @@ export {
   type SpellDisplayVocabulary,
 } from './spells/lib/spell-display'
 export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.client'
-export { SpellCatalogItemHeader } from './spells/components/spell-catalog-item-header.client'
-export type {
-  SpellCatalogItemHeaderProps,
-  SpellMarker,
-} from './spells/components/spell-catalog-item-header.client'
 export {
   ContentCreateShell,
   ContentFormShellResolver,

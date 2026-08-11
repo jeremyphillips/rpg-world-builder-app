@@ -1,0 +1,114 @@
+'use client'
+
+import { Check, TriangleAlert } from 'lucide-react'
+
+import { Badge, Text } from '@rpg/ui'
+
+import { buildEquipmentPickerRowViewModel, EntityItem } from '@/features/content'
+import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
+import {
+  CatalogPickerMetadataRenderer,
+  mapEquipmentCompactSummaryToMetadataLines,
+} from '../picker/catalog-picker-metadata'
+import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
+import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
+import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
+import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
+import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
+import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
+
+const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
+
+export type EquipmentPickerItemRailProps = {
+  item: EquipmentPickerItem
+  presentation: EquipmentPickerItemPresentation
+  ownedQuantity: number
+  isGoldShoppingPath?: boolean
+  onCommit?: () => boolean
+}
+
+export function EquipmentPickerItemRail({
+  item,
+  presentation,
+  ownedQuantity,
+  isGoldShoppingPath = false,
+  onCommit,
+}: EquipmentPickerItemRailProps) {
+  const { isPending, successQuantity, commitQuantity } = useEquipmentAcquisitionQuantityCommit({
+    commit: () => onCommit?.() ?? false,
+  })
+
+  const row = buildEquipmentPickerRowViewModel(item.equipment)
+  const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
+  const addButtonLabel = resolveAcquisitionCommitButtonLabel({
+    isPending,
+    successQuantity,
+    primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
+  })
+
+  return (
+    <EntityItem
+      entity={{
+        heading: row.name,
+        classification: row.kindLabel,
+        description: (
+          <CatalogPickerMetadataRenderer
+            lines={mapEquipmentCompactSummaryToMetadataLines({
+              kindLabel: row.kindLabel,
+              comparisonGroups: row.comparisonGroups,
+            })}
+          />
+        ),
+        status: [
+          ...(presentation.summaryTrailingLabel
+            ? [
+                <Text key="summary-trailing" variant="muted">
+                  {presentation.summaryTrailingLabel}
+                </Text>,
+              ]
+            : []),
+          ...(callout ? [<EquipmentPickerCalloutBadge key="callout" callout={callout} />] : []),
+        ],
+      }}
+      density="compact"
+      action={
+        presentation.action.kind === 'add' ||
+        (presentation.action.kind === 'manage_only' && ownedQuantity > 0) ? (
+          <EquipmentPickerCommerce
+            ownedQuantity={ownedQuantity}
+            showAdd={presentation.action.kind === 'add'}
+            disabled={presentation.action.kind === 'add' ? presentation.action.disabled : false}
+            buttonLabel={addButtonLabel}
+            isPending={isPending}
+            onAdd={() => commitQuantity(1)}
+          />
+        ) : undefined
+      }
+    />
+  )
+}
+
+function EquipmentPickerCalloutBadge({
+  callout,
+}: {
+  callout: NonNullable<ReturnType<typeof getEquipmentPickerCallout>>
+}) {
+  const presentation = getEquipmentCalloutPresentation(callout)
+  const leadingIcon =
+    presentation.leadingIcon === 'check' ? (
+      <Check aria-hidden />
+    ) : presentation.leadingIcon === 'warning' ? (
+      <TriangleAlert aria-hidden />
+    ) : undefined
+
+  return (
+    <Badge
+      appearance={presentation.appearance}
+      tone={presentation.tone}
+      size={presentation.size}
+      leadingIcon={leadingIcon}
+    >
+      {callout.label}
+    </Badge>
+  )
+}

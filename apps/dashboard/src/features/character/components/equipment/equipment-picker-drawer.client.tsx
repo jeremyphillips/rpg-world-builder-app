@@ -59,7 +59,7 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
-import { EquipmentPickerItemHeaderRail } from './equipment-picker-item-header-rail.client'
+import { EquipmentPickerItemRail } from './equipment-picker-item-rail.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
@@ -556,7 +556,7 @@ export function EquipmentPickerDrawer({
         const canQuickAdd = presentation.action.kind === 'add' && !presentation.action.disabled
 
         return (
-          <EquipmentPickerItemHeaderRail
+          <EquipmentPickerItemRail
             item={item}
             presentation={presentation}
             ownedQuantity={ownedQuantity}

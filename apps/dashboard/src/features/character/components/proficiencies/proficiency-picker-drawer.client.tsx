@@ -3,10 +3,13 @@
 import * as React from 'react'
 
 import { CatalogPickerSheet, Text } from '@rpg/ui'
+import { EntityItem } from '@/features/content'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
-import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
+import {
+  CatalogPickerMetadataRenderer,
+  mapSkillProficiencyCompactSummaryToMetadataLines,
+} from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
@@ -19,7 +22,6 @@ import {
   formatProficiencyPickerDrawerTitle,
   formatProficiencyPickerSearchPlaceholder,
   getProficiencyPickerDisabledNote,
-  isProficiencyPickerRowDimmed,
   resolveProficiencyPickerEmptyStateKind,
   resolveProficiencyPickerEmptyStateMessage,
   PROFICIENCY_PICKER_VIEW_DEFAULTS,
@@ -153,16 +155,24 @@ export function ProficiencyPickerDrawer({
         const disabledNote = getProficiencyPickerDisabledNote(item)
 
         return (
-          <CatalogPickerItemHeader
-            name={item.label}
-            metadataLines={
-              item.compactSummary
-                ? mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)
-                : undefined
-            }
-            disabled={isProficiencyPickerRowDimmed(item)}
-            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
-            actions={
+          <EntityItem
+            entity={{
+              heading: item.label,
+              description: item.compactSummary ? (
+                <CatalogPickerMetadataRenderer
+                  lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
+                />
+              ) : undefined,
+              status: disabledNote
+                ? [
+                    <Text key="disabled-note" variant="muted">
+                      {disabledNote}
+                    </Text>,
+                  ]
+                : undefined,
+            }}
+            density="compact"
+            action={
               <CatalogPickerSelectionActions
                 selected={item.state.isAlreadySelected}
                 canSelect={item.state.canSelect}

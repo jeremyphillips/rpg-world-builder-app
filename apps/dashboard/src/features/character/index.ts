@@ -48,8 +48,11 @@ export { CharacterOrganizationMembershipsContainer } from './components/detail/c
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRow } from './components/builder/builder-inventory-row.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
-export { CatalogPickerItemHeader } from './components/picker/catalog-picker-item-header.client'
 export { CatalogPickerSelectionActions } from './components/picker/catalog-picker-selection-actions.client'
+export {
+  CatalogPickerMetadataRenderer,
+  type CatalogPickerMetadataLine,
+} from './components/picker/catalog-picker-metadata'
 export { catalogPickerShellProps } from './components/picker/catalog-picker-shell.lib'
 export { resolveCatalogPickerRowActionPhase } from './components/picker/catalog-picker-row-action.lib'
 export { CATALOG_PICKER_COMMIT_SUCCESS_MS } from './components/picker/use-catalog-picker-commit-confirmation.client'

@@ -4,7 +4,6 @@ import type { ButtonProps } from '@rpg/ui'
 import { Text } from '@rpg/ui'
 
 import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
-import { catalogPickerSelectionActionsClasses } from './catalog-picker-item-header.variants'
 import type { CatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
 import { resolveCatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
 import { CATALOG_PICKER_ADDED_LABEL } from './use-catalog-picker-commit-confirmation.client'
@@ -53,7 +52,7 @@ export function CatalogPickerSelectionActions({
   const resolvedPhase = resolveSelectionPhase({ phase, selected, isPending, isSuccess })
 
   return (
-    <div className={catalogPickerSelectionActionsClasses}>
+    <>
       {resolvedPhase === 'success' ? (
         <Text as="span" className="text-sm font-body-emphasis text-success" role="status">
           {successLabel}
@@ -71,6 +70,6 @@ export function CatalogPickerSelectionActions({
           {resolvedPhase === 'pending' ? pendingLabel : addLabel}
         </CatalogPickerActionButton>
       )}
-    </div>
+    </>
   )
 }

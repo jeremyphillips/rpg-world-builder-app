@@ -6,7 +6,7 @@ import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import {
-  CatalogPickerItemHeader,
+  CatalogPickerMetadataRenderer,
   CatalogPickerSelectionActions,
   catalogPickerShellProps,
   formatCharacterInlineSummary,
@@ -15,6 +15,7 @@ import {
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
+import { EntityItem } from '../../lib/content-entity-card.client'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -186,13 +187,24 @@ export function OrganizationMemberPickerDrawer({
         const identityLine = formatCandidateIdentityLine(candidate)
 
         return (
-          <CatalogPickerItemHeader
-            name={candidate.name}
-            disabled={candidate.isMember}
-            metadataLines={
-              identityLine ? [{ segments: [{ type: 'text', text: identityLine }] }] : undefined
-            }
-            actions={
+          <EntityItem
+            entity={{
+              heading: candidate.name,
+              description: identityLine ? (
+                <CatalogPickerMetadataRenderer
+                  lines={[{ segments: [{ type: 'text', text: identityLine }] }]}
+                />
+              ) : undefined,
+              status: candidate.isMember
+                ? [
+                    <Badge key="member" tone="success">
+                      {ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}
+                    </Badge>,
+                  ]
+                : undefined,
+            }}
+            density="compact"
+            action={
               candidate.isMember ? (
                 <CatalogPickerSelectionActions
                   phase="success"
@@ -207,11 +219,6 @@ export function OrganizationMemberPickerDrawer({
                   onRemove={() => undefined}
                 />
               )
-            }
-            footer={
-              candidate.isMember ? (
-                <Badge tone="success">{ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}</Badge>
-              ) : undefined
             }
           />
         )
