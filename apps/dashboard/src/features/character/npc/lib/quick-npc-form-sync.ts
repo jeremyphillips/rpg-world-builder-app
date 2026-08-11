@@ -20,8 +20,12 @@ function syncRequirementSelections(
   setup: QuickNpcSetupValues,
   context: Parameters<typeof resolveQuickNpcRequirementValidIds>[0]['context'],
 ): Partial<Record<string, unknown>> | undefined {
-  const { weaponIds: reachableWeaponIds, spellIds: reachableSpellIds } =
-    resolveQuickNpcRequirementValidIds({ setup, context })
+  const { weaponIds: validWeaponIds, spellIds: validSpellIds } = resolveQuickNpcRequirementValidIds(
+    {
+      setup,
+      context,
+    },
+  )
 
   const requiredWeaponIds = asStringArray(values[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME])
   const requiredSpellIds = asStringArray(values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME])
@@ -29,8 +33,8 @@ function syncRequirementSelections(
   const intersected = intersectQuickNpcRequirementIds({
     requiredWeaponIds,
     requiredSpellIds,
-    reachableWeaponIds,
-    reachableSpellIds,
+    validWeaponIds,
+    validSpellIds,
   })
   if (!intersected) return undefined
 

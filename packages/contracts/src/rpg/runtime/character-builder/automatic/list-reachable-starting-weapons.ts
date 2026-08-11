@@ -102,8 +102,11 @@ export function isRequiredStartingWeaponSatisfiedInDraft(args: {
 }
 
 /**
- * Advisory: weapons the UI may offer for a Quick NPC requirement picker.
- * Enumerates weapons reachable through non-gold starting-equipment packages only.
+ * Advisory: weapons reachable through non-gold starting-equipment packages.
+ * Used by automatic NPC build constraint planning (package bias, satisfiability).
+ * Must not determine general weapon picker membership — Quick NPC and builder
+ * pickers use campaign-available equipment via `resolveAvailableContent`
+ * (dashboard: `resolveQuickNpcWeaponRequirementOptions`).
  */
 export function listReachableStartingWeapons(args: {
   seed: Pick<AutomaticNpcBuildSeed, 'classId'>

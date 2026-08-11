@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
 import { describe, expect, it } from 'vitest'
 
 import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../components/equipment/equipment-picker-drawer.types'
@@ -92,5 +95,14 @@ describe('quick-npc-requirement-options.lib', () => {
     const validIds = resolveQuickNpcRequirementValidIds({ setup, context })
 
     expect(validIds.weaponIds).toEqual(new Set(options.map((entry) => entry.option.value)))
+  })
+
+  it('does not delegate weapon picker membership to starting-equipment reachability', () => {
+    const source = readFileSync(
+      fileURLToPath(new URL('./quick-npc-requirement-options.lib.ts', import.meta.url)),
+      'utf8',
+    )
+
+    expect(source).not.toContain('listReachableStartingWeapons')
   })
 })

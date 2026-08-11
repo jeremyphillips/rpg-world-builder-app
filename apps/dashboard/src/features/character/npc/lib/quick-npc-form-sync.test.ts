@@ -30,7 +30,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 })
 
 describe('createQuickNpcFormValueSyncs', () => {
-  it('intersects weapon requirements when setup changes make ids unreachable', () => {
+  it('intersects weapon requirements when setup changes make ids invalid', () => {
     const sync = createQuickNpcFormValueSyncs(buildContext)[0]!
     const setup: QuickNpcSetupValues = {
       speciesId: populatedBuilderCatalog.species[0]!.id,
