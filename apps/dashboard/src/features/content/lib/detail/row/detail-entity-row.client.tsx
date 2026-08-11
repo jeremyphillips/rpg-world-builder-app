@@ -3,13 +3,13 @@
 import { ChevronDown } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
 
-import { buildCollapsibleListItemLeadingChromeStyle, cn } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
 import { EntityItemAnatomy } from '../../entity/entity-item.client'
 import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
+import { buildEntityLeadingOffsetStyle } from '../../entity/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
 import {
-  detailEntityRowDisclosureButtonColumnClasses,
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
   detailEntityRowDisclosureItemVariants,
@@ -37,12 +37,9 @@ export type DetailEntityRowProps = {
 
 const DETAIL_ENTITY_ROW_DENSITY = 'compact' as const
 
-const DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE = buildCollapsibleListItemLeadingChromeStyle({
-  showDragHandle: false,
-  collapsible: true,
-})
+const DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE = buildEntityLeadingOffsetStyle(1)
 
-function DetailEntityRowDisclosureColumn({
+function DetailEntityRowDisclosureUtility({
   disclosure,
   collapsed,
   contentId,
@@ -57,29 +54,23 @@ function DetailEntityRowDisclosureColumn({
     const toggleLabel = collapsed ? `Show ${disclosure.label}` : `Hide ${disclosure.label}`
 
     return (
-      <div className={detailEntityRowDisclosureButtonColumnClasses}>
-        <button
-          type="button"
-          className={detailEntityRowDisclosureButtonVariants()}
-          aria-expanded={!collapsed}
-          aria-controls={contentId}
-          aria-label={toggleLabel}
-          onClick={onToggle}
-        >
-          <ChevronDown
-            className={cn('transition-transform', collapsed && '-rotate-90')}
-            aria-hidden
-          />
-        </button>
-      </div>
+      <button
+        type="button"
+        className={detailEntityRowDisclosureButtonVariants()}
+        aria-expanded={!collapsed}
+        aria-controls={contentId}
+        aria-label={toggleLabel}
+        onClick={onToggle}
+      >
+        <ChevronDown
+          className={cn('transition-transform', collapsed && '-rotate-90')}
+          aria-hidden
+        />
+      </button>
     )
   }
 
-  return (
-    <div className={detailEntityRowDisclosureButtonColumnClasses} aria-hidden>
-      <span className="block size-control-action-compact" />
-    </div>
-  )
+  return <span className="block size-control-action-compact" aria-hidden />
 }
 
 function DetailEntityRowIdentity(
@@ -87,10 +78,11 @@ function DetailEntityRowIdentity(
     DetailEntityRowProps,
     'heading' | 'headingHref' | 'headingSuffix' | 'subheading' | 'metadata' | 'trailing'
   > & {
-    leading?: ReactNode
+    leadingUtilities?: readonly ReactNode[]
   },
 ) {
-  const { heading, headingHref, headingSuffix, subheading, metadata, trailing, leading } = props
+  const { heading, headingHref, headingSuffix, subheading, metadata, trailing, leadingUtilities } =
+    props
 
   return (
     <EntityItemAnatomy
@@ -101,7 +93,7 @@ function DetailEntityRowIdentity(
         status: metadata,
       })}
       headingHref={headingHref}
-      leading={leading}
+      leadingUtilities={leadingUtilities}
       trailing={trailing}
       density={DETAIL_ENTITY_ROW_DENSITY}
     />
@@ -140,7 +132,7 @@ export function DetailEntityRow({
   return (
     <div
       className={cn(detailEntityRowDisclosureItemVariants(), className)}
-      style={DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE}
+      style={DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE}
     >
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>
         <DetailEntityRowIdentity
@@ -150,14 +142,15 @@ export function DetailEntityRow({
           subheading={subheading}
           metadata={metadata}
           trailing={trailing}
-          leading={
-            <DetailEntityRowDisclosureColumn
+          leadingUtilities={[
+            <DetailEntityRowDisclosureUtility
+              key="disclosure-utility"
               disclosure={disclosure}
               collapsed={collapsed}
               contentId={contentId}
               onToggle={() => setCollapsed((current) => !current)}
-            />
-          }
+            />,
+          ]}
         />
       </div>
       {disclosure.mode === 'expandable' && !collapsed ? (

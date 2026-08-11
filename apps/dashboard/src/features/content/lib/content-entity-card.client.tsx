@@ -46,7 +46,7 @@ export function ContentEntityCard({
       <EntityItemAnatomy
         entity={entity}
         headingHref={headingHref}
-        leading={leading}
+        leadingUtilities={leading != null ? [leading] : undefined}
         trailing={trailing}
         density={resolvedDensity}
       />

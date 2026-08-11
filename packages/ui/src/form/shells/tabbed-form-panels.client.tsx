@@ -203,7 +203,7 @@ export function TabbedFormPanels({
   )
 }
 
-interface TabbedFormFooterRegionInternalProps extends TabbedFormFooterRegionProps {}
+type TabbedFormFooterRegionInternalProps = TabbedFormFooterRegionProps
 
 function TabbedFormFlatFooter({
   formError,

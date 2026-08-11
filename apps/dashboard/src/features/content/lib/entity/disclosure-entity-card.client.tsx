@@ -9,7 +9,6 @@ import {
   type ContentCardDensity,
 } from '@rpg/ui'
 
-import { EntityLeadingRail } from './entity-leading-rail.client'
 import {
   buildEntityLeadingOffsetStyle,
   resolveEntityLeadingUtilityCount,
@@ -43,18 +42,16 @@ export type DisclosureEntityCardProps = {
   dragHandleProps?: CollapsibleListItemDragHandleConfig
 }
 
-function DisclosureEntityCardLeadingRail({
+function resolveDisclosureLeadingUtilities({
   dragHandle,
   dragHandleProps,
-}: Pick<DisclosureEntityCardProps, 'dragHandle' | 'dragHandleProps'>) {
+}: Pick<DisclosureEntityCardProps, 'dragHandle' | 'dragHandleProps'>): ReactNode[] {
   const showDragHandle = Boolean(dragHandleProps)
 
-  return (
-    <EntityLeadingRail>
-      {showDragHandle ? (dragHandle ?? <CollapsibleListItemDragHandleTrigger />) : null}
-      <CollapsibleListItemDisclosureTrigger />
-    </EntityLeadingRail>
-  )
+  return [
+    showDragHandle ? (dragHandle ?? <CollapsibleListItemDragHandleTrigger />) : null,
+    <CollapsibleListItemDisclosureTrigger key="disclosure-trigger" />,
+  ].filter((utility) => utility != null) as ReactNode[]
 }
 
 export function DisclosureEntityCard({
@@ -73,6 +70,7 @@ export function DisclosureEntityCard({
   dragHandleProps,
 }: DisclosureEntityCardProps) {
   const showDragHandle = Boolean(dragHandleProps)
+  const leadingUtilities = resolveDisclosureLeadingUtilities({ dragHandle, dragHandleProps })
   const leadingUtilityCount = resolveEntityLeadingUtilityCount({
     dragHandle: showDragHandle,
     disclosure: true,
@@ -105,12 +103,7 @@ export function DisclosureEntityCard({
             <EntityItemAnatomy
               entity={entity}
               headingHref={headingHref}
-              leading={
-                <DisclosureEntityCardLeadingRail
-                  dragHandle={dragHandle}
-                  dragHandleProps={dragHandleProps}
-                />
-              }
+              leadingUtilities={leadingUtilities}
               trailing={trailing}
               density={density}
             />

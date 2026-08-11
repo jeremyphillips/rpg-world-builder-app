@@ -4,7 +4,7 @@ import { Check, TriangleAlert } from 'lucide-react'
 
 import { Badge } from '@rpg/ui'
 
-import { EntityItem } from '@/features/content'
+import { EntityItem, type EntityItemTrailing } from '@/features/content'
 
 import { getEquipmentCalloutPresentation } from '../../components/equipment/equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from '../../components/equipment/equipment-picker-drawer.types'
@@ -44,11 +44,11 @@ function RequirementCalloutBadge({ callout }: { callout: EquipmentPickerCallout 
 function RequirementPreviewCard({
   projection,
   callout,
-  endSlot,
+  trailing,
 }: {
   projection: WeaponRequirementPreviewProjection | SpellRequirementPreviewProjection
   callout?: EquipmentPickerCallout
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   return (
     <EntityItem
@@ -57,7 +57,7 @@ function RequirementPreviewCard({
         description: projection.description,
         status: callout ? [<RequirementCalloutBadge callout={callout} />] : undefined,
       }}
-      trailing={endSlot ? { kind: 'action', content: endSlot } : undefined}
+      trailing={trailing}
       density="compact"
     />
   )
@@ -65,28 +65,28 @@ function RequirementPreviewCard({
 
 export function QuickNpcWeaponRequirementPreview({
   entry,
-  endSlot,
+  trailing,
 }: {
   entry: QuickNpcWeaponRequirementOption
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   const projection = projectWeaponRequirementPreview(entry)
   return (
     <RequirementPreviewCard
       projection={projection}
       callout={projection.callout}
-      endSlot={endSlot}
+      trailing={trailing}
     />
   )
 }
 
 export function QuickNpcSpellRequirementPreview({
   entry,
-  endSlot,
+  trailing,
 }: {
   entry: QuickNpcSpellRequirementOption
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   const projection = projectSpellRequirementPreview(entry)
-  return <RequirementPreviewCard projection={projection} endSlot={endSlot} />
+  return <RequirementPreviewCard projection={projection} trailing={trailing} />
 }

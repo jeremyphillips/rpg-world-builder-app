@@ -48,9 +48,10 @@ Feature/domain content          (form fields, section panels, domain rhythm)
 ```
 
 Foundational interaction policy is documented in
-[`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md) and
-the semantic style layers migration. Card primitives **consume** that policy; they do
-not redefine focus rings, hit targets, drag chrome, or interactive-row fills.
+[`packages/ui/docs/semantic-style-layers.md`](../../../packages/ui/docs/semantic-style-layers.md)
+and [`packages/ui/docs/design-tokens.md`](../../../packages/ui/docs/design-tokens.md).
+Card primitives **consume** that policy; they do not redefine focus rings, hit targets,
+drag chrome, or interactive-row fills.
 
 ### Ownership audit matrix
 
@@ -106,6 +107,22 @@ not redefine focus rings, hit targets, drag chrome, or interactive-row fills.
 
 Optional DOM children must never alter grid-track ownership: leading → column 1; content
 → column 2 always; trailing → column 3.
+
+### Leading utilities contract
+
+| API                                  | Scope                 | Rule                                                                           |
+| ------------------------------------ | --------------------- | ------------------------------------------------------------------------------ |
+| `EntityItem.leading`                 | Public embedded hosts | Exactly **one** utility when set — maps to `[leading]` internally              |
+| `EntityItemAnatomy.leadingUtilities` | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
+| DEC / DER disclosure                 | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
+
+Surfaces publish `--entity-leading-offset` on their root from utility **count**.
+Anatomy consumes the var only; it never publishes offset. Do not use Fragments or nested
+rails to group multiple utilities — pass a deterministic array instead.
+
+**Combined DEC merge invariant:** `rowLayout="entity-card"` ⇒ CLI behavior-only (no body
+inset, no entity leading offset on shell) + exactly one Anatomy rail + DEC owns header/body
+geometry and offset on `article`.
 
 ---
 

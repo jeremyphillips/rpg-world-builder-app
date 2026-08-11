@@ -50,6 +50,8 @@ describe('entity item anatomy guard', () => {
 
     expect(decSource).toMatch(/rowLayout="entity-card"/)
     expect(decSource).toMatch(/toolbarLeadingChrome="none"/)
+    expect(decSource).toMatch(/leadingUtilities=/)
+    expect(decSource).not.toMatch(/\bEntityLeadingRail\b/)
     expect(decSource).not.toMatch(/\bclassName=\{[^}]*px-/)
     expect(decSource).not.toMatch(/\bclassName=\{[^}]*py-/)
   })

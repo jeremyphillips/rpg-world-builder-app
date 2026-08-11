@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority'
 
-import { collapsibleListItemChromeColumnClasses, iconGhostControlVariants } from '@rpg/ui'
+import { iconGhostControlVariants } from '@rpg/ui'
+
+import { ENTITY_LEADING_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
@@ -15,9 +17,6 @@ export const detailEntityRowVariants = cva('min-w-0 py-1', {
 })
 
 export const detailEntityRowSubheadingVariants = cva('text-xs text-muted-foreground')
-
-/** One caret column — shared column class from `@rpg/ui` collapsible leading chrome. */
-export const detailEntityRowDisclosureButtonColumnClasses = collapsibleListItemChromeColumnClasses
 
 export const detailEntityRowDisclosureItemVariants = cva('min-w-0')
 
@@ -37,7 +36,9 @@ export const detailEntityRowDisclosureButtonVariants = cva(
   iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
 )
 
-export const detailEntityRowDisclosureContentVariants = cva('pl-[var(--content-column-indent)]')
+export const detailEntityRowDisclosureContentVariants = cva(
+  `pl-[var(${ENTITY_LEADING_OFFSET_VAR})]`,
+)
 
 /** Left rail wrapping disclosure preview child rows. */
 export const detailEntityRowDisclosurePreviewGroupVariants = cva(

@@ -39,7 +39,7 @@ describe('EntityItemAnatomy grid placement', () => {
 
   it('keeps content in column 2 when leading is present', () => {
     const { content, queryLeading, queryTrailing } = renderAnatomy({
-      leading: <span data-testid="leading-control">Grip</span>,
+      leadingUtilities: [<span data-testid="leading-control">Grip</span>],
     })
 
     expect(content).toHaveClass('col-start-2')
@@ -63,7 +63,7 @@ describe('EntityItemAnatomy grid placement', () => {
 
   it('assigns all three tracks when leading and trailing are present', () => {
     const { content, queryLeading, queryTrailing } = renderAnatomy({
-      leading: <span data-testid="leading-control">Grip</span>,
+      leadingUtilities: [<span data-testid="leading-control">Grip</span>],
       trailing: {
         kind: 'action',
         content: <button type="button">Select</button>,
@@ -85,7 +85,7 @@ describe('EntityItemAnatomy grid placement', () => {
 
   it('applies rail spacing only on present leading/trailing slots', () => {
     const { queryLeading, queryTrailing } = renderAnatomy({
-      leading: <span>Grip</span>,
+      leadingUtilities: [<span>Grip</span>],
       trailing: {
         kind: 'action',
         content: <button type="button">Select</button>,
@@ -94,5 +94,17 @@ describe('EntityItemAnatomy grid placement', () => {
 
     expect(queryLeading()).toHaveClass('mr-2')
     expect(queryTrailing()).toHaveClass('ml-2')
+  })
+
+  it('renders two equal-width leading columns for multiple utilities in one rail', () => {
+    const { queryLeading } = renderAnatomy({
+      leadingUtilities: [<span key="grip">Grip</span>, <span key="caret">Caret</span>],
+    })
+
+    const leadingSlot = queryLeading() as HTMLElement
+    expect(leadingSlot.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]')).toHaveLength(
+      2,
+    )
+    expect(leadingSlot.querySelectorAll('.flex.shrink-0.items-center.gap-0')).toHaveLength(1)
   })
 })

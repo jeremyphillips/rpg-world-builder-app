@@ -6,7 +6,7 @@ import {
   formatViewerCharacterRelationshipTooltip,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { InlineInactiveStatus, cn } from '@rpg/ui'
+import { InlineInactiveStatus, cn, interactiveFocusVariants } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
@@ -67,7 +67,10 @@ export function SearchResultRow({
     >
       <Link
         to={href}
-        className="absolute inset-0 rounded-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className={cn(
+          'absolute inset-0 rounded-[inherit]',
+          interactiveFocusVariants({ context: 'standalone' }),
+        )}
         onClick={onActivate}
         aria-label={accessibleName}
       />

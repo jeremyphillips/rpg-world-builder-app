@@ -39,6 +39,7 @@ export {
   EntitySummary,
   type ContentEntityCardProps,
   type DisclosureEntityCardProps,
+  type EntityItemTrailing,
   type EntitySummaryModel,
 } from './lib/content-entity-card.client'
 export {

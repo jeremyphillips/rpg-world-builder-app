@@ -324,4 +324,30 @@ describe('DisclosureEntityCard', () => {
       'calc(1 * var(--leading-chrome-size)',
     )
   })
+
+  it('composes entity-card CLI behavior-only with a single leading rail and two columns', () => {
+    const { container } = render(
+      <DisclosureEntityCard
+        itemId="harbor"
+        toolbarAriaLabel="Harbor District"
+        entity={HARBOR_DISTRICT_ENTITY}
+        dragHandleProps={mockDragHandleProps}
+        defaultCollapsed={false}
+      >
+        <p>Combined invariant body</p>
+      </DisclosureEntityCard>,
+    )
+
+    const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]') as HTMLElement
+    expect(leadingSlot.querySelectorAll('.flex.shrink-0.items-center.gap-0')).toHaveLength(1)
+    expect(leadingSlot.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]')).toHaveLength(
+      2,
+    )
+
+    const body = bodyFor('Combined invariant body')
+    expect(body.className).not.toContain('content-column-indent')
+
+    const shell = container.querySelector('[role="group"]') as HTMLElement
+    expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
+  })
 })

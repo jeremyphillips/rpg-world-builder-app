@@ -99,3 +99,6 @@ Allowlisted host accents: `character-builder-shell.variants.ts` (F9 navigation r
 
 Normalization pass **F1/F2/F6/F7/F8/F10 complete.** Open investigations: **F4** (whole-surface
 drag contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.
+
+Entity/card ownership at Layer 2–3 (anatomy, surfaces, hosts) →
+[dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).

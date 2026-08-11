@@ -167,7 +167,7 @@ describe('DetailEntityRow', () => {
     await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
 
     const expandedRegion = container.querySelector('[id]')
-    expect(expandedRegion).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(expandedRegion).toHaveClass('pl-[var(--entity-leading-offset)]')
     expect(expandedRegion?.firstElementChild).toHaveClass(
       'border-l',
       'border-border-subtle',
@@ -252,7 +252,7 @@ describe('DetailEntityRow', () => {
     expect(expandableItem?.style.getPropertyValue('--leading-chrome-gap')).toBe(
       'calc(var(--spacing)*1)',
     )
-    expect(expandableItem?.style.getPropertyValue('--content-column-indent')).toContain(
+    expect(expandableItem?.style.getPropertyValue('--entity-leading-offset')).toContain(
       '--leading-chrome-size',
     )
     expect(expandableItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
