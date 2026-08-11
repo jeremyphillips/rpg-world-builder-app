@@ -132,53 +132,6 @@ export const fieldSettingsRowClasses =
 /** Vertical gap between siblings in a stack or dependents region. */
 export type FieldRhythm = 'compact' | 'comfortable'
 
-/** @deprecated Use `FieldRhythm`. */
-export type FieldStackRhythm = FieldRhythm
-
-/** Default vertical gap for form columns and groups (`gap-6`). */
-export const DEFAULT_FORM_RHYTHM: FieldStackRhythm = 'comfortable'
-/** Default vertical gap for repeatable array sections (`gap-2`). */
-export const DEFAULT_ARRAY_SECTION_RHYTHM: FieldStackRhythm = 'compact'
-/** Default control scale inside repeatable array sections (`sm`). */
-export const DEFAULT_ARRAY_SECTION_SIZE: FieldSizeToken = 'sm'
-
-/** Resolves stack rhythm: explicit config → section default → inherited context. */
-export function resolveFieldStackRhythm(options: {
-  explicit?: FieldStackRhythm | undefined
-  inherited: FieldStackRhythm
-  sectionDefault?: FieldStackRhythm | undefined
-}): FieldStackRhythm {
-  return options.explicit ?? options.sectionDefault ?? options.inherited
-}
-
-/** Resolves field size inside array sections: explicit config → section default → inherited. */
-export function resolveArraySectionSize(options: {
-  explicit?: FieldSizeToken | undefined
-  inherited: FieldSizeToken
-  sectionDefault?: FieldSizeToken | undefined
-}): FieldSizeToken {
-  return options.explicit ?? options.sectionDefault ?? options.inherited
-}
-
-/** Default control scale for form fields (`md`). */
-export const DEFAULT_FORM_FIELD_SIZE: FieldSizeToken = 'md'
-
-/** Resolves form-level field size: explicit prop → rhythm-derived (`compact` → `sm`). */
-export function resolveFormFieldSize(options: {
-  explicit?: FieldSizeToken | undefined
-  rhythm: FieldStackRhythm
-}): FieldSizeToken {
-  return options.explicit ?? (options.rhythm === 'compact' ? 'sm' : 'md')
-}
-
-/** Resolves leaf field size: per-field config overrides inherited form context. */
-export function resolveInheritedFieldSize(options: {
-  explicit?: FieldSizeToken | undefined
-  inherited: FieldSizeToken
-}): FieldSizeToken {
-  return options.explicit ?? options.inherited
-}
-
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
     rhythm: {
@@ -213,9 +166,7 @@ export const fieldGroupInsetPaddingVariants = cva('', {
   },
 })
 
-export function resolveFieldGroupInsetPaddingClasses(
-  rhythm: FieldStackRhythm = DEFAULT_FORM_RHYTHM,
-): string {
+export function resolveFieldGroupInsetPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
   return fieldGroupInsetPaddingVariants({ rhythm })
 }
 
@@ -224,7 +175,7 @@ export function resolveFieldGroupInsetPaddingClasses(
  * Item body field stacks use {@link fieldStackRhythmVariants} instead.
  */
 export function fieldArrayItemListClasses(options: {
-  rhythm: FieldStackRhythm
+  rhythm: FieldRhythm
   size: FieldSizeToken
 }): string {
   if (options.rhythm === 'comfortable') {

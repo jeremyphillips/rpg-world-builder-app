@@ -10,6 +10,7 @@ import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { RollValueFieldPatchResult } from '../../../components/ui/roll-value-field.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { RollValueFieldConfig } from '../../field-config'
+import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface RollValueFieldRendererProps {
   config: RollValueFieldConfig
@@ -64,6 +65,7 @@ export function RollValueFieldRenderer({
   hint,
   hintPosition,
 }: RollValueFieldRendererProps) {
+  const controlSize = useFieldControlSize(config)
   const diceCount = useController({ name: subPath(fullName, 'dice.count') })
   const diceFaces = useController({ name: subPath(fullName, 'dice.faces') })
   const flatOperator = useController({ name: subPath(fullName, 'flatOperator') })
@@ -113,7 +115,7 @@ export function RollValueFieldRenderer({
       info={config.info}
       required={config.required}
       disabled={config.disabled}
-      size={config.size}
+      size={controlSize}
       width={config.width}
       faces={config.faces ?? DIE_FACES}
       countMin={config.countMin}

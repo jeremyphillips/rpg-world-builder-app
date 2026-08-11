@@ -30,7 +30,6 @@ export function buildBulkCampaignAccessFields(targetType: ContentAccessTargetTyp
       label: BULK_CAMPAIGN_ACCESS_AVAILABILITY_LABEL,
       info: CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
       width: 'full',
-      size: 'sm',
       options: buildCampaignAccessAvailabilityOptions({ includeLeaveUnchanged: true }),
     },
     {
@@ -39,7 +38,6 @@ export function buildBulkCampaignAccessFields(targetType: ContentAccessTargetTyp
       label: BULK_CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
       info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
       width: 'full',
-      size: 'sm',
       options: buildCampaignAccessVisibilityOptions(targetType, {
         includeLeaveUnchanged: true,
         includeSpecificPlayers: false,

@@ -489,7 +489,6 @@ function applySectionAnchor(section: CharacterConfigurationSection, items: FormI
       kind: 'group',
       id: section.id,
       className: SCROLL_SECTION_ANCHOR_CLASS,
-      rhythm: 'comfortable',
       fields: items as GroupFieldItem[],
     },
   ]

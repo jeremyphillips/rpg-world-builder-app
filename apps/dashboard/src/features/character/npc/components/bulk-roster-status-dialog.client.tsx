@@ -134,7 +134,7 @@ export function BulkRosterStatusDialog({
       description={`Apply roster status changes to ${selectedRows.length} selected NPC${selectedRows.length === 1 ? '' : 's'}.`}
       configureSlot={
         <FormProvider {...form}>
-          <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable" />
+          <FormFieldStack fields={fields} idPrefix={formId} density="compact" />
         </FormProvider>
       }
       summarySlot={

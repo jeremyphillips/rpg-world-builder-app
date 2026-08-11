@@ -14,7 +14,7 @@ function Harness() {
   const form = useForm({ defaultValues: { first: '', second: '' } })
   return (
     <FormProvider {...form}>
-      <FormFieldStack fields={fields} idPrefix="test" rhythm="comfortable" />
+      <FormFieldStack fields={fields} idPrefix="test" density="comfortable" />
     </FormProvider>
   )
 }

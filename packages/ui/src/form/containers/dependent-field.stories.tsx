@@ -187,7 +187,6 @@ export const DependentFieldComfortable: Story = {
     fields: [
       {
         kind: 'dependent',
-        rhythm: 'comfortable',
         controller: {
           type: 'switch',
           name: 'advancedEnabled',

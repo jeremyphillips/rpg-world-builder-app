@@ -7,6 +7,7 @@ import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { fieldDefaultValue, type InputSelectFieldConfig } from '../../field-config'
+import { useFieldControlSize } from '../../context/form-section.context'
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value != null && typeof value === 'object' && !Array.isArray(value)
@@ -64,6 +65,7 @@ export function InputSelectFieldRenderer({
   hint,
   hintPosition,
 }: InputSelectFieldRendererProps) {
+  const controlSize = useFieldControlSize(config)
   const valueKey = config.valueKey ?? 'value'
   const unitKey = config.unitKey ?? 'unit'
   const valuePath = `${fullName}.${valueKey}`
@@ -109,7 +111,7 @@ export function InputSelectFieldRenderer({
       unitDisabled={config.unitDisabled}
       unitMode={isFixedUnit ? 'label' : 'select'}
       fixedUnit={config.fixedUnit}
-      size={config.size}
+      size={controlSize}
       width={config.width}
       min={config.min}
       max={config.max}

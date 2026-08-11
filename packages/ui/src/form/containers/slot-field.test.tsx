@@ -10,9 +10,9 @@ import { useFormSectionContext } from '../context/form-section.context'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
 
-function SlotSizeProbe() {
-  const { size } = useFormSectionContext()
-  return <span data-testid="slot-size">{size}</span>
+function SlotDensityProbe() {
+  const { density } = useFormSectionContext()
+  return <span data-testid="slot-density">{density}</span>
 }
 
 function NotesSlot() {
@@ -78,15 +78,14 @@ describe('SlotFieldRenderer', () => {
     expect(results.violations.filter((v) => v.impact === 'critical')).toEqual([])
   })
 
-  it('passes explicit size sm into slot child context', () => {
+  it('inherits parent density in slot child context', () => {
     const sizedFields: FormItem[] = [
       { type: 'text', name: 'name', label: 'Name', required: true },
       {
         kind: 'slot',
         name: 'notes',
         label: 'Notes',
-        size: 'sm',
-        render: () => <SlotSizeProbe />,
+        render: () => <SlotDensityProbe />,
       },
     ]
 
@@ -97,13 +96,14 @@ describe('SlotFieldRenderer', () => {
         defaultValues={{ notes: '' }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
+        density="compact"
       />,
     )
 
-    expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
+    expect(screen.getByTestId('slot-density')).toHaveTextContent('compact')
   })
 
-  it('defaults slot child context to sm when size is omitted', () => {
+  it('defaults slot child context to comfortable form density', () => {
     const probeFields: FormItem[] = [
       { type: 'text', name: 'name', label: 'Name', required: true },
       {
@@ -111,7 +111,7 @@ describe('SlotFieldRenderer', () => {
         name: 'notes',
         label: 'Notes',
         hint: 'Optional author notes.',
-        render: () => <SlotSizeProbe />,
+        render: () => <SlotDensityProbe />,
       },
     ]
 
@@ -125,7 +125,7 @@ describe('SlotFieldRenderer', () => {
       />,
     )
 
-    expect(screen.getByTestId('slot-size')).toHaveTextContent('sm')
+    expect(screen.getByTestId('slot-density')).toHaveTextContent('comfortable')
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
   })
 
@@ -146,7 +146,7 @@ describe('SlotFieldRenderer', () => {
         defaultValues={{ notes: '' }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
-        rhythm="compact"
+        density="compact"
       />,
     )
 
@@ -171,7 +171,7 @@ describe('SlotFieldRenderer', () => {
         defaultValues={{ notes: '' }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
-        rhythm="compact"
+        density="compact"
       />,
     )
 
@@ -213,7 +213,7 @@ describe('SlotFieldRenderer', () => {
       {
         kind: 'group',
         legend: 'Campaign access',
-        rhythm: 'compact',
+        density: 'compact',
         fields: [
           {
             kind: 'slot',

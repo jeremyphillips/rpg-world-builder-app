@@ -18,7 +18,7 @@ function OutcomesStory({ defaultResolution }: { defaultResolution?: ResolutionFo
       fields={resolutionOutcomeBranchesFields()}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
-      rhythm="compact"
+      density="compact"
     />
   )
 }

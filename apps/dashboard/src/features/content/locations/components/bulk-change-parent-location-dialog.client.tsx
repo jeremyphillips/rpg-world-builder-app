@@ -155,7 +155,7 @@ export function BulkChangeParentLocationDialog({
       campaignId={campaignId}
       configureSlot={
         <FormProvider {...form}>
-          <FormFieldStack fields={fields} idPrefix={formId} size="md" rhythm="comfortable" />
+          <FormFieldStack fields={fields} idPrefix={formId} density="compact" />
         </FormProvider>
       }
       summarySlot={presentation.summarySlot}

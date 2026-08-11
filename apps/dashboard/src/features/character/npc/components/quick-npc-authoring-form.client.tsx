@@ -292,8 +292,6 @@ export function QuickNpcAuthoringForm({
       valueSyncs={valueSyncs}
       stickyChrome={false}
       externalFooter
-      rhythm="comfortable"
-      size="md"
       header={(form) => (
         <>
           <QuickNpcAuthoringTabsSync

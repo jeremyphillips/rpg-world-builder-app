@@ -5,8 +5,7 @@ import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } fro
 import type { ZodType } from 'zod'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from '../../components/ui/field.client'
-import type { FieldStackRhythm } from '../../components/ui/field.variants'
+import type { FormDensity } from '../form-density'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { FormFooterRegion, FormShellFieldStack } from './form-shell-field-stack.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
@@ -85,15 +84,10 @@ export interface FormProps<TFieldValues extends FieldValues> {
    */
   externalFooter?: boolean
   /**
-   * Vertical gap between top-level fields/groups. Defaults to `comfortable`
-   * (`gap-6`). Array sections default to `compact` regardless.
+   * Section density for top-level fields/groups. Defaults to `comfortable`.
+   * Array sections default to `compact` regardless.
    */
-  rhythm?: FieldStackRhythm
-  /**
-   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
-   * `sm` and `comfortable` maps to `md`.
-   */
-  size?: FieldSize
+  density?: FormDensity
   /** Patches form values when configured driver fields change after initial mount. */
   valueSyncs?: FormValueSync[]
   /**
@@ -142,8 +136,7 @@ export function Form<TFieldValues extends FieldValues>({
   stickyFooter = false,
   contentWrapper,
   externalFooter = false,
-  rhythm,
-  size,
+  density,
   valueSyncs,
   validationPresentation,
 }: FormProps<TFieldValues>) {
@@ -186,8 +179,7 @@ export function Form<TFieldValues extends FieldValues>({
       fields={fields}
       fileFieldProps={fileFieldProps}
       uiStateKey={uiStateKey}
-      rhythm={rhythm}
-      size={size}
+      density={density}
       validationPresentation={validationPresentation}
       validateSilently={validateSilently}
       onSubmit={onSubmit}

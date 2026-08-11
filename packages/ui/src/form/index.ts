@@ -20,11 +20,19 @@ export {
   FormSectionContext,
   buildFormSectionChildContext,
   useFormSectionContext,
+  useFieldControlSize,
   type FormSectionContextOverrides,
   type FormSectionContextValue,
   type FormRhythmStackProps,
   type FormSectionProviderProps,
 } from './context/form-section.context'
+export {
+  DEFAULT_ARRAY_SECTION_DENSITY,
+  DEFAULT_FORM_DENSITY,
+  resolveFormDensity,
+  resolveSectionDensity,
+  type FormDensity,
+} from './form-density'
 export {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
@@ -341,5 +349,4 @@ export {
   type FieldGroupLegendSize,
   type FieldSeparator,
   type FieldRhythm,
-  type FieldStackRhythm,
 } from '../components/ui/field.variants'

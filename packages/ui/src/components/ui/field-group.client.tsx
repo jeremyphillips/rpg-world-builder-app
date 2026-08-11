@@ -11,13 +11,12 @@ import { isSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
 import {
-  DEFAULT_ARRAY_SECTION_SIZE,
-  DEFAULT_FORM_RHYTHM,
   fieldGroupLegendVariants,
   resolveArrayLegendScale,
   type FieldGroupLegendSize,
-  type FieldStackRhythm,
+  type FieldRhythm,
 } from './field.variants'
+import { resolveFormDensity } from '../../form/form-density'
 
 export type { FieldGroupLegendSize }
 
@@ -32,7 +31,7 @@ export interface FieldGroupProps {
    */
   size?: FieldSize
   /** Vertical gap between sibling fields — defaults to `comfortable` (`gap-6`). */
-  rhythm?: FieldStackRhythm
+  rhythm?: FieldRhythm
   description?: string
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
@@ -63,7 +62,7 @@ export function FieldGroup({
   legend,
   legendSize = 'section',
   size,
-  rhythm = DEFAULT_FORM_RHYTHM,
+  rhythm = resolveFormDensity().rhythm,
   description,
   className,
   id,
@@ -75,7 +74,9 @@ export function FieldGroup({
   children,
 }: FieldGroupProps) {
   const legendScale =
-    legendSize === 'array' ? resolveArrayLegendScale(size ?? DEFAULT_ARRAY_SECTION_SIZE) : 'default'
+    legendSize === 'array'
+      ? resolveArrayLegendScale(size ?? resolveFormDensity('compact').size)
+      : 'default'
   const legendTypography = fieldGroupLegendVariants({ size: legendSize, scale: legendScale })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({

@@ -6,8 +6,7 @@ import type { ZodType } from 'zod'
 
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
 import { type FileFieldPropsMap, type FormItem, type FormValueSync } from '../field-config'
-import type { FieldSize } from '../../components/ui/field.client'
-import type { FieldStackRhythm } from '../../components/ui/field.variants'
+import type { FormDensity } from '../form-density'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
@@ -75,15 +74,10 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** react-hook-form trigger mode. Defaults to `'onSubmit'`. */
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /**
-   * Vertical gap between top-level fields/groups. Defaults to `comfortable`
-   * (`gap-6`). Array sections default to `compact` regardless.
+   * Section density for top-level fields/groups. Defaults to `comfortable`.
+   * Array sections default to `compact` regardless.
    */
-  rhythm?: FieldStackRhythm
-  /**
-   * Control + label scale for leaf fields. When omitted, `compact` rhythm maps to
-   * `sm` and `comfortable` maps to `md`.
-   */
-  size?: FieldSize
+  density?: FormDensity
   /**
    * When true (default), the tab list sticks to the top and the footer sticks to
    * the bottom while scrolling long panels.
@@ -140,8 +134,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   fileFieldProps,
   className,
   mode,
-  rhythm,
-  size,
+  density,
   stickyChrome = true,
   stickyTabsClassName,
   stickyActionsBarClassName,
@@ -236,8 +229,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         fields={allFields}
         fileFieldProps={fileFieldProps}
         uiStateKey={uiStateKey}
-        rhythm={rhythm}
-        size={size}
+        density={density}
         validationPresentation={validationPresentation}
         hasAttemptedSubmit={hasAttemptedSubmit}
         onMarkSubmitAttempted={markSubmitAttempted}

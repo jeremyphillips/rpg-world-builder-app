@@ -11,10 +11,10 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
 ## Required pattern
 
 1. **Field definitions** — `*-form-fields.ts` returns `FormItem[]` with labels, hints, `info`,
-   `labelPosition`, `width`, `size`, `separator`, `disabled`, and `optionAvailability`.
-2. **Containers** — use `kind: 'group' | 'row' | 'stack' | 'dependent'` with `chrome` for
-   visual treatment and `disclosure` for open/collapse/summary behavior. Prefer existing
-   variants before custom markup.
+   `labelPosition`, `width`, `density` (on groups/arrays), `controlSizeOverride` (rare leaf escape),
+   `separator`, `disabled`, and `optionAvailability`.
+2. **Containers** — use `kind: 'group' | 'row' | 'dependent' | 'array'` with `density` on true
+   section boundaries (group/array only). Dependent/slot/row inherit parent density.
 3. **Rendering** — `FormProvider` + `FormItems` (or `<Form>` / `<TabbedForm>`). Section shells
    may own separate persistence (e.g. campaign access PATCH) but must not duplicate field
    layout or disclosure chrome.

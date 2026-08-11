@@ -102,7 +102,6 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
           hint: resolveCampaignAccessPlayerAccessHint(ctx),
           info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
           width: 'full',
-          size: 'sm',
           disabled: !ctx.available || ctx.pending,
           options: buildCampaignAccessVisibilityOptions(ctx.targetType, {
             includeSpecificPlayers: true,

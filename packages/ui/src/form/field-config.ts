@@ -42,8 +42,8 @@ import type {
   FieldGroupLegendSize,
   FieldLabelPosition,
   FieldSeparator,
-  FieldRhythm,
 } from '../components/ui/field.variants'
+import type { FormDensity } from './form-density'
 
 export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 export type {
@@ -261,10 +261,10 @@ interface BaseFieldConfig {
   name: string
   label: string
   /**
-   * Control + label scale (`sm` | `md` | `lg`). Inherits form rhythm when omitted
-   * (`sm` for compact, `md` for comfortable top-level forms).
+   * Overrides control scale only; does not change sibling field rhythm. Rare —
+   * prefer section `density` on shells, groups, or arrays.
    */
-  size?: FieldSize
+  controlSizeOverride?: FieldSize
   /**
    * Width of the field wrapper within its container — see `FIELD_WIDTHS`.
    *
@@ -965,11 +965,6 @@ export interface DependentConfig {
   kind: 'dependent'
   controller: FieldConfig
   dependents: DependentDependentsConfig
-  /**
-   * Vertical gap between controller and dependents. `compact` (default) — dense
-   * settings panels; `comfortable` — matches group rhythm for multi-field blocks.
-   */
-  rhythm?: FieldRhythm
   visibility?: FieldVisibility
   /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator
@@ -1008,10 +1003,9 @@ export interface GroupConfig {
   /** Legend scale — `subsection` (20px) for nested groups inside another group. */
   legendSize?: FieldGroupLegendSize
   /**
-   * Vertical gap between sibling fields. Inherits form rhythm when omitted;
-   * defaults to `comfortable` on standalone `FieldGroup`.
+   * Section density for this group subtree. Inherits parent density when omitted.
    */
-  rhythm?: FieldRhythm
+  density?: FormDensity
   /** When hidden, the whole group unmounts and nested field values clear. */
   visibility?: FieldVisibility
   /**
@@ -1168,8 +1162,10 @@ export interface ArrayConfig {
   name: string
   legend: string
   legendSize?: FieldGroupLegendSize
-  rhythm?: FieldRhythm
-  size?: FieldSize
+  /**
+   * Section density for this array subtree. Defaults to `compact` when omitted.
+   */
+  density?: FormDensity
   fields: FormItem[]
   addAction?: false | ArrayAddActionConfig
   min?: number
@@ -1199,15 +1195,6 @@ export interface SlotConfig {
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
   visibility?: FieldVisibility
   render: () => ReactNode
-  /**
-   * Vertical gap between slot content siblings. Defaults to `compact` array rhythm
-   * (`gap-2`).
-   */
-  rhythm?: FieldRhythm
-  /**
-   * Control + label scale for slot content. Defaults to `sm` (array section default).
-   */
-  size?: FieldSize
   /** Trailing divider after this slot within a group/stack rhythm. */
   separator?: FieldSeparator
   /** Panel or outline shell around slot content. */

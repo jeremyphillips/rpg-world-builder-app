@@ -25,11 +25,10 @@ const dependentField = (
     surface?: SurfaceConfig
     tone?: 'destructive'
     scope?: 'wrapper' | 'arrayItems'
-    rhythm?: 'compact' | 'comfortable'
+    includeNote?: boolean
   } = {},
 ): FormItem => ({
   kind: 'dependent',
-  ...(options.rhythm ? { rhythm: options.rhythm } : {}),
   controller: {
     type: 'switch',
     name: 'featureEnabled',
@@ -53,7 +52,7 @@ const dependentField = (
           visibleWhen: (values) => values.featureEnabled === true,
         },
       },
-      ...(options.rhythm === 'comfortable'
+      ...(options.includeNote
         ? [
             {
               type: 'text' as const,
@@ -155,15 +154,27 @@ describe('dependent field', () => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveClass(fieldToggleDependentIndentClasses)
       expect(queryChromeShell(container)).toBeNull()
-      expect(region?.querySelector('.gap-2')).toBeInTheDocument()
+      expect(region?.querySelector('.gap-6')).toBeInTheDocument()
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
+    })
+  })
+
+  it('inherits comfortable density on the outer dependent wrapper by default', async () => {
+    const user = userEvent.setup()
+    const { container } = renderDependentForm()
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    await waitFor(() => {
+      const dependent = container.querySelector('[data-field-dependent]')
+      expect(dependent).toHaveClass(fieldStackRhythmVariants({ rhythm: 'comfortable' }))
     })
   })
 
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
-      dependentField({ surface: { emphasis: 'subtle' }, rhythm: 'comfortable' }),
+      dependentField({ surface: { emphasis: 'subtle' }, includeNote: true }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -172,18 +183,6 @@ describe('dependent field', () => {
       const shell = queryChromeShell(container)
       expect(shell).toHaveClass(fieldStackRhythmVariants({ rhythm: 'comfortable' }))
       expect(screen.getByLabelText('Feature note')).toBeInTheDocument()
-    })
-  })
-
-  it('applies compact rhythm on the outer dependent wrapper by default', async () => {
-    const user = userEvent.setup()
-    const { container } = renderDependentForm()
-
-    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
-
-    await waitFor(() => {
-      const dependent = container.querySelector('[data-field-dependent]')
-      expect(dependent).toHaveClass(fieldStackRhythmVariants({ rhythm: 'compact' }))
     })
   })
 

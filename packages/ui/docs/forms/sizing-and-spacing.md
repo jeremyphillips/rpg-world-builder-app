@@ -1,10 +1,11 @@
 # Sizing & spacing
 
-Reference for field `size`, `width`, `digits`, rhythm tokens, and row layout. Decision
-rules (array/slot defaults, form-level rhythm) live in the
-[forms hub](../forms.md#form-rhythm).
+Reference for `FormDensity`, field `width`, `digits`, rhythm tokens, and row layout.
+Section shells (`Form`, `TabbedForm`, `FormFieldStack`, `group`, `array`) own `density`;
+leaves inherit control scale from density. Rare leaf overrides use `controlSizeOverride`
+only. Decision rules live in the [forms hub](../forms.md#form-density).
 
-Source of truth: [`field.variants.ts`](../../src/components/ui/field.variants.ts),
+Source of truth: [`form-density.ts`](../../src/form/form-density.ts),
 [`field-stack.variants.ts`](../../src/components/ui/field-stack.variants.ts),
 [`field-sizing.variants.ts`](../../src/components/ui/field-sizing.variants.ts),
 [`field-control-band.variants.ts`](../../src/components/ui/field-control-band.variants.ts),

@@ -95,19 +95,19 @@ describe('Form', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('uses sm control scale when rhythm is compact', () => {
+  it('uses sm control scale when density is compact', () => {
     render(
       <Form<Values>
         schema={schema}
         fields={[{ type: 'text', name: 'name', label: 'Name' }]}
-        rhythm="compact"
+        density="compact"
         onSubmit={vi.fn()}
       />,
     )
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-8')
   })
 
-  it('keeps md control scale on comfortable rhythm by default', () => {
+  it('keeps md control scale on comfortable density by default', () => {
     render(
       <Form<Values>
         schema={schema}
@@ -118,16 +118,23 @@ describe('Form', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
   })
 
-  it('allows per-field size override in compact forms', () => {
+  it('uses controlSizeOverride for leaf control scale', () => {
     render(
       <Form<Values>
         schema={schema}
-        fields={[{ type: 'text', name: 'name', label: 'Name', size: 'md' }]}
-        rhythm="compact"
+        fields={[
+          {
+            type: 'text',
+            name: 'name',
+            label: 'Name',
+            controlSizeOverride: 'lg',
+          },
+        ]}
+        density="compact"
         onSubmit={vi.fn()}
       />,
     )
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-11')
   })
 
   it('renders schema rows as flex rows', () => {

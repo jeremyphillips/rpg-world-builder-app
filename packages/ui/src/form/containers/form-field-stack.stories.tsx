@@ -41,7 +41,7 @@ function DetachedFormModalDemo() {
         <Modal.Header headline="Detached form" description="Actions live in Modal.Footer." />
         <Modal.Body>
           <FormProvider {...form}>
-            <FormFieldStack fields={fields} idPrefix={formId} rhythm="comfortable" size="md">
+            <FormFieldStack fields={fields} idPrefix={formId}>
               <p className="mt-6 text-sm text-muted-foreground">
                 Preview or helper copy can sit in the children slot.
               </p>

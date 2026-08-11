@@ -4,11 +4,7 @@ import { cn } from '../../lib/utils'
 import type { CompactLabelTone } from './compact-label.lib'
 import { resolveChromeClasses } from './chrome.variants'
 import { isCompactLabelTone } from './field-surface.variants'
-import {
-  DEFAULT_FORM_RHYTHM,
-  resolveFieldGroupInsetPaddingClasses,
-  type FieldRhythm,
-} from './field.variants'
+import { resolveFieldGroupInsetPaddingClasses, type FieldRhythm } from './field.variants'
 import type {
   ChromeBorderAccent,
   ChromeConfig,
@@ -247,7 +243,7 @@ export function resolveFieldGroupChromeClassNames(
   chrome: FieldGroupChrome | undefined,
   options?: ResolveFieldGroupChromeOptions,
 ): FieldGroupChromeClassNames {
-  const rhythm = options?.rhythm ?? DEFAULT_FORM_RHYTHM
+  const rhythm = options?.rhythm ?? 'comfortable'
   const resolved = chrome ?? { variant: 'plain' as const }
 
   switch (resolved.variant) {

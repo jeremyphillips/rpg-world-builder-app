@@ -42,7 +42,7 @@ function InvalidSubmitHarness({ defaultResolution }: { defaultResolution: Resolu
   return (
     <FormUiProvider>
       <FormProvider {...form}>
-        <FormSectionProvider size="sm" rhythm="compact">
+        <FormSectionProvider density="compact">
           <SpellResolutionOutcomeApplicationsList outcomeIndex={0} />
         </FormSectionProvider>
         <button

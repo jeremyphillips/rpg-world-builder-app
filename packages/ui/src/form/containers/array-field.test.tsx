@@ -389,14 +389,14 @@ describe('ArrayFieldRenderer', () => {
     expect(itemShell).toHaveClass('shadow-surface-raised')
   })
 
-  it('uses gap-3 between sm comfortable array items while keeping gap-6 inside item bodies', async () => {
+  it('uses gap-6 between comfortable-density array items while keeping gap-6 inside item bodies', async () => {
     const user = userEvent.setup()
     const comfortableFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        rhythm: 'comfortable',
+        density: 'comfortable',
         fields: traitFields,
         addAction: { label: 'Add trait' },
       },
@@ -414,8 +414,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
-    expect(list).toHaveClass('gap-3')
-    expect(list).not.toHaveClass('gap-6')
+    expect(list).toHaveClass('gap-6')
 
     const item = screen.getByRole('group', { name: 'Trait #1' })
     expect(within(item).getByRole('textbox', { name: 'Trait name' }).closest('.gap-6')).toBeTruthy()

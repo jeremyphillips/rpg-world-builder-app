@@ -9,7 +9,7 @@ import {
   resolveFieldHintPresentation,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
-import { resolveInheritedFieldSize } from '../../components/ui/field.variants'
+import { resolveFormDensity, type FormDensity } from '../form-density'
 
 export function buildFieldRendererIds(
   config: FieldConfig,
@@ -25,6 +25,7 @@ export function buildFieldRendererIds(
 
 export interface ResolvedFieldRenderConfig {
   config: FieldConfig
+  controlSize: FieldSize
   hint?: string
   hintPosition: ReturnType<typeof resolveFieldHintPresentation>['position']
   derivedMeta?: FieldDerivedMeta
@@ -44,22 +45,19 @@ function resolveDerivedMetaPresentation(
   }
 }
 
-/** Applies inherited size, dynamic hints, derived metadata, and option availability to a field config. */
+/** Applies inherited density, dynamic hints, derived metadata, and option availability to a field config. */
 export function resolveFieldRenderConfig(
   config: FieldConfig,
-  inheritedSize: FieldSize,
+  density: FormDensity,
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
 ): ResolvedFieldRenderConfig {
-  const resolvedSize = resolveInheritedFieldSize({
-    explicit: config.size,
-    inherited: inheritedSize,
-  })
+  const controlSize = config.controlSizeOverride ?? resolveFormDensity(density).size
   const hintPresentation = resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
-  const renderConfig: FieldConfig = { ...config, size: resolvedSize }
 
   const basePresentation = {
+    controlSize,
     hint: hintPresentation.text,
     hintPosition: hintPresentation.position,
     ...derivedMetaPresentation,
@@ -76,7 +74,7 @@ export function resolveFieldRenderConfig(
 
     return {
       config: {
-        ...renderConfig,
+        ...config,
         options: resolvedOptions,
       } as FieldConfig,
       ...basePresentation,
@@ -85,7 +83,7 @@ export function resolveFieldRenderConfig(
 
   if (!optionAvailability) {
     return {
-      config: renderConfig,
+      config,
       ...basePresentation,
     }
   }
@@ -93,7 +91,7 @@ export function resolveFieldRenderConfig(
   if (config.type === 'chips') {
     return {
       config: {
-        ...renderConfig,
+        ...config,
         options: applyOptionAvailabilityToFieldOptions(
           config.options,
           optionAvailability,
@@ -105,7 +103,7 @@ export function resolveFieldRenderConfig(
   }
 
   return {
-    config: renderConfig,
+    config,
     ...basePresentation,
   }
 }

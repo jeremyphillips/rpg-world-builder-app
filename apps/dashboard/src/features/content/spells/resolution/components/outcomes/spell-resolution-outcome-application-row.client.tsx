@@ -17,6 +17,7 @@ import {
   ArrayItemPresentationContext,
   ArrayItemRowShell,
   buildFieldRendererIds,
+  resolveFormDensity,
   useFieldErrorPresentation,
   useFormSectionContext,
   useArrayItemRowState,
@@ -92,7 +93,8 @@ function OutcomeApplicationAmountSelect({
   options: ReturnType<typeof amountOptionsForEffect>
 }) {
   const { control } = useFormContext()
-  const { size } = useFormSectionContext()
+  const { density } = useFormSectionContext()
+  const { size } = resolveFormDensity(density)
   const { fullName, id } = buildFieldRendererIds(
     outcomeApplicationAmountField,
     idPrefix,
@@ -305,7 +307,8 @@ function OutcomeApplicationRowAmountControl({
   describedByIds?: string
   presentation: ReturnType<typeof buildOutcomeApplicationRowPresentation>
 }) {
-  const { size } = useFormSectionContext()
+  const { density } = useFormSectionContext()
+  const { size } = resolveFormDensity(density)
 
   if (!presentation.showAmountControl) return null
 

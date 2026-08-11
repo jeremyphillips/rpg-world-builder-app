@@ -50,7 +50,6 @@ export function inlineChooseCountToInlineSentence(
     info: config.info,
     required: config.required,
     disabled: config.disabled,
-    size: config.size,
     width: config.width,
     visibility: config.visibility,
   }
@@ -88,7 +87,6 @@ export function chooseFromChipsToInlineSentence(
     info: config.info,
     required: config.required,
     disabled: config.disabled,
-    size: config.size,
     width: config.width,
     chipSize: config.chipSize,
     visibility: config.visibility,
@@ -117,7 +115,6 @@ export function inputUnitToInlineSentence(config: InputUnitFieldConfig): InlineS
     info: config.info,
     required: config.required,
     disabled: config.disabled,
-    size: config.size,
     width: config.width,
     visibility: config.visibility,
   }

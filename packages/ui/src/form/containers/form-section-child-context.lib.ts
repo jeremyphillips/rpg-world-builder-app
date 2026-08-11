@@ -1,15 +1,10 @@
-import {
-  DEFAULT_ARRAY_SECTION_RHYTHM,
-  DEFAULT_ARRAY_SECTION_SIZE,
-  resolveArraySectionSize,
-  resolveFieldStackRhythm,
-} from '../../components/ui/field.variants'
 import { resolveArrayItemChrome } from '../config/array/array-item-config.lib'
 import {
   buildFormSectionChildContext,
   type FormSectionContextValue,
 } from '../context/form-section.context'
-import type { ArrayConfig, SlotConfig } from '../field-config'
+import type { ArrayConfig } from '../field-config'
+import { DEFAULT_ARRAY_SECTION_DENSITY, resolveSectionDensity } from '../form-density'
 
 export function buildArraySectionChildContext(
   parent: FormSectionContextValue,
@@ -18,15 +13,10 @@ export function buildArraySectionChildContext(
 ): FormSectionContextValue {
   const chrome = resolveArrayItemChrome(config)
   return buildFormSectionChildContext(parent, depth, {
-    rhythm: resolveFieldStackRhythm({
-      explicit: config.rhythm,
-      inherited: parent.rhythm,
-      sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
-    }),
-    size: resolveArraySectionSize({
-      explicit: config.size,
-      inherited: parent.size,
-      sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
+    density: resolveSectionDensity({
+      explicit: config.density,
+      inherited: parent.density,
+      sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
     }),
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,
@@ -36,18 +26,6 @@ export function buildArraySectionChildContext(
 export function buildSlotSectionChildContext(
   parent: FormSectionContextValue,
   depth: number,
-  config: SlotConfig,
 ): FormSectionContextValue {
-  return buildFormSectionChildContext(parent, depth, {
-    rhythm: resolveFieldStackRhythm({
-      explicit: config.rhythm,
-      inherited: parent.rhythm,
-      sectionDefault: DEFAULT_ARRAY_SECTION_RHYTHM,
-    }),
-    size: resolveArraySectionSize({
-      explicit: config.size,
-      inherited: parent.size,
-      sectionDefault: DEFAULT_ARRAY_SECTION_SIZE,
-    }),
-  })
+  return buildFormSectionChildContext(parent, depth)
 }

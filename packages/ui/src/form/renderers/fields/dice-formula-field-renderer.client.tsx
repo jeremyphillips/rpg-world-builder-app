@@ -6,6 +6,7 @@ import { DiceFormulaField } from '../../../components/ui/dice-formula-field.clie
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
+import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface DiceFormulaFieldRendererProps {
   config: DiceFormulaFieldConfig
@@ -31,6 +32,7 @@ export function DiceFormulaFieldRenderer({
   hintPosition,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
+  const controlSize = useFieldControlSize(config)
   const currencyConfig = config.currencyUnit
   const currencyName =
     currencyConfig && namePrefix ? `${namePrefix}.${currencyConfig.name ?? 'currency'}` : undefined
@@ -59,7 +61,7 @@ export function DiceFormulaFieldRenderer({
       info={config.info}
       required={config.required}
       width={config.width}
-      size={config.size}
+      size={controlSize}
       disabled={config.disabled}
       labelPosition={config.labelPosition}
       modifierMode={config.modifierMode}

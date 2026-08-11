@@ -18,6 +18,7 @@ import type {
 } from '../../../components/ui/button-dropdown.types'
 import { resolveArrayAddButtonSize } from '../../../components/ui/field-sizing.variants'
 import { cn } from '../../../lib/utils'
+import { resolveFormDensity } from '../../form-density'
 import { useFormSectionContext } from '../../context/form-section.context'
 import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
 
@@ -60,7 +61,8 @@ export function ArrayFieldAddControl({
   onAppendItem,
   onAppendFromMenu,
 }: ArrayFieldAddControlProps) {
-  const { size } = useFormSectionContext()
+  const { density } = useFormSectionContext()
+  const { size } = resolveFormDensity(density)
   const buttonSize = resolveArrayAddButtonSize(size, addActionSize)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
   const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined

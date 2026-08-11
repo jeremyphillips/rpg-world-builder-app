@@ -1,3 +1,4 @@
+import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldOption, SelectFieldConfig } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
@@ -17,7 +18,7 @@ export type SelectFieldChromeProps = {
   info?: SelectFieldConfig['info']
   required?: boolean
   width?: SelectFieldConfig['width']
-  size?: SelectFieldConfig['size']
+  size?: FieldSize
   digits?: SelectFieldConfig['digits']
   labelPosition?: SelectFieldConfig['labelPosition']
   chrome?: SelectFieldConfig['chrome']
@@ -25,7 +26,7 @@ export type SelectFieldChromeProps = {
 
 export function pickSelectFieldChromeProps(
   config: SelectFieldConfig,
-  presentation?: Pick<SelectFieldChromeProps, 'hint' | 'hintPosition'>,
+  presentation?: Pick<SelectFieldChromeProps, 'hint' | 'hintPosition' | 'size'>,
 ): SelectFieldChromeProps {
   return {
     label: config.label,
@@ -34,7 +35,7 @@ export function pickSelectFieldChromeProps(
     info: config.info,
     required: config.required,
     width: config.width,
-    size: config.size,
+    size: presentation?.size,
     digits: config.digits,
     labelPosition: config.labelPosition,
     chrome: config.chrome,

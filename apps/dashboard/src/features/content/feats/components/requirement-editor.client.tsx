@@ -22,7 +22,7 @@ import {
   fieldWidthVariants,
   type FieldSize,
 } from '@rpg/ui'
-import { useFormSectionContext } from '@rpg/ui/form'
+import { useFormSectionContext, resolveFormDensity } from '@rpg/ui/form'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
 
@@ -432,7 +432,8 @@ export function RequirementEditor({
   name,
   maxCharacterLevel = MAX_CHARACTER_LEVEL,
 }: RequirementEditorProps) {
-  const { size, rhythm } = useFormSectionContext()
+  const { density } = useFormSectionContext()
+  const { size, rhythm } = resolveFormDensity(density)
   const groupsPath = `${name}.groups`
   const { fields, append, remove } = useFieldArray({ name: groupsPath })
   const editorValue = useWatch({ name }) as PrerequisiteEditorValue | undefined

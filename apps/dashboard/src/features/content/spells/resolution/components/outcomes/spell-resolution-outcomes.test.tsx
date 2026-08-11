@@ -25,7 +25,7 @@ function renderOutcomes(defaultResolution: ResolutionFormValues) {
       fields={resolutionOutcomeBranchesFields()}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
-      rhythm="compact"
+      density="compact"
     />,
   )
 }

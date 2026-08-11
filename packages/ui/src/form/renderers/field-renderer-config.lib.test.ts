@@ -13,14 +13,26 @@ describe('field-renderer-config.lib', () => {
     })
   })
 
-  it('inherits section size onto the render config', () => {
+  it('inherits section density onto control size', () => {
     const config = {
       type: 'text',
       name: 'title',
       label: 'Title',
     } satisfies FieldConfig
 
-    expect(resolveFieldRenderConfig(config, 'md', {}, {}).config.size).toBe('md')
+    expect(resolveFieldRenderConfig(config, 'comfortable', {}, {}).controlSize).toBe('md')
+    expect(resolveFieldRenderConfig(config, 'compact', {}, {}).controlSize).toBe('sm')
+  })
+
+  it('prefers controlSizeOverride over inherited density', () => {
+    const config = {
+      type: 'text',
+      name: 'title',
+      label: 'Title',
+      controlSizeOverride: 'lg',
+    } satisfies FieldConfig
+
+    expect(resolveFieldRenderConfig(config, 'compact', {}, {}).controlSize).toBe('lg')
   })
 
   it('resolves derived metadata from watched values', () => {
@@ -39,12 +51,17 @@ describe('field-renderer-config.lib', () => {
       },
     } satisfies FieldConfig
 
-    expect(resolveFieldRenderConfig(config, 'md', {}, {})).toMatchObject({
+    expect(resolveFieldRenderConfig(config, 'comfortable', {}, {})).toMatchObject({
       derivedMeta: undefined,
       derivedMetaReserveSpace: true,
     })
     expect(
-      resolveFieldRenderConfig(config, 'md', { 'classification.archetype': 'almshouse' }, {}),
+      resolveFieldRenderConfig(
+        config,
+        'comfortable',
+        { 'classification.archetype': 'almshouse' },
+        {},
+      ),
     ).toMatchObject({
       derivedMeta: { rows: [{ label: 'Typical uses', value: 'Care' }] },
     })
@@ -64,12 +81,16 @@ describe('field-renderer-config.lib', () => {
       },
     } satisfies FieldConfig
 
-    expect(resolveFieldRenderConfig(config, 'md', {}, {}).config).toMatchObject({
+    expect(resolveFieldRenderConfig(config, 'comfortable', {}, {}).config).toMatchObject({
       options: [{ value: 'care', label: 'Care' }],
     })
     expect(
-      resolveFieldRenderConfig(config, 'md', { 'classification.archetype': 'almshouse' }, {})
-        .config,
+      resolveFieldRenderConfig(
+        config,
+        'comfortable',
+        { 'classification.archetype': 'almshouse' },
+        {},
+      ).config,
     ).toMatchObject({
       options: [{ value: 'lodging', label: 'Lodging' }],
     })

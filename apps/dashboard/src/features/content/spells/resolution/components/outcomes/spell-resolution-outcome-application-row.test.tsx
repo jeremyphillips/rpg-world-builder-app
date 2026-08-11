@@ -28,7 +28,7 @@ function ApplicationsListHarness({
   return (
     <FormUiProvider>
       <FormProvider {...form}>
-        <FormSectionProvider size="sm" rhythm="compact">
+        <FormSectionProvider density="compact">
           <SpellResolutionOutcomeApplicationsList outcomeIndex={outcomeIndex} />
         </FormSectionProvider>
       </FormProvider>

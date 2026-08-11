@@ -29,7 +29,6 @@ describe('outcomeNoteFields', () => {
         placeholder: RESOLUTION_SECTION_LABELS.outcomeNotePlaceholder,
         rows: 3,
         width: 'full',
-        size: 'sm',
         optionalDisclosure: {
           addLabel: RESOLUTION_SECTION_LABELS.addOutcomeNote,
           removeLabel: 'Remove',
