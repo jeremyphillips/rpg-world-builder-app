@@ -1,22 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Plus } from 'lucide-react'
-
-import { Button } from '@rpg/ui'
-
 import { DetailSectionPanel } from './detail-section-panel.client'
-import { CrossContentRelationshipRow } from '../relationship/cross-content-relationship-row.client'
-import { RelationshipContentRow } from '../relationship/relationship-content-row.client'
-import { RelationshipFieldGroupRow } from '../relationship/relationship-field-group-row.client'
-
-function GroupAddAction({ label }: { label: string }) {
-  return (
-    <Button type="button" variant="ghost" size="sm" density="compact">
-      <Plus aria-hidden />
-      {label}
-    </Button>
-  )
-}
+import { RelationshipList } from '../relationship/relationship-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailSectionPanel',
@@ -34,18 +19,27 @@ export const TerritorialAuthorityPopulated: Story = {
       headingId="story-territorial-authority-heading"
       helper="Organizations that govern, control, or claim this location."
     >
-      <RelationshipFieldGroupRow eyebrow="Governs">
-        <CrossContentRelationshipRow heading="City Council" />
-      </RelationshipFieldGroupRow>
-      <RelationshipFieldGroupRow
-        eyebrow="Controls"
-        endSlot={<GroupAddAction label="Add organization" />}
-      >
-        <RelationshipContentRow emptyLabel="No controlling organization." />
-      </RelationshipFieldGroupRow>
-      <RelationshipFieldGroupRow eyebrow="Claims" endSlot={<GroupAddAction label="Add claim" />}>
-        <RelationshipContentRow emptyLabel="No organizations claim this location." />
-      </RelationshipFieldGroupRow>
+      <RelationshipList.Root itemCount={1}>
+        <RelationshipList.Group itemCount={1} label="Governs">
+          <RelationshipList.Row title="City Council" />
+        </RelationshipList.Group>
+      </RelationshipList.Root>
+      <RelationshipList.Root itemCount={1}>
+        <RelationshipList.Group
+          itemCount={0}
+          label="Controls"
+          emptyLabel="No controlling organization."
+          headerAction={{ label: 'Add organization', onSelect: () => undefined }}
+        />
+      </RelationshipList.Root>
+      <RelationshipList.Root itemCount={1}>
+        <RelationshipList.Group
+          itemCount={0}
+          label="Claims"
+          emptyLabel="No organizations claim this location."
+          headerAction={{ label: 'Add claim', onSelect: () => undefined }}
+        />
+      </RelationshipList.Root>
     </DetailSectionPanel>
   ),
 }

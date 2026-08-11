@@ -180,7 +180,7 @@ describe('DetailEntityRow', () => {
 
     const { container } = render(
       <MemoryRouter>
-        <DetailSectionRowList>
+        <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Dock Ward"
             href="/locations/dock-ward"
@@ -188,7 +188,7 @@ describe('DetailEntityRow', () => {
               mode: 'expandable',
               label: 'locations in Dock Ward',
               content: (
-                <DetailSectionRowList>
+                <DetailSectionRowList separator="structural">
                   <DetailEntityRow heading="Yawning Portal" href="/locations/yawning-portal" />
                 </DetailSectionRowList>
               ),
@@ -275,7 +275,7 @@ describe('DetailEntityRow', () => {
   it('keeps list separators between disclosure items when one row is reserved', () => {
     const { container } = render(
       <MemoryRouter>
-        <DetailSectionRowList>
+        <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Market Ward"
             href="/locations/market-ward"

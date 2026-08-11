@@ -18,7 +18,7 @@ export const Default: Story = {
   args: {
     label: 'Districts',
     children: (
-      <DetailSectionRowList>
+      <DetailSectionRowList separator="structural">
         <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
       </DetailSectionRowList>
     ),
@@ -36,7 +36,7 @@ export const InsidePanel: Story = {
           </button>
         }
       >
-        <DetailSectionRowList>
+        <DetailSectionRowList separator="structural">
           <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
         </DetailSectionRowList>
       </DetailSectionGroup>

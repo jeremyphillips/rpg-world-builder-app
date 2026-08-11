@@ -56,20 +56,19 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 
 ### Primitives
 
-| Primitive                   | Role                                                                                                                                                                                     |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DetailSectionPanel`        | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                             |
-| `DetailSectionGroup`        | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                   |
-| `DetailSectionRowList`      | Dividers between direct children only — no row padding injection                                                                                                                         |
-| `DetailEntityRow`           | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot` |
-| `DetailEntityRowActions`    | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                |
-| `DetailOverflowMenu`        | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                     |
-| `RelationshipFieldGroupRow` | Typed-edge alias for `DetailSectionGroup` (`eyebrow` → `label`, forwards `endSlot`) — keep for relationship call-site API stability                                                      |
-| `RelationshipContentRow`    | Content-level row: optional muted empty copy + optional group Add action in a leading cluster (`gap-x-6`, no `justify-between`) — the single owner of unlabeled-group Add chrome         |
+| Primitive                | Role                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`     | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                                      |
+| `DetailSectionGroup`     | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                            |
+| `DetailSectionRowList`   | Dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>`)                                                                         |
+| `DetailEntityRow`        | Compact row layout (`py-1`); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot`          |
+| `DetailEntityRowActions` | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                         |
+| `DetailOverflowMenu`     | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                              |
+| `RelationshipList`       | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
-Use **`DetailSectionPanel`** + **`DetailSectionGroup`** (via `RelationshipFieldGroupRow` for typed edges) when a section groups multiple subgroups under one titled block (location Territorial Authority, People & organizations, organization forward family groups, City structure districts / direct places).
+Use **`DetailSectionPanel`** + **`RelationshipList`** for typed-edge relationship sections (location Territorial Authority, People & organizations, organization forward family groups, organization Members). Use **`DetailSectionPanel`** + **`DetailSectionGroup`** + **`DetailSectionRowList`** for hierarchy (City structure districts / direct places) — not `RelationshipList`.
 
 ```text
 ┌ DetailSectionPanel (<section aria-labelledby>, rounded-md border border-border-subtle) ─┐
@@ -88,7 +87,31 @@ Use **`DetailSectionPanel`** + **`DetailSectionGroup`** (via `RelationshipFieldG
 | Single-kind or non-grouped surfaces                                            | Feature section header                                                                   | Bare row primitives only                                                                                        |
 | Location hierarchy (Contained locations / City structure)                      | `DetailSectionPanel` + `DetailSectionGroup` + `DetailSectionRowList` + `DetailEntityRow` | Not a typed-edge relationship — same panel/group/row chrome, hierarchy domain stays in feature code             |
 
-Kind labels inside a relationship panel use **`RelationshipFieldGroupRow`** (`eyebrow`) when `kindHeading: 'show'` — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers. Omit the eyebrow prop entirely when the section heading is sufficient. Hierarchy sections pass the same labels through **`DetailSectionGroup`** `label` directly.
+Kind labels inside a relationship panel use **`RelationshipList.Group`** `label` when `kindHeading: 'show'` — not nested `Heading variant="label"` blocks or `space-y-*` slot wrappers. Omit `label` entirely when the section heading is sufficient. Hierarchy sections pass the same labels through **`DetailSectionGroup`** `label` directly.
+
+### RelationshipList (typed-edge lists)
+
+Required nesting: **`RelationshipList.Root` → `RelationshipList.Group` → `RelationshipList.Row`**. Root never wraps rows automatically — use an explicit unlabeled `Group` when the section has no subgroup labels (Members roster).
+
+| Prop / node                     | Drives                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| Root `itemCount === 0`          | Section `Empty` (+ optional `action`) — no `Footer`                                   |
+| Root `itemCount > 0` + `action` | Populated groups + edge-to-edge `Footer`                                              |
+| Group `itemCount === 0`         | Inline slot empty (`emptyLabel`) — no `<ul>`; optional `headerAction` in group header |
+| Group `itemCount > 0`           | Record-separated `<ul>` + `Row` children                                              |
+
+**Divider ownership** (single owner per boundary):
+
+| Boundary                   | Owner                | Mechanism                                                 |
+| -------------------------- | -------------------- | --------------------------------------------------------- |
+| Row → row within a group   | Group `<ul>`         | Record separators (`[&>li+li]:border-t`)                  |
+| Group → group              | Subsequent `Group`   | Structural `border-t` — not `border-b` on preceding group |
+| Populated content → footer | `Footer` only        | Structural `border-t` on footer wrapper                   |
+| Section header → body      | `DetailSectionPanel` | Unchanged panel header `border-b`                         |
+
+`RelationshipList.Row` delegates populated anatomy to **`CrossContentRelationshipRow`** via a typed `menu` contract. Features supply semantic content (`itemCount`, labels, row data, menu items, handlers) — not spacing, borders, empty placement, or footer placement.
+
+Do **not** hand-roll `ul.space-y-1`, `DetailSectionGroup`, or direct `CrossContentRelationshipRow` in typed-edge relationship section components. Slot-level hand-built editors (spell resolution slots) remain exceptions documented elsewhere.
 
 ### Organization→location compact rows
 
@@ -178,12 +201,12 @@ empty copy   + action        (empty)
 rows… then   + action        (populated — same content-level row)
 ```
 
-| Group structure                                          | Action owner                                                                         | Examples                                                            |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Labeled group (`meaningful_slots`, structural subgroups) | `DetailSectionGroup.endSlot` / `RelationshipFieldGroupRow endSlot`                   | Governed by, Controlled by, Claimed by, Districts, Direct locations |
-| Unlabeled group (`sparse_groups` family-level add)       | `RelationshipContentRow` `addLabel`/`onAdd` inside an unlabeled `DetailSectionGroup` | People & organizations, org forward family adds                     |
-| Panel-scoped action (no internal grouping)               | `DetailSectionPanel.headerEndSlot`                                                   | Flat Contained locations                                            |
-| Row-scoped action                                        | `DetailEntityRow.endSlot` (+ `DetailEntityRowActions`)                               | District row icon `+`, overflow menus                               |
+| Group structure                                          | Action owner                                                                           | Examples                                                        |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Labeled group (`meaningful_slots`, structural subgroups) | `RelationshipList.Group` `headerAction` (empty slots) or persistent header when needed | Governed by, Controlled by, Claimed by                          |
+| Unlabeled group (`sparse_groups` family-level add)       | Root `action` → populated `Footer`; Root `Empty` when section wholly empty             | People & organizations, org forward family adds, Members roster |
+| Panel-scoped action (no internal grouping)               | `DetailSectionPanel.headerEndSlot`                                                     | Flat Contained locations                                        |
+| Row-scoped action                                        | `RelationshipList.Row` `menu` / row overflow                                           | All populated typed-edge rows                                   |
 
 Rules:
 
@@ -192,8 +215,8 @@ Rules:
   in the row overflow.
 - Do not manufacture a synthetic eyebrow (for example `RELATIONSHIPS`) to force an unlabeled
   section into the labeled layout.
-- `RelationshipContentRow` owns empty copy and the unlabeled-group Add. Labeled groups pass it
-  `emptyLabel` only — their Add lives on the group header.
+- **`RelationshipList` owns empty copy, footer add, and slot-empty placement** — features pass
+  `itemCount`, `emptyLabel`, and typed `action` / `headerAction` only.
 - One Add chrome everywhere: `Button variant="ghost" size="sm" density="compact"` + Lucide `Plus`
   - feature-owned label. No literal `+ ` text prefixes.
 - Horizontal inset/measure is owned by the detail primitives (`DetailSectionGroup` `px-4`, page
@@ -237,10 +260,10 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 [`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
-| Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipFieldGroupRow` (`DetailSectionGroup`) |
+| Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipList.Root` + `RelationshipList.Group` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
-| Labeled group empty copy | `RelationshipContentRow` (`emptyLabel` only — Add lives on the group header `endSlot`) |
-| Unlabeled group empty/populated add | `RelationshipContentRow` (`emptyLabel` + `addLabel` when empty; `addLabel` only when populated) |
+| Labeled group empty copy | `RelationshipList.Group` `emptyLabel` + optional `headerAction` |
+| Unlabeled group empty/populated add | Root `emptyLabel` + `action` (empty) or Root `Footer` (populated) |
 
 `CrossContentRelationshipRow` **never** accepts empty-state props.
 
@@ -333,7 +356,7 @@ Organization forward families may omit kind eyebrows only when **both** are true
 
 Cardinality alone is insufficient — generic headings (for example character **Connections**) must keep kind context visible. `kindHeading: 'show' | 'omit'` lives in dashboard family presentation config ([`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts)); never derive from populated rows.
 
-Show and omit modes share the same `RelationshipFieldGroupRow` → row list architecture. When `kindHeading === 'omit'`, pass no eyebrow so the group renders **zero** reserved eyebrow chrome.
+Show and omit modes share the same `RelationshipList.Group` → row list architecture. When `kindHeading === 'omit'`, pass no `label` so the group renders **zero** reserved eyebrow chrome.
 
 Forward kind eyebrows use **direction-aware grammar** (for example `Owns`, `Operates`) via
 `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
@@ -434,10 +457,10 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 Before building a new cross-content relationship surface, evaluate:
 
-1. `DetailSectionPanel` + `DetailSectionGroup` / `RelationshipFieldGroupRow` when grouping kinds under a section title
-2. `CrossContentRelationshipRow` + `DetailOverflowMenu` for populated rows (relationship layer composes detail primitives)
+1. `DetailSectionPanel` + `RelationshipList` when grouping typed-edge kinds under a section title
+2. `RelationshipList.Row` (composes `CrossContentRelationshipRow`) + overflow menu items for populated rows
 3. `DetailSectionPanel` + `DetailSectionGroup` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
-4. `RelationshipContentRow` for empty copy and unlabeled-group add (labeled groups mount add on the group header `endSlot`)
+4. Explicit Root/Group `itemCount` for empty vs footer vs slot-empty — no manual list chrome
 5. `DrawerContext` + embedded entity picker + kind step (when needed)
 6. Direction-aware copy resolvers
 7. Feature-owned entity summary VMs mapped to neutral row / Current fields (`LocationEntitySummaryVm` for org→location targets — generic relationship code never imports location display)
@@ -452,10 +475,9 @@ Before building a new cross-content relationship surface, evaluate:
 
 The organization detail **Members** section is the organization-facing inverse of
 character-owned `connections.organizations` memberships — not a typed location-style
-edge. It reuses relationship primitives (`DetailSectionPanel`,
-`CrossContentRelationshipRow`, `RelationshipContentRow`, `DetailOverflowMenu`) and
-composes member metadata through existing content/slot props (no membership-specific
-props on shared primitives).
+edge. It uses `DetailSectionPanel` + `RelationshipList` (unlabeled `Group`, populated
+`Footer` for Add) and composes member metadata through `RelationshipList.Row` props (no
+membership-specific props on shared primitives).
 
 - **Read:** `GET …/organizations/:organizationId/members` projects membership
   `{ title?, priority? }` per row and sorts with the shared contracts roster helper.

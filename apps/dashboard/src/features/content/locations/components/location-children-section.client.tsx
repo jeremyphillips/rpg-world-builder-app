@@ -137,7 +137,7 @@ function LocationStructurePreviewChildRows({
   inset: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {rows.map((child, childIndex) => (
         <DetailEntityRow
           key={child.item.id}
@@ -316,7 +316,7 @@ function LocationStructureRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {rows.map((row, index) => (
         <LocationStructureRow
           key={row.item.id}
@@ -348,7 +348,7 @@ function LocationChildRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList>
+    <DetailSectionRowList separator="structural">
       {items.map((item) => {
         const actions = buildChildRowActions(item, canManage, onMove, onView)
 
