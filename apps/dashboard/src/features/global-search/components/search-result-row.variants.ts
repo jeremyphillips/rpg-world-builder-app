@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn, interactiveRowVariants } from '@rpg/ui'
 
+import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
 import { resolveGlobalSearchRowHoverSurfaceClasses } from '../lib/global-search-surface.variants'
 import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 
@@ -10,15 +11,15 @@ export type SearchResultRowDensity = 'compact' | 'default'
 export const searchResultRowVariants = cva('relative block w-full text-left transition-colors', {
   variants: {
     borderless: {
-      true: 'border-b-0 px-3',
+      true: `border-b-0 ${globalSearchGroupContentInsetClasses}`,
       false: cn(
         'border-b border-border px-3 sm:px-5',
         interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'navigation' }),
       ),
     },
     density: {
-      compact: '',
-      default: '',
+      compact: 'py-2',
+      default: 'py-3',
     },
     surfaceContext: {
       preview: '',

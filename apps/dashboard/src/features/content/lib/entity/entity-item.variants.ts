@@ -10,8 +10,8 @@ export const entityItemAnatomyVariants = cva(
   {
     variants: {
       density: {
-        compact: 'gap-x-2 gap-y-1',
-        comfortable: 'gap-x-3 gap-y-1',
+        compact: 'gap-y-1',
+        comfortable: 'gap-y-1',
       },
       rowAlign: {
         start: 'items-start',
@@ -25,7 +25,21 @@ export const entityItemAnatomyVariants = cva(
   },
 )
 
-export const entityItemContentVariants = cva('flex min-w-0', {
+/** Leading rail track — only rendered when `leading` is set; spacing stays on this slot. */
+export const entityItemLeadingSlotVariants = cva('col-start-1 row-start-1 min-w-0', {
+  variants: {
+    density: {
+      compact: 'mr-2',
+      comfortable: 'mr-3',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
+/** Content track — always column 2 so summary owns the flexible column. */
+export const entityItemContentVariants = cva('col-start-2 row-start-1 flex min-w-0', {
   variants: {
     density: {
       compact: 'gap-2',
@@ -41,6 +55,22 @@ export const entityItemContentVariants = cva('flex min-w-0', {
     rowAlign: 'start',
   },
 })
+
+/** Trailing rail track — only rendered when `trailing` is set. */
+export const entityItemTrailingSlotVariants = cva(
+  'col-start-3 row-start-1 min-w-0 justify-self-end',
+  {
+    variants: {
+      density: {
+        compact: 'ml-2',
+        comfortable: 'ml-3',
+      },
+    },
+    defaultVariants: {
+      density: 'comfortable',
+    },
+  },
+)
 
 export const entitySummaryDescriptionVariants = supportingTextDensityVariants
 

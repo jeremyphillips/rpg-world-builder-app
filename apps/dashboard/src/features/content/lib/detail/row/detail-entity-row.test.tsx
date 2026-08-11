@@ -87,7 +87,7 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    expect(container.firstElementChild).toHaveClass('flex', 'items-center')
+    expect(container.firstElementChild).toHaveClass('min-w-0', 'py-1', 'px-4')
     expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument()
   })
 

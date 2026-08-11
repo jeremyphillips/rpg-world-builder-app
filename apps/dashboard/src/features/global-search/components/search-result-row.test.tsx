@@ -6,10 +6,19 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
+import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
 import { SearchResultRow } from './search-result-row.client'
 
 function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!
+}
+
+function entityItemRoot(link: HTMLElement): HTMLElement {
+  return link.nextElementSibling!.firstElementChild as HTMLElement
+}
+
+function entityItemAnatomy(link: HTMLElement): HTMLElement {
+  return entityItemRoot(link).firstElementChild as HTMLElement
 }
 
 describe('SearchResultRow', () => {
@@ -67,7 +76,7 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
-  it('uses EntityItem typography and density for its identity content', () => {
+  it('keeps row inset on the host and EntityItem inset-free for default page rows', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -75,19 +84,26 @@ describe('SearchResultRow', () => {
         typeLabel="Spell"
         href="/campaigns/c1/spells/fireball"
         borderless
+        density="default"
+        surfaceContext="page"
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous')
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const row = rowShell(link)
+    const root = entityItemRoot(link)
+    const anatomy = entityItemAnatomy(link)
 
-    expect(row).toHaveClass('px-3')
-    expect(row).not.toHaveClass('py-3')
+    expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
+    expect(root.className).not.toMatch(/\bpx-/)
+    expect(root.className).not.toMatch(/\bpy-/)
+    expect(anatomy.className).not.toMatch(/\bpx-/)
+    expect(anatomy.className).not.toMatch(/\bpy-/)
     expect(secondary).toHaveClass('text-sm', 'truncate')
   })
 
-  it('passes compact density to EntityItem', () => {
+  it('keeps compact preview rows on py-2 host inset', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -96,13 +112,49 @@ describe('SearchResultRow', () => {
         href="/campaigns/c1/spells/fireball"
         density="compact"
         borderless
+        surfaceContext="preview"
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
     const row = rowShell(screen.getByRole('link', { name: 'Fireball, Spell' }))
-    expect(row).toHaveClass('border-b-0', 'hover:bg-surface-subtle', 'px-3')
+
+    expect(row).toHaveClass(
+      'border-b-0',
+      globalSearchGroupContentInsetClasses,
+      'py-2',
+      'hover:bg-surface-muted',
+    )
     expect(secondary).toHaveClass('text-xs', 'truncate')
+  })
+
+  it('keeps trailing in column 3 while the host owns inset', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Champion"
+        secondary="Fighter subclass"
+        typeLabel="Subclass"
+        href="/campaigns/c1/classes/fighter/subclasses/champion"
+        borderless
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Champion, Subclass of Aric, Subclass' })
+    const row = rowShell(link)
+    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+
+    expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
   })
 
   it('removes row borders when borderless for parent-owned list separators', () => {

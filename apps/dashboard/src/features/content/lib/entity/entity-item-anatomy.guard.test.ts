@@ -32,4 +32,16 @@ describe('entity item anatomy guard', () => {
     expect(decSource).toMatch(/buildEntityLeadingOffsetStyle/)
     expect(frameSource).toMatch(/buildEntityLeadingOffsetStyle/)
   })
+
+  it('keeps explicit grid tracks without global horizontal gap', () => {
+    const variantsSource = readFileSync(join(ENTITY_ROOT, 'entity-item.variants.ts'), 'utf8')
+    const anatomyBlock = variantsSource.slice(
+      variantsSource.indexOf('export const entityItemAnatomyVariants'),
+      variantsSource.indexOf('export const entityItemLeadingSlotVariants'),
+    )
+
+    expect(variantsSource).toMatch(/col-start-2/)
+    expect(variantsSource).toMatch(/col-start-3/)
+    expect(anatomyBlock).not.toMatch(/\bgap-x-/)
+  })
 })

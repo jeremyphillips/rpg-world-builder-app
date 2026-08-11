@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { collapsibleListItemChromeColumnClasses, iconGhostControlVariants } from '@rpg/ui'
 
-export const detailEntityRowVariants = cva('flex items-center justify-between gap-4 py-1', {
+export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
     inset: {
       self: 'px-4',
@@ -21,20 +21,17 @@ export const detailEntityRowDisclosureButtonColumnClasses = collapsibleListItemC
 
 export const detailEntityRowDisclosureItemVariants = cva('min-w-0')
 
-export const detailEntityRowDisclosureRowVariants = cva(
-  'flex items-center justify-between gap-4 py-1',
-  {
-    variants: {
-      inset: {
-        self: 'px-4',
-        parent: '',
-      },
-    },
-    defaultVariants: {
-      inset: 'self',
+export const detailEntityRowDisclosureRowVariants = cva('min-w-0 py-1', {
+  variants: {
+    inset: {
+      self: 'px-4',
+      parent: '',
     },
   },
-)
+  defaultVariants: {
+    inset: 'self',
+  },
+})
 
 export const detailEntityRowDisclosureButtonVariants = cva(
   iconGhostControlVariants({ hover: 'text', layout: 'flex' }),

@@ -12,7 +12,9 @@ import type { EntitySummaryModel } from './entity-summary.types'
 import {
   entityItemAnatomyVariants,
   entityItemContentVariants,
+  entityItemLeadingSlotVariants,
   entityItemRootVariants,
+  entityItemTrailingSlotVariants,
 } from './entity-item.variants'
 
 export type { EntityItemTrailing } from './entity-item-trailing.types'
@@ -60,12 +62,26 @@ export function EntityItemAnatomy({
 
   return (
     <div className={entityItemAnatomyVariants({ density, rowAlign })}>
-      {leading ? <EntityLeadingRail>{leading}</EntityLeadingRail> : null}
-      <div className={entityItemContentVariants({ density, rowAlign })}>
+      {leading ? (
+        <div className={entityItemLeadingSlotVariants({ density })} data-entity-item-slot="leading">
+          <EntityLeadingRail>{leading}</EntityLeadingRail>
+        </div>
+      ) : null}
+      <div
+        className={entityItemContentVariants({ density, rowAlign })}
+        data-entity-item-slot="content"
+      >
         {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
         <EntitySummary entity={resolvedEntity} density={density} />
       </div>
-      <EntityItemTrailingSlot trailing={trailing} />
+      {trailing ? (
+        <div
+          className={entityItemTrailingSlotVariants({ density })}
+          data-entity-item-slot="trailing"
+        >
+          <EntityItemTrailingSlot trailing={trailing} />
+        </div>
+      ) : null}
     </div>
   )
 }
