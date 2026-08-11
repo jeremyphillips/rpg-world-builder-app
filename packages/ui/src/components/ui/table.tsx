@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { textVariants } from './text.variants'
 
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
@@ -45,7 +46,12 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        'border-b border-border transition-colors hover:bg-row-hover data-[state=selected]:bg-row-selected',
+        'border-b border-border',
+        interactiveRowVariants({
+          interaction: 'hoverable',
+          hoverTone: 'row',
+          selectedData: 'selected',
+        }),
         className,
       )}
       {...props}

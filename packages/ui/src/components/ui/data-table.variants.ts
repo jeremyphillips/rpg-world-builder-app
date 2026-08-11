@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { iconGlyphDescendantClasses, iconGlyphRootClasses } from './icon-glyph.variants'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { establishSurfaceCurrent, portalPopoverSurfaceClasses } from './surface-current.lib'
 
 /** Outer wrapper for the entire DataTable — stacks toolbar, table, and pagination. */
@@ -71,7 +72,14 @@ export const dataTableHeaderRowVariants = cva(
 
 /** Body row — uniform fill with row-level hover and selection. */
 export const dataTableRowVariants = cva(
-  'group/row min-h-14 border-b border-border-subtle hover:bg-row-hover data-[state=selected]:bg-row-selected',
+  cn(
+    'group/row min-h-14 border-b border-border-subtle',
+    interactiveRowVariants({
+      interaction: 'hoverable',
+      hoverTone: 'row',
+      selectedData: 'selected',
+    }),
+  ),
 )
 
 /** Catalog thumbnail sizing — 24px default, 32px at lg+. Pair with `dataTableWidthMeta('image')`. */

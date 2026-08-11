@@ -1,5 +1,5 @@
 import type { ContentUsageSummaryLabels } from '@rpg/contracts'
-import { cn, Badge, Button, Text } from '@rpg/ui'
+import { cn, Badge, Button, Text, interactiveRowVariants } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
 import {
@@ -30,7 +30,12 @@ const SOURCE_BADGE = {
 function subclassRowShellClass(isSelected: boolean) {
   return cn(
     'flex items-center gap-1 rounded-md border border-transparent',
-    isSelected && 'border-row-selected-border bg-row-selected',
+    isSelected
+      ? interactiveRowVariants({
+          interaction: 'static',
+          selected: 'bordered',
+        })
+      : undefined,
   )
 }
 
@@ -123,7 +128,10 @@ function SubclassListRow({
           type="button"
           aria-current={isSelected ? 'true' : undefined}
           onClick={() => onSelect(item.id)}
-          className="min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm hover:bg-row-hover"
+          className={cn(
+            'min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm',
+            interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'row' }),
+          )}
         >
           <span className="block truncate font-medium">{item.name || UNTITLED_SUBCLASS_LABEL}</span>
           <SubclassListRowBadges source={item.source} isModified={isModified} />

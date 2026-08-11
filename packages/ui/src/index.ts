@@ -110,6 +110,10 @@ export {
   iconGhostControlVariants,
   type IconGhostControlVariantProps,
 } from './components/ui/icon-ghost-control.variants'
+export {
+  interactiveRowVariants,
+  type InteractiveRowVariantProps,
+} from './components/ui/interactive-row.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
   InputActionGroup,

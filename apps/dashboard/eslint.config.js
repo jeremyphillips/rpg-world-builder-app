@@ -71,6 +71,89 @@ const dashboardSheetImportGuard = {
               'Use DrawerShell (or CatalogPickerSheet / BuilderOptionDetailsSheet). Raw Sheet chrome is reserved for DrawerShell. See apps/dashboard/docs/drawer-shell.md.',
           },
         ],
+        patterns: [
+          {
+            group: ['**/control-action.variants', '@rpg/ui/**/control-action*'],
+            message:
+              'Use Button, iconGhostControlVariants, or shared primitives — not internal control-action geometry.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+/** Semantic style layer guards — see packages/ui/docs/semantic-style-layers.md */
+const dashboardSemanticStyleLayerGuards = {
+  files: ['src/features/**/*.variants.ts'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.ts',
+    // Host accents / products documented as do-not-abstract until follow-up.
+    'src/features/character/components/character-builder-shell.variants.ts',
+    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/campaign/components/campaign-destination.variants.ts',
+    'src/features/character/components/equipment/equipment-acquisition-panel.variants.ts',
+    'src/features/character/components/equipment/equipment-picker-purchase.variants.ts',
+    // Drag handle migrates in semantic-style-layers phase 2.
+    'src/features/content/components/master-detail/master-detail-list-panel.variants.ts',
+  ],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'Literal[value=/hover:bg-row-(hover|selected)/]',
+        message:
+          'Use interactiveRowVariants from @rpg/ui for row hover/selection fills — see packages/ui/docs/semantic-style-layers.md.',
+      },
+      {
+        selector: 'TemplateElement[value.raw=/hover:bg-row-(hover|selected)/]',
+        message:
+          'Use interactiveRowVariants from @rpg/ui for row hover/selection fills — see packages/ui/docs/semantic-style-layers.md.',
+      },
+      {
+        selector: 'Literal[value=/border-row-selected-border/]',
+        message:
+          'Use interactiveRowVariants from @rpg/ui for row selection chrome — see packages/ui/docs/semantic-style-layers.md.',
+      },
+      {
+        selector: 'Literal[value=/focus-visible:ring-2/]',
+        message:
+          'Compose interactiveFocusVariants from @rpg/ui — features do not assemble focus ring stacks.',
+      },
+      {
+        selector: 'TemplateElement[value.raw=/focus-visible:ring-2/]',
+        message:
+          'Compose interactiveFocusVariants from @rpg/ui — features do not assemble focus ring stacks.',
+      },
+      {
+        selector: 'VariableDeclarator[id.name=/RemoveButtonClasses$/]',
+        message:
+          'Use Button or iconGhostControlVariants — do not add feature remove button class constants.',
+      },
+      {
+        selector:
+          'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name=/RemoveButtonClasses$/]',
+        message:
+          'Use Button or iconGhostControlVariants — do not add feature remove button class constants.',
+      },
+    ],
+  },
+}
+
+const dashboardDragHandleGuard = {
+  files: ['src/features/**/*.variants.ts'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.ts',
+    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/content/components/master-detail/master-detail-list-panel.variants.ts',
+  ],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'Literal[value=/cursor-grab/]',
+        message:
+          'Use dragHandleVariants from @rpg/ui for sortable grip chrome — see packages/ui/docs/semantic-style-layers.md.',
       },
     ],
   },
@@ -82,4 +165,6 @@ export default [
   dashboardStorybookRouterRule,
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,
+  dashboardSemanticStyleLayerGuards,
+  dashboardDragHandleGuard,
 ]

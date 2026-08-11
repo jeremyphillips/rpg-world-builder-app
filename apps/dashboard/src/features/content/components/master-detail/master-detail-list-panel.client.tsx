@@ -26,12 +26,11 @@ import { EntityItem } from '../../lib/content-entity-card.client'
 import {
   masterDetailListDragHandleClasses,
   masterDetailListDragHandleVisibleClasses,
-  masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
-  masterDetailListRowInactiveClasses,
+  masterDetailListRowLayoutClasses,
   masterDetailListRowSelectClasses,
   masterDetailListRowSortableClasses,
-  masterDetailListRowSelectedClasses,
+  masterDetailListRowSurfaceClasses,
 } from './master-detail-list-panel.variants'
 import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
 import { MasterDetailRowBadges } from './master-detail-row-badges.client'
@@ -118,10 +117,9 @@ function masterDetailListRowClassName(
   showDragHandle: boolean,
 ) {
   return cn(
-    masterDetailListRowClasses,
+    masterDetailListRowLayoutClasses,
+    masterDetailListRowSurfaceClasses({ active, isSelected }),
     showDragHandle && masterDetailListRowSortableClasses,
-    !active && masterDetailListRowInactiveClasses,
-    isSelected && masterDetailListRowSelectedClasses,
   )
 }
 

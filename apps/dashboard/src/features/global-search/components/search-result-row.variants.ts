@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { cn, interactiveRowVariants } from '@rpg/ui'
+
 import { resolveGlobalSearchRowHoverSurfaceClasses } from '../lib/global-search-surface.variants'
 import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 
@@ -9,7 +11,10 @@ export const searchResultRowVariants = cva('relative block w-full text-left tran
   variants: {
     borderless: {
       true: 'border-b-0 px-3',
-      false: 'border-b border-border px-3 hover:bg-muted sm:px-5',
+      false: cn(
+        'border-b border-border px-3 sm:px-5',
+        interactiveRowVariants({ interaction: 'hoverable', hoverTone: 'muted' }),
+      ),
     },
     density: {
       compact: '',
