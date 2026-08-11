@@ -1,6 +1,7 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ContentEntityCardProps } from '../content-entity-card.client'
+import type { DisclosureEntityCardProps } from './disclosure-entity-card.client'
 import type { EntityItemProps } from './entity-item.client'
 
 type ConsumerPresentationKeys =
@@ -37,6 +38,18 @@ describe('entity surface closed API', () => {
   it('ContentEntityCard rejects legacy slot and chrome props', () => {
     expectTypeOf<
       Extract<keyof ContentEntityCardProps, LegacyContentEntityCardKeys>
+    >().toEqualTypeOf<never>()
+  })
+
+  it('DisclosureEntityCard rejects consumer styling props', () => {
+    expectTypeOf<
+      Extract<keyof DisclosureEntityCardProps, ConsumerPresentationKeys>
+    >().toEqualTypeOf<never>()
+  })
+
+  it('DisclosureEntityCard rejects consumer body alignment props', () => {
+    expectTypeOf<
+      Extract<keyof DisclosureEntityCardProps, 'bodyPadding' | 'bodyInset' | 'alignBody'>
     >().toEqualTypeOf<never>()
   })
 

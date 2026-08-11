@@ -1,23 +1,20 @@
-# Content entity card contract
+# Entity presentation contract
 
-Dashboard content features render catalog entities through **`ContentEntityCard`** — the only public entity presentation API. Do not import `ContentCardBody` from `@rpg/ui` in `apps/dashboard/src/features/content/**` (enforced by ESLint).
+Dashboard content features render catalog entities through the **EntityItem** stack:
 
-## Invariants
+```text
+EntitySummaryModel → EntityItem / EntityItemAnatomy → ContentEntityCard | DisclosureEntityCard | embedded host
+```
 
-> A consuming surface may change `ContentEntityCard` **density** / **chrome**, but must not reconstruct internal spacing, typography, or action layout from unrelated shell primitives.
+Do not import `ContentCardBody` from `@rpg/ui` in `apps/dashboard/src/features/content/**` (enforced by ESLint).
 
-> **embedded removes only card-owned outer chrome. It does not remove or alter entity-owned inset, typography, rhythm, or slots.**
+## Surfaces
 
-## Chrome (`standalone` | `embedded`)
-
-`chrome` answers one question: **who draws the outer shell?**
-
-| `chrome`               | Border / bg                       | Density inset                       |
-| ---------------------- | --------------------------------- | ----------------------------------- |
-| `standalone` (default) | Card draws `border border-border` | Entity-owned via `density`          |
-| `embedded`             | Host draws row chrome             | **Same inset tokens as standalone** |
-
-`chrome` is visual-only — it does not encode navigation or interaction policy.
+| Surface                    | When                                                      | Shell owns                                                                                          |
+| -------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **`ContentEntityCard`**    | Bordered static entity card                               | Border, radius, density inset, `EntityItem` anatomy                                                 |
+| **`DisclosureEntityCard`** | Bordered entity card + expandable domain body             | Same outer chrome as CEC + collapse caret, header/body divider, body wash, content-column alignment |
+| **`EntityItem`**           | Embedded identity inside picker/search/relationship hosts | Typography and seam geometry only — host owns row chrome                                            |
 
 ## Density
 
@@ -26,48 +23,62 @@ Dashboard content features render catalog entities through **`ContentEntityCard`
 | `comfortable` (detail default) | `px-5 py-3` | base / sm                      |
 | `compact` (picker rows)        | `px-3 py-2` | sm / xs                        |
 
-**One owner:** `ContentEntityCard.density` → `ContentCard.density`. Picker/list primitives must not expose entity density.
+**One owner:** set `density` on the **shell** (`ContentEntityCard`, `DisclosureEntityCard`) only. Embedded `EntityItem` hosts pass density into the item once.
 
-## Spacing ownership
+## Disclosure content-column contract
 
-| Layer                                    | Owns                                                                                   | Must not own                                                   |
-| ---------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **`ContentEntityCard`**                  | Entity inset, typography, slots, vertical rhythm inside the card                       | Row border/bg, interaction disabling (ARIA), navigation policy |
-| **`CollapsibleListItem` (catalog host)** | Row border/bg/radius, hover/selected, structural leading-chrome gutters, inter-row gap | Entity content inset, entity density                           |
-| **`CatalogPickerSheet`**                 | Search, sheet layout, list gap, picker navigation policy                               | Entity presentation                                            |
+`DisclosureEntityCard` composes `CollapsibleListItem` (borderless, `rowLayout="entity-card"`) inside the shared entity card frame.
 
-When `rowLayout="entity-card"`, the catalog host drops **content-area** inset and duplicate header vertical padding — not structural gutters or list gap.
+| Concern                             | Owner                                                                         |
+| ----------------------------------- | ----------------------------------------------------------------------------- |
+| Header identity                     | `EntityItemAnatomy`                                                           |
+| Collapse caret / optional drag grip | `CollapsibleListItem` leading chrome                                          |
+| Header/body divider                 | DEC body wash (`border-t`) — full bleed to shell edge                         |
+| Body background wash                | DEC — may bleed to shell edge                                                 |
+| Body inner alignment                | Shell-owned `--entity-content-indent` (aliases `--content-column-indent`)     |
+| Domain body layout                  | Feature `children` only — no `bodyPadding`, `bodyInset`, or `alignBody` props |
+
+Leading grip and caret columns share one width token (`--leading-chrome-size`). Consumers never compensate body inset manually.
 
 ## Composition
 
-### Detail surface
+### Static detail card
 
 ```text
-ContentEntityCard          chrome="standalone" density="comfortable"
-  article border + px-5 py-3
-  heading / subheading / endSlot
+ContentEntityCard          density="comfortable"
+  EntityCardFrame border + inset
+  EntityItemAnatomy
 ```
 
-### Picker row
+### Expandable entity card
 
 ```text
-CollapsibleListItem        rowLayout="entity-card" rowPreset="catalog"
-  ContentEntityCard        chrome="embedded" density="compact"
-    px-3 py-2 (entity-owned)
-    heading / headingSuffix / metadata / endSlot
+DisclosureEntityCard       density="compact" | "comfortable"
+  EntityCardFrame border (p-0 overflow)
+  CollapsibleListItem        caret + optional drag grip
+    EntityItemAnatomy header
+    washed body aligned to --entity-content-indent
+      {children}
 ```
 
-Omit `href` at the drawer/picker layer for choose-and-submit flows. The card supports `href` in both chrome modes when navigation is intended.
+### Picker row (legacy — migrate in Phase 4)
+
+```text
+CollapsibleListItem        rowLayout="entity-card" preset="catalog"
+  EntityItem                 density="compact"
+```
+
+Omit `href` at the drawer/picker layer for choose-and-submit flows unless navigation is intended.
 
 ## Relationship rows
 
-Typed cross-content edges on detail pages use `CrossContentRelationshipRow`, not `ContentEntityCard`. See [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+Typed cross-content edges on detail pages use `CrossContentRelationshipRow` → `DetailEntityRow` → `EntityItemAnatomy`, not card shells. See [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 ## `disabled`
 
-- **`ContentEntityCard`:** presentational only (`data-disabled`, `opacity-60`).
+- **`ContentEntityCard` / `DisclosureEntityCard`:** presentational only (`data-disabled`, `opacity-60`).
 - **Host row/button:** owns `disabled`, `aria-disabled`, and focus management.
 
 ## Future work
 
-Character-builder pickers (`CatalogPickerItemHeader`, `EquipmentPickerItemHeader`) still use bespoke headers — migrate separately to avoid global catalog inset changes.
+Character-builder pickers (`CatalogPickerItemHeader`, `EquipmentPickerItemHeader`) still use bespoke headers — migrate in Phase 4.

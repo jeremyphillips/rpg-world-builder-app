@@ -11,6 +11,8 @@ import type { EntitySummaryModel } from './entity/entity-summary.types'
 export type { EntitySummaryModel } from './entity/entity-summary.types'
 export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
+export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
+export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.client'
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel
