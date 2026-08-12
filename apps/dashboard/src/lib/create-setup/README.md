@@ -4,7 +4,8 @@ Ordered, dependent authoring for create flows (locations, Quick NPC, future cons
 
 ## Rule
 
-Setup is **ordered/dependent authoring**; controls are **pluggable**; `collapseWhenComplete` is **presentation policy**, not completion policy.
+Setup is **ordered/dependent authoring**; controls are **pluggable**; `required` controls sequencing,
+while `collapseWhenComplete` is **presentation policy**, not completion policy.
 
 ```text
 sequencer  → order, visibility, dependsOn, active/complete, invalidation, collapse policy
@@ -14,8 +15,14 @@ panel      → kind → control (choice | number | future)
 - **Sequencer** (`create-setup-sequence.lib.ts`) is control-agnostic — it never imports UI.
 - **Panel** (`create-setup-panel.client.tsx`) maps `kind` to `CollapsibleRadioCardField` or `NumberStepper`.
 - **`isComplete`** is caller-owned on each set; the sequencer reads it but does not derive it from values.
+- **`required: false`** makes a set pass-through: it remains visible/editable but does not block the
+  next required set or Continue. Authors do not need a negative sentinel choice merely to advance.
 - **`onReset`** is required when `dependsOn` is non-empty — invalidation calls `onReset()`, not value clears.
 - **`collapseWhenComplete: false`** keeps a completed visible set expanded (e.g. Level between choice sets).
+
+The active set is the first incomplete required set. Completed and optional predecessors are visible;
+an incomplete visible optional set stays expanded. A controlled reopen still temporarily focuses the
+requested set and preserves the existing Change/dependency behavior.
 
 Feature domain models (location intent, NPC build context) stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
 

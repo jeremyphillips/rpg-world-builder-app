@@ -58,7 +58,6 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-create-draft.lib.ts',
   'location-create-draft.lib.test.ts',
   'location-create-draft-prune.client.tsx',
-  'location-create-setup-summary.client.tsx',
   'location-create-setup-session.client.tsx',
   'location-form-fields.compose.test.ts',
   'location-settlement-create-composition.lib.ts',

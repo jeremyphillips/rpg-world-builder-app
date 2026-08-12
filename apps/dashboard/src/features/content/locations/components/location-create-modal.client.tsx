@@ -37,8 +37,7 @@ import {
   buildLocationCreateSetupSets,
   type LocationCreateSetupChoiceSet,
 } from '../lib/location-create-setup.lib'
-import { CreateSetupPanel } from '@/lib/create-setup'
-import { LocationCreateSetupSummary } from './location-create-setup-summary.client'
+import { CreateSetupPanel, CreateSetupSummary } from '@/lib/create-setup'
 import { LocationCreateForm } from './location-create-form.client'
 
 export type LocationCreateModalProps = {
@@ -158,6 +157,8 @@ function buildDetailsChrome({
   onBack: () => void
   onCancel: () => void
 }): ContentFormHostChrome {
+  const setupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
+
   return {
     contentWrapper: (content) => (
       <Modal.Body
@@ -168,8 +169,13 @@ function buildDetailsChrome({
         )}
         aria-hidden={!showDetails}
       >
-        {showDetails && hadSetup && setupModel ? (
-          <LocationCreateSetupSummary entries={setupModel.summaryEntries} onChange={onBack} />
+        {showDetails && hadSetup && setupSummary ? (
+          <CreateSetupSummary
+            eyebrow={setupSummary.eyebrow}
+            summary={setupSummary.summary}
+            changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+            onChange={onBack}
+          />
         ) : null}
         {content}
       </Modal.Body>
@@ -188,6 +194,24 @@ function buildDetailsChrome({
         <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
       </>
     ),
+  }
+}
+
+const MULTI_SETUP_EYEBROW = 'Setup' as const
+
+function resolveSetupSummary(
+  entries: readonly { fieldLabel: string; valueLabel: string }[],
+): { eyebrow: string; summary: string } | null {
+  const firstEntry = entries[0]
+  if (!firstEntry) return null
+
+  if (entries.length === 1) {
+    return { eyebrow: firstEntry.fieldLabel, summary: firstEntry.valueLabel }
+  }
+
+  return {
+    eyebrow: MULTI_SETUP_EYEBROW,
+    summary: entries.map((entry) => entry.valueLabel).join(' · '),
   }
 }
 

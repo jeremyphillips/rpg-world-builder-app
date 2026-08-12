@@ -1,10 +1,13 @@
 export {
   CreateSetupPanel,
   CreateSetupShell,
-  CREATE_SETUP_DEFAULT_CHANGE_LABEL,
   type CreateSetupPanelProps,
   type CreateSetupShellProps,
 } from './create-setup-panel.client'
+
+export { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
+
+export { CreateSetupSummary, type CreateSetupSummaryProps } from './create-setup-summary.client'
 
 export {
   isCreateSetupChoiceComplete,
