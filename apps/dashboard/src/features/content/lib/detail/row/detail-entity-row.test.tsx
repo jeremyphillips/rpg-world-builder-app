@@ -65,7 +65,8 @@ describe('DetailEntityRow', () => {
     const suffix = container.querySelector('[class*="shrink-0"][class*="text-muted-foreground"]')
 
     expect(name).toHaveClass('text-link')
-    expect(nameSpan).toHaveClass('flex-1', 'truncate')
+    expect(nameSpan).toHaveClass('min-w-0', 'shrink', 'truncate')
+    expect(nameSpan.className).not.toMatch(/\bflex-1\b/)
     expect(nameSpan.className).not.toMatch(/\bmax-w-\[60%\]/)
     expect(suffix).toHaveClass('shrink-0')
     expect(suffix?.className).not.toMatch(/\btruncate\b/)

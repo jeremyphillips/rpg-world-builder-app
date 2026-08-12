@@ -128,6 +128,39 @@ describe('SearchResultRow', () => {
     expect(secondary).toHaveClass('text-xs', 'truncate')
   })
 
+  it('keeps classification adjacent to the title while trailing occupies column 3', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Fire Bolt"
+        secondary="Evocation cantrip"
+        typeLabel="Spell"
+        href="/campaigns/c1/spells/fire-bolt"
+        borderless
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Fire Bolt, Subclass of Aric, Spell' })
+    const name = screen.getByText('Fire Bolt')
+    const classification = screen.getByText('Spell')
+    const mixedHeadingRow = name.parentElement as HTMLElement
+    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(mixedHeadingRow.childNodes[0]).toBe(name)
+    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+  })
+
   it('keeps trailing in column 3 while the host owns inset', () => {
     renderWithProviders(
       <SearchResultRow

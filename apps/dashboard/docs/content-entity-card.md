@@ -349,6 +349,13 @@ There is no parallel `action` + `endSlot` + feature-specific trailing sibling on
 surfaces. A destination chevron is an `indicator`, not an `action`. Whole-row navigation
 belongs to the host; trailing indicators remain non-interactive.
 
+**Classification is identity-adjacent.** `EntitySummaryModel.classification` renders in the
+mixed heading phrase immediately after the title (`Title · Classification`). It is not a
+trailing-rail value and must not be right-aligned via title `flex-1`, percentage width
+caps, or `ml-auto`. The title may shrink and truncate when the content column is narrow,
+but must not grow solely to push classification away from the name. `EntitySummary`'s outer
+`flex-1` fills EntityItem column 2; mixed-heading title growth is separate and forbidden.
+
 ---
 
 ## Relationship rows
@@ -383,6 +390,8 @@ prevent regression:
 | `disclosure-entity-card.test.tsx`        | DEC body present; CLI legacy indent absent; leading offset on `article`  |
 | `grant-array-disclosure-shell.test.tsx`  | Grant integration: DEC alignment, no CLI `content-column-indent`         |
 | `collapsible-list-item.variants.test.ts` | Entity-card body classes exclude legacy inset                            |
+| `content-card.variants.test.ts`          | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks |
+| `entity-summary.test.tsx`                | Classification stays adjacent; outer summary `flex-1` preserved          |
 | AGENTS.md component rule                 | No consumer padding overrides on entity surfaces                         |
 
 ---

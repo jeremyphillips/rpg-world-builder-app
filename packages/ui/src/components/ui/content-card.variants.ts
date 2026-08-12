@@ -92,7 +92,7 @@ export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseli
 })
 
 export const contentCardMixedHeadingNameVariants = cva(
-  'min-w-0 flex-1 truncate font-body-emphasis text-foreground [&_a]:truncate',
+  'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
 )
 
 export const contentCardMixedHeadingSeparatorVariants = cva(
