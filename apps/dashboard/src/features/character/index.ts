@@ -54,6 +54,7 @@ export {
   type CatalogPickerMetadataLine,
 } from './components/picker/catalog-picker-metadata'
 export { catalogPickerShellProps } from './components/picker/catalog-picker-shell.lib'
+export { compareName, scoreAndFilterPickerItems } from './components/picker/catalog-picker-sort.lib'
 export {
   CatalogEntityRow,
   CatalogEntityPickerSheet,
