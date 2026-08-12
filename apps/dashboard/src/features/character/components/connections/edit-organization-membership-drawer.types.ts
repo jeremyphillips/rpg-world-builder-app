@@ -1,10 +1,11 @@
-import type { OrganizationDomain } from '@rpg/contracts'
+import type { OrganizationActivity, OrganizationDomain, OrganizationForm } from '@rpg/contracts'
 
 export type EditOrganizationMembershipOrganization = {
   id: string
   name: string
   organizationDomain: OrganizationDomain
-  organizationForm?: string
+  organizationForm?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
 }
 
 /** Surface-facing wording — the drawer body, save flow, and remove flow are shared. */

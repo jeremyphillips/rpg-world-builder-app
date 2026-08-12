@@ -10,14 +10,16 @@ export type { OrganizationMembershipTitleFieldProps } from './organization-membe
 /** Classification-scoped title radios for organization membership chooser/editor. */
 export function OrganizationMembershipTitleField({
   kind,
-  subtype,
+  form,
+  activities,
   value,
   onValueChange,
   idPrefix,
 }: OrganizationMembershipTitleFieldProps) {
   const options = buildOrganizationMembershipTitleRadioOptions({
     kind,
-    subtype,
+    form,
+    activities,
     currentValue: value,
   })
 

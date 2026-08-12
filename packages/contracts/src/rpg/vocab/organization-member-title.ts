@@ -1,4 +1,9 @@
+import {
+  getOrganizationActivityEntry,
+  type OrganizationActivity,
+} from './organization-activity'
 import { getOrganizationDomainEntry, type OrganizationDomain } from './organization-domain'
+import { getOrganizationFormEntry, type OrganizationForm } from './organization-form'
 import type { OrganizationMemberTitleEntry } from './organization-member-title-entry'
 
 export type { OrganizationMemberTitleEntry } from './organization-member-title-entry'
@@ -7,24 +12,47 @@ export {
   organizationMemberTitleEntries,
 } from './organization-member-title-entry'
 
-/** Temporary domain-only resolver; Phase 7d section 3 composes every canonical axis. */
-export function resolveOrganizationMemberTitleSuggestions(input: {
+export type OrganizationMemberTitleClassification = {
   domain: OrganizationDomain
-}): readonly [OrganizationMemberTitleEntry, ...OrganizationMemberTitleEntry[]] {
-  return getOrganizationDomainEntry(input.domain)!.memberTitles
+  form?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
 }
 
 /**
- * Exact-label lookup against the same suggestion source as
- * `resolveOrganizationMemberTitleSuggestions` — suggestions and lookup cannot diverge.
+ * Composes local registry suggestions without encoding familiar subtype tuples.
+ * Local rank is primary; at the same rank activities precede form, then domain.
  */
-export function resolveOrganizationMemberTitleEntry(input: {
-  domain: OrganizationDomain
-  title: string
-}): OrganizationMemberTitleEntry | undefined {
+export function resolveOrganizationMemberTitleSuggestions(
+  input: OrganizationMemberTitleClassification,
+): readonly [OrganizationMemberTitleEntry, ...OrganizationMemberTitleEntry[]] {
+  const contributions = [
+    ...(input.activities ?? []).map((activity) => getOrganizationActivityEntry(activity)!.memberTitles),
+    ...(input.form ? [getOrganizationFormEntry(input.form)!.memberTitles] : []),
+    getOrganizationDomainEntry(input.domain)!.memberTitles,
+  ]
+  const maxLength = Math.max(...contributions.map((entries) => entries.length))
+  const seen = new Set<string>()
+  const resolved: OrganizationMemberTitleEntry[] = []
+
+  for (let rank = 0; rank < maxLength; rank += 1) {
+    for (const contribution of contributions) {
+      const entry = contribution[rank]
+      if (!entry) continue
+      const normalized = entry.label.trim().toLocaleLowerCase('en')
+      if (seen.has(normalized)) continue
+      seen.add(normalized)
+      resolved.push(entry)
+    }
+  }
+
+  return resolved as [OrganizationMemberTitleEntry, ...OrganizationMemberTitleEntry[]]
+}
+
+/** Exact-label lookup against the same compositional source as suggestions. */
+export function resolveOrganizationMemberTitleEntry(
+  input: OrganizationMemberTitleClassification & { title: string },
+): OrganizationMemberTitleEntry | undefined {
   const normalized = input.title.trim()
   if (normalized === '') return undefined
-  return resolveOrganizationMemberTitleSuggestions({
-    domain: input.domain,
-  }).find((entry) => entry.label === normalized)
+  return resolveOrganizationMemberTitleSuggestions(input).find((entry) => entry.label === normalized)
 }

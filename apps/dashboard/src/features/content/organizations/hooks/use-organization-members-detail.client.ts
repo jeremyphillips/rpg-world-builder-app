@@ -48,7 +48,10 @@ function subjectKindFor(
 
 export function useOrganizationMembersDetail(
   campaignId: string,
-  organization: Pick<Organization, 'id' | 'name' | 'organizationDomain' | 'organizationForm'>,
+  organization: Pick<
+    Organization,
+    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'activities'
+  >,
 ) {
   const organizationId = organization.id
   const canManage = useCanManageCampaign(campaignId)
@@ -166,6 +169,8 @@ export function useOrganizationMembersDetail(
       if (!editingRow) return
       const metadata = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
+        form: organization.organizationForm,
+        activities: organization.activities,
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),

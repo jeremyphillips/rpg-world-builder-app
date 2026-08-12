@@ -1,32 +1,47 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_DOMAIN_IDS, getOrganizationDomainEntry } from './organization-domain'
 import {
   resolveOrganizationMemberTitleEntry,
   resolveOrganizationMemberTitleSuggestions,
 } from './organization-member-title'
 
-describe('temporary domain member-title resolution', () => {
-  it('resolves the canonical domain contribution', () => {
-    for (const domain of ORGANIZATION_DOMAIN_IDS) {
-      expect(resolveOrganizationMemberTitleSuggestions({ domain })).toEqual(
-        getOrganizationDomainEntry(domain)?.memberTitles,
-      )
-    }
+describe('organization member-title resolution', () => {
+  it('interleaves activity, form, and domain contributions by local rank', () => {
+    const labels = resolveOrganizationMemberTitleSuggestions({
+      domain: 'criminal',
+      form: 'guild',
+      activities: ['smuggling'],
+    }).map((entry) => entry.label)
+
+    expect(labels.slice(0, 6)).toEqual([
+      'Ringleader',
+      'Guildmaster',
+      'Boss',
+      'Smuggler',
+      'Master',
+      'Lieutenant',
+    ])
   })
 
-  it('looks up exact labels from the same contribution', () => {
+  it('dedupes normalized labels while preserving the first contribution', () => {
+    const titles = resolveOrganizationMemberTitleSuggestions({
+      domain: 'commercial',
+      form: 'company',
+      activities: ['banking', 'finance'],
+    })
+    expect(titles.filter((entry) => entry.label === 'Treasurer')).toEqual([
+      { label: 'Treasurer', priority: 50 },
+    ])
+  })
+
+  it('looks up labels from the complete composition', () => {
     expect(
       resolveOrganizationMemberTitleEntry({
-        domain: 'occupational',
-        title: 'Guildmaster',
+        domain: 'academic',
+        form: 'association',
+        activities: ['education', 'training', 'research'],
+        title: 'Research Director',
       }),
-    ).toEqual({ label: 'Guildmaster', priority: 50 })
-    expect(
-      resolveOrganizationMemberTitleEntry({
-        domain: 'occupational',
-        title: 'Custom Role',
-      }),
-    ).toBeUndefined()
+    ).toEqual({ label: 'Research Director', priority: 50 })
   })
 })

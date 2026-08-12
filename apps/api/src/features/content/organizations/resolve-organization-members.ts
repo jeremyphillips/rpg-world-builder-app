@@ -110,6 +110,8 @@ export async function resolveOrganizationMembers(input: {
         : resolveOrganizationMembershipPriority({
             membership: membership ?? {},
             domain,
+            form: organization.organizationForm,
+            activities: organization.activities,
           })
 
     return [

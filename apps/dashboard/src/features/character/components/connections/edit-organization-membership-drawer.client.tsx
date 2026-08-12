@@ -106,7 +106,8 @@ export function EditOrganizationMembershipDrawer({
           <div className={dialogPanelSectionInsetXClasses}>
             <OrganizationMembershipTitleField
               kind={organization.organizationDomain}
-              subtype={organization.organizationForm}
+              form={organization.organizationForm}
+              activities={organization.activities}
               value={selectedTitle}
               onValueChange={setSelectedTitle}
               idPrefix={`edit-organization-membership-${organization.id}`}
