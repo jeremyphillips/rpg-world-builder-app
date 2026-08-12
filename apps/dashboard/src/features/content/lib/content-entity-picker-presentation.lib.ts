@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Organization } from '@rpg/contracts'
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationDomainLabel } from '@rpg/contracts'
 import type { ContentCardDensity } from '@rpg/ui'
 
 import { buildCharacterEntityContextPresentation } from '@/features/character'
@@ -58,14 +58,14 @@ export function buildLocationPickerEntitySummary(
 }
 
 export function buildOrganizationPickerEntitySummary(
-  organization: Pick<Organization, 'name' | 'organizationKind' | 'imageKey'>,
+  organization: Pick<Organization, 'name' | 'organizationDomain' | 'imageKey'>,
   options: EntitySummaryAdapterOptions = {},
 ): EntitySummaryModel {
   const density = options.density ?? 'compact'
 
   return {
     heading: organization.name,
-    classification: getOrganizationKindLabel(organization.organizationKind),
+    classification: getOrganizationDomainLabel(organization.organizationDomain),
     description: options.description,
     media: resolveEntityMedia(
       options.imageKey ?? organization.imageKey,

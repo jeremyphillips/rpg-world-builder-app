@@ -73,7 +73,7 @@ beforeAll(() => {
 const organization = {
   id: 'organization-lantern-guild',
   name: 'Lantern Guild',
-  organizationKind: 'professional' as const,
+  organizationDomain: 'occupational' as const,
 }
 
 const quickFighter = {

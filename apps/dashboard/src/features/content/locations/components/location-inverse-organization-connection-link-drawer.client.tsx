@@ -9,7 +9,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import {
-  getOrganizationKindLabel,
+  getOrganizationDomainLabel,
   getOrganizationLocationConnectionDisplayLabel,
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
@@ -425,7 +425,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       getItemKey={(organization) => organization.id}
       getItemToolbarLabel={(organization) => organization.name}
       getSearchText={(organization) =>
-        [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
+        [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(' ')
       }
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (organization) =>

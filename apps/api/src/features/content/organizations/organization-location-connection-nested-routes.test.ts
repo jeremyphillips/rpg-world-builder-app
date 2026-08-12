@@ -17,7 +17,7 @@ useIntegrationDb()
 const minimalOrganizationInput = {
   slug: 'org-loc-conn',
   name: 'Org Loc Conn',
-  organizationKind: 'commercial',
+  organizationDomain: 'commercial',
 } as const
 
 function locationConnectionsPath(

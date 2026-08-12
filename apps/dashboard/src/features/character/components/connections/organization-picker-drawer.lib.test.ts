@@ -11,7 +11,7 @@ import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 describe('organization picker library', () => {
   it('searches names and user-facing type labels', () => {
     expect(getOrganizationPickerSearchText(organizationPickerItems[0]!.organization)).toContain(
-      'Guild or professional',
+      'Occupational',
     )
     expect(
       filterAndSortOrganizationPickerItems(organizationPickerItems, {
@@ -25,7 +25,7 @@ describe('organization picker library', () => {
     expect(
       filterAndSortOrganizationPickerItems(organizationPickerItems, {
         searchQuery: '',
-        type: 'professional',
+        type: 'occupational',
       }).map(({ organization }) => organization.name),
     ).toEqual(['Lantern Guild'])
   })
@@ -38,7 +38,7 @@ describe('organization picker library', () => {
     ).toEqual([
       { value: 'all', label: 'All types' },
       { value: 'government', label: 'Government' },
-      { value: 'professional', label: 'Guild or professional' },
+      { value: 'occupational', label: 'Occupational' },
       { value: 'academic', label: 'Academic' },
     ])
     expect(formatOrganizationPickerDescription()).toBe(

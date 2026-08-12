@@ -54,7 +54,7 @@ export function buildingOperatorDefaultValues(): Record<string, unknown> & {
   return {
     operatorOrganization: {
       name: '',
-      organizationKind: '',
+      organizationDomain: '',
       activities: organizationCreateDefaultValues.activities ?? [],
     },
   }

@@ -7,80 +7,79 @@ import { organizationWriteConfig } from './organizations.config'
 
 useIntegrationDb()
 
-describe('organization subtype writes', () => {
-  it('creates and updates organizations with a valid subtype', async () => {
+describe('organization classification writes', () => {
+  it('creates and updates organizations with an optional reusable form', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'crown',
       name: 'The Crown',
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
 
     expect(created).toMatchObject({
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
 
     const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
-      organizationSubtype: 'council',
+      organizationForm: 'company',
     })
-    expect(updated.organizationSubtype).toBe('council')
+    expect(updated.organizationForm).toBe('company')
   })
 
-  it('rejects a merged update that leaves an incompatible kind/subtype pair', async () => {
+  it('keeps form when domain changes because the axes are independent', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'crown',
       name: 'The Crown',
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
 
-    await expect(
-      updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
-        organizationKind: 'military',
-      }),
-    ).rejects.toMatchObject({
-      status: 400,
-      code: 'validation_error',
+    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
+      organizationDomain: 'military',
+    })
+
+    expect(updated).toMatchObject({
+      organizationDomain: 'military',
+      organizationForm: 'association',
     })
   })
 
-  it('accepts a kind change when subtype is cleared in the same update', async () => {
+  it('clears optional form without changing domain', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'crown',
       name: 'The Crown',
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
 
     const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
-      organizationKind: 'military',
-      organizationSubtype: null,
+      organizationForm: null,
     })
 
-    expect(updated.organizationKind).toBe('military')
-    expect(updated.organizationSubtype).toBeUndefined()
+    expect(updated.organizationDomain).toBe('government')
+    expect(updated.organizationForm).toBeUndefined()
   })
 
-  it('accepts replacing subtype when changing kind in the same update', async () => {
+  it('accepts replacing form when changing domain in the same update', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'crown',
       name: 'The Crown',
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
 
     const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
-      organizationKind: 'military',
-      organizationSubtype: 'army',
+      organizationDomain: 'military',
+      organizationForm: 'order',
     })
     expect(updated).toMatchObject({
-      organizationKind: 'military',
-      organizationSubtype: 'army',
+      organizationDomain: 'military',
+      organizationForm: 'order',
     })
   })
 })

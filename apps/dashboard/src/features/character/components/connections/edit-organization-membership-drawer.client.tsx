@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationDomainLabel } from '@rpg/contracts'
 import {
   Button,
   ConfirmDialog,
@@ -91,7 +91,7 @@ export function EditOrganizationMembershipDrawer({
     }
   }, [onOpenChange, onRemove, pending])
 
-  const kindLabel = getOrganizationKindLabel(organization.organizationKind)
+  const kindLabel = getOrganizationDomainLabel(organization.organizationDomain)
 
   return (
     <>
@@ -105,8 +105,8 @@ export function EditOrganizationMembershipDrawer({
         <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
           <div className={dialogPanelSectionInsetXClasses}>
             <OrganizationMembershipTitleField
-              kind={organization.organizationKind}
-              subtype={organization.organizationSubtype}
+              kind={organization.organizationDomain}
+              subtype={organization.organizationForm}
               value={selectedTitle}
               onValueChange={setSelectedTitle}
               idPrefix={`edit-organization-membership-${organization.id}`}

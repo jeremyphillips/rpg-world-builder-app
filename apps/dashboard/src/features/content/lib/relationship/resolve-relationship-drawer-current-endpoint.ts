@@ -1,5 +1,5 @@
 import type { LocationConnectedPartyRow, Organization } from '@rpg/contracts'
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationDomainLabel } from '@rpg/contracts'
 
 import {
   ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
@@ -9,7 +9,7 @@ import {
 export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   relationshipId: string
   rows: readonly LocationConnectedPartyRow[]
-  organizations?: readonly Pick<Organization, 'id' | 'organizationKind' | 'imageKey'>[]
+  organizations?: readonly Pick<Organization, 'id' | 'organizationDomain' | 'imageKey'>[]
 }): EntityReplacementCurrentSnapshot {
   const row = input.rows.find(({ relationshipId }) => relationshipId === input.relationshipId)
 
@@ -22,7 +22,7 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
 
   const organization = input.organizations?.find(({ id }) => id === row.subject.id)
   const kindLabel = organization
-    ? getOrganizationKindLabel(organization.organizationKind)
+    ? getOrganizationDomainLabel(organization.organizationDomain)
     : undefined
 
   return {

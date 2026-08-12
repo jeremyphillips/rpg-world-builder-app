@@ -5,7 +5,7 @@ import type {
   CharacterBuilderDraft,
   CharacterBuildContext,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationDomainLabel } from '@rpg/contracts'
 import { Alert, Text } from '@rpg/ui'
 
 import { getContentTypeItemLabel } from '@/features/content'
@@ -38,7 +38,7 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
           .map(({ organizationId }) => {
             const organization = organizationsById.get(organizationId)
             return organization
-              ? `${organization.name} — ${getOrganizationKindLabel(organization.organizationKind)}`
+              ? `${organization.name} — ${getOrganizationDomainLabel(organization.organizationDomain)}`
               : UNAVAILABLE_ORGANIZATION_LABEL
           })
           .join('; ')

@@ -29,15 +29,15 @@ describe('organization form projection', () => {
 
     expect(standalone.map(({ name }) => name)).toEqual([
       'description',
-      'organizationKind',
-      'organizationSubtype',
+      'organizationDomain',
+      'organizationForm',
       'activities',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
       'operatorOrganization.name',
       'operatorOrganization.description',
-      'operatorOrganization.organizationKind',
-      'operatorOrganization.organizationSubtype',
+      'operatorOrganization.organizationDomain',
+      'operatorOrganization.organizationForm',
       'operatorOrganization.activities',
     ])
     const standaloneActivity = standalone.find(({ name }) => name === 'activities')?.item
@@ -55,30 +55,19 @@ describe('organization form projection', () => {
     expect(
       buildOrganizationCreateInput({
         name: 'Red Dragon Brewing Company',
-        organizationKind: 'commercial',
-        organizationSubtype: 'company',
+        organizationDomain: 'commercial',
+        organizationForm: 'company',
         activities: ['brewing'],
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
-      organizationKind: 'commercial',
-      organizationSubtype: 'company',
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
       activities: ['brewing'],
     })
   })
 
-  it('namespaces subtype pruning with the embedded projection', () => {
-    const [sync] = buildOrganizationFormValueSyncs('operatorOrganization')
-    expect(
-      sync?.apply(
-        {
-          operatorOrganization: {
-            organizationKind: 'religious',
-            organizationSubtype: 'company',
-          },
-        },
-        ['operatorOrganization.organizationKind'],
-      ),
-    ).toEqual({ 'operatorOrganization.organizationSubtype': undefined })
+  it('does not couple form to domain in embedded projections', () => {
+    expect(buildOrganizationFormValueSyncs('operatorOrganization')).toEqual([])
   })
 })

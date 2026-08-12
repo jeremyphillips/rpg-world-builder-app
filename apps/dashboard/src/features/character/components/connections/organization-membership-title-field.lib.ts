@@ -10,8 +10,7 @@ export function buildOrganizationMembershipTitleRadioOptions(input: {
   currentValue?: string
 }): { value: string; label: string }[] {
   const suggestions = resolveOrganizationMemberTitleSuggestions({
-    kind: input.kind,
-    subtype: input.subtype,
+    domain: input.kind,
   })
   const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [

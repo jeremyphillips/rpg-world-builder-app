@@ -1,10 +1,10 @@
-import type { OrganizationKind } from '@rpg/contracts'
+import type { OrganizationDomain } from '@rpg/contracts'
 
 /** UI-only sentinel — never persisted as a membership title. */
 export const ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE = '__no_title__'
 
 export type OrganizationMembershipTitleFieldProps = {
-  kind: OrganizationKind
+  kind: OrganizationDomain
   subtype?: string
   value: string
   onValueChange: (value: string) => void

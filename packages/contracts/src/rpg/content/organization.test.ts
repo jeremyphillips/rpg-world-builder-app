@@ -18,15 +18,15 @@ const timestamps = {
 }
 
 describe('organization body contracts', () => {
-  it('requires organizationKind for publish-complete bodies', () => {
+  it('requires organizationDomain for publish-complete bodies', () => {
     expect(
       organizationBodySchema.parse({
         name: 'The Lantern Guild',
-        organizationKind: 'professional',
+        organizationDomain: 'occupational',
       }),
     ).toEqual({
       name: 'The Lantern Guild',
-      organizationKind: 'professional',
+      organizationDomain: 'occupational',
       activities: [],
       connections: { locations: [] },
     })
@@ -34,36 +34,29 @@ describe('organization body contracts', () => {
     expect(organizationBodySchema.safeParse({ name: 'The Lantern Guild' }).success).toBe(false)
   })
 
-  it('allows optional subtype when valid for kind', () => {
+  it('allows an optional reusable form independently of domain', () => {
     expect(
       organizationBodySchema.parse({
         name: 'Crown of Lankhmar',
-        organizationKind: 'government',
-        organizationSubtype: 'monarchy',
+        organizationDomain: 'government',
+        organizationForm: 'association',
       }),
     ).toMatchObject({
-      organizationKind: 'government',
-      organizationSubtype: 'monarchy',
+      organizationDomain: 'government',
+      organizationForm: 'association',
     })
   })
 
-  it('rejects subtype without kind and cross-kind pairs', () => {
-    expect(
-      organizationBodySchema.safeParse({
-        name: 'Broken',
-        organizationKind: 'military',
-        organizationSubtype: 'monarchy',
-      }).success,
-    ).toBe(false)
+  it('allows drafts to carry form while domain remains incomplete', () => {
     expect(
       organizationBodyDraftSchema.safeParse({
-        name: 'Broken',
-        organizationSubtype: 'monarchy',
+        name: 'Draft Association',
+        organizationForm: 'association',
       }).success,
-    ).toBe(false)
+    ).toBe(true)
   })
 
-  it('allows drafts without organizationKind and normalizes blank names', () => {
+  it('allows drafts without organizationDomain and normalizes blank names', () => {
     expect(organizationBodyDraftSchema.parse({ name: '  ' })).toEqual({
       name: 'Untitled Organization',
       activities: [],
@@ -74,7 +67,7 @@ describe('organization body contracts', () => {
     expect(
       organizationBodySchema.parse({
         name: 'Ember Works',
-        organizationKind: 'commercial',
+        organizationDomain: 'commercial',
         activities: ['blacksmithing', 'brewing'],
       }).activities,
     ).toEqual(['blacksmithing', 'brewing'])
@@ -82,7 +75,7 @@ describe('organization body contracts', () => {
     expect(
       organizationBodySchema.safeParse({
         name: 'Duplicate Works',
-        organizationKind: 'commercial',
+        organizationDomain: 'commercial',
         activities: ['brewing', 'brewing'],
       }).success,
     ).toBe(false)
@@ -105,9 +98,9 @@ describe('organization stored contracts', () => {
         ...meta,
         status: 'published',
         name: 'The Lantern Guild',
-        organizationKind: 'professional',
-      }).organizationKind,
-    ).toBe('professional')
+        organizationDomain: 'occupational',
+      }).organizationDomain,
+    ).toBe('occupational')
 
     expect(
       organizationDraftStoredSchema.parse({
@@ -148,7 +141,7 @@ describe('organization reference resolution', () => {
 })
 
 describe('organization authoring inputs', () => {
-  it('requires a kind for publish create but not draft create', () => {
+  it('requires a domain for publish create but not draft create', () => {
     expect(
       createOrganizationInputSchema.safeParse({
         slug: 'lantern-guild',
@@ -160,7 +153,7 @@ describe('organization authoring inputs', () => {
       createOrganizationInputSchema.safeParse({
         slug: 'lantern-guild',
         name: 'The Lantern Guild',
-        organizationKind: 'professional',
+        organizationDomain: 'occupational',
       }).success,
     ).toBe(true)
 
@@ -173,8 +166,8 @@ describe('organization authoring inputs', () => {
   })
 
   it('supports partial publish and draft updates', () => {
-    expect(updateOrganizationInputSchema.parse({ organizationKind: 'academic' })).toEqual({
-      organizationKind: 'academic',
+    expect(updateOrganizationInputSchema.parse({ organizationDomain: 'academic' })).toEqual({
+      organizationDomain: 'academic',
       connections: { locations: [] },
     })
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
@@ -182,12 +175,12 @@ describe('organization authoring inputs', () => {
     })
   })
 
-  it('rejects cross-kind pairs when both fields are present in a partial update', () => {
+  it('accepts domain and form as independent partial-update fields', () => {
     expect(
       updateOrganizationInputSchema.safeParse({
-        organizationKind: 'military',
-        organizationSubtype: 'monarchy',
+        organizationDomain: 'military',
+        organizationForm: 'association',
       }).success,
-    ).toBe(false)
+    ).toBe(true)
   })
 })

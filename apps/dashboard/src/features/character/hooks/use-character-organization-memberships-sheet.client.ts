@@ -36,13 +36,13 @@ function toEditableOrganization(
   membership: OrganizationReferenceResolution | null,
 ): EditOrganizationMembershipOrganization | null {
   const organization = membership?.organization
-  if (!organization || typeof organization.organizationKind !== 'string') return null
+  if (!organization || typeof organization.organizationDomain !== 'string') return null
   return {
     id: organization.id,
     name: organization.name,
-    organizationKind: organization.organizationKind,
-    ...(organization.organizationSubtype !== undefined
-      ? { organizationSubtype: organization.organizationSubtype }
+    organizationDomain: organization.organizationDomain,
+    ...(organization.organizationForm !== undefined
+      ? { organizationForm: organization.organizationForm }
       : {}),
   }
 }
@@ -98,10 +98,7 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     async (title?: string) => {
       if (!editingMembership || !editingOrganization) return
       const metadata = resolveOrganizationMembershipMetadata({
-        kind: editingOrganization.organizationKind,
-        ...(editingOrganization.organizationSubtype !== undefined
-          ? { subtype: editingOrganization.organizationSubtype }
-          : {}),
+        domain: editingOrganization.organizationDomain,
         selectedTitle: title,
         currentMembership: editingMembership,
       })

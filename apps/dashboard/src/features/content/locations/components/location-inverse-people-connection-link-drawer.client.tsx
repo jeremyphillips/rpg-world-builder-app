@@ -9,7 +9,7 @@ import type {
   Organization,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { getOrganizationKindLabel } from '@rpg/contracts'
+import { getOrganizationDomainLabel } from '@rpg/contracts'
 import { Button, Eyebrow, SegmentedControl, Text } from '@rpg/ui'
 
 import {
@@ -213,21 +213,21 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     [characterRows],
   )
 
-  const organizationKind =
+  const organizationDomain =
     effectiveBinding?.subjectType === 'organization' ? effectiveBinding.kind : undefined
   const characterKind =
     effectiveBinding?.subjectType === 'character' ? effectiveBinding.kind : undefined
 
-  const organizationIntent = organizationKind
-    ? organizationDrawerIntentFromKind(organizationKind)
+  const organizationIntent = organizationDomain
+    ? organizationDrawerIntentFromKind(organizationDomain)
     : undefined
 
-  const organizationAvailabilityKinds = organizationKind ? [organizationKind] : []
+  const organizationAvailabilityKinds = organizationDomain ? [organizationDomain] : []
   const characterAvailabilityKinds = characterKind ? [characterKind] : []
 
   const instructionCopy = (() => {
-    if (organizationKind) {
-      return resolveLocationInverseOrganizationAddDrawerInstruction(organizationKind)
+    if (organizationDomain) {
+      return resolveLocationInverseOrganizationAddDrawerInstruction(organizationDomain)
     }
     if (characterKind) {
       return resolveLocationInverseCharacterAddDrawerInstruction(characterKind)
@@ -236,8 +236,8 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   })()
 
   const submitLabel = (() => {
-    if (organizationKind) {
-      return resolveLocationInverseOrganizationAddSubmitLabel(organizationKind)
+    if (organizationDomain) {
+      return resolveLocationInverseOrganizationAddSubmitLabel(organizationDomain)
     }
     if (characterKind) {
       return resolveLocationInverseCharacterAddSubmitLabel(characterKind)
@@ -252,7 +252,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     !isSubmitting &&
     ((effectiveSubjectType === 'organization' &&
       selectedOrganizationId &&
-      organizationKind &&
+      organizationDomain &&
       canAddOrganization) ||
       (effectiveSubjectType === 'character' &&
         selectedCharacterId &&
@@ -261,8 +261,11 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   )
 
   const handleSubmit = async () => {
-    if (effectiveSubjectType === 'organization' && selectedOrganizationId && organizationKind) {
-      await onOrganizationSubmit({ organizationId: selectedOrganizationId, kind: organizationKind })
+    if (effectiveSubjectType === 'organization' && selectedOrganizationId && organizationDomain) {
+      await onOrganizationSubmit({
+        organizationId: selectedOrganizationId,
+        kind: organizationDomain,
+      })
       return
     }
 
@@ -348,11 +351,11 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       <CatalogEntityPickerSheet
         {...sharedSheetProps}
         searchPlaceholder={
-          resolveLocationInverseOrganizationTargetPresentation(organizationKind).searchPlaceholder
+          resolveLocationInverseOrganizationTargetPresentation(organizationDomain).searchPlaceholder
         }
         noItemsMessage="No organizations are available."
         footer={
-          showEntityPicker && selectedOrganizationId && organizationKind ? (
+          showEntityPicker && selectedOrganizationId && organizationDomain ? (
             <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
               {submitLabel}
             </Button>
@@ -362,14 +365,14 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         getItemKey={(organization) => organization.id}
         getItemToolbarLabel={(organization) => organization.name}
         getSearchText={(organization) =>
-          [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
+          [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(' ')
         }
         renderEntityRow={createCatalogEntityRowRenderer({
           buildEntity: (organization) =>
             buildOrganizationPickerEntitySummary(organization, {
               imageKey: organization.imageKey,
               description:
-                organizationKind != null &&
+                organizationDomain != null &&
                 !organizationInverseSubjectHasAvailableKind(
                   organization.id,
                   location.id,
@@ -382,7 +385,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           buildTrailing: (organization) => {
             const isSelected = selectedOrganizationId === organization.id
             const hasAvailableKind =
-              organizationKind != null &&
+              organizationDomain != null &&
               organizationInverseSubjectHasAvailableKind(
                 organization.id,
                 location.id,

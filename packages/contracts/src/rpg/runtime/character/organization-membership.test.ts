@@ -58,8 +58,7 @@ describe('resolveOrganizationMembershipPriority', () => {
     expect(
       resolveOrganizationMembershipPriority({
         membership: { title: 'Guildmaster', priority: 15 },
-        kind: 'professional',
-        subtype: 'craft_guild',
+        domain: 'occupational',
       }),
     ).toBe(15)
   })
@@ -68,8 +67,7 @@ describe('resolveOrganizationMembershipPriority', () => {
     expect(
       resolveOrganizationMembershipPriority({
         membership: { title: 'Guildmaster' },
-        kind: 'professional',
-        subtype: 'craft_guild',
+        domain: 'occupational',
       }),
     ).toBe(50)
   })
@@ -78,13 +76,13 @@ describe('resolveOrganizationMembershipPriority', () => {
     expect(
       resolveOrganizationMembershipPriority({
         membership: {},
-        kind: 'professional',
+        domain: 'occupational',
       }),
     ).toBeUndefined()
     expect(
       resolveOrganizationMembershipPriority({
         membership: { title: 'Custom Chronicler' },
-        kind: 'professional',
+        domain: 'occupational',
       }),
     ).toBeUndefined()
   })
@@ -117,8 +115,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('stamps canonical title with that entry priority', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        kind: 'professional',
-        subtype: 'craft_guild',
+        domain: 'occupational',
         selectedTitle: 'Guildmaster',
       }),
     ).toEqual({ title: 'Guildmaster', priority: 50 })
@@ -127,7 +124,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('clears title and priority for No title', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        kind: 'professional',
+        domain: 'occupational',
         selectedTitle: undefined,
         currentMembership: { title: 'Guildmaster', priority: 50 },
       }),
@@ -137,7 +134,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('preserves explicit priority for custom/historical titles', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        kind: 'professional',
+        domain: 'occupational',
         selectedTitle: 'Custom Chronicler',
         currentMembership: { title: 'Custom Chronicler', priority: 15 },
       }),

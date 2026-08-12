@@ -2,37 +2,41 @@ import { z } from 'zod'
 import {
   ORGANIZATION_ACTIVITY_ENTRIES,
   ORGANIZATION_ACTIVITY_IDS,
-  ORGANIZATION_KIND_ENTRIES,
-  ORGANIZATION_KIND_IDS,
+  ORGANIZATION_DOMAIN_ENTRIES,
+  ORGANIZATION_DOMAIN_IDS,
+  ORGANIZATION_FORM_ENTRIES,
+  ORGANIZATION_FORM_IDS,
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
-  getOrganizationKindEntry,
-  getOrganizationSubtypeIds,
-  getOrganizationSubtypeLabel,
-  isOrganizationSubtypeValidForKind,
   organizationActivitySchema,
-  organizationKindSchema,
-  organizationSubtypeSchema,
+  organizationDomainSchema,
+  organizationFormSchema as canonicalOrganizationFormSchema,
   slugSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
   type ContentValidationIntent,
   type CreateOrganizationInput,
   type Organization,
-  type OrganizationKind,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem, type FormValueSync } from '@rpg/ui/form'
+import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import type { ContentFormCtx, ContentFormInputCtx } from './content-form-registry'
 import { draftOptionalSelect } from './draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
 import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
 
-const organizationKindOptions = toOptions(
-  ORGANIZATION_KIND_IDS,
+const organizationDomainOptions = toOptions(
+  ORGANIZATION_DOMAIN_IDS,
   Object.fromEntries(
-    ORGANIZATION_KIND_IDS.map((id) => [id, ORGANIZATION_KIND_ENTRIES[id].label]),
-  ) as Record<(typeof ORGANIZATION_KIND_IDS)[number], string>,
+    ORGANIZATION_DOMAIN_IDS.map((id) => [id, ORGANIZATION_DOMAIN_ENTRIES[id].label]),
+  ) as Record<(typeof ORGANIZATION_DOMAIN_IDS)[number], string>,
+)
+
+const organizationFormOptions = toOptions(
+  ORGANIZATION_FORM_IDS,
+  Object.fromEntries(
+    ORGANIZATION_FORM_IDS.map((id) => [id, ORGANIZATION_FORM_ENTRIES[id].label]),
+  ) as Record<(typeof ORGANIZATION_FORM_IDS)[number], string>,
 )
 
 const organizationActivityOptions = toOptions(
@@ -46,45 +50,12 @@ function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
 }
 
-function projectionValues(
-  values: Record<string, unknown>,
-  prefix?: string,
-): Record<string, unknown> {
-  if (!prefix) return values
-  const nested = values[prefix]
-  return nested && typeof nested === 'object' ? (nested as Record<string, unknown>) : {}
-}
-
-function resolveOrganizationSubtypeFieldOptions(
-  values: Record<string, unknown>,
-  prefix?: string,
-): readonly FieldOption[] {
-  const kind = projectionValues(values, prefix).organizationKind
-  if (typeof kind !== 'string' || getOrganizationKindEntry(kind) === undefined) return []
-  return getOrganizationSubtypeIds(kind as OrganizationKind).map((id) => ({
-    value: id,
-    label: getOrganizationSubtypeLabel(kind as OrganizationKind, id),
-  }))
-}
-
-function visibleWhenOrganizationSubtypeAvailable(prefix?: string) {
-  const kindPath = fieldPath(prefix, 'organizationKind')
-  return {
-    dependsOn: [kindPath],
-    visibleWhen: (watched: Record<string, unknown>) => {
-      const kind = watched[kindPath]
-      if (typeof kind !== 'string' || getOrganizationKindEntry(kind) === undefined) return false
-      return getOrganizationSubtypeIds(kind as OrganizationKind).length > 0
-    },
-  }
-}
-
 export const organizationFormSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
   description: z.string().optional(),
-  organizationKind: organizationKindSchema,
-  organizationSubtype: organizationSubtypeSchema.optional(),
+  organizationDomain: organizationDomainSchema,
+  organizationForm: canonicalOrganizationFormSchema.optional(),
   activities: z.array(organizationActivitySchema).default([]),
 })
 
@@ -92,8 +63,8 @@ export const organizationDraftFormSchema = z.object({
   name: z.string(),
   slug: slugSchema.optional(),
   description: z.string().optional(),
-  organizationKind: draftOptionalSelect(organizationKindSchema),
-  organizationSubtype: draftOptionalSelect(organizationSubtypeSchema),
+  organizationDomain: draftOptionalSelect(organizationDomainSchema),
+  organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
   activities: z.array(organizationActivitySchema).default([]),
 })
 
@@ -108,7 +79,7 @@ export function buildOrganizationFields(
   options: { prefix?: string; includeName?: boolean } = {},
 ): FormItem[] {
   const { prefix, includeName = false } = options
-  const kindPath = fieldPath(prefix, 'organizationKind')
+  const domainPath = fieldPath(prefix, 'organizationDomain')
   const fields: FormItem[] = []
 
   if (includeName) {
@@ -119,26 +90,22 @@ export function buildOrganizationFields(
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
     {
       type: 'chips',
-      name: kindPath,
-      label: 'Type',
-      options: organizationKindOptions,
+      name: domainPath,
+      label: 'Domain',
+      options: organizationDomainOptions,
       multiple: false,
       required: true,
       chrome: { variant: 'outline' },
     },
     {
       type: 'select',
-      name: fieldPath(prefix, 'organizationSubtype'),
-      label: 'Subtype',
-      optionsResolve: {
-        dependsOn: [kindPath],
-        optionsWhen: (values) => resolveOrganizationSubtypeFieldOptions(values, prefix),
-      },
-      placeholder: 'Select subtype…',
-      visibility: visibleWhenOrganizationSubtypeAvailable(prefix),
+      name: fieldPath(prefix, 'organizationForm'),
+      label: 'Form',
+      options: organizationFormOptions,
+      placeholder: 'Select form…',
       optionalDisclosure: {
-        addLabel: 'Add subtype',
-        removeLabel: 'Remove subtype',
+        addLabel: 'Add form',
+        removeLabel: 'Remove form',
       },
     },
     {
@@ -159,8 +126,8 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
-    organizationKind: entity.organizationKind,
-    organizationSubtype: entity.organizationSubtype,
+    organizationDomain: entity.organizationDomain,
+    organizationForm: entity.organizationForm,
     activities: entity.activities,
   }
 }
@@ -180,45 +147,25 @@ export function buildOrganizationCreateInput(
         ? updateOrganizationInputSchema
         : createOrganizationInputSchema
 
-  const hasSubtype =
-    typeof values.organizationSubtype === 'string' && values.organizationSubtype.length > 0
+  const hasForm = typeof values.organizationForm === 'string' && values.organizationForm.length > 0
 
   const input = schema.parse({
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
     activities: values.activities ?? [],
-    ...(values.organizationKind !== undefined ? { organizationKind: values.organizationKind } : {}),
-    ...(hasSubtype
-      ? { organizationSubtype: values.organizationSubtype }
+    ...(values.organizationDomain !== undefined
+      ? { organizationDomain: values.organizationDomain }
+      : {}),
+    ...(hasForm
+      ? { organizationForm: values.organizationForm }
       : isEdit
-        ? { organizationSubtype: null }
+        ? { organizationForm: null }
         : {}),
   })
   return finalizeContentInput(input, ctx) as CreateOrganizationInput
 }
 
-export function buildOrganizationFormValueSyncs(prefix?: string): FormValueSync[] {
-  const kindPath = fieldPath(prefix, 'organizationKind')
-  const subtypePath = fieldPath(prefix, 'organizationSubtype')
-  return [
-    {
-      dependsOn: [kindPath],
-      apply: (values, changedKeys) => {
-        if (!changedKeys.includes(kindPath)) return undefined
-        const organizationValues = projectionValues(values, prefix)
-        const kind = organizationValues.organizationKind
-        const subtype = organizationValues.organizationSubtype
-        if (typeof subtype !== 'string' || subtype === '') return undefined
-        if (
-          typeof kind !== 'string' ||
-          kind === '' ||
-          !isOrganizationSubtypeValidForKind(kind as OrganizationKind, subtype)
-        ) {
-          return { [subtypePath]: undefined }
-        }
-        return undefined
-      },
-    },
-  ]
+export function buildOrganizationFormValueSyncs(_prefix?: string): FormValueSync[] {
+  return []
 }

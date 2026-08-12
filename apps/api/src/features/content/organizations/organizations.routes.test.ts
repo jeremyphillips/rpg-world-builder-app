@@ -9,7 +9,7 @@ const getApp = useIntegrationApp()
 const minimalOrganizationInput = {
   slug: 'emerald-concord',
   name: 'Emerald Concord',
-  organizationKind: 'political',
+  organizationDomain: 'political',
   activities: ['worship'],
 } as const
 
@@ -27,7 +27,7 @@ describe('organization content routes', () => {
     const organization = createRes.body.organizations
     expect(organization).toMatchObject({
       name: 'Emerald Concord',
-      organizationKind: 'political',
+      organizationDomain: 'political',
       activities: ['worship'],
       source: 'homebrew',
       status: 'published',
@@ -43,13 +43,13 @@ describe('organization content routes', () => {
       .patch(`/api/campaigns/${campaignId}/content/organizations/${organization.id}`)
       .set(CSRF_HEADER, csrfToken)
       .send({
-        organizationKind: 'academic',
+        organizationDomain: 'academic',
         description: 'A learned society.',
         activities: ['brewing', 'blacksmithing'],
       })
       .expect(200)
     expect(updateRes.body.organizations).toMatchObject({
-      organizationKind: 'academic',
+      organizationDomain: 'academic',
       description: 'A learned society.',
       activities: ['brewing', 'blacksmithing'],
     })
@@ -61,7 +61,7 @@ describe('organization content routes', () => {
       .expect(201)
     expect(duplicateRes.body.organizations).toMatchObject({
       name: 'Emerald Concord Chapter',
-      organizationKind: 'academic',
+      organizationDomain: 'academic',
       activities: ['brewing', 'blacksmithing'],
       status: 'draft',
     })
@@ -94,7 +94,7 @@ describe('organization content routes', () => {
       .send({
         slug: 'duplicate-brewers',
         name: 'Duplicate Brewers',
-        organizationKind: 'commercial',
+        organizationDomain: 'commercial',
         activities: ['brewing', 'brewing'],
       })
       .expect(400)
@@ -112,7 +112,7 @@ describe('organization content routes', () => {
 
     const organizationId = createRes.body.organizations.id as string
     expect(createRes.body.organizations).toMatchObject({ status: 'draft' })
-    expect(createRes.body.organizations.organizationKind).toBeUndefined()
+    expect(createRes.body.organizations.organizationDomain).toBeUndefined()
 
     await agent
       .post(`/api/campaigns/${campaignId}/content/organizations/${organizationId}/publish`)
@@ -122,7 +122,7 @@ describe('organization content routes', () => {
     await agent
       .patch(`/api/campaigns/${campaignId}/content/organizations/${organizationId}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ name: 'Unfinished Order', organizationKind: 'religious' })
+      .send({ name: 'Unfinished Order', organizationDomain: 'religious' })
       .expect(200)
 
     const publishRes = await agent

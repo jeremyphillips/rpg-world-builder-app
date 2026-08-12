@@ -1,11 +1,11 @@
-import type { OrganizationKind } from '@rpg/contracts'
+import type { OrganizationDomain } from '@rpg/contracts'
 
 import type { OrganizationMemberPickerCandidate } from './organization-member-picker-drawer.client'
 
 export const ORGANIZATION_MEMBER_PICKER_ORGANIZATION = {
   id: 'organization-lantern-guild',
   name: 'Lantern Guild',
-  organizationKind: 'professional' as OrganizationKind,
+  organizationDomain: 'occupational' as OrganizationDomain,
 }
 
 /** Shuffled input order — the drawer sorts non-members first, then sinks existing members. */

@@ -51,7 +51,7 @@ type DrawerState =
 export function useOrganizationLocationConnectionsDetail(
   campaignId: string,
   organizationId: string,
-  organization: Pick<Organization, 'name' | 'organizationKind'>,
+  organization: Pick<Organization, 'name' | 'organizationDomain'>,
 ) {
   const canManage = useCanManageCampaign(campaignId)
   const locationsQuery = useLocations(campaignId)

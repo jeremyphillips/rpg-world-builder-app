@@ -21,7 +21,7 @@ useIntegrationDb()
 const minimalOrganizationInput = {
   slug: 'thieves-guild',
   name: "Thieves' Guild",
-  organizationKind: 'criminal',
+  organizationDomain: 'criminal',
 } as const
 
 function membershipsPath(campaignId: string, characterId: string, organizationId?: string) {
@@ -118,7 +118,7 @@ describe('character organization membership nested routes', () => {
       ...minimalOrganizationInput,
       slug: 'legacy-guild',
       name: 'Legacy Guild',
-      organizationKind: 'professional',
+      organizationDomain: 'occupational',
     })
     const { character: npc } = await createCampaignNpc(campaignId, {
       ...minimalNpcRequestInput,

@@ -7,7 +7,7 @@ import {
   resolveOrganizationMembershipMetadata,
   type CampaignNpcDetail,
   type CharacterBuildContext,
-  type OrganizationKind,
+  type OrganizationDomain,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 import { CreateSetupSummary } from '@/lib/create-setup'
@@ -56,8 +56,8 @@ export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as c
 export type QuickNpcCreateFormOrganization = {
   id: string
   name: string
-  organizationKind: OrganizationKind
-  organizationSubtype?: string
+  organizationDomain: OrganizationDomain
+  organizationForm?: string
 }
 
 export type QuickNpcAuthoringFormProps = {
@@ -75,9 +75,9 @@ export type QuickNpcAuthoringFormProps = {
 
 function resolveMembership(organization: QuickNpcCreateFormOrganization) {
   return {
-    kind: organization.organizationKind,
-    ...(organization.organizationSubtype !== undefined
-      ? { subtype: organization.organizationSubtype }
+    kind: organization.organizationDomain,
+    ...(organization.organizationForm !== undefined
+      ? { subtype: organization.organizationForm }
       : {}),
   }
 }
@@ -257,10 +257,7 @@ export function QuickNpcAuthoringForm({
 
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
-        kind: organization.organizationKind,
-        ...(organization.organizationSubtype !== undefined
-          ? { subtype: organization.organizationSubtype }
-          : {}),
+        domain: organization.organizationDomain,
         selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
       })
 

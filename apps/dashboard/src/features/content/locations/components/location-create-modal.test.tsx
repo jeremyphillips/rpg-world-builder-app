@@ -365,7 +365,7 @@ describe('LocationCreateModal', () => {
     expect(submission?.buildingCreateInput).not.toHaveProperty('classification')
     expect(submission?.operatorCreateInput).toMatchObject({
       name: 'Ironroot Smiths',
-      organizationKind: 'commercial',
+      organizationDomain: 'commercial',
       activities: ['blacksmithing'],
     })
   })
@@ -395,7 +395,7 @@ describe('LocationCreateModal', () => {
       },
       operatorCreateInput: {
         name: 'Red Dragon Brewing Company',
-        organizationKind: 'commercial',
+        organizationDomain: 'commercial',
         activities: ['brewing'],
       },
     })
@@ -432,11 +432,11 @@ describe('LocationCreateModal', () => {
       },
       operatorCreateInput: {
         name: 'Dawn Congregation',
-        organizationKind: 'religious',
+        organizationDomain: 'religious',
         activities: ['worship'],
       },
     })
-    expect(submission?.operatorCreateInput).not.toHaveProperty('organizationSubtype')
+    expect(submission?.operatorCreateInput).not.toHaveProperty('organizationForm')
     expect(submission?.operatorCreateInput).not.toHaveProperty('institutionType')
     const classification = (
       submission?.buildingCreateInput as {

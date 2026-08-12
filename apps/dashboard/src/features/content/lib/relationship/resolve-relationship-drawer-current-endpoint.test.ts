@@ -28,7 +28,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         organizations: [
           {
             id: 'org-1',
-            organizationKind: 'government',
+            organizationDomain: 'government',
             imageKey: 'img-1',
           },
         ],

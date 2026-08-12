@@ -9,7 +9,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membershi
 
 describe('buildOrganizationMembershipTitleRadioOptions', () => {
   it('includes No title and kind suggestions', () => {
-    const options = buildOrganizationMembershipTitleRadioOptions({ kind: 'professional' })
+    const options = buildOrganizationMembershipTitleRadioOptions({ kind: 'occupational' })
     expect(options[0]).toEqual({
       value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       label: 'No title',
@@ -19,7 +19,7 @@ describe('buildOrganizationMembershipTitleRadioOptions', () => {
 
   it('appends an unrecognized current value as a current-value option', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      kind: 'professional',
+      kind: 'occupational',
       currentValue: 'Custom Chronicler',
     })
     expect(options.at(-1)).toEqual({ value: 'Custom Chronicler', label: 'Custom Chronicler' })
@@ -27,7 +27,7 @@ describe('buildOrganizationMembershipTitleRadioOptions', () => {
 
   it('does not duplicate a suggestion that matches the current value', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      kind: 'professional',
+      kind: 'occupational',
       currentValue: 'Guildmaster',
     })
     expect(options.filter((option) => option.value === 'Guildmaster')).toHaveLength(1)

@@ -19,7 +19,7 @@ import {
   getCharacterLocationConnectionDisplayLabel,
   getCharacterTotalLevel,
   getMovementModeLabel,
-  getOrganizationKindLabel,
+  getOrganizationDomainLabel,
   MOVEMENT_MODES,
   proficiencyBonus,
   resolveCharacterXpDisplay,
@@ -427,8 +427,8 @@ export function buildCharacterDetailViewModel({
       label: organization?.name ?? UNAVAILABLE_ORGANIZATION_LABEL,
       detail: title
         ? title
-        : organization?.organizationKind
-          ? getOrganizationKindLabel(organization.organizationKind)
+        : organization?.organizationDomain
+          ? getOrganizationDomainLabel(organization.organizationDomain)
           : organization
             ? 'Type not set'
             : 'This organization is missing or no longer available.',

@@ -23,7 +23,7 @@ function ControlledTitleField(
 export const Default: Story = {
   render: () => (
     <ControlledTitleField
-      kind="professional"
+      kind="occupational"
       value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
       idPrefix="story-membership"
     />
@@ -33,7 +33,7 @@ export const Default: Story = {
 export const HistoricalTitle: Story = {
   render: () => (
     <ControlledTitleField
-      kind="professional"
+      kind="occupational"
       value="Custom Chronicler"
       idPrefix="story-membership-historical"
     />

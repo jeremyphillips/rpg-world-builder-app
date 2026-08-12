@@ -1,4 +1,8 @@
-import { getOrganizationKindLabel, ORGANIZATION_KIND_IDS, type Organization } from '@rpg/contracts'
+import {
+  getOrganizationDomainLabel,
+  ORGANIZATION_DOMAIN_IDS,
+  type Organization,
+} from '@rpg/contracts'
 import { normalizeSearchQuery } from '@rpg/ui'
 
 import {
@@ -18,7 +22,7 @@ export const ORGANIZATION_PICKER_VIEW_DEFAULTS = {
 } as const
 
 export function getOrganizationPickerSearchText(organization: Organization): string {
-  return `${organization.name} ${getOrganizationKindLabel(organization.organizationKind)}`
+  return `${organization.name} ${getOrganizationDomainLabel(organization.organizationDomain)}`
 }
 
 export function filterAndSortOrganizationPickerItems(
@@ -34,7 +38,7 @@ export function filterAndSortOrganizationPickerItems(
     .filter(({ organization }) => {
       if (
         options.type !== ORGANIZATION_PICKER_ALL_TYPES &&
-        organization.organizationKind !== options.type
+        organization.organizationDomain !== options.type
       ) {
         return false
       }
@@ -51,12 +55,12 @@ export function filterAndSortOrganizationPickerItems(
 export function buildOrganizationPickerTypeOptions(
   organizations: readonly Organization[],
 ): { value: OrganizationPickerTypeFilter; label: string }[] {
-  const availableKinds = new Set(organizations.map(({ organizationKind }) => organizationKind))
+  const availableKinds = new Set(organizations.map(({ organizationDomain }) => organizationDomain))
   return [
     { value: ORGANIZATION_PICKER_ALL_TYPES, label: 'All types' },
-    ...ORGANIZATION_KIND_IDS.filter((kind) => availableKinds.has(kind)).map((kind) => ({
+    ...ORGANIZATION_DOMAIN_IDS.filter((kind) => availableKinds.has(kind)).map((kind) => ({
       value: kind,
-      label: getOrganizationKindLabel(kind),
+      label: getOrganizationDomainLabel(kind),
     })),
   ]
 }

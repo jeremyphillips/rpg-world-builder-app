@@ -1,7 +1,7 @@
 import type {
   CharacterOrganizationConnection,
   Organization,
-  OrganizationKind,
+  OrganizationDomain,
 } from '@rpg/contracts'
 
 export const ORGANIZATION_PICKER_ALL_TYPES = 'all'
@@ -13,7 +13,7 @@ export const ORGANIZATION_PICKER_DESCRIPTION = 'Choose an organization connected
 
 export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 
-export type OrganizationPickerTypeFilter = typeof ORGANIZATION_PICKER_ALL_TYPES | OrganizationKind
+export type OrganizationPickerTypeFilter = typeof ORGANIZATION_PICKER_ALL_TYPES | OrganizationDomain
 
 export type OrganizationPickerItem = {
   organization: Organization

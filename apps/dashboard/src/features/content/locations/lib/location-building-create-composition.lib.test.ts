@@ -20,8 +20,8 @@ const buildingCreateInput = {
 const operatorCreateInput = {
   name: 'Red Dragon Brewing Company',
   slug: 'red-dragon-brewing-company',
-  organizationKind: 'commercial',
-  organizationSubtype: 'company',
+  organizationDomain: 'commercial',
+  organizationForm: 'company',
   activities: ['brewing'],
 } as CreateOrganizationInput
 
@@ -30,7 +30,7 @@ describe('Building operator form composition', () => {
     expect(() =>
       locationBuildingCreateDraftFormSchema.parse({
         name: 'The Copper Kettle',
-        operatorOrganization: { name: '', organizationKind: '', activities: [] },
+        operatorOrganization: { name: '', organizationDomain: '', activities: [] },
       }),
     ).not.toThrow()
 
@@ -39,8 +39,8 @@ describe('Building operator form composition', () => {
         name: 'The Copper Kettle',
         operatorOrganization: {
           name: 'Red Dragon Brewing Company',
-          organizationKind: 'commercial',
-          organizationSubtype: 'company',
+          organizationDomain: 'commercial',
+          organizationForm: 'company',
           activities: ['brewing'],
         },
       } as unknown as LocationBuildingCreateFormValues),

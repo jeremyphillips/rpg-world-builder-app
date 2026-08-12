@@ -14,7 +14,7 @@ export const lanternGuild: Organization = {
   createdAt: timestamp,
   updatedAt: timestamp,
   name: 'Lantern Guild',
-  organizationKind: 'professional',
+  organizationDomain: 'occupational',
   activities: [],
   description: '<p>Guides and cartographers who keep the old roads open.</p>',
   connections: { locations: [] },
@@ -25,7 +25,7 @@ export const cityCouncil: Organization = {
   id: 'organization-city-council',
   slug: 'city-council',
   name: 'City Council',
-  organizationKind: 'government',
+  organizationDomain: 'government',
 }
 
 export const silverCircle: Organization = {
@@ -33,7 +33,7 @@ export const silverCircle: Organization = {
   id: 'organization-silver-circle',
   slug: 'silver-circle',
   name: 'Silver Circle',
-  organizationKind: 'academic',
+  organizationDomain: 'academic',
 }
 
 export const organizationPickerItems: OrganizationPickerItem[] = [

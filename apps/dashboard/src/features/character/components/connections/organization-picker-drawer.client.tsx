@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import { getOrganizationDomainLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Button, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
@@ -90,10 +90,7 @@ export function OrganizationPickerDrawer({
       if (pending) return
 
       const { title, priority } = resolveOrganizationMembershipMetadata({
-        kind: organization.organizationKind,
-        ...(organization.organizationSubtype !== undefined
-          ? { subtype: organization.organizationSubtype }
-          : {}),
+        domain: organization.organizationDomain,
         selectedTitle: titleFromMembershipRadioValue(selectedTitle),
       })
       const membership: OrganizationMembershipSelection = {
@@ -187,7 +184,7 @@ export function OrganizationPickerDrawer({
                       segments: [
                         {
                           type: 'text',
-                          text: getOrganizationKindLabel(organization.organizationKind),
+                          text: getOrganizationDomainLabel(organization.organizationDomain),
                         },
                       ],
                     },
@@ -218,8 +215,8 @@ export function OrganizationPickerDrawer({
         return (
           <div className="flex flex-col gap-4">
             <OrganizationMembershipTitleField
-              kind={organization.organizationKind}
-              subtype={organization.organizationSubtype}
+              kind={organization.organizationDomain}
+              subtype={organization.organizationForm}
               value={
                 expandedItemId === organization.id
                   ? selectedTitle

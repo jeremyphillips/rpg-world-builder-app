@@ -114,7 +114,7 @@ describe('buildQuickNpcContentOptions', () => {
 describe('buildQuickNpcDetailsFields', () => {
   it('includes the canonical membership title radio with a No title default', () => {
     const fields = buildQuickNpcDetailsFields({
-      membership: { kind: 'professional' },
+      membership: { kind: 'occupational' },
     })
 
     const titleField = fields.find(
@@ -157,7 +157,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('declares explicit ownership for the name field with trailing action', () => {
     const tabs = buildQuickNpcTabs({
       detailsFields: buildQuickNpcDetailsFields({
-        membership: { kind: 'professional' },
+        membership: { kind: 'occupational' },
         nameTrailingAction: {
           label: 'Generate',
           onAction: () => {},
