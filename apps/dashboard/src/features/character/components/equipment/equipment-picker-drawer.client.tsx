@@ -59,7 +59,7 @@ import {
 } from './equipment-picker-drawer.types'
 import { EquipmentBudgetHeader } from './equipment-budget-header.client'
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
-import { EquipmentPickerItemRail } from './equipment-picker-item-rail.client'
+import { EquipmentPickerDisclosureRow } from './equipment-picker-disclosure-row.client'
 import {
   clampEquipmentStepQuantity,
   resolveEquipmentStepPurchaseMaxQuantity,
@@ -539,7 +539,8 @@ export function EquipmentPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
+      renderCollapsibleRow={(rowArgs) => {
+        const item = rowArgs.item
         const rowActionVm = resolveRowVm(item, 1)
         const presentation = resolveEquipmentPickerDrawerItemHeaderPresentation({
           item,
@@ -556,8 +557,8 @@ export function EquipmentPickerDrawer({
         const canQuickAdd = presentation.action.kind === 'add' && !presentation.action.disabled
 
         return (
-          <EquipmentPickerItemRail
-            item={item}
+          <EquipmentPickerDisclosureRow
+            rowArgs={rowArgs}
             presentation={presentation}
             ownedQuantity={ownedQuantity}
             isGoldShoppingPath={isGoldShoppingPath}

@@ -150,6 +150,31 @@ describe('DetailEntityRow', () => {
     expect(screen.getByText('Preview child')).toBeInTheDocument()
   })
 
+  it('publishes compact surface inset on self-inset disclosure rows', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Dock Ward"
+          headingHref="/locations/dock-ward"
+          disclosure={{
+            mode: 'expandable',
+            label: 'locations in Dock Ward',
+            content: <span>Preview child</span>,
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    const disclosureRoot = screen.getByRole('link', { name: 'Dock Ward' }).closest('[style]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+
+    const headerRow = disclosureRoot?.firstElementChild as HTMLElement
+    expect(headerRow.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
+
+    expect(container.querySelector('[id]')).toBeNull()
+  })
+
   it('owns disclosure gutter inset on the expanded region wrapper', async () => {
     const user = userEvent.setup()
 
@@ -170,9 +195,8 @@ describe('DetailEntityRow', () => {
     await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
 
     const expandedRegion = container.querySelector('[id]')
-    expect(expandedRegion).toHaveClass(
-      'pl-[calc(calc(var(--spacing)*4)+var(--entity-content-offset))]',
-    )
+    expect(expandedRegion).toHaveClass('pl-[var(--entity-body-inline-start)]')
+    expect(expandedRegion).toHaveClass('pr-[var(--entity-surface-inline-end)]')
     expect(expandedRegion?.firstElementChild).toHaveClass(
       'border-l',
       'border-border-subtle',

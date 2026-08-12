@@ -392,11 +392,11 @@ prevent regression:
 Documented policy is authoritative. These items may still exist in code and are tracked
 for cleanup — do not weaken docs to match legacy patterns:
 
-| Item                                                         | Status                                                               |
-| ------------------------------------------------------------ | -------------------------------------------------------------------- |
-| Non-entity ArrayItem CLI content-column indent               | **Intentional** for anonymous form arrays only                       |
-| `DetailEntityRow.endSlot`                                    | **Intentional** for non-entity detail hosts — not for EntityItem/DEC |
-| Catalog picker `rowLayout="entity-card"` embedded EntityItem | Host drops catalog inset; verify hosts do not double-apply           |
+| Item                                                             | Status                                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Non-entity ArrayItem CLI content-column indent                   | **Intentional** for anonymous form arrays only                                  |
+| `DetailEntityRow.endSlot`                                        | **Intentional** for non-entity detail hosts — not for EntityItem/DEC            |
+| Catalog picker entity-disclosure rows via `renderCollapsibleRow` | **Migrated** — dashboard `CatalogEntityDisclosureRow` owns surface/inset/header |
 
 ---
 

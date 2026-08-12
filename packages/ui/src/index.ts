@@ -643,6 +643,7 @@ export {
   type CatalogPickerTab,
   type CatalogPickerRowLayout,
   type CatalogPickerAuxiliaryAction,
+  type CatalogPickerCollapsibleRowRenderArgs,
   type CatalogToolbarProps,
   type CatalogToolbarSearch,
   type CatalogToolbarTab,

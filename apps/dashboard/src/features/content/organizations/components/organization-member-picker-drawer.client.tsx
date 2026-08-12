@@ -8,6 +8,7 @@ import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
 import {
   CatalogPickerMetadataRenderer,
   CatalogPickerSelectionActions,
+  CatalogEntityDisclosureRow,
   catalogPickerShellProps,
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -15,7 +16,6 @@ import {
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
-import { EntityItem } from '../../lib/content-entity-card.client'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -183,16 +183,27 @@ export function OrganizationMemberPickerDrawer({
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
-      renderItemHeader={(candidate) => {
-        const identityLine = formatCandidateIdentityLine(candidate)
+      renderCollapsibleRow={(args) => {
+        const candidate = args.item
 
         return (
-          <EntityItem
+          <CatalogEntityDisclosureRow
+            toolbarLabel={args.toolbarLabel}
+            domIds={args.domIds}
+            collapsible={args.collapsible}
+            collapsed={args.collapsed}
+            onToggleCollapse={args.onToggleCollapse}
+            summary={args.summary}
+            details={args.details}
             entity={{
               heading: candidate.name,
-              description: identityLine ? (
+              description: formatCandidateIdentityLine(candidate) ? (
                 <CatalogPickerMetadataRenderer
-                  lines={[{ segments: [{ type: 'text', text: identityLine }] }]}
+                  lines={[
+                    {
+                      segments: [{ type: 'text', text: formatCandidateIdentityLine(candidate)! }],
+                    },
+                  ]}
                 />
               ) : undefined,
               status: candidate.isMember
@@ -203,7 +214,6 @@ export function OrganizationMemberPickerDrawer({
                   ]
                 : undefined,
             }}
-            density="compact"
             trailing={{
               kind: 'action',
               content: candidate.isMember ? (

@@ -50,9 +50,26 @@ describe('entity item anatomy guard', () => {
 
     expect(decSource).toMatch(/rowLayout="entity-card"/)
     expect(decSource).toMatch(/toolbarLeadingChrome="none"/)
-    expect(decSource).toMatch(/leadingUtilities=/)
+    expect(decSource).toMatch(/EntityDisclosureHeaderAnatomy/)
     expect(decSource).not.toMatch(/\bEntityLeadingRail\b/)
     expect(decSource).not.toMatch(/\bclassName=\{[^}]*px-/)
     expect(decSource).not.toMatch(/\bclassName=\{[^}]*py-/)
+  })
+
+  it('does not export EntityDisclosureHeaderAnatomy from the content feature barrel', () => {
+    const barrelSource = readFileSync(join(ENTITY_ROOT, '../../index.ts'), 'utf8')
+
+    expect(barrelSource).not.toMatch(/EntityDisclosureHeaderAnatomy/)
+  })
+
+  it('keeps catalog entity disclosure row on entity-card CLI mode with shared anatomy', () => {
+    const catalogRowSource = readFileSync(
+      join(ENTITY_ROOT, 'catalog-entity-disclosure-row.client.tsx'),
+      'utf8',
+    )
+
+    expect(catalogRowSource).toMatch(/rowLayout="entity-card"/)
+    expect(catalogRowSource).toMatch(/toolbarLeadingChrome="none"/)
+    expect(catalogRowSource).toMatch(/EntityDisclosureHeaderAnatomy/)
   })
 })

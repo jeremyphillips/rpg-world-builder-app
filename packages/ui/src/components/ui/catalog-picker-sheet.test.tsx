@@ -398,6 +398,31 @@ describe('CatalogPickerSheet', () => {
     expect(rowShell).not.toHaveClass('pl-2')
   })
 
+  it('delegates row rendering to renderCollapsibleRow when provided', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemDetails={(item) => <p>{item.name} details</p>}
+        renderCollapsibleRow={(args) => (
+          <div data-testid="custom-row">
+            <span>{args.item.name}</span>
+            <span data-testid="collapsible">{String(args.collapsible)}</span>
+            {args.details}
+          </div>
+        )}
+      />,
+    )
+
+    expect(screen.getAllByTestId('custom-row')).toHaveLength(items.length)
+    expect(screen.getAllByTestId('collapsible')[0]).toHaveTextContent('true')
+    expect(screen.queryByRole('group')).not.toBeInTheDocument()
+  })
+
   it('does not reduce toolbar bottom padding when auxiliaryAction is absent', () => {
     render(
       <CatalogPickerSheet

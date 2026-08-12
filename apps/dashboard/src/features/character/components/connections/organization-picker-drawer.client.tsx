@@ -5,8 +5,8 @@ import * as React from 'react'
 import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
-import { EntityItem } from '@/features/content'
 import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
+import { CatalogEntityDisclosureRow } from '@/features/content'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
@@ -168,51 +168,61 @@ export function OrganizationPickerDrawer({
           </div>
         ),
       }}
-      renderItemHeader={({ organization, selected }) => (
-        <EntityItem
-          entity={{
-            heading: organization.name,
-            description: (
-              <CatalogPickerMetadataRenderer
-                lines={[
-                  {
-                    segments: [
-                      {
-                        type: 'text',
-                        text: getOrganizationKindLabel(organization.organizationKind),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            ),
-            status: selected
-              ? [
-                  <Badge key="added" tone="success">
-                    Added
-                  </Badge>,
-                ]
-              : undefined,
-          }}
-          density="compact"
-          trailing={{
-            kind: 'action',
-            content: selected ? (
-              <CatalogPickerSelectionActions
-                phase="success"
-                onAdd={() => undefined}
-                onRemove={() => undefined}
-              />
-            ) : (
-              <CatalogPickerSelectionActions
-                canSelect
-                onAdd={() => handleExpandedItemChange(organization.id)}
-                onRemove={() => undefined}
-              />
-            ),
-          }}
-        />
-      )}
+      renderCollapsibleRow={(args) => {
+        const { organization, selected } = args.item
+
+        return (
+          <CatalogEntityDisclosureRow
+            toolbarLabel={args.toolbarLabel}
+            domIds={args.domIds}
+            collapsible={args.collapsible}
+            collapsed={args.collapsed}
+            onToggleCollapse={args.onToggleCollapse}
+            summary={args.summary}
+            details={args.details}
+            entity={{
+              heading: organization.name,
+              description: (
+                <CatalogPickerMetadataRenderer
+                  lines={[
+                    {
+                      segments: [
+                        {
+                          type: 'text',
+                          text: getOrganizationKindLabel(organization.organizationKind),
+                        },
+                      ],
+                    },
+                  ]}
+                />
+              ),
+              status: selected
+                ? [
+                    <Badge key="added" tone="success">
+                      Added
+                    </Badge>,
+                  ]
+                : undefined,
+            }}
+            trailing={{
+              kind: 'action',
+              content: selected ? (
+                <CatalogPickerSelectionActions
+                  phase="success"
+                  onAdd={() => undefined}
+                  onRemove={() => undefined}
+                />
+              ) : (
+                <CatalogPickerSelectionActions
+                  canSelect
+                  onAdd={() => handleExpandedItemChange(organization.id)}
+                  onRemove={() => undefined}
+                />
+              ),
+            }}
+          />
+        )
+      }}
       renderItemDetails={({ organization, selected }) => {
         if (selected) return null
         return (

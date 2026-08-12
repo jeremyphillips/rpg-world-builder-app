@@ -78,6 +78,7 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
         kind: 'indicator',
         content: <CharacterEquipmentQuantityLabel quantity={card.quantity} />,
       }}
+      density="compact"
       disabled={header.tone !== 'default'}
     >
       {card.status === 'resolved' ? (

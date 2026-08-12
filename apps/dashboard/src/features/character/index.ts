@@ -54,6 +54,10 @@ export {
   type CatalogPickerMetadataLine,
 } from './components/picker/catalog-picker-metadata'
 export { catalogPickerShellProps } from './components/picker/catalog-picker-shell.lib'
+export {
+  CatalogEntityDisclosureRow,
+  createCatalogEntityDisclosureRowRenderer,
+} from '@/features/content'
 export { resolveCatalogPickerRowActionPhase } from './components/picker/catalog-picker-row-action.lib'
 export { CATALOG_PICKER_COMMIT_SUCCESS_MS } from './components/picker/use-catalog-picker-commit-confirmation.client'
 export {

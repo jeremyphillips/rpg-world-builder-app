@@ -3,7 +3,8 @@
 import * as React from 'react'
 
 import { CatalogPickerSheet, Text } from '@rpg/ui'
-import { EntityItem } from '@/features/content'
+
+import { createCatalogEntityDisclosureRowRenderer } from '@/features/content'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
@@ -151,41 +152,38 @@ export function ProficiencyPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
-        const disabledNote = getProficiencyPickerDisabledNote(item)
+      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+        buildEntity: (item) => {
+          const disabledNote = getProficiencyPickerDisabledNote(item)
 
-        return (
-          <EntityItem
-            entity={{
-              heading: item.label,
-              description: item.compactSummary ? (
-                <CatalogPickerMetadataRenderer
-                  lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
-                />
-              ) : undefined,
-              status: disabledNote
-                ? [
-                    <Text key="disabled-note" variant="muted">
-                      {disabledNote}
-                    </Text>,
-                  ]
-                : undefined,
-            }}
-            density="compact"
-            trailing={{
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  selected={item.state.isAlreadySelected}
-                  canSelect={item.state.canSelect}
-                  onAdd={() => onSelectOption(item.optionId)}
-                  onRemove={() => onRemoveOption(item.optionId)}
-                />
-              ),
-            }}
-          />
-        )
-      }}
+          return {
+            heading: item.label,
+            description: item.compactSummary ? (
+              <CatalogPickerMetadataRenderer
+                lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
+              />
+            ) : undefined,
+            status: disabledNote
+              ? [
+                  <Text key="disabled-note" variant="muted">
+                    {disabledNote}
+                  </Text>,
+                ]
+              : undefined,
+          }
+        },
+        buildTrailing: (item) => ({
+          kind: 'action',
+          content: (
+            <CatalogPickerSelectionActions
+              selected={item.state.isAlreadySelected}
+              canSelect={item.state.canSelect}
+              onAdd={() => onSelectOption(item.optionId)}
+              onRemove={() => onRemoveOption(item.optionId)}
+            />
+          ),
+        }),
+      })}
       renderItemDetails={
         isSkillChoiceSet
           ? (item) => (

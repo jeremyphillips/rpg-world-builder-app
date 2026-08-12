@@ -9,6 +9,7 @@ import { EntityItemAnatomy } from '../../entity/entity-item.client'
 import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
 import { buildEntityContentOffsetStyle } from '../../entity/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
+import { entitySurfaceInsetVariants } from '../../entity/entity-surface-inset.variants'
 import {
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
@@ -134,7 +135,12 @@ export function DetailEntityRow({
 
   return (
     <div
-      className={cn(detailEntityRowDisclosureItemVariants(), className)}
+      className={cn(
+        detailEntityRowDisclosureItemVariants(),
+        inset === 'self' &&
+          entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, leading: true }),
+        className,
+      )}
       style={DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE}
     >
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>

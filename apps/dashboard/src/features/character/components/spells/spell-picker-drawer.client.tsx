@@ -11,7 +11,10 @@ import {
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
-import { CatalogMetadataRenderer, EntityItem } from '@/features/content'
+import {
+  createCatalogEntityDisclosureRowRenderer,
+  CatalogMetadataRenderer,
+} from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
@@ -362,46 +365,43 @@ export function SpellPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
-        const disabledNote = getSpellPickerDisabledNote(item)
-        const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
+      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+        buildEntity: (item) => {
+          const disabledNote = getSpellPickerDisabledNote(item)
+          const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
-        return (
-          <EntityItem
-            entity={{
-              heading: item.spell.name,
-              description: (
-                <CatalogMetadataRenderer
-                  lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
-                />
-              ),
-              status: [
-                ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
-                ...markers,
-                ...(disabledNote
-                  ? [
-                      <Text key="disabled-note" variant="muted">
-                        {disabledNote}
-                      </Text>,
-                    ]
-                  : []),
-              ],
-            }}
-            density="compact"
-            trailing={{
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  selected={item.state.isAlreadySelected}
-                  canSelect={item.state.canSelect}
-                  onAdd={() => onSelectSpell(mode, item.spell.id)}
-                  onRemove={() => onRemoveSpell(mode, item.spell.id)}
-                />
-              ),
-            }}
-          />
-        )
-      }}
+          return {
+            heading: item.spell.name,
+            description: (
+              <CatalogMetadataRenderer
+                lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
+              />
+            ),
+            status: [
+              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
+              ...markers,
+              ...(disabledNote
+                ? [
+                    <Text key="disabled-note" variant="muted">
+                      {disabledNote}
+                    </Text>,
+                  ]
+                : []),
+            ],
+          }
+        },
+        buildTrailing: (item) => ({
+          kind: 'action',
+          content: (
+            <CatalogPickerSelectionActions
+              selected={item.state.isAlreadySelected}
+              canSelect={item.state.canSelect}
+              onAdd={() => onSelectSpell(mode, item.spell.id)}
+              onRemove={() => onRemoveSpell(mode, item.spell.id)}
+            />
+          ),
+        }),
+      })}
       renderItemDetails={(item) => (
         <SpellPickerItemDetails item={item} displayVocabulary={displayVocabulary} />
       )}

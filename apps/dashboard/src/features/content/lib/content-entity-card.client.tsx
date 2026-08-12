@@ -15,6 +15,9 @@ export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
 export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
 export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.client'
+export { CatalogEntityDisclosureRow } from './entity/catalog-entity-disclosure-row.client'
+export type { CatalogEntityDisclosureRowProps } from './entity/catalog-entity-disclosure-row.client'
+export { createCatalogEntityDisclosureRowRenderer } from './entity/catalog-entity-disclosure-row-renderer.client'
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel

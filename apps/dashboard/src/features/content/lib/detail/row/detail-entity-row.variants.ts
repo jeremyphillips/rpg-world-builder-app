@@ -2,10 +2,14 @@ import { cva } from 'class-variance-authority'
 
 import { cn, iconGhostControlVariants } from '@rpg/ui'
 
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
-
-/** Host-owned inline inset for self-contained relationship rows. */
-const DETAIL_ENTITY_ROW_HOST_INLINE_INSET = 'calc(var(--spacing)*4)'
+import {
+  ENTITY_BODY_INLINE_START_VAR,
+  ENTITY_CONTENT_OFFSET_VAR,
+} from '../../entity/entity-leading-rail.lib'
+import {
+  ENTITY_SURFACE_INLINE_END_VAR,
+  entitySurfaceHorizontalInsetClasses,
+} from '../../entity/entity-surface-inset.variants'
 
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
@@ -26,7 +30,7 @@ export const detailEntityRowDisclosureItemVariants = cva('min-w-0')
 export const detailEntityRowDisclosureRowVariants = cva('min-w-0 py-1', {
   variants: {
     inset: {
-      self: 'px-4',
+      self: entitySurfaceHorizontalInsetClasses,
       parent: '',
     },
   },
@@ -43,8 +47,8 @@ export const detailEntityRowDisclosureContentVariants = cva('', {
   variants: {
     inset: {
       self: cn(
-        'pr-4',
-        `pl-[calc(${DETAIL_ENTITY_ROW_HOST_INLINE_INSET}+var(${ENTITY_CONTENT_OFFSET_VAR}))]`,
+        `pl-[var(${ENTITY_BODY_INLINE_START_VAR})]`,
+        `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`,
       ),
       parent: `pl-[var(${ENTITY_CONTENT_OFFSET_VAR})]`,
     },

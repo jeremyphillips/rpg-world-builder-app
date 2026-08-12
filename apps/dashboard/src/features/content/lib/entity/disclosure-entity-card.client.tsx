@@ -3,8 +3,6 @@
 import type { ReactNode } from 'react'
 import {
   CollapsibleListItem,
-  CollapsibleListItemDisclosureTrigger,
-  CollapsibleListItemDragHandleTrigger,
   type CollapsibleListItemDragHandleConfig,
   type ContentCardDensity,
 } from '@rpg/ui'
@@ -13,7 +11,7 @@ import {
   buildEntityContentOffsetStyle,
   resolveEntityLeadingUtilityCount,
 } from './entity-leading-rail.lib'
-import { EntityItemAnatomy } from './entity-item.client'
+import { EntityDisclosureHeaderAnatomy } from './entity-disclosure-header-anatomy.client'
 import type { EntityItemTrailing } from './entity-item-trailing.types'
 import type { EntitySummaryModel } from './entity-summary.types'
 import {
@@ -42,18 +40,6 @@ export type DisclosureEntityCardProps = {
   dragHandleProps?: CollapsibleListItemDragHandleConfig
 }
 
-function resolveDisclosureLeadingUtilities({
-  dragHandle,
-  dragHandleProps,
-}: Pick<DisclosureEntityCardProps, 'dragHandle' | 'dragHandleProps'>): ReactNode[] {
-  const showDragHandle = Boolean(dragHandleProps)
-
-  return [
-    showDragHandle ? (dragHandle ?? <CollapsibleListItemDragHandleTrigger />) : null,
-    <CollapsibleListItemDisclosureTrigger key="disclosure-trigger" />,
-  ].filter((utility) => utility != null) as ReactNode[]
-}
-
 export function DisclosureEntityCard({
   entity,
   itemId,
@@ -70,7 +56,6 @@ export function DisclosureEntityCard({
   dragHandleProps,
 }: DisclosureEntityCardProps) {
   const showDragHandle = Boolean(dragHandleProps)
-  const leadingUtilities = resolveDisclosureLeadingUtilities({ dragHandle, dragHandleProps })
   const leadingUtilityCount = resolveEntityLeadingUtilityCount({
     dragHandle: showDragHandle,
     disclosure: true,
@@ -103,12 +88,13 @@ export function DisclosureEntityCard({
         bodyClassName={disclosureEntityCardBodyWashVariants({ density })}
         header={
           <div className={disclosureEntityCardHeaderPaddingVariants({ density })}>
-            <EntityItemAnatomy
+            <EntityDisclosureHeaderAnatomy
               entity={entity}
               headingHref={headingHref}
-              leadingUtilities={leadingUtilities}
               trailing={trailing}
               density={density}
+              dragHandle={dragHandle}
+              dragHandleProps={dragHandleProps}
             />
           </div>
         }

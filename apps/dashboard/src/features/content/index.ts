@@ -37,8 +37,11 @@ export {
   DisclosureEntityCard,
   EntityItem,
   EntitySummary,
+  CatalogEntityDisclosureRow,
+  createCatalogEntityDisclosureRowRenderer,
   type ContentEntityCardProps,
   type DisclosureEntityCardProps,
+  type CatalogEntityDisclosureRowProps,
   type EntityItemTrailing,
   type EntitySummaryModel,
 } from './lib/content-entity-card.client'
