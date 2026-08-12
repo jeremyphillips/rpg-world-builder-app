@@ -36,7 +36,10 @@ import { MAGIC_ITEM_CATEGORY_TERM } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { ATTACK_RESOLUTION_MODE_TERM } from './mechanics/attack-resolution-mode'
 import { BUILDING_ARCHETYPE_TERM } from './location/building-archetype'
-import { BUILDING_FACILITY_TYPE_TERM } from './location/building-facility-type'
+import {
+  BUILDING_FACILITY_AUTHORING_GROUP_TERM,
+  BUILDING_FACILITY_TYPE_TERM,
+} from './location/building-facility-type'
 import { BUILDING_FORM_TERM } from './location/building-form'
 import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building-function-family'
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
@@ -92,6 +95,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   MAGIC_ITEM_RARITY_TERM,
   ATTACK_RESOLUTION_MODE_TERM,
   BUILDING_ARCHETYPE_TERM,
+  BUILDING_FACILITY_AUTHORING_GROUP_TERM,
   BUILDING_FACILITY_TYPE_TERM,
   BUILDING_FORM_TERM,
   BUILDING_FUNCTION_FAMILY_TERM,
@@ -158,7 +162,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(46)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(47)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

@@ -18,6 +18,7 @@ import {
 } from './dialog-panel.variants'
 import {
   modalContentVariants,
+  modalFooterDockClasses,
   modalOverlayVariants,
   type ModalContentLayout,
   type ModalSize,
@@ -165,7 +166,11 @@ ModalBody.displayName = 'Modal.Body'
 
 const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(dialogPanelFooterClasses, className)} {...props} />
+    <div
+      ref={ref}
+      className={cn(dialogPanelFooterClasses, modalFooterDockClasses, className)}
+      {...props}
+    />
   ),
 )
 ModalFooter.displayName = 'Modal.Footer'

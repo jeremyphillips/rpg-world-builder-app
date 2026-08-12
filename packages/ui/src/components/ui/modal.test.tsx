@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -149,6 +149,24 @@ describe('Modal', () => {
     expect(body).toHaveClass('pb-0')
     expect(body).toHaveClass('px-6')
     expect(body).not.toHaveClass('overflow-y-auto')
+  })
+
+  it('keeps default body shrinkable and panel chrome pinned', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+
+    const dialog = await screen.findByRole('dialog', { name: 'Invite a player' })
+    const body = within(dialog).getByText('Body content')
+    const footer = within(dialog).getByRole('button', { name: 'Cancel' }).parentElement
+      ?.parentElement
+    const header = within(dialog).getByRole('heading', { name: 'Invite a player' }).parentElement
+      ?.parentElement
+
+    expect(body).toHaveClass('min-h-0', 'overflow-y-auto')
+    expect(header).toHaveClass('shrink-0')
+    expect(footer).toHaveClass('shrink-0')
   })
 
   it('applies the stable layout block-size token without changing default content layout', async () => {

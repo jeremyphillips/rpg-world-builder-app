@@ -40,7 +40,7 @@ describe('completeLocationCreateSetup', () => {
         {
           kind: 'building',
           form: 'house',
-          facilityType: 'residence',
+          facilityAuthoringGroup: 'residential',
           operatorIntent: 'none',
         },
       ),

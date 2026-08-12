@@ -4,8 +4,13 @@ import type { z } from 'zod'
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFormContext, useWatch } from 'react-hook-form'
-import type { ContentCampaignAccessPatch } from '@rpg/contracts'
-import { toast } from '@rpg/ui'
+import {
+  isBuildingFacilityInAuthoringGroup,
+  type BuildingFacilityType,
+  type BuildingForm,
+  type ContentCampaignAccessPatch,
+} from '@rpg/contracts'
+import { cn, toast } from '@rpg/ui'
 import type { FormValueSync } from '@rpg/ui/form'
 
 import { notifyContentCreated } from '@/lib/notify'
@@ -92,7 +97,6 @@ export type LocationCreateFormProps = {
   }
   onBuildingClassificationChange?: (classification: {
     form?: BuildingCreateSetupProjection['form']
-    facilityType?: BuildingCreateSetupProjection['facilityType']
   }) => void
 }
 
@@ -102,9 +106,10 @@ type FixedSettlementCreateContext = LocationFixedCreateContext & {
   settlementType: NonNullable<LocationFixedCreateContext['settlementType']>
 }
 
-type BuildingClassificationDraft = Parameters<
-  NonNullable<LocationCreateFormProps['onBuildingClassificationChange']>
->[0]
+type BuildingClassificationDraft = {
+  form?: BuildingForm
+  facilityType?: BuildingFacilityType
+}
 
 function normalizeBuildingClassification(
   classification: LocationDraftFormValues['classification'],
@@ -121,8 +126,19 @@ function buildingClassificationMatches(
 ): boolean {
   return (
     classification.form === projection.form &&
-    classification.facilityType === projection.facilityType
+    (!classification.facilityType ||
+      !projection.facilityAuthoringGroup ||
+      isBuildingFacilityInAuthoringGroup(
+        classification.facilityType,
+        projection.facilityAuthoringGroup,
+      ))
   )
+}
+
+function projectBuildingClassificationToSetup(
+  classification: BuildingClassificationDraft,
+): Parameters<NonNullable<LocationCreateFormProps['onBuildingClassificationChange']>>[0] {
+  return classification.form ? { form: classification.form } : {}
 }
 
 function LocationBuildingSetupProjectionBridge({
@@ -178,7 +194,11 @@ function LocationBuildingSetupProjectionBridge({
         form.unregister(BUILDING_OPERATOR_FORM_PATH as never)
       }
     }
-    onClassificationChange?.(normalizeBuildingClassification(nextValues.classification))
+    onClassificationChange?.(
+      projectBuildingClassificationToSetup(
+        normalizeBuildingClassification(nextValues.classification),
+      ),
+    )
   }, [application, form, onClassificationChange])
 
   useEffect(() => {
@@ -191,7 +211,9 @@ function LocationBuildingSetupProjectionBridge({
       if (matchesProjection) observedRevisionRef.current = application.revision
       return
     }
-    onClassificationChange?.(normalizeBuildingClassification(classification))
+    onClassificationChange?.(
+      projectBuildingClassificationToSetup(normalizeBuildingClassification(classification)),
+    )
   }, [application.projection, application.revision, classification, onClassificationChange])
 
   return null
@@ -253,7 +275,10 @@ function LocationCreateFormShell({
 
   // Keep a stable wrapper so toggling `visible` does not remount the form (dirty/leave bridge).
   return (
-    <div className={visible ? undefined : 'hidden'} aria-hidden={visible ? undefined : true}>
+    <div
+      className={cn('flex min-h-0 flex-1 flex-col', !visible && 'hidden')}
+      aria-hidden={visible ? undefined : true}
+    >
       <ContentFormHost
         mounted={mounted}
         leaveGuardEnabled={leaveGuardEnabled}
@@ -325,6 +350,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
 
   const fields = composeLocationCreateBodyFields(locationCtx, {
     afterDescription: createsOperator ? buildBuildingOperatorFormItems(locationCtx) : undefined,
+    buildingFacilityAuthoringGroup: buildingSetupApplication?.projection.facilityAuthoringGroup,
   })
 
   const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {

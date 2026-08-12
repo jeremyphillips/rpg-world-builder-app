@@ -20,6 +20,9 @@ export const modalOverlayVariants = cva(
  */
 export const modalStableBlockSizeClasses = 'h-[min(85vh,40rem)]'
 
+/** Modal-owned footer dock placement; shared footer tokens own chrome only. */
+export const modalFooterDockClasses = 'shrink-0'
+
 /**
  * The centered modal panel. `size` caps the max-width; the panel itself is
  * height-capped (`max-h-[85vh]`) and clips its overflow so the scrollable region

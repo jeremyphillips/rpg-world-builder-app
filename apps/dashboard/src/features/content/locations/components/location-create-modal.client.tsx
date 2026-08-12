@@ -171,6 +171,7 @@ function buildDetailsChrome({
   return {
     contentWrapper: (content) => (
       <Modal.Body
+        stableBody
         className={cn(
           dialogPanelSectionInsetXClasses,
           'flex flex-col gap-4 pt-0',
@@ -347,7 +348,9 @@ function useLocationCreateModalController({
               revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
               projection: {
                 ...(result.form ? { form: result.form } : {}),
-                ...(result.facilityType ? { facilityType: result.facilityType } : {}),
+                ...(result.facilityAuthoringGroup
+                  ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
+                  : {}),
                 operatorIntent: result.operatorIntent,
               },
             }
@@ -356,16 +359,12 @@ function useLocationCreateModalController({
   }, [intent, setupModel])
 
   const handleBuildingClassificationChange = React.useCallback(
-    (classification: {
-      form?: BuildingCreateSetupProjection['form']
-      facilityType?: BuildingCreateSetupProjection['facilityType']
-    }) => {
+    (classification: { form?: BuildingCreateSetupProjection['form'] }) => {
       setState((current) => ({
         ...current,
         setupValues: {
           ...current.setupValues,
           buildingForm: classification.form ?? '',
-          buildingFacilityType: classification.facilityType ?? '',
         },
       }))
     },

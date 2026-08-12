@@ -1,5 +1,5 @@
 import type {
-  BuildingFacilityType,
+  BuildingFacilityAuthoringGroup,
   BuildingForm,
   LocationKind,
   RegionClassification,
@@ -22,7 +22,7 @@ export type LocationCreateSetupResult =
   | {
       kind: 'building'
       form?: BuildingForm
-      facilityType?: BuildingFacilityType
+      facilityAuthoringGroup?: BuildingFacilityAuthoringGroup
       operatorIntent: BuildingOperatorIntent
     }
   | { kind: 'settlement'; settlementType: SettlementType }

@@ -1,9 +1,11 @@
 import {
+  BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES,
   BUILDING_FACILITY_TYPE_ENTRIES,
   BUILDING_FACILITY_TYPE_IDS,
   BUILDING_FORM_ENTRIES,
   BUILDING_FORM_IDS,
   getInteriorSubtypeIds,
+  getBuildingFacilityTypesForAuthoringGroup,
   getRegionTypeIds,
   getRegionTypeLabelForKind,
   INTERIOR_TYPE_DEFINITIONS,
@@ -19,11 +21,14 @@ import {
   SITE_TYPE_ENTRIES,
   SITE_TYPE_IDS,
   type InteriorClassificationType,
+  type BuildingFacilityAuthoringGroup,
 } from '@rpg/contracts'
+import { rankOptionsByQuery } from '@rpg/ui'
 import {
   areVisibilityDependenciesKnown,
   type FieldOption,
   type FieldOptionAvailability,
+  type ComboboxFieldConfig,
   type FormItem,
   type RowFieldItem,
 } from '@rpg/ui/form'
@@ -62,11 +67,56 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
 )
 
 const buildingFormOptions = entriesToFieldOptions(BUILDING_FORM_IDS, BUILDING_FORM_ENTRIES)
-const buildingFacilityTypeOptions = entriesToFieldOptions(
-  BUILDING_FACILITY_TYPE_IDS,
-  BUILDING_FACILITY_TYPE_ENTRIES,
-)
 
+function buildBuildingFacilityTypeFieldOptions(): FieldOption[] {
+  return BUILDING_FACILITY_TYPE_IDS.map((value) => {
+    const entry = BUILDING_FACILITY_TYPE_ENTRIES[value] as {
+      label: string
+      description: string
+      aliases?: readonly string[]
+      searchTerms?: readonly string[]
+    }
+    return {
+      value,
+      label: entry.label,
+      description: entry.description,
+      searchTerms: [...(entry.aliases ?? []), ...(entry.searchTerms ?? [])],
+    }
+  })
+}
+
+function buildBuildingFacilityTypeField(
+  authoringGroup?: BuildingFacilityAuthoringGroup,
+): ComboboxFieldConfig {
+  const groupFacilityTypes = authoringGroup
+    ? new Set<string>(getBuildingFacilityTypesForAuthoringGroup(authoringGroup))
+    : null
+  const groupLabel = authoringGroup
+    ? BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[authoringGroup].label
+    : null
+
+  return {
+    type: 'combobox',
+    name: 'classification.facilityType',
+    label: 'Facility type',
+    multiple: false,
+    options: buildBuildingFacilityTypeFieldOptions(),
+    placeholder: groupLabel
+      ? `Search ${groupLabel.toLowerCase()} facilities…`
+      : 'Search facility types…',
+    hint: groupLabel
+      ? `${groupLabel} suggestions are shown first. Search includes all facility types.`
+      : 'Search the complete enabled Facility vocabulary.',
+    visibility: visibleForAuthoringType('building'),
+    resolveFilteredOptions: (options, query, selected) => {
+      if (query.trim() || !groupFacilityTypes) return rankOptionsByQuery(options, query)
+      const selectedValues = new Set(selected)
+      return options.filter(
+        (option) => groupFacilityTypes.has(option.value) || selectedValues.has(option.value),
+      )
+    },
+  }
+}
 const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interiorType) =>
   entriesToFieldOptions(
     Object.keys(INTERIOR_TYPE_DEFINITIONS[interiorType].subtypes) as (
@@ -201,7 +251,9 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
 
 export { buildLocationAuthoringTypeOptions }
 
-export function buildLocationClassificationFields(): FormItem[] {
+export function buildLocationClassificationFields(options?: {
+  buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+}): FormItem[] {
   return [
     {
       type: 'select',
@@ -212,18 +264,7 @@ export function buildLocationClassificationFields(): FormItem[] {
       visibility: visibleWhenRegionClassificationKindSet(),
       optionAvailability: regionClassificationTypeAvailability(),
     },
-    {
-      type: 'select',
-      name: 'classification.facilityType',
-      label: 'Facility type',
-      options: buildingFacilityTypeOptions,
-      placeholder: SELECT_PLACEHOLDER,
-      visibility: visibleForAuthoringType('building'),
-      optionalDisclosure: {
-        addLabel: 'Add facility type',
-        removeLabel: 'Remove facility type',
-      },
-    },
+    buildBuildingFacilityTypeField(options?.buildingFacilityAuthoringGroup),
     {
       type: 'select',
       name: 'classification.type',

@@ -1,5 +1,5 @@
 import type {
-  BuildingFacilityType,
+  BuildingFacilityAuthoringGroup,
   BuildingForm,
   RegionClassificationKind,
   SettlementType,
@@ -17,7 +17,7 @@ import {
   BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
   BUILDING_CREATE_SETUP_OPERATOR_PROMPT,
   buildBuildingCreateSetupSummaryEntries,
-  buildBuildingFacilityTypeRadioOptions,
+  buildBuildingFacilityAuthoringGroupRadioOptions,
   buildBuildingFormRadioOptions,
   buildBuildingOperatorIntentRadioOptions,
   applyBuildingCreateSetupSelectionChange,
@@ -51,7 +51,7 @@ import {
 
 export type LocationCreateModalSetupValues = {
   buildingForm: BuildingForm | ''
-  buildingFacilityType: BuildingFacilityType | ''
+  buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
   buildingOperatorIntent: BuildingOperatorIntent | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
@@ -61,7 +61,7 @@ export type LocationCreateModalSetupValues = {
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
   buildingForm: '',
-  buildingFacilityType: '',
+  buildingFacilityAuthoringGroup: '',
   buildingOperatorIntent: '',
   siteType: '',
   settlementType: '',
@@ -97,11 +97,11 @@ function resolveBuildingSetupModel(
   values: LocationCreateModalSetupValues,
 ): LocationCreateModalSetupModel {
   const formOptions = buildBuildingFormRadioOptions()
-  const facilityOptions = buildBuildingFacilityTypeRadioOptions()
+  const facilityOptions = buildBuildingFacilityAuthoringGroupRadioOptions()
   const operatorOptions = buildBuildingOperatorIntentRadioOptions()
   const projection = resolveBuildingCreateSetupProjection({
     form: values.buildingForm,
-    facilityType: values.buildingFacilityType,
+    facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
     operatorIntent: values.buildingOperatorIntent,
   })
   return {
@@ -116,12 +116,11 @@ function resolveBuildingSetupModel(
         required: false,
       },
       {
-        id: 'buildingFacilityType',
+        id: 'buildingFacilityAuthoringGroup',
         fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
         prompt: BUILDING_CREATE_SETUP_FACILITY_PROMPT,
         options: facilityOptions,
-        value: values.buildingFacilityType,
-        required: false,
+        value: values.buildingFacilityAuthoringGroup,
       },
       {
         id: 'buildingOperatorIntent',
@@ -133,7 +132,9 @@ function resolveBuildingSetupModel(
     ],
     canContinue: projection != null,
     complete: () => (projection ? { kind: 'building', ...projection } : null),
-    summaryEntries: projection ? buildBuildingCreateSetupSummaryEntries(projection) : [],
+    summaryEntries: projection
+      ? buildBuildingCreateSetupSummaryEntries(projection, values.buildingFacilityAuthoringGroup)
+      : [],
   }
 }
 
@@ -267,7 +268,7 @@ export function applyLocationCreateModalSetupValueChange({
   const buildingSelection = applyBuildingCreateSetupSelectionChange({
     selection: {
       form: values.buildingForm,
-      facilityType: values.buildingFacilityType,
+      facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
       operatorIntent: values.buildingOperatorIntent,
     },
     choiceSetId,
@@ -277,7 +278,7 @@ export function applyLocationCreateModalSetupValueChange({
     return {
       ...values,
       buildingForm: buildingSelection.form,
-      buildingFacilityType: buildingSelection.facilityType,
+      buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
       buildingOperatorIntent: buildingSelection.operatorIntent,
     }
   }

@@ -173,14 +173,37 @@ async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>)
   expect(await screen.findByRole('heading', { name: 'Create city' })).toBeInTheDocument()
 }
 
-async function continueBuildingSetup(user: ReturnType<typeof userEvent.setup>) {
+async function chooseBuildingFacilityGroup(
+  user: ReturnType<typeof userEvent.setup>,
+  label: 'Browse all' | 'Commercial' | 'Production' | 'Religious' | 'Residence',
+) {
+  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
+}
+
+async function chooseBuildingFacilityType(
+  user: ReturnType<typeof userEvent.setup>,
+  label: 'Brewery' | 'Temple',
+) {
+  await user.click(screen.getByRole('combobox', { name: 'Facility type' }))
+  await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
+}
+
+async function continueBuildingSetup(
+  user: ReturnType<typeof userEvent.setup>,
+  facilityGroup: Parameters<typeof chooseBuildingFacilityGroup>[1] = 'Browse all',
+) {
+  await chooseBuildingFacilityGroup(user, facilityGroup)
   await user.click(screen.getByRole('radio', { name: 'No organization' }))
   await user.click(screen.getByRole('button', { name: 'Continue' }))
   expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
   expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
 }
 
-async function continueBuildingSetupWithOperator(user: ReturnType<typeof userEvent.setup>) {
+async function continueBuildingSetupWithOperator(
+  user: ReturnType<typeof userEvent.setup>,
+  facilityGroup: Parameters<typeof chooseBuildingFacilityGroup>[1] = 'Browse all',
+) {
+  await chooseBuildingFacilityGroup(user, facilityGroup)
   await user.click(screen.getByRole('radio', { name: 'Create an organization' }))
   await user.click(screen.getByRole('button', { name: 'Continue' }))
   expect(await screen.findByText('Create the organization that operates here.')).toBeInTheDocument()
@@ -214,7 +237,7 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('requires only operator intent and allows Form and Facility to remain unspecified', async () => {
+  it('requires Facility discovery intent and operator intent while Form remains optional', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
@@ -223,7 +246,7 @@ describe('LocationCreateModal', () => {
       screen.getByRole('radiogroup', { name: 'What physical form does this building have?' }),
     ).toBeVisible()
     expect(
-      screen.getByRole('radiogroup', { name: 'What is this building configured to be?' }),
+      screen.getByRole('radiogroup', { name: 'What kind of facility are you creating?' }),
     ).toBeVisible()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
 
@@ -269,10 +292,28 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
-    expect(screen.getByText('No organization')).toBeInTheDocument()
+    expect(screen.getByText('Browse all · No organization')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
     ).toBeInTheDocument()
+  })
+
+  it('preserves the bounded modal scroll chain when Building details expand', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetupWithOperator(user)
+
+    const form = screen.getAllByRole('textbox', { name: 'Name' })[0]?.closest('form')
+    const visibilityWrapper = form?.parentElement
+    const modalBody = form?.firstElementChild
+    const footer = screen
+      .getByRole('button', { name: 'Create location' })
+      .closest('.border-border-faint')
+
+    expect(visibilityWrapper).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
+    expect(form).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
+    expect(modalBody).toHaveClass('flex', 'min-h-0', 'flex-1', 'overflow-hidden')
+    expect(footer).toHaveClass('shrink-0')
   })
 
   it('creates the House flow with form as its only persisted classification', async () => {
@@ -283,7 +324,7 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
     await continueBuildingSetup(user)
 
-    expect(screen.getByText('House · No organization')).toBeInTheDocument()
+    expect(screen.getByText('House · Browse all · No organization')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('button', { name: 'Create location' }))
@@ -299,6 +340,9 @@ describe('LocationCreateModal', () => {
       },
     })
     expect(
+      vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0].buildingCreateInput,
+    ).not.toHaveProperty('facilityAuthoringGroup')
+    expect(
       vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0].operatorCreateInput,
     ).toBeUndefined()
   })
@@ -308,7 +352,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
     await continueBuildingSetupWithOperator(user)
 
-    expect(screen.getByText('Create organization')).toBeInTheDocument()
+    expect(screen.getByText('Browse all · Create organization')).toBeInTheDocument()
     const names = screen.getAllByRole('textbox', { name: 'Name' })
     await user.type(names[0]!, 'Ironroot Forge')
     await user.type(names[1]!, 'Ironroot Smiths')
@@ -330,10 +374,10 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Brewery') }))
-    await continueBuildingSetupWithOperator(user)
+    await continueBuildingSetupWithOperator(user, 'Production')
+    await chooseBuildingFacilityType(user, 'Brewery')
 
-    expect(screen.getByText('Brewery · Create organization')).toBeInTheDocument()
+    expect(screen.getByText('Production · Create organization')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
     const names = screen.getAllByRole('textbox', { name: 'Name' })
     expect(names).toHaveLength(2)
@@ -355,6 +399,7 @@ describe('LocationCreateModal', () => {
         activities: ['brewing'],
       },
     })
+    expect(submission?.buildingCreateInput).not.toHaveProperty('facilityAuthoringGroup')
     const classification = (
       submission?.buildingCreateInput as {
         classification?: BuildingClassification
@@ -367,10 +412,10 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Temple') }))
-    await continueBuildingSetupWithOperator(user)
+    await continueBuildingSetupWithOperator(user, 'Religious')
+    await chooseBuildingFacilityType(user, 'Temple')
 
-    expect(screen.getByText('Temple · Create organization')).toBeInTheDocument()
+    expect(screen.getByText('Religious · Create organization')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Temple')
     const names = screen.getAllByRole('textbox', { name: 'Name' })
     await user.type(names[0]!, 'Temple of the Dawn')
@@ -428,25 +473,26 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Brewery') }))
-    await continueBuildingSetup(user)
+    await continueBuildingSetup(user, 'Production')
+    await chooseBuildingFacilityType(user, 'Brewery')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Copper Kettle')
     const description = screen.getByRole('textbox', { name: 'Description' })
     description.innerHTML = '<p>A landmark by the quay.</p>'
     fireEvent.input(description)
 
     await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
-    const brewerySummary = screen.getByRole('heading', { name: 'Brewery' }).closest('article')
-    expect(brewerySummary).not.toBeNull()
-    await user.click(within(brewerySummary!).getByRole('button', { name: 'Change' }))
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Temple') }))
+    const productionSummary = screen.getByRole('heading', { name: 'Production' }).closest('article')
+    expect(productionSummary).not.toBeNull()
+    await user.click(within(productionSummary!).getByRole('button', { name: 'Change' }))
+    await chooseBuildingFacilityGroup(user, 'Religious')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
       'A landmark by the quay.',
     )
-    expect(screen.getByText('House · Temple · No organization')).toBeInTheDocument()
+    expect(screen.getByText('House · Religious · No organization')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).not.toHaveTextContent('Brewery')
 
     await user.click(screen.getByRole('button', { name: 'Create location' }))
     await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
@@ -454,9 +500,25 @@ describe('LocationCreateModal', () => {
     expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]).toMatchObject({
       buildingCreateInput: {
         name: 'Copper Kettle',
-        classification: { form: 'house', facilityType: 'temple' },
+        classification: { form: 'house' },
       },
     })
+  })
+
+  it('preserves a Facility when Change selects another compatible authoring group', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user, 'Production')
+    await chooseBuildingFacilityType(user, 'Brewery')
+
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    const productionSummary = screen.getByRole('heading', { name: 'Production' }).closest('article')
+    await user.click(within(productionSummary!).getByRole('button', { name: 'Change' }))
+    await chooseBuildingFacilityGroup(user, 'Commercial')
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByText('Commercial · No organization')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
   })
 
   it('creates with default campaign access draft without PATCH and closes the modal', async () => {

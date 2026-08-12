@@ -5,16 +5,24 @@ import { getEffectiveBuildingFunctions } from '@rpg/contracts'
 import {
   applyBuildingCreateSetupProjection,
   applyBuildingCreateSetupSelectionChange,
+  buildBuildingFacilityAuthoringGroupRadioOptions,
   resolveBuildingCreateSetupProjection,
 } from './location-building-create-setup.lib'
 
 describe('Building create setup selection', () => {
-  const emptySelection = { form: '', facilityType: '', operatorIntent: '' } as const
+  const emptySelection = { form: '', facilityAuthoringGroup: '', operatorIntent: '' } as const
 
-  it('requires operator intent while leaving Form and Facility optional', () => {
+  it('requires discovery scope and operator intent while leaving Form optional', () => {
     expect(resolveBuildingCreateSetupProjection(emptySelection)).toBeNull()
     expect(
       resolveBuildingCreateSetupProjection({ ...emptySelection, operatorIntent: 'none' }),
+    ).toBeNull()
+    expect(
+      resolveBuildingCreateSetupProjection({
+        ...emptySelection,
+        facilityAuthoringGroup: 'browse_all',
+        operatorIntent: 'none',
+      }),
     ).toEqual({ operatorIntent: 'none' })
   })
 
@@ -26,16 +34,16 @@ describe('Building create setup selection', () => {
     })
     expect(withForm?.form).toBe('house')
 
-    const withFacility = applyBuildingCreateSetupSelectionChange({
+    const withFacilityGroup = applyBuildingCreateSetupSelectionChange({
       selection: withForm!,
-      choiceSetId: 'buildingFacilityType',
-      nextValue: 'brewery',
+      choiceSetId: 'buildingFacilityAuthoringGroup',
+      nextValue: 'production',
     })
-    expect(withFacility?.facilityType).toBe('brewery')
+    expect(withFacilityGroup?.facilityAuthoringGroup).toBe('production')
 
     expect(
       applyBuildingCreateSetupSelectionChange({
-        selection: withFacility!,
+        selection: withFacilityGroup!,
         choiceSetId: 'buildingOperatorIntent',
         nextValue: 'create',
       })?.operatorIntent,
@@ -48,6 +56,12 @@ describe('Building create setup selection', () => {
       }),
     ).toBeNull()
   })
+
+  it('derives setup options from populated canonical Facility groups', () => {
+    expect(buildBuildingFacilityAuthoringGroupRadioOptions().map((option) => option.value)).toEqual(
+      ['residential', 'commercial', 'production', 'religious', 'browse_all'],
+    )
+  })
 })
 
 describe('applyBuildingCreateSetupProjection', () => {
@@ -58,37 +72,40 @@ describe('applyBuildingCreateSetupProjection', () => {
     classification: { form: 'house' as const, facilityType: 'brewery' as const },
   }
 
-  it('updates only canonical Building classification and preserves unrelated draft fields', () => {
+  it('clears an out-of-group Facility while preserving unrelated draft fields', () => {
     expect(
       applyBuildingCreateSetupProjection(draft, {
-        facilityType: 'temple',
+        facilityAuthoringGroup: 'religious',
         operatorIntent: 'create',
       }),
     ).toEqual({
       name: draft.name,
       description: draft.description,
       authoringType: 'building',
-      classification: { facilityType: 'temple' },
+      classification: undefined,
     })
   })
 
   it('supports an unclassified Building end to end', () => {
     expect(
-      applyBuildingCreateSetupProjection(draft, { operatorIntent: 'none' }).classification,
+      applyBuildingCreateSetupProjection(
+        { ...draft, classification: undefined },
+        { operatorIntent: 'none' },
+      ).classification,
     ).toBeUndefined()
   })
 
-  it('changes derived functions when Facility changes from Brewery to Temple', () => {
-    const brewery = applyBuildingCreateSetupProjection(draft, {
-      facilityType: 'brewery',
+  it('preserves a Facility across compatible groups and keeps its derived function', () => {
+    const production = applyBuildingCreateSetupProjection(draft, {
+      facilityAuthoringGroup: 'production',
       operatorIntent: 'none',
     })
-    const temple = applyBuildingCreateSetupProjection(brewery, {
-      facilityType: 'temple',
+    const commercial = applyBuildingCreateSetupProjection(production, {
+      facilityAuthoringGroup: 'commercial',
       operatorIntent: 'none',
     })
 
-    expect(getEffectiveBuildingFunctions(brewery.classification)).toEqual(['production'])
-    expect(getEffectiveBuildingFunctions(temple.classification)).toEqual(['worship'])
+    expect(commercial.classification).toEqual({ facilityType: 'brewery' })
+    expect(getEffectiveBuildingFunctions(commercial.classification)).toEqual(['production'])
   })
 })

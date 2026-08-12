@@ -42,22 +42,45 @@ describe('applyLocationCreateModalSetupValueChange', () => {
 })
 
 describe('resolveLocationCreateModalSetupModel', () => {
-  it('builds optional Form and Facility choices before required operator intent', () => {
+  it('builds optional Form before required Facility discovery and operator intent', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'building' },
       values: {
         ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFacilityAuthoringGroup: 'browse_all',
         buildingOperatorIntent: 'none',
       },
     })
 
     expect(model?.choiceSets.map(({ id, required }) => ({ id, required }))).toEqual([
       { id: 'buildingForm', required: false },
-      { id: 'buildingFacilityType', required: false },
+      { id: 'buildingFacilityAuthoringGroup', required: undefined },
       { id: 'buildingOperatorIntent', required: undefined },
     ])
     expect(model?.canContinue).toBe(true)
     expect(model?.complete()).toEqual({ kind: 'building', operatorIntent: 'none' })
+  })
+
+  it('projects authoring group into setup intent and summary, not Facility classification', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFacilityAuthoringGroup: 'production',
+        buildingOperatorIntent: 'create',
+      },
+    })
+
+    expect(model?.complete()).toEqual({
+      kind: 'building',
+      facilityAuthoringGroup: 'production',
+      operatorIntent: 'create',
+    })
+    expect(model?.summaryEntries.map((entry) => entry.valueLabel)).toEqual([
+      'Production',
+      'Create organization',
+    ])
+    expect(model?.complete()).not.toHaveProperty('facilityType')
   })
 
   it('builds shared region choice sets with dependsOn', () => {

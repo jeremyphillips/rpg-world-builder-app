@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  BUILDING_FACILITY_AUTHORING_GROUP_IDS,
   BUILDING_FACILITY_TYPE_ENTRIES,
   BUILDING_FACILITY_TYPE_IDS,
   buildingFacilityTypeSchema,
+  getBuildingFacilityTypesForAuthoringGroup,
   getBuildingFacilityDefaultFunctions,
 } from './building-facility-type'
 import { BUILDING_FORM_ENTRIES, BUILDING_FORM_IDS, buildingFormSchema } from './building-form'
@@ -41,5 +43,22 @@ describe('Building semantic vocabularies', () => {
     expect(getBuildingFacilityDefaultFunctions('residence')).toEqual(['dwelling'])
     expect(getBuildingFacilityDefaultFunctions('brewery')).toEqual(['production'])
     expect(getBuildingFacilityDefaultFunctions('temple')).toEqual(['worship'])
+  })
+
+  it('owns non-exclusive authoring discovery groups on Facility entries', () => {
+    expect(BUILDING_FACILITY_AUTHORING_GROUP_IDS).toEqual([
+      'residential',
+      'commercial',
+      'production',
+      'civic',
+      'religious',
+      'lodging',
+    ])
+    expect(getBuildingFacilityTypesForAuthoringGroup('residential')).toEqual(['residence'])
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toEqual(['brewery'])
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual(['brewery'])
+    expect(getBuildingFacilityTypesForAuthoringGroup('religious')).toEqual(['temple'])
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toEqual([])
+    expect(getBuildingFacilityTypesForAuthoringGroup('lodging')).toEqual([])
   })
 })

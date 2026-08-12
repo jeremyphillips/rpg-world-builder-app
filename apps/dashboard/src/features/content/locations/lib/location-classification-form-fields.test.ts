@@ -14,7 +14,7 @@ function fieldByName(items: FormItemLike[], name: string) {
 }
 
 describe('Building classification fields', () => {
-  it('projects Form first and Facility as the optional secondary axis', () => {
+  it('projects Form first and Facility as the optional searchable secondary axis', () => {
     const primaryNames = buildLocationPrimaryClassificationFields().flatMap((item) =>
       'kind' in item ? [] : [item.name],
     )
@@ -37,7 +37,7 @@ describe('Building classification fields', () => {
     ])
   })
 
-  it('derives Form and Facility options from their narrow registries', () => {
+  it('derives Form and searchable Facility options from their narrow registries', () => {
     expect(
       fieldByName(buildLocationPrimaryClassificationFields(), 'classification.form'),
     ).toMatchObject({
@@ -48,13 +48,31 @@ describe('Building classification fields', () => {
     expect(
       fieldByName(buildLocationClassificationFields(), 'classification.facilityType'),
     ).toMatchObject({
-      type: 'select',
+      type: 'combobox',
       label: 'Facility type',
+      multiple: false,
       options: [
         { value: 'residence', label: 'Residence' },
         { value: 'brewery', label: 'Brewery' },
         { value: 'temple', label: 'Temple' },
       ],
     })
+  })
+
+  it('scopes initial Facility suggestions but searches the complete registry', () => {
+    const field = fieldByName(
+      buildLocationClassificationFields({ buildingFacilityAuthoringGroup: 'production' }),
+      'classification.facilityType',
+    )
+    if (!('type' in field) || field.type !== 'combobox') {
+      throw new Error('Expected Facility combobox')
+    }
+
+    expect(field.resolveFilteredOptions?.(field.options, '', [])).toMatchObject([
+      { value: 'brewery' },
+    ])
+    expect(field.resolveFilteredOptions?.(field.options, 'temple', [])).toMatchObject([
+      { value: 'temple' },
+    ])
   })
 })

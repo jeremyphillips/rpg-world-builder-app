@@ -1,11 +1,12 @@
 import {
-  BUILDING_FACILITY_TYPE_ENTRIES,
-  BUILDING_FACILITY_TYPE_IDS,
+  BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES,
+  BUILDING_FACILITY_AUTHORING_GROUP_IDS,
   BUILDING_FORM_ENTRIES,
   BUILDING_FORM_IDS,
-  getBuildingFacilityTypeLabel,
+  getBuildingFacilityTypesForAuthoringGroup,
   getBuildingFormLabel,
-  type BuildingFacilityType,
+  isBuildingFacilityInAuthoringGroup,
+  type BuildingFacilityAuthoringGroup,
   type BuildingForm,
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
@@ -17,21 +18,26 @@ export const BUILDING_CREATE_SETUP_HEADLINE = 'Create building' as const
 export const BUILDING_CREATE_SETUP_FORM_FIELD_LABEL = 'Building form' as const
 export const BUILDING_CREATE_SETUP_FORM_PROMPT =
   'What physical form does this building have?' as const
-export const BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL = 'Facility type' as const
+export const BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL = 'Facility' as const
 export const BUILDING_CREATE_SETUP_FACILITY_PROMPT =
-  'What is this building configured to be?' as const
+  'What kind of facility are you creating?' as const
 export const BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL = 'Who operates here?' as const
 export const BUILDING_CREATE_SETUP_OPERATOR_PROMPT = 'Who operates here?' as const
 
+export const BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE = 'browse_all' as const
+
 export type BuildingCreateSetupProjection = {
   form?: BuildingForm
-  facilityType?: BuildingFacilityType
+  facilityAuthoringGroup?: BuildingFacilityAuthoringGroup
   operatorIntent: BuildingOperatorIntent
 }
 
 export type BuildingCreateSetupSelection = {
   form: BuildingForm | ''
-  facilityType: BuildingFacilityType | ''
+  facilityAuthoringGroup:
+    | BuildingFacilityAuthoringGroup
+    | typeof BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
+    | ''
   operatorIntent: BuildingOperatorIntent | ''
 }
 
@@ -43,12 +49,22 @@ export function buildBuildingFormRadioOptions(): RadioCardOption[] {
   }))
 }
 
-export function buildBuildingFacilityTypeRadioOptions(): RadioCardOption[] {
-  return BUILDING_FACILITY_TYPE_IDS.map((value) => ({
-    value,
-    label: BUILDING_FACILITY_TYPE_ENTRIES[value].label,
-    description: BUILDING_FACILITY_TYPE_ENTRIES[value].description,
-  }))
+export function buildBuildingFacilityAuthoringGroupRadioOptions(): RadioCardOption[] {
+  const populatedGroups = BUILDING_FACILITY_AUTHORING_GROUP_IDS.filter(
+    (group) => getBuildingFacilityTypesForAuthoringGroup(group).length > 0,
+  )
+  return [
+    ...populatedGroups.map((value) => ({
+      value,
+      label: BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[value].label,
+      description: BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[value].description,
+    })),
+    {
+      value: BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE,
+      label: 'Browse all',
+      description: 'Start with the complete enabled Facility vocabulary.',
+    },
+  ]
 }
 
 export function buildBuildingOperatorIntentRadioOptions(): RadioCardOption[] {
@@ -62,8 +78,10 @@ export function isBuildingForm(value: string): value is BuildingForm {
   return (BUILDING_FORM_IDS as readonly string[]).includes(value)
 }
 
-export function isBuildingFacilityType(value: string): value is BuildingFacilityType {
-  return (BUILDING_FACILITY_TYPE_IDS as readonly string[]).includes(value)
+export function isBuildingFacilityAuthoringGroup(
+  value: string,
+): value is BuildingFacilityAuthoringGroup {
+  return (BUILDING_FACILITY_AUTHORING_GROUP_IDS as readonly string[]).includes(value)
 }
 
 export function isBuildingOperatorIntent(value: string): value is BuildingOperatorIntent {
@@ -74,9 +92,15 @@ export function resolveBuildingCreateSetupProjection(
   selection: BuildingCreateSetupSelection,
 ): BuildingCreateSetupProjection | null {
   if (!isBuildingOperatorIntent(selection.operatorIntent)) return null
+  const hasFacilityScope =
+    isBuildingFacilityAuthoringGroup(selection.facilityAuthoringGroup) ||
+    selection.facilityAuthoringGroup === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
+  if (!hasFacilityScope) return null
   return {
     ...(selection.form ? { form: selection.form } : {}),
-    ...(selection.facilityType ? { facilityType: selection.facilityType } : {}),
+    ...(isBuildingFacilityAuthoringGroup(selection.facilityAuthoringGroup)
+      ? { facilityAuthoringGroup: selection.facilityAuthoringGroup }
+      : {}),
     operatorIntent: selection.operatorIntent,
   }
 }
@@ -93,10 +117,14 @@ export function applyBuildingCreateSetupSelectionChange({
   if (choiceSetId === 'buildingForm') {
     return { ...selection, form: isBuildingForm(nextValue) ? nextValue : '' }
   }
-  if (choiceSetId === 'buildingFacilityType') {
+  if (choiceSetId === 'buildingFacilityAuthoringGroup') {
     return {
       ...selection,
-      facilityType: isBuildingFacilityType(nextValue) ? nextValue : '',
+      facilityAuthoringGroup:
+        isBuildingFacilityAuthoringGroup(nextValue) ||
+        nextValue === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
+          ? nextValue
+          : '',
     }
   }
   if (choiceSetId === 'buildingOperatorIntent') {
@@ -113,24 +141,37 @@ export function applyBuildingCreateSetupProjection(
   values: LocationFormValues,
   projection: BuildingCreateSetupProjection,
 ): LocationFormValues {
-  const classification = buildBuildingClassificationFromCreateSetup(projection)
+  const classification = buildBuildingClassificationFromCreateSetup(
+    projection,
+    values.classification,
+  )
 
   return { ...values, classification }
 }
 
 export function buildBuildingClassificationFromCreateSetup(
   projection: BuildingCreateSetupProjection,
+  currentClassification?: LocationFormValues['classification'],
 ): LocationFormValues['classification'] {
-  return projection.form || projection.facilityType
+  const currentFacilityType = currentClassification?.facilityType
+  const facilityType =
+    currentFacilityType &&
+    (!projection.facilityAuthoringGroup ||
+      isBuildingFacilityInAuthoringGroup(currentFacilityType, projection.facilityAuthoringGroup))
+      ? currentFacilityType
+      : undefined
+
+  return projection.form || facilityType
     ? {
         ...(projection.form ? { form: projection.form } : {}),
-        ...(projection.facilityType ? { facilityType: projection.facilityType } : {}),
+        ...(facilityType ? { facilityType } : {}),
       }
     : undefined
 }
 
 export function buildBuildingCreateSetupSummaryEntries(
   projection: BuildingCreateSetupProjection,
+  facilityScopeValue: BuildingCreateSetupSelection['facilityAuthoringGroup'],
 ): { fieldLabel: string; valueLabel: string }[] {
   return [
     ...(projection.form
@@ -141,14 +182,14 @@ export function buildBuildingCreateSetupSummaryEntries(
           },
         ]
       : []),
-    ...(projection.facilityType
-      ? [
-          {
-            fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
-            valueLabel: getBuildingFacilityTypeLabel(projection.facilityType),
-          },
-        ]
-      : []),
+    {
+      fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
+      valueLabel: projection.facilityAuthoringGroup
+        ? BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[projection.facilityAuthoringGroup].label
+        : facilityScopeValue === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
+          ? 'Browse all'
+          : '',
+    },
     {
       fieldLabel: BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
       valueLabel:

@@ -63,7 +63,7 @@ export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHea
   ) => (
     <div
       ref={ref}
-      className={cn('flex flex-col space-y-1.5 p-6', endSlot && 'pr-12', className)}
+      className={cn('flex shrink-0 flex-col space-y-1.5 p-6', endSlot && 'pr-12', className)}
       {...props}
     >
       {kicker ? renderKicker(kicker) : null}

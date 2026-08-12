@@ -23,24 +23,34 @@ const buildingArgs = {
 
 async function continueBuildingStory(
   canvasElement: HTMLElement,
-  selections: { form?: 'house'; facility?: 'brewery' | 'temple'; operator: 'none' | 'create' },
+  selections: {
+    form?: 'house'
+    facilityGroup?: 'Browse all' | 'Production' | 'Religious'
+    facility?: 'brewery' | 'temple'
+    operator: 'none' | 'create'
+  },
 ) {
   const canvas = within(canvasElement.ownerDocument.body)
   if (selections.form) {
     await userEvent.click(canvas.getByRole('radio', { name: (name) => name.startsWith('House') }))
   }
-  if (selections.facility) {
-    const facilityLabel = selections.facility === 'brewery' ? 'Brewery' : 'Temple'
-    await userEvent.click(
-      canvas.getByRole('radio', { name: (name) => name.startsWith(facilityLabel) }),
-    )
-  }
+  const facilityGroup = selections.facilityGroup ?? 'Browse all'
+  await userEvent.click(
+    canvas.getByRole('radio', { name: (name) => name.startsWith(facilityGroup) }),
+  )
   await userEvent.click(
     canvas.getByRole('radio', {
       name: selections.operator === 'create' ? 'Create an organization' : 'No organization',
     }),
   )
   await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+  if (selections.facility) {
+    const facilityLabel = selections.facility === 'brewery' ? 'Brewery' : 'Temple'
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Facility type' }))
+    await userEvent.click(
+      canvas.getByRole('option', { name: (name) => name.startsWith(facilityLabel) }),
+    )
+  }
   const nameFields = await canvas.findAllByRole('textbox', { name: 'Name' })
   await expect(nameFields[0]).toBeVisible()
 }
@@ -64,7 +74,7 @@ export const HouseDetails: Story = {
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, { form: 'house', operator: 'none' })
     await expect(
-      within(canvasElement.ownerDocument.body).getByText('House · No organization'),
+      within(canvasElement.ownerDocument.body).getByText('House · Browse all · No organization'),
     ).toBeVisible()
   },
 }
@@ -84,9 +94,13 @@ export const BreweryDetails: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],
   play: async ({ canvasElement }) => {
-    await continueBuildingStory(canvasElement, { facility: 'brewery', operator: 'create' })
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Production',
+      facility: 'brewery',
+      operator: 'create',
+    })
     await expect(
-      within(canvasElement.ownerDocument.body).getByText('Brewery · Create organization'),
+      within(canvasElement.ownerDocument.body).getByText('Production · Create organization'),
     ).toBeVisible()
   },
 }
@@ -95,9 +109,13 @@ export const TempleDetails: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],
   play: async ({ canvasElement }) => {
-    await continueBuildingStory(canvasElement, { facility: 'temple', operator: 'create' })
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Religious',
+      facility: 'temple',
+      operator: 'create',
+    })
     await expect(
-      within(canvasElement.ownerDocument.body).getByText('Temple · Create organization'),
+      within(canvasElement.ownerDocument.body).getByText('Religious · Create organization'),
     ).toBeVisible()
   },
 }

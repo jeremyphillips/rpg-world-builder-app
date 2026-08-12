@@ -9,6 +9,7 @@ import {
   siteTypeSchema,
   slugSchema,
   validateLocationParentRequirement,
+  type BuildingFacilityAuthoringGroup,
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
@@ -115,7 +116,10 @@ function omitFixedCreateNamedFields<T>(
   })
 }
 
-export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
+export function buildLocationFields(
+  ctx: ContentFormCtx,
+  options?: { buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup },
+): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
@@ -137,7 +141,7 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
     items.push(
       ...omitFixedCreateNamedFields(
         filterLocationFieldsForAuthoringType(
-          buildLocationClassificationFields(),
+          buildLocationClassificationFields(options),
           fixedCreate.authoringType,
         ),
         fixedCreate,
@@ -184,9 +188,12 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
 
 export function composeLocationCreateBodyFields(
   ctx: ContentFormCtx,
-  options?: { afterDescription?: FormItem[] },
+  options?: {
+    afterDescription?: FormItem[]
+    buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+  },
 ): FormItem[] {
-  const items = buildLocationFields(ctx)
+  const items = buildLocationFields(ctx, options)
   if (options?.afterDescription?.length) {
     items.push(...options.afterDescription)
   }
