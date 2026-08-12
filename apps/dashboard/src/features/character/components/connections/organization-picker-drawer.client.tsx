@@ -3,12 +3,11 @@
 import * as React from 'react'
 
 import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
+import { Button, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
-import { CatalogEntityDisclosureRow } from '@/features/content'
+import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
-import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import { OrganizationMembershipTitleField } from './organization-membership-title-field.client'
 import { titleFromMembershipRadioValue } from './organization-membership-title-field.lib'
@@ -122,12 +121,11 @@ export function OrganizationPickerDrawer({
   )
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
       title={ORGANIZATION_PICKER_TITLE}
       description={formatOrganizationPickerDescription()}
-      {...catalogPickerShellProps()}
       items={items}
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
@@ -168,11 +166,11 @@ export function OrganizationPickerDrawer({
           </div>
         ),
       }}
-      renderCollapsibleRow={(args) => {
+      renderEntityRow={(args) => {
         const { organization, selected } = args.item
 
         return (
-          <CatalogEntityDisclosureRow
+          <CatalogEntityRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}

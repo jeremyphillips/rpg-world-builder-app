@@ -251,6 +251,24 @@ detail primitives may use `endSlot` for utility controls — that API does not a
 `EntityItem`, CEC, or DEC. See
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
+### Catalog entity picker rows
+
+Entity-backed catalog pickers **must** use `CatalogEntityPickerSheet` → `CatalogEntityRow`.
+Raw `CatalogPickerSheet` remains for generic/non-entity catalogs only.
+
+| Layer                                          | Owns                                                                                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI catalog shell                              | Border, background, hover footprint, structural `p-0`                                                                    |
+| `CatalogEntityRow` inset root                  | Entity inset CSS variables, content-offset when leading utilities present, header padding, optional disclosure body wash |
+| `EntityItem` / `EntityDisclosureHeaderAnatomy` | Three-column identity                                                                                                    |
+
+Features supply entity model, trailing semantics, and optional per-item `details` via
+`renderEntityRow` or `createCatalogEntityRowRenderer`. `rowLayout="entity-card"` is
+internal to `CatalogEntityRow` — not a feature concern.
+
+Disclosure mode activates when **resolved** `details` is non-null (not merely when a
+`buildDetails` callback exists).
+
 ---
 
 ## Feature / domain layer
@@ -439,11 +457,11 @@ prevent regression:
 Documented policy is authoritative. These items may still exist in code and are tracked
 for cleanup — do not weaken docs to match legacy patterns:
 
-| Item                                                             | Status                                                                          |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Non-entity ArrayItem CLI content-column indent                   | **Intentional** for anonymous form arrays only                                  |
-| `DetailEntityRow.endSlot`                                        | **Intentional** for non-entity detail hosts — not for EntityItem/DEC            |
-| Catalog picker entity-disclosure rows via `renderCollapsibleRow` | **Migrated** — dashboard `CatalogEntityDisclosureRow` owns surface/inset/header |
+| Item                                           | Status                                                               |
+| ---------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                       |
+| `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityItem/DEC |
+| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogEntityRow`                      | Mandatory for entity-backed pickers; inset on row root, border/bg on CLI shell |
 
 ---
 

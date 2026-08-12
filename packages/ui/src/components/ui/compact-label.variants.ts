@@ -40,9 +40,9 @@ export const compactLabelVariants = cva(
   {
     variants: {
       size: {
-        sm: 'px-2 py-px text-xs-meta',
-        md: 'px-3 py-1 text-sm-meta',
-        lg: 'px-4 py-2 text-md',
+        sm: 'h-[22px] px-2 text-xs-meta',
+        md: 'h-[31px] px-3 text-sm-meta',
+        lg: 'h-[41px] px-4 text-md',
       },
       filled: {
         true: 'font-medium',
@@ -103,7 +103,7 @@ export function resolveCompactLabelClassName({
   removable = false,
   className,
 }: CompactLabelVariantProps & { className?: string }): string {
-  const resolvedFilled = filled ?? (selected || appearance === 'soft' || appearance === 'neutral')
+  const resolvedFilled = filled ?? (selected || appearance === 'soft' || appearance === 'strong')
 
   const appearanceClasses =
     !selected && !interactive ? compactLabelAppearanceToneClasses(appearance, tone) : null

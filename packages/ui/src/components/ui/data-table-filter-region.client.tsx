@@ -115,7 +115,7 @@ export function DataTableFilterRegion({
                     <SlidersHorizontal className="size-3.5" aria-hidden />
                     {labels.moreFilters}
                     {activeAdditionalFilterCount > 0 ? (
-                      <Badge appearance="neutral" tone="neutral" size="sm" className="ml-0.5">
+                      <Badge appearance="soft" tone="neutral" size="sm" className="ml-0.5">
                         {activeAdditionalFilterCount}
                       </Badge>
                     ) : null}

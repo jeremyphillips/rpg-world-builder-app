@@ -237,7 +237,7 @@ export function SpeciesStep({
             isDetailsSpeciesSelected ? (
               detailsSpeciesHasHeritage ? (
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge appearance="neutral" tone="neutral">
+                  <Badge appearance="soft" tone="neutral">
                     {SELECTED_SPECIES_LABEL}
                   </Badge>
                   <Button
@@ -251,7 +251,7 @@ export function SpeciesStep({
                   </Button>
                 </div>
               ) : (
-                <Badge appearance="neutral" tone="neutral">
+                <Badge appearance="soft" tone="neutral">
                   {SELECTED_SPECIES_LABEL}
                 </Badge>
               )

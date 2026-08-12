@@ -9,16 +9,18 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Heading, SegmentedControl, Text } from '@rpg/ui'
+import { Button, Heading, SegmentedControl, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
   CatalogPickerSelectionActions,
-  catalogPickerShellProps,
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { EntityItem } from '../../lib/content-entity-card.client'
+import {
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
+} from '../../lib/content-entity-card.client'
 import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import { buildEntityMediaFromImageKey } from '../../lib/entity/entity-media.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
@@ -523,12 +525,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
   }, [campaignId, locationsById, pickerLocations])
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      {...catalogPickerShellProps()}
-      rowLayout="entity-card"
       pickerEnabled={showLocationPicker && !showMutationEmptyState}
       searchPlaceholder={targetPresentation.searchPlaceholder}
       noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
@@ -648,52 +648,62 @@ function OrganizationLocationConnectionLinkDrawerContent({
         const summary = pickerLocationSummaries.get(location.id)
         return summary ? buildLocationEntitySummarySearchText(summary) : location.name
       }}
-      renderItemHeader={(location) => {
-        const summary = pickerLocationSummaries.get(location.id)
-        const isSelected = selectedLocationId === location.id
-        const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
-        const kindAvailable =
-          activeKind != null &&
-          organizationLocationConnectionHasAvailableKind({
-            locationId: location.id,
-            kinds: [activeKind],
-            subjectOrganizationId: organizationId,
-            connections: existingConnections,
-            edgesAtLocation,
-            excludeConnectionId,
-          })
-        const entity = summary
-          ? buildLocationPickerEntitySummary(summary, {
-              imageKey: location.imageKey,
-              description: !kindAvailable ? fullyLinkedReason : undefined,
+      renderEntityRow={createCatalogEntityRowRenderer({
+        buildEntity: (location) => {
+          const summary = pickerLocationSummaries.get(location.id)
+          const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+          const kindAvailable =
+            activeKind != null &&
+            organizationLocationConnectionHasAvailableKind({
+              locationId: location.id,
+              kinds: [activeKind],
+              subjectOrganizationId: organizationId,
+              connections: existingConnections,
+              edgesAtLocation,
+              excludeConnectionId,
             })
-          : {
-              heading: location.name,
-              description: !kindAvailable ? fullyLinkedReason : undefined,
-              media: location.imageKey
-                ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
-                : undefined,
-            }
 
-        return (
-          <EntityItem
-            density="compact"
-            entity={entity}
-            trailing={{
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                  canSelect={kindAvailable}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedLocationId(location.id)}
-                  onRemove={() => setSelectedLocationId(null)}
-                />
-              ),
-            }}
-          />
-        )
-      }}
+          return summary
+            ? buildLocationPickerEntitySummary(summary, {
+                imageKey: location.imageKey,
+                description: !kindAvailable ? fullyLinkedReason : undefined,
+              })
+            : {
+                heading: location.name,
+                description: !kindAvailable ? fullyLinkedReason : undefined,
+                media: location.imageKey
+                  ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
+                  : undefined,
+              }
+        },
+        buildTrailing: (location) => {
+          const isSelected = selectedLocationId === location.id
+          const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+          const kindAvailable =
+            activeKind != null &&
+            organizationLocationConnectionHasAvailableKind({
+              locationId: location.id,
+              kinds: [activeKind],
+              subjectOrganizationId: organizationId,
+              connections: existingConnections,
+              edgesAtLocation,
+              excludeConnectionId,
+            })
+
+          return {
+            kind: 'action',
+            content: (
+              <CatalogPickerSelectionActions
+                phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
+                canSelect={kindAvailable}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => setSelectedLocationId(location.id)}
+                onRemove={() => setSelectedLocationId(null)}
+              />
+            ),
+          }
+        },
+      })}
     />
   )
 }

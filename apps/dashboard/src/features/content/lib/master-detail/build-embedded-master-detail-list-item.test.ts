@@ -25,7 +25,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       deletable: false,
       hasError: false,
       active: true,
-      badges: [{ label: 'System', appearance: 'neutral', tone: 'neutral' }],
+      badges: [{ label: 'System', appearance: 'soft', tone: 'neutral' }],
     })
   })
 

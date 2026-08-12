@@ -36,26 +36,26 @@ describe('equipment-picker-callout-presentation.lib', () => {
       appearance: 'outline',
       tone: 'info',
     })
-  })
-
-  it('maps recommended-source labels to accent-outline informative badges', () => {
     expect(presentationFor(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toEqual({
-      appearance: 'accent-outline',
-      tone: 'info',
-    })
-    expect(presentationFor(EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL)).toEqual({
-      appearance: 'accent-outline',
+      appearance: 'outline',
       tone: 'info',
     })
   })
 
-  it('maps essential blockers to soft informative badges', () => {
-    expect(presentationFor(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toEqual({
+  it('maps mid-tier recommended labels to soft informative badges', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL)).toEqual({
       appearance: 'soft',
+      tone: 'info',
+    })
+  })
+
+  it('maps essential blockers to strong informative badges', () => {
+    expect(presentationFor(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toEqual({
+      appearance: 'strong',
       tone: 'info',
     })
     expect(presentationFor(EQUIPMENT_PICKER_CLASS_TOOL_LABEL)).toEqual({
-      appearance: 'soft',
+      appearance: 'strong',
       tone: 'info',
     })
   })

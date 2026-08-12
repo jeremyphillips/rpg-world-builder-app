@@ -28,7 +28,7 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
               {
                 kind: 'badge',
                 label: PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL,
-                appearance: 'neutral',
+                appearance: 'soft',
                 tone: 'neutral',
                 title: row.staleReason,
               },

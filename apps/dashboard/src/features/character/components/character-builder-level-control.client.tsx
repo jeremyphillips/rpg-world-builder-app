@@ -141,7 +141,7 @@ export function CharacterBuilderLevelControl({
         <Text as="span" variant="muted" className="text-sm">
           {formatFieldMessage(characterBuilderLevelMessages.fieldLabel())}
         </Text>
-        <Badge appearance="neutral" tone="neutral">
+        <Badge appearance="soft" tone="neutral">
           {constraints.fixedLevel ?? draft.class.level}
         </Badge>
         <InfoTooltip

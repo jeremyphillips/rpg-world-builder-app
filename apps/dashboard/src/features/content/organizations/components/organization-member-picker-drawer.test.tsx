@@ -51,19 +51,47 @@ describe('OrganizationMemberPickerDrawer', () => {
     expect(screen.getByText('NPC · Human · Level 3 Rogue')).toBeInTheDocument()
   })
 
-  it('marks existing members with a single status badge and no trailing control', () => {
+  it('marks existing members with a status badge and no trailing control', () => {
     renderPicker()
 
-    const memberRow = screen
+    const titledMemberRow = screen
       .getByText('Circle Envoy')
       .closest('[data-entity-item-slot="content"]')?.parentElement
-    expect(memberRow).toBeTruthy()
+    expect(titledMemberRow).toBeTruthy()
 
-    const statusRow = memberRow!.querySelector('[data-entity-summary-status-row]')
-    expect(statusRow).toBeTruthy()
-    expect(within(statusRow as HTMLElement).getByText('Member')).toBeInTheDocument()
-    expect(memberRow!.querySelector('[data-entity-item-slot="trailing"]')).toBeNull()
+    const titledStatusRow = titledMemberRow!.querySelector('[data-entity-summary-status-row]')
+    expect(titledStatusRow).toBeTruthy()
+    expect(
+      within(titledStatusRow as HTMLElement).getByText('Member · Journeyman'),
+    ).toBeInTheDocument()
+    expect(titledMemberRow!.querySelector('[data-entity-item-slot="trailing"]')).toBeNull()
+
+    const untitledMemberRow = screen
+      .getByText('Silent Partner')
+      .closest('[data-entity-item-slot="content"]')?.parentElement
+    expect(untitledMemberRow).toBeTruthy()
+    expect(
+      within(
+        untitledMemberRow!.querySelector('[data-entity-summary-status-row]') as HTMLElement,
+      ).getByText('Member'),
+    ).toBeInTheDocument()
+
     expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
+  })
+
+  it('lists addable candidates before existing members', () => {
+    renderPicker()
+
+    const verna = screen.getByText('Verna')
+    const circleEnvoy = screen.getByText('Circle Envoy')
+    const silentPartner = screen.getByText('Silent Partner')
+
+    expect(
+      verna.compareDocumentPosition(circleEnvoy) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(
+      verna.compareDocumentPosition(silentPartner) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('expands to configure a title, then stamps title and canonical priority on commit', async () => {

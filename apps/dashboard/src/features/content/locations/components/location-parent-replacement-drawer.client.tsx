@@ -3,22 +3,21 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
+import { Button, SegmentedControl, Text } from '@rpg/ui'
 
 import {
   CatalogPickerSelectionActions,
-  catalogPickerShellProps,
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { EntityItem } from '../../lib/content-entity-card.client'
+import {
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
+} from '../../lib/content-entity-card.client'
 import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import {
-  buildLocationEntitySummarySearchText,
-  type LocationEntitySummaryVm,
-} from '../lib/location-display'
+import { buildLocationEntitySummarySearchText } from '../lib/location-display'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -77,40 +76,6 @@ function resolveContextMismatch(input: {
       subject: input.subject,
       expectedParentLocationId: input.expectedParentLocationId,
     })
-  )
-}
-
-function LocationParentReplacementCandidateRow({
-  summary,
-  selectedParentId,
-  onSelect,
-  onClear,
-}: {
-  summary: LocationEntitySummaryVm
-  selectedParentId: string | null
-  onSelect: (locationId: string) => void
-  onClear: () => void
-}) {
-  const isSelected = selectedParentId === summary.id
-  const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
-
-  return (
-    <EntityItem
-      density="compact"
-      entity={buildLocationPickerEntitySummary(summary, { imageKey: summary.imageKey })}
-      trailing={{
-        kind: 'action',
-        content: (
-          <CatalogPickerSelectionActions
-            phase={phase}
-            canSelect
-            addLabel={isSelected ? 'Selected' : 'Select'}
-            onAdd={() => onSelect(summary.id)}
-            onRemove={onClear}
-          />
-        ),
-      }}
-    />
   )
 }
 
@@ -262,7 +227,7 @@ function LocationParentReplacementDrawerContent({
   }
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={resolveLocationParentReplacementDrawerTitle({
@@ -270,8 +235,6 @@ function LocationParentReplacementDrawerContent({
         mode,
         subjectName: subject.name,
       })}
-      {...catalogPickerShellProps()}
-      rowLayout="entity-card"
       pickerEnabled={pickerEnabled}
       searchPlaceholder={LOCATION_PARENT_REPLACEMENT_DRAWER.searchPlaceholder}
       noResultsMessage={LOCATION_PARENT_REPLACEMENT_DRAWER.noResultsMessage}
@@ -305,14 +268,27 @@ function LocationParentReplacementDrawerContent({
       getItemKey={(summary) => summary.id}
       getItemToolbarLabel={(summary) => summary.name}
       getSearchText={buildLocationEntitySummarySearchText}
-      renderItemHeader={(summary) => (
-        <LocationParentReplacementCandidateRow
-          summary={summary}
-          selectedParentId={selectedParentId}
-          onSelect={setSelectedParentId}
-          onClear={() => setSelectedParentId(null)}
-        />
-      )}
+      renderEntityRow={createCatalogEntityRowRenderer({
+        buildEntity: (summary) =>
+          buildLocationPickerEntitySummary(summary, { imageKey: summary.imageKey }),
+        buildTrailing: (summary) => {
+          const isSelected = selectedParentId === summary.id
+          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+
+          return {
+            kind: 'action',
+            content: (
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => setSelectedParentId(summary.id)}
+                onRemove={() => setSelectedParentId(null)}
+              />
+            ),
+          }
+        },
+      })}
     />
   )
 }

@@ -135,6 +135,29 @@ const dashboardSemanticStyleLayerGuards = {
   },
 }
 
+const dashboardEntityCatalogPickerImportGuard = {
+  files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/lib/entity/catalog-entity-picker-sheet.client.tsx',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['CatalogPickerSheet'],
+            message:
+              'Entity-backed catalog pickers must use CatalogEntityPickerSheet from @/features/content. Raw CatalogPickerSheet is for generic/non-entity catalogs only.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardDragHandleGuard = {
   files: ['src/features/**/*.variants.ts'],
   ignores: [
@@ -159,6 +182,7 @@ export default [
   dashboardStorybookRouterRule,
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,
+  dashboardEntityCatalogPickerImportGuard,
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
 ]

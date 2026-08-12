@@ -3,7 +3,9 @@
 import * as React from 'react'
 import { CircleAlert } from 'lucide-react'
 
-import { CatalogPickerSheet, EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
+import { EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
+
+import { CatalogEntityPickerSheet } from '@/features/content'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 import {
   formatMoney,
@@ -13,7 +15,6 @@ import {
 } from '@rpg/contracts'
 
 import { formatAddContentTypeLabel, getContentTypeItemLabel } from '@/features/content'
-import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
@@ -171,7 +172,7 @@ function EquipmentPickerRowSummary({
   )
 }
 
-/** Equipment catalog drawer — thin wrapper over `CatalogPickerSheet`. */
+/** Equipment catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function EquipmentPickerDrawer({
   open,
   onOpenChange,
@@ -455,12 +456,11 @@ export function EquipmentPickerDrawer({
   }, [])
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={formatAddContentTypeLabel('equipment')}
       description="Search the catalog and add items to your loadout."
-      {...catalogPickerShellProps()}
       items={filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
@@ -539,7 +539,7 @@ export function EquipmentPickerDrawer({
           />
         ),
       }}
-      renderCollapsibleRow={(rowArgs) => {
+      renderEntityRow={(rowArgs) => {
         const item = rowArgs.item
         const rowActionVm = resolveRowVm(item, 1)
         const presentation = resolveEquipmentPickerDrawerItemHeaderPresentation({

@@ -97,7 +97,7 @@ function RemovableChip({
     <span
       className={resolveCompactLabelClassName({
         size,
-        appearance: 'neutral',
+        appearance: 'soft',
         tone: 'neutral',
         filled: true,
         interactive: false,

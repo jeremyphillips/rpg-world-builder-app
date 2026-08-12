@@ -142,7 +142,7 @@ function AcquisitionOwnedSection({
             {owned.heading}
           </Heading>
           {owned.totalQuantity > 0 ? (
-            <Badge appearance="neutral" tone="neutral" size="sm">
+            <Badge appearance="soft" tone="neutral" size="sm">
               {owned.totalQuantity}
             </Badge>
           ) : null}

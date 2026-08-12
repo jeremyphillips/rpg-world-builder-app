@@ -10,7 +10,7 @@ export const VOCABULARY_SOURCE_LABELS = {
 
 export const VOCABULARY_SOURCE_BADGE = {
   system: {
-    appearance: 'neutral',
+    appearance: 'soft',
     tone: 'neutral',
     label: VOCABULARY_SOURCE_LABELS.system,
   },

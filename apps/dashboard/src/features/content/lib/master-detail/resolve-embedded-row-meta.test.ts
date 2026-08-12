@@ -15,7 +15,7 @@ describe('resolveEmbeddedRowMeta', () => {
 
     expect(meta.availability.status).toBe('inactive')
     expect(meta.badges).toEqual([
-      { label: 'System', appearance: 'neutral', tone: 'neutral' },
+      { label: 'System', appearance: 'soft', tone: 'neutral' },
       { label: 'Inactive', appearance: 'outline', tone: 'warning' },
     ])
     expect(meta.deletable).toBe(false)

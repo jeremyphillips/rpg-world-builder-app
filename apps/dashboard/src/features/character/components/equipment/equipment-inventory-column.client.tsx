@@ -43,7 +43,7 @@ export function EquipmentInventoryColumn({
               {title}
             </Heading>
             {titleBadgeCount !== undefined && titleBadgeCount > 0 ? (
-              <Badge appearance="neutral" tone="neutral" size="sm">
+              <Badge appearance="soft" tone="neutral" size="sm">
                 {titleBadgeCount}
               </Badge>
             ) : null}

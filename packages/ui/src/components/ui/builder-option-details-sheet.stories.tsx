@@ -97,7 +97,7 @@ export const SelectedSpecies: Story = {
           open={open}
           onOpenChange={setOpen}
           primaryAction={
-            <Badge appearance="neutral" tone="neutral">
+            <Badge appearance="soft" tone="neutral">
               Selected
             </Badge>
           }

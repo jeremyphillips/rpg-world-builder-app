@@ -6,7 +6,7 @@ describe('character vital presentation', () => {
   it('maps vital statuses to quiet badges', () => {
     expect(resolveCharacterVitalStatusPresentation('alive')).toMatchObject({
       label: 'Alive',
-      appearance: 'neutral',
+      appearance: 'soft',
     })
     expect(resolveCharacterVitalStatusPresentation('deceased')).toMatchObject({
       tone: 'destructive',

@@ -437,7 +437,7 @@ export interface TableBadgeCellProps {
 }
 
 export function TableBadgeCell({
-  appearance = 'neutral',
+  appearance = 'soft',
   tone = 'neutral',
   children,
 }: TableBadgeCellProps) {

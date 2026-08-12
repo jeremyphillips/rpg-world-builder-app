@@ -54,9 +54,11 @@ export {
   type CatalogPickerMetadataLine,
 } from './components/picker/catalog-picker-metadata'
 export { catalogPickerShellProps } from './components/picker/catalog-picker-shell.lib'
+export { compareName, scoreAndFilterPickerItems } from './components/picker/catalog-picker-sort.lib'
 export {
-  CatalogEntityDisclosureRow,
-  createCatalogEntityDisclosureRowRenderer,
+  CatalogEntityRow,
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
 } from '@/features/content'
 export { resolveCatalogPickerRowActionPhase } from './components/picker/catalog-picker-row-action.lib'
 export { CATALOG_PICKER_COMMIT_SUCCESS_MS } from './components/picker/use-catalog-picker-commit-confirmation.client'

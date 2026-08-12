@@ -24,6 +24,9 @@ type Story = StoryObj<typeof OrganizationMemberPickerDrawer>
 
 export const Default: Story = {}
 
+/** Member badges show title suffix when set; untitled memberships show Member only. */
+export const MemberStatusBadges: Story = {}
+
 export const NoCandidates: Story = {
   args: { candidates: [] },
 }

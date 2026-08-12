@@ -14,7 +14,7 @@ export function resolveCharacterRosterStatusPresentation(
 
   switch (status) {
     case 'active':
-      return { label, appearance: 'neutral', tone: 'neutral' }
+      return { label, appearance: 'soft', tone: 'neutral' }
     case 'inactive':
       return { label, appearance: 'outline', tone: 'neutral' }
     case 'retired':

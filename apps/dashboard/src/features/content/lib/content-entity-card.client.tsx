@@ -19,9 +19,11 @@ export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
 export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
 export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.client'
-export { CatalogEntityDisclosureRow } from './entity/catalog-entity-disclosure-row.client'
-export type { CatalogEntityDisclosureRowProps } from './entity/catalog-entity-disclosure-row.client'
-export { createCatalogEntityDisclosureRowRenderer } from './entity/catalog-entity-disclosure-row-renderer.client'
+export { CatalogEntityRow } from './entity/catalog-entity-row.client'
+export type { CatalogEntityRowProps } from './entity/catalog-entity-row.client'
+export { CatalogEntityPickerSheet } from './entity/catalog-entity-picker-sheet.client'
+export type { CatalogEntityPickerSheetProps } from './entity/catalog-entity-picker-sheet.client'
+export { createCatalogEntityRowRenderer } from './entity/catalog-entity-row-renderer.client'
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel

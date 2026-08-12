@@ -40,7 +40,7 @@ export function EquipmentPickerCommerce({
   return (
     <>
       {ownedQuantity > 0 ? (
-        <Badge appearance="neutral" tone="neutral" size="sm">
+        <Badge appearance="soft" tone="neutral" size="sm">
           {ownedQuantity}
         </Badge>
       ) : null}

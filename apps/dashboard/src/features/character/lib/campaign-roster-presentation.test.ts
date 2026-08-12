@@ -6,7 +6,7 @@ describe('campaign roster presentation', () => {
   it('maps roster statuses to quiet badges', () => {
     expect(resolveCharacterRosterStatusPresentation('active')).toMatchObject({
       label: 'Active',
-      appearance: 'neutral',
+      appearance: 'soft',
     })
     expect(resolveCharacterRosterStatusPresentation('inactive')).toMatchObject({
       appearance: 'outline',

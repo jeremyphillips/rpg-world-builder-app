@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -67,14 +67,49 @@ describe('entity item anatomy guard', () => {
     expect(barrelSource).not.toMatch(/EntityDisclosureHeaderAnatomy/)
   })
 
-  it('keeps catalog entity disclosure row on entity-card CLI mode with shared anatomy', () => {
+  it('keeps catalog entity row on entity-card CLI mode with shared anatomy', () => {
     const catalogRowSource = readFileSync(
-      join(ENTITY_ROOT, 'catalog-entity-disclosure-row.client.tsx'),
+      join(ENTITY_ROOT, 'catalog-entity-row.client.tsx'),
       'utf8',
     )
 
     expect(catalogRowSource).toMatch(/rowLayout="entity-card"/)
     expect(catalogRowSource).toMatch(/toolbarLeadingChrome="none"/)
     expect(catalogRowSource).toMatch(/EntityDisclosureHeaderAnatomy/)
+  })
+
+  it('keeps entity-backed catalog pickers on CatalogEntityPickerSheet', () => {
+    const featureRoot = join(ENTITY_ROOT, '../..')
+    const allowlist = new Set([
+      join(ENTITY_ROOT, 'catalog-entity-picker-sheet.client.tsx'),
+      join(ENTITY_ROOT, '../content-entity-card.test.tsx'),
+    ])
+    const entityPickerPattern =
+      /(picker|drawer)\.(client|integration)\.(tsx|ts)$|(picker|drawer)\.client\.(tsx|ts)$/
+
+    function walk(dir: string): string[] {
+      return readdirSync(dir).flatMap((entry) => {
+        const fullPath = join(dir, entry)
+        if (statSync(fullPath).isDirectory()) {
+          return walk(fullPath)
+        }
+        return fullPath.endsWith('.tsx') || fullPath.endsWith('.ts') ? [fullPath] : []
+      })
+    }
+
+    const violations: string[] = []
+
+    for (const filePath of walk(featureRoot)) {
+      if (!entityPickerPattern.test(filePath)) continue
+      if (filePath.includes('.test.') || filePath.includes('.stories.')) continue
+      if (allowlist.has(filePath)) continue
+
+      const source = readFileSync(filePath, 'utf8')
+      if (source.includes("from '@rpg/ui'") && source.match(/CatalogPickerSheet/)) {
+        violations.push(filePath.replace(featureRoot + '/', ''))
+      }
+    }
+
+    expect(violations).toEqual([])
   })
 })

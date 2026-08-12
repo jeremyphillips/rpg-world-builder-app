@@ -189,6 +189,36 @@
   --semantic-destructive-subtle: var(--destructive-subtle);
 
   /*
+   * Badge appearance roles — tone × appearance resolved in badge-appearance.lib.ts.
+   * Light/dark values differ here; Badge uses one stable utility class per role.
+   */
+  --semantic-neutral-soft-bg: var(--semantic-neutral-subtle);
+  --semantic-neutral-soft-foreground: var(--foreground);
+  --semantic-neutral-strong-bg: var(--semantic-neutral-border);
+  --semantic-neutral-strong-foreground: var(--foreground);
+  --semantic-neutral-outline-foreground: var(--foreground);
+  --semantic-info-soft-bg: var(--semantic-info-subtle);
+  --semantic-info-soft-foreground: var(--semantic-info);
+  --semantic-info-strong-bg: var(--semantic-info-border);
+  --semantic-info-strong-foreground: var(--info-foreground);
+  --semantic-info-outline-foreground: var(--foreground);
+  --semantic-success-soft-bg: var(--semantic-success-subtle);
+  --semantic-success-soft-foreground: var(--semantic-success);
+  --semantic-success-strong-bg: var(--semantic-success-border);
+  --semantic-success-strong-foreground: var(--success-foreground);
+  --semantic-success-outline-foreground: var(--foreground);
+  --semantic-warning-soft-bg: var(--semantic-warning-subtle);
+  --semantic-warning-soft-foreground: var(--semantic-warning);
+  --semantic-warning-strong-bg: var(--semantic-warning-border);
+  --semantic-warning-strong-foreground: var(--warning-foreground);
+  --semantic-warning-outline-foreground: var(--foreground);
+  --semantic-destructive-soft-bg: var(--semantic-destructive-subtle);
+  --semantic-destructive-soft-foreground: var(--semantic-destructive-on-subtle);
+  --semantic-destructive-strong-bg: var(--semantic-destructive-border);
+  --semantic-destructive-strong-foreground: var(--destructive-foreground);
+  --semantic-destructive-outline-foreground: var(--foreground);
+
+  /*
    * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
    */
   --choice-control-border: color-mix(

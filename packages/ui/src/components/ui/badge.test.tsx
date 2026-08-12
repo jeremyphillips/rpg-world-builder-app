@@ -22,15 +22,16 @@ describe('Badge', () => {
     )
     const el = screen.getByText('Stale')
     expect(el).toHaveClass(
-      'text-foreground',
+      'text-semantic-warning-outline-foreground',
       'border-semantic-warning-border',
       'border-[1.5px]',
       'font-medium',
+      'h-[22px]',
     )
     expect(el).toHaveClass('text-xs-meta', 'rounded-full')
   })
 
-  it('uses font-medium for filled soft appearance', () => {
+  it('uses token-owned soft destructive foreground', () => {
     render(
       <Badge appearance="soft" tone="destructive">
         Error
@@ -38,14 +39,26 @@ describe('Badge', () => {
     )
     expect(screen.getByText('Error')).toHaveClass(
       'font-medium',
-      'bg-semantic-destructive-subtle',
-      'text-semantic-destructive-on-subtle',
+      'bg-semantic-destructive-soft',
+      'text-semantic-destructive-soft-foreground',
+    )
+  })
+
+  it('uses strong appearance fill roles', () => {
+    render(
+      <Badge appearance="strong" tone="info">
+        Essential
+      </Badge>,
+    )
+    expect(screen.getByText('Essential')).toHaveClass(
+      'bg-semantic-info-strong',
+      'text-semantic-info-strong-foreground',
     )
   })
 
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <Badge appearance="neutral" tone="neutral">
+      <Badge appearance="soft" tone="neutral">
         Homebrew
       </Badge>,
     )

@@ -4,7 +4,7 @@ import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 import { Badge } from '@rpg/ui'
 
 const priorityBadge: Record<TicketPriority, { appearance: BadgeAppearance; tone: BadgeTone }> = {
-  low: { appearance: 'neutral', tone: 'neutral' },
+  low: { appearance: 'soft', tone: 'neutral' },
   medium: { appearance: 'outline', tone: 'neutral' },
   high: { appearance: 'soft', tone: 'info' },
   critical: { appearance: 'soft', tone: 'destructive' },
