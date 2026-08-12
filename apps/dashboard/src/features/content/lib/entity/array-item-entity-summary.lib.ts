@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
 import type { ResolvedArrayItemHeader } from '@rpg/ui/form'
 
+import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import type { EntitySummaryModel } from './entity-summary.types'
 
 /**
@@ -17,7 +17,7 @@ export function projectArrayItemEntitySummary({
   header: ResolvedArrayItemHeader
   summary?: string
   classification?: string
-  status?: readonly ReactNode[]
+  status?: readonly EntitySummaryStatusItem[]
 }): EntitySummaryModel {
   const heading = header.primary ?? header.fallback
   const resolvedClassification =

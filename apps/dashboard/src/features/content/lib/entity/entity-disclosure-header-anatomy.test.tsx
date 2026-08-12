@@ -66,7 +66,7 @@ describe('EntityDisclosureHeaderAnatomy', () => {
         trailing={{
           kind: 'group',
           primary: <button type="button">Add</button>,
-          secondary: '12 gp',
+          secondary: { kind: 'price', label: '12 gp' },
         }}
       />,
     )

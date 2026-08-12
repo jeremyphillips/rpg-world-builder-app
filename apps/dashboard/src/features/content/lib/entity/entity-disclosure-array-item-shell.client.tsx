@@ -2,6 +2,8 @@
 
 import type { ArrayItemShellRenderProps } from '@rpg/ui/form'
 
+import type { ReactElement } from 'react'
+
 import { DisclosureEntityCard } from './disclosure-entity-card.client'
 import { projectArrayItemEntitySummary } from './array-item-entity-summary.lib'
 
@@ -41,7 +43,7 @@ export function EntityDisclosureArrayItemShell({
         itemId={itemId}
         toolbarAriaLabel={header.ariaLabel}
         entity={entity}
-        trailing={action ? { kind: 'action', content: action } : undefined}
+        trailing={action ? { kind: 'action', content: action as ReactElement } : undefined}
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         dragHandleProps={

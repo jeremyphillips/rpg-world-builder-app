@@ -43,7 +43,9 @@ export {
   type DisclosureEntityCardProps,
   type CatalogEntityDisclosureRowProps,
   type EntityItemTrailing,
+  type EntityItemTrailingSecondary,
   type EntitySummaryModel,
+  type EntitySummaryStatusItem,
 } from './lib/content-entity-card.client'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,

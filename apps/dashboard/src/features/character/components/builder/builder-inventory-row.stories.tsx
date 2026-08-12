@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ContentEntityCard } from '@/features/content'
-import { Badge, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action.client'
 
@@ -37,11 +37,7 @@ export const WithMetaAndRemove: Story = {
           Chosen from Rogue Skills
         </Text>
       ),
-      status: [
-        <Badge key="stale" appearance="neutral" tone="neutral" size="sm">
-          Stale
-        </Badge>,
-      ],
+      status: [{ kind: 'badge', label: 'Stale', appearance: 'neutral', tone: 'neutral' }],
     },
     trailing: {
       kind: 'action',

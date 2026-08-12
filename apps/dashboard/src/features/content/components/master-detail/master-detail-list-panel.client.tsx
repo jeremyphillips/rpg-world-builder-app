@@ -20,7 +20,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
-import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
+import { GripVertical, Trash2 } from 'lucide-react'
 
 import { EntityItem } from '../../lib/content-entity-card.client'
 import {
@@ -32,7 +32,7 @@ import {
   masterDetailListRowSurfaceClasses,
 } from './master-detail-list-panel.variants'
 import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
-import { MasterDetailRowBadges } from './master-detail-row-badges.client'
+import { buildMasterDetailRowStatus } from './master-detail-row-badges.client'
 
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
@@ -95,19 +95,7 @@ function MasterDetailListRowStatus({
   hasError,
   badges,
 }: Pick<MasterDetailListItem, 'hasError' | 'badges'>) {
-  if (!hasError && !badges?.length) return null
-
-  return (
-    <span className="flex flex-wrap items-center gap-1">
-      {hasError ? (
-        <>
-          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
-          <span className="sr-only">Has validation errors</span>
-        </>
-      ) : null}
-      {badges?.length ? <MasterDetailRowBadges badges={badges} /> : null}
-    </span>
-  )
+  return buildMasterDetailRowStatus({ hasError, badges })
 }
 
 function masterDetailListRowClassName(
@@ -223,10 +211,7 @@ function MasterDetailListRowContent({
             </button>
           ),
           classification: item.eyebrow,
-          status:
-            item.hasError || item.badges?.length
-              ? [<MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />]
-              : undefined,
+          status: MasterDetailListRowStatus({ hasError: item.hasError, badges: item.badges }),
         }}
       />
     </div>

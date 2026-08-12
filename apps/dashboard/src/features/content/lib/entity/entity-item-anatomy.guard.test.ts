@@ -6,6 +6,11 @@ import { describe, expect, it } from 'vitest'
 const ENTITY_ROOT = join(__dirname)
 
 describe('entity item anatomy guard', () => {
+  it('keeps status row spacing on the canonical lane', () => {
+    const source = readFileSync(join(ENTITY_ROOT, 'entity-item.variants.ts'), 'utf8')
+    expect(source).toMatch(/entityItemStatusRowVariants[\s\S]*mt-1/)
+  })
+
   it('does not assign collection inset on EntityItem root', () => {
     const source = readFileSync(join(ENTITY_ROOT, 'entity-item.variants.ts'), 'utf8')
     expect(source).not.toMatch(/\bpx-\d/)

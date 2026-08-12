@@ -146,7 +146,7 @@ export const PilotInventoryRow: Story = {
           heading: 'Longsword',
           classification: 'Weapon',
           description: 'Martial melee',
-          status: ['Equipped'],
+          status: [{ kind: 'badge', label: 'Equipped', tone: 'success' }],
         }}
         density="compact"
         defaultCollapsed={false}

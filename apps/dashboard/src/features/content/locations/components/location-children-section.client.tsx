@@ -82,8 +82,10 @@ function buildChildRowActions(
     : []
 }
 
+import type { ReactElement } from 'react'
+
 function detailEntityRowActionTrailing(
-  content: React.ReactNode | undefined,
+  content: ReactElement | undefined,
 ): EntityItemTrailing | undefined {
   return content ? { kind: 'action', content } : undefined
 }

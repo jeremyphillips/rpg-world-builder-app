@@ -497,8 +497,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
         contentAvailable: true,
       })
       return {
-        summaryTrailingLabel: row.priceLabel || undefined,
-        summaryTrailingTone: row.priceLabel ? 'default' : undefined,
+        ...(row.priceLabel ? { secondary: { kind: 'price', label: row.priceLabel } } : {}),
         action: action.disabled
           ? ownedQuantity > 0
             ? { kind: 'manage_only' }

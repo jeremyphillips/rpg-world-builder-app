@@ -151,7 +151,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: '50 GP',
+      secondary: { kind: 'price', label: '50 GP' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -165,7 +165,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'Common choice',
+      secondary: { kind: 'grantPreview', label: 'Common choice' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -193,7 +193,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: '50 GP',
+      secondary: { kind: 'price', label: '50 GP' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -221,8 +221,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'No Rare choices',
-      summaryTrailingTone: 'blocked',
+      statusItems: [{ kind: 'badge', label: 'No Rare choices' }],
       action: { kind: 'none' },
     })
   })
@@ -268,8 +267,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'One copy maximum',
-      summaryTrailingTone: 'blocked',
+      statusItems: [{ kind: 'badge', label: 'One copy maximum' }],
       action: { kind: 'manage_only' },
     })
   })

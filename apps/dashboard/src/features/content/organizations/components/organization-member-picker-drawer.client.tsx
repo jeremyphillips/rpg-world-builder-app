@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import {
   CatalogPickerMetadataRenderer,
@@ -208,29 +208,28 @@ export function OrganizationMemberPickerDrawer({
               ) : undefined,
               status: candidate.isMember
                 ? [
-                    <Badge key="member" tone="success">
-                      {ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}
-                    </Badge>,
+                    {
+                      kind: 'badge',
+                      label: ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+                      tone: 'success',
+                    },
                   ]
                 : undefined,
             }}
-            trailing={{
-              kind: 'action',
-              content: candidate.isMember ? (
-                <CatalogPickerSelectionActions
-                  phase="success"
-                  successLabel={ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}
-                  onAdd={() => undefined}
-                  onRemove={() => undefined}
-                />
-              ) : (
-                <CatalogPickerSelectionActions
-                  canSelect
-                  onAdd={() => handleExpandedItemChange(candidate.id)}
-                  onRemove={() => undefined}
-                />
-              ),
-            }}
+            trailing={
+              candidate.isMember
+                ? undefined
+                : {
+                    kind: 'action',
+                    content: (
+                      <CatalogPickerSelectionActions
+                        canSelect
+                        onAdd={() => handleExpandedItemChange(candidate.id)}
+                        onRemove={() => undefined}
+                      />
+                    ),
+                  }
+            }
           />
         )
       }}

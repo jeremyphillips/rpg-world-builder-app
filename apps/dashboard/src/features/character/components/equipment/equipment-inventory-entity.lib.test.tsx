@@ -12,7 +12,9 @@ describe('buildEquipmentInventoryRowEntity', () => {
 
     expect(entity.heading).toBe('Rations')
     expect(entity.description).toBeTruthy()
-    expect(entity.status).toHaveLength(1)
+    expect(entity.status).toEqual([
+      { kind: 'badge', label: 'Equipped', appearance: 'soft', tone: 'success' },
+    ])
   })
 
   it('marks staged removal in the heading', () => {

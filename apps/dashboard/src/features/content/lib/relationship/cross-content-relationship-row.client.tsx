@@ -6,6 +6,7 @@ import { cn } from '@rpg/ui'
 
 import { DetailEntityRow } from '../detail/row/detail-entity-row.client'
 import type { EntityItemTrailing } from '../entity/entity-item-trailing.types'
+import type { EntitySummaryStatusItem } from '../entity/entity-summary-status.types'
 import { detailEntityRowSubheadingVariants } from '../detail/row/detail-entity-row.variants'
 import {
   DetailOverflowMenu,
@@ -22,14 +23,14 @@ export type CrossContentRelationshipRowProps = {
   subheading?: ReactNode
   /** Feature-supplied disambiguation rendered below the heading row. */
   description?: ReactNode
-  /** @deprecated Use status — trailing metadata such as badges. */
-  metadata?: ReactNode
-  /** Trailing metadata such as badges — maps to entity summary `status`. */
-  status?: ReactNode
+  /** @deprecated Use status — entity summary status lane. */
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** Entity summary status lane — badges, annotations, inactive markers. */
+  status?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   /** @deprecated Use description */
   secondaryText?: ReactNode
   /** @deprecated Use status */
-  badge?: ReactNode
+  badge?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
   /**
@@ -40,6 +41,13 @@ export type CrossContentRelationshipRowProps = {
    */
   trailing?: EntityItemTrailing | null
   className?: string
+}
+
+function normalizeRelationshipStatus(
+  status: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[] | undefined,
+): EntitySummaryStatusItem | readonly EntitySummaryStatusItem[] | undefined {
+  if (status == null) return undefined
+  return status
 }
 
 export function CrossContentRelationshipRow({
@@ -59,7 +67,7 @@ export function CrossContentRelationshipRow({
   className,
 }: CrossContentRelationshipRowProps) {
   const resolvedDescription = description ?? secondaryText ?? subheading
-  const resolvedStatus = status ?? badge ?? metadata
+  const resolvedStatus = normalizeRelationshipStatus(status ?? badge ?? metadata)
   const resolvedTrailing =
     trailing !== undefined
       ? (trailing ?? undefined)

@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
 import { CatalogEntityDisclosureRow } from '@/features/content'
@@ -196,30 +196,22 @@ export function OrganizationPickerDrawer({
                   ]}
                 />
               ),
-              status: selected
-                ? [
-                    <Badge key="added" tone="success">
-                      Added
-                    </Badge>,
-                  ]
-                : undefined,
+              status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
             }}
-            trailing={{
-              kind: 'action',
-              content: selected ? (
-                <CatalogPickerSelectionActions
-                  phase="success"
-                  onAdd={() => undefined}
-                  onRemove={() => undefined}
-                />
-              ) : (
-                <CatalogPickerSelectionActions
-                  canSelect
-                  onAdd={() => handleExpandedItemChange(organization.id)}
-                  onRemove={() => undefined}
-                />
-              ),
-            }}
+            trailing={
+              selected
+                ? undefined
+                : {
+                    kind: 'action',
+                    content: (
+                      <CatalogPickerSelectionActions
+                        canSelect
+                        onAdd={() => handleExpandedItemChange(organization.id)}
+                        onRemove={() => undefined}
+                      />
+                    ),
+                  }
+            }
           />
         )
       }}

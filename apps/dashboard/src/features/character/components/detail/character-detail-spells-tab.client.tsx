@@ -53,12 +53,18 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
         heading: header.name,
         description: <CatalogMetadataRenderer lines={header.metadataLines} />,
         status: [
-          ...header.markers,
+          ...header.markers.map((marker) => ({
+            kind: 'text' as const,
+            label: marker,
+            variant: 'muted' as const,
+          })),
           ...(header.footerLabels.length > 0
             ? [
-                <Text key="source" variant="muted">
-                  {header.footerLabels.join(' · ')}
-                </Text>,
+                {
+                  kind: 'text' as const,
+                  label: header.footerLabels.join(' · '),
+                  variant: 'muted' as const,
+                },
               ]
             : []),
         ],

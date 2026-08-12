@@ -8,8 +8,6 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
-
 import { ContentEntityCard, DisclosureEntityCard } from '@/features/content'
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
@@ -29,7 +27,6 @@ import {
   resolveDistinctAcquisitionSourceKinds,
   usesInlineManagement,
 } from './equipment-inventory-manage.lib'
-import { equipmentInventoryRowQtyLabelClasses } from './equipment-inventory-summary.variants'
 
 export type EquipmentAddedInventoryRowItemProps = {
   entry: AddedEquipmentEntryViewModel
@@ -132,11 +129,9 @@ function ManagedInventoryRow({
       })}
       trailing={{
         kind: 'indicator',
-        content: (
-          <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-            Qty {totalQuantity}
-          </Text>
-        ),
+        variant: 'quantity',
+        quantity: totalQuantity,
+        format: 'label',
       }}
       collapsed={!isOpen}
       onToggleCollapse={handleToggleCollapse}

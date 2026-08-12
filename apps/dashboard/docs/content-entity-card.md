@@ -337,13 +337,26 @@ offset system.
 
 ## Trailing kinds
 
-Entity surfaces use one trailing seam:
+Entity surfaces use one trailing seam with **closed types** — no arbitrary strings or
+free-form `ReactNode` slots:
 
-| Kind        | Use                                               |
-| ----------- | ------------------------------------------------- |
-| `action`    | Add, delete, overflow, selection controls         |
-| `indicator` | Destination chevrons, quiet `×qty` labels         |
-| `group`     | Commerce stacks (qty + Add, secondary price/meta) |
+```text
+trailing
+├── action      → ReactElement control only
+├── indicator   → chevron | quantity variants
+└── group
+    ├── primary   → ReactElement control composition
+    └── secondary → price | quantity | grantPreview metadata variants
+```
+
+| Kind        | Type contract                                   | Use                                              |
+| ----------- | ----------------------------------------------- | ------------------------------------------------ |
+| `action`    | `content: ReactElement`                         | Add, delete, overflow, selection controls        |
+| `indicator` | `variant: 'chevron' \| 'quantity'`              | Destination chevrons, quiet qty labels           |
+| `group`     | `primary: ReactElement`, structured `secondary` | Commerce stacks (qty + Add, price/grant preview) |
+
+**Status and classification never use trailing.** Role labels (`Member`), availability
+(`Unavailable`), and callouts (`Spellcasting focus`) belong in `EntitySummary.status`.
 
 There is no parallel `action` + `endSlot` + feature-specific trailing sibling on entity
 surfaces. A destination chevron is an `indicator`, not an `action`. Whole-row navigation
@@ -355,6 +368,29 @@ trailing-rail value and must not be right-aligned via title `flex-1`, percentage
 caps, or `ml-auto`. The title may shrink and truncate when the content column is narrow,
 but must not grow solely to push classification away from the name. `EntitySummary`'s outer
 `flex-1` fills EntityItem column 2; mixed-heading title growth is separate and forbidden.
+
+---
+
+## EntitySummary status lane
+
+```text
+EntitySummary
+├── heading row → heading · classification
+├── description
+└── status row (mt-1)
+    └── EntitySummaryStatusItem[]
+```
+
+`EntitySummaryModel.status` accepts structured `EntitySummaryStatusItem` values only:
+
+| Kind              | Use                                                                 |
+| ----------------- | ------------------------------------------------------------------- |
+| `badge`           | Discrete state / callout — Member, Equipped, Spellcasting focus     |
+| `text`            | Supporting annotation — ritual markers, disabled notes (not a dump) |
+| `inactive`        | Circle-slash inactive metadata (search unavailable rows)            |
+| `validationError` | Master-detail validation indicator                                  |
+
+EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
 
 ---
 
@@ -391,7 +427,9 @@ prevent regression:
 | `grant-array-disclosure-shell.test.tsx`  | Grant integration: DEC alignment, no CLI `content-column-indent`         |
 | `collapsible-list-item.variants.test.ts` | Entity-card body classes exclude legacy inset                            |
 | `content-card.variants.test.ts`          | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks |
-| `entity-summary.test.tsx`                | Classification stays adjacent; outer summary `flex-1` preserved          |
+| `entity-summary.test.tsx`                | Classification adjacent; status lane spacing and density-sized badges    |
+| `entity-summary-status.type.test.ts`     | Status prop is structured data, not ReactNode                            |
+| `entity-item-trailing.type.test.ts`      | Trailing action/group primary require ReactElement; closed secondary     |
 | AGENTS.md component rule                 | No consumer padding overrides on entity surfaces                         |
 
 ---

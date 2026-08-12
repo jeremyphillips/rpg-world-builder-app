@@ -10,7 +10,11 @@ import type { EntityItemTrailing } from './entity/entity-item-trailing.types'
 import type { EntitySummaryModel } from './entity/entity-summary.types'
 
 export type { EntitySummaryModel } from './entity/entity-summary.types'
-export type { EntityItemTrailing } from './entity/entity-item-trailing.types'
+export type { EntitySummaryStatusItem } from './entity/entity-summary-status.types'
+export type {
+  EntityItemTrailing,
+  EntityItemTrailingSecondary,
+} from './entity/entity-item-trailing.types'
 export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
 export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'

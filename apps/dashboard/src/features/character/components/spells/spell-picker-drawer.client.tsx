@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
+import { CatalogPickerSheet, SegmentedControl } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
@@ -378,14 +378,23 @@ export function SpellPickerDrawer({
               />
             ),
             status: [
-              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
-              ...markers,
-              ...(disabledNote
+              ...(recommendationsEnabled && item.state.isRecommended
                 ? [
-                    <Text key="disabled-note" variant="muted">
-                      {disabledNote}
-                    </Text>,
+                    {
+                      kind: 'badge' as const,
+                      label: 'Recommended',
+                      appearance: 'outline' as const,
+                      tone: 'info' as const,
+                    },
                   ]
+                : []),
+              ...markers.map((marker) => ({
+                kind: 'text' as const,
+                label: marker,
+                variant: 'muted' as const,
+              })),
+              ...(disabledNote
+                ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
                 : []),
             ],
           }

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, Text } from '@rpg/ui'
+import { CatalogPickerSheet } from '@rpg/ui'
 
 import { createCatalogEntityDisclosureRowRenderer } from '@/features/content'
 
@@ -164,11 +164,7 @@ export function ProficiencyPickerDrawer({
               />
             ) : undefined,
             status: disabledNote
-              ? [
-                  <Text key="disabled-note" variant="muted">
-                    {disabledNote}
-                  </Text>,
-                ]
+              ? [{ kind: 'text', label: disabledNote, variant: 'muted' }]
               : undefined,
           }
         },

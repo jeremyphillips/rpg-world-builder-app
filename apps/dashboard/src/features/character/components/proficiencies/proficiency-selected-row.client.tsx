@@ -1,7 +1,7 @@
 'use client'
 
 import type { ProficiencyChoiceSelectedRow } from '@rpg/contracts'
-import { Badge, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
@@ -25,15 +25,13 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
         ) : undefined,
         status: row.isStale
           ? [
-              <Badge
-                key="stale"
-                appearance="neutral"
-                tone="neutral"
-                size="sm"
-                title={row.staleReason}
-              >
-                {PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL}
-              </Badge>,
+              {
+                kind: 'badge',
+                label: PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL,
+                appearance: 'neutral',
+                tone: 'neutral',
+                title: row.staleReason,
+              },
             ]
           : undefined,
       }}

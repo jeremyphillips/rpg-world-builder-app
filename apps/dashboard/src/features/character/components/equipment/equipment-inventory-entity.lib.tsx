@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { Badge, Text } from '@rpg/ui'
+import { Text } from '@rpg/ui'
 
 import type { EntitySummaryModel } from '@/features/content'
 import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
@@ -34,13 +34,16 @@ function resolveInventoryDescription(detailLabel?: string): ReactNode | undefine
   )
 }
 
-function resolveEquippedStatus(equipped: boolean): readonly ReactNode[] | undefined {
+function resolveEquippedStatus(equipped: boolean) {
   if (!equipped) return undefined
 
   return [
-    <Badge key="equipped" appearance="soft" tone="success" size="sm">
-      Equipped
-    </Badge>,
+    {
+      kind: 'badge' as const,
+      label: 'Equipped',
+      appearance: 'soft' as const,
+      tone: 'success' as const,
+    },
   ]
 }
 

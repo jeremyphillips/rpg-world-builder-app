@@ -4,11 +4,11 @@ import type { ReactNode } from 'react'
 import { ContentCardHeading, type ContentCardDensity } from '@rpg/ui'
 
 import type { EntitySummaryModel } from './entity-summary.types'
+import { EntitySummaryStatusItemView } from './entity-summary-status.client'
 import {
   entityItemStatusRowVariants,
   entitySummaryDescriptionVariants,
   entitySummaryHeadingBandVariants,
-  entitySummaryStatusVariants,
 } from './entity-item.variants'
 
 const CLASSIFICATION_SEPARATOR = ' · ' as const
@@ -66,11 +66,9 @@ export function EntitySummary({
         <div className={entitySummaryDescriptionVariants({ density })}>{entity.description}</div>
       ) : null}
       {entity.status && entity.status.length > 0 ? (
-        <div className={entityItemStatusRowVariants()}>
+        <div className={entityItemStatusRowVariants()} data-entity-summary-status-row>
           {entity.status.map((status, index) => (
-            <div key={index} className={entitySummaryStatusVariants({ density })}>
-              {status}
-            </div>
+            <EntitySummaryStatusItemView key={index} item={status} density={density} />
           ))}
         </div>
       ) : null}

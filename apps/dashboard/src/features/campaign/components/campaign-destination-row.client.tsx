@@ -1,16 +1,11 @@
 'use client'
 
 import type { CampaignListItem } from '@rpg/contracts'
-import { Badge } from '@rpg/ui'
-import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { EntityItem } from '@/features/content'
 
-import {
-  campaignDestinationChevronClasses,
-  campaignDestinationRowVariants,
-} from './campaign-destination.variants'
+import { campaignDestinationRowVariants } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../lib/campaign-display'
 import {
   resolveCampaignEntryDestination,
@@ -53,17 +48,10 @@ export function CampaignDestinationRow({
           description: destination.supportingCopy,
           status:
             badgeLabel && badgeTone
-              ? [
-                  <Badge appearance="outline" tone={badgeTone} size="sm">
-                    {badgeLabel}
-                  </Badge>,
-                ]
+              ? [{ kind: 'badge', label: badgeLabel, appearance: 'outline', tone: badgeTone }]
               : undefined,
         }}
-        trailing={{
-          kind: 'indicator',
-          content: <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />,
-        }}
+        trailing={{ kind: 'indicator', variant: 'chevron' }}
       />
     </Link>
   )

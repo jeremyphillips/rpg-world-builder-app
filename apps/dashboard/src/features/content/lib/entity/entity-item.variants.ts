@@ -65,4 +65,4 @@ export const entitySummaryDescriptionVariants = supportingTextDensityVariants
 
 export const entitySummaryStatusVariants = supportingTextDensityVariants
 
-export const entityItemStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
+export const entityItemStatusRowVariants = cva('mt-1 flex min-w-0 flex-wrap gap-x-2 gap-y-1')

@@ -1,20 +1,16 @@
 'use client'
 
 import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
-import { Check, TriangleAlert } from 'lucide-react'
 
-import { Badge } from '@rpg/ui'
-
-import { buildEquipmentPickerRowViewModel } from '@/features/content'
+import { buildEquipmentPickerRowViewModel, CatalogEntityDisclosureRow } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
-import { CatalogEntityDisclosureRow } from '@/features/content'
 import {
   CatalogPickerMetadataRenderer,
   mapEquipmentCompactSummaryToMetadataLines,
 } from '../picker/catalog-picker-metadata'
 import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
-import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
+import { buildEquipmentPickerEntityStatus } from './equipment-picker-callout-presentation.lib'
 import { getEquipmentPickerCallout } from './equipment-picker-callout.lib'
 import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
 import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
@@ -64,7 +60,7 @@ export function EquipmentPickerDisclosureRow({
               onAdd={() => commitQuantity(1)}
             />
           ),
-          secondary: presentation.summaryTrailingLabel,
+          secondary: presentation.secondary,
         }
       : undefined
 
@@ -88,36 +84,12 @@ export function EquipmentPickerDisclosureRow({
             })}
           />
         ),
-        status: [
-          ...(callout ? [<EquipmentPickerCalloutBadge key="callout" callout={callout} />] : []),
-        ],
+        status: buildEquipmentPickerEntityStatus({
+          callout,
+          statusItems: presentation.statusItems,
+        }),
       }}
       trailing={trailing}
     />
-  )
-}
-
-function EquipmentPickerCalloutBadge({
-  callout,
-}: {
-  callout: NonNullable<ReturnType<typeof getEquipmentPickerCallout>>
-}) {
-  const presentation = getEquipmentCalloutPresentation(callout)
-  const leadingIcon =
-    presentation.leadingIcon === 'check' ? (
-      <Check aria-hidden />
-    ) : presentation.leadingIcon === 'warning' ? (
-      <TriangleAlert aria-hidden />
-    ) : undefined
-
-  return (
-    <Badge
-      appearance={presentation.appearance}
-      tone={presentation.tone}
-      size={presentation.size}
-      leadingIcon={leadingIcon}
-    >
-      {callout.label}
-    </Badge>
   )
 }

@@ -9,6 +9,7 @@ import { detailSectionGroupHeaderVariants } from '../detail/section/detail-secti
 import { detailRowListSeparatorVariants } from '../detail/section/detail-row-list.variants'
 import type { DetailOverflowAction } from '../detail/row/detail-overflow-menu.client'
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
+import type { EntitySummaryStatusItem } from '../entity/entity-summary-status.types'
 import {
   relationshipListEmptyVariants,
   relationshipListFooterVariants,
@@ -40,12 +41,12 @@ export type RelationshipListRowProps = {
   classification?: ReactNode
   /** Feature-supplied disambiguation below the title — maps to entity summary `description`. */
   description?: ReactNode
-  /** Trailing metadata such as badges — maps to entity summary `status`. */
-  status?: ReactNode
+  /** Entity summary status lane — badges, annotations, inactive markers. */
+  status?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   /** @deprecated Use `status` */
-  badge?: ReactNode
+  badge?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   /** @deprecated Use `status` */
-  metadata?: ReactNode
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   menu?: {
     label: string
     items: readonly RelationshipRowMenuItem[]

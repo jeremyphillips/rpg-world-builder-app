@@ -6,7 +6,7 @@ import {
   formatViewerCharacterRelationshipTooltip,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { InlineInactiveStatus, cn, interactiveFocusVariants } from '@rpg/ui'
+import { cn, interactiveFocusVariants } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
@@ -82,7 +82,7 @@ export function SearchResultRow({
             classification: typeLabel,
             description: secondary || undefined,
             status: campaignUnavailable
-              ? [<InlineInactiveStatus label={INACTIVE_ROW_BADGE_LABEL} />]
+              ? [{ kind: 'inactive', label: INACTIVE_ROW_BADGE_LABEL }]
               : undefined,
           }}
           trailing={

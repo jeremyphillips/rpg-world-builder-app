@@ -40,7 +40,6 @@ import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filt
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
-import { CharacterEquipmentQuantityLabel } from '../equipment/character-equipment-quantity-label.client'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls.client'
 
 export type CharacterDetailEquipmentTabProps = {
@@ -67,16 +66,14 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
         description: <CatalogMetadataRenderer lines={header.metadataLines} />,
         status:
           footerLabels.length > 0
-            ? [
-                <Text key="source" variant="muted">
-                  {footerLabels.join(' · ')}
-                </Text>,
-              ]
+            ? [{ kind: 'text', label: footerLabels.join(' · '), variant: 'muted' }]
             : undefined,
       }}
       trailing={{
         kind: 'indicator',
-        content: <CharacterEquipmentQuantityLabel quantity={card.quantity} />,
+        variant: 'quantity',
+        quantity: card.quantity,
+        format: 'compact',
       }}
       density="compact"
       disabled={header.tone !== 'default'}

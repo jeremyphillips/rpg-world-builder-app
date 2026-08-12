@@ -6,6 +6,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 
 import { EntityItemAnatomy } from '../../entity/entity-item.client'
+import type { EntitySummaryStatusItem } from '../../entity/entity-summary-status.types'
 import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
 import { buildEntityContentOffsetStyle } from '../../entity/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
@@ -29,7 +30,7 @@ export type DetailEntityRowProps = {
   /** Muted classification text rendered inline after the heading (includes leading separator). */
   headingSuffix?: ReactNode
   subheading?: ReactNode
-  metadata?: ReactNode
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   trailing?: EntityItemTrailing
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure

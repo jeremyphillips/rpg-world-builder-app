@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -51,10 +51,18 @@ describe('OrganizationMemberPickerDrawer', () => {
     expect(screen.getByText('NPC · Human · Level 3 Rogue')).toBeInTheDocument()
   })
 
-  it('marks existing members and offers no add affordance for them', () => {
+  it('marks existing members with a single status badge and no trailing control', () => {
     renderPicker()
 
-    expect(screen.getAllByText('Member').length).toBeGreaterThan(0)
+    const memberRow = screen
+      .getByText('Circle Envoy')
+      .closest('[data-entity-item-slot="content"]')?.parentElement
+    expect(memberRow).toBeTruthy()
+
+    const statusRow = memberRow!.querySelector('[data-entity-summary-status-row]')
+    expect(statusRow).toBeTruthy()
+    expect(within(statusRow as HTMLElement).getByText('Member')).toBeInTheDocument()
+    expect(memberRow!.querySelector('[data-entity-item-slot="trailing"]')).toBeNull()
     expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
   })
 

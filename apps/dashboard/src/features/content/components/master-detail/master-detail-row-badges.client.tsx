@@ -1,21 +1,32 @@
-import { Badge } from '@rpg/ui'
+import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
-import type { MasterDetailListBadge } from './master-detail-list-panel.client'
+import type { EntitySummaryStatusItem } from '../../lib/entity/entity-summary-status.types'
 
-export interface MasterDetailRowBadgesProps {
-  badges: MasterDetailListBadge[]
+export interface MasterDetailListBadge {
+  label: string
+  appearance: BadgeAppearance
+  tone: BadgeTone
 }
 
-export function MasterDetailRowBadges({ badges }: MasterDetailRowBadgesProps) {
-  if (!badges.length) return null
+export function mapMasterDetailBadgesToStatus(
+  badges: readonly MasterDetailListBadge[],
+): EntitySummaryStatusItem[] {
+  return badges.map((badge) => ({
+    kind: 'badge',
+    label: badge.label,
+    appearance: badge.appearance,
+    tone: badge.tone,
+  }))
+}
 
-  return (
-    <span className="mt-1 flex flex-wrap items-center gap-1">
-      {badges.map((badge) => (
-        <Badge key={badge.label} appearance={badge.appearance} tone={badge.tone} size="sm">
-          {badge.label}
-        </Badge>
-      ))}
-    </span>
-  )
+export function buildMasterDetailRowStatus(args: {
+  hasError?: boolean
+  badges?: readonly MasterDetailListBadge[]
+}): EntitySummaryStatusItem[] | undefined {
+  const items: EntitySummaryStatusItem[] = [
+    ...(args.hasError ? [{ kind: 'validationError' as const }] : []),
+    ...(args.badges ? mapMasterDetailBadgesToStatus(args.badges) : []),
+  ]
+
+  return items.length > 0 ? items : undefined
 }

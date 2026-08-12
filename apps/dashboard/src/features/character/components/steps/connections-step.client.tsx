@@ -10,7 +10,7 @@ import {
   type CharacterOrganizationConnection,
 } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Badge, Button, InsetPanel, Text } from '@rpg/ui'
+import { Button, InsetPanel, Text } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
@@ -120,17 +120,15 @@ export function ConnectionsStep({
 
             const status = [
               ...(secondary
-                ? [
-                    <Text key="secondary" as="span" variant="muted">
-                      {secondary}
-                    </Text>,
-                  ]
+                ? [{ kind: 'text' as const, label: secondary, variant: 'muted' as const }]
                 : []),
               ...(unavailable
                 ? [
-                    <Badge key="unavailable" tone="warning">
-                      {organization ? 'Unavailable' : 'Missing organization'}
-                    </Badge>,
+                    {
+                      kind: 'badge' as const,
+                      label: organization ? 'Unavailable' : 'Missing organization',
+                      tone: 'warning' as const,
+                    },
                   ]
                 : []),
             ]

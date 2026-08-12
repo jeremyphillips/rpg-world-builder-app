@@ -1,12 +1,8 @@
 'use client'
 
-import { Check, TriangleAlert } from 'lucide-react'
-
-import { Badge } from '@rpg/ui'
-
 import { EntityItem, type EntityItemTrailing } from '@/features/content'
 
-import { getEquipmentCalloutPresentation } from '../../components/equipment/equipment-picker-callout-presentation.lib'
+import { mapEquipmentCalloutToStatusItem } from '../../components/equipment/equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from '../../components/equipment/equipment-picker-drawer.types'
 
 import {
@@ -19,27 +15,6 @@ import type {
   QuickNpcSpellRequirementOption,
   QuickNpcWeaponRequirementOption,
 } from '../lib/quick-npc-requirement-options.lib'
-
-function RequirementCalloutBadge({ callout }: { callout: EquipmentPickerCallout }) {
-  const presentation = getEquipmentCalloutPresentation(callout)
-  const leadingIcon =
-    presentation.leadingIcon === 'check' ? (
-      <Check aria-hidden />
-    ) : presentation.leadingIcon === 'warning' ? (
-      <TriangleAlert aria-hidden />
-    ) : undefined
-
-  return (
-    <Badge
-      appearance={presentation.appearance}
-      tone={presentation.tone}
-      size={presentation.size}
-      leadingIcon={leadingIcon}
-    >
-      {callout.label}
-    </Badge>
-  )
-}
 
 function RequirementPreviewCard({
   projection,
@@ -55,7 +30,7 @@ function RequirementPreviewCard({
       entity={{
         heading: projection.title,
         description: projection.description,
-        status: callout ? [<RequirementCalloutBadge callout={callout} />] : undefined,
+        status: callout ? [mapEquipmentCalloutToStatusItem(callout)] : undefined,
       }}
       trailing={trailing}
       density="compact"

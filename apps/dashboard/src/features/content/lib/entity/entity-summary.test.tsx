@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { EntityItemAnatomy } from './entity-item.client'
 import { EntitySummary } from './entity-summary.client'
 
 describe('EntitySummary mixed heading', () => {
@@ -55,5 +56,75 @@ describe('EntitySummary mixed heading', () => {
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(screen.getByText('Spell')).toBeInTheDocument()
     expect(container.querySelector('[class*="max-w-"]')).toBeNull()
+  })
+})
+
+describe('EntitySummary status lane', () => {
+  it('renders compact status badges at sm density with canonical row spacing', () => {
+    const { container } = render(
+      <EntitySummary
+        density="compact"
+        entity={{
+          heading: 'Amulet',
+          classification: 'Adventuring Gear',
+          description: 'Holy symbol',
+          status: [{ kind: 'badge', label: 'Spellcasting focus', appearance: 'accent-outline' }],
+        }}
+      />,
+    )
+
+    const statusRow = container.querySelector('[data-entity-summary-status-row]')
+    expect(statusRow).toHaveClass('mt-1')
+    expect(screen.getByText('Spellcasting focus').className).toMatch(/text-xs-meta/)
+  })
+
+  it('renders comfortable status badges at md density', () => {
+    render(
+      <EntitySummary
+        density="comfortable"
+        entity={{
+          heading: 'Amulet',
+          status: [{ kind: 'badge', label: 'Equipped', tone: 'success' }],
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Equipped').className).toMatch(/text-sm-meta/)
+  })
+
+  it('renders status below heading when description is absent', () => {
+    const { container } = render(
+      <EntitySummary
+        entity={{
+          heading: 'Brock',
+          status: [{ kind: 'badge', label: 'Member', tone: 'success' }],
+        }}
+      />,
+    )
+
+    expect(container.querySelector('[data-entity-summary-status-row]')).toHaveClass('mt-1')
+    expect(screen.getByText('Member')).toBeInTheDocument()
+  })
+
+  it('keeps status in the summary column when trailing action is present', () => {
+    render(
+      <EntityItemAnatomy
+        density="compact"
+        entity={{
+          heading: 'Amulet',
+          classification: 'Adventuring Gear',
+          description: 'Holy symbol',
+          status: [{ kind: 'badge', label: 'Spellcasting focus' }],
+        }}
+        trailing={{
+          kind: 'action',
+          content: <button type="button">Add</button>,
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Spellcasting focus')).toBeInTheDocument()
+    expect(document.querySelector('[data-entity-summary-status-row]')).toBeTruthy()
+    expect(document.querySelector('[data-entity-item-slot="trailing"]')).toBeTruthy()
   })
 })
