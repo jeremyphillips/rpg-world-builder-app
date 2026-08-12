@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, SegmentedControl, Text } from '@rpg/ui'
+import { CatalogPickerSheet, SegmentedControl } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
@@ -11,7 +11,10 @@ import {
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
-import { SpellCatalogItemHeader } from '@/features/content'
+import {
+  createCatalogEntityDisclosureRowRenderer,
+  CatalogMetadataRenderer,
+} from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
@@ -27,7 +30,6 @@ import {
   formatSpellPickerSelectionMetadata,
   getSpellPickerDisabledNote,
   itemsForSpellPickerMode,
-  isSpellPickerRowDimmed,
   resolveActivePreparedLevelSuffix,
   resolveInitialSpellPickerMode,
   resolveSpellPickerEmptyStateKind,
@@ -363,31 +365,52 @@ export function SpellPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
-        const disabledNote = getSpellPickerDisabledNote(item)
-        const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
+      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+        buildEntity: (item) => {
+          const disabledNote = getSpellPickerDisabledNote(item)
+          const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
-        return (
-          <SpellCatalogItemHeader
-            name={item.spell.name}
-            metadataLines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
-            markers={[
-              ...(recommendationsEnabled && item.state.isRecommended ? ['Recommended'] : []),
-              ...markers,
-            ]}
-            tone={isSpellPickerRowDimmed(item) ? 'muted' : 'default'}
-            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
-            actions={
-              <CatalogPickerSelectionActions
-                selected={item.state.isAlreadySelected}
-                canSelect={item.state.canSelect}
-                onAdd={() => onSelectSpell(mode, item.spell.id)}
-                onRemove={() => onRemoveSpell(mode, item.spell.id)}
+          return {
+            heading: item.spell.name,
+            description: (
+              <CatalogMetadataRenderer
+                lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
               />
-            }
-          />
-        )
-      }}
+            ),
+            status: [
+              ...(recommendationsEnabled && item.state.isRecommended
+                ? [
+                    {
+                      kind: 'badge' as const,
+                      label: 'Recommended',
+                      appearance: 'outline' as const,
+                      tone: 'info' as const,
+                    },
+                  ]
+                : []),
+              ...markers.map((marker) => ({
+                kind: 'text' as const,
+                label: marker,
+                variant: 'muted' as const,
+              })),
+              ...(disabledNote
+                ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
+                : []),
+            ],
+          }
+        },
+        buildTrailing: (item) => ({
+          kind: 'action',
+          content: (
+            <CatalogPickerSelectionActions
+              selected={item.state.isAlreadySelected}
+              canSelect={item.state.canSelect}
+              onAdd={() => onSelectSpell(mode, item.spell.id)}
+              onRemove={() => onRemoveSpell(mode, item.spell.id)}
+            />
+          ),
+        }),
+      })}
       renderItemDetails={(item) => (
         <SpellPickerItemDetails item={item} displayVocabulary={displayVocabulary} />
       )}

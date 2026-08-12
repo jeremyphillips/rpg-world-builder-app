@@ -43,10 +43,16 @@ export {
 export type {
   CollapsibleListItemCollapseButtonProps,
   CollapsibleListItemDragHandleProps,
+  CollapsibleListItemToolbarLeadingChromePlacement,
   CollapsibleListItemToolbarProps,
 } from './collapsible-list-item-toolbar.client'
 
-export { CollapsibleListItem, CollapsibleListItemBody } from './collapsible-list-item.client'
+export {
+  CollapsibleListItem,
+  CollapsibleListItemBody,
+  CollapsibleListItemDisclosureTrigger,
+  CollapsibleListItemDragHandleTrigger,
+} from './collapsible-list-item.client'
 export type {
   CollapsibleListItemBodyProps,
   CollapsibleListItemDragHandleConfig,

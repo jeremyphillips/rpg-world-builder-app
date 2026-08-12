@@ -97,6 +97,7 @@ describe('GlobalSearchGroupSection', () => {
     expect(list?.className).not.toContain('px-3')
     expect(row).toHaveClass(globalSearchGroupContentInsetClasses)
     expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('page'))
+    expect(row).toHaveClass('py-3')
   })
 
   it('uses muted headings and hover on preview surface context', () => {
@@ -108,12 +109,16 @@ describe('GlobalSearchGroupSection', () => {
       },
     ]
 
-    const { container } = renderSection(sections[0]!, 0, sections, { surfaceContext: 'preview' })
+    const { container } = renderSection(sections[0]!, 0, sections, {
+      surfaceContext: 'preview',
+      rowDensity: 'compact',
+    })
     const heading = container.querySelector('section > div')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
     expect(heading).toHaveClass(resolveGlobalSearchHeadingSurfaceClasses('preview'))
     expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('preview'))
+    expect(row).toHaveClass('py-2')
   })
 
   it('adds first-heading top inset in parity with preview groups', () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useId } from 'react'
+import { useCallback } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -14,19 +14,13 @@ import {
   resolveEquipmentAcquisitionBuilderContext,
   standardStartingWealthTableId,
 } from '@rpg/contracts'
-import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@rpg/ui'
 
-import {
-  EQUIPMENT_INVENTORY_MANAGE_LABEL,
-  type EquipmentInventoryRow,
-} from '../../lib/equipment/equipment-step.lib'
+import { DisclosureEntityCard } from '@/features/content'
+import { type EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from './equipment-inventory-summary.lib'
 import type { EquipmentOwnedSourceAction } from './equipment-acquisition-panel.lib'
 import { EquipmentAcquisitionPanelBody } from './equipment-acquisition-panel-body.client'
-import {
-  equipmentInventoryManagePanelContentClasses,
-  equipmentInventoryManagePanelRootClasses,
-} from './equipment-inventory-manage-panel.variants'
+import { buildEquipmentInventoryRowEntity } from './equipment-inventory-entity.lib'
 import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
 
 export type EquipmentInventoryManagePanelBodyProps = {
@@ -99,45 +93,42 @@ export function EquipmentInventoryManagePanelBody({
   )
 }
 
-export type EquipmentInventoryManagePanelProps = EquipmentInventoryManagePanelBodyProps & {
+export type EquipmentInventoryManageDisclosureCardProps = EquipmentInventoryManagePanelBodyProps & {
   equipmentName: string
+  provenanceLabel?: string
+  itemId: string
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+  defaultCollapsed?: boolean
 }
 
-export function EquipmentInventoryManagePanel({
-  equipmentName: _equipmentName,
-  ...props
-}: EquipmentInventoryManagePanelProps) {
-  const contentId = useId()
-
+export function EquipmentInventoryManageDisclosureCard({
+  equipmentName,
+  provenanceLabel,
+  itemId,
+  collapsed,
+  onToggleCollapse,
+  defaultCollapsed = true,
+  equipment,
+  rows,
+  ...bodyProps
+}: EquipmentInventoryManageDisclosureCardProps) {
   return (
-    <Collapsible className={equipmentInventoryManagePanelRootClasses}>
-      <CollapsibleTrigger asChild>
-        <Button type="button" size="sm" variant="secondary">
-          {EQUIPMENT_INVENTORY_MANAGE_LABEL}
-        </Button>
-      </CollapsibleTrigger>
-      <CollapsibleContent id={contentId} className={equipmentInventoryManagePanelContentClasses}>
-        <EquipmentInventoryManagePanelBody {...props} />
-      </CollapsibleContent>
-    </Collapsible>
+    <DisclosureEntityCard
+      itemId={itemId}
+      toolbarAriaLabel={equipmentName}
+      entity={buildEquipmentInventoryRowEntity({
+        equipmentName,
+        detailLabel: provenanceLabel,
+      })}
+      collapsed={collapsed}
+      onToggleCollapse={onToggleCollapse}
+      defaultCollapsed={defaultCollapsed}
+      density="compact"
+    >
+      <EquipmentInventoryManagePanelBody equipment={equipment} rows={rows} {...bodyProps} />
+    </DisclosureEntityCard>
   )
-}
-
-export type EquipmentInventoryManageEntryProps = Omit<
-  EquipmentInventoryManagePanelProps,
-  'equipment' | 'rows'
-> & {
-  entry: AddedEquipmentEntryViewModel
-}
-
-export function EquipmentInventoryManageEntryPanel({
-  entry,
-  ...props
-}: EquipmentInventoryManageEntryProps) {
-  const equipment = entry.rows.find((row) => row.equipment)?.equipment
-  if (!equipment) return null
-
-  return <EquipmentInventoryManagePanel equipment={equipment} rows={entry.rows} {...props} />
 }
 
 export function createStorybookApplyMagicItemAcquisition(args: {
@@ -167,4 +158,30 @@ export function createStorybookApplyMagicItemAcquisition(args: {
     args.onDraftChange?.(result.patch)
     return true
   }
+}
+
+export type EquipmentInventoryManageEntryProps = Omit<
+  EquipmentInventoryManageDisclosureCardProps,
+  'equipment' | 'rows' | 'itemId' | 'equipmentName' | 'provenanceLabel'
+> & {
+  entry: AddedEquipmentEntryViewModel
+}
+
+export function EquipmentInventoryManageEntryCard({
+  entry,
+  ...props
+}: EquipmentInventoryManageEntryProps) {
+  const equipment = entry.rows.find((row) => row.equipment)?.equipment
+  if (!equipment) return null
+
+  return (
+    <EquipmentInventoryManageDisclosureCard
+      itemId={entry.equipmentId}
+      equipmentName={entry.equipmentName}
+      provenanceLabel={entry.provenanceLabel}
+      equipment={equipment}
+      rows={entry.rows}
+      {...props}
+    />
+  )
 }

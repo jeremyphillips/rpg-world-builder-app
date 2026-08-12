@@ -12,9 +12,9 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="The Silver Eel"
-          href="/locations/silver-eel"
+          headingHref="/locations/silver-eel"
           headingSuffix=" · Building · Tavern"
-          endSlot={<button type="button">Actions</button>}
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,
     )
@@ -31,12 +31,12 @@ describe('DetailEntityRow', () => {
     expect(container.firstElementChild).toHaveClass('px-4', 'py-1')
   })
 
-  it('keeps the leading separator visible beside a non-shrinking entity name', () => {
+  it('keeps the leading separator visible beside the classification suffix', () => {
     render(
       <MemoryRouter>
         <DetailEntityRow
           heading="Braggi"
-          href="/characters/braggi"
+          headingHref="/characters/braggi"
           headingSuffix=" · NPC · Human · Level 3 Fighter"
         />
       </MemoryRouter>,
@@ -48,31 +48,35 @@ describe('DetailEntityRow', () => {
     expect(headingRow?.querySelector('[aria-hidden="true"]')).toHaveTextContent('·')
   })
 
-  it('truncates the heading suffix before the entity name', () => {
+  it('truncates the entity name before the classification suffix', () => {
     const { container } = render(
       <MemoryRouter>
         <DetailEntityRow
           heading="Verna Stormcaller"
-          href="/characters/verna"
+          headingHref="/characters/verna"
           headingSuffix=" · PC · Elf (Drow) · Level 8 · Fighter 5 (Battle Master) / Rogue 3 (Assassin)"
-          endSlot={<button type="button">Actions</button>}
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,
     )
 
-    const suffix = container.querySelector('[class*="flex-1"][class*="truncate"]')
-    expect(suffix).toHaveClass('truncate')
-    expect(screen.getByRole('link', { name: 'Verna Stormcaller' })).toHaveClass('text-link')
-    expect(screen.getByRole('link', { name: 'Verna Stormcaller' }).parentElement).toHaveClass(
-      'shrink-0',
-    )
+    const name = screen.getByRole('link', { name: 'Verna Stormcaller' })
+    const nameSpan = name.parentElement as HTMLElement
+    const suffix = container.querySelector('[class*="shrink-0"][class*="text-muted-foreground"]')
+
+    expect(name).toHaveClass('text-link')
+    expect(nameSpan).toHaveClass('min-w-0', 'shrink', 'truncate')
+    expect(nameSpan.className).not.toMatch(/\bflex-1\b/)
+    expect(nameSpan.className).not.toMatch(/\bmax-w-\[60%\]/)
+    expect(suffix).toHaveClass('shrink-0')
+    expect(suffix?.className).not.toMatch(/\btruncate\b/)
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
   })
 
   it('omits end slot when not provided', () => {
     render(
       <MemoryRouter>
-        <DetailEntityRow heading="Harborford" href="/locations/harborford" />
+        <DetailEntityRow heading="Harborford" headingHref="/locations/harborford" />
       </MemoryRouter>,
     )
 
@@ -83,11 +87,11 @@ describe('DetailEntityRow', () => {
   it('renders an ordinary row without leading disclosure chrome when disclosure is omitted', () => {
     const { container } = render(
       <MemoryRouter>
-        <DetailEntityRow heading="Harborford" href="/locations/harborford" />
+        <DetailEntityRow heading="Harborford" headingHref="/locations/harborford" />
       </MemoryRouter>,
     )
 
-    expect(container.firstElementChild).toHaveClass('flex', 'items-center')
+    expect(container.firstElementChild).toHaveClass('min-w-0', 'py-1', 'px-4')
     expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument()
   })
 
@@ -98,7 +102,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -126,8 +130,8 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
-          endSlot={<button type="button">Actions</button>}
+          headingHref="/locations/dock-ward"
+          trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -147,6 +151,31 @@ describe('DetailEntityRow', () => {
     expect(screen.getByText('Preview child')).toBeInTheDocument()
   })
 
+  it('publishes compact surface inset on self-inset disclosure rows', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="Dock Ward"
+          headingHref="/locations/dock-ward"
+          disclosure={{
+            mode: 'expandable',
+            label: 'locations in Dock Ward',
+            content: <span>Preview child</span>,
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    const disclosureRoot = screen.getByRole('link', { name: 'Dock Ward' }).closest('[style]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+
+    const headerRow = disclosureRoot?.firstElementChild as HTMLElement
+    expect(headerRow.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
+
+    expect(container.querySelector('[id]')).toBeNull()
+  })
+
   it('owns disclosure gutter inset on the expanded region wrapper', async () => {
     const user = userEvent.setup()
 
@@ -154,7 +183,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -167,7 +196,8 @@ describe('DetailEntityRow', () => {
     await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
 
     const expandedRegion = container.querySelector('[id]')
-    expect(expandedRegion).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(expandedRegion).toHaveClass('pl-[var(--entity-body-inline-start)]')
+    expect(expandedRegion).toHaveClass('pr-[var(--entity-surface-inline-end)]')
     expect(expandedRegion?.firstElementChild).toHaveClass(
       'border-l',
       'border-border-subtle',
@@ -183,18 +213,21 @@ describe('DetailEntityRow', () => {
         <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Dock Ward"
-            href="/locations/dock-ward"
+            headingHref="/locations/dock-ward"
             disclosure={{
               mode: 'expandable',
               label: 'locations in Dock Ward',
               content: (
                 <DetailSectionRowList separator="structural">
-                  <DetailEntityRow heading="Yawning Portal" href="/locations/yawning-portal" />
+                  <DetailEntityRow
+                    heading="Yawning Portal"
+                    headingHref="/locations/yawning-portal"
+                  />
                 </DetailSectionRowList>
               ),
             }}
           />
-          <DetailEntityRow heading="Market Ward" href="/locations/market-ward" />
+          <DetailEntityRow heading="Market Ward" headingHref="/locations/market-ward" />
         </DetailSectionRowList>
       </MemoryRouter>,
     )
@@ -217,7 +250,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Dock Ward"
-          href="/locations/dock-ward"
+          headingHref="/locations/dock-ward"
           disclosure={{
             mode: 'expandable',
             label: 'locations in Dock Ward',
@@ -231,7 +264,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Market Ward"
-          href="/locations/market-ward"
+          headingHref="/locations/market-ward"
           disclosure={{ mode: 'reserved' }}
         />
       </MemoryRouter>,
@@ -246,11 +279,8 @@ describe('DetailEntityRow', () => {
     expect(reservedItem?.style.getPropertyValue('--leading-chrome-size')).toBe(
       'calc(var(--spacing)*6)',
     )
-    expect(expandableItem?.style.getPropertyValue('--leading-chrome-gap')).toBe(
-      'calc(var(--spacing)*1)',
-    )
-    expect(expandableItem?.style.getPropertyValue('--content-column-indent')).toContain(
-      '--leading-chrome-size',
+    expect(expandableItem?.style.getPropertyValue('--entity-content-offset')).toContain(
+      'calc(var(--spacing)*6)',
     )
     expect(expandableItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
     expect(reservedItem?.querySelector('[class*="w-[var(--leading-chrome-size)]"]')).toBeTruthy()
@@ -261,7 +291,7 @@ describe('DetailEntityRow', () => {
       <MemoryRouter>
         <DetailEntityRow
           heading="Market Ward"
-          href="/locations/market-ward"
+          headingHref="/locations/market-ward"
           disclosure={{ mode: 'reserved' }}
         />
       </MemoryRouter>,
@@ -278,12 +308,12 @@ describe('DetailEntityRow', () => {
         <DetailSectionRowList separator="structural">
           <DetailEntityRow
             heading="Market Ward"
-            href="/locations/market-ward"
+            headingHref="/locations/market-ward"
             disclosure={{ mode: 'reserved' }}
           />
           <DetailEntityRow
             heading="Dock Ward"
-            href="/locations/dock-ward"
+            headingHref="/locations/dock-ward"
             disclosure={{
               mode: 'expandable',
               label: 'locations in Dock Ward',

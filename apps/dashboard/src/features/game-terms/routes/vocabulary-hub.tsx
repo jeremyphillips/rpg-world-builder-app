@@ -11,6 +11,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 import {
   campaignDestinationChevronClasses,
   campaignDestinationListVariants,
+  campaignDestinationRowVariants,
 } from '@/features/campaign'
 
 import { useVocabularySets } from '@/features/vocabulary'
@@ -71,7 +72,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
                 <li key={category.setId}>
                   <Link
                     to={ROUTES.gameTerms.overview(campaignId, category.setId)}
-                    className="flex w-full items-center gap-3 p-6 text-left hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className={campaignDestinationRowVariants()}
                   >
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <span className="font-medium text-foreground">{category.label}</span>

@@ -11,6 +11,8 @@ import {
   contentCardHeadingRowVariants,
   contentCardHeadingVariants,
   contentCardMetadataVariants,
+  contentCardMixedHeadingNameVariants,
+  contentCardMixedHeadingSuffixVariants,
   contentCardRootVariants,
   contentCardSubheadingVariants,
   resolveContentCardDensityInsetClasses,
@@ -104,6 +106,50 @@ describe('ContentCard', () => {
       contentCardMetadataVariants({ density: 'compact' }),
     )
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
+  it('keeps classification adjacent to the title without title flex growth', () => {
+    render(
+      <ContentCard
+        heading="Fire Bolt"
+        headingSuffix=" · Spell"
+        endSlot={<button type="button">Add</button>}
+      />,
+    )
+
+    const name = screen.getByText('Fire Bolt')
+    const classification = screen.getByText('Spell')
+    const mixedHeadingRow = name.parentElement as HTMLElement
+
+    expect(name).toHaveClass(contentCardMixedHeadingNameVariants())
+    expect(name).toHaveClass('min-w-0', 'shrink', 'truncate')
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(name.className).not.toMatch(/\bmax-w-\[60%\]/)
+
+    expect(classification).toHaveClass(contentCardMixedHeadingSuffixVariants())
+    expect(classification).toHaveClass('shrink-0')
+    expect(classification.className).not.toMatch(/\bflex-1\b/)
+
+    expect(mixedHeadingRow.childNodes[0]).toBe(name)
+    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
+  })
+
+  it('truncates long titles while keeping classification visible in the mixed heading row', () => {
+    const { container } = render(
+      <div className="w-32">
+        <ContentCard
+          heading="Very Long Spell Name That Eventually Truncates"
+          headingSuffix=" · Spell"
+        />
+      </div>,
+    )
+
+    const name = screen.getByText('Very Long Spell Name That Eventually Truncates')
+    expect(name).toHaveClass('truncate')
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(screen.getByText('Spell')).toBeInTheDocument()
+    expect(container.querySelector('[class*="max-w-"]')).toBeNull()
   })
 
   it('applies compact density classes when requested', () => {

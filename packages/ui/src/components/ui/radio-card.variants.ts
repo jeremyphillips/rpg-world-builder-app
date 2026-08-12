@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { interactiveFocusVariants } from './interactive-focus.variants'
+import { interactiveRowVariants } from './interactive-row.variants'
 import { cardBorderClasses, cardRadiusClasses } from './card.variants'
 import {
   choiceControlIndicatorGroupCheckedBorderClasses,
@@ -49,8 +51,16 @@ export const radioCardDensityContentGapVariants = cva('', {
 /** Compact chooser summary — flush eyebrow→title (tighter than option-card content gap). */
 export const radioCardCompactSummaryContentGapClasses = 'gap-0'
 
-const radioCardRowBase =
-  'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground transition-colors hover:bg-row-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-row-selected aria-invalid:border aria-invalid:border-destructive'
+const radioCardRowBase = cn(
+  'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
+  interactiveRowVariants({
+    interaction: 'hoverable',
+    hoverFamily: 'selectable',
+    selectedData: 'checked',
+  }),
+  interactiveFocusVariants({ context: 'standalone' }),
+  'disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border aria-invalid:border-destructive',
+)
 
 /** Card-style radio option: selected, hover, and focus states use design tokens only. */
 export const radioCardVariants = cva('', {

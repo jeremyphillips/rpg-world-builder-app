@@ -102,6 +102,28 @@ export {
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
+export {
+  interactiveFocusVariants,
+  type InteractiveFocusVariantProps,
+} from './components/ui/interactive-focus.variants'
+export {
+  iconGhostControlVariants,
+  type IconGhostControlVariantProps,
+} from './components/ui/icon-ghost-control.variants'
+export {
+  interactiveRowVariants,
+  type InteractiveRowVariantProps,
+} from './components/ui/interactive-row.variants'
+export {
+  dragHandleVariants,
+  dragHandleVisibleWhileDraggingClasses,
+  type DragHandleVariantProps,
+} from './components/ui/drag-handle.variants'
+export {
+  dragSurfaceVariants,
+  dragSurfaceDraggingOpacityClasses,
+  type DragSurfaceVariantProps,
+} from './components/ui/drag-surface.variants'
 export { Input, type InputProps } from './components/ui/input.client'
 export {
   InputActionGroup,
@@ -433,6 +455,7 @@ export {
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
   contentCardMediaVariants,
+  supportingTextDensityVariants,
   resolveContentCardDensityInsetClasses,
   type ContentCardDensity,
   type ContentCardChrome,
@@ -592,7 +615,9 @@ export {
   CollapsibleListItemActions,
   CollapsibleListItemBody,
   CollapsibleListItemCollapseButton,
+  CollapsibleListItemDisclosureTrigger,
   CollapsibleListItemDragHandle,
+  CollapsibleListItemDragHandleTrigger,
   CollapsibleListItemShell,
   CollapsibleListItemToolbar,
   buildCollapsibleListItemLeadingChromeStyle,
@@ -609,6 +634,7 @@ export {
   type CollapsibleListItemShellPreset,
   type CollapsibleListItemRowLayout,
   type CollapsibleListItemToolbarProps,
+  type CollapsibleListItemToolbarLeadingChromePlacement,
 } from './components/ui/collapsible-list-item'
 export {
   CatalogPickerSheet,
@@ -617,6 +643,7 @@ export {
   type CatalogPickerTab,
   type CatalogPickerRowLayout,
   type CatalogPickerAuxiliaryAction,
+  type CatalogPickerCollapsibleRowRenderArgs,
   type CatalogToolbarProps,
   type CatalogToolbarSearch,
   type CatalogToolbarTab,

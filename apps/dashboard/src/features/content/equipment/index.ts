@@ -6,8 +6,6 @@ export {
 export { EquipmentFamilyCreate } from './routes/equipment-family-create'
 export { EquipmentDetail, EquipmentDetailContent } from './routes/equipment-detail'
 export { EquipmentDetailMetadata } from './components/equipment-detail-metadata.client'
-export { EquipmentCatalogItemHeader } from './components/equipment-catalog-item-header.client'
-export type { EquipmentCatalogItemHeaderProps } from './components/equipment-catalog-item-header.client'
 export {
   buildEquipmentDetailViewModel,
   buildEquipmentPickerRowViewModel,

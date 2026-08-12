@@ -1,10 +1,8 @@
 'use client'
 
-import { Check, TriangleAlert } from 'lucide-react'
+import { EntityItem, type EntityItemTrailing } from '@/features/content'
 
-import { Badge, PreviewCard } from '@rpg/ui'
-
-import { getEquipmentCalloutPresentation } from '../../components/equipment/equipment-picker-callout-presentation.lib'
+import { mapEquipmentCalloutToStatusItem } from '../../components/equipment/equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from '../../components/equipment/equipment-picker-drawer.types'
 
 import {
@@ -18,73 +16,52 @@ import type {
   QuickNpcWeaponRequirementOption,
 } from '../lib/quick-npc-requirement-options.lib'
 
-function RequirementCalloutBadge({ callout }: { callout: EquipmentPickerCallout }) {
-  const presentation = getEquipmentCalloutPresentation(callout)
-  const leadingIcon =
-    presentation.leadingIcon === 'check' ? (
-      <Check aria-hidden />
-    ) : presentation.leadingIcon === 'warning' ? (
-      <TriangleAlert aria-hidden />
-    ) : undefined
-
-  return (
-    <Badge
-      appearance={presentation.appearance}
-      tone={presentation.tone}
-      size={presentation.size}
-      leadingIcon={leadingIcon}
-    >
-      {callout.label}
-    </Badge>
-  )
-}
-
 function RequirementPreviewCard({
   projection,
   callout,
-  endSlot,
+  trailing,
 }: {
   projection: WeaponRequirementPreviewProjection | SpellRequirementPreviewProjection
   callout?: EquipmentPickerCallout
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   return (
-    <PreviewCard
-      title={projection.title}
-      description={projection.description}
-      footerSlot={callout ? <RequirementCalloutBadge callout={callout} /> : undefined}
-      endSlot={endSlot}
+    <EntityItem
+      entity={{
+        heading: projection.title,
+        description: projection.description,
+        status: callout ? [mapEquipmentCalloutToStatusItem(callout)] : undefined,
+      }}
+      trailing={trailing}
       density="compact"
-      layout="list"
-      className="w-full border-0 bg-transparent p-0 shadow-none"
     />
   )
 }
 
 export function QuickNpcWeaponRequirementPreview({
   entry,
-  endSlot,
+  trailing,
 }: {
   entry: QuickNpcWeaponRequirementOption
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   const projection = projectWeaponRequirementPreview(entry)
   return (
     <RequirementPreviewCard
       projection={projection}
       callout={projection.callout}
-      endSlot={endSlot}
+      trailing={trailing}
     />
   )
 }
 
 export function QuickNpcSpellRequirementPreview({
   entry,
-  endSlot,
+  trailing,
 }: {
   entry: QuickNpcSpellRequirementOption
-  endSlot?: React.ReactNode
+  trailing?: EntityItemTrailing
 }) {
   const projection = projectSpellRequirementPreview(entry)
-  return <RequirementPreviewCard projection={projection} endSlot={endSlot} />
+  return <RequirementPreviewCard projection={projection} trailing={trailing} />
 }

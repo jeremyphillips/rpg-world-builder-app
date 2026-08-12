@@ -1,7 +1,9 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
-import { controlActionCompactIconClasses } from '../control-action.variants'
+import { dragHandleVariants } from '../drag-handle.variants'
+import { dragSurfaceVariants } from '../drag-surface.variants'
+import { iconGhostControlVariants } from '../icon-ghost-control.variants'
 import { establishSurfaceCurrent } from '../surface-current.lib'
 import {
   resolveCollapsibleListItemLeadingChrome,
@@ -39,10 +41,10 @@ export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
-export const collapsibleListItemChromeButtonClasses = cn(
-  'flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-  controlActionCompactIconClasses,
-)
+export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
+  hover: 'text',
+  layout: 'flex',
+})
 
 /** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
 export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
@@ -155,11 +157,7 @@ export function collapsibleListItemActionsRailClasses(
 
 /** Inline drag handle — first leading chrome column when sortable. */
 export function collapsibleListItemDragHandleClasses(options: { compact?: boolean } = {}): string {
-  return cn(
-    collapsibleListItemChromeButtonClasses,
-    'cursor-grab active:cursor-grabbing',
-    options.compact && '-mt-1',
-  )
+  return cn(dragHandleVariants({ visibility: 'always' }), options.compact && '-mt-1')
 }
 
 /** Collapse caret in detailed item headers. */
@@ -182,12 +180,23 @@ export function collapsibleListItemToolbarContentClasses(
 export type CollapsibleListItemBodyClassOptions =
   Partial<CollapsibleListItemLeadingChromeOptions> & {
     preset?: CollapsibleListItemShellPreset
+    rowLayout?: CollapsibleListItemRowLayout
   }
+
+/**
+ * Entity-card hosts — structural pass-through only. Outer surfaces (DEC) own all
+ * header/body inset; CLI supplies disclosure behavior and DOM structure.
+ */
+export const collapsibleListItemEntityCardBodyClasses = 'min-w-0'
 
 /** Aligns detailed item bodies with the toolbar content column. */
 export function collapsibleListItemBodyClasses(
   options: CollapsibleListItemBodyClassOptions = {},
 ): string {
+  if (options.rowLayout === 'entity-card') {
+    return collapsibleListItemEntityCardBodyClasses
+  }
+
   const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
     showDragHandle: options.showDragHandle ?? false,
     collapsible: options.collapsible ?? false,
@@ -228,4 +237,4 @@ export function resolveCollapsibleListItemDomIds(itemId: string): {
 }
 
 /** Applied to the item wrapper while it is being dragged. */
-export const collapsibleListItemDraggingClasses = 'opacity-50'
+export const collapsibleListItemDraggingClasses = dragSurfaceVariants({ dragging: true })

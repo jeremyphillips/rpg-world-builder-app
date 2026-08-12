@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 
 import { DetailEntityRow } from '../detail/row/detail-entity-row.client'
+import type { EntityItemTrailing } from '../entity/entity-item-trailing.types'
+import type { EntitySummaryStatusItem } from '../entity/entity-summary-status.types'
 import { detailEntityRowSubheadingVariants } from '../detail/row/detail-entity-row.variants'
 import {
   DetailOverflowMenu,
@@ -17,20 +19,35 @@ export type CrossContentRelationshipRowProps = {
   href?: string
   /** Muted classification text inline after the heading (includes leading ` · ` separator). */
   headingSuffix?: ReactNode
-  /** @deprecated Use secondaryText — feature-supplied disambiguation only. */
+  /** @deprecated Use description — feature-supplied disambiguation only. */
   subheading?: ReactNode
+  /** Feature-supplied disambiguation rendered below the heading row. */
+  description?: ReactNode
+  /** @deprecated Use status — entity summary status lane. */
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** Entity summary status lane — badges, annotations, inactive markers. */
+  status?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** @deprecated Use description */
   secondaryText?: ReactNode
-  metadata?: ReactNode
+  /** @deprecated Use status */
+  badge?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
   /**
    * Trailing controls override.
    * - `undefined` — convenience overflow from `actions` when non-empty
    * - `null` — no trailing controls
-   * - `ReactNode` — use as-is (compose via `DetailEntityRowActions` when needed)
+   * - `EntityItemTrailing` — semantic trailing rail content
    */
-  endSlot?: ReactNode
+  trailing?: EntityItemTrailing | null
   className?: string
+}
+
+function normalizeRelationshipStatus(
+  status: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[] | undefined,
+): EntitySummaryStatusItem | readonly EntitySummaryStatusItem[] | undefined {
+  if (status == null) return undefined
+  return status
 }
 
 export function CrossContentRelationshipRow({
@@ -39,20 +56,27 @@ export function CrossContentRelationshipRow({
   href,
   headingSuffix,
   subheading,
-  secondaryText,
+  description,
   metadata,
+  status,
+  secondaryText,
+  badge,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
-  endSlot,
+  trailing,
   className,
 }: CrossContentRelationshipRowProps) {
-  const resolvedSecondaryText = secondaryText ?? subheading
-  const resolvedEndSlot =
-    endSlot !== undefined ? (
-      endSlot
-    ) : actions.length > 0 ? (
-      <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />
-    ) : undefined
+  const resolvedDescription = description ?? secondaryText ?? subheading
+  const resolvedStatus = normalizeRelationshipStatus(status ?? badge ?? metadata)
+  const resolvedTrailing =
+    trailing !== undefined
+      ? (trailing ?? undefined)
+      : actions.length > 0
+        ? {
+            kind: 'action' as const,
+            content: <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />,
+          }
+        : undefined
 
   return (
     <div className={cn(className)}>
@@ -62,11 +86,11 @@ export function CrossContentRelationshipRow({
       <DetailEntityRow
         inset="parent"
         heading={heading}
-        href={href}
+        headingHref={href}
         headingSuffix={headingSuffix}
-        subheading={resolvedSecondaryText}
-        metadata={metadata}
-        endSlot={resolvedEndSlot}
+        subheading={resolvedDescription}
+        metadata={resolvedStatus}
+        trailing={resolvedTrailing}
       />
     </div>
   )

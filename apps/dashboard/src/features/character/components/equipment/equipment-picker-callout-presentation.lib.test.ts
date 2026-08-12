@@ -27,17 +27,14 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor(EQUIPMENT_PICKER_STANDARD_GEAR_LABEL)).toEqual({
       appearance: 'outline',
       tone: 'info',
-      size: 'sm',
     })
     expect(presentationFor(EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL)).toEqual({
       appearance: 'outline',
       tone: 'info',
-      size: 'sm',
     })
     expect(presentationFor(EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL)).toEqual({
       appearance: 'outline',
       tone: 'info',
-      size: 'sm',
     })
   })
 
@@ -45,12 +42,10 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toEqual({
       appearance: 'accent-outline',
       tone: 'info',
-      size: 'sm',
     })
     expect(presentationFor(EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL)).toEqual({
       appearance: 'accent-outline',
       tone: 'info',
-      size: 'sm',
     })
   })
 
@@ -58,12 +53,10 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor(EQUIPMENT_PICKER_ESSENTIAL_LABEL)).toEqual({
       appearance: 'soft',
       tone: 'info',
-      size: 'sm',
     })
     expect(presentationFor(EQUIPMENT_PICKER_CLASS_TOOL_LABEL)).toEqual({
       appearance: 'soft',
       tone: 'info',
-      size: 'sm',
     })
   })
 
@@ -71,13 +64,11 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor(EQUIPMENT_PICKER_PROFICIENT_LABEL)).toEqual({
       appearance: 'soft',
       tone: 'success',
-      size: 'sm',
       leadingIcon: 'check',
     })
     expect(presentationFor(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toEqual({
       appearance: 'soft',
       tone: 'warning',
-      size: 'sm',
       leadingIcon: 'warning',
     })
   })
@@ -86,7 +77,6 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)).toEqual({
       appearance: 'soft',
       tone: 'destructive',
-      size: 'sm',
       leadingIcon: 'warning',
     })
   })
@@ -95,7 +85,6 @@ describe('equipment-picker-callout-presentation.lib', () => {
     expect(presentationFor('Alternative option')).toEqual({
       appearance: 'outline',
       tone: 'info',
-      size: 'sm',
     })
   })
 })

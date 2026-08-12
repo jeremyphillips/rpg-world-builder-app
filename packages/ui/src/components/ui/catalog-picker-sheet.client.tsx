@@ -32,6 +32,7 @@ export type {
   CatalogPickerTab,
   CatalogPickerRowLayout,
   CatalogPickerAuxiliaryAction,
+  CatalogPickerCollapsibleRowRenderArgs,
 } from './catalog-picker-sheet.types'
 export type {
   CatalogToolbarProps,
@@ -100,6 +101,7 @@ export function CatalogPickerSheet<TItem>({
   getItemKey,
   getSearchText,
   renderItemHeader,
+  renderCollapsibleRow,
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
@@ -170,6 +172,7 @@ export function CatalogPickerSheet<TItem>({
 
   const rowProps = {
     renderItemHeader,
+    renderCollapsibleRow,
     renderItemSummary,
     renderItemActions,
     renderItemDetails,

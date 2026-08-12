@@ -13,6 +13,7 @@ import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
 import { DetailEntityRow } from '../../lib/detail/row/detail-entity-row.client'
+import type { EntityItemTrailing } from '../../lib/entity/entity-item-trailing.types'
 import { DetailEntityRowActions } from '../../lib/detail/row/detail-entity-row-actions.client'
 import {
   detailEntityRowDisclosurePreviewRowVariants,
@@ -81,6 +82,14 @@ function buildChildRowActions(
     : []
 }
 
+import type { ReactElement } from 'react'
+
+function detailEntityRowActionTrailing(
+  content: ReactElement | undefined,
+): EntityItemTrailing | undefined {
+  return content ? { kind: 'action', content } : undefined
+}
+
 function resolveStructureRowHeadingSuffix(row: LocationStructureRowVm): string {
   const parts = [row.item.summaryLine]
   if (row.countPhrase) {
@@ -142,7 +151,7 @@ function LocationStructurePreviewChildRows({
         <DetailEntityRow
           key={child.item.id}
           heading={child.item.name}
-          href={child.item.href}
+          headingHref={child.item.href}
           headingSuffix={resolveStructureRowHeadingSuffix(child)}
           inset={inset}
           className={detailEntityRowDisclosurePreviewRowVariants({
@@ -265,7 +274,7 @@ function LocationStructureRow({
     return (
       <DetailEntityRow
         heading={row.item.name}
-        href={row.item.href}
+        headingHref={row.item.href}
         headingSuffix={resolveStructureRowHeadingSuffix(row)}
         inset={inset}
         className={previewClassName}
@@ -285,16 +294,18 @@ function LocationStructureRow({
   return (
     <DetailEntityRow
       heading={row.item.name}
-      href={row.item.href}
+      headingHref={row.item.href}
       headingSuffix={resolveStructureRowHeadingSuffix(row)}
       inset={inset}
       disclosure={resolveStructureRowDisclosure(row, nestedContent)}
-      endSlot={resolveStructureRowEndSlot({
-        row,
-        canManage,
-        actions,
-        onSelectAuthoringType,
-      })}
+      trailing={detailEntityRowActionTrailing(
+        resolveStructureRowEndSlot({
+          row,
+          canManage,
+          actions,
+          onSelectAuthoringType,
+        }),
+      )}
       className={!row.disclosure && !row.canAddChildren ? previewClassName : undefined}
     />
   )
@@ -356,14 +367,14 @@ function LocationChildRows({
           <DetailEntityRow
             key={item.id}
             heading={item.name}
-            href={item.href}
+            headingHref={item.href}
             headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
             inset={inset}
-            endSlot={
+            trailing={detailEntityRowActionTrailing(
               canManage ? (
                 <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
-              ) : undefined
-            }
+              ) : undefined,
+            )}
           />
         )
       })}

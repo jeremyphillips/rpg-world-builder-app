@@ -20,28 +20,31 @@ export const UtilityAndOverflow: Story = {
   render: () => (
     <DetailEntityRow
       heading="Dock Ward"
-      href="/campaigns/demo/locations/dock-ward"
+      headingHref="/campaigns/demo/locations/dock-ward"
       headingSuffix=" · District · 1 location"
-      endSlot={
-        <DetailEntityRowActions>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            density="compact"
-            aria-label="Add location to Dock Ward"
-          >
-            <Plus aria-hidden />
-          </Button>
-          <DetailOverflowMenu
-            triggerLabel="Actions for Dock Ward"
-            actions={[
-              { id: 'view', label: 'View location', onSelect: () => undefined },
-              { id: 'move', label: 'Move location', onSelect: () => undefined },
-            ]}
-          />
-        </DetailEntityRowActions>
-      }
+      trailing={{
+        kind: 'action',
+        content: (
+          <DetailEntityRowActions>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              density="compact"
+              aria-label="Add location to Dock Ward"
+            >
+              <Plus aria-hidden />
+            </Button>
+            <DetailOverflowMenu
+              triggerLabel="Actions for Dock Ward"
+              actions={[
+                { id: 'view', label: 'View location', onSelect: () => undefined },
+                { id: 'move', label: 'Move location', onSelect: () => undefined },
+              ]}
+            />
+          </DetailEntityRowActions>
+        ),
+      }}
     />
   ),
 }

@@ -10,13 +10,19 @@ import {
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { Heading } from '@rpg/ui'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  toOptions,
+  type ArrayItemShellRenderProps,
+  type FieldVisibility,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
   wealthGrantMoneyFromForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import { EntityDisclosureArrayItemShell } from '../../../lib/entity/entity-disclosure-array-item-shell.client'
 import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,
@@ -309,6 +315,8 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
               equipmentOptions,
             ),
         },
+        renderShell: (props: ArrayItemShellRenderProps) =>
+          createElement(EntityDisclosureArrayItemShell, props),
       },
       fields: startingEquipmentItemFields(ctx),
     },

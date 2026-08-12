@@ -3,7 +3,7 @@
 import type { ProficiencyGrantedRow as ProficiencyGrantedRowModel } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import { BuilderInventoryRow } from '../builder/builder-inventory-row.client'
+import { ContentEntityCard } from '@/features/content'
 
 export type ProficiencyGrantedRowProps = {
   row: ProficiencyGrantedRowModel
@@ -11,10 +11,16 @@ export type ProficiencyGrantedRowProps = {
 
 export function ProficiencyGrantedRow({ row }: ProficiencyGrantedRowProps) {
   return (
-    <BuilderInventoryRow
-      label={<Text as="span">{row.label}</Text>}
-      itemLabel={row.label}
-      sourceLabel={row.sourceLabel}
+    <ContentEntityCard
+      entity={{
+        heading: row.label,
+        description: row.sourceLabel ? (
+          <Text as="span" variant="muted">
+            {row.sourceLabel}
+          </Text>
+        ) : undefined,
+      }}
+      density="compact"
     />
   )
 }

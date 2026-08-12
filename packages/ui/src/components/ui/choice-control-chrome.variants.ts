@@ -1,3 +1,5 @@
+import { interactiveFocusVariants } from './interactive-focus.variants'
+
 /**
  * Shared chrome for radio/checkbox choice indicators on panel surfaces.
  * Uses `--choice-control-border` (mixed toward `--surface-current`), not field-input chrome.
@@ -5,8 +7,9 @@
 export const choiceControlIndicatorShellClasses =
   'border border-choice-control shadow-sm transition-colors'
 
-export const choiceControlIndicatorFocusClasses =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+export const choiceControlIndicatorFocusClasses = interactiveFocusVariants({
+  context: 'standalone',
+})
 
 export const choiceControlIndicatorCheckedBorderClasses = 'data-[state=checked]:border-primary'
 

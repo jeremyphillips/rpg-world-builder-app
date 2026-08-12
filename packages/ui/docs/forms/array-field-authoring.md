@@ -109,6 +109,29 @@ applies a semantic wash (`info` | `success` | `warning` | `destructive`). Defaul
 `showFallbackInHeader: true` appends ` · {fallback}` after the primary in the visible
 title (off by default).
 
+## `item.renderShell` — entity presentation
+
+When an array item represents a catalog entity (grants, starting-equipment items),
+replace default ArrayItem chrome with a custom shell via `item.renderShell`. The
+form layer still owns registration, validation, remove/reorder, and the trailing
+action rail; the shell owns card anatomy (dashboard: `DisclosureEntityCard`).
+
+**Form-owned ≠ form-styled.** The form layer must not add card padding, leading
+indentation, or disclosure body inset — `DisclosureEntityCard` owns complete header/body
+geometry when `CollapsibleListItem` uses `rowLayout="entity-card"`. See
+[dashboard entity presentation contract](../../../../apps/dashboard/docs/content-entity-card.md#disclosureentitycard).
+
+```ts
+item: {
+  collapsible: true,
+  header: { fallback: (i) => `Grant ${i + 1}`, primary: formatPrimary, summary },
+  renderShell: (props) => createElement(EntityDisclosureArrayItemShell, props),
+},
+```
+
+Anonymous configuration arrays omit `renderShell` and keep the default ArrayItem
+shell. Do not invent fake entity summaries for those rows.
+
 ## `min` / `max` and add/remove
 
 | Prop                                | Behavior                                         |

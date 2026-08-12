@@ -1,7 +1,11 @@
 import type { Equipment, MagicItemRarity } from '@rpg/contracts'
 import { getMagicItemRarityLabel } from '@rpg/contracts'
 
-import type { EquipmentPickerRowViewModel } from '@/features/content'
+import type {
+  EntityItemTrailingSecondary,
+  EntitySummaryStatusItem,
+  EquipmentPickerRowViewModel,
+} from '@/features/content'
 
 import type { EquipmentPickerWorkflowMode } from '../../lib/equipment/equipment-step.lib'
 import type { EquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
@@ -11,17 +15,15 @@ import {
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
 } from './equipment-picker-drawer.types'
 
-export type EquipmentPickerHeaderAction =
+export type EquipmentPickerAction =
   | { kind: 'add'; disabled: boolean }
   | { kind: 'manage_only' }
   | { kind: 'none' }
 
-export type EquipmentPickerSummaryTrailingTone = 'default' | 'muted' | 'blocked'
-
-export type EquipmentPickerItemHeaderPresentation = {
-  summaryTrailingLabel?: string
-  summaryTrailingTone?: EquipmentPickerSummaryTrailingTone
-  action: EquipmentPickerHeaderAction
+export type EquipmentPickerItemPresentation = {
+  secondary?: EntityItemTrailingSecondary
+  statusItems?: readonly EntitySummaryStatusItem[]
+  action: EquipmentPickerAction
 }
 
 type EquipmentAcquisitionBlocker = NonNullable<
@@ -30,6 +32,16 @@ type EquipmentAcquisitionBlocker = NonNullable<
     { kind: 'magic_item_grant' }
   >['capabilities']['addBlockedReason']
 >
+
+function blockerStatusItem(label: string): EntitySummaryStatusItem {
+  return {
+    kind: 'badge',
+    label,
+    tone: 'destructive',
+    appearance: 'soft',
+    leadingIcon: 'warning',
+  }
+}
 
 export function formatEquipmentPickerHeaderTrailingLabel(args: {
   blocker: EquipmentAcquisitionBlocker
@@ -52,7 +64,7 @@ export function formatEquipmentPickerHeaderTrailingLabel(args: {
 function resolveHeaderAction(args: {
   canAdd: boolean
   ownedQuantity: number
-}): EquipmentPickerHeaderAction {
+}): EquipmentPickerAction {
   if (args.canAdd) return { kind: 'add', disabled: false }
   if (args.ownedQuantity > 0) return { kind: 'manage_only' }
   return { kind: 'none' }
@@ -62,7 +74,7 @@ function resolveMagicItemGrantTrailing(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
   row: EquipmentPickerRowViewModel
   equipment: Equipment
-}): Pick<EquipmentPickerItemHeaderPresentation, 'summaryTrailingLabel' | 'summaryTrailingTone'> {
+}): Pick<EquipmentPickerItemPresentation, 'secondary' | 'statusItems'> {
   const { plan, capabilities } = args.rowActionVm
   const grantQuantity = plan.grantAllocations.reduce(
     (sum, allocation) => sum + allocation.quantity,
@@ -73,23 +85,23 @@ function resolveMagicItemGrantTrailing(args: {
 
   if (grantQuantity > 0 && rarity) {
     return {
-      summaryTrailingLabel: formatGrantPreviewLine(grantQuantity, rarity),
-      summaryTrailingTone: 'default',
+      secondary: {
+        kind: 'grantPreview',
+        label: formatGrantPreviewLine(grantQuantity, rarity),
+      },
     }
   }
 
   if (plan.fulfilledQuantity === 1 && grantQuantity === 0 && purchaseQuantity === 1) {
-    return {
-      summaryTrailingLabel: args.row.priceLabel || undefined,
-      summaryTrailingTone: args.row.priceLabel ? 'default' : 'muted',
-    }
+    return args.row.priceLabel ? { secondary: { kind: 'price', label: args.row.priceLabel } } : {}
   }
 
   const blocker = capabilities.addBlockedReason ?? plan.blockers[0]
   if (blocker) {
     return {
-      summaryTrailingLabel: formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity }),
-      summaryTrailingTone: 'blocked',
+      statusItems: [
+        blockerStatusItem(formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity })),
+      ],
     }
   }
 
@@ -100,46 +112,51 @@ function resolvePurchasePresentation(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }>
   row: EquipmentPickerRowViewModel
   ownedQuantity: number
-}): EquipmentPickerItemHeaderPresentation {
+}): EquipmentPickerItemPresentation {
   const { availability, disabled } = args.rowActionVm
 
   if (availability.status === 'unavailable') {
     return {
-      summaryTrailingLabel: formatEquipmentPickerHeaderTrailingLabel({
-        blocker: { code: 'no_market_price' },
-      }),
-      summaryTrailingTone: 'blocked',
+      statusItems: [
+        blockerStatusItem(
+          formatEquipmentPickerHeaderTrailingLabel({
+            blocker: { code: 'no_market_price' },
+          }),
+        ),
+      ],
       action: { kind: 'none' },
     }
   }
 
-  const trailingLabel = args.row.priceLabel || undefined
-  const action: EquipmentPickerHeaderAction = disabled
+  const priceLabel = args.row.priceLabel || undefined
+  const action: EquipmentPickerAction = disabled
     ? { kind: 'add', disabled: true }
     : { kind: 'add', disabled: false }
 
   if (availability.status === 'unaffordable') {
     return {
-      summaryTrailingLabel: trailingLabel ?? EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-      summaryTrailingTone: trailingLabel ? 'muted' : 'blocked',
+      ...(priceLabel
+        ? { secondary: { kind: 'price', label: priceLabel } }
+        : {
+            statusItems: [blockerStatusItem(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
+          }),
       action: args.ownedQuantity > 0 ? { kind: 'manage_only' } : action,
     }
   }
 
   return {
-    summaryTrailingLabel: trailingLabel,
-    summaryTrailingTone: trailingLabel ? 'default' : undefined,
+    ...(priceLabel ? { secondary: { kind: 'price', label: priceLabel } } : {}),
     action: resolveHeaderAction({ canAdd: !disabled, ownedQuantity: args.ownedQuantity }),
   }
 }
 
-export function resolveEquipmentPickerItemHeaderPresentation(args: {
+export function resolveEquipmentPickerItemPresentation(args: {
   equipment: Equipment
   row: EquipmentPickerRowViewModel
   workflowMode: EquipmentPickerWorkflowMode
   rowActionVm: EquipmentPickerRowActionViewModel
   ownedQuantity: number
-}): EquipmentPickerItemHeaderPresentation {
+}): EquipmentPickerItemPresentation {
   const { equipment, row, workflowMode, rowActionVm, ownedQuantity } = args
 
   if (workflowMode === 'purchase' && rowActionVm.kind === 'purchase') {

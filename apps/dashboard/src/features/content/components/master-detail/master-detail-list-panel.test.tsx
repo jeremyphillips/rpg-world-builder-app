@@ -52,7 +52,7 @@ describe('MasterDetailListPanel', () => {
     expect(props.onRemove).toHaveBeenCalledWith(0)
   })
 
-  it('renders the eyebrow and hides the remove control for protected rows', () => {
+  it('renders classification through EntityItem and hides protected row removal', () => {
     const protectedItems: MasterDetailListItem[] = [
       {
         id: 'a',
@@ -64,7 +64,7 @@ describe('MasterDetailListPanel', () => {
     ]
     render(<MasterDetailListPanel {...baseProps()} items={protectedItems} />)
 
-    expect(screen.getByText('Level 1')).toHaveClass('eyebrow-style-sm')
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove Rage/i })).not.toBeInTheDocument()
   })
@@ -81,9 +81,7 @@ describe('MasterDetailListPanel', () => {
     render(<MasterDetailListPanel {...baseProps()} items={errorItems} />)
 
     expect(screen.getByText('Has validation errors')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Has validation errors/ }),
-    ).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('button', { name: 'Rage' })).toHaveAttribute('aria-invalid', 'true')
   })
 
   it('renders drag handles when onMove is provided and hides them for a single item', () => {

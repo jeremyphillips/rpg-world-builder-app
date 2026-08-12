@@ -3,9 +3,10 @@
 import * as React from 'react'
 
 import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Badge, Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, SelectField, Text } from '@rpg/ui'
 
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
+import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
+import { CatalogEntityDisclosureRow } from '@/features/content'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
@@ -167,37 +168,53 @@ export function OrganizationPickerDrawer({
           </div>
         ),
       }}
-      renderItemHeader={({ organization, selected }) => (
-        <CatalogPickerItemHeader
-          name={organization.name}
-          metadataLines={[
-            {
-              segments: [
-                {
-                  type: 'text',
-                  text: getOrganizationKindLabel(organization.organizationKind),
-                },
-              ],
-            },
-          ]}
-          actions={
-            selected ? (
-              <CatalogPickerSelectionActions
-                phase="success"
-                onAdd={() => undefined}
-                onRemove={() => undefined}
-              />
-            ) : (
-              <CatalogPickerSelectionActions
-                canSelect
-                onAdd={() => handleExpandedItemChange(organization.id)}
-                onRemove={() => undefined}
-              />
-            )
-          }
-          footer={selected ? <Badge tone="success">Added</Badge> : undefined}
-        />
-      )}
+      renderCollapsibleRow={(args) => {
+        const { organization, selected } = args.item
+
+        return (
+          <CatalogEntityDisclosureRow
+            toolbarLabel={args.toolbarLabel}
+            domIds={args.domIds}
+            collapsible={args.collapsible}
+            collapsed={args.collapsed}
+            onToggleCollapse={args.onToggleCollapse}
+            summary={args.summary}
+            details={args.details}
+            entity={{
+              heading: organization.name,
+              description: (
+                <CatalogPickerMetadataRenderer
+                  lines={[
+                    {
+                      segments: [
+                        {
+                          type: 'text',
+                          text: getOrganizationKindLabel(organization.organizationKind),
+                        },
+                      ],
+                    },
+                  ]}
+                />
+              ),
+              status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+            }}
+            trailing={
+              selected
+                ? undefined
+                : {
+                    kind: 'action',
+                    content: (
+                      <CatalogPickerSelectionActions
+                        canSelect
+                        onAdd={() => handleExpandedItemChange(organization.id)}
+                        onRemove={() => undefined}
+                      />
+                    ),
+                  }
+            }
+          />
+        )
+      }}
       renderItemDetails={({ organization, selected }) => {
         if (selected) return null
         return (

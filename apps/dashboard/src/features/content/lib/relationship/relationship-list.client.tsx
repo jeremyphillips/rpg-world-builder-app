@@ -9,6 +9,7 @@ import { detailSectionGroupHeaderVariants } from '../detail/section/detail-secti
 import { detailRowListSeparatorVariants } from '../detail/section/detail-row-list.variants'
 import type { DetailOverflowAction } from '../detail/row/detail-overflow-menu.client'
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
+import type { EntitySummaryStatusItem } from '../entity/entity-summary-status.types'
 import {
   relationshipListEmptyVariants,
   relationshipListFooterVariants,
@@ -34,10 +35,18 @@ export type RelationshipRowMenuItem = {
 export type RelationshipListRowProps = {
   title: ReactNode
   href?: string
+  /** Inline classification after the title — maps to entity summary `classification`. */
   headingSuffix?: ReactNode
-  metadata?: ReactNode
+  /** @deprecated Use `classification` — alias for headingSuffix. */
+  classification?: ReactNode
+  /** Feature-supplied disambiguation below the title — maps to entity summary `description`. */
   description?: ReactNode
-  badge?: ReactNode
+  /** Entity summary status lane — badges, annotations, inactive markers. */
+  status?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** @deprecated Use `status` */
+  badge?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** @deprecated Use `status` */
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   menu?: {
     label: string
     items: readonly RelationshipRowMenuItem[]
@@ -201,12 +210,15 @@ function RelationshipListRow({
   title,
   href,
   headingSuffix,
-  metadata,
+  classification,
   description,
+  status,
   badge,
+  metadata,
   menu,
 }: RelationshipListRowProps) {
-  const resolvedMetadata = badge ?? metadata
+  const resolvedClassification = classification ?? headingSuffix
+  const resolvedStatus = status ?? badge ?? metadata
   const actions = menu ? toOverflowActions(menu.items) : []
 
   return (
@@ -214,9 +226,9 @@ function RelationshipListRow({
       <CrossContentRelationshipRow
         heading={title}
         href={href}
-        headingSuffix={headingSuffix}
-        secondaryText={description}
-        metadata={resolvedMetadata}
+        headingSuffix={resolvedClassification}
+        description={description}
+        status={resolvedStatus}
         actions={actions}
         overflowTriggerLabel={menu?.label ?? 'Relationship actions'}
       />

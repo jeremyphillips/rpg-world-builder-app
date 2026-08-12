@@ -4,9 +4,9 @@ import { YAWNING_PORTAL, LOCATIONS_LIST } from '../locations/fixtures'
 import { buildLocationsById, buildLocationEntitySummaryVm } from '../locations/lib/location-display'
 import { CITY_COUNCIL } from '../organizations/fixtures'
 import {
-  buildCharacterPickerCardPresentation,
-  buildLocationPickerCardPresentation,
-  buildOrganizationPickerCardPresentation,
+  buildCharacterPickerEntitySummary,
+  buildLocationPickerEntitySummary,
+  buildOrganizationPickerEntitySummary,
 } from './content-entity-picker-presentation.lib'
 
 describe('content-entity-picker-presentation', () => {
@@ -17,23 +17,26 @@ describe('content-entity-picker-presentation', () => {
       campaignId: 'camp-1',
     })
 
-    expect(buildLocationPickerCardPresentation(summary)).toEqual({
+    expect(buildLocationPickerEntitySummary(summary)).toEqual({
       heading: 'Yawning Portal',
-      headingSuffix: ' · Building · Tavern',
-      metadata: 'Located in Dock Ward',
+      classification: 'Building · Tavern',
+      description: 'Located in Dock Ward',
+      media: undefined,
     })
   })
 
   it('builds organization picker rows with inline kind suffix', () => {
-    expect(buildOrganizationPickerCardPresentation(CITY_COUNCIL)).toEqual({
+    expect(buildOrganizationPickerEntitySummary(CITY_COUNCIL)).toEqual({
       heading: 'City Council',
-      headingSuffix: ' · Government',
+      classification: 'Government',
+      description: undefined,
+      media: undefined,
     })
   })
 
   it('builds character picker rows with type on the heading line and identity below', () => {
     expect(
-      buildCharacterPickerCardPresentation({
+      buildCharacterPickerEntitySummary({
         id: 'char-1',
         name: 'Frug Daergel',
         summary: 'Human · Level 1 Fighter',
@@ -41,8 +44,9 @@ describe('content-entity-picker-presentation', () => {
       }),
     ).toEqual({
       heading: 'Frug Daergel',
-      headingSuffix: ' · PC',
-      metadata: 'Human · Level 1 Fighter',
+      classification: 'PC',
+      description: 'Human · Level 1 Fighter',
+      media: undefined,
     })
   })
 })

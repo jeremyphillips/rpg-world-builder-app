@@ -18,8 +18,9 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { buildLocationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { EntityItem } from '../../lib/content-entity-card.client'
+import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
+import { buildEntityMediaFromImageKey } from '../../lib/entity/entity-media.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -661,25 +662,35 @@ function OrganizationLocationConnectionLinkDrawerContent({
             edgesAtLocation,
             excludeConnectionId,
           })
-        return (
-          <ContentEntityCard
-            chrome="embedded"
-            density="compact"
-            {...(summary
-              ? buildLocationPickerCardPresentation(summary)
-              : { heading: location.name })}
-            subheading={!kindAvailable ? fullyLinkedReason : undefined}
-            imageKey={location.imageKey}
-            disabled={!kindAvailable}
-            endSlot={
-              <CatalogPickerSelectionActions
-                phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                canSelect={kindAvailable}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedLocationId(location.id)}
-                onRemove={() => setSelectedLocationId(null)}
-              />
+        const entity = summary
+          ? buildLocationPickerEntitySummary(summary, {
+              imageKey: location.imageKey,
+              description: !kindAvailable ? fullyLinkedReason : undefined,
+            })
+          : {
+              heading: location.name,
+              description: !kindAvailable ? fullyLinkedReason : undefined,
+              media: location.imageKey
+                ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
+                : undefined,
             }
+
+        return (
+          <EntityItem
+            density="compact"
+            entity={entity}
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
+                  canSelect={kindAvailable}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedLocationId(location.id)}
+                  onRemove={() => setSelectedLocationId(null)}
+                />
+              ),
+            }}
           />
         )
       }}

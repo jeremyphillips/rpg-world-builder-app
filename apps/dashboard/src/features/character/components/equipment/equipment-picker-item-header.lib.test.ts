@@ -21,7 +21,7 @@ import {
 } from '../../lib/equipment/equipment-step.fixtures'
 import { resolveEquipmentAcquisitionContext } from '../../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from './equipment-picker-action.lib'
-import { resolveEquipmentPickerItemHeaderPresentation } from './equipment-picker-item-header.lib'
+import { resolveEquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
 
 const RULESET = 'srd-cc-5.2.1' as const
 const TABLE_ID = standardStartingWealthTableId(RULESET)
@@ -121,7 +121,7 @@ function presentationFor(args: {
   const rowActionVm = buildEquipmentPickerRowActionViewModel(actionState)
   const row = buildEquipmentPickerRowViewModel(args.equipment)
 
-  return resolveEquipmentPickerItemHeaderPresentation({
+  return resolveEquipmentPickerItemPresentation({
     equipment: args.equipment,
     row,
     workflowMode: args.workflowMode,
@@ -130,7 +130,7 @@ function presentationFor(args: {
   })
 }
 
-describe('resolveEquipmentPickerItemHeaderPresentation', () => {
+describe('resolveEquipmentPickerItemPresentation', () => {
   const catalogIndex = indexCharacterBuildCatalog({
     species: [],
     classes: [equipmentStepMonkClassFixture],
@@ -151,7 +151,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: '50 GP',
+      secondary: { kind: 'price', label: '50 GP' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -165,7 +165,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'Common choice',
+      secondary: { kind: 'grantPreview', label: 'Common choice' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -193,7 +193,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: '50 GP',
+      secondary: { kind: 'price', label: '50 GP' },
       action: { kind: 'add', disabled: false },
     })
   })
@@ -221,8 +221,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'No Rare choices',
-      summaryTrailingTone: 'blocked',
+      statusItems: [{ kind: 'badge', label: 'No Rare choices' }],
       action: { kind: 'none' },
     })
   })
@@ -268,8 +267,7 @@ describe('resolveEquipmentPickerItemHeaderPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      summaryTrailingLabel: 'One copy maximum',
-      summaryTrailingTone: 'blocked',
+      statusItems: [{ kind: 'badge', label: 'One copy maximum' }],
       action: { kind: 'manage_only' },
     })
   })

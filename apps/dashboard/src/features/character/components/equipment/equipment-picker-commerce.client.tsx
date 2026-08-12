@@ -5,7 +5,6 @@ import { Badge } from '@rpg/ui'
 
 import { CatalogPickerActionButton } from '../picker/catalog-picker-action-button.client'
 import { resolveAcquisitionCommitButtonLabel } from './equipment-acquisition-commit-labels.lib'
-import { EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ACTIONS_CLASSES } from './equipment-picker-item-header.variants'
 
 const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
 
@@ -39,7 +38,7 @@ export function EquipmentPickerCommerce({
     })
 
   return (
-    <div className={EQUIPMENT_PICKER_ITEM_HEADER_TITLE_ACTIONS_CLASSES}>
+    <>
       {ownedQuantity > 0 ? (
         <Badge appearance="neutral" tone="neutral" size="sm">
           {ownedQuantity}
@@ -54,6 +53,6 @@ export function EquipmentPickerCommerce({
           {label}
         </CatalogPickerActionButton>
       ) : null}
-    </div>
+    </>
   )
 }

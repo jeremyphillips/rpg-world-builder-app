@@ -2,15 +2,16 @@
 
 import * as React from 'react'
 
-import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { CatalogToolbar, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
-import { buildCatalogDisclosureLabel, CatalogCollapsibleList } from '@/features/content'
 import {
-  buildSpellDetailViewModel,
-  SpellCatalogItemHeader,
-  SpellDetailMetadata,
+  buildCatalogDisclosureLabel,
+  CatalogCollapsibleList,
+  CatalogMetadataRenderer,
+  DisclosureEntityCard,
 } from '@/features/content'
+import { buildSpellDetailViewModel, SpellDetailMetadata } from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
 import {
   createCharacterDetailSpellFilterSchema,
@@ -45,39 +46,42 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
   })
 
   return (
-    <CollapsibleListItem
+    <DisclosureEntityCard
       itemId={card.id}
       toolbarAriaLabel={toolbarLabel}
-      preset="catalog"
-      toolbarCompact
-      actionsAlign="center"
-      collapsible
-      header={
-        <SpellCatalogItemHeader
-          name={header.name}
-          metadataLines={header.metadataLines}
-          markers={header.markers}
-          tone={header.tone}
-          footer={
-            header.footerLabels.length > 0 ? (
-              <Text variant="muted">{header.footerLabels.join(' · ')}</Text>
-            ) : undefined
-          }
+      entity={{
+        heading: header.name,
+        description: <CatalogMetadataRenderer lines={header.metadataLines} />,
+        status: [
+          ...header.markers.map((marker) => ({
+            kind: 'text' as const,
+            label: marker,
+            variant: 'muted' as const,
+          })),
+          ...(header.footerLabels.length > 0
+            ? [
+                {
+                  kind: 'text' as const,
+                  label: header.footerLabels.join(' · '),
+                  variant: 'muted' as const,
+                },
+              ]
+            : []),
+        ],
+      }}
+      disabled={header.tone !== 'default'}
+    >
+      {card.status === 'resolved' ? (
+        <SpellDetailMetadata
+          viewModel={buildSpellDetailViewModel(card.spell)}
+          sectionId={`${card.id}-detail-metadata`}
+          omitSectionTitle
+          statRowSize="sm"
         />
-      }
-      body={
-        card.status === 'resolved' ? (
-          <SpellDetailMetadata
-            viewModel={buildSpellDetailViewModel(card.spell)}
-            sectionId={`${card.id}-detail-metadata`}
-            omitSectionTitle
-            statRowSize="sm"
-          />
-        ) : (
-          <Text variant="muted">{header.unavailableMessage}</Text>
-        )
-      }
-    />
+      ) : (
+        <Text variant="muted">{header.unavailableMessage}</Text>
+      )}
+    </DisclosureEntityCard>
   )
 }
 

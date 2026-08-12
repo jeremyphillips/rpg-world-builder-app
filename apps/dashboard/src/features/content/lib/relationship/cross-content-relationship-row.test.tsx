@@ -57,12 +57,12 @@ describe('CrossContentRelationshipRow', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('uses an explicit endSlot override instead of convenience overflow', () => {
+  it('uses an explicit trailing override instead of convenience overflow', () => {
     render(
       <CrossContentRelationshipRow
         heading="The Monarchy"
         actions={[{ id: 'view', label: 'View organization', onSelect: vi.fn() }]}
-        endSlot={<button type="button">Utility</button>}
+        trailing={{ kind: 'action', content: <button type="button">Utility</button> }}
       />,
     )
 
@@ -70,12 +70,12 @@ describe('CrossContentRelationshipRow', () => {
     expect(screen.queryByRole('button', { name: 'Relationship actions' })).not.toBeInTheDocument()
   })
 
-  it('suppresses trailing controls when endSlot is null', () => {
+  it('suppresses trailing controls when trailing is null', () => {
     render(
       <CrossContentRelationshipRow
         heading="The Monarchy"
         actions={[{ id: 'view', label: 'View organization', onSelect: vi.fn() }]}
-        endSlot={null}
+        trailing={null}
       />,
     )
 

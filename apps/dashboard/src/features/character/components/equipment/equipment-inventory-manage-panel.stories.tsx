@@ -8,7 +8,7 @@ import {
   equipmentStepPotionOfHealingFixture,
 } from '../../lib/equipment/equipment-step.fixtures'
 import {
-  EquipmentInventoryManagePanel,
+  EquipmentInventoryManageDisclosureCard,
   createStorybookApplyMagicItemAcquisition,
 } from './equipment-inventory-manage-panel.client'
 import type { EquipmentInventoryRow } from '../../lib/equipment/equipment-step.lib'
@@ -37,11 +37,13 @@ const rows: EquipmentInventoryRow[] = [
 ]
 
 const meta = {
-  title: 'Character Builder/EquipmentInventoryManagePanel',
-  component: EquipmentInventoryManagePanel,
+  title: 'Character Builder/EquipmentInventoryManageDisclosureCard',
+  component: EquipmentInventoryManageDisclosureCard,
   parameters: { layout: 'padded' },
   args: {
+    itemId: 'potion-of-healing',
     equipmentName: 'Potion of Healing',
+    provenanceLabel: '2 Common choices',
     equipment: equipmentStepPotionOfHealingFixture,
     rows,
     draft: createEmptyCharacterBuilderDraft(),
@@ -55,7 +57,7 @@ const meta = {
       catalogIndex: equipmentStepCatalogIndexFixture,
     }),
   },
-} satisfies Meta<typeof EquipmentInventoryManagePanel>
+} satisfies Meta<typeof EquipmentInventoryManageDisclosureCard>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -65,6 +67,7 @@ export const GrantOnly: Story = {}
 export const MixedSource: Story = {
   args: {
     equipment: equipmentStepPotionOfHealingFixture,
+    provenanceLabel: '2 Common choices · Purchased',
     rows: [
       ...rows,
       {

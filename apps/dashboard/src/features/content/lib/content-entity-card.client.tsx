@@ -2,86 +2,63 @@
 
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import {
-  cn,
-  ContentCard,
-  ContentCardHeadingAction,
-  ContentCardMedia,
-  contentCardHeadingLinkVariants,
-  contentCardMediaVariants,
-  type ContentCardChrome,
-  type ContentCardDensity,
-  type ContentCardProps,
-} from '@rpg/ui'
+import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 
-import { getContentImageUrl } from './detail/page/content-image-url'
+import { EntityCardFrame } from './entity/entity-card-frame.client'
+import { EntityItemAnatomy } from './entity/entity-item.client'
+import type { EntityItemTrailing } from './entity/entity-item-trailing.types'
+import type { EntitySummaryModel } from './entity/entity-summary.types'
+
+export type { EntitySummaryModel } from './entity/entity-summary.types'
+export type { EntitySummaryStatusItem } from './entity/entity-summary-status.types'
+export type {
+  EntityItemTrailing,
+  EntityItemTrailingSecondary,
+} from './entity/entity-item-trailing.types'
+export { EntitySummary } from './entity/entity-summary.client'
+export { EntityItem } from './entity/entity-item.client'
+export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
+export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.client'
+export { CatalogEntityDisclosureRow } from './entity/catalog-entity-disclosure-row.client'
+export type { CatalogEntityDisclosureRowProps } from './entity/catalog-entity-disclosure-row.client'
+export { createCatalogEntityDisclosureRowRenderer } from './entity/catalog-entity-disclosure-row-renderer.client'
 
 export type ContentEntityCardProps = {
-  heading: ReactNode
-  headingSuffix?: ReactNode
-  href?: string
-  subheading?: ReactNode
-  metadata?: ReactNode
-  imageKey?: string
-  headingEndSlot?: ReactNode
-  endSlot?: ReactNode
-  footer?: ReactNode
+  entity: EntitySummaryModel
+  /** Exactly one leading utility when set — never a multi-control fragment. */
+  leading?: ReactNode
+  trailing?: EntityItemTrailing
+  /** Links the entity heading only — not whole-row/card navigation. */
+  headingHref?: string
   density?: ContentCardDensity
-  /** Who draws the outer shell — card (`standalone`) or host (`embedded`). */
-  chrome?: ContentCardChrome
-  /** Presentational disabled state — host owns interaction disabling and ARIA. */
   disabled?: boolean
-  className?: string
 }
 
 export function ContentEntityCard({
-  heading,
-  headingSuffix,
-  href,
-  subheading,
-  metadata,
-  imageKey,
-  headingEndSlot,
-  endSlot,
-  footer,
+  entity,
+  leading,
+  trailing,
+  headingHref,
   density,
-  chrome,
   disabled = false,
-  className,
 }: ContentEntityCardProps) {
-  const resolvedHeading = href ? (
-    <Link to={href} className={contentCardHeadingLinkVariants()}>
-      {heading}
-    </Link>
-  ) : (
-    heading
-  )
-
   const resolvedDensity = density ?? 'comfortable'
 
-  const media = imageKey ? (
-    <ContentCardMedia
-      src={getContentImageUrl(imageKey)}
-      alt={typeof heading === 'string' ? heading : ''}
-      className={contentCardMediaVariants({ density: resolvedDensity })}
-    />
-  ) : undefined
-
-  const cardProps: ContentCardProps = {
-    heading: resolvedHeading,
-    headingSuffix,
-    subheading,
-    metadata,
-    media,
-    headingEndSlot,
-    endSlot,
-    footer,
-    density: resolvedDensity,
-    chrome,
-    className: cn(disabled && 'opacity-60', className),
-  }
-
-  return <ContentCard {...cardProps} data-disabled={disabled ? true : undefined} />
+  return (
+    <EntityCardFrame
+      density={resolvedDensity}
+      disabled={disabled}
+      leadingUtilityCount={leading ? 1 : 0}
+    >
+      <EntityItemAnatomy
+        entity={entity}
+        headingHref={headingHref}
+        leadingUtilities={leading != null ? [leading] : undefined}
+        trailing={trailing}
+        density={resolvedDensity}
+      />
+    </EntityCardFrame>
+  )
 }
 
 export function ContentEntityCardViewLink({ href }: { href: string }) {

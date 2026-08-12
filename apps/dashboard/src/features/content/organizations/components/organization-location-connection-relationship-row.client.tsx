@@ -7,7 +7,6 @@ import type {
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
-import { Badge } from '@rpg/ui'
 
 import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { RelationshipList } from '../../lib/relationship/relationship-list.client'
@@ -172,12 +171,8 @@ export function OrganizationLocationConnectionListRow({
       href={item.target?.href}
       headingSuffix={presentation.headingSuffix}
       description={presentation.supportingText}
-      badge={
-        item.target == null ? (
-          <Badge tone="warning" className="mt-1">
-            Unavailable
-          </Badge>
-        ) : undefined
+      status={
+        item.target == null ? [{ kind: 'badge', label: 'Unavailable', tone: 'warning' }] : undefined
       }
       menu={
         actions.length > 0

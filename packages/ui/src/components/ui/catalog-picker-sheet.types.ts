@@ -16,6 +16,29 @@ export type CatalogPickerSheetActionsHelpers = {
 
 export type CatalogPickerRowLayout = CollapsibleListItemRowLayout
 
+/** Generic collapsible row render args — entity-agnostic. */
+export type CatalogPickerCollapsibleRowRenderArgs<TItem> = {
+  item: TItem
+  itemKey: string
+  toolbarLabel: string
+  domIds: { itemId: string; titleId: string; bodyId: string }
+  collapsible: boolean
+  collapsed?: boolean
+  onToggleCollapse?: () => void
+  summary?: ReactNode
+  details?: ReactNode
+}
+
+type CatalogPickerSheetRowRenderProps<TItem> =
+  | {
+      renderItemHeader: (item: TItem) => ReactNode
+      renderCollapsibleRow?: never
+    }
+  | {
+      renderCollapsibleRow: (args: CatalogPickerCollapsibleRowRenderArgs<TItem>) => ReactNode
+      renderItemHeader?: never
+    }
+
 /**
  * Quiet alternate acquisition path when the desired catalog item may not exist.
  *
@@ -51,7 +74,6 @@ export type CatalogPickerSheetProps<TItem> = {
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
   getSearchText: (item: TItem) => string
-  renderItemHeader: (item: TItem) => ReactNode
   renderItemSummary?: (item: TItem) => ReactNode
   renderItemActions?: (item: TItem) => ReactNode
   renderItemDetails?: (item: TItem) => ReactNode
@@ -130,4 +152,4 @@ export type CatalogPickerSheetProps<TItem> = {
   rowBodyClassName?: string
   /** Optional class merged onto each collapsible row shell (`role="group"`). */
   rowShellClassName?: string
-}
+} & CatalogPickerSheetRowRenderProps<TItem>

@@ -19,10 +19,10 @@ import {
 } from '@/features/character'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
+import { EntityItem } from '../../lib/content-entity-card.client'
 import {
-  buildCharacterPickerCardPresentation,
-  buildOrganizationPickerCardPresentation,
+  buildCharacterPickerEntitySummary,
+  buildOrganizationPickerEntitySummary,
 } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -377,22 +377,24 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
           return (
-            <ContentEntityCard
-              chrome="embedded"
+            <EntityItem
               density="compact"
-              {...buildOrganizationPickerCardPresentation(organization)}
-              subheading={!hasAvailableKind ? organizationFullyLinkedReason : undefined}
-              imageKey={organization.imageKey}
-              disabled={!hasAvailableKind}
-              endSlot={
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedOrganizationId(organization.id)}
-                  onRemove={() => setSelectedOrganizationId(null)}
-                />
-              }
+              entity={buildOrganizationPickerEntitySummary(organization, {
+                imageKey: organization.imageKey,
+                description: !hasAvailableKind ? organizationFullyLinkedReason : undefined,
+              })}
+              trailing={{
+                kind: 'action',
+                content: (
+                  <CatalogPickerSelectionActions
+                    phase={phase}
+                    canSelect={hasAvailableKind}
+                    addLabel={isSelected ? 'Selected' : 'Select'}
+                    onAdd={() => setSelectedOrganizationId(organization.id)}
+                    onRemove={() => setSelectedOrganizationId(null)}
+                  />
+                ),
+              }}
             />
           )
         }}
@@ -430,21 +432,23 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
         return (
-          <ContentEntityCard
-            chrome="embedded"
+          <EntityItem
             density="compact"
-            {...buildCharacterPickerCardPresentation(character)}
-            subheading={!hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined}
-            disabled={!hasAvailableKind}
-            endSlot={
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedCharacterId(character.id)}
-                onRemove={() => setSelectedCharacterId(null)}
-              />
-            }
+            entity={buildCharacterPickerEntitySummary(character, {
+              description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
+            })}
+            trailing={{
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={phase}
+                  canSelect={hasAvailableKind}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedCharacterId(character.id)}
+                  onRemove={() => setSelectedCharacterId(null)}
+                />
+              ),
+            }}
           />
         )
       }}

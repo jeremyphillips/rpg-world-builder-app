@@ -11,8 +11,8 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { buildLocationPickerCardPresentation } from '../../lib/content-entity-picker-presentation.lib'
+import { EntityItem } from '../../lib/content-entity-card.client'
+import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import {
@@ -95,20 +95,21 @@ function LocationParentReplacementCandidateRow({
   const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
   return (
-    <ContentEntityCard
-      chrome="embedded"
+    <EntityItem
       density="compact"
-      {...buildLocationPickerCardPresentation(summary)}
-      imageKey={summary.imageKey}
-      endSlot={
-        <CatalogPickerSelectionActions
-          phase={phase}
-          canSelect
-          addLabel={isSelected ? 'Selected' : 'Select'}
-          onAdd={() => onSelect(summary.id)}
-          onRemove={onClear}
-        />
-      }
+      entity={buildLocationPickerEntitySummary(summary, { imageKey: summary.imageKey })}
+      trailing={{
+        kind: 'action',
+        content: (
+          <CatalogPickerSelectionActions
+            phase={phase}
+            canSelect
+            addLabel={isSelected ? 'Selected' : 'Select'}
+            onAdd={() => onSelect(summary.id)}
+            onRemove={onClear}
+          />
+        ),
+      }}
     />
   )
 }

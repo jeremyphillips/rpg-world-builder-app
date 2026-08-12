@@ -53,7 +53,7 @@ describe('CampaignPicker', () => {
       'href',
       ROUTES.campaign.detail('camp_1'),
     )
-    expect(screen.getByText('Active Campaign')).toHaveClass('heading-style-card')
+    expect(screen.getByText('Active Campaign')).toHaveClass('font-body-emphasis')
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
   })
 

@@ -291,7 +291,9 @@ export {
   ARRAY_ITEM_HEADER_DIVIDER,
   ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
+  type ResolvedArrayItemHeader,
 } from './config/array/array-item-config.lib'
+export type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
 export {
   buildItemKeysByFieldId,
   collapsedIdsFromSnapshot,

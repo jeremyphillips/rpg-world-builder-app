@@ -1,15 +1,11 @@
 'use client'
 
 import type { CampaignListItem } from '@rpg/contracts'
-import { Badge, Text } from '@rpg/ui'
-import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-import { CampaignDisplayName } from './campaign-display-name'
-import {
-  campaignDestinationChevronClasses,
-  campaignDestinationRowVariants,
-} from './campaign-destination.variants'
+import { EntityItem } from '@/features/content'
+
+import { campaignDestinationRowVariants } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../lib/campaign-display'
 import {
   resolveCampaignEntryDestination,
@@ -45,20 +41,18 @@ export function CampaignDestinationRow({
         onPersistSelection(campaign.id)
       }}
     >
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <div className="flex min-w-0 items-center gap-2">
-          <CampaignDisplayName display={display} surface="row" />
-          {badgeLabel && badgeTone ? (
-            <Badge appearance="outline" tone={badgeTone} size="sm">
-              {badgeLabel}
-            </Badge>
-          ) : null}
-        </div>
-        {destination.supportingCopy ? (
-          <Text variant="small">{destination.supportingCopy}</Text>
-        ) : null}
-      </div>
-      <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />
+      <EntityItem
+        density="comfortable"
+        entity={{
+          heading: display.name,
+          description: destination.supportingCopy,
+          status:
+            badgeLabel && badgeTone
+              ? [{ kind: 'badge', label: badgeLabel, appearance: 'outline', tone: badgeTone }]
+              : undefined,
+        }}
+        trailing={{ kind: 'indicator', variant: 'chevron' }}
+      />
     </Link>
   )
 }

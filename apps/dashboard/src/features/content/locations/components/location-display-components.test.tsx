@@ -48,9 +48,8 @@ describe('ContentEntityCard (location rows)', () => {
     render(
       <MemoryRouter>
         <ContentEntityCard
-          heading="Dock Ward"
-          href="/campaigns/camp_1/locations/location-dock-ward"
-          subheading="District"
+          entity={{ heading: 'Dock Ward', description: 'District' }}
+          headingHref="/campaigns/camp_1/locations/location-dock-ward"
         />
       </MemoryRouter>,
     )
@@ -62,7 +61,7 @@ describe('ContentEntityCard (location rows)', () => {
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>
-        <ContentEntityCard heading="Dock Ward" subheading="District" />
+        <ContentEntityCard entity={{ heading: 'Dock Ward', description: 'District' }} />
       </MemoryRouter>,
     )
 

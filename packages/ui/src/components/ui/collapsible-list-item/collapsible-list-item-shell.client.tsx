@@ -9,7 +9,10 @@ import {
   type SemanticSurfaceTone,
 } from '../field-surface.variants'
 import type { SurfaceConfig } from '../visual-vocabulary.types'
-import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-item-leading-chrome.lib'
+import {
+  buildCollapsibleListItemGeometryStyle,
+  buildCollapsibleListItemLeadingChromeStyle,
+} from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
   collapsibleListItemDraggingClasses,
@@ -109,7 +112,10 @@ export function CollapsibleListItemShell({
     collapsible,
   }
 
-  const leadingChromeStyle = buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
+  const leadingChromeStyle =
+    rowLayout === 'entity-card'
+      ? buildCollapsibleListItemGeometryStyle(leadingChrome)
+      : buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
 
   const shellLayout = resolveCollapsibleListItemShellLayout({
     layout,

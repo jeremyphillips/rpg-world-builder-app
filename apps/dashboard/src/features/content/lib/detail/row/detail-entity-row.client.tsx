@@ -2,25 +2,21 @@
 
 import { ChevronDown } from 'lucide-react'
 import { useId, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 
-import {
-  buildCollapsibleListItemLeadingChromeStyle,
-  cn,
-  ContentCardHeading,
-  contentCardHeadingLinkVariants,
-} from '@rpg/ui'
+import { cn } from '@rpg/ui'
 
+import { EntityItemAnatomy } from '../../entity/entity-item.client'
+import type { EntitySummaryStatusItem } from '../../entity/entity-summary-status.types'
+import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
+import { buildEntityContentOffsetStyle } from '../../entity/entity-leading-rail.lib'
+import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
+import { entitySurfaceInsetVariants } from '../../entity/entity-surface-inset.variants'
 import {
-  detailEntityRowContentVariants,
-  detailEntityRowDisclosureButtonColumnClasses,
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
-  detailEntityRowDisclosureIdentityVariants,
   detailEntityRowDisclosureItemVariants,
   detailEntityRowDisclosurePreviewGroupVariants,
   detailEntityRowDisclosureRowVariants,
-  detailEntityRowSubheadingVariants,
   detailEntityRowVariants,
 } from './detail-entity-row.variants'
 
@@ -30,51 +26,25 @@ export type DetailEntityRowDisclosure =
 
 export type DetailEntityRowProps = {
   heading: ReactNode
-  href?: string
+  headingHref?: string
   /** Muted classification text rendered inline after the heading (includes leading separator). */
   headingSuffix?: ReactNode
   subheading?: ReactNode
-  metadata?: ReactNode
-  endSlot?: ReactNode
+  metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  trailing?: EntityItemTrailing
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure
   className?: string
 }
 
-const DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE = buildCollapsibleListItemLeadingChromeStyle({
-  showDragHandle: false,
-  collapsible: true,
+const DETAIL_ENTITY_ROW_DENSITY = 'compact' as const
+
+const DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE = buildEntityContentOffsetStyle({
+  count: 1,
+  density: DETAIL_ENTITY_ROW_DENSITY,
 })
 
-function DetailEntityRowIdentity({
-  heading,
-  href,
-  headingSuffix,
-  subheading,
-  metadata,
-}: Pick<DetailEntityRowProps, 'heading' | 'href' | 'headingSuffix' | 'subheading' | 'metadata'>) {
-  const resolvedHeading = href ? (
-    <Link to={href} className={contentCardHeadingLinkVariants()}>
-      {heading}
-    </Link>
-  ) : (
-    heading
-  )
-
-  return (
-    <div className={detailEntityRowContentVariants()}>
-      <ContentCardHeading
-        heading={resolvedHeading}
-        headingSuffix={headingSuffix}
-        density="compact"
-      />
-      {subheading ? <p className={detailEntityRowSubheadingVariants()}>{subheading}</p> : null}
-      {metadata ? <div className={detailEntityRowSubheadingVariants()}>{metadata}</div> : null}
-    </div>
-  )
-}
-
-function DetailEntityRowDisclosureColumn({
+function DetailEntityRowDisclosureUtility({
   disclosure,
   collapsed,
   contentId,
@@ -89,38 +59,59 @@ function DetailEntityRowDisclosureColumn({
     const toggleLabel = collapsed ? `Show ${disclosure.label}` : `Hide ${disclosure.label}`
 
     return (
-      <div className={detailEntityRowDisclosureButtonColumnClasses}>
-        <button
-          type="button"
-          className={detailEntityRowDisclosureButtonVariants()}
-          aria-expanded={!collapsed}
-          aria-controls={contentId}
-          aria-label={toggleLabel}
-          onClick={onToggle}
-        >
-          <ChevronDown
-            className={cn('transition-transform', collapsed && '-rotate-90')}
-            aria-hidden
-          />
-        </button>
-      </div>
+      <button
+        type="button"
+        className={detailEntityRowDisclosureButtonVariants()}
+        aria-expanded={!collapsed}
+        aria-controls={contentId}
+        aria-label={toggleLabel}
+        onClick={onToggle}
+      >
+        <ChevronDown
+          className={cn('transition-transform', collapsed && '-rotate-90')}
+          aria-hidden
+        />
+      </button>
     )
   }
 
+  return <span className="block size-control-action-compact" aria-hidden />
+}
+
+function DetailEntityRowIdentity(
+  props: Pick<
+    DetailEntityRowProps,
+    'heading' | 'headingHref' | 'headingSuffix' | 'subheading' | 'metadata' | 'trailing'
+  > & {
+    leadingUtilities?: readonly ReactNode[]
+  },
+) {
+  const { heading, headingHref, headingSuffix, subheading, metadata, trailing, leadingUtilities } =
+    props
+
   return (
-    <div className={detailEntityRowDisclosureButtonColumnClasses} aria-hidden>
-      <span className="block size-control-action-compact" />
-    </div>
+    <EntityItemAnatomy
+      entity={projectEntitySummaryModel({
+        heading,
+        classification: headingSuffix,
+        description: subheading,
+        status: metadata,
+      })}
+      headingHref={headingHref}
+      leadingUtilities={leadingUtilities}
+      trailing={trailing}
+      density={DETAIL_ENTITY_ROW_DENSITY}
+    />
   )
 }
 
 export function DetailEntityRow({
   heading,
-  href,
+  headingHref,
   headingSuffix,
   subheading,
   metadata,
-  endSlot,
+  trailing,
   inset = 'self',
   disclosure,
   className,
@@ -133,41 +124,47 @@ export function DetailEntityRow({
       <div className={cn(detailEntityRowVariants({ inset }), className)}>
         <DetailEntityRowIdentity
           heading={heading}
-          href={href}
+          headingHref={headingHref}
           headingSuffix={headingSuffix}
           subheading={subheading}
           metadata={metadata}
+          trailing={trailing}
         />
-        {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
       </div>
     )
   }
 
   return (
     <div
-      className={cn(detailEntityRowDisclosureItemVariants(), className)}
-      style={DETAIL_ENTITY_ROW_DISCLOSURE_CHROME_STYLE}
+      className={cn(
+        detailEntityRowDisclosureItemVariants(),
+        inset === 'self' &&
+          entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, leading: true }),
+        className,
+      )}
+      style={DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE}
     >
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>
-        <div className={detailEntityRowDisclosureIdentityVariants()}>
-          <DetailEntityRowDisclosureColumn
-            disclosure={disclosure}
-            collapsed={collapsed}
-            contentId={contentId}
-            onToggle={() => setCollapsed((current) => !current)}
-          />
-          <DetailEntityRowIdentity
-            heading={heading}
-            href={href}
-            headingSuffix={headingSuffix}
-            subheading={subheading}
-            metadata={metadata}
-          />
-        </div>
-        {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+        <DetailEntityRowIdentity
+          heading={heading}
+          headingHref={headingHref}
+          headingSuffix={headingSuffix}
+          subheading={subheading}
+          metadata={metadata}
+          trailing={trailing}
+          leadingUtilities={[
+            <DetailEntityRowDisclosureUtility
+              key="disclosure-utility"
+              disclosure={disclosure}
+              collapsed={collapsed}
+              contentId={contentId}
+              onToggle={() => setCollapsed((current) => !current)}
+            />,
+          ]}
+        />
       </div>
       {disclosure.mode === 'expandable' && !collapsed ? (
-        <div id={contentId} className={detailEntityRowDisclosureContentVariants()}>
+        <div id={contentId} className={detailEntityRowDisclosureContentVariants({ inset })}>
           <div className={detailEntityRowDisclosurePreviewGroupVariants()}>
             {disclosure.content}
           </div>

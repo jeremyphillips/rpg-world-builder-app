@@ -19,24 +19,20 @@ import {
 } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
-import { cn, Button, Eyebrow, Text } from '@rpg/ui'
-import { AlertCircle, GripVertical, Trash2 } from 'lucide-react'
+import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
+import { GripVertical, Trash2 } from 'lucide-react'
 
+import { EntityItem } from '../../lib/content-entity-card.client'
 import {
   masterDetailListDragHandleClasses,
-  masterDetailListDragHandleVisibleClasses,
-  masterDetailListRowClasses,
   masterDetailListRowDraggingClasses,
-  masterDetailListRowInactiveClasses,
-  masterDetailListRowInactiveTitleClasses,
+  masterDetailListRowLayoutClasses,
   masterDetailListRowSelectClasses,
-  masterDetailListRowSelectDefaultPaddingClasses,
-  masterDetailListRowSelectWithDragClasses,
   masterDetailListRowSortableClasses,
-  masterDetailListRowSelectedClasses,
+  masterDetailListRowSurfaceClasses,
 } from './master-detail-list-panel.variants'
 import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
-import { MasterDetailRowBadges } from './master-detail-row-badges.client'
+import { buildMasterDetailRowStatus } from './master-detail-row-badges.client'
 
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
@@ -99,19 +95,7 @@ function MasterDetailListRowStatus({
   hasError,
   badges,
 }: Pick<MasterDetailListItem, 'hasError' | 'badges'>) {
-  if (!hasError && !badges?.length) return null
-
-  return (
-    <span className="mt-1 flex flex-wrap items-center gap-1">
-      {hasError ? (
-        <>
-          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
-          <span className="sr-only">Has validation errors</span>
-        </>
-      ) : null}
-      {badges?.length ? <MasterDetailRowBadges badges={badges} /> : null}
-    </span>
-  )
+  return buildMasterDetailRowStatus({ hasError, badges })
 }
 
 function masterDetailListRowClassName(
@@ -120,10 +104,9 @@ function masterDetailListRowClassName(
   showDragHandle: boolean,
 ) {
   return cn(
-    masterDetailListRowClasses,
+    masterDetailListRowLayoutClasses,
+    masterDetailListRowSurfaceClasses({ active, isSelected }),
     showDragHandle && masterDetailListRowSortableClasses,
-    !active && masterDetailListRowInactiveClasses,
-    isSelected && masterDetailListRowSelectedClasses,
   )
 }
 
@@ -141,64 +124,13 @@ function MasterDetailListDragHandle({
   return (
     <button
       type="button"
-      className={cn(
-        masterDetailListDragHandleClasses,
-        isDragging && masterDetailListDragHandleVisibleClasses,
-      )}
+      className={masterDetailListDragHandleClasses(isDragging)}
       aria-label={`Drag to reorder ${title}`}
       onClick={(event) => event.stopPropagation()}
       {...dragHandleProps.attributes}
       {...dragHandleProps.listeners}
     >
       <GripVertical className="size-3.5" aria-hidden />
-    </button>
-  )
-}
-
-type MasterDetailListRowSelectButtonProps = {
-  item: MasterDetailListItem
-  index: number
-  isSelected: boolean
-  active: boolean
-  showDragHandle: boolean
-  onSelect: (index: number) => void
-}
-
-function MasterDetailListRowSelectButton({
-  item,
-  index,
-  isSelected,
-  active,
-  showDragHandle,
-  onSelect,
-}: MasterDetailListRowSelectButtonProps) {
-  return (
-    <button
-      type="button"
-      aria-current={isSelected ? 'true' : undefined}
-      aria-invalid={item.hasError ? true : undefined}
-      onClick={() => onSelect(index)}
-      className={cn(
-        masterDetailListRowSelectClasses,
-        showDragHandle
-          ? masterDetailListRowSelectWithDragClasses
-          : masterDetailListRowSelectDefaultPaddingClasses,
-      )}
-    >
-      {item.eyebrow ? (
-        <Eyebrow as="span" size="sm" className="block">
-          {item.eyebrow}
-        </Eyebrow>
-      ) : null}
-      <span
-        className={cn(
-          'block truncate font-medium',
-          !active && masterDetailListRowInactiveTitleClasses,
-        )}
-      >
-        {item.title}
-      </span>
-      <MasterDetailListRowStatus hasError={item.hasError} badges={item.badges} />
     </button>
   )
 }
@@ -215,16 +147,14 @@ function MasterDetailListRowRemoveButton({
   onRemove,
 }: MasterDetailListRowRemoveButtonProps) {
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="sm"
-      className="mr-1 size-8 shrink-0 p-0"
+      className={iconGhostControlVariants({ hover: 'destructiveSubtle', layout: 'flex' })}
       aria-label={`Remove ${title}`}
       onClick={() => onRemove(index)}
     >
-      <Trash2 className="size-4" aria-hidden />
-    </Button>
+      <Trash2 aria-hidden />
+    </button>
   )
 }
 
@@ -243,24 +173,47 @@ function MasterDetailListRowContent({
 
   return (
     <div className={masterDetailListRowClassName(active, isSelected, showDragHandle)}>
-      {showDragHandle && dragHandleProps ? (
-        <MasterDetailListDragHandle
-          title={item.title}
-          isDragging={isDragging}
-          dragHandleProps={dragHandleProps}
-        />
-      ) : null}
-      <MasterDetailListRowSelectButton
-        item={item}
-        index={index}
-        isSelected={isSelected}
-        active={active}
-        showDragHandle={showDragHandle}
-        onSelect={onSelect}
+      <EntityItem
+        density="compact"
+        leading={
+          showDragHandle && dragHandleProps ? (
+            <MasterDetailListDragHandle
+              title={item.title}
+              isDragging={isDragging}
+              dragHandleProps={dragHandleProps}
+            />
+          ) : undefined
+        }
+        trailing={
+          deletable
+            ? {
+                kind: 'action',
+                content: (
+                  <MasterDetailListRowRemoveButton
+                    title={item.title}
+                    index={index}
+                    onRemove={onRemove}
+                  />
+                ),
+              }
+            : undefined
+        }
+        entity={{
+          heading: (
+            <button
+              type="button"
+              aria-current={isSelected ? 'true' : undefined}
+              aria-invalid={item.hasError ? true : undefined}
+              onClick={() => onSelect(index)}
+              className={masterDetailListRowSelectClasses}
+            >
+              {item.title}
+            </button>
+          ),
+          classification: item.eyebrow,
+          status: MasterDetailListRowStatus({ hasError: item.hasError, badges: item.badges }),
+        }}
       />
-      {deletable ? (
-        <MasterDetailListRowRemoveButton title={item.title} index={index} onRemove={onRemove} />
-      ) : null}
     </div>
   )
 }

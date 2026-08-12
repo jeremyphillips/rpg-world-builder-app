@@ -13,6 +13,14 @@ function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!
 }
 
+function entityItemRoot(link: HTMLElement): HTMLElement {
+  return link.nextElementSibling!.firstElementChild as HTMLElement
+}
+
+function entityItemAnatomy(link: HTMLElement): HTMLElement {
+  return entityItemRoot(link).firstElementChild as HTMLElement
+}
+
 describe('SearchResultRow', () => {
   it('renders presentation fields and navigates via link', () => {
     renderWithProviders(
@@ -28,7 +36,7 @@ describe('SearchResultRow', () => {
     expect(link).toHaveAttribute('href', '/campaigns/c1/spells/fireball')
     expect(screen.getByText('3rd-level evocation')).toBeInTheDocument()
     expect(screen.getByText('Spell')).toBeInTheDocument()
-    expect(screen.getByText('Fireball')).toHaveClass('font-semibold')
+    expect(screen.getByText('Fireball')).toHaveClass('font-body-emphasis')
   })
 
   it('calls onActivate when clicked', async () => {
@@ -68,7 +76,7 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
-  it('uses text-xs secondary copy by default with roomier vertical rhythm', () => {
+  it('keeps row inset on the host and EntityItem inset-free for default page rows', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -76,20 +84,26 @@ describe('SearchResultRow', () => {
         typeLabel="Spell"
         href="/campaigns/c1/spells/fireball"
         borderless
+        density="default"
+        surfaceContext="page"
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous')
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const row = rowShell(link)
+    const root = entityItemRoot(link)
+    const anatomy = entityItemAnatomy(link)
 
-    expect(secondary).toHaveClass('text-xs')
-    expect(secondary).not.toHaveClass('truncate')
-    expect(secondary).not.toHaveClass('mt-1')
-    expect(row).toHaveClass('py-3', globalSearchGroupContentInsetClasses, 'hover:bg-surface-subtle')
+    expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
+    expect(root.className).not.toMatch(/\bpx-/)
+    expect(root.className).not.toMatch(/\bpy-/)
+    expect(anatomy.className).not.toMatch(/\bpx-/)
+    expect(anatomy.className).not.toMatch(/\bpy-/)
+    expect(secondary).toHaveClass('text-sm', 'truncate')
   })
 
-  it('uses compact density for tighter py and truncated secondary copy', () => {
+  it('keeps compact preview rows on py-2 host inset', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -98,18 +112,82 @@ describe('SearchResultRow', () => {
         href="/campaigns/c1/spells/fireball"
         density="compact"
         borderless
+        surfaceContext="preview"
       />,
     )
 
     const secondary = screen.getByText('3rd-level evocation · Instantaneous · Extra detail')
-    expect(secondary).toHaveClass('text-xs', 'truncate')
     const row = rowShell(screen.getByRole('link', { name: 'Fireball, Spell' }))
+
     expect(row).toHaveClass(
-      'py-2',
       'border-b-0',
       globalSearchGroupContentInsetClasses,
-      'hover:bg-surface-subtle',
+      'py-2',
+      'hover:bg-surface-muted',
     )
+    expect(secondary).toHaveClass('text-xs', 'truncate')
+  })
+
+  it('keeps classification adjacent to the title while trailing occupies column 3', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Fire Bolt"
+        secondary="Evocation cantrip"
+        typeLabel="Spell"
+        href="/campaigns/c1/spells/fire-bolt"
+        borderless
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Fire Bolt, Subclass of Aric, Spell' })
+    const name = screen.getByText('Fire Bolt')
+    const classification = screen.getByText('Spell')
+    const mixedHeadingRow = name.parentElement as HTMLElement
+    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+
+    expect(name.className).not.toMatch(/\bflex-1\b/)
+    expect(mixedHeadingRow.childNodes[0]).toBe(name)
+    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+  })
+
+  it('keeps trailing in column 3 while the host owns inset', () => {
+    renderWithProviders(
+      <SearchResultRow
+        title="Champion"
+        secondary="Fighter subclass"
+        typeLabel="Subclass"
+        href="/campaigns/c1/classes/fighter/subclasses/champion"
+        borderless
+        viewerCharacterRelationships={{
+          count: 1,
+          groups: [
+            {
+              kind: 'subclass',
+              count: 1,
+              relationships: [{ kind: 'subclass', characterId: '1', characterName: 'Aric' }],
+            },
+          ],
+        }}
+      />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Champion, Subclass of Aric, Subclass' })
+    const row = rowShell(link)
+    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+
+    expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
+    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
   })
 
   it('removes row borders when borderless for parent-owned list separators', () => {

@@ -80,13 +80,10 @@ function createFormShellFooterStore(): FormShellFooterScopeContextValue {
 
 /** Wrap overlay content so a form body and external footer slot share one footer model store. */
 export function FormShellFooterScope({ children }: { children: React.ReactNode }) {
-  const storeRef = React.useRef<FormShellFooterScopeContextValue | null>(null)
-  if (!storeRef.current) {
-    storeRef.current = createFormShellFooterStore()
-  }
+  const [store] = React.useState(createFormShellFooterStore)
 
   return (
-    <FormShellFooterScopeContext.Provider value={storeRef.current}>
+    <FormShellFooterScopeContext.Provider value={store}>
       {children}
     </FormShellFooterScopeContext.Provider>
   )
@@ -107,15 +104,23 @@ export function useFormShellFooterModel(): FormShellFooterModel | null {
   return useSyncExternalStore(scope.subscribe, scope.getSnapshot, scope.getSnapshot)
 }
 
+const noopSubscribe = () => () => {}
+const noopSnapshot = (): FormShellFooterModel | null => null
+
 /** Read the active external footer form id — used by submit buttons outside the `<form>` element. */
 export function useFormShellFooterFormId(): string | null {
   const scopedFormId = React.useContext(FormShellFooterFormIdContext)
-  if (scopedFormId) return scopedFormId
-
   const scope = React.useContext(FormShellFooterScopeContext)
+  const model = useSyncExternalStore(
+    scope?.subscribe ?? noopSubscribe,
+    scope?.getSnapshot ?? noopSnapshot,
+    scope?.getSnapshot ?? noopSnapshot,
+  )
+
+  if (scopedFormId) return scopedFormId
   if (!scope) return null
 
-  return useSyncExternalStore(scope.subscribe, scope.getSnapshot, scope.getSnapshot)?.formId ?? null
+  return model?.formId ?? null
 }
 
 export type FormShellFooterContentProps = {

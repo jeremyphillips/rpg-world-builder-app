@@ -3,11 +3,12 @@
 import * as React from 'react'
 
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Badge, Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
 
 import {
-  CatalogPickerItemHeader,
+  CatalogPickerMetadataRenderer,
   CatalogPickerSelectionActions,
+  CatalogEntityDisclosureRow,
   catalogPickerShellProps,
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -182,36 +183,52 @@ export function OrganizationMemberPickerDrawer({
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
-      renderItemHeader={(candidate) => {
-        const identityLine = formatCandidateIdentityLine(candidate)
+      renderCollapsibleRow={(args) => {
+        const candidate = args.item
 
         return (
-          <CatalogPickerItemHeader
-            name={candidate.name}
-            disabled={candidate.isMember}
-            metadataLines={
-              identityLine ? [{ segments: [{ type: 'text', text: identityLine }] }] : undefined
-            }
-            actions={
-              candidate.isMember ? (
-                <CatalogPickerSelectionActions
-                  phase="success"
-                  successLabel={ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}
-                  onAdd={() => undefined}
-                  onRemove={() => undefined}
+          <CatalogEntityDisclosureRow
+            toolbarLabel={args.toolbarLabel}
+            domIds={args.domIds}
+            collapsible={args.collapsible}
+            collapsed={args.collapsed}
+            onToggleCollapse={args.onToggleCollapse}
+            summary={args.summary}
+            details={args.details}
+            entity={{
+              heading: candidate.name,
+              description: formatCandidateIdentityLine(candidate) ? (
+                <CatalogPickerMetadataRenderer
+                  lines={[
+                    {
+                      segments: [{ type: 'text', text: formatCandidateIdentityLine(candidate)! }],
+                    },
+                  ]}
                 />
-              ) : (
-                <CatalogPickerSelectionActions
-                  canSelect
-                  onAdd={() => handleExpandedItemChange(candidate.id)}
-                  onRemove={() => undefined}
-                />
-              )
-            }
-            footer={
-              candidate.isMember ? (
-                <Badge tone="success">{ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}</Badge>
-              ) : undefined
+              ) : undefined,
+              status: candidate.isMember
+                ? [
+                    {
+                      kind: 'badge',
+                      label: ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+                      tone: 'success',
+                    },
+                  ]
+                : undefined,
+            }}
+            trailing={
+              candidate.isMember
+                ? undefined
+                : {
+                    kind: 'action',
+                    content: (
+                      <CatalogPickerSelectionActions
+                        canSelect
+                        onAdd={() => handleExpandedItemChange(candidate.id)}
+                        onRemove={() => undefined}
+                      />
+                    ),
+                  }
             }
           />
         )

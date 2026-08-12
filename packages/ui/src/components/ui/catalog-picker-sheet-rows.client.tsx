@@ -3,17 +3,60 @@
 import * as React from 'react'
 
 import { CollapsibleListItem } from './collapsible-list-item'
-import type { CatalogPickerRowLayout, CatalogPickerSheetProps } from './catalog-picker-sheet.types'
+import type {
+  CatalogPickerCollapsibleRowRenderArgs,
+  CatalogPickerRowLayout,
+  CatalogPickerSheetProps,
+} from './catalog-picker-sheet.types'
 import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
 import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
+
+function resolveCollapsibleRowRenderArgs<TItem>({
+  item,
+  itemKey,
+  toolbarLabel,
+  renderItemSummary,
+  renderItemDetails,
+  expandedItemId,
+  onExpandedItemChange,
+}: {
+  item: TItem
+  itemKey: string
+  toolbarLabel: string
+  renderItemSummary?: (item: TItem) => React.ReactNode
+  renderItemDetails?: (item: TItem) => React.ReactNode
+  expandedItemId?: string | null
+  onExpandedItemChange?: (itemId: string | null) => void
+}): CatalogPickerCollapsibleRowRenderArgs<TItem> {
+  const domIds = resolveCollapsibleListItemDomIds(itemKey)
+  const hasDetails = Boolean(renderItemDetails)
+  const controlledExpansion = expandedItemId !== undefined
+  const isExpanded = controlledExpansion ? expandedItemId === itemKey : undefined
+
+  return {
+    item,
+    itemKey,
+    toolbarLabel,
+    domIds,
+    collapsible: hasDetails,
+    collapsed: controlledExpansion ? !isExpanded : undefined,
+    onToggleCollapse:
+      controlledExpansion && onExpandedItemChange
+        ? () => onExpandedItemChange(isExpanded ? null : itemKey)
+        : undefined,
+    summary: renderItemSummary?.(item),
+    details: hasDetails ? renderItemDetails?.(item) : undefined,
+  }
+}
 
 function CatalogPickerCollapsibleItemRow<TItem>({
   item,
   itemKey,
   toolbarLabel,
   renderItemHeader,
+  renderCollapsibleRow,
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
@@ -27,7 +70,8 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   item: TItem
   itemKey: string
   toolbarLabel: string
-  renderItemHeader: (item: TItem) => React.ReactNode
+  renderItemHeader?: (item: TItem) => React.ReactNode
+  renderCollapsibleRow?: (args: CatalogPickerCollapsibleRowRenderArgs<TItem>) => React.ReactNode
   renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
@@ -38,6 +82,24 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   expandedItemId?: string | null
   onExpandedItemChange?: (itemId: string | null) => void
 }) {
+  if (renderCollapsibleRow) {
+    return (
+      <div data-picker-item-key={itemKey}>
+        {renderCollapsibleRow(
+          resolveCollapsibleRowRenderArgs({
+            item,
+            itemKey,
+            toolbarLabel,
+            renderItemSummary,
+            renderItemDetails,
+            expandedItemId,
+            onExpandedItemChange,
+          }),
+        )}
+      </div>
+    )
+  }
+
   const domIds = resolveCollapsibleListItemDomIds(itemKey)
   const hasDetails = Boolean(renderItemDetails)
   const controlledExpansion = expandedItemId !== undefined
@@ -63,7 +125,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
             ? () => onExpandedItemChange(isExpanded ? null : itemKey)
             : undefined
         }
-        header={renderItemHeader(item)}
+        header={renderItemHeader!(item)}
         summary={renderItemSummary?.(item)}
         actions={renderItemActions?.(item)}
         body={hasDetails ? renderItemDetails?.(item) : undefined}
@@ -93,6 +155,7 @@ export function CatalogPickerSheetResults<TItem>({
               itemKey={itemKey}
               toolbarLabel={rowProps.getItemToolbarLabel?.(item) ?? itemKey}
               renderItemHeader={rowProps.renderItemHeader}
+              renderCollapsibleRow={rowProps.renderCollapsibleRow}
               renderItemSummary={rowProps.renderItemSummary}
               renderItemActions={rowProps.renderItemActions}
               renderItemDetails={rowProps.renderItemDetails}

@@ -2,11 +2,15 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, Text } from '@rpg/ui'
+import { CatalogPickerSheet } from '@rpg/ui'
+
+import { createCatalogEntityDisclosureRowRenderer } from '@/features/content'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import { CatalogPickerItemHeader } from '../picker/catalog-picker-item-header.client'
-import { mapSkillProficiencyCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
+import {
+  CatalogPickerMetadataRenderer,
+  mapSkillProficiencyCompactSummaryToMetadataLines,
+} from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
@@ -19,7 +23,6 @@ import {
   formatProficiencyPickerDrawerTitle,
   formatProficiencyPickerSearchPlaceholder,
   getProficiencyPickerDisabledNote,
-  isProficiencyPickerRowDimmed,
   resolveProficiencyPickerEmptyStateKind,
   resolveProficiencyPickerEmptyStateMessage,
   PROFICIENCY_PICKER_VIEW_DEFAULTS,
@@ -149,30 +152,34 @@ export function ProficiencyPickerDrawer({
           />
         ),
       }}
-      renderItemHeader={(item) => {
-        const disabledNote = getProficiencyPickerDisabledNote(item)
+      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+        buildEntity: (item) => {
+          const disabledNote = getProficiencyPickerDisabledNote(item)
 
-        return (
-          <CatalogPickerItemHeader
-            name={item.label}
-            metadataLines={
-              item.compactSummary
-                ? mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)
-                : undefined
-            }
-            disabled={isProficiencyPickerRowDimmed(item)}
-            footer={disabledNote ? <Text variant="muted">{disabledNote}</Text> : undefined}
-            actions={
-              <CatalogPickerSelectionActions
-                selected={item.state.isAlreadySelected}
-                canSelect={item.state.canSelect}
-                onAdd={() => onSelectOption(item.optionId)}
-                onRemove={() => onRemoveOption(item.optionId)}
+          return {
+            heading: item.label,
+            description: item.compactSummary ? (
+              <CatalogPickerMetadataRenderer
+                lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
-            }
-          />
-        )
-      }}
+            ) : undefined,
+            status: disabledNote
+              ? [{ kind: 'text', label: disabledNote, variant: 'muted' }]
+              : undefined,
+          }
+        },
+        buildTrailing: (item) => ({
+          kind: 'action',
+          content: (
+            <CatalogPickerSelectionActions
+              selected={item.state.isAlreadySelected}
+              canSelect={item.state.canSelect}
+              onAdd={() => onSelectOption(item.optionId)}
+              onRemove={() => onRemoveOption(item.optionId)}
+            />
+          ),
+        }),
+      })}
       renderItemDetails={
         isSkillChoiceSet
           ? (item) => (

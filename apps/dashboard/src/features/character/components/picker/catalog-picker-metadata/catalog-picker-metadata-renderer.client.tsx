@@ -4,13 +4,13 @@ import { Fragment } from 'react'
 
 import { Badge, Text } from '@rpg/ui'
 
-import { CATALOG_PICKER_ITEM_HEADER_METADATA_CLASSES } from '../catalog-picker-item-header.variants'
 import type {
   CatalogPickerMetadataLine,
   CatalogPickerMetadataSegment,
 } from './catalog-picker-metadata.types'
 import {
   CATALOG_PICKER_METADATA_LINE_CLASSES,
+  CATALOG_PICKER_METADATA_TEXT_CLASSES,
   CATALOG_PICKER_METADATA_TEXT_SEPARATOR,
   CATALOG_PICKER_METADATA_WRAPPER_CLASSES,
 } from './catalog-picker-metadata-renderer.variants'
@@ -39,7 +39,7 @@ function CatalogPickerMetadataSegmentView({ segment }: { segment: CatalogPickerM
   }
 
   return (
-    <Text as="span" className={CATALOG_PICKER_ITEM_HEADER_METADATA_CLASSES}>
+    <Text as="span" className={CATALOG_PICKER_METADATA_TEXT_CLASSES}>
       {segment.text}
     </Text>
   )
@@ -62,7 +62,7 @@ export function CatalogPickerMetadataRenderer({ lines }: CatalogPickerMetadataRe
             return (
               <Fragment key={`${segment.type}-${index}`}>
                 {showTextSeparator ? (
-                  <span aria-hidden className={CATALOG_PICKER_ITEM_HEADER_METADATA_CLASSES}>
+                  <span aria-hidden className={CATALOG_PICKER_METADATA_TEXT_CLASSES}>
                     {CATALOG_PICKER_METADATA_TEXT_SEPARATOR}
                   </span>
                 ) : null}

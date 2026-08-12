@@ -78,6 +78,7 @@ import {
   weaponProficiencyGrantTitle,
 } from './proficiency-grant-form-values'
 import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
+import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
@@ -782,6 +783,7 @@ export function grantArrayFields<T extends string>(
           primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
           summary: (values) => formatGrantRowSummary(values, headerContext),
         },
+        renderShell: renderGrantArrayItemShell,
       },
       fields: grantItemFields(grantTypes, labels, ctx),
     },

@@ -2,15 +2,16 @@
 
 import * as React from 'react'
 
-import { CatalogToolbar, CollapsibleListItem, Text } from '@rpg/ui'
+import { CatalogToolbar, Text } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
-import { buildCatalogDisclosureLabel, CatalogCollapsibleList } from '@/features/content'
 import {
-  buildEquipmentDetailViewModel,
-  EquipmentDetailMetadata,
-  EquipmentCatalogItemHeader,
+  buildCatalogDisclosureLabel,
+  CatalogCollapsibleList,
+  CatalogMetadataRenderer,
+  DisclosureEntityCard,
 } from '@/features/content'
+import { buildEquipmentDetailViewModel, EquipmentDetailMetadata } from '@/features/content'
 import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
 import {
   createCharacterDetailEquipmentFilterSchema,
@@ -39,7 +40,6 @@ import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filt
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
-import { CharacterEquipmentQuantityLabel } from '../equipment/character-equipment-quantity-label.client'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls.client'
 
 export type CharacterDetailEquipmentTabProps = {
@@ -58,39 +58,37 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
   )
 
   return (
-    <CollapsibleListItem
+    <DisclosureEntityCard
       itemId={card.id}
       toolbarAriaLabel={toolbarLabel}
-      preset="catalog"
-      toolbarCompact
-      actionsAlign="center"
-      collapsible
-      header={
-        <EquipmentCatalogItemHeader
-          name={header.name}
-          metadataLines={header.metadataLines}
-          tone={header.tone}
-          footer={
-            footerLabels.length > 0 ? (
-              <Text variant="muted">{footerLabels.join(' · ')}</Text>
-            ) : undefined
-          }
-          actions={<CharacterEquipmentQuantityLabel quantity={card.quantity} />}
+      entity={{
+        heading: header.name,
+        description: <CatalogMetadataRenderer lines={header.metadataLines} />,
+        status:
+          footerLabels.length > 0
+            ? [{ kind: 'text', label: footerLabels.join(' · '), variant: 'muted' }]
+            : undefined,
+      }}
+      trailing={{
+        kind: 'indicator',
+        variant: 'quantity',
+        quantity: card.quantity,
+        format: 'compact',
+      }}
+      density="compact"
+      disabled={header.tone !== 'default'}
+    >
+      {card.status === 'resolved' ? (
+        <EquipmentDetailMetadata
+          viewModel={buildEquipmentDetailViewModel(card.equipment)}
+          sectionId={`${card.id}-detail-metadata`}
+          omitSectionTitle
+          statRowSize="sm"
         />
-      }
-      body={
-        card.status === 'resolved' ? (
-          <EquipmentDetailMetadata
-            viewModel={buildEquipmentDetailViewModel(card.equipment)}
-            sectionId={`${card.id}-detail-metadata`}
-            omitSectionTitle
-            statRowSize="sm"
-          />
-        ) : (
-          <Text variant="muted">{header.unavailableMessage}</Text>
-        )
-      }
-    />
+      ) : (
+        <Text variant="muted">{header.unavailableMessage}</Text>
+      )}
+    </DisclosureEntityCard>
   )
 }
 

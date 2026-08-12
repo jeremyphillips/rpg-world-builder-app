@@ -1,8 +1,17 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, collapsibleListItemChromeColumnClasses } from '@rpg/ui'
+import { cn, iconGhostControlVariants } from '@rpg/ui'
 
-export const detailEntityRowVariants = cva('flex items-center justify-between gap-4 py-1', {
+import {
+  ENTITY_BODY_INLINE_START_VAR,
+  ENTITY_CONTENT_OFFSET_VAR,
+} from '../../entity/entity-leading-rail.lib'
+import {
+  ENTITY_SURFACE_INLINE_END_VAR,
+  entitySurfaceHorizontalInsetClasses,
+} from '../../entity/entity-surface-inset.variants'
+
+export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
     inset: {
       self: 'px-4',
@@ -14,42 +23,40 @@ export const detailEntityRowVariants = cva('flex items-center justify-between ga
   },
 })
 
-export const detailEntityRowContentVariants = cva('min-w-0 flex-1')
-
 export const detailEntityRowSubheadingVariants = cva('text-xs text-muted-foreground')
-
-/** One caret column — shared column class from `@rpg/ui` collapsible leading chrome. */
-export const detailEntityRowDisclosureButtonColumnClasses = collapsibleListItemChromeColumnClasses
 
 export const detailEntityRowDisclosureItemVariants = cva('min-w-0')
 
-export const detailEntityRowDisclosureRowVariants = cva(
-  'flex items-center justify-between gap-4 py-1',
-  {
-    variants: {
-      inset: {
-        self: 'px-4',
-        parent: '',
-      },
-    },
-    defaultVariants: {
-      inset: 'self',
+export const detailEntityRowDisclosureRowVariants = cva('min-w-0 py-1', {
+  variants: {
+    inset: {
+      self: entitySurfaceHorizontalInsetClasses,
+      parent: '',
     },
   },
-)
-
-export const detailEntityRowDisclosureIdentityVariants = cva(
-  'flex min-w-0 flex-1 items-center gap-[var(--leading-chrome-gap)]',
-)
+  defaultVariants: {
+    inset: 'self',
+  },
+})
 
 export const detailEntityRowDisclosureButtonVariants = cva(
-  cn(
-    'flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    'size-control-action-compact [&_svg]:size-icon-glyph-md',
-  ),
+  iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
 )
 
-export const detailEntityRowDisclosureContentVariants = cva('pl-[var(--content-column-indent)]')
+export const detailEntityRowDisclosureContentVariants = cva('', {
+  variants: {
+    inset: {
+      self: cn(
+        `pl-[var(${ENTITY_BODY_INLINE_START_VAR})]`,
+        `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`,
+      ),
+      parent: `pl-[var(${ENTITY_CONTENT_OFFSET_VAR})]`,
+    },
+  },
+  defaultVariants: {
+    inset: 'self',
+  },
+})
 
 /** Left rail wrapping disclosure preview child rows. */
 export const detailEntityRowDisclosurePreviewGroupVariants = cva(
