@@ -27,6 +27,7 @@ describe('organization body contracts', () => {
     ).toEqual({
       name: 'The Lantern Guild',
       organizationKind: 'professional',
+      activities: [],
       connections: { locations: [] },
     })
 
@@ -65,7 +66,26 @@ describe('organization body contracts', () => {
   it('allows drafts without organizationKind and normalizes blank names', () => {
     expect(organizationBodyDraftSchema.parse({ name: '  ' })).toEqual({
       name: 'Untitled Organization',
+      activities: [],
     })
+  })
+
+  it('accepts ordered activities independently and rejects duplicates', () => {
+    expect(
+      organizationBodySchema.parse({
+        name: 'Ember Works',
+        organizationKind: 'commercial',
+        activities: ['blacksmithing', 'brewing'],
+      }).activities,
+    ).toEqual(['blacksmithing', 'brewing'])
+
+    expect(
+      organizationBodySchema.safeParse({
+        name: 'Duplicate Works',
+        organizationKind: 'commercial',
+        activities: ['brewing', 'brewing'],
+      }).success,
+    ).toBe(false)
   })
 })
 

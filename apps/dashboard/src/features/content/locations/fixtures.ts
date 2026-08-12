@@ -57,7 +57,7 @@ export const YAWNING_PORTAL: Location = {
   name: 'Yawning Portal',
   kind: 'structure',
   structureType: 'building',
-  classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+  classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
   parentLocationId: DOCK_WARD.id,
 }
 

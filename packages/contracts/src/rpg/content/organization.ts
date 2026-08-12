@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { organizationKindSchema } from '../vocab/organization-kind'
+import { organizationActivitySchema } from '../vocab/organization-activity'
 import {
   organizationSubtypeSchema,
   refineOrganizationKindSubtypePair,
@@ -11,10 +12,17 @@ import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from './lib/envelope'
 import { ORGANIZATION_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 
+const organizationActivitiesSchema = z
+  .array(organizationActivitySchema)
+  .refine((activities) => new Set(activities).size === activities.length, {
+    message: 'Organization activities must not contain duplicates.',
+  })
+
 /** Publish-complete organization body fields (object — refinements applied below). */
 const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
   organizationKind: organizationKindSchema,
   organizationSubtype: organizationSubtypeSchema.optional(),
+  activities: organizationActivitiesSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
@@ -31,6 +39,7 @@ const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
 ).extend({
   organizationKind: organizationKindSchema.optional(),
   organizationSubtype: organizationSubtypeSchema.optional(),
+  activities: organizationActivitiesSchema.default([]),
 })
 
 /** Draft organization body — kind may remain unset until publish. */
@@ -87,6 +96,7 @@ export const updateOrganizationInputSchema = organizationBodyFieldsSchema
   .extend({
     slug: slugSchema,
     organizationSubtype: organizationSubtypeSchema.nullable().optional(),
+    activities: organizationActivitiesSchema.optional(),
   })
   .partial()
   .superRefine((data, ctx) => {
@@ -110,6 +120,7 @@ export const updateOrganizationDraftInputSchema = createDraftInputSchema(
 )
   .extend({
     organizationSubtype: organizationSubtypeSchema.nullable().optional(),
+    activities: organizationActivitiesSchema.optional(),
   })
   .partial()
   .superRefine((data, ctx) => {

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { BUILDING_CORPUS_DISPOSITIONS, BUILDING_CORPUS_IDS } from './building-corpus-disposition'
 import { BUILDING_ARCHETYPE_ENTRIES_A_C } from './building-archetypes/a-c'
 import { BUILDING_ARCHETYPE_ENTRIES_D_G } from './building-archetypes/d-g'
 import { BUILDING_ARCHETYPE_ENTRIES_H_L } from './building-archetypes/h-l'
@@ -201,36 +200,6 @@ describe('building archetype registry integrity', () => {
         expect(seen.has(id)).toBe(false)
         seen.add(id)
       }
-    }
-  })
-
-  it('maps every corpus id to exactly one disposition', () => {
-    expect(BUILDING_CORPUS_IDS.length).toBe(308)
-    expect(new Set(BUILDING_CORPUS_IDS).size).toBe(308)
-
-    for (const id of BUILDING_CORPUS_IDS) {
-      expect(BUILDING_CORPUS_DISPOSITIONS[id]).toBeDefined()
-    }
-
-    expect(Object.keys(BUILDING_CORPUS_DISPOSITIONS).length).toBe(308)
-  })
-
-  it('rejects placeholder targets on specialization and manifestation dispositions', () => {
-    const knownIds = new Set<string>([...BUILDING_ARCHETYPE_IDS, ...BUILDING_CORPUS_IDS])
-
-    for (const id of BUILDING_CORPUS_IDS) {
-      const disposition = BUILDING_CORPUS_DISPOSITIONS[id]
-      if (disposition.kind !== 'specialization' && disposition.kind !== 'manifestation') {
-        continue
-      }
-
-      const target = disposition.of
-      expect(target, `${id} ${disposition.kind} of`).not.toBe('n')
-      expect(target.trim(), `${id} ${disposition.kind} of`).not.toBe('')
-      expect(
-        knownIds.has(target),
-        `${id} ${disposition.kind} of "${target}" must be a corpus or archetype id`,
-      ).toBe(true)
     }
   })
 

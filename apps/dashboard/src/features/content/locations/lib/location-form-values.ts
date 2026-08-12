@@ -42,24 +42,13 @@ function buildRegionClassification(values: LocationFormValues) {
 
 function buildBuildingClassification(values: LocationFormValues) {
   const classification = values.classification
-  if (!classification?.archetype) return {}
-
-  const result: {
-    archetype: string
-    specialization?: string
-    functionOverride?: string
-  } = {
-    archetype: classification.archetype,
+  if (!classification?.form && !classification?.facilityType) return {}
+  return {
+    classification: {
+      ...(classification.form ? { form: classification.form } : {}),
+      ...(classification.facilityType ? { facilityType: classification.facilityType } : {}),
+    },
   }
-
-  if (classification.specialization) {
-    result.specialization = classification.specialization
-  }
-  if (classification.functionOverride) {
-    result.functionOverride = classification.functionOverride
-  }
-
-  return { classification: result }
 }
 
 function buildInteriorClassification(values: LocationFormValues) {
@@ -145,12 +134,9 @@ const kindFormValueExtractors: Partial<
     entity.kind === 'structure' && entity.classification
       ? {
           classification: {
-            archetype: entity.classification.archetype,
-            ...(entity.classification.specialization
-              ? { specialization: entity.classification.specialization }
-              : {}),
-            ...(entity.classification.functionOverride
-              ? { functionOverride: entity.classification.functionOverride }
+            ...(entity.classification.form ? { form: entity.classification.form } : {}),
+            ...(entity.classification.facilityType
+              ? { facilityType: entity.classification.facilityType }
               : {}),
           },
         }

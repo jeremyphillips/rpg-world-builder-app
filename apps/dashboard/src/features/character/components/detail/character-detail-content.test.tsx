@@ -51,6 +51,7 @@ const connectedViewModel = buildCharacterDetailViewModel({
         updatedAt: '2026-07-28T12:00:00.000Z',
         name: 'Lantern Guild',
         organizationKind: 'professional',
+        activities: [],
       },
     },
     { organizationId: 'organization-missing', organization: null },

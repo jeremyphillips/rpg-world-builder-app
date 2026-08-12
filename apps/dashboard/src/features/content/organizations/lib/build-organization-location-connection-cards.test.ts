@@ -38,7 +38,7 @@ describe('buildOrganizationLocationConnectionCards', () => {
     expect(previewItems[0]?.target).toMatchObject({
       id: YAWNING_PORTAL.id,
       name: 'Yawning Portal',
-      classification: { text: 'Building · Tavern' },
+      classification: { text: 'Building · Brewery' },
     })
     expect(previewItems[0]?.target?.ancestry.items.map((item) => item.name)).toEqual([
       'Aldermere',
@@ -185,7 +185,8 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
     ).toEqual({
       entity: {
         heading: 'Yawning Portal',
-        headingSuffix: ' · Building · Tavern',
+        headingSuffix: ' · Building · Brewery',
+        href: undefined,
         supportingText: 'Located in Dock Ward',
       },
       imageKey: YAWNING_PORTAL.imageKey,

@@ -1,4 +1,5 @@
-import { getBuildingArchetypeLabel } from '../../vocab/location/building-archetype'
+import { getBuildingFacilityTypeLabel } from '../../vocab/location/building-facility-type'
+import { getBuildingFormLabel } from '../../vocab/location/building-form'
 import { getInteriorTypeLabel } from '../../vocab/location/interior-type'
 import {
   getInteriorSubtypeLabel,
@@ -19,7 +20,8 @@ export const LOCATION_DISPLAY_SUMMARY_SEPARATOR = ' · ' as const
 export type LocationDisplaySummary = {
   typeLabel: string
   classificationLabel?: string
-  specializationLabel?: string
+  buildingFormLabel?: string
+  buildingFacilityTypeLabel?: string
 }
 
 export type LocationClassificationDisplay = {
@@ -33,15 +35,16 @@ function resolveStructureTypeLabel(structureType: string | undefined): string {
 }
 
 function resolveBuildingClassificationLabels(classification: BuildingClassification | undefined): {
-  classificationLabel?: string
-  specializationLabel?: string
+  buildingFormLabel?: string
+  buildingFacilityTypeLabel?: string
 } {
-  if (!classification?.archetype) return {}
-
-  const classificationLabel = getBuildingArchetypeLabel(classification.archetype)
-  const specializationLabel = classification.specialization?.trim() || undefined
-
-  return { classificationLabel, specializationLabel }
+  if (!classification) return {}
+  return {
+    buildingFormLabel: classification.form ? getBuildingFormLabel(classification.form) : undefined,
+    buildingFacilityTypeLabel: classification.facilityType
+      ? getBuildingFacilityTypeLabel(classification.facilityType)
+      : undefined,
+  }
 }
 
 function resolvePlaneClassificationLabel(
@@ -69,13 +72,6 @@ function resolveSiteClassificationLabel(
   return location.siteType ? getSiteTypeLabel(location.siteType) : undefined
 }
 
-function resolveBuildingStructureClassificationLabel(
-  location: Extract<Location, { kind: 'structure' }>,
-): string | undefined {
-  if (location.structureType !== 'building') return undefined
-  return resolveBuildingClassificationLabels(location.classification).classificationLabel
-}
-
 function resolveInteriorClassificationLabel(
   location: Extract<Location, { kind: 'interior' }>,
 ): string | undefined {
@@ -93,7 +89,6 @@ const CLASSIFICATION_LABEL_BY_KIND: Partial<{
   region: resolveRegionClassificationLabel,
   settlement: resolveSettlementClassificationLabel,
   site: resolveSiteClassificationLabel,
-  structure: resolveBuildingStructureClassificationLabel,
   interior: resolveInteriorClassificationLabel,
 }
 
@@ -106,9 +101,12 @@ function resolveClassificationLabel(location: Location): string | undefined {
   return resolve(location)
 }
 
-function resolveSpecializationLabel(location: Location): string | undefined {
-  if (location.kind !== 'structure' || location.structureType !== 'building') return undefined
-  return location.classification?.specialization?.trim() || undefined
+function resolveBuildingLabels(location: Location): {
+  buildingFormLabel?: string
+  buildingFacilityTypeLabel?: string
+} {
+  if (location.kind !== 'structure' || location.structureType !== 'building') return {}
+  return resolveBuildingClassificationLabels(location.classification)
 }
 
 function resolveTypeLabel(location: Location): string {
@@ -151,7 +149,7 @@ export function resolveLocationDisplaySummary(location: Location): LocationDispl
   return {
     typeLabel: resolveTypeLabel(location),
     classificationLabel: resolveClassificationLabel(location),
-    specializationLabel: resolveSpecializationLabel(location),
+    ...resolveBuildingLabels(location),
   }
 }
 
@@ -160,9 +158,12 @@ export function resolveLocationClassificationDisplay(
   location: Location,
 ): LocationClassificationDisplay {
   const summary = resolveLocationDisplaySummary(location)
-  const parts = [summary.typeLabel, summary.classificationLabel].filter(
-    (segment): segment is string => Boolean(segment),
-  )
+  const parts = [
+    summary.typeLabel,
+    summary.buildingFormLabel,
+    summary.buildingFacilityTypeLabel,
+    summary.classificationLabel,
+  ].filter((segment): segment is string => Boolean(segment))
 
   return {
     parts,
@@ -173,7 +174,7 @@ export function resolveLocationClassificationDisplay(
 /**
  * Lexicographic compare of classification parts for table sorting.
  * Missing indices at a position are treated as empty strings, so equal-prefix
- * classifications sort shorter-first (for example `Building` before `Building · Guildhall`).
+ * classifications sort shorter-first (for example `Building` before `Building · House`).
  */
 export function compareLocationClassificationParts(
   left: readonly string[],
@@ -195,7 +196,7 @@ export function resolveLocationDetailClassificationFieldLabel(
 ): string | undefined {
   switch (location.kind) {
     case 'structure':
-      return location.structureType === 'building' ? 'Archetype' : undefined
+      return undefined
     case 'settlement':
     case 'region':
       return 'Classification'

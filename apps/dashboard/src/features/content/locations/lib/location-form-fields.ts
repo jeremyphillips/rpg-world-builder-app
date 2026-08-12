@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
+  buildingFacilityTypeSchema,
+  buildingFormSchema,
   interiorTypeSchema,
   planeTypeSchema,
   settlementTypeSchema,
@@ -40,9 +42,8 @@ const classificationFormSchema = z
   .object({
     kind: z.string().optional(),
     type: z.string().optional(),
-    archetype: z.string().optional(),
-    functionOverride: z.string().optional(),
-    specialization: z.string().optional(),
+    form: draftOptionalSelect(buildingFormSchema),
+    facilityType: draftOptionalSelect(buildingFacilityTypeSchema),
   })
   .optional()
 

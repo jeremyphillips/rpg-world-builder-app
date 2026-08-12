@@ -1,6 +1,7 @@
 /**
- * Machine-checkable corpus disposition for Model E Phase 6 (2026-08-03).
- * Every BUILDING_CORPUS_IDS entry maps to exactly one disposition.
+ * Tooling-owned migration evidence for the Building classification refactor.
+ * Every BUILDING_CORPUS_IDS entry maps to exactly one historical disposition.
+ * This module is non-runtime and must never be imported by an app or package.
  */
 
 export type BuildingCorpusDispositionKind =
@@ -648,3 +649,58 @@ export const BUILDING_CORPUS_DISPOSITIONS = {
   yurt: { kind: 'manifestation', of: 'house' },
   ziggurat: { kind: 'form_only', structureType: 'monument' },
 } as const satisfies Record<BuildingCorpusId, BuildingCorpusDisposition>
+
+export const BUILDING_ARCHETYPE_REFACTOR_STATUS = {
+  enabledForm: 'enabled-form',
+  enabledFacility: 'enabled-facility',
+  rehomeToOrganizationActivity: 'rehome-to-organization-activity',
+  pending: 'pending',
+  needsDesign: 'needs-design',
+} as const
+
+export type BuildingArchetypeRefactorStatus =
+  (typeof BUILDING_ARCHETYPE_REFACTOR_STATUS)[keyof typeof BUILDING_ARCHETYPE_REFACTOR_STATUS]
+
+export type BuildingArchetypeRefactorInventoryEntry = {
+  readonly id: BuildingCorpusId
+  readonly wasRuntimeArchetype: boolean
+  readonly status: BuildingArchetypeRefactorStatus
+}
+
+export const BUILDING_RESEARCH_CORPUS_IDS = BUILDING_CORPUS_IDS
+
+const LEGACY_RUNTIME_COMPOSITE_IDS = new Set<BuildingCorpusId>(['monastery', 'palace', 'shipyard'])
+
+export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter((id) => {
+  const disposition = BUILDING_CORPUS_DISPOSITIONS[id]
+  return (
+    disposition.kind === 'archetype' ||
+    disposition.kind === 'manifestation' ||
+    LEGACY_RUNTIME_COMPOSITE_IDS.has(id)
+  )
+})
+
+const INITIAL_STATUS_BY_ID = {
+  house: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm,
+  brewery: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  temple: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
+} as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
+
+const legacyRuntimeIds = new Set<BuildingCorpusId>(LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS)
+
+/**
+ * Non-runtime migration inventory for the full 308-concept Building research corpus.
+ *
+ * `wasRuntimeArchetype` identifies the 143 concepts enabled in the legacy runtime
+ * registry at the Phase 1 checkpoint. This file is migration evidence, not product
+ * vocabulary, and must never be imported by an app or package.
+ */
+export const BUILDING_ARCHETYPE_REFACTOR_INVENTORY =
+  BUILDING_RESEARCH_CORPUS_IDS.map<BuildingArchetypeRefactorInventoryEntry>((id) => ({
+    id,
+    wasRuntimeArchetype: legacyRuntimeIds.has(id),
+    status:
+      INITIAL_STATUS_BY_ID[id as keyof typeof INITIAL_STATUS_BY_ID] ??
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.pending,
+  }))

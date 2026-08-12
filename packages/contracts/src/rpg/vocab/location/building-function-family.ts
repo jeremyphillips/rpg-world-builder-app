@@ -107,3 +107,9 @@ export function getBuildingFunctionFamilyEntry(id: string): GameTermEntry | unde
 export function getBuildingFunctionFamilyLabel(id: string): string {
   return getBuildingFunctionFamilyEntry(id)?.label ?? id
 }
+
+export function formatBuildingFunctionFamilyLabels(
+  functions: readonly BuildingFunctionFamily[],
+): string {
+  return functions.map(getBuildingFunctionFamilyLabel).join(' · ')
+}

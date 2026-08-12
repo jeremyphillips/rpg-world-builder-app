@@ -35,17 +35,14 @@ describe('location classification registries', () => {
 })
 
 describe('getEffectiveBuildingFunctions', () => {
-  it('returns archetype defaults when no override is set', () => {
-    expect(getEffectiveBuildingFunctions({ archetype: 'inn' })).toEqual([
-      'lodging',
-      'food_drink_social',
-    ])
+  it('returns Facility defaults', () => {
+    expect(getEffectiveBuildingFunctions({ facilityType: 'brewery' })).toEqual(['production'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'temple' })).toEqual(['worship'])
   })
 
-  it('replaces — not augments — defaults when functionOverride is set', () => {
-    expect(getEffectiveBuildingFunctions({ archetype: 'inn', functionOverride: 'care' })).toEqual([
-      'care',
-    ])
+  it('returns no functions for Form-only or unclassified buildings', () => {
+    expect(getEffectiveBuildingFunctions({ form: 'house' })).toEqual([])
+    expect(getEffectiveBuildingFunctions(undefined)).toEqual([])
   })
 })
 
@@ -68,11 +65,11 @@ describe('location classification schema rejection', () => {
         name: 'Yawning Portal',
         parentLocationId: 'district-dock-ward',
         structureType: 'building',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
       }),
     ).toMatchObject({
       structureType: 'building',
-      classification: { archetype: 'tavern' },
+      classification: { facilityType: 'brewery' },
     })
 
     expect(
@@ -98,7 +95,7 @@ describe('location classification schema rejection', () => {
     })
   })
 
-  it('accepts archetype with specialization and function override', () => {
+  it('accepts independent Form and Facility axes', () => {
     expect(
       locationBodySchema.parse({
         kind: 'structure',
@@ -106,30 +103,38 @@ describe('location classification schema rejection', () => {
         parentLocationId: 'site-1',
         structureType: 'building',
         classification: {
-          archetype: 'temple',
-          specialization: 'Sea temple',
-          functionOverride: 'care',
+          form: 'house',
+          facilityType: 'temple',
         },
       }),
     ).toMatchObject({
       classification: {
-        archetype: 'temple',
-        specialization: 'Sea temple',
-        functionOverride: 'care',
+        form: 'house',
+        facilityType: 'temple',
       },
     })
   })
 
-  it('accepts manifestation archetype and unclassified building', () => {
+  it('accepts Form-only, Facility-only, and unclassified buildings', () => {
     expect(
       locationBodySchema.parse({
         kind: 'structure',
         name: 'Desert Rest',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'caravanserai' },
+        classification: { form: 'house' },
       }),
-    ).toMatchObject({ classification: { archetype: 'caravanserai' } })
+    ).toMatchObject({ classification: { form: 'house' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Neighborhood Residence',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { facilityType: 'residence' },
+      }),
+    ).toMatchObject({ classification: { facilityType: 'residence' } })
 
     const unclassified = locationBodySchema.parse({
       kind: 'structure',
@@ -141,24 +146,34 @@ describe('location classification schema rejection', () => {
     expect(unclassified).not.toHaveProperty('classification')
   })
 
-  it('rejects invalid archetype and function override', () => {
+  it('rejects invalid Form, Facility, and empty classification', () => {
     expect(
       locationBodySchema.safeParse({
         kind: 'structure',
         name: 'Bad Building',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'not_an_archetype' },
+        classification: { form: 'tower' },
       }).success,
     ).toBe(false)
 
     expect(
       locationBodySchema.safeParse({
         kind: 'structure',
-        name: 'Bad Override',
+        name: 'Bad Facility',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'temple', functionOverride: 'not_a_function' },
+        classification: { facilityType: 'workshop' },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      locationBodySchema.safeParse({
+        kind: 'structure',
+        name: 'Empty Classification',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: {},
       }).success,
     ).toBe(false)
   })
@@ -170,7 +185,7 @@ describe('location classification schema rejection', () => {
         name: 'North Wall',
         parentLocationId: 'settlement-1',
         structureType: 'fortification',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
       }).success,
     ).toBe(false)
   })

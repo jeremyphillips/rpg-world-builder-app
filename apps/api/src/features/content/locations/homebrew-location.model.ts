@@ -1,8 +1,8 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
 import {
-  BUILDING_ARCHETYPE_IDS,
-  BUILDING_FUNCTION_FAMILY_IDS,
+  BUILDING_FACILITY_TYPE_IDS,
+  BUILDING_FORM_IDS,
   GEOGRAPHIC_REGION_TYPE_IDS,
   INTERIOR_TYPE_IDS,
   LOCATION_KIND_IDS,
@@ -48,9 +48,8 @@ const homebrewLocationSchema = new Schema(
           ...interiorClassificationTypeIds,
         ],
       },
-      archetype: { type: String, enum: [...BUILDING_ARCHETYPE_IDS] },
-      functionOverride: { type: String, enum: [...BUILDING_FUNCTION_FAMILY_IDS] },
-      specialization: { type: String },
+      form: { type: String, enum: [...BUILDING_FORM_IDS] },
+      facilityType: { type: String, enum: [...BUILDING_FACILITY_TYPE_IDS] },
     },
     settlementType: { type: String, enum: [...SETTLEMENT_TYPE_IDS] },
     siteType: { type: String, enum: [...SITE_TYPE_IDS] },

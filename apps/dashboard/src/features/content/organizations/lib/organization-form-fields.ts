@@ -1,10 +1,13 @@
 import { z } from 'zod'
 import {
+  ORGANIZATION_ACTIVITY_ENTRIES,
+  ORGANIZATION_ACTIVITY_IDS,
   ORGANIZATION_KIND_ENTRIES,
   ORGANIZATION_KIND_IDS,
   getOrganizationKindEntry,
   getOrganizationSubtypeIds,
   getOrganizationSubtypeLabel,
+  organizationActivitySchema,
   organizationKindSchema,
   organizationSubtypeSchema,
   slugSchema,
@@ -21,6 +24,13 @@ const organizationKindOptions = toOptions(
   Object.fromEntries(
     ORGANIZATION_KIND_IDS.map((id) => [id, ORGANIZATION_KIND_ENTRIES[id].label]),
   ) as Record<(typeof ORGANIZATION_KIND_IDS)[number], string>,
+)
+
+const organizationActivityOptions = toOptions(
+  ORGANIZATION_ACTIVITY_IDS,
+  Object.fromEntries(
+    ORGANIZATION_ACTIVITY_IDS.map((id) => [id, ORGANIZATION_ACTIVITY_ENTRIES[id].label]),
+  ) as Record<(typeof ORGANIZATION_ACTIVITY_IDS)[number], string>,
 )
 
 function resolveOrganizationSubtypeFieldOptions(
@@ -51,6 +61,7 @@ export const organizationFormSchema = z.object({
   description: z.string().optional(),
   organizationKind: organizationKindSchema,
   organizationSubtype: organizationSubtypeSchema.optional(),
+  activities: z.array(organizationActivitySchema).default([]),
 })
 
 export const organizationDraftFormSchema = z.object({
@@ -59,6 +70,7 @@ export const organizationDraftFormSchema = z.object({
   description: z.string().optional(),
   organizationKind: draftOptionalSelect(organizationKindSchema),
   organizationSubtype: draftOptionalSelect(organizationSubtypeSchema),
+  activities: z.array(organizationActivitySchema).default([]),
 })
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
@@ -91,6 +103,14 @@ export function buildOrganizationFields(ctx: ContentFormCtx): FormItem[] {
         addLabel: 'Add subtype',
         removeLabel: 'Remove subtype',
       },
+    },
+    {
+      type: 'chips',
+      name: 'activities',
+      label: 'Activities',
+      options: organizationActivityOptions,
+      multiple: true,
+      chrome: { variant: 'outline' },
     },
   ]
 }

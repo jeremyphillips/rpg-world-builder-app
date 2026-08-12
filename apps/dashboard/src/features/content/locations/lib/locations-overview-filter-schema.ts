@@ -1,12 +1,12 @@
 import {
-  BUILDING_ARCHETYPE_ENTRIES,
-  BUILDING_ARCHETYPE_IDS,
+  BUILDING_FACILITY_TYPE_ENTRIES,
+  BUILDING_FACILITY_TYPE_IDS,
   BUILDING_FUNCTION_FAMILY_ENTRIES,
   BUILDING_FUNCTION_FAMILY_IDS,
   getEffectiveBuildingFunctions,
   LOCATION_KIND_ENTRIES,
   LOCATION_KIND_IDS,
-  type BuildingArchetype,
+  type BuildingFacilityType,
   type BuildingFunctionFamily,
   type Location,
   type WithCampaignAccess,
@@ -35,7 +35,7 @@ type LocationRow = WithCampaignAccess<Location>
 
 export type LocationsOverviewFilterState = ContentOverviewBaseFilterState & {
   kind?: Location['kind']
-  buildingArchetype?: BuildingArchetype
+  buildingFacilityType?: BuildingFacilityType
   buildingFunction?: BuildingFunctionFamily
 }
 
@@ -49,26 +49,26 @@ function createLocationNameFilter(): FilterFieldDef<LocationRow, LocationsOvervi
   })
 }
 
-function createBuildingArchetypeFilter(): FilterFieldDef<
+function createBuildingFacilityTypeFilter(): FilterFieldDef<
   LocationRow,
   LocationsOverviewFilterState
 > {
   return createEqualsFilter<
     LocationRow,
     LocationsOverviewFilterState,
-    'buildingArchetype',
-    BuildingArchetype
+    'buildingFacilityType',
+    BuildingFacilityType
   >({
-    id: 'buildingArchetype',
-    label: 'Archetype',
-    allOptionLabel: 'All archetypes',
-    options: BUILDING_ARCHETYPE_IDS.map((id) => ({
+    id: 'buildingFacilityType',
+    label: 'Facility type',
+    allOptionLabel: 'All facility types',
+    options: BUILDING_FACILITY_TYPE_IDS.map((id) => ({
       value: id,
-      label: BUILDING_ARCHETYPE_ENTRIES[id].label,
+      label: BUILDING_FACILITY_TYPE_ENTRIES[id].label,
     })),
     getValue: (row) =>
-      readLocationBuildingClassification(row)?.archetype ?? ('' as BuildingArchetype),
-    matches: (row, value) => readLocationBuildingClassification(row)?.archetype === value,
+      readLocationBuildingClassification(row)?.facilityType ?? ('' as BuildingFacilityType),
+    matches: (row, value) => readLocationBuildingClassification(row)?.facilityType === value,
   })
 }
 
@@ -119,7 +119,7 @@ export function buildLocationsFilterSchema(): FilterSchema<
 > {
   const contentFields: FilterFieldDef<LocationRow, LocationsOverviewFilterState>[] = [
     createKindFilter(),
-    createBuildingArchetypeFilter(),
+    createBuildingFacilityTypeFilter(),
     createBuildingFunctionFilter(),
   ]
 
@@ -139,5 +139,5 @@ export function buildLocationsFilterSchema(): FilterSchema<
   )
 }
 
-/** Locations overview filter schema with Model E archetype and function filters. */
+/** Locations overview filter schema with Facility and derived-function filters. */
 export const locationsFilterSchema = buildLocationsFilterSchema()

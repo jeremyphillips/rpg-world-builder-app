@@ -42,37 +42,29 @@ describe('getLocationOverviewSearchText', () => {
     expect(getLocationOverviewSearchText(region)).toEqual(['Sword Coast'])
   })
 
-  it('includes archetype discovery metadata for classified buildings', () => {
-    const warehouse = buildingLocation(
-      'loc-warehouse',
-      'North Dock Warehouse',
-      buildingClassificationSchema.parse({ archetype: 'warehouse' }),
+  it('includes Form, Facility, and derived-function labels', () => {
+    const brewery = buildingLocation(
+      'loc-brewery',
+      'North Dock Brewery',
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'brewery' }),
     )
 
-    expect(getLocationOverviewSearchText(warehouse)).toEqual(
-      expect.arrayContaining([
-        'North Dock Warehouse',
-        'Warehouse',
-        'storehouse',
-        'storage',
-        'Storage',
-      ]),
+    expect(getLocationOverviewSearchText(brewery)).toEqual(
+      expect.arrayContaining(['North Dock Brewery', 'House', 'Brewery', 'Production']),
     )
   })
 
-  it('includes specialization and effective override function labels', () => {
+  it('includes the Facility-derived Worship function label', () => {
     const temple = buildingLocation(
       'loc-temple',
       'Temple of Healing',
       buildingClassificationSchema.parse({
-        archetype: 'temple',
-        specialization: 'Field hospital',
-        functionOverride: 'care',
+        facilityType: 'temple',
       }),
     )
 
     expect(getLocationOverviewSearchText(temple)).toEqual(
-      expect.arrayContaining(['Temple of Healing', 'Temple', 'Field hospital', 'Care']),
+      expect.arrayContaining(['Temple of Healing', 'Temple', 'Worship']),
     )
   })
 })

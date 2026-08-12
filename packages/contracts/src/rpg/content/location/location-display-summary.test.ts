@@ -81,21 +81,21 @@ describe('resolveLocationDisplaySummary', () => {
     expect(resolveLocationStructureHeadingNoun(site)).toBe('Landmark')
   })
 
-  it('resolves building archetype and specialization separately', () => {
+  it('resolves Building Form and Facility separately', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
       classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Thieves',
+        form: 'house',
+        facilityType: 'residence',
       }),
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
       typeLabel: 'Building',
-      classificationLabel: 'Guildhall',
-      specializationLabel: 'Thieves',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Residence',
     })
   })
 
@@ -167,7 +167,7 @@ describe('resolveLocationReferenceNoun', () => {
         ...baseLocation,
         kind: 'structure',
         structureType: 'building',
-        classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+        classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
       }),
     ).toBe('building')
 
@@ -199,20 +199,20 @@ describe('resolveLocationReferenceNoun', () => {
 })
 
 describe('resolveLocationClassificationDisplay', () => {
-  it('omits specialization from compact classification text', () => {
+  it('includes independent Form and Facility labels in compact text', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
       classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Thieves',
+        form: 'house',
+        facilityType: 'residence',
       }),
     }
 
     expect(resolveLocationClassificationDisplay(location)).toEqual({
-      parts: ['Building', 'Guildhall'],
-      text: 'Building · Guildhall',
+      parts: ['Building', 'House', 'Residence'],
+      text: 'Building · House · Residence',
     })
   })
 
@@ -324,34 +324,30 @@ describe('resolveLocationClassificationDisplay', () => {
 
 describe('compareLocationClassificationParts', () => {
   it('returns zero when parts are equal', () => {
-    expect(
-      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Guildhall']),
-    ).toBe(0)
+    expect(compareLocationClassificationParts(['Building', 'House'], ['Building', 'House'])).toBe(0)
   })
 
   it('compares different second segments', () => {
     expect(
-      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Tavern']),
+      compareLocationClassificationParts(['Building', 'Brewery'], ['Building', 'Temple']),
     ).toBeLessThan(0)
   })
 
   it('sorts shorter equal-prefix classifications first', () => {
-    expect(
-      compareLocationClassificationParts(['Building'], ['Building', 'Guildhall']),
-    ).toBeLessThan(0)
+    expect(compareLocationClassificationParts(['Building'], ['Building', 'House'])).toBeLessThan(0)
   })
 })
 
 describe('resolveLocationDetailClassificationFieldLabel', () => {
-  it('returns archetype label for building structures', () => {
+  it('returns no generic classification label for building structures', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
-      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     }
 
-    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Archetype')
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBeUndefined()
   })
 
   it('returns settlement classification label', () => {

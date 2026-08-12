@@ -1,4 +1,5 @@
 import {
+  getOrganizationActivityLabel,
   getOrganizationKindEntry,
   getOrganizationKindLabel,
   getOrganizationSubtypeEntry,
@@ -82,6 +83,14 @@ export function buildOrganizationDetailViewModel(
           getOrganizationKindEntry(organization.organizationKind)?.description,
         infoAriaLabel: `About ${subtypeLabel ?? kindLabel}`,
       },
+      ...(organization.activities.length > 0
+        ? [
+            {
+              label: 'Activities',
+              value: organization.activities.map(getOrganizationActivityLabel).join(' · '),
+            },
+          ]
+        : []),
     ],
     description: organization.description || undefined,
     locationConnections,

@@ -85,11 +85,11 @@ describe('LocationDetailContent', () => {
     ).toBeTruthy()
   })
 
-  it('shows building archetype in identity metadata', () => {
+  it('shows building facility type in identity metadata', () => {
     renderDetail(YAWNING_PORTAL)
 
-    expect(screen.getByText('Archetype')).toBeInTheDocument()
-    expect(screen.getByText('Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Facility type')).toBeInTheDocument()
+    expect(screen.getByText('Brewery')).toBeInTheDocument()
   })
 
   it('shows empty copy when there are no contained locations', () => {

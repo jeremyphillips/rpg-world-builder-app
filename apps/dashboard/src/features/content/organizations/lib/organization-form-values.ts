@@ -12,7 +12,7 @@ import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content
 import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
 import type { OrganizationFormValues } from './organization-form-fields'
 
-export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = {}
+export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = { activities: [] }
 
 export function organizationToFormValues(entity: Organization): Partial<OrganizationFormValues> {
   return {
@@ -21,6 +21,7 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     description: entity.description,
     organizationKind: entity.organizationKind,
     organizationSubtype: entity.organizationSubtype,
+    activities: entity.activities,
   }
 }
 
@@ -46,6 +47,7 @@ export function buildOrganizationCreateInput(
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
+    activities: values.activities ?? [],
     ...(values.organizationKind !== undefined ? { organizationKind: values.organizationKind } : {}),
     ...(hasSubtype
       ? { organizationSubtype: values.organizationSubtype }

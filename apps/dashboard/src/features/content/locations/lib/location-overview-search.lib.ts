@@ -1,12 +1,11 @@
 import {
   formatBuildingFunctionFamilyLabels,
-  getBuildingArchetypeLabel,
+  getBuildingFacilityTypeLabel,
+  getBuildingFormLabel,
   getEffectiveBuildingFunctions,
   type BuildingClassification,
   type Location,
 } from '@rpg/contracts'
-
-import { buildBuildingArchetypeSearchTerms } from './building-archetype-form-options'
 
 export function readLocationBuildingClassification(
   location: Location,
@@ -22,20 +21,18 @@ export function getLocationOverviewSearchText(location: Location): readonly stri
   const parts: string[] = [location.name]
   const classification = readLocationBuildingClassification(location)
 
-  if (!classification?.archetype) {
+  if (!classification) {
     return parts
   }
 
-  parts.push(getBuildingArchetypeLabel(classification.archetype))
-
-  if (classification.specialization) {
-    parts.push(classification.specialization)
+  if (classification.form) parts.push(getBuildingFormLabel(classification.form))
+  if (classification.facilityType) {
+    parts.push(getBuildingFacilityTypeLabel(classification.facilityType))
   }
-
-  parts.push(
-    ...buildBuildingArchetypeSearchTerms(classification.archetype),
-    formatBuildingFunctionFamilyLabels(getEffectiveBuildingFunctions(classification)),
+  const functionsLabel = formatBuildingFunctionFamilyLabels(
+    getEffectiveBuildingFunctions(classification),
   )
+  if (functionsLabel) parts.push(functionsLabel)
 
   return parts
 }

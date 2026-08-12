@@ -33,6 +33,7 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     ...(record.organizationSubtype !== undefined && {
       organizationSubtype: record.organizationSubtype,
     }),
+    activities: record.activities ?? [],
     connections: {
       locations: record.connections?.locations ?? [],
     },

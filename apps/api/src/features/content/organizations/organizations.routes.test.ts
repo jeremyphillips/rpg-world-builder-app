@@ -10,6 +10,7 @@ const minimalOrganizationInput = {
   slug: 'emerald-concord',
   name: 'Emerald Concord',
   organizationKind: 'political',
+  activities: ['worship'],
 } as const
 
 describe('organization content routes', () => {
@@ -27,6 +28,7 @@ describe('organization content routes', () => {
     expect(organization).toMatchObject({
       name: 'Emerald Concord',
       organizationKind: 'political',
+      activities: ['worship'],
       source: 'homebrew',
       status: 'published',
     })
@@ -40,11 +42,16 @@ describe('organization content routes', () => {
     const updateRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/organizations/${organization.id}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ organizationKind: 'academic', description: 'A learned society.' })
+      .send({
+        organizationKind: 'academic',
+        description: 'A learned society.',
+        activities: ['brewing', 'blacksmithing'],
+      })
       .expect(200)
     expect(updateRes.body.organizations).toMatchObject({
       organizationKind: 'academic',
       description: 'A learned society.',
+      activities: ['brewing', 'blacksmithing'],
     })
 
     const duplicateRes = await agent
@@ -55,6 +62,7 @@ describe('organization content routes', () => {
     expect(duplicateRes.body.organizations).toMatchObject({
       name: 'Emerald Concord Chapter',
       organizationKind: 'academic',
+      activities: ['brewing', 'blacksmithing'],
       status: 'draft',
     })
 
@@ -74,6 +82,22 @@ describe('organization content routes', () => {
       .delete(`/api/campaigns/${campaignId}/content/organizations/${organization.id}`)
       .set(CSRF_HEADER, csrfToken)
       .expect(200)
+  })
+
+  it('rejects duplicate Organization activities', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/organizations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'duplicate-brewers',
+        name: 'Duplicate Brewers',
+        organizationKind: 'commercial',
+        activities: ['brewing', 'brewing'],
+      })
+      .expect(400)
   })
 
   it('allows incomplete drafts but requires organization kind to publish', async () => {

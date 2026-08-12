@@ -44,10 +44,10 @@ describe('projectContentEntity', () => {
       status: 'published',
       kind: 'structure',
       structureType: 'building',
-      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
       campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
     } as never)
 
-    expect(document.secondary).toBe('Building · Tavern')
+    expect(document.secondary).toBe('Building · Brewery')
   })
 })
