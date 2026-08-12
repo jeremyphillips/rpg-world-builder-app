@@ -61,6 +61,34 @@ describe('ContentEntityCard', () => {
     expect(viewLink).toHaveClass('h-control-action-compact')
   })
 
+  it('uses symmetric surface inset when no leading utility is present', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+      </MemoryRouter>,
+    )
+
+    const article = container.querySelector('article') as HTMLElement
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+  })
+
+  it('reduces start inset when a leading utility is present', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ContentEntityCard
+          entity={HARBOR_DISTRICT_ENTITY}
+          density="compact"
+          leading={<span aria-hidden>Grip</span>}
+        />
+      </MemoryRouter>,
+    )
+
+    const article = container.querySelector('article') as HTMLElement
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+  })
+
   it('applies presentational disabled treatment only', () => {
     const { container } = render(
       <MemoryRouter>

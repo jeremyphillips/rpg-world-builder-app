@@ -2,17 +2,17 @@ import { cva } from 'class-variance-authority'
 
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
-/**
- * Density-owned horizontal inset shared by DEC header edges and body inline-end.
- * Leading utilities only extend the body/header content *start* — never the end.
- */
-export const DISCLOSURE_ENTITY_DENSITY_INLINE_VAR = '--entity-density-inline'
+import {
+  entitySurfaceHorizontalInsetClasses,
+  entitySurfaceInsetVariants,
+  ENTITY_SURFACE_INLINE_END_VAR,
+} from './entity-surface-inset.variants'
 
 /** Body content start — value published on DEC article as {@link ENTITY_BODY_INLINE_START_VAR}. */
 export const disclosureEntityCardBodyInlineStartClasses = 'pl-[var(--entity-body-inline-start)]'
 
-/** Body content end: density inset only — independent of trailing actions. */
-export const disclosureEntityCardBodyInlineEndClasses = 'pr-[var(--entity-density-inline)]'
+/** Body content end: surface inline-end inset only — independent of trailing actions. */
+export const disclosureEntityCardBodyInlineEndClasses = `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`
 
 /** Bordered disclosure shell — owns card plane so nested form hosts cannot bleed fill. */
 export const disclosureEntityCardShellVariants = cva(
@@ -23,8 +23,8 @@ export const disclosureEntityCardShellVariants = cva(
   {
     variants: {
       density: {
-        compact: '[--entity-density-inline:calc(var(--spacing)*3)]',
-        comfortable: '[--entity-density-inline:calc(var(--spacing)*5)]',
+        compact: '',
+        comfortable: '',
       },
       disabled: {
         true: 'opacity-60',
@@ -38,25 +38,42 @@ export const disclosureEntityCardShellVariants = cva(
   },
 )
 
+/** DEC article — shell chrome plus surface inset tokens (always leading: disclosure caret). */
+export function disclosureEntityCardArticleVariants({
+  density,
+  disabled = false,
+}: {
+  density: 'compact' | 'comfortable'
+  disabled?: boolean
+}) {
+  return cn(
+    disclosureEntityCardShellVariants({ density, disabled }),
+    entitySurfaceInsetVariants({ density, leading: true }),
+  )
+}
+
 /** Strip CollapsibleListItem outer chrome — density tokens live on DEC article. */
 export const disclosureEntityCardListItemVariants = cva('border-0 rounded-none shadow-none')
 
-/** Density-aware header inset — fills the CLI toolbar region so anatomy column 3 can align trailing. */
-export const disclosureEntityCardHeaderPaddingVariants = cva('w-full min-w-0', {
-  variants: {
-    density: {
-      compact: 'px-[var(--entity-density-inline)] py-2',
-      comfortable: 'px-[var(--entity-density-inline)] py-3',
+/** Surface-aware header inset — fills the CLI toolbar region so anatomy column 3 can align trailing. */
+export const disclosureEntityCardHeaderPaddingVariants = cva(
+  cn('w-full min-w-0', entitySurfaceHorizontalInsetClasses),
+  {
+    variants: {
+      density: {
+        compact: 'py-2',
+        comfortable: 'py-3',
+      },
+    },
+    defaultVariants: {
+      density: 'comfortable',
     },
   },
-  defaultVariants: {
-    density: 'comfortable',
-  },
-})
+)
 
 /**
  * Full-bleed expanded body wash — divider/wash span shell edge.
- * Inline-start = density inset + leading indent; inline-end = density inset only.
+ * Inline-start = surface start inset + content offset; inline-end = surface end inset only.
  */
 export const disclosureEntityCardBodyWashVariants = cva(
   cn(

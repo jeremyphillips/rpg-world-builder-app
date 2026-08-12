@@ -20,10 +20,12 @@ export const ENTITY_LEADING_GAP_VALUE = 'calc(var(--spacing)*1)'
 /** Canonical distance from leading edge to entity content column — published by surfaces with aligned siblings. */
 export const ENTITY_CONTENT_OFFSET_VAR = '--entity-content-offset'
 
-/** DEC body inline-start — density inset + content offset; consumed by static Tailwind utility only. */
+import { ENTITY_SURFACE_INLINE_START_VAR } from './entity-surface-inset.variants'
+
+/** DEC body inline-start — surface start inset + content offset; static Tailwind utility only. */
 export const ENTITY_BODY_INLINE_START_VAR = '--entity-body-inline-start'
 
-export const ENTITY_BODY_INLINE_START_VALUE = `calc(var(--entity-density-inline) + var(${ENTITY_CONTENT_OFFSET_VAR}))`
+export const ENTITY_BODY_INLINE_START_VALUE = `calc(var(${ENTITY_SURFACE_INLINE_START_VAR}) + var(${ENTITY_CONTENT_OFFSET_VAR}))`
 
 /** @deprecated Alias during migration — prefer {@link ENTITY_CONTENT_OFFSET_VAR}. */
 export const ENTITY_LEADING_OFFSET_VAR = '--entity-leading-offset'

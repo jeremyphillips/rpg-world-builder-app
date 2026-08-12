@@ -17,10 +17,10 @@ import { EntityItemAnatomy } from './entity-item.client'
 import type { EntityItemTrailing } from './entity-item-trailing.types'
 import type { EntitySummaryModel } from './entity-summary.types'
 import {
+  disclosureEntityCardArticleVariants,
   disclosureEntityCardBodyWashVariants,
   disclosureEntityCardHeaderPaddingVariants,
   disclosureEntityCardListItemVariants,
-  disclosureEntityCardShellVariants,
 } from './disclosure-entity-card.variants'
 
 export type DisclosureEntityCardProps = {
@@ -82,7 +82,7 @@ export function DisclosureEntityCard({
 
   return (
     <article
-      className={disclosureEntityCardShellVariants({ density, disabled })}
+      className={disclosureEntityCardArticleVariants({ density, disabled })}
       style={leadingOffsetStyle}
       data-disabled={disabled ? true : undefined}
     >

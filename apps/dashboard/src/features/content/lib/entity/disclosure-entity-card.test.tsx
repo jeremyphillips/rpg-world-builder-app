@@ -73,12 +73,13 @@ describe('DisclosureEntityCard', () => {
       'calc(var(--spacing)*6)',
     )
     expect(article.style.getPropertyValue(ENTITY_BODY_INLINE_START_VAR)).toBe(
-      'calc(var(--entity-density-inline) + var(--entity-content-offset))',
+      'calc(var(--entity-surface-inline-start) + var(--entity-content-offset))',
     )
-    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*5)]')
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*2)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*5)]')
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
-    expect(shell.className).not.toContain('--entity-density-inline')
+    expect(shell.className).not.toContain('--entity-surface-inline-start')
   })
 
   it('keeps body inline-end inset identical regardless of trailing action width', () => {
@@ -130,7 +131,7 @@ describe('DisclosureEntityCard', () => {
     expect(new Set(classNames).size).toBe(1)
   })
 
-  it('publishes compact density inline token without coupling to trailing chrome', () => {
+  it('publishes compact surface inset tokens without coupling to trailing chrome', () => {
     const { container } = render(
       <DisclosureEntityCard
         itemId="harbor"
@@ -146,8 +147,9 @@ describe('DisclosureEntityCard', () => {
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
     const article = container.querySelector('article') as HTMLElement
-    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*3)]')
-    expect(shell.className).not.toContain('--entity-density-inline')
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(shell.className).not.toContain('--entity-surface-inline-start')
     expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
   })
 
@@ -279,7 +281,7 @@ describe('DisclosureEntityCard', () => {
 
     const headerWrap = screen
       .getByText('Light', { selector: '.font-body-emphasis' })
-      .closest('[class*="px-[var(--entity-density-inline)]"]') as HTMLElement
+      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
     const anatomy = headerWrap.querySelector('.grid') as HTMLElement
     const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
     const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
@@ -354,8 +356,9 @@ describe('DisclosureEntityCard', () => {
 
     const headerWrap = screen
       .getByText('Harbor District', { selector: '.font-body-emphasis' })
-      .closest('[class*="--entity-density-inline"]') as HTMLElement
-    expect(headerWrap.className).toMatch(/px-\[var\(--entity-density-inline\)\]/)
+      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
+    expect(headerWrap.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
+    expect(headerWrap.className).toMatch(/pr-\[var\(--entity-surface-inline-end\)\]/)
   })
 
   it('matches leading offset to grip+caret count on the article root', () => {

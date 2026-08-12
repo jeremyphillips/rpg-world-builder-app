@@ -170,7 +170,7 @@ DisclosureEntityCard (article)
 
 - Card surface chrome and disabled presentation on `article`
 - Density-aware **header** inset (`disclosureEntityCardHeaderPaddingVariants`)
-- `--entity-density-inline` and `--entity-content-offset` publication on `article`
+- `--entity-surface-inline-start`, `--entity-surface-inline-end`, and `--entity-content-offset` publication on `article`
 - Complete **body** inset: inline-start = density + content offset; inline-end = density; block rhythm via density
 
 ### Consumer supplies
@@ -320,8 +320,8 @@ does not add `mr-*` for content-start.
 CEC, master-detail, and embedded `EntityItem` hosts need anatomy layout only — CEC may
 publish `--leading-chrome-size` when a leading utility is present.
 
-DEC `article` publishes `--entity-density-inline` and `--entity-content-offset`. Body
-inline-start = density inset + content offset. Inline-end = density inset only.
+DEC `article` publishes surface inset tokens and `--entity-content-offset`. Body
+inline-start = surface start inset + content offset. Inline-end = surface end inset only.
 
 DER keeps host `px-4` on the header row; disclosed body uses host inset + content offset
 via `detailEntityRowDisclosureContentVariants` — host inset is not folded into the geometry

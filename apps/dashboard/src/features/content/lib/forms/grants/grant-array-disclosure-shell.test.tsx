@@ -128,7 +128,7 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
     expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
-    expect(body?.className).toContain('pr-[var(--entity-density-inline)]')
+    expect(body?.className).toContain('pr-[var(--entity-surface-inline-end)]')
     expect(body).toHaveClass('border-t')
     expect(body?.className).not.toContain('content-column-indent')
     expect(body?.className).not.toContain('content-inline-start')
@@ -137,15 +137,17 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
       'calc(2 * calc(var(--spacing)*6)',
     )
-    expect(article).toHaveClass('[--entity-density-inline:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
     const shell = firstRow.querySelector('[role="group"]') as HTMLElement
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
-    expect(shell.className).not.toContain('--entity-density-inline')
+    expect(shell.className).not.toContain('--entity-surface-inline-start')
 
     const headerWrap = screen
       .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
-      .closest('[class*="--entity-density-inline"]') as HTMLElement
-    expect(headerWrap?.className).toMatch(/px-\[var\(--entity-density-inline\)\]/)
+      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
+    expect(headerWrap?.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
+    expect(headerWrap?.className).toMatch(/pr-\[var\(--entity-surface-inline-end\)\]/)
 
     await user.clear(ability)
     await user.type(ability, 'int')

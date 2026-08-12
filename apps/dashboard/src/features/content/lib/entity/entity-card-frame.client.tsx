@@ -28,7 +28,9 @@ export function EntityCardFrame({
 
   return (
     <article
-      className={cn(entityCardFrameVariants({ density, disabled }))}
+      className={cn(
+        entityCardFrameVariants({ density, disabled, leading: leadingUtilityCount > 0 }),
+      )}
       style={leadingChromeStyle}
       data-disabled={disabled ? true : undefined}
     >
