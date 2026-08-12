@@ -22,14 +22,20 @@ import {
   buildConnectedPartyCharacterPickerSearchText,
   type LocationConnectedPartyCharacterOption,
 } from '../../locations/lib/location-connected-party-character-options.lib'
+import {
+  filterAndSortOrganizationMemberPickerCandidates,
+  formatOrganizationMemberPickerStatusBadgeLabel,
+  ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+} from '../lib/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../lib/organization-members.constants'
+
+export { ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL }
 
 export const ORGANIZATION_MEMBER_PICKER_TITLE = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SUBMIT_LABEL = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
 export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters match this search.'
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
-export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE =
   'Quick NPC creation is unavailable — campaign build data failed to load.'
@@ -37,6 +43,8 @@ export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE =
 /** Campaign PC/NPC option plus whether the character already holds a membership here. */
 export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
   isMember: boolean
+  /** Existing membership title when isMember is true. */
+  membershipTitle?: string
 }
 
 export type OrganizationMemberPickerCommit = {
@@ -152,6 +160,17 @@ export function OrganizationMemberPickerDrawer({
     ],
   )
 
+  const transformVisibleItems = React.useCallback(
+    (
+      visibleItems: readonly OrganizationMemberPickerCandidate[],
+      context: { searchQuery: string },
+    ) =>
+      filterAndSortOrganizationMemberPickerCandidates(visibleItems, {
+        searchQuery: context.searchQuery,
+      }),
+    [],
+  )
+
   return (
     <CatalogEntityPickerSheet
       open={open}
@@ -180,6 +199,7 @@ export function OrganizationMemberPickerDrawer({
       searchPlaceholder={ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
+      transformVisibleItems={transformVisibleItems}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
       renderEntityRow={(args) => {
@@ -209,7 +229,9 @@ export function OrganizationMemberPickerDrawer({
                 ? [
                     {
                       kind: 'badge',
-                      label: ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+                      label: formatOrganizationMemberPickerStatusBadgeLabel(
+                        candidate.membershipTitle,
+                      ),
                       tone: 'success',
                     },
                   ]

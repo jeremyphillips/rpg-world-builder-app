@@ -75,8 +75,8 @@ export function useOrganizationMembersDetail(
     [campaignId, membersQuery.data],
   )
 
-  const memberIds = React.useMemo(
-    () => new Set(members.rows.map((row) => row.characterId)),
+  const membersByCharacterId = React.useMemo(
+    () => new Map(members.rows.map((row) => [row.characterId, row])),
     [members.rows],
   )
 
@@ -87,11 +87,16 @@ export function useOrganizationMembersDetail(
       npcsQuery.data ?? [],
       catalogIndex,
     )
-    return [...characters.values()].map((character) => ({
-      ...character,
-      isMember: memberIds.has(character.id),
-    }))
-  }, [campaignCharactersQuery.data, canManage, catalogIndex, memberIds, npcsQuery.data])
+    return [...characters.values()].map((character) => {
+      const member = membersByCharacterId.get(character.id)
+
+      return {
+        ...character,
+        isMember: member !== undefined,
+        ...(member?.title !== undefined ? { membershipTitle: member.title } : {}),
+      }
+    })
+  }, [campaignCharactersQuery.data, canManage, catalogIndex, membersByCharacterId, npcsQuery.data])
 
   const invalidate = React.useCallback(
     async (input: {
