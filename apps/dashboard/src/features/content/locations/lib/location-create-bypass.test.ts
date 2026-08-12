@@ -16,9 +16,11 @@ const modalSource = readFileSync(
 )
 
 describe('location create bypass guard', () => {
-  it('routes overview promoted shortcuts through resolveLocationCreateSession launcher', () => {
+  it('routes overview promoted shortcuts through the canonical session surfaces', () => {
     expect(actionsSource).toContain('useLocationCreateSessionLaunch')
     expect(actionsSource).toContain('launch({ authoringType })')
+    expect(actionsSource).toContain("authoringType === 'building'")
+    expect(actionsSource).toContain('LocationCreateModal')
     expect(actionsSource).not.toMatch(/Link to=\{buildLocationCreateHref\([^)]*authoringType/)
   })
 

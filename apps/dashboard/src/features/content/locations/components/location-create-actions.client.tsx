@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   Button,
@@ -16,6 +17,7 @@ import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
 
 import { useLocationCreateSessionLaunch } from './location-create-launcher.client'
+import { LocationCreateModal } from './location-create-modal.client'
 import {
   buildLocationFixedCreateHref,
   getLocationAuthoringTypeLabel,
@@ -29,6 +31,7 @@ export type LocationCreateActionsProps = {
 /** Overview "New location" primary action with promoted type shortcuts. */
 export function LocationCreateActions({ campaignId }: LocationCreateActionsProps) {
   const navigate = useNavigate()
+  const [buildingCreateOpen, setBuildingCreateOpen] = useState(false)
   const createLabel = formatContentCreateHeading('locations')
   const createHref = ROUTES.content.locations.create(campaignId)
 
@@ -39,6 +42,12 @@ export function LocationCreateActions({ campaignId }: LocationCreateActionsProps
   return (
     <>
       {setupHost}
+      <LocationCreateModal
+        open={buildingCreateOpen}
+        onOpenChange={setBuildingCreateOpen}
+        intent={{ authoringType: 'building' }}
+        campaignId={campaignId}
+      />
       <div className="flex items-stretch">
         <Link
           to={createHref}
@@ -62,7 +71,16 @@ export function LocationCreateActions({ campaignId }: LocationCreateActionsProps
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {LOCATION_CREATE_PROMOTED_AUTHORING_TYPES.map((authoringType) => (
-              <DropdownMenuItem key={authoringType} onSelect={() => launch({ authoringType })}>
+              <DropdownMenuItem
+                key={authoringType}
+                onSelect={() => {
+                  if (authoringType === 'building') {
+                    setBuildingCreateOpen(true)
+                    return
+                  }
+                  launch({ authoringType })
+                }}
+              >
                 {getLocationAuthoringTypeLabel(authoringType)}
               </DropdownMenuItem>
             ))}

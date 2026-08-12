@@ -8,6 +8,7 @@ import { formatContentCreateHeading } from '@/features/content/lib/content-type-
 import { useCampaigns } from '@/features/campaign'
 import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
 import { LocationCreateSetupHost } from './location-create-setup-host.client'
+import { LocationCreateModal } from './location-create-modal.client'
 import {
   buildLocationFixedCreateHref,
   parseLocationCreateSessionFromSearchParams,
@@ -52,6 +53,19 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
   )
 
   if (session.kind === 'needsSetup') {
+    if (session.intent.authoringType === 'building') {
+      return (
+        <LocationCreateModal
+          open
+          intent={session.intent}
+          campaignId={campaignId}
+          onOpenChange={(open) => {
+            if (!open) navigate(ROUTES.content.locations.overview(campaignId))
+          }}
+        />
+      )
+    }
+
     return (
       <LocationCreateSetupHost
         intent={session.intent}

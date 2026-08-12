@@ -1,7 +1,29 @@
-import type { RegionClassificationKind, SettlementType, SiteType } from '@rpg/contracts'
+import type {
+  BuildingFacilityType,
+  BuildingForm,
+  RegionClassificationKind,
+  SettlementType,
+  SiteType,
+} from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
 import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
+import {
+  BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
+  BUILDING_CREATE_SETUP_FACILITY_PROMPT,
+  BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
+  BUILDING_CREATE_SETUP_FORM_PROMPT,
+  BUILDING_CREATE_SETUP_HEADLINE,
+  BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
+  BUILDING_CREATE_SETUP_OPERATOR_PROMPT,
+  buildBuildingCreateSetupSummaryEntries,
+  buildBuildingFacilityTypeRadioOptions,
+  buildBuildingFormRadioOptions,
+  buildBuildingOperatorIntentRadioOptions,
+  applyBuildingCreateSetupSelectionChange,
+  resolveBuildingCreateSetupProjection,
+} from './location-building-create-setup.lib'
+import type { BuildingOperatorIntent } from './location-create-session'
 import {
   buildRegionClassificationKindRadioOptions,
   buildRegionTypeRadioOptions,
@@ -28,6 +50,9 @@ import {
 } from './location-site-create-setup.lib'
 
 export type LocationCreateModalSetupValues = {
+  buildingForm: BuildingForm | ''
+  buildingFacilityType: BuildingFacilityType | ''
+  buildingOperatorIntent: BuildingOperatorIntent | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
   classificationKind: RegionClassificationKind | ''
@@ -35,6 +60,9 @@ export type LocationCreateModalSetupValues = {
 }
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
+  buildingForm: '',
+  buildingFacilityType: '',
+  buildingOperatorIntent: '',
   siteType: '',
   settlementType: '',
   classificationKind: '',
@@ -65,6 +93,50 @@ function optionLabel(options: readonly RadioCardOption[], value: string): string
   return options.find((option) => option.value === value)?.label ?? value
 }
 
+function resolveBuildingSetupModel(
+  values: LocationCreateModalSetupValues,
+): LocationCreateModalSetupModel {
+  const formOptions = buildBuildingFormRadioOptions()
+  const facilityOptions = buildBuildingFacilityTypeRadioOptions()
+  const operatorOptions = buildBuildingOperatorIntentRadioOptions()
+  const projection = resolveBuildingCreateSetupProjection({
+    form: values.buildingForm,
+    facilityType: values.buildingFacilityType,
+    operatorIntent: values.buildingOperatorIntent,
+  })
+  return {
+    headline: BUILDING_CREATE_SETUP_HEADLINE,
+    choiceSets: [
+      {
+        id: 'buildingForm',
+        fieldLabel: BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
+        prompt: BUILDING_CREATE_SETUP_FORM_PROMPT,
+        options: formOptions,
+        value: values.buildingForm,
+        required: false,
+      },
+      {
+        id: 'buildingFacilityType',
+        fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
+        prompt: BUILDING_CREATE_SETUP_FACILITY_PROMPT,
+        options: facilityOptions,
+        value: values.buildingFacilityType,
+        required: false,
+      },
+      {
+        id: 'buildingOperatorIntent',
+        fieldLabel: BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
+        prompt: BUILDING_CREATE_SETUP_OPERATOR_PROMPT,
+        options: operatorOptions,
+        value: values.buildingOperatorIntent,
+      },
+    ],
+    canContinue: projection != null,
+    complete: () => (projection ? { kind: 'building', ...projection } : null),
+    summaryEntries: projection ? buildBuildingCreateSetupSummaryEntries(projection) : [],
+  }
+}
+
 export function resolveLocationCreateModalSetupModel({
   intent,
   values,
@@ -72,6 +144,10 @@ export function resolveLocationCreateModalSetupModel({
   intent: LocationCreateIntent
   values: LocationCreateModalSetupValues
 }): LocationCreateModalSetupModel | null {
+  if (intent.authoringType === 'building') {
+    return resolveBuildingSetupModel(values)
+  }
+
   if (intent.authoringType === 'site') {
     const options = buildSiteTypeRadioOptions()
     const canContinue = Boolean(values.siteType)
@@ -188,6 +264,23 @@ export function applyLocationCreateModalSetupValueChange({
   choiceSetId: string
   nextValue: string
 }): LocationCreateModalSetupValues {
+  const buildingSelection = applyBuildingCreateSetupSelectionChange({
+    selection: {
+      form: values.buildingForm,
+      facilityType: values.buildingFacilityType,
+      operatorIntent: values.buildingOperatorIntent,
+    },
+    choiceSetId,
+    nextValue,
+  })
+  if (buildingSelection) {
+    return {
+      ...values,
+      buildingForm: buildingSelection.form,
+      buildingFacilityType: buildingSelection.facilityType,
+      buildingOperatorIntent: buildingSelection.operatorIntent,
+    }
+  }
   if (choiceSetId === 'siteType') {
     return { ...values, siteType: isSiteType(nextValue) ? nextValue : '' }
   }

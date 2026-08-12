@@ -3,6 +3,7 @@
 import type { z } from 'zod'
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
 
@@ -37,6 +38,10 @@ import {
 import { locationFormValueSyncs } from '../lib/location-form-sync'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'
 import {
+  applyBuildingCreateSetupProjection,
+  type BuildingCreateSetupProjection,
+} from '../lib/location-building-create-setup.lib'
+import {
   createSettlementWithStartingDistricts,
   resolveSettlementCreateCompletionToast,
   resolveSettlementStructureAuthoringGuidance,
@@ -65,12 +70,106 @@ export type LocationCreateFormProps = {
   /** When false, form stays mounted for dirty tracking but is not shown. */
   visible?: boolean
   onPendingChange?: (pending: boolean) => void
+  buildingSetupApplication?: {
+    revision: number
+    projection: BuildingCreateSetupProjection
+  }
+  onBuildingClassificationChange?: (classification: {
+    form?: BuildingCreateSetupProjection['form']
+    facilityType?: BuildingCreateSetupProjection['facilityType']
+  }) => void
 }
 
 type LocationCreateFormBodyProps = LocationCreateFormProps
 
 type FixedSettlementCreateContext = LocationFixedCreateContext & {
   settlementType: NonNullable<LocationFixedCreateContext['settlementType']>
+}
+
+type BuildingClassificationDraft = Parameters<
+  NonNullable<LocationCreateFormProps['onBuildingClassificationChange']>
+>[0]
+
+function normalizeBuildingClassification(
+  classification: LocationDraftFormValues['classification'],
+): BuildingClassificationDraft {
+  const normalized: BuildingClassificationDraft = {}
+  if (classification?.form) normalized.form = classification.form
+  if (classification?.facilityType) normalized.facilityType = classification.facilityType
+  return normalized
+}
+
+function buildingClassificationMatches(
+  classification: BuildingClassificationDraft,
+  projection: BuildingCreateSetupProjection,
+): boolean {
+  return (
+    classification.form === projection.form &&
+    classification.facilityType === projection.facilityType
+  )
+}
+
+function LocationBuildingSetupProjectionBridge({
+  application,
+  onClassificationChange,
+}: {
+  application: NonNullable<LocationCreateFormProps['buildingSetupApplication']>
+  onClassificationChange?: LocationCreateFormProps['onBuildingClassificationChange']
+}) {
+  const form = useFormContext<LocationDraftFormValues>()
+  const classification = useWatch({ control: form.control, name: 'classification' })
+  const appliedRevisionRef = useRef<number | null>(null)
+  const observedRevisionRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (appliedRevisionRef.current === application.revision) return
+    const nextValues = applyBuildingCreateSetupProjection(
+      form.getValues() as LocationFormValues,
+      application.projection,
+    )
+    appliedRevisionRef.current = application.revision
+    observedRevisionRef.current = null
+    form.setValue('classification.form', nextValues.classification?.form, {
+      shouldDirty: true,
+      shouldTouch: false,
+      shouldValidate: false,
+    })
+    form.setValue('classification.facilityType', nextValues.classification?.facilityType, {
+      shouldDirty: true,
+      shouldTouch: false,
+      shouldValidate: false,
+    })
+    if (!nextValues.classification) {
+      form.setValue('classification', undefined, {
+        shouldDirty: true,
+        shouldTouch: false,
+        shouldValidate: false,
+      })
+    }
+    onClassificationChange?.(normalizeBuildingClassification(nextValues.classification))
+  }, [application, form, onClassificationChange])
+
+  useEffect(() => {
+    if (appliedRevisionRef.current == null) return
+    if (observedRevisionRef.current !== application.revision) {
+      const matchesProjection = buildingClassificationMatches(
+        normalizeBuildingClassification(classification),
+        application.projection,
+      )
+      if (matchesProjection) observedRevisionRef.current = application.revision
+      return
+    }
+    onClassificationChange?.(normalizeBuildingClassification(classification))
+  }, [
+    application.projection.facilityType,
+    application.projection.form,
+    application.revision,
+    classification?.facilityType,
+    classification?.form,
+    onClassificationChange,
+  ])
+
+  return null
 }
 
 function isSettlementWithStartingDistricts(
@@ -100,6 +199,8 @@ function LocationCreateFormShell({
   formKey,
   visible = true,
   onPendingChange,
+  buildingSetupApplication,
+  onBuildingClassificationChange,
   campaignAccessDraftRef,
   fields,
   pending,
@@ -139,6 +240,12 @@ function LocationCreateFormShell({
           formKey,
           header: () => (
             <>
+              {buildingSetupApplication ? (
+                <LocationBuildingSetupProjectionBridge
+                  application={buildingSetupApplication}
+                  onClassificationChange={onBuildingClassificationChange}
+                />
+              ) : null}
               <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
               <LocationCreateDraftPrune fixedCreate={fixedCreate} />
               <ContentFormHeader

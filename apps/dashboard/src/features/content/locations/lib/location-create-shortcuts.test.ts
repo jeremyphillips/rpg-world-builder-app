@@ -13,7 +13,7 @@ import {
   parseLocationCreateSessionFromSearchParams,
   parseLocationCreateSoftParent,
 } from './location-create-shortcuts'
-import { completeLocationCreateSetup, fixedCreateFromIntent } from './location-create-session'
+import { completeLocationCreateSetup } from './location-create-session'
 
 describe('parseLocationCreateSessionFromSearchParams', () => {
   it('returns unrestricted when type param is absent', () => {
@@ -22,13 +22,13 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
     })
   })
 
-  it('returns ready fixed building session for valid type param', () => {
+  it('routes a typed building param into setup without serializing classification', () => {
     const params = new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
     const intent = { authoringType: 'building' as const }
 
     expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
-      kind: 'ready',
-      fixedCreate: fixedCreateFromIntent(intent),
+      kind: 'needsSetup',
+      intent,
     })
   })
 

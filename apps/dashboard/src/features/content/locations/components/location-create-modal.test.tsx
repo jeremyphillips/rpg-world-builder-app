@@ -160,6 +160,13 @@ async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>)
   expect(await screen.findByRole('heading', { name: 'Create city' })).toBeInTheDocument()
 }
 
+async function continueBuildingSetup(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: 'No organization' }))
+  await user.click(screen.getByRole('button', { name: 'Continue' }))
+  expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
+  expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+}
+
 async function submitCreateForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Harbor Inn')
   await user.click(screen.getByRole('button', { name: 'Create location' }))
@@ -182,10 +189,20 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('renders the contextual create heading for building (no setup)', () => {
+  it('requires only operator intent and allows Form and Facility to remain unspecified', async () => {
+    const user = userEvent.setup()
     renderModal(buildingIntent)
+
     expect(screen.getByRole('heading', { name: 'Create building' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('radiogroup', { name: 'What physical form does this building have?' }),
+    ).toBeVisible()
+    expect(
+      screen.getByRole('radiogroup', { name: 'What is this building configured to be?' }),
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+
+    await continueBuildingSetup(user)
   })
 
   it('renders settlement-type create headings after setup continue', async () => {
@@ -221,20 +238,51 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
-  it('omits Back and setup summary Change for no-setup building create', () => {
+  it('shows setup navigation and the operator summary for Building details', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+    expect(screen.getByText('No organization')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
+    ).toBeInTheDocument()
+  })
+
+  it('reapplies Building setup through canonical form values without losing the draft', async () => {
+    const user = userEvent.setup()
     renderModal(buildingIntent)
 
-    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
-    ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Brewery') }))
+    await continueBuildingSetup(user)
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Copper Kettle')
+
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    const brewerySummary = screen.getByRole('heading', { name: 'Brewery' }).closest('article')
+    expect(brewerySummary).not.toBeNull()
+    await user.click(within(brewerySummary!).getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Temple') }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
+    expect(screen.getByText('House · Temple · No organization')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Create location' }))
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledOnce())
+
+    expect(mutateAsync.mock.calls[0]?.[0]).toMatchObject({
+      name: 'Copper Kettle',
+      classification: { form: 'house', facilityType: 'temple' },
+    })
   })
 
   it('creates with default campaign access draft without PATCH and closes the modal', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
+    await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('button', { name: 'Use default campaign access' }))
     await submitCreateForm(user)
@@ -253,6 +301,7 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
+    await continueBuildingSetup(user)
     const pendingAccess = {
       ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
       available: false,
@@ -279,6 +328,7 @@ describe('LocationCreateModal', () => {
   it('submits fixed building context without leaking incompatible form values', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
+    await continueBuildingSetup(user)
 
     await submitCreateForm(user)
 
@@ -297,6 +347,7 @@ describe('LocationCreateModal', () => {
     expect(payload).not.toHaveProperty('planeType')
     expect(payload).not.toHaveProperty('settlementType')
     expect(payload).not.toHaveProperty('interiorType')
+    expect(payload).not.toHaveProperty('classification')
   })
 
   it('closes after create when deferred access PATCH fails and warns without double-create', async () => {
@@ -304,6 +355,7 @@ describe('LocationCreateModal', () => {
     const onOpenChange = vi.fn()
     updateRouteContentCampaignAccess.mockRejectedValue(new Error('network'))
     renderModal(buildingIntent, onOpenChange)
+    await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
     await submitCreateForm(user)

@@ -40,6 +40,7 @@ export type LocationAuthoringType = (typeof LOCATION_AUTHORING_TYPE_IDS)[number]
 
 /** Authoring types that require a setup step before opening create. */
 export const LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP = [
+  'building',
   'settlement',
   'region',
   'site',

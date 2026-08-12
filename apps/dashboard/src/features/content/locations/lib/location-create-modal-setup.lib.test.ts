@@ -42,6 +42,24 @@ describe('applyLocationCreateModalSetupValueChange', () => {
 })
 
 describe('resolveLocationCreateModalSetupModel', () => {
+  it('builds optional Form and Facility choices before required operator intent', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingOperatorIntent: 'none',
+      },
+    })
+
+    expect(model?.choiceSets.map(({ id, required }) => ({ id, required }))).toEqual([
+      { id: 'buildingForm', required: false },
+      { id: 'buildingFacilityType', required: false },
+      { id: 'buildingOperatorIntent', required: undefined },
+    ])
+    expect(model?.canContinue).toBe(true)
+    expect(model?.complete()).toEqual({ kind: 'building', operatorIntent: 'none' })
+  })
+
   it('builds shared region choice sets with dependsOn', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'region' },

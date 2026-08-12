@@ -32,6 +32,7 @@ import {
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
+import type { BuildingCreateSetupProjection } from '../lib/location-building-create-setup.lib'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import {
   buildLocationCreateSetupSets,
@@ -57,6 +58,10 @@ type LocationCreateModalState = {
   setupValues: LocationCreateModalSetupValues
   reopenChoiceSetId: string | null
   formKey: string
+  buildingSetupApplication: {
+    revision: number
+    projection: BuildingCreateSetupProjection
+  } | null
 }
 
 function createInitialState(intent: LocationCreateIntent): LocationCreateModalState {
@@ -73,6 +78,7 @@ function createInitialState(intent: LocationCreateIntent): LocationCreateModalSt
       setupValues: emptySetup,
       reopenChoiceSetId: null,
       formKey,
+      buildingSetupApplication: null,
     }
   }
 
@@ -84,6 +90,7 @@ function createInitialState(intent: LocationCreateIntent): LocationCreateModalSt
     setupValues: emptySetup,
     reopenChoiceSetId: null,
     formKey,
+    buildingSetupApplication: null,
   }
 }
 
@@ -230,6 +237,8 @@ function LocationCreateModalDetailsForm({
   onCancel,
   onTrustedClose,
   onPendingChange,
+  buildingSetupApplication,
+  onBuildingClassificationChange,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -245,6 +254,10 @@ function LocationCreateModalDetailsForm({
   onCancel: () => void
   onTrustedClose: () => void
   onPendingChange?: (pending: boolean) => void
+  buildingSetupApplication: LocationCreateModalState['buildingSetupApplication']
+  onBuildingClassificationChange: NonNullable<
+    React.ComponentProps<typeof LocationCreateForm>['onBuildingClassificationChange']
+  >
 }) {
   return (
     <LocationCreateForm
@@ -258,6 +271,8 @@ function LocationCreateModalDetailsForm({
       visible={showDetails}
       onTrustedClose={onTrustedClose}
       onPendingChange={onPendingChange}
+      buildingSetupApplication={buildingSetupApplication ?? undefined}
+      onBuildingClassificationChange={onBuildingClassificationChange}
       chrome={({ pending }) =>
         buildDetailsChrome({
           showDetails,
@@ -324,8 +339,36 @@ function useLocationCreateModalController({
       fixedCreate,
       detailsMounted: true,
       reopenChoiceSetId: null,
+      buildingSetupApplication:
+        result.kind === 'building'
+          ? {
+              revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
+              projection: {
+                ...(result.form ? { form: result.form } : {}),
+                ...(result.facilityType ? { facilityType: result.facilityType } : {}),
+                operatorIntent: result.operatorIntent,
+              },
+            }
+          : current.buildingSetupApplication,
     }))
   }, [intent, setupModel])
+
+  const handleBuildingClassificationChange = React.useCallback(
+    (classification: {
+      form?: BuildingCreateSetupProjection['form']
+      facilityType?: BuildingCreateSetupProjection['facilityType']
+    }) => {
+      setState((current) => ({
+        ...current,
+        setupValues: {
+          ...current.setupValues,
+          buildingForm: classification.form ?? '',
+          buildingFacilityType: classification.facilityType ?? '',
+        },
+      }))
+    },
+    [],
+  )
 
   const handleBackToSetup = React.useCallback(() => {
     setState((current) => ({
@@ -365,6 +408,7 @@ function useLocationCreateModalController({
     handleBackToSetup,
     setReopenChoiceSetId,
     setDetailsPending,
+    handleBuildingClassificationChange,
     trustedClose,
   }
 }
@@ -398,6 +442,7 @@ function LocationCreateModalSession({
     handleBackToSetup,
     setReopenChoiceSetId,
     setDetailsPending,
+    handleBuildingClassificationChange,
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
 
@@ -452,6 +497,8 @@ function LocationCreateModalSession({
                   onCancel={requestClose}
                   onTrustedClose={trustedClose}
                   onPendingChange={setDetailsPending}
+                  buildingSetupApplication={state.buildingSetupApplication}
+                  onBuildingClassificationChange={handleBuildingClassificationChange}
                 />
               )}
             </ContentFormOptionsGate>
