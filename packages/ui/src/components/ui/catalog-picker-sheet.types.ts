@@ -142,7 +142,7 @@ export type CatalogPickerSheetProps<TItem> = {
   noItemsMessage?: string
   /** Collapsible row shell preset — equipment picker uses `catalog`. */
   rowPreset?: CollapsibleListItemShellPreset
-  /** Row host layout — `entity-card` drops catalog content inset for embedded entity cards. */
+  /** Row host layout — `entity-card` drops catalog content inset for embedded entity cards. Host-composition only; dashboard entity pickers use `CatalogEntityPickerSheet`. */
   rowLayout?: CatalogPickerRowLayout
   /** Collapsible row surface config — defaults to flat canvas. */
   rowSurface?: SurfaceConfig

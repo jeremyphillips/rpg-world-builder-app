@@ -3,19 +3,19 @@
 import * as React from 'react'
 
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogPickerMetadataRenderer,
   CatalogPickerSelectionActions,
-  CatalogEntityDisclosureRow,
-  catalogPickerShellProps,
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   OrganizationMembershipTitleField,
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
+
+import { CatalogEntityPickerSheet, CatalogEntityRow } from '../../lib/content-entity-card.client'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -153,7 +153,7 @@ export function OrganizationMemberPickerDrawer({
   )
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
       title={ORGANIZATION_MEMBER_PICKER_TITLE}
@@ -173,7 +173,6 @@ export function OrganizationMemberPickerDrawer({
               }
           : undefined
       }
-      {...catalogPickerShellProps()}
       items={candidates}
       getItemKey={(candidate) => candidate.id}
       getItemToolbarLabel={(candidate) => candidate.name}
@@ -183,11 +182,11 @@ export function OrganizationMemberPickerDrawer({
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
-      renderCollapsibleRow={(args) => {
+      renderEntityRow={(args) => {
         const candidate = args.item
 
         return (
-          <CatalogEntityDisclosureRow
+          <CatalogEntityRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}

@@ -2,9 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet } from '@rpg/ui'
-
-import { createCatalogEntityDisclosureRowRenderer } from '@/features/content'
+import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
@@ -12,7 +10,6 @@ import {
   mapSkillProficiencyCompactSummaryToMetadataLines,
 } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
-import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
 import { CatalogSortControl } from '../picker/catalog-sort-control.client'
 import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
@@ -75,7 +72,7 @@ function ProficiencyPickerToolbarReset({
   )
 }
 
-/** Proficiency catalog drawer — thin wrapper over `CatalogPickerSheet`. */
+/** Proficiency catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function ProficiencyPickerDrawer({
   open,
   onOpenChange,
@@ -108,12 +105,11 @@ export function ProficiencyPickerDrawer({
   const isSkillChoiceSet = choiceSet.choiceType === 'skillProficiency'
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={formatProficiencyPickerDrawerTitle(choiceSet, selectedIds)}
       description={formatProficiencyPickerDrawerDescription(choiceSet, selectedIds)}
-      {...catalogPickerShellProps()}
       items={items}
       getItemKey={(item) => item.optionId}
       getItemToolbarLabel={(item) => item.label}
@@ -152,7 +148,7 @@ export function ProficiencyPickerDrawer({
           />
         ),
       }}
-      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+      renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getProficiencyPickerDisabledNote(item)
 

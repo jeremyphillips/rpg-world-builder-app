@@ -2,7 +2,7 @@
 
 import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
 
-import { buildEquipmentPickerRowViewModel, CatalogEntityDisclosureRow } from '@/features/content'
+import { buildEquipmentPickerRowViewModel, CatalogEntityRow } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../hooks/use-equipment-acquisition-quantity-commit.client'
 import {
   CatalogPickerMetadataRenderer,
@@ -65,7 +65,7 @@ export function EquipmentPickerDisclosureRow({
       : undefined
 
   return (
-    <CatalogEntityDisclosureRow
+    <CatalogEntityRow
       toolbarLabel={rowArgs.toolbarLabel}
       domIds={rowArgs.domIds}
       collapsible={rowArgs.collapsible}

@@ -12,16 +12,18 @@ import {
   getOrganizationKindLabel,
   getOrganizationLocationConnectionDisplayLabel,
 } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
   CatalogPickerSelectionActions,
-  catalogPickerShellProps,
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { EntityItem } from '../../lib/content-entity-card.client'
+import {
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
+} from '../../lib/content-entity-card.client'
 import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
@@ -359,12 +361,10 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
   )
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      {...catalogPickerShellProps()}
-      rowLayout="entity-card"
       pickerEnabled={showOrganizationPicker}
       searchPlaceholder={organizationTargetPresentation.searchPlaceholder}
       noResultsMessage={
@@ -427,49 +427,55 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       getSearchText={(organization) =>
         [organization.name, getOrganizationKindLabel(organization.organizationKind)].join(' ')
       }
-      renderItemHeader={(organization) => {
-        const isSelected = selectedOrganizationId === organization.id
-        const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
-          organization.id,
-          location.id,
-          availabilityKinds,
-          orgRows,
-          excludeRelationshipId,
-        )
-        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+      renderEntityRow={createCatalogEntityRowRenderer({
+        buildEntity: (organization) =>
+          buildOrganizationPickerEntitySummary(organization, {
+            imageKey: organization.imageKey,
+            description: !organizationInverseSubjectHasAvailableKind(
+              organization.id,
+              location.id,
+              availabilityKinds,
+              orgRows,
+              excludeRelationshipId,
+            )
+              ? fullyLinkedReason
+              : undefined,
+          }),
+        buildTrailing: (organization) => {
+          const isSelected = selectedOrganizationId === organization.id
+          const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
+            organization.id,
+            location.id,
+            availabilityKinds,
+            orgRows,
+            excludeRelationshipId,
+          )
+          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
-        return (
-          <EntityItem
-            density="compact"
-            entity={buildOrganizationPickerEntitySummary(organization, {
-              imageKey: organization.imageKey,
-              description: !hasAvailableKind ? fullyLinkedReason : undefined,
-            })}
-            trailing={{
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => {
-                    setSelectedOrganizationId(organization.id)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                  onRemove={() => {
-                    setSelectedOrganizationId(null)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                />
-              ),
-            }}
-          />
-        )
-      }}
+          return {
+            kind: 'action',
+            content: (
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect={hasAvailableKind}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => {
+                  setSelectedOrganizationId(organization.id)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                }}
+                onRemove={() => {
+                  setSelectedOrganizationId(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                }}
+              />
+            ),
+          }
+        },
+      })}
     />
   )
 }

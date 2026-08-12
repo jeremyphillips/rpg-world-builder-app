@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { CatalogPickerSheet, SegmentedControl } from '@rpg/ui'
+import { SegmentedControl } from '@rpg/ui'
 import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
@@ -12,12 +12,12 @@ import {
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
 import {
-  createCatalogEntityDisclosureRowRenderer,
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
   CatalogMetadataRenderer,
 } from '@/features/content'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../picker/catalog-picker-metadata'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
-import { catalogPickerShellProps } from '../picker/catalog-picker-shell.lib'
 import { CatalogPickerResultsState } from '../picker/catalog-picker-results-state.client'
 import { CatalogPickerSelectionSummary } from '../picker/catalog-picker-selection-summary.client'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
@@ -271,7 +271,7 @@ export function SpellPickerDrawer({
   )
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={formatSpellPickerDrawerTitle(mode)}
@@ -282,7 +282,6 @@ export function SpellPickerDrawer({
           metadata={formatSpellPickerSelectionMetadata(mode, className, activePreparedLevel)}
         />
       }
-      {...catalogPickerShellProps()}
       recommendationsEnabled={recommendationsEnabled}
       recommendationTabsPosition="after-search"
       headerBelowDescription={
@@ -365,7 +364,7 @@ export function SpellPickerDrawer({
           />
         ),
       }}
-      renderCollapsibleRow={createCatalogEntityDisclosureRowRenderer({
+      renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getSpellPickerDisabledNote(item)
           const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)

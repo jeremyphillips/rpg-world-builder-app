@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { CatalogPickerSheet } from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { buildEntityMediaFromImageKey } from './entity/entity-media.lib'
 import { HARBOR_DISTRICT_ENTITY } from './entity/entity.fixture'
 import {
+  CatalogEntityPickerSheet,
   ContentEntityCard,
   ContentEntityCardViewLink,
-  EntityItem,
+  createCatalogEntityRowRenderer,
 } from './content-entity-card.client'
 
 describe('ContentEntityCard', () => {
@@ -128,25 +128,23 @@ describe('ContentEntityCard', () => {
   })
 })
 
-describe('EntityItem', () => {
-  it('embeds in entity-card picker rows without double-applying host content inset', () => {
+describe('CatalogEntityPickerSheet', () => {
+  it('embeds flat entity rows with host-owned inset via CatalogEntityRow', () => {
     render(
-      <CatalogPickerSheet
+      <CatalogEntityPickerSheet
         open
         onOpenChange={() => undefined}
         title="Locations"
-        rowPreset="catalog"
-        rowLayout="entity-card"
         items={[{ id: 'loc-1', name: 'Grey Coast', kind: 'Region' }]}
         getItemKey={(item) => item.id}
         getSearchText={(item) => item.name}
-        renderItemHeader={(item) => (
-          <EntityItem
-            density="compact"
-            entity={{ heading: item.name, classification: item.kind }}
-            trailing={{ kind: 'action', content: <button type="button">Select</button> }}
-          />
-        )}
+        renderEntityRow={createCatalogEntityRowRenderer({
+          buildEntity: (item) => ({ heading: item.name, classification: item.kind }),
+          buildTrailing: () => ({
+            kind: 'action',
+            content: <button type="button">Select</button>,
+          }),
+        })}
       />,
     )
 

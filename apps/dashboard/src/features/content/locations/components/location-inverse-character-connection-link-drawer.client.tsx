@@ -8,12 +8,11 @@ import type {
   LocationConnectedPartyRow,
 } from '@rpg/contracts'
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
-import { Button, CatalogPickerSheet, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
 import {
   CatalogPickerSelectionActions,
-  catalogPickerShellProps,
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
@@ -23,7 +22,10 @@ import {
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
 } from '../../lib/location-connection-drawer-intent'
-import { EntityItem } from '../../lib/content-entity-card.client'
+import {
+  CatalogEntityPickerSheet,
+  createCatalogEntityRowRenderer,
+} from '../../lib/content-entity-card.client'
 import { buildCharacterPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
@@ -230,12 +232,10 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   }, [campaignId, location, locationsById, lockedCharacter, mode])
 
   return (
-    <CatalogPickerSheet
+    <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
       title={title}
-      {...catalogPickerShellProps()}
-      rowLayout="entity-card"
       pickerEnabled={showCharacterPicker}
       searchPlaceholder={
         resolveLocationInverseCharacterTargetPresentation(activeKind).searchPlaceholder
@@ -280,46 +280,50 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={buildConnectedPartyCharacterPickerSearchText}
-      renderItemHeader={(character) => {
-        const isSelected = selectedCharacterId === character.id
-        const hasAvailableKind = characterInverseSubjectHasAvailableKind(
-          character.id,
-          availabilityKinds,
-          existingKeys,
-        )
-        const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+      renderEntityRow={createCatalogEntityRowRenderer({
+        buildEntity: (character) =>
+          buildCharacterPickerEntitySummary(character, {
+            description: !characterInverseSubjectHasAvailableKind(
+              character.id,
+              availabilityKinds,
+              existingKeys,
+            )
+              ? CHARACTER_DRAWER_FULLY_LINKED_REASON
+              : undefined,
+          }),
+        buildTrailing: (character) => {
+          const isSelected = selectedCharacterId === character.id
+          const hasAvailableKind = characterInverseSubjectHasAvailableKind(
+            character.id,
+            availabilityKinds,
+            existingKeys,
+          )
+          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
-        return (
-          <EntityItem
-            density="compact"
-            entity={buildCharacterPickerEntitySummary(character, {
-              description: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
-            })}
-            trailing={{
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => {
-                    setSelectedCharacterId(character.id)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                  onRemove={() => {
-                    setSelectedCharacterId(null)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                />
-              ),
-            }}
-          />
-        )
-      }}
+          return {
+            kind: 'action',
+            content: (
+              <CatalogPickerSelectionActions
+                phase={phase}
+                canSelect={hasAvailableKind}
+                addLabel={isSelected ? 'Selected' : 'Select'}
+                onAdd={() => {
+                  setSelectedCharacterId(character.id)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                }}
+                onRemove={() => {
+                  setSelectedCharacterId(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                }}
+              />
+            ),
+          }
+        },
+      })}
     />
   )
 }
