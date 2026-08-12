@@ -65,25 +65,23 @@ export function EntityItemAnatomy({
   density = 'comfortable',
 }: EntityItemAnatomyProps) {
   const resolvedEntity = resolveLinkedHeading(entity, headingHref)
-  const hasSecondaryText = Boolean(
-    resolvedEntity.description || (resolvedEntity.status && resolvedEntity.status.length > 0),
-  )
-  const rowAlign = hasSecondaryText ? 'start' : 'center'
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
+  const hasControlChrome = resolvedLeadingUtilities.length > 0 || trailing != null
 
   return (
-    <div className={entityItemAnatomyVariants({ density, rowAlign })}>
+    <div className={entityItemAnatomyVariants({ density })}>
       {resolvedLeadingUtilities.length > 0 ? (
         <div className={entityItemLeadingSlotVariants()} data-entity-item-slot="leading">
           <EntityLeadingRail density={density}>{resolvedLeadingUtilities}</EntityLeadingRail>
         </div>
       ) : null}
-      <div
-        className={entityItemContentVariants({ density, rowAlign })}
-        data-entity-item-slot="content"
-      >
+      <div className={entityItemContentVariants({ density })} data-entity-item-slot="content">
         {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
-        <EntitySummary entity={resolvedEntity} density={density} />
+        <EntitySummary
+          entity={resolvedEntity}
+          density={density}
+          headingBand={hasControlChrome ? 'control' : 'natural'}
+        />
       </div>
       {trailing ? (
         <div

@@ -92,7 +92,7 @@ export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseli
 })
 
 export const contentCardMixedHeadingNameVariants = cva(
-  'inline-block min-w-0 max-w-[60%] shrink-0 truncate font-body-emphasis text-foreground [&_a]:truncate',
+  'min-w-0 flex-1 truncate font-body-emphasis text-foreground [&_a]:truncate',
 )
 
 export const contentCardMixedHeadingSeparatorVariants = cva(
@@ -100,7 +100,7 @@ export const contentCardMixedHeadingSeparatorVariants = cva(
 )
 
 export const contentCardMixedHeadingSuffixVariants = cva(
-  'min-w-0 flex-1 truncate font-normal text-muted-foreground',
+  'shrink-0 font-normal text-muted-foreground',
 )
 
 /** Layer-2 supporting copy density — shared by content-card and entity summary surfaces. */

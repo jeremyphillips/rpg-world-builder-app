@@ -11,6 +11,8 @@ import {
   contentCardHeadingRowVariants,
   contentCardHeadingVariants,
   contentCardMetadataVariants,
+  contentCardMixedHeadingNameVariants,
+  contentCardMixedHeadingSuffixVariants,
   contentCardRootVariants,
   contentCardSubheadingVariants,
   resolveContentCardDensityInsetClasses,
@@ -104,6 +106,29 @@ describe('ContentCard', () => {
       contentCardMetadataVariants({ density: 'compact' }),
     )
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
+  it('lets the primary heading consume available mixed-heading width before truncating', () => {
+    render(
+      <ContentCard
+        heading="Speak with Animals"
+        headingSuffix=" · Spells"
+        endSlot={<button type="button">Remove</button>}
+      />,
+    )
+
+    const name = screen.getByText('Speak with Animals')
+    const classification = screen.getByText('Spells')
+
+    expect(name).toHaveClass(contentCardMixedHeadingNameVariants())
+    expect(name).toHaveClass('min-w-0', 'flex-1', 'truncate')
+    expect(name.className).not.toMatch(/\bmax-w-\[60%\]/)
+    expect(name.className).not.toMatch(/\bshrink-0\b/)
+
+    expect(classification).toHaveClass(contentCardMixedHeadingSuffixVariants())
+    expect(classification).toHaveClass('shrink-0')
+    expect(classification.className).not.toMatch(/\bflex-1\b/)
+    expect(classification.className).not.toMatch(/\btruncate\b/)
   })
 
   it('applies compact density classes when requested', () => {

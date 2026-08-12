@@ -5,22 +5,18 @@ import { supportingTextDensityVariants } from '@rpg/ui'
 /** Embedded EntityItem host — anatomy only; collection inset owned by the host. */
 export const entityItemRootVariants = cva('w-full min-w-0')
 
+/** Grid cross-axis — top-aligned so rails pin to the heading band, not full summary height. */
 export const entityItemAnatomyVariants = cva(
-  'grid min-w-0 w-full grid-cols-[auto_minmax(0,1fr)_auto]',
+  'grid min-w-0 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start',
   {
     variants: {
       density: {
         compact: 'gap-y-1',
         comfortable: 'gap-y-1',
       },
-      rowAlign: {
-        start: 'items-start',
-        center: 'items-center',
-      },
     },
     defaultVariants: {
       density: 'comfortable',
-      rowAlign: 'start',
     },
   },
 )
@@ -29,22 +25,25 @@ export const entityItemAnatomyVariants = cva(
 export const entityItemLeadingSlotVariants = cva('col-start-1 row-start-1 min-w-0')
 
 /** Content track — always column 2 so summary owns the flexible column. */
-export const entityItemContentVariants = cva('col-start-2 row-start-1 flex min-w-0', {
+export const entityItemContentVariants = cva('col-start-2 row-start-1 flex min-w-0 items-start', {
   variants: {
     density: {
       compact: 'gap-2',
       comfortable: 'gap-3',
     },
-    rowAlign: {
-      start: 'items-start',
-      center: 'items-center',
-    },
   },
   defaultVariants: {
     density: 'comfortable',
-    rowAlign: 'start',
   },
 })
+
+/**
+ * Heading band — compact-control height floor when leading/trailing chrome exists.
+ * Secondary copy flows below; rails align to this band, not the full summary stack.
+ */
+export const entitySummaryHeadingBandVariants = cva(
+  'flex min-w-0 min-h-control-action-compact items-center',
+)
 
 /** Trailing rail track — only rendered when `trailing` is set. */
 export const entityItemTrailingSlotVariants = cva(

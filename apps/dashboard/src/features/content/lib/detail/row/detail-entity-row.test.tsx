@@ -31,7 +31,7 @@ describe('DetailEntityRow', () => {
     expect(container.firstElementChild).toHaveClass('px-4', 'py-1')
   })
 
-  it('keeps the leading separator visible beside a non-shrinking entity name', () => {
+  it('keeps the leading separator visible beside the classification suffix', () => {
     render(
       <MemoryRouter>
         <DetailEntityRow
@@ -48,7 +48,7 @@ describe('DetailEntityRow', () => {
     expect(headingRow?.querySelector('[aria-hidden="true"]')).toHaveTextContent('·')
   })
 
-  it('truncates the heading suffix before the entity name', () => {
+  it('truncates the entity name before the classification suffix', () => {
     const { container } = render(
       <MemoryRouter>
         <DetailEntityRow
@@ -60,12 +60,15 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    const suffix = container.querySelector('[class*="flex-1"][class*="truncate"]')
-    expect(suffix).toHaveClass('truncate')
-    expect(screen.getByRole('link', { name: 'Verna Stormcaller' })).toHaveClass('text-link')
-    expect(screen.getByRole('link', { name: 'Verna Stormcaller' }).parentElement).toHaveClass(
-      'shrink-0',
-    )
+    const name = screen.getByRole('link', { name: 'Verna Stormcaller' })
+    const nameSpan = name.parentElement as HTMLElement
+    const suffix = container.querySelector('[class*="shrink-0"][class*="text-muted-foreground"]')
+
+    expect(name).toHaveClass('text-link')
+    expect(nameSpan).toHaveClass('flex-1', 'truncate')
+    expect(nameSpan.className).not.toMatch(/\bmax-w-\[60%\]/)
+    expect(suffix).toHaveClass('shrink-0')
+    expect(suffix?.className).not.toMatch(/\btruncate\b/)
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
   })
 

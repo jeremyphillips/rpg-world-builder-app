@@ -109,4 +109,55 @@ describe('EntityItemAnatomy grid placement', () => {
     )
     expect(leadingSlot.querySelectorAll('.flex.shrink-0.items-center.gap-0')).toHaveLength(1)
   })
+
+  it('top-aligns grid tracks when control chrome is present', () => {
+    const { anatomy } = renderAnatomy({
+      leadingUtilities: [<span>Grip</span>],
+      trailing: {
+        kind: 'action',
+        content: <button type="button">Select</button>,
+      },
+    })
+
+    expect(anatomy).toHaveClass('items-start')
+    expect(anatomy.className).not.toMatch(/\bitems-center\b/)
+  })
+
+  it('wraps the heading in a compact-control band when leading chrome exists', () => {
+    const { content } = renderAnatomy({
+      leadingUtilities: [<span>Grip</span>],
+    })
+
+    const band = content.querySelector('[data-entity-summary-band="control"]')
+    expect(band).toHaveClass('min-h-control-action-compact', 'items-center')
+  })
+
+  it('wraps the heading in a compact-control band when trailing chrome exists', () => {
+    const { content } = renderAnatomy({
+      trailing: {
+        kind: 'action',
+        content: <button type="button">Select</button>,
+      },
+    })
+
+    expect(content.querySelector('[data-entity-summary-band="control"]')).toBeInTheDocument()
+  })
+
+  it('does not wrap the heading in a control band when no chrome is present', () => {
+    const { content } = renderAnatomy()
+
+    expect(content.querySelector('[data-entity-summary-band="control"]')).toBeNull()
+  })
+
+  it('does not apply self-center on trailing action chrome', () => {
+    const { queryTrailing } = renderAnatomy({
+      trailing: {
+        kind: 'action',
+        content: <button type="button">Select</button>,
+      },
+    })
+
+    const actionWrapper = queryTrailing()?.firstElementChild as HTMLElement
+    expect(actionWrapper.className).not.toMatch(/\bself-center\b/)
+  })
 })

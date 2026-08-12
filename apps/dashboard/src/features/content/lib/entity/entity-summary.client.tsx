@@ -7,6 +7,7 @@ import type { EntitySummaryModel } from './entity-summary.types'
 import {
   entityItemStatusRowVariants,
   entitySummaryDescriptionVariants,
+  entitySummaryHeadingBandVariants,
   entitySummaryStatusVariants,
 } from './entity-item.variants'
 
@@ -33,21 +34,34 @@ function resolveClassificationSuffix(classification: ReactNode): ReactNode | und
   )
 }
 
+export type EntitySummaryHeadingBand = 'control' | 'natural'
+
 export type EntitySummaryProps = {
   entity: EntitySummaryModel
   density?: ContentCardDensity
+  /** When `control`, wraps the heading in a compact-control-height band for rail alignment. */
+  headingBand?: EntitySummaryHeadingBand
 }
 
-export function EntitySummary({ entity, density = 'comfortable' }: EntitySummaryProps) {
+export function EntitySummary({
+  entity,
+  density = 'comfortable',
+  headingBand = 'natural',
+}: EntitySummaryProps) {
   const headingSuffix = resolveClassificationSuffix(entity.classification)
+  const heading = (
+    <ContentCardHeading heading={entity.heading} headingSuffix={headingSuffix} density={density} />
+  )
 
   return (
     <div className="min-w-0 flex-1">
-      <ContentCardHeading
-        heading={entity.heading}
-        headingSuffix={headingSuffix}
-        density={density}
-      />
+      {headingBand === 'control' ? (
+        <div className={entitySummaryHeadingBandVariants()} data-entity-summary-band="control">
+          {heading}
+        </div>
+      ) : (
+        heading
+      )}
       {entity.description ? (
         <div className={entitySummaryDescriptionVariants({ density })}>{entity.description}</div>
       ) : null}
