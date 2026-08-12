@@ -16,6 +16,7 @@ describe('organizationFormDef', () => {
     expect(() => createOrganizationInputSchema.parse(input)).not.toThrow()
     expect(input.organizationKind).toBe('government')
     expect(input.description).toBe(CITY_COUNCIL.description)
+    expect(input.activities).toEqual([])
   })
 
   it('allows organization kind to be absent for a draft', () => {

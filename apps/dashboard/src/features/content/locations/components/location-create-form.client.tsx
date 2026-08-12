@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
+import type { FormValueSync } from '@rpg/ui/form'
 
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handler'
@@ -16,6 +17,8 @@ import {
   invalidateContentFormDefQueries,
   useContentWriteMutation,
 } from '../../lib/list/use-content-mutations'
+import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
+import { organizationsQueryKey } from '../../organizations'
 import { contentFormFields, type ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   ContentFormHost,
@@ -47,6 +50,18 @@ import {
   resolveSettlementStructureAuthoringGuidance,
   validateSettlementCreateComposition,
 } from '../lib/location-settlement-create-composition.lib'
+import {
+  BUILDING_OPERATOR_FORM_PATH,
+  buildBuildingOperatorCreateInput,
+  buildingOperatorDefaultValues,
+  buildingOperatorFormValueSyncs,
+  buildBuildingOperatorFormItems,
+  createBuildingWithOptionalOperator,
+  locationBuildingCreateDraftFormSchema,
+  pruneBuildingOperatorDraft,
+  resolveBuildingCreateCompletionToast,
+  type LocationBuildingCreateFormValues,
+} from '../lib/location-building-create-composition.lib'
 import { LocationCreateDraftPrune } from './location-create-draft-prune.client'
 import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
 import {
@@ -146,6 +161,22 @@ function LocationBuildingSetupProjectionBridge({
         shouldValidate: false,
       })
     }
+
+    if (application.projection.operatorIntent === 'create') {
+      const currentOperator = form.getValues(BUILDING_OPERATOR_FORM_PATH as never)
+      if (currentOperator === undefined) {
+        form.setValue(
+          BUILDING_OPERATOR_FORM_PATH as never,
+          buildingOperatorDefaultValues().operatorOrganization as never,
+          { shouldDirty: true, shouldTouch: false, shouldValidate: false },
+        )
+      }
+    } else {
+      const currentValues = form.getValues() as Record<string, unknown>
+      if (pruneBuildingOperatorDraft(currentValues) !== currentValues) {
+        form.unregister(BUILDING_OPERATOR_FORM_PATH as never)
+      }
+    }
     onClassificationChange?.(normalizeBuildingClassification(nextValues.classification))
   }, [application, form, onClassificationChange])
 
@@ -160,14 +191,7 @@ function LocationBuildingSetupProjectionBridge({
       return
     }
     onClassificationChange?.(normalizeBuildingClassification(classification))
-  }, [
-    application.projection.facilityType,
-    application.projection.form,
-    application.revision,
-    classification?.facilityType,
-    classification?.form,
-    onClassificationChange,
-  ])
+  }, [application.projection, application.revision, classification, onClassificationChange])
 
   return null
 }
@@ -185,6 +209,9 @@ type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   extraUnsavedEdits?: boolean
   onSubmit: FormSubmitHandler<LocationDraftFormValues>
   formError?: string | null
+  formSchema?: z.ZodType<LocationDraftFormValues>
+  formDefaultValues?: Record<string, unknown>
+  formValueSyncs?: FormValueSync[]
 }
 
 function LocationCreateFormShell({
@@ -207,6 +234,9 @@ function LocationCreateFormShell({
   extraUnsavedEdits,
   onSubmit,
   formError,
+  formSchema = locationDraftFormSchema,
+  formDefaultValues,
+  formValueSyncs = locationFormValueSyncs,
 }: LocationCreateFormShellProps) {
   useEffect(() => {
     onPendingChange?.(pending)
@@ -231,12 +261,13 @@ function LocationCreateFormShell({
         extraUnsavedEdits={extraUnsavedEdits}
         wrapForm={(form) => <CampaignAccessFormProvider>{form}</CampaignAccessFormProvider>}
         form={{
-          schema: locationDraftFormSchema,
+          schema: formSchema,
           defaultValues: {
             ...locationFormDef.createDefaultValues,
             ...fixedCreateToInitialValues(fixedCreate),
+            ...formDefaultValues,
           },
-          valueSyncs: locationFormValueSyncs,
+          valueSyncs: formValueSyncs,
           formKey,
           header: () => (
             <>
@@ -270,6 +301,102 @@ function LocationCreateFormShell({
         }}
       />
     </div>
+  )
+}
+
+function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
+  const { campaignId, fixedCreate, optionsCtx, buildingSetupApplication } = props
+  const queryClient = useQueryClient()
+  const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
+  const [compositionPending, setCompositionPending] = useState(false)
+  const createsOperator = buildingSetupApplication?.projection.operatorIntent === 'create'
+
+  const locationCtx: LocationFormCtx = {
+    ...optionsCtx,
+    campaignId,
+    mode: 'create',
+    entitySource: 'homebrew',
+    fixedCreate,
+  }
+
+  const fields = composeLocationCreateBodyFields(locationCtx, {
+    afterDescription: createsOperator ? buildBuildingOperatorFormItems(locationCtx) : undefined,
+  })
+
+  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {
+    resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
+    const canonicalValues = applyLocationFixedCreateContext(
+      values as LocationFormValues,
+      fixedCreate,
+    )
+    const buildingCreateInput = {
+      ...locationFormDef.toInput(
+        canonicalValues,
+        {
+          weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
+          campaignRules: locationCtx.campaignRules,
+          equipmentKind: locationCtx.equipmentKind,
+        },
+        'publish',
+      ),
+      status: 'published' as const,
+    }
+    const operatorCreateInput = createsOperator
+      ? buildBuildingOperatorCreateInput(values as LocationBuildingCreateFormValues)
+      : undefined
+
+    setCompositionPending(true)
+    try {
+      const result = await createBuildingWithOptionalOperator({
+        campaignId,
+        locationRouteKey: locationFormDef.routeKey,
+        buildingCreateInput,
+        pendingAccess: campaignAccessDraftRef.current,
+        operatorCreateInput,
+      })
+
+      invalidateContentFormDefQueries(queryClient, campaignId, locationFormDef)
+      if (
+        result.operator.status !== 'not_requested' &&
+        result.operator.status !== 'organization_failed'
+      ) {
+        void queryClient.invalidateQueries({ queryKey: organizationsQueryKey(campaignId) })
+        await invalidateLocationConnectionQueries(queryClient, {
+          campaignId,
+          organizationId: result.operator.organization.id,
+          locationIds: [result.building.id],
+        })
+      } else if (result.operator.status === 'organization_failed') {
+        void queryClient.invalidateQueries({ queryKey: organizationsQueryKey(campaignId) })
+      }
+
+      const toastResult = resolveBuildingCreateCompletionToast(result)
+      if (toastResult.kind === 'success') {
+        notifyContentCreated('locations')
+      } else {
+        toast.warning(toastResult.message)
+      }
+    } finally {
+      setCompositionPending(false)
+    }
+  }, 'Could not create locations.')
+
+  return (
+    <LocationCreateFormShell
+      {...props}
+      campaignAccessDraftRef={campaignAccessDraftRef}
+      fields={fields}
+      pending={compositionPending}
+      onSubmit={onSubmit}
+      formError={formError}
+      formSchema={createsOperator ? locationBuildingCreateDraftFormSchema : locationDraftFormSchema}
+      formDefaultValues={createsOperator ? buildingOperatorDefaultValues() : undefined}
+      formValueSyncs={
+        createsOperator
+          ? [...locationFormValueSyncs, ...buildingOperatorFormValueSyncs]
+          : locationFormValueSyncs
+      }
+    />
   )
 }
 
@@ -436,6 +563,10 @@ function LocationCreateFormBody(props: LocationCreateFormBodyProps) {
         <LocationSettlementCreateForm {...props} fixedCreate={props.fixedCreate} />
       </SettlementCreateCompositionProvider>
     )
+  }
+
+  if (props.fixedCreate.authoringType === 'building' && props.buildingSetupApplication) {
+    return <LocationBuildingCreateForm {...props} />
   }
 
   return <LocationGenericCreateForm {...props} />

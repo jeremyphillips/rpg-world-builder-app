@@ -11,11 +11,11 @@ import type * as RpgUi from '@rpg/ui'
 import { notifyContentCreated } from '@/lib/notify'
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
 import { HARBORFORD } from '../fixtures'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
+import { createBuildingWithOptionalOperator } from '../lib/location-building-create-composition.lib'
 import {
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_PROMPT,
@@ -44,6 +44,14 @@ vi.mock('../lib/location-settlement-create-composition.lib', async (importOrigin
   return {
     ...actual,
     createSettlementWithStartingDistricts: vi.fn(),
+  }
+})
+
+vi.mock('../lib/location-building-create-composition.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    createBuildingWithOptionalOperator: vi.fn(),
   }
 })
 
@@ -167,6 +175,12 @@ async function continueBuildingSetup(user: ReturnType<typeof userEvent.setup>) {
   expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
 }
 
+async function continueBuildingSetupWithOperator(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: 'Create an organization' }))
+  await user.click(screen.getByRole('button', { name: 'Continue' }))
+  expect(await screen.findByText('Create the organization that operates here.')).toBeInTheDocument()
+}
+
 async function submitCreateForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Harbor Inn')
   await user.click(screen.getByRole('button', { name: 'Create location' }))
@@ -178,6 +192,7 @@ describe('LocationCreateModal', () => {
     updateRouteContentCampaignAccess.mockReset()
     invalidateContentFormDefQueries.mockReset()
     vi.mocked(createSettlementWithStartingDistricts).mockReset()
+    vi.mocked(createBuildingWithOptionalOperator).mockReset()
     vi.mocked(notifyContentCreated).mockReset()
     vi.mocked(toast.warning).mockReset()
     mutateAsync.mockResolvedValue({ id: 'location-new' })
@@ -186,6 +201,11 @@ describe('LocationCreateModal', () => {
       settlement: { id: 'settlement-new' },
       deferredAccessFailed: false,
       districts: { created: [], failed: [] },
+    })
+    vi.mocked(createBuildingWithOptionalOperator).mockResolvedValue({
+      building: { id: 'location-new' },
+      deferredAccessFailed: false,
+      operator: { status: 'not_requested' },
     })
   })
 
@@ -250,6 +270,51 @@ describe('LocationCreateModal', () => {
     ).toBeInTheDocument()
   })
 
+  it('submits the inline Organization projection through the Building workflow', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetupWithOperator(user)
+
+    const names = screen.getAllByRole('textbox', { name: 'Name' })
+    expect(names).toHaveLength(2)
+    await user.type(names[0]!, 'Red Dragon Brewery')
+    await user.type(names[1]!, 'Red Dragon Brewing Company')
+    await user.click(screen.getByRole('radio', { name: 'Commercial' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Brewing' }))
+    await user.click(screen.getByRole('button', { name: 'Create location' }))
+
+    await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
+    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]).toMatchObject({
+      operatorCreateInput: {
+        name: 'Red Dragon Brewing Company',
+        organizationKind: 'commercial',
+        activities: ['brewing'],
+      },
+    })
+  })
+
+  it('prunes only inline Organization draft fields when operator intent is removed', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetupWithOperator(user)
+
+    const names = screen.getAllByRole('textbox', { name: 'Name' })
+    await user.type(names[0]!, 'Copper Kettle')
+    await user.type(names[1]!, 'Temporary Operator')
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    await user.click(screen.getByRole('radio', { name: 'No organization' }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    await user.click(screen.getByRole('radio', { name: 'Create an organization' }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    const reopenedNames = screen.getAllByRole('textbox', { name: 'Name' })
+    expect(reopenedNames[0]).toHaveValue('Copper Kettle')
+    expect(reopenedNames[1]).toHaveValue('')
+  })
+
   it('reapplies Building setup through canonical form values without losing the draft', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
@@ -270,11 +335,13 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('House · Temple · No organization')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Create location' }))
-    await waitFor(() => expect(mutateAsync).toHaveBeenCalledOnce())
+    await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
 
-    expect(mutateAsync.mock.calls[0]?.[0]).toMatchObject({
-      name: 'Copper Kettle',
-      classification: { form: 'house', facilityType: 'temple' },
+    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]).toMatchObject({
+      buildingCreateInput: {
+        name: 'Copper Kettle',
+        classification: { form: 'house', facilityType: 'temple' },
+      },
     })
   })
 
@@ -288,11 +355,14 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
     expect(updateRouteContentCampaignAccess).not.toHaveBeenCalled()
+    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0].pendingAccess).toEqual(
+      DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+    )
     expect(notifyContentCreated).toHaveBeenCalledWith('locations')
     expect(toast.warning).not.toHaveBeenCalled()
   })
@@ -311,16 +381,13 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
-      expect(updateRouteContentCampaignAccess).toHaveBeenCalledWith(
-        STORY_CAMPAIGN_ID,
-        'locations',
-        'location-new',
-        pendingAccess,
-      )
+      expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
+    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0].pendingAccess).toEqual(
+      pendingAccess,
+    )
     expect(notifyContentCreated).toHaveBeenCalledWith('locations')
     expect(toast.warning).not.toHaveBeenCalled()
   })
@@ -333,10 +400,11 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce()
     })
 
-    const payload = mutateAsync.mock.calls[0]?.[0] as Record<string, unknown>
+    const payload = vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]
+      .buildingCreateInput as Record<string, unknown>
     expect(payload).toMatchObject({
       name: 'Harbor Inn',
       parentLocationId: HARBORFORD.id,
@@ -353,7 +421,11 @@ describe('LocationCreateModal', () => {
   it('closes after create when deferred access PATCH fails and warns without double-create', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    updateRouteContentCampaignAccess.mockRejectedValue(new Error('network'))
+    vi.mocked(createBuildingWithOptionalOperator).mockResolvedValue({
+      building: { id: 'location-new' },
+      deferredAccessFailed: true,
+      operator: { status: 'not_requested' },
+    })
     renderModal(buildingIntent, onOpenChange)
     await continueBuildingSetup(user)
 
@@ -361,11 +433,13 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
-    expect(toast.warning).toHaveBeenCalledWith(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
+    expect(toast.warning).toHaveBeenCalledWith(
+      'Building created, but campaign access could not be completed.',
+    )
     expect(notifyContentCreated).not.toHaveBeenCalled()
   })
 
