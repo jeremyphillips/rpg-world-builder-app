@@ -789,3 +789,526 @@ spatial-granularity and function-adjustment questions.
 Architecturally, **Facility type** is the correct contract term. User-facing copy may later use a
 friendlier label such as **Building type** if “facility” sounds overly institutional; that copy
 decision does not change semantic ownership and is outside this pass.
+
+## Phase 7c — Organization taxonomy and Location alignment audit
+
+**Audit date:** 2026-08-12
+
+**Scope:** Organization kind/subtype semantics, authoring presets, member-title suggestions, and
+alignment with the Location model. This section recommends a target model; it does not authorize or
+implement a schema change.
+
+**Revision status:** Accepted and closed. The canonical domain/form/activity model, ephemeral preset
+ownership, and compositional title-resolution policy are settled for the first direct refactor.
+
+### Executive decision
+
+Replace the current persisted `organizationKind + organizationSubtype` pair with exactly one
+primary **Organization domain**, an optional reusable **Organization form**, and zero-to-many
+**Organization activities**. Keep familiar compound identities as contract-owned, ephemeral
+authoring presets by default. Do not persist an `authoringPresetId` merely to record how an
+Organization was created.
+
+The existing subtype registry is not suitable as a canonical axis. Its 45 entries mix forms
+(`company`, `cooperative`, `council`), institutions (`academy`, `bank`, `church`), activities
+(`advocacy_group`, `smuggling_ring`), constituencies (`clan`, `noble_bloc`), and domain-qualified
+compositions (`thieves_guild`, `martial_order`). Its attached member-title metadata is valuable,
+but that UX behavior does not prove that subtype belongs in persisted classification.
+
+The current runtime makes this a broader change than renaming fields:
+
+- 69 app/package source files reference `organizationKind`; 23 reference `organizationSubtype` outside
+  generated JSON schemas.
+- Contracts enforce kind/subtype compatibility on published, draft, create, and update shapes.
+- The API repeats the enums in Mongo and validates the merged kind/subtype pair before writes.
+- Dashboard forms dynamically project subtype options and clear stale subtype values when kind
+  changes.
+- Detail, overview, picker, filtering, and global-search projections expose kind or subtype.
+- Character membership editors and priority stamping resolve five ordered title suggestions from
+  the exact kind/subtype pair.
+
+There is no evidence that Organization kind currently controls Location relationship eligibility.
+Eligibility is owned by Location kind/`structureType`; Organization classification is display,
+filtering, search, validation, and member-title input. That separation should remain.
+
+### Domain test and ten-kind disposition
+
+A domain answers **“in what primary institutional sphere does this actor operate?”** It must not
+answer how the actor is constituted, name a premises, or merely identify its members. One domain is
+required for a published Organization; cross-domain character is expressed through form and
+multiple activities.
+
+| Current kind | Disposition                | Recommended domain | Boundary                                                                                                                                                 |
+| ------------ | -------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Government   | Keep and narrow            | `government`       | Exercises public governing, administrative, legislative, or judicial authority. Political influence without public authority is political.               |
+| Political    | Keep and narrow            | `political`        | Organizes influence, representation, advocacy, or political change. Holding office does not automatically make every party or movement governmental.     |
+| Religious    | Keep                       | `religious`        | Centers faith, worship, ministry, doctrine, or sacred stewardship. Armed or educational work remains activity.                                           |
+| Military     | Keep                       | `military`         | Organized primarily for armed command, defense, or warfare. A sacred order may instead be religious with martial activity.                               |
+| Criminal     | Keep                       | `criminal`         | Illicit enterprise is the actor's primary identity. An otherwise commercial or political actor does not change domain merely because it commits a crime. |
+| Commercial   | Keep and narrow            | `commercial`       | Produces, trades, finances, or operates for economic exchange. Member-serving trade bodies belong in occupational.                                       |
+| Professional | Rename and strictly narrow | `occupational`     | Serves, regulates, represents, or develops a trade, craft, profession, or labor community. It does not mean “does skilled work.”                         |
+| Academic     | Keep for now; broaden copy | `academic`         | Centers education, research, scholarship, or knowledge stewardship. “Academic and knowledge” is clearer UI copy if libraries remain here.                |
+| Community    | Keep and narrow            | `community`        | Organizes kinship, locality, mutual aid, civic participation, or social fellowship where no more specific institutional sphere dominates.                |
+| Other        | Keep fallback              | `other`            | Used only when no established domain passes; it must not become a shelter for unmodeled form or activity.                                                |
+
+#### Occupational verdict
+
+`occupational` **narrowly passes** the domain test, but only with an admission rule. It is a valid
+institutional sphere when the Organization exists to serve, regulate, represent, or develop an
+occupational community. It is constituency leakage if it is assigned simply because members share
+a job, and it is activity leakage if it means the Organization performs skilled work.
+
+Examples establish the boundary:
+
+- A blacksmithing company is `commercial + company + blacksmithing`, not occupational.
+- A smiths' guild that certifies masters and trains apprentices is
+  `occupational + guild + standards/training`.
+- A merchants' union that bargains or advocates for members is
+  `occupational + union + collective bargaining/advocacy`.
+- A neighborhood craft club remains `community + fellowship/association + craft practice` when
+  fellowship, not occupational governance, is primary.
+
+This is materially better than the current **Guild or professional** label: `guild` moves to form,
+and profession/trade/labor/craft distinctions move to activities or, if later needed for querying,
+a separately justified constituency projection.
+
+### Forty-five-subtype semantic disposition
+
+Semantic and preset dispositions remain separate. **Preset only** means the familiar compound noun
+has no single canonical counterpart after decomposition; it does not mean the concept disappears
+from authoring. An atomic component such as `guild` or `crew` may still survive independently as a
+reusable form.
+
+| Current subtype          | Semantic disposition                               | Canonical composition or evidence needed                                                                                                       |
+| ------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monarchy                 | Preset only; authority evidence case               | government + council/administration or no form as applicable + rule/governance; a later authority axis needs a non-UX consumer                 |
+| Council                  | Reusable form                                      | government + council + deliberation/governance                                                                                                 |
+| Assembly                 | Reusable form                                      | government + assembly + legislation/deliberation                                                                                               |
+| Administration           | Reusable form                                      | government + administration + administration/governance                                                                                        |
+| Magistracy               | Preset only                                        | government + council/administration + adjudication/enforcement                                                                                 |
+| Party                    | Reusable form                                      | political + party + campaigning/representation/governance                                                                                      |
+| Movement                 | Reusable form                                      | political + movement + advocacy/mobilization                                                                                                   |
+| Noble bloc               | Preset only; constituency-bearing composition      | political + network/association + aristocratic advocacy                                                                                        |
+| Court faction            | Preset only; context-bearing composition           | political + network + influence/campaigning; “court” is context, not domain                                                                    |
+| Advocacy group           | Preset only; activity-bearing composition          | political/community/occupational + association + advocacy                                                                                      |
+| Church                   | Preset only; institution evidence case             | religious + congregation/association + worship/ministry                                                                                        |
+| Cult                     | Preset only                                        | religious + congregation/order/network + worship/devotion; keep the loaded label out of atomic form                                            |
+| Temple                   | Preset only; place/institution composition         | religious + congregation/order + worship/sacred-site stewardship; the premises independently uses Facility type `temple`                       |
+| Holy order               | Preset only; form plus activities                  | religious + order + ministry/protection                                                                                                        |
+| Monastic order           | Preset only; form plus activities/way of life      | religious + order + worship/study/stewardship                                                                                                  |
+| Army                     | Preset only; institution evidence case             | military + warfare/defense; add provisional force only if it passes the form test                                                              |
+| Guard                    | Preset only; activity-bearing composition          | military or government + guarding/policing; add provisional force only if it passes the form test                                              |
+| Militia                  | Preset only; mobilization/constituency composition | military + local defense/mobilization; add provisional force only if it passes the form test                                                   |
+| Mercenary company        | Preset only; form plus activity                    | military + company + mercenary warfare/security                                                                                                |
+| Martial order            | Preset only; form plus activities                  | military or religious + order + warfare/protection                                                                                             |
+| Syndicate                | Preset only; prefer network/association form       | criminal + network/association + coordinated illicit enterprise                                                                                |
+| Gang                     | Preset only                                        | criminal + network/crew + activity such as extortion, theft, or territorial control                                                            |
+| Thieves' guild           | Preset only; form plus activities                  | criminal + guild + theft/fencing                                                                                                               |
+| Smuggling ring           | Preset only; form plus activity                    | criminal + network + smuggling                                                                                                                 |
+| Pirate crew              | Preset only; form plus activity                    | criminal + crew + piracy                                                                                                                       |
+| Company                  | Reusable form                                      | commercial + company + one or more actual activities                                                                                           |
+| Merchant house           | Preset only; familiar identity plus activity       | commercial + optional form + trade/finance; do not admit `house` solely to preserve this noun                                                  |
+| Trading consortium       | Preset only; form plus activity                    | commercial + network/association + trade coordination                                                                                          |
+| Bank                     | Preset only; institution evidence case             | commercial + company/cooperative + banking/finance; do not add `institutionType` yet                                                           |
+| Cooperative              | Reusable form                                      | commercial/community/occupational + cooperative + actual activities                                                                            |
+| Craft guild              | Preset only; form plus activity/constituency       | occupational + guild + craft standards/training                                                                                                |
+| Trade guild              | Preset only; form plus activity/constituency       | occupational + guild + trade coordination/standards                                                                                            |
+| Professional association | Preset only; form plus activities                  | occupational + association + standards/advocacy/education                                                                                      |
+| Labor association        | Preset only; form plus activities                  | occupational + union/association + collective bargaining/advocacy/mutual aid                                                                   |
+| Fellowship               | Reusable form                                      | occupational/religious/academic/community + fellowship + actual activities                                                                     |
+| School                   | Preset only; institution evidence case             | academic + association/administration as applicable + education                                                                                |
+| College                  | Preset only; institution evidence case             | academic + association/administration as applicable + higher education/research                                                                |
+| Academy                  | Preset only; institution evidence case             | academic + association/company/order as applicable + education/training/research                                                               |
+| Library                  | Preset only; place/institution composition         | academic/community/government + association/administration + knowledge stewardship/access; premises independently uses a library Facility type |
+| Learned society          | Preset only; form plus activities                  | academic + association/fellowship + research/knowledge exchange                                                                                |
+| Clan                     | Preset only; constituency-bearing composition      | community + network or no form + kinship/mutual aid; kinship is not organizational form                                                        |
+| Neighborhood association | Preset only; form plus activities/context          | community + association + local advocacy/stewardship                                                                                           |
+| Mutual aid group         | Preset only; activity-bearing composition          | community/occupational + association/network + mutual aid                                                                                      |
+| Civic association        | Preset only; form plus activities                  | community/political + association + civic participation/advocacy                                                                               |
+| Social club              | Preset only; form plus activities                  | community + association/fellowship + social fellowship                                                                                         |
+
+This decomposition does not establish a new institutional axis. Unresolved hard nouns first land in
+canonical decomposition + preset, not in an institution bucket. School/college/academy,
+church/temple, Army, and Bank are the strongest tests: only a later consumer that needs their
+distinction independently of form, activities, premises, search aliases, presets, and title
+suggestions would justify a new persisted axis.
+
+### Reusable Organization form vocabulary
+
+The recommended first vocabulary is intentionally small. A form qualifies when it can host
+materially different domains or activities; it is not required to be equally common in every
+domain.
+
+| Form             | Reuse evidence                                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `administration` | governmental bureaucracy, religious administration, commercial administration                                                                                         |
+| `assembly`       | legislature, civic assembly, religious assembly                                                                                                                       |
+| `association`    | political advocacy, professional standards, learned society, civic group                                                                                              |
+| `company`        | commercial enterprise, mercenary company, criminal front                                                                                                              |
+| `congregation`   | worship, ministry, education, mutual aid within a religious domain                                                                                                    |
+| `cooperative`    | commercial production, occupational services, community mutual aid                                                                                                    |
+| `council`        | government council, guild council, religious council, community council                                                                                               |
+| `crew`           | pirate crew, shipping crew, military crew                                                                                                                             |
+| `fellowship`     | occupational, religious, academic, and social fellowship                                                                                                              |
+| `force`          | **Provisional:** army, guard, militia, enforcement, and private security reuse it, but Phase 7d must prove it describes constitution rather than operational grouping |
+| `guild`          | craft/trade regulation, mutual aid, criminal coordination, learned practice                                                                                           |
+| `movement`       | political, religious, and community mobilization                                                                                                                      |
+| `network`        | syndicate, trade consortium, scholarly network, mutual-aid network                                                                                                    |
+| `order`          | holy, monastic, martial, and learned orders                                                                                                                           |
+| `party`          | campaigning, representation, governance, patronage within political organizations                                                                                     |
+| `union`          | labor representation, trade coordination, mutual aid, political advocacy                                                                                              |
+
+`house` is deliberately excluded from the first atomic form vocabulary despite plausible reuse.
+Its collision with Building form, authoring copy, search, and developer terminology outweighs the
+current evidence. Merchant house, Noble house/bloc, and Clan remain familiar presets with an
+optional different form or no form. Reconsider an organization-specific concept such as
+`dynastic_house` only after a non-preset consumer proves common constitutional semantics.
+
+`force` remains the weakest admitted candidate. It has stronger reuse evidence than `house`, but
+Phase 7d must test whether it describes how an actor is constituted rather than merely a military
+or enforcement grouping. If it fails, Army, Guard, and Militia remain presets over military or
+government domain + activities with form unset. `gang`, `bank`, `academy`, `church`, `army`, and
+`clan` should not enter the atomic form list in the first pass.
+
+### Organization activity backlog
+
+The implemented activity vocabulary currently contains only `blacksmithing`, `brewing`, and
+`worship`. The domain/form model cannot carry the decomposed subtypes without expanding it. The
+first backlog should be broad enough to express current identities but should avoid services and
+rank titles:
+
+| Family       | Candidate activities                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Government   | governance, administration, legislation, adjudication, taxation, diplomacy, public works, law enforcement                      |
+| Political    | advocacy, campaigning, representation, mobilization, patronage, political education                                            |
+| Religious    | ministry, devotion, proselytizing, sacred-site stewardship, charity, monastic practice                                         |
+| Military     | warfare, defense, guarding, policing, training, mercenary service, logistics                                                   |
+| Criminal     | theft, fencing, smuggling, piracy, extortion, illicit trade, espionage, territorial control                                    |
+| Commercial   | trade, retail, banking, finance, production, transport, hospitality, brokerage                                                 |
+| Occupational | standards, certification, apprenticeship, vocational training, collective bargaining, member advocacy, occupational mutual aid |
+| Academic     | education, higher education, training, research, knowledge stewardship, archiving, knowledge exchange                          |
+| Community    | mutual aid, civic participation, local stewardship, social fellowship, cultural practice                                       |
+
+Activities remain multi-valued and cross-domain. `advocacy`, `education`, `training`, `mutual aid`,
+and `stewardship` must not be duplicated per domain. More specific services such as a bank's loan
+product or a temple's named ceremony remain optional offerings, not classification activities.
+
+The table is a backlog, not the first implementation set. Phase 7d should enable only what the six
+stress cases require, alongside the existing values:
+
+| Status              | Activities                      |
+| ------------------- | ------------------------------- |
+| Already implemented | blacksmithing, brewing, worship |
+| Church              | ministry                        |
+| Army                | warfare, defense                |
+| Bank                | banking, finance                |
+| Academy             | education, training, research   |
+| Craft guild         | standards, apprenticeship       |
+| Smuggling ring      | smuggling                       |
+
+Do not add the remaining backlog merely for taxonomy completeness. Each later activity family
+should enter with a concrete preset, authoring, search, or rules consumer.
+
+### Authoring preset assessment
+
+Presets are contract-owned input recipes. Selecting one initializes domain/form/activities and may
+provide creation-session title suggestions; once initialized, canonical form values own persisted
+classification. A preset is not a fourth classification axis.
+
+Preset values are defaults, never constraints. Immediately after application, the preset has no
+authority over domain, form, or activities. Changing any initialized value is an ordinary edit: it
+does not require preset compatibility, confirmation, invalidation, restoration of defaults, or a
+replacement preset. Only canonical form state is submitted.
+
+The dependency direction is one-way:
+
+```text
+domain / form / activity registries
+                ↑
+                │ referenced by
+                │
+authoring preset registry
+```
+
+A preset recipe may reference canonical values. Canonical schemas, vocabulary validation, title
+resolution, and persistence must never import or depend on the preset registry. This prevents
+authoring convenience from becoming hidden taxonomy validation.
+
+| Current identity         | Canonical composition                                                              |                              Keep as preset? | Creation-session suggestions    |
+| ------------------------ | ---------------------------------------------------------------------------------- | -------------------------------------------: | ------------------------------- |
+| Monarchy                 | government + administration or no form + governance                                |                                          Yes | royal/court titles              |
+| Council                  | government + council + governance                                                  |               No — direct form is sufficient | derive council titles           |
+| Assembly                 | government + assembly + legislation                                                |               No — direct form is sufficient | derive assembly titles          |
+| Administration           | government + administration + administration                                       |               No — direct form is sufficient | derive administrative titles    |
+| Magistracy               | government + administration/council + adjudication                                 |                                          Yes | magistrate/judicial titles      |
+| Party                    | political + party + campaigning/representation                                     |                                          Yes | party leadership titles         |
+| Movement                 | political + movement + advocacy/mobilization                                       | No — direct form plus activity is sufficient | derive movement titles          |
+| Noble bloc               | political + network/association + aristocratic advocacy                            |                                          Yes | noble-faction titles            |
+| Court faction            | political + network + influence                                                    |                                          Yes | court-faction titles            |
+| Advocacy group           | political + association + advocacy                                                 |                                          Yes | advocacy/organizer titles       |
+| Church                   | religious + congregation + worship/ministry                                        |                                          Yes | clergy titles                   |
+| Cult                     | religious + congregation/order + devotion                                          |                                          Yes | cult leadership titles          |
+| Temple                   | religious + congregation/order + worship/stewardship                               |                                          Yes | priest/keeper titles            |
+| Holy order               | religious + order + ministry/protection                                            |                                          Yes | order/clergy titles             |
+| Monastic order           | religious + order + monastic practice                                              |                                          Yes | monastic titles                 |
+| Army                     | military + provisional force or no form + warfare/defense                          |                                          Yes | rank titles                     |
+| Guard                    | military/government + provisional force or no form + guarding                      |                                          Yes | guard/watch ranks               |
+| Militia                  | military + provisional force or no form + local defense                            |                                          Yes | militia ranks                   |
+| Mercenary company        | military + company + mercenary service                                             |                                          Yes | company ranks                   |
+| Martial order            | military/religious + order + warfare/protection                                    |                                          Yes | order/rank titles               |
+| Syndicate                | criminal + network + illicit enterprise                                            |                                          Yes | syndicate hierarchy             |
+| Gang                     | criminal + network/crew + selected illicit activity                                |                                          Yes | gang roles                      |
+| Thieves' guild           | criminal + guild + theft/fencing                                                   |                                          Yes | guild/theft titles              |
+| Smuggling ring           | criminal + network + smuggling                                                     |                                          Yes | smuggling roles                 |
+| Pirate crew              | criminal + crew + piracy                                                           |                                          Yes | shipboard roles                 |
+| Company                  | commercial + company + selected activities                                         |               No — direct form is sufficient | derive company titles           |
+| Merchant house           | commercial + optional form + trade/finance                                         |                                          Yes | house/trade titles              |
+| Trading consortium       | commercial + network/association + trade                                           |                                          Yes | consortium roles                |
+| Bank                     | commercial + company/cooperative + banking                                         |                                          Yes | finance titles                  |
+| Cooperative              | commercial/community + cooperative + selected activities                           |               No — direct form is sufficient | derive cooperative titles       |
+| Craft guild              | occupational + guild + craft standards/training                                    |                                          Yes | craft-guild ranks               |
+| Trade guild              | occupational + guild + trade coordination                                          |                                          Yes | trade-guild ranks               |
+| Professional association | occupational + association + standards/advocacy                                    |                                          Yes | practitioner/association titles |
+| Labor association        | occupational + union/association + bargaining/advocacy                             |                                          Yes | steward/organizer titles        |
+| Fellowship               | selected domain + fellowship + selected activities                                 |               No — direct form is sufficient | derive fellowship titles        |
+| School                   | academic + association/administration + education                                  |                                          Yes | school titles                   |
+| College                  | academic + association/administration + higher education/research                  |                                          Yes | college titles                  |
+| Academy                  | academic + association/order + education/training/research                         |                                          Yes | academy titles                  |
+| Library                  | academic/community/government + administration/association + knowledge stewardship |                                          Yes | librarian/archive titles        |
+| Learned society          | academic + association/fellowship + research/exchange                              |                                          Yes | scholarly titles                |
+| Clan                     | community + network or no form + kinship/mutual aid                                |                                          Yes | kinship titles                  |
+| Neighborhood association | community + association + local stewardship/advocacy                               |                                          Yes | neighborhood roles              |
+| Mutual aid group         | community/occupational + association/network + mutual aid                          |                                          Yes | coordinator/volunteer roles     |
+| Civic association        | community/political + association + civic participation                            |                                          Yes | civic roles                     |
+| Social club              | community + association/fellowship + social fellowship                             |                                          Yes | club/host titles                |
+
+This deliberately preserves direct access to familiar identities while allowing the canonical
+vocabularies to stay small. Pure atomic forms do not need duplicate presets unless usability testing
+shows that a preset-first picker is the only effective authoring path.
+
+### Member-title suggestion resolution
+
+The current title resolver does two jobs: it offers labels in later membership editors and maps a
+recognized label to a default priority. Membership records already persist the selected title and
+priority, so classification changes do not rewrite historical membership facts. The behavior to
+preserve is **suggestion specificity**, not subtype provenance.
+
+Do not replace subtype with another registry of whole-composition identities. Each canonical axis
+may contribute suggestions independently:
+
+```text
+domain contribution      broad roles for the institutional sphere
+form contribution        roles implied by how the actor is constituted
+activity contributions   specialist roles implied by each sustained activity
+            │
+            └── collect → rank → deduplicate → present
+```
+
+Policy and content have distinct owners. Domain, form, and activity entries own only their local
+`memberTitles` contributions. One shared
+`resolveOrganizationMemberTitleSuggestions(classification)` function owns collection, ordering,
+deduplication, current-value preservation, and returned suggestion shape. It must contain no
+identity-specific tuple branches such as `domain === 'criminal' && form === 'guild'`; such branches
+would recreate subtype outside the registries.
+
+Illustrative contributions show that specificity can survive decomposition:
+
+| Composition                                         | Domain contribution                                 | Form contribution                                | Activity contribution                         | Useful result without preset identity                                                                          |
+| --------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| criminal + guild + theft                            | Boss, Enforcer, Associate                           | Guildmaster, Master, Apprentice, Member          | Master Thief, Thief, Cutpurse, Fence, Lookout | Guild hierarchy and theft roles both remain available                                                          |
+| criminal + network + smuggling                      | Boss, Operative, Associate                          | Coordinator, Agent, Member                       | Ringleader, Smuggler, Courier, Lookout        | Reconstructs the useful Smuggling ring role family                                                             |
+| criminal + crew + piracy                            | Boss, Operative, Associate                          | Captain, Quartermaster, Crew                     | Boatswain, Pirate, Sailor, Swab               | Reconstructs shipboard and criminal roles without `pirate_crew`                                                |
+| military + accepted `force` (if admitted) + warfare | Commander, Captain, Officer, Soldier, Recruit       | General, Commander, Sergeant, Member             | Strategist, Captain, Combatant, Scout         | Tests whether provisional `force` adds constitutional rank roles; military + warfare remains useful without it |
+| commercial + company + banking                      | Proprietor, Partner, Manager, Agent, Employee       | Director, Partner, Manager, Agent, Employee      | Treasurer, Banker, Clerk, Auditor             | Preserves Bank's distinctive finance roles while deduplicating generic company roles                           |
+| religious + congregation + worship                  | High Priest, Priest, Deacon, Acolyte, Initiate      | Elder, Steward, Minister, Member                 | Celebrant, Priest, Acolyte, Keeper            | Preserves Church/Temple clergy roles; exact institution noun is unnecessary                                    |
+| occupational + guild + standards/training           | Guildmaster, Master, Journeyman, Apprentice, Member | Guildmaster, Master, Steward, Apprentice, Member | Assessor, Instructor, Practitioner, Trainee   | Preserves craft-guild hierarchy from canonical fields                                                          |
+| academic + association + education/research         | Rector, Professor, Scholar, Fellow, Student         | President, Officer, Fellow, Member               | Instructor, Tutor, Researcher, Student        | Useful for School/College/Academy, though it no longer selects Chancellor solely from the institution noun     |
+
+The labels are evidence examples, not a proposed final vocabulary. The later contract registry must
+own the actual entries and must not copy contributor maps into dashboard code.
+
+#### Ranking, deduplication, and priority
+
+Resolution should be deterministic and should distinguish **suggestion order** from persisted
+membership **priority**:
+
+1. Collect entries from every selected activity, then optional form, then primary domain. Process
+   activities in canonical registry order, never authoring-array or object-iteration order.
+2. Preserve each contributor's local suggestion rank. Interleave by local rank so one contributor
+   cannot exhaust a bounded UI list: first-ranked activity/form/domain entries precede second-ranked
+   entries, and so on. Within the same local rank use source specificity
+   `activity > form > domain`, then stable contributor ID and normalized label.
+3. Deduplicate case-insensitively by trimmed label. When the same label appears more than once, the
+   winner is the contribution with the earliest resolved suggestion order. Its label and default
+   membership priority win; development assertions should expose conflicting priorities rather
+   than silently depending on registry iteration.
+4. Preserve the current membership title as an additional option when it is absent from the derived
+   set. A current custom or historical title never disappears merely because classification
+   changed.
+5. Stamp a suggestion's default membership priority only when that suggestion is selected. An
+   explicitly persisted membership priority remains authoritative, as it is today.
+
+This produces a coherent union rather than requiring an exact tuple such as
+`criminal + guild + theft → thieves_guild_titles`. A consumer may present a bounded prefix, but the
+shared resolver—not each UI—must own the ordering and deduplication contract.
+
+#### Durable-profile verdict
+
+Compositional contribution is sufficiently specific for the high-value guild, smuggling, pirate,
+army, bank, church/temple, and library cases. The remaining loss is fine institutional flavor:
+School, College, and Academy no longer independently imply Headmaster, Dean, or Chancellor, and
+Monarchy/Magistracy no longer independently imply every court or judicial title. That loss does not
+currently justify durable Organization state because:
+
+- derived suggestions remain relevant rather than generic;
+- preset suggestions can assist during the active authoring session;
+- membership titles are editable and custom values remain supported;
+- an already selected title and its explicit priority persist independently;
+- no display, filtering, search, or rules consumer needs the title family identity.
+
+Therefore Phase 7c recommends **no `MemberTitleSuggestionProfile` field** in the initial refactor.
+Reserve that exact name for a later, explicitly selected behavior-only fallback if editing evidence
+shows that composition-derived suggestions materially fail. It must never be named or populated as
+creation provenance and must not become classification.
+
+### Stale-state rules
+
+| Change                                 | Ephemeral preset behavior                                            | Canonical classification                           | Optional durable title profile, if later justified                     |
+| -------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------- |
+| Preset selected                        | Initialize fields and session suggestions, then relinquish authority | Form state immediately owns domain/form/activities | Do not persist automatically                                           |
+| Domain changes                         | No compatibility check; recompute suggestions                        | New domain is authoritative                        | Clear or reject when the profile's local compatibility predicate fails |
+| Form changes or clears                 | No compatibility check; recompute suggestions                        | New/absent form is authoritative                   | Clear or reject if the profile requires the prior form                 |
+| Any activity is removed                | No compatibility check; recompute from remaining activities          | Remaining activities are authoritative             | Clear or reject if required activities no longer match                 |
+| Any activity is added                  | No compatibility check; include its contributions                    | Full activity set is authoritative                 | May remain when required conditions still hold                         |
+| Organization is reopened later         | No preset state is reconstructed                                     | Load only canonical classification                 | Derive suggestions; load a profile only if it was explicitly persisted |
+| Existing member has a custom/old title | Keep it as an available current value                                | No classification effect                           | No profile required; persisted title/priority remains authoritative    |
+
+The preset column intentionally contains no invalidation behavior: there is no persisted preset to
+invalidate. If a future explicit profile is justified, its validity must live with the
+title-suggestion registry, not in the preset registry or a general Organization classifier. The
+form should clear an incompatible profile immediately; the API should validate the merged update so
+stale suggestion metadata cannot survive a direct write. That safety rule applies only to the
+hypothetical behavior-specific profile.
+
+#### Preset-collision stress tests
+
+| Authoring sequence                                                                      | Resulting canonical state            | Required behavior                                                                                                                                                                                                | Result                                                                                        |
+| --------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Select Thieves' Guild (`criminal + guild + theft`), then remove theft and add smuggling | `criminal + guild + smuggling`       | Keep domain/form edits exactly as authored; derive guild, criminal, and smuggling contributions. Do not restore theft, change guild to network, or retain a hidden Thieves' Guild identity                       | Passes with ephemeral defaults; the unusual guild of smugglers is valid canonical composition |
+| Select Army, then change/add form to order                                              | `military + order + warfare/defense` | If `force` is admitted, replace it; if omitted, add order. In either case derive military, order, warfare, and defense contributions without restoring a preset default or requiring conversion to Martial order | Passes with ephemeral defaults; the user has authored a military order directly               |
+
+These are not stale-state cases because preset state no longer exists after initialization. Only a
+future independently persisted `MemberTitleSuggestionProfile` could become incompatible, and Phase
+7c does not currently recommend adding one.
+
+### Worked compositions and single-domain stress tests
+
+| Case                                 | Primary domain + form + activities                                                                                                                                                                             | Facility/relationship alignment                                                          | Result                                                                                                               |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Temple                               | religious + congregation/order + worship, ministry, sacred-site stewardship                                                                                                                                    | Building Facility `temple`; Organization connected as operator/owner/tenant/headquarters | Clean; premises identity is not copied into Organization classification                                              |
+| Academy                              | academic + association/order + education, training, research                                                                                                                                                   | Building Facility `academy`; operator relationship                                       | Clean; exact academy titles are preset/session UX or a later title profile, not proof of subtype                     |
+| Craft guild                          | occupational + guild + standards, apprenticeship, training                                                                                                                                                     | Guildhall Facility; operator/headquarters relationship                                   | Clean if occupational admission rule is enforced                                                                     |
+| Bank                                 | commercial + company/cooperative + banking, finance                                                                                                                                                            | Bank Facility; operator/headquarters relationship                                        | Clean; no institutional axis required by current consumers                                                           |
+| Government council                   | government + council + governance, deliberation                                                                                                                                                                | Council chamber/town hall Facility; governs/headquarters/operator as distinct edges      | Clean; council is reusable form, while `governs` remains relational                                                  |
+| Military guard                       | military + accepted `force` or no form + guarding, defense                                                                                                                                                     | Barracks/guardhouse Facility; operator/headquarters relationship                         | Clean; guarding is activity, guardhouse is place; `force` remains subject to its form test                           |
+| Pirate crew                          | criminal + crew + piracy                                                                                                                                                                                       | Vessel Location; operator/owns relationship where eligible                               | Clean; crew is form and piracy is activity                                                                           |
+| Community association                | community + association + local stewardship, civic participation                                                                                                                                               | Meeting hall/community-center Facility; operator/tenant                                  | Clean; community is domain, association is form                                                                      |
+| Religious–military holy order        | religious + order + worship, ministry, armed protection when sacred mission is primary; military + order + warfare, sacred stewardship when armed command is primary                                           | Temple/fortification relationships remain factual                                        | Passes. Choosing a primary institutional identity is meaningful; activities preserve the other character             |
+| Political–criminal insurgent network | political + movement/network + advocacy, mobilization, smuggling or violence when political change is primary; criminal + network + smuggling/extortion, political advocacy when illicit enterprise is primary | Hideout/headquarters/operator relationships remain factual                               | Semantically passes. Domain-only filters would hide the secondary character unless activity filters/search are added |
+| Commercial–criminal smuggling front  | criminal + network/company + smuggling, illicit trade when illegality is constitutive; commercial + company + trade plus a criminal activity when it is genuinely a commercial actor committing offenses       | Warehouse/shop Facility and operator relationship remain independent                     | Passes, but activity vocabulary and search must not sanitize or suppress illicit activities                          |
+| Religious–academic monastic school   | religious + order + worship, education, research when monastic identity is primary; academic + order + education, research, devotion when teaching is primary                                                  | Monastery/academy Facilities can be separate or mixed-use according to spatial rules     | Passes without a second domain                                                                                       |
+
+The single-domain rule has one genuine product cost: a strict domain-only filter cannot find every
+cross-domain facet. That is not evidence for multi-domain persistence. Activities must participate
+in picker search and eventually in explicit filters/groupings. If a later non-search consumer needs
+two simultaneous domains—for example, rules that grant domain-specific capabilities—reopen the
+cardinality decision with that concrete consumer.
+
+For Phase 7d, activity discovery is a requirement rather than follow-up polish: global search and
+Organization entity pickers must index activity labels and registry-owned aliases. A political
+Organization with smuggling activity must be discoverable by “smuggling” even though it correctly
+does not appear under a strict Criminal-domain filter. Domain filters remain exact; activity search
+preserves the secondary facet without introducing a second domain.
+
+### Alignment with the Location model
+
+The two content types should align by ownership pattern, not by sharing vocabularies or IDs:
+
+```text
+Location                              Organization
+structureType: broad spatial family  domain: broad institutional sphere
+form: physical morphology            form: actor constitution
+facilityType: durable place identity activities: sustained actor work
+authoring group/preset: input recipe authoring preset: input recipe
+function projection: derived use     title suggestions: derived UX metadata
+
+Organization ↔ Location relationship: why this actor and place are connected
+```
+
+Facility and activity terms may have parallel labels—brewery/brewing, temple/worship,
+bank/banking—but must remain separate registry entries because they make different claims. Presets
+may initialize both sides in a create session, but may not infer or persist an Organization from a
+Facility or a Facility from an Organization. Location relationship kinds remain unchanged and must
+not be derived from Organization domain/form/activity.
+
+### Recommended direct-refactor boundary and likely scope
+
+There is no data-migration or compatibility requirement. When implementation is authorized, replace
+the dev-only model directly and update all compile-time/runtime consumers in the same refactor. The
+scope below is a coordination map, not a migration plan.
+
+1. **Contracts:** introduce domain/form vocabularies, expand activities, replace body/input fields,
+   define ephemeral preset recipes, and change member-title resolution to ranked/deduplicated
+   contributions from canonical axes.
+2. **API:** replace Mongo enums and merged-write validation. Preserve the valuable pattern of
+   validating the effective merged state, but validate independent fields rather than a kind-bound
+   subtype pair.
+3. **Dashboard canonical form projection:** replace Type/Subtype with Domain/Form/Activities. A
+   preset applies defaults once; it does not install form synchronization or compatibility rules.
+   The Location modal's embedded Organization projection must consume this same owner rather than
+   define a second schema.
+4. **Consumers:** update Organization detail/overview, entity pickers, type filters, global search,
+   fixtures, and tests. Activity labels and registry-owned aliases must enter global search and
+   entity discovery in the same cutover so cross-domain Organizations remain findable.
+5. **Membership UX:** update title suggestion and priority stamping consumers together. Preserve
+   explicit membership title/priority semantics and custom-title fallback.
+6. **Authoring presets:** add a contract registry and setup projection only after canonical fields
+   work. Preset selection initializes form state and then disappears; no provenance field is added.
+
+The recommended first implementation slice is **domain/form/activity contracts plus form
+projection and compositional member-title contribution tests**, not all 45 presets. Prove Church,
+Army, Bank, Academy, Craft guild, and Smuggling ring before expanding the preset catalog. These
+cases exercise institutional ambiguity, cross-domain reusable forms, title specificity, and preset
+independence without forcing an institutional axis.
+
+`institutionType` is explicitly rejected for that slice. Church, Army, Bank, and Academy are
+adequately preserved by canonical composition + ephemeral presets; reopen an institutional axis
+only when a non-UX consumer cannot recover a required distinction.
+
+### Phase 7c conclusion
+
+The Organization and Location models can now share the same architectural grammar while remaining
+semantically independent. The target separates three levels:
+
+```text
+Canonical persisted meaning
+    one primary domain + optional reusable form + multiple activities
+
+Authoring convenience
+    ephemeral familiar preset
+        └── initializes canonical form values, then relinquishes authority
+
+Editing assistance
+    ranked/deduplicated contributions from domain + form + activities
+        ↓ only if later evidence proves insufficient
+    optional behavior-specific MemberTitleSuggestionProfile
+```
+
+`occupational` is acceptable under a strict member-serving/regulatory boundary. Familiar identities
+should remain selectable as presets, but preset provenance and constraints should not persist.
+Compositional member-title contribution is sufficient for the initial refactor, so Phase 7c does
+not recommend `MemberTitleSuggestionProfile`. Only demonstrated loss of later editing quality would
+justify that separately owned, compatibility-checked fallback. No current consumer requires
+multi-domain Organizations or a general institutional designation axis. `house` is excluded from
+the first Organization form vocabulary; `force` is provisional and must either pass its
+constitutional form test during Phase 7d or be omitted without blocking Army authoring.
