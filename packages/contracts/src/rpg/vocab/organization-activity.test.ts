@@ -8,16 +8,33 @@ import {
 
 describe('Organization Activity vocabulary', () => {
   it('keeps the initial registry narrow and schema-backed', () => {
-    expect(ORGANIZATION_ACTIVITY_IDS).toEqual(['blacksmithing', 'brewing', 'worship'])
+    expect(ORGANIZATION_ACTIVITY_IDS).toEqual([
+      'blacksmithing',
+      'brewing',
+      'worship',
+      'ministry',
+      'warfare',
+      'defense',
+      'banking',
+      'finance',
+      'education',
+      'training',
+      'research',
+      'standards',
+      'apprenticeship',
+      'smuggling',
+    ])
     expect(Object.keys(ORGANIZATION_ACTIVITY_ENTRIES)).toEqual(ORGANIZATION_ACTIVITY_IDS)
     expect(organizationActivitySchema.parse('blacksmithing')).toBe('blacksmithing')
-    expect(organizationActivitySchema.safeParse('banking')).toMatchObject({ success: false })
+    expect(organizationActivitySchema.parse('banking')).toBe('banking')
+    expect(organizationActivitySchema.safeParse('advocacy')).toMatchObject({ success: false })
   })
 
   it('defines non-empty labels and descriptions', () => {
     for (const entry of Object.values(ORGANIZATION_ACTIVITY_ENTRIES)) {
       expect(entry.label.trim()).not.toBe('')
       expect(entry.description.trim()).not.toBe('')
+      expect(entry.memberTitles).toHaveLength(5)
     }
   })
 })
