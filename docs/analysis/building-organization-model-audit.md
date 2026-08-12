@@ -1312,3 +1312,25 @@ justify that separately owned, compatibility-checked fallback. No current consum
 multi-domain Organizations or a general institutional designation axis. `house` is excluded from
 the first Organization form vocabulary; `force` is provisional and must either pass its
 constitutional form test during Phase 7d or be omitted without blocking Army authoring.
+
+### Phase 7d implementation checkpoint
+
+The bounded direct refactor now proves all six initial recipes through the same standalone and
+embedded Organization form projection: Church, Army, Bank, Academy, Craft guild, and Smuggling
+ring. Each recipe initializes canonical values and immediately clears its UI-only preset selection;
+serialization and reload retain only domain, optional form, and activities.
+
+`force` was omitted. The first vocabulary pass did not establish that it describes constitutional
+structure rather than an operational or institutional grouping, and Army remains complete as
+`military + warfare + defense` with no form. `house` also remains outside the atomic form
+vocabulary.
+
+Compositional member-title suggestions interleave local activity, form, and domain ranks and
+deduplicate normalized labels without tuple-specific branches. Activity labels, aliases, and search
+terms now participate in global and entity-picker discovery, while domain filters remain exact. A
+political Organization with smuggling activity is therefore discoverable by “smuggling” without
+being classified as Criminal.
+
+No legacy kind/subtype runtime fields, persisted preset provenance, reverse preset display lookup,
+institution axis, multi-domain escape hatch, or durable title profile was introduced. Expansion
+beyond the six recipes should wait for UI review of this checkpoint.

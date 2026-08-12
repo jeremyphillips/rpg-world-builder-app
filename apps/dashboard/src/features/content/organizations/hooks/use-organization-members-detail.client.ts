@@ -198,6 +198,7 @@ export function useOrganizationMembersDetail(
       campaignId,
       editingRow,
       invalidate,
+      organization.activities,
       organization.organizationDomain,
       organization.organizationForm,
       organizationId,

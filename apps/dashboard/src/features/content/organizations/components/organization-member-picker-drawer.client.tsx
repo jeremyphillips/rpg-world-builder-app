@@ -151,6 +151,7 @@ export function OrganizationMemberPickerDrawer({
     [
       onAdd,
       onOpenChange,
+      organization.activities,
       organization.organizationDomain,
       organization.organizationForm,
       pending,
