@@ -68,7 +68,7 @@ describe('EntitySummary status lane', () => {
           heading: 'Amulet',
           classification: 'Adventuring Gear',
           description: 'Holy symbol',
-          status: [{ kind: 'badge', label: 'Spellcasting focus', appearance: 'accent-outline' }],
+          status: [{ kind: 'badge', label: 'Spellcasting focus', appearance: 'soft' }],
         }}
       />,
     )

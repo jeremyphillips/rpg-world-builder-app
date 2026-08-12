@@ -58,7 +58,7 @@ describe('MasterDetailListPanel', () => {
         id: 'a',
         title: 'Rage',
         eyebrow: 'Level 1',
-        badges: [{ label: 'System', appearance: 'neutral', tone: 'neutral' }],
+        badges: [{ label: 'System', appearance: 'soft', tone: 'neutral' }],
         deletable: false,
       },
     ]

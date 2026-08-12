@@ -37,7 +37,7 @@ export const WithMetaAndRemove: Story = {
           Chosen from Rogue Skills
         </Text>
       ),
-      status: [{ kind: 'badge', label: 'Stale', appearance: 'neutral', tone: 'neutral' }],
+      status: [{ kind: 'badge', label: 'Stale', appearance: 'soft', tone: 'neutral' }],
     },
     trailing: {
       kind: 'action',

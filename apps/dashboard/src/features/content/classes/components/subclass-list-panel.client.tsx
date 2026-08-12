@@ -19,12 +19,12 @@ export interface SubclassListPanelProps {
 }
 
 const SOURCE_BADGE = {
-  system: { appearance: 'neutral', tone: 'neutral', label: 'System' },
+  system: { appearance: 'soft', tone: 'neutral', label: 'System' },
   homebrew: { appearance: 'outline', tone: 'neutral', label: 'Homebrew' },
   unsaved: { appearance: 'outline', tone: 'neutral', label: 'Unsaved' },
 } as const satisfies Record<
   SubclassListItem['source'],
-  { appearance: 'neutral' | 'outline'; tone: 'neutral'; label: string }
+  { appearance: 'soft' | 'outline'; tone: 'neutral'; label: string }
 >
 
 function subclassRowShellClass(isSelected: boolean) {

@@ -191,7 +191,7 @@ const BASE_COLUMNS: ColumnDef<CharacterClass>[] = [
     cell: ({ row }) => {
       const source = row.getValue<'system' | 'homebrew'>('source')
       return (
-        <TableBadgeCell appearance={source === 'system' ? 'neutral' : 'outline'} tone="neutral">
+        <TableBadgeCell appearance={source === 'system' ? 'soft' : 'outline'} tone="neutral">
           {source === 'system' ? 'System' : 'Homebrew'}
         </TableBadgeCell>
       )

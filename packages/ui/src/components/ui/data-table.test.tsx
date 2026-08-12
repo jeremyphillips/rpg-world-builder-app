@@ -107,7 +107,7 @@ describe('DataTable cell helpers', () => {
 
   it('TableBadgeCell renders a compact badge', () => {
     render(
-      <TableBadgeCell appearance="neutral" tone="neutral">
+      <TableBadgeCell appearance="soft" tone="neutral">
         System
       </TableBadgeCell>,
     )

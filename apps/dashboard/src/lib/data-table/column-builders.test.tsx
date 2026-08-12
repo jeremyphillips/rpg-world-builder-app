@@ -21,7 +21,7 @@ import {
 type Row = { id: string; name: string; source: 'system' | 'homebrew' }
 
 const SOURCE_BADGE = {
-  system: { appearance: 'neutral' as const, tone: 'neutral' as const, label: 'System' },
+  system: { appearance: 'soft' as const, tone: 'neutral' as const, label: 'System' },
   homebrew: { appearance: 'outline' as const, tone: 'neutral' as const, label: 'Homebrew' },
 }
 
@@ -65,7 +65,7 @@ describe('buildSourceColumn', () => {
     })
 
     render(
-      <TableBadgeCell appearance="neutral" tone="neutral">
+      <TableBadgeCell appearance="soft" tone="neutral">
         System
       </TableBadgeCell>,
     )

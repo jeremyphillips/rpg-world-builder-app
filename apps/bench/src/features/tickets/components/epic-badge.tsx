@@ -24,7 +24,7 @@ export function EpicBadge({ epic, className, stopActivation = false }: EpicBadge
   if (!epic) {
     return (
       <Badge
-        appearance="neutral"
+        appearance="soft"
         tone="neutral"
         size="sm"
         className={cn('max-w-full truncate', className)}
@@ -42,7 +42,7 @@ export function EpicBadge({ epic, className, stopActivation = false }: EpicBadge
       onClick={stopActivation ? stopCardActivation : undefined}
       onKeyDown={stopActivation ? stopCardActivation : undefined}
     >
-      <Badge appearance="accent-outline" tone="info" size="sm" className="max-w-full truncate">
+      <Badge appearance="outline" tone="info" size="sm" className="max-w-full truncate">
         {epic.title}
       </Badge>
     </Link>

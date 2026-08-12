@@ -3,7 +3,6 @@ import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
 import type { BadgeAppearance, BadgeSize, BadgeTone } from './badge.variants'
-import { compactLabelFilledFromAppearance } from './compact-label.lib'
 import { resolveCompactLabelClassName } from './compact-label.variants'
 import { badgeIconGlyphClasses } from './icon-glyph.variants'
 
@@ -46,7 +45,7 @@ function Badge({
     size,
     appearance,
     tone,
-    filled: compactLabelFilledFromAppearance(appearance),
+    filled: appearance === 'soft' || appearance === 'strong',
     className: cn('border-[1.5px]', className),
   })
 

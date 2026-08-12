@@ -1,7 +1,6 @@
-import { type CompactLabelAppearance, type CompactLabelTone } from './compact-label.lib'
+export type { BadgeAppearance, BadgeTone } from './badge-appearance.lib'
+export { BADGE_APPEARANCES } from './badge-appearance.lib'
 
-export type BadgeAppearance = CompactLabelAppearance
-export type BadgeTone = CompactLabelTone
 export type BadgeSize = 'sm' | 'md' | 'lg'
 
 export const badgeVariants = {

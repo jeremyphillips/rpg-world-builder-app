@@ -43,19 +43,19 @@ const EQUIPMENT_CALLOUT_LABEL_PRESENTATION = {
     tone: 'info',
   },
   [EQUIPMENT_PICKER_STARTING_OPTION_LABEL]: {
-    appearance: 'accent-outline',
+    appearance: 'outline',
     tone: 'info',
   },
   [EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL]: {
-    appearance: 'accent-outline',
+    appearance: 'soft',
     tone: 'info',
   },
   [EQUIPMENT_PICKER_ESSENTIAL_LABEL]: {
-    appearance: 'soft',
+    appearance: 'strong',
     tone: 'info',
   },
   [EQUIPMENT_PICKER_CLASS_TOOL_LABEL]: {
-    appearance: 'soft',
+    appearance: 'strong',
     tone: 'info',
   },
   [EQUIPMENT_PICKER_PROFICIENT_LABEL]: {

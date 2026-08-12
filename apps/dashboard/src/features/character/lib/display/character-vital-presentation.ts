@@ -14,10 +14,10 @@ export function resolveCharacterVitalStatusPresentation(
 
   switch (status) {
     case 'alive':
-      return { label, appearance: 'neutral', tone: 'neutral' }
+      return { label, appearance: 'soft', tone: 'neutral' }
     case 'unknown':
       return { label, appearance: 'outline', tone: 'neutral' }
     case 'deceased':
-      return { label, appearance: 'neutral', tone: 'destructive' }
+      return { label, appearance: 'soft', tone: 'destructive' }
   }
 }

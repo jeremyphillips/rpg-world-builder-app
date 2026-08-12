@@ -14,7 +14,7 @@ import type { MasterDetailListBadge } from '../../components/master-detail/maste
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
 const SOURCE_BADGE = {
-  system: { appearance: 'neutral', tone: 'neutral', label: 'System' },
+  system: { appearance: 'soft', tone: 'neutral', label: 'System' },
   homebrew: { appearance: 'outline', tone: 'neutral', label: 'Homebrew' },
 } as const satisfies Record<
   EmbeddedRowSource,

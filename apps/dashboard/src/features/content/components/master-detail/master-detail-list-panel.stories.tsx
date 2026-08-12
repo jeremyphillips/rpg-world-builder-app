@@ -38,7 +38,7 @@ export const WithProtectedSystemRow: Story = {
         id: 'a',
         title: 'Rage',
         eyebrow: 'Level 1',
-        badges: [{ label: 'System', appearance: 'neutral', tone: 'neutral' }],
+        badges: [{ label: 'System', appearance: 'soft', tone: 'neutral' }],
         deletable: false,
       },
       {
@@ -52,7 +52,7 @@ export const WithProtectedSystemRow: Story = {
         title: 'Legacy Option',
         eyebrow: 'Level 5',
         badges: [
-          { label: 'System', appearance: 'neutral', tone: 'neutral' },
+          { label: 'System', appearance: 'soft', tone: 'neutral' },
           { label: 'Inactive', appearance: 'outline', tone: 'warning' },
         ],
         active: false,

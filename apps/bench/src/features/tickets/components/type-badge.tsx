@@ -9,7 +9,7 @@ interface TypeBadgeProps {
 
 export function TypeBadge({ type, className }: TypeBadgeProps) {
   return (
-    <Badge appearance="neutral" tone="neutral" size="sm" className={className}>
+    <Badge appearance="soft" tone="neutral" size="sm" className={className}>
       {getTicketTypeLabel(type)}
     </Badge>
   )

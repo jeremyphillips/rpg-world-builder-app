@@ -213,7 +213,7 @@ function RadioCardSecondaryContent({
         <ul className={radioCardMetaListVariants()} aria-hidden="true">
           {meta.map((chip) => (
             <li key={chip}>
-              <Badge appearance="neutral" tone="neutral" size="sm">
+              <Badge appearance="soft" tone="neutral" size="sm">
                 {chip}
               </Badge>
             </li>
