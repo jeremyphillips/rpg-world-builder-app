@@ -2,6 +2,8 @@ import { z } from 'zod'
 import {
   ORGANIZATION_ACTIVITY_ENTRIES,
   ORGANIZATION_ACTIVITY_IDS,
+  ORGANIZATION_AUTHORING_PRESETS,
+  ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_DOMAIN_ENTRIES,
   ORGANIZATION_DOMAIN_IDS,
   ORGANIZATION_FORM_ENTRIES,
@@ -14,6 +16,7 @@ import {
   slugSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
+  applyOrganizationAuthoringPreset,
   type ContentValidationIntent,
   type CreateOrganizationInput,
   type Organization,
@@ -46,6 +49,11 @@ const organizationActivityOptions = toOptions(
   ) as Record<(typeof ORGANIZATION_ACTIVITY_IDS)[number], string>,
 )
 
+const organizationAuthoringPresetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => ({
+  value: id,
+  label: ORGANIZATION_AUTHORING_PRESETS[id].label,
+}))
+
 function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
 }
@@ -57,6 +65,7 @@ export const organizationFormSchema = z.object({
   organizationDomain: organizationDomainSchema,
   organizationForm: canonicalOrganizationFormSchema.optional(),
   activities: z.array(organizationActivitySchema).default([]),
+  authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
 export const organizationDraftFormSchema = z.object({
@@ -66,6 +75,7 @@ export const organizationDraftFormSchema = z.object({
   organizationDomain: draftOptionalSelect(organizationDomainSchema),
   organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
   activities: z.array(organizationActivitySchema).default([]),
+  authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
@@ -87,6 +97,13 @@ export function buildOrganizationFields(
   }
 
   fields.push(
+    {
+      type: 'select',
+      name: fieldPath(prefix, 'authoringPresetId'),
+      label: 'Start from familiar type',
+      options: organizationAuthoringPresetOptions,
+      placeholder: 'Choose a preset…',
+    },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
     {
       type: 'chips',
@@ -166,6 +183,32 @@ export function buildOrganizationCreateInput(
   return finalizeContentInput(input, ctx) as CreateOrganizationInput
 }
 
-export function buildOrganizationFormValueSyncs(_prefix?: string): FormValueSync[] {
-  return []
+export function buildOrganizationFormValueSyncs(prefix?: string): FormValueSync[] {
+  const presetPath = fieldPath(prefix, 'authoringPresetId')
+  return [
+    {
+      dependsOn: [presetPath],
+      apply: (values, changedKeys) => {
+        if (!changedKeys.includes(presetPath)) return undefined
+        const presetId = values[presetPath]
+        if (
+          typeof presetId !== 'string' ||
+          !ORGANIZATION_AUTHORING_PRESET_IDS.includes(
+            presetId as (typeof ORGANIZATION_AUTHORING_PRESET_IDS)[number],
+          )
+        ) {
+          return undefined
+        }
+        const recipe = applyOrganizationAuthoringPreset(
+          presetId as (typeof ORGANIZATION_AUTHORING_PRESET_IDS)[number],
+        )
+        return {
+          [presetPath]: undefined,
+          [fieldPath(prefix, 'organizationDomain')]: recipe.organizationDomain,
+          [fieldPath(prefix, 'organizationForm')]: recipe.organizationForm,
+          [fieldPath(prefix, 'activities')]: recipe.activities,
+        }
+      },
+    },
+  ]
 }

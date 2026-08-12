@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { organizationFormValueSyncs } from './organization-form-sync'
 
 describe('organizationFormValueSyncs', () => {
-  it('keeps domain, form, and activities independent', () => {
-    expect(organizationFormValueSyncs).toEqual([])
+  it('only watches the ephemeral authoring preset', () => {
+    expect(organizationFormValueSyncs).toHaveLength(1)
+    expect(organizationFormValueSyncs[0]?.dependsOn).toEqual(['authoringPresetId'])
   })
 })

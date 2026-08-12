@@ -28,6 +28,7 @@ describe('organization form projection', () => {
     )
 
     expect(standalone.map(({ name }) => name)).toEqual([
+      'authoringPresetId',
       'description',
       'organizationDomain',
       'organizationForm',
@@ -35,6 +36,7 @@ describe('organization form projection', () => {
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
       'operatorOrganization.name',
+      'operatorOrganization.authoringPresetId',
       'operatorOrganization.description',
       'operatorOrganization.organizationDomain',
       'operatorOrganization.organizationForm',
@@ -67,7 +69,30 @@ describe('organization form projection', () => {
     })
   })
 
-  it('does not couple form to domain in embedded projections', () => {
-    expect(buildOrganizationFormValueSyncs('operatorOrganization')).toEqual([])
+  it('never serializes ephemeral preset identity', () => {
+    const input = buildOrganizationCreateInput({
+      name: 'Night Market Ring',
+      authoringPresetId: 'smuggling_ring',
+      organizationDomain: 'political',
+      organizationForm: 'network',
+      activities: ['smuggling'],
+    })
+    expect(input).not.toHaveProperty('authoringPresetId')
+    expect(input.organizationDomain).toBe('political')
+  })
+
+  it('applies an ephemeral preset equally under an embedded namespace', () => {
+    const [sync] = buildOrganizationFormValueSyncs('operatorOrganization')
+    expect(
+      sync?.apply(
+        { 'operatorOrganization.authoringPresetId': 'smuggling_ring' },
+        ['operatorOrganization.authoringPresetId'],
+      ),
+    ).toEqual({
+      'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.organizationDomain': 'criminal',
+      'operatorOrganization.organizationForm': 'network',
+      'operatorOrganization.activities': ['smuggling'],
+    })
   })
 })
