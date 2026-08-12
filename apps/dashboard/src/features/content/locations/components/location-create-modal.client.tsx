@@ -46,6 +46,8 @@ export type LocationCreateModalProps = {
   onOpenChange: (open: boolean) => void
   intent: LocationCreateIntent
   campaignId: string
+  /** Optional preloaded context for embedded/test surfaces; normal app usage resolves it here. */
+  formOptionsCtx?: ContentFormCtx
 }
 
 type LocationCreateModalPhase = 'setup' | 'details'
@@ -430,6 +432,7 @@ function LocationCreateModalSession({
   onOpenChange,
   intent,
   campaignId,
+  formOptionsCtx,
 }: LocationCreateModalProps) {
   const {
     state,
@@ -450,6 +453,26 @@ function LocationCreateModalSession({
   const showSetup = state.phase === 'setup' && setupModel != null
   const submitLabel = formatContentCreateActionLabel('locations')
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
+  const renderDetailsForm = (optionsCtx: ContentFormCtx) => (
+    <LocationCreateModalDetailsForm
+      fixedCreate={state.fixedCreate!}
+      campaignId={campaignId}
+      optionsCtx={optionsCtx}
+      open={open}
+      leaveBridgeRef={leaveBridgeRef}
+      formKey={state.formKey}
+      showDetails={showDetails}
+      hadSetup={state.hadSetup}
+      setupModel={setupModel}
+      submitLabel={submitLabel}
+      onBack={handleBackToSetup}
+      onCancel={requestClose}
+      onTrustedClose={trustedClose}
+      onPendingChange={setDetailsPending}
+      buildingSetupApplication={state.buildingSetupApplication}
+      onBuildingClassificationChange={handleBuildingClassificationChange}
+    />
+  )
 
   return (
     <Modal.Root open={open} onOpenChange={handleOpenChange}>
@@ -480,28 +503,13 @@ function LocationCreateModalSession({
 
         {state.detailsMounted && state.fixedCreate ? (
           <FormShellFooterScope>
-            <ContentFormOptionsGate campaignId={campaignId}>
-              {(optionsCtx) => (
-                <LocationCreateModalDetailsForm
-                  fixedCreate={state.fixedCreate!}
-                  campaignId={campaignId}
-                  optionsCtx={optionsCtx}
-                  open={open}
-                  leaveBridgeRef={leaveBridgeRef}
-                  formKey={state.formKey}
-                  showDetails={showDetails}
-                  hadSetup={state.hadSetup}
-                  setupModel={setupModel}
-                  submitLabel={submitLabel}
-                  onBack={handleBackToSetup}
-                  onCancel={requestClose}
-                  onTrustedClose={trustedClose}
-                  onPendingChange={setDetailsPending}
-                  buildingSetupApplication={state.buildingSetupApplication}
-                  onBuildingClassificationChange={handleBuildingClassificationChange}
-                />
-              )}
-            </ContentFormOptionsGate>
+            {formOptionsCtx ? (
+              renderDetailsForm(formOptionsCtx)
+            ) : (
+              <ContentFormOptionsGate campaignId={campaignId}>
+                {renderDetailsForm}
+              </ContentFormOptionsGate>
+            )}
             <Modal.Footer className={cn(!showDetails && 'hidden')} aria-hidden={!showDetails}>
               <FormShellFooterSlot />
             </Modal.Footer>

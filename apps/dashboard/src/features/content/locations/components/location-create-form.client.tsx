@@ -42,6 +42,7 @@ import { locationFormValueSyncs } from '../lib/location-form-sync'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'
 import {
   applyBuildingCreateSetupProjection,
+  buildBuildingClassificationFromCreateSetup,
   type BuildingCreateSetupProjection,
 } from '../lib/location-building-create-setup.lib'
 import {
@@ -310,6 +311,9 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
   const [compositionPending, setCompositionPending] = useState(false)
   const createsOperator = buildingSetupApplication?.projection.operatorIntent === 'create'
+  const setupClassification = buildingSetupApplication
+    ? buildBuildingClassificationFromCreateSetup(buildingSetupApplication.projection)
+    : undefined
 
   const locationCtx: LocationFormCtx = {
     ...optionsCtx,
@@ -390,7 +394,10 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
       onSubmit={onSubmit}
       formError={formError}
       formSchema={createsOperator ? locationBuildingCreateDraftFormSchema : locationDraftFormSchema}
-      formDefaultValues={createsOperator ? buildingOperatorDefaultValues() : undefined}
+      formDefaultValues={{
+        ...(setupClassification ? { classification: setupClassification } : {}),
+        ...(createsOperator ? buildingOperatorDefaultValues() : {}),
+      }}
       formValueSyncs={
         createsOperator
           ? [...locationFormValueSyncs, ...buildingOperatorFormValueSyncs]

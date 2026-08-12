@@ -1,8 +1,13 @@
 import type { ReactNode } from 'react'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, type ContentCampaignAccessPatch } from '@rpg/contracts'
+import {
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  getEffectiveBuildingFunctions,
+  type BuildingClassification,
+  type ContentCampaignAccessPatch,
+} from '@rpg/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from '@rpg/ui'
 
@@ -270,11 +275,66 @@ describe('LocationCreateModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('submits the inline Organization projection through the Building workflow', async () => {
+  it('creates the House flow with form as its only persisted classification', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    renderModal(buildingIntent, onOpenChange)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
+    await continueBuildingSetup(user)
+
+    expect(screen.getByText('House · No organization')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
+    await user.click(screen.getByRole('button', { name: 'Create location' }))
+
+    await waitFor(() => {
+      expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce()
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]).toMatchObject({
+      buildingCreateInput: {
+        name: 'Ash House',
+        classification: { form: 'house' },
+      },
+    })
+    expect(
+      vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0].operatorCreateInput,
+    ).toBeUndefined()
+  })
+
+  it('creates the Blacksmith flow without inventing a Building classification', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
     await continueBuildingSetupWithOperator(user)
 
+    expect(screen.getByText('Create organization')).toBeInTheDocument()
+    const names = screen.getAllByRole('textbox', { name: 'Name' })
+    await user.type(names[0]!, 'Ironroot Forge')
+    await user.type(names[1]!, 'Ironroot Smiths')
+    await user.click(screen.getByRole('radio', { name: 'Commercial' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Blacksmithing' }))
+    await user.click(screen.getByRole('button', { name: 'Create location' }))
+
+    await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
+    const submission = vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]
+    expect(submission?.buildingCreateInput).not.toHaveProperty('classification')
+    expect(submission?.operatorCreateInput).toMatchObject({
+      name: 'Ironroot Smiths',
+      organizationKind: 'commercial',
+      activities: ['blacksmithing'],
+    })
+  })
+
+  it('creates the Brewery flow with independent Facility and Organization activity', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Brewery') }))
+    await continueBuildingSetupWithOperator(user)
+
+    expect(screen.getByText('Brewery · Create organization')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
     const names = screen.getAllByRole('textbox', { name: 'Name' })
     expect(names).toHaveLength(2)
     await user.type(names[0]!, 'Red Dragon Brewery')
@@ -284,13 +344,61 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Create location' }))
 
     await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
-    expect(vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]).toMatchObject({
+    const submission = vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]
+    expect(submission).toMatchObject({
+      buildingCreateInput: {
+        classification: { facilityType: 'brewery' },
+      },
       operatorCreateInput: {
         name: 'Red Dragon Brewing Company',
         organizationKind: 'commercial',
         activities: ['brewing'],
       },
     })
+    const classification = (
+      submission?.buildingCreateInput as {
+        classification?: BuildingClassification
+      }
+    ).classification
+    expect(getEffectiveBuildingFunctions(classification)).toEqual(['production'])
+  })
+
+  it('creates the Temple flow compositionally without a legacy institutional subtype', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Temple') }))
+    await continueBuildingSetupWithOperator(user)
+
+    expect(screen.getByText('Temple · Create organization')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Temple')
+    const names = screen.getAllByRole('textbox', { name: 'Name' })
+    await user.type(names[0]!, 'Temple of the Dawn')
+    await user.type(names[1]!, 'Dawn Congregation')
+    await user.click(screen.getByRole('radio', { name: 'Religious' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Worship' }))
+    await user.click(screen.getByRole('button', { name: 'Create location' }))
+
+    await waitFor(() => expect(createBuildingWithOptionalOperator).toHaveBeenCalledOnce())
+    const submission = vi.mocked(createBuildingWithOptionalOperator).mock.calls[0]?.[0]
+    expect(submission).toMatchObject({
+      buildingCreateInput: {
+        classification: { facilityType: 'temple' },
+      },
+      operatorCreateInput: {
+        name: 'Dawn Congregation',
+        organizationKind: 'religious',
+        activities: ['worship'],
+      },
+    })
+    expect(submission?.operatorCreateInput).not.toHaveProperty('organizationSubtype')
+    expect(submission?.operatorCreateInput).not.toHaveProperty('institutionType')
+    const classification = (
+      submission?.buildingCreateInput as {
+        classification?: BuildingClassification
+      }
+    ).classification
+    expect(getEffectiveBuildingFunctions(classification)).toEqual(['worship'])
   })
 
   it('prunes only inline Organization draft fields when operator intent is removed', async () => {
@@ -323,6 +431,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Brewery') }))
     await continueBuildingSetup(user)
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Copper Kettle')
+    const description = screen.getByRole('textbox', { name: 'Description' })
+    description.innerHTML = '<p>A landmark by the quay.</p>'
+    fireEvent.input(description)
 
     await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
     const brewerySummary = screen.getByRole('heading', { name: 'Brewery' }).closest('article')
@@ -332,6 +443,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
+    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
+      'A landmark by the quay.',
+    )
     expect(screen.getByText('House · Temple · No organization')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Create location' }))

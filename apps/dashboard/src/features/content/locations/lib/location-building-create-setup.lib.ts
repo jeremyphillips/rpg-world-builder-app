@@ -113,15 +113,20 @@ export function applyBuildingCreateSetupProjection(
   values: LocationFormValues,
   projection: BuildingCreateSetupProjection,
 ): LocationFormValues {
-  const classification =
-    projection.form || projection.facilityType
-      ? {
-          ...(projection.form ? { form: projection.form } : {}),
-          ...(projection.facilityType ? { facilityType: projection.facilityType } : {}),
-        }
-      : undefined
+  const classification = buildBuildingClassificationFromCreateSetup(projection)
 
   return { ...values, classification }
+}
+
+export function buildBuildingClassificationFromCreateSetup(
+  projection: BuildingCreateSetupProjection,
+): LocationFormValues['classification'] {
+  return projection.form || projection.facilityType
+    ? {
+        ...(projection.form ? { form: projection.form } : {}),
+        ...(projection.facilityType ? { facilityType: projection.facilityType } : {}),
+      }
+    : undefined
 }
 
 export function buildBuildingCreateSetupSummaryEntries(
