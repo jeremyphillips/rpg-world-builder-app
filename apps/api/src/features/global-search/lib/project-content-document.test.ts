@@ -50,4 +50,21 @@ describe('projectContentEntity', () => {
 
     expect(document.secondary).toBe('Building · Brewery')
   })
+
+  it('indexes activities independently of the single primary domain', () => {
+    const document = projectContentEntity('organizations', {
+      id: 'organization-night-market',
+      name: 'Night Market Caucus',
+      slug: 'night-market-caucus',
+      source: 'homebrew',
+      status: 'published',
+      organizationDomain: 'political',
+      organizationForm: 'network',
+      activities: ['smuggling'],
+    } as never)
+
+    expect(document.secondary).toBe('Political')
+    expect(document.fields.some((field) => field.text.includes('Smuggling'))).toBe(true)
+    expect(document.fields.some((field) => field.text.includes('contraband'))).toBe(true)
+  })
 })

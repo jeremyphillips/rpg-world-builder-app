@@ -25,13 +25,13 @@ export type OrganizationsOverviewFilterState = ContentOverviewBaseFilterState & 
 const ORGANIZATION_MIDDLE_COLUMNS: ColumnDef<Organization>[] = [
   {
     accessorKey: 'organizationDomain',
-    header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column}>Domain</SortableHeader>,
     cell: ({ row }) =>
       getOrganizationDomainLabel(
         row.getValue<Organization['organizationDomain']>('organizationDomain'),
       ),
     filterFn: 'equalsString',
-    meta: { label: 'Type', ...dataTableColumnChromeMeta('medium', 'meta') },
+    meta: { label: 'Domain', ...dataTableColumnChromeMeta('medium', 'meta') },
   },
 ]
 
@@ -46,8 +46,8 @@ export const organizationsFilterSchema = buildContentFilterSchema<
     Organization['organizationDomain']
   >({
     id: 'organizationDomain',
-    label: 'Type',
-    allOptionLabel: 'All types',
+    label: 'Domain',
+    allOptionLabel: 'All domains',
     options: ORGANIZATION_DOMAIN_IDS.map((id) => ({
       value: id,
       label: ORGANIZATION_DOMAIN_ENTRIES[id].label,

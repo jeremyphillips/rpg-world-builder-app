@@ -25,6 +25,7 @@ import {
   resolveLocationClassificationDisplay,
   getFeatCategoryLabel,
   getOrganizationDomainLabel,
+  getOrganizationClassificationDiscoveryText,
   getEquipmentSearchName,
   joinCompactSegments,
   stripHtmlTags,
@@ -173,6 +174,7 @@ function buildOrganizationFields(organization: Organization): GlobalSearchField[
   return [
     labelField(organization.name),
     keywordField(organization.slug),
+    keywordField(getOrganizationClassificationDiscoveryText(organization)),
     descriptionField(stripHtmlTags(organization.description ?? '')),
   ]
 }

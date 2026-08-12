@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildOrganizationPickerTypeOptions,
+  buildOrganizationPickerDomainOptions,
   filterAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
   getOrganizationPickerSearchText,
@@ -9,34 +9,34 @@ import {
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 
 describe('organization picker library', () => {
-  it('searches names and user-facing type labels', () => {
+  it('searches names and canonical classification terms', () => {
     expect(getOrganizationPickerSearchText(organizationPickerItems[0]!.organization)).toContain(
       'Occupational',
     )
     expect(
       filterAndSortOrganizationPickerItems(organizationPickerItems, {
         searchQuery: 'government',
-        type: 'all',
+        domain: 'all',
       }).map(({ organization }) => organization.name),
     ).toEqual(['City Council'])
   })
 
-  it('filters by type and sorts by name', () => {
+  it('filters by domain and sorts by name', () => {
     expect(
       filterAndSortOrganizationPickerItems(organizationPickerItems, {
         searchQuery: '',
-        type: 'occupational',
+        domain: 'occupational',
       }).map(({ organization }) => organization.name),
     ).toEqual(['Lantern Guild'])
   })
 
-  it('builds only available type options and formats the singular description', () => {
+  it('builds only available domain options and formats the singular description', () => {
     expect(
-      buildOrganizationPickerTypeOptions(
+      buildOrganizationPickerDomainOptions(
         organizationPickerItems.map(({ organization }) => organization),
       ),
     ).toEqual([
-      { value: 'all', label: 'All types' },
+      { value: 'all', label: 'All domains' },
       { value: 'government', label: 'Government' },
       { value: 'occupational', label: 'Occupational' },
       { value: 'academic', label: 'Academic' },

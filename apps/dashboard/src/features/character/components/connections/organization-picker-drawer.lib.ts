@@ -1,15 +1,16 @@
 import {
   getOrganizationDomainLabel,
+  getOrganizationClassificationDiscoveryText,
   ORGANIZATION_DOMAIN_IDS,
   type Organization,
 } from '@rpg/contracts'
 import { normalizeSearchQuery } from '@rpg/ui'
 
 import {
-  ORGANIZATION_PICKER_ALL_TYPES,
+  ORGANIZATION_PICKER_ALL_DOMAINS,
   ORGANIZATION_PICKER_DESCRIPTION,
   type OrganizationPickerItem,
-  type OrganizationPickerTypeFilter,
+  type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
 
 const organizationNameCollator = new Intl.Collator(undefined, {
@@ -18,18 +19,18 @@ const organizationNameCollator = new Intl.Collator(undefined, {
 })
 
 export const ORGANIZATION_PICKER_VIEW_DEFAULTS = {
-  type: ORGANIZATION_PICKER_ALL_TYPES,
+  domain: ORGANIZATION_PICKER_ALL_DOMAINS,
 } as const
 
 export function getOrganizationPickerSearchText(organization: Organization): string {
-  return `${organization.name} ${getOrganizationDomainLabel(organization.organizationDomain)}`
+  return `${organization.name} ${getOrganizationClassificationDiscoveryText(organization)}`
 }
 
 export function filterAndSortOrganizationPickerItems(
   items: readonly OrganizationPickerItem[],
   options: {
     searchQuery: string
-    type: OrganizationPickerTypeFilter
+    domain: OrganizationPickerDomainFilter
   },
 ): OrganizationPickerItem[] {
   const query = normalizeSearchQuery(options.searchQuery)
@@ -37,8 +38,8 @@ export function filterAndSortOrganizationPickerItems(
   return items
     .filter(({ organization }) => {
       if (
-        options.type !== ORGANIZATION_PICKER_ALL_TYPES &&
-        organization.organizationDomain !== options.type
+        options.domain !== ORGANIZATION_PICKER_ALL_DOMAINS &&
+        organization.organizationDomain !== options.domain
       ) {
         return false
       }
@@ -52,12 +53,12 @@ export function filterAndSortOrganizationPickerItems(
     )
 }
 
-export function buildOrganizationPickerTypeOptions(
+export function buildOrganizationPickerDomainOptions(
   organizations: readonly Organization[],
-): { value: OrganizationPickerTypeFilter; label: string }[] {
+): { value: OrganizationPickerDomainFilter; label: string }[] {
   const availableKinds = new Set(organizations.map(({ organizationDomain }) => organizationDomain))
   return [
-    { value: ORGANIZATION_PICKER_ALL_TYPES, label: 'All types' },
+    { value: ORGANIZATION_PICKER_ALL_DOMAINS, label: 'All domains' },
     ...ORGANIZATION_DOMAIN_IDS.filter((kind) => availableKinds.has(kind)).map((kind) => ({
       value: kind,
       label: getOrganizationDomainLabel(kind),
