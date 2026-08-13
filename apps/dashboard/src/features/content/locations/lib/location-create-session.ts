@@ -23,13 +23,10 @@ export type LocationCreateSetupResult =
       kind: 'building'
       form?: BuildingForm
       facilityAuthoringGroup?: BuildingFacilityAuthoringGroup
-      operatorIntent: BuildingOperatorIntent
     }
   | { kind: 'settlement'; settlementType: SettlementType }
   | { kind: 'region'; classification: RegionClassification }
   | { kind: 'site'; siteType: SiteType }
-
-export type BuildingOperatorIntent = 'none' | 'create'
 
 export type LocationCreateSession =
   | { status: 'needsSetup' }

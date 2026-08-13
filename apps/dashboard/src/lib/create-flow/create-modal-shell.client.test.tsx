@@ -107,6 +107,33 @@ describe('CreateModalShell', () => {
     expect(onChangeSetup).toHaveBeenCalledOnce()
   })
 
+  it('keeps tab panels mounted while Setup temporarily owns the visible body', () => {
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        tabsVisible={false}
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            content: <input aria-label="Preserved Building name" defaultValue="Copper Kettle" />,
+            status: { invalid: false, dirty: true },
+          },
+        ]}
+        footer={<button type="button">Continue</button>}
+      >
+        <p>Building Setup choices</p>
+      </CreateModalShell>,
+    )
+
+    expect(screen.getByText('Building Setup choices')).toBeVisible()
+    expect(
+      screen.getByRole('textbox', { name: 'Preserved Building name', hidden: true }),
+    ).toHaveValue('Copper Kettle')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <CreateModalShell

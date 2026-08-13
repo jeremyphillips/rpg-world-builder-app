@@ -14,16 +14,12 @@ import {
   BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
   BUILDING_CREATE_SETUP_FORM_PROMPT,
   BUILDING_CREATE_SETUP_HEADLINE,
-  BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
-  BUILDING_CREATE_SETUP_OPERATOR_PROMPT,
   buildBuildingCreateSetupSummaryEntries,
   buildBuildingFacilityAuthoringGroupRadioOptions,
   buildBuildingFormRadioOptions,
-  buildBuildingOperatorIntentRadioOptions,
   applyBuildingCreateSetupSelectionChange,
   resolveBuildingCreateSetupProjection,
 } from './location-building-create-setup.lib'
-import type { BuildingOperatorIntent } from './location-create-session'
 import {
   buildRegionClassificationKindRadioOptions,
   buildRegionTypeRadioOptions,
@@ -52,7 +48,6 @@ import {
 export type LocationCreateModalSetupValues = {
   buildingForm: BuildingForm | ''
   buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
-  buildingOperatorIntent: BuildingOperatorIntent | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
   classificationKind: RegionClassificationKind | ''
@@ -62,7 +57,6 @@ export type LocationCreateModalSetupValues = {
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
   buildingForm: '',
   buildingFacilityAuthoringGroup: '',
-  buildingOperatorIntent: '',
   siteType: '',
   settlementType: '',
   classificationKind: '',
@@ -98,11 +92,9 @@ function resolveBuildingSetupModel(
 ): LocationCreateModalSetupModel {
   const formOptions = buildBuildingFormRadioOptions()
   const facilityOptions = buildBuildingFacilityAuthoringGroupRadioOptions()
-  const operatorOptions = buildBuildingOperatorIntentRadioOptions()
   const projection = resolveBuildingCreateSetupProjection({
     form: values.buildingForm,
     facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
-    operatorIntent: values.buildingOperatorIntent,
   })
   return {
     headline: BUILDING_CREATE_SETUP_HEADLINE,
@@ -121,13 +113,6 @@ function resolveBuildingSetupModel(
         prompt: BUILDING_CREATE_SETUP_FACILITY_PROMPT,
         options: facilityOptions,
         value: values.buildingFacilityAuthoringGroup,
-      },
-      {
-        id: 'buildingOperatorIntent',
-        fieldLabel: BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
-        prompt: BUILDING_CREATE_SETUP_OPERATOR_PROMPT,
-        options: operatorOptions,
-        value: values.buildingOperatorIntent,
       },
     ],
     canContinue: projection != null,
@@ -269,7 +254,6 @@ export function applyLocationCreateModalSetupValueChange({
     selection: {
       form: values.buildingForm,
       facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
-      operatorIntent: values.buildingOperatorIntent,
     },
     choiceSetId,
     nextValue,
@@ -279,7 +263,6 @@ export function applyLocationCreateModalSetupValueChange({
       ...values,
       buildingForm: buildingSelection.form,
       buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
-      buildingOperatorIntent: buildingSelection.operatorIntent,
     }
   }
   if (choiceSetId === 'siteType') {

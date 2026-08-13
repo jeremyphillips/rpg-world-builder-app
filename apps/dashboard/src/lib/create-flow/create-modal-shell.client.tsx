@@ -21,6 +21,7 @@ import {
   createModalShellIssueSeparatorClasses,
   createModalShellTabContentVariants,
   createModalShellTabsListRegionVariants,
+  createModalShellTabsVisibilityVariants,
   createModalShellTabsVariants,
 } from './create-modal-shell.variants'
 
@@ -29,6 +30,24 @@ export type CreateWorkflowPanelStatus = {
   issueCount?: number
   dirty: boolean
 }
+
+export type CreateWorkflowPanelValidationResult = Readonly<{
+  valid: boolean
+  issueCount: number
+}>
+
+export type CreateWorkflowPanelController = Readonly<{
+  validate: () => Promise<CreateWorkflowPanelValidationResult>
+  focusFirstIssue: () => void
+}>
+
+export type CreateWorkflowDraftPanelController<TPayload, TServerIssue> =
+  CreateWorkflowPanelController &
+    Readonly<{
+      getPayload: () => TPayload
+      reset: () => void
+      hydrateServerIssues: (issues: readonly TServerIssue[]) => void
+    }>
 
 export type CreateModalShellContentMode = 'managed' | 'scroll'
 
@@ -48,6 +67,8 @@ export type CreateModalShellProps = {
   description?: React.ReactNode
   setupSummary?: CreateSetupSummaryProps
   tabs?: readonly [CreateModalShellTab, ...CreateModalShellTab[]]
+  /** Hides tab chrome/panels without unmounting them while a workflow returns to Setup. */
+  tabsVisible?: boolean
   activeTabId?: string
   defaultActiveTabId?: string
   onActiveTabChange?: (tabId: string) => void
@@ -148,6 +169,7 @@ export function CreateModalShell({
   description,
   setupSummary,
   tabs,
+  tabsVisible = true,
   activeTabId,
   defaultActiveTabId,
   onActiveTabChange,
@@ -173,12 +195,27 @@ export function CreateModalShell({
         <Modal.Body stableBody data-create-modal-body className={createModalShellBodyVariants()}>
           {setupSummary ? <CreateSetupSummary {...setupSummary} /> : null}
           {tabs ? (
-            <CreateModalShellTabs
-              tabs={tabs}
-              activeTabId={activeTabId}
-              defaultActiveTabId={defaultActiveTabId}
-              onActiveTabChange={onActiveTabChange}
-            />
+            <>
+              <div
+                className={createModalShellTabsVisibilityVariants({ visible: tabsVisible })}
+                aria-hidden={!tabsVisible || undefined}
+              >
+                <CreateModalShellTabs
+                  tabs={tabs}
+                  activeTabId={activeTabId}
+                  defaultActiveTabId={defaultActiveTabId}
+                  onActiveTabChange={onActiveTabChange}
+                />
+              </div>
+              {!tabsVisible ? (
+                <div
+                  data-create-modal-content
+                  className={createModalShellContentVariants({ mode: contentMode })}
+                >
+                  {children}
+                </div>
+              ) : null}
+            </>
           ) : (
             <div
               data-create-modal-content

@@ -41,7 +41,6 @@ describe('completeLocationCreateSetup', () => {
           kind: 'building',
           form: 'house',
           facilityAuthoringGroup: 'residential',
-          operatorIntent: 'none',
         },
       ),
     ).toEqual({

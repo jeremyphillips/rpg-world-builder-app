@@ -16,6 +16,11 @@ export const createModalShellContentVariants = cva('min-h-0 flex-1', {
 
 export const createModalShellTabsVariants = cva('flex min-h-0 flex-1 flex-col')
 
+export const createModalShellTabsVisibilityVariants = cva('', {
+  variants: { visible: { true: 'contents', false: 'hidden' } },
+  defaultVariants: { visible: true },
+})
+
 export const createModalShellTabsListRegionVariants = cva('shrink-0 overflow-x-auto')
 
 export const createModalShellTabContentVariants = cva(

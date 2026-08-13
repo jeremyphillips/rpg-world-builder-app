@@ -10,20 +10,16 @@ import {
 } from './location-building-create-setup.lib'
 
 describe('Building create setup selection', () => {
-  const emptySelection = { form: '', facilityAuthoringGroup: '', operatorIntent: '' } as const
+  const emptySelection = { form: '', facilityAuthoringGroup: '' } as const
 
-  it('requires discovery scope and operator intent while leaving Form optional', () => {
+  it('requires discovery scope while leaving Form optional', () => {
     expect(resolveBuildingCreateSetupProjection(emptySelection)).toBeNull()
-    expect(
-      resolveBuildingCreateSetupProjection({ ...emptySelection, operatorIntent: 'none' }),
-    ).toBeNull()
     expect(
       resolveBuildingCreateSetupProjection({
         ...emptySelection,
         facilityAuthoringGroup: 'browse_all',
-        operatorIntent: 'none',
       }),
-    ).toEqual({ operatorIntent: 'none' })
+    ).toEqual({})
   })
 
   it('updates each Building setup field and ignores unrelated ids', () => {
@@ -41,13 +37,6 @@ describe('Building create setup selection', () => {
     })
     expect(withFacilityGroup?.facilityAuthoringGroup).toBe('production')
 
-    expect(
-      applyBuildingCreateSetupSelectionChange({
-        selection: withFacilityGroup!,
-        choiceSetId: 'buildingOperatorIntent',
-        nextValue: 'create',
-      })?.operatorIntent,
-    ).toBe('create')
     expect(
       applyBuildingCreateSetupSelectionChange({
         selection: emptySelection,
@@ -76,7 +65,6 @@ describe('applyBuildingCreateSetupProjection', () => {
     expect(
       applyBuildingCreateSetupProjection(draft, {
         facilityAuthoringGroup: 'religious',
-        operatorIntent: 'create',
       }),
     ).toEqual({
       name: draft.name,
@@ -88,21 +76,17 @@ describe('applyBuildingCreateSetupProjection', () => {
 
   it('supports an unclassified Building end to end', () => {
     expect(
-      applyBuildingCreateSetupProjection(
-        { ...draft, classification: undefined },
-        { operatorIntent: 'none' },
-      ).classification,
+      applyBuildingCreateSetupProjection({ ...draft, classification: undefined }, {})
+        .classification,
     ).toBeUndefined()
   })
 
   it('preserves a Facility across compatible groups and keeps its derived function', () => {
     const production = applyBuildingCreateSetupProjection(draft, {
       facilityAuthoringGroup: 'production',
-      operatorIntent: 'none',
     })
     const commercial = applyBuildingCreateSetupProjection(production, {
       facilityAuthoringGroup: 'commercial',
-      operatorIntent: 'none',
     })
 
     expect(commercial.classification).toEqual({ facilityType: 'brewery' })

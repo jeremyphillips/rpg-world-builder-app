@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
-import { CreateModalShell } from '@/lib/create-flow'
+import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
 import { CreateSetupPanel } from '@/lib/create-setup'
 
 import type {
@@ -35,6 +35,10 @@ import {
   type LocationCreateSetupChoiceSet,
 } from '../lib/location-create-setup.lib'
 import { LocationCreateForm } from './location-create-form.client'
+import {
+  BuildingOrganizationsCreateTab,
+  type BuildingOrganizationsCreateTabController,
+} from './building-organizations-create-tab.client'
 
 export type LocationCreateModalProps = {
   open: boolean
@@ -189,7 +193,7 @@ function LocationCreateModalDetailsForm({
   onTrustedClose,
   onPendingChange,
   buildingSetupApplication,
-  onBuildingClassificationChange,
+  extraUnsavedEdits,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -205,9 +209,7 @@ function LocationCreateModalDetailsForm({
   onTrustedClose: () => void
   onPendingChange?: (pending: boolean) => void
   buildingSetupApplication: LocationCreateModalState['buildingSetupApplication']
-  onBuildingClassificationChange: NonNullable<
-    React.ComponentProps<typeof LocationCreateForm>['onBuildingClassificationChange']
-  >
+  extraUnsavedEdits?: boolean
 }) {
   return (
     <LocationCreateForm
@@ -221,8 +223,8 @@ function LocationCreateModalDetailsForm({
       visible={showDetails}
       onTrustedClose={onTrustedClose}
       onPendingChange={onPendingChange}
+      extraUnsavedEdits={extraUnsavedEdits}
       buildingSetupApplication={buildingSetupApplication ?? undefined}
-      onBuildingClassificationChange={onBuildingClassificationChange}
       chrome={({ pending }) =>
         buildDetailsChrome({
           hadSetup,
@@ -296,25 +298,11 @@ function useLocationCreateModalController({
                 ...(result.facilityAuthoringGroup
                   ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
                   : {}),
-                operatorIntent: result.operatorIntent,
               },
             }
           : current.buildingSetupApplication,
     }))
   }, [intent, setupModel])
-
-  const handleBuildingClassificationChange = React.useCallback(
-    (classification: { form?: BuildingCreateSetupProjection['form'] }) => {
-      setState((current) => ({
-        ...current,
-        setupValues: {
-          ...current.setupValues,
-          buildingForm: classification.form ?? '',
-        },
-      }))
-    },
-    [],
-  )
 
   const handleBackToSetup = React.useCallback(() => {
     setState((current) => ({
@@ -354,7 +342,6 @@ function useLocationCreateModalController({
     handleBackToSetup,
     setReopenChoiceSetId,
     setDetailsPending,
-    handleBuildingClassificationChange,
     trustedClose,
   }
 }
@@ -389,11 +376,22 @@ function LocationCreateModalSession({
     handleBackToSetup,
     setReopenChoiceSetId,
     setDetailsPending,
-    handleBuildingClassificationChange,
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
+  const [activeTabId, setActiveTabId] = React.useState('details')
+  const [organizationsStatus, setOrganizationsStatus] = React.useState<CreateWorkflowPanelStatus>({
+    invalid: false,
+    dirty: false,
+  })
+  const organizationsControllerRef = React.useRef<BuildingOrganizationsCreateTabController | null>(
+    null,
+  )
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
+  const buildingTabsConfigured =
+    state.detailsMounted &&
+    state.fixedCreate?.authoringType === 'building' &&
+    state.buildingSetupApplication != null
   const showSetup = state.phase === 'setup' && setupModel != null
   const submitLabel = formatContentCreateActionLabel('locations')
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
@@ -405,7 +403,7 @@ function LocationCreateModalSession({
       open={open}
       leaveBridgeRef={leaveBridgeRef}
       formKey={state.formKey}
-      showDetails={showDetails}
+      showDetails={showDetails && (!buildingTabsConfigured || activeTabId === 'details')}
       hadSetup={state.hadSetup}
       submitLabel={submitLabel}
       onBack={handleBackToSetup}
@@ -413,7 +411,7 @@ function LocationCreateModalSession({
       onTrustedClose={trustedClose}
       onPendingChange={setDetailsPending}
       buildingSetupApplication={state.buildingSetupApplication}
-      onBuildingClassificationChange={handleBuildingClassificationChange}
+      extraUnsavedEdits={organizationsStatus.dirty}
     />
   )
   const resolvedSetupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
@@ -439,6 +437,42 @@ function LocationCreateModalSession({
         description={setupHeader.description}
         setupSummary={setupSummary}
         contentMode={showSetup ? 'scroll' : 'managed'}
+        activeTabId={buildingTabsConfigured ? activeTabId : undefined}
+        onActiveTabChange={buildingTabsConfigured ? setActiveTabId : undefined}
+        tabsVisible={showDetails}
+        tabs={
+          buildingTabsConfigured
+            ? [
+                {
+                  id: 'details',
+                  label: 'Details',
+                  content: formOptionsCtx ? (
+                    renderDetailsForm(formOptionsCtx)
+                  ) : (
+                    <ContentFormOptionsGate campaignId={campaignId}>
+                      {renderDetailsForm}
+                    </ContentFormOptionsGate>
+                  ),
+                  status: { invalid: false, dirty: false },
+                  contentMode: 'managed',
+                },
+                {
+                  id: 'organizations',
+                  label: 'Organizations',
+                  optional: true,
+                  content: (
+                    <BuildingOrganizationsCreateTab
+                      campaignId={campaignId}
+                      formCtx={formOptionsCtx}
+                      controllerRef={organizationsControllerRef}
+                      onStatusChange={setOrganizationsStatus}
+                    />
+                  ),
+                  status: organizationsStatus,
+                },
+              ]
+            : undefined
+        }
         footer={
           showSetup ? (
             <DialogPanelActionRow>
@@ -466,7 +500,7 @@ function LocationCreateModalSession({
           />
         ) : null}
 
-        {state.detailsMounted && state.fixedCreate ? (
+        {!buildingTabsConfigured && state.detailsMounted && state.fixedCreate ? (
           formOptionsCtx ? (
             renderDetailsForm(formOptionsCtx)
           ) : (

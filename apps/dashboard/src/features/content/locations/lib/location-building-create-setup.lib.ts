@@ -12,7 +12,6 @@ import {
 import type { RadioCardOption } from '@rpg/ui'
 
 import type { LocationFormValues } from './location-form-fields'
-import type { BuildingOperatorIntent } from './location-create-session'
 
 export const BUILDING_CREATE_SETUP_HEADLINE = 'Create building' as const
 export const BUILDING_CREATE_SETUP_FORM_FIELD_LABEL = 'Building form' as const
@@ -21,15 +20,11 @@ export const BUILDING_CREATE_SETUP_FORM_PROMPT =
 export const BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL = 'Facility' as const
 export const BUILDING_CREATE_SETUP_FACILITY_PROMPT =
   'What kind of facility are you creating?' as const
-export const BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL = 'Who operates here?' as const
-export const BUILDING_CREATE_SETUP_OPERATOR_PROMPT = 'Who operates here?' as const
-
 export const BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE = 'browse_all' as const
 
 export type BuildingCreateSetupProjection = {
   form?: BuildingForm
   facilityAuthoringGroup?: BuildingFacilityAuthoringGroup
-  operatorIntent: BuildingOperatorIntent
 }
 
 export type BuildingCreateSetupSelection = {
@@ -38,7 +33,6 @@ export type BuildingCreateSetupSelection = {
     | BuildingFacilityAuthoringGroup
     | typeof BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
     | ''
-  operatorIntent: BuildingOperatorIntent | ''
 }
 
 export function buildBuildingFormRadioOptions(): RadioCardOption[] {
@@ -67,13 +61,6 @@ export function buildBuildingFacilityAuthoringGroupRadioOptions(): RadioCardOpti
   ]
 }
 
-export function buildBuildingOperatorIntentRadioOptions(): RadioCardOption[] {
-  return [
-    { value: 'none', label: 'No organization' },
-    { value: 'create', label: 'Create an organization' },
-  ]
-}
-
 export function isBuildingForm(value: string): value is BuildingForm {
   return (BUILDING_FORM_IDS as readonly string[]).includes(value)
 }
@@ -84,14 +71,9 @@ export function isBuildingFacilityAuthoringGroup(
   return (BUILDING_FACILITY_AUTHORING_GROUP_IDS as readonly string[]).includes(value)
 }
 
-export function isBuildingOperatorIntent(value: string): value is BuildingOperatorIntent {
-  return value === 'none' || value === 'create'
-}
-
 export function resolveBuildingCreateSetupProjection(
   selection: BuildingCreateSetupSelection,
 ): BuildingCreateSetupProjection | null {
-  if (!isBuildingOperatorIntent(selection.operatorIntent)) return null
   const hasFacilityScope =
     isBuildingFacilityAuthoringGroup(selection.facilityAuthoringGroup) ||
     selection.facilityAuthoringGroup === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
@@ -101,7 +83,6 @@ export function resolveBuildingCreateSetupProjection(
     ...(isBuildingFacilityAuthoringGroup(selection.facilityAuthoringGroup)
       ? { facilityAuthoringGroup: selection.facilityAuthoringGroup }
       : {}),
-    operatorIntent: selection.operatorIntent,
   }
 }
 
@@ -125,12 +106,6 @@ export function applyBuildingCreateSetupSelectionChange({
         nextValue === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
           ? nextValue
           : '',
-    }
-  }
-  if (choiceSetId === 'buildingOperatorIntent') {
-    return {
-      ...selection,
-      operatorIntent: isBuildingOperatorIntent(nextValue) ? nextValue : '',
     }
   }
   return null
@@ -189,11 +164,6 @@ export function buildBuildingCreateSetupSummaryEntries(
         : facilityScopeValue === BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE
           ? 'Browse all'
           : '',
-    },
-    {
-      fieldLabel: BUILDING_CREATE_SETUP_OPERATOR_FIELD_LABEL,
-      valueLabel:
-        projection.operatorIntent === 'create' ? 'Create organization' : 'No organization',
     },
   ]
 }

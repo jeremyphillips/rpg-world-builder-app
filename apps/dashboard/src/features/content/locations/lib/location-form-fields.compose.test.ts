@@ -56,6 +56,23 @@ describe('composeLocationCreateBodyFields', () => {
     expect(fieldIndex(items, 'description')).toBeGreaterThan(-1)
     expect(fieldIndex(items, 'startingDistricts')).toBeGreaterThan(fieldIndex(items, 'description'))
   })
+
+  it('omits Building Form only when fixed create Setup owns that choice', () => {
+    const buildingCtx: LocationFormCtx = {
+      ...makeContentFormCtx(),
+      mode: 'create',
+      fixedCreate: { authoringType: 'building' },
+    }
+
+    expect(collectFieldNames(composeLocationCreateBodyFields(buildingCtx))).toContain(
+      'classification.form',
+    )
+    const setupOwnedFields = collectFieldNames(
+      composeLocationCreateBodyFields(buildingCtx, { omitBuildingForm: true }),
+    )
+    expect(setupOwnedFields).not.toContain('classification.form')
+    expect(setupOwnedFields).toContain('classification.facilityType')
+  })
 })
 
 describe('buildSettlementStartingDistrictsFormItems', () => {

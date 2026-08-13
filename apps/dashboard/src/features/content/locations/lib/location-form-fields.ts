@@ -116,9 +116,22 @@ function omitFixedCreateNamedFields<T>(
   })
 }
 
+function omitNamedFields<T>(fields: readonly T[], names: ReadonlySet<string>): T[] {
+  return fields.filter((field) => {
+    const name =
+      field && typeof field === 'object' && 'name' in field && typeof field.name === 'string'
+        ? field.name
+        : undefined
+    return !name || !names.has(name)
+  })
+}
+
 export function buildLocationFields(
   ctx: ContentFormCtx,
-  options?: { buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup },
+  options?: {
+    buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+    omitBuildingForm?: boolean
+  },
 ): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
@@ -127,12 +140,15 @@ export function buildLocationFields(
   const items: FormItem[] = []
 
   if (fixedCreate) {
-    const primaryFields: RowFieldItem[] = omitFixedCreateNamedFields(
-      filterLocationFieldsForAuthoringType(
-        buildLocationPrimaryClassificationFields(),
-        fixedCreate.authoringType,
+    const primaryFields: RowFieldItem[] = omitNamedFields(
+      omitFixedCreateNamedFields(
+        filterLocationFieldsForAuthoringType(
+          buildLocationPrimaryClassificationFields(),
+          fixedCreate.authoringType,
+        ),
+        fixedCreate,
       ),
-      fixedCreate,
+      options?.omitBuildingForm ? new Set(['classification.form']) : new Set(),
     )
     if (primaryFields.length > 0) {
       items.push({ kind: 'row', fields: primaryFields })
@@ -191,6 +207,7 @@ export function composeLocationCreateBodyFields(
   options?: {
     afterDescription?: FormItem[]
     buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+    omitBuildingForm?: boolean
   },
 ): FormItem[] {
   const items = buildLocationFields(ctx, options)
