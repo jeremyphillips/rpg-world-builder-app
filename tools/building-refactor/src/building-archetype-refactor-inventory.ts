@@ -682,8 +682,26 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
 
 const INITIAL_STATUS_BY_ID = {
   house: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm,
+  apartment_building: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  boarding_house: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  inn: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  tavern: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  market: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  bank: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  warehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
   brewery: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  distillery: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  factory: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  mill: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  town_hall: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  courthouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  prison: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  barracks: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  library: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  hospital: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
   temple: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  theater: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  stable: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
 

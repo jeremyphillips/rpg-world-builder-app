@@ -6,6 +6,7 @@ import {
   buildOrganizationCreateInput,
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
+  organizationDraftFormSchema,
 } from './organization-form-projection'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
@@ -18,6 +19,17 @@ function collectFields(items: readonly FormItem[]): Array<{ name: string; item: 
 }
 
 describe('organization form projection', () => {
+  it('accepts the blank sentinel from an untouched authoring preset select', () => {
+    expect(
+      organizationDraftFormSchema.parse({
+        name: 'Ironroot Smiths',
+        authoringPresetId: '',
+        organizationDomain: 'commercial',
+        activities: ['blacksmithing'],
+      }),
+    ).toMatchObject({ authoringPresetId: undefined })
+  })
+
   it('reuses the canonical standalone fields under an embedded namespace', () => {
     const standalone = collectFields(buildOrganizationFields(makeContentFormCtx()))
     const embedded = collectFields(
@@ -84,10 +96,9 @@ describe('organization form projection', () => {
   it('applies an ephemeral preset equally under an embedded namespace', () => {
     const [sync] = buildOrganizationFormValueSyncs('operatorOrganization')
     expect(
-      sync?.apply(
-        { 'operatorOrganization.authoringPresetId': 'smuggling_ring' },
-        ['operatorOrganization.authoringPresetId'],
-      ),
+      sync?.apply({ 'operatorOrganization.authoringPresetId': 'smuggling_ring' }, [
+        'operatorOrganization.authoringPresetId',
+      ]),
     ).toEqual({
       'operatorOrganization.authoringPresetId': undefined,
       'operatorOrganization.organizationDomain': 'criminal',

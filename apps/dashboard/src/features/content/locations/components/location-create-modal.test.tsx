@@ -305,7 +305,8 @@ describe('LocationCreateModal', () => {
 
     const form = screen.getAllByRole('textbox', { name: 'Name' })[0]?.closest('form')
     const visibilityWrapper = form?.parentElement
-    const modalBody = form?.firstElementChild
+    const modalBody = document.querySelector('[data-create-modal-body]')
+    const formScrollRegion = form?.firstElementChild
     const footer = screen
       .getByRole('button', { name: 'Create location' })
       .closest('.border-border-faint')
@@ -313,6 +314,7 @@ describe('LocationCreateModal', () => {
     expect(visibilityWrapper).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
     expect(form).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
     expect(modalBody).toHaveClass('flex', 'min-h-0', 'flex-1', 'overflow-hidden')
+    expect(formScrollRegion).toHaveClass('min-h-0', 'flex-1', 'overflow-y-auto')
     expect(footer).toHaveClass('shrink-0')
   })
 

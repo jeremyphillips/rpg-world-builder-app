@@ -59,7 +59,7 @@ describe('Building create setup selection', () => {
 
   it('derives setup options from populated canonical Facility groups', () => {
     expect(buildBuildingFacilityAuthoringGroupRadioOptions().map((option) => option.value)).toEqual(
-      ['residential', 'commercial', 'production', 'religious', 'browse_all'],
+      ['residential', 'commercial', 'production', 'civic', 'religious', 'lodging', 'browse_all'],
     )
   })
 })

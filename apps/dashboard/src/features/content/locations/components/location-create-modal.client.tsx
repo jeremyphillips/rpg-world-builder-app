@@ -1,15 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import {
-  Button,
-  DialogPanelActionRow,
-  Modal,
-  cn,
-  dialogPanelSectionInsetXClasses,
-  usePendingAwareOpenChange,
-} from '@rpg/ui'
+import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
+
+import { CreateModalShell } from '@/lib/create-flow'
+import { CreateSetupPanel } from '@/lib/create-setup'
 
 import type {
   ContentFormHostChrome,
@@ -38,7 +34,6 @@ import {
   buildLocationCreateSetupSets,
   type LocationCreateSetupChoiceSet,
 } from '../lib/location-create-setup.lib'
-import { CreateSetupPanel, CreateSetupSummary } from '@/lib/create-setup'
 import { LocationCreateForm } from './location-create-form.client'
 
 export type LocationCreateModalProps = {
@@ -110,86 +105,40 @@ function resolveModalHeadline({
   return 'Create location'
 }
 
-function LocationCreateModalSetupPhase({
+function LocationCreateModalSetupPanel({
   choiceSets,
   reopenChoiceSetId,
   onReopenChoiceSetIdChange,
-  canContinue,
-  onContinue,
-  onCancel,
 }: {
   choiceSets: LocationCreateSetupChoiceSet[]
   reopenChoiceSetId: string | null
   onReopenChoiceSetIdChange: (choiceSetId: string | null) => void
-  canContinue: boolean
-  onContinue: () => void
-  onCancel: () => void
 }) {
   return (
-    <>
-      <Modal.Body>
-        <CreateSetupPanel
-          sets={buildLocationCreateSetupSets(choiceSets)}
-          changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
-          reopenSetId={reopenChoiceSetId}
-          onReopenSetIdChange={onReopenChoiceSetIdChange}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <DialogPanelActionRow>
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="button" disabled={!canContinue} onClick={onContinue}>
-            Continue
-          </Button>
-        </DialogPanelActionRow>
-      </Modal.Footer>
-    </>
+    <CreateSetupPanel
+      sets={buildLocationCreateSetupSets(choiceSets)}
+      changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+      reopenSetId={reopenChoiceSetId}
+      onReopenSetIdChange={onReopenChoiceSetIdChange}
+    />
   )
 }
 
 function buildDetailsChrome({
-  showDetails,
   hadSetup,
-  setupModel,
   pending,
   submitLabel,
   onBack,
   onCancel,
 }: {
-  showDetails: boolean
   hadSetup: boolean
-  setupModel: LocationCreateModalSetupModel | null
   pending: boolean
   submitLabel: string
   onBack: () => void
   onCancel: () => void
 }): ContentFormHostChrome {
-  const setupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
-
   return {
-    contentWrapper: (content) => (
-      <Modal.Body
-        stableBody
-        className={cn(
-          dialogPanelSectionInsetXClasses,
-          'flex flex-col gap-4 pt-0',
-          !showDetails && 'hidden',
-        )}
-        aria-hidden={!showDetails}
-      >
-        {showDetails && hadSetup && setupSummary ? (
-          <CreateSetupSummary
-            eyebrow={setupSummary.eyebrow}
-            summary={setupSummary.summary}
-            changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
-            onChange={onBack}
-          />
-        ) : null}
-        {content}
-      </Modal.Body>
-    ),
+    contentWrapper: (content) => content,
     footer: () => (
       <>
         {hadSetup ? (
@@ -234,7 +183,6 @@ function LocationCreateModalDetailsForm({
   formKey,
   showDetails,
   hadSetup,
-  setupModel,
   submitLabel,
   onBack,
   onCancel,
@@ -251,7 +199,6 @@ function LocationCreateModalDetailsForm({
   formKey: string
   showDetails: boolean
   hadSetup: boolean
-  setupModel: LocationCreateModalSetupModel | null
   submitLabel: string
   onBack: () => void
   onCancel: () => void
@@ -278,9 +225,7 @@ function LocationCreateModalDetailsForm({
       onBuildingClassificationChange={onBuildingClassificationChange}
       chrome={({ pending }) =>
         buildDetailsChrome({
-          showDetails,
           hadSetup,
-          setupModel,
           pending,
           submitLabel,
           onBack,
@@ -462,7 +407,6 @@ function LocationCreateModalSession({
       formKey={state.formKey}
       showDetails={showDetails}
       hadSetup={state.hadSetup}
-      setupModel={setupModel}
       submitLabel={submitLabel}
       onBack={handleBackToSetup}
       onCancel={requestClose}
@@ -472,50 +416,67 @@ function LocationCreateModalSession({
       onBuildingClassificationChange={handleBuildingClassificationChange}
     />
   )
+  const resolvedSetupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
+  const setupSummary =
+    showDetails && state.hadSetup && resolvedSetupSummary
+      ? {
+          ...resolvedSetupSummary,
+          changeLabel: LOCATION_CREATE_SETUP_CHANGE_LABEL,
+          onChange: handleBackToSetup,
+        }
+      : undefined
 
   return (
-    <Modal.Root open={open} onOpenChange={handleOpenChange}>
-      <Modal.Content
-        size="md"
-        closeOnOutsideClick={false}
-        {...(setupHeader.clearAriaDescribedBy ? { 'aria-describedby': undefined } : {})}
+    <FormShellFooterScope>
+      <CreateModalShell
+        open={open}
+        onOpenChange={handleOpenChange}
+        headline={resolveModalHeadline({
+          phase: state.phase,
+          setupModel,
+          fixedCreate: state.fixedCreate,
+        })}
+        description={setupHeader.description}
+        setupSummary={setupSummary}
+        contentMode={showSetup ? 'scroll' : 'managed'}
+        footer={
+          showSetup ? (
+            <DialogPanelActionRow>
+              <Button type="button" variant="outline" onClick={requestClose}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                disabled={!setupModel?.canContinue}
+                onClick={handleContinueFromSetup}
+              >
+                Continue
+              </Button>
+            </DialogPanelActionRow>
+          ) : (
+            <FormShellFooterSlot />
+          )
+        }
       >
-        <Modal.Header
-          headline={resolveModalHeadline({
-            phase: state.phase,
-            setupModel,
-            fixedCreate: state.fixedCreate,
-          })}
-          description={setupHeader.description}
-        />
-
         {showSetup ? (
-          <LocationCreateModalSetupPhase
+          <LocationCreateModalSetupPanel
             choiceSets={choiceSets}
             reopenChoiceSetId={state.reopenChoiceSetId}
             onReopenChoiceSetIdChange={setReopenChoiceSetId}
-            canContinue={Boolean(setupModel?.canContinue)}
-            onContinue={handleContinueFromSetup}
-            onCancel={requestClose}
           />
         ) : null}
 
         {state.detailsMounted && state.fixedCreate ? (
-          <FormShellFooterScope>
-            {formOptionsCtx ? (
-              renderDetailsForm(formOptionsCtx)
-            ) : (
-              <ContentFormOptionsGate campaignId={campaignId}>
-                {renderDetailsForm}
-              </ContentFormOptionsGate>
-            )}
-            <Modal.Footer className={cn(!showDetails && 'hidden')} aria-hidden={!showDetails}>
-              <FormShellFooterSlot />
-            </Modal.Footer>
-          </FormShellFooterScope>
+          formOptionsCtx ? (
+            renderDetailsForm(formOptionsCtx)
+          ) : (
+            <ContentFormOptionsGate campaignId={campaignId}>
+              {renderDetailsForm}
+            </ContentFormOptionsGate>
+          )
         ) : null}
-      </Modal.Content>
-    </Modal.Root>
+      </CreateModalShell>
+    </FormShellFooterScope>
   )
 }
 

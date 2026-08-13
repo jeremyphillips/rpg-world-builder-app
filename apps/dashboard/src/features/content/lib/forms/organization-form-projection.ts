@@ -75,7 +75,7 @@ export const organizationDraftFormSchema = z.object({
   organizationDomain: draftOptionalSelect(organizationDomainSchema),
   organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
   activities: z.array(organizationActivitySchema).default([]),
-  authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
+  authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>

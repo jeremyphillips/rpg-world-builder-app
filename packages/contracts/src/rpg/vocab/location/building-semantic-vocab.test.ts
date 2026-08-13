@@ -20,10 +20,32 @@ describe('Building semantic vocabularies', () => {
     expect(BUILDING_FORM_ENTRIES.house).not.toHaveProperty('defaultFunctions')
   })
 
-  it('keeps the initial Facility registry narrow and schema-backed', () => {
-    expect(BUILDING_FACILITY_TYPE_IDS).toEqual(['residence', 'brewery', 'temple'])
+  it('defines the approved Facility UX sample in deterministic registry order', () => {
+    expect(BUILDING_FACILITY_TYPE_IDS).toEqual([
+      'residence',
+      'apartment_building',
+      'boarding_house',
+      'inn',
+      'tavern',
+      'market',
+      'bank',
+      'warehouse',
+      'brewery',
+      'distillery',
+      'factory',
+      'mill',
+      'town_hall',
+      'courthouse',
+      'prison',
+      'barracks',
+      'library',
+      'hospital',
+      'temple',
+      'theater',
+      'stable',
+    ])
     expect(Object.keys(BUILDING_FACILITY_TYPE_ENTRIES)).toEqual(BUILDING_FACILITY_TYPE_IDS)
-    expect(buildingFacilityTypeSchema.parse('brewery')).toBe('brewery')
+    expect(buildingFacilityTypeSchema.parse('hospital')).toBe('hospital')
     expect(buildingFacilityTypeSchema.safeParse('workshop')).toMatchObject({ success: false })
   })
 
@@ -39,13 +61,40 @@ describe('Building semantic vocabularies', () => {
     }
   })
 
-  it('assigns only the agreed initial Facility defaults', () => {
-    expect(getBuildingFacilityDefaultFunctions('residence')).toEqual(['dwelling'])
-    expect(getBuildingFacilityDefaultFunctions('brewery')).toEqual(['production'])
-    expect(getBuildingFacilityDefaultFunctions('temple')).toEqual(['worship'])
+  it('assigns the approved default functions without changing function resolution', () => {
+    expect(
+      Object.fromEntries(
+        BUILDING_FACILITY_TYPE_IDS.map((facilityType) => [
+          facilityType,
+          getBuildingFacilityDefaultFunctions(facilityType),
+        ]),
+      ),
+    ).toEqual({
+      residence: ['dwelling'],
+      apartment_building: ['dwelling'],
+      boarding_house: ['dwelling', 'lodging'],
+      inn: ['lodging', 'food_drink_social'],
+      tavern: ['food_drink_social'],
+      market: ['retail'],
+      bank: ['finance'],
+      warehouse: ['storage'],
+      brewery: ['production'],
+      distillery: ['production'],
+      factory: ['production'],
+      mill: ['production'],
+      town_hall: ['governance', 'assembly'],
+      courthouse: ['governance'],
+      prison: ['governance'],
+      barracks: ['defense_watch'],
+      library: ['knowledge'],
+      hospital: ['care'],
+      temple: ['worship'],
+      theater: ['spectacle'],
+      stable: ['transport_support'],
+    })
   })
 
-  it('owns non-exclusive authoring discovery groups on Facility entries', () => {
+  it('derives populated, non-exclusive discovery groups in registry order', () => {
     expect(BUILDING_FACILITY_AUTHORING_GROUP_IDS).toEqual([
       'residential',
       'commercial',
@@ -54,11 +103,56 @@ describe('Building semantic vocabularies', () => {
       'religious',
       'lodging',
     ])
-    expect(getBuildingFacilityTypesForAuthoringGroup('residential')).toEqual(['residence'])
-    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toEqual(['brewery'])
-    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual(['brewery'])
+    expect(getBuildingFacilityTypesForAuthoringGroup('residential')).toEqual([
+      'residence',
+      'apartment_building',
+      'boarding_house',
+    ])
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toEqual([
+      'inn',
+      'tavern',
+      'market',
+      'bank',
+      'warehouse',
+      'brewery',
+      'distillery',
+      'theater',
+      'stable',
+    ])
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual([
+      'warehouse',
+      'brewery',
+      'distillery',
+      'factory',
+      'mill',
+    ])
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toEqual([
+      'town_hall',
+      'courthouse',
+      'prison',
+      'barracks',
+      'library',
+      'hospital',
+      'theater',
+    ])
     expect(getBuildingFacilityTypesForAuthoringGroup('religious')).toEqual(['temple'])
-    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toEqual([])
-    expect(getBuildingFacilityTypesForAuthoringGroup('lodging')).toEqual([])
+    expect(getBuildingFacilityTypesForAuthoringGroup('lodging')).toEqual([
+      'boarding_house',
+      'inn',
+      'stable',
+    ])
+  })
+
+  it('provides unique label, alias, and search discovery metadata', () => {
+    for (const entry of Object.values(BUILDING_FACILITY_TYPE_ENTRIES)) {
+      const discoveryTerms = [entry.label, ...('aliases' in entry ? entry.aliases : [])]
+      expect(new Set(discoveryTerms.map((term) => term.toLocaleLowerCase())).size).toBe(
+        discoveryTerms.length,
+      )
+      if ('searchTerms' in entry) {
+        expect(entry.searchTerms.length).toBeGreaterThan(0)
+        expect(new Set(entry.searchTerms).size).toBe(entry.searchTerms.length)
+      }
+    }
   })
 })

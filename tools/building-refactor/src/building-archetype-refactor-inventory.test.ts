@@ -55,19 +55,42 @@ describe('Building archetype refactor inventory', () => {
     }
   })
 
-  it('records the initial four mappings and leaves 304 concepts pending design', () => {
+  it('records the expanded Facility sample and leaves 286 concepts pending design', () => {
     const statusById = new Map(
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
     )
     expect(statusById.get('house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
-    expect(statusById.get('brewery')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
-    expect(statusById.get('temple')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    const facilityIds = [
+      'apartment_building',
+      'boarding_house',
+      'inn',
+      'tavern',
+      'market',
+      'bank',
+      'warehouse',
+      'brewery',
+      'distillery',
+      'factory',
+      'mill',
+      'town_hall',
+      'courthouse',
+      'prison',
+      'barracks',
+      'library',
+      'hospital',
+      'temple',
+      'theater',
+      'stable',
+    ] as const
+    for (const id of facilityIds) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    }
     expect(statusById.get('blacksmith')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
     )
     expect(
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
-        ({ id }) => id === 'house' || id === 'brewery' || id === 'temple' || id === 'blacksmith',
+        ({ id }) => id === 'house' || id === 'blacksmith' || facilityIds.includes(id as never),
       ).every(({ wasRuntimeArchetype }) => wasRuntimeArchetype),
     ).toBe(true)
 
@@ -76,8 +99,8 @@ describe('Building archetype refactor inventory', () => {
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(304)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(139)
+    expect(unresolved).toHaveLength(286)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(121)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(165)
   })
 
