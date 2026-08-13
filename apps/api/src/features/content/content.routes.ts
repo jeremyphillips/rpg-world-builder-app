@@ -17,6 +17,7 @@ import { listOrganizationLocationReferences } from './locations/organization-loc
 import { listLocationConnectedParties } from './locations/location-connected-parties.controller'
 import { listOrganizationMembers } from './organizations/organization-members.controller'
 import { listCampaignOrganizationLocationConnectionEdges } from './organizations/list-campaign-organization-location-connection-edges.controller'
+import { createBuildingCompositionItem } from './locations/building-create-composition.handlers'
 
 // `mergeParams` so the `:campaignId` from the mount path reaches the membership
 // guard and handlers. Mounted at `/api/campaigns/:campaignId/content`.
@@ -28,6 +29,13 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   controller.getCampaignAccessParticipants,
+)
+
+contentRouter.post(
+  '/locations/building-compositions',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  createBuildingCompositionItem,
 )
 
 contentRouter.get(

@@ -6,6 +6,7 @@ import {
   type SystemRulesetId,
 } from '@rpg/contracts'
 import { ContentKeyError } from '@rpg/contracts'
+import type { ClientSession } from 'mongoose'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
@@ -37,6 +38,8 @@ export interface CreateHomebrewContentOptions {
   resolvedSlug?: ResolvedContentSlug
   /** Skip nested id assignment — duplicate transform already regenerated authored ids. */
   preserveNestedIds?: boolean
+  /** Bind every Mongo operation performed by this create to an existing transaction. */
+  session?: ClientSession
 }
 
 type StoredEntity = {
@@ -70,7 +73,16 @@ async function loadCampaignSlugs<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
   rulesetId: Parameters<ContentWriteConfig<T>['readConfig']['loadHomebrew']>[1],
+  session?: ClientSession,
 ): Promise<Set<string>> {
+  if (session) {
+    const records = await config.homebrewModel
+      .find({ campaignId, rulesetId })
+      .select({ slug: 1 })
+      .session(session)
+      .lean<Array<{ slug: string }>>()
+    return new Set(records.map((record) => record.slug))
+  }
   const homebrew = await config.readConfig.loadHomebrew(campaignId, rulesetId)
   return new Set(homebrew.map((record) => record.slug))
 }
@@ -304,6 +316,7 @@ export async function createHomebrewContent<T extends StoredEntity>(
       name: requestedName,
       rulesetId,
       config,
+      session: options.session,
     })
 
     const slugCheckedInput = { ...input, slug }
@@ -317,13 +330,14 @@ export async function createHomebrewContent<T extends StoredEntity>(
     )
 
     try {
-      const created = await config.homebrewModel.create({
+      const created = new config.homebrewModel({
         campaignId,
         rulesetId,
         slug,
         status,
         ...body,
       })
+      await created.save(options.session ? { session: options.session } : undefined)
 
       const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
       const parsed = resolveStoredSchema(config, validationIntent).parse(entity)
@@ -347,6 +361,7 @@ async function resolveSlugForCreateAttempt<T extends StoredEntity>({
   name,
   rulesetId,
   config,
+  session,
 }: {
   attempt: number
   resolvedSlug?: ResolvedContentSlug
@@ -356,9 +371,10 @@ async function resolveSlugForCreateAttempt<T extends StoredEntity>({
   name: string
   rulesetId: SystemRulesetId
   config: ContentWriteConfig<T>
+  session?: ClientSession
 }): Promise<string> {
   if (attempt === 0 && resolvedSlug) {
-    const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
+    const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId, session)
     if (slugCollisionPolicy === 'reject') {
       assertSlugAvailable({
         slug: resolvedSlug,
@@ -375,7 +391,7 @@ async function resolveSlugForCreateAttempt<T extends StoredEntity>({
   }
 
   const slug = asResolvedContentSlug(deriveSlugFromInputName(name))
-  const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId)
+  const campaignSlugs = await loadCampaignSlugs(config, campaignId, rulesetId, session)
   assertSlugAvailable({
     slug,
     systemSlugs: loadSystemContentSlugs(config.readConfig, rulesetId),
@@ -394,6 +410,43 @@ function deriveSlugFromInputName(name: string): string {
     throw new HttpError(400, 'bad_request', 'Create input must include a non-empty name.')
   }
   return slug
+}
+
+/** Validate a complete create, including hooks and slug availability, without mutating MongoDB. */
+export async function validateHomebrewContentCreate<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  rawInput: unknown,
+  options: Pick<CreateHomebrewContentOptions, 'status' | 'session'> = {},
+): Promise<void> {
+  const status = options.status ?? 'published'
+  const validationIntent = contentStatusToValidationIntent(status)
+  const normalized = normalizeWriteInput(rawInput)
+  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+
+  const writeCtx = buildWriteContext(
+    campaignId,
+    campaign.rulesetId,
+    'create',
+    validationIntent,
+    input,
+    normalized,
+  )
+  await runValidateBeforeWrite(config, writeCtx)
+  await resolveSlugForCreateAttempt({
+    attempt: 0,
+    slugCollisionPolicy: 'reject',
+    contentType: config.typeName as ApiContentTypeKey,
+    campaignId,
+    name: typeof input.name === 'string' ? input.name : '',
+    rulesetId: campaign.rulesetId,
+    config,
+    session: options.session,
+  })
 }
 
 /** Resolve a catalog entity for write/delete guards — shared by update and deletion. */

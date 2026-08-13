@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import type { ClientSession } from 'mongoose'
 
 import type {
   LocationConnectionEligibilityInput,
@@ -100,10 +101,12 @@ export function removeOrganizationLocationConnection(
 export async function persistOrganizationLocationConnections(
   organizationId: string,
   connections: OrganizationLocationConnection[],
+  session?: ClientSession,
 ): Promise<void> {
   const result = await HomebrewOrganizationModel.updateOne(
     { _id: organizationId },
     { $set: { 'connections.locations': connections } },
+    session ? { session } : undefined,
   )
 
   if (result.matchedCount !== 1) {
