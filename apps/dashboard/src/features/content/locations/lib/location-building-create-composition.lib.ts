@@ -243,6 +243,10 @@ function hasPartitionedIssues(issues: PartitionedBuildingCreateCompositionIssues
   )
 }
 
+function hasPanelAttributedIssues(issues: PartitionedBuildingCreateCompositionIssues): boolean {
+  return issues.building.length > 0 || issues.organizations.length > 0
+}
+
 function applyPartitionedBuildingCreateIssues<T extends FieldValues>(input: {
   form: UseFormReturn<T>
   issues: PartitionedBuildingCreateCompositionIssues
@@ -287,7 +291,11 @@ export function assertClientBuildingCreatePlan<T extends FieldValues>(input: {
     organizationsController: input.organizationsController,
     onNavigateToTab: input.onNavigateToTab,
   })
-  throw new BuildingCreateSubmitBlockedError()
+  if (hasPanelAttributedIssues(issues)) {
+    throw new BuildingCreateSubmitBlockedError()
+  }
+  const compositionMessage = issues.composition[0]?.message
+  throw new Error(compositionMessage ?? 'Could not create building.')
 }
 
 export function mapBuildingCreateSubmitError(error: unknown): string | undefined {
@@ -315,7 +323,7 @@ export function handleBuildingCreateCompositionFailure<T extends FieldValues>(in
     organizationsController: input.organizationsController,
     onNavigateToTab: input.onNavigateToTab,
   })
-  if (hasPartitionedIssues(partitioned)) {
+  if (hasPanelAttributedIssues(partitioned)) {
     throw new BuildingCreateSubmitBlockedError()
   }
   throw input.error

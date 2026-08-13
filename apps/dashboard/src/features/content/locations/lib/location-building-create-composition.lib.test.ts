@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { ApiError, type CreateLocationInput } from '@rpg/contracts'
+import type { UseFormReturn } from 'react-hook-form'
 
 import {
   buildBuildingCreateCompositionRequest,
+  handleBuildingCreateCompositionFailure,
+  mapBuildingCreateSubmitError,
   partitionBuildingCreateCompositionIssues,
   resolveBuildingCreateCompletionToast,
   validateBuildingCreateCompositionRequest,
@@ -142,5 +145,91 @@ describe('resolveBuildingCreateCompletionToast', () => {
       kind: 'warning',
       message: 'Building created, but campaign access could not be updated.',
     })
+  })
+})
+
+describe('mapBuildingCreateSubmitError', () => {
+  it('surfaces composition capability failures for form display', () => {
+    const error = new ApiError(
+      503,
+      'transactions_unavailable',
+      'Atomic Building creation is unavailable because MongoDB transactions are disabled.',
+      {
+        issues: [
+          {
+            target: 'capability',
+            code: 'transactions_unavailable',
+            message: 'Atomic Building creation requires MongoDB transaction support.',
+          },
+        ],
+      },
+    )
+
+    expect(mapBuildingCreateSubmitError(error)).toBe(
+      'Atomic Building creation requires MongoDB transaction support.',
+    )
+  })
+
+  it('suppresses formError when panel-attributed issues were handled inline', () => {
+    const error = new ApiError(422, 'building_create_validation_failed', 'Invalid plan.', {
+      issues: [
+        {
+          target: 'building',
+          code: 'validation_error',
+          message: 'Name is required.',
+          path: 'name',
+        },
+      ],
+    })
+
+    expect(mapBuildingCreateSubmitError(error)).toBeUndefined()
+  })
+})
+
+describe('handleBuildingCreateCompositionFailure', () => {
+  it('rethrows capability failures so they can map to formError', () => {
+    const error = new ApiError(
+      503,
+      'transactions_unavailable',
+      'Atomic Building creation is unavailable because MongoDB transactions are disabled.',
+      {
+        issues: [
+          {
+            target: 'capability',
+            code: 'transactions_unavailable',
+            message: 'Atomic Building creation requires MongoDB transaction support.',
+          },
+        ],
+      },
+    )
+    const form = { setError: vi.fn() } as unknown as UseFormReturn<Record<string, unknown>>
+
+    expect(() =>
+      handleBuildingCreateCompositionFailure({
+        error,
+        form,
+      }),
+    ).toThrow(error)
+  })
+
+  it('throws a blocked error after hydrating panel-attributed issues', () => {
+    const error = new ApiError(422, 'building_create_validation_failed', 'Invalid plan.', {
+      issues: [
+        {
+          target: 'relationship',
+          relationshipDraftId: 'relationship-1',
+          code: 'relationship_conflict',
+          message: 'Owner conflicts with another relationship.',
+        },
+      ],
+    })
+    const form = { setError: vi.fn() } as unknown as UseFormReturn<Record<string, unknown>>
+
+    expect(() =>
+      handleBuildingCreateCompositionFailure({
+        error,
+        form,
+      }),
+    ).toThrow(expect.objectContaining({ name: 'BuildingCreateSubmitBlockedError' }))
   })
 })

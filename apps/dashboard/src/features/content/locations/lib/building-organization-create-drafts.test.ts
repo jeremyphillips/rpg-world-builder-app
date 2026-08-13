@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { Organization } from '@rpg/contracts'
 
 import {
+  BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
   buildBuildingOrganizationRelationshipKindOptions,
   removeBuildingOrganizationRelationshipDraft,
+  resolveBuildingOrganizationDiscoveryAddState,
   upsertBuildingOrganizationRelationshipDraft,
   validateBuildingOrganizationDraftPlan,
   type BuildingOrganizationDraftPlan,
@@ -151,6 +153,24 @@ describe('Building Organization create drafts', () => {
     expect(removeBuildingOrganizationRelationshipDraft(plan, 'relationship-1')).toEqual({
       organizations: [],
       relationships: [],
+    })
+  })
+
+  it('disables discovery Add when every relationship kind is blocked', () => {
+    expect(
+      resolveBuildingOrganizationDiscoveryAddState([
+        { value: 'owns', label: 'Owner', disabled: true, disabledReason: 'Owner is taken.' },
+        { value: 'tenant', label: 'Tenant', disabled: true },
+      ]),
+    ).toEqual({
+      eligibleCount: 0,
+      addDisabled: true,
+      addDisabledReason: 'Owner is taken.',
+    })
+    expect(resolveBuildingOrganizationDiscoveryAddState([])).toEqual({
+      eligibleCount: 0,
+      addDisabled: true,
+      addDisabledReason: BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
     })
   })
 })

@@ -118,13 +118,27 @@ Verify the connection (optional, needs `mongosh`):
 mongosh "mongodb://127.0.0.1:27017/rpg" --eval "db.runCommand({ ping: 1 })"
 ```
 
-**Replica set (optional — enables multi-document transactions):**
+**Replica set (required for Create Building with Organizations):**
+
+Standalone Mongo does not support multi-document transactions. **Create Building**
+(composite save with organization relationships) returns `transactions_unavailable`
+without a replica set. Other flows fall back to compensation when
+`MONGO_TRANSACTION_MODE=auto`.
+
+Only one Mongo should bind port `27017` — stop an existing `rpg-mongo` (or
+Homebrew service) before starting the replica-set stack. The compose file uses a
+**separate volume** (`rpg-mongo-rs-data`); switching from standalone starts with
+an empty database.
 
 ```bash
+docker stop rpg-mongo 2>/dev/null || true
 docker compose -f docker-compose.mongo-rs.yml up -d
-# wait for mongo-rs-init to complete, then use:
+# wait for mongo-rs-init to exit successfully, then export before starting the API:
 export MONGODB_URI='mongodb://127.0.0.1:27017/rpg?replicaSet=rs0'
 ```
+
+Restart the API after Mongo is ready — transaction support is probed **once at
+startup**, not per request.
 
 Stop / remove:
 
@@ -137,7 +151,15 @@ docker volume rm rpg-world-builder-app_rpg-mongo-rs-data   # delete data
 
 ```bash
 cp apps/api/.env.example apps/api/.env
-# set JWT_SECRET (>= 16 chars); MONGODB_URI already points at the local mongo
+# set JWT_SECRET (>= 16 chars) and, for replica-set Mongo, MONGODB_URI with ?replicaSet=rs0
+```
+
+The API reads **`process.env` only** — it does not load `apps/api/.env`
+automatically. Export variables in the same shell before `pnpm dev`, or source
+the file yourself. For replica-set Mongo:
+
+```bash
+export MONGODB_URI='mongodb://127.0.0.1:27017/rpg?replicaSet=rs0'
 ```
 
 ### 4. Run the dev servers

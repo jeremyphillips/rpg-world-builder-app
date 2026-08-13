@@ -305,14 +305,13 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
-    await user.click(screen.getByRole('button', { name: 'New Organization' }))
+    await user.click(screen.getByRole('button', { name: '+ Create new organization' }))
     await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(screen.getByRole('button', { name: 'New Organization' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    )
+    expect(
+      screen.getByRole('button', { name: '← Choose existing organization' }),
+    ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Close' }))
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
     expect(onOpenChange).not.toHaveBeenCalled()

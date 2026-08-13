@@ -247,6 +247,34 @@ export function validateBuildingOrganizationDraftPlan(input: {
   return uniqueIssues([...(input.serverIssues ?? []), ...organizationIssues, ...relationshipIssues])
 }
 
+export const BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON =
+  'No eligible relationships for this Organization.'
+
+export function resolveBuildingOrganizationDiscoveryAddState(
+  options: readonly BuildingOrganizationRelationshipKindOption[],
+): {
+  eligibleCount: number
+  addDisabled: boolean
+  addDisabledReason?: string
+  singleEligibleValue?: OrganizationLocationConnectionKind
+} {
+  const eligible = options.filter((option) => !option.disabled)
+  if (eligible.length === 0) {
+    return {
+      eligibleCount: 0,
+      addDisabled: true,
+      addDisabledReason:
+        options.find((option) => option.disabledReason)?.disabledReason ??
+        BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
+    }
+  }
+  return {
+    eligibleCount: eligible.length,
+    addDisabled: false,
+    ...(eligible.length === 1 ? { singleEligibleValue: eligible[0]?.value } : {}),
+  }
+}
+
 export function buildBuildingOrganizationRelationshipKindOptions(input: {
   plan: BuildingOrganizationDraftPlan
   existingOrganizations: readonly Organization[]

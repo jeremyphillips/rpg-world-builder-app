@@ -50,6 +50,10 @@ export {
   type EntitySummaryStatusItem,
 } from './lib/content-entity-card.client'
 export {
+  AddPendingDisclosureCard,
+  type AddPendingDisclosureCardProps,
+} from './lib/entity/add-pending-disclosure-card.client'
+export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
   CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,

@@ -21,6 +21,7 @@ which semantic layer owns the concern — see [Ownership hierarchy](#ownership-h
 | Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityItem`                           |
 | Bordered static identity                                                               | `ContentEntityCard`                    |
 | Bordered identity with expandable domain content                                       | `DisclosureEntityCard`                 |
+| Create-tab Add/Pending discovery or pending-row expansion                              | `AddPendingDisclosureCard` → CEC / DEC |
 | Detail hierarchy or typed relationship                                                 | `DetailEntityRow` / `RelationshipList` |
 | Anonymous form value or choice affordance                                              | Purpose-built form/choice component    |
 
@@ -409,6 +410,31 @@ EntitySummary
 | `validationError` | Master-detail validation indicator                                  |
 
 EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
+
+---
+
+## Add / Pending disclosure
+
+Create-tab relationship composition (Building Organizations first) uses
+`AddPendingDisclosureCard` as the CEC/DEC switch. Ownership and mode rules live
+in [create-flow.md](./create-flow.md#add--pending-disclosure-workflow).
+
+```text
+AddPendingDisclosureCard
+├── collapsed → ContentEntityCard + trailing Add (or consumer overflow)
+└── expanded  → DisclosureEntityCard + domain composer children
+```
+
+**`ContentEntityCard` must not expand.** Do not add collapse, composer, or
+relationship-kind props to CEC. Do not nest CEC inside DEC — that doubles card
+chrome. DEC already owns entity identity in its header.
+
+Zero-eligible discovery rows stay on CEC with a disabled trailing **Add** and
+the authoritative reason in the entity status lane. Opening an empty composer
+is forbidden.
+
+Pending-row edit expands one DEC in place. Sibling pending cards stay mounted
+on CEC. That is not Add/discovery mode.
 
 ---
 
