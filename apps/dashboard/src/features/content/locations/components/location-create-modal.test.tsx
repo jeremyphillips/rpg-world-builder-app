@@ -21,6 +21,10 @@ import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
 import {
+  completeBuildingCreateComposition,
+  applyDeferredBuildingCampaignAccess,
+} from '../lib/location-building-create-composition.lib'
+import {
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_PROMPT,
 } from '../lib/location-settlement-create-setup.lib'
@@ -48,6 +52,16 @@ vi.mock('../lib/location-settlement-create-composition.lib', async (importOrigin
   return {
     ...actual,
     createSettlementWithStartingDistricts: vi.fn(),
+  }
+})
+
+vi.mock('../lib/location-building-create-composition.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    completeBuildingCreateComposition: vi.fn(async () => ({ kind: 'success' as const })),
+    invalidateBuildingCreateCompositionQueries: vi.fn(),
+    applyDeferredBuildingCampaignAccess: vi.fn(async () => false),
   }
 })
 
@@ -144,6 +158,9 @@ const regionIntent = {
   parentKind: HARBORFORD.kind,
 } as const satisfies LocationCreateIntent
 
+const mockedCompleteBuildingCreateComposition = vi.mocked(completeBuildingCreateComposition)
+const mockedApplyDeferredBuildingCampaignAccess = vi.mocked(applyDeferredBuildingCampaignAccess)
+
 function renderModal(intent: LocationCreateIntent, onOpenChange = vi.fn(), open = true) {
   const queryClient = makeTestQueryClient()
   return {
@@ -204,6 +221,8 @@ describe('LocationCreateModal', () => {
     updateRouteContentCampaignAccess.mockReset()
     invalidateContentFormDefQueries.mockReset()
     vi.mocked(createSettlementWithStartingDistricts).mockReset()
+    mockedCompleteBuildingCreateComposition.mockReset()
+    mockedApplyDeferredBuildingCampaignAccess.mockReset()
     vi.mocked(notifyContentCreated).mockReset()
     vi.mocked(toast.warning).mockReset()
     mutateAsync.mockResolvedValue({ id: 'location-new' })
@@ -213,6 +232,8 @@ describe('LocationCreateModal', () => {
       deferredAccessFailed: false,
       districts: { created: [], failed: [] },
     })
+    mockedApplyDeferredBuildingCampaignAccess.mockResolvedValue(false)
+    mockedCompleteBuildingCreateComposition.mockResolvedValue({ kind: 'success' })
   })
 
   it('requires Facility discovery intent while Form remains optional', async () => {
@@ -331,14 +352,20 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Create location' }))
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
-    expect(mutateAsync.mock.calls[0]?.[0]).toMatchObject({
-      name: 'Ash House',
-      classification: { form: 'house' },
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          name: 'Ash House',
+          classification: { form: 'house' },
+        }),
+      },
     })
-    expect(mutateAsync.mock.calls[0]?.[0]).not.toHaveProperty('facilityAuthoringGroup')
+    expect(
+      mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building.input,
+    ).not.toHaveProperty('facilityAuthoringGroup')
   })
 
   it('creates the Brewery flow from the selected Facility', async () => {
@@ -353,8 +380,9 @@ describe('LocationCreateModal', () => {
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Red Dragon Brewery')
     await user.click(screen.getByRole('button', { name: 'Create location' }))
 
-    await waitFor(() => expect(mutateAsync).toHaveBeenCalledOnce())
-    const submission = mutateAsync.mock.calls[0]?.[0]
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    const submission =
+      mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building.input
     expect(submission).toMatchObject({
       classification: { facilityType: 'brewery' },
     })
@@ -388,9 +416,11 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('combobox', { name: 'Facility type' })).not.toHaveTextContent('Brewery')
 
     await user.click(screen.getByRole('button', { name: 'Create location' }))
-    await waitFor(() => expect(mutateAsync).toHaveBeenCalledOnce())
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
 
-    expect(mutateAsync.mock.calls[0]?.[0]).toMatchObject({
+    expect(
+      mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building.input,
+    ).toMatchObject({
       name: 'Copper Kettle',
       classification: { form: 'house' },
     })
@@ -420,11 +450,16 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
-    expect(updateRouteContentCampaignAccess).not.toHaveBeenCalled()
+    expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        campaignId: STORY_CAMPAIGN_ID,
+        pendingAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+      }),
+    )
     expect(notifyContentCreated).toHaveBeenCalledWith('locations')
     expect(toast.warning).not.toHaveBeenCalled()
   })
@@ -434,24 +469,23 @@ describe('LocationCreateModal', () => {
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
     await continueBuildingSetup(user)
-    const pendingAccess = {
-      ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-      available: false,
-    }
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
-    expect(updateRouteContentCampaignAccess).toHaveBeenCalledWith(
-      STORY_CAMPAIGN_ID,
-      'locations',
-      'location-new',
-      pendingAccess,
+    expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledWith(
+      expect.objectContaining({
+        campaignId: STORY_CAMPAIGN_ID,
+        pendingAccess: {
+          ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+          available: false,
+        },
+      }),
     )
     expect(notifyContentCreated).toHaveBeenCalledWith('locations')
     expect(toast.warning).not.toHaveBeenCalled()
@@ -465,16 +499,16 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
     })
 
-    const payload = mutateAsync.mock.calls[0]?.[0] as Record<string, unknown>
+    const payload = mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building
+      .input as Record<string, unknown>
     expect(payload).toMatchObject({
       name: 'Harbor Inn',
       parentLocationId: HARBORFORD.id,
       kind: 'structure',
       structureType: 'building',
-      status: 'published',
     })
     expect(payload).not.toHaveProperty('planeType')
     expect(payload).not.toHaveProperty('settlementType')
@@ -485,7 +519,10 @@ describe('LocationCreateModal', () => {
   it('closes after create when deferred access PATCH fails and warns without double-create', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
-    updateRouteContentCampaignAccess.mockRejectedValueOnce(new Error('patch failed'))
+    mockedCompleteBuildingCreateComposition.mockResolvedValueOnce({
+      kind: 'warning',
+      message: 'Building created, but campaign access could not be updated.',
+    })
     renderModal(buildingIntent, onOpenChange)
     await continueBuildingSetup(user)
 
@@ -493,12 +530,12 @@ describe('LocationCreateModal', () => {
     await submitCreateForm(user)
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledOnce()
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
 
     expect(toast.warning).toHaveBeenCalledWith(
-      'Location created, but campaign access could not be updated.',
+      'Building created, but campaign access could not be updated.',
     )
     expect(notifyContentCreated).not.toHaveBeenCalled()
   })

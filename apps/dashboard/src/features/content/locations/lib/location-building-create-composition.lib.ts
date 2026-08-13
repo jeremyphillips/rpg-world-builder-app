@@ -1,186 +1,412 @@
-import type {
-  ContentCampaignAccessPatch,
-  CreateLocationInput,
-  CreateOrganizationInput,
-} from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { QueryClient } from '@tanstack/react-query'
+import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
+import type { z } from 'zod'
 
-import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
-  buildOrganizationCreateInput,
-  buildOrganizationFields,
-  buildOrganizationFormValueSyncs,
-  organizationCreateDefaultValues,
-  organizationDraftFormSchema,
-  type OrganizationFormValues,
-} from '../../lib/forms/organization-form-projection'
-import { createOrganizationLocationConnection } from '../../lib/organization-location-connection-client'
-import { createContent } from '../../lib/list/content-client'
-import { locationDraftFormSchema, type LocationFormValues } from './location-form-fields'
+  buildingCreateCompositionErrorDetailsSchema,
+  buildingCreateCompositionRequestSchema,
+  getErrorMessage,
+  isApiError,
+  type ApiError,
+  type BuildingCreateCompositionIssue,
+  type BuildingCreateCompositionRequest,
+  type BuildingCreateCompositionResponse,
+  type ContentCampaignAccessPatch,
+  type CreateLocationInput,
+} from '@rpg/contracts'
 
-export const BUILDING_OPERATOR_FORM_PATH = 'operatorOrganization' as const
-export const BUILDING_OPERATOR_GROUP_LEGEND = 'Organization' as const
-export const buildingOperatorFormValueSyncs = buildOrganizationFormValueSyncs(
-  BUILDING_OPERATOR_FORM_PATH,
-)
+import { postJson } from '@/lib/api-client'
+import { updateRouteContentCampaignAccess } from '../../lib/campaign-access/campaign-access-api'
+import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
+import { buildOrganizationCreateInput } from '../../lib/forms/organization-form-projection'
+import { invalidateContentFormDefQueries } from '../../lib/list/use-content-mutations'
+import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
+import { organizationsQueryKey } from '../../organizations/hooks/use-organizations'
+import { locationFormDef } from './location-form-def'
+import type {
+  BuildingOrganizationDraftIssue,
+  BuildingOrganizationDraftPlan,
+} from './building-organization-create-drafts'
 
-export const locationBuildingCreateDraftFormSchema = locationDraftFormSchema.extend({
-  operatorOrganization: organizationDraftFormSchema,
-})
-
-export type LocationBuildingCreateFormValues = LocationFormValues & {
-  operatorOrganization: OrganizationFormValues
+export class BuildingCreateSubmitBlockedError extends Error {
+  constructor() {
+    super('')
+    this.name = 'BuildingCreateSubmitBlockedError'
+  }
 }
 
-export function buildBuildingOperatorFormItems(ctx: ContentFormCtx): FormItem[] {
-  return [
-    {
-      kind: 'group',
-      legend: BUILDING_OPERATOR_GROUP_LEGEND,
-      description: 'Create the organization that operates here.',
-      chrome: { variant: 'inset' },
-      fields: buildOrganizationFields(ctx, {
-        prefix: BUILDING_OPERATOR_FORM_PATH,
-        includeName: true,
-      }),
-    },
-  ]
+export function isBuildingCreateSubmitBlockedError(
+  error: unknown,
+): error is BuildingCreateSubmitBlockedError {
+  return error instanceof BuildingCreateSubmitBlockedError
 }
 
-export function buildingOperatorDefaultValues(): Record<string, unknown> & {
-  operatorOrganization: Record<string, unknown>
-} {
+const BUILDING_CREATE_COMPOSITION_FALLBACK = 'Could not create building.' as const
+
+export type BuildBuildingCreateCompositionRequestInput = Readonly<{
+  buildingInput: CreateLocationInput
+  plan: BuildingOrganizationDraftPlan
+}>
+
+export function buildBuildingCreateCompositionRequest(
+  input: BuildBuildingCreateCompositionRequestInput,
+): BuildingCreateCompositionRequest {
   return {
-    operatorOrganization: {
-      name: '',
-      organizationDomain: '',
-      activities: organizationCreateDefaultValues.activities ?? [],
-    },
+    building: { status: 'published', input: input.buildingInput },
+    organizations: input.plan.organizations.map((draft) => ({
+      organizationDraftId: draft.draftOrganizationId,
+      status: 'published' as const,
+      input: buildOrganizationCreateInput(draft.values),
+    })),
+    relationships: input.plan.relationships.map((relationship) => ({
+      relationshipDraftId: relationship.draftId,
+      kind: relationship.kind,
+      organization:
+        relationship.organization.kind === 'existing'
+          ? {
+              kind: 'existing' as const,
+              organizationId: relationship.organization.organizationId,
+            }
+          : {
+              kind: 'new' as const,
+              organizationDraftId: relationship.organization.draftOrganizationId,
+            },
+    })),
   }
 }
 
-/** Setup owns intent only; removing it prunes just the unsaved embedded projection. */
-export function pruneBuildingOperatorDraft<T extends Record<string, unknown>>(values: T): T {
-  if (!(BUILDING_OPERATOR_FORM_PATH in values)) return values
-  const next = { ...values }
-  delete next[BUILDING_OPERATOR_FORM_PATH]
-  return next
+export async function createBuildingComposition(
+  campaignId: string,
+  request: BuildingCreateCompositionRequest,
+): Promise<BuildingCreateCompositionResponse> {
+  return postJson<BuildingCreateCompositionResponse>(
+    `/api/campaigns/${campaignId}/content/locations/building-compositions`,
+    request,
+    BUILDING_CREATE_COMPOSITION_FALLBACK,
+  )
 }
 
-export function buildBuildingOperatorCreateInput(
-  values: LocationBuildingCreateFormValues,
-): CreateOrganizationInput {
-  return buildOrganizationCreateInput(values.operatorOrganization)
+export type PartitionedBuildingCreateCompositionIssues = Readonly<{
+  building: readonly BuildingCreateCompositionIssue[]
+  organizations: readonly BuildingOrganizationDraftIssue[]
+  composition: readonly BuildingCreateCompositionIssue[]
+  fallback?: string
+}>
+
+function parseBuildingCreateCompositionIssues(
+  error: ApiError,
+): readonly BuildingCreateCompositionIssue[] {
+  const parsed = buildingCreateCompositionErrorDetailsSchema.safeParse(error.details)
+  return parsed.success ? parsed.data.issues : []
 }
 
-type CreatedEntity = { id: string }
-
-export type BuildingOperatorCreateResult =
-  | { status: 'not_requested' }
-  | { status: 'organization_failed' }
-  | { status: 'relationship_failed'; organization: CreatedEntity }
-  | { status: 'created'; organization: CreatedEntity }
-
-export type CreateBuildingWithOptionalOperatorResult = {
-  building: CreatedEntity
-  deferredAccessFailed: boolean
-  operator: BuildingOperatorCreateResult
-}
-
-export type CreateBuildingWithOptionalOperatorParams = {
-  campaignId: string
-  locationRouteKey: string
-  buildingCreateInput: CreateLocationInput
-  pendingAccess: ContentCampaignAccessPatch | null
-  operatorCreateInput?: CreateOrganizationInput
-}
-
-type CreateBuildingWithOptionalOperatorDependencies = {
-  createEntity: (
-    campaignId: string,
-    routeKey: string,
-    input: unknown,
-    fallbackMessage?: string,
-  ) => Promise<CreatedEntity>
-  connectOperator: (
-    campaignId: string,
-    organizationId: string,
-    input: { locationId: string; kind: 'operator' },
-  ) => Promise<unknown>
-}
-
-const defaultDependencies: CreateBuildingWithOptionalOperatorDependencies = {
-  createEntity: createContent,
-  connectOperator: createOrganizationLocationConnection,
-}
-
-export async function createBuildingWithOptionalOperator(
-  params: CreateBuildingWithOptionalOperatorParams,
-  dependencies: CreateBuildingWithOptionalOperatorDependencies = defaultDependencies,
-): Promise<CreateBuildingWithOptionalOperatorResult> {
-  const { entity: building, deferredAccessFailed } = await createWithDeferredCampaignAccess({
-    campaignId: params.campaignId,
-    routeKey: params.locationRouteKey,
-    createInput: params.buildingCreateInput,
-    mutateAsync: (input) =>
-      dependencies.createEntity(
-        params.campaignId,
-        params.locationRouteKey,
-        input,
-        'Could not create locations.',
-      ),
-    pendingAccess: params.pendingAccess,
-  })
-
-  if (!params.operatorCreateInput) {
-    return { building, deferredAccessFailed, operator: { status: 'not_requested' } }
-  }
-
-  let organization: CreatedEntity
-  try {
-    organization = await dependencies.createEntity(
-      params.campaignId,
-      'organizations',
-      params.operatorCreateInput,
-      'Could not create organizations.',
-    )
-  } catch {
-    return { building, deferredAccessFailed, operator: { status: 'organization_failed' } }
-  }
-
-  try {
-    await dependencies.connectOperator(params.campaignId, organization.id, {
-      locationId: building.id,
-      kind: 'operator',
-    })
-  } catch {
+export function partitionBuildingCreateCompositionIssues(
+  error: unknown,
+): PartitionedBuildingCreateCompositionIssues {
+  if (!isApiError(error)) {
     return {
-      building,
-      deferredAccessFailed,
-      operator: { status: 'relationship_failed', organization },
+      building: [],
+      organizations: [],
+      composition: [],
+      fallback: getErrorMessage(error, BUILDING_CREATE_COMPOSITION_FALLBACK),
     }
   }
 
-  return { building, deferredAccessFailed, operator: { status: 'created', organization } }
+  const issues = parseBuildingCreateCompositionIssues(error)
+  if (issues.length === 0) {
+    return {
+      building: [],
+      organizations: [],
+      composition: [],
+      fallback: error.message,
+    }
+  }
+
+  const building: BuildingCreateCompositionIssue[] = []
+  const organizations: BuildingOrganizationDraftIssue[] = []
+  const composition: BuildingCreateCompositionIssue[] = []
+
+  for (const issue of issues) {
+    if (issue.target === 'building') {
+      building.push(issue)
+      continue
+    }
+    if (issue.target === 'organization') {
+      organizations.push({
+        organizationDraftId: issue.organizationDraftId,
+        message: issue.message,
+      })
+      continue
+    }
+    if (issue.target === 'relationship') {
+      organizations.push({
+        relationshipDraftId: issue.relationshipDraftId,
+        message: issue.message,
+      })
+      continue
+    }
+    composition.push(issue)
+  }
+
+  return { building, organizations, composition }
 }
 
-export type BuildingCreateCompletionToast =
-  | { kind: 'success' }
-  | { kind: 'warning'; message: string }
+export function applyBuildingCreateCompositionBuildingIssues<T extends FieldValues>(
+  form: UseFormReturn<T>,
+  issues: readonly BuildingCreateCompositionIssue[],
+): void {
+  for (const issue of issues) {
+    if (!issue.path) continue
+    form.setError(issue.path as FieldPath<T>, { message: issue.message })
+  }
+}
 
-export function resolveBuildingCreateCompletionToast(
-  result: CreateBuildingWithOptionalOperatorResult,
-): BuildingCreateCompletionToast {
-  const incomplete: string[] = []
-  if (result.deferredAccessFailed) incomplete.push('campaign access')
-  if (result.operator.status === 'organization_failed') incomplete.push('the organization')
-  if (result.operator.status === 'relationship_failed') incomplete.push('the operator relationship')
+export async function applyDeferredBuildingCampaignAccess(input: {
+  campaignId: string
+  buildingId: string
+  pendingAccess: ContentCampaignAccessPatch | null
+}): Promise<boolean> {
+  if (!input.pendingAccess || isDefaultCampaignAccessPatch(input.pendingAccess)) {
+    return false
+  }
 
-  if (incomplete.length === 0) return { kind: 'success' }
-  const summary =
-    incomplete.length === 1
-      ? incomplete[0]
-      : `${incomplete.slice(0, -1).join(', ')} and ${incomplete.at(-1)}`
-  return { kind: 'warning', message: `Building created, but ${summary} could not be completed.` }
+  try {
+    await updateRouteContentCampaignAccess(
+      input.campaignId,
+      locationFormDef.routeKey,
+      input.buildingId,
+      input.pendingAccess,
+    )
+    return false
+  } catch {
+    return true
+  }
+}
+
+export async function invalidateBuildingCreateCompositionQueries(
+  queryClient: QueryClient,
+  campaignId: string,
+  response: BuildingCreateCompositionResponse,
+): Promise<void> {
+  invalidateContentFormDefQueries(queryClient, campaignId, locationFormDef)
+  void queryClient.invalidateQueries({ queryKey: organizationsQueryKey(campaignId) })
+
+  const organizationIds = new Set<string>()
+  for (const row of response.organizations) {
+    organizationIds.add(row.organization.id)
+  }
+  for (const row of response.relationships) {
+    organizationIds.add(row.organizationId)
+  }
+
+  await invalidateLocationConnectionQueries(queryClient, {
+    campaignId,
+    locationIds: [response.building.id],
+  })
+
+  await Promise.all(
+    [...organizationIds].map((organizationId) =>
+      invalidateLocationConnectionQueries(queryClient, {
+        campaignId,
+        organizationId,
+        locationIds: [response.building.id],
+      }),
+    ),
+  )
+}
+
+export type BuildingCreateCompletionToast = Readonly<
+  { kind: 'success' } | { kind: 'warning'; message: string }
+>
+
+export function resolveBuildingCreateCompletionToast(input: {
+  deferredAccessFailed: boolean
+}): BuildingCreateCompletionToast {
+  if (!input.deferredAccessFailed) return { kind: 'success' }
+  return {
+    kind: 'warning',
+    message: 'Building created, but campaign access could not be updated.',
+  }
+}
+
+export type BuildingOrganizationsPanelController = Readonly<{
+  validate: () => Promise<{ valid: boolean; issueCount: number }>
+  focusFirstIssue: () => void
+  getPayload: () => BuildingOrganizationDraftPlan
+  hydrateServerIssues: (issues: readonly BuildingOrganizationDraftIssue[]) => void
+  reset: () => void
+}>
+
+function hasPartitionedIssues(issues: PartitionedBuildingCreateCompositionIssues): boolean {
+  return (
+    issues.building.length > 0 || issues.organizations.length > 0 || issues.composition.length > 0
+  )
+}
+
+function applyPartitionedBuildingCreateIssues<T extends FieldValues>(input: {
+  form: UseFormReturn<T>
+  issues: PartitionedBuildingCreateCompositionIssues
+  organizationsController?: BuildingOrganizationsPanelController | null
+  onNavigateToTab?: (tabId: string) => void
+}): void {
+  if (input.issues.building.length > 0) {
+    applyBuildingCreateCompositionBuildingIssues(input.form, input.issues.building)
+    input.onNavigateToTab?.('details')
+  }
+  if (input.issues.organizations.length > 0) {
+    input.onNavigateToTab?.('organizations')
+    input.organizationsController?.hydrateServerIssues(input.issues.organizations)
+    input.organizationsController?.focusFirstIssue()
+  }
+}
+
+export async function validateBuildingCreateOrganizationsPanel(input: {
+  organizationsController?: BuildingOrganizationsPanelController | null
+  onNavigateToTab?: (tabId: string) => void
+}): Promise<void> {
+  const controller = input.organizationsController
+  if (!controller) return
+  const validation = await controller.validate()
+  if (validation.valid) return
+  input.onNavigateToTab?.('organizations')
+  controller.focusFirstIssue()
+  throw new BuildingCreateSubmitBlockedError()
+}
+
+export function assertClientBuildingCreatePlan<T extends FieldValues>(input: {
+  request: BuildingCreateCompositionRequest
+  form: UseFormReturn<T>
+  organizationsController?: BuildingOrganizationsPanelController | null
+  onNavigateToTab?: (tabId: string) => void
+}): void {
+  const issues = validateBuildingCreateCompositionRequest(input.request)
+  if (!hasPartitionedIssues(issues)) return
+  applyPartitionedBuildingCreateIssues({
+    form: input.form,
+    issues,
+    organizationsController: input.organizationsController,
+    onNavigateToTab: input.onNavigateToTab,
+  })
+  throw new BuildingCreateSubmitBlockedError()
+}
+
+export function mapBuildingCreateSubmitError(error: unknown): string | undefined {
+  if (isBuildingCreateSubmitBlockedError(error)) return undefined
+  const partitioned = partitionBuildingCreateCompositionIssues(error)
+  if (partitioned.building.length > 0 || partitioned.organizations.length > 0) {
+    return undefined
+  }
+  if (partitioned.composition.length > 0) {
+    return partitioned.composition[0]?.message ?? partitioned.fallback
+  }
+  return partitioned.fallback
+}
+
+export function handleBuildingCreateCompositionFailure<T extends FieldValues>(input: {
+  error: unknown
+  form: UseFormReturn<T>
+  organizationsController?: BuildingOrganizationsPanelController | null
+  onNavigateToTab?: (tabId: string) => void
+}): void {
+  const partitioned = partitionBuildingCreateCompositionIssues(input.error)
+  applyPartitionedBuildingCreateIssues({
+    form: input.form,
+    issues: partitioned,
+    organizationsController: input.organizationsController,
+    onNavigateToTab: input.onNavigateToTab,
+  })
+  if (hasPartitionedIssues(partitioned)) {
+    throw new BuildingCreateSubmitBlockedError()
+  }
+  throw input.error
+}
+
+export async function completeBuildingCreateComposition(input: {
+  campaignId: string
+  request: BuildingCreateCompositionRequest
+  queryClient: QueryClient
+  pendingAccess: ContentCampaignAccessPatch | null
+  organizationsController?: BuildingOrganizationsPanelController | null
+}): Promise<BuildingCreateCompletionToast> {
+  const result = await createBuildingComposition(input.campaignId, input.request)
+  const deferredAccessFailed = await applyDeferredBuildingCampaignAccess({
+    campaignId: input.campaignId,
+    buildingId: result.building.id,
+    pendingAccess: input.pendingAccess,
+  })
+  await invalidateBuildingCreateCompositionQueries(input.queryClient, input.campaignId, result)
+  input.organizationsController?.reset()
+  return resolveBuildingCreateCompletionToast({ deferredAccessFailed })
+}
+
+function classifyRequestValidationIssue(
+  request: BuildingCreateCompositionRequest,
+  issue: z.ZodIssue,
+):
+  | { bucket: 'organizations'; issue: BuildingOrganizationDraftIssue }
+  | { bucket: 'building'; issue: BuildingCreateCompositionIssue }
+  | { bucket: 'composition'; issue: BuildingCreateCompositionIssue } {
+  const path = issue.path.map(String).join('.')
+  const organizationDraftId =
+    issue.path[0] === 'organizations' && typeof issue.path[1] === 'number'
+      ? request.organizations[issue.path[1]]?.organizationDraftId
+      : undefined
+  const relationshipDraftId =
+    issue.path[0] === 'relationships' && typeof issue.path[1] === 'number'
+      ? request.relationships[issue.path[1]]?.relationshipDraftId
+      : undefined
+
+  if (organizationDraftId) {
+    return { bucket: 'organizations', issue: { organizationDraftId, message: issue.message } }
+  }
+  if (relationshipDraftId) {
+    return { bucket: 'organizations', issue: { relationshipDraftId, message: issue.message } }
+  }
+  if (issue.path[0] === 'building') {
+    return {
+      bucket: 'building',
+      issue: {
+        target: 'building',
+        code: 'validation_error',
+        message: issue.message,
+        ...(path ? { path } : {}),
+      },
+    }
+  }
+  return {
+    bucket: 'composition',
+    issue: {
+      target: 'capability',
+      code: 'validation_error',
+      message: issue.message,
+    },
+  }
+}
+
+export function validateBuildingCreateCompositionRequest(
+  request: BuildingCreateCompositionRequest,
+): PartitionedBuildingCreateCompositionIssues {
+  const parsed = buildingCreateCompositionRequestSchema.safeParse(request)
+  if (parsed.success) {
+    return { building: [], organizations: [], composition: [] }
+  }
+
+  const building: BuildingCreateCompositionIssue[] = []
+  const organizations: BuildingOrganizationDraftIssue[] = []
+  const composition: BuildingCreateCompositionIssue[] = []
+
+  for (const issue of parsed.error.issues) {
+    const classified = classifyRequestValidationIssue(request, issue)
+    if (classified.bucket === 'organizations') {
+      organizations.push(classified.issue)
+      continue
+    }
+    if (classified.bucket === 'building') {
+      building.push(classified.issue)
+      continue
+    }
+    composition.push(classified.issue)
+  }
+
+  return { building, organizations, composition }
 }

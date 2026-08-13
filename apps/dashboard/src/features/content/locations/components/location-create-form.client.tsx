@@ -3,15 +3,19 @@
 import type { z } from 'zod'
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, useFormState } from 'react-hook-form'
 import { type ContentCampaignAccessPatch } from '@rpg/contracts'
-import { cn, toast } from '@rpg/ui'
-import type { FormValueSync } from '@rpg/ui/form'
+import { Button, cn, toast } from '@rpg/ui'
+import { FormShellSubmitButton, useSchemaFormSubmit, type FormValueSync } from '@rpg/ui/form'
 
+import type { CreateWorkflowPanelStatus } from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
+import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handler'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
+import { formatContentCreateActionLabel } from '../../lib/content-type-labels'
 import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context.client'
 import {
   invalidateContentFormDefQueries,
@@ -44,6 +48,16 @@ import {
   type BuildingCreateSetupProjection,
 } from '../lib/location-building-create-setup.lib'
 import {
+  assertClientBuildingCreatePlan,
+  buildBuildingCreateCompositionRequest,
+  completeBuildingCreateComposition,
+  handleBuildingCreateCompositionFailure,
+  mapBuildingCreateSubmitError,
+  validateBuildingCreateOrganizationsPanel,
+} from '../lib/location-building-create-composition.lib'
+import { EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN } from '../lib/building-organization-create-drafts'
+import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
+import {
   createSettlementWithStartingDistricts,
   resolveSettlementCreateCompletionToast,
   resolveSettlementStructureAuthoringGuidance,
@@ -65,7 +79,7 @@ export type LocationCreateFormProps = {
   mounted: boolean
   leaveGuardEnabled: boolean
   leaveBridgeRef: MutableRefObject<ContentFormHostLeaveBridge | null>
-  chrome: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
+  chrome?: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
   onTrustedClose: () => void
   /** Stable across setup revisits so draft/dirty survive phase swaps. */
   formKey: string
@@ -73,10 +87,16 @@ export type LocationCreateFormProps = {
   visible?: boolean
   onPendingChange?: (pending: boolean) => void
   extraUnsavedEdits?: boolean
+  hadSetup?: boolean
+  onBack?: () => void
+  onCancel?: () => void
   buildingSetupApplication?: {
     revision: number
     projection: BuildingCreateSetupProjection
   }
+  organizationsControllerRef?: MutableRefObject<BuildingOrganizationsCreateTabController | null>
+  onNavigateToTab?: (tabId: string) => void
+  onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
 }
 
 type LocationCreateFormBodyProps = LocationCreateFormProps
@@ -122,6 +142,109 @@ function LocationBuildingSetupProjectionBridge({
   return null
 }
 
+function countFormIssuePaths(errors: Record<string, unknown>): number {
+  let count = 0
+  for (const value of Object.values(errors)) {
+    if (!value || typeof value !== 'object') continue
+    if ('message' in value && value.message) {
+      count += 1
+      continue
+    }
+    count += countFormIssuePaths(value as Record<string, unknown>)
+  }
+  return count
+}
+
+function LocationCreateDetailsPanelStatusBridge({
+  formError,
+  extraUnsavedEdits,
+  onStatusChange,
+}: {
+  formError?: string | null
+  extraUnsavedEdits?: boolean
+  onStatusChange?: (status: CreateWorkflowPanelStatus) => void
+}) {
+  const { dirtyFields, errors, isSubmitted } = useFormState()
+  const campaignAccess = useCampaignAccessForm()
+  const issueCount =
+    (formError ? 1 : 0) + (isSubmitted ? countFormIssuePaths(errors as Record<string, unknown>) : 0)
+  const dirty = composeFormLeaveDirty({
+    dirtyFields,
+    extraUnsavedEdits,
+    campaignAccessDirty: campaignAccess.isDirty,
+  })
+
+  useEffect(() => {
+    onStatusChange?.({
+      invalid: issueCount > 0,
+      ...(issueCount > 0 ? { issueCount } : {}),
+      dirty,
+    })
+  }, [dirty, issueCount, onStatusChange])
+
+  return null
+}
+
+function BuildingCreateSubmitButton({
+  pending,
+  submitLabel,
+  onSubmit,
+  onInvalidDetails,
+}: {
+  pending: boolean
+  submitLabel: string
+  onSubmit: FormSubmitHandler<LocationDraftFormValues>
+  onInvalidDetails: () => void
+}) {
+  const schemaFormSubmit = useSchemaFormSubmit<LocationDraftFormValues>()
+  if (!schemaFormSubmit) {
+    return <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
+  }
+
+  return (
+    <Button
+      type="button"
+      disabled={pending}
+      onClick={() => schemaFormSubmit.requestSubmit(onSubmit, onInvalidDetails)}
+    >
+      {submitLabel}
+    </Button>
+  )
+}
+
+function buildBuildingCreateFooterChrome(input: {
+  hadSetup: boolean
+  pending: boolean
+  submitLabel: string
+  onSubmit: FormSubmitHandler<LocationDraftFormValues>
+  onInvalidDetails: () => void
+  onBack: () => void
+  onCancel: () => void
+}): ContentFormHostChrome {
+  return {
+    contentWrapper: (content) => content,
+    footer: () => (
+      <>
+        {input.hadSetup ? (
+          <Button type="button" variant="outline" disabled={input.pending} onClick={input.onBack}>
+            Back
+          </Button>
+        ) : (
+          <Button type="button" variant="outline" disabled={input.pending} onClick={input.onCancel}>
+            Cancel
+          </Button>
+        )}
+        <BuildingCreateSubmitButton
+          pending={input.pending}
+          submitLabel={input.submitLabel}
+          onSubmit={input.onSubmit}
+          onInvalidDetails={input.onInvalidDetails}
+        />
+      </>
+    ),
+  }
+}
+
 function isSettlementWithStartingDistricts(
   fixedCreate: LocationFixedCreateContext,
 ): fixedCreate is FixedSettlementCreateContext {
@@ -138,6 +261,8 @@ type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   formSchema?: z.ZodType<LocationDraftFormValues>
   formDefaultValues?: Record<string, unknown>
   formValueSyncs?: FormValueSync[]
+  onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
+  chrome: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
 }
 
 function LocationCreateFormShell({
@@ -162,6 +287,7 @@ function LocationCreateFormShell({
   formSchema = locationDraftFormSchema,
   formDefaultValues,
   formValueSyncs = locationFormValueSyncs,
+  onDetailsStatusChange,
 }: LocationCreateFormShellProps) {
   useEffect(() => {
     onPendingChange?.(pending)
@@ -202,6 +328,13 @@ function LocationCreateFormShell({
               {buildingSetupApplication ? (
                 <LocationBuildingSetupProjectionBridge application={buildingSetupApplication} />
               ) : null}
+              {onDetailsStatusChange ? (
+                <LocationCreateDetailsPanelStatusBridge
+                  formError={formError}
+                  extraUnsavedEdits={extraUnsavedEdits}
+                  onStatusChange={onDetailsStatusChange}
+                />
+              ) : null}
               <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
               <LocationCreateDraftPrune fixedCreate={fixedCreate} />
               <ContentFormHeader
@@ -230,9 +363,21 @@ function LocationCreateFormShell({
 }
 
 function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
-  const { campaignId, fixedCreate, optionsCtx, buildingSetupApplication } = props
-  const mutation = useContentWriteMutation(locationFormDef, campaignId)
+  const {
+    campaignId,
+    fixedCreate,
+    optionsCtx,
+    buildingSetupApplication,
+    hadSetup = false,
+    onBack = () => undefined,
+    onCancel = () => undefined,
+    organizationsControllerRef,
+    onNavigateToTab,
+    onDetailsStatusChange,
+  } = props
+  const queryClient = useQueryClient()
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
+  const [compositionPending, setCompositionPending] = useState(false)
   const setupClassification = buildingSetupApplication
     ? buildBuildingClassificationFromCreateSetup(buildingSetupApplication.projection)
     : undefined
@@ -250,55 +395,104 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     omitBuildingForm: true,
   })
 
-  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {
-    resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
-    const overlaidValues = applyLocationFixedCreateContext(
-      values as LocationFormValues,
-      fixedCreate,
-    )
-    const { deferredAccessFailed } = await createWithDeferredCampaignAccess({
-      campaignId,
-      routeKey: locationFormDef.routeKey,
-      createInput: {
-        ...locationFormDef.toInput(
-          overlaidValues,
-          {
-            weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
-            campaignRules: locationCtx.campaignRules,
-            equipmentKind: locationCtx.equipmentKind,
-          },
-          'publish',
-        ),
-        status: 'published' as const,
-      },
-      mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
-      pendingAccess: campaignAccessDraftRef.current,
-    })
+  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>({
+    fallbackMessage: 'Could not create building.',
+    mapError: mapBuildingCreateSubmitError,
+    submit: async (values, form) => {
+      resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
+      const overlaidValues = applyLocationFixedCreateContext(
+        values as LocationFormValues,
+        fixedCreate,
+      )
+      const buildingCreateInput = locationFormDef.toInput(
+        overlaidValues,
+        {
+          weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
+          campaignRules: locationCtx.campaignRules,
+          equipmentKind: locationCtx.equipmentKind,
+        },
+        'publish',
+      )
 
-    if (deferredAccessFailed) {
-      toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
-    } else {
-      notifyContentCreated('locations')
-    }
-  }, 'Could not create locations.')
+      const organizationsController = organizationsControllerRef?.current
+      await validateBuildingCreateOrganizationsPanel({
+        organizationsController,
+        onNavigateToTab,
+      })
+
+      const plan = organizationsController?.getPayload() ?? EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN
+      const request = buildBuildingCreateCompositionRequest({
+        buildingInput: buildingCreateInput,
+        plan,
+      })
+      assertClientBuildingCreatePlan({
+        request,
+        form,
+        organizationsController,
+        onNavigateToTab,
+      })
+
+      setCompositionPending(true)
+      try {
+        const toastResult = await completeBuildingCreateComposition({
+          campaignId,
+          request,
+          queryClient,
+          pendingAccess: campaignAccessDraftRef.current,
+          organizationsController,
+        })
+        if (toastResult.kind === 'success') {
+          notifyContentCreated('locations')
+        } else {
+          toast.warning(toastResult.message)
+        }
+      } catch (error) {
+        handleBuildingCreateCompositionFailure({
+          error,
+          form,
+          organizationsController,
+          onNavigateToTab,
+        })
+      } finally {
+        setCompositionPending(false)
+      }
+    },
+  })
+
+  const submitLabel = formatContentCreateActionLabel('locations')
 
   return (
     <LocationCreateFormShell
       {...props}
       campaignAccessDraftRef={campaignAccessDraftRef}
       fields={fields}
-      pending={mutation.isPending}
+      pending={compositionPending}
       onSubmit={onSubmit}
       formError={formError}
+      onDetailsStatusChange={onDetailsStatusChange}
       formDefaultValues={{
         ...(setupClassification ? { classification: setupClassification } : {}),
       }}
+      chrome={({ pending }) =>
+        buildBuildingCreateFooterChrome({
+          hadSetup,
+          pending,
+          submitLabel,
+          onSubmit,
+          onInvalidDetails: () => onNavigateToTab?.('details'),
+          onBack,
+          onCancel,
+        })
+      }
     />
   )
 }
 
 function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
-  const { campaignId, fixedCreate, optionsCtx } = props
+  const { campaignId, fixedCreate, optionsCtx, chrome } = props
+  if (!chrome) {
+    throw new Error('LocationGenericCreateForm requires chrome.')
+  }
   const mutation = useContentWriteMutation(locationFormDef, campaignId)
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
 
@@ -347,6 +541,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
   return (
     <LocationCreateFormShell
       {...props}
+      chrome={chrome}
       campaignAccessDraftRef={campaignAccessDraftRef}
       fields={contentFormFields(locationFormDef, locationCtx)}
       pending={mutation.isPending}
@@ -359,7 +554,10 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
 function LocationSettlementCreateForm(
   props: LocationCreateFormBodyProps & { fixedCreate: FixedSettlementCreateContext },
 ) {
-  const { campaignId, fixedCreate, optionsCtx } = props
+  const { campaignId, fixedCreate, optionsCtx, chrome } = props
+  if (!chrome) {
+    throw new Error('LocationSettlementCreateForm requires chrome.')
+  }
   const queryClient = useQueryClient()
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
   const [compositionPending, setCompositionPending] = useState(false)
@@ -437,6 +635,7 @@ function LocationSettlementCreateForm(
   return (
     <LocationCreateFormShell
       {...props}
+      chrome={chrome}
       campaignAccessDraftRef={campaignAccessDraftRef}
       fields={fields}
       pending={compositionPending}

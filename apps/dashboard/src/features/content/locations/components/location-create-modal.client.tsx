@@ -194,6 +194,10 @@ function LocationCreateModalDetailsForm({
   onPendingChange,
   buildingSetupApplication,
   extraUnsavedEdits,
+  organizationsControllerRef,
+  onNavigateToTab,
+  onDetailsStatusChange,
+  useCompositeBuildingChrome,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -210,6 +214,10 @@ function LocationCreateModalDetailsForm({
   onPendingChange?: (pending: boolean) => void
   buildingSetupApplication: LocationCreateModalState['buildingSetupApplication']
   extraUnsavedEdits?: boolean
+  organizationsControllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
+  onNavigateToTab?: (tabId: string) => void
+  onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
+  useCompositeBuildingChrome?: boolean
 }) {
   return (
     <LocationCreateForm
@@ -224,15 +232,24 @@ function LocationCreateModalDetailsForm({
       onTrustedClose={onTrustedClose}
       onPendingChange={onPendingChange}
       extraUnsavedEdits={extraUnsavedEdits}
+      hadSetup={hadSetup}
+      onBack={onBack}
+      onCancel={onCancel}
       buildingSetupApplication={buildingSetupApplication ?? undefined}
-      chrome={({ pending }) =>
-        buildDetailsChrome({
-          hadSetup,
-          pending,
-          submitLabel,
-          onBack,
-          onCancel,
-        })
+      organizationsControllerRef={organizationsControllerRef}
+      onNavigateToTab={onNavigateToTab}
+      onDetailsStatusChange={onDetailsStatusChange}
+      chrome={
+        useCompositeBuildingChrome
+          ? undefined
+          : ({ pending }) =>
+              buildDetailsChrome({
+                hadSetup,
+                pending,
+                submitLabel,
+                onBack,
+                onCancel,
+              })
       }
     />
   )
@@ -379,6 +396,10 @@ function LocationCreateModalSession({
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
   const [activeTabId, setActiveTabId] = React.useState('details')
+  const [detailsStatus, setDetailsStatus] = React.useState<CreateWorkflowPanelStatus>({
+    invalid: false,
+    dirty: false,
+  })
   const [organizationsStatus, setOrganizationsStatus] = React.useState<CreateWorkflowPanelStatus>({
     invalid: false,
     dirty: false,
@@ -412,6 +433,10 @@ function LocationCreateModalSession({
       onPendingChange={setDetailsPending}
       buildingSetupApplication={state.buildingSetupApplication}
       extraUnsavedEdits={organizationsStatus.dirty}
+      organizationsControllerRef={buildingTabsConfigured ? organizationsControllerRef : undefined}
+      onNavigateToTab={buildingTabsConfigured ? setActiveTabId : undefined}
+      onDetailsStatusChange={buildingTabsConfigured ? setDetailsStatus : undefined}
+      useCompositeBuildingChrome={buildingTabsConfigured}
     />
   )
   const resolvedSetupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
@@ -453,7 +478,7 @@ function LocationCreateModalSession({
                       {renderDetailsForm}
                     </ContentFormOptionsGate>
                   ),
-                  status: { invalid: false, dirty: false },
+                  status: detailsStatus,
                   contentMode: 'managed',
                 },
                 {

@@ -1,158 +1,146 @@
-import { describe, expect, it, vi } from 'vitest'
-import type { CreateLocationInput, CreateOrganizationInput } from '@rpg/contracts'
+import { describe, expect, it } from 'vitest'
+import { ApiError, type CreateLocationInput } from '@rpg/contracts'
 
 import {
-  buildBuildingOperatorCreateInput,
-  createBuildingWithOptionalOperator,
-  locationBuildingCreateDraftFormSchema,
-  pruneBuildingOperatorDraft,
+  buildBuildingCreateCompositionRequest,
+  partitionBuildingCreateCompositionIssues,
   resolveBuildingCreateCompletionToast,
-  type CreateBuildingWithOptionalOperatorResult,
-  type LocationBuildingCreateFormValues,
+  validateBuildingCreateCompositionRequest,
 } from './location-building-create-composition.lib'
+import type { BuildingOrganizationDraftPlan } from './building-organization-create-drafts'
 
-const buildingCreateInput = {
-  name: 'The Copper Kettle',
-  slug: 'the-copper-kettle',
-  kind: 'building',
-} as unknown as CreateLocationInput
+const buildingInput = {
+  slug: 'clock-tower',
+  name: 'Clock Tower',
+  kind: 'structure',
+  structureType: 'building',
+} as CreateLocationInput
 
-const operatorCreateInput = {
-  name: 'Red Dragon Brewing Company',
-  slug: 'red-dragon-brewing-company',
-  organizationDomain: 'commercial',
-  organizationForm: 'company',
-  activities: ['brewing'],
-} as CreateOrganizationInput
+const organizationPlan: BuildingOrganizationDraftPlan = {
+  organizations: [
+    {
+      draftOrganizationId: 'organization-1',
+      values: {
+        name: 'Clockkeepers',
+        organizationDomain: 'commercial',
+        organizationForm: 'company',
+        activities: [],
+      },
+    },
+  ],
+  relationships: [
+    {
+      draftId: 'relationship-1',
+      kind: 'operator',
+      organization: { kind: 'new', draftOrganizationId: 'organization-1' },
+    },
+  ],
+}
 
-describe('Building operator form composition', () => {
-  it('accepts draft sentinels without persisting them through the Organization builder', () => {
-    expect(() =>
-      locationBuildingCreateDraftFormSchema.parse({
-        name: 'The Copper Kettle',
-        operatorOrganization: { name: '', organizationDomain: '', activities: [] },
-      }),
-    ).not.toThrow()
-
+describe('buildBuildingCreateCompositionRequest', () => {
+  it('maps building input and draft plan into the composite contract', () => {
     expect(
-      buildBuildingOperatorCreateInput({
-        name: 'The Copper Kettle',
-        operatorOrganization: {
-          name: 'Red Dragon Brewing Company',
-          organizationDomain: 'commercial',
-          organizationForm: 'company',
-          activities: ['brewing'],
+      buildBuildingCreateCompositionRequest({
+        buildingInput,
+        plan: organizationPlan,
+      }),
+    ).toMatchObject({
+      building: { status: 'published', input: buildingInput },
+      organizations: [
+        expect.objectContaining({
+          organizationDraftId: 'organization-1',
+          input: expect.objectContaining({ name: 'Clockkeepers' }),
+        }),
+      ],
+      relationships: [
+        {
+          relationshipDraftId: 'relationship-1',
+          kind: 'operator',
+          organization: { kind: 'new', organizationDraftId: 'organization-1' },
         },
-      } as unknown as LocationBuildingCreateFormValues),
-    ).toMatchObject(operatorCreateInput)
-  })
-
-  it('prunes only unsaved operator fields when intent is removed', () => {
-    const draft = {
-      name: 'The Copper Kettle',
-      classification: { facilityType: 'brewery' },
-      operatorOrganization: { name: 'Red Dragon Brewing Company' },
-    }
-
-    expect(pruneBuildingOperatorDraft(draft)).toEqual({
-      name: draft.name,
-      classification: draft.classification,
+      ],
     })
   })
 })
 
-describe('createBuildingWithOptionalOperator', () => {
-  it('creates Building, Organization, then operator relationship in order', async () => {
-    const calls: string[] = []
-    const createEntity = vi.fn(async (_campaignId: string, routeKey: string) => {
-      calls.push(routeKey)
-      return { id: routeKey === 'locations' ? 'building-1' : 'organization-1' }
-    })
-    const connectOperator = vi.fn(async () => {
-      calls.push('operator')
-      return {}
-    })
-
-    const result = await createBuildingWithOptionalOperator(
-      {
-        campaignId: 'campaign-1',
-        locationRouteKey: 'locations',
-        buildingCreateInput,
-        pendingAccess: null,
-        operatorCreateInput,
+describe('validateBuildingCreateCompositionRequest', () => {
+  it('partitions dangling draft references into organization issues', () => {
+    const request = buildBuildingCreateCompositionRequest({
+      buildingInput,
+      plan: {
+        organizations: [],
+        relationships: [
+          {
+            draftId: 'relationship-1',
+            kind: 'owns',
+            organization: { kind: 'new', draftOrganizationId: 'missing' },
+          },
+        ],
       },
-      { createEntity, connectOperator },
-    )
+    })
 
-    expect(calls).toEqual(['locations', 'organizations', 'operator'])
-    expect(connectOperator).toHaveBeenCalledWith('campaign-1', 'organization-1', {
-      locationId: 'building-1',
-      kind: 'operator',
-    })
-    expect(result.operator).toEqual({
-      status: 'created',
-      organization: { id: 'organization-1' },
-    })
+    const result = validateBuildingCreateCompositionRequest(request)
+    expect(result.organizations).toEqual([
+      expect.objectContaining({
+        relationshipDraftId: 'relationship-1',
+        message: 'Relationship references an unknown organization draft.',
+      }),
+    ])
   })
+})
 
-  it('reports Organization failure without attempting the relationship', async () => {
-    const createEntity = vi.fn(async (_campaignId: string, routeKey: string) => {
-      if (routeKey === 'organizations') throw new Error('organization failed')
-      return { id: 'building-1' }
-    })
-    const connectOperator = vi.fn(async () => ({}))
-
-    const result = await createBuildingWithOptionalOperator(
-      {
-        campaignId: 'campaign-1',
-        locationRouteKey: 'locations',
-        buildingCreateInput,
-        pendingAccess: null,
-        operatorCreateInput,
-      },
-      { createEntity, connectOperator },
-    )
-
-    expect(result.operator).toEqual({ status: 'organization_failed' })
-    expect(connectOperator).not.toHaveBeenCalled()
-  })
-
-  it('retains the created Organization id when only the relationship fails', async () => {
-    const createEntity = vi.fn(async (_campaignId: string, routeKey: string) => ({
-      id: routeKey === 'locations' ? 'building-1' : 'organization-1',
-    }))
-    const connectOperator = vi.fn(async () => {
-      throw new Error('relationship failed')
+describe('partitionBuildingCreateCompositionIssues', () => {
+  it('routes attributed API issues to building and organization partitions', () => {
+    const error = new ApiError(422, 'building_create_validation_failed', 'Invalid plan.', {
+      issues: [
+        {
+          target: 'building',
+          code: 'validation_error',
+          message: 'Name is required.',
+          path: 'name',
+        },
+        {
+          target: 'relationship',
+          relationshipDraftId: 'relationship-1',
+          code: 'relationship_conflict',
+          message: 'Owner conflicts with another relationship.',
+        },
+        {
+          target: 'capability',
+          code: 'transactions_unavailable',
+          message: 'Atomic Building creation requires MongoDB transaction support.',
+        },
+      ],
     })
 
-    const result = await createBuildingWithOptionalOperator(
-      {
-        campaignId: 'campaign-1',
-        locationRouteKey: 'locations',
-        buildingCreateInput,
-        pendingAccess: null,
-        operatorCreateInput,
-      },
-      { createEntity, connectOperator },
-    )
-
-    expect(result.operator).toEqual({
-      status: 'relationship_failed',
-      organization: { id: 'organization-1' },
+    expect(partitionBuildingCreateCompositionIssues(error)).toEqual({
+      building: [
+        expect.objectContaining({ target: 'building', message: 'Name is required.', path: 'name' }),
+      ],
+      organizations: [
+        {
+          relationshipDraftId: 'relationship-1',
+          message: 'Owner conflicts with another relationship.',
+        },
+      ],
+      composition: [
+        expect.objectContaining({
+          target: 'capability',
+          code: 'transactions_unavailable',
+        }),
+      ],
     })
   })
 })
 
 describe('resolveBuildingCreateCompletionToast', () => {
-  it('aggregates deterministic partial completion warnings', () => {
-    const result: CreateBuildingWithOptionalOperatorResult = {
-      building: { id: 'building-1' },
-      deferredAccessFailed: true,
-      operator: { status: 'organization_failed' },
-    }
-    expect(resolveBuildingCreateCompletionToast(result)).toEqual({
+  it('warns only when deferred campaign access fails', () => {
+    expect(resolveBuildingCreateCompletionToast({ deferredAccessFailed: false })).toEqual({
+      kind: 'success',
+    })
+    expect(resolveBuildingCreateCompletionToast({ deferredAccessFailed: true })).toEqual({
       kind: 'warning',
-      message: 'Building created, but campaign access and the organization could not be completed.',
+      message: 'Building created, but campaign access could not be updated.',
     })
   })
 })
