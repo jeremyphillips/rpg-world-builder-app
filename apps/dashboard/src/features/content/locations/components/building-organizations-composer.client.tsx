@@ -1,7 +1,7 @@
 'use client'
 
 import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
-import { Alert, Button, ChooserSummaryCard, Text, TextField } from '@rpg/ui'
+import { Alert, Button, ChooserSummaryCard, SearchBar, Text } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
 import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
@@ -26,7 +26,6 @@ import {
   BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL,
   BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
   BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
-  BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
@@ -38,6 +37,9 @@ import type { BuildingOrganizationRelationshipDraft } from '../lib/building-orga
 import {
   buildingOrganizationsComposerClasses,
   buildingOrganizationsConfirmActionsClasses,
+  buildingOrganizationsDiscoveryControlsClasses,
+  buildingOrganizationsDiscoveryCreateActionClasses,
+  buildingOrganizationsDiscoveryClasses,
   buildingOrganizationsDiscoveryListClasses,
 } from './building-organizations-create-tab.variants'
 
@@ -132,18 +134,26 @@ export function BuildingOrganizationDiscovery({
   } = controller
 
   return (
-    <>
-      <TextField
-        id="building-organization-search"
-        label={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
-        placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
-        value={searchQuery}
-        onChange={(event) => setSearchQuery(event.target.value)}
-      />
-      <div>
-        <Button type="button" variant="ghost" onClick={enterNewOrganizationBranch}>
-          {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
-        </Button>
+    <div className={buildingOrganizationsDiscoveryClasses}>
+      <div className={buildingOrganizationsDiscoveryControlsClasses}>
+        <SearchBar
+          id="building-organization-search"
+          placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
+          ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            density="compact"
+            onClick={enterNewOrganizationBranch}
+          >
+            {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
+          </Button>
+        </div>
       </div>
       <div className={buildingOrganizationsDiscoveryListClasses}>
         {isError ? (
@@ -164,7 +174,7 @@ export function BuildingOrganizationDiscovery({
           />
         ))}
       </div>
-    </>
+    </div>
   )
 }
 

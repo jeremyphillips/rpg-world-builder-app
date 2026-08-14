@@ -378,7 +378,7 @@ describe('EquipmentInventorySummary', () => {
 
     const addedColumn = screen.getByRole('heading', { name: 'Added Equipment' }).closest('section')
     expect(addedColumn?.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
-    expect(container.querySelector('.bg-card')).not.toBeInTheDocument()
+    expect(container.querySelector('article.bg-card')).toBeInTheDocument()
   })
 
   it('renders a title badge and outline panel when added inventory has entries', () => {
@@ -421,7 +421,7 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
-    expect(container.querySelector('.bg-card')).not.toBeInTheDocument()
+    expect(container.querySelector('article.bg-card')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

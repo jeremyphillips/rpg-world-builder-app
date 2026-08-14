@@ -29,6 +29,8 @@ export type CreateWorkflowPanelStatus = {
   invalid: boolean
   issueCount?: number
   dirty: boolean
+  /** When true, composite create submit must stay disabled until resolved. */
+  blocksSubmit?: boolean
 }
 
 export type CreateWorkflowPanelValidationResult = Readonly<{

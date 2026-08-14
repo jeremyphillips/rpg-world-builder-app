@@ -181,6 +181,10 @@ function resolveSetupSummary(
   }
 }
 
+function resolveCreateWorkflowPanelBlocksSubmit(status: CreateWorkflowPanelStatus): boolean {
+  return status.blocksSubmit ?? status.invalid
+}
+
 function LocationCreateModalDetailsForm({
   fixedCreate,
   campaignId,
@@ -201,6 +205,7 @@ function LocationCreateModalDetailsForm({
   onNavigateToTab,
   onDetailsStatusChange,
   useCompositeBuildingChrome,
+  submitBlocked,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -221,6 +226,7 @@ function LocationCreateModalDetailsForm({
   onNavigateToTab?: (tabId: string) => void
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
   useCompositeBuildingChrome?: boolean
+  submitBlocked?: boolean
 }) {
   return (
     <LocationCreateForm
@@ -242,6 +248,7 @@ function LocationCreateModalDetailsForm({
       organizationsControllerRef={organizationsControllerRef}
       onNavigateToTab={onNavigateToTab}
       onDetailsStatusChange={onDetailsStatusChange}
+      submitBlocked={submitBlocked}
       chrome={
         useCompositeBuildingChrome
           ? undefined
@@ -421,6 +428,10 @@ function LocationCreateModalSession({
     ? BUILDING_CREATE_SETUP_HEADLINE
     : formatContentCreateActionLabel('locations')
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
+  const buildingSubmitBlocked =
+    buildingTabsConfigured &&
+    (resolveCreateWorkflowPanelBlocksSubmit(detailsStatus) ||
+      resolveCreateWorkflowPanelBlocksSubmit(organizationsStatus))
   const renderDetailsForm = (optionsCtx: ContentFormCtx) => (
     <LocationCreateModalDetailsForm
       fixedCreate={state.fixedCreate!}
@@ -442,6 +453,7 @@ function LocationCreateModalSession({
       onNavigateToTab={buildingTabsConfigured ? setActiveTabId : undefined}
       onDetailsStatusChange={buildingTabsConfigured ? setDetailsStatus : undefined}
       useCompositeBuildingChrome={buildingTabsConfigured}
+      submitBlocked={buildingSubmitBlocked || undefined}
     />
   )
   const resolvedSetupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null

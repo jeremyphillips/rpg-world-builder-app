@@ -97,6 +97,7 @@ export type LocationCreateFormProps = {
   organizationsControllerRef?: MutableRefObject<BuildingOrganizationsCreateTabController | null>
   onNavigateToTab?: (tabId: string) => void
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
+  submitBlocked?: boolean
 }
 
 type LocationCreateFormBodyProps = LocationCreateFormProps
@@ -177,6 +178,7 @@ function LocationCreateDetailsPanelStatusBridge({
   useEffect(() => {
     onStatusChange?.({
       invalid: issueCount > 0,
+      blocksSubmit: issueCount > 0,
       ...(issueCount > 0 ? { issueCount } : {}),
       dirty,
     })
@@ -187,24 +189,30 @@ function LocationCreateDetailsPanelStatusBridge({
 
 function BuildingCreateSubmitButton({
   pending,
+  submitBlocked,
   submitLabel,
   onSubmit,
   onInvalidDetails,
 }: {
   pending: boolean
+  submitBlocked?: boolean
   submitLabel: string
   onSubmit: FormSubmitHandler<LocationDraftFormValues>
   onInvalidDetails: () => void
 }) {
   const schemaFormSubmit = useSchemaFormSubmit<LocationDraftFormValues>()
   if (!schemaFormSubmit) {
-    return <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
+    return (
+      <FormShellSubmitButton disabled={pending || submitBlocked}>
+        {submitLabel}
+      </FormShellSubmitButton>
+    )
   }
 
   return (
     <Button
       type="button"
-      disabled={pending}
+      disabled={pending || submitBlocked}
       onClick={() => schemaFormSubmit.requestSubmit(onSubmit, onInvalidDetails)}
     >
       {submitLabel}
@@ -215,6 +223,7 @@ function BuildingCreateSubmitButton({
 function buildBuildingCreateFooterChrome(input: {
   hadSetup: boolean
   pending: boolean
+  submitBlocked?: boolean
   submitLabel: string
   onSubmit: FormSubmitHandler<LocationDraftFormValues>
   onInvalidDetails: () => void
@@ -236,6 +245,7 @@ function buildBuildingCreateFooterChrome(input: {
         )}
         <BuildingCreateSubmitButton
           pending={input.pending}
+          submitBlocked={input.submitBlocked}
           submitLabel={input.submitLabel}
           onSubmit={input.onSubmit}
           onInvalidDetails={input.onInvalidDetails}
@@ -374,6 +384,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     organizationsControllerRef,
     onNavigateToTab,
     onDetailsStatusChange,
+    submitBlocked,
   } = props
   const queryClient = useQueryClient()
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
@@ -477,6 +488,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
         buildBuildingCreateFooterChrome({
           hadSetup,
           pending,
+          submitBlocked,
           submitLabel,
           onSubmit,
           onInvalidDetails: () => onNavigateToTab?.('details'),

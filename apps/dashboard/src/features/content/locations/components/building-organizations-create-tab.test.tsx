@@ -20,6 +20,7 @@ import {
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../lib/building-organizations-create-tab.lib'
@@ -112,7 +113,11 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
 
     await waitFor(() =>
-      expect(onStatusChange).toHaveBeenLastCalledWith({ invalid: false, dirty: false }),
+      expect(onStatusChange).toHaveBeenLastCalledWith({
+        invalid: false,
+        blocksSubmit: false,
+        dirty: false,
+      }),
     )
     expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
@@ -221,6 +226,43 @@ describe('BuildingOrganizationsCreateTab', () => {
     ).toBeDisabled()
   })
 
+  it('renders placeholder-only discovery search with a clear control when filtered', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+
+    const searchbox = screen.getByRole('searchbox', {
+      name: BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
+    })
+    expect(searchbox).toBeInTheDocument()
+    expect(screen.queryByText('Search organizations')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
+
+    await user.type(searchbox, 'Copper')
+    expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+    expect(searchbox).toHaveValue('')
+  })
+
+  it('reports blocksSubmit while the composer is in progress', async () => {
+    const user = userEvent.setup()
+    const onStatusChange = vi.fn()
+    render(
+      <BuildingOrganizationsCreateTab campaignId="campaign-1" onStatusChange={onStatusChange} />,
+    )
+
+    await chooseOwnerIntent(user)
+    await waitFor(() =>
+      expect(onStatusChange).toHaveBeenLastCalledWith({
+        invalid: false,
+        blocksSubmit: true,
+        dirty: true,
+      }),
+    )
+  })
+
   it('collapses the chosen intent kind before organization discovery', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
@@ -266,6 +308,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     await waitFor(() =>
       expect(onStatusChange).toHaveBeenLastCalledWith({
         invalid: false,
+        blocksSubmit: true,
         dirty: true,
       }),
     )

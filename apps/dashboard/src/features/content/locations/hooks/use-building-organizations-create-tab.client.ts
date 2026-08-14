@@ -165,6 +165,7 @@ export function useBuildingOrganizationsCreateTab({
   const status = React.useMemo<CreateWorkflowPanelStatus>(
     () => ({
       invalid: planIssues.length > 0 || (validationAttempted && inProgress),
+      blocksSubmit: validationIssueCount > 0,
       ...(visibleIssues.length > 0 ? { issueCount: visibleIssues.length } : {}),
       dirty: plan.relationships.length > 0 || inProgress,
     }),
@@ -173,6 +174,7 @@ export function useBuildingOrganizationsCreateTab({
       planIssues.length,
       plan.relationships.length,
       validationAttempted,
+      validationIssueCount,
       visibleIssues.length,
     ],
   )

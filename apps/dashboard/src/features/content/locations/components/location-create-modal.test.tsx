@@ -326,6 +326,20 @@ describe('LocationCreateModal', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
+  it('disables Create building while the Organizations composer is in progress', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
+    await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+
+    const createButton = screen.getByRole('button', { name: 'Create building' })
+    expect(createButton).toBeDisabled()
+    expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
+  })
+
   it('preserves the bounded modal scroll chain when Building details expand', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
