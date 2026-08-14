@@ -965,6 +965,41 @@ export const PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS = [
   'blockhouse',
 ] as const satisfies readonly BuildingCorpusId[]
 
+/** Phase 19A cultural morphology reviewed 2026-08-14. */
+export const PHASE_19A_CULTURAL_DECOMPOSE_IDS = [
+  'broch',
+  'domus',
+  'igloo',
+  'longhouse',
+  'machiya',
+  'roundhouse',
+  'tholos',
+  'tipi',
+  'yurt',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'crannog',
+  'siheyuan',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A site/context morphology reviewed 2026-08-14. */
+export const PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS = [
+  'cave_dwelling',
+  'elven_tree_dwelling',
+  'shipwreck_dwelling',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_DECOMPOSE_IDS = [
+  ...PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
+  ...PHASE_19A_CULTURAL_DECOMPOSE_IDS,
+  ...PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  ...PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,
@@ -1020,7 +1055,19 @@ const INITIAL_STATUS_BY_ID = {
     BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
   ),
   ...statusMapForIds(
+    PHASE_19A_CULTURAL_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
     TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(
+    PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
     BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
   ),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,

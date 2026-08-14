@@ -28,6 +28,11 @@ import {
   PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
   PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
   PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS,
+  PHASE_19A_CULTURAL_DECOMPOSE_IDS,
+  PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
+  PHASE_19A_DECOMPOSE_IDS,
+  PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -48,31 +53,17 @@ function sourceFilesUnder(directory: string): string[] {
 const SWEEP_FALSE_POSITIVE_PENDING_IDS = [
   'artificer_atelier',
   'bounty_office',
-  'broch',
-  'cave_dwelling',
   'coach_house',
-  'crannog',
-  'domus',
   'dyeworks',
-  'elven_tree_dwelling',
   'foundry',
   'fulling_mill',
   'golem_workshop',
   'icehouse',
-  'igloo',
   'kennel',
-  'longhouse',
-  'machiya',
   'pigsty',
   'ropewalk',
-  'roundhouse',
-  'shipwreck_dwelling',
-  'siheyuan',
   'tent_pavilion',
-  'tholos',
-  'tipi',
   'tollhouse',
-  'yurt',
 ] as const
 
 describe('Building archetype refactor inventory', () => {
@@ -182,15 +173,15 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 135 concepts pending or awaiting design after Phase 19A fortification review', () => {
+  it('leaves 121 concepts pending or awaiting design after Phase 19A closeout', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(135)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(68)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(67)
+    expect(unresolved).toHaveLength(121)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(57)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(64)
   })
 
   it('maps every explicit Tier C disposition allowlist id to the reviewed status', () => {
@@ -250,17 +241,6 @@ describe('Building archetype refactor inventory', () => {
     const statusById = new Map(
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
     )
-    const reviewedIds = new Set<string>([
-      ...SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
-      ...SWEEP_PRIOR_DECOMPOSE_IDS,
-      ...SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
-      ...SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
-      ...SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
-      ...SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
-      ...SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
-      ...TIER_C_DECOMPOSE_IDS,
-      ...TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
-    ])
 
     expect(PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS).toEqual(['blockhouse', 'martello_tower'])
     expect(PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS).toHaveLength(11)
@@ -271,29 +251,39 @@ describe('Building archetype refactor inventory', () => {
     ])
     expect(PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS).toHaveLength(16)
     expect(new Set(PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS).size).toBe(16)
+    expect(PHASE_19A_DECOMPOSE_IDS).toHaveLength(13)
+    expect(PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toEqual(['crannog', 'siheyuan'])
+    expect(PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toEqual(['crannog', 'siheyuan'])
 
     for (const id of PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS) {
       expect(BUILDING_RESEARCH_CORPUS_IDS).toContain(id)
-      expect(reviewedIds.has(id)).toBe(false)
-
-      const status = statusById.get(id)
-      if (id === 'martello_tower') {
-        expect(status).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
-        continue
-      }
-
-      expect(
-        status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
-          status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
-      ).toBe(true)
+      expect(statusById.get(id)).not.toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     }
 
     expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+  })
 
-    for (const id of PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS) {
-      if (id === 'blockhouse' || id === 'martello_tower') continue
-      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+  it('maps Phase 19A disposition allowlist ids to reviewed statuses', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    for (const id of PHASE_19A_DECOMPOSE_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     }
+
+    for (const id of PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS) {
+      expect(statusById.get(id)).toBe(
+        BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+      )
+    }
+
+    for (const id of PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+    }
+
+    expect(PHASE_19A_CULTURAL_DECOMPOSE_IDS).toHaveLength(9)
+    expect(PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS).toHaveLength(3)
   })
 
   it('maps Phase 19A fortification disposition ids to reviewed statuses', () => {
@@ -397,48 +387,65 @@ describe('Building archetype refactor inventory', () => {
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
     )
 
-    expect(
-      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
-        ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
-      ),
-    ).toHaveLength(53)
-
     const decomposed = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toHaveLength(81)
+    expect(decomposed).toHaveLength(93)
     expect(decomposed).toEqual(
       expect.arrayContaining([
         'abbey',
         'adventurers_guild',
         'apothecary',
         'barber_surgeon',
+        'broch',
+        'cave_dwelling',
         'cobbler',
         'customs_house',
+        'domus',
         'dower_house',
         'dzong',
+        'elven_tree_dwelling',
         'gatehouse',
         'general_store',
         'gymnasium',
         'haunted_manor',
         'hammam',
         'healers_house',
+        'igloo',
+        'longhouse',
+        'machiya',
         'manor',
         'martello_tower',
         'monastery',
         'oracle_shrine',
         'orphanage',
         'palace',
+        'roundhouse',
         'royal_mews',
+        'shipwreck_dwelling',
         'thermae',
+        'tholos',
+        'tipi',
         'wizard_tower',
+        'yurt',
       ]),
     )
-    expect(statusById.get('broch')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
+        ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+      ),
+    ).toHaveLength(55)
+    expect(statusById.get('broch')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('crannog')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
+    expect(statusById.get('siheyuan')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
     expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('pigsty')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
-    expect(statusById.get('longhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('longhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('ferry_house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('bridge')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,

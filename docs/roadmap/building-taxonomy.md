@@ -58,7 +58,7 @@ notes). If documentation and tests disagree, **tests win**.
 | Forms                                   |                                                                                   **4** — `house`, `tower`, `hall`, `keep` |
 | Facilities                              | **36** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
 | Research corpus                         |                                                                                                                    **308** |
-| Unresolved                              |                                                                                     **135** — see refactor inventory tests |
+| Unresolved                              |                                                                                     **121** — see refactor inventory tests |
 | Legacy runtime archetypes (quarantined) |                                                                                                                    **143** |
 
 Persisted ids `watchtower` and `lighthouse` are accepted identifier debt (runtime labels: Watch post,
@@ -100,12 +100,12 @@ records implementation history through Phase 18. **Do not append further phases 
 
 **Phase 19 — Remaining Building corpus convergence**
 
-| Subphase                                | Status      |
-| --------------------------------------- | ----------- |
-| 19A Morphology / Form evidence          | IN PROGRESS |
-| 19B Production / Facility boundary      | PLANNED     |
-| 19C Selective runtime promotion         | PLANNED     |
-| 19D Exception cleanup / stopping review | PLANNED     |
+| Subphase                                | Status   |
+| --------------------------------------- | -------- |
+| 19A Morphology / Form evidence          | COMPLETE |
+| 19B Production / Facility boundary      | NEXT     |
+| 19C Selective runtime promotion         | PLANNED  |
+| 19D Exception cleanup / stopping review | PLANNED  |
 
 Future work updates one row in this table rather than creating a new plan.
 
@@ -128,6 +128,11 @@ whether House / Hall / Tower / Keep plus Facilities are sufficient.
 Inventory inspection:
 [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
 Per-term disposition cards proceed from this list only — no scope expansion without a new checkpoint.
+
+**Closeout (2026-08-14):** 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design`
+(`blockhouse`). Evidence:
+[`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
+Only `blockhouse` remains a credible **19C Form** candidate.
 
 **Gate**
 
@@ -233,7 +238,7 @@ Open these only for the reason listed. None of them is the current plan.
 | [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)     | Runtime authoring SSOT         | Understanding the shipped model                                           |
 | [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | 19A/19B — family rules, morphology pulls, approximate-Facility exceptions |
 | [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)             | Supporting evidence            | 19A — scale/unit gate, morphology protocol, composite cards               |
-| [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Active investigation evidence  | 19A — frozen allowlist, per-term cards, tranche closeout                  |
+| [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Closed supporting evidence     | 19A closeout — allowlist, rules, disposition cards                        |
 | [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md) | Deferred evidence              | 2B is reopened                                                            |
 | [`building-create-phase-7-acceptance.md`](../analysis/building-create-phase-7-acceptance.md)                 | Historical; create-flow closed | Identifier debt, open composition, 2B acceptance findings                 |
 | [`building-corpus-disposition-tranche-1.md`](../analysis/building-corpus-disposition-tranche-1.md)           | Historical                     | Apothecary or early blockhouse cards                                      |
