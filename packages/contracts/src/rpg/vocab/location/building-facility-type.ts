@@ -136,6 +136,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['commercial', 'production'],
     searchTerms: ['depot', 'storehouse', 'cargo'],
   },
+  barn: {
+    label: 'Barn',
+    description:
+      'A building configured for farm storage, livestock shelter, and related agricultural premises use — not generic cargo depot or traveler mount shelter.',
+    defaultFunctions: ['storage', 'service'],
+    authoringGroups: ['production', 'commercial'],
+    searchTerms: ['farm', 'livestock', 'agricultural outbuilding', 'hay', 'byre', 'threshing barn'],
+  },
   brewery: {
     label: 'Brewery',
     description: 'A building durably configured for brewing beverages.',
@@ -186,6 +194,22 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['civic'],
     searchTerms: ['court', 'justice', 'law'],
   },
+  embassy: {
+    label: 'Embassy',
+    description:
+      'A building configured for diplomatic representation, reception, consular work, and mission administration — representational premises, not the diplomatic organization itself.',
+    defaultFunctions: ['governance', 'assembly'],
+    authoringGroups: ['civic'],
+    aliases: ['Diplomatic premises'],
+    searchTerms: [
+      'diplomatic',
+      'diplomatic mission',
+      'consulate',
+      'ambassador',
+      'diplomatic representation',
+      'planar embassy',
+    ],
+  },
   prison: {
     label: 'Prison',
     description: 'A secure civic building configured for custody and confinement.',
@@ -231,6 +255,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['civic'],
     searchTerms: ['books', 'study', 'reading'],
   },
+  schoolhouse: {
+    label: 'Schoolhouse',
+    description:
+      'A building configured for teaching and local instruction — instructional premises, not records custody or the school organization itself.',
+    defaultFunctions: ['knowledge'],
+    authoringGroups: ['civic'],
+    searchTerms: ['school', 'education', 'teaching', 'instruction', 'children', 'pupils'],
+  },
   lighthouse: {
     label: 'Beacon station',
     description:
@@ -248,6 +280,22 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
       'beacon',
       'signal',
       'maritime',
+    ],
+  },
+  observatory: {
+    label: 'Observatory',
+    description:
+      'A building configured for instrumented sky observation and astronomical study — staffed observation premises, not an outdoor viewpoint or landmark site.',
+    defaultFunctions: ['knowledge'],
+    authoringGroups: ['civic'],
+    searchTerms: [
+      'astronomy',
+      'astronomical',
+      'stars',
+      'sky',
+      'telescope',
+      'stargazing',
+      'celestial observation',
     ],
   },
   archive: {

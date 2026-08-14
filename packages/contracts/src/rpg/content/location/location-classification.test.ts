@@ -407,6 +407,32 @@ describe('legacy decomposition example compositions', () => {
     expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'bathhouse' })).toEqual(
       { form: 'hall', facilityType: 'bathhouse' },
     )
+    expect(buildingClassificationSchema.parse({ facilityType: 'observatory' })).toEqual({
+      facilityType: 'observatory',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'observatory' }),
+    ).toEqual({ form: 'tower', facilityType: 'observatory' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'embassy' })).toEqual({
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'embassy' })).toEqual({
+      form: 'hall',
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'schoolhouse' })).toEqual({
+      facilityType: 'schoolhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'schoolhouse' }),
+    ).toEqual({ form: 'house', facilityType: 'schoolhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'barn' })).toEqual({
+      facilityType: 'barn',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'barn' })).toEqual({
+      form: 'house',
+      facilityType: 'barn',
+    })
   })
 
   it('derives functions from Facility only, not from legacy concept names', () => {
@@ -415,6 +441,13 @@ describe('legacy decomposition example compositions', () => {
       'care',
     ])
     expect(getEffectiveBuildingFunctions({ facilityType: 'bathhouse' })).toEqual(['care'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'observatory' })).toEqual(['knowledge'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'embassy' })).toEqual([
+      'governance',
+      'assembly',
+    ])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'schoolhouse' })).toEqual(['knowledge'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'barn' })).toEqual(['storage', 'service'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'checkpoint' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'lighthouse' })).toEqual(['defense_watch'])

@@ -330,6 +330,92 @@ export const HouseBathhouse: Story = {
   },
 }
 
+export const TowerObservatory: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'tower',
+      facilityGroup: 'Civic',
+      facility: 'observatory',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Tower · Observatory'),
+    ).toBeVisible()
+  },
+}
+
+export const HallObservatory: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'observatory',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Hall · Observatory'),
+    ).toBeVisible()
+  },
+}
+
+export const HallEmbassy: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'embassy',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('Hall · Embassy')).toBeVisible()
+  },
+}
+
+export const HouseEmbassy: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Civic',
+      facility: 'embassy',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('House · Embassy'),
+    ).toBeVisible()
+  },
+}
+
+export const HouseSchoolhouse: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Civic',
+      facility: 'schoolhouse',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('House · Schoolhouse'),
+    ).toBeVisible()
+  },
+}
+
+export const HouseBarn: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Production',
+      facility: 'barn',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('House · Barn')).toBeVisible()
+  },
+}
+
 export const HallWatchPost: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],

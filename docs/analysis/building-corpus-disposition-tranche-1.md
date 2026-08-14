@@ -26,9 +26,9 @@ decide what ships. This note records corpus disposition evidence only. The quara
 
 **Decomposed:** 4 (`apothecary`, `gatehouse`, `manor`, `wizard_tower`).  
 **Needs-design:** 1 (`blockhouse`).  
-**Facility candidates (inventory `pending`):** `embassy`, `observatory`, `schoolhouse`, `barn`.  
-**Shipped after tranche 1:** `bathhouse` → `enabled-facility` (see Phase 12 in audit).  
-**Unresolved:** 272 concepts (`pending` or `needs-design`).
+**Facility candidates (inventory `pending`):** none from tranche-1 batch (all promoted).  
+**Shipped after tranche 1:** `bathhouse`, `observatory`, `embassy`, `schoolhouse`, `barn` → `enabled-facility` (audit Phase 12–15).  
+**Unresolved:** 268 concepts (`pending` or `needs-design`; only `blockhouse` is non-inferable `needs-design`).
 
 The tranche does not optimize for reducing the unresolved count. Resolved statuses must be
 trustworthy; unresolved statuses must be actionable.
@@ -203,10 +203,25 @@ omitted + Bathhouse when morphology is incidental.
 | Premises-use test           | Can Building premises independently be configured for diplomatic representation, reception, consular work, and administration while the diplomatic mission remains an Organization? **Yes.** Example composition: Form House / Hall / other + Facility diplomatic premises + Organization diplomatic mission + operator / tenant / headquarters relationships as authored. |
 | Organization coexistence    | A diplomatic Organization and diplomatic premises Facility are **cleanly separable** — coexistence is evidence **for** the split, not ambiguity. Operator departure does not invalidate Facility ownership (configured use may change, as with any Facility).                                                                                                              |
 | Label refinement            | If `embassy` bundles mission identity too strongly at promotion time, evaluate axis-pure labels such as “Diplomatic premises” before rejecting Facility ownership.                                                                                                                                                                                                         |
-| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — premises describe representational/administrative configured use independent of which mission occupies them.                                                                                                                                                                                                                              |
-| Runtime action this slice   | **NONE**                                                                                                                                                                                                                                                                                                                                                                   |
+| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — representational premises independent of diplomatic Organization.                                                                                                                                                                                                                                                                         |
+| Runtime action this slice   | Tranche 1: **NONE**; shipped Phase 14.                                                                                                                                                                                                                                                                                                                                     |
 
-**Inventory:** `pending` (candidate).
+**Approved registry metadata (Phase 14):**
+
+| Field            | Value                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------- |
+| id               | `embassy`                                                                                   |
+| label            | Embassy                                                                                     |
+| description      | Diplomatic representation/reception/consular/administration premises — not the Organization |
+| authoringGroups  | `civic`                                                                                     |
+| defaultFunctions | `governance`, `assembly`                                                                    |
+| aliases          | Diplomatic premises                                                                         |
+| searchTerms      | diplomatic, consulate, ambassador, planar embassy, …                                        |
+
+Organization coexistence remains clean: diplomatic mission is modeled separately via Organization and
+relationships.
+
+**Inventory:** `enabled-facility` (registry-derived).
 
 ---
 
@@ -233,24 +248,27 @@ omitted + Bathhouse when morphology is incidental.
 **Why selected:** instrumented sky-observation premises vs viewpoint Site; distinct from Watch post
 and Library.
 
-| Layer                       | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Corpus evidence             | “Sky observation”; `service` function; astronomy search terms.                                                                                                                                                                                                                                                                                                                                                                                           |
-| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE.** Form-independent label **passes** — configured observation premises, not dome/tower morphology. Distinct from Watch post (`defense_watch` signaling) and Library (records/study custody). **Site boundary required at promotion:** coastal cliff lookout or hilltop viewpoint is a Site concept; instrumented observation building is Building premises (Beacon station precedent). Classify independently of Bathhouse. |
-| Runtime action this slice   | **NONE**                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Layer                       | Finding                                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Corpus evidence             | “Sky observation”; `service` function; astronomy search terms.                                            |
+| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — instrumented observation premises; distinct from Watch post and Library. |
+| Runtime action this slice   | Tranche 1: **NONE**; shipped Phase 13.                                                                    |
 
-**Illustrative metadata (provisional — not approved for promotion):**
+**Approved registry metadata (Phase 13):**
 
-| Field            | Illustrative value                                                |
-| ---------------- | ----------------------------------------------------------------- |
-| id               | `observatory`                                                     |
-| label            | Observatory                                                       |
-| description      | A building configured for sky observation and astronomical study. |
-| authoringGroups  | `civic`                                                           |
-| defaultFunctions | `service` or `knowledge` — review at promotion                    |
-| searchTerms      | astronomy, stars, sky, telescope                                  |
+| Field            | Value                                                               |
+| ---------------- | ------------------------------------------------------------------- |
+| id               | `observatory`                                                       |
+| label            | Observatory                                                         |
+| description      | Instrumented sky observation premises — not outdoor viewpoint/site  |
+| authoringGroups  | `civic`                                                             |
+| defaultFunctions | `knowledge`                                                         |
+| searchTerms      | astronomy, stars, sky, telescope, stargazing, celestial observation |
 
-**Inventory:** `pending` (candidate).
+**Site boundary:** description excludes outdoor viewpoints and landmark sites without configured
+Building premises (Beacon station precedent).
+
+**Inventory:** `enabled-facility` (registry-derived).
 
 ---
 
@@ -265,10 +283,21 @@ ships.
 | Premises-use test           | Does `schoolhouse` name premises independently of the particular school organization? **Yes.** Can those premises exist without requiring an Organization record? **Yes.** Can different educational organizations occupy the same kind of Facility? **Yes.** Does Library fail to express instructional use? **Yes** — Library is records/study custody, not configured teaching premises. |
 | Organization coexistence    | School as Organization + `education` activity **and** configured teaching premises Facility are cleanly separable — evidence **for** Facility ownership, not dual-path ambiguity.                                                                                                                                                                                                           |
 | Compound label              | “Schoolhouse” passes the compound-label rule — instructional premises, not Form: House.                                                                                                                                                                                                                                                                                                     |
-| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE**                                                                                                                                                                                                                                                                                                                                                              |
-| Runtime action this slice   | **NONE**                                                                                                                                                                                                                                                                                                                                                                                    |
+| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — instructional premises; Organization coexistence clean.                                                                                                                                                                                                                                                                                                    |
+| Runtime action this slice   | Tranche 1: **NONE**; shipped Phase 15.                                                                                                                                                                                                                                                                                                                                                      |
 
-**Inventory:** `pending` (candidate).
+**Approved registry metadata (Phase 15):**
+
+| Field            | Value                                                                       |
+| ---------------- | --------------------------------------------------------------------------- |
+| id               | `schoolhouse`                                                               |
+| label            | Schoolhouse                                                                 |
+| description      | Teaching/local instruction — not records custody or the school Organization |
+| authoringGroups  | `civic`                                                                     |
+| defaultFunctions | `knowledge`                                                                 |
+| searchTerms      | school, education, teaching, instruction, children, pupils                  |
+
+**Inventory:** `enabled-facility` (registry-derived).
 
 ---
 
@@ -282,24 +311,23 @@ outbuilding corpus cluster.
 | Corpus evidence             | “Farm storage and outbuildings”; `service`, `storage`; specializations include `byre`, `dovecote`, `shearing_shed`, `threshing_barn`, `tithe_barn`.                                                                                                                          |
 | Re-open finding             | Barns commonly combine crop/material storage, livestock shelter, and agricultural work. Warehouse + Stable approximates **parts** of that identity but may lose the distinct **agricultural-premises** configured use — barn is not merely generic storage or mount shelter. |
 | Premises-use test           | Form-independent label **passes** — “Barn” names configured agricultural outbuilding premises without requiring a specific Form. Operator/trade leakage: low — farm operation is typically Organization/relationship, not embedded in the Facility label.                    |
-| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — distinct agricultural-premises concept that existing Facilities do not capture cleanly. Decompose to Warehouse/Stable alone is **rejected** as too aggressive for this tranche.                                                             |
-| Runtime action this slice   | **NONE**                                                                                                                                                                                                                                                                     |
+| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — agricultural-premises identity distinct from warehouse/stable.                                                                                                                                                                              |
+| Runtime action this slice   | Tranche 1: **NONE**; shipped Phase 15.                                                                                                                                                                                                                                       |
 
-**Illustrative metadata (provisional — review agricultural function alignment at promotion):**
+**Approved registry metadata (Phase 15):**
 
-| Field            | Illustrative value                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------------- |
-| id               | `barn`                                                                                            |
-| label            | Barn                                                                                              |
-| description      | A building configured for farm storage, livestock shelter, and related agricultural premises use. |
-| authoringGroups  | `production` and/or `commercial` — review at promotion                                            |
-| defaultFunctions | `storage`, `service` — review at promotion                                                        |
-| searchTerms      | farm, livestock, agricultural outbuilding                                                         |
+| Field            | Value                                                                                     |
+| ---------------- | ----------------------------------------------------------------------------------------- |
+| id               | `barn`                                                                                    |
+| label            | Barn                                                                                      |
+| description      | Farm storage, livestock shelter, agricultural premises — not cargo depot or mount shelter |
+| authoringGroups  | `production`, `commercial`                                                                |
+| defaultFunctions | `storage`, `service`                                                                      |
+| searchTerms      | farm, livestock, agricultural outbuilding, hay, byre, threshing barn                      |
 
-Farm outbuilding specializations (`byre`, `dovecote`, …) remain corpus disposition leverage, not
-runtime children.
+Farm outbuilding specializations remain corpus disposition leverage, not runtime children.
 
-**Inventory:** `pending` (candidate).
+**Inventory:** `enabled-facility` (registry-derived).
 
 ---
 
@@ -316,17 +344,13 @@ runtime children.
 
 ### Facility candidates (independent — not a shipping bundle)
 
-| id            | Disposition note                                           |
-| ------------- | ---------------------------------------------------------- |
-| `embassy`     | Diplomatic premises; Organization coexistence clean        |
-| `observatory` | Observation premises; Site boundary at promotion           |
-| `schoolhouse` | Teaching premises; distinct from Library                   |
-| `barn`        | Agricultural-premises identity; not Warehouse/Stable proxy |
+Tranche-1 Facility candidates are **fully promoted** (Phases 12–15). Registry metadata for
+remaining corpus work belongs to future disposition tranches, not this note.
 
-**Shipped (Phase 12):** `bathhouse` — hygiene/service premises; compound label passes.
-
-Promotion of remaining candidates requires separate explicit approval. Registry metadata in this
-note is illustrative except where Phase 12 records approved Bathhouse fields.
+**Shipped (Phase 12):** `bathhouse`  
+**Shipped (Phase 13):** `observatory`  
+**Shipped (Phase 14):** `embassy`  
+**Shipped (Phase 15):** `schoolhouse`, `barn`
 
 ### Organization follow-ups
 

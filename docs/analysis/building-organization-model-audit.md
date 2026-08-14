@@ -1623,12 +1623,10 @@ presets — identified with the exact axis and at least two parent/child pairs b
 
 ### Corpus disposition (unchanged process)
 
-272 concepts remain `pending` or `needsDesign` in the refactor inventory after tranche 1 and the
-Bathhouse Facility promotion. Non-inferable rows include `decompose` reconciliations (`gatehouse`,
-`manor`, `wizard_tower`, `apothecary`), `needs-design` (`blockhouse`), and `blacksmith` (rehome).
-Remaining Facility candidates (`embassy`, `observatory`, `schoolhouse`, `barn`) stay inventory
-`pending` until explicit promotion. Shipped Form/Facility alignment derives from `@rpg/contracts`
-registries — `bathhouse` is now `enabled-facility` via registry derivation.
+268 concepts remain `pending` or `needsDesign` after tranche 1 and all tranche-1 Facility
+promotions (Phases 12–15). Non-inferable rows: `decompose` (4), `needs-design` (`blockhouse`),
+`rehome` (`blacksmith`). Tranche-1 Facility candidates are fully shipped via `@rpg/contracts`
+registry derivation.
 
 Full tranche-1 evidence cards:
 [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md).
@@ -1645,7 +1643,7 @@ matrix, create-flow track closure. Full note:
 | Axis     | Values                                                             |
 | -------- | ------------------------------------------------------------------ |
 | Form     | `house`, `tower`, `hall`, `keep`                                   |
-| Facility | 29 ids — `residence` … `stable` (see `BUILDING_FACILITY_TYPE_IDS`) |
+| Facility | 33 ids — `residence` … `stable` (see `BUILDING_FACILITY_TYPE_IDS`) |
 
 ### Facility admission rule
 
@@ -1692,7 +1690,6 @@ discovery failure observed in the Phase 7 scenario review.
 
 - Corpus disposition tranche 1 — [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md)
 - `blockhouse` — `needs-design` (morphology evidence)
-- `embassy`, `observatory`, `schoolhouse`, `barn` — Facility candidates (not shipped)
 - Organization activity vocabulary gap around pharmacy/healing/herbal practice (Apothecary — Org audit)
 - Persisted Facility id rename for morphological ids (`watchtower`, `lighthouse`)
 - Building preset implementation (2B)
@@ -1723,9 +1720,68 @@ passes Form-independent test (`bathhouse` ≠ Form `house`). Alias: Public baths
 ### Inventory
 
 Refactor inventory derives `bathhouse` → `enabled-facility` from `@rpg/contracts`. Unresolved count
-272 (`pending` + `needs-design`).
+272 after Bathhouse (`pending` + `needs-design`).
 
-### Next Facility candidates (unchanged by this slice)
+### Next Facility candidates (unchanged by Bathhouse slice)
 
 `embassy`, `observatory`, `schoolhouse`, `barn` — remain evidence-backed candidates; choose next
 after authoring review, not as a bundled promotion.
+
+## Phase 13 — Observatory Facility promotion
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Second post-convergence standalone Facility from tranche-1 disposition evidence.
+
+### Shipped registry entry
+
+| id            | label       | defaultFunctions | authoringGroups | Notes                                                               |
+| ------------- | ----------- | ---------------- | --------------- | ------------------------------------------------------------------- |
+| `observatory` | Observatory | `knowledge`      | `civic`         | Instrumented sky observation — distinct from Watch post and Library |
+
+Description includes Site boundary copy (staffed observation premises, not outdoor viewpoint or
+landmark site). `knowledge` default aligns with astronomical study; Library retains records/study
+custody framing.
+
+### Inventory
+
+Refactor inventory derives `observatory` → `enabled-facility`. Unresolved count 271.
+
+### Next Facility candidates
+
+`embassy`, `schoolhouse`, `barn` — choose individually after authoring review.
+
+## Phase 14 — Embassy Facility promotion
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Third post-convergence standalone Facility from tranche-1 disposition evidence.
+
+### Shipped registry entry
+
+| id        | label   | defaultFunctions         | authoringGroups | Notes                                                             |
+| --------- | ------- | ------------------------ | --------------- | ----------------------------------------------------------------- |
+| `embassy` | Embassy | `governance`, `assembly` | `civic`         | Diplomatic premises — distinct from Organization mission identity |
+
+Label `Embassy` with alias **Diplomatic premises** for axis-pure discovery. Description emphasizes
+representational/administrative configured use, not the diplomatic Organization. Same function
+defaults as `town_hall` with distinct premises framing.
+
+### Inventory
+
+Refactor inventory derives `embassy` → `enabled-facility`. Unresolved count 270.
+
+## Phase 15 — Schoolhouse and Barn Facility promotion
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Final tranche-1 Facility candidates — teaching premises and agricultural premises.
+
+### Shipped registry entries
+
+| id            | label       | defaultFunctions     | authoringGroups            | Notes                                                                                          |
+| ------------- | ----------- | -------------------- | -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `schoolhouse` | Schoolhouse | `knowledge`          | `civic`                    | Instructional premises — distinct from Library records custody; Organization coexistence clean |
+| `barn`        | Barn        | `storage`, `service` | `production`, `commercial` | Agricultural premises — distinct from Warehouse and Stable                                     |
+
+### Inventory
+
+Refactor inventory derives both ids → `enabled-facility`. Unresolved count **268**. Tranche-1
+Facility candidate batch is complete; only `blockhouse` retains non-inferable `needs-design`.

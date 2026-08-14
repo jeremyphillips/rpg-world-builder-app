@@ -146,6 +146,79 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
+  it('displays observatory via registry label with optional tower Form open composition', () => {
+    const towerObservatory: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'tower',
+        facilityType: 'observatory',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(towerObservatory)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Tower',
+      buildingFacilityTypeLabel: 'Observatory',
+    })
+  })
+
+  it('displays embassy via registry label as premises distinct from residence pairing', () => {
+    const hallEmbassy: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'embassy',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(hallEmbassy)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Embassy',
+    })
+  })
+
+  it('displays schoolhouse via registry label without inferring Form house morphology', () => {
+    const houseSchool: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'schoolhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(houseSchool)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Schoolhouse',
+    })
+  })
+
+  it('displays barn as agricultural premises with open Form composition', () => {
+    const houseBarn: Location = {
+      ...baseLocation,
+      id: 'loc_barn',
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'barn',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(houseBarn)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Barn',
+    })
+  })
+
   it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,

@@ -107,6 +107,39 @@ describe('Building semantic vocabularies', () => {
     expect(
       buildingClassificationSchema.parse({ form: 'house', facilityType: 'bathhouse' }),
     ).toEqual({ form: 'house', facilityType: 'bathhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'observatory' })).toEqual({
+      facilityType: 'observatory',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'observatory' }),
+    ).toEqual({ form: 'tower', facilityType: 'observatory' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'observatory' }),
+    ).toEqual({ form: 'hall', facilityType: 'observatory' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'embassy' })).toEqual({
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'embassy' })).toEqual({
+      form: 'house',
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'embassy' })).toEqual({
+      form: 'hall',
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'schoolhouse' })).toEqual({
+      facilityType: 'schoolhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'schoolhouse' }),
+    ).toEqual({ form: 'house', facilityType: 'schoolhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'barn' })).toEqual({
+      facilityType: 'barn',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'barn' })).toEqual({
+      form: 'house',
+      facilityType: 'barn',
+    })
   })
 
   it('keeps hall, guildhall, and town_hall as distinct ids on their axes', () => {
@@ -128,6 +161,7 @@ describe('Building semantic vocabularies', () => {
       'shop',
       'bank',
       'warehouse',
+      'barn',
       'brewery',
       'distillery',
       'factory',
@@ -135,13 +169,16 @@ describe('Building semantic vocabularies', () => {
       'town_hall',
       'guildhall',
       'courthouse',
+      'embassy',
       'prison',
       'barracks',
       'checkpoint',
       'armory',
       'watchtower',
       'library',
+      'schoolhouse',
       'lighthouse',
+      'observatory',
       'archive',
       'bathhouse',
       'hospital',
@@ -184,6 +221,7 @@ describe('Building semantic vocabularies', () => {
       shop: ['retail'],
       bank: ['finance'],
       warehouse: ['storage'],
+      barn: ['storage', 'service'],
       brewery: ['production'],
       distillery: ['production'],
       factory: ['production'],
@@ -191,13 +229,16 @@ describe('Building semantic vocabularies', () => {
       town_hall: ['governance', 'assembly'],
       guildhall: ['assembly'],
       courthouse: ['governance'],
+      embassy: ['governance', 'assembly'],
       prison: ['governance'],
       barracks: ['defense_watch'],
       checkpoint: ['defense_watch'],
       armory: ['storage', 'defense_watch'],
       watchtower: ['defense_watch'],
       library: ['knowledge'],
+      schoolhouse: ['knowledge'],
       lighthouse: ['defense_watch'],
+      observatory: ['knowledge'],
       archive: ['knowledge'],
       bathhouse: ['care'],
       hospital: ['care'],
@@ -228,6 +269,7 @@ describe('Building semantic vocabularies', () => {
       'shop',
       'bank',
       'warehouse',
+      'barn',
       'brewery',
       'distillery',
       'bathhouse',
@@ -236,6 +278,7 @@ describe('Building semantic vocabularies', () => {
     ])
     expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual([
       'warehouse',
+      'barn',
       'brewery',
       'distillery',
       'factory',
@@ -245,13 +288,16 @@ describe('Building semantic vocabularies', () => {
       'town_hall',
       'guildhall',
       'courthouse',
+      'embassy',
       'prison',
       'barracks',
       'checkpoint',
       'armory',
       'watchtower',
       'library',
+      'schoolhouse',
       'lighthouse',
+      'observatory',
       'archive',
       'bathhouse',
       'hospital',
@@ -288,6 +334,54 @@ describe('Building semantic vocabularies', () => {
     expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('bathhouse')
     expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('bathhouse')
     expect(getBuildingFacilityTypeLabel('bathhouse').toLocaleLowerCase()).not.toBe('house')
+  })
+
+  it('ships observatory as instrumented observation premises distinct from watch post and library', () => {
+    expect(buildingFacilityTypeSchema.parse('observatory')).toBe('observatory')
+    expect(getBuildingFacilityTypeLabel('observatory')).toBe('Observatory')
+    expect(getBuildingFacilityDefaultFunctions('observatory')).toEqual(['knowledge'])
+    expect(getBuildingFacilityDefaultFunctions('library')).toEqual(['knowledge'])
+    expect(getBuildingFacilityDefaultFunctions('watchtower')).toEqual(['defense_watch'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.observatory.description).toContain('observation')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.observatory.description).toContain('viewpoint')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.library.description).toContain('records')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('observatory')
+  })
+
+  it('ships embassy as diplomatic premises distinct from town hall and residence pairing', () => {
+    expect(buildingFacilityTypeSchema.parse('embassy')).toBe('embassy')
+    expect(getBuildingFacilityTypeLabel('embassy')).toBe('Embassy')
+    expect(getBuildingFacilityDefaultFunctions('embassy')).toEqual(['governance', 'assembly'])
+    expect(getBuildingFacilityDefaultFunctions('town_hall')).toEqual(['governance', 'assembly'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.embassy.description).toContain('representational')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.embassy.description).toContain(
+      'not the diplomatic organization itself',
+    )
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.town_hall.description).toContain('civic')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('embassy')
+    expect(buildingFacilityTypeSchema.safeParse('residence')).toMatchObject({ success: true })
+  })
+
+  it('ships schoolhouse as instructional premises distinct from library', () => {
+    expect(buildingFacilityTypeSchema.parse('schoolhouse')).toBe('schoolhouse')
+    expect(getBuildingFacilityTypeLabel('schoolhouse')).toBe('Schoolhouse')
+    expect(getBuildingFacilityDefaultFunctions('schoolhouse')).toEqual(['knowledge'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.schoolhouse.description).toContain('instruction')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.library.description).toContain('records')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('schoolhouse')
+    expect(getBuildingFacilityTypeLabel('schoolhouse').toLocaleLowerCase()).not.toBe('house')
+  })
+
+  it('ships barn as agricultural premises distinct from warehouse and stable', () => {
+    expect(buildingFacilityTypeSchema.parse('barn')).toBe('barn')
+    expect(getBuildingFacilityTypeLabel('barn')).toBe('Barn')
+    expect(getBuildingFacilityDefaultFunctions('barn')).toEqual(['storage', 'service'])
+    expect(getBuildingFacilityDefaultFunctions('warehouse')).toEqual(['storage'])
+    expect(getBuildingFacilityDefaultFunctions('stable')).toEqual(['transport_support'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.barn.description).toContain('agricultural')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.warehouse.description).toContain('cargo')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('barn')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('barn')
   })
 
   it('resolves legacy morphological Facility ids from registry metadata, not lexical id shape', () => {
