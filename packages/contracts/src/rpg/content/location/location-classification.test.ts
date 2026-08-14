@@ -197,6 +197,58 @@ describe('location classification schema rejection', () => {
     })
   })
 
+  it('accepts Facility tranche compositions without pair allowlists', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Corner Shop',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'house', facilityType: 'shop' },
+      }),
+    ).toMatchObject({ classification: { form: 'house', facilityType: 'shop' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Watch Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower', facilityType: 'watchtower' },
+      }),
+    ).toMatchObject({ classification: { form: 'tower', facilityType: 'watchtower' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Craft Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall', facilityType: 'guildhall' },
+      }),
+    ).toMatchObject({ classification: { form: 'hall', facilityType: 'guildhall' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Castle Armory',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'armory' },
+      }),
+    ).toMatchObject({ classification: { form: 'keep', facilityType: 'armory' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Record House',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'house', facilityType: 'archive' },
+      }),
+    ).toMatchObject({ classification: { form: 'house', facilityType: 'archive' } })
+  })
+
   it('accepts Form-only, Facility-only, and unclassified buildings', () => {
     expect(
       locationBodySchema.parse({

@@ -48,11 +48,32 @@ describe('Building semantic vocabularies', () => {
       form: 'keep',
       facilityType: 'barracks',
     })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'shop' })).toEqual({
+      form: 'house',
+      facilityType: 'shop',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'watchtower' }),
+    ).toEqual({ form: 'tower', facilityType: 'watchtower' })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'guildhall' })).toEqual(
+      { form: 'hall', facilityType: 'guildhall' },
+    )
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'armory' })).toEqual({
+      form: 'keep',
+      facilityType: 'armory',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'archive' })).toEqual({
+      form: 'house',
+      facilityType: 'archive',
+    })
   })
 
-  it('keeps hall and town_hall as distinct ids on distinct axes', () => {
+  it('keeps hall, guildhall, and town_hall as distinct ids on their axes', () => {
     expect(buildingFormSchema.safeParse('town_hall')).toMatchObject({ success: false })
+    expect(buildingFormSchema.safeParse('guildhall')).toMatchObject({ success: false })
     expect(buildingFacilityTypeSchema.safeParse('hall')).toMatchObject({ success: false })
+    expect(buildingFacilityTypeSchema.parse('town_hall')).toBe('town_hall')
+    expect(buildingFacilityTypeSchema.parse('guildhall')).toBe('guildhall')
   })
 
   it('defines the approved Facility UX sample in deterministic registry order', () => {
@@ -63,6 +84,7 @@ describe('Building semantic vocabularies', () => {
       'inn',
       'tavern',
       'market',
+      'shop',
       'bank',
       'warehouse',
       'brewery',
@@ -70,10 +92,14 @@ describe('Building semantic vocabularies', () => {
       'factory',
       'mill',
       'town_hall',
+      'guildhall',
       'courthouse',
       'prison',
       'barracks',
+      'armory',
+      'watchtower',
       'library',
+      'archive',
       'hospital',
       'temple',
       'theater',
@@ -111,6 +137,7 @@ describe('Building semantic vocabularies', () => {
       inn: ['lodging', 'food_drink_social'],
       tavern: ['food_drink_social'],
       market: ['retail'],
+      shop: ['retail'],
       bank: ['finance'],
       warehouse: ['storage'],
       brewery: ['production'],
@@ -118,10 +145,14 @@ describe('Building semantic vocabularies', () => {
       factory: ['production'],
       mill: ['production'],
       town_hall: ['governance', 'assembly'],
+      guildhall: ['assembly'],
       courthouse: ['governance'],
       prison: ['governance'],
       barracks: ['defense_watch'],
+      armory: ['storage', 'defense_watch'],
+      watchtower: ['defense_watch'],
       library: ['knowledge'],
+      archive: ['knowledge'],
       hospital: ['care'],
       temple: ['worship'],
       theater: ['spectacle'],
@@ -147,6 +178,7 @@ describe('Building semantic vocabularies', () => {
       'inn',
       'tavern',
       'market',
+      'shop',
       'bank',
       'warehouse',
       'brewery',
@@ -163,10 +195,14 @@ describe('Building semantic vocabularies', () => {
     ])
     expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toEqual([
       'town_hall',
+      'guildhall',
       'courthouse',
       'prison',
       'barracks',
+      'armory',
+      'watchtower',
       'library',
+      'archive',
       'hospital',
       'theater',
     ])

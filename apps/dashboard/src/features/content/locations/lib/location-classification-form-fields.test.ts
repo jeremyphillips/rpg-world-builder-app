@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { BUILDING_FORM_ENTRIES, BUILDING_FORM_IDS } from '@rpg/contracts'
+import {
+  BUILDING_FACILITY_TYPE_ENTRIES,
+  BUILDING_FACILITY_TYPE_IDS,
+  BUILDING_FORM_ENTRIES,
+  BUILDING_FORM_IDS,
+} from '@rpg/contracts'
 
 import {
   buildLocationClassificationFields,
@@ -56,29 +61,10 @@ describe('Building classification fields', () => {
       type: 'combobox',
       label: 'Facility type',
       multiple: false,
-      options: [
-        { value: 'residence', label: 'Residence' },
-        { value: 'apartment_building', label: 'Apartment building' },
-        { value: 'boarding_house', label: 'Boarding house' },
-        { value: 'inn', label: 'Inn' },
-        { value: 'tavern', label: 'Tavern' },
-        { value: 'market', label: 'Market' },
-        { value: 'bank', label: 'Bank' },
-        { value: 'warehouse', label: 'Warehouse' },
-        { value: 'brewery', label: 'Brewery' },
-        { value: 'distillery', label: 'Distillery' },
-        { value: 'factory', label: 'Factory' },
-        { value: 'mill', label: 'Mill' },
-        { value: 'town_hall', label: 'Town hall' },
-        { value: 'courthouse', label: 'Courthouse' },
-        { value: 'prison', label: 'Prison' },
-        { value: 'barracks', label: 'Barracks' },
-        { value: 'library', label: 'Library' },
-        { value: 'hospital', label: 'Hospital' },
-        { value: 'temple', label: 'Temple' },
-        { value: 'theater', label: 'Theater' },
-        { value: 'stable', label: 'Stable' },
-      ],
+      options: BUILDING_FACILITY_TYPE_IDS.map((id) => ({
+        value: id,
+        label: BUILDING_FACILITY_TYPE_ENTRIES[id].label,
+      })),
     })
   })
 
