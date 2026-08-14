@@ -1060,6 +1060,24 @@ export const PHASE_19B_DECOMPOSE_IDS = [
   ...PHASE_19B_SHOP_DECOMPOSE_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Phase 19C selective runtime promotion gate — frozen 2026-08-14.
+ * Four carry-forwards from 19A/19B/Tier B only — no scope expansion.
+ * Evidence: docs/analysis/building-corpus-disposition-phase-19c-1.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19C_CANDIDATE_IDS = [
+  'blockhouse',
+  'workshop',
+  'museum',
+  'academy',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19C gate reviewed 2026-08-14 — zero runtime Form/Facility promotions. */
+export const PHASE_19C_NO_PROMOTION_IDS = [
+  ...PHASE_19C_CANDIDATE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,

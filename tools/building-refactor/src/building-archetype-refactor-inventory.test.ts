@@ -35,6 +35,8 @@ import {
   PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
   PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS,
   PHASE_19B_DECOMPOSE_IDS,
+  PHASE_19C_CANDIDATE_IDS,
+  PHASE_19C_NO_PROMOTION_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -161,7 +163,7 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 110 concepts pending or awaiting design after Phase 19B closeout', () => {
+  it('leaves 110 concepts pending or awaiting design after Phase 19C closeout', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
@@ -308,6 +310,33 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('fulling_mill')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('tollhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('bounty_office')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+  })
+
+  it('maps Phase 19C promotion gate candidates to unchanged inventory statuses', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    expect(PHASE_19C_CANDIDATE_IDS).toEqual(['blockhouse', 'workshop', 'museum', 'academy'])
+    expect(PHASE_19C_NO_PROMOTION_IDS).toHaveLength(4)
+    expect(new Set(PHASE_19C_NO_PROMOTION_IDS).size).toBe(4)
+
+    for (const id of PHASE_19C_CANDIDATE_IDS) {
+      expect(BUILDING_RESEARCH_CORPUS_IDS).toContain(id)
+    }
+
+    expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+    expect(statusById.get('workshop')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('museum')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('academy')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+
+    for (const formId of BUILDING_FORM_IDS) {
+      expect(PHASE_19C_CANDIDATE_IDS).not.toContain(formId)
+    }
+
+    for (const facilityId of BUILDING_FACILITY_TYPE_IDS) {
+      expect(PHASE_19C_CANDIDATE_IDS).not.toContain(facilityId)
+    }
   })
 
   it('derives granary, greenhouse, and arena enabled-facility from registry membership, not INITIAL_STATUS_BY_ID', () => {
