@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
-import { modalStableBlockSizeClasses } from './modal.variants'
+import { modalStableBlockSizeClasses, modalStableTallBlockSizeClasses } from './modal.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
 import { useModal } from '../../hooks/use-modal'
@@ -186,6 +186,69 @@ describe('Modal', () => {
     await user.click(screen.getByRole('button', { name: 'Open' }))
     const content = await screen.findByTestId('modal-content')
     expect(content.className).toContain(modalStableBlockSizeClasses)
+    expect(content.className).toContain('max-h-[85vh]')
+  })
+
+  it('applies default stable size explicitly the same as implicit stable layout', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content layout="stable" stableSize="default" data-testid="modal-content">
+          <Modal.Header headline="Stable default" />
+          <Modal.Body>Short body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content.className).toContain(modalStableBlockSizeClasses)
+    expect(content.className).toContain('max-h-[85vh]')
+  })
+
+  it('applies tall stable size with overridden max-height cap', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content layout="stable" stableSize="tall" data-testid="modal-content">
+          <Modal.Header headline="Stable tall" />
+          <Modal.Body>Short body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content.className).toContain(modalStableTallBlockSizeClasses)
+    expect(content.className).toContain('max-h-[90vh]')
+    expect(content.className).not.toContain(modalStableBlockSizeClasses)
+    expect(content.className).not.toContain('max-h-[85vh]')
+  })
+
+  it('ignores stableSize when layout is content', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content layout="content" stableSize="tall" data-testid="modal-content">
+          <Modal.Header headline="Content layout" />
+          <Modal.Body>Short body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content.className).not.toContain(modalStableBlockSizeClasses)
+    expect(content.className).not.toContain(modalStableTallBlockSizeClasses)
   })
 })
 

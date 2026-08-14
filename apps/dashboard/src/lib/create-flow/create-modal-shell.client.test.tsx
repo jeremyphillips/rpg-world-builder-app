@@ -1,6 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
+import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -8,8 +9,28 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { CreateModalShell } from './create-modal-shell.client'
 
+const modalContentSpy = vi.fn()
+
+vi.mock('@rpg/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const ActualModalContent = actual.Modal.Content
+
+  return {
+    ...actual,
+    Modal: {
+      ...actual.Modal,
+      Content: (props: React.ComponentProps<typeof ActualModalContent>) => {
+        modalContentSpy(props)
+        return <ActualModalContent {...props} />
+      },
+    },
+  }
+})
+
 describe('CreateModalShell', () => {
-  it('selects the stable Modal layout and owns one body, scroll region, and footer', () => {
+  it('selects stable tall Modal layout and owns one body, scroll region, and footer', () => {
+    modalContentSpy.mockClear()
+
     render(
       <CreateModalShell
         open
@@ -21,7 +42,9 @@ describe('CreateModalShell', () => {
       </CreateModalShell>,
     )
 
-    expect(screen.getByRole('dialog')).toHaveClass('h-[min(85vh,40rem)]')
+    expect(modalContentSpy).toHaveBeenCalled()
+    const contentProps = modalContentSpy.mock.calls.at(-1)?.[0]
+    expect(contentProps).toMatchObject({ layout: 'stable', stableSize: 'tall' })
     expect(document.querySelectorAll('[data-create-modal-body]')).toHaveLength(1)
     expect(document.querySelectorAll('[data-create-modal-content]')).toHaveLength(1)
     expect(document.querySelector('[data-create-modal-content]')).toHaveClass('overflow-y-auto')

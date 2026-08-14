@@ -188,6 +188,7 @@ export function CreateModalShell({
       <Modal.Content
         size={size}
         layout="stable"
+        stableSize="tall"
         closeOnOutsideClick={closeOnOutsideClick}
         closeOnEscape={closeOnEscape}
         aria-busy={ariaBusy || undefined}

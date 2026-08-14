@@ -9,7 +9,9 @@ relationship vocabulary.
 
 `CreateModalShell` places header, optional Setup summary, optional tabs, one
 body scroll region, and one footer. It always selects `Modal.Content
-layout="stable"`. Stable height remains owned by the UI Modal primitive.
+layout="stable"` with `stableSize="tall"`. Stable height remains owned by the
+UI Modal primitive — features must not import modal height tokens or add
+app-local height utilities.
 
 The shell consumes normalized panel status (`invalid`, optional `issueCount`,
 `dirty`). It never inspects RHF, relationship drafts, or domain validation.

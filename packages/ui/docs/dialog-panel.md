@@ -84,6 +84,29 @@ Modal, Sheet, and ConfirmDialog share one open-focus policy via
 Consumer override: pass `onOpenAutoFocus` and call `preventDefault()` to skip
 the default panel policy.
 
+## Stable modal geometry
+
+| Concern                       | Owner                                                            |
+| ----------------------------- | ---------------------------------------------------------------- |
+| Content-sized vs stable shell | `layout` (`content` \| `stable`)                                 |
+| Modal width                   | `size` (`sm` \| `md` \| `lg`) — inline `max-w-*`                 |
+| Stable shell block height     | `stableSize` (`default` \| `tall`) — only when `layout="stable"` |
+| Height token classes          | `@rpg/ui` `modal.variants.ts` only (not app-importable)          |
+| Workflow chooses tall         | application shell (e.g. dashboard `CreateModalShell`)            |
+| Scroll / flex body behavior   | `Modal.Body stableBody` (independent of `stableSize`)            |
+
+`size` and `stableSize` are **orthogonal** — width vs stable block height. Both
+can be set together (e.g. `size="lg" layout="stable" stableSize="tall"`).
+
+When `layout="content"`, `stableSize` has no effect. Do not add raw Tailwind
+height classes as extension points:
+
+```tsx
+<Modal.Content layout="stable" />
+<Modal.Content layout="stable" stableSize="tall" />
+<Modal.Content size="lg" layout="stable" stableSize="tall" />
+```
+
 ## Size and surface (capability alignment)
 
 `Modal` and `Sheet` both expose a prop named `size` (and may share the value `"md"`).
@@ -109,7 +132,7 @@ DrawerShell `bodyMode`:
 - `managed` — body becomes `p-0 overflow-hidden`; child owns scroll inside the body
 - `composed` — no auto `Sheet.Body`; Form/feature supplies Body + Footer via wrappers
 
-Modal `stableBody` + docked `Modal.Footer`:
+Modal `stableBody` + docked `Modal.Footer` (independent of `stableSize`):
 
 - Shell: `dialogPanelStableBodyVariants` (`px-6`, `pb-0`, `overflow-hidden`)
 - Inner scroll: `dialogPanelScrollRegionClasses` (`overflow-y-auto` + `pb-6` + `px-1` focus clearance)

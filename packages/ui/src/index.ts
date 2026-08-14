@@ -578,7 +578,12 @@ export {
 } from './components/ui/file-dropzone.client'
 export { FileField, type FileFieldProps } from './components/ui/file-field.client'
 
-export { Modal, type ModalContentProps, type ModalHeaderProps } from './components/ui/modal.client'
+export {
+  Modal,
+  type ModalContentProps,
+  type ModalHeaderProps,
+  type ModalStableSize,
+} from './components/ui/modal.client'
 export {
   modalOverlayVariants,
   modalContentVariants,
