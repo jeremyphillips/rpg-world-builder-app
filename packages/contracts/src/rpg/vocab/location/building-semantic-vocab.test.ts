@@ -140,6 +140,26 @@ describe('Building semantic vocabularies', () => {
       form: 'house',
       facilityType: 'barn',
     })
+    expect(buildingClassificationSchema.parse({ facilityType: 'granary' })).toEqual({
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'granary' })).toEqual({
+      form: 'house',
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'greenhouse' })).toEqual({
+      facilityType: 'greenhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'greenhouse' }),
+    ).toEqual({ form: 'hall', facilityType: 'greenhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'arena' })).toEqual({
+      facilityType: 'arena',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'arena' })).toEqual({
+      form: 'hall',
+      facilityType: 'arena',
+    })
   })
 
   it('keeps hall, guildhall, and town_hall as distinct ids on their axes', () => {
@@ -162,6 +182,8 @@ describe('Building semantic vocabularies', () => {
       'bank',
       'warehouse',
       'barn',
+      'granary',
+      'greenhouse',
       'brewery',
       'distillery',
       'factory',
@@ -180,6 +202,7 @@ describe('Building semantic vocabularies', () => {
       'lighthouse',
       'observatory',
       'archive',
+      'arena',
       'bathhouse',
       'hospital',
       'temple',
@@ -222,6 +245,8 @@ describe('Building semantic vocabularies', () => {
       bank: ['finance'],
       warehouse: ['storage'],
       barn: ['storage', 'service'],
+      granary: ['storage'],
+      greenhouse: ['production'],
       brewery: ['production'],
       distillery: ['production'],
       factory: ['production'],
@@ -240,6 +265,7 @@ describe('Building semantic vocabularies', () => {
       lighthouse: ['defense_watch'],
       observatory: ['knowledge'],
       archive: ['knowledge'],
+      arena: ['spectacle'],
       bathhouse: ['care'],
       hospital: ['care'],
       temple: ['worship'],
@@ -272,6 +298,7 @@ describe('Building semantic vocabularies', () => {
       'barn',
       'brewery',
       'distillery',
+      'arena',
       'bathhouse',
       'theater',
       'stable',
@@ -279,6 +306,8 @@ describe('Building semantic vocabularies', () => {
     expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual([
       'warehouse',
       'barn',
+      'granary',
+      'greenhouse',
       'brewery',
       'distillery',
       'factory',
@@ -299,6 +328,7 @@ describe('Building semantic vocabularies', () => {
       'lighthouse',
       'observatory',
       'archive',
+      'arena',
       'bathhouse',
       'hospital',
       'theater',
@@ -382,6 +412,38 @@ describe('Building semantic vocabularies', () => {
     expect(BUILDING_FACILITY_TYPE_ENTRIES.warehouse.description).toContain('cargo')
     expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('barn')
     expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('barn')
+  })
+
+  it('ships granary as grain-storage premises distinct from warehouse and barn via functions and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('granary')).toBe('granary')
+    expect(getBuildingFacilityTypeLabel('granary')).toBe('Granary')
+    expect(getBuildingFacilityDefaultFunctions('granary')).toEqual(['storage'])
+    expect(getBuildingFacilityDefaultFunctions('warehouse')).toEqual(['storage'])
+    expect(getBuildingFacilityDefaultFunctions('barn')).toEqual(['storage', 'service'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.granary.description).toContain('grain')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('granary')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).not.toContain('granary')
+  })
+
+  it('ships greenhouse as cultivation premises distinct from barn via functions and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('greenhouse')).toBe('greenhouse')
+    expect(getBuildingFacilityTypeLabel('greenhouse')).toBe('Greenhouse')
+    expect(getBuildingFacilityDefaultFunctions('greenhouse')).toEqual(['production'])
+    expect(getBuildingFacilityDefaultFunctions('barn')).toEqual(['storage', 'service'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.greenhouse.description).toContain('cultivation')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('greenhouse')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).not.toContain('greenhouse')
+  })
+
+  it('ships arena as combat spectacle premises distinct from theater via labels and search terms', () => {
+    expect(buildingFacilityTypeSchema.parse('arena')).toBe('arena')
+    expect(getBuildingFacilityTypeLabel('arena')).toBe('Arena')
+    expect(getBuildingFacilityDefaultFunctions('arena')).toEqual(['spectacle'])
+    expect(getBuildingFacilityDefaultFunctions('theater')).toEqual(['spectacle'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.arena.description).toContain('combat')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.theater.description).toContain('performance')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('arena')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('arena')
   })
 
   it('resolves legacy morphological Facility ids from registry metadata, not lexical id shape', () => {

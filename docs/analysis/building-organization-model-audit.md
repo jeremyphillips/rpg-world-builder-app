@@ -1801,22 +1801,49 @@ remains a separate plan. Tier B shortlist is evidence only. Tier C is the remain
 
 ### Inventory outcomes
 
-| Status                            | Count | Notes                                                                           |
-| --------------------------------- | ----: | ------------------------------------------------------------------------------- |
-| `outside-building-classification` |    39 | Family F post false-positive audit                                              |
-| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows             |
-| `needs-design`                    |     1 | `blockhouse` unchanged                                                          |
-| Unresolved                        |   166 | Tier B candidates, morphology queue, production cluster, deferred interior pass |
+| Status                            | Count | Notes                                                                          |
+| --------------------------------- | ----: | ------------------------------------------------------------------------------ |
+| `outside-building-classification` |    39 | Family F post false-positive audit                                             |
+| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows            |
+| `needs-design`                    |     1 | `blockhouse` unchanged                                                         |
+| Unresolved                        |   163 | Tier B remainder, morphology queue, production cluster, deferred interior pass |
 
 27 terms returned to `pending` during the Family F/E false-positive audit (see sweep note §False-positive
 audit). Tier A reviewed count is **102**, not a preserved row target.
 
-### Tier B Facility candidates (unchanged inventory)
+### Tier B Facility candidates
 
-Ranked in sweep note — `granary`, `greenhouse`, and `arena` remain **PROMOTE SOON** pending scale-vs-
-configuration review and a separate admission PR. Valid promotion outcome includes **none**.
+`granary`, `greenhouse`, and `arena` **shipped** in Phase 17 (see below). Remaining ranked candidates —
+`museum`, `workshop`, `academy` — stay evidence-only until a separate admission PR.
 
 ### Explicit non-goals (sweep 1)
 
 Runtime promotion, presets, manifestation pilot, Organization activity implementation, corpus-graph
 retargeting, heuristic/kind/prefix classification.
+
+## Phase 17 — Tier B Facility promotion (`granary`, `greenhouse`, `arena`)
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Admit three Tier B Facility candidates via registry-only promotion (same path as Bathhouse/Barn).
+Admission evidence in facility promotion tranche plan; neighbor rejection stays in audit/sweep notes, not
+registry copy.
+
+**Status:** **Implemented.** Runtime Form/Facility count **36** Facilities. Unresolved corpus **163**
+(was 166).
+
+### Shipped Facilities
+
+| id           | Groups                | Functions    | Nearest shipped neighbor |
+| ------------ | --------------------- | ------------ | ------------------------ |
+| `granary`    | `production`          | `storage`    | `warehouse`, `barn`      |
+| `greenhouse` | `production`          | `production` | `barn`                   |
+| `arena`      | `civic`, `commercial` | `spectacle`  | `theater`                |
+
+Inventory derives all three → `enabled-facility` from `BUILDING_FACILITY_TYPE_IDS` membership (not
+`INITIAL_STATUS_BY_ID`). Frozen corpus graph unchanged (`silo → granary`, `orangery → greenhouse`,
+`amphitheater` / `fighting_pit → arena`).
+
+### Explicit non-goals (Tier B tranche)
+
+Museum / Workshop / Academy promotion, `silo` / `orangery` runtime synonyms, Form promotion, new
+authoring groups, Setup redesign.

@@ -276,9 +276,9 @@ Additional admission question (pre-promotion):
 
 | id           | Nearest shipped Facility | Distinction / scale test                                                                  | Bucket            |
 | ------------ | ------------------------ | ----------------------------------------------------------------------------------------- | ----------------- |
-| `granary`    | Warehouse / Barn         | Stored-grain drying/ventilation — **configuration**, not just smaller warehouse           | PROMOTE SOON      |
-| `greenhouse` | Barn                     | Cultivation climate control — **configuration**                                           | PROMOTE SOON      |
-| `arena`      | Theater                  | Combat spectacle premises — **configuration** vs performance                              | PROMOTE SOON      |
+| `granary`    | Warehouse / Barn         | Stored-grain drying/ventilation — **configuration**, not just smaller warehouse           | **SHIPPED**       |
+| `greenhouse` | Barn                     | Cultivation climate control — **configuration**                                           | **SHIPPED**       |
+| `arena`      | Theater                  | Combat spectacle premises — **configuration** vs performance                              | **SHIPPED**       |
 | `museum`     | Archive / Library        | Exhibition vs custody — **mixed; mostly flavor**                                          | PROMOTE LATER     |
 | `workshop`   | Factory                  | Craft premises vs industrial scale — **subtype/scale**, not clearly durable configuration | KEEP AS CANDIDATE |
 | `academy`    | Schoolhouse              | Institution identity collision                                                            | KEEP AS CANDIDATE |
@@ -293,13 +293,13 @@ Additional admission question (pre-promotion):
 
 ---
 
-## Remainder analysis (166 unresolved)
+## Remainder analysis (163 unresolved)
 
 | Remainder bucket                    |                Approx. count | Examples                                       |
 | ----------------------------------- | ---------------------------: | ---------------------------------------------- |
 | Tier C ambiguity / composite        |                          ~24 | `abbey`, `castle`, `monastery`, `palace`, …    |
 | Morphology / Form investigation     |                          ~14 | `broch`, `longhouse`, `igloo`, `blockhouse`, … |
-| Tier B Facility candidates          | ~6 ranked + funerary cluster | `granary`, `greenhouse`, `arena`, …            |
+| Tier B Facility candidates          | ~3 ranked + funerary cluster | `museum`, `workshop`, `academy`, …             |
 | Approximate Facility / production   |                          ~11 | `foundry`, `tollhouse`, `fulling_mill`, …      |
 | Family B institution default        |                           ~6 | `academy`, `orphanage`, …                      |
 | Family F / E exceptions             |                          ~14 | `chapel`, `pigsty`, `workshop`, …              |
@@ -326,8 +326,8 @@ Do not start another broad sweep merely to lower the pending count.
 | Inventory statuses applied        | Complete — 102 Tier A rows                                                       |
 | Runtime Form/Facility registries  | **Unchanged**                                                                    |
 | Quarantined Archetype graph       | **Unchanged** (`potion_shop → apothecary` preserved)                             |
-| Tier B Facility promotion         | **Not implemented** — separate plan                                              |
-| Tier C detailed review            | 166 unresolved concepts remain                                                   |
+| Tier B Facility promotion         | **Implemented** — `granary`, `greenhouse`, `arena` shipped 2026-08-14            |
+| Tier C detailed review            | 163 unresolved concepts remain                                                   |
 
 Original pre-audit Tier A estimate: **129** rows. Final implemented Tier A: **102** rows. The 27-row
 reduction (27 returned to `pending`, plus `haunted_manor` rerouted within Tier A) is successful exception
@@ -346,7 +346,7 @@ detection, not a shortfall.
 | Prior tranche-1 decompositions     |       4 | `decompose` (included in 67 total) |
 | **Tier A implemented**             | **102** |                                    |
 
-**Total `decompose` rows:** 67 (includes prior 4). **Unresolved:** 166 (`165 pending` + `blockhouse` `needs-design`).
+**Total `decompose` rows:** 67 (includes prior 4). **Unresolved:** 163 (`162 pending` + `blockhouse` `needs-design`).
 
 ---
 

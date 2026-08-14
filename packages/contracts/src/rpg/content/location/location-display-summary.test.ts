@@ -219,6 +219,90 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
+  it('displays granary via registry label with Form-omitted and house compositions', () => {
+    const granaryOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'granary' }),
+    }
+    const houseGranary: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'granary',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(granaryOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Granary',
+    })
+    expect(resolveLocationDisplaySummary(houseGranary)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Granary',
+    })
+  })
+
+  it('displays greenhouse via registry label with Form-omitted and hall compositions', () => {
+    const greenhouseOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'greenhouse' }),
+    }
+    const hallGreenhouse: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'greenhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(greenhouseOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Greenhouse',
+    })
+    expect(resolveLocationDisplaySummary(hallGreenhouse)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Greenhouse',
+    })
+  })
+
+  it('displays arena via registry label with Form-omitted and hall compositions', () => {
+    const arenaOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'arena' }),
+    }
+    const hallArena: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'arena',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(arenaOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Arena',
+    })
+    expect(resolveLocationDisplaySummary(hallArena)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Arena',
+    })
+  })
+
   it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,

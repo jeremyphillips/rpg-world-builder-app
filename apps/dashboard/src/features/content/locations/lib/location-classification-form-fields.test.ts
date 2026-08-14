@@ -80,6 +80,8 @@ describe('Building classification fields', () => {
     expect(field.resolveFilteredOptions?.(field.options, '', [])).toMatchObject([
       { value: 'warehouse' },
       { value: 'barn' },
+      { value: 'granary' },
+      { value: 'greenhouse' },
       { value: 'brewery' },
       { value: 'distillery' },
       { value: 'factory' },

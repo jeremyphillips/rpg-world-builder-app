@@ -127,6 +127,9 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('embassy')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('schoolhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('barn')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    expect(statusById.get('granary')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    expect(statusById.get('greenhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    expect(statusById.get('arena')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('blacksmith')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
     )
@@ -169,15 +172,29 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 166 concepts pending or awaiting design after sweep 1 dispositions', () => {
+  it('leaves 163 concepts pending or awaiting design after Tier B Facility promotion', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(166)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(78)
+    expect(unresolved).toHaveLength(163)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(75)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(88)
+  })
+
+  it('derives granary, greenhouse, and arena enabled-facility from registry membership, not INITIAL_STATUS_BY_ID', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    for (const facilityId of ['granary', 'greenhouse', 'arena'] as const) {
+      expect(BUILDING_FACILITY_TYPE_IDS).toContain(facilityId)
+      expect(
+        BUILDING_ARCHETYPE_REFACTOR_INVENTORY.find(({ id }) => id === facilityId)?.status,
+      ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+      expect(statusById.get(facilityId)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    }
   })
 
   it('maps every explicit sweep allowlist id to the reviewed Tier A status', () => {

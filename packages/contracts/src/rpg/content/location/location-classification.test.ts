@@ -433,6 +433,26 @@ describe('legacy decomposition example compositions', () => {
       form: 'house',
       facilityType: 'barn',
     })
+    expect(buildingClassificationSchema.parse({ facilityType: 'granary' })).toEqual({
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'granary' })).toEqual({
+      form: 'house',
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'greenhouse' })).toEqual({
+      facilityType: 'greenhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'greenhouse' }),
+    ).toEqual({ form: 'hall', facilityType: 'greenhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'arena' })).toEqual({
+      facilityType: 'arena',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'arena' })).toEqual({
+      form: 'hall',
+      facilityType: 'arena',
+    })
   })
 
   it('derives functions from Facility only, not from legacy concept names', () => {
@@ -448,6 +468,9 @@ describe('legacy decomposition example compositions', () => {
     ])
     expect(getEffectiveBuildingFunctions({ facilityType: 'schoolhouse' })).toEqual(['knowledge'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'barn' })).toEqual(['storage', 'service'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'granary' })).toEqual(['storage'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'greenhouse' })).toEqual(['production'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'arena' })).toEqual(['spectacle'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'checkpoint' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'lighthouse' })).toEqual(['defense_watch'])

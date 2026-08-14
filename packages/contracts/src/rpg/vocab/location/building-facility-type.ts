@@ -144,6 +144,22 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['production', 'commercial'],
     searchTerms: ['farm', 'livestock', 'agricultural outbuilding', 'hay', 'byre', 'threshing barn'],
   },
+  granary: {
+    label: 'Granary',
+    description:
+      'Building premises configured for protected bulk grain storage, including drying and ventilation.',
+    defaultFunctions: ['storage'],
+    authoringGroups: ['production'],
+    searchTerms: ['grain', 'food storage', 'drying', 'corn'],
+  },
+  greenhouse: {
+    label: 'Greenhouse',
+    description:
+      'Building premises configured for controlled plant cultivation through managed light, climate, or growing conditions.',
+    defaultFunctions: ['production'],
+    authoringGroups: ['production'],
+    searchTerms: ['plants', 'cultivation', 'garden', 'glasshouse', 'conservatory'],
+  },
   brewery: {
     label: 'Brewery',
     description: 'A building durably configured for brewing beverages.',
@@ -304,6 +320,13 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     defaultFunctions: ['knowledge'],
     authoringGroups: ['civic'],
     searchTerms: ['records', 'documents', 'custody'],
+  },
+  arena: {
+    label: 'Arena',
+    description: 'Building premises configured for combat, competition, and spectator events.',
+    defaultFunctions: ['spectacle'],
+    authoringGroups: ['civic', 'commercial'],
+    searchTerms: ['combat', 'games', 'amphitheater', 'fighting pit', 'coliseum'],
   },
   bathhouse: {
     label: 'Bathhouse',
