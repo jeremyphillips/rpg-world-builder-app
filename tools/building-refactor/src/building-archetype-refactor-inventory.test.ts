@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { BUILDING_FACILITY_TYPE_IDS, BUILDING_FORM_IDS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -55,52 +56,82 @@ describe('Building archetype refactor inventory', () => {
     }
   })
 
-  it('records the expanded Facility sample and leaves 286 concepts pending design', () => {
+  it('derives shipped Form and Facility alignment from canonical registries', () => {
+    const corpusIds = new Set<string>(BUILDING_RESEARCH_CORPUS_IDS)
     const statusById = new Map(
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
     )
-    expect(statusById.get('house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
-    const facilityIds = [
-      'apartment_building',
-      'boarding_house',
-      'inn',
-      'tavern',
-      'market',
-      'bank',
-      'warehouse',
-      'brewery',
-      'distillery',
-      'factory',
-      'mill',
-      'town_hall',
-      'courthouse',
-      'prison',
-      'barracks',
-      'library',
-      'hospital',
-      'temple',
-      'theater',
-      'stable',
-    ] as const
-    for (const id of facilityIds) {
-      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+
+    const formIds = new Set<string>(BUILDING_FORM_IDS)
+    const facilityIds = new Set<string>(BUILDING_FACILITY_TYPE_IDS)
+    for (const id of formIds) {
+      expect(facilityIds.has(id)).toBe(false)
     }
+
+    for (const formId of BUILDING_FORM_IDS) {
+      if (!corpusIds.has(formId)) continue
+      expect(statusById.get(formId as never)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
+    }
+
+    for (const facilityId of BUILDING_FACILITY_TYPE_IDS) {
+      if (!corpusIds.has(facilityId)) continue
+      expect(statusById.get(facilityId as never)).toBe(
+        BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+      )
+    }
+
+    expect(statusById.get('house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
+    expect(statusById.get('tower')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
+    expect(statusById.get('keep')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
+    expect(statusById.get('checkpoint')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    expect(statusById.get('lighthouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('blacksmith')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
     )
-    expect(
-      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
-        ({ id }) => id === 'house' || id === 'blacksmith' || facilityIds.includes(id as never),
-      ).every(({ wasRuntimeArchetype }) => wasRuntimeArchetype),
-    ).toBe(true)
+    expect(statusById.get('gatehouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+    expect(statusById.get('apothecary')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+  })
 
+  it('does not require non-corpus shipped ids in the inventory', () => {
+    const inventoryIds = new Set(BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id }) => id))
+
+    for (const formId of BUILDING_FORM_IDS) {
+      if (inventoryIds.has(formId as never)) continue
+      expect(formId).toBe('hall')
+    }
+
+    for (const facilityId of BUILDING_FACILITY_TYPE_IDS) {
+      if (inventoryIds.has(facilityId as never)) continue
+      expect(facilityId).toBe('residence')
+    }
+  })
+
+  it('rejects explicit inventory rows that contradict shipped registries', () => {
+    for (const formId of BUILDING_FORM_IDS) {
+      expect(
+        BUILDING_ARCHETYPE_REFACTOR_INVENTORY.find(({ id }) => id === formId)?.status,
+      ).not.toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
+    }
+
+    for (const facilityId of BUILDING_FACILITY_TYPE_IDS) {
+      expect(
+        BUILDING_ARCHETYPE_REFACTOR_INVENTORY.find(({ id }) => id === facilityId)?.status,
+      ).not.toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
+    }
+
+    expect(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.find(({ id }) => id === 'blacksmith')?.status,
+    ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
+  })
+
+  it('leaves 277 concepts pending or awaiting design after registry-derived shipping', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(286)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(121)
+    expect(unresolved).toHaveLength(277)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(112)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(165)
   })
 

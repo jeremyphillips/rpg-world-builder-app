@@ -1153,3 +1153,17 @@ or `'Elven tree dwelling'` stay valid — no migration.
 
 Mechanical coverage: `building-archetype.test.ts` reconciles all 88 audited terms to
 exactly one final disposition; corpus dispositions reject placeholder `of: 'n'` targets.
+
+## Editorial appendix — Model E runtime retired (2026-08-14)
+
+The discovery corpus and dimensional evidence above remain frozen. **Runtime Building
+classification no longer uses Model E** (`classification.archetype`, function override, or
+specialization). Shipped axes are **Building Form** and **Building Facility type** only — see
+[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building-form.ts) and
+[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
+
+The quarantined `BuildingArchetype` registry is migration evidence, not product vocabulary.
+Authoring guidance:
+[`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
+Implementation spec archived with supersession banner:
+[`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md).

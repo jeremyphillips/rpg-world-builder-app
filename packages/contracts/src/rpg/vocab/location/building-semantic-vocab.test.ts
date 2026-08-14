@@ -55,6 +55,18 @@ describe('Building semantic vocabularies', () => {
     expect(
       buildingClassificationSchema.parse({ form: 'tower', facilityType: 'watchtower' }),
     ).toEqual({ form: 'tower', facilityType: 'watchtower' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'checkpoint' })).toEqual({
+      facilityType: 'checkpoint',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'keep', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'keep', facilityType: 'checkpoint' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'tower', facilityType: 'checkpoint' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'lighthouse' })).toEqual({
+      facilityType: 'lighthouse',
+    })
     expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'guildhall' })).toEqual(
       { form: 'hall', facilityType: 'guildhall' },
     )
@@ -96,9 +108,11 @@ describe('Building semantic vocabularies', () => {
       'courthouse',
       'prison',
       'barracks',
+      'checkpoint',
       'armory',
       'watchtower',
       'library',
+      'lighthouse',
       'archive',
       'hospital',
       'temple',
@@ -149,9 +163,11 @@ describe('Building semantic vocabularies', () => {
       courthouse: ['governance'],
       prison: ['governance'],
       barracks: ['defense_watch'],
+      checkpoint: ['defense_watch'],
       armory: ['storage', 'defense_watch'],
       watchtower: ['defense_watch'],
       library: ['knowledge'],
+      lighthouse: ['defense_watch'],
       archive: ['knowledge'],
       hospital: ['care'],
       temple: ['worship'],
@@ -199,9 +215,11 @@ describe('Building semantic vocabularies', () => {
       'courthouse',
       'prison',
       'barracks',
+      'checkpoint',
       'armory',
       'watchtower',
       'library',
+      'lighthouse',
       'archive',
       'hospital',
       'theater',

@@ -4,6 +4,8 @@
  * This module is non-runtime and must never be imported by an app or package.
  */
 
+import { BUILDING_FACILITY_TYPE_IDS, BUILDING_FORM_IDS } from '@rpg/contracts'
+
 export type BuildingCorpusDispositionKind =
   | 'archetype'
   | 'manifestation'
@@ -350,6 +352,7 @@ export const BUILDING_CORPUS_DISPOSITIONS = {
   anchorhold: { kind: 'interior' },
   apartment_building: { kind: 'archetype' },
   apiary: { kind: 'not_building' },
+  /** Slice 1: hybrid decompose evaluation — card only; may not ship as Facility. */
   apothecary: { kind: 'archetype' },
   aqueduct: { kind: 'form_only', structureType: 'infrastructure' },
   archive: { kind: 'archetype' },
@@ -452,6 +455,7 @@ export const BUILDING_CORPUS_DISPOSITIONS = {
   gallows: { kind: 'not_building' },
   gambling_hall: { kind: 'archetype' },
   gamekeepers_cottage: { kind: 'interior' },
+  /** Slice 1: contextual decompose — not Form; not a deterministic alias of checkpoint. */
   gatehouse: { kind: 'archetype' },
   general_store: { kind: 'specialization', of: 'shop' },
   gladiator_school: { kind: 'archetype' },
@@ -680,30 +684,23 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
   )
 })
 
+/** Non-inferable migration decisions only — shipped Form/Facility ids derive from registries. */
 const INITIAL_STATUS_BY_ID = {
-  apartment_building: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  bank: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  barracks: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  apothecary: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
-  boarding_house: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  brewery: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  courthouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  distillery: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  factory: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  hospital: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  house: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm,
-  inn: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  library: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  market: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  mill: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  prison: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  stable: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  tavern: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  temple: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  theater: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  town_hall: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
-  warehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility,
+  gatehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
+
+const SHIPPED_FORM_IDS = new Set<string>(BUILDING_FORM_IDS)
+const SHIPPED_FACILITY_IDS = new Set<string>(BUILDING_FACILITY_TYPE_IDS)
+
+function deriveInventoryStatus(id: BuildingCorpusId): BuildingArchetypeRefactorStatus {
+  const explicit = INITIAL_STATUS_BY_ID[id as keyof typeof INITIAL_STATUS_BY_ID]
+  if (explicit) return explicit
+  if (SHIPPED_FORM_IDS.has(id)) return BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm
+  if (SHIPPED_FACILITY_IDS.has(id)) return BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility
+  return BUILDING_ARCHETYPE_REFACTOR_STATUS.pending
+}
 
 const legacyRuntimeIds = new Set<BuildingCorpusId>(LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS)
 
@@ -718,7 +715,5 @@ export const BUILDING_ARCHETYPE_REFACTOR_INVENTORY =
   BUILDING_RESEARCH_CORPUS_IDS.map<BuildingArchetypeRefactorInventoryEntry>((id) => ({
     id,
     wasRuntimeArchetype: legacyRuntimeIds.has(id),
-    status:
-      INITIAL_STATUS_BY_ID[id as keyof typeof INITIAL_STATUS_BY_ID] ??
-      BUILDING_ARCHETYPE_REFACTOR_STATUS.pending,
+    status: deriveInventoryStatus(id),
   }))

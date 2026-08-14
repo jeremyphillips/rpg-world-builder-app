@@ -386,6 +386,18 @@ describe('legacy decomposition example compositions', () => {
     expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'residence' })).toEqual(
       { form: 'keep', facilityType: 'residence' },
     )
+    expect(
+      buildingClassificationSchema.parse({ form: 'keep', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'keep', facilityType: 'checkpoint' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'tower', facilityType: 'checkpoint' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'checkpoint' })).toEqual({
+      facilityType: 'checkpoint',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'lighthouse' })).toEqual({
+      facilityType: 'lighthouse',
+    })
     expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'town_hall' })).toEqual(
       { form: 'hall', facilityType: 'town_hall' },
     )
@@ -397,5 +409,7 @@ describe('legacy decomposition example compositions', () => {
       'care',
     ])
     expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'checkpoint' })).toEqual(['defense_watch'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'lighthouse' })).toEqual(['defense_watch'])
   })
 })

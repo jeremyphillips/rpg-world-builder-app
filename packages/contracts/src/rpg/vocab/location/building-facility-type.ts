@@ -200,6 +200,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['civic'],
     searchTerms: ['garrison', 'soldiers', 'guard'],
   },
+  checkpoint: {
+    label: 'Checkpoint',
+    description:
+      'A building configured for entry and movement control as a staffed post or station — not a road crossing, route segment, or gateway morphology.',
+    defaultFunctions: ['defense_watch'],
+    authoringGroups: ['civic'],
+    searchTerms: ['border', 'inspection', 'control'],
+  },
   armory: {
     label: 'Armory',
     description: 'A building configured to store and maintain arms and armor.',
@@ -220,6 +228,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     defaultFunctions: ['knowledge'],
     authoringGroups: ['civic'],
     searchTerms: ['books', 'study', 'reading'],
+  },
+  lighthouse: {
+    label: 'Lighthouse',
+    description:
+      'A building configured to emit a navigation signal for mariners — a staffed signaling premises, not a coastal landmark site.',
+    defaultFunctions: ['defense_watch'],
+    authoringGroups: ['civic'],
+    searchTerms: ['navigation', 'coast', 'beacon', 'signal'],
   },
   archive: {
     label: 'Archive',

@@ -1,5 +1,12 @@
 # Implement Building Classification — Model E
 
+> **SUPERSEDED (2026-08-14).** Runtime Building classification is Form + Facility only.
+> Authoring guidance lives in
+> [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
+> Convergence audit and decomposition evidence:
+> [`docs/analysis/building-organization-model-audit.md`](../analysis/building-organization-model-audit.md).
+> This document is retained as historical Model E implementation planning only.
+
 Implementation specification (relocated from `building-taxonomy-discovery.md`).
 Evidence and the 308-concept corpus remain in
 [building-taxonomy-discovery.md](./building-taxonomy-discovery.md).
