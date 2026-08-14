@@ -1,13 +1,19 @@
 # Building create relationship tabs — Phase 0 architecture checkpoint
 
+**Status:** Superseded architecture evidence  
+**Current create-flow documentation:** [`apps/dashboard/docs/create-flow.md`](../../apps/dashboard/docs/create-flow.md)  
+**Current Building planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
+
+Dense HTTP/transaction preflight detail below is retained as history and was not merged into
+`create-flow.md` in the consolidation pass.
+
 **Confirmed:** 2026-08-13
 **Scope:** Architecture and transaction-feasibility checkpoint; no create-flow feature implementation
 
 ## Decisions
 
-This checkpoint freezes the seams required by
-`.cursor/plans/building_create_relationship_tabs_refinement.plan.md` before shared shell or Building
-relationship-tab implementation begins.
+This checkpoint froze the seams later implemented in the Building create relationship-tab
+refinement. The Cursor plan is completed local history only.
 
 1. Stable height remains owned by `@rpg/ui` through `Modal.Content layout="stable"` and
    `modalStableBlockSizeClasses`. Dashboard code does not own a height token.

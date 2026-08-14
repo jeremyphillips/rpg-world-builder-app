@@ -1,15 +1,20 @@
-# Building classification (Model E)
+# Building classification
 
-Locations whose `kind` is **structure** and `structureType` is **building** carry Model E
+Locations whose `kind` is **structure** and `structureType` is **building** carry Form + Facility
 classification: optional **Building Form** (morphology) and/or **Facility type** (configured
 purpose). At least one must be present on persisted classification.
 
 **Facility is the primary authoring/discovery axis; Form is optional structural precision.** Setup
 requires a Facility discovery group (including Browse all), not a persisted `facilityType`.
-Canonical registries live in `@rpg/contracts` — [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts)
-and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
-Evidence and curation history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/building-taxonomy-discovery.md)
-(historical curation, not current ownership).
+
+| Concern                       | Where to read                                                                                                                                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime model**             | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
+| **Current taxonomy planning** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                         |
+| **Corpus evidence**           | Linked from that roadmap only where a phase needs it                                                                                                                                                                      |
+
+Do not start from the frozen discovery corpus or the closed Building/Organization audit to learn
+the current model.
 
 ## Canonical axes
 
@@ -33,7 +38,7 @@ concept and not physical morphology owned by Form. Labels must pass the **Form-i
 test**: if Form is omitted, the Facility label still describes a coherent configured use of Building
 premises without requiring the reader to infer morphology.
 
-Phase 7 acceptance review:
+Phase 7 acceptance review (historical; create-flow closed):
 [`building-create-phase-7-acceptance.md`](../../../docs/analysis/building-create-phase-7-acceptance.md).
 
 **Open composition:** Form and Facility compose without pair allowlists. Awkward combinations are
@@ -51,10 +56,10 @@ Persisted Building classification is **only** `classification.form` and/or
 ([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building-archetype.ts))
 is a **quarantined research corpus** — not exported from runtime barrels, not imported by
 production apps (ESLint-enforced). It may inform future authoring presets or manifestation
-migration; presets remain **investigation-only until 2B approval**
+migration; presets remain **deferred until 2B approval**
 ([building-authoring-preset-investigation-2a.md](../../../docs/analysis/building-authoring-preset-investigation-2a.md));
-manifestation remains deferred pending a gated consumer
-([building-organization-model-audit.md](../../../docs/analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3)).
+manifestation remains deferred
+([building-taxonomy.md](../../../docs/roadmap/building-taxonomy.md#deferred)).
 
 ## Overview surfaces
 

@@ -1,10 +1,16 @@
 # Building corpus disposition — tranche 1
 
+**Status:** Historical evidence / superseded for planning  
+**Current roadmap:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
+
+Preserve apothecary and early blockhouse cards. Snapshot totals below are historical (unresolved 268
+at tranche closeout). Live counts live in the refactor inventory and the canonical roadmap.
+
 **Checkpoint date:** 2026-08-14  
 **Scope:** Inventory + analysis only. No runtime Form/Facility promotion, presets, manifestation, or
 create-flow changes.
 
-**Related:** Phase 11 closeout in
+**Related:** Closed audit
 [`building-organization-model-audit.md`](./building-organization-model-audit.md); refactor inventory
 in [`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
 

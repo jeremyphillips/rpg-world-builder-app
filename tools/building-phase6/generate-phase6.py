@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Generate Phase 6 building corpus disposition + archetype registry shards."""
+"""Generate Phase 6 building corpus disposition + archetype registry shards.
+
+Historical one-shot generator. Live corpus disposition is
+`tools/building-refactor/src/building-archetype-refactor-inventory.ts`.
+Current planning: `docs/roadmap/building-taxonomy.md`.
+The `building-corpus-disposition.ts` output path below is discovery-era and is
+not a runtime SSOT.
+"""
 
 from __future__ import annotations
 

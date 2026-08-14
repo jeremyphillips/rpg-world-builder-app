@@ -5,6 +5,11 @@ Dashboard create workflows compose under `apps/dashboard/src/lib/create-flow`.
 and optional relationship-draft presentation — not domain forms, persistence, or
 relationship vocabulary.
 
+Building create-flow Phases 7–8 are **closed**. Pre-implementation architecture notes live in
+[`building-create-relationship-tabs-phase-0.md`](../../../docs/analysis/building-create-relationship-tabs-phase-0.md)
+(superseded evidence). Remaining Building taxonomy work is planned in
+[`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md).
+
 ## CreateModalShell
 
 `CreateModalShell` places header, optional Setup summary, optional tabs, one

@@ -6,7 +6,7 @@
  */
 
 const BUILDING_ARCHETYPE_QUARANTINE_MESSAGE =
-  'BuildingArchetype is a quarantined research corpus — not runtime classification. Use Form, Facility, and Organization relationships instead. See docs/analysis/building-organization-model-audit.md.'
+  'BuildingArchetype is a quarantined research corpus — not runtime classification. Use Form, Facility, and Organization relationships instead. See docs/roadmap/building-taxonomy.md.'
 
 /** Production apps (dashboard, api, public). */
 export const buildingArchetypeAppQuarantine = {

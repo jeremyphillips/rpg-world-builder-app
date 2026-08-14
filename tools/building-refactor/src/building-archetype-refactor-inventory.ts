@@ -688,7 +688,10 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
 
 /**
  * Non-inferable migration decisions only — shipped Form/Facility ids derive from registries.
- * Sweep 1 membership is explicit per family; Tier C per batch — see building-corpus-disposition-tier-c-1.md.
+ * Sweep 1 membership is explicit per family; Tier C per batch.
+ * Planning: docs/roadmap/building-taxonomy.md
+ * Evidence: docs/analysis/building-corpus-disposition-sweep-1.md,
+ * docs/analysis/building-corpus-disposition-tier-c-1.md.
  */
 export const SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
   'airship',
@@ -819,7 +822,8 @@ export const SWEEP_PRIOR_DECOMPOSE_IDS = [
 
 /**
  * Tier C composite review queue — scheduling only; `kind: composite` is not disposition evidence.
- * See building-corpus-disposition-tier-c-1.md.
+ * Evidence: docs/analysis/building-corpus-disposition-tier-c-1.md
+ * Planning: docs/roadmap/building-taxonomy.md
  */
 export const TIER_C_COMPOSITE_QUEUE_IDS = [
   'monastery',

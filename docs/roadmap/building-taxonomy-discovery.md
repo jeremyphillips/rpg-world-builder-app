@@ -1,16 +1,23 @@
 # Building Taxonomy Discovery
 
+> **Status:** Frozen discovery evidence  
+> **Not the current Building roadmap**  
+> **Current roadmap:** [`docs/roadmap/building-taxonomy.md`](./building-taxonomy.md)
+>
 > **Frozen evidence set — corpus v0.5 (308 concepts).** Content through the
 > Phase 5 decision record (v0.5) below is immutable discovery evidence. Later
 > editorial output (function-family curation, archetype disposition) is appended
-> in clearly dated sections at the end — never edited in place. Implementation
-> guidance lives in
+> in clearly dated sections at the end — never edited in place. Retired Model E
+> implementation history:
 > [building-model-e-implementation-spec.md](./building-model-e-implementation-spec.md).
 
 Working artifact for the building classification discovery process. Companion
 research notes: the superseded taxonomy plan (Candidate Model A and its
-outlier catalogue). Current shipped vocab under test:
-[`building-type-definitions.ts`](../../packages/contracts/src/rpg/vocab/location/building-type-definitions.ts).
+outlier catalogue). Discovery-era shipped vocab (`building-type-definitions.ts`)
+was later replaced by Form and Facility registries — see
+[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building-form.ts)
+and
+[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
 
 | Phase                                     | Status                                           |
 | ----------------------------------------- | ------------------------------------------------ |
@@ -851,9 +858,12 @@ Consequences:
 
 ### Implementation scope (handed to the implementation plan)
 
+> Historical handoff. The Cursor plan below is completed/superseded local history. Current
+> planning: [`building-taxonomy.md`](./building-taxonomy.md).
+
 Scoped in full in the fresh implementation plan
 ([building_archetype_registry_a7e3d1c4.plan.md](../../.cursor/plans/building_archetype_registry_a7e3d1c4.plan.md)
-— see Next step). Summary of the shape:
+— historical; not active). Summary of the shape:
 
 ```text
 classification (building):
@@ -953,8 +963,12 @@ appear in 12 of 15 buckets.
 
 ## Next step
 
+> Historical. Model E implementation executed and later retired at runtime. Current planning:
+> [`building-taxonomy.md`](./building-taxonomy.md).
+
 Discovery is concluded. Execute the implementation plan
-([building_archetype_registry_a7e3d1c4.plan.md](../../.cursor/plans/building_archetype_registry_a7e3d1c4.plan.md)):
+([building_archetype_registry_a7e3d1c4.plan.md](../../.cursor/plans/building_archetype_registry_a7e3d1c4.plan.md)
+— historical; not active):
 function-family vocabulary + archetype registry replacing
 `BUILDING_TYPE_DEFINITIONS`, new classification schema
 (`archetype` / `functionOverride?` / `specialization?`), and the downstream
@@ -1009,8 +1023,12 @@ Working-set ids retained unchanged where they survived curation (`food_drink_soc
 
 ## Editorial appendix — Phase 6 archetype disposition (2026-08-03)
 
-Machine-checkable disposition artifact:
-[`building-corpus-disposition.ts`](../../packages/contracts/src/rpg/vocab/location/building-corpus-disposition.ts).
+Machine-checkable disposition artifact (historical; live corpus disposition is the
+refactor inventory, not a contracts module):
+[`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts)
+(`BUILDING_CORPUS_DISPOSITIONS`). The discovery-era path
+`packages/contracts/src/rpg/vocab/location/building-corpus-disposition.ts` was never the
+runtime SSOT.
 Comprehensive registry shards compose
 [`BUILDING_ARCHETYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-archetype.ts)
 via neutral alphabetical files under
@@ -1165,13 +1183,17 @@ specialization). Shipped axes are **Building Form** and **Building Facility type
 The quarantined `BuildingArchetype` registry is migration evidence, not product vocabulary.
 Authoring guidance:
 [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
-Implementation spec archived with supersession banner:
+Current taxonomy planning:
+[`building-taxonomy.md`](./building-taxonomy.md).
+Retired Model E implementation spec:
 [`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md).
 
 ## Editorial appendix — Preset investigation and manifestation gate (2026-08-14)
 
 Slice 2A (preset UX) and Slice 3 (manifestation evidence gate) are documented in
 [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md)
-and
-[`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3).
+and the closed audit
+[`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3)
+(historical). Current sequencing:
+[`building-taxonomy.md`](./building-taxonomy.md).
 No Building preset registry or manifestation encoding was added.

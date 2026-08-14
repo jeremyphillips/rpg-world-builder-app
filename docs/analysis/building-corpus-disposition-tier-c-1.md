@@ -1,12 +1,18 @@
 # Building corpus disposition — Tier C tranche 1
 
+**Status:** Supporting evidence  
+**Current planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
+
+This note owns the scale/unit gate, institution-vs-premises rule, morphology protocol, and Tier C
+per-term reasoning. It is not the current plan. The Cursor plan that produced it is completed local
+history only.
+
 **Checkpoint date:** 2026-08-14  
 **Scope:** Detailed review of the 24-term composite queue, blockhouse morphology protocol, and Family B
 non-composite institution terms. Inventory + analysis only — no runtime Form/Facility promotion.
 
-**Related:** Plan [`.cursor/plans/tier_c_disposition_tranche.plan.md`](../../.cursor/plans/tier_c_disposition_tranche.plan.md);
-sweep 1 [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md); Phase 18 in
-[`building-organization-model-audit.md`](./building-organization-model-audit.md).
+**Related:** Sweep 1 [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md);
+closed audit [`building-organization-model-audit.md`](./building-organization-model-audit.md).
 
 **Queue rule:** `kind: composite` selected these terms for review; it is **not** disposition evidence.
 

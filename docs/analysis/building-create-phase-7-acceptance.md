@@ -1,9 +1,15 @@
 # Building create Phase 7–8 acceptance
 
+**Status:** Historical evidence / create-flow track closed  
+**Current Building planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)  
+**Create-flow SSOT:** [`apps/dashboard/docs/create-flow.md`](../../apps/dashboard/docs/create-flow.md)
+
+Keep this note for open-composition evidence, Form-independent labels, watchtower/lighthouse
+identifier debt, and 2B acceptance findings. It is not current corpus guidance.
+
 **Investigation date:** 2026-08-14  
 **Scope:** UX review, semantic disposition cards, localized vocabulary/copy fixes, create-flow closeout  
-**Prerequisite:** frozen 2A preset policy — [`building-authoring-preset-investigation-2a.md`](./building-authoring-preset-investigation-2a.md)  
-**Plan:** `.cursor/plans/building_create_acceptance_dfb6c9ac.plan.md`
+**Prerequisite:** frozen 2A preset policy — [`building-authoring-preset-investigation-2a.md`](./building-authoring-preset-investigation-2a.md)
 
 Evidence in this note is from Storybook, Vitest interaction tests, and code-path inspection of
 Setup → Details → Organizations. It is **not** an external usability study. Later live authoring
@@ -314,22 +320,26 @@ manifestation.
 
 ## Phase 8 closeout summary
 
-See [`building-organization-model-audit.md`](./building-organization-model-audit.md#phase-11--building-create-flow-closeout)
-and [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
+See closed-audit Phase 11
+([`building-organization-model-audit.md`](./building-organization-model-audit.md#phase-11--building-create-flow-closeout)),
+runtime authoring
+[`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md),
+and current planning
+[`building-taxonomy.md`](../roadmap/building-taxonomy.md).
 
-| Item                      | Outcome                                                                                        |
-| ------------------------- | ---------------------------------------------------------------------------------------------- |
-| Canonical Form values     | `house`, `tower`, `hall`, `keep`                                                               |
-| Canonical Facility values | 28 ids — see registry                                                                          |
-| Facility admission rule   | Documented above (Form-independent label test included)                                        |
-| Open-composition policy   | Evidence-backed statement — holds; identifier debt acknowledged                                |
-| Deferred concepts         | apothecary `needsDesign`; gatehouse decompose; manifestation ungated; id normalization ungated |
-| Preset evidence           | Aliases sufficient in review; 2B not approved                                                  |
-| Manifestation evidence    | Still ungated (Phase 10)                                                                       |
-| Civic group               | RENAME AUTHORING LABEL ONLY → Civic / institutional                                            |
-| Watchtower disposition    | Canonical meaning Watch post; persisted id `watchtower`                                        |
-| Lighthouse disposition    | Canonical meaning Beacon station; persisted id `lighthouse`                                    |
-| Storybook                 | Scenario matrix under `phase-7-building-flows`                                                 |
+| Item                      | Outcome                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Canonical Form values     | `house`, `tower`, `hall`, `keep`                                                                                           |
+| Canonical Facility values | **36** ids at consolidation — see `BUILDING_FACILITY_TYPE_IDS` (28 at this review)                                         |
+| Facility admission rule   | Documented above (Form-independent label test included)                                                                    |
+| Open-composition policy   | Evidence-backed statement — holds; identifier debt acknowledged                                                            |
+| Deferred concepts         | apothecary **decompose** (Org activity gap deferred); gatehouse decompose; manifestation ungated; id normalization ungated |
+| Preset evidence           | Aliases sufficient in review; 2B not approved                                                                              |
+| Manifestation evidence    | Still ungated (Phase 10)                                                                                                   |
+| Civic group               | RENAME AUTHORING LABEL ONLY → Civic / institutional                                                                        |
+| Watchtower disposition    | Canonical meaning Watch post; persisted id `watchtower`                                                                    |
+| Lighthouse disposition    | Canonical meaning Beacon station; persisted id `lighthouse`                                                                |
+| Storybook                 | Scenario matrix under `phase-7-building-flows`                                                                             |
 
 ---
 

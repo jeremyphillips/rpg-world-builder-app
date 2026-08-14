@@ -1,11 +1,18 @@
 # Building corpus disposition — sweep 1
 
+**Status:** Supporting evidence  
+**Current planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
+
+This note owns family-rule evidence, the false-positive audit, morphology pull lists, and
+approximate-Facility exceptions. It is not the current plan. Snapshot totals below are historical
+(sweep closeout); live counts live in the refactor inventory and the canonical roadmap.
+
 **Checkpoint date:** 2026-08-14  
 **Scope:** High-confidence corpus disposition sweep. Inventory + analysis only. No runtime Form/Facility
 promotion, presets, manifestation, or create-flow changes.
 
-**Related:** Tranche 1 in [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md);
-Phase 11–15 closeout in [`building-organization-model-audit.md`](./building-organization-model-audit.md);
+**Related:** Tranche 1 (historical) in [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md);
+closed audit [`building-organization-model-audit.md`](./building-organization-model-audit.md);
 refactor inventory in
 [`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
 
@@ -293,7 +300,11 @@ Additional admission question (pre-promotion):
 
 ---
 
-## Remainder analysis (163 unresolved)
+## Remainder analysis (historical snapshot — 163 unresolved at sweep closeout)
+
+Tier C later closed the composite queue (24/24). Current unresolved count and sequencing live on
+the [canonical roadmap](../roadmap/building-taxonomy.md). The buckets below are sweep-closeout
+evidence, not a live work queue.
 
 | Remainder bucket                    |                Approx. count | Examples                                       |
 | ----------------------------------- | ---------------------------: | ---------------------------------------------- |
@@ -327,7 +338,7 @@ Do not start another broad sweep merely to lower the pending count.
 | Runtime Form/Facility registries  | **Unchanged**                                                                    |
 | Quarantined Archetype graph       | **Unchanged** (`potion_shop → apothecary` preserved)                             |
 | Tier B Facility promotion         | **Implemented** — `granary`, `greenhouse`, `arena` shipped 2026-08-14            |
-| Tier C detailed review            | 163 unresolved concepts remain                                                   |
+| Tier C detailed review            | Closed after this sweep — see roadmap; do not treat 163 as current               |
 
 Original pre-audit Tier A estimate: **129** rows. Final implemented Tier A: **102** rows. The 27-row
 reduction (27 returned to `pending`, plus `haunted_manor` rerouted within Tier A) is successful exception
@@ -346,7 +357,9 @@ detection, not a shortfall.
 | Prior tranche-1 decompositions     |       4 | `decompose` (included in 67 total) |
 | **Tier A implemented**             | **102** |                                    |
 
-**Total `decompose` rows:** 67 (includes prior 4). **Unresolved:** 163 (`162 pending` + `blockhouse` `needs-design`).
+**Total `decompose` rows at sweep closeout:** 67 (includes prior 4). Unresolved **163** was the
+sweep-closeout snapshot (`162 pending` + `blockhouse` `needs-design`). Live totals: inventory tests
+and [`building-taxonomy.md`](../roadmap/building-taxonomy.md).
 
 ---
 

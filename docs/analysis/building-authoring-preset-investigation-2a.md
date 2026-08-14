@@ -1,9 +1,15 @@
 # Building authoring preset investigation — Slice 2A
 
+**Status:** Deferred supporting evidence  
+**2B remains unapproved**  
+**Current planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
+
+This note is the frozen 2A design record. It is not the current Building roadmap. Reopen only if
+the deferred Presets / 2B trigger on that roadmap is met.
+
 **Investigation date:** 2026-08-14  
 **Revised:** 2026-08-14 (projection policy, suggestion semantics, copy evaluation)  
-**Scope:** UX/model investigation only — no preset registry, schema field, or UI implementation  
-**Roadmap:** `.cursor/plans/building_classification_roadmap_5966c54d.plan.md` Slice 2A
+**Scope:** UX/model investigation only — no preset registry, schema field, or UI implementation
 
 ## Goal
 

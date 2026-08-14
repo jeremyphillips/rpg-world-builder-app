@@ -1,5 +1,13 @@
 # Building archetypes against a Building ↔ Organization model
 
+**Status:** Closed audit / historical evidence  
+**Current Building planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)  
+**Do not append future Building taxonomy phases here.**
+
+This file is not the current Building roadmap. Remaining corpus work is Phase 19 on the canonical
+roadmap. Organization 7c/7d evidence below remains historical Organization design record and is not
+moved in the consolidation pass.
+
 **Audit date:** 2026-08-12  
 **Scope:** Non-destructive architectural audit; no schema or data changes
 

@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Apply Phase 8 specialization-term curation to building archetype registry shards."""
+"""Apply Phase 8 specialization-term curation to building archetype registry shards.
+
+Historical one-shot generator. Live corpus disposition is
+`tools/building-refactor/src/building-archetype-refactor-inventory.ts`.
+Current planning: `docs/roadmap/building-taxonomy.md`.
+The `building-corpus-disposition.ts` path below is discovery-era and is not a
+runtime SSOT.
+"""
 
 from __future__ import annotations
 
