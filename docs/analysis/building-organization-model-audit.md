@@ -1406,13 +1406,13 @@ filters**. All consumers derive from `BUILDING_FORM_ENTRIES`:
 
 ### Decomposition outcomes (ambiguous corpus)
 
-| Term                                               | Outcome          | Notes                          |
-| -------------------------------------------------- | ---------------- | ------------------------------ |
-| House, Tower, Hall                                 | PRIMARY FORM     | Optional Facility composition  |
-| Town Hall, Watchtower, Warehouse                   | PRIMARY FACILITY | Optional Form is composition   |
-| Wizard tower, Healer's house, Blacksmith           | DECOMPOSE        | Bundles multiple axes          |
-| Martello tower, Drum tower, Longhouse              | MANIFESTATION    | Defer rewiring until migration |
-| Keep, Gatehouse, Manor, Palace, Apartment building | DEFER            | See recommendations below      |
+| Term                                                    | Outcome                | Notes                          |
+| ------------------------------------------------------- | ---------------------- | ------------------------------ |
+| House, Tower, Hall, Keep                                | PRIMARY FORM           | Optional Facility composition  |
+| Town Hall, Watchtower, Guildhall, Warehouse, Shop       | PRIMARY FACILITY       | Optional Form is composition   |
+| Wizard tower, Healer's house, Blacksmith, Manor, Palace | DECOMPOSE              | See Slice D table              |
+| Martello tower, Drum tower, Longhouse                   | MANIFESTATION          | Defer rewiring until migration |
+| Gatehouse, Apartment building                           | REJECT / FACILITY-ONLY | See Slice D table              |
 
 ### Manifestation evaluation (no encoding chosen)
 
@@ -1512,3 +1512,62 @@ no longer describes archetype picker/filter as live UX. Former Model E sections 
 ### Apartment building
 
 **KEEP FACILITY-ONLY** — dual-axis promotion rejected under the dual-axis rule (see Phase 8).
+
+## Phase 9 — Building classification convergence (Slice D)
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Document legacy decomposition outcomes; prove canonical compositions are valid and
+unrestricted without fixed legacy-to-classification mappings; record explicit deferred work.
+
+### Convergence summary (Slices A–D)
+
+| Slice | Outcome                                                                             |
+| ----- | ----------------------------------------------------------------------------------- |
+| A     | Archetype quarantine enforced; stale Model E docs archived; apartment Facility-only |
+| B     | Form `keep` admitted (morphology-only)                                              |
+| C     | Facility tranche: `shop`, `watchtower`, `guildhall`, `armory`, `archive`            |
+| D     | Decomposition table + runtime composition proofs (this checkpoint)                  |
+
+Persisted classification remains `classification.form` and/or `classification.facilityType`.
+No fifth semantic axis was required for the reviewed legacy terms.
+
+### Legacy decomposition table (contextual — not a resolver)
+
+These rows describe **semantic ownership** and **example** canonical compositions. They must not
+become deterministic mappings such as `wizard_tower → { form: 'tower', facilityType: 'residence' }`.
+
+| Legacy term        | Outcome            | Example Form        | Example Facility              | Organization / relationship         | Notes                                        |
+| ------------------ | ------------------ | ------------------- | ----------------------------- | ----------------------------------- | -------------------------------------------- |
+| Wizard tower       | DECOMPOSE          | Tower               | Residence and/or library      | Wizard / order operator or occupant | Named language undecided (preset/alias/none) |
+| Healer's house     | DECOMPOSE          | House               | Hospital if care premises     | Healer / healing org operator       | Form-only valid when care is not configured  |
+| Blacksmith         | DECOMPOSE          | —                   | Shop if retail premises       | Activity + operator relationship    | No Building type for the trade itself        |
+| Manor              | DECOMPOSE          | House / Hall / Keep | Residence / town_hall         | Ownership / authority relationships | Status is not Form                           |
+| Palace             | DECOMPOSE          | Hall / Keep         | Residence + town_hall         | Ruler / government presence         | Authority on relationships + Facility        |
+| Watchtower         | PRIMARY FACILITY   | optional Tower      | Watchtower                    | Garrison if any                     | Shipped Slice C                              |
+| Guildhall          | PRIMARY FACILITY   | optional Hall       | Guildhall                     | Guild via relationship              | Shipped Slice C; assembly-only functions     |
+| Town Hall          | PRIMARY FACILITY   | optional Hall       | Town hall                     | Government operator                 | Lexical overlap with Form `hall` is safe     |
+| House              | PRIMARY FORM       | House               | optional                      | —                                   | Shipped Phase 8                              |
+| Tower              | PRIMARY FORM       | Tower               | optional                      | —                                   | Shipped Phase 8                              |
+| Hall               | PRIMARY FORM       | Hall                | optional                      | —                                   | Shipped Phase 8                              |
+| Keep               | PRIMARY FORM       | Keep                | optional                      | —                                   | Shipped Slice B                              |
+| Gatehouse          | REJECT (decompose) | House/Tower/Keep    | Watchtower / checkpoint later | Garrison relationships              | Not admitted as Form under current evidence  |
+| Apartment building | FACILITY-ONLY      | —                   | Apartment building            | —                                   | Dual-axis Form rejected                      |
+| Martello tower     | MANIFESTATION      | optional Tower      | Watchtower / armory           | —                                   | Defer `manifestationOf` rewiring             |
+| Drum tower         | MANIFESTATION      | optional Tower      | Watchtower                    | —                                   | Keep facility parent in corpus               |
+| Longhouse / broch  | MANIFESTATION      | House               | —                             | —                                   | Corpus `manifestationOf: 'house'`            |
+
+**Runtime proof:** `location-classification.test.ts` validates example compositions parse and derive
+Facility functions without encoding legacy archetype ids as classification mappings.
+
+### Explicitly deferred (post-convergence)
+
+- Manifestation migration (`manifestationOf`, axis-local graphs, discriminated targets)
+- Building authoring presets / named-expression shortcuts (Wizard tower, etc.)
+- Gatehouse as Form; `checkpoint` Facility
+- Searchable/grouped Form Setup (4 Forms still scan fine)
+- Form×Facility compatibility policy
+- Deleting `building-archetype` shards
+- New defense/military Facility authoring group
+- Dual-axis Form for apartment buildings
+- Any new Building classification axis
+- Archetype picker / overview filter / worked-example doc migration

@@ -9,6 +9,7 @@ import {
   getInteriorSubtypeIds,
   getRegionTypeIds,
 } from '../../vocab/location'
+import { buildingClassificationSchema } from './building-classification'
 import { locationBodySchema } from './location'
 
 describe('location classification registries', () => {
@@ -357,5 +358,44 @@ describe('location classification schema rejection', () => {
         regionType: 'coast',
       }).success,
     ).toBe(false)
+  })
+})
+
+describe('legacy decomposition example compositions', () => {
+  it('accepts canonical shapes illustrated by legacy concepts without fixed mappings', () => {
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'residence' }),
+    ).toEqual({ form: 'tower', facilityType: 'residence' })
+    expect(buildingClassificationSchema.parse({ form: 'tower' })).toEqual({ form: 'tower' })
+
+    expect(buildingClassificationSchema.parse({ form: 'house' })).toEqual({ form: 'house' })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'hospital' })).toEqual(
+      { form: 'house', facilityType: 'hospital' },
+    )
+
+    expect(buildingClassificationSchema.parse({ facilityType: 'shop' })).toEqual({
+      facilityType: 'shop',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'watchtower' })).toEqual({
+      facilityType: 'watchtower',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'guildhall' })).toEqual({
+      facilityType: 'guildhall',
+    })
+
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'residence' })).toEqual(
+      { form: 'keep', facilityType: 'residence' },
+    )
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'town_hall' })).toEqual(
+      { form: 'hall', facilityType: 'town_hall' },
+    )
+  })
+
+  it('derives functions from Facility only, not from legacy concept names', () => {
+    expect(getEffectiveBuildingFunctions({ form: 'tower' })).toEqual([])
+    expect(getEffectiveBuildingFunctions({ form: 'house', facilityType: 'hospital' })).toEqual([
+      'care',
+    ])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
   })
 })
