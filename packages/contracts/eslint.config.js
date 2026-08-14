@@ -1,7 +1,9 @@
+import { buildingArchetypeContractsQuarantine } from '@rpg/config/eslint/building-archetype-quarantine'
 import base from '@rpg/config/eslint/base'
 
 export default [
   ...base,
+  buildingArchetypeContractsQuarantine,
   {
     files: ['src/**/*.{ts,tsx}'],
     ignores: ['src/**/*.test.ts', 'src/**/*.test.tsx'],

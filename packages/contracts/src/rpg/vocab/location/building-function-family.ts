@@ -10,7 +10,7 @@ import type { GameTermEntry, VocabularyTerm } from '../types'
 
 export const BUILDING_FUNCTION_FAMILY_TERM = {
   label: 'Building Function Family',
-  description: 'Semantic function families a building archetype normally serves.',
+  description: 'Semantic function families a building facility normally serves.',
   sentence: {
     singular: 'building function family',
     plural: 'building function families',

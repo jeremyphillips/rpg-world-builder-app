@@ -1,8 +1,10 @@
 /**
- * Building archetype registry for Model E classification.
+ * Quarantined BuildingArchetype research corpus (143 entries).
  *
- * Archetype ids are persisted vocabulary — established in Phase 6 curation
- * (2026-08-03). Future renames or removals require deliberate migration.
+ * **Not** canonical persisted Building classification — runtime uses Form +
+ * Facility (`building-form.ts`, `building-facility-type.ts`). This registry
+ * remains for corpus integrity tests, migration tooling, and future
+ * manifestation/preset research. Do not import from production apps.
  *
  * ## Manifestation discovery inheritance (Phase 7)
  *
@@ -30,14 +32,11 @@ import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
 import { BUILDING_ARCHETYPE_SHARD_ENTRIES } from './building-archetypes'
-import {
-  BUILDING_FUNCTION_FAMILY_ENTRIES,
-  type BuildingFunctionFamily,
-} from './building-function-family'
+import type { BuildingFunctionFamily } from './building-function-family'
 
 export const BUILDING_ARCHETYPE_TERM = {
   label: 'Building Archetype',
-  description: 'Canonical building identity — what the structure is.',
+  description: 'Quarantined research corpus — predecessor building identity vocabulary.',
   sentence: {
     singular: 'building archetype',
     plural: 'building archetypes',
@@ -61,11 +60,6 @@ export type BuildingArchetype = keyof typeof BUILDING_ARCHETYPE_ENTRIES
 export const BUILDING_ARCHETYPE_IDS = keysFromEntries(BUILDING_ARCHETYPE_ENTRIES)
 
 export const buildingArchetypeSchema = vocabEnumFromEntries(BUILDING_ARCHETYPE_ENTRIES)
-
-export type BuildingClassificationInput = {
-  readonly archetype: BuildingArchetype
-  readonly functionOverride?: BuildingFunctionFamily
-}
 
 function normalizeDiscoveryTerms(terms: readonly string[]): readonly string[] {
   const seen = new Set<string>()
@@ -91,26 +85,13 @@ export function getBuildingArchetypeLabel(archetype: string): string {
   return getBuildingArchetypeDefinition(archetype)?.label ?? archetype
 }
 
-/** Returns the default function families for an archetype. */
+/** Returns the default function families recorded on a corpus archetype entry. */
 export function getBuildingArchetypeFunctions(
   archetype: BuildingArchetype,
 ): readonly BuildingFunctionFamily[] {
   return BUILDING_ARCHETYPE_ENTRIES[archetype].functions.filter(
     (fn: BuildingFunctionFamily | undefined): fn is BuildingFunctionFamily => fn !== undefined,
   )
-}
-
-/**
- * Effective semantic functions for a building classification.
- * Override replaces — never augments — the archetype default set.
- */
-export function getEffectiveBuildingFunctions(
-  classification: BuildingClassificationInput,
-): readonly BuildingFunctionFamily[] {
-  if (classification.functionOverride) {
-    return [classification.functionOverride]
-  }
-  return getBuildingArchetypeFunctions(classification.archetype)
 }
 
 /** Returns stored aliases for an archetype (own registry field only). */
@@ -177,11 +158,4 @@ export function getBuildingManifestationRoot(archetype: BuildingArchetype): Buil
     visited.add(parent)
     current = parent
   }
-}
-
-/** Joins function family labels for display (e.g. "Lodging · Food & drink"). */
-export function formatBuildingFunctionFamilyLabels(
-  functions: readonly BuildingFunctionFamily[],
-): string {
-  return functions.map((fn) => BUILDING_FUNCTION_FAMILY_ENTRIES[fn].label).join(' · ')
 }

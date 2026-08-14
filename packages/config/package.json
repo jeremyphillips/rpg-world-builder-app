@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./eslint/base": "./src/eslint/base.js",
+    "./eslint/building-archetype-quarantine": "./src/eslint/building-archetype-quarantine.js",
     "./eslint/react": "./src/eslint/react.js",
     "./prettier": "./src/prettier/index.js",
     "./vitest/base": "./src/vitest/base.js",

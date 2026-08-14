@@ -8,8 +8,8 @@ describe('rowFieldReservesDerivedMeta', () => {
     expect(
       rowFieldReservesDerivedMeta({
         type: 'combobox',
-        name: 'classification.archetype',
-        label: 'Archetype',
+        name: 'classification.facilityType',
+        label: 'Facility type',
         options: [],
         derivedMeta: { reserveSpace: true, dependsOn: [], metaWhen: () => undefined },
       }),
@@ -48,8 +48,8 @@ describe('resolveRowFieldAlign', () => {
         { type: 'select', name: 'authoringType', label: 'Location type', options: [] },
         {
           type: 'combobox',
-          name: 'classification.archetype',
-          label: 'Archetype',
+          name: 'classification.facilityType',
+          label: 'Facility type',
           options: [],
           derivedMeta: { reserveSpace: true, dependsOn: [], metaWhen: () => undefined },
         },
@@ -66,8 +66,8 @@ describe('resolveRowFieldAlign', () => {
       fields: [
         {
           type: 'combobox',
-          name: 'classification.archetype',
-          label: 'Archetype',
+          name: 'classification.facilityType',
+          label: 'Facility type',
           options: [],
           derivedMeta: { reserveSpace: true, dependsOn: [], metaWhen: () => undefined },
         },

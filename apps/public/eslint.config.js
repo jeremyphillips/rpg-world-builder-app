@@ -1,8 +1,10 @@
+import { buildingArchetypeAppQuarantine } from '@rpg/config/eslint/building-archetype-quarantine'
 import react from '@rpg/config/eslint/react'
 import next from '@next/eslint-plugin-next'
 
 export default [
   ...react,
+  buildingArchetypeAppQuarantine,
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: { '@next/next': next },

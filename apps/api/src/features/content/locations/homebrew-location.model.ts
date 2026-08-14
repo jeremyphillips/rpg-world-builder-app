@@ -29,7 +29,7 @@ const interiorClassificationTypeIds = (
 
 /**
  * Classification subdoc mirrors storage shape only.
- * `kind`/`type` discriminate region and interior branches; building fields are Model E.
+ * `kind`/`type` discriminate region and interior branches; building fields are Form/Facility.
  * Zod contracts own cross-field classification validity — do not duplicate here.
  */
 const homebrewLocationSchema = new Schema(

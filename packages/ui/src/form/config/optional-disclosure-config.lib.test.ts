@@ -63,7 +63,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
       name: 'classification.specialization',
       label: 'Specialization',
       suggestions: {
-        dependsOn: ['classification.archetype'],
+        dependsOn: ['classification.facilityType'],
         suggestionsWhen: () => [],
       },
       optionalDisclosure: { addLabel: 'Add specialization' },

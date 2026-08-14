@@ -268,7 +268,7 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Bad Form',
         structureType: 'building',
-        classification: { form: 'tower' },
+        classification: { form: 'keep' },
         parentLocationId: parentId,
       })
       .expect(400)

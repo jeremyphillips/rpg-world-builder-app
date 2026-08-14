@@ -38,14 +38,14 @@ describe('field-renderer-config.lib', () => {
   it('resolves derived metadata from watched values', () => {
     const config = {
       type: 'combobox',
-      name: 'classification.archetype',
-      label: 'Archetype',
+      name: 'classification.facilityType',
+      label: 'Facility type',
       options: [],
       derivedMeta: {
         reserveSpace: true,
-        dependsOn: ['classification.archetype'],
+        dependsOn: ['classification.facilityType'],
         metaWhen: (values) =>
-          values['classification.archetype']
+          values['classification.facilityType']
             ? { rows: [{ label: 'Typical uses', value: 'Care' }] }
             : undefined,
       },
@@ -59,7 +59,7 @@ describe('field-renderer-config.lib', () => {
       resolveFieldRenderConfig(
         config,
         'comfortable',
-        { 'classification.archetype': 'almshouse' },
+        { 'classification.facilityType': 'hospital' },
         {},
       ),
     ).toMatchObject({
@@ -73,9 +73,9 @@ describe('field-renderer-config.lib', () => {
       name: 'classification.functionOverride',
       label: 'Function override',
       optionsResolve: {
-        dependsOn: ['classification.archetype'],
+        dependsOn: ['classification.facilityType'],
         optionsWhen: (values: Record<string, unknown>) =>
-          values['classification.archetype'] === 'almshouse'
+          values['classification.facilityType'] === 'hospital'
             ? [{ value: 'lodging', label: 'Lodging' }]
             : [{ value: 'care', label: 'Care' }],
       },
@@ -88,7 +88,7 @@ describe('field-renderer-config.lib', () => {
       resolveFieldRenderConfig(
         config,
         'comfortable',
-        { 'classification.archetype': 'almshouse' },
+        { 'classification.facilityType': 'hospital' },
         {},
       ).config,
     ).toMatchObject({

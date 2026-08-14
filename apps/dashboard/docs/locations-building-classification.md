@@ -26,22 +26,42 @@ Form. Form-only buildings have no derived functions.
 emphasis — Setup gates on Facility discovery intent, not on requiring `facilityType` on every
 Building. Optional Form does not make both axes equally required at Setup.
 
-## Transitional archetype surfaces
+## Quarantined archetype corpus
 
-`BuildingArchetype`, `manifestationOf`, specialization, function override, and the overview
-archetype filter still exist as predecessor surfaces. The sections below that reference
-archetype picker UX, worked examples, and overview archetype filters describe transitional
-behavior — not the canonical Form/Facility contract. Archetype picker/filter/manifestation
-migration is follow-up work.
+Persisted Building classification is **only** `classification.form` and/or
+`classification.facilityType`. The 143-entry `BuildingArchetype` registry
+([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building-archetype.ts))
+is a **quarantined research corpus** — not exported from runtime barrels, not imported by
+production apps (ESLint-enforced). It may inform future authoring presets or manifestation
+migration; that is **possible, not promised**.
 
-## Legacy four layers (archetype-primary)
+## Overview surfaces
 
-| Layer              | Field                                 | Question it answers                                            | Author-facing?                                                                                      |
-| ------------------ | ------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| **Archetype**      | `classification.archetype`            | What is this building?                                         | Yes — primary picker                                                                                |
-| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)                                                   |
-| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Yes — optional disclosure text field with inline registry suggestion actions (`Add specialization`) |
-| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Yes — optional disclosure select (`Add function override`); excludes archetype default functions    |
+The locations overview exposes Form/Facility discovery:
+
+| Surface             | Behavior                                                                                        |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| **Name search**     | Forgiving match on location name plus Form/Facility labels and Facility-derived function labels |
+| **Facility filter** | Exact `classification.facilityType`                                                             |
+| **Function filter** | Cross-facility grouping via `getEffectiveBuildingFunctions()` (Facility defaults)               |
+
+Kind, source, status, and campaign availability filters behave like other content
+overviews. See [content-overviews.md](./content-overviews.md).
+
+## Historical Model E (archetype-primary, retired)
+
+The sections below describe the **superseded** archetype-primary Model E that persisted
+`classification.archetype`. Runtime authoring, Mongo, and API no longer use these fields or
+surfaces. Kept as design history only.
+
+### Former four layers
+
+| Layer              | Field (retired)                       | Question it answered                                           | Former author-facing?                                                                         |
+| ------------------ | ------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Archetype**      | `classification.archetype`            | What is this building?                                         | Primary picker (removed)                                                                      |
+| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)                                             |
+| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Optional disclosure text field with inline registry suggestion actions (`Add specialization`) |
+| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Optional disclosure select (`Add function override`); excluded archetype default functions    |
 
 Two more registry fields support discovery but are not separate authored layers:
 
@@ -51,7 +71,7 @@ Two more registry fields support discovery but are not separate authored layers:
 Changing archetype clears specialization and function override so stale semantic
 state cannot survive an identity change.
 
-## Worked examples
+## Former worked examples
 
 ### Thieves' guild in a guildhall vs a warehouse
 
@@ -90,21 +110,9 @@ function queries (overview function filter, effective-function helpers) see
 
 ### Wizard tower blend
 
-**Wizard tower** is its own archetype whose registry functions blend **dwelling**
-and **knowledge** — one identity, two semantic functions, no override required.
-
-## Overview surfaces
-
-The locations overview keeps three discovery paths distinct:
-
-| Surface              | Behavior                                                                                          |
-| -------------------- | ------------------------------------------------------------------------------------------------- |
-| **Name search**      | Forgiving match on location name plus building labels, aliases, function labels, and search terms |
-| **Archetype filter** | Exact canonical identity (`classification.archetype`)                                             |
-| **Function filter**  | Cross-archetype grouping via `getEffectiveBuildingFunctions()` — respects override                |
-
-Kind, source, status, and campaign availability filters behave like other content
-overviews. See [content-overviews.md](./content-overviews.md).
+**Wizard tower** was its own archetype whose registry functions blended **dwelling**
+and **knowledge** — one identity, two semantic functions, no override required. Under the
+current model, decompose onto Form + Facility + Organization relationships instead.
 
 ## Authoring flow
 
@@ -175,15 +183,12 @@ Create-setup choice collapse and selected-summary presentation are owned by the 
 
 ## Authoring modules
 
-| Module                                    | Role                                                                    |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity          |
-| `location-create-shortcuts.ts`            | Fixed-session URL parse/serialize, promoted shortcuts, child-type menus |
-| `location-classification-form-fields.ts`  | Form select + Facility searchable combobox                              |
-| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking (transitional archetype)    |
-| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions (transitional)              |
-| `location-form-sync.ts`                   | Clears specialization and override on archetype change (transitional)   |
-| `location-overview-search.lib.ts`         | Overview name-search discovery strings                                  |
-| `locations-overview-filter-schema.ts`     | Archetype and function overview filters (archetype filter transitional) |
+| Module                                   | Role                                           |
+| ---------------------------------------- | ---------------------------------------------- |
+| `location-authoring-type.ts`             | Form projection ids, hydrate/serialize mapping |
+| `location-create-shortcuts.ts`           | Fixed-session URL parse/serialize              |
+| `location-classification-form-fields.ts` | Form select + Facility searchable combobox     |
+| `location-overview-search.lib.ts`        | Overview name-search discovery strings         |
+| `locations-overview-filter-schema.ts`    | Facility type and function overview filters    |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

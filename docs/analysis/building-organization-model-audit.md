@@ -1437,13 +1437,21 @@ than searching or grouping. 8–10 options is an empirical warning range (Site t
 flat Setup set today), not a hard rule. Future scalable extension belongs in `@/lib/create-setup`,
 not location-building feature code.
 
-### Apartment building dual-axis question (undecided)
+### Apartment building — KEEP FACILITY-ONLY (decided)
 
-`apartment_building` remains Facility-only. Before any concept may exist on multiple canonical axes,
-each axis must answer a different question, values must be independently authorable, shared
-spelling must use distinct IDs, and if selecting one typically implies the other, keep a single
-primary owner. A future Form candidate should use clearer morphological terms (block, tenement
-massing) rather than duplicating "Apartment building."
+`apartment_building` remains **Facility-only**. Evidence is sufficient; do not promote to Form.
+
+- Facility already answers configured multi-unit residence.
+- A second "Apartment building" Form card would duplicate authoring vocabulary for ordinary use.
+- Independent morphology (stacked envelope used as something else) is rare; a future Form candidate
+  should use clearer morphological terms (block / tenement massing), not dual-axis
+  `apartment_building`.
+- `insula → apartment_building` stays corpus/manifestation (deferred).
+
+**Dual-axis rule:** a concept may exist on two canonical axes only when each axis answers a
+different question, either value can be authored independently without implying the other, IDs do
+not collide, and selecting one does not typically imply the other. `apartment_building` fails the
+last two. Facility remains sole owner.
 
 ### Keep and gatehouse recommendations
 
@@ -1462,3 +1470,47 @@ migration remains deferred.
 
 Still deferred. No `manifestationOf: 'tower'` retargeting for `wizard_tower` / `martello_tower`;
 no standalone `hall` archetype introduced.
+
+## Phase 9 — Building classification convergence (Slice A)
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Freeze Archetype role, enforce quarantine, fix stale docs, remove ambiguous runtime
+helpers, record apartment KEEP FACILITY-ONLY.
+
+### Archetype is not canonical persisted classification
+
+Persisted Building classification is `classification.form` and/or `classification.facilityType`
+only. `classification.archetype` is gone from Zod, Mongo, API, and dashboard authoring.
+
+The 143-entry `BuildingArchetype` registry is a **quarantined research corpus** — not barrel-exported,
+not consumed by production apps. It may inform future authoring presets or manifestation migration;
+that is **possible, not promised**. Do not delete the corpus in this slice.
+
+### Quarantine boundary (enforced)
+
+```text
+Runtime (apps + contracts content/runtime barrels)
+→ Form / Facility / relationships only
+
+Research + migration tooling + dedicated corpus tests
+→ may inspect Archetype corpus
+```
+
+ESLint `no-restricted-imports` guards in dashboard, api, public, and contracts production src
+(blocking `building-archetype*` and `building-archetypes/**`). Tooling (`tools/building-refactor`)
+and corpus tests remain allowed.
+
+### Runtime function resolution
+
+`getEffectiveBuildingFunctions` and `formatBuildingFunctionFamilyLabels` are owned exclusively by
+`building-facility-type.ts` / `building-function-family.ts`. Ambiguous duplicates removed from the
+Archetype corpus module. `getBuildingArchetypeFunctions` remains corpus-scoped for registry metadata.
+
+### Classification doc
+
+[`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)
+no longer describes archetype picker/filter as live UX. Former Model E sections archived as historical.
+
+### Apartment building
+
+**KEEP FACILITY-ONLY** — dual-axis promotion rejected under the dual-axis rule (see Phase 8).
