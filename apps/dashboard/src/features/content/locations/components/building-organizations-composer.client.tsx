@@ -36,7 +36,10 @@ import type { UseBuildingOrganizationsCreateTabResult } from '../hooks/use-build
 import type { BuildingOrganizationRelationshipDraft } from '../lib/building-organization-create-drafts'
 import {
   buildingOrganizationsComposerClasses,
+  buildingOrganizationsComposerReviewClasses,
+  buildingOrganizationsComposerStageOffsetClasses,
   buildingOrganizationsConfirmActionsClasses,
+  buildingOrganizationsChooseExistingClasses,
   buildingOrganizationsDiscoveryControlsClasses,
   buildingOrganizationsDiscoveryCreateActionClasses,
   buildingOrganizationsDiscoveryClasses,
@@ -48,11 +51,13 @@ function BuildingOrganizationConfirmButton({
   disabled,
   onConfirm,
   submit = false,
+  compact = false,
 }: {
   confirmLabel: string
   disabled: boolean
   onConfirm?: () => void
   submit?: boolean
+  compact?: boolean
 }) {
   return (
     <div className={buildingOrganizationsConfirmActionsClasses}>
@@ -60,7 +65,7 @@ function BuildingOrganizationConfirmButton({
         type={submit ? 'submit' : 'button'}
         variant="outline"
         size="sm"
-        density="compact"
+        density={compact ? 'compact' : undefined}
         disabled={disabled}
         onClick={onConfirm}
       >
@@ -196,8 +201,14 @@ export function BuildingOrganizationNewBranch({
 
   return (
     <>
-      <div>
-        <Button type="button" variant="ghost" onClick={returnToDiscovery}>
+      <div className={buildingOrganizationsChooseExistingClasses}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          density="compact"
+          onClick={returnToDiscovery}
+        >
           {BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL}
         </Button>
       </div>
@@ -214,6 +225,7 @@ export function BuildingOrganizationNewBranch({
             confirmLabel={confirmLabel}
             disabled={validationAttempted && !kind}
             submit
+            compact
           />
         }
       />
@@ -243,7 +255,7 @@ function BuildingOrganizationReviewStage({
   if (!kind || !selectedOrganization) return null
 
   return (
-    <>
+    <div className={buildingOrganizationsComposerReviewClasses}>
       <ChooserSummaryCard
         density="compact"
         eyebrow={BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW}
@@ -267,7 +279,7 @@ function BuildingOrganizationReviewStage({
         disabled={!canConfirm || (validationAttempted && !kind)}
         onConfirm={onConfirm}
       />
-    </>
+    </div>
   )
 }
 
@@ -324,20 +336,30 @@ function BuildingOrganizationRelationshipStage({
   })
 
   if (composerStage === 'discovery' && kind) {
-    return <BuildingOrganizationDiscovery controller={controller} />
+    return (
+      <div className={buildingOrganizationsComposerStageOffsetClasses}>
+        <BuildingOrganizationDiscovery controller={controller} />
+      </div>
+    )
   }
   if (composerStage === 'review') {
     return (
-      <BuildingOrganizationReviewStage
-        controller={controller}
-        confirmLabel={confirmLabel}
-        onConfirm={onConfirm}
-        canConfirm={canConfirm}
-      />
+      <div className={buildingOrganizationsComposerStageOffsetClasses}>
+        <BuildingOrganizationReviewStage
+          controller={controller}
+          confirmLabel={confirmLabel}
+          onConfirm={onConfirm}
+          canConfirm={canConfirm}
+        />
+      </div>
     )
   }
   if (composerStage === 'branch' && kind && selectedOrganization) {
-    return <BuildingOrganizationNewBranch controller={controller} confirmLabel={confirmLabel} />
+    return (
+      <div className={buildingOrganizationsComposerStageOffsetClasses}>
+        <BuildingOrganizationNewBranch controller={controller} confirmLabel={confirmLabel} />
+      </div>
+    )
   }
   return null
 }
