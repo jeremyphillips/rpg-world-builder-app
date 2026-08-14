@@ -1587,15 +1587,18 @@ schema/UI; no manifestation pilot.
 Full design note:
 [`building-authoring-preset-investigation-2a.md`](./building-authoring-preset-investigation-2a.md).
 
-| Candidate      | Outcome                            | 2B recommendation                                 |
-| -------------- | ---------------------------------- | ------------------------------------------------- |
-| Wizard tower   | **PARTIAL PRESET**                 | First implementation candidate if 2B approved     |
-| Healer's house | **PARTIAL PRESET**                 | Second; optional Facility default is the friction |
-| Manor          | **TOO CONTEXTUAL — DO NOT PRESET** | Exclude                                           |
+| Candidate      | Verdict                              | 2B recommendation                                                       |
+| -------------- | ------------------------------------ | ----------------------------------------------------------------------- |
+| Wizard tower   | **GOOD PRESET / PARTIAL PROJECTION** | First — safe-init `form: tower` only; Facility group author-chosen      |
+| Healer's house | **GOOD PRESET / PARTIAL PROJECTION** | Second — safe-init `form: house`; hospital suggestion-only, not default |
+| Manor          | **TOO CONTEXTUAL — DO NOT PRESET**   | Exclude                                                                 |
 
-**Placement (if 2B approved):** optional **Start from familiar type** at the **top of the Building
-Setup shell** — not before Setup, not on Details v1. Projects Setup selection + optional
-`classification` only; clears preset id before persistence; relationships remain suggestion-only.
+**Projection policy:** presets initialize values only when unambiguous; Facility discovery group
+and ambiguous Facility type remain author choice. See the 2A design note.
+
+**Placement (if 2B approved):** optional familiar-starting-point control at the **top of the Building
+Setup shell** — not before Setup, not on Details v1. Safe canonical init + hints only; clears preset
+id before persistence; no pre-created relationship drafts in the pilot.
 
 **2B status:** not approved. No `@rpg/contracts` preset registry, no Location field, no dashboard
 control in this slice.
