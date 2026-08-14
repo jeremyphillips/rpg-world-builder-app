@@ -58,7 +58,7 @@ notes). If documentation and tests disagree, **tests win**.
 | Forms                                   |                                                                                   **4** — `house`, `tower`, `hall`, `keep` |
 | Facilities                              | **36** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
 | Research corpus                         |                                                                                                                    **308** |
-| Unresolved                              |                                                                                     **121** — see refactor inventory tests |
+| Unresolved                              |                                                                                     **110** — see refactor inventory tests |
 | Legacy runtime archetypes (quarantined) |                                                                                                                    **143** |
 
 Persisted ids `watchtower` and `lighthouse` are accepted identifier debt (runtime labels: Watch post,
@@ -89,6 +89,7 @@ Beacon station). Do not infer morphology from the id.
 | Tier B promotion                        | `granary`, `greenhouse`, `arena`                                                                                             |
 | Tier C composite queue                  | **24/24** reviewed; Family B reviewed (`academy` remains `pending`)                                                          |
 | Phase 19A morphology                    | **16/16** reviewed — 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design` (`blockhouse`); no Form promotion |
+| Phase 19B approximate Facility          | **11/11** reviewed — all `decompose` onto existing Facilities; **0** new Facility candidates                                 |
 
 Completed-phase counts are historical closeout facts; only the **Current state** section should be
 used for present inventory totals.
@@ -104,13 +105,13 @@ records implementation history through Phase 18. **Do not append further phases 
 | Subphase                                | Status   |
 | --------------------------------------- | -------- |
 | 19A Morphology / Form evidence          | COMPLETE |
-| 19B Production / Facility boundary      | NEXT     |
-| 19C Selective runtime promotion         | PLANNED  |
+| 19B Production / Facility boundary      | COMPLETE |
+| 19C Selective runtime promotion         | NEXT     |
 | 19D Exception cleanup / stopping review | PLANNED  |
 
 Future work updates one row in this table rather than creating a new plan.
 
-Do not create a new phase for every handful of corpus terms. **19A is closed.** Do not start 19B
+Do not create a new phase for every handful of corpus terms. **19B is closed.** Do not start 19C
 until the user asks to continue corpus work.
 
 ### 19A — Morphology / Form evidence (closed)
@@ -151,18 +152,34 @@ Supporting evidence (historical): [`building-corpus-disposition-sweep-1.md`](../
 [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md),
 [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
 
-### 19B — Production / Facility boundary (next)
+### 19B — Production / Facility boundary (closed)
 
 **Purpose:** Determine whether existing Facilities (Factory, Warehouse, Shop, Checkpoint, Barn, …)
 preserve the configured-premises distinction, or whether a Facility is genuinely missing.
 
-**Investigation seeds** (not an executable allowlist):
+**Frozen allowlist (11):** `PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS` in
+[`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
+Sweep Family E approximate Facility pull only — **not** the broader production/commercial tail.
 
-`foundry`, `dyeworks`, `ropewalk`, `workshop`, `icehouse`, `kennel`, `coach_house`,
-`artificer_atelier`, `bounty_office`, `fulling_mill`, `tollhouse`, `golem_workshop`
+**Excluded:** `workshop` (interior vs premises — Tier B / 19C boundary; sweep Family F exception).
 
-These ids are investigation seeds only. The executable tranche begins only after an exact allowlist
-is derived from the current inventory. **Do not** launch another broad count-reduction sweep.
+**Closeout (2026-08-14):** **11 / 11** `decompose` onto nearest shipped Facility
+(`factory`, `mill`, `warehouse`, `stable`, `checkpoint`, `shop` + Organization). **0** new Facility
+candidates from this tranche. Evidence:
+[`building-corpus-disposition-phase-19b-1.md`](../analysis/building-corpus-disposition-phase-19b-1.md).
+
+**Gate**
+
+```text
+configured Building-premises use?
+  → Form-independent label test
+  → nearest shipped Facility
+  → duplicate-vs-distinct (configuration vs scale/subtype)
+  → decompose / pending / 19C Facility candidate
+```
+
+**19C carry-forward (prior ranking + 19A):** `blockhouse` (Form), `workshop` (Facility),
+`academy`, `museum` (institution/premises — not reopened here).
 
 ### 19C — Selective runtime vocabulary promotion
 
@@ -236,7 +253,8 @@ Open these only for the reason listed. None of them is the current plan.
 | Document                                                                                                     | Status                         | Open when                                                               |
 | ------------------------------------------------------------------------------------------------------------ | ------------------------------ | ----------------------------------------------------------------------- |
 | [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)     | Runtime authoring SSOT         | Understanding the shipped model                                         |
-| [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | 19B — family rules, morphology pulls, approximate-Facility exceptions   |
+| [`building-corpus-disposition-phase-19b-1.md`](../analysis/building-corpus-disposition-phase-19b-1.md)       | Closed                         | 19B closeout — approximate Facility allowlist, rules, disposition cards |
+| [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | Family rules, Tier B duplicate-vs-distinct test                         |
 | [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)             | Closed supporting evidence     | Morphology protocol history; scale/unit gate                            |
 | [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Closed                         | 19A morphology closeout — do not append; use for historical rules/cards |
 | [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md) | Deferred evidence              | 2B is reopened                                                          |

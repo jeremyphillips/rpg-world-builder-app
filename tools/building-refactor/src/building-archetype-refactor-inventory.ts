@@ -1000,6 +1000,66 @@ export const PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
   ...PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Phase 19B production / approximate-Facility allowlist — frozen 2026-08-14.
+ * Sweep Family E approximate Facility pull (11). `workshop` excluded — interior /
+ * Tier B Facility-candidate boundary; see sweep Family F exception list.
+ * Evidence: docs/analysis/building-corpus-disposition-phase-19b-1.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS = [
+  'artificer_atelier',
+  'bounty_office',
+  'coach_house',
+  'dyeworks',
+  'foundry',
+  'fulling_mill',
+  'golem_workshop',
+  'icehouse',
+  'kennel',
+  'ropewalk',
+  'tollhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19B reviewed 2026-08-14 — nearest shipped Facility sufficient. */
+export const PHASE_19B_FACTORY_DECOMPOSE_IDS = [
+  'artificer_atelier',
+  'dyeworks',
+  'foundry',
+  'golem_workshop',
+  'ropewalk',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_MILL_DECOMPOSE_IDS = [
+  'fulling_mill',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_WAREHOUSE_DECOMPOSE_IDS = [
+  'icehouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_STABLE_DECOMPOSE_IDS = [
+  'coach_house',
+  'kennel',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_CHECKPOINT_DECOMPOSE_IDS = [
+  'tollhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_SHOP_DECOMPOSE_IDS = [
+  'bounty_office',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_DECOMPOSE_IDS = [
+  ...PHASE_19B_FACTORY_DECOMPOSE_IDS,
+  ...PHASE_19B_MILL_DECOMPOSE_IDS,
+  ...PHASE_19B_WAREHOUSE_DECOMPOSE_IDS,
+  ...PHASE_19B_STABLE_DECOMPOSE_IDS,
+  ...PHASE_19B_CHECKPOINT_DECOMPOSE_IDS,
+  ...PHASE_19B_SHOP_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,
@@ -1070,6 +1130,7 @@ const INITIAL_STATUS_BY_ID = {
     PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
     BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
   ),
+  ...statusMapForIds(PHASE_19B_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
   blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>

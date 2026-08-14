@@ -33,6 +33,8 @@ import {
   PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
   PHASE_19A_DECOMPOSE_IDS,
   PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS,
+  PHASE_19B_DECOMPOSE_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -50,21 +52,7 @@ function sourceFilesUnder(directory: string): string[] {
   })
 }
 
-const SWEEP_FALSE_POSITIVE_PENDING_IDS = [
-  'artificer_atelier',
-  'bounty_office',
-  'coach_house',
-  'dyeworks',
-  'foundry',
-  'fulling_mill',
-  'golem_workshop',
-  'icehouse',
-  'kennel',
-  'pigsty',
-  'ropewalk',
-  'tent_pavilion',
-  'tollhouse',
-] as const
+const SWEEP_FALSE_POSITIVE_PENDING_IDS = ['pigsty', 'tent_pavilion'] as const
 
 describe('Building archetype refactor inventory', () => {
   it('accounts for all researched and formerly-runtime concepts exactly once', () => {
@@ -173,15 +161,15 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 121 concepts pending or awaiting design after Phase 19A closeout', () => {
+  it('leaves 110 concepts pending or awaiting design after Phase 19B closeout', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(121)
+    expect(unresolved).toHaveLength(110)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(57)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(64)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(53)
   })
 
   it('maps every explicit Tier C disposition allowlist id to the reviewed status', () => {
@@ -303,6 +291,25 @@ describe('Building archetype refactor inventory', () => {
     }
   })
 
+  it('maps Phase 19B approximate-Facility disposition ids to reviewed statuses', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    expect(PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS).toHaveLength(11)
+    expect(PHASE_19B_DECOMPOSE_IDS).toHaveLength(11)
+
+    for (const id of PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS) {
+      expect(BUILDING_RESEARCH_CORPUS_IDS).toContain(id)
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    }
+
+    expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('fulling_mill')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('tollhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('bounty_office')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+  })
+
   it('derives granary, greenhouse, and arena enabled-facility from registry membership, not INITIAL_STATUS_BY_ID', () => {
     const statusById = new Map(
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
@@ -391,28 +398,37 @@ describe('Building archetype refactor inventory', () => {
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toHaveLength(93)
+    expect(decomposed).toHaveLength(104)
     expect(decomposed).toEqual(
       expect.arrayContaining([
         'abbey',
         'adventurers_guild',
         'apothecary',
+        'artificer_atelier',
         'barber_surgeon',
+        'bounty_office',
         'broch',
         'cave_dwelling',
+        'coach_house',
         'cobbler',
         'customs_house',
         'domus',
         'dower_house',
+        'dyeworks',
         'dzong',
         'elven_tree_dwelling',
+        'foundry',
+        'fulling_mill',
         'gatehouse',
         'general_store',
+        'golem_workshop',
         'gymnasium',
         'haunted_manor',
         'hammam',
         'healers_house',
+        'icehouse',
         'igloo',
+        'kennel',
         'longhouse',
         'machiya',
         'manor',
@@ -421,12 +437,14 @@ describe('Building archetype refactor inventory', () => {
         'oracle_shrine',
         'orphanage',
         'palace',
+        'ropewalk',
         'roundhouse',
         'royal_mews',
         'shipwreck_dwelling',
         'thermae',
         'tholos',
         'tipi',
+        'tollhouse',
         'wizard_tower',
         'yurt',
       ]),
@@ -443,7 +461,7 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('siheyuan')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
     )
-    expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('pigsty')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('longhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('ferry_house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
