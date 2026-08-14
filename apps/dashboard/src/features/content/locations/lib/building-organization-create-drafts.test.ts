@@ -6,6 +6,7 @@ import {
   buildBuildingOrganizationRelationshipKindOptions,
   removeBuildingOrganizationRelationshipDraft,
   resolveBuildingOrganizationDiscoveryAddState,
+  resolveBuildingOrganizationSelectState,
   upsertBuildingOrganizationRelationshipDraft,
   validateBuildingOrganizationDraftPlan,
   type BuildingOrganizationDraftPlan,
@@ -159,8 +160,19 @@ describe('Building Organization create drafts', () => {
   it('disables discovery Add when every relationship kind is blocked', () => {
     expect(
       resolveBuildingOrganizationDiscoveryAddState([
-        { value: 'owns', label: 'Owner', disabled: true, disabledReason: 'Owner is taken.' },
-        { value: 'tenant', label: 'Tenant', disabled: true },
+        {
+          value: 'owns',
+          label: 'Owner',
+          description: 'Owns or holds title to a property or site.',
+          disabled: true,
+          disabledReason: 'Owner is taken.',
+        },
+        {
+          value: 'tenant',
+          label: 'Tenant',
+          description: 'Occupies or leases space without ownership.',
+          disabled: true,
+        },
       ]),
     ).toEqual({
       eligibleCount: 0,
@@ -171,6 +183,60 @@ describe('Building Organization create drafts', () => {
       eligibleCount: 0,
       addDisabled: true,
       addDisabledReason: BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
+    })
+  })
+
+  it('includes descriptions for intent-stage kind options', () => {
+    const options = buildBuildingOrganizationRelationshipKindOptions({
+      plan: {
+        organizations: [],
+        relationships: [
+          {
+            draftId: 'relationship-hq',
+            kind: 'headquarters',
+            organization: { kind: 'existing', organizationId: 'organization-1' },
+          },
+        ],
+      },
+      existingOrganizations: [existingOrganization({ id: 'organization-1' })],
+    })
+
+    expect(options.length).toBeGreaterThan(0)
+    for (const option of options) {
+      expect(option.description).toEqual(expect.any(String))
+    }
+  })
+
+  it('keeps intent-stage and per-organization eligibility separate', () => {
+    const organization = existingOrganization({
+      id: 'organization-1',
+      connections: [{ id: 'persisted-hq', locationId: 'other-place', kind: 'headquarters' }],
+    })
+    const intentOptions = buildBuildingOrganizationRelationshipKindOptions({
+      plan: { organizations: [], relationships: [] },
+      existingOrganizations: [organization],
+    })
+    const perOrgOptions = buildBuildingOrganizationRelationshipKindOptions({
+      plan: { organizations: [], relationships: [] },
+      existingOrganizations: [organization],
+      organization: { kind: 'existing', organizationId: organization.id },
+    })
+
+    expect(
+      intentOptions.find((option) => option.value === 'headquarters')?.disabled,
+    ).toBeUndefined()
+    expect(perOrgOptions.find((option) => option.value === 'headquarters')).toMatchObject({
+      disabled: true,
+      disabledReason: expect.stringContaining('conflicts'),
+    })
+    expect(
+      resolveBuildingOrganizationSelectState({
+        kind: 'headquarters',
+        options: perOrgOptions,
+      }),
+    ).toEqual({
+      selectDisabled: true,
+      selectDisabledReason: expect.stringContaining('conflicts'),
     })
   })
 })

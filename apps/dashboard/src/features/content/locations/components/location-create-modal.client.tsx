@@ -28,7 +28,10 @@ import {
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
-import type { BuildingCreateSetupProjection } from '../lib/location-building-create-setup.lib'
+import {
+  BUILDING_CREATE_SETUP_HEADLINE,
+  type BuildingCreateSetupProjection,
+} from '../lib/location-building-create-setup.lib'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import {
   buildLocationCreateSetupSets,
@@ -414,7 +417,9 @@ function LocationCreateModalSession({
     state.fixedCreate?.authoringType === 'building' &&
     state.buildingSetupApplication != null
   const showSetup = state.phase === 'setup' && setupModel != null
-  const submitLabel = formatContentCreateActionLabel('locations')
+  const submitLabel = buildingTabsConfigured
+    ? BUILDING_CREATE_SETUP_HEADLINE
+    : formatContentCreateActionLabel('locations')
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
   const renderDetailsForm = (optionsCtx: ContentFormCtx) => (
     <LocationCreateModalDetailsForm

@@ -15,7 +15,6 @@ import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handl
 import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
-import { formatContentCreateActionLabel } from '../../lib/content-type-labels'
 import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context.client'
 import {
   invalidateContentFormDefQueries,
@@ -45,6 +44,7 @@ import { applyLocationFixedCreateContext } from '../lib/location-form-values'
 import {
   applyBuildingCreateSetupProjection,
   buildBuildingClassificationFromCreateSetup,
+  BUILDING_CREATE_SETUP_HEADLINE,
   type BuildingCreateSetupProjection,
 } from '../lib/location-building-create-setup.lib'
 import {
@@ -459,7 +459,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     },
   })
 
-  const submitLabel = formatContentCreateActionLabel('locations')
+  const submitLabel = BUILDING_CREATE_SETUP_HEADLINE
 
   return (
     <LocationCreateFormShell

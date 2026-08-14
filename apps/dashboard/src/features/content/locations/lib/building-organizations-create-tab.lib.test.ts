@@ -4,10 +4,7 @@ import type { Organization } from '@rpg/contracts'
 import {
   BUILDING_ORGANIZATIONS_NEW_BADGE_LABEL,
   buildBuildingOrganizationPendingEntity,
-  buildingOrganizationDiscoveryItemId,
-  buildingOrganizationPendingItemId,
-  parseBuildingOrganizationDiscoveryItemId,
-  parseBuildingOrganizationPendingItemId,
+  resolveBuildingOrganizationTargetName,
 } from './building-organizations-create-tab.lib'
 import type { BuildingOrganizationDraftPlan } from './building-organization-create-drafts'
 
@@ -45,16 +42,6 @@ const organizations = [
 ] as Organization[]
 
 describe('building organizations create tab presentation', () => {
-  it('namespaces discovery and pending disclosure ids', () => {
-    expect(
-      parseBuildingOrganizationDiscoveryItemId(buildingOrganizationDiscoveryItemId('org-1')),
-    ).toBe('org-1')
-    expect(
-      parseBuildingOrganizationPendingItemId(buildingOrganizationPendingItemId('draft-1')),
-    ).toBe('draft-1')
-    expect(parseBuildingOrganizationDiscoveryItemId('pending:draft-1')).toBeNull()
-  })
-
   it('builds pending entity anatomy as name · domain · relationship', () => {
     expect(
       buildBuildingOrganizationPendingEntity({
@@ -77,5 +64,22 @@ describe('building organizations create tab presentation', () => {
       classification: 'Commercial · Operator',
       status: [{ kind: 'badge', label: BUILDING_ORGANIZATIONS_NEW_BADGE_LABEL, tone: 'info' }],
     })
+  })
+
+  it('resolves organization target names for review summaries', () => {
+    expect(
+      resolveBuildingOrganizationTargetName({
+        organization: plan.relationships[0]!.organization,
+        plan,
+        existingOrganizations: organizations,
+      }),
+    ).toBe('Harbor Merchants Guild')
+    expect(
+      resolveBuildingOrganizationTargetName({
+        organization: plan.relationships[1]!.organization,
+        plan,
+        existingOrganizations: organizations,
+      }),
+    ).toBe('Copper Kettle Cooperative')
   })
 })

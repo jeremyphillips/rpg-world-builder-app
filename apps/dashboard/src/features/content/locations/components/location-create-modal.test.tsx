@@ -18,6 +18,7 @@ import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import { BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL } from '../lib/building-organizations-create-tab.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
 import {
@@ -210,9 +211,16 @@ async function continueBuildingSetup(
   expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
 }
 
-async function submitCreateForm(user: ReturnType<typeof userEvent.setup>) {
+async function submitCreateForm(
+  user: ReturnType<typeof userEvent.setup>,
+  label = 'Create location',
+) {
   await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Harbor Inn')
-  await user.click(screen.getByRole('button', { name: 'Create location' }))
+  await user.click(screen.getByRole('button', { name: label }))
+}
+
+async function submitBuildingCreateForm(user: ReturnType<typeof userEvent.setup>) {
+  await submitCreateForm(user, 'Create building')
 }
 
 describe('LocationCreateModal', () => {
@@ -305,7 +313,8 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
-    await user.click(screen.getByRole('button', { name: '+ Create new organization' }))
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
     await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -327,7 +336,7 @@ describe('LocationCreateModal', () => {
     const modalBody = document.querySelector('[data-create-modal-body]')
     const formScrollRegion = form?.firstElementChild
     const footer = screen
-      .getByRole('button', { name: 'Create location' })
+      .getByRole('button', { name: 'Create building' })
       .closest('.border-border-faint')
 
     expect(visibilityWrapper).toHaveClass('flex', 'min-h-0', 'flex-1', 'flex-col')
@@ -348,7 +357,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('House · Browse all')).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Form' })).not.toBeInTheDocument()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
-    await user.click(screen.getByRole('button', { name: 'Create location' }))
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
 
     await waitFor(() => {
       expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
@@ -377,7 +386,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('Production')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Red Dragon Brewery')
-    await user.click(screen.getByRole('button', { name: 'Create location' }))
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
 
     await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
     const submission =
@@ -414,7 +423,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('House · Religious')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).not.toHaveTextContent('Brewery')
 
-    await user.click(screen.getByRole('button', { name: 'Create location' }))
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
     await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
 
     expect(
@@ -446,7 +455,7 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('button', { name: 'Use default campaign access' }))
-    await submitCreateForm(user)
+    await submitBuildingCreateForm(user)
 
     await waitFor(() => {
       expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
@@ -470,7 +479,7 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
-    await submitCreateForm(user)
+    await submitBuildingCreateForm(user)
 
     await waitFor(() => {
       expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
@@ -495,7 +504,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
     await continueBuildingSetup(user)
 
-    await submitCreateForm(user)
+    await submitBuildingCreateForm(user)
 
     await waitFor(() => {
       expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
@@ -526,7 +535,7 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
-    await submitCreateForm(user)
+    await submitBuildingCreateForm(user)
 
     await waitFor(() => {
       expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()

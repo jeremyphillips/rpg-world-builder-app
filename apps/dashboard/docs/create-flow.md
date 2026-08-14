@@ -16,27 +16,26 @@ The shell consumes normalized panel status (`invalid`, optional `issueCount`,
 Controlled `activeTabId` lets a domain coordinator activate the first invalid
 panel after submit.
 
-## Add / Pending disclosure workflow
+## Add / Pending workflow
 
 Optional create-tab relationship composition uses a shared **Add / Pending**
 root. Building Organizations is the first consumer. The root is presentation
 and mode composition only.
 
 ```text
-ADD MODE     → discover → expand entity → configure relationship → confirm draft
-PENDING MODE → review drafts → edit/remove → add another
+ADD MODE     → intent → discovery → review → confirm draft
+PENDING MODE → review drafts → edit/remove in place → add another
 ```
 
 ```text
 AddPendingWorkflow
-  → AddPendingDisclosureCard
-    → ContentEntityCard (collapsed) or DisclosureEntityCard (expanded)
-      → DisclosureChoiceComposer (domain-supplied choices + confirm)
+  → composing slot (domain-owned intent → discovery → review → branch tree)
+  → pending collection slot (ContentEntityCard rows + add-another)
 ```
 
-### Phase 6b architecture checkpoint
+### Architecture checkpoint
 
-Recorded before implementation. Findings:
+Recorded before the relationship-first refinement. Findings:
 
 1. **Add Member owner today.** `OrganizationMemberPickerDrawer` composes
    `CatalogEntityPickerSheet` + `CatalogEntityRow`. Trailing **Add** comes from
@@ -46,50 +45,43 @@ Recorded before implementation. Findings:
 2. **Disclosure/card anatomy is not directly reusable in a create modal.**
    `CatalogEntityRow` is picker-sheet specific. Nesting `CatalogEntityPickerSheet`
    inside `CreateModalShell` would add a second overlay/scroll owner. The
-   reusable bordered surfaces are `ContentEntityCard` (static) and
-   `DisclosureEntityCard` (expandable).
+   reusable bordered surface for discovery and pending rows is
+   `ContentEntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
-   titles from `OrganizationMembershipTitleField`. The generic primitive is
-   `@rpg/ui` `RadioGroupField`. Do not lift title vocabulary into shared UI.
-4. **Lifted pieces.** Add/Pending mode root and one-open disclosure context
-   (`AddPendingWorkflow`); generic choice/confirm composer
-   (`DisclosureChoiceComposer`); CEC/DEC switch with trailing **Add**
-   (`AddPendingDisclosureCard`). Do not lift the picker Sheet, membership title
-   field, or immediate-persist controller.
+   titles from `OrganizationMembershipTitleField`. Relationship-first building
+   composition uses `LocationConnectionKindStep` (`CollapsibleRadioCardField` /
+   `ChooserSummaryCard`). Do not lift title vocabulary into shared UI.
+4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
+   composing slot and one pending collection slot. Do not lift the picker Sheet,
+   membership title field, or immediate-persist controller.
 5. **Reusable root.** `AddPendingWorkflow` in `src/lib/create-flow`. Add Member
    has no pending-review mode and persists immediately, so it is not generalized
-   into this root. It remains a follow-on candidate for the choice composer and
-   disclosure-card composition only.
-6. **`ContentEntityCard` stays pure.** Collapsed identity uses CEC with a
-   trailing action only. Expanded identity uses DEC with domain `children`.
-   CEC is never nested inside DEC (that would double card chrome) and never
-   receives expand, composer, or relationship props.
-7. **Pending edit stays in Pending mode.** The edited row swaps to DEC + the
-   same `DisclosureChoiceComposer`. Sibling pending cards remain visible. This
-   is not a return to Add/discovery.
+   into this root.
+6. **`ContentEntityCard` stays pure.** Discovery and pending rows use CEC with a
+   trailing action only. CEC never receives expand, composer, or relationship
+   props.
+7. **Pending edit stays in Pending mode.** The edited row swaps to hydrated
+   `ChooserSummaryCard` review in place. Sibling pending cards remain visible.
+   This is not a return to Add/discovery at the root.
 8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,
    equipment picker disclosure (commerce), and mutation-oriented relationship
    drawers. Do not migrate them in this phase.
 
 ### Root contract
 
-`AddPendingWorkflow` may own Add vs Pending mode, one-open disclosure
-coordination, add-another transition, and pending-collection placement/chrome.
+`AddPendingWorkflow` may own Add vs Pending mode, add-another transition, one
+composing content slot, and pending-collection placement/chrome.
 
 It must not own Organization APIs, Location semantics, relationship vocabulary,
-domain validation, persistence, composite submit, or pending-row record
-interpretation. Consumers supply discovery content, composer content,
+domain validation, persistence, composite submit, pending-row record
+interpretation, or composer stage machines. Consumers supply composing content,
 pending-row content, and domain actions.
 
-The root API uses `addAnotherLabel` / action slots — never domain nouns such as
+The root API uses `addAnotherLabel` / slot props — never domain nouns such as
 “organization.”
-
-`DisclosureChoiceComposer` understands choices, selected value, disabled
-reasons, and a confirm action. It omits radios when exactly one choice is
-eligible. It never names Owner, Tenant, or other relationship kinds.
 
 ### `ContentEntityCard` consumption
 
-See [content-entity-card.md](./content-entity-card.md#add--pending-disclosure).
-Collapsed discovery and pending rows use CEC. Expansion belongs to
-`DisclosureEntityCard` via `AddPendingDisclosureCard`.
+See [content-entity-card.md](./content-entity-card.md#add--pending-composition).
+Discovery rows use CEC + trailing **Select** (outline, compact). Pending rows
+use CEC + overflow actions until edit swaps the row to hydrated review.

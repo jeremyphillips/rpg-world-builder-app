@@ -1,12 +1,14 @@
 import {
   getOrganizationLocationConnectionLabel,
   organizationLocationConnectionKindBlockedForLocation,
+  ORGANIZATION_LOCATION_CONNECTION_ENTRIES,
   resolveLocationConnectionEligibility,
   type Organization,
   type OrganizationLocationConnectionEdgeAtLocation,
   type OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import { buildOrganizationLocationConnectionKindOptions } from '../../lib/location-connection-kind-options'
 import {
   organizationFormSchema,
   type OrganizationFormValues,
@@ -47,6 +49,7 @@ export const EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN: BuildingOrganizationDraftPl
 export type BuildingOrganizationRelationshipKindOption = Readonly<{
   value: OrganizationLocationConnectionKind
   label: string
+  description: string
   disabled?: boolean
   disabledReason?: string
 }>
@@ -250,6 +253,9 @@ export function validateBuildingOrganizationDraftPlan(input: {
 export const BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON =
   'No eligible relationships for this Organization.'
 
+export const BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON =
+  'No eligible relationship kinds remain for this building.'
+
 export function resolveBuildingOrganizationDiscoveryAddState(
   options: readonly BuildingOrganizationRelationshipKindOption[],
 ): {
@@ -286,9 +292,15 @@ export function buildBuildingOrganizationRelationshipKindOptions(input: {
     structureType: 'building',
   }).organizationKinds
   if (!input.organization) {
-    return eligibleKinds.map((value) => ({
-      value,
-      label: getOrganizationLocationConnectionLabel(value),
+    return buildOrganizationLocationConnectionKindOptions({
+      locationId: PENDING_BUILDING_LOCATION_ID,
+      kinds: eligibleKinds,
+      edgesAtLocation: pendingEdges(input.plan.relationships),
+    }).map((option) => ({
+      value: option.value as OrganizationLocationConnectionKind,
+      label: option.label,
+      description: option.description,
+      ...(option.disabled ? { disabled: true, disabledReason: option.disabledReason } : {}),
     }))
   }
 
@@ -312,9 +324,37 @@ export function buildBuildingOrganizationRelationshipKindOptions(input: {
     return {
       value,
       label: getOrganizationLocationConnectionLabel(value),
+      description: ORGANIZATION_LOCATION_CONNECTION_ENTRIES[value].description,
       ...(conflict ? { disabled: true, disabledReason: conflict.message } : {}),
     }
   })
+}
+
+export function resolveBuildingOrganizationSelectState(input: {
+  kind: OrganizationLocationConnectionKind | null
+  options: readonly BuildingOrganizationRelationshipKindOption[]
+}): {
+  selectDisabled: boolean
+  selectDisabledReason?: string
+} {
+  if (!input.kind) {
+    return {
+      selectDisabled: true,
+      selectDisabledReason: BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
+    }
+  }
+
+  const option = input.options.find((candidate) => candidate.value === input.kind)
+  if (!option || option.disabled) {
+    return {
+      selectDisabled: true,
+      selectDisabledReason:
+        option?.disabledReason ??
+        `${getOrganizationLocationConnectionLabel(input.kind)} is not eligible for this Organization.`,
+    }
+  }
+
+  return { selectDisabled: false }
 }
 
 export function upsertBuildingOrganizationRelationshipDraft(input: {

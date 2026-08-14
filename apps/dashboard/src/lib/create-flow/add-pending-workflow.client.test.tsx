@@ -9,7 +9,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { AddPendingWorkflow } from './add-pending-workflow.client'
 
 describe('AddPendingWorkflow', () => {
-  it('keeps Add-mode discovery exclusive of the pending collection', () => {
+  it('keeps Add-mode composing exclusive of the pending collection', () => {
     render(
       <AddPendingWorkflow
         hasPendingItems={false}
@@ -17,20 +17,16 @@ describe('AddPendingWorkflow', () => {
         onAddAnother={vi.fn()}
         pendingHeading="Pending relationships"
         pendingItems={<p>Pending row</p>}
-        addDescription={<p>Search or create an item.</p>}
-        addSearch={<input aria-label="Search items" />}
-        addDiscovery={<p>Discovery row</p>}
-        addAlternateAction={<button type="button">Create new</button>}
+        composing={<p>Composing content</p>}
       />,
     )
 
-    expect(screen.getByText('Search or create an item.')).toBeInTheDocument()
-    expect(screen.getByText('Discovery row')).toBeInTheDocument()
+    expect(screen.getByText('Composing content')).toBeInTheDocument()
     expect(screen.queryByText('Pending row')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '+ Add another' })).not.toBeInTheDocument()
   })
 
-  it('keeps Pending-mode review exclusive of Add-mode discovery', () => {
+  it('keeps Pending-mode review exclusive of Add-mode composing', () => {
     render(
       <AddPendingWorkflow
         hasPendingItems
@@ -39,15 +35,12 @@ describe('AddPendingWorkflow', () => {
         onAddAnother={vi.fn()}
         pendingHeading="Pending relationships"
         pendingItems={<p>Pending row</p>}
-        addDescription={<p>Search or create an item.</p>}
-        addSearch={<input aria-label="Search items" />}
-        addDiscovery={<p>Discovery row</p>}
+        composing={<p>Composing content</p>}
       />,
     )
 
     expect(screen.getByText('Pending row')).toBeInTheDocument()
-    expect(screen.queryByText('Discovery row')).not.toBeInTheDocument()
-    expect(screen.queryByLabelText('Search items')).not.toBeInTheDocument()
+    expect(screen.queryByText('Composing content')).not.toBeInTheDocument()
   })
 
   it('returns to Add mode from add-another and when the last pending item is gone', async () => {
@@ -62,7 +55,7 @@ describe('AddPendingWorkflow', () => {
         addAnotherLabel="+ Add another"
         onAddAnother={onAddAnother}
         pendingItems={<p>Pending row</p>}
-        addDiscovery={<p>Discovery row</p>}
+        composing={<p>Composing content</p>}
       />,
     )
 
@@ -78,31 +71,12 @@ describe('AddPendingWorkflow', () => {
         addAnotherLabel="+ Add another"
         onAddAnother={onAddAnother}
         pendingItems={<p>Pending row</p>}
-        addDiscovery={<p>Discovery row</p>}
+        composing={<p>Composing content</p>}
       />,
     )
 
-    expect(screen.getByText('Discovery row')).toBeInTheDocument()
+    expect(screen.getByText('Composing content')).toBeInTheDocument()
     expect(screen.queryByText('Pending row')).not.toBeInTheDocument()
-  })
-
-  it('shows the Add-mode branch instead of discovery', () => {
-    render(
-      <AddPendingWorkflow
-        hasPendingItems={false}
-        addAnotherLabel="+ Add another"
-        onAddAnother={vi.fn()}
-        pendingItems={null}
-        addDiscovery={<p>Discovery row</p>}
-        addBranch={<p>New item form</p>}
-        addBranchBackLabel="Choose existing"
-        onAddBranchBack={vi.fn()}
-      />,
-    )
-
-    expect(screen.getByText('New item form')).toBeInTheDocument()
-    expect(screen.queryByText('Discovery row')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Choose existing' })).toBeInTheDocument()
   })
 
   itAxe('has no accessibility violations in Add mode', async () => {
@@ -111,8 +85,7 @@ describe('AddPendingWorkflow', () => {
         hasPendingItems={false}
         addAnotherLabel="+ Add another"
         onAddAnother={vi.fn()}
-        addDescription={<p>Search or create an item.</p>}
-        addDiscovery={<p>Discovery row</p>}
+        composing={<p>Composing content</p>}
         pendingItems={null}
       />,
     )

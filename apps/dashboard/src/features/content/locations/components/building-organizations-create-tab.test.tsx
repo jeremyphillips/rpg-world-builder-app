@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { act, render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import type { Organization } from '@rpg/contracts'
@@ -9,16 +9,18 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
+import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../../lib/location-connection-drawer-intent'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
-  BUILDING_ORGANIZATIONS_ADD_DESCRIPTION,
   BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
   BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
   BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
   BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE,
+  BUILDING_ORGANIZATIONS_INTENT_PROMPT,
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../lib/building-organizations-create-tab.lib'
 import type { BuildingOrganizationDraftPlan } from '../lib/building-organization-create-drafts'
@@ -90,9 +92,13 @@ const threeKindsPlan: BuildingOrganizationDraftPlan = {
   relationships: allKindsPlan.relationships.slice(0, 3),
 }
 
+async function chooseOwnerIntent(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: /Owner/i }))
+}
+
 async function addExistingOwner(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
-  await user.click(screen.getByRole('radio', { name: 'Owner' }))
+  await chooseOwnerIntent(user)
+  await user.click(screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!)
   await user.click(
     screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
   )
@@ -108,10 +114,9 @@ describe('BuildingOrganizationsCreateTab', () => {
     await waitFor(() =>
       expect(onStatusChange).toHaveBeenLastCalledWith({ invalid: false, dirty: false }),
     )
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_ADD_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Connection type' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Existing Organization' })).not.toBeInTheDocument()
   })
 
   it('does not create a draft until Add relationship is confirmed', async () => {
@@ -126,24 +131,12 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
-    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await chooseOwnerIntent(user)
     expect(onPlanChange).not.toHaveBeenCalled()
-    expect(screen.getByRole('radio', { name: 'Owner' })).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE)).not.toBeInTheDocument()
     expect(await controllerRef.current?.validate()).toEqual({ valid: false, issueCount: 1 })
     expect(await screen.findByText(BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE)).toBeInTheDocument()
-  })
-
-  it('keeps only one discovery disclosure open', async () => {
-    const user = userEvent.setup()
-    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
-
-    const addButtons = screen.getAllByRole('button', { name: 'Add' })
-    await user.click(addButtons[0]!)
-    expect(screen.getByRole('radio', { name: 'Owner' })).toBeInTheDocument()
-    await user.click(addButtons[1]!)
-    expect(screen.getAllByRole('radio', { name: 'Owner' })).toHaveLength(1)
   })
 
   it('adds, edits in Pending mode, and removes the last draft without persistence', async () => {
@@ -160,7 +153,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     await addExistingOwner(user)
 
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
-    expect(screen.queryByText(BUILDING_ORGANIZATIONS_ADD_DESCRIPTION)).not.toBeInTheDocument()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
     expect(onPlanChange).toHaveBeenCalledOnce()
     const firstPlan = onPlanChange.mock.calls[0]![0]
     expect(firstPlan.relationships[0]).toMatchObject({
@@ -173,8 +166,9 @@ describe('BuildingOrganizationsCreateTab', () => {
       screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL }),
     )
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
-    expect(screen.queryByText(BUILDING_ORGANIZATIONS_ADD_DESCRIPTION)).not.toBeInTheDocument()
-    await user.click(screen.getByRole('radio', { name: 'Operator' }))
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: LOCATION_CONNECTION_KIND_CHANGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: /Operator/i }))
     await user.click(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL }),
     )
@@ -187,7 +181,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     await user.click(
       screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL }),
     )
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_ADD_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
   })
 
@@ -197,10 +191,12 @@ describe('BuildingOrganizationsCreateTab', () => {
 
     await addExistingOwner(user)
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL }))
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_ADD_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
 
-    await user.click(screen.getAllByRole('button', { name: 'Add' })[1]!)
-    await user.click(screen.getByRole('radio', { name: 'Tenant' }))
+    await user.click(screen.getByRole('radio', { name: /Tenant/i }))
+    await user.click(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[1]!,
+    )
     await user.click(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
     )
@@ -209,7 +205,8 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(screen.getByText('Harbor Merchants Guild')).toBeInTheDocument()
   })
 
-  it('disables Add when no relationship kinds are eligible', () => {
+  it('disables Select when the chosen kind is not eligible for the organization', async () => {
+    const user = userEvent.setup()
     render(
       <BuildingOrganizationsCreateTab
         campaignId="campaign-1"
@@ -218,13 +215,13 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
-    const kettleCard = screen.getByText('Copper Kettle Guild').closest('article')
-    expect(kettleCard).not.toBeNull()
-    expect(within(kettleCard as HTMLElement).getByRole('button', { name: /Add/ })).toBeDisabled()
-    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    expect(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0],
+    ).toBeDisabled()
   })
 
-  it('omits radios for a single eligible kind and still requires confirm', async () => {
+  it('collapses the chosen intent kind before organization discovery', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
     render(
@@ -236,10 +233,13 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
-    const kettleCard = screen.getByText('Copper Kettle Guild').closest('article')
-    await user.click(within(kettleCard as HTMLElement).getByRole('button', { name: 'Add' }))
+    await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
+    expect(screen.getByRole('heading', { name: 'Headquarters' })).toBeInTheDocument()
     expect(screen.queryByRole('radio')).not.toBeInTheDocument()
     expect(onPlanChange).not.toHaveBeenCalled()
+    await user.click(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
+    )
     await user.click(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
     )
@@ -249,7 +249,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     })
   })
 
-  it('normalizes in-progress disclosure and attributed server issues through its panel controller', async () => {
+  it('normalizes in-progress composer and attributed server issues through its panel controller', async () => {
     const user = userEvent.setup()
     const onStatusChange = vi.fn()
     const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
@@ -261,6 +261,7 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
+    await chooseOwnerIntent(user)
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
     await waitFor(() =>
       expect(onStatusChange).toHaveBeenLastCalledWith({

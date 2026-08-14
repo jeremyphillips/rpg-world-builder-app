@@ -10,15 +10,19 @@ import type {
   BuildingOrganizationRelationshipDraft,
 } from './building-organization-create-drafts'
 
-export const BUILDING_ORGANIZATIONS_ADD_DESCRIPTION =
-  'Search or create an organization to associate with this building.'
+export const BUILDING_ORGANIZATIONS_INTENT_PROMPT =
+  'What relationship should this organization have with this building?'
+export const BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW = 'Relationship'
+export const BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW = 'Organization'
+export const BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL = 'Change'
 export const BUILDING_ORGANIZATIONS_SEARCH_LABEL = 'Search organizations'
 export const BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER = 'Search organizations…'
-export const BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL = '+ Create new organization'
+export const BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL = '+ Create organization'
 export const BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL = '← Choose existing organization'
-export const BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL = '+ Add another organization'
+export const BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL = '+ Add another relationship'
 export const BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL = 'Add relationship'
 export const BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL = 'Update relationship'
+export const BUILDING_ORGANIZATIONS_SELECT_LABEL = 'Select'
 export const BUILDING_ORGANIZATIONS_PENDING_HEADING = 'Pending relationships'
 export const BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE =
   'Finish or cancel the relationship you are adding.'
@@ -31,27 +35,6 @@ export const BUILDING_ORGANIZATIONS_OVERFLOW_LABEL = 'Relationship actions'
 export const BUILDING_ORGANIZATIONS_LOADING_LABEL = 'Loading Organizations…'
 export const BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL = 'No Organizations match this search.'
 export const BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE = 'Could not load Organizations.'
-
-const DISCOVERY_ITEM_PREFIX = 'discovery:'
-const PENDING_ITEM_PREFIX = 'pending:'
-
-export function buildingOrganizationDiscoveryItemId(organizationId: string): string {
-  return `${DISCOVERY_ITEM_PREFIX}${organizationId}`
-}
-
-export function buildingOrganizationPendingItemId(draftId: string): string {
-  return `${PENDING_ITEM_PREFIX}${draftId}`
-}
-
-export function parseBuildingOrganizationDiscoveryItemId(itemId: string): string | null {
-  return itemId.startsWith(DISCOVERY_ITEM_PREFIX)
-    ? itemId.slice(DISCOVERY_ITEM_PREFIX.length)
-    : null
-}
-
-export function parseBuildingOrganizationPendingItemId(itemId: string): string | null {
-  return itemId.startsWith(PENDING_ITEM_PREFIX) ? itemId.slice(PENDING_ITEM_PREFIX.length) : null
-}
 
 export function relationshipOrganizationName(input: {
   relationship: BuildingOrganizationRelationshipDraft
@@ -111,4 +94,40 @@ export function buildBuildingOrganizationPendingEntity(input: {
         }
       : {}),
   }
+}
+
+export function resolveBuildingOrganizationTargetName(input: {
+  organization: BuildingOrganizationRelationshipDraft['organization']
+  plan: BuildingOrganizationDraftPlan
+  existingOrganizations: readonly Organization[]
+}): string {
+  const target = input.organization
+  if (target.kind === 'existing') {
+    return (
+      input.existingOrganizations.find((item) => item.id === target.organizationId)?.name ??
+      BUILDING_ORGANIZATIONS_UNAVAILABLE_NAME
+    )
+  }
+  return (
+    input.plan.organizations.find((item) => item.draftOrganizationId === target.draftOrganizationId)
+      ?.values.name ?? BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME
+  )
+}
+
+export function resolveBuildingOrganizationTargetDomainLabel(input: {
+  organization: BuildingOrganizationRelationshipDraft['organization']
+  plan: BuildingOrganizationDraftPlan
+  existingOrganizations: readonly Organization[]
+}): string {
+  const target = input.organization
+  if (target.kind === 'existing') {
+    const organization = input.existingOrganizations.find(
+      (item) => item.id === target.organizationId,
+    )
+    return organization ? getOrganizationDomainLabel(organization.organizationDomain) : ''
+  }
+  const draft = input.plan.organizations.find(
+    (item) => item.draftOrganizationId === target.draftOrganizationId,
+  )
+  return draft ? getOrganizationDomainLabel(draft.values.organizationDomain) : ''
 }

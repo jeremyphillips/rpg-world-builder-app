@@ -1,11 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  getOrganizationDomainLabel,
-  type Organization,
-  type OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import { getOrganizationDomainLabel, type Organization } from '@rpg/contracts'
 
 import type {
   AddPendingWorkflowMode,
@@ -22,18 +18,29 @@ import {
   EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
   removeBuildingOrganizationRelationshipDraft,
   resolveBuildingOrganizationDiscoveryAddState,
-  upsertBuildingOrganizationRelationshipDraft,
+  resolveBuildingOrganizationSelectState,
   validateBuildingOrganizationDraftPlan,
   type BuildingOrganizationDraftIssue,
   type BuildingOrganizationDraftPlan,
   type BuildingOrganizationRelationshipDraft,
 } from '../lib/building-organization-create-drafts'
 import {
-  BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE,
-  buildingOrganizationPendingItemId,
-  parseBuildingOrganizationDiscoveryItemId,
-  parseBuildingOrganizationPendingItemId,
-} from '../lib/building-organizations-create-tab.lib'
+  buildExistingOrganizationCommitPlan,
+  buildNewOrganizationCommitPlan,
+  buildPendingOrganizationCommitPlan,
+  createBuildingOrganizationPanelController,
+  filterVisibleOrganizations,
+  organizationTargetEligibleForKind,
+  resolveBuildingOrganizationCommitKind,
+  resolveBuildingOrganizationComposerStage,
+  resolveBuildingOrganizationEffectiveKind,
+  resolveBuildingOrganizationInProgress,
+  resolveBuildingOrganizationVisibleIssues,
+  type BuildingOrganizationComposerStage,
+  type BuildingOrganizationComposerTarget,
+} from '../lib/building-organizations-create-tab-controller.lib'
+
+export type { BuildingOrganizationComposerStage, BuildingOrganizationComposerTarget }
 
 export type UseBuildingOrganizationsCreateTabInput = {
   campaignId: string
@@ -66,24 +73,26 @@ export function useBuildingOrganizationsCreateTab({
   const [requestedMode, setRequestedMode] = React.useState<AddPendingWorkflowMode>(
     initialMode ?? (initialPlan.relationships.length > 0 ? 'pending' : 'add'),
   )
-  const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
-  const [newOrganizationBranch, setNewOrganizationBranch] = React.useState(false)
+  const [composerStage, setComposerStage] =
+    React.useState<BuildingOrganizationComposerStage>('intent')
+  const [editingDraftId, setEditingDraftId] = React.useState<string | null>(null)
+  const [selectedOrganization, setSelectedOrganization] =
+    React.useState<BuildingOrganizationComposerTarget | null>(null)
   const [newOrganizationDraftId, setNewOrganizationDraftId] = React.useState<string | null>(null)
-  const [kind, setKind] = React.useState<OrganizationLocationConnectionKind | null>(null)
+  const [kind, setKind] = React.useState<BuildingOrganizationRelationshipDraft['kind'] | null>(null)
   const [searchQuery, setSearchQuery] = React.useState('')
   const [validationAttempted, setValidationAttempted] = React.useState(false)
   const [serverIssues, setServerIssues] = React.useState<readonly BuildingOrganizationDraftIssue[]>(
     [],
   )
 
-  const inProgress = expandedItemId != null || newOrganizationBranch
-
   const resetEditor = React.useCallback(() => {
+    setComposerStage('intent')
+    setEditingDraftId(null)
+    setSelectedOrganization(null)
+    setNewOrganizationDraftId(null)
     setKind(null)
     setSearchQuery('')
-    setExpandedItemId(null)
-    setNewOrganizationBranch(false)
-    setNewOrganizationDraftId(null)
   }, [])
 
   const updatePlan = React.useCallback(
@@ -94,6 +103,45 @@ export function useBuildingOrganizationsCreateTab({
     },
     [onPlanChange],
   )
+
+  const kindOptionsFor = React.useCallback(
+    (
+      organization?: BuildingOrganizationRelationshipDraft['organization'],
+      relationshipDraftId?: string,
+    ) =>
+      buildBuildingOrganizationRelationshipKindOptions({
+        plan,
+        existingOrganizations: organizations,
+        organization,
+        relationshipDraftId,
+      }),
+    [organizations, plan],
+  )
+
+  const intentKindOptions = React.useMemo(() => kindOptionsFor(), [kindOptionsFor])
+  const intentState = React.useMemo(
+    () => resolveBuildingOrganizationDiscoveryAddState(intentKindOptions),
+    [intentKindOptions],
+  )
+  const effectiveKind = resolveBuildingOrganizationEffectiveKind({
+    kind,
+    requestedMode,
+    composerStage,
+    editingDraftId,
+    intentState,
+  })
+  const resolvedComposerStage = resolveBuildingOrganizationComposerStage({
+    composerStage,
+    effectiveKind,
+    kind,
+    intentState,
+  })
+  const inProgress = resolveBuildingOrganizationInProgress({
+    editingDraftId,
+    requestedMode,
+    composerStage: resolvedComposerStage,
+    effectiveKind,
+  })
 
   const planIssues = React.useMemo(
     () =>
@@ -107,9 +155,11 @@ export function useBuildingOrganizationsCreateTab({
   const validationIssueCount = planIssues.length + (inProgress ? 1 : 0)
   const visibleIssues = React.useMemo(
     () =>
-      validationAttempted && inProgress
-        ? [...planIssues, { message: BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE }]
-        : planIssues,
+      resolveBuildingOrganizationVisibleIssues({
+        validationAttempted,
+        inProgress,
+        planIssues,
+      }),
     [inProgress, planIssues, validationAttempted],
   )
   const status = React.useMemo<CreateWorkflowPanelStatus>(
@@ -129,60 +179,59 @@ export function useBuildingOrganizationsCreateTab({
 
   React.useEffect(() => onStatusChange?.(status), [onStatusChange, status])
 
+  const focusFirstIssue = React.useCallback(() => {
+    const root = rootRef.current
+    const target =
+      root?.querySelector<HTMLElement>('[data-organization-draft-issue]') ??
+      root?.querySelector<HTMLElement>(
+        '[data-building-organization-composer] input, [data-building-organization-composer] button, [data-building-organization-composer] [role="radio"]',
+      )
+    target?.focus()
+  }, [])
+
+  const hydrateServerIssues = React.useCallback(
+    (issues: readonly BuildingOrganizationDraftIssue[]) => {
+      setServerIssues(issues)
+      setValidationAttempted(true)
+    },
+    [],
+  )
+
+  const panelReset = React.useCallback(() => {
+    setPlan(EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN)
+    setServerIssues([])
+    setValidationAttempted(false)
+    setRequestedMode('add')
+    resetEditor()
+  }, [resetEditor])
+
   React.useEffect(() => {
     if (!controllerRef) return
+    const controller = createBuildingOrganizationPanelController({
+      plan,
+      reset: panelReset,
+      validationIssueCount,
+      focusFirstIssue,
+      hydrateServerIssues,
+    })
     controllerRef.current = {
-      getPayload: () => plan,
-      reset: () => {
-        setPlan(EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN)
-        setServerIssues([])
-        setValidationAttempted(false)
-        setRequestedMode('add')
-        resetEditor()
-      },
-      hydrateServerIssues: (issues) => {
-        setServerIssues(issues)
-        setValidationAttempted(true)
-      },
+      ...controller,
       validate: async () => {
         setValidationAttempted(true)
-        return { valid: validationIssueCount === 0, issueCount: validationIssueCount }
-      },
-      focusFirstIssue: () => {
-        const root = rootRef.current
-        const target =
-          root?.querySelector<HTMLElement>('[data-organization-draft-issue]') ??
-          root?.querySelector<HTMLElement>('input, button, [role="radio"], [role="combobox"]')
-        target?.focus()
+        return controller.validate()
       },
     }
     return () => {
       controllerRef.current = null
     }
-  }, [controllerRef, plan, resetEditor, validationIssueCount])
+  }, [controllerRef, focusFirstIssue, hydrateServerIssues, panelReset, plan, validationIssueCount])
 
-  const visibleOrganizations = React.useMemo(() => {
-    const normalized = searchQuery.trim().toLocaleLowerCase()
-    if (!normalized) return organizations
-    return organizations.filter((organization) =>
-      `${organization.name} ${getOrganizationDomainLabel(organization.organizationDomain)}`
-        .toLocaleLowerCase()
-        .includes(normalized),
-    )
-  }, [organizations, searchQuery])
-
-  const kindOptionsFor = React.useCallback(
-    (
-      organization?: BuildingOrganizationRelationshipDraft['organization'],
-      relationshipDraftId?: string,
-    ) =>
-      buildBuildingOrganizationRelationshipKindOptions({
-        plan,
-        existingOrganizations: organizations,
-        organization,
-        relationshipDraftId,
-      }),
-    [organizations, plan],
+  const visibleOrganizations = React.useMemo(
+    () =>
+      filterVisibleOrganizations(organizations, searchQuery, (organization) =>
+        getOrganizationDomainLabel(organization.organizationDomain),
+      ),
+    [organizations, searchQuery],
   )
 
   const returnToPending = React.useCallback(() => {
@@ -190,137 +239,157 @@ export function useBuildingOrganizationsCreateTab({
     setRequestedMode('pending')
   }, [resetEditor])
 
-  const commitExisting = React.useCallback(
-    (organizationId: string) => {
-      const options = kindOptionsFor({ kind: 'existing', organizationId })
-      const resolvedKind =
-        resolveBuildingOrganizationDiscoveryAddState(options).singleEligibleValue ?? kind
-      if (!resolvedKind) {
-        setValidationAttempted(true)
+  const handleKindChange = React.useCallback(
+    (value: BuildingOrganizationRelationshipDraft['kind']) => {
+      setValidationAttempted(false)
+      setKind(value)
+      if (!selectedOrganization) {
+        setComposerStage('discovery')
         return
       }
-      updatePlan(
-        upsertBuildingOrganizationRelationshipDraft({
-          plan,
-          relationship: {
-            draftId: createBuildingOrganizationDraftId(),
-            kind: resolvedKind,
-            organization: { kind: 'existing', organizationId },
-          },
-        }),
-      )
-      returnToPending()
+      const stillEligible = organizationTargetEligibleForKind({
+        kind: value,
+        organization: selectedOrganization,
+        kindOptionsFor,
+        relationshipDraftId: editingDraftId ?? undefined,
+      })
+      setComposerStage(stillEligible ? 'review' : 'discovery')
+      if (!stillEligible) setSelectedOrganization(null)
     },
-    [kind, kindOptionsFor, plan, returnToPending, updatePlan],
+    [editingDraftId, kindOptionsFor, selectedOrganization],
   )
+
+  const selectExistingOrganization = React.useCallback((organizationId: string) => {
+    setValidationAttempted(false)
+    setSelectedOrganization({ kind: 'existing', organizationId })
+    setComposerStage('review')
+  }, [])
+
+  const commitExisting = React.useCallback(() => {
+    const resolvedKind = resolveBuildingOrganizationCommitKind({
+      kind,
+      singleEligibleValue: intentState.singleEligibleValue,
+    })
+    if (!resolvedKind || !selectedOrganization || selectedOrganization.kind !== 'existing') {
+      setValidationAttempted(true)
+      return
+    }
+    updatePlan(
+      buildExistingOrganizationCommitPlan({
+        plan,
+        kind: resolvedKind,
+        organizationId: selectedOrganization.organizationId,
+      }),
+    )
+    returnToPending()
+  }, [
+    intentState.singleEligibleValue,
+    kind,
+    plan,
+    returnToPending,
+    selectedOrganization,
+    updatePlan,
+  ])
 
   const commitNew = React.useCallback(
     (values: OrganizationFormValues) => {
       const draftOrganizationId = newOrganizationDraftId ?? createBuildingOrganizationDraftId()
-      const options = kindOptionsFor({ kind: 'new', draftOrganizationId })
-      const resolvedKind =
-        resolveBuildingOrganizationDiscoveryAddState(options).singleEligibleValue ?? kind
+      const resolvedKind = resolveBuildingOrganizationCommitKind({
+        kind,
+        singleEligibleValue: intentState.singleEligibleValue,
+      })
       if (!resolvedKind) {
         setValidationAttempted(true)
         return
       }
       updatePlan(
-        upsertBuildingOrganizationRelationshipDraft({
+        buildNewOrganizationCommitPlan({
           plan,
-          relationship: {
-            draftId: createBuildingOrganizationDraftId(),
-            kind: resolvedKind,
-            organization: { kind: 'new', draftOrganizationId },
-          },
-          organizationDraft: { draftOrganizationId, values },
+          kind: resolvedKind,
+          draftOrganizationId,
+          values,
         }),
       )
       returnToPending()
     },
-    [kind, kindOptionsFor, newOrganizationDraftId, plan, returnToPending, updatePlan],
+    [
+      intentState.singleEligibleValue,
+      kind,
+      newOrganizationDraftId,
+      plan,
+      returnToPending,
+      updatePlan,
+    ],
   )
 
   const commitPendingEdit = React.useCallback(
     (relationship: BuildingOrganizationRelationshipDraft) => {
-      const options = kindOptionsFor(relationship.organization, relationship.draftId)
-      const resolvedKind =
-        resolveBuildingOrganizationDiscoveryAddState(options).singleEligibleValue ?? kind
-      if (!resolvedKind) {
+      if (!kind || !selectedOrganization) {
         setValidationAttempted(true)
         return
       }
       updatePlan(
-        upsertBuildingOrganizationRelationshipDraft({
+        buildPendingOrganizationCommitPlan({
           plan,
-          relationship: { ...relationship, kind: resolvedKind },
+          relationship,
+          kind,
+          organization: selectedOrganization,
         }),
       )
-      setExpandedItemId(null)
+      setEditingDraftId(null)
+      setSelectedOrganization(null)
       setKind(null)
+      setComposerStage('intent')
     },
-    [kind, kindOptionsFor, plan, updatePlan],
+    [kind, plan, selectedOrganization, updatePlan],
   )
 
   const editRelationship = React.useCallback(
     (relationship: BuildingOrganizationRelationshipDraft) => {
-      setRequestedMode('pending')
-      setNewOrganizationBranch(false)
-      setExpandedItemId(buildingOrganizationPendingItemId(relationship.draftId))
+      setValidationAttempted(false)
+      setEditingDraftId(relationship.draftId)
+      setSelectedOrganization(relationship.organization)
       setKind(relationship.kind)
+      setComposerStage('review')
+      setNewOrganizationDraftId(null)
     },
     [],
   )
+
+  const cancelPendingEdit = React.useCallback(() => {
+    setEditingDraftId(null)
+    setSelectedOrganization(null)
+    setKind(null)
+    setComposerStage('intent')
+  }, [])
 
   const removeRelationship = React.useCallback(
     (relationshipDraftId: string) => {
       const nextPlan = removeBuildingOrganizationRelationshipDraft(plan, relationshipDraftId)
       updatePlan(nextPlan)
-      if (parseBuildingOrganizationPendingItemId(expandedItemId ?? '') === relationshipDraftId) {
-        setExpandedItemId(null)
-        setKind(null)
-      }
+      if (editingDraftId === relationshipDraftId) cancelPendingEdit()
       if (nextPlan.relationships.length === 0) {
         setRequestedMode('add')
         resetEditor()
       }
     },
-    [expandedItemId, plan, resetEditor, updatePlan],
-  )
-
-  const handleExpandedItemIdChange = React.useCallback(
-    (itemId: string | null) => {
-      if (itemId) setValidationAttempted(false)
-      setExpandedItemId(itemId)
-      const organizationId = itemId ? parseBuildingOrganizationDiscoveryItemId(itemId) : null
-      if (organizationId) {
-        const addState = resolveBuildingOrganizationDiscoveryAddState(
-          kindOptionsFor({ kind: 'existing', organizationId }),
-        )
-        setKind(addState.singleEligibleValue ?? null)
-        return
-      }
-      const pendingDraftId = itemId ? parseBuildingOrganizationPendingItemId(itemId) : null
-      if (pendingDraftId) {
-        const relationship = plan.relationships.find((item) => item.draftId === pendingDraftId)
-        setKind(relationship?.kind ?? null)
-        return
-      }
-      setKind(null)
-    },
-    [kindOptionsFor, plan.relationships],
+    [cancelPendingEdit, editingDraftId, plan, resetEditor, updatePlan],
   )
 
   const enterNewOrganizationBranch = React.useCallback(() => {
     const draftOrganizationId = createBuildingOrganizationDraftId()
-    const addState = resolveBuildingOrganizationDiscoveryAddState(
-      kindOptionsFor({ kind: 'new', draftOrganizationId }),
-    )
     setValidationAttempted(false)
     setNewOrganizationDraftId(draftOrganizationId)
-    setNewOrganizationBranch(true)
-    setExpandedItemId(null)
-    setKind(addState.singleEligibleValue ?? null)
-  }, [kindOptionsFor])
+    setSelectedOrganization({ kind: 'new', draftOrganizationId })
+    setComposerStage('branch')
+  }, [])
+
+  const returnToDiscovery = React.useCallback(() => {
+    setValidationAttempted(false)
+    setSelectedOrganization(null)
+    setNewOrganizationDraftId(null)
+    setComposerStage('discovery')
+  }, [])
 
   const context: ContentFormCtx = formCtx ?? {
     campaignId,
@@ -335,28 +404,37 @@ export function useBuildingOrganizationsCreateTab({
     organizations,
     requestedMode,
     setRequestedMode,
-    expandedItemId,
-    handleExpandedItemIdChange,
+    composerStage: resolvedComposerStage,
+    setComposerStage,
+    editingDraftId,
+    selectedOrganization,
     visibleIssues,
-    kind,
-    setKind,
+    kind: effectiveKind,
+    handleKindChange,
     searchQuery,
     setSearchQuery,
     isPending,
     isError,
     visibleOrganizations,
     kindOptionsFor,
-    newOrganizationBranch,
+    intentKindOptions,
+    intentState,
     newOrganizationDraftId,
     validationAttempted,
     resetEditor,
+    selectExistingOrganization,
     commitExisting,
     commitNew,
     commitPendingEdit,
     editRelationship,
+    cancelPendingEdit,
     removeRelationship,
     enterNewOrganizationBranch,
-    setNewOrganizationBranch,
-    setNewOrganizationDraftId,
+    returnToDiscovery,
+    resolveBuildingOrganizationSelectState,
   }
 }
+
+export type UseBuildingOrganizationsCreateTabResult = ReturnType<
+  typeof useBuildingOrganizationsCreateTab
+>

@@ -89,20 +89,20 @@ type Story = StoryObj<typeof meta>
 
 export const EmptyAddMode: Story = {}
 
-export const SearchResultsWithDisclosure: Story = {
+export const IntentFirstDiscovery: Story = {
   args: {
     organizationItems,
   },
 }
 
-export const ZeroEligibleDisabledAdd: Story = {
+export const ZeroEligibleIntent: Story = {
   args: {
     initialPlan: fullyBlockedPlan,
     initialMode: 'add',
   },
 }
 
-export const SingleEligibleConfirmOnly: Story = {
+export const SingleEligibleIntentSummary: Story = {
   args: {
     initialPlan: singleEligiblePlan,
     initialMode: 'add',

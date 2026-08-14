@@ -21,7 +21,7 @@ which semantic layer owns the concern — see [Ownership hierarchy](#ownership-h
 | Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityItem`                           |
 | Bordered static identity                                                               | `ContentEntityCard`                    |
 | Bordered identity with expandable domain content                                       | `DisclosureEntityCard`                 |
-| Create-tab Add/Pending discovery or pending-row expansion                              | `AddPendingDisclosureCard` → CEC / DEC |
+| Create-tab Add/Pending discovery or pending rows                                       | `ContentEntityCard` + trailing action  |
 | Detail hierarchy or typed relationship                                                 | `DetailEntityRow` / `RelationshipList` |
 | Anonymous form value or choice affordance                                              | Purpose-built form/choice component    |
 
@@ -413,28 +413,28 @@ EntitySummary owns badge presentation. Badge size follows density: **compact →
 
 ---
 
-## Add / Pending disclosure
+## Add / Pending composition
 
-Create-tab relationship composition (Building Organizations first) uses
-`AddPendingDisclosureCard` as the CEC/DEC switch. Ownership and mode rules live
-in [create-flow.md](./create-flow.md#add--pending-disclosure-workflow).
+Create-tab relationship composition (Building Organizations first) uses stable
+`ContentEntityCard` rows inside `AddPendingWorkflow`. Ownership and mode rules
+live in [create-flow.md](./create-flow.md#add--pending-workflow).
 
 ```text
-AddPendingDisclosureCard
-├── collapsed → ContentEntityCard + trailing Add (or consumer overflow)
-└── expanded  → DisclosureEntityCard + domain composer children
+AddPendingWorkflow
+├── Add mode    → domain composing tree (intent → discovery → review → branch)
+└── Pending mode → ContentEntityCard rows + overflow; edit swaps row to review
 ```
 
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
-relationship-kind props to CEC. Do not nest CEC inside DEC — that doubles card
-chrome. DEC already owns entity identity in its header.
+relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
+(outline, `size="sm"`, `density="compact"`). Pending edit replaces one row with
+hydrated `ChooserSummaryCard` review in place — sibling pending cards stay on CEC.
 
-Zero-eligible discovery rows stay on CEC with a disabled trailing **Add** and
-the authoritative reason in the entity status lane. Opening an empty composer
-is forbidden.
+Zero-eligible discovery rows stay on CEC with a disabled trailing **Select** and
+the authoritative reason in the entity status lane.
 
-Pending-row edit expands one DEC in place. Sibling pending cards stay mounted
-on CEC. That is not Add/discovery mode.
+Pending-row edit stays in Pending mode. That is not Add/discovery mode at the
+root.
 
 ---
 
