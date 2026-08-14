@@ -14,12 +14,13 @@ import { BUILDING_FUNCTION_FAMILY_IDS } from './building-function-family'
 
 describe('Building semantic vocabularies', () => {
   it('keeps the Form registry narrow, schema-backed, and morphology-only', () => {
-    expect(BUILDING_FORM_IDS).toEqual(['house', 'tower', 'hall'])
+    expect(BUILDING_FORM_IDS).toEqual(['house', 'tower', 'hall', 'keep'])
     expect(Object.keys(BUILDING_FORM_ENTRIES)).toEqual(BUILDING_FORM_IDS)
     expect(buildingFormSchema.parse('house')).toBe('house')
     expect(buildingFormSchema.parse('tower')).toBe('tower')
     expect(buildingFormSchema.parse('hall')).toBe('hall')
-    expect(buildingFormSchema.safeParse('keep')).toMatchObject({ success: false })
+    expect(buildingFormSchema.parse('keep')).toBe('keep')
+    expect(buildingFormSchema.safeParse('gatehouse')).toMatchObject({ success: false })
     for (const entry of Object.values(BUILDING_FORM_ENTRIES)) {
       expect(entry).not.toHaveProperty('defaultFunctions')
     }
@@ -40,6 +41,13 @@ describe('Building semantic vocabularies', () => {
     expect(
       buildingClassificationSchema.parse({ form: 'tower', facilityType: 'residence' }),
     ).toEqual({ form: 'tower', facilityType: 'residence' })
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'residence' })).toEqual(
+      { form: 'keep', facilityType: 'residence' },
+    )
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'barracks' })).toEqual({
+      form: 'keep',
+      facilityType: 'barracks',
+    })
   })
 
   it('keeps hall and town_hall as distinct ids on distinct axes', () => {

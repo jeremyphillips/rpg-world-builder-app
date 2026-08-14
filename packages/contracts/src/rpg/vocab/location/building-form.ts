@@ -26,6 +26,11 @@ export const BUILDING_FORM_ENTRIES = {
     description:
       'A building architecturally organized around a dominant hall volume, not merely a building that contains a hall room. Independent of civic, ceremonial, or commercial facility identity.',
   },
+  keep: {
+    label: 'Keep',
+    description:
+      'A compact, thick-walled massing organized as a dominant central block, independent of present use.',
+  },
 } as const satisfies Record<string, GameTermEntry>
 
 export type BuildingForm = keyof typeof BUILDING_FORM_ENTRIES

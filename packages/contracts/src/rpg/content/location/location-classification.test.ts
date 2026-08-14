@@ -161,6 +161,42 @@ describe('location classification schema rejection', () => {
     })
   })
 
+  it('accepts keep form-only and composed classifications', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Stone Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep' },
+      }),
+    ).toMatchObject({ classification: { form: 'keep' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Lord Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'residence' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'keep', facilityType: 'residence' },
+    })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Garrison Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'barracks' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'keep', facilityType: 'barracks' },
+    })
+  })
+
   it('accepts Form-only, Facility-only, and unclassified buildings', () => {
     expect(
       locationBodySchema.parse({
@@ -199,7 +235,7 @@ describe('location classification schema rejection', () => {
         name: 'Bad Building',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { form: 'keep' },
+        classification: { form: 'gatehouse' },
       }).success,
     ).toBe(false)
 

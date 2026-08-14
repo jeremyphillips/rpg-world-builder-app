@@ -1377,13 +1377,13 @@ Admission result is one of: `ADMIT` · `NEEDS DESCRIPTION/POLICY WORK` · `DECOM
 
 #### Admission cards (this pass)
 
-| Candidate | Primary axis     | Result                          | Notes                                                                         |
-| --------- | ---------------- | ------------------------------- | ----------------------------------------------------------------------------- |
-| House     | Form             | ADMIT (shipped; copy tightened) | Small-scale house envelope/massing, independent of use                        |
-| Tower     | Form             | ADMIT (this pass)               | Vertical morphology, independent of watch/defense/residence use               |
-| Hall      | Form             | ADMIT (this pass)               | Whole-building hall volume; lexical overlap with `town_hall` Facility is safe |
-| Keep      | Form (contested) | NEEDS DESCRIPTION/POLICY WORK   | Morphology vs refuge-use still mixed in archetype copy                        |
-| Gatehouse | Form (contested) | NEEDS DESCRIPTION/POLICY WORK   | Gateway envelope vs entry-control facility overlap                            |
+| Candidate | Primary axis     | Result                           | Notes                                                                         |
+| --------- | ---------------- | -------------------------------- | ----------------------------------------------------------------------------- |
+| House     | Form             | ADMIT (shipped; copy tightened)  | Small-scale house envelope/massing, independent of use                        |
+| Tower     | Form             | ADMIT (this pass)                | Vertical morphology, independent of watch/defense/residence use               |
+| Hall      | Form             | ADMIT (this pass)                | Whole-building hall volume; lexical overlap with `town_hall` Facility is safe |
+| Keep      | Form             | ADMIT (Slice B)                  | Compact thick-walled central-block massing; defense on Facility/relationships |
+| Gatehouse | Form (contested) | REJECT (decompose for authoring) | Entry control dominates; optional Form + watch/checkpoint Facility            |
 
 ### Runtime vs audit metadata
 
@@ -1431,7 +1431,7 @@ Adding Form `tower` beside archetype `tower` is evidence, not the trigger itself
 
 ### Setup UI scalability trigger
 
-Form choices remain flat radio cards (3 after this pass). Migration is **semantic-first,
+Form choices remain flat radio cards (4 after Slice B). Migration is **semantic-first,
 count-second**: trigger when scanning the full Form set as radio cards becomes meaningfully worse
 than searching or grouping. 8–10 options is an empirical warning range (Site type is the largest
 flat Setup set today), not a hard rule. Future scalable extension belongs in `@/lib/create-setup`,
@@ -1455,10 +1455,8 @@ last two. Facility remains sole owner.
 
 ### Keep and gatehouse recommendations
 
-- **Keep:** Do not admit until description is morphology-first and defense is owned by
-  Facility/relationships. Likely next Form after this pass.
-- **Gatehouse:** Do not admit until Form vs Facility ownership is written into the entry. If
-  control/use dominates after rewrite, `DECOMPOSE` rather than force onto Form.
+- **Keep:** **ADMITTED** as Form (Slice B) — morphology-only description; defense on Facility/relationships.
+- **Gatehouse:** **Rejected** as canonical Form under current evidence; decompose onto optional Form + watch/checkpoint Facility + relationships.
 
 ### Classification ownership doc
 

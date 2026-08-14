@@ -105,6 +105,17 @@ export const HallDetails: Story = {
   },
 }
 
+export const KeepDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, { form: 'keep' })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Keep · Browse all'),
+    ).toBeVisible()
+  },
+}
+
 export const OrganizationsTab: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],

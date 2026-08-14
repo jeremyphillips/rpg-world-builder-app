@@ -67,7 +67,7 @@ describe('Building create setup selection', () => {
     )
   })
 
-  it('accepts tower and hall selections without Form-to-Facility filtering', () => {
+  it('accepts tower, hall, and keep selections without Form-to-Facility filtering', () => {
     const withTower = applyBuildingCreateSetupSelectionChange({
       selection: emptySelection,
       choiceSetId: 'buildingForm',
@@ -82,11 +82,24 @@ describe('Building create setup selection', () => {
     })
     expect(withHall?.form).toBe('hall')
 
+    const withKeep = applyBuildingCreateSetupSelectionChange({
+      selection: emptySelection,
+      choiceSetId: 'buildingForm',
+      nextValue: 'keep',
+    })
+    expect(withKeep?.form).toBe('keep')
+
     const towerProjection = resolveBuildingCreateSetupProjection({
       form: 'tower',
       facilityAuthoringGroup: 'religious',
     })
     expect(towerProjection).toEqual({ form: 'tower', facilityAuthoringGroup: 'religious' })
+
+    const keepProjection = resolveBuildingCreateSetupProjection({
+      form: 'keep',
+      facilityAuthoringGroup: 'civic',
+    })
+    expect(keepProjection).toEqual({ form: 'keep', facilityAuthoringGroup: 'civic' })
   })
 })
 
