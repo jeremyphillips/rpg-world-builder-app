@@ -98,6 +98,15 @@ describe('Building semantic vocabularies', () => {
       form: 'house',
       facilityType: 'checkpoint',
     })
+    expect(buildingClassificationSchema.parse({ facilityType: 'bathhouse' })).toEqual({
+      facilityType: 'bathhouse',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'bathhouse' })).toEqual(
+      { form: 'hall', facilityType: 'bathhouse' },
+    )
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'bathhouse' }),
+    ).toEqual({ form: 'house', facilityType: 'bathhouse' })
   })
 
   it('keeps hall, guildhall, and town_hall as distinct ids on their axes', () => {
@@ -134,6 +143,7 @@ describe('Building semantic vocabularies', () => {
       'library',
       'lighthouse',
       'archive',
+      'bathhouse',
       'hospital',
       'temple',
       'theater',
@@ -189,6 +199,7 @@ describe('Building semantic vocabularies', () => {
       library: ['knowledge'],
       lighthouse: ['defense_watch'],
       archive: ['knowledge'],
+      bathhouse: ['care'],
       hospital: ['care'],
       temple: ['worship'],
       theater: ['spectacle'],
@@ -219,6 +230,7 @@ describe('Building semantic vocabularies', () => {
       'warehouse',
       'brewery',
       'distillery',
+      'bathhouse',
       'theater',
       'stable',
     ])
@@ -241,6 +253,7 @@ describe('Building semantic vocabularies', () => {
       'library',
       'lighthouse',
       'archive',
+      'bathhouse',
       'hospital',
       'theater',
     ])
@@ -263,6 +276,18 @@ describe('Building semantic vocabularies', () => {
         expect(new Set(entry.searchTerms).size).toBe(entry.searchTerms.length)
       }
     }
+  })
+
+  it('ships bathhouse as a Form-independent hygiene premises Facility distinct from hospital', () => {
+    expect(buildingFacilityTypeSchema.parse('bathhouse')).toBe('bathhouse')
+    expect(getBuildingFacilityTypeLabel('bathhouse')).toBe('Bathhouse')
+    expect(getBuildingFacilityDefaultFunctions('bathhouse')).toEqual(['care'])
+    expect(getBuildingFacilityDefaultFunctions('hospital')).toEqual(['care'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.bathhouse.description).toContain('bathing')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.hospital.description).toContain('healing')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('bathhouse')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('bathhouse')
+    expect(getBuildingFacilityTypeLabel('bathhouse').toLocaleLowerCase()).not.toBe('house')
   })
 
   it('resolves legacy morphological Facility ids from registry metadata, not lexical id shape', () => {

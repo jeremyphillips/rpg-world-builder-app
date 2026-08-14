@@ -26,8 +26,9 @@ decide what ships. This note records corpus disposition evidence only. The quara
 
 **Decomposed:** 4 (`apothecary`, `gatehouse`, `manor`, `wizard_tower`).  
 **Needs-design:** 1 (`blockhouse`).  
-**Facility candidates (inventory `pending`):** `bathhouse`, `embassy`, `observatory`, `schoolhouse`, `barn`.  
-**Unresolved:** 273 concepts (`pending` or `needs-design`).
+**Facility candidates (inventory `pending`):** `embassy`, `observatory`, `schoolhouse`, `barn`.  
+**Shipped after tranche 1:** `bathhouse` → `enabled-facility` (see Phase 12 in audit).  
+**Unresolved:** 272 concepts (`pending` or `needs-design`).
 
 The tranche does not optimize for reducing the unresolved count. Resolved statuses must be
 trustworthy; unresolved statuses must be actionable.
@@ -41,11 +42,11 @@ Every card separates:
 ```text
 Corpus evidence              → quarantined vocabulary
 Canonical-model disposition  → Form / Facility / Organization / relationships
-Runtime action this slice    → NONE for all terms (no vocab ships here)
+Runtime action this slice    → NONE in tranche 1 (Bathhouse promoted in Phase 12 — see audit)
 ```
 
 Where a term belongs on Facility, disposition says **PRIMARY FACILITY CANDIDATE**. Runtime action
-remains **NONE** until a separate promotion plan is approved.
+in tranche 1 remains **NONE** until a separate promotion plan is approved.
 
 ---
 
@@ -167,27 +168,28 @@ Organization follow-up: activity vocabulary gap — audit separately
 `hammam`, `onsen`, `thermae`, `sweat_lodge` as **disposition leverage only** — those terms do not
 become runtime children of a Bathhouse Facility.
 
-| Layer                       | Finding                                                                                                                                                                                                                                                                                                                    |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Corpus evidence             | “Bathing service”; `care` function. Manifestations include `hammam`, `sweat_lodge`; `thermae` is composite; `onsen` is interior-scoped in refactor graph.                                                                                                                                                                  |
-| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE.** Distinct configured use from `hospital` (medical/healing care vs hygiene/bathing service). Form-independent label test **passes** — “Bathhouse” is lexicalized bathing premises and does not require Form: House (see compound-label rule). Civic and commercial discovery both plausible. |
-| Runtime action this slice   | **NONE**                                                                                                                                                                                                                                                                                                                   |
+| Layer                       | Finding                                                                                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Corpus evidence             | “Bathing service”; `care` function. Manifestations include `hammam`, `sweat_lodge`; `thermae` is composite; `onsen` is interior-scoped in refactor graph. |
+| Canonical-model disposition | **PRIMARY FACILITY CANDIDATE** — distinct from `hospital`; compound label passes.                                                                         |
+| Runtime action this slice   | Tranche 1: **NONE**; shipped Phase 12.                                                                                                                    |
 
-**Illustrative metadata (provisional — not approved for promotion):**
+**Approved registry metadata (Phase 12):**
 
-| Field            | Illustrative value                                                        |
-| ---------------- | ------------------------------------------------------------------------- |
-| id               | `bathhouse`                                                               |
-| label            | Bathhouse                                                                 |
-| description      | A building configured for bathing, hygiene, and related wellness service. |
-| authoringGroups  | `civic` and/or `commercial`                                               |
-| defaultFunctions | `care` (hygiene-oriented — review at promotion)                           |
-| searchTerms      | bathing, baths, hygiene, wellness, thermae                                |
+| Field            | Value                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| id               | `bathhouse`                                                      |
+| label            | Bathhouse                                                        |
+| description      | Bathing/hygiene/wellness premises — not medical treatment        |
+| authoringGroups  | `civic`, `commercial`                                            |
+| defaultFunctions | `care`                                                           |
+| aliases          | Public baths                                                     |
+| searchTerms      | bathing, baths, hygiene, wellness, hammam, thermae, public baths |
 
-**Open compositions (examples):** Hall + Bathhouse (civic baths); Form omitted + Bathhouse when
-morphology is incidental.
+**Open compositions (examples):** Hall + Bathhouse (civic); House + Bathhouse (commercial); Form
+omitted + Bathhouse when morphology is incidental.
 
-**Inventory:** `pending` (candidate).
+**Inventory:** `enabled-facility` (registry-derived).
 
 ---
 
@@ -316,14 +318,15 @@ runtime children.
 
 | id            | Disposition note                                           |
 | ------------- | ---------------------------------------------------------- |
-| `bathhouse`   | Hygiene/service premises; compound label passes            |
 | `embassy`     | Diplomatic premises; Organization coexistence clean        |
 | `observatory` | Observation premises; Site boundary at promotion           |
 | `schoolhouse` | Teaching premises; distinct from Library                   |
 | `barn`        | Agricultural-premises identity; not Warehouse/Stable proxy |
 
-Promotion requires separate explicit approval and its own implementation plan. Registry metadata in
-this note is illustrative only.
+**Shipped (Phase 12):** `bathhouse` — hygiene/service premises; compound label passes.
+
+Promotion of remaining candidates requires separate explicit approval. Registry metadata in this
+note is illustrative except where Phase 12 records approved Bathhouse fields.
 
 ### Organization follow-ups
 
@@ -339,9 +342,9 @@ this note is illustrative only.
 
 ---
 
-## Explicit non-goals (this slice)
+## Explicit non-goals (tranche 1 slice)
 
-- Runtime Facility or Form promotion
+- Runtime Facility or Form promotion _(Bathhouse shipped separately — Phase 12)_
 - Building presets / 2B
 - Manifestation pilot or corpus-graph retargeting (including `potion_shop`)
 - Organization activity implementation

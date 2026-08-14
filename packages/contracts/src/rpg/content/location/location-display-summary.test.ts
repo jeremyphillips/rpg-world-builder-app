@@ -128,6 +128,24 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
+  it('displays bathhouse via registry label without inferring Form house morphology', () => {
+    const civicBaths: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'bathhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(civicBaths)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Bathhouse',
+    })
+  })
+
   it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,

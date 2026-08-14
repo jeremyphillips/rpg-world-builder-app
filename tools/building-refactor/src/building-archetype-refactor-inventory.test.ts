@@ -85,6 +85,7 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('keep')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm)
     expect(statusById.get('checkpoint')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('lighthouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
+    expect(statusById.get('bathhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility)
     expect(statusById.get('blacksmith')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
     )
@@ -96,7 +97,6 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('embassy')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
     expect(statusById.get('schoolhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
-    expect(statusById.get('bathhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('observatory')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
   })
 
@@ -132,14 +132,14 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 273 concepts pending or awaiting design after registry-derived shipping', () => {
+  it('leaves 272 concepts pending or awaiting design after registry-derived shipping', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(273)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(108)
+    expect(unresolved).toHaveLength(272)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(107)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(165)
   })
 

@@ -257,6 +257,15 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['civic'],
     searchTerms: ['records', 'documents', 'custody'],
   },
+  bathhouse: {
+    label: 'Bathhouse',
+    description:
+      'A building configured for bathing, hygiene, and wellness service — not medical treatment premises.',
+    defaultFunctions: ['care'],
+    authoringGroups: ['civic', 'commercial'],
+    aliases: ['Public baths'],
+    searchTerms: ['bathing', 'baths', 'hygiene', 'wellness', 'hammam', 'thermae', 'public baths'],
+  },
   hospital: {
     label: 'Hospital',
     description: 'A building configured to provide healing, care, and welfare.',

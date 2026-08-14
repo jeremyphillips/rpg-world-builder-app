@@ -401,6 +401,12 @@ describe('legacy decomposition example compositions', () => {
     expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'town_hall' })).toEqual(
       { form: 'hall', facilityType: 'town_hall' },
     )
+    expect(buildingClassificationSchema.parse({ facilityType: 'bathhouse' })).toEqual({
+      facilityType: 'bathhouse',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'bathhouse' })).toEqual(
+      { form: 'hall', facilityType: 'bathhouse' },
+    )
   })
 
   it('derives functions from Facility only, not from legacy concept names', () => {
@@ -408,6 +414,7 @@ describe('legacy decomposition example compositions', () => {
     expect(getEffectiveBuildingFunctions({ form: 'house', facilityType: 'hospital' })).toEqual([
       'care',
     ])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'bathhouse' })).toEqual(['care'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'checkpoint' })).toEqual(['defense_watch'])
     expect(getEffectiveBuildingFunctions({ facilityType: 'lighthouse' })).toEqual(['defense_watch'])

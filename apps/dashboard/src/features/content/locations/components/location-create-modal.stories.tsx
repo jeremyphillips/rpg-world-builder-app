@@ -300,6 +300,36 @@ export const HallArchive: Story = {
   },
 }
 
+export const HallBathhouse: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'bathhouse',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Hall · Bathhouse'),
+    ).toBeVisible()
+  },
+}
+
+export const HouseBathhouse: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Commercial',
+      facility: 'bathhouse',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('House · Bathhouse'),
+    ).toBeVisible()
+  },
+}
+
 export const HallWatchPost: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],

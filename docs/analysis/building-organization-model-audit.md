@@ -1623,12 +1623,12 @@ presets — identified with the exact axis and at least two parent/child pairs b
 
 ### Corpus disposition (unchanged process)
 
-273 concepts remain `pending` or `needsDesign` in the refactor inventory after tranche 1.
-Non-inferable rows include `decompose` reconciliations (`gatehouse`, `manor`, `wizard_tower`,
-`apothecary`), `needs-design` (`blockhouse`), and `blacksmith` (rehome). Facility candidates
-(`bathhouse`, `embassy`, `observatory`, `schoolhouse`, `barn`) remain inventory `pending` until an
-explicit promotion plan ships registry ids. Shipped Form/Facility alignment derives from
-`@rpg/contracts` registries.
+272 concepts remain `pending` or `needsDesign` in the refactor inventory after tranche 1 and the
+Bathhouse Facility promotion. Non-inferable rows include `decompose` reconciliations (`gatehouse`,
+`manor`, `wizard_tower`, `apothecary`), `needs-design` (`blockhouse`), and `blacksmith` (rehome).
+Remaining Facility candidates (`embassy`, `observatory`, `schoolhouse`, `barn`) stay inventory
+`pending` until explicit promotion. Shipped Form/Facility alignment derives from `@rpg/contracts`
+registries — `bathhouse` is now `enabled-facility` via registry derivation.
 
 Full tranche-1 evidence cards:
 [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md).
@@ -1645,7 +1645,7 @@ matrix, create-flow track closure. Full note:
 | Axis     | Values                                                             |
 | -------- | ------------------------------------------------------------------ |
 | Form     | `house`, `tower`, `hall`, `keep`                                   |
-| Facility | 28 ids — `residence` … `stable` (see `BUILDING_FACILITY_TYPE_IDS`) |
+| Facility | 29 ids — `residence` … `stable` (see `BUILDING_FACILITY_TYPE_IDS`) |
 
 ### Facility admission rule
 
@@ -1692,7 +1692,7 @@ discovery failure observed in the Phase 7 scenario review.
 
 - Corpus disposition tranche 1 — [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md)
 - `blockhouse` — `needs-design` (morphology evidence)
-- `bathhouse`, `embassy`, `observatory`, `schoolhouse`, `barn` — Facility candidates (not shipped)
+- `embassy`, `observatory`, `schoolhouse`, `barn` — Facility candidates (not shipped)
 - Organization activity vocabulary gap around pharmacy/healing/herbal practice (Apothecary — Org audit)
 - Persisted Facility id rename for morphological ids (`watchtower`, `lighthouse`)
 - Building preset implementation (2B)
@@ -1704,3 +1704,28 @@ discovery failure observed in the Phase 7 scenario review.
 vocabulary fixes are verified, open composition remains valid, and no preset or manifestation
 trigger was found. Remaining identifier normalization and unresolved corpus concepts are independent
 follow-up work and do not keep the create-flow track open.
+
+## Phase 12 — Bathhouse Facility promotion
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** First post-convergence standalone Facility addition from tranche-1 disposition evidence.
+Full tranche-1 cards: [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md).
+
+### Shipped registry entry
+
+| id          | label     | defaultFunctions | authoringGroups       | Notes                                                               |
+| ----------- | --------- | ---------------- | --------------------- | ------------------------------------------------------------------- |
+| `bathhouse` | Bathhouse | `care`           | `civic`, `commercial` | Hygiene/bathing premises — distinct from `hospital` medical framing |
+
+Description emphasizes bathing/hygiene/wellness service, not medical treatment. Compound label
+passes Form-independent test (`bathhouse` ≠ Form `house`). Alias: Public baths.
+
+### Inventory
+
+Refactor inventory derives `bathhouse` → `enabled-facility` from `@rpg/contracts`. Unresolved count
+272 (`pending` + `needs-design`).
+
+### Next Facility candidates (unchanged by this slice)
+
+`embassy`, `observatory`, `schoolhouse`, `barn` — remain evidence-backed candidates; choose next
+after authoring review, not as a bundled promotion.
