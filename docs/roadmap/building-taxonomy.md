@@ -4,10 +4,11 @@ Status: Active (runtime model)
 **Building corpus convergence: CLOSED**  
 **Phase 20 — Commercial / Production vocabulary enrichment: COMPLETE**  
 **Phase 21 — Commercial / Production tail reconciliation: COMPLETE**  
+**Phase 22 — Final practical Building coverage review: COMPLETE**  
 Canonical planning document: Yes
 
 This is the **canonical planning entry point** for Building taxonomy — runtime model, deferred
-reopen triggers, and Phase 19–21 closeout. Broad corpus disposition is **closed**.
+reopen triggers, and Phase 19–22 sequencing. Broad corpus disposition is **closed**.
 Completed Cursor plans and analysis documents are supporting evidence only unless explicitly linked
 from the active or completed phase below. They are not alternate current roadmaps.
 
@@ -62,7 +63,8 @@ notes). If documentation and tests disagree, **tests win**.
 | Forms                                   |                                                                                   **4** — `house`, `tower`, `hall`, `keep` |
 | Facilities                              | **40** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
 | Research corpus                         |                                                                                                                    **308** |
-| Unresolved                              |                                                                                      **71** — see refactor inventory tests |
+| Unresolved                              |                                                                                      **56** — see refactor inventory tests |
+| Unresolved breakdown                    |                                                     **55** `pending` + **1** `needs-design` — post-Phase 22 snapshot below |
 | Legacy runtime archetypes (quarantined) |                                                                                                                    **143** |
 
 Persisted ids `watchtower` and `lighthouse` are accepted identifier debt (runtime labels: Watch post,
@@ -77,31 +79,58 @@ Beacon station). Do not infer morphology from the id.
 | `museum`     | `pending`          | 19C gate rejected Facility promotion — exhibition reads as flavor on library-class premises        |
 | `workshop`   | `enabled-facility` | **Phase 20A PROMOTE** — artisan craft/production premises; corpus `interior` disposition unchanged |
 
+**Post-Phase 22 unresolved snapshot** (verified 2026-08-14 — tests win):
+
+```text
+pending:          55
+needs-design:      1  (blockhouse)
+total unresolved: 56
+```
+
+| Corpus `kind`    | Unresolved | Inventory status split          | Post-Phase 22 posture                       |
+| ---------------- | ---------: | ------------------------------- | ------------------------------------------- |
+| `interior`       |     **38** | 38 `pending`                    | **Deferred** — out of scope                 |
+| `archetype`      |     **17** | 16 `pending` + 1 `needs-design` | 11 carry-forward controls + 6 cultural tail |
+| `overlay`        |      **1** | 1 `pending` (`tent_pavilion`)   | Scenario/context — intentionally unresolved |
+| `specialization` |      **0** | —                               | Closed in 22A (`orangery`, `silo`)          |
+| `not_building`   |      **0** | —                               | Closed in 22A (`pigsty` → outside)          |
+| `manifestation`  |      **0** | —                               | Closed — all dispositioned                  |
+
+Exact membership: post-Phase 22 tests in
+[`building-archetype-refactor-inventory.test.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.test.ts).
+22A disposition allowlists: `PHASE_22A_*` in
+[`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
+
+**Pre-Phase 22 entry snapshot** (historical): pending **70**, needs-design **1**, total **71**.
+Count-reconciliation note: `38 + 25 + 5 + 2 + 1 = 71` by kind; pending sum is
+`38 + 24 + 5 + 2 + 1 = 70` because `blockhouse` is `needs-design` within the 25 `archetype` rows.
+
 ## Completed
 
-| Work                                    | Outcome                                                                                                                      |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Taxonomy discovery (308-concept corpus) | Frozen evidence in [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md)                                      |
-| Model E (archetype-primary)             | Shipped, then **retired** at runtime                                                                                         |
-| Building ↔ Organization vertical slice  | Form + Facility persisted; Org domain/form/activity shipped                                                                  |
-| Form axis proof                         | `tower`, `hall`, then `keep`                                                                                                 |
-| Classification convergence              | Archetype quarantined; representative decompositions proven                                                                  |
-| Registry-derived inventory              | `enabled-form` / `enabled-facility` from contracts ids                                                                       |
-| Create-flow Phases 7–8                  | **Closed** — open composition holds; 2B not triggered                                                                        |
-| Preset investigation (2A)               | Frozen policy; **2B not approved**                                                                                           |
-| Manifestation evidence gate             | Failed — no pilot                                                                                                            |
-| Tranche 1 disposition                   | Inventory + later Facility promotions (`bathhouse` … `barn`)                                                                 |
-| Tier A sweep                            | **102** high-confidence rows; broad-sweep stopping rule **met**                                                              |
-| Tier B promotion                        | `granary`, `greenhouse`, `arena`                                                                                             |
-| Tier C composite queue                  | **24/24** reviewed; Family B reviewed (`academy` remains `pending`)                                                          |
-| Phase 19A morphology                    | **16/16** reviewed — 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design` (`blockhouse`); no Form promotion |
-| Phase 19B approximate Facility          | **11/11** reviewed — all `decompose` onto existing Facilities; **0** new Facility candidates                                 |
-| Phase 19C selective promotion           | **4/4** carry-forwards gate-reviewed — **0** runtime Form/Facility promotions                                                |
-| Phase 19D stopping review               | Stopping criteria met — **no** further broad corpus disposition; **110** rows remain deferred                                |
-| Phase 20A foundation Facility admission | **2 / 2** promoted — `workshop`, `office`; unresolved **109**                                                                |
-| Phase 20B specialist Facility admission | **2 / 8** promoted — `bakery`, `auction_house`; unresolved **107**                                                           |
-| Phase 20C authoring / discovery review  | Grouping held; Setup scanability verified at **40** Facilities; Storybook tag `phase-20-building-flows`                      |
-| Phase 21 Commercial / Production tail   | **38 / 38** reviewed — **34** `decompose`, **2** `outside-building-classification`, **2** `pending`; unresolved **71**       |
+| Work                                    | Outcome                                                                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy discovery (308-concept corpus) | Frozen evidence in [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md)                                         |
+| Model E (archetype-primary)             | Shipped, then **retired** at runtime                                                                                            |
+| Building ↔ Organization vertical slice  | Form + Facility persisted; Org domain/form/activity shipped                                                                     |
+| Form axis proof                         | `tower`, `hall`, then `keep`                                                                                                    |
+| Classification convergence              | Archetype quarantined; representative decompositions proven                                                                     |
+| Registry-derived inventory              | `enabled-form` / `enabled-facility` from contracts ids                                                                          |
+| Create-flow Phases 7–8                  | **Closed** — open composition holds; 2B not triggered                                                                           |
+| Preset investigation (2A)               | Frozen policy; **2B not approved**                                                                                              |
+| Manifestation evidence gate             | Failed — no pilot                                                                                                               |
+| Tranche 1 disposition                   | Inventory + later Facility promotions (`bathhouse` … `barn`)                                                                    |
+| Tier A sweep                            | **102** high-confidence rows; broad-sweep stopping rule **met**                                                                 |
+| Tier B promotion                        | `granary`, `greenhouse`, `arena`                                                                                                |
+| Tier C composite queue                  | **24/24** reviewed; Family B reviewed (`academy` remains `pending`)                                                             |
+| Phase 19A morphology                    | **16/16** reviewed — 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design` (`blockhouse`); no Form promotion    |
+| Phase 19B approximate Facility          | **11/11** reviewed — all `decompose` onto existing Facilities; **0** new Facility candidates                                    |
+| Phase 19C selective promotion           | **4/4** carry-forwards gate-reviewed — **0** runtime Form/Facility promotions                                                   |
+| Phase 19D stopping review               | Stopping criteria met — **no** further broad corpus disposition; **110** rows remain deferred                                   |
+| Phase 20A foundation Facility admission | **2 / 2** promoted — `workshop`, `office`; unresolved **109**                                                                   |
+| Phase 20B specialist Facility admission | **2 / 8** promoted — `bakery`, `auction_house`; unresolved **107**                                                              |
+| Phase 20C authoring / discovery review  | Grouping held; Setup scanability verified at **40** Facilities; Storybook tag `phase-20-building-flows`                         |
+| Phase 21 Commercial / Production tail   | **38 / 38** reviewed — **34** `decompose`, **2** `outside-building-classification`, **2** `pending`; unresolved **71**          |
+| Phase 22 Final practical coverage       | **22 / 22** 22A + urban audit — **14** `decompose`, **1** `outside-building-classification`, **7** `pending`; unresolved **56** |
 
 Completed-phase counts are historical closeout facts; only the **Current state** section should be
 used for present inventory totals.
@@ -515,6 +544,123 @@ No further enrichment phase is warranted from Phase 21 evidence alone.
 - retargeting the frozen corpus graph
 - optimizing unresolved-count reduction
 
+## Phase 22 — Final practical Building coverage review
+
+**Status:** COMPLETE (2026-08-14)
+
+Final bounded pass before stopping Building corpus taxonomy work. Two independent tracks executed:
+
+1. **22A** — residual non-interior corpus review against enriched Form + Facility vocabulary;
+2. **22B** — common urban premises coverage audit independent of the research corpus.
+
+| Subphase                                | Status   |
+| --------------------------------------- | -------- |
+| 22A Residual non-interior corpus review | COMPLETE |
+| 22B Common urban coverage audit         | COMPLETE |
+| 22C Selective closeout                  | COMPLETE |
+
+### Closeout (2026-08-14)
+
+**Entry snapshot:** pending **70**, needs-design **1**, total **71**.  
+**Exit snapshot:** pending **55**, needs-design **1**, total **56**.
+
+#### 22A — Residual corpus (22 / 22 reviewed)
+
+| Outcome                           |  Count | Terms                                                                                  |
+| --------------------------------- | -----: | -------------------------------------------------------------------------------------- |
+| `decompose`                       | **14** | See `PHASE_22A_DECOMPOSE_IDS`                                                          |
+| `outside-building-classification` |  **1** | `pigsty`                                                                               |
+| `pending` (intentional)           |  **7** | `charnel_house`, `folly`, `hermitage`, `kiva`, `mausoleum`, `nuraghe`, `tent_pavilion` |
+
+**Closed by Tower Form (2):** `bell_tower`, `clock_tower`
+
+**Closed by other existing vocabulary (12 decompose):**
+
+| Target                        | Terms                                                 |
+| ----------------------------- | ----------------------------------------------------- |
+| `lighthouse` (Beacon station) | `beacon_tower`                                        |
+| `barracks`                    | `command_post`                                        |
+| `checkpoint`                  | `guard_post`                                          |
+| `guildhall`                   | `paladin_chapterhouse`                                |
+| `apartment_building`          | `tenement`                                            |
+| `greenhouse`                  | `orangery`                                            |
+| `granary`                     | `silo`                                                |
+| `inn`                         | `hunting_lodge`                                       |
+| overlay composition           | `hovel`, `safe_house`, `smugglers_den`, `thieves_den` |
+
+**Outside Building classification (1):** `pigsty` (livestock enclosure — align with `sheepfold` gate)
+
+**Intentionally unresolved (7):** cultural/morphology/scenario tail — canonical vocabulary does not
+clearly preserve useful author-facing distinction; acceptable indefinite deferral.
+
+**Carry-forward controls (11):** not reopened — `blockhouse`, `academy`, `museum`, `slaughterhouse`,
+`tannery`, `mint`, `mortuary`, `crematorium`, `gambling_hall`, `brothel`, `washhouse`.
+
+#### 22B — Common urban coverage audit
+
+**Domains audited:** Housing, Food/hospitality, Retail/trade, Craft/production, Storage/logistics,
+Civic/administration, Security/emergency, Health/care, Education, Religion, Culture/leisure,
+Transport, Death care.
+
+**Urban probes evaluated (10):**
+
+```text
+fire station / firehouse
+post / courier office
+slaughterhouse
+mortuary / funeral premises
+crematorium
+washhouse / laundry
+watch / police station
+assembly / meeting hall
+public works / maintenance depot
+tenement
+```
+
+| Probe                   | Coverage verdict                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| Fire station            | **Awkward but acceptable** — `workshop` + `office` + Organization; no durable fire-premises gap    |
+| Post / courier office   | **Covered** — `office`                                                                             |
+| Slaughterhouse          | **Awkward but acceptable** — `factory` / `workshop`; Phase 20B reject stands — no new 22B evidence |
+| Mortuary / funeral      | **Awkward but acceptable** — `hospital` / `workshop` / `office`; no funerary cluster warranted     |
+| Crematorium             | **Awkward but acceptable** — production-form rhyme on `factory`; pairs with mortuary deferral      |
+| Washhouse / laundry     | **Awkward but acceptable** — `shop` / `workshop` / `bathhouse`; Phase 21 pending stands            |
+| Watch / police station  | **Covered** — `office` + `checkpoint` / `barracks` / Watch post                                    |
+| Assembly / meeting hall | **Covered** — `town_hall` / `guildhall` / `theater` / Hall Form                                    |
+| Public works depot      | **Covered** — `workshop` + `warehouse` + `office`                                                  |
+| Tenement                | **Covered** — `apartment_building` (22A decompose)                                                 |
+
+**Repeated missing premises concept:** **None**
+
+**Previously rejected candidates reopened:** **None** — urban audit did not produce new product
+evidence beyond Phase 20/21 conclusions.
+
+**Runtime outcome:** **0** new Forms, **0** new Facilities.
+
+**Conclusion:**
+
+```text
+COMMON URBAN COVERAGE: SUFFICIENT
+```
+
+### Final stopping rule (active)
+
+> Stop Building corpus taxonomy work unless real authoring usage exposes a concrete missing concept.
+
+Remaining **56** unresolved research rows (mostly **38** interiors + reviewed carry-forwards +
+cultural tail) may stay deferred indefinitely. Phase 22 confirms the canonical vocabulary is
+**practically useful for ordinary authoring**.
+
+### Non-goals (held)
+
+- reopening interiors or manifestations
+- broad corpus sweep or zero-pending chase
+- culturally narrow Facilities for flavor
+- every production process as a Facility
+- relitigating all Phase 20/21 rejects without new 22B evidence
+- Form × Facility compatibility, corpus graph retargeting, presets, manifestation runtime, new axes
+- exhaustive medieval/urban research
+
 ## Execution contract
 
 Every future bounded tranche follows this contract. A tranche does **not** automatically require a
@@ -550,8 +696,10 @@ roadmap cannot concisely own.
 | `workshop` promotion                                   | **Closed — promoted Phase 20A**                                                                                                     |
 | `museum` promotion                                     | Exhibition premises configuration case stronger than Library/Archive + spectacle Facilities                                         |
 | Low-confidence cultural tail                           | Manifestation work reopens, or repeated authoring gap after 19B–C                                                                   |
-| Remaining corpus (~71 unresolved)                      | Concrete product need outside Phase 20/21 scope — migration blocker, interior/manifestation axis — not count reduction              |
+| Remaining corpus (~56 unresolved)                      | **Closed at Phase 22** — stop unless authoring exposes a concrete gap                                                               |
 | Production / commercial corpus tail (~40)              | **Closed at Phase 21** — tail reconciled; no further disposition sweep                                                              |
+| Residual non-interior corpus tail (22)                 | **Closed at Phase 22A** — `PHASE_22A_*` disposition recorded                                                                        |
+| Common urban premises coverage                         | **Closed at Phase 22B** — `COMMON URBAN COVERAGE: SUFFICIENT`                                                                       |
 | Broad production sweep for count reduction             | **Do not reopen** solely to lower the unresolved count                                                                              |
 | Form × Facility compatibility matrices                 | A reviewed semantic counterexample to open composition                                                                              |
 | Searchable / grouped Form Setup                        | Form count materially exceeds current radio-card scanability (empirical warning ~8–10)                                              |

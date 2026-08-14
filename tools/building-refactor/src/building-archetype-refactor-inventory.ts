@@ -1290,6 +1290,138 @@ export const PHASE_21_DECOMPOSE_IDS = [
   ...PHASE_21_BANK_DECOMPOSE_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Phase 22 reviewed carry-forwards — comparison controls only; not 22A investigation targets.
+ * Reopen only when Phase 22B urban coverage produces new product evidence.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_22_REVIEWED_CARRY_FORWARD_IDS = [
+  'blockhouse',
+  'academy',
+  'museum',
+  'slaughterhouse',
+  'tannery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'gambling_hall',
+  'brothel',
+  'washhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 22A residual non-interior corpus allowlist — frozen 2026-08-14 from live inventory.
+ * Unresolved rows excluding `interior`, `manifestation`, and Phase 22 carry-forwards.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_22A_RESIDUAL_ALLOWLIST_IDS = [
+  'beacon_tower',
+  'bell_tower',
+  'charnel_house',
+  'clock_tower',
+  'command_post',
+  'folly',
+  'guard_post',
+  'hermitage',
+  'hovel',
+  'hunting_lodge',
+  'kiva',
+  'mausoleum',
+  'nuraghe',
+  'orangery',
+  'paladin_chapterhouse',
+  'pigsty',
+  'safe_house',
+  'silo',
+  'smugglers_den',
+  'tenement',
+  'tent_pavilion',
+  'thieves_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — tower morphology + beacon signaling premises. */
+export const PHASE_22A_LIGHTHOUSE_DECOMPOSE_IDS = [
+  'beacon_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — tower Form sufficient for bell/clock morphology. */
+export const PHASE_22A_TOWER_DECOMPOSE_IDS = [
+  'bell_tower',
+  'clock_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — military command premises. */
+export const PHASE_22A_BARRACKS_DECOMPOSE_IDS = [
+  'command_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — security/checkpoint premises. */
+export const PHASE_22A_CHECKPOINT_DECOMPOSE_IDS = [
+  'guard_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — order/chapter institution premises. */
+export const PHASE_22A_GUILDHALL_DECOMPOSE_IDS = [
+  'paladin_chapterhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — dense urban housing premises. */
+export const PHASE_22A_APARTMENT_BUILDING_DECOMPOSE_IDS = [
+  'tenement',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — greenhouse-class cultivation premises. */
+export const PHASE_22A_GREENHOUSE_DECOMPOSE_IDS = [
+  'orangery',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — bulk grain storage premises. */
+export const PHASE_22A_GRANARY_DECOMPOSE_IDS = [
+  'silo',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — rural hospitality premises. */
+export const PHASE_22A_INN_DECOMPOSE_IDS = [
+  'hunting_lodge',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — overlay/contextual composition onto shipped premises. */
+export const PHASE_22A_OVERLAY_DECOMPOSE_IDS = [
+  'hovel',
+  'safe_house',
+  'smugglers_den',
+  'thieves_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — livestock enclosure (align with sheepfold gate). */
+export const PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'pigsty',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — cultural/morphology tail; canonical vocabulary sufficient. */
+export const PHASE_22A_REVIEWED_PENDING_IDS = [
+  'charnel_house',
+  'folly',
+  'hermitage',
+  'kiva',
+  'mausoleum',
+  'nuraghe',
+  'tent_pavilion',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_22A_DECOMPOSE_IDS = [
+  ...PHASE_22A_LIGHTHOUSE_DECOMPOSE_IDS,
+  ...PHASE_22A_TOWER_DECOMPOSE_IDS,
+  ...PHASE_22A_BARRACKS_DECOMPOSE_IDS,
+  ...PHASE_22A_CHECKPOINT_DECOMPOSE_IDS,
+  ...PHASE_22A_GUILDHALL_DECOMPOSE_IDS,
+  ...PHASE_22A_APARTMENT_BUILDING_DECOMPOSE_IDS,
+  ...PHASE_22A_GREENHOUSE_DECOMPOSE_IDS,
+  ...PHASE_22A_GRANARY_DECOMPOSE_IDS,
+  ...PHASE_22A_INN_DECOMPOSE_IDS,
+  ...PHASE_22A_OVERLAY_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,
@@ -1364,6 +1496,11 @@ const INITIAL_STATUS_BY_ID = {
   ...statusMapForIds(PHASE_21_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
   ...statusMapForIds(
     PHASE_21_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(PHASE_22A_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
     BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
   ),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,

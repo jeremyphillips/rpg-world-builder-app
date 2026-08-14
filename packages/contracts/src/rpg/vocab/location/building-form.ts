@@ -13,23 +13,21 @@ export const BUILDING_FORM_TERM = {
 export const BUILDING_FORM_ENTRIES = {
   house: {
     label: 'House',
-    description:
-      'A small-scale enclosed building with a recognizable house envelope and massing, independent of its present use.',
+    description: 'A compact enclosed form with recognizable house massing, independent of use.',
   },
   tower: {
     label: 'Tower',
-    description:
-      'A tall, vertically emphasized built form, independent of watch, defense, residence, or other use.',
+    description: 'A tall, vertically emphasized form, independent of use.',
   },
   hall: {
     label: 'Hall',
     description:
-      'A building architecturally organized around a dominant hall volume, not merely a building that contains a hall room. Independent of civic, ceremonial, or commercial facility identity.',
+      'A form organized around a dominant hall volume, rather than merely containing a hall room.',
   },
   keep: {
     label: 'Keep',
     description:
-      'A compact, thick-walled massing organized as a dominant central block, independent of present use.',
+      'A compact, thick-walled form organized around a dominant central block, independent of use.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

@@ -10,6 +10,7 @@ import {
   BUILDING_ARCHETYPE_REFACTOR_STATUS,
   BUILDING_CORPUS_DISPOSITIONS,
   BUILDING_RESEARCH_CORPUS_IDS,
+  type BuildingCorpusDispositionKind,
   LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS,
   SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
   SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
@@ -47,6 +48,11 @@ import {
   PHASE_21_REVIEWED_PENDING_IDS,
   PHASE_21_WORKSHOP_DECOMPOSE_IDS,
   PHASE_21_OFFICE_DECOMPOSE_IDS,
+  PHASE_22_REVIEWED_CARRY_FORWARD_IDS,
+  PHASE_22A_RESIDUAL_ALLOWLIST_IDS,
+  PHASE_22A_DECOMPOSE_IDS,
+  PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  PHASE_22A_REVIEWED_PENDING_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -64,7 +70,7 @@ function sourceFilesUnder(directory: string): string[] {
   })
 }
 
-const SWEEP_FALSE_POSITIVE_PENDING_IDS = ['pigsty', 'tent_pavilion'] as const
+const SWEEP_FALSE_POSITIVE_PENDING_IDS = ['tent_pavilion'] as const
 
 describe('Building archetype refactor inventory', () => {
   it('accounts for all researched and formerly-runtime concepts exactly once', () => {
@@ -176,15 +182,128 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 71 concepts pending or awaiting design after Phase 21 tail reconciliation', () => {
+  it('leaves 56 concepts pending or awaiting design after Phase 22 closeout', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(71)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(25)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(46)
+    expect(unresolved).toHaveLength(56)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(17)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(39)
+  })
+
+  it('maps Phase 22A residual allowlist to reviewed statuses', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    expect(PHASE_22A_RESIDUAL_ALLOWLIST_IDS).toHaveLength(22)
+    expect(PHASE_22A_DECOMPOSE_IDS).toHaveLength(14)
+    expect(PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toEqual(['pigsty'])
+    expect(PHASE_22A_REVIEWED_PENDING_IDS).toEqual([
+      'charnel_house',
+      'folly',
+      'hermitage',
+      'kiva',
+      'mausoleum',
+      'nuraghe',
+      'tent_pavilion',
+    ])
+
+    for (const id of PHASE_22A_RESIDUAL_ALLOWLIST_IDS) {
+      expect(BUILDING_RESEARCH_CORPUS_IDS).toContain(id)
+      expect(PHASE_22_REVIEWED_CARRY_FORWARD_IDS).not.toContain(id)
+      expect(PHASE_21_ALLOWLIST_IDS).not.toContain(id)
+    }
+
+    for (const id of PHASE_22A_DECOMPOSE_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    }
+
+    for (const id of PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS) {
+      expect(statusById.get(id)).toBe(
+        BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+      )
+    }
+
+    for (const id of PHASE_22A_REVIEWED_PENDING_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    }
+
+    for (const id of PHASE_22_REVIEWED_CARRY_FORWARD_IDS) {
+      if (id === 'blockhouse') {
+        expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+        continue
+      }
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    }
+
+    expect(
+      [
+        ...PHASE_22A_DECOMPOSE_IDS,
+        ...PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+        ...PHASE_22A_REVIEWED_PENDING_IDS,
+      ].sort(),
+    ).toEqual([...PHASE_22A_RESIDUAL_ALLOWLIST_IDS].sort())
+  })
+
+  it('groups the post-Phase 22 unresolved corpus by disposition kind', () => {
+    const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
+      ({ status }) =>
+        status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
+        status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+    )
+    const pending = unresolved.filter(
+      ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending,
+    )
+    const needsDesign = unresolved.filter(
+      ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+    )
+
+    expect(pending).toHaveLength(55)
+    expect(needsDesign).toHaveLength(1)
+    expect(needsDesign.map(({ id }) => id)).toEqual(['blockhouse'])
+
+    const byKind = (kind: BuildingCorpusDispositionKind) =>
+      unresolved.filter(({ id }) => BUILDING_CORPUS_DISPOSITIONS[id].kind === kind)
+    const interior = byKind('interior')
+      .map(({ id }) => id)
+      .sort()
+    const archetypeEntries = byKind('archetype')
+    const overlay = byKind('overlay')
+      .map(({ id }) => id)
+      .sort()
+    const specialization = byKind('specialization')
+      .map(({ id }) => id)
+      .sort()
+    const notBuilding = byKind('not_building')
+      .map(({ id }) => id)
+      .sort()
+
+    expect(interior).toHaveLength(38)
+    expect(archetypeEntries).toHaveLength(17)
+    expect(overlay).toEqual(['tent_pavilion'])
+    expect(specialization).toEqual([])
+    expect(notBuilding).toEqual([])
+    expect(
+      interior.length +
+        archetypeEntries.length +
+        overlay.length +
+        specialization.length +
+        notBuilding.length,
+    ).toBe(56)
+
+    expect(
+      archetypeEntries.filter(
+        ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending,
+      ),
+    ).toHaveLength(16)
+    expect(
+      archetypeEntries.filter(
+        ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+      ),
+    ).toHaveLength(1)
   })
 
   it('maps every explicit Tier C disposition allowlist id to the reviewed status', () => {
@@ -539,7 +658,7 @@ describe('Building archetype refactor inventory', () => {
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toHaveLength(138)
+    expect(decomposed).toHaveLength(152)
     expect(decomposed).toEqual(
       expect.arrayContaining([
         'abbey',
@@ -594,7 +713,7 @@ describe('Building archetype refactor inventory', () => {
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
         ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
       ),
-    ).toHaveLength(57)
+    ).toHaveLength(58)
     expect(statusById.get('broch')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('crannog')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
@@ -603,7 +722,9 @@ describe('Building archetype refactor inventory', () => {
       BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
     )
     expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
-    expect(statusById.get('pigsty')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('pigsty')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
     expect(statusById.get('longhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('ferry_house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('bridge')).toBe(

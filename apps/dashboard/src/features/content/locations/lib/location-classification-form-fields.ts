@@ -104,9 +104,7 @@ function buildBuildingFacilityTypeField(
     placeholder: groupLabel
       ? `Search ${groupLabel.toLowerCase()} facilities…`
       : 'Search facility types…',
-    hint: groupLabel
-      ? `${groupLabel} suggestions are shown first. Search includes all facility types.`
-      : 'Search the complete enabled Facility vocabulary.',
+    hint: 'Choose how the building’s premises are used.',
     visibility: visibleForAuthoringType('building'),
     resolveFilteredOptions: (options, query, selected) => {
       if (query.trim() || !groupFacilityTypes) return rankOptionsByQuery(options, query)
