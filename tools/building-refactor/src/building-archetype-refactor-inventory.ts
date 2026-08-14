@@ -916,6 +916,45 @@ export const TIER_C_REVIEWED_PENDING_IDS = [
   'academy',
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Phase 19A morphology investigation allowlist — frozen 2026-08-14.
+ * Derived from roadmap investigation seeds; verified against live inventory.
+ * Evidence: docs/analysis/building-corpus-disposition-phase-19a-1.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS = [
+  'blockhouse',
+  'martello_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Sweep Family E morphology-rich cultural expressions (pending). */
+export const PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS = [
+  'broch',
+  'crannog',
+  'domus',
+  'igloo',
+  'longhouse',
+  'machiya',
+  'roundhouse',
+  'siheyuan',
+  'tholos',
+  'tipi',
+  'yurt',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Sweep Family E site/context morphology terms (pending). */
+export const PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS = [
+  'cave_dwelling',
+  'elven_tree_dwelling',
+  'shipwreck_dwelling',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS = [
+  ...PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS,
+  ...PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS,
+  ...PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,

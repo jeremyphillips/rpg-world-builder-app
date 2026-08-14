@@ -100,12 +100,12 @@ records implementation history through Phase 18. **Do not append further phases 
 
 **Phase 19 — Remaining Building corpus convergence**
 
-| Subphase                                | Status  |
-| --------------------------------------- | ------- |
-| 19A Morphology / Form evidence          | NEXT    |
-| 19B Production / Facility boundary      | PLANNED |
-| 19C Selective runtime promotion         | PLANNED |
-| 19D Exception cleanup / stopping review | PLANNED |
+| Subphase                                | Status      |
+| --------------------------------------- | ----------- |
+| 19A Morphology / Form evidence          | IN PROGRESS |
+| 19B Production / Facility boundary      | PLANNED     |
+| 19C Selective runtime promotion         | PLANNED     |
+| 19D Exception cleanup / stopping review | PLANNED     |
 
 Future work updates one row in this table rather than creating a new plan.
 
@@ -117,14 +117,17 @@ to continue corpus work.
 **Purpose:** Determine whether remaining morphology-rich terms expose a missing canonical Form, or
 whether House / Hall / Tower / Keep plus Facilities are sufficient.
 
-**Investigation seeds** (not an executable allowlist, not a promotion list):
+**Investigation seeds** (roadmap source list — frozen into executable allowlist 2026-08-14):
 
 `blockhouse`, `martello_tower`, `broch`, `longhouse`, `roundhouse`, `igloo`, `crannog`, `domus`,
 `machiya`, `siheyuan`, `tholos`, `tipi`, `yurt`, `cave_dwelling`, `elven_tree_dwelling`,
 `shipwreck_dwelling`
 
-These ids are investigation seeds only. The executable tranche begins only after an exact allowlist
-is derived from the current inventory.
+**Frozen allowlist (16):** `PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS` in
+[`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
+Inventory inspection:
+[`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
+Per-term disposition cards proceed from this list only — no scope expansion without a new checkpoint.
 
 **Gate**
 
@@ -230,6 +233,7 @@ Open these only for the reason listed. None of them is the current plan.
 | [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)     | Runtime authoring SSOT         | Understanding the shipped model                                           |
 | [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | 19A/19B — family rules, morphology pulls, approximate-Facility exceptions |
 | [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)             | Supporting evidence            | 19A — scale/unit gate, morphology protocol, composite cards               |
+| [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Active investigation evidence  | 19A — frozen allowlist, per-term cards, tranche closeout                  |
 | [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md) | Deferred evidence              | 2B is reopened                                                            |
 | [`building-create-phase-7-acceptance.md`](../analysis/building-create-phase-7-acceptance.md)                 | Historical; create-flow closed | Identifier debt, open composition, 2B acceptance findings                 |
 | [`building-corpus-disposition-tranche-1.md`](../analysis/building-corpus-disposition-tranche-1.md)           | Historical                     | Apothecary or early blockhouse cards                                      |

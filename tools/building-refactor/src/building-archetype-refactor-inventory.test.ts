@@ -22,6 +22,10 @@ import {
   TIER_C_DECOMPOSE_IDS,
   TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
   TIER_C_REVIEWED_PENDING_IDS,
+  PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS,
+  PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS,
+  PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS,
+  PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -238,6 +242,51 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('dzong')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
     expect(statusById.get('academy')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
     expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+  })
+
+  it('freezes the Phase 19A morphology allowlist from roadmap seeds against live inventory', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+    const reviewedIds = new Set<string>([
+      ...SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+      ...SWEEP_PRIOR_DECOMPOSE_IDS,
+      ...SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
+      ...SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+      ...SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+      ...SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+      ...SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+      ...TIER_C_DECOMPOSE_IDS,
+      ...TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    ])
+
+    expect(PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS).toEqual(['blockhouse', 'martello_tower'])
+    expect(PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS).toHaveLength(11)
+    expect(PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS).toEqual([
+      'cave_dwelling',
+      'elven_tree_dwelling',
+      'shipwreck_dwelling',
+    ])
+    expect(PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS).toHaveLength(16)
+    expect(new Set(PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS).size).toBe(16)
+
+    for (const id of PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS) {
+      expect(BUILDING_RESEARCH_CORPUS_IDS).toContain(id)
+      expect(reviewedIds.has(id)).toBe(false)
+
+      const status = statusById.get(id)
+      expect(
+        status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
+          status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+      ).toBe(true)
+    }
+
+    expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
+
+    for (const id of PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS) {
+      if (id === 'blockhouse') continue
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    }
   })
 
   it('derives granary, greenhouse, and arena enabled-facility from registry membership, not INITIAL_STATUS_BY_ID', () => {
