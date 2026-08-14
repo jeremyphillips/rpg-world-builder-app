@@ -73,21 +73,22 @@ Beacon station). Do not infer morphology from the id.
 
 ## Completed
 
-| Work                                    | Outcome                                                                                 |
-| --------------------------------------- | --------------------------------------------------------------------------------------- |
-| Taxonomy discovery (308-concept corpus) | Frozen evidence in [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md) |
-| Model E (archetype-primary)             | Shipped, then **retired** at runtime                                                    |
-| Building ↔ Organization vertical slice  | Form + Facility persisted; Org domain/form/activity shipped                             |
-| Form axis proof                         | `tower`, `hall`, then `keep`                                                            |
-| Classification convergence              | Archetype quarantined; representative decompositions proven                             |
-| Registry-derived inventory              | `enabled-form` / `enabled-facility` from contracts ids                                  |
-| Create-flow Phases 7–8                  | **Closed** — open composition holds; 2B not triggered                                   |
-| Preset investigation (2A)               | Frozen policy; **2B not approved**                                                      |
-| Manifestation evidence gate             | Failed — no pilot                                                                       |
-| Tranche 1 disposition                   | Inventory + later Facility promotions (`bathhouse` … `barn`)                            |
-| Tier A sweep                            | **102** high-confidence rows; broad-sweep stopping rule **met**                         |
-| Tier B promotion                        | `granary`, `greenhouse`, `arena`                                                        |
-| Tier C composite queue                  | **24/24** reviewed; Family B reviewed (`academy` remains `pending`)                     |
+| Work                                    | Outcome                                                                                                                      |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy discovery (308-concept corpus) | Frozen evidence in [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md)                                      |
+| Model E (archetype-primary)             | Shipped, then **retired** at runtime                                                                                         |
+| Building ↔ Organization vertical slice  | Form + Facility persisted; Org domain/form/activity shipped                                                                  |
+| Form axis proof                         | `tower`, `hall`, then `keep`                                                                                                 |
+| Classification convergence              | Archetype quarantined; representative decompositions proven                                                                  |
+| Registry-derived inventory              | `enabled-form` / `enabled-facility` from contracts ids                                                                       |
+| Create-flow Phases 7–8                  | **Closed** — open composition holds; 2B not triggered                                                                        |
+| Preset investigation (2A)               | Frozen policy; **2B not approved**                                                                                           |
+| Manifestation evidence gate             | Failed — no pilot                                                                                                            |
+| Tranche 1 disposition                   | Inventory + later Facility promotions (`bathhouse` … `barn`)                                                                 |
+| Tier A sweep                            | **102** high-confidence rows; broad-sweep stopping rule **met**                                                              |
+| Tier B promotion                        | `granary`, `greenhouse`, `arena`                                                                                             |
+| Tier C composite queue                  | **24/24** reviewed; Family B reviewed (`academy` remains `pending`)                                                          |
+| Phase 19A morphology                    | **16/16** reviewed — 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design` (`blockhouse`); no Form promotion |
 
 Completed-phase counts are historical closeout facts; only the **Current state** section should be
 used for present inventory totals.
@@ -109,10 +110,10 @@ records implementation history through Phase 18. **Do not append further phases 
 
 Future work updates one row in this table rather than creating a new plan.
 
-Do not create a new phase for every handful of corpus terms. Do not start 19A until the user asks
-to continue corpus work.
+Do not create a new phase for every handful of corpus terms. **19A is closed.** Do not start 19B
+until the user asks to continue corpus work.
 
-### 19A — Morphology / Form evidence
+### 19A — Morphology / Form evidence (closed)
 
 **Purpose:** Determine whether remaining morphology-rich terms expose a missing canonical Form, or
 whether House / Hall / Tower / Keep plus Facilities are sufficient.
@@ -132,9 +133,10 @@ Per-term disposition cards proceed from this list only — no scope expansion wi
 **Closeout (2026-08-14):** 13 `decompose`, 2 `outside-building-classification`, 1 `needs-design`
 (`blockhouse`). Evidence:
 [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
-Only `blockhouse` remains a credible **19C Form** candidate.
+Only `blockhouse` remains a credible **19C Form** candidate. Evidence note **closed** —
+[`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
 
-**Gate**
+**Gate** (historical)
 
 ```text
 scale / unit
@@ -145,13 +147,11 @@ scale / unit
 
 Runtime Form promotion is a **separate 19C** decision if a term actually earns admission.
 
-Evidence to consult when 19A starts:
-[`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)
-(morphology pull list),
-[`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)
-(morphology protocol).
+Supporting evidence (historical): [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md),
+[`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md),
+[`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md).
 
-### 19B — Production / Facility boundary
+### 19B — Production / Facility boundary (next)
 
 **Purpose:** Determine whether existing Facilities (Factory, Warehouse, Shop, Checkpoint, Barn, …)
 preserve the configured-premises distinction, or whether a Facility is genuinely missing.
@@ -219,7 +219,7 @@ roadmap cannot concisely own.
 | Archetype deletion                                     | No remaining migration/research consumers; quarantine stays until then                                                           |
 | `watchtower` / `lighthouse` persisted-id normalization | Real API/domain confusion, lexical-id inference in new code, or a broader Facility-id pass                                       |
 | `academy` promotion                                    | Premises distinction materially exceeds Schoolhouse plus institution identity                                                    |
-| Low-confidence cultural tail                           | 19A exposes repeated missing morphology, or manifestation work reopens                                                           |
+| Low-confidence cultural tail                           | Manifestation work reopens, or repeated authoring gap after 19B–C                                                                |
 | Broad production sweep for count reduction             | **Do not reopen** solely to lower the unresolved count                                                                           |
 | Form × Facility compatibility matrices                 | A reviewed semantic counterexample to open composition                                                                           |
 | Searchable / grouped Form Setup                        | Form count materially exceeds current radio-card scanability (empirical warning ~8–10)                                           |
@@ -233,20 +233,20 @@ Do not create speculative implementation work from this table.
 
 Open these only for the reason listed. None of them is the current plan.
 
-| Document                                                                                                     | Status                         | Open when                                                                 |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------ | ------------------------------------------------------------------------- |
-| [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)     | Runtime authoring SSOT         | Understanding the shipped model                                           |
-| [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | 19A/19B — family rules, morphology pulls, approximate-Facility exceptions |
-| [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)             | Supporting evidence            | 19A — scale/unit gate, morphology protocol, composite cards               |
-| [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Closed supporting evidence     | 19A closeout — allowlist, rules, disposition cards                        |
-| [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md) | Deferred evidence              | 2B is reopened                                                            |
-| [`building-create-phase-7-acceptance.md`](../analysis/building-create-phase-7-acceptance.md)                 | Historical; create-flow closed | Identifier debt, open composition, 2B acceptance findings                 |
-| [`building-corpus-disposition-tranche-1.md`](../analysis/building-corpus-disposition-tranche-1.md)           | Historical                     | Apothecary or early blockhouse cards                                      |
-| [`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md)                   | Closed audit                   | Original axis split, Org 7c/7d, Form admission protocol                   |
-| [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md)                                         | Frozen discovery               | Reconstructing the 308-concept matrix                                     |
-| [`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md)                       | Superseded                     | Retired Model E implementation history                                    |
-| [`building-create-relationship-tabs-phase-0.md`](../analysis/building-create-relationship-tabs-phase-0.md)   | Superseded                     | Pre-implementation create-flow architecture                               |
-| [`create-flow.md`](../../apps/dashboard/docs/create-flow.md)                                                 | Runtime create-flow SSOT       | Shared shell / Add-Pending ownership                                      |
+| Document                                                                                                     | Status                         | Open when                                                               |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------ | ----------------------------------------------------------------------- |
+| [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)     | Runtime authoring SSOT         | Understanding the shipped model                                         |
+| [`building-corpus-disposition-sweep-1.md`](../analysis/building-corpus-disposition-sweep-1.md)               | Supporting evidence            | 19B — family rules, morphology pulls, approximate-Facility exceptions   |
+| [`building-corpus-disposition-tier-c-1.md`](../analysis/building-corpus-disposition-tier-c-1.md)             | Closed supporting evidence     | Morphology protocol history; scale/unit gate                            |
+| [`building-corpus-disposition-phase-19a-1.md`](../analysis/building-corpus-disposition-phase-19a-1.md)       | Closed                         | 19A morphology closeout — do not append; use for historical rules/cards |
+| [`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md) | Deferred evidence              | 2B is reopened                                                          |
+| [`building-create-phase-7-acceptance.md`](../analysis/building-create-phase-7-acceptance.md)                 | Historical; create-flow closed | Identifier debt, open composition, 2B acceptance findings               |
+| [`building-corpus-disposition-tranche-1.md`](../analysis/building-corpus-disposition-tranche-1.md)           | Historical                     | Apothecary or early blockhouse cards                                    |
+| [`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md)                   | Closed audit                   | Original axis split, Org 7c/7d, Form admission protocol                 |
+| [`building-taxonomy-discovery.md`](./building-taxonomy-discovery.md)                                         | Frozen discovery               | Reconstructing the 308-concept matrix                                   |
+| [`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md)                       | Superseded                     | Retired Model E implementation history                                  |
+| [`building-create-relationship-tabs-phase-0.md`](../analysis/building-create-relationship-tabs-phase-0.md)   | Superseded                     | Pre-implementation create-flow architecture                             |
+| [`create-flow.md`](../../apps/dashboard/docs/create-flow.md)                                                 | Runtime create-flow SSOT       | Shared shell / Add-Pending ownership                                    |
 
 ## Completed Cursor plans (do not reopen)
 

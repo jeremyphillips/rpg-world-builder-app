@@ -1,10 +1,11 @@
 # Building corpus disposition — Phase 19A tranche 1
 
-**Status:** Closed supporting evidence  
+**Status:** Closed  
 **Current planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
 
-This note owns the Phase 19A morphology allowlist, disposition cards, and frozen inventory
-allowlists. It is not the current plan.
+Phase 19A closed 2026-08-14. This note owns the morphology allowlist, disposition cards, and frozen
+inventory allowlists. It is **not** the current plan — **do not append** further Phase 19A work here;
+19B continues from the roadmap.
 
 **Checkpoint date:** 2026-08-14  
 **Scope:** All 16 roadmap morphology seeds reviewed. Inventory + analysis only — no runtime Form/Facility
@@ -183,3 +184,14 @@ Example-only (not recipe): Building row with Form `house` + `residence` under a 
 | Unresolved corpus (`pending` + `needs-design`)  |   121 | inventory tests       |
 
 No corpus-graph retargeting. No runtime registry changes.
+
+---
+
+## Phase closeout
+
+**Closed:** 2026-08-14  
+**Next subphase:** 19B Production / Facility boundary — see
+[`building-taxonomy.md`](../roadmap/building-taxonomy.md).
+
+**Do not append** to this note. Future bounded tranches follow the roadmap execution contract; open
+a new analysis note only if 19B+ produces reusable evidence the roadmap cannot own.
