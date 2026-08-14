@@ -871,11 +871,18 @@ export const TIER_C_BATCH2_DECOMPOSE_IDS = ['dzong'] as const satisfies readonly
 /** Batch 3A — religious institution / premises. */
 export const TIER_C_BATCH3A_DECOMPOSE_IDS = ['abbey'] as const satisfies readonly BuildingCorpusId[]
 
+export const TIER_C_BATCH3A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'lamasery',
+  'shinto_shrine',
+  'wat',
+] as const satisfies readonly BuildingCorpusId[]
+
 /** Batch 3B — education / care institution composites. */
 export const TIER_C_BATCH3B_DECOMPOSE_IDS = [
+  'gymnasium',
+  'leprosarium',
   'mage_college',
   'university_college',
-  'leprosarium',
 ] as const satisfies readonly BuildingCorpusId[]
 
 /** Batch 4 — mixed composite review batch (independent cards). */
@@ -885,7 +892,12 @@ export const TIER_C_BATCH4_DECOMPOSE_IDS = [
 ] as const satisfies readonly BuildingCorpusId[]
 
 export const TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'dwarven_forgehold',
+  'farmstead',
+  'ksar',
   'palace_complex',
+  'souk',
+  'yamen',
 ] as const satisfies readonly BuildingCorpusId[]
 
 /** Family B non-composite institution terms reviewed 2026-08-14. */
@@ -893,6 +905,11 @@ export const TIER_C_FAMILY_B_DECOMPOSE_IDS = [
   'adventurers_guild',
   'customs_house',
   'orphanage',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Reviewed Tier C / Family B terms intentionally kept pending (concrete trigger on card). */
+export const TIER_C_REVIEWED_PENDING_IDS = [
+  'academy',
 ] as const satisfies readonly BuildingCorpusId[]
 
 export const TIER_C_DECOMPOSE_IDS = [
@@ -907,6 +924,7 @@ export const TIER_C_DECOMPOSE_IDS = [
 export const TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
   ...TIER_C_BATCH1_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
   ...TIER_C_BATCH2_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH3A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
   ...TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 

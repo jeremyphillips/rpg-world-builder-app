@@ -1798,16 +1798,16 @@ Full sweep evidence:
 [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md).
 
 **Status:** Sweep 1 Tier A dispositions **implemented** in refactor inventory. Runtime Facility promotion
-remains a separate plan. Tier B shortlist is evidence only. Tier C is the remaining detailed-review queue.
+remains a separate plan. Tier B shortlist is evidence only. Tier C composite queue **closed** (2026-08-14).
 
 ### Inventory outcomes
 
-| Status                            | Count | Notes                                                                                                                   |
-| --------------------------------- | ----: | ----------------------------------------------------------------------------------------------------------------------- |
-| `outside-building-classification` |    39 | Family F post false-positive audit                                                                                      |
-| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows                                                     |
-| `needs-design`                    |     1 | `blockhouse` unchanged                                                                                                  |
-| Unresolved                        |   145 | Tier C tranche 1 + Batch 2 — see [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md) |
+| Status                            | Count | Notes                                                                                                        |
+| --------------------------------- | ----: | ------------------------------------------------------------------------------------------------------------ |
+| `outside-building-classification` |    39 | Family F post false-positive audit                                                                           |
+| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows                                          |
+| `needs-design`                    |     1 | `blockhouse` unchanged                                                                                       |
+| Unresolved                        |   136 | Tier C closeout — see [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md) |
 
 27 terms returned to `pending` during the Family F/E false-positive audit (see sweep note §False-positive
 audit). Tier A reviewed count is **102**, not a preserved row target.
@@ -1849,7 +1849,7 @@ Inventory derives all three → `enabled-facility` from `BUILDING_FACILITY_TYPE_
 Museum / Workshop / Academy promotion, `silo` / `orangery` runtime synonyms, Form promotion, new
 authoring groups, Setup redesign.
 
-## Phase 18 — Tier C composite disposition tranche 1
+## Phase 18 — Tier C composite disposition (closeout)
 
 **Checkpoint date:** 2026-08-14  
 **Scope:** Review all 24 composite-queue terms, blockhouse morphology protocol, and Family B
@@ -1857,18 +1857,23 @@ non-composite institution terms. Inventory + analysis only.
 
 Full evidence: [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md).
 
-**Status:** **Implemented** (tranche 1 + Batch 2). 28 terms reviewed (24 composite queue + 4 Family B).
-**18** inventory dispositions (12 `decompose`, 6 `outside-building-classification`). **12** remain
-`pending` or `needs-design` with documented triggers. Runtime unchanged.
+**Status:** **Implemented** (full closeout). 28 terms reviewed (24 composite queue + 4 Family B).
+
+| Queue                | Outcome                                          |
+| -------------------- | ------------------------------------------------ |
+| Composite queue (24) | **24 / 24 reviewed and dispositioned**           |
+| Family B (4)         | **4 / 4 reviewed** — `academy` remains `pending` |
+
+**23** composite inventory dispositions (13 `decompose`, 11 `outside-building-classification` in composite queue). **3** Family B `decompose`. Runtime unchanged.
 
 ### Inventory outcomes
 
 | Status                            | Count | Notes                                                           |
 | --------------------------------- | ----: | --------------------------------------------------------------- |
-| `decompose` (sweep + Tier C)      |    79 | +12 Tier C rows (incl. Batch 2 `dzong`)                         |
-| `outside-building-classification` |    45 | +6 Tier C rows (incl. Batch 2 fortifications)                   |
+| `decompose` (sweep + Tier C)      |    80 | +13 Tier C rows (incl. `gymnasium`, Family B)                   |
+| `outside-building-classification` |    53 | +14 Tier C rows (scale-gated compounds incl. `souk`, `wat`)     |
 | `needs-design`                    |     1 | `blockhouse` — morphology protocol documented, status unchanged |
-| Unresolved                        |   145 | 144 `pending` + `blockhouse`                                    |
+| Unresolved                        |   136 | 135 `pending` + `blockhouse`                                    |
 
 ### Batch 1 legacy runtime (dispositioned)
 
@@ -1887,6 +1892,46 @@ Full evidence: [`building-corpus-disposition-tier-c-1.md`](./building-corpus-dis
 | `fortress` | `outside-building-classification` |
 | `kasbah`   | `outside-building-classification` |
 | `dzong`    | `decompose`                       |
+
+### Batch 3A religious (dispositioned)
+
+| id              | Outcome                           |
+| --------------- | --------------------------------- |
+| `abbey`         | `decompose`                       |
+| `lamasery`      | `outside-building-classification` |
+| `wat`           | `outside-building-classification` |
+| `shinto_shrine` | `outside-building-classification` |
+
+### Batch 3B education / care (dispositioned)
+
+| id                   | Outcome     |
+| -------------------- | ----------- |
+| `gymnasium`          | `decompose` |
+| `mage_college`       | `decompose` |
+| `university_college` | `decompose` |
+| `leprosarium`        | `decompose` |
+
+### Batch 4 mixed composites (dispositioned)
+
+| id                  | Outcome                           |
+| ------------------- | --------------------------------- |
+| `farmstead`         | `outside-building-classification` |
+| `palace_complex`    | `outside-building-classification` |
+| `souk`              | `outside-building-classification` |
+| `dwarven_forgehold` | `outside-building-classification` |
+| `ksar`              | `outside-building-classification` |
+| `yamen`             | `outside-building-classification` |
+| `royal_mews`        | `decompose`                       |
+| `thermae`           | `decompose`                       |
+
+### Family B (dispositioned / pending)
+
+| id                  | Outcome     |
+| ------------------- | ----------- |
+| `adventurers_guild` | `decompose` |
+| `customs_house`     | `decompose` |
+| `orphanage`         | `decompose` |
+| `academy`           | `pending`   |
 
 ### Explicit non-goals (Tier C)
 

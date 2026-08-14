@@ -21,6 +21,7 @@ import {
   TIER_C_COMPOSITE_QUEUE_IDS,
   TIER_C_DECOMPOSE_IDS,
   TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  TIER_C_REVIEWED_PENDING_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -175,15 +176,15 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 145 concepts pending or awaiting design after Tier C Batch 2', () => {
+  it('leaves 136 concepts pending or awaiting design after Tier C composite closeout', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(145)
+    expect(unresolved).toHaveLength(136)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(69)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(76)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(67)
   })
 
   it('maps every explicit Tier C disposition allowlist id to the reviewed status', () => {
@@ -202,10 +203,32 @@ describe('Building archetype refactor inventory', () => {
     }
 
     expect(TIER_C_COMPOSITE_QUEUE_IDS).toHaveLength(24)
-    expect(TIER_C_DECOMPOSE_IDS).toHaveLength(12)
-    expect(TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toHaveLength(6)
+    expect(TIER_C_DECOMPOSE_IDS).toHaveLength(13)
+    expect(TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toHaveLength(14)
+    expect(TIER_C_REVIEWED_PENDING_IDS).toEqual(['academy'])
+
+    for (const id of TIER_C_COMPOSITE_QUEUE_IDS) {
+      const status = statusById.get(id)
+      expect(status).not.toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    }
 
     expect(statusById.get('monastery')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('lamasery')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
+    expect(statusById.get('wat')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
+    expect(statusById.get('shinto_shrine')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
+    expect(statusById.get('gymnasium')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    expect(statusById.get('souk')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
+    expect(statusById.get('dwarven_forgehold')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
     expect(statusById.get('shipyard')).toBe(
       BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
     )
@@ -305,13 +328,13 @@ describe('Building archetype refactor inventory', () => {
       BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
         ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
       ),
-    ).toHaveLength(45)
+    ).toHaveLength(53)
 
     const decomposed = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toHaveLength(79)
+    expect(decomposed).toHaveLength(80)
     expect(decomposed).toEqual(
       expect.arrayContaining([
         'abbey',
@@ -324,6 +347,7 @@ describe('Building archetype refactor inventory', () => {
         'dzong',
         'gatehouse',
         'general_store',
+        'gymnasium',
         'haunted_manor',
         'hammam',
         'healers_house',

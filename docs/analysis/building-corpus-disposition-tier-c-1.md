@@ -14,20 +14,19 @@ sweep 1 [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition
 
 ## Summary
 
-| Metric                                  | Before Tier C |            After Tier C tranche 1 |
-| --------------------------------------- | ------------: | --------------------------------: |
-| Composite queue reviewed                |        0 / 24 |                       **24 / 24** |
-| Family B non-composite reviewed         |         0 / 4 |                         **4 / 4** |
-| Batch 2 defense/massing dispositioned   |             — |            **5 / 5** (2026-08-14) |
-| Blockhouse morphology protocol          |             — | **Documented** (status unchanged) |
-| `decompose` (sweep + Tier C)            |            67 |                            **79** |
-| `outside-building-classification`       |            39 |                            **45** |
-| `needs-design`                          |             1 |                  1 (`blockhouse`) |
-| Unresolved (`pending` + `needs-design`) |           163 |                           **145** |
-| Runtime Form/Facility promotion         |             — |                          **NONE** |
+| Metric                                  | Before Tier C   | After Tier C closeout                            |
+| --------------------------------------- | --------------- | ------------------------------------------------ |
+| **Composite queue**                     | 0 / 24 reviewed | **24 / 24 reviewed and dispositioned**           |
+| **Family B**                            | 0 / 4 reviewed  | **4 / 4 reviewed** (`academy` remains `pending`) |
+| Blockhouse morphology protocol          | —               | Documented (`needs-design` unchanged)            |
+| `decompose` (sweep + Tier C)            | 67              | **80**                                           |
+| `outside-building-classification`       | 39              | **53**                                           |
+| `needs-design`                          | 1               | 1 (`blockhouse`)                                 |
+| Unresolved (`pending` + `needs-design`) | 163             | **136**                                          |
+| Runtime Form/Facility promotion         | —               | **NONE**                                         |
 
-**Tier C dispositioned (tranche 1 + Batch 2):** 18 terms (12 `decompose`, 6 `outside-building-classification`).  
-**Reviewed, kept `pending`:** 16 composite terms + `academy` (concrete triggers on cards below).
+**Tier C inventory (composite queue only):** 13 `decompose`, 11 `outside-building-classification` (24 total).  
+**Family B inventory:** 3 `decompose`; `academy` reviewed — **`pending`** (Tier B trigger on card).
 
 ---
 
@@ -192,15 +191,35 @@ Compact card — monastery Batch 1 precedent; subordinate/community nuance is Or
 | Facility     | `temple` + optional `residence` / `library` as authored |
 | Runtime      | **NONE**                                                |
 
-### lamasery, wat → KEEP PENDING
+### lamasery → OUTSIDE-BUILDING-CLASSIFICATION
 
-Cultural religious compound — canonical axes may suffice (`temple` + Organization), but stable morphology and Site-scale meaning unresolved (§ cultural labels).
+| Layer                 | Finding                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| Scale gate            | Corpus/taxonomy primary referent: **monastic complex** (compound), not one worship Building |
+| Canonical owner       | Site / multi-structure religious compound                                                   |
+| Constituent Buildings | `temple`, `residence`, `library`, etc. on individual rows + Organization                    |
+| vs decompose          | Do not choose decompose merely because Temple + Organization describe parts                 |
+| Runtime               | **NONE**                                                                                    |
 
-### shinto_shrine → KEEP PENDING
+### wat → OUTSIDE-BUILDING-CLASSIFICATION
 
-Shrine vs temple semantics; outdoor/Site boundary (`open_air_shrine` already outside-building). Trigger: shrine premises vs Site shrine disposition.
+| Layer                 | Finding                                                         |
+| --------------------- | --------------------------------------------------------------- |
+| Scale gate            | Corpus/taxonomy: **temple-monastery complex** (compound)        |
+| Canonical owner       | Site / religious compound                                       |
+| Constituent Buildings | `temple`, `schoolhouse`, `library` as applicable + Organization |
+| Runtime               | **NONE**                                                        |
 
-**Batch 3A inventory:** `abbey` → `decompose`.
+### shinto_shrine → OUTSIDE-BUILDING-CLASSIFICATION
+
+| Layer                | Finding                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| Scale gate           | Corpus/taxonomy: **kami veneration precinct** (gates + halls) — precinct = Site + buildings |
+| vs `open_air_shrine` | Outdoor/unroofed shrine remains `outside-building-classification` (sweep Family F)          |
+| Canonical owner      | Site / shrine precinct — not one Building label                                             |
+| Runtime              | **NONE**                                                                                    |
+
+**Batch 3A inventory:** `abbey` → `decompose`; `lamasery`, `wat`, `shinto_shrine` → `outside-building-classification`.
 
 ---
 
@@ -223,11 +242,18 @@ Shrine vs temple semantics; outdoor/Site boundary (`open_air_shrine` already out
 | Organization | Care institution operator                                       |
 | Runtime      | **NONE**                                                        |
 
-### gymnasium → KEEP PENDING
+### gymnasium → DECOMPOSE
 
-Athletics + school dual use; sweep noted `palaestra` / gymnasium infrastructure conflation. Trigger: institution premises vs athletic Site/infrastructure.
+| Layer              | Finding                                                                                                                                                                                 |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Corpus             | Classical **educational institution** (athletics + education + baths bundle) — not modern “gym” alone                                                                                   |
+| Facility           | `schoolhouse` when instructional premises apply; `bathhouse` only when bath premises genuinely authored                                                                                 |
+| Organization       | School/institution operator                                                                                                                                                             |
+| Explicitly **not** | **Arena** (combat spectacle — shipped `arena`); **Bathhouse** as default (premises must be authored); **Site athletic grounds** / `palaestra` (infrastructure — sweep outside-building) |
+| Modern overload    | Recorded — disposition follows **historical/classical** institution meaning                                                                                                             |
+| Runtime            | **NONE**                                                                                                                                                                                |
 
-**Batch 3B inventory:** `mage_college`, `university_college`, `leprosarium` → `decompose`.
+**Batch 3B inventory:** `gymnasium`, `mage_college`, `university_college`, `leprosarium` → `decompose`.
 
 ---
 
@@ -235,18 +261,20 @@ Athletics + school dual use; sweep noted `palaestra` / gymnasium infrastructure 
 
 Independent cards — no batch-wide disposition rule.
 
-| Term                | Outcome              | Notes                                                                                                  |
-| ------------------- | -------------------- | ------------------------------------------------------------------------------------------------------ |
-| `farmstead`         | **KEEP PENDING**     | Scale gate: one Building vs agricultural compound/Site                                                 |
-| `palace_complex`    | **OUTSIDE-BUILDING** | Complex-scale; link `palace` card — not forced single-Building decompose                               |
-| `royal_mews`        | **DECOMPOSE**        | `stable` premises + Organization/status relationships                                                  |
-| `souk`              | **KEEP PENDING**     | Market compound — Site bazaar vs `market`/`shop` Buildings                                             |
-| `thermae`           | **DECOMPOSE**        | Bath complex — `bathhouse` axes suffice; corpus expression frozen (`hammam`, `thermae` in searchTerms) |
-| `dwarven_forgehold` | **KEEP PENDING**     | Fantasy production + dwelling + defense compound                                                       |
-| `ksar`              | **KEEP PENDING**     | Fortified compound — cultural / Site scale (§ cultural labels)                                         |
-| `yamen`             | **KEEP PENDING**     | Administrative compound — cultural / Site scale                                                        |
+| Term                | Outcome              | Notes                                                                                                                                                        |
+| ------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `farmstead`         | **OUTSIDE-BUILDING** | Agriculture composite flagship (dwelling + barns + yards) — Site/compound; child Buildings authored separately                                               |
+| `palace_complex`    | **OUTSIDE-BUILDING** | Complex-scale; link `palace` card                                                                                                                            |
+| `royal_mews`        | **DECOMPOSE**        | `stable` premises + Organization/status relationships                                                                                                        |
+| `souk`              | **OUTSIDE-BUILDING** | Corpus primary referent: **retail district / bazaar** (shop lanes), not single `market` premises — `market` Facility remains for configured market Buildings |
+| `thermae`           | **DECOMPOSE**        | `bathhouse` axes suffice for bath premises; corpus expression frozen                                                                                         |
+| `dwarven_forgehold` | **OUTSIDE-BUILDING** | Scale gate: forge + fortress + **settlement** compound (dzong rhyme) — not one Building                                                                      |
+| `ksar`              | **OUTSIDE-BUILDING** | Fortified village compound — Site scale                                                                                                                      |
+| `yamen`             | **OUTSIDE-BUILDING** | Magistrate/administrative compound — Site scale                                                                                                              |
 
-**Batch 4 inventory:** `palace_complex` → `outside-building-classification`; `royal_mews`, `thermae` → `decompose`.
+**Batch 4 inventory:** `dwarven_forgehold`, `farmstead`, `ksar`, `palace_complex`, `souk`, `yamen` → `outside-building-classification`; `royal_mews`, `thermae` → `decompose`.
+
+**Example-only (not recipe) for forgehold constituents:** `factory` and/or `residence` Facilities; defensive Facilities such as `armory`, `barracks`, or `checkpoint` when applicable; Organization/relationships on individual Building rows.
 
 ---
 
@@ -257,6 +285,8 @@ Organization identity may coexist with Facility identity — test premises indep
 ### academy → KEEP PENDING
 
 Tier B **KEEP AS CANDIDATE** — compare with shipped `schoolhouse` premises; institution collision unresolved.
+
+**Resolution trigger:** premises-behavior case stronger than “advanced school” naming; separate Tier B admission PR if promoted.
 
 ### adventurers_guild → DECOMPOSE
 
@@ -282,7 +312,7 @@ Tier B **KEEP AS CANDIDATE** — compare with shipped `schoolhouse` premises; in
 | Organization | Child-welfare institution                                     |
 | Runtime      | **NONE**                                                      |
 
-**Family B inventory:** `adventurers_guild`, `customs_house`, `orphanage` → `decompose`.
+**Family B inventory:** `adventurers_guild`, `customs_house`, `orphanage` → `decompose`. **`academy` → `pending`** (reviewed; not part of composite queue).
 
 ---
 
@@ -312,6 +342,11 @@ Deferred manifestation is **not** a reason to force closure. **KEEP PENDING** pr
 
 **Implemented:** 2026-08-14 in [`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts).
 
-Exported allowlists: `TIER_C_COMPOSITE_QUEUE_IDS`, `TIER_C_DECOMPOSE_IDS`, `TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS`, per-batch constants.
+Exported allowlists: `TIER_C_COMPOSITE_QUEUE_IDS`, `TIER_C_DECOMPOSE_IDS`, `TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS`, `TIER_C_REVIEWED_PENDING_IDS`, per-batch constants.
+
+| Queue                | Status                                                         |
+| -------------------- | -------------------------------------------------------------- |
+| Composite queue (24) | **24 / 24 reviewed and dispositioned** — 0 composite `pending` |
+| Family B (4)         | **4 / 4 reviewed** — `academy` remains `pending`               |
 
 **Frozen corpus graph:** unchanged.
