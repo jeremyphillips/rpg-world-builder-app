@@ -21,7 +21,7 @@ function buildingLocation(overrides: Partial<Location> = {}): Location {
     ...baseLocation,
     kind: 'structure',
     structureType: 'building',
-    classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+    classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     ...overrides,
   } as Location
 }

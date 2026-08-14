@@ -56,6 +56,18 @@ describe('create-setup-sequence', () => {
       ).toBe('regionType')
     })
 
+    it('skips incomplete optional sets and activates the first incomplete required set', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'form', isComplete: false, required: false },
+            { id: 'facility', isComplete: false, required: false },
+            { id: 'operator', isComplete: false },
+          ]),
+        }),
+      ).toBe('operator')
+    })
+
     it('selects the terminal set when all are complete', () => {
       expect(
         resolveCreateSetupActiveSetId({
@@ -112,6 +124,7 @@ describe('create-setup-sequence', () => {
           setId: 'classification',
           activeSetId: 'classification',
           visible: true,
+          isComplete: false,
         }),
       ).toBe(true)
       expect(
@@ -119,6 +132,7 @@ describe('create-setup-sequence', () => {
           setId: 'regionType',
           activeSetId: 'classification',
           visible: true,
+          isComplete: false,
         }),
       ).toBe(false)
     })
@@ -129,7 +143,20 @@ describe('create-setup-sequence', () => {
           setId: 'level',
           activeSetId: 'class',
           visible: true,
+          isComplete: true,
           collapseWhenComplete: false,
+        }),
+      ).toBe(true)
+    })
+
+    it('keeps a visible incomplete optional set expanded', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'facility',
+          activeSetId: 'operator',
+          visible: true,
+          isComplete: false,
+          required: false,
         }),
       ).toBe(true)
     })
@@ -160,6 +187,19 @@ describe('create-setup-sequence', () => {
           activeSetId: 'b',
         }),
       ).toEqual(['a', 'b'])
+    })
+
+    it('reveals incomplete optional predecessors without requiring negative answers', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'form', isComplete: false, required: false },
+            { id: 'facility', isComplete: false, required: false },
+            { id: 'operator', isComplete: false },
+          ]),
+          activeSetId: 'operator',
+        }),
+      ).toEqual(['form', 'facility', 'operator'])
     })
 
     it('shows completed predecessors plus terminal when all complete', () => {

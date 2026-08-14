@@ -8,10 +8,9 @@ import {
 } from './location-create-session'
 
 describe('resolveLocationCreateSession', () => {
-  it('returns ready immediately for types without setup', () => {
+  it('requires setup for typed Building create', () => {
     expect(resolveLocationCreateSession({ authoringType: 'building' })).toEqual({
-      status: 'ready',
-      fixedCreate: { authoringType: 'building' },
+      status: 'needsSetup',
     })
   })
 
@@ -28,16 +27,28 @@ describe('resolveLocationCreateSession', () => {
         parentLocationId: HARBORFORD.id,
       }),
     ).toEqual({
-      status: 'ready',
-      fixedCreate: {
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
+      status: 'needsSetup',
     })
   })
 })
 
 describe('completeLocationCreateSetup', () => {
+  it('keeps Building classification out of fixed create context', () => {
+    expect(
+      completeLocationCreateSetup(
+        { authoringType: 'building', parentLocationId: HARBORFORD.id },
+        {
+          kind: 'building',
+          form: 'house',
+          facilityAuthoringGroup: 'residential',
+        },
+      ),
+    ).toEqual({
+      authoringType: 'building',
+      parent: { kind: 'fixed', locationId: HARBORFORD.id },
+    })
+  })
+
   it('merges setup result into fixed create context deterministically', () => {
     expect(
       completeLocationCreateSetup(

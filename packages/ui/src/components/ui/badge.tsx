@@ -2,13 +2,15 @@ import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../lib/utils'
-import type { BadgeAppearance, BadgeSize, BadgeTone } from './badge.variants'
+import type { BadgeAppearance, BadgeLayout, BadgeSize, BadgeTone } from './badge.variants'
+import { badgeLayoutVariants } from './badge.variants'
 import { resolveCompactLabelClassName } from './compact-label.variants'
 import { badgeIconGlyphClasses } from './icon-glyph.variants'
 
 export {
   badgeVariants,
   type BadgeAppearance,
+  type BadgeLayout,
   type BadgeSize,
   type BadgeTone,
 } from './badge.variants'
@@ -17,6 +19,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   appearance?: BadgeAppearance
   tone?: BadgeTone
   size?: BadgeSize
+  layout?: BadgeLayout
   leadingIcon?: React.ReactNode
   trailingIcon?: React.ReactNode
   asChild?: boolean
@@ -35,6 +38,7 @@ function Badge({
   appearance = 'soft',
   tone = 'info',
   size = 'md',
+  layout = 'label',
   leadingIcon,
   trailingIcon,
   asChild = false,
@@ -46,7 +50,7 @@ function Badge({
     appearance,
     tone,
     filled: appearance === 'soft' || appearance === 'strong',
-    className: cn('border-[1.5px]', className),
+    className: cn('border-[1.5px]', badgeLayoutVariants({ layout }), className),
   })
 
   if (asChild) {

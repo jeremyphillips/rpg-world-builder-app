@@ -24,7 +24,8 @@ import {
   getCreatureSizeLabel,
   resolveLocationClassificationDisplay,
   getFeatCategoryLabel,
-  getOrganizationKindLabel,
+  getOrganizationDomainLabel,
+  getOrganizationClassificationDiscoveryText,
   getEquipmentSearchName,
   joinCompactSegments,
   stripHtmlTags,
@@ -166,13 +167,14 @@ function buildSkillTarget(skill: SkillProficiency): GlobalSearchTarget {
 }
 
 function buildOrganizationSecondary(organization: Organization): string {
-  return getOrganizationKindLabel(organization.organizationKind)
+  return getOrganizationDomainLabel(organization.organizationDomain)
 }
 
 function buildOrganizationFields(organization: Organization): GlobalSearchField[] {
   return [
     labelField(organization.name),
     keywordField(organization.slug),
+    keywordField(getOrganizationClassificationDiscoveryText(organization)),
     descriptionField(stripHtmlTags(organization.description ?? '')),
   ]
 }

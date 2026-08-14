@@ -2,6 +2,7 @@ import type {
   OrganizationLocationConnection,
   OrganizationLocationConnectionEdgeAtLocation,
 } from '@rpg/contracts'
+import type { ClientSession } from 'mongoose'
 
 import { HomebrewOrganizationModel } from './homebrew-organization.model'
 
@@ -16,13 +17,14 @@ type OrganizationLocationConnectionHit = {
 export async function loadOrganizationLocationConnectionEdgesAtLocation(
   campaignId: string,
   locationId: string,
+  session?: ClientSession,
 ): Promise<OrganizationLocationConnectionEdgeAtLocation[]> {
-  const hits = await HomebrewOrganizationModel.find({
+  const query = HomebrewOrganizationModel.find({
     campaignId,
     'connections.locations.locationId': locationId,
-  })
-    .select({ connections: 1 })
-    .lean<OrganizationLocationConnectionHit[]>()
+  }).select({ connections: 1 })
+  if (session) query.session(session)
+  const hits = await query.lean<OrganizationLocationConnectionHit[]>()
 
   const edges: OrganizationLocationConnectionEdgeAtLocation[] = []
 

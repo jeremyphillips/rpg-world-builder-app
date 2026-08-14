@@ -19,7 +19,7 @@ describe('content-entity-picker-presentation', () => {
 
     expect(buildLocationPickerEntitySummary(summary)).toEqual({
       heading: 'Yawning Portal',
-      classification: 'Building · Tavern',
+      classification: 'Building · Brewery',
       description: 'Located in Dock Ward',
       media: undefined,
     })

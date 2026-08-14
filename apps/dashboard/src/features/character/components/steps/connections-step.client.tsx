@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import {
-  getOrganizationKindLabel,
+  getOrganizationDomainLabel,
   resolveAvailableContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -32,10 +32,10 @@ export type ConnectionsStepProps = {
 
 function membershipSecondaryLabel(
   membership: CharacterOrganizationConnection,
-  organizationKind: string | undefined,
+  organizationDomain: string | undefined,
 ): string | null {
   if (membership.title) return membership.title
-  if (organizationKind) return getOrganizationKindLabel(organizationKind)
+  if (organizationDomain) return getOrganizationDomainLabel(organizationDomain)
   return null
 }
 
@@ -116,7 +116,7 @@ export function ConnectionsStep({
             const organization = organizationsById.get(membership.organizationId)
             const unavailable = !availableIdSet.has(membership.organizationId)
             const label = organization?.name ?? membership.organizationId
-            const secondary = membershipSecondaryLabel(membership, organization?.organizationKind)
+            const secondary = membershipSecondaryLabel(membership, organization?.organizationDomain)
 
             const status = [
               ...(secondary

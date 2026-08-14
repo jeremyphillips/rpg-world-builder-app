@@ -168,23 +168,10 @@ export type LocationChildrenViewModel = {
   emptyText: string
 }
 
-/** @deprecated Use LocationStructureRowVm — kept for transitional imports. */
-export type SettlementStructureDistrictItem = {
-  item: LocationChildItem
-  immediateChildren: LocationChildItem[]
-}
-
 export type LocationDetailViewModel = {
   identity: LocationDetailIdentityViewModel
   description?: string
   children: LocationChildrenViewModel
-}
-
-export function resolveLocationDetailSpecializationFieldLabel(
-  location: Location,
-): 'Specialization' | undefined {
-  const summary = resolveLocationDisplaySummary(location)
-  return summary.specializationLabel ? 'Specialization' : undefined
 }
 
 function buildLocationDetailIdentityRows(location: Location): LocationDetailIdentityRow[] {
@@ -198,19 +185,19 @@ function buildLocationDetailIdentityRows(location: Location): LocationDetailIden
     },
   ]
 
+  if (summary.buildingFormLabel) {
+    rows.push({ label: 'Form', value: summary.buildingFormLabel })
+  }
+
+  if (summary.buildingFacilityTypeLabel) {
+    rows.push({ label: 'Facility type', value: summary.buildingFacilityTypeLabel })
+  }
+
   const classificationFieldLabel = resolveLocationDetailClassificationFieldLabel(location)
   if (classificationFieldLabel && summary.classificationLabel) {
     rows.push({
       label: classificationFieldLabel,
       value: summary.classificationLabel,
-    })
-  }
-
-  const specializationFieldLabel = resolveLocationDetailSpecializationFieldLabel(location)
-  if (specializationFieldLabel && summary.specializationLabel) {
-    rows.push({
-      label: specializationFieldLabel,
-      value: summary.specializationLabel,
     })
   }
 

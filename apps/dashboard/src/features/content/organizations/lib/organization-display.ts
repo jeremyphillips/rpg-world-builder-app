@@ -1,8 +1,9 @@
 import {
-  getOrganizationKindEntry,
-  getOrganizationKindLabel,
-  getOrganizationSubtypeEntry,
-  getOrganizationSubtypeLabel,
+  getOrganizationActivityLabel,
+  getOrganizationDomainEntry,
+  getOrganizationDomainLabel,
+  getOrganizationFormEntry,
+  getOrganizationFormLabel,
   type Organization,
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionKind,
@@ -62,26 +63,42 @@ export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
 ): OrganizationDetailViewModel {
-  const kindLabel = getOrganizationKindLabel(organization.organizationKind)
-  const subtype =
-    organization.organizationSubtype !== undefined
-      ? getOrganizationSubtypeEntry(organization.organizationKind, organization.organizationSubtype)
+  const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
+  const form =
+    organization.organizationForm !== undefined
+      ? getOrganizationFormEntry(organization.organizationForm)
       : undefined
-  const subtypeLabel =
-    organization.organizationSubtype !== undefined
-      ? getOrganizationSubtypeLabel(organization.organizationKind, organization.organizationSubtype)
+  const formLabel =
+    organization.organizationForm !== undefined
+      ? getOrganizationFormLabel(organization.organizationForm)
       : undefined
 
   return {
     statRows: [
       {
-        label: 'Type',
-        value: subtypeLabel ? `${kindLabel} · ${subtypeLabel}` : kindLabel,
-        info:
-          subtype?.description ??
-          getOrganizationKindEntry(organization.organizationKind)?.description,
-        infoAriaLabel: `About ${subtypeLabel ?? kindLabel}`,
+        label: 'Domain',
+        value: domainLabel,
+        info: getOrganizationDomainEntry(organization.organizationDomain)?.description,
+        infoAriaLabel: `About ${domainLabel}`,
       },
+      ...(formLabel
+        ? [
+            {
+              label: 'Form',
+              value: formLabel,
+              info: form?.description,
+              infoAriaLabel: `About ${formLabel}`,
+            },
+          ]
+        : []),
+      ...(organization.activities.length > 0
+        ? [
+            {
+              label: 'Activities',
+              value: organization.activities.map(getOrganizationActivityLabel).join(' · '),
+            },
+          ]
+        : []),
     ],
     description: organization.description || undefined,
     locationConnections,

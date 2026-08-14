@@ -16,7 +16,6 @@ import {
   HomebrewOrganizationModel,
   type HomebrewOrganizationSchemaType,
 } from './homebrew-organization.model'
-import { organizationValidateBeforeWrite } from './organization-write-hooks'
 
 type HomebrewOrganizationRecord = HomebrewOrganizationSchemaType & { _id: unknown }
 
@@ -27,12 +26,13 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
-    ...(record.organizationKind !== undefined && {
-      organizationKind: record.organizationKind,
+    ...(record.organizationDomain !== undefined && {
+      organizationDomain: record.organizationDomain,
     }),
-    ...(record.organizationSubtype !== undefined && {
-      organizationSubtype: record.organizationSubtype,
+    ...(record.organizationForm !== undefined && {
+      organizationForm: record.organizationForm,
     }),
+    activities: record.activities ?? [],
     connections: {
       locations: record.connections?.locations ?? [],
     },
@@ -68,7 +68,6 @@ export const organizationWriteConfig: ContentWriteConfig<Organization> = {
   homebrewModel: HomebrewOrganizationModel,
   toHomebrewEntity: toHomebrewOrganization,
   bodyFromCreateInput,
-  validateBeforeWrite: organizationValidateBeforeWrite,
   characterUsageBlocksDemotion: false,
 }
 

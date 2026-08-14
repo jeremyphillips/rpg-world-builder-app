@@ -105,7 +105,7 @@ describe('ReviewStep', () => {
     expect(screen.getByText(chrome.reviewReadyMessage)).toBeInTheDocument()
   })
 
-  it('shows selected organization names and type labels', () => {
+  it('shows selected organization names and domain labels', () => {
     const organizationContext = {
       ...context,
       catalog: { ...context.catalog, organizations: [lanternGuild] },
@@ -126,7 +126,7 @@ describe('ReviewStep', () => {
       />,
     )
 
-    expect(screen.getByText('Lantern Guild — Guild or professional')).toBeInTheDocument()
+    expect(screen.getByText('Lantern Guild — Occupational')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

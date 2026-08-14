@@ -1,5 +1,11 @@
 import {
+  BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES,
+  BUILDING_FACILITY_TYPE_ENTRIES,
+  BUILDING_FACILITY_TYPE_IDS,
+  BUILDING_FORM_ENTRIES,
+  BUILDING_FORM_IDS,
   getInteriorSubtypeIds,
+  getBuildingFacilityTypesForAuthoringGroup,
   getRegionTypeIds,
   getRegionTypeLabelForKind,
   INTERIOR_TYPE_DEFINITIONS,
@@ -15,11 +21,14 @@ import {
   SITE_TYPE_ENTRIES,
   SITE_TYPE_IDS,
   type InteriorClassificationType,
+  type BuildingFacilityAuthoringGroup,
 } from '@rpg/contracts'
+import { rankOptionsByQuery } from '@rpg/ui'
 import {
   areVisibilityDependenciesKnown,
   type FieldOption,
   type FieldOptionAvailability,
+  type ComboboxFieldConfig,
   type FormItem,
   type RowFieldItem,
 } from '@rpg/ui/form'
@@ -27,21 +36,11 @@ import {
 import type { LocationAuthoringType } from './location-authoring-type'
 
 import {
-  buildBuildingArchetypeFieldOptions,
-  BUILDING_FUNCTION_OVERRIDE_HINT,
-  hasBuildingFunctionOverrideChoices,
-  resolveBuildingArchetypeDerivedMeta,
-  resolveBuildingArchetypeFilteredOptions,
-  resolveBuildingFunctionOverrideFieldOptions,
-} from './building-archetype-form-options'
-import { resolveBuildingSpecializationSuggestions } from './building-specialization-form-options'
-import {
   buildLocationAuthoringTypeOptions,
   visibleForAuthoringType,
 } from './location-authoring-type'
 
 const SELECT_PLACEHOLDER = 'Select…'
-const BUILDING_ARCHETYPE_PLACEHOLDER = 'Search building archetypes…'
 
 function entriesToFieldOptions<T extends string>(
   ids: readonly T[],
@@ -67,22 +66,55 @@ const allRegionTypeOptions: FieldOption[] = REGION_CLASSIFICATION_KIND_IDS.flatM
   })),
 )
 
-const buildingArchetypeOptions = buildBuildingArchetypeFieldOptions()
+const buildingFormOptions = entriesToFieldOptions(BUILDING_FORM_IDS, BUILDING_FORM_ENTRIES)
 
-const buildingArchetypeDerivedMeta = {
-  reserveSpace: true,
-  dependsOn: ['classification.archetype'],
-  metaWhen: resolveBuildingArchetypeDerivedMeta,
+function buildBuildingFacilityTypeFieldOptions(): FieldOption[] {
+  return BUILDING_FACILITY_TYPE_IDS.map((value) => {
+    const entry = BUILDING_FACILITY_TYPE_ENTRIES[value] as {
+      label: string
+      description: string
+      aliases?: readonly string[]
+      searchTerms?: readonly string[]
+    }
+    return {
+      value,
+      label: entry.label,
+      description: entry.description,
+      searchTerms: [...(entry.aliases ?? []), ...(entry.searchTerms ?? [])],
+    }
+  })
 }
 
-const BUILDING_SPECIALIZATION_HINT =
-  'Add a specialization when you want to describe a more specific kind of building.'
+function buildBuildingFacilityTypeField(
+  authoringGroup?: BuildingFacilityAuthoringGroup,
+): ComboboxFieldConfig {
+  const groupFacilityTypes = authoringGroup
+    ? new Set<string>(getBuildingFacilityTypesForAuthoringGroup(authoringGroup))
+    : null
+  const groupLabel = authoringGroup
+    ? BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[authoringGroup].label
+    : null
 
-const buildingSpecializationSuggestions = {
-  dependsOn: ['classification.archetype'],
-  suggestionsWhen: resolveBuildingSpecializationSuggestions,
+  return {
+    type: 'combobox',
+    name: 'classification.facilityType',
+    label: 'Facility type',
+    multiple: false,
+    options: buildBuildingFacilityTypeFieldOptions(),
+    placeholder: groupLabel
+      ? `Search ${groupLabel.toLowerCase()} facilities…`
+      : 'Search facility types…',
+    hint: 'Choose how the building’s premises are used.',
+    visibility: visibleForAuthoringType('building'),
+    resolveFilteredOptions: (options, query, selected) => {
+      if (query.trim() || !groupFacilityTypes) return rankOptionsByQuery(options, query)
+      const selectedValues = new Set(selected)
+      return options.filter(
+        (option) => groupFacilityTypes.has(option.value) || selectedValues.has(option.value),
+      )
+    },
+  }
 }
-
 const allInteriorClassificationTypeOptions = INTERIOR_TYPE_IDS.flatMap((interiorType) =>
   entriesToFieldOptions(
     Object.keys(INTERIOR_TYPE_DEFINITIONS[interiorType].subtypes) as (
@@ -130,25 +162,6 @@ function visibleWhenRegionClassificationKindSet() {
         isRegionClassificationKind(kind)
       )
     },
-  }
-}
-
-function visibleWhenBuildingSpecializationAvailable() {
-  return {
-    dependsOn: ['authoringType', 'classification.archetype'],
-    visibleWhen: (watched: Record<string, unknown>) =>
-      watched['authoringType'] === 'building' &&
-      typeof watched['classification.archetype'] === 'string',
-  }
-}
-
-function visibleWhenBuildingFunctionOverrideAvailable() {
-  return {
-    dependsOn: ['authoringType', 'classification.archetype'],
-    visibleWhen: (watched: Record<string, unknown>) =>
-      watched['authoringType'] === 'building' &&
-      typeof watched['classification.archetype'] === 'string' &&
-      hasBuildingFunctionOverrideChoices(watched),
   }
 }
 
@@ -216,16 +229,12 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       visibility: visibleForAuthoringType('site'),
     },
     {
-      type: 'combobox',
-      name: 'classification.archetype',
-      label: 'Archetype',
-      options: buildingArchetypeOptions,
-      multiple: false,
-      placeholder: BUILDING_ARCHETYPE_PLACEHOLDER,
+      type: 'select',
+      name: 'classification.form',
+      label: 'Form',
+      options: buildingFormOptions,
+      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
-      derivedMeta: buildingArchetypeDerivedMeta,
-      resolveFilteredOptions: resolveBuildingArchetypeFilteredOptions,
-      width: '2/3',
     },
     {
       type: 'select',
@@ -240,7 +249,9 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
 
 export { buildLocationAuthoringTypeOptions }
 
-export function buildLocationClassificationFields(): FormItem[] {
+export function buildLocationClassificationFields(options?: {
+  buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+}): FormItem[] {
   return [
     {
       type: 'select',
@@ -251,35 +262,7 @@ export function buildLocationClassificationFields(): FormItem[] {
       visibility: visibleWhenRegionClassificationKindSet(),
       optionAvailability: regionClassificationTypeAvailability(),
     },
-    {
-      type: 'textSuggestions',
-      name: 'classification.specialization',
-      label: 'Specialization',
-      placeholder: 'Enter specialization…',
-      hint: BUILDING_SPECIALIZATION_HINT,
-      suggestions: buildingSpecializationSuggestions,
-      visibility: visibleWhenBuildingSpecializationAvailable(),
-      optionalDisclosure: {
-        addLabel: 'Add specialization',
-        removeLabel: 'Remove specialization',
-      },
-    },
-    {
-      type: 'select',
-      name: 'classification.functionOverride',
-      label: 'Function override',
-      optionsResolve: {
-        dependsOn: ['classification.archetype'],
-        optionsWhen: resolveBuildingFunctionOverrideFieldOptions,
-      },
-      placeholder: 'Select function…',
-      hint: BUILDING_FUNCTION_OVERRIDE_HINT,
-      visibility: visibleWhenBuildingFunctionOverrideAvailable(),
-      optionalDisclosure: {
-        addLabel: 'Add function override',
-        removeLabel: 'Remove function override',
-      },
-    },
+    buildBuildingFacilityTypeField(options?.buildingFacilityAuthoringGroup),
     {
       type: 'select',
       name: 'classification.type',

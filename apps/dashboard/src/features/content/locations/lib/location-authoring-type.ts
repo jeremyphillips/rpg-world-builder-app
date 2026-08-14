@@ -40,6 +40,7 @@ export type LocationAuthoringType = (typeof LOCATION_AUTHORING_TYPE_IDS)[number]
 
 /** Authoring types that require a setup step before opening create. */
 export const LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP = [
+  'building',
   'settlement',
   'region',
   'site',
@@ -111,12 +112,7 @@ export type LocationAuthoringTopLevelField =
   | 'interiorType'
 
 /** Nested classification keys governed by authoring type validity. */
-export type LocationAuthoringClassificationField =
-  | 'kind'
-  | 'type'
-  | 'archetype'
-  | 'specialization'
-  | 'functionOverride'
+export type LocationAuthoringClassificationField = 'kind' | 'type' | 'form' | 'facilityType'
 
 export interface LocationAuthoringFieldValidity {
   topLevel: ReadonlySet<LocationAuthoringTopLevelField>
@@ -133,9 +129,8 @@ const ALL_TOP_LEVEL_FIELDS: LocationAuthoringTopLevelField[] = [
 const ALL_CLASSIFICATION_FIELDS: LocationAuthoringClassificationField[] = [
   'kind',
   'type',
-  'archetype',
-  'specialization',
-  'functionOverride',
+  'form',
+  'facilityType',
 ]
 
 /** Which form fields remain valid for a selected authoring type. */
@@ -160,9 +155,8 @@ export function formFieldsValidForAuthoringType(
       classification.add('type')
       break
     case 'building':
-      classification.add('archetype')
-      classification.add('specialization')
-      classification.add('functionOverride')
+      classification.add('form')
+      classification.add('facilityType')
       break
     case 'interior':
       topLevel.add('interiorType')

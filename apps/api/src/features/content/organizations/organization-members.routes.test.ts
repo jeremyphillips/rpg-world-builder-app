@@ -28,7 +28,7 @@ useIntegrationDb()
 const minimalOrganizationInput = {
   slug: 'iron-circle',
   name: 'Iron Circle',
-  organizationKind: 'military',
+  organizationDomain: 'military',
 } as const
 
 const membersPath = (campaignId: string, organizationId: string) =>
@@ -208,7 +208,7 @@ describe('resolveOrganizationMembers', () => {
     const organization = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       ...minimalOrganizationInput,
       slug: 'priority-circle',
-      organizationKind: 'professional',
+      organizationDomain: 'occupational',
     })
 
     const recruit = await createPcRecord(
@@ -282,7 +282,7 @@ describe('resolveOrganizationMembers', () => {
       {
         slug: 'draft-circle',
         name: 'Draft Circle',
-        organizationKind: 'other',
+        organizationDomain: 'other',
       },
       { status: 'draft' },
     )
@@ -369,7 +369,7 @@ describe('organization members routes', () => {
     const createOrgRes = await agent
       .post(`/api/campaigns/${campaignId}/content/organizations`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ ...minimalOrganizationInput, organizationKind: 'professional' })
+      .send({ ...minimalOrganizationInput, organizationDomain: 'occupational' })
       .expect(201)
 
     const organizationId = createOrgRes.body.organizations.id as string

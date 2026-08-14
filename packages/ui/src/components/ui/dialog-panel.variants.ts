@@ -20,7 +20,7 @@ export const dialogPanelSectionInsetXClasses = 'px-6'
  * DrawerShell `bodyMode="managed"` opts out of this padding so the child re-owns inset.
  */
 export const dialogPanelBodyVariants = cva(
-  cn(dialogPanelSectionPaddingClasses, 'overflow-y-auto pt-0 text-sm'),
+  cn(dialogPanelSectionPaddingClasses, 'min-h-0 overflow-y-auto pt-0 text-sm'),
 )
 
 /**

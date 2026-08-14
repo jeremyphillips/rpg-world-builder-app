@@ -30,7 +30,7 @@ describe('locationsColumns', () => {
     const cell = typeColumn?.cell as (ctx: { row: { original: Location } }) => string
 
     expect(cell({ row: { original: HARBORFORD } })).toBe('Settlement · City')
-    expect(cell({ row: { original: YAWNING_PORTAL } })).toBe('Building · Tavern')
+    expect(cell({ row: { original: YAWNING_PORTAL } })).toBe('Building · Brewery')
   })
 
   it('sorts Type column by classification parts with name tie-break', () => {
@@ -45,29 +45,23 @@ describe('locationsColumns', () => {
     expect(sortingFn({ original: HARBORFORD }, { original: YAWNING_PORTAL })).toBeGreaterThan(0)
   })
 
-  it('sorts buildings with the same visible type by name when specialization differs', () => {
-    const guildhallA = {
+  it('sorts buildings with the same visible classification by name', () => {
+    const breweryA = {
       ...YAWNING_PORTAL,
       id: 'location-guildhall-a',
       slug: 'guildhall-a',
       name: 'Alpha Guildhall',
-      classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Thieves',
-      }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     } as Location
-    const guildhallB = {
+    const breweryB = {
       ...YAWNING_PORTAL,
       id: 'location-guildhall-b',
       slug: 'guildhall-b',
       name: 'Beta Guildhall',
-      classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Merchants',
-      }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     } as Location
     const columns = locationsColumns(CAMPAIGN_ID, {
-      locations: [...LOCATIONS_LIST, guildhallA, guildhallB],
+      locations: [...LOCATIONS_LIST, breweryA, breweryB],
     })
     const typeColumn = columns.find((column) => column.id === 'locationType')
     const sortingFn = typeColumn?.sortingFn as (
@@ -75,8 +69,8 @@ describe('locationsColumns', () => {
       right: { original: Location },
     ) => number
 
-    expect(sortingFn({ original: guildhallA }, { original: guildhallB })).toBeLessThan(0)
-    expect(sortingFn({ original: guildhallB }, { original: guildhallA })).toBeGreaterThan(0)
+    expect(sortingFn({ original: breweryA }, { original: breweryB })).toBeLessThan(0)
+    expect(sortingFn({ original: breweryB }, { original: breweryA })).toBeGreaterThan(0)
   })
 
   it('sorts shorter equal-prefix classifications before longer ones', () => {
@@ -88,15 +82,15 @@ describe('locationsColumns', () => {
     } as Location
     delete (plainBuilding as { classification?: unknown }).classification
 
-    const archetypedBuilding = {
+    const classifiedBuilding = {
       ...YAWNING_PORTAL,
       id: 'location-archetyped-building',
       slug: 'archetyped-building',
       name: 'Archetyped Building',
-      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     } as Location
     const columns = locationsColumns(CAMPAIGN_ID, {
-      locations: [...LOCATIONS_LIST, plainBuilding, archetypedBuilding],
+      locations: [...LOCATIONS_LIST, plainBuilding, classifiedBuilding],
     })
     const typeColumn = columns.find((column) => column.id === 'locationType')
     const sortingFn = typeColumn?.sortingFn as (
@@ -104,9 +98,9 @@ describe('locationsColumns', () => {
       right: { original: Location },
     ) => number
 
-    expect(sortingFn({ original: plainBuilding }, { original: archetypedBuilding })).toBeLessThan(0)
+    expect(sortingFn({ original: plainBuilding }, { original: classifiedBuilding })).toBeLessThan(0)
     expect(
-      sortingFn({ original: archetypedBuilding }, { original: plainBuilding }),
+      sortingFn({ original: classifiedBuilding }, { original: plainBuilding }),
     ).toBeGreaterThan(0)
   })
 

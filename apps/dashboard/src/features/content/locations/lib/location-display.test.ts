@@ -95,7 +95,7 @@ describe('located-in presentation helpers', () => {
 
     expect(buildLocationEntityContextPresentation(summary)).toEqual({
       heading: 'Yawning Portal',
-      headingSuffix: ' · Building · Tavern',
+      headingSuffix: ' · Building · Brewery',
       supportingText: 'Located in Dock Ward',
     })
   })
@@ -128,7 +128,7 @@ describe('buildLocationEntitySummaryVm', () => {
     })
 
     expect(summary.name).toBe('Yawning Portal')
-    expect(summary.classification.text).toBe('Building · Tavern')
+    expect(summary.classification.text).toBe('Building · Brewery')
     expect(summary.ancestry.items.map((item) => item.name)).toEqual([
       'Aldermere',
       'Greyshore',
@@ -157,7 +157,7 @@ describe('buildLocationEntitySummaryVm', () => {
     })
 
     expect(buildLocationEntitySummarySearchText(summary)).toBe(
-      'Yawning Portal Building Tavern Aldermere Greyshore Harborford Dock Ward',
+      'Yawning Portal Building Brewery Aldermere Greyshore Harborford Dock Ward',
     )
   })
 })
@@ -256,14 +256,14 @@ describe('buildLocationDetailViewModel', () => {
     ])
   })
 
-  it('shows building archetype and specialization as separate identity rows', () => {
+  it('shows building facility type as its own identity row', () => {
     const viewModel = buildLocationDetailViewModel(YAWNING_PORTAL, {
       locations: LOCATIONS_LIST,
       campaignId: CAMPAIGN_ID,
     })
 
-    expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type', 'Archetype'])
-    expect(viewModel.identity.rows[1]?.value).toBe('Tavern')
+    expect(viewModel.identity.rows.map((row) => row.label)).toEqual(['Type', 'Facility type'])
+    expect(viewModel.identity.rows[1]?.value).toBe('Brewery')
     expect(viewModel.identity.locatedIn.map((segment) => segment.name)).toEqual([
       'Aldermere',
       'Greyshore',

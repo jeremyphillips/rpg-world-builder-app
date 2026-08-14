@@ -13,8 +13,10 @@ export type LocationConnectionKindStepProps = {
   value: string | null
   onValueChange: (value: string) => void
   changeLabel?: string
+  summaryEyebrow?: string
   /** When true, eligible options render immediately instead of behind a collapsed summary. */
   defaultExpanded?: boolean
+  onExpandedChange?: (expanded: boolean) => void
 }
 
 function toRadioCardOptions(options: readonly LocationConnectionKindOption[]): RadioCardOption[] {
@@ -33,7 +35,9 @@ export function LocationConnectionKindStep({
   value,
   onValueChange,
   changeLabel = LOCATION_CONNECTION_KIND_CHANGE_LABEL,
+  summaryEyebrow,
   defaultExpanded,
+  onExpandedChange,
 }: LocationConnectionKindStepProps) {
   if (options.length === 1) {
     const resolved = options[0]
@@ -57,13 +61,14 @@ export function LocationConnectionKindStep({
     <CollapsibleRadioCardField
       id={id}
       label={label}
-      summaryEyebrow={label}
+      summaryEyebrow={summaryEyebrow ?? label}
       changeLabel={changeLabel}
       density="compact"
       value={value ?? ''}
       options={toRadioCardOptions(options)}
       onValueChange={onValueChange}
       defaultExpanded={defaultExpanded}
+      onExpandedChange={onExpandedChange}
     />
   )
 }

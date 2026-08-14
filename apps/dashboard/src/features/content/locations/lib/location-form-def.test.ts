@@ -30,7 +30,7 @@ describe('locationFormDef', () => {
     expect(input.kind).toBe('structure')
     if (input.kind === 'structure') {
       expect(input.structureType).toBe('building')
-      expect(input.classification).toEqual({ archetype: 'tavern' })
+      expect(input.classification).toEqual({ facilityType: 'brewery' })
     }
     expect(values.authoringType).toBe('building')
     expect(resolveLocationAuthoringType(YAWNING_PORTAL)).toBe('building')
@@ -42,17 +42,17 @@ describe('locationFormDef', () => {
       name: 'The Sleeping Giant',
       authoringType: 'building',
       parentLocationId: YAWNING_PORTAL.parentLocationId,
-      classification: { archetype: 'inn' },
+      classification: { form: 'house' },
     } as LocationFormValues)
 
     expect(input).toMatchObject({
       kind: 'structure',
       structureType: 'building',
-      classification: { archetype: 'inn' },
+      classification: { form: 'house' },
     })
     expect(locationFormDef.toFormValues(YAWNING_PORTAL)).toMatchObject({
       authoringType: 'building',
-      classification: { archetype: 'tavern' },
+      classification: { facilityType: 'brewery' },
     })
   })
 

@@ -5,7 +5,7 @@ export type ResolveCreateSetupActiveSetIdInput = {
   reopenSetId?: string | null
 }
 
-/** Active = reopened (if still present) ?? first incomplete ?? terminal. */
+/** Active = reopened (if still present) ?? first incomplete required set ?? terminal. */
 export function resolveCreateSetupActiveSetId({
   sets,
   reopenSetId,
@@ -16,8 +16,8 @@ export function resolveCreateSetupActiveSetId({
     return reopenSetId
   }
 
-  const firstIncomplete = sets.find((set) => !set.isComplete)
-  if (firstIncomplete) return firstIncomplete.id
+  const firstIncompleteRequired = sets.find((set) => set.required !== false && !set.isComplete)
+  if (firstIncompleteRequired) return firstIncompleteRequired.id
 
   return sets[sets.length - 1]?.id ?? null
 }
@@ -26,21 +26,26 @@ export function resolveCreateSetupSetExpanded({
   setId,
   activeSetId,
   visible,
+  isComplete,
+  required = true,
   collapseWhenComplete = true,
 }: {
   setId: string
   activeSetId: string | null
   visible: boolean
+  isComplete: boolean
+  required?: boolean
   collapseWhenComplete?: boolean
 }): boolean {
   if (setId === activeSetId) return true
+  if (visible && required === false && !isComplete) return true
   if (visible && collapseWhenComplete === false) return true
   return false
 }
 
 /**
- * Reveal completed predecessors plus the active set. Later sets unlock as
- * earlier sets complete — ordinary step progression, not domain visibility.
+ * Reveal completed or optional predecessors plus the active set. Required sets
+ * still unlock in order; untouched optional sets are pass-through authoring.
  */
 export function resolveCreateSetupVisibleSetIds({
   sets,
@@ -58,7 +63,7 @@ export function resolveCreateSetupVisibleSetIds({
   for (let index = 0; index < sets.length; index += 1) {
     const set = sets[index]
     if (!set) continue
-    if (index < activeIndex && set.isComplete) {
+    if (index < activeIndex && (set.isComplete || set.required === false)) {
       visibleIds.push(set.id)
       continue
     }

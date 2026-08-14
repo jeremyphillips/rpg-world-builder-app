@@ -6,7 +6,10 @@ import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { Input } from './input.client'
-import { dialogPanelActionRowClasses } from './dialog-panel.variants'
+import {
+  dialogPanelActionRowClasses,
+  dialogPanelScrollRegionClasses,
+} from './dialog-panel.variants'
 import { useModal } from '../../hooks/use-modal'
 
 const meta = {
@@ -210,4 +213,48 @@ export const LongContent: StoryObj = {
       </Modal.Content>
     </Modal.Root>
   ),
+}
+
+function StableLayoutDemo({ stableSize }: { stableSize?: 'default' | 'tall' }) {
+  return (
+    <Modal.Root>
+      <Modal.Trigger asChild>
+        <Button>{stableSize === 'tall' ? 'Open tall stable' : 'Open stable'}</Button>
+      </Modal.Trigger>
+      <Modal.Content layout="stable" stableSize={stableSize}>
+        <Modal.Header
+          headline="Create workflow"
+          description="Header and footer stay pinned; the inner region scrolls."
+        />
+        <Modal.Body stableBody>
+          <div className={dialogPanelScrollRegionClasses}>
+            {Array.from({ length: 24 }, (_, i) => (
+              <p key={i} className="mb-3">
+                Section {i + 1}: form fields and relationship drafts scroll here without a second
+                scrollbar on the shell.
+              </p>
+            ))}
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <div className={dialogPanelActionRowClasses}>
+            <Modal.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Modal.Close>
+            <Button>Create</Button>
+          </div>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  )
+}
+
+/** Default stable shell geometry with pinned header/footer and inner scroll. */
+export const StableDefault: StoryObj = {
+  render: () => <StableLayoutDemo />,
+}
+
+/** Taller stable shell for multi-step create workflows. */
+export const StableTall: StoryObj = {
+  render: () => <StableLayoutDemo stableSize="tall" />,
 }

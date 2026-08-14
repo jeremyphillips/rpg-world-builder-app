@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
-import type { OrganizationKind } from '../../vocab/organization-kind'
+import type { OrganizationActivity } from '../../vocab/organization-activity'
+import type { OrganizationDomain } from '../../vocab/organization-domain'
+import type { OrganizationForm } from '../../vocab/organization-form'
 import { resolveOrganizationMemberTitleEntry } from '../../vocab/organization-member-title'
 import { comparePriorityDescending } from '../../vocab/types'
 import { characterOrganizationConnectionSchema } from './connections'
@@ -43,8 +45,9 @@ type MembershipPrioritySource = {
  */
 export function resolveOrganizationMembershipPriority(input: {
   membership: MembershipPrioritySource
-  kind: OrganizationKind
-  subtype?: string
+  domain: OrganizationDomain
+  form?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
 }): number | undefined {
   if (input.membership.priority !== undefined) {
     return input.membership.priority
@@ -52,8 +55,9 @@ export function resolveOrganizationMembershipPriority(input: {
   const title = input.membership.title
   if (title === undefined) return undefined
   return resolveOrganizationMemberTitleEntry({
-    kind: input.kind,
-    subtype: input.subtype,
+    domain: input.domain,
+    form: input.form,
+    activities: input.activities,
     title,
   })?.priority
 }
@@ -103,8 +107,9 @@ export type ResolvedOrganizationMembershipMetadata = {
  * - Preserved historical/custom title → keep the current membership's explicit priority
  */
 export function resolveOrganizationMembershipMetadata(input: {
-  kind: OrganizationKind
-  subtype?: string
+  domain: OrganizationDomain
+  form?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
   /** Selected title after radio mapping; `undefined` means No title. */
   selectedTitle: string | undefined
   currentMembership?: MembershipPrioritySource
@@ -115,8 +120,9 @@ export function resolveOrganizationMembershipMetadata(input: {
   }
 
   const canonical = resolveOrganizationMemberTitleEntry({
-    kind: input.kind,
-    subtype: input.subtype,
+    domain: input.domain,
+    form: input.form,
+    activities: input.activities,
     title: selectedTitle,
   })
   if (canonical) {

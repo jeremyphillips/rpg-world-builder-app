@@ -9,6 +9,7 @@ import {
   getInteriorSubtypeIds,
   getRegionTypeIds,
 } from '../../vocab/location'
+import { buildingClassificationSchema } from './building-classification'
 import { locationBodySchema } from './location'
 
 describe('location classification registries', () => {
@@ -35,17 +36,14 @@ describe('location classification registries', () => {
 })
 
 describe('getEffectiveBuildingFunctions', () => {
-  it('returns archetype defaults when no override is set', () => {
-    expect(getEffectiveBuildingFunctions({ archetype: 'inn' })).toEqual([
-      'lodging',
-      'food_drink_social',
-    ])
+  it('returns Facility defaults', () => {
+    expect(getEffectiveBuildingFunctions({ facilityType: 'brewery' })).toEqual(['production'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'temple' })).toEqual(['worship'])
   })
 
-  it('replaces — not augments — defaults when functionOverride is set', () => {
-    expect(getEffectiveBuildingFunctions({ archetype: 'inn', functionOverride: 'care' })).toEqual([
-      'care',
-    ])
+  it('returns no functions for Form-only or unclassified buildings', () => {
+    expect(getEffectiveBuildingFunctions({ form: 'house' })).toEqual([])
+    expect(getEffectiveBuildingFunctions(undefined)).toEqual([])
   })
 })
 
@@ -68,11 +66,11 @@ describe('location classification schema rejection', () => {
         name: 'Yawning Portal',
         parentLocationId: 'district-dock-ward',
         structureType: 'building',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
       }),
     ).toMatchObject({
       structureType: 'building',
-      classification: { archetype: 'tavern' },
+      classification: { facilityType: 'brewery' },
     })
 
     expect(
@@ -98,7 +96,7 @@ describe('location classification schema rejection', () => {
     })
   })
 
-  it('accepts archetype with specialization and function override', () => {
+  it('accepts independent Form and Facility axes', () => {
     expect(
       locationBodySchema.parse({
         kind: 'structure',
@@ -106,30 +104,172 @@ describe('location classification schema rejection', () => {
         parentLocationId: 'site-1',
         structureType: 'building',
         classification: {
-          archetype: 'temple',
-          specialization: 'Sea temple',
-          functionOverride: 'care',
+          form: 'house',
+          facilityType: 'temple',
         },
       }),
     ).toMatchObject({
       classification: {
-        archetype: 'temple',
-        specialization: 'Sea temple',
-        functionOverride: 'care',
+        form: 'house',
+        facilityType: 'temple',
       },
     })
   })
 
-  it('accepts manifestation archetype and unclassified building', () => {
+  it('accepts tower and hall form-only and composed classifications', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Watch Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower' },
+      }),
+    ).toMatchObject({ classification: { form: 'tower' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Great Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall' },
+      }),
+    ).toMatchObject({ classification: { form: 'hall' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Temple Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower', facilityType: 'temple' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'tower', facilityType: 'temple' },
+    })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Civic Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall', facilityType: 'town_hall' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'hall', facilityType: 'town_hall' },
+    })
+  })
+
+  it('accepts keep form-only and composed classifications', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Stone Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep' },
+      }),
+    ).toMatchObject({ classification: { form: 'keep' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Lord Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'residence' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'keep', facilityType: 'residence' },
+    })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Garrison Keep',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'barracks' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'keep', facilityType: 'barracks' },
+    })
+  })
+
+  it('accepts Facility tranche compositions without pair allowlists', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Corner Shop',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'house', facilityType: 'shop' },
+      }),
+    ).toMatchObject({ classification: { form: 'house', facilityType: 'shop' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Watch Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower', facilityType: 'watchtower' },
+      }),
+    ).toMatchObject({ classification: { form: 'tower', facilityType: 'watchtower' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Craft Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall', facilityType: 'guildhall' },
+      }),
+    ).toMatchObject({ classification: { form: 'hall', facilityType: 'guildhall' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Castle Armory',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'keep', facilityType: 'armory' },
+      }),
+    ).toMatchObject({ classification: { form: 'keep', facilityType: 'armory' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Record House',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'house', facilityType: 'archive' },
+      }),
+    ).toMatchObject({ classification: { form: 'house', facilityType: 'archive' } })
+  })
+
+  it('accepts Form-only, Facility-only, and unclassified buildings', () => {
     expect(
       locationBodySchema.parse({
         kind: 'structure',
         name: 'Desert Rest',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'caravanserai' },
+        classification: { form: 'house' },
       }),
-    ).toMatchObject({ classification: { archetype: 'caravanserai' } })
+    ).toMatchObject({ classification: { form: 'house' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Neighborhood Residence',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { facilityType: 'residence' },
+      }),
+    ).toMatchObject({ classification: { facilityType: 'residence' } })
 
     const unclassified = locationBodySchema.parse({
       kind: 'structure',
@@ -141,24 +281,44 @@ describe('location classification schema rejection', () => {
     expect(unclassified).not.toHaveProperty('classification')
   })
 
-  it('rejects invalid archetype and function override', () => {
+  it('rejects invalid Form, Facility, and empty classification', () => {
     expect(
       locationBodySchema.safeParse({
         kind: 'structure',
         name: 'Bad Building',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'not_an_archetype' },
+        classification: { form: 'gatehouse' },
       }).success,
     ).toBe(false)
 
     expect(
       locationBodySchema.safeParse({
         kind: 'structure',
-        name: 'Bad Override',
+        name: 'Craft Workshop',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { archetype: 'temple', functionOverride: 'not_a_function' },
+        classification: { facilityType: 'workshop' },
+      }).success,
+    ).toBe(true)
+
+    expect(
+      locationBodySchema.safeParse({
+        kind: 'structure',
+        name: 'Bad Facility',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { facilityType: 'not-a-facility' },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      locationBodySchema.safeParse({
+        kind: 'structure',
+        name: 'Empty Classification',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: {},
       }).success,
     ).toBe(false)
   })
@@ -170,7 +330,7 @@ describe('location classification schema rejection', () => {
         name: 'North Wall',
         parentLocationId: 'settlement-1',
         structureType: 'fortification',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
       }).success,
     ).toBe(false)
   })
@@ -208,5 +368,121 @@ describe('location classification schema rejection', () => {
         regionType: 'coast',
       }).success,
     ).toBe(false)
+  })
+})
+
+describe('legacy decomposition example compositions', () => {
+  it('accepts canonical shapes illustrated by legacy concepts without fixed mappings', () => {
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'residence' }),
+    ).toEqual({ form: 'tower', facilityType: 'residence' })
+    expect(buildingClassificationSchema.parse({ form: 'tower' })).toEqual({ form: 'tower' })
+
+    expect(buildingClassificationSchema.parse({ form: 'house' })).toEqual({ form: 'house' })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'hospital' })).toEqual(
+      { form: 'house', facilityType: 'hospital' },
+    )
+
+    expect(buildingClassificationSchema.parse({ facilityType: 'shop' })).toEqual({
+      facilityType: 'shop',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'watchtower' })).toEqual({
+      facilityType: 'watchtower',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'guildhall' })).toEqual({
+      facilityType: 'guildhall',
+    })
+
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'residence' })).toEqual(
+      { form: 'keep', facilityType: 'residence' },
+    )
+    expect(
+      buildingClassificationSchema.parse({ form: 'keep', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'keep', facilityType: 'checkpoint' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'checkpoint' }),
+    ).toEqual({ form: 'tower', facilityType: 'checkpoint' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'checkpoint' })).toEqual({
+      facilityType: 'checkpoint',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'lighthouse' })).toEqual({
+      facilityType: 'lighthouse',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'town_hall' })).toEqual(
+      { form: 'hall', facilityType: 'town_hall' },
+    )
+    expect(buildingClassificationSchema.parse({ facilityType: 'bathhouse' })).toEqual({
+      facilityType: 'bathhouse',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'bathhouse' })).toEqual(
+      { form: 'hall', facilityType: 'bathhouse' },
+    )
+    expect(buildingClassificationSchema.parse({ facilityType: 'observatory' })).toEqual({
+      facilityType: 'observatory',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'observatory' }),
+    ).toEqual({ form: 'tower', facilityType: 'observatory' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'embassy' })).toEqual({
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'embassy' })).toEqual({
+      form: 'hall',
+      facilityType: 'embassy',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'schoolhouse' })).toEqual({
+      facilityType: 'schoolhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'schoolhouse' }),
+    ).toEqual({ form: 'house', facilityType: 'schoolhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'barn' })).toEqual({
+      facilityType: 'barn',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'barn' })).toEqual({
+      form: 'house',
+      facilityType: 'barn',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'granary' })).toEqual({
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'granary' })).toEqual({
+      form: 'house',
+      facilityType: 'granary',
+    })
+    expect(buildingClassificationSchema.parse({ facilityType: 'greenhouse' })).toEqual({
+      facilityType: 'greenhouse',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'greenhouse' }),
+    ).toEqual({ form: 'hall', facilityType: 'greenhouse' })
+    expect(buildingClassificationSchema.parse({ facilityType: 'arena' })).toEqual({
+      facilityType: 'arena',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'arena' })).toEqual({
+      form: 'hall',
+      facilityType: 'arena',
+    })
+  })
+
+  it('derives functions from Facility only, not from legacy concept names', () => {
+    expect(getEffectiveBuildingFunctions({ form: 'tower' })).toEqual([])
+    expect(getEffectiveBuildingFunctions({ form: 'house', facilityType: 'hospital' })).toEqual([
+      'care',
+    ])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'bathhouse' })).toEqual(['care'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'observatory' })).toEqual(['knowledge'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'embassy' })).toEqual([
+      'governance',
+      'assembly',
+    ])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'schoolhouse' })).toEqual(['knowledge'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'barn' })).toEqual(['storage', 'service'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'granary' })).toEqual(['storage'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'greenhouse' })).toEqual(['production'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'arena' })).toEqual(['spectacle'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'watchtower' })).toEqual(['defense_watch'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'checkpoint' })).toEqual(['defense_watch'])
+    expect(getEffectiveBuildingFunctions({ facilityType: 'lighthouse' })).toEqual(['defense_watch'])
   })
 })

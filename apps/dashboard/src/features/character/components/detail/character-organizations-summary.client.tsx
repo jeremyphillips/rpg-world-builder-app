@@ -20,7 +20,8 @@ type CharacterOrganizationsSummaryRowProps = {
 
 function canEditMembershipTitle(membership: CharacterOrganizationsSummaryMembership): boolean {
   return (
-    membership.organization !== null && typeof membership.organization.organizationKind === 'string'
+    membership.organization !== null &&
+    typeof membership.organization.organizationDomain === 'string'
   )
 }
 

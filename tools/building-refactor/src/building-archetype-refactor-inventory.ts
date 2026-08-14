@@ -1,0 +1,1534 @@
+/**
+ * Tooling-owned migration evidence for the Building classification refactor.
+ * Every BUILDING_CORPUS_IDS entry maps to exactly one historical disposition.
+ * This module is non-runtime and must never be imported by an app or package.
+ */
+
+import { BUILDING_FACILITY_TYPE_IDS, BUILDING_FORM_IDS } from '@rpg/contracts'
+
+export type BuildingCorpusDispositionKind =
+  | 'archetype'
+  | 'manifestation'
+  | 'specialization'
+  | 'form_only'
+  | 'interior'
+  | 'site'
+  | 'composite'
+  | 'overlay'
+  | 'not_building'
+
+export type BuildingCorpusDisposition =
+  | { readonly kind: 'archetype' }
+  | { readonly kind: 'manifestation'; readonly of: string }
+  | { readonly kind: 'specialization'; readonly of: string }
+  | { readonly kind: 'form_only'; readonly structureType?: string }
+  | { readonly kind: 'interior' }
+  | { readonly kind: 'site' }
+  | { readonly kind: 'composite' }
+  | { readonly kind: 'overlay' }
+  | { readonly kind: 'not_building' }
+
+export const BUILDING_CORPUS_IDS = [
+  'abbey',
+  'academy',
+  'adventurers_guild',
+  'airship',
+  'airship_dock',
+  'almshouse',
+  'amphitheater',
+  'anchorhold',
+  'apartment_building',
+  'apiary',
+  'apothecary',
+  'aqueduct',
+  'archive',
+  'arena',
+  'armory',
+  'arsenal',
+  'artificer_atelier',
+  'asylum',
+  'auction_house',
+  'audience_hall',
+  'bakery',
+  'bank',
+  'banqueting_house',
+  'baptistery',
+  'barber_surgeon',
+  'bardic_college',
+  'barn',
+  'barracks',
+  'barrow',
+  'basilica',
+  'bathhouse',
+  'beacon_tower',
+  'beast_stable',
+  'bell_tower',
+  'blacksmith',
+  'blockhouse',
+  'boarding_house',
+  'boathouse',
+  'bounty_office',
+  'brewery',
+  'brickworks',
+  'bridge',
+  'bridge_house',
+  'broch',
+  'brothel',
+  'butcher',
+  'byre',
+  'cairn',
+  'camp',
+  'caravanserai',
+  'castle',
+  'catacombs',
+  'cathedral',
+  'cave_dwelling',
+  'chandler',
+  'chantry',
+  'chapel',
+  'chapter_house',
+  'charnel_house',
+  'checkpoint',
+  'citadel',
+  'city_gate',
+  'clinic',
+  'clock_tower',
+  'cloister',
+  'coach_house',
+  'coaching_inn',
+  'cobbler',
+  'coffeehouse',
+  'command_post',
+  'cooperage',
+  'cottage',
+  'counting_house',
+  'courthouse',
+  'covered_bridge',
+  'crannog',
+  'crematorium',
+  'crypt',
+  'customs_house',
+  'distillery',
+  'divination_parlor',
+  'domus',
+  'dormitory',
+  'dovecote',
+  'dower_house',
+  'dragon_roost',
+  'drum_tower',
+  'drydock',
+  'dwarven_forgehold',
+  'dyeworks',
+  'dzong',
+  'elven_tree_dwelling',
+  'embassy',
+  'enchanting_hall',
+  'exchange',
+  'factory',
+  'farmhouse',
+  'farmstead',
+  'feast_hall',
+  'ferry_house',
+  'festhall',
+  'fighting_pit',
+  'flophouse',
+  'folly',
+  'forge',
+  'fortress',
+  'foundry',
+  'fountain',
+  'fulling_mill',
+  'gallows',
+  'gambling_hall',
+  'gamekeepers_cottage',
+  'gatehouse',
+  'general_store',
+  'gladiator_school',
+  'glassworks',
+  'godown',
+  'golem_workshop',
+  'granary',
+  'granary_on_stilts',
+  'greenhouse',
+  'griffon_aerie',
+  'guard_post',
+  'guildhall',
+  'gymnasium',
+  'hammam',
+  'harbourmaster_office',
+  'haunted_manor',
+  'healers_house',
+  'hermitage',
+  'hippodrome',
+  'hobbit_burrow',
+  'hof',
+  'hollowed_colossus',
+  'hospice',
+  'hospital',
+  'house',
+  'houseboat',
+  'hovel',
+  'hunting_lodge',
+  'icehouse',
+  'igloo',
+  'inn',
+  'insula',
+  'jeweler',
+  'kasbah',
+  'keep',
+  'kennel',
+  'kiln',
+  'kiva',
+  'ksar',
+  'laboratory',
+  'lamasery',
+  'lazaretto',
+  'leprosarium',
+  'library',
+  'lighthouse',
+  'livery',
+  'longhouse',
+  'machiya',
+  'madrasa',
+  'mage_college',
+  'mage_prison',
+  'magic_shop',
+  'malt_house',
+  'manor',
+  'marae',
+  'market',
+  'market_stall',
+  'martello_tower',
+  'mastaba',
+  'mausoleum',
+  'meeting_hall',
+  'memorial',
+  'memorial_hall',
+  'menagerie',
+  'mill',
+  'mimic_building',
+  'mint',
+  'mithraeum',
+  'moai',
+  'monastery',
+  'moneylender',
+  'moot_hall',
+  'mortuary',
+  'mosque',
+  'museum',
+  'nuraghe',
+  'oast_house',
+  'obelisk',
+  'observatory',
+  'odeon',
+  'onsen',
+  'open_air_shrine',
+  'opium_den',
+  'oracle_shrine',
+  'orangery',
+  'orphanage',
+  'ossuary',
+  'pa',
+  'pagoda',
+  'palace',
+  'palace_complex',
+  'paladin_chapterhouse',
+  'palaestra',
+  'pawnshop',
+  'pigsty',
+  'planar_embassy',
+  'poorhouse',
+  'portal_chamber',
+  'post_house',
+  'potion_shop',
+  'powder_magazine',
+  'printing_press',
+  'prison',
+  'pyramid',
+  'ranger_station',
+  'records_hall',
+  'rectory',
+  'ribat',
+  'ritual_chamber',
+  'root_cellar',
+  'ropewalk',
+  'roundhouse',
+  'royal_mews',
+  'ryokan',
+  'safe_house',
+  'sail_loft',
+  'salt_works',
+  'sanctum',
+  'schoolhouse',
+  'scriptorium',
+  'shearing_shed',
+  'sheepfold',
+  'shinto_shrine',
+  'ship',
+  'shipwreck_dwelling',
+  'shipyard',
+  'shop',
+  'shrine',
+  'siege_tower',
+  'siheyuan',
+  'silo',
+  'slaughterhouse',
+  'smokehouse',
+  'smugglers_den',
+  'souk',
+  'sphinx',
+  'stable',
+  'staithe',
+  'statue',
+  'stave_church',
+  'stoa',
+  'stupa',
+  'summoning_hall',
+  'sweat_lodge',
+  'synagogue',
+  'tailor',
+  'tannery',
+  'tavern',
+  'teahouse',
+  'temple',
+  'temple_infirmary',
+  'tenement',
+  'tent_pavilion',
+  'theater',
+  'thermae',
+  'thieves_den',
+  'tholos',
+  'threshing_barn',
+  'throne_room',
+  'tipi',
+  'tithe_barn',
+  'tolbooth',
+  'tollhouse',
+  'tomb',
+  'tower',
+  'town_hall',
+  'townhouse',
+  'trading_factory',
+  'trading_post',
+  'training_hall',
+  'treasury',
+  'triumphal_arch',
+  'undercroft',
+  'university_college',
+  'vardo_wagon',
+  'wall_segment',
+  'walled_town',
+  'war_camp',
+  'warded_vault',
+  'warehouse',
+  'washhouse',
+  'wat',
+  'watchtower',
+  'water_tower',
+  'watermill',
+  'waystation',
+  'weigh_house',
+  'well_house',
+  'wheelwright',
+  'windmill',
+  'wizard_tower',
+  'workhouse',
+  'workshop',
+  'yamen',
+  'yurt',
+  'ziggurat',
+] as const
+
+export type BuildingCorpusId = (typeof BUILDING_CORPUS_IDS)[number]
+
+export const BUILDING_CORPUS_DISPOSITIONS = {
+  abbey: { kind: 'composite' },
+  academy: { kind: 'archetype' },
+  adventurers_guild: { kind: 'archetype' },
+  airship: { kind: 'form_only', structureType: 'vessel' },
+  airship_dock: { kind: 'form_only', structureType: 'infrastructure' },
+  almshouse: { kind: 'archetype' },
+  amphitheater: { kind: 'specialization', of: 'arena' },
+  anchorhold: { kind: 'interior' },
+  apartment_building: { kind: 'archetype' },
+  apiary: { kind: 'not_building' },
+  /** Slice 1: hybrid decompose evaluation — card only; may not ship as Facility. */
+  apothecary: { kind: 'archetype' },
+  aqueduct: { kind: 'form_only', structureType: 'infrastructure' },
+  archive: { kind: 'archetype' },
+  arena: { kind: 'archetype' },
+  armory: { kind: 'archetype' },
+  arsenal: { kind: 'archetype' },
+  artificer_atelier: { kind: 'specialization', of: 'factory' },
+  asylum: { kind: 'archetype' },
+  auction_house: { kind: 'archetype' },
+  audience_hall: { kind: 'archetype' },
+  bakery: { kind: 'specialization', of: 'shop' },
+  bank: { kind: 'archetype' },
+  banqueting_house: { kind: 'specialization', of: 'festhall' },
+  baptistery: { kind: 'interior' },
+  barber_surgeon: { kind: 'archetype' },
+  bardic_college: { kind: 'specialization', of: 'academy' },
+  barn: { kind: 'archetype' },
+  barracks: { kind: 'archetype' },
+  barrow: { kind: 'form_only', structureType: 'monument' },
+  basilica: { kind: 'manifestation', of: 'temple' },
+  bathhouse: { kind: 'archetype' },
+  beacon_tower: { kind: 'archetype' },
+  beast_stable: { kind: 'specialization', of: 'stable' },
+  bell_tower: { kind: 'archetype' },
+  blacksmith: { kind: 'archetype' },
+  blockhouse: { kind: 'archetype' },
+  boarding_house: { kind: 'archetype' },
+  boathouse: { kind: 'archetype' },
+  bounty_office: { kind: 'specialization', of: 'adventurers_guild' },
+  brewery: { kind: 'archetype' },
+  brickworks: { kind: 'archetype' },
+  bridge: { kind: 'form_only', structureType: 'infrastructure' },
+  bridge_house: { kind: 'interior' },
+  broch: { kind: 'manifestation', of: 'house' },
+  brothel: { kind: 'archetype' },
+  butcher: { kind: 'specialization', of: 'shop' },
+  byre: { kind: 'specialization', of: 'barn' },
+  cairn: { kind: 'form_only', structureType: 'monument' },
+  camp: { kind: 'site' },
+  caravanserai: { kind: 'manifestation', of: 'inn' },
+  castle: { kind: 'composite' },
+  catacombs: { kind: 'interior' },
+  cathedral: { kind: 'specialization', of: 'temple' },
+  cave_dwelling: { kind: 'specialization', of: 'house' },
+  chandler: { kind: 'specialization', of: 'shop' },
+  chantry: { kind: 'interior' },
+  chapel: { kind: 'interior' },
+  chapter_house: { kind: 'interior' },
+  charnel_house: { kind: 'archetype' },
+  checkpoint: { kind: 'archetype' },
+  citadel: { kind: 'composite' },
+  city_gate: { kind: 'interior' },
+  clinic: { kind: 'specialization', of: 'hospital' },
+  clock_tower: { kind: 'archetype' },
+  cloister: { kind: 'interior' },
+  coach_house: { kind: 'specialization', of: 'stable' },
+  coaching_inn: { kind: 'archetype' },
+  cobbler: { kind: 'specialization', of: 'shop' },
+  coffeehouse: { kind: 'archetype' },
+  command_post: { kind: 'archetype' },
+  cooperage: { kind: 'archetype' },
+  cottage: { kind: 'specialization', of: 'house' },
+  counting_house: { kind: 'specialization', of: 'bank' },
+  courthouse: { kind: 'archetype' },
+  covered_bridge: { kind: 'interior' },
+  crannog: { kind: 'manifestation', of: 'house' },
+  crematorium: { kind: 'archetype' },
+  crypt: { kind: 'interior' },
+  customs_house: { kind: 'archetype' },
+  distillery: { kind: 'archetype' },
+  divination_parlor: { kind: 'interior' },
+  domus: { kind: 'manifestation', of: 'house' },
+  dormitory: { kind: 'interior' },
+  dovecote: { kind: 'specialization', of: 'barn' },
+  dower_house: { kind: 'specialization', of: 'manor' },
+  dragon_roost: { kind: 'overlay' },
+  drum_tower: { kind: 'manifestation', of: 'watchtower' },
+  drydock: { kind: 'form_only', structureType: 'infrastructure' },
+  dwarven_forgehold: { kind: 'composite' },
+  dyeworks: { kind: 'specialization', of: 'factory' },
+  dzong: { kind: 'composite' },
+  elven_tree_dwelling: { kind: 'specialization', of: 'house' },
+  embassy: { kind: 'archetype' },
+  enchanting_hall: { kind: 'interior' },
+  exchange: { kind: 'archetype' },
+  factory: { kind: 'archetype' },
+  farmhouse: { kind: 'specialization', of: 'house' },
+  farmstead: { kind: 'composite' },
+  feast_hall: { kind: 'interior' },
+  ferry_house: { kind: 'specialization', of: 'inn' },
+  festhall: { kind: 'archetype' },
+  fighting_pit: { kind: 'specialization', of: 'arena' },
+  flophouse: { kind: 'specialization', of: 'boarding_house' },
+  folly: { kind: 'archetype' },
+  forge: { kind: 'interior' },
+  fortress: { kind: 'composite' },
+  foundry: { kind: 'specialization', of: 'factory' },
+  fountain: { kind: 'form_only', structureType: 'infrastructure' },
+  fulling_mill: { kind: 'specialization', of: 'mill' },
+  gallows: { kind: 'not_building' },
+  gambling_hall: { kind: 'archetype' },
+  gamekeepers_cottage: { kind: 'interior' },
+  /** Slice 1: contextual decompose — not Form; not a deterministic alias of checkpoint. */
+  gatehouse: { kind: 'archetype' },
+  general_store: { kind: 'specialization', of: 'shop' },
+  gladiator_school: { kind: 'archetype' },
+  glassworks: { kind: 'archetype' },
+  godown: { kind: 'manifestation', of: 'warehouse' },
+  golem_workshop: { kind: 'specialization', of: 'factory' },
+  granary: { kind: 'archetype' },
+  granary_on_stilts: { kind: 'manifestation', of: 'warehouse' },
+  greenhouse: { kind: 'archetype' },
+  griffon_aerie: { kind: 'specialization', of: 'stable' },
+  guard_post: { kind: 'archetype' },
+  guildhall: { kind: 'archetype' },
+  gymnasium: { kind: 'composite' },
+  hammam: { kind: 'manifestation', of: 'bathhouse' },
+  harbourmaster_office: { kind: 'archetype' },
+  haunted_manor: { kind: 'overlay' },
+  healers_house: { kind: 'archetype' },
+  hermitage: { kind: 'archetype' },
+  hippodrome: { kind: 'form_only', structureType: 'infrastructure' },
+  hobbit_burrow: { kind: 'interior' },
+  hof: { kind: 'manifestation', of: 'temple' },
+  hollowed_colossus: { kind: 'overlay' },
+  hospice: { kind: 'archetype' },
+  hospital: { kind: 'archetype' },
+  house: { kind: 'archetype' },
+  houseboat: { kind: 'manifestation', of: 'house' },
+  hovel: { kind: 'overlay' },
+  hunting_lodge: { kind: 'archetype' },
+  icehouse: { kind: 'specialization', of: 'warehouse' },
+  igloo: { kind: 'manifestation', of: 'house' },
+  inn: { kind: 'archetype' },
+  insula: { kind: 'manifestation', of: 'apartment_building' },
+  jeweler: { kind: 'specialization', of: 'shop' },
+  kasbah: { kind: 'composite' },
+  keep: { kind: 'archetype' },
+  kennel: { kind: 'specialization', of: 'stable' },
+  kiln: { kind: 'interior' },
+  kiva: { kind: 'archetype' },
+  ksar: { kind: 'composite' },
+  laboratory: { kind: 'interior' },
+  lamasery: { kind: 'composite' },
+  lazaretto: { kind: 'archetype' },
+  leprosarium: { kind: 'composite' },
+  library: { kind: 'archetype' },
+  lighthouse: { kind: 'archetype' },
+  livery: { kind: 'specialization', of: 'stable' },
+  longhouse: { kind: 'manifestation', of: 'house' },
+  machiya: { kind: 'manifestation', of: 'house' },
+  madrasa: { kind: 'manifestation', of: 'academy' },
+  mage_college: { kind: 'composite' },
+  mage_prison: { kind: 'specialization', of: 'prison' },
+  magic_shop: { kind: 'specialization', of: 'shop' },
+  malt_house: { kind: 'interior' },
+  manor: { kind: 'archetype' },
+  marae: { kind: 'site' },
+  market: { kind: 'archetype' },
+  market_stall: { kind: 'not_building' },
+  martello_tower: { kind: 'archetype' },
+  mastaba: { kind: 'manifestation', of: 'mausoleum' },
+  mausoleum: { kind: 'archetype' },
+  meeting_hall: { kind: 'archetype' },
+  memorial: { kind: 'form_only', structureType: 'monument' },
+  memorial_hall: { kind: 'archetype' },
+  menagerie: { kind: 'archetype' },
+  mill: { kind: 'archetype' },
+  mimic_building: { kind: 'not_building' },
+  mint: { kind: 'archetype' },
+  mithraeum: { kind: 'interior' },
+  moai: { kind: 'form_only', structureType: 'monument' },
+  monastery: { kind: 'composite' },
+  moneylender: { kind: 'specialization', of: 'bank' },
+  moot_hall: { kind: 'manifestation', of: 'town_hall' },
+  mortuary: { kind: 'archetype' },
+  mosque: { kind: 'manifestation', of: 'temple' },
+  museum: { kind: 'archetype' },
+  nuraghe: { kind: 'archetype' },
+  oast_house: { kind: 'interior' },
+  obelisk: { kind: 'form_only', structureType: 'monument' },
+  observatory: { kind: 'archetype' },
+  odeon: { kind: 'specialization', of: 'theater' },
+  onsen: { kind: 'interior' },
+  open_air_shrine: { kind: 'site' },
+  opium_den: { kind: 'archetype' },
+  oracle_shrine: { kind: 'specialization', of: 'temple' },
+  orangery: { kind: 'specialization', of: 'greenhouse' },
+  orphanage: { kind: 'archetype' },
+  ossuary: { kind: 'interior' },
+  pa: { kind: 'site' },
+  pagoda: { kind: 'manifestation', of: 'temple' },
+  palace: { kind: 'composite' },
+  palace_complex: { kind: 'composite' },
+  paladin_chapterhouse: { kind: 'archetype' },
+  palaestra: { kind: 'form_only', structureType: 'infrastructure' },
+  pawnshop: { kind: 'specialization', of: 'shop' },
+  pigsty: { kind: 'not_building' },
+  planar_embassy: { kind: 'specialization', of: 'embassy' },
+  poorhouse: { kind: 'archetype' },
+  portal_chamber: { kind: 'interior' },
+  post_house: { kind: 'archetype' },
+  potion_shop: { kind: 'specialization', of: 'apothecary' },
+  powder_magazine: { kind: 'specialization', of: 'armory' },
+  printing_press: { kind: 'archetype' },
+  prison: { kind: 'archetype' },
+  pyramid: { kind: 'form_only', structureType: 'monument' },
+  ranger_station: { kind: 'specialization', of: 'guard_post' },
+  records_hall: { kind: 'archetype' },
+  rectory: { kind: 'specialization', of: 'house' },
+  ribat: { kind: 'manifestation', of: 'monastery' },
+  ritual_chamber: { kind: 'interior' },
+  root_cellar: { kind: 'interior' },
+  ropewalk: { kind: 'specialization', of: 'factory' },
+  roundhouse: { kind: 'manifestation', of: 'house' },
+  royal_mews: { kind: 'composite' },
+  ryokan: { kind: 'manifestation', of: 'inn' },
+  safe_house: { kind: 'overlay' },
+  sail_loft: { kind: 'interior' },
+  salt_works: { kind: 'archetype' },
+  sanctum: { kind: 'interior' },
+  schoolhouse: { kind: 'archetype' },
+  scriptorium: { kind: 'interior' },
+  shearing_shed: { kind: 'specialization', of: 'barn' },
+  sheepfold: { kind: 'not_building' },
+  shinto_shrine: { kind: 'composite' },
+  ship: { kind: 'form_only', structureType: 'vessel' },
+  shipwreck_dwelling: { kind: 'specialization', of: 'house' },
+  shipyard: { kind: 'composite' },
+  shop: { kind: 'archetype' },
+  shrine: { kind: 'interior' },
+  siege_tower: { kind: 'not_building' },
+  siheyuan: { kind: 'manifestation', of: 'house' },
+  silo: { kind: 'specialization', of: 'granary' },
+  slaughterhouse: { kind: 'archetype' },
+  smokehouse: { kind: 'archetype' },
+  smugglers_den: { kind: 'overlay' },
+  souk: { kind: 'composite' },
+  sphinx: { kind: 'form_only', structureType: 'monument' },
+  stable: { kind: 'archetype' },
+  staithe: { kind: 'form_only', structureType: 'infrastructure' },
+  statue: { kind: 'form_only', structureType: 'monument' },
+  stave_church: { kind: 'manifestation', of: 'temple' },
+  stoa: { kind: 'form_only', structureType: 'infrastructure' },
+  stupa: { kind: 'form_only', structureType: 'monument' },
+  summoning_hall: { kind: 'interior' },
+  sweat_lodge: { kind: 'manifestation', of: 'bathhouse' },
+  synagogue: { kind: 'manifestation', of: 'temple' },
+  tailor: { kind: 'specialization', of: 'shop' },
+  tannery: { kind: 'archetype' },
+  tavern: { kind: 'archetype' },
+  teahouse: { kind: 'manifestation', of: 'tavern' },
+  temple: { kind: 'archetype' },
+  temple_infirmary: { kind: 'interior' },
+  tenement: { kind: 'archetype' },
+  tent_pavilion: { kind: 'overlay' },
+  theater: { kind: 'archetype' },
+  thermae: { kind: 'composite' },
+  thieves_den: { kind: 'overlay' },
+  tholos: { kind: 'manifestation', of: 'mausoleum' },
+  threshing_barn: { kind: 'specialization', of: 'barn' },
+  throne_room: { kind: 'interior' },
+  tipi: { kind: 'manifestation', of: 'house' },
+  tithe_barn: { kind: 'specialization', of: 'barn' },
+  tolbooth: { kind: 'manifestation', of: 'courthouse' },
+  tollhouse: { kind: 'specialization', of: 'checkpoint' },
+  tomb: { kind: 'interior' },
+  tower: { kind: 'archetype' },
+  town_hall: { kind: 'archetype' },
+  townhouse: { kind: 'specialization', of: 'house' },
+  trading_factory: { kind: 'manifestation', of: 'warehouse' },
+  trading_post: { kind: 'archetype' },
+  training_hall: { kind: 'archetype' },
+  treasury: { kind: 'archetype' },
+  triumphal_arch: { kind: 'form_only', structureType: 'monument' },
+  undercroft: { kind: 'interior' },
+  university_college: { kind: 'composite' },
+  vardo_wagon: { kind: 'not_building' },
+  wall_segment: { kind: 'form_only', structureType: 'fortification' },
+  walled_town: { kind: 'site' },
+  war_camp: { kind: 'site' },
+  warded_vault: { kind: 'interior' },
+  warehouse: { kind: 'archetype' },
+  washhouse: { kind: 'archetype' },
+  wat: { kind: 'composite' },
+  watchtower: { kind: 'archetype' },
+  water_tower: { kind: 'form_only', structureType: 'infrastructure' },
+  watermill: { kind: 'specialization', of: 'mill' },
+  waystation: { kind: 'archetype' },
+  weigh_house: { kind: 'archetype' },
+  well_house: { kind: 'interior' },
+  wheelwright: { kind: 'archetype' },
+  windmill: { kind: 'specialization', of: 'mill' },
+  wizard_tower: { kind: 'archetype' },
+  workhouse: { kind: 'specialization', of: 'poorhouse' },
+  workshop: { kind: 'interior' },
+  yamen: { kind: 'composite' },
+  yurt: { kind: 'manifestation', of: 'house' },
+  ziggurat: { kind: 'form_only', structureType: 'monument' },
+} as const satisfies Record<BuildingCorpusId, BuildingCorpusDisposition>
+
+export const BUILDING_ARCHETYPE_REFACTOR_STATUS = {
+  enabledForm: 'enabled-form',
+  enabledFacility: 'enabled-facility',
+  rehomeToOrganizationActivity: 'rehome-to-organization-activity',
+  decompose: 'decompose',
+  outsideBuildingClassification: 'outside-building-classification',
+  pending: 'pending',
+  needsDesign: 'needs-design',
+} as const
+
+export type BuildingArchetypeRefactorStatus =
+  (typeof BUILDING_ARCHETYPE_REFACTOR_STATUS)[keyof typeof BUILDING_ARCHETYPE_REFACTOR_STATUS]
+
+export type BuildingArchetypeRefactorInventoryEntry = {
+  readonly id: BuildingCorpusId
+  readonly wasRuntimeArchetype: boolean
+  readonly status: BuildingArchetypeRefactorStatus
+}
+
+export const BUILDING_RESEARCH_CORPUS_IDS = BUILDING_CORPUS_IDS
+
+const LEGACY_RUNTIME_COMPOSITE_IDS = new Set<BuildingCorpusId>(['monastery', 'palace', 'shipyard'])
+
+export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter((id) => {
+  const disposition = BUILDING_CORPUS_DISPOSITIONS[id]
+  return (
+    disposition.kind === 'archetype' ||
+    disposition.kind === 'manifestation' ||
+    LEGACY_RUNTIME_COMPOSITE_IDS.has(id)
+  )
+})
+
+/**
+ * Non-inferable migration decisions only — shipped Form/Facility ids derive from registries.
+ * Sweep 1 membership is explicit per family; Tier C per batch.
+ * Planning: docs/roadmap/building-taxonomy.md
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
+ */
+export const SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'airship',
+  'airship_dock',
+  'apiary',
+  'aqueduct',
+  'barrow',
+  'bridge',
+  'cairn',
+  'camp',
+  'dragon_roost',
+  'drydock',
+  'fountain',
+  'gallows',
+  'hippodrome',
+  'hollowed_colossus',
+  'market_stall',
+  'marae',
+  'memorial',
+  'mimic_building',
+  'moai',
+  'obelisk',
+  'open_air_shrine',
+  'pa',
+  'palaestra',
+  'pyramid',
+  'sheepfold',
+  'ship',
+  'siege_tower',
+  'sphinx',
+  'statue',
+  'staithe',
+  'stoa',
+  'stupa',
+  'triumphal_arch',
+  'vardo_wagon',
+  'wall_segment',
+  'walled_town',
+  'war_camp',
+  'water_tower',
+  'ziggurat',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS = [
+  'barber_surgeon',
+  'butcher',
+  'chandler',
+  'cobbler',
+  'jeweler',
+  'moneylender',
+  'tailor',
+  'wheelwright',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS = [
+  'amphitheater',
+  'banqueting_house',
+  'bardic_college',
+  'basilica',
+  'beast_stable',
+  'byre',
+  'caravanserai',
+  'cathedral',
+  'cottage',
+  'counting_house',
+  'dovecote',
+  'drum_tower',
+  'farmhouse',
+  'fighting_pit',
+  'flophouse',
+  'general_store',
+  'godown',
+  'granary_on_stilts',
+  'griffon_aerie',
+  'hammam',
+  'hof',
+  'houseboat',
+  'insula',
+  'livery',
+  'magic_shop',
+  'madrasa',
+  'mastaba',
+  'mage_prison',
+  'moot_hall',
+  'mosque',
+  'oracle_shrine',
+  'pagoda',
+  'pawnshop',
+  'planar_embassy',
+  'potion_shop',
+  'powder_magazine',
+  'ranger_station',
+  'rectory',
+  'ribat',
+  'ryokan',
+  'shearing_shed',
+  'stave_church',
+  'sweat_lodge',
+  'synagogue',
+  'teahouse',
+  'threshing_barn',
+  'tithe_barn',
+  'tolbooth',
+  'townhouse',
+  'trading_factory',
+  'watermill',
+  'windmill',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS = [
+  'haunted_manor',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS = [
+  'dower_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS = [
+  'healers_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_PRIOR_DECOMPOSE_IDS = [
+  'apothecary',
+  'gatehouse',
+  'manor',
+  'wizard_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Tier C composite review queue — scheduling only; `kind: composite` is not disposition evidence.
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const TIER_C_COMPOSITE_QUEUE_IDS = [
+  'monastery',
+  'palace',
+  'shipyard',
+  'castle',
+  'citadel',
+  'fortress',
+  'kasbah',
+  'dzong',
+  'abbey',
+  'lamasery',
+  'wat',
+  'shinto_shrine',
+  'mage_college',
+  'university_college',
+  'leprosarium',
+  'gymnasium',
+  'farmstead',
+  'palace_complex',
+  'royal_mews',
+  'souk',
+  'thermae',
+  'dwarven_forgehold',
+  'ksar',
+  'yamen',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 1 — legacy runtime composites reviewed 2026-08-14. */
+export const TIER_C_BATCH1_DECOMPOSE_IDS = [
+  'monastery',
+  'palace',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH1_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'shipyard',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 2 — defense / status massing reviewed 2026-08-14 (structure/complex gate). */
+export const TIER_C_BATCH2_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'castle',
+  'citadel',
+  'fortress',
+  'kasbah',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH2_DECOMPOSE_IDS = ['dzong'] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 3A — religious institution / premises. */
+export const TIER_C_BATCH3A_DECOMPOSE_IDS = ['abbey'] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH3A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'lamasery',
+  'shinto_shrine',
+  'wat',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 3B — education / care institution composites. */
+export const TIER_C_BATCH3B_DECOMPOSE_IDS = [
+  'gymnasium',
+  'leprosarium',
+  'mage_college',
+  'university_college',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 4 — mixed composite review batch (independent cards). */
+export const TIER_C_BATCH4_DECOMPOSE_IDS = [
+  'royal_mews',
+  'thermae',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'dwarven_forgehold',
+  'farmstead',
+  'ksar',
+  'palace_complex',
+  'souk',
+  'yamen',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Family B non-composite institution terms reviewed 2026-08-14. */
+export const TIER_C_FAMILY_B_DECOMPOSE_IDS = [
+  'adventurers_guild',
+  'customs_house',
+  'orphanage',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Reviewed Tier C / Family B terms intentionally kept pending (concrete trigger on card). */
+export const TIER_C_REVIEWED_PENDING_IDS = [
+  'academy',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 19A morphology investigation allowlist — frozen 2026-08-14.
+ * Derived from roadmap investigation seeds; verified against live inventory.
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS = [
+  'blockhouse',
+  'martello_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Sweep Family E morphology-rich cultural expressions (pending). */
+export const PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS = [
+  'broch',
+  'crannog',
+  'domus',
+  'igloo',
+  'longhouse',
+  'machiya',
+  'roundhouse',
+  'siheyuan',
+  'tholos',
+  'tipi',
+  'yurt',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Sweep Family E site/context morphology terms (pending). */
+export const PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS = [
+  'cave_dwelling',
+  'elven_tree_dwelling',
+  'shipwreck_dwelling',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS = [
+  ...PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS,
+  ...PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS,
+  ...PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A fortification morphology reviewed 2026-08-14. */
+export const PHASE_19A_FORTIFICATION_DECOMPOSE_IDS = [
+  'martello_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A fortification morphology reviewed 2026-08-14. */
+export const PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS = [
+  'blockhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A cultural morphology reviewed 2026-08-14. */
+export const PHASE_19A_CULTURAL_DECOMPOSE_IDS = [
+  'broch',
+  'domus',
+  'igloo',
+  'longhouse',
+  'machiya',
+  'roundhouse',
+  'tholos',
+  'tipi',
+  'yurt',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'crannog',
+  'siheyuan',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A site/context morphology reviewed 2026-08-14. */
+export const PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS = [
+  'cave_dwelling',
+  'elven_tree_dwelling',
+  'shipwreck_dwelling',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_DECOMPOSE_IDS = [
+  ...PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
+  ...PHASE_19A_CULTURAL_DECOMPOSE_IDS,
+  ...PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  ...PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 19B production / approximate-Facility allowlist — frozen 2026-08-14.
+ * Sweep Family E approximate Facility pull (11). `workshop` excluded — interior /
+ * Tier B Facility-candidate boundary; see sweep Family F exception list.
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS = [
+  'artificer_atelier',
+  'bounty_office',
+  'coach_house',
+  'dyeworks',
+  'foundry',
+  'fulling_mill',
+  'golem_workshop',
+  'icehouse',
+  'kennel',
+  'ropewalk',
+  'tollhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19B reviewed 2026-08-14 — nearest shipped Facility sufficient. */
+export const PHASE_19B_FACTORY_DECOMPOSE_IDS = [
+  'artificer_atelier',
+  'dyeworks',
+  'foundry',
+  'golem_workshop',
+  'ropewalk',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_MILL_DECOMPOSE_IDS = [
+  'fulling_mill',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_WAREHOUSE_DECOMPOSE_IDS = [
+  'icehouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_STABLE_DECOMPOSE_IDS = [
+  'coach_house',
+  'kennel',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_CHECKPOINT_DECOMPOSE_IDS = [
+  'tollhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_SHOP_DECOMPOSE_IDS = [
+  'bounty_office',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_19B_DECOMPOSE_IDS = [
+  ...PHASE_19B_FACTORY_DECOMPOSE_IDS,
+  ...PHASE_19B_MILL_DECOMPOSE_IDS,
+  ...PHASE_19B_WAREHOUSE_DECOMPOSE_IDS,
+  ...PHASE_19B_STABLE_DECOMPOSE_IDS,
+  ...PHASE_19B_CHECKPOINT_DECOMPOSE_IDS,
+  ...PHASE_19B_SHOP_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 19C selective runtime promotion gate — frozen 2026-08-14.
+ * Four carry-forwards from 19A/19B/Tier B only — no scope expansion.
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_19C_CANDIDATE_IDS = [
+  'blockhouse',
+  'workshop',
+  'museum',
+  'academy',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19C gate reviewed 2026-08-14 — zero runtime Form/Facility promotions. */
+export const PHASE_19C_NO_PROMOTION_IDS = [
+  ...PHASE_19C_CANDIDATE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 20A foundation Facility admission — frozen 2026-08-14.
+ * Product-driven promotion gate; not corpus disposition scope expansion.
+ * `office` is authoring-only (not in research corpus). Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_20A_PROMOTED_CORPUS_FACILITY_IDS = [
+  'workshop',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 20B specialist Facility admission — frozen 2026-08-14.
+ * Eight-term comparison set from roadmap; product gate only — not corpus disposition sweep.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_20B_SPECIALIST_ALLOWLIST_IDS = [
+  'slaughterhouse',
+  'tannery',
+  'bakery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'auction_house',
+  'gambling_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 20B gate reviewed 2026-08-14 — two specialist promotions. */
+export const PHASE_20B_PROMOTED_CORPUS_FACILITY_IDS = [
+  'bakery',
+  'auction_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 20B gate reviewed 2026-08-14 — nearest shipped Facility sufficient. */
+export const PHASE_20B_REJECTED_SPECIALIST_IDS = [
+  'slaughterhouse',
+  'tannery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'gambling_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 21 Commercial / Production tail reconciliation — frozen 2026-08-14.
+ * Thirty-eight corpus terms not reviewed in Phase 20; regrouped by canonical-owner
+ * boundary after workshop/office enrichment. `gambling_hall` excluded — Phase 20B reviewed.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_21_ALLOWLIST_IDS = [
+  'brickworks',
+  'glassworks',
+  'salt_works',
+  'cooperage',
+  'printing_press',
+  'smokehouse',
+  'exchange',
+  'trading_post',
+  'washhouse',
+  'weigh_house',
+  'ferry_house',
+  'odeon',
+  'clinic',
+  'brothel',
+  'coffeehouse',
+  'festhall',
+  'menagerie',
+  'opium_den',
+  'post_house',
+  'harbourmaster_office',
+  'boathouse',
+  'coaching_inn',
+  'waystation',
+  'treasury',
+  'records_hall',
+  'gladiator_school',
+  'training_hall',
+  'meeting_hall',
+  'audience_hall',
+  'memorial_hall',
+  'almshouse',
+  'asylum',
+  'poorhouse',
+  'hospice',
+  'lazaretto',
+  'workhouse',
+  'arsenal',
+  'divination_parlor',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket A — workshop-scale craft/production (post-20A). */
+export const PHASE_21_WORKSHOP_DECOMPOSE_IDS = [
+  'cooperage',
+  'printing_press',
+  'smokehouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket A — works-scale industrial production. */
+export const PHASE_21_FACTORY_DECOMPOSE_IDS = [
+  'brickworks',
+  'glassworks',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B — administrative / trade clerical premises (post-20A office). */
+export const PHASE_21_OFFICE_DECOMPOSE_IDS = [
+  'exchange',
+  'harbourmaster_office',
+  'weigh_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C — hospitality / relay lodging compositions. */
+export const PHASE_21_INN_DECOMPOSE_IDS = [
+  'coaching_inn',
+  'ferry_house',
+  'post_house',
+  'waystation',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C — drink / social hospitality premises. */
+export const PHASE_21_TAVERN_DECOMPOSE_IDS = [
+  'coffeehouse',
+  'festhall',
+  'opium_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket D — configured care / treatment premises. */
+export const PHASE_21_HOSPITAL_DECOMPOSE_IDS = [
+  'asylum',
+  'clinic',
+  'hospice',
+  'lazaretto',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket D — configured residential care premises. */
+export const PHASE_21_BOARDING_HOUSE_DECOMPOSE_IDS = [
+  'almshouse',
+  'poorhouse',
+  'workhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — archive-class record / memorial premises. */
+export const PHASE_21_ARCHIVE_DECOMPOSE_IDS = [
+  'memorial_hall',
+  'records_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — performance / audience premises. */
+export const PHASE_21_THEATER_DECOMPOSE_IDS = [
+  'audience_hall',
+  'odeon',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B/E — civic assembly premises. */
+export const PHASE_21_TOWN_HALL_DECOMPOSE_IDS = [
+  'meeting_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — weapons storage premises. */
+export const PHASE_21_ARMORY_DECOMPOSE_IDS = [
+  'arsenal',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C/F — storage / frontier trade premises. */
+export const PHASE_21_WAREHOUSE_DECOMPOSE_IDS = [
+  'boathouse',
+  'trading_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C/G — retail / parlor service premises. */
+export const PHASE_21_SHOP_DECOMPOSE_IDS = [
+  'divination_parlor',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — training-school premises. */
+export const PHASE_21_SCHOOLHOUSE_DECOMPOSE_IDS = [
+  'gladiator_school',
+  'training_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B — state finance storage premises. */
+export const PHASE_21_BANK_DECOMPOSE_IDS = [
+  'treasury',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket F — site-scale production / grounds (scale/unit gate). */
+export const PHASE_21_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'menagerie',
+  'salt_works',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket G — reviewed; existing Facilities sufficient; keep pending. */
+export const PHASE_21_REVIEWED_PENDING_IDS = [
+  'brothel',
+  'washhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_21_DECOMPOSE_IDS = [
+  ...PHASE_21_WORKSHOP_DECOMPOSE_IDS,
+  ...PHASE_21_FACTORY_DECOMPOSE_IDS,
+  ...PHASE_21_OFFICE_DECOMPOSE_IDS,
+  ...PHASE_21_INN_DECOMPOSE_IDS,
+  ...PHASE_21_TAVERN_DECOMPOSE_IDS,
+  ...PHASE_21_HOSPITAL_DECOMPOSE_IDS,
+  ...PHASE_21_BOARDING_HOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_ARCHIVE_DECOMPOSE_IDS,
+  ...PHASE_21_THEATER_DECOMPOSE_IDS,
+  ...PHASE_21_TOWN_HALL_DECOMPOSE_IDS,
+  ...PHASE_21_ARMORY_DECOMPOSE_IDS,
+  ...PHASE_21_WAREHOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_SHOP_DECOMPOSE_IDS,
+  ...PHASE_21_SCHOOLHOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_BANK_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 22 reviewed carry-forwards — comparison controls only; not 22A investigation targets.
+ * Reopen only when Phase 22B urban coverage produces new product evidence.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_22_REVIEWED_CARRY_FORWARD_IDS = [
+  'blockhouse',
+  'academy',
+  'museum',
+  'slaughterhouse',
+  'tannery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'gambling_hall',
+  'brothel',
+  'washhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 22A residual non-interior corpus allowlist — frozen 2026-08-14 from live inventory.
+ * Unresolved rows excluding `interior`, `manifestation`, and Phase 22 carry-forwards.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_22A_RESIDUAL_ALLOWLIST_IDS = [
+  'beacon_tower',
+  'bell_tower',
+  'charnel_house',
+  'clock_tower',
+  'command_post',
+  'folly',
+  'guard_post',
+  'hermitage',
+  'hovel',
+  'hunting_lodge',
+  'kiva',
+  'mausoleum',
+  'nuraghe',
+  'orangery',
+  'paladin_chapterhouse',
+  'pigsty',
+  'safe_house',
+  'silo',
+  'smugglers_den',
+  'tenement',
+  'tent_pavilion',
+  'thieves_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — tower morphology + beacon signaling premises. */
+export const PHASE_22A_LIGHTHOUSE_DECOMPOSE_IDS = [
+  'beacon_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — tower Form sufficient for bell/clock morphology. */
+export const PHASE_22A_TOWER_DECOMPOSE_IDS = [
+  'bell_tower',
+  'clock_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — military command premises. */
+export const PHASE_22A_BARRACKS_DECOMPOSE_IDS = [
+  'command_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — security/checkpoint premises. */
+export const PHASE_22A_CHECKPOINT_DECOMPOSE_IDS = [
+  'guard_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — order/chapter institution premises. */
+export const PHASE_22A_GUILDHALL_DECOMPOSE_IDS = [
+  'paladin_chapterhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — dense urban housing premises. */
+export const PHASE_22A_APARTMENT_BUILDING_DECOMPOSE_IDS = [
+  'tenement',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — greenhouse-class cultivation premises. */
+export const PHASE_22A_GREENHOUSE_DECOMPOSE_IDS = [
+  'orangery',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — bulk grain storage premises. */
+export const PHASE_22A_GRANARY_DECOMPOSE_IDS = [
+  'silo',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — rural hospitality premises. */
+export const PHASE_22A_INN_DECOMPOSE_IDS = [
+  'hunting_lodge',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — overlay/contextual composition onto shipped premises. */
+export const PHASE_22A_OVERLAY_DECOMPOSE_IDS = [
+  'hovel',
+  'safe_house',
+  'smugglers_den',
+  'thieves_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — livestock enclosure (align with sheepfold gate). */
+export const PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'pigsty',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 22A reviewed 2026-08-14 — cultural/morphology tail; canonical vocabulary sufficient. */
+export const PHASE_22A_REVIEWED_PENDING_IDS = [
+  'charnel_house',
+  'folly',
+  'hermitage',
+  'kiva',
+  'mausoleum',
+  'nuraghe',
+  'tent_pavilion',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_22A_DECOMPOSE_IDS = [
+  ...PHASE_22A_LIGHTHOUSE_DECOMPOSE_IDS,
+  ...PHASE_22A_TOWER_DECOMPOSE_IDS,
+  ...PHASE_22A_BARRACKS_DECOMPOSE_IDS,
+  ...PHASE_22A_CHECKPOINT_DECOMPOSE_IDS,
+  ...PHASE_22A_GUILDHALL_DECOMPOSE_IDS,
+  ...PHASE_22A_APARTMENT_BUILDING_DECOMPOSE_IDS,
+  ...PHASE_22A_GREENHOUSE_DECOMPOSE_IDS,
+  ...PHASE_22A_GRANARY_DECOMPOSE_IDS,
+  ...PHASE_22A_INN_DECOMPOSE_IDS,
+  ...PHASE_22A_OVERLAY_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_DECOMPOSE_IDS = [
+  ...TIER_C_BATCH1_DECOMPOSE_IDS,
+  ...TIER_C_BATCH2_DECOMPOSE_IDS,
+  ...TIER_C_BATCH3A_DECOMPOSE_IDS,
+  ...TIER_C_BATCH3B_DECOMPOSE_IDS,
+  ...TIER_C_BATCH4_DECOMPOSE_IDS,
+  ...TIER_C_FAMILY_B_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  ...TIER_C_BATCH1_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH2_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH3A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+function statusMapForIds(
+  ids: readonly BuildingCorpusId[],
+  status: BuildingArchetypeRefactorStatus,
+): Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>> {
+  return Object.fromEntries(ids.map((id) => [id, status]))
+}
+
+const INITIAL_STATUS_BY_ID = {
+  ...statusMapForIds(SWEEP_PRIOR_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(
+    SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(TIER_C_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    PHASE_19A_CULTURAL_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    PHASE_19A_SITE_CONTEXT_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(
+    PHASE_19A_CULTURAL_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(PHASE_19B_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(PHASE_21_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_21_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(PHASE_22A_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_22A_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
+  blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+} as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
+
+const SHIPPED_FORM_IDS = new Set<string>(BUILDING_FORM_IDS)
+const SHIPPED_FACILITY_IDS = new Set<string>(BUILDING_FACILITY_TYPE_IDS)
+
+function deriveInventoryStatus(id: BuildingCorpusId): BuildingArchetypeRefactorStatus {
+  const explicit = INITIAL_STATUS_BY_ID[id as keyof typeof INITIAL_STATUS_BY_ID]
+  if (explicit) return explicit
+  if (SHIPPED_FORM_IDS.has(id)) return BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledForm
+  if (SHIPPED_FACILITY_IDS.has(id)) return BUILDING_ARCHETYPE_REFACTOR_STATUS.enabledFacility
+  return BUILDING_ARCHETYPE_REFACTOR_STATUS.pending
+}
+
+const legacyRuntimeIds = new Set<BuildingCorpusId>(LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS)
+
+/**
+ * Non-runtime migration inventory for the full 308-concept Building research corpus.
+ *
+ * `wasRuntimeArchetype` identifies the 143 concepts enabled in the legacy runtime
+ * registry at the Phase 1 checkpoint. This file is migration evidence, not product
+ * vocabulary, and must never be imported by an app or package.
+ */
+export const BUILDING_ARCHETYPE_REFACTOR_INVENTORY =
+  BUILDING_RESEARCH_CORPUS_IDS.map<BuildingArchetypeRefactorInventoryEntry>((id) => ({
+    id,
+    wasRuntimeArchetype: legacyRuntimeIds.has(id),
+    status: deriveInventoryStatus(id),
+  }))

@@ -18,17 +18,19 @@ type OrganizationMembersDetail = ReturnType<typeof useOrganizationMembersDetail>
 type EditableOrganization = {
   id: string
   name: string
-  organizationKind: Organization['organizationKind']
-  organizationSubtype?: string
+  organizationDomain: Organization['organizationDomain']
+  organizationForm?: Organization['organizationForm']
+  activities?: Organization['activities']
 }
 
 function toEditableOrganization(organization: Organization): EditableOrganization {
   return {
     id: organization.id,
     name: organization.name,
-    organizationKind: organization.organizationKind,
-    ...(organization.organizationSubtype !== undefined
-      ? { organizationSubtype: organization.organizationSubtype }
+    organizationDomain: organization.organizationDomain,
+    activities: organization.activities,
+    ...(organization.organizationForm !== undefined
+      ? { organizationForm: organization.organizationForm }
       : {}),
   }
 }

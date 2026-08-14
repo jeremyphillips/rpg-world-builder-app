@@ -1,79 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  applyAuthoringTypeValueSync,
-  applyBuildingArchetypeValueSync,
-  locationFormValueSyncs,
-} from './location-form-sync'
-
-function applyRedundantFunctionOverrideSync(values: Record<string, unknown>) {
-  const sync = locationFormValueSyncs.find(
-    (entry) =>
-      entry.dependsOn.includes('classification.functionOverride') &&
-      entry.dependsOn.includes('classification.archetype'),
-  )
-  if (!sync) throw new Error('expected redundant function override sync')
-  return sync.apply(values, ['classification.functionOverride'])
-}
-
-describe('applyBuildingArchetypeValueSync', () => {
-  it('returns undefined when specialization and override are already clear', () => {
-    expect(
-      applyBuildingArchetypeValueSync({
-        classification: { archetype: 'inn' },
-      }),
-    ).toBeUndefined()
-  })
-
-  it('clears specialization and function override when archetype changes', () => {
-    expect(
-      applyBuildingArchetypeValueSync({
-        classification: {
-          archetype: 'temple',
-          specialization: 'Sea temple',
-          functionOverride: 'care',
-        },
-      }),
-    ).toEqual({
-      classification: {
-        archetype: 'temple',
-        specialization: undefined,
-        functionOverride: undefined,
-      },
-    })
-  })
-})
-
-describe('redundant function override sync', () => {
-  it('clears an override that repeats the selected archetype default', () => {
-    expect(
-      applyRedundantFunctionOverrideSync({
-        authoringType: 'building',
-        classification: {
-          archetype: 'almshouse',
-          functionOverride: 'care',
-        },
-      }),
-    ).toEqual({
-      classification: {
-        archetype: 'almshouse',
-        functionOverride: undefined,
-      },
-    })
-  })
-
-  it('keeps a meaningful override that differs from archetype defaults', () => {
-    expect(
-      applyRedundantFunctionOverrideSync({
-        authoringType: 'building',
-        classification: {
-          archetype: 'temple',
-          functionOverride: 'lodging',
-        },
-      }),
-    ).toBeUndefined()
-  })
-})
+import { applyAuthoringTypeValueSync } from './location-form-sync'
 
 describe('applyAuthoringTypeValueSync', () => {
   it('clears building classification when switching to fortification', () => {
@@ -81,16 +8,14 @@ describe('applyAuthoringTypeValueSync', () => {
       applyAuthoringTypeValueSync({
         authoringType: 'fortification',
         classification: {
-          archetype: 'inn',
-          specialization: 'Harbor inn',
-          functionOverride: 'lodging',
+          form: 'house',
+          facilityType: 'residence',
         },
       }),
     ).toEqual({
       classification: {
-        archetype: undefined,
-        specialization: undefined,
-        functionOverride: undefined,
+        form: undefined,
+        facilityType: undefined,
       },
     })
   })
@@ -99,11 +24,11 @@ describe('applyAuthoringTypeValueSync', () => {
     expect(
       applyAuthoringTypeValueSync({
         authoringType: 'structure',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
       }),
     ).toEqual({
       classification: {
-        archetype: undefined,
+        facilityType: undefined,
       },
     })
   })
@@ -112,7 +37,7 @@ describe('applyAuthoringTypeValueSync', () => {
     expect(
       applyAuthoringTypeValueSync({
         authoringType: 'building',
-        classification: { archetype: 'warehouse' },
+        classification: { form: 'house' },
       }),
     ).toBeUndefined()
   })
@@ -122,16 +47,14 @@ describe('applyAuthoringTypeValueSync', () => {
       applyAuthoringTypeValueSync({
         authoringType: 'region',
         classification: {
-          archetype: 'inn',
-          specialization: 'Harbor inn',
-          functionOverride: 'lodging',
+          form: 'house',
+          facilityType: 'residence',
         },
       }),
     ).toEqual({
       classification: {
-        archetype: undefined,
-        specialization: undefined,
-        functionOverride: undefined,
+        form: undefined,
+        facilityType: undefined,
       },
     })
   })

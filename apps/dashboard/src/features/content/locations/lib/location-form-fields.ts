@@ -1,12 +1,15 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
+  buildingFacilityTypeSchema,
+  buildingFormSchema,
   interiorTypeSchema,
   planeTypeSchema,
   settlementTypeSchema,
   siteTypeSchema,
   slugSchema,
   validateLocationParentRequirement,
+  type BuildingFacilityAuthoringGroup,
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
@@ -40,9 +43,8 @@ const classificationFormSchema = z
   .object({
     kind: z.string().optional(),
     type: z.string().optional(),
-    archetype: z.string().optional(),
-    functionOverride: z.string().optional(),
-    specialization: z.string().optional(),
+    form: draftOptionalSelect(buildingFormSchema),
+    facilityType: draftOptionalSelect(buildingFacilityTypeSchema),
   })
   .optional()
 
@@ -114,7 +116,23 @@ function omitFixedCreateNamedFields<T>(
   })
 }
 
-export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
+function omitNamedFields<T>(fields: readonly T[], names: ReadonlySet<string>): T[] {
+  return fields.filter((field) => {
+    const name =
+      field && typeof field === 'object' && 'name' in field && typeof field.name === 'string'
+        ? field.name
+        : undefined
+    return !name || !names.has(name)
+  })
+}
+
+export function buildLocationFields(
+  ctx: ContentFormCtx,
+  options?: {
+    buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+    omitBuildingForm?: boolean
+  },
+): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
@@ -122,12 +140,15 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
   const items: FormItem[] = []
 
   if (fixedCreate) {
-    const primaryFields: RowFieldItem[] = omitFixedCreateNamedFields(
-      filterLocationFieldsForAuthoringType(
-        buildLocationPrimaryClassificationFields(),
-        fixedCreate.authoringType,
+    const primaryFields: RowFieldItem[] = omitNamedFields(
+      omitFixedCreateNamedFields(
+        filterLocationFieldsForAuthoringType(
+          buildLocationPrimaryClassificationFields(),
+          fixedCreate.authoringType,
+        ),
+        fixedCreate,
       ),
-      fixedCreate,
+      options?.omitBuildingForm ? new Set(['classification.form']) : new Set(),
     )
     if (primaryFields.length > 0) {
       items.push({ kind: 'row', fields: primaryFields })
@@ -136,7 +157,7 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
     items.push(
       ...omitFixedCreateNamedFields(
         filterLocationFieldsForAuthoringType(
-          buildLocationClassificationFields(),
+          buildLocationClassificationFields(options),
           fixedCreate.authoringType,
         ),
         fixedCreate,
@@ -183,9 +204,13 @@ export function buildLocationFields(ctx: ContentFormCtx): FormItem[] {
 
 export function composeLocationCreateBodyFields(
   ctx: ContentFormCtx,
-  options?: { afterDescription?: FormItem[] },
+  options?: {
+    afterDescription?: FormItem[]
+    buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+    omitBuildingForm?: boolean
+  },
 ): FormItem[] {
-  const items = buildLocationFields(ctx)
+  const items = buildLocationFields(ctx, options)
   if (options?.afterDescription?.length) {
     items.push(...options.afterDescription)
   }

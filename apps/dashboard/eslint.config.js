@@ -1,3 +1,4 @@
+import { buildingArchetypeAppQuarantine } from '@rpg/config/eslint/building-archetype-quarantine'
 import react from '@rpg/config/eslint/react'
 import storybook from 'eslint-plugin-storybook'
 
@@ -179,6 +180,7 @@ const dashboardDragHandleGuard = {
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
+  buildingArchetypeAppQuarantine,
   dashboardStorybookRouterRule,
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,

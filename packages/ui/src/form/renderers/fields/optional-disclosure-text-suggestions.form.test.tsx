@@ -34,8 +34,8 @@ function TextSuggestionsDisclosureHarness({
   )
 }
 
-async function selectArchetype(user: ReturnType<typeof userEvent.setup>, label: string) {
-  await user.click(screen.getByRole('combobox', { name: 'Archetype' }))
+async function selectFacilityType(user: ReturnType<typeof userEvent.setup>, label: string) {
+  await user.click(screen.getByRole('combobox', { name: 'Facility type' }))
   await user.click(screen.getByRole('option', { name: label }))
 }
 
@@ -46,13 +46,13 @@ const specializationFields: FormItem[] = [
     label: 'Specialization',
     placeholder: 'Enter specialization…',
     suggestions: {
-      dependsOn: ['classification.archetype'],
+      dependsOn: ['classification.facilityType'],
       suggestionsWhen: (values) => {
-        if (values['classification.archetype'] === 'inn') {
+        if (values['classification.facilityType'] === 'inn') {
           return ['coaching inn', 'roadside inn']
         }
-        if (values['classification.archetype'] === 'embassy') {
-          return ['planar embassy']
+        if (values['classification.facilityType'] === 'temple') {
+          return ['sea temple']
         }
         return []
       },
@@ -64,11 +64,11 @@ const specializationFields: FormItem[] = [
   },
   {
     type: 'select',
-    name: 'classification.archetype',
-    label: 'Archetype',
+    name: 'classification.facilityType',
+    label: 'Facility type',
     options: [
       { value: 'inn', label: 'Inn' },
-      { value: 'embassy', label: 'Embassy' },
+      { value: 'temple', label: 'Temple' },
     ],
   },
 ]
@@ -78,7 +78,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
     render(
       <TextSuggestionsDisclosureHarness
         items={specializationFields}
-        defaultValues={{ 'classification.archetype': 'inn' }}
+        defaultValues={{ 'classification.facilityType': 'inn' }}
       />,
     )
 
@@ -93,7 +93,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
       <TextSuggestionsDisclosureHarness
         items={specializationFields}
         defaultValues={{
-          'classification.archetype': 'inn',
+          'classification.facilityType': 'inn',
           'classification.specialization': 'coaching inn',
         }}
       />,
@@ -110,7 +110,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
     render(
       <TextSuggestionsDisclosureHarness
         items={specializationFields}
-        defaultValues={{ 'classification.archetype': 'inn' }}
+        defaultValues={{ 'classification.facilityType': 'inn' }}
       />,
     )
 
@@ -118,7 +118,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
     expect(screen.getByRole('textbox', { name: 'Specialization' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Coaching inn' })).toBeInTheDocument()
 
-    await selectArchetype(user, 'Embassy')
+    await selectFacilityType(user, 'Temple')
 
     expect(screen.getByRole('button', { name: 'Add specialization' })).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: 'Specialization' })).not.toBeInTheDocument()
@@ -127,11 +127,11 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
 
 describe('Form specialization disclosure with value sync', () => {
   const schema = z.object({
-    'classification.archetype': z.string().optional(),
+    'classification.facilityType': z.string().optional(),
     'classification.specialization': z.string().optional(),
   })
 
-  it('collapses disclosure after archetype change clears specialization', async () => {
+  it('collapses disclosure after facility type change clears specialization', async () => {
     const user = userEvent.setup()
 
     render(
@@ -139,14 +139,14 @@ describe('Form specialization disclosure with value sync', () => {
         schema={schema}
         fields={specializationFields}
         defaultValues={{
-          'classification.archetype': 'inn',
+          'classification.facilityType': 'inn',
           'classification.specialization': 'coaching inn',
         }}
         valueSyncs={[
           {
-            dependsOn: ['classification.archetype'],
+            dependsOn: ['classification.facilityType'],
             apply: (values, changedKeys) => {
-              if (!changedKeys.includes('classification.archetype')) return undefined
+              if (!changedKeys.includes('classification.facilityType')) return undefined
               if (!values['classification.specialization']) return undefined
               return { 'classification.specialization': undefined }
             },
@@ -158,7 +158,7 @@ describe('Form specialization disclosure with value sync', () => {
 
     expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveValue('coaching inn')
 
-    await selectArchetype(user, 'Embassy')
+    await selectFacilityType(user, 'Temple')
 
     expect(screen.getByRole('button', { name: 'Add specialization' })).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: 'Specialization' })).not.toBeInTheDocument()

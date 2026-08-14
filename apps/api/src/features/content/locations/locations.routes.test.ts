@@ -164,7 +164,7 @@ describe('location content routes', () => {
 
     const parentId = settlementRes.body.locations.id
 
-    const archetypeOnlyRes = await agent
+    const facilityOnlyRes = await agent
       .post(`/api/campaigns/${campaignId}/content/locations`)
       .set(CSRF_HEADER, csrfToken)
       .send({
@@ -172,13 +172,13 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Yawning Portal',
         structureType: 'building',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
         parentLocationId: parentId,
       })
       .expect(201)
-    expect(archetypeOnlyRes.body.locations.classification).toEqual({ archetype: 'tavern' })
+    expect(facilityOnlyRes.body.locations.classification).toEqual({ facilityType: 'brewery' })
 
-    const specializationRes = await agent
+    const formOnlyRes = await agent
       .post(`/api/campaigns/${campaignId}/content/locations`)
       .set(CSRF_HEADER, csrfToken)
       .send({
@@ -186,16 +186,13 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Coaching Inn',
         structureType: 'building',
-        classification: { archetype: 'inn', specialization: 'Coaching inn' },
+        classification: { form: 'house' },
         parentLocationId: parentId,
       })
       .expect(201)
-    expect(specializationRes.body.locations.classification).toEqual({
-      archetype: 'inn',
-      specialization: 'Coaching inn',
-    })
+    expect(formOnlyRes.body.locations.classification).toEqual({ form: 'house' })
 
-    const overrideRes = await agent
+    const combinedRes = await agent
       .post(`/api/campaigns/${campaignId}/content/locations`)
       .set(CSRF_HEADER, csrfToken)
       .send({
@@ -203,28 +200,14 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Healing Temple',
         structureType: 'building',
-        classification: { archetype: 'temple', functionOverride: 'care' },
+        classification: { form: 'house', facilityType: 'temple' },
         parentLocationId: parentId,
       })
       .expect(201)
-    expect(overrideRes.body.locations.classification).toEqual({
-      archetype: 'temple',
-      functionOverride: 'care',
+    expect(combinedRes.body.locations.classification).toEqual({
+      form: 'house',
+      facilityType: 'temple',
     })
-
-    const manifestationRes = await agent
-      .post(`/api/campaigns/${campaignId}/content/locations`)
-      .set(CSRF_HEADER, csrfToken)
-      .send({
-        slug: 'desert-rest',
-        kind: 'structure',
-        name: 'Desert Rest',
-        structureType: 'building',
-        classification: { archetype: 'caravanserai' },
-        parentLocationId: parentId,
-      })
-      .expect(201)
-    expect(manifestationRes.body.locations.classification).toEqual({ archetype: 'caravanserai' })
 
     const unclassifiedRes = await agent
       .post(`/api/campaigns/${campaignId}/content/locations`)
@@ -268,11 +251,11 @@ describe('location content routes', () => {
       .post(`/api/campaigns/${campaignId}/content/locations`)
       .set(CSRF_HEADER, csrfToken)
       .send({
-        slug: 'bad-archetype',
+        slug: 'empty-classification',
         kind: 'structure',
-        name: 'Bad Archetype',
+        name: 'Empty Classification',
         structureType: 'building',
-        classification: { archetype: 'not_an_archetype' },
+        classification: {},
         parentLocationId: parentId,
       })
       .expect(400)
@@ -281,11 +264,24 @@ describe('location content routes', () => {
       .post(`/api/campaigns/${campaignId}/content/locations`)
       .set(CSRF_HEADER, csrfToken)
       .send({
-        slug: 'bad-override',
+        slug: 'bad-form',
         kind: 'structure',
-        name: 'Bad Override',
+        name: 'Bad Form',
         structureType: 'building',
-        classification: { archetype: 'temple', functionOverride: 'not_a_function' },
+        classification: { form: 'gatehouse' },
+        parentLocationId: parentId,
+      })
+      .expect(400)
+
+    await agent
+      .post(`/api/campaigns/${campaignId}/content/locations`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'bad-facility',
+        kind: 'structure',
+        name: 'Bad Facility',
+        structureType: 'building',
+        classification: { facilityType: 'not-a-facility' },
         parentLocationId: parentId,
       })
       .expect(400)
@@ -298,7 +294,7 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Fort With Classification',
         structureType: 'fortification',
-        classification: { archetype: 'tavern' },
+        classification: { facilityType: 'brewery' },
         parentLocationId: parentId,
       })
       .expect(400)
@@ -423,7 +419,7 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Guildhouse',
         structureType: 'building',
-        classification: { archetype: 'guildhall' },
+        classification: { facilityType: 'residence' },
         parentLocationId: parkRes.body.locations.id,
       })
       .expect(201)

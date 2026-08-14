@@ -45,7 +45,7 @@ describe('GET /api/campaigns/:campaignId/content/organizations/references/:chara
     const organization = await createHomebrewContent(organizationWriteConfig, campaignId, {
       slug: 'shadow-guild',
       name: 'Shadow Guild',
-      organizationKind: 'other',
+      organizationDomain: 'other',
     })
     const { character: npc } = await createCampaignNpc(campaignId, {
       ...minimalNpcRequestInput,

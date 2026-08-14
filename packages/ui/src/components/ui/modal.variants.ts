@@ -15,18 +15,30 @@ export const modalOverlayVariants = cva(
 )
 
 /**
- * Reserved block-size for `Modal.Content layout="stable"`. Single authoritative
- * definition — do not duplicate in features or modal implementation.
+ * Reserved block-size for `Modal.Content layout="stable" stableSize="default"`.
+ * Single authoritative definition — do not duplicate in features or modal implementation.
  */
 export const modalStableBlockSizeClasses = 'h-[min(85vh,40rem)]'
+
+/**
+ * Taller block-size for `Modal.Content layout="stable" stableSize="tall"`.
+ * Paired with {@link modalStableTallMaxHeightClasses} to override the base cap.
+ */
+export const modalStableTallBlockSizeClasses = 'h-[min(90vh,48rem)]'
+
+/** Compound override only — wins over the base `max-h-[85vh]` shell cap for tall stable modals. */
+export const modalStableTallMaxHeightClasses = 'max-h-[90vh]'
+
+/** Modal-owned footer dock placement; shared footer tokens own chrome only. */
+export const modalFooterDockClasses = 'shrink-0'
 
 /**
  * The centered modal panel. `size` caps the max-width; the panel itself is
  * height-capped (`max-h-[85vh]`) and clips its overflow so the scrollable region
  * lives in `Modal.Body`, keeping the header/footer pinned.
  *
- * `layout="stable"` applies {@link modalStableBlockSizeClasses} for a fixed shell
- * block-size; scroll ownership stays on `Modal.Body` / `stableBody`.
+ * `layout="stable"` reserves a fixed shell block-size via `stableSize` compounds;
+ * scroll ownership stays on `Modal.Body` / `stableBody`.
  *
  * Surface is locked to `background` — no `surface` prop (do not add for API parity
  * with Sheet). Size values/maps stay modality-owned (`ModalSize` ≠ `SheetSize`).
@@ -46,12 +58,29 @@ export const modalContentVariants = cva(
       },
       layout: {
         content: '',
-        stable: modalStableBlockSizeClasses,
+        stable: '',
+      },
+      stableSize: {
+        default: '',
+        tall: '',
       },
     },
+    compoundVariants: [
+      {
+        layout: 'stable',
+        stableSize: 'default',
+        class: modalStableBlockSizeClasses,
+      },
+      {
+        layout: 'stable',
+        stableSize: 'tall',
+        class: cn(modalStableTallBlockSizeClasses, modalStableTallMaxHeightClasses),
+      },
+    ],
     defaultVariants: {
       size: 'md',
       layout: 'content',
+      stableSize: 'default',
     },
   },
 )
@@ -59,3 +88,4 @@ export const modalContentVariants = cva(
 export type ModalContentVariantProps = VariantProps<typeof modalContentVariants>
 export type ModalSize = NonNullable<ModalContentVariantProps['size']>
 export type ModalContentLayout = NonNullable<ModalContentVariantProps['layout']>
+export type ModalStableSize = NonNullable<ModalContentVariantProps['stableSize']>

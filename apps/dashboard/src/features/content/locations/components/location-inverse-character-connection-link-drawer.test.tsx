@@ -59,7 +59,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByText('Yawning Portal')).toBeInTheDocument()
-    expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
+    expect(screen.getByText('Building · Brewery')).toBeInTheDocument()
     expect(screen.getByText('Located in Dock Ward')).toBeInTheDocument()
   })
 

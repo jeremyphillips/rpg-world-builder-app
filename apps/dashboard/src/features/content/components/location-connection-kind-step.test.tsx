@@ -108,6 +108,24 @@ describe('LocationConnectionKindStep', () => {
     expect(screen.getByRole('radio', { name: /Owner/i })).toBeEnabled()
   })
 
+  it('passes a custom summary eyebrow to the collapsed chooser', () => {
+    render(
+      <LocationConnectionKindStep
+        id="connection-kind"
+        label="What relationship should this organization have with this building?"
+        summaryEyebrow="Relationship"
+        options={multiKindOptions}
+        value="governs"
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Relationship')).toBeInTheDocument()
+    expect(
+      screen.queryByText('What relationship should this organization have with this building?'),
+    ).not.toBeInTheDocument()
+  })
+
   it('re-expands the chooser when Change is clicked', async () => {
     const user = userEvent.setup()
 

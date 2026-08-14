@@ -1,6 +1,10 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
-import { ORGANIZATION_KIND_IDS, ORGANIZATION_SUBTYPE_IDS } from '@rpg/contracts'
+import {
+  ORGANIZATION_ACTIVITY_IDS,
+  ORGANIZATION_DOMAIN_IDS,
+  ORGANIZATION_FORM_IDS,
+} from '@rpg/contracts'
 
 import {
   homebrewCampaignSlugIndex,
@@ -12,8 +16,12 @@ const { model, models, Schema } = mongoose
 const homebrewOrganizationSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
-    organizationKind: { type: String, enum: [...ORGANIZATION_KIND_IDS] },
-    organizationSubtype: { type: String, enum: [...ORGANIZATION_SUBTYPE_IDS] },
+    organizationDomain: { type: String, enum: [...ORGANIZATION_DOMAIN_IDS] },
+    organizationForm: { type: String, enum: [...ORGANIZATION_FORM_IDS] },
+    activities: {
+      type: [{ type: String, enum: [...ORGANIZATION_ACTIVITY_IDS] }],
+      default: [],
+    },
     connections: {
       locations: [
         {

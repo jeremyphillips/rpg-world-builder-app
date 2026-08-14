@@ -11,10 +11,13 @@
 ## API environment variables
 
 The API validates its environment at startup (`apps/api/src/env.ts`); a
-misconfiguration fails fast with a clear message. Copy the example and adjust:
+misconfiguration fails fast with a clear message. Copy the example for local
+reference, then **export** the values you need — the dev server does not load
+`apps/api/.env` automatically (see [README](../README.md#getting-started)):
 
 ```bash
 cp apps/api/.env.example apps/api/.env
+export MONGODB_URI='mongodb://127.0.0.1:27017/rpg?replicaSet=rs0'  # replica-set Mongo only
 ```
 
 | Variable                 | Required      | Default                                        | Purpose                                                                     |
@@ -50,12 +53,15 @@ startup** after `connectDb` — not per request.
 | `disabled` | Always use compensation (standalone Mongo, tests that assert rollback)  |
 
 **Standalone Mongo** (default Docker / Homebrew setup) does not support
-transactions — `auto` falls back to compensation. For local transaction
+transactions — `auto` falls back to compensation. **Composite Building create** (plans with
+Organization drafts or relationships) requires transactions and returns
+`transactions_unavailable` on standalone Mongo. Building-only create works without transactions. For local transaction
 development and integration tests, use the replica-set compose file:
 
 ```bash
 docker compose -f docker-compose.mongo-rs.yml up -d
-# then point MONGODB_URI at the replica set (see README)
+# wait for mongo-rs-init, export MONGODB_URI, then restart the API (see README)
+export MONGODB_URI='mongodb://127.0.0.1:27017/rpg?replicaSet=rs0'
 ```
 
 ## Dev proxy variables

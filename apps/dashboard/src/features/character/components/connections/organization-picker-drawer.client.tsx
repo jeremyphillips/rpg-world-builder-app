@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { getOrganizationKindLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import { getOrganizationDomainLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Button, SelectField, Text } from '@rpg/ui'
 
 import { CatalogPickerMetadataRenderer } from '../picker/catalog-picker-metadata'
@@ -13,14 +13,14 @@ import { OrganizationMembershipTitleField } from './organization-membership-titl
 import { titleFromMembershipRadioValue } from './organization-membership-title-field.lib'
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 import {
-  buildOrganizationPickerTypeOptions,
+  buildOrganizationPickerDomainOptions,
   filterAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
   getOrganizationPickerSearchText,
   ORGANIZATION_PICKER_VIEW_DEFAULTS,
 } from './organization-picker-drawer.lib'
 import {
-  ORGANIZATION_PICKER_ALL_TYPES,
+  ORGANIZATION_PICKER_ALL_DOMAINS,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
   ORGANIZATION_PICKER_RESET_VIEW_LABEL,
@@ -28,7 +28,7 @@ import {
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
   type OrganizationPickerItem,
-  type OrganizationPickerTypeFilter,
+  type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
 import { organizationPickerTypeControlClasses } from './organization-picker-drawer.variants'
 
@@ -42,8 +42,8 @@ export function OrganizationPickerDrawer({
   items,
   onAdd,
 }: OrganizationPickerDrawerProps) {
-  const [type, setType] = React.useState<OrganizationPickerTypeFilter>(
-    ORGANIZATION_PICKER_VIEW_DEFAULTS.type,
+  const [domain, setDomain] = React.useState<OrganizationPickerDomainFilter>(
+    ORGANIZATION_PICKER_VIEW_DEFAULTS.domain,
   )
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
@@ -72,17 +72,17 @@ export function OrganizationPickerDrawer({
     setSubmitError(null)
   }, [])
 
-  const typeOptions = React.useMemo(
-    () => buildOrganizationPickerTypeOptions(items.map(({ organization }) => organization)),
+  const domainOptions = React.useMemo(
+    () => buildOrganizationPickerDomainOptions(items.map(({ organization }) => organization)),
     [items],
   )
   const transformVisibleItems = React.useCallback(
     (visibleItems: readonly (typeof items)[number][], context: { searchQuery: string }) =>
       filterAndSortOrganizationPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
-        type,
+        domain,
       }),
-    [type],
+    [domain],
   )
 
   const commitMembership = React.useCallback(
@@ -90,10 +90,9 @@ export function OrganizationPickerDrawer({
       if (pending) return
 
       const { title, priority } = resolveOrganizationMembershipMetadata({
-        kind: organization.organizationKind,
-        ...(organization.organizationSubtype !== undefined
-          ? { subtype: organization.organizationSubtype }
-          : {}),
+        domain: organization.organizationDomain,
+        form: organization.organizationForm,
+        activities: organization.activities,
         selectedTitle: titleFromMembershipRadioValue(selectedTitle),
       })
       const membership: OrganizationMembershipSelection = {
@@ -134,13 +133,14 @@ export function OrganizationPickerDrawer({
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
-      hasStructuredFilters={type !== ORGANIZATION_PICKER_ALL_TYPES}
+      hasStructuredFilters={domain !== ORGANIZATION_PICKER_ALL_DOMAINS}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
       actions={({ searchQuery, resetSearchQuery }) => {
-        const showReset = searchQuery.length > 0 || type !== ORGANIZATION_PICKER_VIEW_DEFAULTS.type
+        const showReset =
+          searchQuery.length > 0 || domain !== ORGANIZATION_PICKER_VIEW_DEFAULTS.domain
         const handleReset = () => {
-          setType(ORGANIZATION_PICKER_VIEW_DEFAULTS.type)
+          setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
           resetSearchQuery()
         }
 
@@ -156,12 +156,12 @@ export function OrganizationPickerDrawer({
         controls: (
           <div className={organizationPickerTypeControlClasses}>
             <SelectField
-              id="organization-picker-type"
-              label="Type"
+              id="organization-picker-domain"
+              label="Domain"
               labelPosition="inline"
-              value={type}
-              options={typeOptions}
-              onValueChange={(value) => setType(value as OrganizationPickerTypeFilter)}
+              value={domain}
+              options={domainOptions}
+              onValueChange={(value) => setDomain(value as OrganizationPickerDomainFilter)}
             />
           </div>
         ),
@@ -187,7 +187,7 @@ export function OrganizationPickerDrawer({
                       segments: [
                         {
                           type: 'text',
-                          text: getOrganizationKindLabel(organization.organizationKind),
+                          text: getOrganizationDomainLabel(organization.organizationDomain),
                         },
                       ],
                     },
@@ -218,8 +218,9 @@ export function OrganizationPickerDrawer({
         return (
           <div className="flex flex-col gap-4">
             <OrganizationMembershipTitleField
-              kind={organization.organizationKind}
-              subtype={organization.organizationSubtype}
+              kind={organization.organizationDomain}
+              form={organization.organizationForm}
+              activities={organization.activities}
               value={
                 expandedItemId === organization.id
                   ? selectedTitle

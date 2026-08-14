@@ -14,8 +14,9 @@ describe('organizationFormDef', () => {
     const values = organizationFormDef.toFormValues(CITY_COUNCIL) as OrganizationFormValues
     const input = organizationFormDef.toInput(values)
     expect(() => createOrganizationInputSchema.parse(input)).not.toThrow()
-    expect(input.organizationKind).toBe('government')
+    expect(input.organizationDomain).toBe('government')
     expect(input.description).toBe(CITY_COUNCIL.description)
+    expect(input.activities).toEqual([])
   })
 
   it('allows organization kind to be absent for a draft', () => {
@@ -25,7 +26,7 @@ describe('organizationFormDef', () => {
       'draft',
     )
     expect(input.name).toBe('Untitled Organization')
-    expect(input).not.toHaveProperty('organizationKind')
+    expect(input).not.toHaveProperty('organizationDomain')
   })
 
   it('requires organization kind for publish', () => {

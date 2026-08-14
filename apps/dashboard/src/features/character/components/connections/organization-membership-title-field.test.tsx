@@ -13,7 +13,7 @@ describe('OrganizationMembershipTitleField', () => {
 
     render(
       <OrganizationMembershipTitleField
-        kind="professional"
+        kind="occupational"
         value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
         onValueChange={onValueChange}
         idPrefix="membership-title"
@@ -28,7 +28,7 @@ describe('OrganizationMembershipTitleField', () => {
   it('shows an unrecognized current value as a selectable option', () => {
     render(
       <OrganizationMembershipTitleField
-        kind="professional"
+        kind="occupational"
         value="Custom Chronicler"
         onValueChange={vi.fn()}
         idPrefix="membership-title"
@@ -41,7 +41,7 @@ describe('OrganizationMembershipTitleField', () => {
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <OrganizationMembershipTitleField
-        kind="professional"
+        kind="occupational"
         value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
         onValueChange={vi.fn()}
         idPrefix="membership-title"

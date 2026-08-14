@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Apply Phase 7 alias and search-term curation to building archetype registry shards."""
+"""Apply Phase 7 alias and search-term curation to building archetype registry shards.
+
+Historical one-shot generator. Current Building planning:
+`docs/roadmap/building-taxonomy.md`.
+"""
 
 from __future__ import annotations
 

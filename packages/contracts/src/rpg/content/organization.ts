@@ -1,56 +1,56 @@
 import { z } from 'zod'
 
-import { organizationKindSchema } from '../vocab/organization-kind'
-import {
-  organizationSubtypeSchema,
-  refineOrganizationKindSubtypePair,
-} from '../vocab/organization-subtype'
+import { organizationDomainSchema } from '../vocab/organization-domain'
+import { organizationActivitySchema } from '../vocab/organization-activity'
+import { organizationFormSchema } from '../vocab/organization-form'
 import { organizationConnectionsSchema } from './organization-connections'
 import { createDraftInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from './lib/envelope'
 import { ORGANIZATION_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 
-/** Publish-complete organization body fields (object — refinements applied below). */
+const organizationActivitiesSchema = z
+  .array(organizationActivitySchema)
+  .refine((activities) => new Set(activities).size === activities.length, {
+    message: 'Organization activities must not contain duplicates.',
+  })
+
+/** Publish-complete organization body fields. */
 const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
-  organizationKind: organizationKindSchema,
-  organizationSubtype: organizationSubtypeSchema.optional(),
+  organizationDomain: organizationDomainSchema,
+  organizationForm: organizationFormSchema.optional(),
+  activities: organizationActivitiesSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
 /** Publish-complete organization body. */
-export const organizationBodySchema = organizationBodyFieldsSchema.superRefine(
-  refineOrganizationKindSubtypePair,
-)
+export const organizationBodySchema = organizationBodyFieldsSchema
 
 export type OrganizationBody = z.infer<typeof organizationBodySchema>
 
-/** Draft organization body fields — kind/subtype may remain unset until publish. */
+/** Draft organization body fields — domain may remain unset until publish. */
 const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
   ORGANIZATION_CONTENT_TYPE_TERM.label,
 ).extend({
-  organizationKind: organizationKindSchema.optional(),
-  organizationSubtype: organizationSubtypeSchema.optional(),
+  organizationDomain: organizationDomainSchema.optional(),
+  organizationForm: organizationFormSchema.optional(),
+  activities: organizationActivitiesSchema.default([]),
 })
 
-/** Draft organization body — kind may remain unset until publish. */
-export const organizationBodyDraftSchema = organizationBodyDraftFieldsSchema.superRefine(
-  refineOrganizationKindSubtypePair,
-)
+/** Draft organization body — domain may remain unset until publish. */
+export const organizationBodyDraftSchema = organizationBodyDraftFieldsSchema
 
 export type OrganizationBodyDraft = z.infer<typeof organizationBodyDraftSchema>
 
 /** Stored published organization = ownership envelope + complete body. */
-export const organizationSchema = contentMetaSchema
-  .extend(organizationBodyFieldsSchema.shape)
-  .superRefine(refineOrganizationKindSubtypePair)
+export const organizationSchema = contentMetaSchema.extend(organizationBodyFieldsSchema.shape)
 
 export type Organization = z.infer<typeof organizationSchema>
 
 /** Stored draft organization = ownership envelope + relaxed body. */
-export const organizationDraftStoredSchema = contentMetaSchema
-  .extend(organizationBodyDraftFieldsSchema.shape)
-  .superRefine(refineOrganizationKindSubtypePair)
+export const organizationDraftStoredSchema = contentMetaSchema.extend(
+  organizationBodyDraftFieldsSchema.shape,
+)
 
 export type OrganizationDraft = z.infer<typeof organizationDraftStoredSchema>
 
@@ -66,42 +66,28 @@ export const organizationReferenceResolutionSchema = z.object({
 
 export type OrganizationReferenceResolution = z.infer<typeof organizationReferenceResolutionSchema>
 
-export const createOrganizationInputSchema = organizationBodyFieldsSchema
-  .extend({ slug: slugSchema })
-  .superRefine(refineOrganizationKindSubtypePair)
+export const createOrganizationInputSchema = organizationBodyFieldsSchema.extend({
+  slug: slugSchema,
+})
 
 export type CreateOrganizationInput = z.infer<typeof createOrganizationInputSchema>
 
 export const createOrganizationDraftInputSchema = createDraftInputSchema(
   organizationBodyDraftFieldsSchema,
-).superRefine(refineOrganizationKindSubtypePair)
+)
 
 export type CreateOrganizationDraftInput = z.infer<typeof createOrganizationDraftInputSchema>
 
 /**
- * Partial publish update. Pair check fires only when both fields are present in the
- * patch; merged-document validity is enforced at the API write layer.
- * `organizationSubtype: null` clears a stored subtype (`$unset`).
+ * Partial publish update. `organizationForm: null` clears the optional stored form (`$unset`).
  */
 export const updateOrganizationInputSchema = organizationBodyFieldsSchema
   .extend({
     slug: slugSchema,
-    organizationSubtype: organizationSubtypeSchema.nullable().optional(),
+    organizationForm: organizationFormSchema.nullable().optional(),
+    activities: organizationActivitiesSchema.optional(),
   })
   .partial()
-  .superRefine((data, ctx) => {
-    // Pair check only when both fields are in the patch; merged validity is API-enforced.
-    if (typeof data.organizationKind !== 'string' || typeof data.organizationSubtype !== 'string') {
-      return
-    }
-    refineOrganizationKindSubtypePair(
-      {
-        organizationKind: data.organizationKind,
-        organizationSubtype: data.organizationSubtype,
-      },
-      ctx,
-    )
-  })
 
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationInputSchema>
 
@@ -109,20 +95,9 @@ export const updateOrganizationDraftInputSchema = createDraftInputSchema(
   organizationBodyDraftFieldsSchema,
 )
   .extend({
-    organizationSubtype: organizationSubtypeSchema.nullable().optional(),
+    organizationForm: organizationFormSchema.nullable().optional(),
+    activities: organizationActivitiesSchema.optional(),
   })
   .partial()
-  .superRefine((data, ctx) => {
-    if (typeof data.organizationKind !== 'string' || typeof data.organizationSubtype !== 'string') {
-      return
-    }
-    refineOrganizationKindSubtypePair(
-      {
-        organizationKind: data.organizationKind,
-        organizationSubtype: data.organizationSubtype,
-      },
-      ctx,
-    )
-  })
 
 export type UpdateOrganizationDraftInput = z.infer<typeof updateOrganizationDraftInputSchema>

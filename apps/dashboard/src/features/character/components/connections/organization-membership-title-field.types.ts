@@ -1,11 +1,12 @@
-import type { OrganizationKind } from '@rpg/contracts'
+import type { OrganizationActivity, OrganizationDomain, OrganizationForm } from '@rpg/contracts'
 
 /** UI-only sentinel — never persisted as a membership title. */
 export const ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE = '__no_title__'
 
 export type OrganizationMembershipTitleFieldProps = {
-  kind: OrganizationKind
-  subtype?: string
+  kind: OrganizationDomain
+  form?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
   value: string
   onValueChange: (value: string) => void
   idPrefix: string

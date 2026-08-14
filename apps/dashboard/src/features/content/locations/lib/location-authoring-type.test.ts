@@ -105,7 +105,7 @@ describe('formFieldsValidForAuthoringType', () => {
   it('allows building-only classification fields for building', () => {
     expect(formFieldsValidForAuthoringType('building')).toEqual({
       topLevel: new Set(),
-      classification: new Set(['archetype', 'specialization', 'functionOverride']),
+      classification: new Set(['form', 'facilityType']),
     })
   })
 
@@ -122,14 +122,14 @@ describe('clearInvalidFieldsForAuthoringType', () => {
     expect(
       clearInvalidFieldsForAuthoringType(
         {
-          classification: { archetype: 'inn', specialization: 'Harbor inn' },
+          classification: { form: 'house', facilityType: 'residence' },
         },
         'fortification',
       ),
     ).toEqual({
       classification: {
-        archetype: undefined,
-        specialization: undefined,
+        form: undefined,
+        facilityType: undefined,
       },
     })
   })

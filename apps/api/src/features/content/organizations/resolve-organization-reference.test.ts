@@ -23,7 +23,7 @@ describe('resolveOrganizationReference', () => {
       {
         slug: 'hidden-society',
         name: 'Hidden Society',
-        organizationKind: 'other',
+        organizationDomain: 'other',
       },
       { status: 'draft' },
     )

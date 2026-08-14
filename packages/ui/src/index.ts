@@ -200,6 +200,7 @@ export {
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
+export { SearchBar, type SearchBarProps } from './components/ui/search-bar.client'
 export {
   TextSuggestionsField,
   type TextSuggestionsFieldProps,
@@ -577,7 +578,12 @@ export {
 } from './components/ui/file-dropzone.client'
 export { FileField, type FileFieldProps } from './components/ui/file-field.client'
 
-export { Modal, type ModalContentProps, type ModalHeaderProps } from './components/ui/modal.client'
+export {
+  Modal,
+  type ModalContentProps,
+  type ModalHeaderProps,
+  type ModalStableSize,
+} from './components/ui/modal.client'
 export {
   modalOverlayVariants,
   modalContentVariants,

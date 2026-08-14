@@ -3,13 +3,10 @@
 import * as React from 'react'
 
 import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
-import { Button, DialogPanelActionRow, Modal, usePendingAwareOpenChange } from '@rpg/ui'
-import {
-  FormShellFooterScope,
-  FormShellFooterSlot,
-  formSheetScrollRegionClasses,
-} from '@rpg/ui/form'
+import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
+import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
+import { CreateModalShell } from '@/lib/create-flow'
 import { CreateSetupPanel } from '@/lib/create-setup'
 
 import {
@@ -142,64 +139,58 @@ function QuickNpcCreateModalSession({
   )
 
   return (
-    <Modal.Root open={open} onOpenChange={handleDismiss}>
-      <FormShellFooterScope>
-        <Modal.Content size="md" layout="stable" closeOnOutsideClick={false}>
-          <Modal.Header
-            headline={QUICK_NPC_CREATE_TITLE}
-            description={
-              state.phase === 'setup'
-                ? `Choose species, class, and level for a new member of ${organization.name}.`
-                : `Create a new NPC as a member of ${organization.name}.`
-            }
+    <FormShellFooterScope>
+      <CreateModalShell
+        open={open}
+        onOpenChange={handleDismiss}
+        headline={QUICK_NPC_CREATE_TITLE}
+        description={
+          state.phase === 'setup'
+            ? `Choose species, class, and level for a new member of ${organization.name}.`
+            : `Create a new NPC as a member of ${organization.name}.`
+        }
+        contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
+        footer={
+          state.phase === 'setup' ? (
+            <DialogPanelActionRow>
+              <Button type="button" variant="outline" onClick={requestCancel}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                disabled={!setupModel.canContinue}
+                onClick={() => {
+                  if (!setupModel.canContinue) return
+                  handleContinueFromSetup(state.setupValues)
+                }}
+              >
+                Continue
+              </Button>
+            </DialogPanelActionRow>
+          ) : (
+            <FormShellFooterSlot />
+          )
+        }
+      >
+        {state.phase === 'setup' ? (
+          <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
+        ) : (
+          <QuickNpcAuthoringForm
+            key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
+            campaignId={campaignId}
+            buildContext={buildContext}
+            organization={organization}
+            setup={state.setupValues}
+            setupSummaryLine={setupModel.summaryLine}
+            initialValues={state.authoringValues}
+            onCancel={requestCancel}
+            onChangeSetup={handleChangeSetup}
+            onCreated={handleAuthoringCreated}
+            onPendingChange={setAuthoringPending}
           />
-
-          <Modal.Body stableBody>
-            {state.phase === 'setup' ? (
-              <div className={formSheetScrollRegionClasses}>
-                <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
-              </div>
-            ) : (
-              <QuickNpcAuthoringForm
-                key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
-                campaignId={campaignId}
-                buildContext={buildContext}
-                organization={organization}
-                setup={state.setupValues}
-                setupSummaryLine={setupModel.summaryLine}
-                initialValues={state.authoringValues}
-                onCancel={requestCancel}
-                onChangeSetup={handleChangeSetup}
-                onCreated={handleAuthoringCreated}
-                onPendingChange={setAuthoringPending}
-              />
-            )}
-          </Modal.Body>
-
-          <Modal.Footer>
-            {state.phase === 'setup' ? (
-              <DialogPanelActionRow>
-                <Button type="button" variant="outline" onClick={requestCancel}>
-                  Cancel
-                </Button>
-                <Button
-                  type="button"
-                  disabled={!setupModel.canContinue}
-                  onClick={() => {
-                    if (!setupModel.canContinue) return
-                    handleContinueFromSetup(state.setupValues)
-                  }}
-                >
-                  Continue
-                </Button>
-              </DialogPanelActionRow>
-            ) : (
-              <FormShellFooterSlot />
-            )}
-          </Modal.Footer>
-        </Modal.Content>
-      </FormShellFooterScope>
-    </Modal.Root>
+        )}
+      </CreateModalShell>
+    </FormShellFooterScope>
   )
 }
 

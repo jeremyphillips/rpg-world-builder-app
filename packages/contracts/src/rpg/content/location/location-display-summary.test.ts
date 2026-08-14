@@ -81,21 +81,225 @@ describe('resolveLocationDisplaySummary', () => {
     expect(resolveLocationStructureHeadingNoun(site)).toBe('Landmark')
   })
 
-  it('resolves building archetype and specialization separately', () => {
+  it('resolves Building Form and Facility separately', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
       classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Thieves',
+        form: 'house',
+        facilityType: 'residence',
       }),
     }
 
     expect(resolveLocationDisplaySummary(location)).toEqual({
       typeLabel: 'Building',
-      classificationLabel: 'Guildhall',
-      specializationLabel: 'Thieves',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Residence',
+    })
+  })
+
+  it('displays legacy morphological Facility ids via registry labels, not the persisted id', () => {
+    const watchPost: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'watchtower' }),
+    }
+    const beaconStation: Location = {
+      ...baseLocation,
+      id: 'loc_beacon',
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'lighthouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(watchPost)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Watch post',
+    })
+    expect(resolveLocationDisplaySummary(beaconStation)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Beacon station',
+    })
+  })
+
+  it('displays bathhouse via registry label without inferring Form house morphology', () => {
+    const civicBaths: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'bathhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(civicBaths)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Bathhouse',
+    })
+  })
+
+  it('displays observatory via registry label with optional tower Form open composition', () => {
+    const towerObservatory: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'tower',
+        facilityType: 'observatory',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(towerObservatory)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Tower',
+      buildingFacilityTypeLabel: 'Observatory',
+    })
+  })
+
+  it('displays embassy via registry label as premises distinct from residence pairing', () => {
+    const hallEmbassy: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'embassy',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(hallEmbassy)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Embassy',
+    })
+  })
+
+  it('displays schoolhouse via registry label without inferring Form house morphology', () => {
+    const houseSchool: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'schoolhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(houseSchool)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Schoolhouse',
+    })
+  })
+
+  it('displays barn as agricultural premises with open Form composition', () => {
+    const houseBarn: Location = {
+      ...baseLocation,
+      id: 'loc_barn',
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'barn',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(houseBarn)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Barn',
+    })
+  })
+
+  it('displays granary via registry label with Form-omitted and house compositions', () => {
+    const granaryOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'granary' }),
+    }
+    const houseGranary: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'house',
+        facilityType: 'granary',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(granaryOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Granary',
+    })
+    expect(resolveLocationDisplaySummary(houseGranary)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'House',
+      buildingFacilityTypeLabel: 'Granary',
+    })
+  })
+
+  it('displays greenhouse via registry label with Form-omitted and hall compositions', () => {
+    const greenhouseOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'greenhouse' }),
+    }
+    const hallGreenhouse: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'greenhouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(greenhouseOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Greenhouse',
+    })
+    expect(resolveLocationDisplaySummary(hallGreenhouse)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Greenhouse',
+    })
+  })
+
+  it('displays arena via registry label with Form-omitted and hall compositions', () => {
+    const arenaOnly: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'arena' }),
+    }
+    const hallArena: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'arena',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(arenaOnly)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Arena',
+    })
+    expect(resolveLocationDisplaySummary(hallArena)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Arena',
     })
   })
 
@@ -167,7 +371,7 @@ describe('resolveLocationReferenceNoun', () => {
         ...baseLocation,
         kind: 'structure',
         structureType: 'building',
-        classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+        classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
       }),
     ).toBe('building')
 
@@ -199,20 +403,20 @@ describe('resolveLocationReferenceNoun', () => {
 })
 
 describe('resolveLocationClassificationDisplay', () => {
-  it('omits specialization from compact classification text', () => {
+  it('includes independent Form and Facility labels in compact text', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
       classification: buildingClassificationSchema.parse({
-        archetype: 'guildhall',
-        specialization: 'Thieves',
+        form: 'house',
+        facilityType: 'residence',
       }),
     }
 
     expect(resolveLocationClassificationDisplay(location)).toEqual({
-      parts: ['Building', 'Guildhall'],
-      text: 'Building · Guildhall',
+      parts: ['Building', 'House', 'Residence'],
+      text: 'Building · House · Residence',
     })
   })
 
@@ -324,34 +528,30 @@ describe('resolveLocationClassificationDisplay', () => {
 
 describe('compareLocationClassificationParts', () => {
   it('returns zero when parts are equal', () => {
-    expect(
-      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Guildhall']),
-    ).toBe(0)
+    expect(compareLocationClassificationParts(['Building', 'House'], ['Building', 'House'])).toBe(0)
   })
 
   it('compares different second segments', () => {
     expect(
-      compareLocationClassificationParts(['Building', 'Guildhall'], ['Building', 'Tavern']),
+      compareLocationClassificationParts(['Building', 'Brewery'], ['Building', 'Temple']),
     ).toBeLessThan(0)
   })
 
   it('sorts shorter equal-prefix classifications first', () => {
-    expect(
-      compareLocationClassificationParts(['Building'], ['Building', 'Guildhall']),
-    ).toBeLessThan(0)
+    expect(compareLocationClassificationParts(['Building'], ['Building', 'House'])).toBeLessThan(0)
   })
 })
 
 describe('resolveLocationDetailClassificationFieldLabel', () => {
-  it('returns archetype label for building structures', () => {
+  it('returns no generic classification label for building structures', () => {
     const location: Location = {
       ...baseLocation,
       kind: 'structure',
       structureType: 'building',
-      classification: buildingClassificationSchema.parse({ archetype: 'tavern' }),
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     }
 
-    expect(resolveLocationDetailClassificationFieldLabel(location)).toBe('Archetype')
+    expect(resolveLocationDetailClassificationFieldLabel(location)).toBeUndefined()
   })
 
   it('returns settlement classification label', () => {

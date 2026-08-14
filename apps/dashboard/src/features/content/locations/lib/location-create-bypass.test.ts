@@ -15,10 +15,21 @@ const modalSource = readFileSync(
   'utf8',
 )
 
+const pageSource = readFileSync(
+  fileURLToPath(new URL('../components/location-create-page.client.tsx', import.meta.url)),
+  'utf8',
+)
+const formSource = readFileSync(
+  fileURLToPath(new URL('../components/location-create-form.client.tsx', import.meta.url)),
+  'utf8',
+)
+
 describe('location create bypass guard', () => {
-  it('routes overview promoted shortcuts through resolveLocationCreateSession launcher', () => {
+  it('routes overview promoted shortcuts through the canonical session surfaces', () => {
     expect(actionsSource).toContain('useLocationCreateSessionLaunch')
     expect(actionsSource).toContain('launch({ authoringType })')
+    expect(actionsSource).toContain("authoringType === 'building'")
+    expect(actionsSource).toContain('LocationCreateModal')
     expect(actionsSource).not.toMatch(/Link to=\{buildLocationCreateHref\([^)]*authoringType/)
   })
 
@@ -37,5 +48,21 @@ describe('location create bypass guard', () => {
     expect(modalSource).toContain('LocationCreateForm')
     expect(modalSource).not.toContain('LocationContainedCreateDrawer')
     expect(modalSource).not.toContain('ContentFormDrawer')
+  })
+
+  it('routes unrestricted Building selection into the typed building session', () => {
+    expect(pageSource).toContain('LocationCreateAuthoringTypeWatcher')
+    expect(pageSource).toContain("authoringType === 'building'")
+    expect(pageSource).toContain('buildLocationFixedCreateHref')
+    expect(pageSource).toContain('ROUTES.content.locations.create(campaignId)')
+  })
+
+  it('blocks generic create from persisting buildings', () => {
+    expect(pageSource).toContain('Building create must use the composition coordinator.')
+    expect(formSource).toContain("fixedCreate.authoringType === 'building'")
+    expect(formSource).toContain('completeBuildingCreateComposition')
+    expect(formSource).not.toMatch(
+      /fixedCreate\.authoringType === 'building' && props\.buildingSetupApplication/,
+    )
   })
 })

@@ -20,7 +20,7 @@ useIntegrationDb()
 const minimalOrganizationInput = {
   slug: 'iron-circle',
   name: 'Iron Circle',
-  organizationKind: 'military',
+  organizationDomain: 'military',
 } as const
 
 async function setOrganizationConnection(characterId: string, organizationId: string) {

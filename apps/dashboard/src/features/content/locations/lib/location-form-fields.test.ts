@@ -36,9 +36,8 @@ describe('buildLocationFields', () => {
 
     expect(names).not.toContain('authoringType')
     expect(names).not.toContain('parentLocationId')
-    expect(names).toContain('classification.archetype')
-    expect(names).toContain('classification.specialization')
-    expect(names).toContain('classification.functionOverride')
+    expect(names).toContain('classification.form')
+    expect(names).toContain('classification.facilityType')
     expect(names).toContain('description')
   })
 
@@ -121,7 +120,7 @@ describe('buildLocationFields', () => {
     expect(names).toContain('description')
     expect(names).not.toContain('authoringType')
     expect(names).not.toContain('parentLocationId')
-    expect(names).not.toContain('classification.archetype')
+    expect(names).not.toContain('classification.form')
     expect(names).not.toContain('classification.kind')
     expect(names).not.toContain('interiorType')
     expect(names).not.toContain('planeType')

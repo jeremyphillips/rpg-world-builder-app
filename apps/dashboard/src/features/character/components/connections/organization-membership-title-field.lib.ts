@@ -5,13 +5,15 @@ import type { OrganizationMembershipTitleFieldProps } from './organization-membe
 
 export function buildOrganizationMembershipTitleRadioOptions(input: {
   kind: OrganizationMembershipTitleFieldProps['kind']
-  subtype?: string
+  form?: OrganizationMembershipTitleFieldProps['form']
+  activities?: OrganizationMembershipTitleFieldProps['activities']
   /** Current persisted/selected title — appended when absent from suggestions. */
   currentValue?: string
 }): { value: string; label: string }[] {
   const suggestions = resolveOrganizationMemberTitleSuggestions({
-    kind: input.kind,
-    subtype: input.subtype,
+    domain: input.kind,
+    form: input.form,
+    activities: input.activities,
   })
   const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [

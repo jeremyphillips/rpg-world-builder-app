@@ -36,6 +36,11 @@ import { MAGIC_ITEM_CATEGORY_TERM } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { ATTACK_RESOLUTION_MODE_TERM } from './mechanics/attack-resolution-mode'
 import { BUILDING_ARCHETYPE_TERM } from './location/building-archetype'
+import {
+  BUILDING_FACILITY_AUTHORING_GROUP_TERM,
+  BUILDING_FACILITY_TYPE_TERM,
+} from './location/building-facility-type'
+import { BUILDING_FORM_TERM } from './location/building-form'
 import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building-function-family'
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
 import { HIT_POINTS_TERM } from './mechanics/hit-points'
@@ -59,8 +64,9 @@ import { WEAPON_CATEGORY_TERM } from './weapon/category'
 import { WEAPON_MASTERY_TERM } from './weapon/mastery'
 import { WEAPON_MODE_TERM } from './weapon/mode'
 import { WEAPON_PROPERTY_TERM } from './weapon/property'
-import { ORGANIZATION_KIND_TERM } from './organization-kind'
-import { ORGANIZATION_SUBTYPE_TERM } from './organization-subtype'
+import { ORGANIZATION_ACTIVITY_TERM } from './organization-activity'
+import { ORGANIZATION_DOMAIN_TERM } from './organization-domain'
+import { ORGANIZATION_FORM_TERM } from './organization-form'
 
 /** Closed `rpg/vocab` modules — each `*_ENTRIES` map has a sibling `*_TERM`. */
 const RPG_VOCAB_CLOSED_TERMS = [
@@ -89,6 +95,9 @@ const RPG_VOCAB_CLOSED_TERMS = [
   MAGIC_ITEM_RARITY_TERM,
   ATTACK_RESOLUTION_MODE_TERM,
   BUILDING_ARCHETYPE_TERM,
+  BUILDING_FACILITY_AUTHORING_GROUP_TERM,
+  BUILDING_FACILITY_TYPE_TERM,
+  BUILDING_FORM_TERM,
   BUILDING_FUNCTION_FAMILY_TERM,
   EDITION_PRESET_TERM,
   SPELL_ATOMIC_EFFECT_KIND_TERM,
@@ -105,8 +114,9 @@ const RPG_VOCAB_CLOSED_TERMS = [
   WEAPON_MASTERY_TERM,
   WEAPON_MODE_TERM,
   WEAPON_PROPERTY_TERM,
-  ORGANIZATION_KIND_TERM,
-  ORGANIZATION_SUBTYPE_TERM,
+  ORGANIZATION_DOMAIN_TERM,
+  ORGANIZATION_FORM_TERM,
+  ORGANIZATION_ACTIVITY_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Open `rpg/vocab` sets — `*_SET_ID` modules with a sibling `*_TERM`. */
@@ -152,7 +162,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(43)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(47)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

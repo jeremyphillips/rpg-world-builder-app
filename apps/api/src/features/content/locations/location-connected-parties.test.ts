@@ -41,7 +41,7 @@ describe('resolveLocationConnectedParties', () => {
     const organization = await createHomebrewContent(organizationWriteConfig, campaignId, {
       slug: 'cp-org',
       name: 'Alpha Org',
-      organizationKind: 'commercial',
+      organizationDomain: 'commercial',
     })
 
     await HomebrewOrganizationModel.collection.updateOne(
@@ -121,7 +121,7 @@ describe('location connected parties routes', () => {
     const organization = await createHomebrewContent(organizationWriteConfig, campaignId, {
       slug: 'route-cp-org',
       name: 'Route CP Org',
-      organizationKind: 'commercial',
+      organizationDomain: 'commercial',
     })
 
     await agent

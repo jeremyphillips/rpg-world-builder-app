@@ -48,7 +48,10 @@ function subjectKindFor(
 
 export function useOrganizationMembersDetail(
   campaignId: string,
-  organization: Pick<Organization, 'id' | 'name' | 'organizationKind' | 'organizationSubtype'>,
+  organization: Pick<
+    Organization,
+    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'activities'
+  >,
 ) {
   const organizationId = organization.id
   const canManage = useCanManageCampaign(campaignId)
@@ -165,10 +168,9 @@ export function useOrganizationMembersDetail(
     async (title?: string) => {
       if (!editingRow) return
       const metadata = resolveOrganizationMembershipMetadata({
-        kind: organization.organizationKind,
-        ...(organization.organizationSubtype !== undefined
-          ? { subtype: organization.organizationSubtype }
-          : {}),
+        domain: organization.organizationDomain,
+        form: organization.organizationForm,
+        activities: organization.activities,
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),
@@ -196,8 +198,9 @@ export function useOrganizationMembersDetail(
       campaignId,
       editingRow,
       invalidate,
-      organization.organizationKind,
-      organization.organizationSubtype,
+      organization.activities,
+      organization.organizationDomain,
+      organization.organizationForm,
       organizationId,
     ],
   )

@@ -37,26 +37,21 @@ function buildingRow(
 
 const rows: WithCampaignAccess<Location>[] = [
   buildingRow(
-    'loc-inn',
+    'loc-residence',
     'Travelers Rest',
-    buildingClassificationSchema.parse({ archetype: 'inn' }),
+    buildingClassificationSchema.parse({ facilityType: 'residence' }),
   ),
+  buildingRow('loc-house', 'Old House', buildingClassificationSchema.parse({ form: 'house' })),
   buildingRow(
-    'loc-caravanserai',
-    'Desert Waystation',
-    buildingClassificationSchema.parse({ archetype: 'caravanserai' }),
-  ),
-  buildingRow(
-    'loc-tavern',
-    'Yawning Portal',
-    buildingClassificationSchema.parse({ archetype: 'tavern' }),
+    'loc-brewery',
+    'Yawning Portal Brewery',
+    buildingClassificationSchema.parse({ facilityType: 'brewery' }),
   ),
   buildingRow(
     'loc-temple',
     'Temple of Healing',
     buildingClassificationSchema.parse({
-      archetype: 'temple',
-      functionOverride: 'care',
+      facilityType: 'temple',
     }),
   ),
   {
@@ -73,33 +68,28 @@ const schema = buildLocationsFilterSchema()
 
 describe('locations overview filters', () => {
   it('finds buildings by broad Model E discovery search terms', () => {
-    const filtered = applyFilterSchema(schema, { name: 'lodging' }, rows)
+    const filtered = applyFilterSchema(schema, { name: 'production' }, rows)
 
-    expect(filtered.map((row) => row.id)).toEqual(
-      expect.arrayContaining(['loc-inn', 'loc-caravanserai']),
-    )
-    expect(filtered.map((row) => row.id)).not.toContain('loc-tavern')
+    expect(filtered.map((row) => row.id)).toEqual(['loc-brewery'])
   })
 
-  it('filters by exact building archetype identity', () => {
-    const filtered = applyFilterSchema(schema, { buildingArchetype: 'tavern' }, rows)
+  it('filters by exact Building Facility identity', () => {
+    const filtered = applyFilterSchema(schema, { buildingFacilityType: 'brewery' }, rows)
 
-    expect(filtered.map((row) => row.id)).toEqual(['loc-tavern'])
+    expect(filtered.map((row) => row.id)).toEqual(['loc-brewery'])
   })
 
-  it('filters by effective function membership across archetypes', () => {
-    const filtered = applyFilterSchema(schema, { buildingFunction: 'lodging' }, rows)
+  it('filters by Facility-derived function membership', () => {
+    const filtered = applyFilterSchema(schema, { buildingFunction: 'dwelling' }, rows)
 
-    expect(filtered.map((row) => row.id)).toEqual(
-      expect.arrayContaining(['loc-inn', 'loc-caravanserai']),
-    )
+    expect(filtered.map((row) => row.id)).toEqual(['loc-residence'])
   })
 
-  it('uses function override semantics without changing archetype identity', () => {
-    const byFunction = applyFilterSchema(schema, { buildingFunction: 'care' }, rows)
-    const byArchetype = applyFilterSchema(schema, { buildingArchetype: 'temple' }, rows)
+  it('keeps Facility identity aligned with its derived function', () => {
+    const byFunction = applyFilterSchema(schema, { buildingFunction: 'worship' }, rows)
+    const byFacility = applyFilterSchema(schema, { buildingFacilityType: 'temple' }, rows)
 
     expect(byFunction.map((row) => row.id)).toEqual(['loc-temple'])
-    expect(byArchetype.map((row) => row.id)).toEqual(['loc-temple'])
+    expect(byFacility.map((row) => row.id)).toEqual(['loc-temple'])
   })
 })

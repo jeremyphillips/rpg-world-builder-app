@@ -8,7 +8,7 @@ import {
   entitySurfaceVerticalInsetVariants,
 } from './entity-surface-inset.variants'
 
-const entityCardFrameShellVariants = cva('w-full min-w-0 rounded-md border border-border', {
+const entityCardFrameShellVariants = cva('w-full min-w-0 rounded-md border border-border bg-card', {
   variants: {
     disabled: {
       true: 'opacity-60',

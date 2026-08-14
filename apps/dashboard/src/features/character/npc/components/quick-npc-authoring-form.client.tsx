@@ -7,9 +7,12 @@ import {
   resolveOrganizationMembershipMetadata,
   type CampaignNpcDetail,
   type CharacterBuildContext,
-  type OrganizationKind,
+  type OrganizationActivity,
+  type OrganizationDomain,
+  type OrganizationForm,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
+import { CreateSetupSummary } from '@/lib/create-setup'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -39,12 +42,15 @@ import {
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import {
+  QUICK_NPC_SETUP_CHANGE_LABEL,
+  QUICK_NPC_SETUP_SUMMARY_EYEBROW,
+} from '../lib/quick-npc-create-modal-setup.lib'
+import {
   QUICK_NPC_GENERATE_NAME_LABEL,
   resolveQuickNpcNameGenerationSupport,
 } from '../lib/quick-npc-name-generation'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
-import { QuickNpcSetupSummary } from './quick-npc-setup-summary.client'
 
 export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
 export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as const
@@ -52,8 +58,9 @@ export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as c
 export type QuickNpcCreateFormOrganization = {
   id: string
   name: string
-  organizationKind: OrganizationKind
-  organizationSubtype?: string
+  organizationDomain: OrganizationDomain
+  organizationForm?: OrganizationForm
+  activities?: readonly OrganizationActivity[]
 }
 
 export type QuickNpcAuthoringFormProps = {
@@ -71,9 +78,9 @@ export type QuickNpcAuthoringFormProps = {
 
 function resolveMembership(organization: QuickNpcCreateFormOrganization) {
   return {
-    kind: organization.organizationKind,
-    ...(organization.organizationSubtype !== undefined
-      ? { subtype: organization.organizationSubtype }
+    kind: organization.organizationDomain,
+    ...(organization.organizationForm !== undefined
+      ? { subtype: organization.organizationForm }
       : {}),
   }
 }
@@ -253,10 +260,9 @@ export function QuickNpcAuthoringForm({
 
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
-        kind: organization.organizationKind,
-        ...(organization.organizationSubtype !== undefined
-          ? { subtype: organization.organizationSubtype }
-          : {}),
+        domain: organization.organizationDomain,
+        form: organization.organizationForm,
+        activities: organization.activities,
         selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
       })
 
@@ -307,7 +313,12 @@ export function QuickNpcAuthoringForm({
             fallback={defaultValues}
             onConfiguredCountChange={setConfiguredCount}
           />
-          <QuickNpcSetupSummary summaryLine={setupSummaryLine} onChange={onChangeSetup} />
+          <CreateSetupSummary
+            eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
+            summary={setupSummaryLine}
+            changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+            onChange={onChangeSetup}
+          />
         </>
       )}
       footer={() => (

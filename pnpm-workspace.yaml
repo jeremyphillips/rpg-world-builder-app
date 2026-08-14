@@ -5,6 +5,7 @@ packages:
   - 'tools/vocab/term-audit'
   - 'tools/vocab/set-integration'
   - 'tools/content-types'
+  - 'tools/building-refactor'
 
 allowBuilds:
   '@swc/core': true

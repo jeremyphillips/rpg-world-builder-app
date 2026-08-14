@@ -1,7 +1,7 @@
 import {
-  getOrganizationKindLabel,
-  ORGANIZATION_KIND_ENTRIES,
-  ORGANIZATION_KIND_IDS,
+  getOrganizationDomainLabel,
+  ORGANIZATION_DOMAIN_ENTRIES,
+  ORGANIZATION_DOMAIN_IDS,
   type Organization,
   type WithCampaignAccess,
 } from '@rpg/contracts'
@@ -19,17 +19,19 @@ import { buildContentColumns } from '../../lib/overview/content-table-config'
 type OrganizationRow = WithCampaignAccess<Organization>
 
 export type OrganizationsOverviewFilterState = ContentOverviewBaseFilterState & {
-  organizationKind?: Organization['organizationKind']
+  organizationDomain?: Organization['organizationDomain']
 }
 
 const ORGANIZATION_MIDDLE_COLUMNS: ColumnDef<Organization>[] = [
   {
-    accessorKey: 'organizationKind',
-    header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+    accessorKey: 'organizationDomain',
+    header: ({ column }) => <SortableHeader column={column}>Domain</SortableHeader>,
     cell: ({ row }) =>
-      getOrganizationKindLabel(row.getValue<Organization['organizationKind']>('organizationKind')),
+      getOrganizationDomainLabel(
+        row.getValue<Organization['organizationDomain']>('organizationDomain'),
+      ),
     filterFn: 'equalsString',
-    meta: { label: 'Type', ...dataTableColumnChromeMeta('medium', 'meta') },
+    meta: { label: 'Domain', ...dataTableColumnChromeMeta('medium', 'meta') },
   },
 ]
 
@@ -40,17 +42,17 @@ export const organizationsFilterSchema = buildContentFilterSchema<
   createEqualsFilter<
     OrganizationRow,
     OrganizationsOverviewFilterState,
-    'organizationKind',
-    Organization['organizationKind']
+    'organizationDomain',
+    Organization['organizationDomain']
   >({
-    id: 'organizationKind',
-    label: 'Type',
-    allOptionLabel: 'All types',
-    options: ORGANIZATION_KIND_IDS.map((id) => ({
+    id: 'organizationDomain',
+    label: 'Domain',
+    allOptionLabel: 'All domains',
+    options: ORGANIZATION_DOMAIN_IDS.map((id) => ({
       value: id,
-      label: ORGANIZATION_KIND_ENTRIES[id].label,
+      label: ORGANIZATION_DOMAIN_ENTRIES[id].label,
     })),
-    getValue: (row) => row.organizationKind,
+    getValue: (row) => row.organizationDomain,
   }),
 ])
 

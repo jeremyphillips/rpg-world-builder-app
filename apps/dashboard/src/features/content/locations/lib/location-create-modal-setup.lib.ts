@@ -1,7 +1,25 @@
-import type { RegionClassificationKind, SettlementType, SiteType } from '@rpg/contracts'
+import type {
+  BuildingFacilityAuthoringGroup,
+  BuildingForm,
+  RegionClassificationKind,
+  SettlementType,
+  SiteType,
+} from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
 import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
+import {
+  BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
+  BUILDING_CREATE_SETUP_FACILITY_PROMPT,
+  BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
+  BUILDING_CREATE_SETUP_FORM_PROMPT,
+  BUILDING_CREATE_SETUP_HEADLINE,
+  buildBuildingCreateSetupSummaryEntries,
+  buildBuildingFacilityAuthoringGroupRadioOptions,
+  buildBuildingFormRadioOptions,
+  applyBuildingCreateSetupSelectionChange,
+  resolveBuildingCreateSetupProjection,
+} from './location-building-create-setup.lib'
 import {
   buildRegionClassificationKindRadioOptions,
   buildRegionTypeRadioOptions,
@@ -28,6 +46,8 @@ import {
 } from './location-site-create-setup.lib'
 
 export type LocationCreateModalSetupValues = {
+  buildingForm: BuildingForm | ''
+  buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
   classificationKind: RegionClassificationKind | ''
@@ -35,6 +55,8 @@ export type LocationCreateModalSetupValues = {
 }
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
+  buildingForm: '',
+  buildingFacilityAuthoringGroup: '',
   siteType: '',
   settlementType: '',
   classificationKind: '',
@@ -65,6 +87,42 @@ function optionLabel(options: readonly RadioCardOption[], value: string): string
   return options.find((option) => option.value === value)?.label ?? value
 }
 
+function resolveBuildingSetupModel(
+  values: LocationCreateModalSetupValues,
+): LocationCreateModalSetupModel {
+  const formOptions = buildBuildingFormRadioOptions()
+  const facilityOptions = buildBuildingFacilityAuthoringGroupRadioOptions()
+  const projection = resolveBuildingCreateSetupProjection({
+    form: values.buildingForm,
+    facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
+  })
+  return {
+    headline: BUILDING_CREATE_SETUP_HEADLINE,
+    choiceSets: [
+      {
+        id: 'buildingForm',
+        fieldLabel: BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
+        prompt: BUILDING_CREATE_SETUP_FORM_PROMPT,
+        options: formOptions,
+        value: values.buildingForm,
+        required: false,
+      },
+      {
+        id: 'buildingFacilityAuthoringGroup',
+        fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
+        prompt: BUILDING_CREATE_SETUP_FACILITY_PROMPT,
+        options: facilityOptions,
+        value: values.buildingFacilityAuthoringGroup,
+      },
+    ],
+    canContinue: projection != null,
+    complete: () => (projection ? { kind: 'building', ...projection } : null),
+    summaryEntries: projection
+      ? buildBuildingCreateSetupSummaryEntries(projection, values.buildingFacilityAuthoringGroup)
+      : [],
+  }
+}
+
 export function resolveLocationCreateModalSetupModel({
   intent,
   values,
@@ -72,6 +130,10 @@ export function resolveLocationCreateModalSetupModel({
   intent: LocationCreateIntent
   values: LocationCreateModalSetupValues
 }): LocationCreateModalSetupModel | null {
+  if (intent.authoringType === 'building') {
+    return resolveBuildingSetupModel(values)
+  }
+
   if (intent.authoringType === 'site') {
     const options = buildSiteTypeRadioOptions()
     const canContinue = Boolean(values.siteType)
@@ -188,6 +250,21 @@ export function applyLocationCreateModalSetupValueChange({
   choiceSetId: string
   nextValue: string
 }): LocationCreateModalSetupValues {
+  const buildingSelection = applyBuildingCreateSetupSelectionChange({
+    selection: {
+      form: values.buildingForm,
+      facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
+    },
+    choiceSetId,
+    nextValue,
+  })
+  if (buildingSelection) {
+    return {
+      ...values,
+      buildingForm: buildingSelection.form,
+      buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
+    }
+  }
   if (choiceSetId === 'siteType') {
     return { ...values, siteType: isSiteType(nextValue) ? nextValue : '' }
   }

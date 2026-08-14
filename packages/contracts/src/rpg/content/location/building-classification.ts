@@ -1,17 +1,15 @@
 import { z } from 'zod'
 
-import {
-  buildingArchetypeSchema,
-  type BuildingArchetype,
-} from '../../vocab/location/building-archetype'
-import { buildingFunctionFamilySchema } from '../../vocab/location/building-function-family'
+import { buildingFacilityTypeSchema } from '../../vocab/location/building-facility-type'
+import { buildingFormSchema } from '../../vocab/location/building-form'
 
-export const buildingClassificationSchema = z.object({
-  archetype: buildingArchetypeSchema,
-  functionOverride: buildingFunctionFamilySchema.optional(),
-  specialization: z.string().trim().min(1).max(80).optional(),
-})
+export const buildingClassificationSchema = z
+  .object({
+    form: buildingFormSchema.optional(),
+    facilityType: buildingFacilityTypeSchema.optional(),
+  })
+  .refine((value) => value.form !== undefined || value.facilityType !== undefined, {
+    message: 'Building classification must include a form or facility type.',
+  })
 
 export type BuildingClassification = z.infer<typeof buildingClassificationSchema>
-
-export type { BuildingArchetype }

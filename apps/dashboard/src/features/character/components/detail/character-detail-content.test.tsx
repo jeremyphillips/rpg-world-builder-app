@@ -50,7 +50,8 @@ const connectedViewModel = buildCharacterDetailViewModel({
         createdAt: '2026-07-28T12:00:00.000Z',
         updatedAt: '2026-07-28T12:00:00.000Z',
         name: 'Lantern Guild',
-        organizationKind: 'professional',
+        organizationDomain: 'occupational',
+        activities: [],
       },
     },
     { organizationId: 'organization-missing', organization: null },
@@ -120,7 +121,7 @@ describe('CharacterDetailContent', () => {
 
     await user.click(screen.getByRole('tab', { name: 'Connections' }))
     expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
-    expect(screen.getByText('Guild or professional')).toBeInTheDocument()
+    expect(screen.getByText('Occupational')).toBeInTheDocument()
     expect(screen.getByText('Unavailable organization')).toBeInTheDocument()
     expect(
       screen.getByText('This organization is missing or no longer available.'),

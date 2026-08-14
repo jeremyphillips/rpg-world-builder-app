@@ -40,7 +40,7 @@ describe('locationToFormValues', () => {
     expect(values.authoringType).toBe('building')
     expect(values).not.toHaveProperty('kind')
     expect(values).not.toHaveProperty('structureType')
-    expect(values.classification).toEqual({ archetype: 'tavern' })
+    expect(values.classification).toEqual({ facilityType: 'brewery' })
   })
 
   it('hydrates settlement subtype fields through authoringType', () => {
@@ -57,14 +57,14 @@ describe('buildLocationCreateInput', () => {
       name: 'The Sleeping Giant',
       authoringType: 'building',
       parentLocationId: DOCK_WARD.id,
-      classification: { archetype: 'inn' },
+      classification: { form: 'house', facilityType: 'residence' },
     } as LocationFormValues)
 
     expect(() => createLocationInputSchema.parse(input)).not.toThrow()
     expect(input).toMatchObject({
       kind: 'structure',
       structureType: 'building',
-      classification: { archetype: 'inn' },
+      classification: { form: 'house', facilityType: 'residence' },
       parentLocationId: DOCK_WARD.id,
     })
     expect(input).not.toHaveProperty('authoringType')
@@ -83,7 +83,7 @@ describe('buildLocationCreateInput', () => {
     expect(input).toMatchObject({
       kind: 'structure',
       structureType: 'building',
-      classification: { archetype: 'tavern' },
+      classification: { facilityType: 'brewery' },
     })
   })
 
@@ -107,6 +107,18 @@ describe('buildLocationCreateInput', () => {
 
     expect(input).not.toHaveProperty('kind')
     expect(input).not.toHaveProperty('authoringType')
+  })
+
+  it('omits Building classification when both optional axes are unset', () => {
+    const input = buildLocationCreateInput({
+      name: 'Unclassified Workshop',
+      authoringType: 'building',
+      parentLocationId: DOCK_WARD.id,
+      classification: undefined,
+    } as LocationFormValues)
+
+    expect(() => createLocationInputSchema.parse(input)).not.toThrow()
+    expect(input).not.toHaveProperty('classification')
   })
 })
 

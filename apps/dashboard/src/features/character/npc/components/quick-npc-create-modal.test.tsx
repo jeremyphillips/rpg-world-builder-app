@@ -33,7 +33,7 @@ beforeAll(() => {
 const organization = {
   id: 'organization-lantern-guild',
   name: 'Lantern Guild',
-  organizationKind: 'professional' as const,
+  organizationDomain: 'occupational' as const,
 }
 
 const quickFighter = {
@@ -62,7 +62,8 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
         name: organization.name,
-        organizationKind: organization.organizationKind,
+        organizationDomain: organization.organizationDomain,
+        activities: [],
         connections: { locations: [] },
       },
     ],

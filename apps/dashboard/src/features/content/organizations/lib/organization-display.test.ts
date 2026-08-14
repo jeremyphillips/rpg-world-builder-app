@@ -22,13 +22,13 @@ describe('formatLocationConnectionsCount', () => {
 })
 
 describe('buildOrganizationDetailViewModel', () => {
-  it('maps kind vocabulary, authored description, and location connections', () => {
+  it('maps canonical classification, authored description, and location connections', () => {
     expect(buildOrganizationDetailViewModel(CITY_COUNCIL, emptyLocationConnections)).toEqual({
       statRows: [
         {
-          label: 'Type',
+          label: 'Domain',
           value: 'Government',
-          info: 'A kingdom, council, administration, or other governing body.',
+          info: 'Exercises public governing, administrative, legislative, or judicial authority.',
           infoAriaLabel: 'About Government',
         },
       ],

@@ -8,6 +8,8 @@ import { formatContentCreateHeading } from '@/features/content/lib/content-type-
 import { useCampaigns } from '@/features/campaign'
 import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
 import { LocationCreateSetupHost } from './location-create-setup-host.client'
+import { LocationCreateModal } from './location-create-modal.client'
+import { LocationCreateAuthoringTypeWatcher } from './location-create-authoring-type-watcher.client'
 import {
   buildLocationFixedCreateHref,
   parseLocationCreateSessionFromSearchParams,
@@ -52,6 +54,19 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
   )
 
   if (session.kind === 'needsSetup') {
+    if (session.intent.authoringType === 'building') {
+      return (
+        <LocationCreateModal
+          open
+          intent={session.intent}
+          campaignId={campaignId}
+          onOpenChange={(open) => {
+            if (!open) navigate(ROUTES.content.locations.create(campaignId))
+          }}
+        />
+      )
+    }
+
     return (
       <LocationCreateSetupHost
         intent={session.intent}
@@ -82,13 +97,22 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
       backHref={ROUTES.content.locations.overview(campaignId)}
       initialValues={initialValues}
       formCtx={formCtx}
-      prepareSubmitValues={
-        fixedCreate
-          ? (values) => applyLocationFixedCreateContext(values as LocationFormValues, fixedCreate)
-          : undefined
-      }
+      prepareSubmitValues={(values) => {
+        const typed = values as LocationFormValues
+        if (!fixedCreate && typed.authoringType === 'building') {
+          throw new Error('Building create must use the composition coordinator.')
+        }
+        return fixedCreate ? applyLocationFixedCreateContext(typed, fixedCreate) : values
+      }}
       formHeaderPrefix={
-        fixedCreate ? <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} /> : undefined
+        fixedCreate ? (
+          <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
+        ) : (
+          <LocationCreateAuthoringTypeWatcher
+            campaignId={campaignId}
+            softParentLocationId={softParentLocationId ?? primaryWorldId}
+          />
+        )
       }
     />
   )

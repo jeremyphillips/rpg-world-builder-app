@@ -11,6 +11,7 @@ import {
 } from '@rpg/ui'
 
 import { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
+import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
 import {
   resolveCreateSetupActiveSetId,
   resolveCreateSetupCanContinue,
@@ -20,8 +21,6 @@ import {
 } from './create-setup-sequence.lib'
 import type { CreateSetupSet } from './create-setup.types'
 import { createSetupModalBodyClasses } from './create-setup.variants'
-
-export const CREATE_SETUP_DEFAULT_CHANGE_LABEL = 'Change' as const
 
 export type CreateSetupPanelProps = {
   sets: CreateSetupSet[]
@@ -89,6 +88,8 @@ export function CreateSetupPanel({
           setId,
           activeSetId,
           visible,
+          isComplete: set.isComplete,
+          required: set.required,
           collapseWhenComplete: set.collapseWhenComplete ?? true,
         })
 

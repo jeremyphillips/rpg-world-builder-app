@@ -13,7 +13,8 @@ export const CITY_COUNCIL: Organization = {
   updatedAt: CONTENT_TIMESTAMP,
   name: 'City Council',
   description: '<p>The elected council governing the city.</p>',
-  organizationKind: 'government',
+  organizationDomain: 'government',
+  activities: [],
   connections: { locations: [] },
 }
 
@@ -23,7 +24,7 @@ export const SILVER_CIRCLE: Organization = {
   slug: 'silver-circle',
   name: 'Silver Circle',
   description: '<p>A learned society studying ancient magic.</p>',
-  organizationKind: 'academic',
+  organizationDomain: 'academic',
 }
 
 export const ORGANIZATIONS_LIST = [CITY_COUNCIL, SILVER_CIRCLE] as const

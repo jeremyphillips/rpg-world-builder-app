@@ -12,7 +12,7 @@ import {
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
-  type OrganizationKind,
+  type OrganizationDomain,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -208,7 +208,7 @@ function formatRequirementsTabLabel(configuredCount: number): string {
 
 export type QuickNpcDetailsFieldsArgs = {
   membership: {
-    kind: OrganizationKind
+    kind: OrganizationDomain
     subtype?: string
   }
   nameTrailingAction?: TrailingFieldActionConfig

@@ -1,10 +1,10 @@
 import type {
   CharacterOrganizationConnection,
   Organization,
-  OrganizationKind,
+  OrganizationDomain,
 } from '@rpg/contracts'
 
-export const ORGANIZATION_PICKER_ALL_TYPES = 'all'
+export const ORGANIZATION_PICKER_ALL_DOMAINS = 'all'
 export const ORGANIZATION_PICKER_RESET_VIEW_LABEL = 'Reset view'
 export const ORGANIZATION_PICKER_NO_RESULTS_MESSAGE = 'No organizations match this view.'
 export const ORGANIZATION_PICKER_NO_ITEMS_MESSAGE = 'No organizations are available.'
@@ -13,7 +13,9 @@ export const ORGANIZATION_PICKER_DESCRIPTION = 'Choose an organization connected
 
 export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 
-export type OrganizationPickerTypeFilter = typeof ORGANIZATION_PICKER_ALL_TYPES | OrganizationKind
+export type OrganizationPickerDomainFilter =
+  | typeof ORGANIZATION_PICKER_ALL_DOMAINS
+  | OrganizationDomain
 
 export type OrganizationPickerItem = {
   organization: Organization

@@ -93,7 +93,8 @@ function makeOrganization(
     campaignId: null,
     ...timestamps,
     name: slug,
-    organizationKind: 'professional',
+    organizationDomain: 'occupational',
+    activities: [],
     connections: { locations: [] },
     campaignAccess: {
       available: true,

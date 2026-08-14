@@ -69,6 +69,7 @@ describe('ContentEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
+    expect(article).toHaveClass('bg-card')
     expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
     expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
   })

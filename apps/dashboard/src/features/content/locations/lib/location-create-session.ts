@@ -1,4 +1,11 @@
-import type { LocationKind, RegionClassification, SettlementType, SiteType } from '@rpg/contracts'
+import type {
+  BuildingFacilityAuthoringGroup,
+  BuildingForm,
+  LocationKind,
+  RegionClassification,
+  SettlementType,
+  SiteType,
+} from '@rpg/contracts'
 
 import { requiresLocationCreateSetup, type LocationAuthoringType } from './location-authoring-type'
 import type { LocationFixedCreateContext } from './location-form-ctx'
@@ -12,6 +19,11 @@ export type LocationCreateIntent = {
 }
 
 export type LocationCreateSetupResult =
+  | {
+      kind: 'building'
+      form?: BuildingForm
+      facilityAuthoringGroup?: BuildingFacilityAuthoringGroup
+    }
   | { kind: 'settlement'; settlementType: SettlementType }
   | { kind: 'region'; classification: RegionClassification }
   | { kind: 'site'; siteType: SiteType }
@@ -54,6 +66,8 @@ export function completeLocationCreateSetup(
   const base = fixedCreateFromIntent(intent)
 
   switch (setupResult.kind) {
+    case 'building':
+      return base
     case 'settlement':
       return { ...base, settlementType: setupResult.settlementType }
     case 'region':

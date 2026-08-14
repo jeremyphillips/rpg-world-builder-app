@@ -78,7 +78,71 @@ function MixedSetupHarness() {
   return <CreateSetupPanel sets={sets} />
 }
 
+function OptionalSetupHarness() {
+  const [values, setValues] = useState({ form: '', facility: '', operator: '' })
+  const sets: CreateSetupSet[] = [
+    {
+      id: 'form',
+      kind: 'choice',
+      fieldLabel: 'Building form',
+      prompt: 'What physical building is this?',
+      options: [{ value: 'house', label: 'House' }],
+      value: values.form,
+      required: false,
+      isComplete: isCreateSetupChoiceComplete(values.form),
+      onValueChange: (form) => setValues((current) => ({ ...current, form })),
+      onReset: () => setValues((current) => ({ ...current, form: '' })),
+    },
+    {
+      id: 'facility',
+      kind: 'choice',
+      fieldLabel: 'Facility type',
+      prompt: 'How is this building used?',
+      options: [{ value: 'residence', label: 'Residence' }],
+      value: values.facility,
+      required: false,
+      isComplete: isCreateSetupChoiceComplete(values.facility),
+      onValueChange: (facility) => setValues((current) => ({ ...current, facility })),
+      onReset: () => setValues((current) => ({ ...current, facility: '' })),
+    },
+    {
+      id: 'operator',
+      kind: 'choice',
+      fieldLabel: 'Operator',
+      prompt: 'Who operates here?',
+      options: [
+        { value: 'none', label: 'No organization' },
+        { value: 'create', label: 'Create an organization' },
+      ],
+      value: values.operator,
+      isComplete: isCreateSetupChoiceComplete(values.operator),
+      onValueChange: (operator) => setValues((current) => ({ ...current, operator })),
+      onReset: () => setValues((current) => ({ ...current, operator: '' })),
+    },
+  ]
+
+  return <CreateSetupPanel sets={sets} />
+}
+
 describe('CreateSetupPanel', () => {
+  it('shows untouched optional sets without blocking the required decision', async () => {
+    const user = userEvent.setup()
+    render(<OptionalSetupHarness />)
+
+    expect(
+      screen.getByRole('radiogroup', { name: 'What physical building is this?' }),
+    ).toBeVisible()
+    expect(screen.getByRole('radiogroup', { name: 'How is this building used?' })).toBeVisible()
+    expect(screen.getByRole('radiogroup', { name: 'Who operates here?' })).toBeVisible()
+
+    await user.click(screen.getByRole('radio', { name: 'No organization' }))
+
+    expect(
+      screen.getByRole('radiogroup', { name: 'What physical building is this?' }),
+    ).toBeVisible()
+    expect(screen.getByRole('radiogroup', { name: 'How is this building used?' })).toBeVisible()
+  })
+
   it('keeps a number set expanded when collapseWhenComplete is false', async () => {
     const user = userEvent.setup()
     render(<MixedSetupHarness />)

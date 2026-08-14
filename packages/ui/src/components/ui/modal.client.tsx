@@ -18,10 +18,14 @@ import {
 } from './dialog-panel.variants'
 import {
   modalContentVariants,
+  modalFooterDockClasses,
   modalOverlayVariants,
   type ModalContentLayout,
   type ModalSize,
+  type ModalStableSize,
 } from './modal.variants'
+
+export type { ModalStableSize }
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const ModalRoot = DialogPrimitive.Root
@@ -41,10 +45,15 @@ ModalOverlay.displayName = 'Modal.Overlay'
 export interface ModalContentProps extends React.ComponentPropsWithoutRef<
   typeof DialogPrimitive.Content
 > {
-  /** Width preset for the panel. */
+  /** Inline width preset (`max-w-*`). Orthogonal to {@link stableSize}. */
   size?: ModalSize
   /** `content` grows with children; `stable` reserves a fixed shell block-size. */
   layout?: ModalContentLayout
+  /**
+   * Stable shell block height (`default` | `tall`). Only applies when
+   * `layout="stable"`; ignored for `layout="content"`. Orthogonal to {@link size}.
+   */
+  stableSize?: ModalStableSize
   /** Accessible name for the built-in close (X) button. */
   closeLabel?: string
   /** Dismiss when clicking the overlay/outside the panel (default `true`). */
@@ -63,6 +72,7 @@ const ModalContent = React.forwardRef<
       children,
       size,
       layout,
+      stableSize,
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
@@ -82,7 +92,7 @@ const ModalContent = React.forwardRef<
           ref={composedRef}
           tabIndex={-1}
           className={cn(
-            modalContentVariants({ size, layout }),
+            modalContentVariants({ size, layout, stableSize }),
             dialogContentFocusShellClasses,
             className,
           )}
@@ -165,7 +175,11 @@ ModalBody.displayName = 'Modal.Body'
 
 const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(dialogPanelFooterClasses, className)} {...props} />
+    <div
+      ref={ref}
+      className={cn(dialogPanelFooterClasses, modalFooterDockClasses, className)}
+      {...props}
+    />
   ),
 )
 ModalFooter.displayName = 'Modal.Footer'

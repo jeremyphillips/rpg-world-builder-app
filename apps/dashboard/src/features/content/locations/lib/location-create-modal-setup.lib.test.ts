@@ -42,6 +42,40 @@ describe('applyLocationCreateModalSetupValueChange', () => {
 })
 
 describe('resolveLocationCreateModalSetupModel', () => {
+  it('builds optional Form before required Facility discovery', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFacilityAuthoringGroup: 'browse_all',
+      },
+    })
+
+    expect(model?.choiceSets.map(({ id, required }) => ({ id, required }))).toEqual([
+      { id: 'buildingForm', required: false },
+      { id: 'buildingFacilityAuthoringGroup', required: undefined },
+    ])
+    expect(model?.canContinue).toBe(true)
+    expect(model?.complete()).toEqual({ kind: 'building' })
+  })
+
+  it('projects authoring group into setup intent and summary, not Facility classification', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFacilityAuthoringGroup: 'production',
+      },
+    })
+
+    expect(model?.complete()).toEqual({
+      kind: 'building',
+      facilityAuthoringGroup: 'production',
+    })
+    expect(model?.summaryEntries.map((entry) => entry.valueLabel)).toEqual(['Production'])
+    expect(model?.complete()).not.toHaveProperty('facilityType')
+  })
+
   it('builds shared region choice sets with dependsOn', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'region' },

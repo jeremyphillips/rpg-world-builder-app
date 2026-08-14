@@ -10,7 +10,7 @@ import type { GameTermEntry, VocabularyTerm } from '../types'
 
 export const BUILDING_FUNCTION_FAMILY_TERM = {
   label: 'Building Function Family',
-  description: 'Semantic function families a building archetype normally serves.',
+  description: 'Semantic function families a building facility normally serves.',
   sentence: {
     singular: 'building function family',
     plural: 'building function families',
@@ -106,4 +106,10 @@ export function getBuildingFunctionFamilyEntry(id: string): GameTermEntry | unde
 /** Returns the display label for a function family. Falls back to the raw id. */
 export function getBuildingFunctionFamilyLabel(id: string): string {
   return getBuildingFunctionFamilyEntry(id)?.label ?? id
+}
+
+export function formatBuildingFunctionFamilyLabels(
+  functions: readonly BuildingFunctionFamily[],
+): string {
+  return functions.map(getBuildingFunctionFamilyLabel).join(' · ')
 }
