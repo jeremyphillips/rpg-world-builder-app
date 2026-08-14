@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { BUILDING_FORM_ENTRIES, type BuildingForm } from '@rpg/contracts'
+import {
+  BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES,
+  BUILDING_FACILITY_TYPE_ENTRIES,
+  BUILDING_FORM_ENTRIES,
+  type BuildingFacilityType,
+  type BuildingForm,
+} from '@rpg/contracts'
 
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
@@ -23,12 +29,22 @@ const buildingArgs = {
   },
 } satisfies LocationCreateModalProps
 
+const civicGroupLabel = BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES.civic.label
+
+type BuildingFacilityGroup =
+  | 'Browse all'
+  | 'Production'
+  | 'Religious'
+  | 'Civic'
+  | 'Residence'
+  | 'Commercial'
+
 async function continueBuildingStory(
   canvasElement: HTMLElement,
   selections: {
     form?: BuildingForm
-    facilityGroup?: 'Browse all' | 'Production' | 'Religious' | 'Civic' | 'Residence'
-    facility?: 'brewery' | 'temple' | 'town_hall' | 'residence'
+    facilityGroup?: BuildingFacilityGroup
+    facility?: BuildingFacilityType
   },
 ) {
   const canvas = within(canvasElement.ownerDocument.body)
@@ -42,14 +58,7 @@ async function continueBuildingStory(
   )
   await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
   if (selections.facility) {
-    const facilityLabel =
-      selections.facility === 'brewery'
-        ? 'Brewery'
-        : selections.facility === 'temple'
-          ? 'Temple'
-          : selections.facility === 'town_hall'
-            ? 'Town hall'
-            : 'Residence'
+    const facilityLabel = BUILDING_FACILITY_TYPE_ENTRIES[selections.facility].label
     await userEvent.click(canvas.getByRole('combobox', { name: 'Facility type' }))
     await userEvent.click(
       canvas.getByRole('option', { name: (name) => name.startsWith(facilityLabel) }),
@@ -63,6 +72,11 @@ const meta = {
   title: 'Content/Locations/LocationCreateModal',
   component: LocationCreateModal,
   decorators: [withDashboardProviders],
+  parameters: {
+    viewport: {
+      defaultViewport: 'responsive',
+    },
+  },
 } satisfies Meta<typeof LocationCreateModal>
 
 export default meta
@@ -148,6 +162,240 @@ export const TempleDetails: Story = {
       facility: 'temple',
     })
     await expect(within(canvasElement.ownerDocument.body).getByText('Religious')).toBeVisible()
+  },
+}
+
+export const HouseResidence: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Residence',
+      facility: 'residence',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('House · Residence'),
+    ).toBeVisible()
+  },
+}
+
+export const TowerResidence: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'tower',
+      facilityGroup: 'Residence',
+      facility: 'residence',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Tower · Residence'),
+    ).toBeVisible()
+  },
+}
+
+export const HallTownHall: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'town_hall',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Hall · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const HallGuildhall: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'guildhall',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Hall · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const KeepArmory: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'keep',
+      facilityGroup: 'Civic',
+      facility: 'armory',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Keep · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const TowerWatchPost: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'tower',
+      facilityGroup: 'Civic',
+      facility: 'watchtower',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Tower · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const TowerBeaconStation: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'tower',
+      facilityGroup: 'Civic',
+      facility: 'lighthouse',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Tower · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const KeepCheckpoint: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'keep',
+      facilityGroup: 'Civic',
+      facility: 'checkpoint',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Keep · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const HallArchive: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'archive',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Hall · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const HallWatchPost: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'watchtower',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Hall · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const HallBeaconStation: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'hall',
+      facilityGroup: 'Civic',
+      facility: 'lighthouse',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Hall · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const HouseCheckpoint: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'house',
+      facilityGroup: 'Civic',
+      facility: 'checkpoint',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`House · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const KeepLibrary: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'keep',
+      facilityGroup: 'Civic',
+      facility: 'library',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Keep · ${civicGroupLabel}`),
+    ).toBeVisible()
+  },
+}
+
+export const FormUnspecifiedWatchPost: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Civic',
+      facility: 'watchtower',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText(civicGroupLabel)).toBeVisible()
+  },
+}
+
+export const FormUnspecifiedBeaconStation: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Civic',
+      facility: 'lighthouse',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText(civicGroupLabel)).toBeVisible()
+  },
+}
+
+export const TowerTownHall: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      form: 'tower',
+      facilityGroup: 'Civic',
+      facility: 'town_hall',
+    })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText(`Tower · ${civicGroupLabel}`),
+    ).toBeVisible()
   },
 }
 

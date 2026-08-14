@@ -99,6 +99,35 @@ describe('resolveLocationDisplaySummary', () => {
     })
   })
 
+  it('displays legacy morphological Facility ids via registry labels, not the persisted id', () => {
+    const watchPost: Location = {
+      ...baseLocation,
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'watchtower' }),
+    }
+    const beaconStation: Location = {
+      ...baseLocation,
+      id: 'loc_beacon',
+      kind: 'structure',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({
+        form: 'hall',
+        facilityType: 'lighthouse',
+      }),
+    }
+
+    expect(resolveLocationDisplaySummary(watchPost)).toEqual({
+      typeLabel: 'Building',
+      buildingFacilityTypeLabel: 'Watch post',
+    })
+    expect(resolveLocationDisplaySummary(beaconStation)).toEqual({
+      typeLabel: 'Building',
+      buildingFormLabel: 'Hall',
+      buildingFacilityTypeLabel: 'Beacon station',
+    })
+  })
+
   it('resolves interior type and subtype classification separately', () => {
     const location: Location = {
       ...baseLocation,

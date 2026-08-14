@@ -26,6 +26,24 @@ Form. Form-only buildings have no derived functions.
 emphasis — Setup gates on Facility discovery intent, not on requiring `facilityType` on every
 Building. Optional Form does not make both axes equally required at Setup.
 
+### Facility admission rule
+
+A Building Facility describes a configured use of **Building premises**, not primarily a Site/location
+concept and not physical morphology owned by Form. Labels must pass the **Form-independent label
+test**: if Form is omitted, the Facility label still describes a coherent configured use of Building
+premises without requiring the reader to infer morphology.
+
+Phase 7 acceptance review:
+[`building-create-phase-7-acceptance.md`](../../../docs/analysis/building-create-phase-7-acceptance.md).
+
+**Open composition:** Form and Facility compose without pair allowlists. Awkward combinations are
+investigated as unusual-but-valid composition or vocabulary label debt — not as evidence for
+Form-dependent Facility eligibility. Persisted ids `watchtower` and `lighthouse` are accepted
+identifier debt; runtime meaning comes from registry metadata, not lexical interpretation of the id.
+
+**Discovery groups** (`civic`, `commercial`, …) are Setup-only authoring facets; they are never
+persisted. Group display labels may differ from registry ids (e.g. `civic` → “Civic / institutional”).
+
 ## Quarantined archetype corpus
 
 Persisted Building classification is **only** `classification.form` and/or
@@ -193,5 +211,9 @@ Create-setup choice collapse and selected-summary presentation are owned by the 
 | `location-classification-form-fields.ts` | Form select + Facility searchable combobox     |
 | `location-overview-search.lib.ts`        | Overview name-search discovery strings         |
 | `locations-overview-filter-schema.ts`    | Facility type and function overview filters    |
+
+Building create UX acceptance (Phase 7–8): Storybook tag `phase-7-building-flows` on
+[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx)
+covers the stereotypical and unstereotypical scenario matrix.
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

@@ -6,8 +6,9 @@ import {
   BUILDING_FACILITY_TYPE_ENTRIES,
   BUILDING_FACILITY_TYPE_IDS,
   buildingFacilityTypeSchema,
-  getBuildingFacilityTypesForAuthoringGroup,
   getBuildingFacilityDefaultFunctions,
+  getBuildingFacilityTypeLabel,
+  getBuildingFacilityTypesForAuthoringGroup,
 } from './building-facility-type'
 import { BUILDING_FORM_ENTRIES, BUILDING_FORM_IDS, buildingFormSchema } from './building-form'
 import { BUILDING_FUNCTION_FAMILY_IDS } from './building-function-family'
@@ -77,6 +78,25 @@ describe('Building semantic vocabularies', () => {
     expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'archive' })).toEqual({
       form: 'house',
       facilityType: 'archive',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'watchtower' }),
+    ).toEqual({ form: 'hall', facilityType: 'watchtower' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'lighthouse' }),
+    ).toEqual({ form: 'hall', facilityType: 'lighthouse' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'town_hall' }),
+    ).toEqual({ form: 'tower', facilityType: 'town_hall' })
+    expect(buildingClassificationSchema.parse({ form: 'keep', facilityType: 'library' })).toEqual({
+      form: 'keep',
+      facilityType: 'library',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'checkpoint' }),
+    ).toEqual({
+      form: 'house',
+      facilityType: 'checkpoint',
     })
   })
 
@@ -243,5 +263,21 @@ describe('Building semantic vocabularies', () => {
         expect(new Set(entry.searchTerms).size).toBe(entry.searchTerms.length)
       }
     }
+  })
+
+  it('resolves legacy morphological Facility ids from registry metadata, not lexical id shape', () => {
+    expect(getBuildingFacilityTypeLabel('watchtower')).toBe('Watch post')
+    expect(getBuildingFacilityTypeLabel('lighthouse')).toBe('Beacon station')
+    expect(getBuildingFacilityTypeLabel('watchtower').toLocaleLowerCase()).not.toContain('tower')
+    expect(getBuildingFacilityTypeLabel('lighthouse').toLocaleLowerCase()).not.toContain('tower')
+    expect(getBuildingFacilityTypeLabel('lighthouse').toLocaleLowerCase()).not.toBe('lighthouse')
+    expect(getBuildingFacilityDefaultFunctions('watchtower')).toEqual(['defense_watch'])
+    expect(getBuildingFacilityDefaultFunctions('lighthouse')).toEqual(['defense_watch'])
+    expect(
+      buildingClassificationSchema.parse({ form: 'hall', facilityType: 'watchtower' }),
+    ).toEqual({ form: 'hall', facilityType: 'watchtower' })
+    expect(
+      buildingClassificationSchema.parse({ form: 'house', facilityType: 'lighthouse' }),
+    ).toEqual({ form: 'house', facilityType: 'lighthouse' })
   })
 })

@@ -1627,3 +1627,73 @@ presets — identified with the exact axis and at least two parent/child pairs b
 `blacksmith` (rehome), `gatehouse` / `apothecary` (decompose). Shipped Form/Facility alignment
 derives from `@rpg/contracts` registries — adding a Facility or Form id to the registry updates
 inventory automatically.
+
+## Phase 11 — Building create-flow closeout
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Phase 7 UX review, disposition cards, localized label/alias cleanup, Storybook scenario
+matrix, create-flow track closure. Full note:
+[`building-create-phase-7-acceptance.md`](./building-create-phase-7-acceptance.md).
+
+### Current canonical vocabulary
+
+| Axis     | Values                                                             |
+| -------- | ------------------------------------------------------------------ |
+| Form     | `house`, `tower`, `hall`, `keep`                                   |
+| Facility | 28 ids — `residence` … `stable` (see `BUILDING_FACILITY_TYPE_IDS`) |
+
+### Facility admission rule
+
+A Building Facility must describe configured **Building-premises use**, not Site morphology or Form
+morphology. The **Form-independent label test** is primary: if Form is omitted, the Facility label
+still describes a coherent configured use of Building premises without requiring the reader to infer
+morphology.
+
+### Open-composition policy
+
+**Evidence-backed statement holds:** reviewed awkward combinations (Hall + watch/beacon premises,
+Tower + town hall, etc.) are unusual-but-valid or former label debt — not invalid domain pairings.
+No counterexample requires Form-dependent Facility eligibility or compatibility matrices.
+
+Authoring composition is clean after label/metadata correction. Persisted ids `watchtower` and
+`lighthouse` remain **accepted identifier debt** — runtime meaning comes from registry metadata, not
+lexical interpretation of the id. Open composition does not require renaming those ids immediately.
+
+### Independent dispositions
+
+| Term       | Canonical meaning | Persisted id | Alias      |
+| ---------- | ----------------- | ------------ | ---------- |
+| watchtower | Watch post        | `watchtower` | Watchtower |
+| lighthouse | Beacon station    | `lighthouse` | Lighthouse |
+
+`guard_post` corpus term not promoted — broader public-order semantics. Identifier migration waits
+for a dedicated trigger (API/domain confusion, lexical-id inference in new code, or a broader
+Facility-id normalization).
+
+### Civic discovery group
+
+**RENAME AUTHORING LABEL ONLY** — registry id `civic`; display **Civic / institutional**. Copy avoids
+asserting public ownership, government operation, or territorial authority. No split — no repeated
+discovery failure observed in the Phase 7 scenario review.
+
+### Preset and manifestation evidence
+
+| Track                   | Outcome                                                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Presets (2A/2B)         | Aliases resolve watchtower/lighthouse discoverability in review; the reviewed scenarios do not provide evidence sufficient to trigger 2B — not approved |
+| Manifestation (Slice 3) | Still ungated — see Phase 10                                                                                                                            |
+
+### Known deferred (non-blocking)
+
+- `apothecary` — `needsDesign`; shop + operator decompose
+- `gatehouse` — contextual decompose, not Form admission
+- Persisted Facility id rename for morphological ids (`watchtower`, `lighthouse`)
+- Building preset implementation (2B)
+- Manifestation pilot
+
+### Create-flow status
+
+**Building create-flow Phase 7–8 is closed:** reviewed scenarios are coherent, localized authoring
+vocabulary fixes are verified, open composition remains valid, and no preset or manifestation
+trigger was found. Remaining identifier normalization and unresolved corpus concepts are independent
+follow-up work and do not keep the create-flow track open.

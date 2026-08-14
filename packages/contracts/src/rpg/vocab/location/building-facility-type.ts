@@ -39,8 +39,9 @@ export const BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES = {
     description: 'Facilities used to make, process, or transform goods and materials.',
   },
   civic: {
-    label: 'Civic / government',
-    description: 'Facilities used for civic administration, authority, or public institutions.',
+    label: 'Civic / institutional',
+    description:
+      'Facilities for administration, assembly, custody, care, knowledge, defense, signaling, or other institutional uses.',
   },
   religious: {
     label: 'Religious',
@@ -216,11 +217,12 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     searchTerms: ['weapons', 'arms', 'armor'],
   },
   watchtower: {
-    label: 'Watchtower',
+    label: 'Watch post',
     description: 'A building configured for observation, signaling, and watch duties.',
     defaultFunctions: ['defense_watch'],
     authoringGroups: ['civic'],
-    searchTerms: ['observation', 'sentry', 'lookout'],
+    aliases: ['Watchtower'],
+    searchTerms: ['watchtower', 'observation', 'sentry', 'lookout', 'signal'],
   },
   library: {
     label: 'Library',
@@ -230,12 +232,23 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     searchTerms: ['books', 'study', 'reading'],
   },
   lighthouse: {
-    label: 'Lighthouse',
+    label: 'Beacon station',
     description:
       'A building configured to emit a navigation signal for mariners — a staffed signaling premises, not a coastal landmark site.',
     defaultFunctions: ['defense_watch'],
     authoringGroups: ['civic'],
-    searchTerms: ['navigation', 'coast', 'beacon', 'signal'],
+    aliases: ['Lighthouse'],
+    searchTerms: [
+      'lighthouse',
+      'navigation beacon',
+      'navigation station',
+      'signal station',
+      'navigation',
+      'coast',
+      'beacon',
+      'signal',
+      'maritime',
+    ],
   },
   archive: {
     label: 'Archive',

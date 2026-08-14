@@ -209,7 +209,9 @@ async function chooseBuildingFacilityType(
     | 'Residence'
     | 'Barracks'
     | 'Shop'
-    | 'Watchtower'
+    | 'Watch post'
+    | 'Beacon station'
+    | 'Checkpoint'
     | 'Guildhall'
     | 'Armory'
     | 'Archive',
@@ -533,13 +535,13 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('creates Tower + Watchtower as an open composition', async () => {
+  it('creates Tower + Watch post as an open composition', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'tower')
     await continueBuildingSetup(user, 'Civic')
-    await chooseBuildingFacilityType(user, 'Watchtower')
+    await chooseBuildingFacilityType(user, 'Watch post')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Border Watch')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
