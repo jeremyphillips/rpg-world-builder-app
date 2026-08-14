@@ -1167,3 +1167,11 @@ Authoring guidance:
 [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
 Implementation spec archived with supersession banner:
 [`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md).
+
+## Editorial appendix — Preset investigation and manifestation gate (2026-08-14)
+
+Slice 2A (preset UX) and Slice 3 (manifestation evidence gate) are documented in
+[`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md)
+and
+[`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3).
+No Building preset registry or manifestation encoding was added.

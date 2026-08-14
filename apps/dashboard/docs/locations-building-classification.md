@@ -33,7 +33,10 @@ Persisted Building classification is **only** `classification.form` and/or
 ([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building-archetype.ts))
 is a **quarantined research corpus** — not exported from runtime barrels, not imported by
 production apps (ESLint-enforced). It may inform future authoring presets or manifestation
-migration; that is **possible, not promised**.
+migration; presets remain **investigation-only until 2B approval**
+([building-authoring-preset-investigation-2a.md](../../../docs/analysis/building-authoring-preset-investigation-2a.md));
+manifestation remains deferred pending a gated consumer
+([building-organization-model-audit.md](../../../docs/analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3)).
 
 ## Overview surfaces
 

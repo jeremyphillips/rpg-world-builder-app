@@ -1561,9 +1561,11 @@ Facility functions without encoding legacy archetype ids as classification mappi
 
 ### Explicitly deferred (post-convergence)
 
-- Manifestation migration (`manifestationOf`, axis-local graphs, discriminated targets)
-- Building authoring presets / named-expression shortcuts (Wizard tower, etc.)
-- Gatehouse as Form; `checkpoint` Facility
+- Manifestation migration (`manifestationOf`, axis-local graphs, discriminated targets) — **Slice 3
+  evidence gate failed; see Phase 10 below**
+- Building authoring presets / named-expression shortcuts — **Slice 2A investigation complete; 2B
+  not approved** ([building-authoring-preset-investigation-2a.md](./building-authoring-preset-investigation-2a.md))
+- Gatehouse as Form
 - Searchable/grouped Form Setup (4 Forms still scan fine)
 - Form×Facility compatibility policy
 - Deleting `building-archetype` shards
@@ -1571,3 +1573,54 @@ Facility functions without encoding legacy archetype ids as classification mappi
 - Dual-axis Form for apartment buildings
 - Any new Building classification axis
 - Archetype picker / overview filter / worked-example doc migration
+
+**Shipped since Slice D table (roadmap PR-1):** `checkpoint` and `lighthouse` Facilities; registry-derived refactor inventory.
+
+## Phase 10 — Post-convergence roadmap (Slices 2A + 3)
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Building preset UX investigation (2A only); manifestation evidence gate (3); no preset
+schema/UI; no manifestation pilot.
+
+### Slice 2A — Building authoring preset investigation
+
+Full design note:
+[`building-authoring-preset-investigation-2a.md`](./building-authoring-preset-investigation-2a.md).
+
+| Candidate      | Outcome                            | 2B recommendation                                 |
+| -------------- | ---------------------------------- | ------------------------------------------------- |
+| Wizard tower   | **PARTIAL PRESET**                 | First implementation candidate if 2B approved     |
+| Healer's house | **PARTIAL PRESET**                 | Second; optional Facility default is the friction |
+| Manor          | **TOO CONTEXTUAL — DO NOT PRESET** | Exclude                                           |
+
+**Placement (if 2B approved):** optional **Start from familiar type** at the **top of the Building
+Setup shell** — not before Setup, not on Details v1. Projects Setup selection + optional
+`classification` only; clears preset id before persistence; relationships remain suggestion-only.
+
+**2B status:** not approved. No `@rpg/contracts` preset registry, no Location field, no dashboard
+control in this slice.
+
+### Slice 3 — Manifestation evidence gate
+
+Manifestation is deferred until **all three** gates pass. Evaluation as of 2026-08-14:
+
+| Gate | Requirement                                                                               | Status                 | Evidence                                                                                                                                                                                  |
+| ---- | ----------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Concrete consumer cannot be satisfied by Form/Facility metadata or ephemeral presets      | **Not met**            | Overview search/filter uses Form label, exact `facilityType`, and `getEffectiveBuildingFunctions()` — no consumer requires cultural subtype ids (`caravanserai`, `ryokan`, `basilica`, …) |
+| 2    | Exact canonical axis for inheritance identified (Form or Facility — not cross-axis graph) | **Not met for pilot**  | Corpus pairs imply Facility parents (`inn`, `temple`) and Form parents (`house`); no encoding chosen; cross-axis graph still rejected by audit                                            |
+| 3    | ≥ two real values share the same reusable relationship on that axis                       | **Met in corpus only** | e.g. `caravanserai` + `ryokan` → inn; `basilica` + `stave_church` → temple — but insufficient without gate 1                                                                              |
+
+**Decision:** **Do not run a manifestation pilot.** Continue corpus disposition from the
+registry-derived refactor inventory (`tools/building-refactor`). `manifestationOf` remains on the
+quarantined archetype corpus for migration evidence only.
+
+**Next manifestation trigger:** a shipped consumer (inherited discovery, same-axis “kind of” filter,
+or overview grouping) that cannot be implemented with Facility metadata, search terms, or ephemeral
+presets — identified with the exact axis and at least two parent/child pairs before encoding work.
+
+### Corpus disposition (unchanged process)
+
+277 concepts remain `pending` or `needsDesign` in the refactor inventory. Non-inferable rows:
+`blacksmith` (rehome), `gatehouse` / `apothecary` (decompose). Shipped Form/Facility alignment
+derives from `@rpg/contracts` registries — adding a Facility or Form id to the registry updates
+inventory automatically.
