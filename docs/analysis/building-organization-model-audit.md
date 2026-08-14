@@ -1623,10 +1623,15 @@ presets — identified with the exact axis and at least two parent/child pairs b
 
 ### Corpus disposition (unchanged process)
 
-277 concepts remain `pending` or `needsDesign` in the refactor inventory. Non-inferable rows:
-`blacksmith` (rehome), `gatehouse` / `apothecary` (decompose). Shipped Form/Facility alignment
-derives from `@rpg/contracts` registries — adding a Facility or Form id to the registry updates
-inventory automatically.
+273 concepts remain `pending` or `needsDesign` in the refactor inventory after tranche 1.
+Non-inferable rows include `decompose` reconciliations (`gatehouse`, `manor`, `wizard_tower`,
+`apothecary`), `needs-design` (`blockhouse`), and `blacksmith` (rehome). Facility candidates
+(`bathhouse`, `embassy`, `observatory`, `schoolhouse`, `barn`) remain inventory `pending` until an
+explicit promotion plan ships registry ids. Shipped Form/Facility alignment derives from
+`@rpg/contracts` registries.
+
+Full tranche-1 evidence cards:
+[`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md).
 
 ## Phase 11 — Building create-flow closeout
 
@@ -1685,8 +1690,10 @@ discovery failure observed in the Phase 7 scenario review.
 
 ### Known deferred (non-blocking)
 
-- `apothecary` — `needsDesign`; shop + operator decompose
-- `gatehouse` — contextual decompose, not Form admission
+- Corpus disposition tranche 1 — [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md)
+- `blockhouse` — `needs-design` (morphology evidence)
+- `bathhouse`, `embassy`, `observatory`, `schoolhouse`, `barn` — Facility candidates (not shipped)
+- Organization activity vocabulary gap around pharmacy/healing/herbal practice (Apothecary — Org audit)
 - Persisted Facility id rename for morphological ids (`watchtower`, `lighthouse`)
 - Building preset implementation (2B)
 - Manifestation pilot

@@ -658,6 +658,7 @@ export const BUILDING_ARCHETYPE_REFACTOR_STATUS = {
   enabledForm: 'enabled-form',
   enabledFacility: 'enabled-facility',
   rehomeToOrganizationActivity: 'rehome-to-organization-activity',
+  decompose: 'decompose',
   pending: 'pending',
   needsDesign: 'needs-design',
 } as const
@@ -686,9 +687,12 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
 
 /** Non-inferable migration decisions only — shipped Form/Facility ids derive from registries. */
 const INITIAL_STATUS_BY_ID = {
-  apothecary: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+  apothecary: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
-  gatehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+  blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
+  gatehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  manor: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  wizard_tower: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
 
 const SHIPPED_FORM_IDS = new Set<string>(BUILDING_FORM_IDS)
