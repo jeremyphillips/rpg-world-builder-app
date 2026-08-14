@@ -26,6 +26,8 @@ import {
   PHASE_19A_MORPHOLOGY_CULTURAL_EXPRESSION_IDS,
   PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS,
   PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
+  PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
+  PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -180,14 +182,14 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 136 concepts pending or awaiting design after Tier C composite closeout', () => {
+  it('leaves 135 concepts pending or awaiting design after Phase 19A fortification review', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(136)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(69)
+    expect(unresolved).toHaveLength(135)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(68)
     expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(67)
   })
 
@@ -275,6 +277,11 @@ describe('Building archetype refactor inventory', () => {
       expect(reviewedIds.has(id)).toBe(false)
 
       const status = statusById.get(id)
+      if (id === 'martello_tower') {
+        expect(status).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+        continue
+      }
+
       expect(
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
           status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
@@ -284,8 +291,25 @@ describe('Building archetype refactor inventory', () => {
     expect(statusById.get('blockhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
 
     for (const id of PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS) {
-      if (id === 'blockhouse') continue
+      if (id === 'blockhouse' || id === 'martello_tower') continue
       expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    }
+  })
+
+  it('maps Phase 19A fortification disposition ids to reviewed statuses', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    expect(PHASE_19A_FORTIFICATION_DECOMPOSE_IDS).toEqual(['martello_tower'])
+    expect(PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS).toEqual(['blockhouse'])
+
+    for (const id of PHASE_19A_FORTIFICATION_DECOMPOSE_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    }
+
+    for (const id of PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign)
     }
   })
 
@@ -383,7 +407,7 @@ describe('Building archetype refactor inventory', () => {
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toHaveLength(80)
+    expect(decomposed).toHaveLength(81)
     expect(decomposed).toEqual(
       expect.arrayContaining([
         'abbey',
@@ -401,6 +425,7 @@ describe('Building archetype refactor inventory', () => {
         'hammam',
         'healers_house',
         'manor',
+        'martello_tower',
         'monastery',
         'oracle_shrine',
         'orphanage',

@@ -58,7 +58,7 @@ notes). If documentation and tests disagree, **tests win**.
 | Forms                                   |                                                                                   **4** — `house`, `tower`, `hall`, `keep` |
 | Facilities                              | **36** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
 | Research corpus                         |                                                                                                                    **308** |
-| Unresolved                              |                                                                                     **136** — see refactor inventory tests |
+| Unresolved                              |                                                                                     **135** — see refactor inventory tests |
 | Legacy runtime archetypes (quarantined) |                                                                                                                    **143** |
 
 Persisted ids `watchtower` and `lighthouse` are accepted identifier debt (runtime labels: Watch post,
@@ -66,10 +66,10 @@ Beacon station). Do not infer morphology from the id.
 
 **Inventory notables** (exceptions only — not a status ledger)
 
-| Id           | Status         | Note                                                    |
-| ------------ | -------------- | ------------------------------------------------------- |
-| `academy`    | `pending`      | Family B reviewed; premises vs `schoolhouse` unresolved |
-| `blockhouse` | `needs-design` | Morphology protocol documented; no Form admission yet   |
+| Id           | Status         | Note                                                                                      |
+| ------------ | -------------- | ----------------------------------------------------------------------------------------- |
+| `academy`    | `pending`      | Family B reviewed; premises vs `schoolhouse` unresolved                                   |
+| `blockhouse` | `needs-design` | Morphology protocol documented; fortification subgroup reviewed — 19C Form candidacy open |
 
 ## Completed
 

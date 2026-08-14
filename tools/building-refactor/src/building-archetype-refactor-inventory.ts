@@ -955,6 +955,16 @@ export const PHASE_19A_MORPHOLOGY_ALLOWLIST_IDS = [
   ...PHASE_19A_MORPHOLOGY_SITE_CONTEXT_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 
+/** Phase 19A fortification morphology reviewed 2026-08-14. */
+export const PHASE_19A_FORTIFICATION_DECOMPOSE_IDS = [
+  'martello_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 19A fortification morphology reviewed 2026-08-14. */
+export const PHASE_19A_FORTIFICATION_NEEDS_DESIGN_IDS = [
+  'blockhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,
@@ -1005,6 +1015,10 @@ const INITIAL_STATUS_BY_ID = {
     BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
   ),
   ...statusMapForIds(TIER_C_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_19A_FORTIFICATION_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
   ...statusMapForIds(
     TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
     BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
