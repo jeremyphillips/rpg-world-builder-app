@@ -1689,6 +1689,7 @@ discovery failure observed in the Phase 7 scenario review.
 ### Known deferred (non-blocking)
 
 - Corpus disposition sweep 1 — [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md)
+- Corpus disposition Tier C tranche 1 — [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md)
 - Corpus disposition tranche 1 — [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md)
 - `blockhouse` — `needs-design` (morphology evidence)
 - Organization activity vocabulary gap around pharmacy/healing/herbal practice (Apothecary — Org audit)
@@ -1801,12 +1802,12 @@ remains a separate plan. Tier B shortlist is evidence only. Tier C is the remain
 
 ### Inventory outcomes
 
-| Status                            | Count | Notes                                                                          |
-| --------------------------------- | ----: | ------------------------------------------------------------------------------ |
-| `outside-building-classification` |    39 | Family F post false-positive audit                                             |
-| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows            |
-| `needs-design`                    |     1 | `blockhouse` unchanged                                                         |
-| Unresolved                        |   163 | Tier B remainder, morphology queue, production cluster, deferred interior pass |
+| Status                            | Count | Notes                                                                                                                   |
+| --------------------------------- | ----: | ----------------------------------------------------------------------------------------------------------------------- |
+| `outside-building-classification` |    39 | Family F post false-positive audit                                                                                      |
+| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows                                                     |
+| `needs-design`                    |     1 | `blockhouse` unchanged                                                                                                  |
+| Unresolved                        |   145 | Tier C tranche 1 + Batch 2 — see [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md) |
 
 27 terms returned to `pending` during the Family F/E false-positive audit (see sweep note §False-positive
 audit). Tier A reviewed count is **102**, not a preserved row target.
@@ -1847,3 +1848,46 @@ Inventory derives all three → `enabled-facility` from `BUILDING_FACILITY_TYPE_
 
 Museum / Workshop / Academy promotion, `silo` / `orangery` runtime synonyms, Form promotion, new
 authoring groups, Setup redesign.
+
+## Phase 18 — Tier C composite disposition tranche 1
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Review all 24 composite-queue terms, blockhouse morphology protocol, and Family B
+non-composite institution terms. Inventory + analysis only.
+
+Full evidence: [`building-corpus-disposition-tier-c-1.md`](./building-corpus-disposition-tier-c-1.md).
+
+**Status:** **Implemented** (tranche 1 + Batch 2). 28 terms reviewed (24 composite queue + 4 Family B).
+**18** inventory dispositions (12 `decompose`, 6 `outside-building-classification`). **12** remain
+`pending` or `needs-design` with documented triggers. Runtime unchanged.
+
+### Inventory outcomes
+
+| Status                            | Count | Notes                                                           |
+| --------------------------------- | ----: | --------------------------------------------------------------- |
+| `decompose` (sweep + Tier C)      |    79 | +12 Tier C rows (incl. Batch 2 `dzong`)                         |
+| `outside-building-classification` |    45 | +6 Tier C rows (incl. Batch 2 fortifications)                   |
+| `needs-design`                    |     1 | `blockhouse` — morphology protocol documented, status unchanged |
+| Unresolved                        |   145 | 144 `pending` + `blockhouse`                                    |
+
+### Batch 1 legacy runtime (dispositioned)
+
+| id          | Outcome                           |
+| ----------- | --------------------------------- |
+| `monastery` | `decompose`                       |
+| `palace`    | `decompose`                       |
+| `shipyard`  | `outside-building-classification` |
+
+### Batch 2 defense / massing (dispositioned)
+
+| id         | Outcome                           |
+| ---------- | --------------------------------- |
+| `castle`   | `outside-building-classification` |
+| `citadel`  | `outside-building-classification` |
+| `fortress` | `outside-building-classification` |
+| `kasbah`   | `outside-building-classification` |
+| `dzong`    | `decompose`                       |
+
+### Explicit non-goals (Tier C)
+
+Runtime promotion, corpus graph retargeting, manifestation, presets 2B.

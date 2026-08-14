@@ -688,7 +688,7 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
 
 /**
  * Non-inferable migration decisions only — shipped Form/Facility ids derive from registries.
- * Sweep 1 membership is explicit per family; see building-corpus-disposition-sweep-1.md.
+ * Sweep 1 membership is explicit per family; Tier C per batch — see building-corpus-disposition-tier-c-1.md.
  */
 export const SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
   'airship',
@@ -817,6 +817,99 @@ export const SWEEP_PRIOR_DECOMPOSE_IDS = [
   'wizard_tower',
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Tier C composite review queue — scheduling only; `kind: composite` is not disposition evidence.
+ * See building-corpus-disposition-tier-c-1.md.
+ */
+export const TIER_C_COMPOSITE_QUEUE_IDS = [
+  'monastery',
+  'palace',
+  'shipyard',
+  'castle',
+  'citadel',
+  'fortress',
+  'kasbah',
+  'dzong',
+  'abbey',
+  'lamasery',
+  'wat',
+  'shinto_shrine',
+  'mage_college',
+  'university_college',
+  'leprosarium',
+  'gymnasium',
+  'farmstead',
+  'palace_complex',
+  'royal_mews',
+  'souk',
+  'thermae',
+  'dwarven_forgehold',
+  'ksar',
+  'yamen',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 1 — legacy runtime composites reviewed 2026-08-14. */
+export const TIER_C_BATCH1_DECOMPOSE_IDS = [
+  'monastery',
+  'palace',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH1_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'shipyard',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 2 — defense / status massing reviewed 2026-08-14 (structure/complex gate). */
+export const TIER_C_BATCH2_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'castle',
+  'citadel',
+  'fortress',
+  'kasbah',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH2_DECOMPOSE_IDS = ['dzong'] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 3A — religious institution / premises. */
+export const TIER_C_BATCH3A_DECOMPOSE_IDS = ['abbey'] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 3B — education / care institution composites. */
+export const TIER_C_BATCH3B_DECOMPOSE_IDS = [
+  'mage_college',
+  'university_college',
+  'leprosarium',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Batch 4 — mixed composite review batch (independent cards). */
+export const TIER_C_BATCH4_DECOMPOSE_IDS = [
+  'royal_mews',
+  'thermae',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'palace_complex',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Family B non-composite institution terms reviewed 2026-08-14. */
+export const TIER_C_FAMILY_B_DECOMPOSE_IDS = [
+  'adventurers_guild',
+  'customs_house',
+  'orphanage',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_DECOMPOSE_IDS = [
+  ...TIER_C_BATCH1_DECOMPOSE_IDS,
+  ...TIER_C_BATCH2_DECOMPOSE_IDS,
+  ...TIER_C_BATCH3A_DECOMPOSE_IDS,
+  ...TIER_C_BATCH3B_DECOMPOSE_IDS,
+  ...TIER_C_BATCH4_DECOMPOSE_IDS,
+  ...TIER_C_FAMILY_B_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
+export const TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  ...TIER_C_BATCH1_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH2_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  ...TIER_C_BATCH4_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 function statusMapForIds(
   ids: readonly BuildingCorpusId[],
   status: BuildingArchetypeRefactorStatus,
@@ -849,6 +942,11 @@ const INITIAL_STATUS_BY_ID = {
   ...statusMapForIds(
     SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
     BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(TIER_C_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    TIER_C_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
   ),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
   blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
