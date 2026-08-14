@@ -9,6 +9,7 @@ import { Input, type InputProps } from './input.client'
 import type { FieldSize } from './field.client'
 import {
   searchBarClearButtonVariants,
+  searchBarInputVariants,
   searchBarLeadingIconVariants,
   searchBarRootVariants,
 } from './search-bar.variants'
@@ -65,7 +66,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
           aria-label={ariaLabel ?? placeholder}
           size={size}
           disabled={disabled}
-          className={cn('pl-9', showClear ? 'pr-9' : undefined, className)}
+          className={cn(searchBarInputVariants({ clearable: showClear }), className)}
           {...inputProps}
         />
         {showClear ? (

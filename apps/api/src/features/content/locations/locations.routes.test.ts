@@ -281,7 +281,7 @@ describe('location content routes', () => {
         kind: 'structure',
         name: 'Bad Facility',
         structureType: 'building',
-        classification: { facilityType: 'workshop' },
+        classification: { facilityType: 'not-a-facility' },
         parentLocationId: parentId,
       })
       .expect(400)

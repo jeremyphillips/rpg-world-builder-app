@@ -56,6 +56,21 @@ describe('Badge', () => {
     )
   })
 
+  it('uses counter layout for compact numeric badges', () => {
+    render(
+      <Badge appearance="soft" tone="destructive" size="sm" layout="counter">
+        2
+      </Badge>,
+    )
+    expect(screen.getByText('2')).toHaveClass(
+      'min-w-5',
+      'justify-center',
+      'px-1',
+      'tabular-nums',
+      'leading-none',
+    )
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <Badge appearance="soft" tone="neutral">

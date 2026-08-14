@@ -17,7 +17,6 @@ import { CreateSetupSummary, type CreateSetupSummaryProps } from '@/lib/create-s
 import {
   createModalShellBodyVariants,
   createModalShellContentVariants,
-  createModalShellIssueBadgeClasses,
   createModalShellIssueSeparatorClasses,
   createModalShellTabContentVariants,
   createModalShellTabsListRegionVariants,
@@ -94,13 +93,7 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
       <span aria-hidden className={createModalShellIssueSeparatorClasses}>
         {' · '}
       </span>
-      <Badge
-        appearance="soft"
-        tone="destructive"
-        size="sm"
-        aria-hidden
-        className={createModalShellIssueBadgeClasses}
-      >
+      <Badge appearance="soft" tone="destructive" size="sm" layout="counter" aria-hidden>
         {count ?? '!'}
       </Badge>
       <span className="sr-only">, {formatIssueAttentionLabel(count)}</span>

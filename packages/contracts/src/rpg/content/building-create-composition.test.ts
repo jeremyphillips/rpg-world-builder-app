@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildingCreateCompositionRequestSchema } from './building-create-composition'
+import {
+  buildingCreateCompositionRequestSchema,
+  normalizeBuildingCreateCompositionIssuePath,
+} from './building-create-composition'
 
 const building = {
   status: 'published' as const,
@@ -23,6 +26,18 @@ const organization = {
     connections: { locations: [] },
   },
 }
+
+describe('normalizeBuildingCreateCompositionIssuePath', () => {
+  it('maps building.input.* request paths onto form field paths', () => {
+    expect(normalizeBuildingCreateCompositionIssuePath('building.input.name')).toBe('name')
+    expect(normalizeBuildingCreateCompositionIssuePath('building.input.slug')).toBe('slug')
+  })
+
+  it('leaves service validation paths unchanged', () => {
+    expect(normalizeBuildingCreateCompositionIssuePath('name')).toBe('name')
+    expect(normalizeBuildingCreateCompositionIssuePath(undefined)).toBeUndefined()
+  })
+})
 
 describe('buildingCreateCompositionRequestSchema', () => {
   it('accepts correlated existing and new Organization relationships', () => {

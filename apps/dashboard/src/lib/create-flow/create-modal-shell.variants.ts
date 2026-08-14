@@ -39,6 +39,3 @@ export const createModalShellTabContentVariants = cva(
 )
 
 export const createModalShellIssueSeparatorClasses = 'text-muted-foreground'
-
-export const createModalShellIssueBadgeClasses =
-  'min-w-5 justify-center px-1 tabular-nums leading-none'

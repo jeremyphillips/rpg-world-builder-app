@@ -193,10 +193,12 @@ Form + group + Facility composition alone does not trigger 2B.
 
 Building create with relationship drafts is **atomic** — no sequential or compensating fallback.
 
-- **Endpoint:** `POST /api/campaigns/:campaignId/content/locations/building-create-compositions`
-- **Validation:** structured `422` (`building_create_plan_invalid`) with scoped issues
-  (`building`, `organization`, `relationship`, `composition`); transaction unavailable → `503`
-  (`atomic_write_unavailable`)
+- **Endpoint:** `POST /api/campaigns/:campaignId/content/locations/building-compositions`
+- **Validation:** structured `422` (`building_create_validation_failed`) with scoped issues
+  (`building`, `organization`, `relationship`, `capability`); composite transaction unavailable → `503`
+  (`transactions_unavailable`)
+- **Building-only:** no Organization drafts or relationships — works on standalone Mongo without transactions
+- **Unrestricted create:** type picker Building selection enters the same modal/coordinator (`?type=building`)
 - **Preflight:** complete validation before any mutation; race-sensitive state revalidated inside
   transaction
 - **Draft IDs:** opaque client-generated; server generates persisted Mongo ids independently

@@ -20,12 +20,14 @@ import {
   BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
   BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL,
   BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
+  BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_INTENT_PROMPT,
   BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE,
   BUILDING_ORGANIZATIONS_LOADING_LABEL,
   BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL,
   BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
   BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
+  BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
@@ -144,7 +146,7 @@ export function BuildingOrganizationDiscovery({
         <SearchBar
           id="building-organization-search"
           placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
-          ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
+          ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
@@ -165,8 +167,8 @@ export function BuildingOrganizationDiscovery({
           <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
         ) : null}
         {isPending ? <Text variant="muted">{BUILDING_ORGANIZATIONS_LOADING_LABEL}</Text> : null}
-        {!isPending && visibleOrganizations.length === 0 ? (
-          <Text variant="muted">No Organizations match this search.</Text>
+        {!isPending && !isError && visibleOrganizations.length === 0 ? (
+          <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
         ) : null}
         {visibleOrganizations.map((organization) => (
           <BuildingOrganizationDiscoveryRow

@@ -517,6 +517,10 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
   }
 
   const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {
+    if (fixedCreate.authoringType === 'building') {
+      throw new Error('Building create must use the composition coordinator.')
+    }
+
     resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
 
     const overlaidValues = applyLocationFixedCreateContext(
@@ -673,7 +677,7 @@ function LocationCreateFormBody(props: LocationCreateFormBodyProps) {
     )
   }
 
-  if (props.fixedCreate.authoringType === 'building' && props.buildingSetupApplication) {
+  if (props.fixedCreate.authoringType === 'building') {
     return <LocationBuildingCreateForm {...props} />
   }
 

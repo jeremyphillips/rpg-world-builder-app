@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 
 import {
   buildingCreateCompositionRequestSchema,
+  normalizeBuildingCreateCompositionIssuePath,
   type BuildingCreateCompositionIssue,
 } from '@rpg/contracts'
 
@@ -50,7 +51,9 @@ export async function createBuildingCompositionItem(req: Request, res: Response)
       target: requestIssueTarget(entry.path),
       code: 'validation_error',
       message: entry.message,
-      ...(entry.path.length > 0 ? { path: entry.path.join('.') } : {}),
+      ...(entry.path.length > 0
+        ? { path: normalizeBuildingCreateCompositionIssuePath(entry.path.join('.')) }
+        : {}),
       ...requestIssueAttribution(req.body, entry.path),
     })) satisfies BuildingCreateCompositionIssue[]
     throw new HttpError(

@@ -99,7 +99,7 @@ sequential or compensating fallback.
 ### Endpoint
 
 ```text
-POST /api/campaigns/:campaignId/content/locations/building-create-compositions
+POST /api/campaigns/:campaignId/content/locations/building-compositions
 role: owner | co-owner
 ```
 
@@ -115,9 +115,11 @@ with a client `relationshipDraftId` and kind). The Building must parse as a publ
 ### Validation and errors
 
 - Complete preflight validation before any mutation.
-- Validation failures: HTTP `422`, code `building_create_plan_invalid`, structured issues scoped to
-  `composition`, `building`, `organization`, or `relationship`.
-- Transaction unavailable: HTTP `503`, code `atomic_write_unavailable` — no partial writes.
+- Validation failures: HTTP `422`, code `building_create_validation_failed`, structured issues scoped to
+  `capability`, `building`, `organization`, or `relationship`.
+- Transaction unavailable (composite plans only): HTTP `503`, code `transactions_unavailable` — no partial writes.
+- Building-only plans (no Organization drafts or relationships) work on standalone Mongo without transactions.
+- The unrestricted `/locations/new` type picker routes Building selection into the same modal/coordinator flow (`?type=building`).
 - The dashboard maps Building issues to Details; Organization/relationship issues select
   Organizations and annotate the stable draft row.
 
@@ -136,9 +138,12 @@ race-sensitive persisted state inside the transaction.
 
 ### Transactions
 
-When Mongo transactions are disabled, the endpoint returns `503` before mutation. Deployments that
+Replica-set Mongo is required **only for composite Building+Organization writes** (when the plan
+includes Organization drafts or relationships). Building-only create works on standalone Mongo.
+
+When Mongo transactions are disabled, composite plans return `503` before mutation. Deployments that
 need composite Building create should use a replica-set topology with transactions enabled. All
-mutation-time reads and writes for the composition share one `ClientSession`.
+mutation-time reads and writes for composite compositions share one `ClientSession`.
 
 Contracts: `@rpg/contracts` building-create-composition schemas. Handlers:
 `apps/api/src/features/content/locations/building-create-composition.handlers.ts`.

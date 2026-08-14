@@ -177,7 +177,7 @@ describe('Building create composition route', () => {
     expect(await HomebrewOrganizationModel.countDocuments({ campaignId })).toBe(0)
   })
 
-  it('fails with a structured capability issue before mutation when transactions are unavailable', async () => {
+  it('creates a Building-only plan without transactions', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
     const district = await seedBuildingParent(campaignId)
@@ -192,6 +192,37 @@ describe('Building create composition route', () => {
         organizations: [],
         relationships: [],
       })
+      .expect(201)
+
+    const parsed = buildingCreateCompositionResponseSchema.parse(response.body)
+    expect(parsed.building).toMatchObject({ name: 'Guildhall' })
+    expect(parsed.organizations).toEqual([])
+    expect(parsed.relationships).toEqual([])
+    expect(await HomebrewLocationModel.countDocuments({ campaignId })).toBe(locationCount + 1)
+    expect(await HomebrewOrganizationModel.countDocuments({ campaignId })).toBe(0)
+  })
+
+  it('fails with a structured capability issue before mutation when composite plans need transactions', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const district = await seedBuildingParent(campaignId)
+    const locationCount = await HomebrewLocationModel.countDocuments({ campaignId })
+    setMongoTransactionsEnabled(false)
+
+    const response = await agent
+      .post(path(campaignId))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        building: { status: 'published', input: buildingInput(district.id) },
+        organizations: [newOrganization('org-draft', 'stewards', 'Stewards')],
+        relationships: [
+          {
+            relationshipDraftId: 'relationship-new',
+            kind: 'operator',
+            organization: { kind: 'new', organizationDraftId: 'org-draft' },
+          },
+        ],
+      })
       .expect(503)
 
     expect(response.body.error).toMatchObject({
@@ -199,6 +230,7 @@ describe('Building create composition route', () => {
       details: { issues: [{ target: 'capability', code: 'transactions_unavailable' }] },
     })
     expect(await HomebrewLocationModel.countDocuments({ campaignId })).toBe(locationCount)
+    expect(await HomebrewOrganizationModel.countDocuments({ campaignId })).toBe(0)
   })
 
   it('aborts Building and Organization writes when relationship persistence fails', async () => {

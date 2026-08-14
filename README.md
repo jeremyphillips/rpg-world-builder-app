@@ -118,11 +118,11 @@ Verify the connection (optional, needs `mongosh`):
 mongosh "mongodb://127.0.0.1:27017/rpg" --eval "db.runCommand({ ping: 1 })"
 ```
 
-**Replica set (required for Create Building with Organizations):**
+**Replica set (required for composite Building create with Organizations):**
 
-Standalone Mongo does not support multi-document transactions. **Create Building**
-(composite save with organization relationships) returns `transactions_unavailable`
-without a replica set. Other flows fall back to compensation when
+Standalone Mongo does not support multi-document transactions. **Composite Building create**
+(plans with Organization drafts or relationships) returns `transactions_unavailable`
+without a replica set. Building-only create works on standalone Mongo. Other flows fall back to compensation when
 `MONGO_TRANSACTION_MODE=auto`.
 
 Only one Mongo should bind port `27017` — stop an existing `rpg-mongo` (or

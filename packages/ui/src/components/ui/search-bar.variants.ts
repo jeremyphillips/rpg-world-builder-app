@@ -20,3 +20,15 @@ export const searchBarLeadingIconVariants = cva(
 export const searchBarClearButtonVariants = cva(
   'absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground hover:text-foreground',
 )
+
+export const searchBarInputVariants = cva('pl-9', {
+  variants: {
+    clearable: {
+      true: 'pr-9 [&::-webkit-search-cancel-button]:appearance-none',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    clearable: false,
+  },
+})

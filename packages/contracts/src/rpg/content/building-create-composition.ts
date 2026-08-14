@@ -114,3 +114,16 @@ export const buildingCreateCompositionResponseSchema = z.object({
 export type BuildingCreateCompositionResponse = z.infer<
   typeof buildingCreateCompositionResponseSchema
 >
+
+const BUILDING_INPUT_ISSUE_PATH_PREFIX = 'building.input.'
+
+/** Maps request-scoped Zod paths onto location form field paths for issue attribution. */
+export function normalizeBuildingCreateCompositionIssuePath(
+  path: string | undefined,
+): string | undefined {
+  if (!path) return path
+  if (path.startsWith(BUILDING_INPUT_ISSUE_PATH_PREFIX)) {
+    return path.slice(BUILDING_INPUT_ISSUE_PATH_PREFIX.length)
+  }
+  return path
+}

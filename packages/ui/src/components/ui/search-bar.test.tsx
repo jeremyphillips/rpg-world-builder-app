@@ -44,6 +44,10 @@ describe('SearchBar', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox')).toHaveClass(
+      'pr-9',
+      '[&::-webkit-search-cancel-button]:appearance-none',
+    )
     await user.click(screen.getByRole('button', { name: 'Clear search' }))
     expect(onValueChange).toHaveBeenCalledWith('')
 

@@ -7,6 +7,7 @@ import {
   buildingCreateCompositionRequestSchema,
   getErrorMessage,
   isApiError,
+  normalizeBuildingCreateCompositionIssuePath,
   type ApiError,
   type BuildingCreateCompositionIssue,
   type BuildingCreateCompositionRequest,
@@ -156,8 +157,9 @@ export function applyBuildingCreateCompositionBuildingIssues<T extends FieldValu
   issues: readonly BuildingCreateCompositionIssue[],
 ): void {
   for (const issue of issues) {
-    if (!issue.path) continue
-    form.setError(issue.path as FieldPath<T>, { message: issue.message })
+    const path = normalizeBuildingCreateCompositionIssuePath(issue.path)
+    if (!path) continue
+    form.setError(path as FieldPath<T>, { message: issue.message })
   }
 }
 
@@ -355,6 +357,7 @@ function classifyRequestValidationIssue(
   | { bucket: 'building'; issue: BuildingCreateCompositionIssue }
   | { bucket: 'composition'; issue: BuildingCreateCompositionIssue } {
   const path = issue.path.map(String).join('.')
+  const normalizedPath = normalizeBuildingCreateCompositionIssuePath(path)
   const organizationDraftId =
     issue.path[0] === 'organizations' && typeof issue.path[1] === 'number'
       ? request.organizations[issue.path[1]]?.organizationDraftId
@@ -377,7 +380,7 @@ function classifyRequestValidationIssue(
         target: 'building',
         code: 'validation_error',
         message: issue.message,
-        ...(path ? { path } : {}),
+        ...(normalizedPath ? { path: normalizedPath } : {}),
       },
     }
   }

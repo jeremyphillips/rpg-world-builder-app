@@ -27,6 +27,10 @@ import { locationWriteConfig } from './locations.config'
 
 const PENDING_BUILDING_ID = '__pending_building__'
 
+function requiresAtomicComposition(request: BuildingCreateCompositionRequest): boolean {
+  return request.organizations.length > 0 || request.relationships.length > 0
+}
+
 type OrganizationConnectionsDocument = {
   _id: unknown
   connections?: { locations?: OrganizationLocationConnection[] }
@@ -378,11 +382,35 @@ async function executeComposition(
   })
 }
 
-/** Atomically create one Building, optional Organizations, and all declared relationships. */
+async function executeBuildingOnly(
+  campaignId: string,
+  request: BuildingCreateCompositionRequest,
+): Promise<BuildingCreateCompositionResponse> {
+  const building = await createHomebrewContent(
+    locationWriteConfig,
+    campaignId,
+    request.building.input,
+    { status: request.building.status },
+  )
+
+  return buildingCreateCompositionResponseSchema.parse({
+    building,
+    organizations: [],
+    relationships: [],
+  })
+}
+
+/** Create one Building, optionally with Organizations and relationships in one atomic write. */
 export async function createBuildingComposition(
   campaignId: string,
   request: BuildingCreateCompositionRequest,
 ): Promise<BuildingCreateCompositionResponse> {
+  await preflight(campaignId, request)
+
+  if (!requiresAtomicComposition(request)) {
+    return executeBuildingOnly(campaignId, request)
+  }
+
   if (!areMongoTransactionsEnabled()) {
     throw new HttpError(
       503,
@@ -400,6 +428,5 @@ export async function createBuildingComposition(
     )
   }
 
-  await preflight(campaignId, request)
   return runInTransaction((session) => executeComposition(campaignId, request, session))
 }

@@ -86,6 +86,15 @@ describe('CreateModalShell', () => {
     expect(nameInput).toBeInTheDocument()
     expect(nameInput).toHaveValue('North Gate')
     expect(screen.getByRole('tab', { name: /2 issues need attention/ })).toBeInTheDocument()
+    const issueBadge = screen.getByText('2')
+    expect(issueBadge).toHaveClass(
+      'min-w-5',
+      'justify-center',
+      'px-1',
+      'tabular-nums',
+      'leading-none',
+    )
+    expect(issueBadge.className).not.toMatch(/createModalShellIssueBadge/)
   })
 
   it('supports controlled navigation and domain-owned setup summary actions', async () => {

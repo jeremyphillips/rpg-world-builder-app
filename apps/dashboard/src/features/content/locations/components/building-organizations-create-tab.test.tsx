@@ -20,7 +20,7 @@ import {
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
-  BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
+  BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../lib/building-organizations-create-tab.lib'
@@ -233,10 +233,10 @@ describe('BuildingOrganizationsCreateTab', () => {
     await chooseOwnerIntent(user)
 
     const searchbox = screen.getByRole('searchbox', {
-      name: BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
+      name: BUILDING_ORGANIZATIONS_SEARCH_LABEL,
     })
     expect(searchbox).toBeInTheDocument()
-    expect(screen.queryByText('Search organizations')).not.toBeInTheDocument()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_SEARCH_LABEL)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
 
     await user.type(searchbox, 'Copper')

@@ -3,6 +3,7 @@ import { ApiError, type CreateLocationInput } from '@rpg/contracts'
 import type { UseFormReturn } from 'react-hook-form'
 
 import {
+  applyBuildingCreateCompositionBuildingIssues,
   buildBuildingCreateCompositionRequest,
   handleBuildingCreateCompositionFailure,
   mapBuildingCreateSubmitError,
@@ -67,6 +68,21 @@ describe('buildBuildingCreateCompositionRequest', () => {
 })
 
 describe('validateBuildingCreateCompositionRequest', () => {
+  it('normalizes building.input.* Zod paths into building field paths', () => {
+    const request = buildBuildingCreateCompositionRequest({
+      buildingInput: { ...buildingInput, name: '' },
+      plan: { organizations: [], relationships: [] },
+    })
+
+    const result = validateBuildingCreateCompositionRequest(request)
+    expect(result.building).toEqual([
+      expect.objectContaining({
+        target: 'building',
+        path: 'name',
+      }),
+    ])
+  })
+
   it('partitions dangling draft references into organization issues', () => {
     const request = buildBuildingCreateCompositionRequest({
       buildingInput,
@@ -183,6 +199,23 @@ describe('mapBuildingCreateSubmitError', () => {
     })
 
     expect(mapBuildingCreateSubmitError(error)).toBeUndefined()
+  })
+})
+
+describe('applyBuildingCreateCompositionBuildingIssues', () => {
+  it('sets form errors on normalized field paths', () => {
+    const form = { setError: vi.fn() } as unknown as UseFormReturn<Record<string, unknown>>
+
+    applyBuildingCreateCompositionBuildingIssues(form, [
+      {
+        target: 'building',
+        code: 'validation_error',
+        message: 'Name is required.',
+        path: 'building.input.name',
+      },
+    ])
+
+    expect(form.setError).toHaveBeenCalledWith('name', { message: 'Name is required.' })
   })
 })
 

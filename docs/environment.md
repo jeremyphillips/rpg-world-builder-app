@@ -53,9 +53,9 @@ startup** after `connectDb` — not per request.
 | `disabled` | Always use compensation (standalone Mongo, tests that assert rollback)  |
 
 **Standalone Mongo** (default Docker / Homebrew setup) does not support
-transactions — `auto` falls back to compensation. **Create Building** (composite
-save with organization relationships) requires transactions and returns
-`transactions_unavailable` on standalone Mongo. For local transaction
+transactions — `auto` falls back to compensation. **Composite Building create** (plans with
+Organization drafts or relationships) requires transactions and returns
+`transactions_unavailable` on standalone Mongo. Building-only create works without transactions. For local transaction
 development and integration tests, use the replica-set compose file:
 
 ```bash
