@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { BUILDING_FORM_ENTRIES, type BuildingForm } from '@rpg/contracts'
+
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
@@ -24,14 +26,15 @@ const buildingArgs = {
 async function continueBuildingStory(
   canvasElement: HTMLElement,
   selections: {
-    form?: 'house'
-    facilityGroup?: 'Browse all' | 'Production' | 'Religious'
-    facility?: 'brewery' | 'temple'
+    form?: BuildingForm
+    facilityGroup?: 'Browse all' | 'Production' | 'Religious' | 'Civic' | 'Residence'
+    facility?: 'brewery' | 'temple' | 'town_hall' | 'residence'
   },
 ) {
   const canvas = within(canvasElement.ownerDocument.body)
   if (selections.form) {
-    await userEvent.click(canvas.getByRole('radio', { name: (name) => name.startsWith('House') }))
+    const formLabel = BUILDING_FORM_ENTRIES[selections.form].label
+    await userEvent.click(canvas.getByRole('radio', { name: (name) => name.startsWith(formLabel) }))
   }
   const facilityGroup = selections.facilityGroup ?? 'Browse all'
   await userEvent.click(
@@ -39,7 +42,14 @@ async function continueBuildingStory(
   )
   await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
   if (selections.facility) {
-    const facilityLabel = selections.facility === 'brewery' ? 'Brewery' : 'Temple'
+    const facilityLabel =
+      selections.facility === 'brewery'
+        ? 'Brewery'
+        : selections.facility === 'temple'
+          ? 'Temple'
+          : selections.facility === 'town_hall'
+            ? 'Town hall'
+            : 'Residence'
     await userEvent.click(canvas.getByRole('combobox', { name: 'Facility type' }))
     await userEvent.click(
       canvas.getByRole('option', { name: (name) => name.startsWith(facilityLabel) }),
@@ -69,6 +79,28 @@ export const HouseDetails: Story = {
     await continueBuildingStory(canvasElement, { form: 'house' })
     await expect(
       within(canvasElement.ownerDocument.body).getByText('House · Browse all'),
+    ).toBeVisible()
+  },
+}
+
+export const TowerDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, { form: 'tower' })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Tower · Browse all'),
+    ).toBeVisible()
+  },
+}
+
+export const HallDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-7-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, { form: 'hall' })
+    await expect(
+      within(canvasElement.ownerDocument.body).getByText('Hall · Browse all'),
     ).toBeVisible()
   },
 }

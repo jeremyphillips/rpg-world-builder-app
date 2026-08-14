@@ -115,6 +115,52 @@ describe('location classification schema rejection', () => {
     })
   })
 
+  it('accepts tower and hall form-only and composed classifications', () => {
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Watch Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower' },
+      }),
+    ).toMatchObject({ classification: { form: 'tower' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Great Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall' },
+      }),
+    ).toMatchObject({ classification: { form: 'hall' } })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Temple Spire',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'tower', facilityType: 'temple' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'tower', facilityType: 'temple' },
+    })
+
+    expect(
+      locationBodySchema.parse({
+        kind: 'structure',
+        name: 'Civic Hall',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { form: 'hall', facilityType: 'town_hall' },
+      }),
+    ).toMatchObject({
+      classification: { form: 'hall', facilityType: 'town_hall' },
+    })
+  })
+
   it('accepts Form-only, Facility-only, and unclassified buildings', () => {
     expect(
       locationBodySchema.parse({
@@ -153,7 +199,7 @@ describe('location classification schema rejection', () => {
         name: 'Bad Building',
         parentLocationId: 'site-1',
         structureType: 'building',
-        classification: { form: 'tower' },
+        classification: { form: 'keep' },
       }).success,
     ).toBe(false)
 

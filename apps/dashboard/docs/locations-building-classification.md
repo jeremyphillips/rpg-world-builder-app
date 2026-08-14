@@ -1,14 +1,40 @@
 # Building classification (Model E)
 
-Locations whose `kind` is **structure** and `structureType` is **building** can
-carry Model E classification: what the building **is**, what it normally
-**does**, and optional refinements or exceptions.
+Locations whose `kind` is **structure** and `structureType` is **building** carry Model E
+classification: optional **Building Form** (morphology) and/or **Facility type** (configured
+purpose). At least one must be present on persisted classification.
 
-Registry vocabulary lives in `@rpg/contracts`
-(`building-archetype.ts`, `building-function-family.ts`). Evidence and curation
-history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/building-taxonomy-discovery.md).
+**Facility is the primary authoring/discovery axis; Form is optional structural precision.** Setup
+requires a Facility discovery group (including Browse all), not a persisted `facilityType`.
+Canonical registries live in `@rpg/contracts` — [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts)
+and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
+Evidence and curation history: [docs/roadmap/building-taxonomy-discovery.md](../../../docs/roadmap/building-taxonomy-discovery.md)
+(historical curation, not current ownership).
 
-## The four layers
+## Canonical axes
+
+| Axis              | Field                         | Question it answers                                                      | Author-facing?                                                     |
+| ----------------- | ----------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| **Building Form** | `classification.form`         | What is the physical morphology, construction, or architectural pattern? | Optional — Setup radio cards and Details select                    |
+| **Facility type** | `classification.facilityType` | What configured purpose or service does the premises provide?            | Primary discovery axis — Setup group + Details searchable combobox |
+
+Both fields are optional in schema, but at least one is required on persisted classification.
+Derived **functions** come from a selected Facility (`getEffectiveBuildingFunctions()`), not from
+Form. Form-only buildings have no derived functions.
+
+**Authoring principle:** one primary semantic owner per vocabulary term. Facility-primary is UX
+emphasis — Setup gates on Facility discovery intent, not on requiring `facilityType` on every
+Building. Optional Form does not make both axes equally required at Setup.
+
+## Transitional archetype surfaces
+
+`BuildingArchetype`, `manifestationOf`, specialization, function override, and the overview
+archetype filter still exist as predecessor surfaces. The sections below that reference
+archetype picker UX, worked examples, and overview archetype filters describe transitional
+behavior — not the canonical Form/Facility contract. Archetype picker/filter/manifestation
+migration is follow-up work.
+
+## Legacy four layers (archetype-primary)
 
 | Layer              | Field                                 | Question it answers                                            | Author-facing?                                                                                      |
 | ------------------ | ------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -87,11 +113,11 @@ Location create/edit forms use a dashboard-owned **Location type** projection
 separately. The mapping module (`location-authoring-type.ts`) hydrates and
 serializes at the form boundary only — API payloads stay canonical.
 
-| Author intent           | Location type          | Primary field   | Persists as                                       |
-| ----------------------- | ---------------------- | --------------- | ------------------------------------------------- |
-| Inn in a city district  | Building               | Archetype → Inn | `kind: structure`, `structureType: building`, …   |
-| Generic defensive wall  | Fortification          | —               | `kind: structure`, `structureType: fortification` |
-| Rare unclassified shell | Unclassified structure | —               | `kind: structure` (no `structureType`)            |
+| Author intent           | Location type          | Primary field                            | Persists as                                                                                      |
+| ----------------------- | ---------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Inn in a city district  | Building               | Facility discovery → Inn (or Browse all) | `kind: structure`, `structureType: building`, `classification` with `form` and/or `facilityType` |
+| Generic defensive wall  | Fortification          | —                                        | `kind: structure`, `structureType: fortification`                                                |
+| Rare unclassified shell | Unclassified structure | —                                        | `kind: structure` (no `structureType`)                                                           |
 
 Creation shortcuts use an authoritative fixed session on the create route:
 
@@ -153,11 +179,11 @@ Create-setup choice collapse and selected-summary presentation are owned by the 
 | ----------------------------------------- | ----------------------------------------------------------------------- |
 | `location-authoring-type.ts`              | Form projection ids, hydrate/serialize mapping, field validity          |
 | `location-create-shortcuts.ts`            | Fixed-session URL parse/serialize, promoted shortcuts, child-type menus |
-| `location-classification-form-fields.ts`  | Archetype combobox, specialization, optional function-override select   |
-| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking                             |
-| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions                             |
-| `location-form-sync.ts`                   | Clears specialization and override on archetype change                  |
+| `location-classification-form-fields.ts`  | Form select + Facility searchable combobox                              |
+| `building-archetype-form-options.ts`      | Registry → combobox options, search ranking (transitional archetype)    |
+| `building-specialization-form-options.ts` | Archetype-driven specialization suggestions (transitional)              |
+| `location-form-sync.ts`                   | Clears specialization and override on archetype change (transitional)   |
 | `location-overview-search.lib.ts`         | Overview name-search discovery strings                                  |
-| `locations-overview-filter-schema.ts`     | Archetype and function overview filters                                 |
+| `locations-overview-filter-schema.ts`     | Archetype and function overview filters (archetype filter transitional) |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

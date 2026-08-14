@@ -186,16 +186,24 @@ async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>)
   expect(await screen.findByRole('heading', { name: 'Create city' })).toBeInTheDocument()
 }
 
+async function chooseBuildingForm(
+  user: ReturnType<typeof userEvent.setup>,
+  form: 'house' | 'tower' | 'hall',
+) {
+  const label = form === 'house' ? 'House' : form === 'tower' ? 'Tower' : 'Hall'
+  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
+}
+
 async function chooseBuildingFacilityGroup(
   user: ReturnType<typeof userEvent.setup>,
-  label: 'Browse all' | 'Commercial' | 'Production' | 'Religious' | 'Residence',
+  label: 'Browse all' | 'Commercial' | 'Production' | 'Religious' | 'Residence' | 'Civic',
 ) {
   await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
 }
 
 async function chooseBuildingFacilityType(
   user: ReturnType<typeof userEvent.setup>,
-  label: 'Brewery' | 'Temple',
+  label: 'Brewery' | 'Temple' | 'Town hall' | 'Residence',
 ) {
   await user.click(screen.getByRole('combobox', { name: 'Facility type' }))
   await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
@@ -388,6 +396,130 @@ describe('LocationCreateModal', () => {
     expect(
       mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building.input,
     ).not.toHaveProperty('facilityAuthoringGroup')
+  })
+
+  it('creates the Tower form-only flow with Browse all', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'tower')
+    await continueBuildingSetup(user)
+
+    expect(screen.getByText('Tower · Browse all')).toBeInTheDocument()
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'North Spire')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          name: 'North Spire',
+          classification: { form: 'tower' },
+        }),
+      },
+    })
+  })
+
+  it('creates the Hall form-only flow with Browse all', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'hall')
+    await continueBuildingSetup(user)
+
+    expect(screen.getByText('Hall · Browse all')).toBeInTheDocument()
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Great Hall')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          name: 'Great Hall',
+          classification: { form: 'hall' },
+        }),
+      },
+    })
+  })
+
+  it('creates Tower + Temple without stereotypical pairing restrictions', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'tower')
+    await continueBuildingSetup(user, 'Religious')
+    await chooseBuildingFacilityType(user, 'Temple')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Temple Spire')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          classification: { form: 'tower', facilityType: 'temple' },
+        }),
+      },
+    })
+  })
+
+  it('creates Hall + Town Hall without axis collision', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'hall')
+    await continueBuildingSetup(user, 'Civic')
+    await chooseBuildingFacilityType(user, 'Town hall')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Civic Hall')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          classification: { form: 'hall', facilityType: 'town_hall' },
+        }),
+      },
+    })
+  })
+
+  it('creates House + Temple as a non-stereotypical composition', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'house')
+    await continueBuildingSetup(user, 'Religious')
+    await chooseBuildingFacilityType(user, 'Temple')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Shrine House')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          classification: { form: 'house', facilityType: 'temple' },
+        }),
+      },
+    })
+  })
+
+  it('creates Tower + Residence as a non-stereotypical composition', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+
+    await chooseBuildingForm(user, 'tower')
+    await continueBuildingSetup(user, 'Residence')
+    await chooseBuildingFacilityType(user, 'Residence')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Tower Residence')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      building: {
+        input: expect.objectContaining({
+          classification: { form: 'tower', facilityType: 'residence' },
+        }),
+      },
+    })
   })
 
   it('creates the Brewery flow from the selected Facility', async () => {

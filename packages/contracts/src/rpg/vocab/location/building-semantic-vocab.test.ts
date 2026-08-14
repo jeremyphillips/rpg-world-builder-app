@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { buildingClassificationSchema } from '../../content/location/building-classification'
 import {
   BUILDING_FACILITY_AUTHORING_GROUP_IDS,
   BUILDING_FACILITY_TYPE_ENTRIES,
@@ -12,12 +13,38 @@ import { BUILDING_FORM_ENTRIES, BUILDING_FORM_IDS, buildingFormSchema } from './
 import { BUILDING_FUNCTION_FAMILY_IDS } from './building-function-family'
 
 describe('Building semantic vocabularies', () => {
-  it('keeps the initial Form registry narrow and schema-backed', () => {
-    expect(BUILDING_FORM_IDS).toEqual(['house'])
+  it('keeps the Form registry narrow, schema-backed, and morphology-only', () => {
+    expect(BUILDING_FORM_IDS).toEqual(['house', 'tower', 'hall'])
     expect(Object.keys(BUILDING_FORM_ENTRIES)).toEqual(BUILDING_FORM_IDS)
     expect(buildingFormSchema.parse('house')).toBe('house')
-    expect(buildingFormSchema.safeParse('tower')).toMatchObject({ success: false })
-    expect(BUILDING_FORM_ENTRIES.house).not.toHaveProperty('defaultFunctions')
+    expect(buildingFormSchema.parse('tower')).toBe('tower')
+    expect(buildingFormSchema.parse('hall')).toBe('hall')
+    expect(buildingFormSchema.safeParse('keep')).toMatchObject({ success: false })
+    for (const entry of Object.values(BUILDING_FORM_ENTRIES)) {
+      expect(entry).not.toHaveProperty('defaultFunctions')
+    }
+  })
+
+  it('accepts open Form and Facility compositions without pair allowlists', () => {
+    expect(buildingClassificationSchema.parse({ form: 'tower', facilityType: 'temple' })).toEqual({
+      form: 'tower',
+      facilityType: 'temple',
+    })
+    expect(buildingClassificationSchema.parse({ form: 'hall', facilityType: 'town_hall' })).toEqual(
+      { form: 'hall', facilityType: 'town_hall' },
+    )
+    expect(buildingClassificationSchema.parse({ form: 'house', facilityType: 'temple' })).toEqual({
+      form: 'house',
+      facilityType: 'temple',
+    })
+    expect(
+      buildingClassificationSchema.parse({ form: 'tower', facilityType: 'residence' }),
+    ).toEqual({ form: 'tower', facilityType: 'residence' })
+  })
+
+  it('keeps hall and town_hall as distinct ids on distinct axes', () => {
+    expect(buildingFormSchema.safeParse('town_hall')).toMatchObject({ success: false })
+    expect(buildingFacilityTypeSchema.safeParse('hall')).toMatchObject({ success: false })
   })
 
   it('defines the approved Facility UX sample in deterministic registry order', () => {

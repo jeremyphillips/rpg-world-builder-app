@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { BUILDING_FORM_ENTRIES, BUILDING_FORM_IDS } from '@rpg/contracts'
+
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
@@ -43,7 +45,10 @@ describe('Building classification fields', () => {
     ).toMatchObject({
       type: 'select',
       label: 'Form',
-      options: [{ value: 'house', label: 'House' }],
+      options: BUILDING_FORM_IDS.map((id) => ({
+        value: id,
+        label: BUILDING_FORM_ENTRIES[id].label,
+      })),
     })
     expect(
       fieldByName(buildLocationClassificationFields(), 'classification.facilityType'),

@@ -1334,3 +1334,131 @@ being classified as Criminal.
 No legacy kind/subtype runtime fields, persisted preset provenance, reverse preset display lookup,
 institution axis, multi-domain escape hatch, or durable title profile was introduced. Expansion
 beyond the six recipes should wait for UI review of this checkpoint.
+
+## Phase 8 — Building Form axis expansion checkpoint
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** Admit `tower` and `hall` to `BUILDING_FORM_ENTRIES`; prove registry-driven projection;
+document admission/decomposition rules; identify next architectural triggers.
+
+### Four-axis classification contract
+
+| Axis                          | Semantic responsibility                                                                |
+| ----------------------------- | -------------------------------------------------------------------------------------- |
+| **Building Form**             | Physical morphology, construction, spatial arrangement, or architectural pattern       |
+| **Facility type**             | Configured purpose, service, or use of the premises                                    |
+| **Organization relationship** | Who owns, occupies, operates, governs, or is headquartered there                       |
+| **Archetype / manifestation** | Named specialized/cultural expression that may project onto one or more canonical axes |
+
+**Primary-owner rule:** a vocabulary candidate should have one clear primary semantic owner. Do not
+use Form as a catch-all for terms whose identity is primarily use, occupant, status, or authority.
+
+**Authoring principle:** Facility is the primary authoring/discovery axis; Form is optional structural
+precision. Setup requires a Facility discovery group (including Browse all), not a persisted
+`facilityType`. Canonical classification remains `form` and/or `facilityType` — form-only,
+facility-only, and both are valid.
+
+No additional semantic axis was required to explain the ambiguous terms reviewed in this audit.
+
+### Form admission protocol
+
+A candidate belongs on **Building Form** only when its identity is grounded primarily in shape,
+construction pattern, massing, vertical/horizontal organization, spatial arrangement, or
+architectural envelope.
+
+A candidate must **not** be admitted when its identity is primarily use, operator, occupant,
+trade/activity, institutional function, social status, territorial authority, or an interior room.
+
+**Whole-building rule:** Form describes the building's architectural organization, not a room it
+happens to contain.
+
+Admission result is one of: `ADMIT` · `NEEDS DESCRIPTION/POLICY WORK` · `DECOMPOSE` · `DEFER` ·
+`REJECT`.
+
+#### Admission cards (this pass)
+
+| Candidate | Primary axis     | Result                          | Notes                                                                         |
+| --------- | ---------------- | ------------------------------- | ----------------------------------------------------------------------------- |
+| House     | Form             | ADMIT (shipped; copy tightened) | Small-scale house envelope/massing, independent of use                        |
+| Tower     | Form             | ADMIT (this pass)               | Vertical morphology, independent of watch/defense/residence use               |
+| Hall      | Form             | ADMIT (this pass)               | Whole-building hall volume; lexical overlap with `town_hall` Facility is safe |
+| Keep      | Form (contested) | NEEDS DESCRIPTION/POLICY WORK   | Morphology vs refuge-use still mixed in archetype copy                        |
+| Gatehouse | Form (contested) | NEEDS DESCRIPTION/POLICY WORK   | Gateway envelope vs entry-control facility overlap                            |
+
+### Runtime vs audit metadata
+
+`BUILDING_FORM_ENTRIES` contains only `GameTermEntry` fields consumed today: `id`, `label`,
+`description`. No `aliases`, `searchTerms`, `defaultFunctions`, grouping, or `manifestationOf`.
+Facility owns discovery metadata; Form Setup uses label + description only.
+
+### Registry-driven consumer proof
+
+Adding `tower` and `hall` required **no feature-local Form allowlists, label maps, or pair
+filters**. All consumers derive from `BUILDING_FORM_ENTRIES`:
+
+- `buildingFormSchema` / `BUILDING_FORM_IDS`
+- Mongo enum (spreads `BUILDING_FORM_IDS`)
+- `buildBuildingFormRadioOptions()` → Setup panel
+- `buildBuildingCreateSetupSummaryEntries`
+- `location-classification-form-fields` Form select
+- `getLocationOverviewSearchText` via `getBuildingFormLabel`
+- `location-form-values` serialization
+
+### Decomposition outcomes (ambiguous corpus)
+
+| Term                                               | Outcome          | Notes                          |
+| -------------------------------------------------- | ---------------- | ------------------------------ |
+| House, Tower, Hall                                 | PRIMARY FORM     | Optional Facility composition  |
+| Town Hall, Watchtower, Warehouse                   | PRIMARY FACILITY | Optional Form is composition   |
+| Wizard tower, Healer's house, Blacksmith           | DECOMPOSE        | Bundles multiple axes          |
+| Martello tower, Drum tower, Longhouse              | MANIFESTATION    | Defer rewiring until migration |
+| Keep, Gatehouse, Manor, Palace, Apartment building | DEFER            | See recommendations below      |
+
+### Manifestation evaluation (no encoding chosen)
+
+`manifestationOf` remains on archetype shard entries, validated against `BUILDING_ARCHETYPE_ENTRIES`.
+Form and Facility registries are not legal manifestation targets today. String-ID collisions exist
+(`house`, `tower`, `town_hall`, `apartment_building`).
+
+| Encoding                        | Fit                                                              | Risk                                                                                 |
+| ------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| **Axis-local graphs**           | Form `manifestationOf` only Form ids; Facility only Facility ids | Duplicate graph helpers; cross-axis links unrepresentable (matches audit constraint) |
+| **Discriminated shared target** | `{ axis: 'form'; id } \| { axis: 'facility'; id }`               | Can become a generic cross-axis graph the audit avoids                               |
+
+**Migration trigger:** when a manifestation parent leaves the archetype registry, same-string IDs
+collide across axes, or archetype retirement begins for terms with canonical Form/Facility ids.
+Adding Form `tower` beside archetype `tower` is evidence, not the trigger itself.
+
+### Setup UI scalability trigger
+
+Form choices remain flat radio cards (3 after this pass). Migration is **semantic-first,
+count-second**: trigger when scanning the full Form set as radio cards becomes meaningfully worse
+than searching or grouping. 8–10 options is an empirical warning range (Site type is the largest
+flat Setup set today), not a hard rule. Future scalable extension belongs in `@/lib/create-setup`,
+not location-building feature code.
+
+### Apartment building dual-axis question (undecided)
+
+`apartment_building` remains Facility-only. Before any concept may exist on multiple canonical axes,
+each axis must answer a different question, values must be independently authorable, shared
+spelling must use distinct IDs, and if selecting one typically implies the other, keep a single
+primary owner. A future Form candidate should use clearer morphological terms (block, tenement
+massing) rather than duplicating "Apartment building."
+
+### Keep and gatehouse recommendations
+
+- **Keep:** Do not admit until description is morphology-first and defense is owned by
+  Facility/relationships. Likely next Form after this pass.
+- **Gatehouse:** Do not admit until Form vs Facility ownership is written into the entry. If
+  control/use dominates after rewrite, `DECOMPOSE` rather than force onto Form.
+
+### Classification ownership doc
+
+[`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)
+ownership section updated to Form/Facility contract. Archetype picker/filter/manifestation
+migration remains deferred.
+
+### Manifestation cleanup
+
+Still deferred. No `manifestationOf: 'tower'` retargeting for `wizard_tower` / `martello_tower`;
+no standalone `hall` archetype introduced.

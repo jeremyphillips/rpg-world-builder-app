@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { getEffectiveBuildingFunctions } from '@rpg/contracts'
+import {
+  BUILDING_FORM_ENTRIES,
+  BUILDING_FORM_IDS,
+  getEffectiveBuildingFunctions,
+} from '@rpg/contracts'
 
 import {
   applyBuildingCreateSetupProjection,
   applyBuildingCreateSetupSelectionChange,
   buildBuildingFacilityAuthoringGroupRadioOptions,
+  buildBuildingFormRadioOptions,
   resolveBuildingCreateSetupProjection,
 } from './location-building-create-setup.lib'
 
@@ -50,6 +55,38 @@ describe('Building create setup selection', () => {
     expect(buildBuildingFacilityAuthoringGroupRadioOptions().map((option) => option.value)).toEqual(
       ['residential', 'commercial', 'production', 'civic', 'religious', 'lodging', 'browse_all'],
     )
+  })
+
+  it('derives Form radio options from the canonical registry without allowlists', () => {
+    expect(buildBuildingFormRadioOptions()).toEqual(
+      BUILDING_FORM_IDS.map((value) => ({
+        value,
+        label: BUILDING_FORM_ENTRIES[value].label,
+        description: BUILDING_FORM_ENTRIES[value].description,
+      })),
+    )
+  })
+
+  it('accepts tower and hall selections without Form-to-Facility filtering', () => {
+    const withTower = applyBuildingCreateSetupSelectionChange({
+      selection: emptySelection,
+      choiceSetId: 'buildingForm',
+      nextValue: 'tower',
+    })
+    expect(withTower?.form).toBe('tower')
+
+    const withHall = applyBuildingCreateSetupSelectionChange({
+      selection: emptySelection,
+      choiceSetId: 'buildingForm',
+      nextValue: 'hall',
+    })
+    expect(withHall?.form).toBe('hall')
+
+    const towerProjection = resolveBuildingCreateSetupProjection({
+      form: 'tower',
+      facilityAuthoringGroup: 'religious',
+    })
+    expect(towerProjection).toEqual({ form: 'tower', facilityAuthoringGroup: 'religious' })
   })
 })
 
