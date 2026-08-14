@@ -129,6 +129,22 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     authoringGroups: ['commercial'],
     searchTerms: ['money', 'exchange', 'vault'],
   },
+  office: {
+    label: 'Office',
+    description:
+      'A building configured for administrative, clerical, or professional work — business premises distinct from retail storefronts, civic assembly halls, or the organization that occupies it.',
+    defaultFunctions: ['governance'],
+    authoringGroups: ['commercial', 'civic'],
+    searchTerms: [
+      'counting house',
+      'clerks',
+      'bureau',
+      'professional',
+      'harbourmaster',
+      'post house',
+      'records',
+    ],
+  },
   warehouse: {
     label: 'Warehouse',
     description: 'A building configured to store goods, cargo, or production materials.',
@@ -143,6 +159,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     defaultFunctions: ['storage', 'service'],
     authoringGroups: ['production', 'commercial'],
     searchTerms: ['farm', 'livestock', 'agricultural outbuilding', 'hay', 'byre', 'threshing barn'],
+  },
+  bakery: {
+    label: 'Bakery',
+    description:
+      'A building configured for on-site baking and bread production — production premises that may include a retail front, distinct from a generic shop or industrial factory.',
+    defaultFunctions: ['production', 'retail'],
+    authoringGroups: ['production', 'commercial'],
+    searchTerms: ['bread', 'oven', 'pastry', 'baker', 'baking'],
   },
   granary: {
     label: 'Granary',
@@ -187,6 +211,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     defaultFunctions: ['production'],
     authoringGroups: ['production'],
     searchTerms: ['grinding', 'sawmill', 'watermill', 'windmill'],
+  },
+  workshop: {
+    label: 'Workshop',
+    description:
+      'A building configured for small-scale craft, repair, or batch production — artisan premises distinct from industrial manufacturing, retail storefronts, or an interior workspace within a larger building.',
+    defaultFunctions: ['production'],
+    authoringGroups: ['production', 'commercial'],
+    searchTerms: ['craft', 'artisan', 'smithy', 'atelier', 'work floor', 'repair'],
   },
   town_hall: {
     label: 'Town hall',
@@ -320,6 +352,14 @@ export const BUILDING_FACILITY_TYPE_ENTRIES = {
     defaultFunctions: ['knowledge'],
     authoringGroups: ['civic'],
     searchTerms: ['records', 'documents', 'custody'],
+  },
+  auction_house: {
+    label: 'Auction house',
+    description:
+      'A building configured to conduct sale-by-auction events — a dedicated auction venue distinct from a multi-merchant market or single retail shop.',
+    defaultFunctions: ['retail'],
+    authoringGroups: ['commercial'],
+    searchTerms: ['auction', 'bidding', 'sale room', 'exchange', 'lot'],
   },
   arena: {
     label: 'Arena',

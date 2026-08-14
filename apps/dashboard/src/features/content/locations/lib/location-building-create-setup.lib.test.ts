@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  BUILDING_FACILITY_TYPE_IDS,
   BUILDING_FORM_ENTRIES,
   BUILDING_FORM_IDS,
+  getBuildingFacilityTypesForAuthoringGroup,
   getEffectiveBuildingFunctions,
 } from '@rpg/contracts'
 
@@ -141,5 +143,29 @@ describe('applyBuildingCreateSetupProjection', () => {
 
     expect(commercial.classification).toEqual({ facilityType: 'brewery' })
     expect(getEffectiveBuildingFunctions(commercial.classification)).toEqual(['production'])
+  })
+})
+
+describe('Phase 20 authoring/discovery review (20C)', () => {
+  it('keeps Production and Commercial groups scannable at 40 Facilities', () => {
+    expect(BUILDING_FACILITY_TYPE_IDS).toHaveLength(40)
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toHaveLength(10)
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toHaveLength(17)
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toHaveLength(19)
+  })
+
+  it('includes Phase 20 promoted Facilities in the expected discovery groups', () => {
+    const production = new Set(getBuildingFacilityTypesForAuthoringGroup('production'))
+    const commercial = new Set(getBuildingFacilityTypesForAuthoringGroup('commercial'))
+    const civic = new Set(getBuildingFacilityTypesForAuthoringGroup('civic'))
+
+    expect(production.has('workshop')).toBe(true)
+    expect(production.has('bakery')).toBe(true)
+    expect(commercial.has('workshop')).toBe(true)
+    expect(commercial.has('bakery')).toBe(true)
+    expect(commercial.has('auction_house')).toBe(true)
+    expect(commercial.has('office')).toBe(true)
+    expect(civic.has('office')).toBe(true)
+    expect(civic.has('auction_house')).toBe(false)
   })
 })

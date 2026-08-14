@@ -1078,6 +1078,218 @@ export const PHASE_19C_NO_PROMOTION_IDS = [
   ...PHASE_19C_CANDIDATE_IDS,
 ] as const satisfies readonly BuildingCorpusId[]
 
+/**
+ * Phase 20A foundation Facility admission — frozen 2026-08-14.
+ * Product-driven promotion gate; not corpus disposition scope expansion.
+ * `office` is authoring-only (not in research corpus). Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_20A_PROMOTED_CORPUS_FACILITY_IDS = [
+  'workshop',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 20B specialist Facility admission — frozen 2026-08-14.
+ * Eight-term comparison set from roadmap; product gate only — not corpus disposition sweep.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_20B_SPECIALIST_ALLOWLIST_IDS = [
+  'slaughterhouse',
+  'tannery',
+  'bakery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'auction_house',
+  'gambling_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 20B gate reviewed 2026-08-14 — two specialist promotions. */
+export const PHASE_20B_PROMOTED_CORPUS_FACILITY_IDS = [
+  'bakery',
+  'auction_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 20B gate reviewed 2026-08-14 — nearest shipped Facility sufficient. */
+export const PHASE_20B_REJECTED_SPECIALIST_IDS = [
+  'slaughterhouse',
+  'tannery',
+  'mint',
+  'mortuary',
+  'crematorium',
+  'gambling_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/**
+ * Phase 21 Commercial / Production tail reconciliation — frozen 2026-08-14.
+ * Thirty-eight corpus terms not reviewed in Phase 20; regrouped by canonical-owner
+ * boundary after workshop/office enrichment. `gambling_hall` excluded — Phase 20B reviewed.
+ * Planning: docs/roadmap/building-taxonomy.md
+ */
+export const PHASE_21_ALLOWLIST_IDS = [
+  'brickworks',
+  'glassworks',
+  'salt_works',
+  'cooperage',
+  'printing_press',
+  'smokehouse',
+  'exchange',
+  'trading_post',
+  'washhouse',
+  'weigh_house',
+  'ferry_house',
+  'odeon',
+  'clinic',
+  'brothel',
+  'coffeehouse',
+  'festhall',
+  'menagerie',
+  'opium_den',
+  'post_house',
+  'harbourmaster_office',
+  'boathouse',
+  'coaching_inn',
+  'waystation',
+  'treasury',
+  'records_hall',
+  'gladiator_school',
+  'training_hall',
+  'meeting_hall',
+  'audience_hall',
+  'memorial_hall',
+  'almshouse',
+  'asylum',
+  'poorhouse',
+  'hospice',
+  'lazaretto',
+  'workhouse',
+  'arsenal',
+  'divination_parlor',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket A — workshop-scale craft/production (post-20A). */
+export const PHASE_21_WORKSHOP_DECOMPOSE_IDS = [
+  'cooperage',
+  'printing_press',
+  'smokehouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket A — works-scale industrial production. */
+export const PHASE_21_FACTORY_DECOMPOSE_IDS = [
+  'brickworks',
+  'glassworks',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B — administrative / trade clerical premises (post-20A office). */
+export const PHASE_21_OFFICE_DECOMPOSE_IDS = [
+  'exchange',
+  'harbourmaster_office',
+  'weigh_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C — hospitality / relay lodging compositions. */
+export const PHASE_21_INN_DECOMPOSE_IDS = [
+  'coaching_inn',
+  'ferry_house',
+  'post_house',
+  'waystation',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C — drink / social hospitality premises. */
+export const PHASE_21_TAVERN_DECOMPOSE_IDS = [
+  'coffeehouse',
+  'festhall',
+  'opium_den',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket D — configured care / treatment premises. */
+export const PHASE_21_HOSPITAL_DECOMPOSE_IDS = [
+  'asylum',
+  'clinic',
+  'hospice',
+  'lazaretto',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket D — configured residential care premises. */
+export const PHASE_21_BOARDING_HOUSE_DECOMPOSE_IDS = [
+  'almshouse',
+  'poorhouse',
+  'workhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — archive-class record / memorial premises. */
+export const PHASE_21_ARCHIVE_DECOMPOSE_IDS = [
+  'memorial_hall',
+  'records_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — performance / audience premises. */
+export const PHASE_21_THEATER_DECOMPOSE_IDS = [
+  'audience_hall',
+  'odeon',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B/E — civic assembly premises. */
+export const PHASE_21_TOWN_HALL_DECOMPOSE_IDS = [
+  'meeting_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — weapons storage premises. */
+export const PHASE_21_ARMORY_DECOMPOSE_IDS = [
+  'arsenal',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C/F — storage / frontier trade premises. */
+export const PHASE_21_WAREHOUSE_DECOMPOSE_IDS = [
+  'boathouse',
+  'trading_post',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket C/G — retail / parlor service premises. */
+export const PHASE_21_SHOP_DECOMPOSE_IDS = [
+  'divination_parlor',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket E — training-school premises. */
+export const PHASE_21_SCHOOLHOUSE_DECOMPOSE_IDS = [
+  'gladiator_school',
+  'training_hall',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket B — state finance storage premises. */
+export const PHASE_21_BANK_DECOMPOSE_IDS = [
+  'treasury',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket F — site-scale production / grounds (scale/unit gate). */
+export const PHASE_21_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'menagerie',
+  'salt_works',
+] as const satisfies readonly BuildingCorpusId[]
+
+/** Phase 21 bucket G — reviewed; existing Facilities sufficient; keep pending. */
+export const PHASE_21_REVIEWED_PENDING_IDS = [
+  'brothel',
+  'washhouse',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const PHASE_21_DECOMPOSE_IDS = [
+  ...PHASE_21_WORKSHOP_DECOMPOSE_IDS,
+  ...PHASE_21_FACTORY_DECOMPOSE_IDS,
+  ...PHASE_21_OFFICE_DECOMPOSE_IDS,
+  ...PHASE_21_INN_DECOMPOSE_IDS,
+  ...PHASE_21_TAVERN_DECOMPOSE_IDS,
+  ...PHASE_21_HOSPITAL_DECOMPOSE_IDS,
+  ...PHASE_21_BOARDING_HOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_ARCHIVE_DECOMPOSE_IDS,
+  ...PHASE_21_THEATER_DECOMPOSE_IDS,
+  ...PHASE_21_TOWN_HALL_DECOMPOSE_IDS,
+  ...PHASE_21_ARMORY_DECOMPOSE_IDS,
+  ...PHASE_21_WAREHOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_SHOP_DECOMPOSE_IDS,
+  ...PHASE_21_SCHOOLHOUSE_DECOMPOSE_IDS,
+  ...PHASE_21_BANK_DECOMPOSE_IDS,
+] as const satisfies readonly BuildingCorpusId[]
+
 export const TIER_C_DECOMPOSE_IDS = [
   ...TIER_C_BATCH1_DECOMPOSE_IDS,
   ...TIER_C_BATCH2_DECOMPOSE_IDS,
@@ -1149,6 +1361,11 @@ const INITIAL_STATUS_BY_ID = {
     BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
   ),
   ...statusMapForIds(PHASE_19B_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(PHASE_21_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    PHASE_21_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
   blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>

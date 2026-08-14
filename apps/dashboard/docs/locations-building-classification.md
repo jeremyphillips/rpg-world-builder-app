@@ -218,7 +218,7 @@ Create-setup choice collapse and selected-summary presentation are owned by the 
 | `locations-overview-filter-schema.ts`    | Facility type and function overview filters    |
 
 Building create UX acceptance (Phase 7–8): Storybook tag `phase-7-building-flows` on
-[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx)
-covers the stereotypical and unstereotypical scenario matrix.
+[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx).
+Phase 20 promoted Facilities: tag `phase-20-building-flows` on the same file.
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

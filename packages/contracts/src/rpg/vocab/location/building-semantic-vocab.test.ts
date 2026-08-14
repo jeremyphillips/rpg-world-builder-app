@@ -180,14 +180,17 @@ describe('Building semantic vocabularies', () => {
       'market',
       'shop',
       'bank',
+      'office',
       'warehouse',
       'barn',
+      'bakery',
       'granary',
       'greenhouse',
       'brewery',
       'distillery',
       'factory',
       'mill',
+      'workshop',
       'town_hall',
       'guildhall',
       'courthouse',
@@ -202,6 +205,7 @@ describe('Building semantic vocabularies', () => {
       'lighthouse',
       'observatory',
       'archive',
+      'auction_house',
       'arena',
       'bathhouse',
       'hospital',
@@ -211,7 +215,8 @@ describe('Building semantic vocabularies', () => {
     ])
     expect(Object.keys(BUILDING_FACILITY_TYPE_ENTRIES)).toEqual(BUILDING_FACILITY_TYPE_IDS)
     expect(buildingFacilityTypeSchema.parse('hospital')).toBe('hospital')
-    expect(buildingFacilityTypeSchema.safeParse('workshop')).toMatchObject({ success: false })
+    expect(buildingFacilityTypeSchema.parse('workshop')).toBe('workshop')
+    expect(buildingFacilityTypeSchema.parse('office')).toBe('office')
   })
 
   it('defines non-empty, duplicate-free Facility defaults from the function vocabulary', () => {
@@ -243,14 +248,17 @@ describe('Building semantic vocabularies', () => {
       market: ['retail'],
       shop: ['retail'],
       bank: ['finance'],
+      office: ['governance'],
       warehouse: ['storage'],
       barn: ['storage', 'service'],
+      bakery: ['production', 'retail'],
       granary: ['storage'],
       greenhouse: ['production'],
       brewery: ['production'],
       distillery: ['production'],
       factory: ['production'],
       mill: ['production'],
+      workshop: ['production'],
       town_hall: ['governance', 'assembly'],
       guildhall: ['assembly'],
       courthouse: ['governance'],
@@ -265,6 +273,7 @@ describe('Building semantic vocabularies', () => {
       lighthouse: ['defense_watch'],
       observatory: ['knowledge'],
       archive: ['knowledge'],
+      auction_house: ['retail'],
       arena: ['spectacle'],
       bathhouse: ['care'],
       hospital: ['care'],
@@ -294,10 +303,14 @@ describe('Building semantic vocabularies', () => {
       'market',
       'shop',
       'bank',
+      'office',
       'warehouse',
       'barn',
+      'bakery',
       'brewery',
       'distillery',
+      'workshop',
+      'auction_house',
       'arena',
       'bathhouse',
       'theater',
@@ -306,14 +319,17 @@ describe('Building semantic vocabularies', () => {
     expect(getBuildingFacilityTypesForAuthoringGroup('production')).toEqual([
       'warehouse',
       'barn',
+      'bakery',
       'granary',
       'greenhouse',
       'brewery',
       'distillery',
       'factory',
       'mill',
+      'workshop',
     ])
     expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toEqual([
+      'office',
       'town_hall',
       'guildhall',
       'courthouse',
@@ -444,6 +460,50 @@ describe('Building semantic vocabularies', () => {
     expect(BUILDING_FACILITY_TYPE_ENTRIES.theater.description).toContain('performance')
     expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('arena')
     expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('arena')
+  })
+
+  it('ships workshop as artisan production premises distinct from factory via functions and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('workshop')).toBe('workshop')
+    expect(getBuildingFacilityTypeLabel('workshop')).toBe('Workshop')
+    expect(getBuildingFacilityDefaultFunctions('workshop')).toEqual(['production'])
+    expect(getBuildingFacilityDefaultFunctions('factory')).toEqual(['production'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.workshop.description).toContain('small-scale')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.factory.description).toContain('manufacturing')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('workshop')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('workshop')
+  })
+
+  it('ships office as administrative premises distinct from shop and town hall via functions and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('office')).toBe('office')
+    expect(getBuildingFacilityTypeLabel('office')).toBe('Office')
+    expect(getBuildingFacilityDefaultFunctions('office')).toEqual(['governance'])
+    expect(getBuildingFacilityDefaultFunctions('shop')).toEqual(['retail'])
+    expect(getBuildingFacilityDefaultFunctions('town_hall')).toEqual(['governance', 'assembly'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.office.description).toContain('administrative')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('office')
+    expect(getBuildingFacilityTypesForAuthoringGroup('civic')).toContain('office')
+  })
+
+  it('ships bakery as configured baking premises distinct from shop and factory via functions and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('bakery')).toBe('bakery')
+    expect(getBuildingFacilityTypeLabel('bakery')).toBe('Bakery')
+    expect(getBuildingFacilityDefaultFunctions('bakery')).toEqual(['production', 'retail'])
+    expect(getBuildingFacilityDefaultFunctions('shop')).toEqual(['retail'])
+    expect(getBuildingFacilityDefaultFunctions('factory')).toEqual(['production'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.bakery.description).toContain('baking')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).toContain('bakery')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('bakery')
+  })
+
+  it('ships auction_house as sale-event premises distinct from market and shop via labels and groups', () => {
+    expect(buildingFacilityTypeSchema.parse('auction_house')).toBe('auction_house')
+    expect(getBuildingFacilityTypeLabel('auction_house')).toBe('Auction house')
+    expect(getBuildingFacilityDefaultFunctions('auction_house')).toEqual(['retail'])
+    expect(getBuildingFacilityDefaultFunctions('market')).toEqual(['retail'])
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.auction_house.description).toContain('auction')
+    expect(BUILDING_FACILITY_TYPE_ENTRIES.market.description).toContain('merchants')
+    expect(getBuildingFacilityTypesForAuthoringGroup('commercial')).toContain('auction_house')
+    expect(getBuildingFacilityTypesForAuthoringGroup('production')).not.toContain('auction_house')
   })
 
   it('resolves legacy morphological Facility ids from registry metadata, not lexical id shape', () => {

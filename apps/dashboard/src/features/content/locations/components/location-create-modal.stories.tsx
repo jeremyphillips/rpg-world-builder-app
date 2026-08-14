@@ -153,6 +153,54 @@ export const BreweryDetails: Story = {
   },
 }
 
+export const WorkshopDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-20-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Production',
+      facility: 'workshop',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('Production')).toBeVisible()
+  },
+}
+
+export const OfficeDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-20-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Commercial',
+      facility: 'office',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('Commercial')).toBeVisible()
+  },
+}
+
+export const BakeryDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-20-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Production',
+      facility: 'bakery',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('Production')).toBeVisible()
+  },
+}
+
+export const AuctionHouseDetails: Story = {
+  args: buildingArgs,
+  tags: ['phase-20-building-flows'],
+  play: async ({ canvasElement }) => {
+    await continueBuildingStory(canvasElement, {
+      facilityGroup: 'Commercial',
+      facility: 'auction_house',
+    })
+    await expect(within(canvasElement.ownerDocument.body).getByText('Commercial')).toBeVisible()
+  },
+}
+
 export const TempleDetails: Story = {
   args: buildingArgs,
   tags: ['phase-7-building-flows'],

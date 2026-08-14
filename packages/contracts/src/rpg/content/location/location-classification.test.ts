@@ -295,10 +295,20 @@ describe('location classification schema rejection', () => {
     expect(
       locationBodySchema.safeParse({
         kind: 'structure',
-        name: 'Bad Facility',
+        name: 'Craft Workshop',
         parentLocationId: 'site-1',
         structureType: 'building',
         classification: { facilityType: 'workshop' },
+      }).success,
+    ).toBe(true)
+
+    expect(
+      locationBodySchema.safeParse({
+        kind: 'structure',
+        name: 'Bad Facility',
+        parentLocationId: 'site-1',
+        structureType: 'building',
+        classification: { facilityType: 'not-a-facility' },
       }).success,
     ).toBe(false)
 

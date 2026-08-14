@@ -67,4 +67,40 @@ describe('getLocationOverviewSearchText', () => {
       expect.arrayContaining(['Temple of Healing', 'Temple', 'Worship']),
     )
   })
+
+  it('includes Phase 20 promoted Facility labels and derived functions in overview search', () => {
+    const workshop = buildingLocation(
+      'loc-workshop',
+      'Copper Lane Workshop',
+      buildingClassificationSchema.parse({ facilityType: 'workshop' }),
+    )
+    const office = buildingLocation(
+      'loc-office',
+      'Harbourmaster Office',
+      buildingClassificationSchema.parse({ facilityType: 'office' }),
+    )
+    const bakery = buildingLocation(
+      'loc-bakery',
+      'Mill Street Bakery',
+      buildingClassificationSchema.parse({ facilityType: 'bakery' }),
+    )
+    const auctionHouse = buildingLocation(
+      'loc-auction',
+      'River Exchange',
+      buildingClassificationSchema.parse({ facilityType: 'auction_house' }),
+    )
+
+    expect(getLocationOverviewSearchText(workshop)).toEqual(
+      expect.arrayContaining(['Copper Lane Workshop', 'Workshop', 'Production']),
+    )
+    expect(getLocationOverviewSearchText(office)).toEqual(
+      expect.arrayContaining(['Harbourmaster Office', 'Office', 'Governance']),
+    )
+    expect(getLocationOverviewSearchText(bakery)).toEqual(
+      expect.arrayContaining(['Mill Street Bakery', 'Bakery', 'Production · Retail']),
+    )
+    expect(getLocationOverviewSearchText(auctionHouse)).toEqual(
+      expect.arrayContaining(['River Exchange', 'Auction house', 'Retail']),
+    )
+  })
 })

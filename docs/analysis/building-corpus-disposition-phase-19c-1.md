@@ -4,8 +4,8 @@
 **Current planning:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)
 
 Phase 19C closed 2026-08-14. This note owns the selective promotion gate for the four 19A/19B
-carry-forwards only. It is **not** the current plan — **do not append** further Phase 19C work here;
-19D continues from the roadmap.
+carry-forwards only. It is **not** the current plan — **do not append** further Phase 19C work here.
+Phase 19D stopping review and corpus convergence closeout live in the roadmap only.
 
 **Checkpoint date:** 2026-08-14  
 **Scope:** Four carry-forward candidates — no corpus expansion, no discovery sweep.
