@@ -1,15 +1,15 @@
 # Building Taxonomy Discovery
 
-> **Status:** Frozen discovery evidence  
-> **Not the current Building roadmap**  
-> **Current roadmap:** [`docs/roadmap/building-taxonomy.md`](./building-taxonomy.md)
+> **Status:** Frozen research corpus  
+> **Planning authority:** None  
+> **Canonical roadmap:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)  
+> **Runtime classification:** [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)
 >
 > **Frozen evidence set — corpus v0.5 (308 concepts).** Content through the
 > Phase 5 decision record (v0.5) below is immutable discovery evidence. Later
 > editorial output (function-family curation, archetype disposition) is appended
-> in clearly dated sections at the end — never edited in place. Retired Model E
-> implementation history:
-> [building-model-e-implementation-spec.md](./building-model-e-implementation-spec.md).
+> in clearly dated sections at the end — never edited in place. Model E was
+> retired; see [`building-taxonomy-evidence.md`](./building-taxonomy-evidence.md).
 
 Working artifact for the building classification discovery process. Companion
 research notes: the superseded taxonomy plan (Candidate Model A and its
@@ -859,7 +859,7 @@ Consequences:
 ### Implementation scope (handed to the implementation plan)
 
 > Historical handoff. The Cursor plan below is completed/superseded local history. Current
-> planning: [`building-taxonomy.md`](./building-taxonomy.md).
+> planning: [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md).
 
 Scoped in full in the fresh implementation plan
 ([building_archetype_registry_a7e3d1c4.plan.md](../../.cursor/plans/building_archetype_registry_a7e3d1c4.plan.md)
@@ -964,7 +964,7 @@ appear in 12 of 15 buckets.
 ## Next step
 
 > Historical. Model E implementation executed and later retired at runtime. Current planning:
-> [`building-taxonomy.md`](./building-taxonomy.md).
+> [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md).
 
 Discovery is concluded. Execute the implementation plan
 ([building_archetype_registry_a7e3d1c4.plan.md](../../.cursor/plans/building_archetype_registry_a7e3d1c4.plan.md)
@@ -1184,16 +1184,14 @@ The quarantined `BuildingArchetype` registry is migration evidence, not product 
 Authoring guidance:
 [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md).
 Current taxonomy planning:
-[`building-taxonomy.md`](./building-taxonomy.md).
-Retired Model E implementation spec:
-[`building-model-e-implementation-spec.md`](./building-model-e-implementation-spec.md).
+[`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md).
+Consolidated semantic evidence:
+[`building-taxonomy-evidence.md`](./building-taxonomy-evidence.md).
 
 ## Editorial appendix — Preset investigation and manifestation gate (2026-08-14)
 
 Slice 2A (preset UX) and Slice 3 (manifestation evidence gate) are documented in
-[`building-authoring-preset-investigation-2a.md`](../analysis/building-authoring-preset-investigation-2a.md)
-and the closed audit
-[`building-organization-model-audit.md`](../analysis/building-organization-model-audit.md#phase-10--post-convergence-roadmap-slices-2a--3)
-(historical). Current sequencing:
-[`building-taxonomy.md`](./building-taxonomy.md).
+[`building-taxonomy-evidence.md`](./building-taxonomy-evidence.md#presets-slice-2a--frozen)
+and the deferred table in
+[`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md#deferred).
 No Building preset registry or manifestation encoding was added.

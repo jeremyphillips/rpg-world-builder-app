@@ -7,14 +7,14 @@ purpose). At least one must be present on persisted classification.
 **Facility is the primary authoring/discovery axis; Form is optional structural precision.** Setup
 requires a Facility discovery group (including Browse all), not a persisted `facilityType`.
 
-| Concern                       | Where to read                                                                                                                                                                                                             |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Runtime model**             | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
-| **Current taxonomy planning** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                         |
-| **Corpus evidence**           | Linked from that roadmap only where a phase needs it                                                                                                                                                                      |
+| Concern                        | Where to read                                                                                                                                                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime model**              | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
+| **Taxonomy planning / status** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                         |
+| **Semantic gates / history**   | [`building-taxonomy-evidence.md`](../../../docs/analysis/building-taxonomy-evidence.md) — only when boundary reasoning is needed                                                                                          |
+| **Frozen research corpus**     | [`building-taxonomy-discovery.md`](../../../docs/analysis/building-taxonomy-discovery.md) — only for the 308-concept matrix                                                                                               |
 
-Do not start from the frozen discovery corpus or the closed Building/Organization audit to learn
-the current model.
+Do not start from the frozen discovery corpus to learn the current shipped model.
 
 ## Canonical axes
 
@@ -38,28 +38,41 @@ concept and not physical morphology owned by Form. Labels must pass the **Form-i
 test**: if Form is omitted, the Facility label still describes a coherent configured use of Building
 premises without requiring the reader to infer morphology.
 
-Phase 7 acceptance review (historical; create-flow closed):
-[`building-create-phase-7-acceptance.md`](../../../docs/analysis/building-create-phase-7-acceptance.md).
-
 **Open composition:** Form and Facility compose without pair allowlists. Awkward combinations are
 investigated as unusual-but-valid composition or vocabulary label debt — not as evidence for
-Form-dependent Facility eligibility. Persisted ids `watchtower` and `lighthouse` are accepted
-identifier debt; runtime meaning comes from registry metadata, not lexical interpretation of the id.
+Form-dependent Facility eligibility.
+
+**Identifier debt:** persisted ids `watchtower` and `lighthouse` are accepted legacy identifiers.
+Runtime labels are **Watch post** and **Beacon station**; meaning comes from registry metadata, not
+lexical interpretation of the id. Do not rename persisted enum values as UX cleanup unless a
+dedicated migration trigger fires (see evidence doc).
 
 **Discovery groups** (`civic`, `commercial`, …) are Setup-only authoring facets; they are never
-persisted. Group display labels may differ from registry ids (e.g. `civic` → “Civic / institutional”).
+persisted. The `civic` group displays as **Civic / institutional** — institutional uses without
+asserting public ownership.
 
-## Quarantined archetype corpus
+### Institution vs premises
+
+```text
+Facility     = configured premises use
+Organization = institution identity
+Relationships = operator / owner / occupant / headquarters
+```
+
+Organization identity on relationships does not replace Facility when premises configuration is the
+claim. Facility and Organization may coexist on the same Building.
+
+### Quarantined archetype corpus
 
 Persisted Building classification is **only** `classification.form` and/or
 `classification.facilityType`. The 143-entry `BuildingArchetype` registry
 ([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building-archetype.ts))
 is a **quarantined research corpus** — not exported from runtime barrels, not imported by
-production apps (ESLint-enforced). It may inform future authoring presets or manifestation
-migration; presets remain **deferred until 2B approval**
-([building-authoring-preset-investigation-2a.md](../../../docs/analysis/building-authoring-preset-investigation-2a.md));
-manifestation remains deferred
-([building-taxonomy.md](../../../docs/roadmap/building-taxonomy.md#deferred)).
+production apps (ESLint-enforced). It may inform future presets or manifestation migration; both
+remain **deferred** — see [`building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md#deferred).
+
+**Model E** (archetype-primary classification) was retired. Historical detail:
+[`building-taxonomy-evidence.md`](../analysis/building-taxonomy-evidence.md#model-e-retired).
 
 ## Overview surfaces
 
@@ -71,81 +84,15 @@ The locations overview exposes Form/Facility discovery:
 | **Facility filter** | Exact `classification.facilityType`                                                             |
 | **Function filter** | Cross-facility grouping via `getEffectiveBuildingFunctions()` (Facility defaults)               |
 
-Kind, source, status, and campaign availability filters behave like other content
-overviews. See [content-overviews.md](./content-overviews.md).
-
-## Historical Model E (archetype-primary, retired)
-
-The sections below describe the **superseded** archetype-primary Model E that persisted
-`classification.archetype`. Runtime authoring, Mongo, and API no longer use these fields or
-surfaces. Kept as design history only.
-
-### Former four layers
-
-| Layer              | Field (retired)                       | Question it answered                                           | Former author-facing?                                                                         |
-| ------------------ | ------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| **Archetype**      | `classification.archetype`            | What is this building?                                         | Primary picker (removed)                                                                      |
-| **Functions**      | Registry `functions` on the archetype | What does this kind of building normally do?                   | Derived metadata below Archetype (`Typical uses`)                                             |
-| **Specialization** | `classification.specialization`       | How is _this instance_ narrowed?                               | Optional disclosure text field with inline registry suggestion actions (`Add specialization`) |
-| **Override**       | `classification.functionOverride`     | Does _this instance_ serve a substantially different function? | Optional disclosure select (`Add function override`); excluded archetype default functions    |
-
-Two more registry fields support discovery but are not separate authored layers:
-
-- **Aliases** — alternative names for the same archetype (warehouse / storehouse).
-- **Search terms** — broader vocabulary for finding archetypes (traveler, caravan, books).
-
-Changing archetype clears specialization and function override so stale semantic
-state cannot survive an identity change.
-
-## Former worked examples
-
-### Thieves' guild in a guildhall vs a warehouse
-
-Both might be authored as child locations under a city, but the building
-classification differs:
-
-- **Guildhall** archetype — assembly + governance. "Thieves' guild" is
-  organization ownership, not building identity; the hall remains a guildhall.
-- **Warehouse** archetype — storage. A front business occupying a warehouse keeps
-  the warehouse identity; smuggling activity is narrative, not a new archetype.
-
-Do not mint a `thieves_guild` archetype because criminals meet there.
-
-### Coaching inn with a child stable
-
-Author the inn as **Inn** with specialization `Coaching inn` (lodging + food &
-drink by default). Put the horses in a **child structure** classified as
-**Stable** (service). Model E does not fold every offered facility into the
-parent archetype.
-
-### Caravanserai
-
-**Caravanserai** is a cultural **manifestation** of **Inn** in the registry
-(`manifestationOf: 'inn'`). Authors pick Caravanserai when that identity matters;
-discovery search still connects it to inn/traveler/caravan vocabulary at
-projection time. The archetype picker shows manifestation context on option rows;
-post-selection authoring shows **Typical uses** only (not a separate Related
-archetype line) to keep a single stable metadata row below the control.
-
-### Temple with a care override
-
-A temple normally carries **worship**. A field hospital operating in a temple
-shell stays **Temple** archetype but sets **function override → Care**. Semantic
-function queries (overview function filter, effective-function helpers) see
-`care`; archetype identity stays temple.
-
-### Wizard tower blend
-
-**Wizard tower** was its own archetype whose registry functions blended **dwelling**
-and **knowledge** — one identity, two semantic functions, no override required. Under the
-current model, decompose onto Form + Facility + Organization relationships instead.
+Kind, source, status, and campaign availability filters behave like other content overviews. See
+[content-overviews.md](./content-overviews.md).
 
 ## Authoring flow
 
-Location create/edit forms use a dashboard-owned **Location type** projection
-(`authoringType`) instead of exposing canonical `kind` + `structureType`
-separately. The mapping module (`location-authoring-type.ts`) hydrates and
-serializes at the form boundary only — API payloads stay canonical.
+Location create/edit forms use a dashboard-owned **Location type** projection (`authoringType`)
+instead of exposing canonical `kind` + `structureType` separately. The mapping module
+(`location-authoring-type.ts`) hydrates and serializes at the form boundary only — API payloads stay
+canonical.
 
 | Author intent           | Location type          | Primary field                            | Persists as                                                                                      |
 | ----------------------- | ---------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -161,51 +108,35 @@ Creation shortcuts use an authoritative fixed session on the create route:
 | `/locations/new?type=building`                       | Fixed Building session (type locked)             |
 | `/locations/new?type=settlement&settlementType=city` | Fixed Settlement + settlement type (after setup) |
 
-Overview promoted shortcuts run through `resolveLocationCreateSession` — Settlement opens a
-setup step first; other promoted types navigate directly to the fixed URL. The optional
-`?parent=` query param remains a soft initial value for the parent picker on the page.
+Overview promoted shortcuts run through `resolveLocationCreateSession` — Settlement opens a setup
+step first; other promoted types navigate directly to the fixed URL. The optional `?parent=` query
+param remains a soft initial value for the parent picker on the page.
 
-Detail-page **Add location** (Contained locations panel, City structure Direct locations
-subgroup, and District row `+`) opens `LocationCreateModal` (`size="md"`) for both
-setup-gated and ready authoring types — one continuous setup ↔ details transaction with
-no drawer handoff. City structure partitions District vs direct choices from one canonical
-eligibility result — see
-[location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
+Detail-page **Add location** opens `LocationCreateModal` (`size="md"`) for both setup-gated and
+ready authoring types — one continuous setup ↔ details transaction. City structure partitions
+District vs direct choices — see [location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
+
+Building create with Organization relationship drafts uses atomic composite submit — see
+[create-flow.md](./create-flow.md).
 
 ### Contained settlement create — starting districts
 
-When the create modal reaches details for a fixed settlement session (after setup chooses
-`settlementType`), authors can optionally seed **starting districts** in the Structure
-group below description. Field order uses `composeLocationCreateBodyFields` with an
-`afterDescription` slot — overview create continues to call `buildLocationFields`
-directly and does not surface this UI.
+When the create modal reaches details for a fixed settlement session, authors can optionally seed
+**starting districts** in the Structure group below description. Submit creates the settlement
+first, then sequentially POSTs each district as a child `kind: 'district'` Location.
 
-| Layer             | Module                                                   | Role                                                                                             |
-| ----------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Form placement    | `location-form-fields.ts`                                | `composeLocationCreateBodyFields`, presentation-only `buildSettlementStartingDistrictsFormItems` |
-| Interactive UI    | `location-settlement-starting-districts-slot.client.tsx` | Name rows, add/remove                                                                            |
-| Composition state | `settlement-create-composition-context.client.tsx`       | Empty baseline per open session                                                                  |
-| Workflow          | `location-settlement-create-composition.lib.ts`          | Validation, `buildStartingDistrictCreateInput`, `createSettlementWithStartingDistricts`          |
+| Module                                   | Role                                                          |
+| ---------------------------------------- | ------------------------------------------------------------- |
+| `location-create-session.ts`             | `resolveLocationCreateSession`, `completeLocationCreateSetup` |
+| `location-create-shortcuts.ts`           | Fixed-session URL parse/serialize                             |
+| `location-create-modal.client.tsx`       | Contained create: setup ↔ details in one modal                |
+| `location-classification-form-fields.ts` | Form select + Facility searchable combobox                    |
+| `location-building-create-setup.lib.ts`  | Building Setup — Form cards + Facility discovery groups       |
 
-Submit creates the settlement first, then sequentially POSTs each district as a child
-`kind: 'district'` Location with `parentLocationId` set to the new settlement. Partial
-district or deferred campaign-access failures surface as **one** aggregated warning toast;
-success still trusted-closes the modal.
+Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).
 
-**Campaign access:** starting districts inherit default public access — locations do not
-inherit parent/child access. A default-public district can appear in list/search while a
-restricted parent remains hidden. Session-access mirroring for composed districts is a
-follow-up candidate only.
-
-| Module                                                                    | Role                                                                                                                                                                             |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `location-create-session.ts`                                              | `resolveLocationCreateSession`, `completeLocationCreateSetup`                                                                                                                    |
-| `location-create-shortcuts.ts`                                            | Fixed-session URL parse/serialize, child-type menus, Create/Add headings                                                                                                         |
-| `location-create-modal.client.tsx`                                        | Contained create surface: setup ↔ details in one `md` modal; transaction dirty + draft prune                                                                                     |
-| `@/lib/create-setup` (`CreateSetupPanel`, `create-setup-sequence.lib.ts`) | Shared setup chrome/panel: compact summaries, `dependsOn` invalidation, active-set expansion, derived Continue — see [create-setup README](../../src/lib/create-setup/README.md) |
-| `location-settlement-structure.lib.ts`                                    | District vs direct-place partition helpers                                                                                                                                       |
-
-Create-setup choice collapse and selected-summary presentation are owned by the shared shell/sequence — Site, Settlement, and Region supply ordered choice-set definitions only (no per-type selected-card or collapse wiring).
+Storybook: tag `phase-7-building-flows` and `phase-20-building-flows` on
+[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx).
 
 ## Authoring modules
 
@@ -216,9 +147,3 @@ Create-setup choice collapse and selected-summary presentation are owned by the 
 | `location-classification-form-fields.ts` | Form select + Facility searchable combobox     |
 | `location-overview-search.lib.ts`        | Overview name-search discovery strings         |
 | `locations-overview-filter-schema.ts`    | Facility type and function overview filters    |
-
-Building create UX acceptance (Phase 7–8): Storybook tag `phase-7-building-flows` on
-[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx).
-Phase 20 promoted Facilities: tag `phase-20-building-flows` on the same file.
-
-Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).

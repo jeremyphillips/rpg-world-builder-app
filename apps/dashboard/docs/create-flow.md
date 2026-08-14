@@ -5,9 +5,7 @@ Dashboard create workflows compose under `apps/dashboard/src/lib/create-flow`.
 and optional relationship-draft presentation — not domain forms, persistence, or
 relationship vocabulary.
 
-Building create-flow Phases 7–8 are **closed**. Pre-implementation architecture notes live in
-[`building-create-relationship-tabs-phase-0.md`](../../../docs/analysis/building-create-relationship-tabs-phase-0.md)
-(superseded evidence). Remaining Building taxonomy work is planned in
+Building create-flow Phases 7–8 are **closed**. Remaining Building taxonomy work is planned in
 [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md).
 
 ## CreateModalShell
@@ -92,3 +90,55 @@ The root API uses `addAnotherLabel` / slot props — never domain nouns such as
 See [content-entity-card.md](./content-entity-card.md#add--pending-composition).
 Discovery rows use CEC + trailing **Select** (outline, compact). Pending rows
 use CEC + overflow actions until edit swaps the row to hydrated review.
+
+## Building composite create (atomic submit)
+
+Building create with Organization relationship drafts uses a single composite endpoint — no
+sequential or compensating fallback.
+
+### Endpoint
+
+```text
+POST /api/campaigns/:campaignId/content/locations/building-create-compositions
+role: owner | co-owner
+```
+
+Register the focused route before generic `/:contentType` routes.
+
+### Request shape
+
+The request carries the Building `CreateLocationInput`, optional campaign-access patch, new
+Organization drafts (each with a client `organizationDraftId`), and pending relationship rows (each
+with a client `relationshipDraftId` and kind). The Building must parse as a published Building
+(`kind: 'structure'`, `structureType: 'building'`).
+
+### Validation and errors
+
+- Complete preflight validation before any mutation.
+- Validation failures: HTTP `422`, code `building_create_plan_invalid`, structured issues scoped to
+  `composition`, `building`, `organization`, or `relationship`.
+- Transaction unavailable: HTTP `503`, code `atomic_write_unavailable` — no partial writes.
+- The dashboard maps Building issues to Details; Organization/relationship issues select
+  Organizations and annotate the stable draft row.
+
+### Draft identity
+
+Client draft IDs are opaque, unique within the create session, and correlate request rows with
+response records. The server generates all persisted Mongo `_id` and relationship `id` values
+independently. Removing a new Organization draft is blocked while a relationship references it.
+
+### Relationship policy
+
+Pending relationships are validated through the same contract-owned eligibility, family,
+cardinality, and occupancy rules as persisted edges — evaluated together, not only row-by-row in UI
+order. Dashboard preflight and the API service both use contract policy; the API reloads
+race-sensitive persisted state inside the transaction.
+
+### Transactions
+
+When Mongo transactions are disabled, the endpoint returns `503` before mutation. Deployments that
+need composite Building create should use a replica-set topology with transactions enabled. All
+mutation-time reads and writes for the composition share one `ClientSession`.
+
+Contracts: `@rpg/contracts` building-create-composition schemas. Handlers:
+`apps/api/src/features/content/locations/building-create-composition.handlers.ts`.

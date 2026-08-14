@@ -168,12 +168,6 @@ export type LocationChildrenViewModel = {
   emptyText: string
 }
 
-/** @deprecated Use LocationStructureRowVm — kept for transitional imports. */
-export type SettlementStructureDistrictItem = {
-  item: LocationChildItem
-  immediateChildren: LocationChildItem[]
-}
-
 export type LocationDetailViewModel = {
   identity: LocationDetailIdentityViewModel
   description?: string

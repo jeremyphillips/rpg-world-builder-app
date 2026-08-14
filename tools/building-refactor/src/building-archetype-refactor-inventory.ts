@@ -690,8 +690,7 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
  * Non-inferable migration decisions only — shipped Form/Facility ids derive from registries.
  * Sweep 1 membership is explicit per family; Tier C per batch.
  * Planning: docs/roadmap/building-taxonomy.md
- * Evidence: docs/analysis/building-corpus-disposition-sweep-1.md,
- * docs/analysis/building-corpus-disposition-tier-c-1.md.
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
  */
 export const SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
   'airship',
@@ -822,7 +821,7 @@ export const SWEEP_PRIOR_DECOMPOSE_IDS = [
 
 /**
  * Tier C composite review queue — scheduling only; `kind: composite` is not disposition evidence.
- * Evidence: docs/analysis/building-corpus-disposition-tier-c-1.md
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
  * Planning: docs/roadmap/building-taxonomy.md
  */
 export const TIER_C_COMPOSITE_QUEUE_IDS = [
@@ -919,7 +918,7 @@ export const TIER_C_REVIEWED_PENDING_IDS = [
 /**
  * Phase 19A morphology investigation allowlist — frozen 2026-08-14.
  * Derived from roadmap investigation seeds; verified against live inventory.
- * Evidence: docs/analysis/building-corpus-disposition-phase-19a-1.md
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
  * Planning: docs/roadmap/building-taxonomy.md
  */
 export const PHASE_19A_MORPHOLOGY_FORTIFICATION_IDS = [
@@ -1004,7 +1003,7 @@ export const PHASE_19A_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
  * Phase 19B production / approximate-Facility allowlist — frozen 2026-08-14.
  * Sweep Family E approximate Facility pull (11). `workshop` excluded — interior /
  * Tier B Facility-candidate boundary; see sweep Family F exception list.
- * Evidence: docs/analysis/building-corpus-disposition-phase-19b-1.md
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
  * Planning: docs/roadmap/building-taxonomy.md
  */
 export const PHASE_19B_APPROXIMATE_FACILITY_ALLOWLIST_IDS = [
@@ -1063,7 +1062,7 @@ export const PHASE_19B_DECOMPOSE_IDS = [
 /**
  * Phase 19C selective runtime promotion gate — frozen 2026-08-14.
  * Four carry-forwards from 19A/19B/Tier B only — no scope expansion.
- * Evidence: docs/analysis/building-corpus-disposition-phase-19c-1.md
+ * Evidence: docs/analysis/building-taxonomy-evidence.md
  * Planning: docs/roadmap/building-taxonomy.md
  */
 export const PHASE_19C_CANDIDATE_IDS = [
