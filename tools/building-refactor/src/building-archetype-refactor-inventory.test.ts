@@ -11,6 +11,13 @@ import {
   BUILDING_CORPUS_DISPOSITIONS,
   BUILDING_RESEARCH_CORPUS_IDS,
   LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS,
+  SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+  SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+  SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+  SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+  SWEEP_PRIOR_DECOMPOSE_IDS,
+  SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+  SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
 } from './building-archetype-refactor-inventory'
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
@@ -27,6 +34,36 @@ function sourceFilesUnder(directory: string): string[] {
     return SOURCE_EXTENSIONS.has(extname(entry.name)) ? [path] : []
   })
 }
+
+const SWEEP_FALSE_POSITIVE_PENDING_IDS = [
+  'artificer_atelier',
+  'bounty_office',
+  'broch',
+  'cave_dwelling',
+  'coach_house',
+  'crannog',
+  'domus',
+  'dyeworks',
+  'elven_tree_dwelling',
+  'foundry',
+  'fulling_mill',
+  'golem_workshop',
+  'icehouse',
+  'igloo',
+  'kennel',
+  'longhouse',
+  'machiya',
+  'pigsty',
+  'ropewalk',
+  'roundhouse',
+  'shipwreck_dwelling',
+  'siheyuan',
+  'tent_pavilion',
+  'tholos',
+  'tipi',
+  'tollhouse',
+  'yurt',
+] as const
 
 describe('Building archetype refactor inventory', () => {
   it('accounts for all researched and formerly-runtime concepts exactly once', () => {
@@ -132,23 +169,122 @@ describe('Building archetype refactor inventory', () => {
     ).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity)
   })
 
-  it('leaves 268 concepts pending or awaiting design after registry-derived shipping', () => {
+  it('leaves 166 concepts pending or awaiting design after sweep 1 dispositions', () => {
     const unresolved = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) =>
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.pending ||
         status === BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
     )
-    expect(unresolved).toHaveLength(268)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(103)
-    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(165)
+    expect(unresolved).toHaveLength(166)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => wasRuntimeArchetype)).toHaveLength(78)
+    expect(unresolved.filter(({ wasRuntimeArchetype }) => !wasRuntimeArchetype)).toHaveLength(88)
   })
 
-  it('records tranche-1 decompose rows without inferring shipped Form or Facility ids', () => {
+  it('maps every explicit sweep allowlist id to the reviewed Tier A status', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    for (const id of SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS) {
+      expect(statusById.get(id)).toBe(
+        BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+      )
+    }
+
+    for (const id of [
+      ...SWEEP_PRIOR_DECOMPOSE_IDS,
+      ...SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
+      ...SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+      ...SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+      ...SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+      ...SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+    ]) {
+      expect(statusById.get(id)).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose)
+    }
+  })
+
+  it('keeps false-positive audit exclusions pending and free of overlapping sweep membership', () => {
+    const sweepIds = new Set<string>([
+      ...SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+      ...SWEEP_PRIOR_DECOMPOSE_IDS,
+      ...SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
+      ...SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+      ...SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+      ...SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+      ...SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+    ])
+
+    expect(sweepIds.size).toBe(106)
+    expect(SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS).toHaveLength(39)
+    expect(SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS).toHaveLength(52)
+    expect(SWEEP_PRIOR_DECOMPOSE_IDS).toHaveLength(4)
+
+    // 102 Tier A sweep rows = 106 explicit allowlist ids minus 4 tranche-1 prior decompositions.
+    expect(sweepIds.size - SWEEP_PRIOR_DECOMPOSE_IDS.length).toBe(102)
+
+    for (const id of SWEEP_FALSE_POSITIVE_PENDING_IDS) {
+      expect(sweepIds.has(id)).toBe(false)
+      expect(BUILDING_ARCHETYPE_REFACTOR_INVENTORY.find((entry) => entry.id === id)?.status).toBe(
+        BUILDING_ARCHETYPE_REFACTOR_STATUS.pending,
+      )
+    }
+  })
+
+  it('keeps the frozen corpus graph and tooling-only outside-building status', () => {
+    expect(BUILDING_CORPUS_DISPOSITIONS.potion_shop).toEqual({
+      kind: 'specialization',
+      of: 'apothecary',
+    })
+    expect(BUILDING_CORPUS_DISPOSITIONS.apothecary).toEqual({ kind: 'archetype' })
+
+    const contractsSource = readFileSync(
+      join(REPO_ROOT, 'packages/contracts/src/rpg/vocab/location/building-facility-type.ts'),
+      'utf8',
+    )
+    expect(contractsSource).not.toContain('outside-building-classification')
+    expect(contractsSource).not.toContain('building-archetype-refactor-inventory')
+  })
+
+  it('records sweep-1 disposition rows with explicit family membership', () => {
+    const statusById = new Map(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.map(({ id, status }) => [id, status]),
+    )
+
+    expect(
+      BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
+        ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+      ),
+    ).toHaveLength(39)
+
     const decomposed = BUILDING_ARCHETYPE_REFACTOR_INVENTORY.filter(
       ({ status }) => status === BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
     ).map(({ id }) => id)
 
-    expect(decomposed).toEqual(['apothecary', 'gatehouse', 'manor', 'wizard_tower'])
+    expect(decomposed).toHaveLength(67)
+    expect(decomposed).toEqual(
+      expect.arrayContaining([
+        'apothecary',
+        'barber_surgeon',
+        'cobbler',
+        'dower_house',
+        'gatehouse',
+        'general_store',
+        'haunted_manor',
+        'hammam',
+        'healers_house',
+        'manor',
+        'oracle_shrine',
+        'wizard_tower',
+      ]),
+    )
+    expect(statusById.get('broch')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('foundry')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('pigsty')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('longhouse')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('ferry_house')).toBe(BUILDING_ARCHETYPE_REFACTOR_STATUS.pending)
+    expect(statusById.get('bridge')).toBe(
+      BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+    )
   })
 
   it('is not imported by runtime app or package source', () => {

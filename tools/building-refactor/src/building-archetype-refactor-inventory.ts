@@ -659,6 +659,7 @@ export const BUILDING_ARCHETYPE_REFACTOR_STATUS = {
   enabledFacility: 'enabled-facility',
   rehomeToOrganizationActivity: 'rehome-to-organization-activity',
   decompose: 'decompose',
+  outsideBuildingClassification: 'outside-building-classification',
   pending: 'pending',
   needsDesign: 'needs-design',
 } as const
@@ -685,14 +686,172 @@ export const LEGACY_RUNTIME_BUILDING_ARCHETYPE_IDS = BUILDING_CORPUS_IDS.filter(
   )
 })
 
-/** Non-inferable migration decisions only — shipped Form/Facility ids derive from registries. */
+/**
+ * Non-inferable migration decisions only — shipped Form/Facility ids derive from registries.
+ * Sweep 1 membership is explicit per family; see building-corpus-disposition-sweep-1.md.
+ */
+export const SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS = [
+  'airship',
+  'airship_dock',
+  'apiary',
+  'aqueduct',
+  'barrow',
+  'bridge',
+  'cairn',
+  'camp',
+  'dragon_roost',
+  'drydock',
+  'fountain',
+  'gallows',
+  'hippodrome',
+  'hollowed_colossus',
+  'market_stall',
+  'marae',
+  'memorial',
+  'mimic_building',
+  'moai',
+  'obelisk',
+  'open_air_shrine',
+  'pa',
+  'palaestra',
+  'pyramid',
+  'sheepfold',
+  'ship',
+  'siege_tower',
+  'sphinx',
+  'statue',
+  'staithe',
+  'stoa',
+  'stupa',
+  'triumphal_arch',
+  'vardo_wagon',
+  'wall_segment',
+  'walled_town',
+  'war_camp',
+  'water_tower',
+  'ziggurat',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS = [
+  'barber_surgeon',
+  'butcher',
+  'chandler',
+  'cobbler',
+  'jeweler',
+  'moneylender',
+  'tailor',
+  'wheelwright',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS = [
+  'amphitheater',
+  'banqueting_house',
+  'bardic_college',
+  'basilica',
+  'beast_stable',
+  'byre',
+  'caravanserai',
+  'cathedral',
+  'cottage',
+  'counting_house',
+  'dovecote',
+  'drum_tower',
+  'farmhouse',
+  'fighting_pit',
+  'flophouse',
+  'general_store',
+  'godown',
+  'granary_on_stilts',
+  'griffon_aerie',
+  'hammam',
+  'hof',
+  'houseboat',
+  'insula',
+  'livery',
+  'magic_shop',
+  'madrasa',
+  'mastaba',
+  'mage_prison',
+  'moot_hall',
+  'mosque',
+  'oracle_shrine',
+  'pagoda',
+  'pawnshop',
+  'planar_embassy',
+  'potion_shop',
+  'powder_magazine',
+  'ranger_station',
+  'rectory',
+  'ribat',
+  'ryokan',
+  'shearing_shed',
+  'stave_church',
+  'sweat_lodge',
+  'synagogue',
+  'teahouse',
+  'threshing_barn',
+  'tithe_barn',
+  'tolbooth',
+  'townhouse',
+  'trading_factory',
+  'watermill',
+  'windmill',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS = [
+  'haunted_manor',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS = [
+  'dower_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS = [
+  'healers_house',
+] as const satisfies readonly BuildingCorpusId[]
+
+export const SWEEP_PRIOR_DECOMPOSE_IDS = [
+  'apothecary',
+  'gatehouse',
+  'manor',
+  'wizard_tower',
+] as const satisfies readonly BuildingCorpusId[]
+
+function statusMapForIds(
+  ids: readonly BuildingCorpusId[],
+  status: BuildingArchetypeRefactorStatus,
+): Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>> {
+  return Object.fromEntries(ids.map((id) => [id, status]))
+}
+
 const INITIAL_STATUS_BY_ID = {
-  apothecary: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ...statusMapForIds(SWEEP_PRIOR_DECOMPOSE_IDS, BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose),
+  ...statusMapForIds(
+    SWEEP_OUTSIDE_BUILDING_CLASSIFICATION_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.outsideBuildingClassification,
+  ),
+  ...statusMapForIds(
+    SWEEP_TRADE_OPERATOR_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_CANONICAL_SUFFICIENT_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_STATUS_AUTHORITY_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_BUNDLED_FORM_ACTOR_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
+  ...statusMapForIds(
+    SWEEP_OVERLAY_COMPOSITION_DECOMPOSE_IDS,
+    BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
+  ),
   blacksmith: BUILDING_ARCHETYPE_REFACTOR_STATUS.rehomeToOrganizationActivity,
   blockhouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.needsDesign,
-  gatehouse: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
-  manor: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
-  wizard_tower: BUILDING_ARCHETYPE_REFACTOR_STATUS.decompose,
 } as const satisfies Partial<Record<BuildingCorpusId, BuildingArchetypeRefactorStatus>>
 
 const SHIPPED_FORM_IDS = new Set<string>(BUILDING_FORM_IDS)

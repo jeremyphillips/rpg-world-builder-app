@@ -1688,6 +1688,7 @@ discovery failure observed in the Phase 7 scenario review.
 
 ### Known deferred (non-blocking)
 
+- Corpus disposition sweep 1 — [`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md)
 - Corpus disposition tranche 1 — [`building-corpus-disposition-tranche-1.md`](./building-corpus-disposition-tranche-1.md)
 - `blockhouse` — `needs-design` (morphology evidence)
 - Organization activity vocabulary gap around pharmacy/healing/herbal practice (Apothecary — Org audit)
@@ -1785,3 +1786,37 @@ Refactor inventory derives `embassy` → `enabled-facility`. Unresolved count 27
 
 Refactor inventory derives both ids → `enabled-facility`. Unresolved count **268**. Tranche-1
 Facility candidate batch is complete; only `blockhouse` retains non-inferable `needs-design`.
+
+## Phase 16 — Corpus disposition sweep 1 (Tier A implemented)
+
+**Checkpoint date:** 2026-08-14  
+**Scope:** High-confidence Tier A family bulk disposition from proven rules. Inventory + analysis only;
+no runtime Form/Facility promotion.
+
+Full sweep evidence:
+[`building-corpus-disposition-sweep-1.md`](./building-corpus-disposition-sweep-1.md).
+
+**Status:** Sweep 1 Tier A dispositions **implemented** in refactor inventory. Runtime Facility promotion
+remains a separate plan. Tier B shortlist is evidence only. Tier C is the remaining detailed-review queue.
+
+### Inventory outcomes
+
+| Status                            | Count | Notes                                                                           |
+| --------------------------------- | ----: | ------------------------------------------------------------------------------- |
+| `outside-building-classification` |    39 | Family F post false-positive audit                                              |
+| `decompose` (sweep + prior)       |    67 | Families A, C, D, E, overlay composition, plus tranche-1 prior rows             |
+| `needs-design`                    |     1 | `blockhouse` unchanged                                                          |
+| Unresolved                        |   166 | Tier B candidates, morphology queue, production cluster, deferred interior pass |
+
+27 terms returned to `pending` during the Family F/E false-positive audit (see sweep note §False-positive
+audit). Tier A reviewed count is **102**, not a preserved row target.
+
+### Tier B Facility candidates (unchanged inventory)
+
+Ranked in sweep note — `granary`, `greenhouse`, and `arena` remain **PROMOTE SOON** pending scale-vs-
+configuration review and a separate admission PR. Valid promotion outcome includes **none**.
+
+### Explicit non-goals (sweep 1)
+
+Runtime promotion, presets, manifestation pilot, Organization activity implementation, corpus-graph
+retargeting, heuristic/kind/prefix classification.
