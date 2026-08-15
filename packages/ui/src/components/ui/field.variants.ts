@@ -189,6 +189,9 @@ export function fieldArrayItemListClasses(options: {
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
 /** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
 export const fieldToggleDependentIndentClasses = 'pl-11'
+
+/** Small inner padding on rail-decorated dependent/group chrome wrappers — not layout offset. */
+export const fieldRailInnerPaddingClasses = 'pl-3'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 /** Trailing divider tone — maps to the global border ladder in design-tokens.md. */

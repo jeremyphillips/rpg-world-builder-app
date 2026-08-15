@@ -108,14 +108,15 @@ describe('FieldGroup', () => {
     expect(stack).toHaveClass('rounded-md', 'border', 'p-4', 'bg-surface-subtle')
   })
 
-  it('applies inset chrome on the field stack', () => {
+  it('applies rail chrome on the field stack', () => {
     render(
-      <FieldGroup legend="Effects" chrome={{ variant: 'inset' }}>
+      <FieldGroup legend="Effects" chrome={{ variant: 'rail' }}>
         <TextField id="effect-name" label="Effect" />
       </FieldGroup>,
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Effects/ }))
-    expect(stack).toHaveClass('border-l-2', 'pl-4', 'sm:pl-8', 'border-border')
+    expect(stack).toHaveClass('border-l-2', 'pl-3', 'border-border')
+    expect(stack).not.toHaveClass('sm:pl-8')
   })
 
   it('applies divider top chrome on the fieldset', () => {

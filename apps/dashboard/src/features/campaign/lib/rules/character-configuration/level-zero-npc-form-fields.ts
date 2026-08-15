@@ -132,7 +132,8 @@ export function levelZeroNpcsFields({
             defaultValue: true,
           },
           dependents: {
-            chrome: 'inset',
+            layout: 'inset',
+            chrome: 'rail',
             fields: [
               standardArrayFormFields({
                 name: 'levelZeroStandardArray',

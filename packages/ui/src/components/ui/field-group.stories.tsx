@@ -64,7 +64,7 @@ export const InsetBorder: Story = {
   args: {
     legend: 'Effects & outcomes',
     description: 'Define what the spell does, then choose when each effect applies.',
-    chrome: { variant: 'inset' },
+    chrome: { variant: 'rail' },
     children: (
       <>
         <FieldGroup legend="Authored effects" legendSize="subsection">
@@ -81,7 +81,7 @@ export const InsetBorder: Story = {
 export const InsetPrimary: Story = {
   args: {
     legend: 'Effects',
-    chrome: { variant: 'inset', tone: 'primary' },
+    chrome: { variant: 'rail', tone: 'primary' },
     children: <TextField id="inset-primary" label="Effect" />,
   },
 }
@@ -282,7 +282,7 @@ export const ResolutionLayout: Story = {
       <FieldGroup
         legend="Effects & outcomes"
         description="Define what the spell does, then choose when each effect applies."
-        chrome={{ variant: 'inset' }}
+        chrome={{ variant: 'rail' }}
       >
         <FieldGroup legend="Authored effects" legendSize="subsection">
           <TextField id="resolution-effect" label="Effect" />

@@ -11,6 +11,14 @@ describe('resolveFieldGroupChromeClassNames', () => {
     })
   })
 
+  it('applies rail body classes with small inner padding only', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'rail' })
+    expect(classes.body).toContain('border-l-2')
+    expect(classes.body).toContain('pl-3')
+    expect(classes.body).not.toContain('sm:pl-8')
+    expect(classes.body).toContain('border-border')
+  })
+
   it('applies inset body classes', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
     expect(classes.body).toContain('border-l-2')

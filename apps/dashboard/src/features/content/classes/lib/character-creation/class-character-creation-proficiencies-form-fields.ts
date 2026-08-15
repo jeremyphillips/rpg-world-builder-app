@@ -127,7 +127,7 @@ export function characterCreationProficienciesFields(
     {
       kind: 'group',
       legend: 'Proficiencies',
-      chrome: { variant: 'inset' },
+      chrome: { variant: 'rail' },
       fields: [
         {
           kind: 'group',

@@ -104,7 +104,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          chrome: { variant: 'inset' },
+          chrome: { variant: 'rail' },
           fields: [
             {
               type: 'chips',

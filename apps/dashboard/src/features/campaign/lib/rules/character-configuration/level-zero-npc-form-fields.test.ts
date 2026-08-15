@@ -28,11 +28,13 @@ describe('levelZeroNpcsFields', () => {
       name: LEVEL_ZERO_NPCS_ENABLED,
       label: 'Allow',
     })
-    expect(allow.dependents).toMatchObject({ chrome: 'inset' })
+    expect(allow.dependents).toMatchObject({ layout: 'inset', chrome: 'rail' })
     expect(
       allow.dependents.fields.some(
         (field) =>
-          isContainer(field) && field.kind === 'group' && field.chrome?.variant === 'inset',
+          isContainer(field) &&
+          field.kind === 'group' &&
+          (field.chrome?.variant === 'inset' || field.chrome?.variant === 'rail'),
       ),
     ).toBe(false)
   })

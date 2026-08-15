@@ -39,6 +39,7 @@ describe('modeDependentGrantSetField', () => {
         name: 'weaponProficiencyMode',
       },
       dependents: {
+        layout: 'inset',
         chrome: 'none',
       },
     })

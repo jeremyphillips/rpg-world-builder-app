@@ -91,6 +91,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
             },
           }
         : {}),
+      layout: 'inset',
       chrome: 'none',
       fields: [
         {

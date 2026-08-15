@@ -944,8 +944,11 @@ export type GroupFieldItem =
   | DependentConfig
   | ArrayConfig
 
-/** Visual containment for toggle-gated dependent fields — orthogonal to heading tier. */
-export type DependentChrome = 'none' | 'inset' | 'panel'
+/** Controller-relative positioning for toggle-gated dependents. */
+export type DependentLayout = 'inset' | 'flush'
+
+/** Decorative boundary for the dependents region — orthogonal to {@link DependentLayout}. */
+export type DependentChrome = 'none' | 'rail' | 'panel'
 
 export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
@@ -954,11 +957,9 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  /**
-   * Visual containment for the dependents region.
-   *
-   * @default 'inset'
-   */
+  /** Where dependent content sits relative to its controller. @default 'inset' */
+  layout?: DependentLayout
+  /** Optional visual treatment on the dependents region. @default 'none' */
   chrome?: DependentChrome
   /** Panel wash options — only when `chrome === 'panel'`. */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }

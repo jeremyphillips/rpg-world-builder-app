@@ -135,6 +135,7 @@ export function multiclassingPolicyFields(ctx: ContentFormCtx): FormItem[] {
       },
       dependents: {
         visibility: visibleWhenClassPolicyNeedsIds(),
+        layout: 'inset',
         chrome: 'panel',
         panel: { surface: { emphasis: 'subtle' } },
         fields: classPolicyClassIdFields(ctx),
@@ -192,6 +193,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
         labelPosition: 'settings',
       },
       dependents: {
+        layout: 'inset',
         chrome: 'panel',
         panel: { surface: { emphasis: 'subtle' } },
         fields: [

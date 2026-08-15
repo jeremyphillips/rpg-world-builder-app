@@ -22,7 +22,8 @@ type Values = z.infer<typeof schema>
 
 const dependentField = (
   options: {
-    chrome?: 'none' | 'inset' | 'panel'
+    layout?: 'inset' | 'flush'
+    chrome?: 'none' | 'rail' | 'panel'
     panel?: { surface?: SurfaceConfig; tone?: 'destructive' }
     scope?: 'wrapper' | 'arrayItems'
     includeNote?: boolean
@@ -37,6 +38,7 @@ const dependentField = (
     defaultValue: false,
   },
   dependents: {
+    ...(options.layout ? { layout: options.layout } : {}),
     ...(options.chrome ? { chrome: options.chrome } : {}),
     ...(options.panel ? { panel: options.panel } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
@@ -109,19 +111,20 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      const shell = queryChromeShell(container) as HTMLElement | null
       expect(region).toHaveClass(fieldToggleDependentIndentClasses)
-      expect(shell).toBeInTheDocument()
-      expect(region).toContainElement(shell)
-      expect(shell).not.toContainElement(switchControl)
-      expect(shell).toContainElement(screen.getByLabelText('Feature value'))
+      expect(queryChromeShell(container)).toBeNull()
+      expect(region).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
 
   it('applies subtle panel chrome classes when chrome is panel', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
-      dependentField({ chrome: 'panel', panel: { surface: { emphasis: 'subtle' } } }),
+      dependentField({
+        layout: 'inset',
+        chrome: 'panel',
+        panel: { surface: { emphasis: 'subtle' } },
+      }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -148,7 +151,7 @@ describe('dependent field', () => {
     expect(dependent).toHaveAttribute('aria-labelledby', expect.stringContaining('featureEnabled'))
   })
 
-  it('applies default inset chrome when dependents chrome is omitted', async () => {
+  it('defaults to inset layout without decorative chrome when layout and chrome are omitted', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField()])
 
@@ -156,13 +159,42 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      const shell = queryChromeShell(container)
       expect(region).toHaveClass(fieldToggleDependentIndentClasses)
-      expect(shell).toHaveClass('border-l-2')
-      expect(shell).not.toHaveClass('bg-surface-subtle')
+      expect(queryChromeShell(container)).toBeNull()
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
+
+  it.each([
+    { layout: 'inset' as const, chrome: 'none' as const, expectIndent: true, expectRail: false },
+    { layout: 'inset' as const, chrome: 'rail' as const, expectIndent: true, expectRail: true },
+    { layout: 'flush' as const, chrome: 'none' as const, expectIndent: false, expectRail: false },
+    { layout: 'flush' as const, chrome: 'rail' as const, expectIndent: false, expectRail: true },
+  ])(
+    'composes layout=$layout and chrome=$chrome independently',
+    async ({ layout, chrome, expectIndent, expectRail }) => {
+      const user = userEvent.setup()
+      const { container } = renderDependentForm([dependentField({ layout, chrome })])
+
+      await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+      await waitFor(() => {
+        const region = queryDependentsRegion(container)
+        if (expectIndent) {
+          expect(region).toHaveClass(fieldToggleDependentIndentClasses)
+        } else {
+          expect(region).not.toHaveClass(fieldToggleDependentIndentClasses)
+        }
+
+        const shell = queryChromeShell(container)
+        if (expectRail) {
+          expect(shell).toHaveClass('border-l-2')
+        } else {
+          expect(shell).toBeNull()
+        }
+      })
+    },
+  )
 
   it('inherits comfortable density on the outer dependent wrapper by default', async () => {
     const user = userEvent.setup()
@@ -180,6 +212,7 @@ describe('dependent field', () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
       dependentField({
+        layout: 'inset',
         chrome: 'panel',
         panel: { surface: { emphasis: 'subtle' } },
         includeNote: true,
@@ -241,6 +274,7 @@ describe('dependent field', () => {
           defaultValue: false,
         },
         dependents: {
+          layout: 'inset',
           chrome: 'panel',
           panel: { surface: { emphasis: 'subtle' } },
           scope: 'arrayItems',
@@ -304,6 +338,7 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
+          layout: 'inset',
           chrome: 'panel',
           panel: { surface: { emphasis: 'subtle' } },
           fields: [
@@ -378,6 +413,7 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
+          layout: 'inset',
           chrome: 'panel',
           panel: { surface: { emphasis: 'subtle' } },
           fields: [

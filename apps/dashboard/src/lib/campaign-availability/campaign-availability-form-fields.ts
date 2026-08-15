@@ -52,7 +52,7 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
       kind: 'group',
       id: ctx.groupId,
       legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
-      chrome: { variant: 'inset' },
+      chrome: { variant: 'rail' },
       density: ctx.groupDensity ?? 'compact',
       disclosure: {
         variant: 'summary',

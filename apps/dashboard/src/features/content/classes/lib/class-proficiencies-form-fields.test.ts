@@ -17,7 +17,7 @@ describe('proficienciesFields', () => {
 
     expect(armorGroup).toMatchObject({
       kind: 'group',
-      chrome: { variant: 'inset' },
+      chrome: { variant: 'rail' },
     })
     expect(armorGroup).not.toHaveProperty('legend')
     expect(armorGroup).not.toHaveProperty('heading')

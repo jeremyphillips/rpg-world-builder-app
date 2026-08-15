@@ -3,13 +3,10 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldStackRhythmVariants,
-  fieldToggleDependentIndentClasses,
-} from '../../components/ui/field.variants'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import {
   DEFAULT_DEPENDENT_SURFACE,
-  resolveDependentChromePresentation,
+  resolveDependentPresentation,
 } from '../../components/ui/field-dependent.variants'
 import { resolveFormDensity } from '../form-density'
 import {
@@ -147,23 +144,18 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const chromePresentation = resolveDependentChromePresentation(dependentsChrome, rhythm)
-  const useArrayItemScope = chromePresentation.chrome === 'panel' && scope === 'arrayItems'
+  const presentation = resolveDependentPresentation(dependentsChrome, rhythm)
+  const useArrayItemScope = presentation.chrome === 'panel' && scope === 'arrayItems'
   const arrayItemContext = React.useMemo(
     () =>
       useArrayItemScope
         ? {
             ...parentContext,
-            arrayItemSurface: chromePresentation.arrayItemSurface ?? DEFAULT_DEPENDENT_SURFACE,
-            arrayItemTone: chromePresentation.arrayItemTone,
+            arrayItemSurface: presentation.arrayItemSurface ?? DEFAULT_DEPENDENT_SURFACE,
+            arrayItemTone: presentation.arrayItemTone,
           }
         : null,
-    [
-      useArrayItemScope,
-      parentContext,
-      chromePresentation.arrayItemSurface,
-      chromePresentation.arrayItemTone,
-    ],
+    [useArrayItemScope, parentContext, presentation.arrayItemSurface, presentation.arrayItemTone],
   )
 
   const dependentsContent = renderNestedItems({
@@ -177,11 +169,10 @@ function DependentFieldsRegionContent({
     <div className={fieldStackRhythmVariants({ rhythm })}>{content}</div>
   )
 
-  const chromeWrapperClassName =
-    chromePresentation.chrome !== 'none' ? chromePresentation.wrapperClassName : undefined
+  const chromeWrapperClassName = presentation.chromeWrapperClassName
 
   return (
-    <div className={fieldToggleDependentIndentClasses} data-field-dependent-fields="">
+    <div className={cn(presentation.layoutClassName)} data-field-dependent-fields="">
       {chromeWrapperClassName && scope === 'wrapper' ? (
         <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeWrapperClassName)}>
           {dependentsContent}

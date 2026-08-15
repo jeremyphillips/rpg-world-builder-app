@@ -147,7 +147,7 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     legend: RESOLUTION_SECTION_LABELS.effectsAndOutcomes,
     description: RESOLUTION_SECTION_LABELS.effectsAndOutcomesHint,
-    chrome: { variant: 'inset' },
+    chrome: { variant: 'rail' },
     visibility: visibleWhenResolutionConfigured(),
     fields: [
       {
