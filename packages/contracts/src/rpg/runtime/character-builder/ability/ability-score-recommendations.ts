@@ -1,10 +1,12 @@
 import { ABILITY_IDS, getAbilityLabel, type Ability } from '../../../vocab/ability'
+import { resolveStandardArrayAssignment } from '../../../primitives/standard-array'
 
 import {
   findAbilityAssignedToScore,
   getAssignedScoreCount,
   getAvailableStandardArrayScores,
 } from './ability-generation'
+import { resolveClassAbilityScoreOrder } from './resolve-class-ability-score-order'
 import { pluralizeTermLabel } from '../../../vocab/types'
 
 import { characterBuilderAbilityRecommendationMessages } from './ability-score-recommendation-messages'
@@ -22,6 +24,7 @@ function capitalizeLabel(label: string): string {
 export type AbilityScoreRecommendationClassInput = {
   className: string
   primaryAbilities: readonly Ability[]
+  abilityScoreOrder?: readonly Ability[]
 }
 
 export type AbilityRecommendation = {
@@ -110,29 +113,13 @@ function pairScoresToAbilitiesInOrder(
  * Deterministic full-pool assignment: abilities in class-priority order
  * (primary abilities first, then remaining ABILITY_IDS) receive pool scores in
  * descending order. Same inputs always produce the same assignment — used by
- * automatic build resolution; the interactive auto-fill keeps its shuffle.
+ * automatic build resolution for temporary Level 0 fills.
  */
 export function deriveDeterministicAbilityAssignment(
   primaryAbilities: readonly Ability[],
   scorePool: readonly number[],
 ): Partial<Record<Ability, number>> {
   return pairScoresToAbilitiesInOrder(deriveAbilityAssignmentPriority(primaryAbilities), scorePool)
-}
-
-function removeScoresFromPool(
-  pool: readonly number[],
-  scoresToRemove: readonly number[],
-): number[] {
-  const remaining = [...pool]
-
-  for (const score of scoresToRemove) {
-    const index = remaining.indexOf(score)
-    if (index !== -1) {
-      remaining.splice(index, 1)
-    }
-  }
-
-  return remaining
 }
 
 /** Fisher–Yates shuffle for score tokens; injectable randomizer for tests. */
@@ -153,16 +140,6 @@ export function shuffleAbilityScores(
   }
 
   return result
-}
-
-function deriveSuggestedAssignment(
-  primaryAbilities: readonly Ability[],
-  scoreSource: readonly number[],
-): Partial<Record<Ability, number>> | undefined {
-  if (primaryAbilities.length === 0 || scoreSource.length === 0) return undefined
-
-  const assignment = pairScoresToAbilitiesInOrder(primaryAbilities, scoreSource)
-  return Object.keys(assignment).length > 0 ? assignment : undefined
 }
 
 /** True when unassigned pool scores remain to fill empty abilities. */
@@ -189,39 +166,28 @@ export function clearAllAbilityScores(): Partial<Record<Ability, number>> {
 }
 
 /**
- * Fills only empty ability slots from the available pool. Recommended abilities
- * (primaryAbilities) receive the highest remaining scores in order; other empty
- * abilities receive the rest in shuffled order so repeated fills vary.
+ * Fills only empty ability slots from the available pool, walking the class
+ * ability order and assigning the next remaining Standard Array score for each
+ * empty ability (multiset subtraction — duplicate score values are supported).
  */
 export function fillEmptyAbilitiesWithClassRecommendations(
   currentScores: Partial<Record<Ability, number>>,
   scoreSource: readonly number[],
-  primaryAbilities: readonly Ability[],
-  shuffleScores: ScoreShuffleFn = shuffleAbilityScores,
+  abilityScoreOrder: readonly Ability[],
 ): Partial<Record<Ability, number>> {
-  const available = getAvailableStandardArrayScores(currentScores, scoreSource)
-  if (available.length === 0) return currentScores
+  const next = { ...currentScores }
 
-  const recommendedAbilities = new Set(primaryAbilities)
-  const priority = deriveAbilityAssignmentPriority(primaryAbilities)
-  const emptyRecommended = priority.filter(
-    (ability) => recommendedAbilities.has(ability) && typeof currentScores[ability] !== 'number',
-  )
-  const emptyNonRecommended = priority.filter(
-    (ability) => !recommendedAbilities.has(ability) && typeof currentScores[ability] !== 'number',
-  )
+  for (const ability of abilityScoreOrder) {
+    if (typeof next[ability] === 'number') continue
 
-  if (emptyRecommended.length === 0 && emptyNonRecommended.length === 0) {
-    return currentScores
+    const available = getAvailableStandardArrayScores(next, scoreSource)
+    const score = available[0]
+    if (score === undefined) break
+
+    next[ability] = score
   }
 
-  const recommendedPatch = pairScoresToAbilitiesInOrder(emptyRecommended, available)
-  const recommendedScores = Object.values(recommendedPatch)
-  const remainingScores = removeScoresFromPool(available, recommendedScores)
-  const shuffledScores = shuffleScores(remainingScores)
-  const nonRecommendedPatch = zipScoresToAbilitiesInOrder(emptyNonRecommended, shuffledScores)
-
-  return { ...currentScores, ...recommendedPatch, ...nonRecommendedPatch }
+  return next
 }
 
 /** Advisory recommendation from selected class(es) and optional fixed score source. */
@@ -237,10 +203,21 @@ export function deriveAbilityScoreRecommendations(
     return recommendation
   }
 
-  const allPrimaryAbilities = classes.flatMap((entry) => [...entry.primaryAbilities])
-  const suggestedAssignment = deriveSuggestedAssignment(allPrimaryAbilities, scoreSource)
+  const entry = classes[0]
+  if (!entry) return recommendation
 
-  return suggestedAssignment ? { ...recommendation, suggestedAssignment } : recommendation
+  const order = resolveClassAbilityScoreOrder({
+    abilityScoreOrder: entry.abilityScoreOrder,
+    primaryAbilities: entry.primaryAbilities,
+  })
+  const suggestedAssignment = resolveStandardArrayAssignment({
+    standardArray: scoreSource,
+    abilityScoreOrder: order,
+  })
+
+  return Object.keys(suggestedAssignment).length > 0
+    ? { ...recommendation, suggestedAssignment }
+    : recommendation
 }
 
 /** Formats the benefit sentence ability list from primaryAbilities (title-case labels). */

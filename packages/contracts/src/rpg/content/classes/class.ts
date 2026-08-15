@@ -203,13 +203,23 @@ export function subclassChoiceFeatureLevel(
 }
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
-export const createClassInputSchema = classStoredBodySchema.extend({ slug: slugSchema })
-export type CreateClassInput = z.infer<typeof createClassInputSchema>
+const createClassInputBaseSchema = classStoredBodySchema.extend({ slug: slugSchema })
+
+export const createClassInputSchema = createClassInputBaseSchema.superRefine((value, ctx) => {
+  if (value.characterCreation && value.characterCreation.abilityScoreOrder === undefined) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'characterCreation requires abilityScoreOrder on publish',
+      path: ['characterCreation', 'abilityScoreOrder'],
+    })
+  }
+})
+export type CreateClassInput = z.infer<typeof createClassInputBaseSchema>
 
 export const createClassDraftInputSchema = createDraftInputSchema(classBodyDraftSchema)
 export type CreateClassDraftInput = z.infer<typeof createClassDraftInputSchema>
 
-export const updateClassInputSchema = createClassInputSchema.partial()
+export const updateClassInputSchema = createClassInputBaseSchema.partial()
 export type UpdateClassInput = z.infer<typeof updateClassInputSchema>
 
 export const updateClassDraftInputSchema = createClassDraftInputSchema.partial()

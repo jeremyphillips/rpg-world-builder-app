@@ -8,6 +8,7 @@ import {
   characterBuilderValidationMessages,
   formatFieldMessage,
   getAlignmentLabel,
+  isClassProgressionApplicable,
   resolveAvailableContent,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
@@ -29,6 +30,7 @@ import {
   countQuickNpcConfiguredRequirementsFromArrays,
   type QuickNpcRequirementOptionSets,
 } from './quick-npc-requirement-options.lib'
+import { resolveQuickNpcDefaultLevel } from './quick-npc-create-modal-setup.lib'
 
 // ---------------------------------------------------------------------------
 // Quick NPC form — setup (species/class/level) plus authoring tabs for
@@ -50,37 +52,60 @@ export type QuickNpcSetupValues = {
   level: number
 }
 
+export function createQuickNpcSetupDefaultValues(
+  context: CharacterBuildContext,
+): QuickNpcSetupValues {
+  return {
+    speciesId: '',
+    classId: '',
+    level: resolveQuickNpcDefaultLevel(context),
+  }
+}
+
 export const EMPTY_QUICK_NPC_SETUP_VALUES: QuickNpcSetupValues = {
   speciesId: '',
   classId: '',
   level: 1,
 }
 
-export function quickNpcSetupSchema(maxLevel: number) {
-  return z.object({
-    speciesId: z
-      .string()
-      .min(1, formatFieldMessage(characterBuilderValidationMessages.speciesRequired())),
-    classId: z
-      .string()
-      .min(1, formatFieldMessage(characterBuilderValidationMessages.classRequired())),
-    level: z
-      .number({
-        message: formatFieldMessage(characterBuilderValidationMessages.levelBelowAllowedMinimum()),
-      })
-      .int()
-      .min(1, formatFieldMessage(characterBuilderValidationMessages.levelBelowAllowedMinimum()))
-      .max(
-        maxLevel,
-        formatFieldMessage(
-          characterBuilderValidationMessages.levelExceedsCampaignMaximum({ maxLevel }),
+export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
+  return z
+    .object({
+      speciesId: z
+        .string()
+        .min(1, formatFieldMessage(characterBuilderValidationMessages.speciesRequired())),
+      classId: z.string(),
+      level: z
+        .number({
+          message: formatFieldMessage(
+            characterBuilderValidationMessages.levelBelowAllowedMinimum(),
+          ),
+        })
+        .int()
+        .min(
+          minLevel,
+          formatFieldMessage(characterBuilderValidationMessages.levelBelowAllowedMinimum()),
+        )
+        .max(
+          maxLevel,
+          formatFieldMessage(
+            characterBuilderValidationMessages.levelExceedsCampaignMaximum({ maxLevel }),
+          ),
         ),
-      ),
-  })
+    })
+    .superRefine((values, ctx) => {
+      if (isClassProgressionApplicable(values.level) && values.classId.trim().length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          message: formatFieldMessage(characterBuilderValidationMessages.classRequired()),
+          path: ['classId'],
+        })
+      }
+    })
 }
 
-export function quickNpcAuthoringSchema(maxLevel: number) {
-  return quickNpcSetupSchema(maxLevel).extend({
+export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
+  return quickNpcSetupSchema(maxLevel, minLevel).extend({
     name: z
       .string()
       .trim()
@@ -142,7 +167,9 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
   return {
     name: values.name,
     speciesId: values.speciesId,
-    classId: values.classId,
+    ...(isClassProgressionApplicable(values.level) && values.classId
+      ? { classId: values.classId }
+      : {}),
     level: values.level,
     alignment: values.alignment,
   }

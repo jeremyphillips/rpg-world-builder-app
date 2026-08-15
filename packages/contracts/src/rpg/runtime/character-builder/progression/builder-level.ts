@@ -1,11 +1,18 @@
 import type { CharacterKind } from '../../character-acquisition/kind'
 import type { CharacterRulesScope } from '../../character-acquisition/scope'
+import { proficiencyBonus } from '../../../primitives/level'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext, ResolvedCharacterCreationRules } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
+
+import {
+  isClassProgressionApplicable,
+  isLevelZeroNpcPermitted,
+  resolveCharacterLevelConstraints,
+} from './character-level-policy'
 
 // ---------------------------------------------------------------------------
 // Builder level — total vs selected starting level semantics.
@@ -29,7 +36,9 @@ export function getBuilderSelectedStartingLevel(draft: CharacterBuilderDraft): n
   return draft.class.level
 }
 
-export function resolveBuilderMaxAllowedLevel(rules: ResolvedCharacterCreationRules): number {
+export function resolveBuilderMaxAllowedLevel(
+  rules: Pick<ResolvedCharacterCreationRules, 'progression'>,
+): number {
   const { progression } = rules
   return progression.extendedProgression?.maxLevel ?? progression.maxCharacterLevel
 }
@@ -42,28 +51,15 @@ export type BuilderLevelConstraints = {
   allowedLevels?: number[]
 }
 
+/** @deprecated Use {@link resolveCharacterLevelConstraints} — kept for existing imports. */
 export function resolveBuilderLevelConstraints(
   context: CharacterBuildContext,
 ): BuilderLevelConstraints {
-  const maxLevel = resolveBuilderMaxAllowedLevel(context.characterCreationRules)
-  const isCampaignPc = context.characterKind === 'pc' && context.rulesScope.type === 'campaign'
-
-  if (isCampaignPc) {
-    const fixedLevel = context.characterCreationRules.startingLevel
-    return {
-      mode: 'fixed',
-      fixedLevel,
-      minLevel: fixedLevel,
-      maxLevel: fixedLevel,
-      allowedLevels: [fixedLevel],
-    }
-  }
-
-  return {
-    mode: 'selectable',
-    minLevel: 1,
-    maxLevel,
-  }
+  return resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  })
 }
 
 export type ValidateBuilderCharacterLevelInput = {
@@ -73,22 +69,51 @@ export type ValidateBuilderCharacterLevelInput = {
   characterCreationRules: ResolvedCharacterCreationRules
 }
 
+const LEVEL_FIELD = { path: 'class.level', stepId: 'class' as const }
+
+function levelZeroNotPermittedIssue(): CharacterBuildValidationIssue {
+  return validationIssue(
+    'level_zero_not_permitted',
+    formatFieldMessage(characterBuilderValidationMessages.levelZeroNotPermitted()),
+    LEVEL_FIELD,
+  )
+}
+
+function validateLevelZeroIssues(
+  input: ValidateBuilderCharacterLevelInput,
+): CharacterBuildValidationIssue[] {
+  if (input.level !== 0) return []
+
+  const pcAtLevelZero = input.characterKind === 'pc'
+  const npcWithoutFeature =
+    input.characterKind === 'npc' && !input.characterCreationRules.levelZeroNpcs.enabled
+
+  return pcAtLevelZero || npcWithoutFeature ? [levelZeroNotPermittedIssue()] : []
+}
+
 export function validateBuilderCharacterLevel(
   input: ValidateBuilderCharacterLevelInput,
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
   const maxLevel = resolveBuilderMaxAllowedLevel(input.characterCreationRules)
+  const { minLevel } = resolveCharacterLevelConstraints({
+    characterKind: input.characterKind,
+    rulesScope: input.rulesScope,
+    characterCreationRules: input.characterCreationRules,
+  })
   const isCampaignPc = input.characterKind === 'pc' && input.rulesScope.type === 'campaign'
 
-  if (input.level < 1) {
+  if (input.level < minLevel) {
     issues.push(
       validationIssue(
         'level_below_allowed_minimum',
         formatFieldMessage(characterBuilderValidationMessages.levelBelowAllowedMinimum()),
-        { path: 'class.level', stepId: 'class' },
+        LEVEL_FIELD,
       ),
     )
   }
+
+  issues.push(...validateLevelZeroIssues(input))
 
   if (input.level > maxLevel) {
     issues.push(
@@ -97,7 +122,7 @@ export function validateBuilderCharacterLevel(
         formatFieldMessage(
           characterBuilderValidationMessages.levelExceedsCampaignMaximum({ maxLevel }),
         ),
-        { path: 'class.level', stepId: 'class' },
+        LEVEL_FIELD,
       ),
     )
   }
@@ -111,10 +136,25 @@ export function validateBuilderCharacterLevel(
             startingLevel: input.characterCreationRules.startingLevel,
           }),
         ),
-        { path: 'class.level', stepId: 'class' },
+        LEVEL_FIELD,
       ),
     )
   }
 
   return issues
+}
+
+export function resolveBuilderProficiencyBonus(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+): number | undefined {
+  if (draft.class.level === 0 && isLevelZeroNpcPermitted(context)) {
+    return context.characterCreationRules.levelZeroNpcs.proficiencyBonus
+  }
+
+  if (!isClassProgressionApplicable(draft.class.level)) {
+    return undefined
+  }
+
+  return proficiencyBonus(draft.class.level)
 }

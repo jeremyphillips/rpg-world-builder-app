@@ -28,7 +28,9 @@ import {
   mapRulesetPatchToRulesValues,
 } from './rules/character-configuration/character-configuration-form-values'
 import { languageProficiencyRulesDefaultValues } from './rules/character-configuration/language-proficiency-form-values'
+import { levelZeroNpcsDefaultFormValues } from './rules/character-configuration/level-zero-npc-form-values'
 import { mapStartingWealthToFormValues } from './rules/character-configuration/starting-wealth-form-values'
+import { standardArrayDefaultFormValues } from '@/lib/forms/standard-array-form-values'
 
 const defaultStartingWealth = mapStartingWealthToFormValues(
   getStandardStartingWealthRules('srd-cc-5.2.1'),
@@ -77,7 +79,9 @@ const defaultMulticlassingFields = {
   speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
   startingWealth: defaultStartingWealth,
+  standardArray: standardArrayDefaultFormValues(),
   ...languageProficiencyRulesDefaultValues(),
+  ...levelZeroNpcsDefaultFormValues(),
 } as const
 
 describe('mapCampaignToSettingsValues', () => {
@@ -194,7 +198,9 @@ describe('buildCharacterCreationPatchInput', () => {
         speciesLevelLimitsEnabled: false,
         subclassChoicesEnabled: true,
         startingWealth: defaultStartingWealth,
+        standardArray: standardArrayDefaultFormValues(),
         ...languageProficiencyRulesDefaultValues(),
+        ...levelZeroNpcsDefaultFormValues(),
       }),
     ).toEqual({
       startingLevel: 1,
@@ -238,7 +244,9 @@ describe('buildCharacterCreationPatchInput', () => {
           speciesLevelLimitsEnabled: true,
           subclassChoicesEnabled: true,
           startingWealth: defaultStartingWealth,
+          standardArray: standardArrayDefaultFormValues(),
           ...languageProficiencyRulesDefaultValues(),
+          ...levelZeroNpcsDefaultFormValues(),
         },
         { includeDefaultMulticlassing: true },
       ),
@@ -368,7 +376,9 @@ describe('mapRulesetPatchToRulesValues', () => {
       speciesLevelLimitsEnabled: false,
       subclassChoicesEnabled: true,
       startingWealth: defaultStartingWealth,
+      standardArray: standardArrayDefaultFormValues(),
       ...languageProficiencyRulesDefaultValues(),
+      ...levelZeroNpcsDefaultFormValues(),
     })
   })
 })

@@ -26,6 +26,7 @@ import {
   getAvailableStandardArrayScores,
   mergeSuggestedAssignmentIntoScores,
   resolveAbilityScorePoolActionState,
+  resolveClassAbilityScoreOrder,
   type Ability,
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
@@ -95,6 +96,7 @@ export type FixedScoresAssignmentProps = {
   scorePool: readonly number[]
   showInvalidStates?: boolean
   classInput?: AbilityScoreRecommendationClassInput | null
+  classStepApplicable?: boolean
   recommendation?: AbilityScoreRecommendation | null
 }
 
@@ -354,6 +356,7 @@ export function FixedScoresAssignment({
   scorePool,
   showInvalidStates = false,
   classInput = null,
+  classStepApplicable = false,
   recommendation = null,
 }: FixedScoresAssignmentProps) {
   const introId = useId()
@@ -473,7 +476,14 @@ export function FixedScoresAssignment({
     }
 
     syncScoresToForm(
-      fillEmptyAbilitiesWithClassRecommendations(scores, scorePool, classInput.primaryAbilities),
+      fillEmptyAbilitiesWithClassRecommendations(
+        scores,
+        scorePool,
+        resolveClassAbilityScoreOrder({
+          abilityScoreOrder: classInput.abilityScoreOrder,
+          primaryAbilities: classInput.primaryAbilities,
+        }),
+      ),
     )
   }, [classInput, form, poolActionState, scorePool, scores, syncScoresToForm])
 
@@ -546,6 +556,7 @@ export function FixedScoresAssignment({
 
       <AbilityRecommendationPanel
         classInput={classInput}
+        classStepApplicable={classStepApplicable}
         recommendation={recommendation}
         currentScores={scores}
         showSuggestedAssignment

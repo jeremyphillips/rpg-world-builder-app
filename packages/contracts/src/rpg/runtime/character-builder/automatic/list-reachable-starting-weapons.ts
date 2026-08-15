@@ -112,6 +112,8 @@ export function listReachableStartingWeapons(args: {
   seed: Pick<AutomaticNpcBuildSeed, 'classId'>
   context: CharacterBuildContext
 }): ReachableStartingWeaponOption[] {
+  if (!args.seed.classId) return []
+
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const characterClass = catalogIndex.classes.get(args.seed.classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment

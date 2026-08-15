@@ -824,6 +824,27 @@ describe('SRD 5.2.1 class seed', () => {
     ])
   })
 
+  it('stores explicit SRD ability score order on every class', () => {
+    const expectedOrders: Record<string, string[]> = {
+      barbarian: ['str', 'con', 'dex', 'wis', 'int', 'cha'],
+      bard: ['cha', 'dex', 'int', 'con', 'wis', 'str'],
+      cleric: ['wis', 'str', 'con', 'cha', 'int', 'dex'],
+      druid: ['wis', 'con', 'int', 'dex', 'cha', 'str'],
+      fighter: ['str', 'dex', 'con', 'cha', 'wis', 'int'],
+      monk: ['dex', 'wis', 'con', 'str', 'int', 'cha'],
+      paladin: ['str', 'cha', 'con', 'wis', 'dex', 'int'],
+      ranger: ['dex', 'wis', 'con', 'str', 'cha', 'int'],
+      rogue: ['dex', 'int', 'con', 'str', 'wis', 'cha'],
+      sorcerer: ['cha', 'con', 'dex', 'wis', 'str', 'int'],
+      warlock: ['cha', 'dex', 'con', 'int', 'wis', 'str'],
+      wizard: ['int', 'wis', 'con', 'dex', 'cha', 'str'],
+    }
+
+    for (const cls of classes) {
+      expect(cls.characterCreation?.abilityScoreOrder, cls.slug).toEqual(expectedOrders[cls.slug])
+    }
+  })
+
   it('wealth-only starting-gold alternatives match SRD starting wealth amounts', () => {
     const expectedGoldGp: Record<string, number> = {
       barbarian: 75,

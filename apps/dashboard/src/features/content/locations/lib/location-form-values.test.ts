@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import {
-  createLocationInputSchema,
-  defaultMulticlassingRules,
-  defaultSubclassingRules,
-} from '@rpg/contracts'
+import { createLocationInputSchema } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
   canonicalFieldsForAuthoringType,
@@ -24,13 +21,7 @@ const baseLocationCreateCtx: LocationFormCtx = {
   campaignId: 'campaign-1',
   mode: 'create',
   entitySource: 'homebrew',
-  campaignRules: {
-    maxCharacterLevel: 20,
-    standardMaxCharacterLevel: 20,
-    allowedCharacterCreatureTypes: ['humanoid'],
-    multiclassing: defaultMulticlassingRules(),
-    subclassing: defaultSubclassingRules(),
-  },
+  campaignRules: defaultCampaignRules(),
 }
 
 describe('locationToFormValues', () => {

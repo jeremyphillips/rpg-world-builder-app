@@ -84,6 +84,18 @@ vi.mock('../hooks/use-patch-mechanics-mutation', () => ({
   })),
 }))
 
+vi.mock('@/features/content', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>
+  return {
+    ...actual,
+    useEquipment: vi.fn(() => ({
+      data: [],
+      isPending: false,
+      isError: false,
+    })),
+  }
+})
+
 import { useCanManageCampaign } from '@/features/campaign'
 
 import * as rulesConfigRegistry from '../lib/hub/rules-config-registry'

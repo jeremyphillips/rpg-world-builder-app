@@ -5,6 +5,8 @@ export type CharacterSummaryParts = {
     name: string
     heritageName?: string
   }
+  /** When set with empty classes, renders a classless level segment (e.g. Level 0). */
+  classlessLevel?: number
   classes: readonly {
     name: string
     level: number
@@ -40,6 +42,9 @@ export function formatCharacterSummarySegments(parts: CharacterSummaryParts): st
 
   const classes = parts.classes.filter((entry) => entry.name.trim().length > 0)
   if (classes.length === 0) {
+    if (parts.classlessLevel !== undefined) {
+      segments.push(`Level ${parts.classlessLevel}`)
+    }
     return segments
   }
 

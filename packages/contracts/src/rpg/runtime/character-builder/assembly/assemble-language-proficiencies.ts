@@ -13,8 +13,14 @@ import {
 import type { CharacterProficiencies } from '../../character/proficiencies'
 import type { CharacterSelectionSource } from '../../character/selection-sources'
 import type { ChoiceSet } from '../choice-set'
-import type { CharacterBuildContext } from '../context'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
+import {
+  LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE,
+  levelZeroBaselineLanguageIds,
+  levelZeroSpeciesLanguageIds,
+} from './level-zero-baseline-proficiency-entries'
 
 // ---------------------------------------------------------------------------
 // Character Builder language finalization — orchestrates creature primitives,
@@ -102,6 +108,8 @@ export function assembleLanguageProficiencyEntries(
   languages: readonly LanguageSeedOption[],
   choiceSets: readonly ChoiceSet[],
   characterClass?: CharacterClass,
+  buildContext?: CharacterBuildContext,
+  catalogIndex?: CharacterBuildCatalogIndex,
 ): CharacterProficiencies['languages'] {
   const grantSources = characterCreationLanguageGrantSources(context.rulesetId)
   const grantedIds = grantedLanguageIds(context, languages)
@@ -132,5 +140,22 @@ export function assembleLanguageProficiencyEntries(
     ? classFeatureLanguageProficiencies(characterClass, draft.class.level)
     : []
 
-  return mergeLanguageProficiencyEntries([...entries, ...classFeatureEntries])
+  const levelZeroEntries: CharacterProficiencies['languages'] = []
+  if (buildContext && isBuilderLevelZeroClassless(draft, buildContext)) {
+    const rules = buildContext.characterCreationRules.levelZeroNpcs
+    const species = draft.species.speciesId
+      ? catalogIndex?.species.get(draft.species.speciesId)
+      : undefined
+    const baselineIds = levelZeroBaselineLanguageIds(rules, languages)
+    const speciesIds = levelZeroSpeciesLanguageIds(species, rules)
+
+    for (const language of [...new Set([...baselineIds, ...speciesIds])]) {
+      levelZeroEntries.push({
+        language,
+        sources: LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE,
+      })
+    }
+  }
+
+  return mergeLanguageProficiencyEntries([...entries, ...classFeatureEntries, ...levelZeroEntries])
 }

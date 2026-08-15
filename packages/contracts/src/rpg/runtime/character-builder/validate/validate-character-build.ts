@@ -17,6 +17,7 @@ import type {
 import { validateChoiceSetsForStep } from './validate-choice-sets'
 import { validateEquipment } from './validate-equipment'
 import { validateEquipmentPurchases } from './validate-equipment-purchases'
+import { resolveBuilderStandardArray } from '../ability/resolve-builder-standard-array'
 import {
   validateAbilities,
   validateClass,
@@ -65,7 +66,7 @@ const STEP_VALIDATORS: Record<
   ],
   class: (draft, context) => validateClass(draft, context),
   abilities: (draft, context) =>
-    validateAbilities(draft, context.characterCreationRules.abilityGeneration.standardArray),
+    validateAbilities(draft, resolveBuilderStandardArray(context, draft.class.level)),
   proficiencies: (draft, context, choiceSets) =>
     validateChoiceSetsForStep(draft, context, choiceSets, 'proficiencies'),
   equipment: (draft, context, choiceSets) => [

@@ -1,8 +1,10 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { CharacterWeaponProficiencyEntry } from '../../character/proficiencies'
 import type { ChoiceSet } from '../choice-set'
-import type { CharacterBuildCatalogIndex } from '../context'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
+import { levelZeroBaselineWeaponEntries } from './level-zero-baseline-proficiency-entries'
 import { assembleGrantWeaponProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 
@@ -104,10 +106,20 @@ export function assembleWeaponProficiencyEntries(
   catalogIndex: CharacterBuildCatalogIndex,
   choiceSets: readonly ChoiceSet[],
   characterClass: CharacterClass | undefined,
+  context?: CharacterBuildContext,
 ): CharacterWeaponProficiencyEntry[] {
   const classEntries = characterClass ? classFixedWeaponProficiencies(characterClass) : []
   const grantEntries = assembleGrantWeaponProficiencyEntries(draft, catalogIndex, characterClass)
   const selectedEntries = selectedWeaponProficiencies(draft, catalogIndex, choiceSets)
+  const levelZeroEntries =
+    context && isBuilderLevelZeroClassless(draft, context)
+      ? levelZeroBaselineWeaponEntries(context.characterCreationRules.levelZeroNpcs)
+      : []
 
-  return mergeWeaponProficiencyEntries([...classEntries, ...grantEntries, ...selectedEntries])
+  return mergeWeaponProficiencyEntries([
+    ...levelZeroEntries,
+    ...classEntries,
+    ...grantEntries,
+    ...selectedEntries,
+  ])
 }

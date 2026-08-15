@@ -1,4 +1,9 @@
-import { type CharacterClass, type CreateClassInput } from '@rpg/contracts'
+import {
+  resolveClassAbilityScoreOrder,
+  type AbilityScoreOrder,
+  type CharacterClass,
+  type CreateClassInput,
+} from '@rpg/contracts'
 
 import {
   contentFormRegistry,
@@ -27,6 +32,28 @@ import {
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
+
+function characterCreationToFormValues(
+  entity: CharacterClass,
+): ClassFormValues['characterCreation'] {
+  const primaryAbilities = entity.primaryAbilities?.length
+    ? entity.primaryAbilities
+    : classCreateDefaultValues.primaryAbilities!
+
+  return {
+    proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
+    abilityScoreOrder: entity.characterCreation?.abilityScoreOrder
+      ? ([...entity.characterCreation.abilityScoreOrder] as AbilityScoreOrder)
+      : resolveClassAbilityScoreOrder({ primaryAbilities }),
+    ...(entity.characterCreation?.startingEquipment
+      ? {
+          startingEquipment: startingEquipmentToFormValues(
+            entity.characterCreation.startingEquipment,
+          ),
+        }
+      : {}),
+  }
+}
 
 const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
   routeKey: 'classes',
@@ -60,16 +87,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
       : classCreateDefaultValues.proficiencies!,
     features: entity.features.map(featureToFormRow),
     resources: entity.resources?.map(resourceToFormRow) ?? [],
-    characterCreation: {
-      proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
-      ...(entity.characterCreation?.startingEquipment
-        ? {
-            startingEquipment: startingEquipmentToFormValues(
-              entity.characterCreation.startingEquipment,
-            ),
-          }
-        : {}),
-    },
+    characterCreation: characterCreationToFormValues(entity),
   }),
 
   toInput: (values, ctx, validationIntent = 'publish') =>

@@ -115,6 +115,17 @@ describe('ContentEntityCard', () => {
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
   })
 
+  it('renders headingEndValue when provided, including zero', () => {
+    render(
+      <MemoryRouter>
+        <ContentEntityCard entity={{ heading: 'Strength' }} headingEndValue={0} density="compact" />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.getByText('Strength')).toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <MemoryRouter>

@@ -27,6 +27,8 @@ export type EntityItemAnatomyProps = {
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityItemTrailing
   density?: ContentCardDensity
+  /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
+  headingEndValue?: number
 }
 
 export type EntityItemProps = {
@@ -63,6 +65,7 @@ export function EntityItemAnatomy({
   leadingUtilities,
   trailing,
   density = 'comfortable',
+  headingEndValue,
 }: EntityItemAnatomyProps) {
   const resolvedEntity = resolveLinkedHeading(entity, headingHref)
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
@@ -81,6 +84,7 @@ export function EntityItemAnatomy({
           entity={resolvedEntity}
           density={density}
           headingBand={hasControlChrome ? 'control' : 'natural'}
+          headingEndValue={headingEndValue}
         />
       </div>
       {trailing ? (

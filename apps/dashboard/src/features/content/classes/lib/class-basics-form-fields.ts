@@ -1,7 +1,11 @@
+import { createElement } from 'react'
 import { ABILITY_ENTRIES, ABILITY_IDS, CLASS_HIT_DICE, formatHitDie } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
+import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { HIT_DIE_SELECT_DIGITS } from '../../lib/form-options/level-field-options'
+import { SuggestedAbilityScoreOrderSlot } from '../components/suggested-ability-score-order-slot.client'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -16,7 +20,9 @@ const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   label: formatHitDie(face),
 }))
 
-export function coreAttributesFields(): FormItem[] {
+export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
+  const campaignRules = campaignRulesFromCtx(ctx)
+
   return [
     {
       kind: 'row',
@@ -41,6 +47,17 @@ export function coreAttributesFields(): FormItem[] {
           width: 'auto',
         },
       ],
+    },
+    {
+      kind: 'slot',
+      name: 'characterCreation.abilityScoreOrder',
+      label: 'Suggested ability scores',
+      hint: "Reorder abilities to define how this class assigns the campaign's Standard Array.",
+      className: 'w-full sm:w-1/2',
+      render: () =>
+        createElement(SuggestedAbilityScoreOrderSlot, {
+          standardArray: [...campaignRules.standardArray],
+        }),
     },
   ]
 }

@@ -10,6 +10,7 @@ import {
   isBuilderStepComplete,
   isChoiceStep,
   resolveEffectiveBuilderSteps,
+  isEffectiveBuilderStep,
   resolveBuilderStepDescription,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
@@ -496,6 +497,22 @@ describe('resolveBuilderStepDescription', () => {
     expect(resolveBuilderStepDescription(context, 'review')).toBe(
       'Review and add this NPC to your campaign',
     )
+  })
+})
+
+describe('isEffectiveBuilderStep', () => {
+  it('returns true when the step is in the effective flow', () => {
+    const context = createCharacterBuildContext()
+    const draft = makeDraft()
+
+    expect(isEffectiveBuilderStep(context, draft, 'class')).toBe(true)
+  })
+
+  it('returns false when the step is filtered out of the effective flow', () => {
+    const context = createCharacterBuildContext()
+    const draft = makeDraft({ class: { classId: undefined, level: 0 } })
+
+    expect(isEffectiveBuilderStep(context, draft, 'class')).toBe(false)
   })
 })
 

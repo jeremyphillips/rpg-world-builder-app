@@ -1,3 +1,4 @@
+import { isClassProgressionApplicable } from '../../progression/character-level-policy'
 import { characterBuilderStepReadinessMessages } from '../../messages/character-builder-messages'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
@@ -107,7 +108,7 @@ export function resolveEquipmentStepReadiness(
   resolvedChoiceSets: readonly ChoiceSet[],
   context: CharacterBuildContext,
 ): BuilderStepReadinessState {
-  if (!draft.class.classId) {
+  if (!draft.class.classId && isClassProgressionApplicable(draft.class.level)) {
     return {
       readiness: 'blocked',
       message: formatStepReadinessMessage(
@@ -135,8 +136,10 @@ export function resolveEquipmentStepReadiness(
 
   const classId = draft.class.classId
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  const optionBlock = resolveStartingEquipmentOptionStepBlock({ draft, classId, catalogIndex })
-  if (optionBlock) return optionBlock
+  if (classId) {
+    const optionBlock = resolveStartingEquipmentOptionStepBlock({ draft, classId, catalogIndex })
+    if (optionBlock) return optionBlock
+  }
 
   const magicItemBlock = resolveMagicItemGrantStepBlock({ draft, context })
   if (magicItemBlock) return magicItemBlock

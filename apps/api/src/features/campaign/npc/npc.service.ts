@@ -6,7 +6,7 @@ import type {
   CreateNpcRequestInput,
   CreateNpcServiceInput,
 } from '@rpg/contracts'
-import { createDefaultCampaignRosterState } from '@rpg/contracts'
+import { createDefaultCampaignRosterState, getCharacterTotalLevel } from '@rpg/contracts'
 
 import { findCampaignById } from '../find-campaign-by-id'
 import {
@@ -19,6 +19,7 @@ import {
 } from '../../character'
 import { HttpError } from '../../../lib/http-error'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
+import { getRulesetPatchRead } from '../../vocabulary'
 import {
   createParticipation,
   deleteAllParticipationsForCharacter,
@@ -42,6 +43,22 @@ function assertNpcIntegrity(
   }
 }
 
+async function assertLevelZeroNpcCreatePermitted(
+  campaignId: string,
+  input: CreateNpcRequestInput,
+): Promise<void> {
+  if (getCharacterTotalLevel(input) !== 0) return
+
+  if (input.classes.length > 0) {
+    throw HttpError.badRequest('Level 0 NPCs cannot have classes.')
+  }
+
+  const rules = await getRulesetPatchRead(campaignId)
+  if (!rules?.characterCreation.levelZeroNpcs.enabled) {
+    throw HttpError.badRequest('Level 0 NPCs are not enabled for this campaign.')
+  }
+}
+
 export async function createCampaignNpc(
   campaignId: string,
   input: CreateNpcRequestInput,
@@ -56,6 +73,7 @@ export async function createCampaignNpc(
   }
 
   assertNpcCreateRequestRestrictions(input)
+  await assertLevelZeroNpcCreatePermitted(campaignId, input)
 
   const serviceInput: CreateNpcServiceInput = {
     ...input,

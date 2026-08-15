@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { CharacterClass } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { pickClass } from '../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
@@ -76,10 +76,7 @@ describe('ClassProgressionTable', () => {
       <ClassProgressionTable
         characterClass={pickClass('bard')}
         campaignRules={{
-          maxCharacterLevel: 20,
-          standardMaxCharacterLevel: 20,
-          allowedCharacterCreatureTypes: ['humanoid'],
-          multiclassing: defaultMulticlassingRules(),
+          ...defaultCampaignRules(),
           subclassing: { enabled: false },
         }}
       />,
@@ -130,11 +127,8 @@ describe('ClassProgressionTable', () => {
       <ClassProgressionTable
         characterClass={pickClass('bard')}
         campaignRules={{
+          ...defaultCampaignRules(),
           maxCharacterLevel: 30,
-          standardMaxCharacterLevel: 20,
-          allowedCharacterCreatureTypes: ['humanoid'],
-          multiclassing: defaultMulticlassingRules(),
-          subclassing: defaultSubclassingRules(),
           extendedProgression: {
             tierName: 'Epic Destiny',
             startsAt: 21,
@@ -154,11 +148,9 @@ describe('ClassProgressionTable', () => {
       <ClassProgressionTable
         characterClass={pickClass('bard')}
         campaignRules={{
+          ...defaultCampaignRules(),
           maxCharacterLevel: 25,
           standardMaxCharacterLevel: 25,
-          allowedCharacterCreatureTypes: ['humanoid'],
-          multiclassing: defaultMulticlassingRules(),
-          subclassing: defaultSubclassingRules(),
         }}
       />,
     )

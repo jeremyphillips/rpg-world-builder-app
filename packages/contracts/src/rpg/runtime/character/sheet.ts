@@ -6,6 +6,7 @@ import {
   characterClassesSchema,
   characterHitPointsSchema,
   characterSpeciesSchema,
+  npcCharacterClassesSchema,
 } from './core'
 import {
   characterEquipmentSchema,
@@ -24,12 +25,11 @@ import { characterConnectionsSchema } from './connections'
 // services/builders from class, species, feat, spell, and equipment content.
 // ---------------------------------------------------------------------------
 
-const characterBaseSchema = z.object({
+const characterBaseFields = {
   id: z.string().min(1),
   name: z.string().min(1),
   imageKey: z.string().optional(),
   rulesetId: z.string().min(1),
-  classes: characterClassesSchema,
   species: characterSpeciesSchema,
   alignment: alignmentSchema,
   xp: z.number().int().min(0).nullable(),
@@ -45,16 +45,20 @@ const characterBaseSchema = z.object({
   vital: characterVitalStateSchema,
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
-})
+} as const
 
-export const pcCharacterSchema = characterBaseSchema.extend({
+export const pcCharacterSchema = z.object({
+  ...characterBaseFields,
+  classes: characterClassesSchema,
   characterType: z.literal('pc'),
   userId: z.string().min(1),
 })
 
 export type PcCharacter = z.infer<typeof pcCharacterSchema>
 
-export const npcCharacterSchema = characterBaseSchema.extend({
+export const npcCharacterSchema = z.object({
+  ...characterBaseFields,
+  classes: npcCharacterClassesSchema,
   characterType: z.literal('npc'),
   userId: z.never().optional(),
 })

@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
-  STANDARD_ARRAY,
+  DEFAULT_STANDARD_ARRAY,
   characterBuilderAbilityRecommendationMessages,
   formatFieldMessage,
 } from '@rpg/contracts'
@@ -108,7 +108,7 @@ describe('FixedScoresAssignment', () => {
     expect(pool.getByText('6 scores remaining')).toBeInTheDocument()
     expect(container.querySelector('.border-dashed')).toBeInTheDocument()
 
-    for (const score of STANDARD_ARRAY) {
+    for (const score of DEFAULT_STANDARD_ARRAY) {
       expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
     }
   })
@@ -345,7 +345,7 @@ describe('FixedScoresAssignment', () => {
     })
 
     const pool = within(getScorePoolSection())
-    for (const score of STANDARD_ARRAY) {
+    for (const score of DEFAULT_STANDARD_ARRAY) {
       expect(pool.getByRole('button', { name: `Score ${score}` })).toBeInTheDocument()
     }
   })

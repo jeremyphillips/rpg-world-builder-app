@@ -1,6 +1,7 @@
 import {
   characterBuilderLevelMessages,
   formatFieldMessage,
+  sanitizeClassForLevel,
   type BuilderLevelConstraints,
   type BuilderSelectionRemoval,
   type CharacterBuildContext,
@@ -61,9 +62,11 @@ export function evaluateBuilderLevelChange(
     return { kind: 'unchanged' }
   }
 
-  const candidateDraft = mergeCharacterBuilderDraft(draft, {
-    class: { ...draft.class, level },
-  })
+  const candidateDraft = sanitizeClassForLevel(
+    mergeCharacterBuilderDraft(draft, {
+      class: { ...draft.class, level },
+    }),
+  )
   const { nextDraft, removedSelections } = pruneInvalidBuilderSelections(candidateDraft, context)
 
   if (removedSelections.length === 0) {

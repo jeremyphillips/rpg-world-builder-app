@@ -1,3 +1,4 @@
+import { isClassProgressionApplicable } from '../../progression/character-level-policy'
 import { characterBuilderStepReadinessMessages } from '../../messages/character-builder-messages'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuilderDraft } from '../../draft/draft'
@@ -12,7 +13,7 @@ export function resolveProficienciesStepReadiness(
   draft: CharacterBuilderDraft,
   resolvedChoiceSets: readonly ChoiceSet[],
 ): BuilderStepReadinessState {
-  if (!draft.class.classId) {
+  if (!draft.class.classId && isClassProgressionApplicable(draft.class.level)) {
     return {
       readiness: 'blocked',
       classDependentBlocked: true,

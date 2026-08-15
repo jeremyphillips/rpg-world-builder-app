@@ -58,92 +58,65 @@ describe('canAutoFillEmptyAbilities', () => {
 
 describe('fillEmptyAbilitiesWithClassRecommendations', () => {
   const source = [15, 14, 13, 12, 10, 8] as const
-  const fighterPrimary = ['str', 'dex'] as const
-  const identityShuffle = (scores: readonly number[]) => [...scores]
+  const fighterOrder = ['str', 'dex', 'con', 'cha', 'wis', 'int'] as const
 
-  it('fills recommended abilities deterministically and shuffles non-recommended scores', () => {
-    const result = fillEmptyAbilitiesWithClassRecommendations(
-      {},
-      source,
-      fighterPrimary,
-      identityShuffle,
-    )
+  it('fills empty abilities by walking the class ability order', () => {
+    const result = fillEmptyAbilitiesWithClassRecommendations({}, source, fighterOrder)
 
     expect(result).toEqual({
       str: 15,
       dex: 14,
       con: 13,
-      int: 12,
+      cha: 12,
       wis: 10,
-      cha: 8,
+      int: 8,
     })
   })
 
-  it('produces different non-recommended assignments when shuffle order changes', () => {
-    const identityShuffle = (scores: readonly number[]) => [...scores]
-    const reverseShuffle = (scores: readonly number[]) => [...scores].reverse()
-
-    const first = fillEmptyAbilitiesWithClassRecommendations(
-      {},
-      source,
-      fighterPrimary,
-      identityShuffle,
-    )
-    const second = fillEmptyAbilitiesWithClassRecommendations(
-      {},
-      source,
-      fighterPrimary,
-      reverseShuffle,
-    )
-
-    expect(first.str).toBe(15)
-    expect(first.dex).toBe(14)
-    expect(second.str).toBe(15)
-    expect(second.dex).toBe(14)
-    expect(first).not.toEqual(second)
-  })
-
-  it('preserves existing assignments and fills recommended abilities next', () => {
-    expect(
-      fillEmptyAbilitiesWithClassRecommendations(
-        { con: 15 },
-        source,
-        fighterPrimary,
-        identityShuffle,
-      ),
-    ).toEqual({
+  it('preserves existing assignments and fills the next slots in order', () => {
+    expect(fillEmptyAbilitiesWithClassRecommendations({ con: 15 }, source, fighterOrder)).toEqual({
       con: 15,
       str: 14,
       dex: 13,
-      int: 12,
+      cha: 12,
       wis: 10,
-      cha: 8,
+      int: 8,
     })
   })
 
   it('does not overwrite assigned abilities', () => {
     expect(
-      fillEmptyAbilitiesWithClassRecommendations(
-        { str: 8, con: 15 },
-        source,
-        fighterPrimary,
-        identityShuffle,
-      ),
+      fillEmptyAbilitiesWithClassRecommendations({ str: 8, con: 15 }, source, fighterOrder),
     ).toEqual({
       str: 8,
       con: 15,
       dex: 14,
-      int: 13,
+      cha: 13,
       wis: 12,
-      cha: 10,
+      int: 10,
     })
   })
 
   it('returns current scores unchanged when the pool is empty', () => {
     const current = { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 }
+    expect(fillEmptyAbilitiesWithClassRecommendations(current, source, fighterOrder)).toEqual(
+      current,
+    )
+  })
+
+  it('treats duplicate score values as a multiset when auto-filling', () => {
+    const duplicateSource = [15, 14, 14, 12, 10, 8] as const
+
     expect(
-      fillEmptyAbilitiesWithClassRecommendations(current, source, fighterPrimary, identityShuffle),
-    ).toEqual(current)
+      fillEmptyAbilitiesWithClassRecommendations({ str: 15 }, duplicateSource, fighterOrder),
+    ).toEqual({
+      str: 15,
+      dex: 14,
+      con: 14,
+      cha: 12,
+      wis: 10,
+      int: 8,
+    })
   })
 })
 
@@ -202,7 +175,29 @@ describe('deriveAbilityScoreRecommendations', () => {
     })
   })
 
-  it('pairs highest source-array scores with primaryAbilities in order', () => {
+  it('derives the full suggested assignment from explicit class ability order', () => {
+    const result = deriveAbilityScoreRecommendations(
+      [
+        {
+          className: 'Fighter',
+          primaryAbilities: ['str', 'dex'],
+          abilityScoreOrder: ['str', 'dex', 'con', 'cha', 'wis', 'int'],
+        },
+      ],
+      [15, 14, 13, 12, 10, 8],
+    )
+
+    expect(result?.suggestedAssignment).toEqual({
+      str: 15,
+      dex: 14,
+      con: 13,
+      cha: 12,
+      wis: 10,
+      int: 8,
+    })
+  })
+
+  it('falls back to primary-ability priority when ability order is missing', () => {
     const result = deriveAbilityScoreRecommendations(
       [{ className: 'Fighter', primaryAbilities: ['str', 'dex'] }],
       [15, 14, 13, 12, 10, 8],
@@ -211,16 +206,11 @@ describe('deriveAbilityScoreRecommendations', () => {
     expect(result?.suggestedAssignment).toEqual({
       str: 15,
       dex: 14,
+      con: 13,
+      int: 12,
+      wis: 10,
+      cha: 8,
     })
-  })
-
-  it('derives suggested assignment from source array regardless of current assignments', () => {
-    const result = deriveAbilityScoreRecommendations(
-      [{ className: 'Fighter', primaryAbilities: ['str', 'dex'] }],
-      [15, 14, 13, 12, 10, 8],
-    )
-
-    expect(result?.suggestedAssignment).toEqual({ str: 15, dex: 14 })
   })
 
   it('omits suggested assignment when no score source is provided', () => {

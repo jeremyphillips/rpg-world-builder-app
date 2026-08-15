@@ -53,6 +53,11 @@ const attackResolutionOptions = buildAttackResolutionModeFieldOptions(
 )
 
 const SLOT_IGNORE = [/^_/] as const
+const RULES_CONFIG_IGNORE = [
+  ...SLOT_IGNORE,
+  /^standardArray(\.|$)/,
+  /^levelZeroStandardArray(\.|$)/,
+] as const
 
 describe('dashboard form validation', () => {
   it('account profile', () => {
@@ -109,7 +114,7 @@ describe('dashboard form validation', () => {
     const schema = resolveRulesSchema()
 
     assertFieldPathsRegistered(fields)
-    assertRegistryCoverage(schema, fields, { ignorePaths: SLOT_IGNORE })
+    assertRegistryCoverage(schema, fields, { ignorePaths: RULES_CONFIG_IGNORE })
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: { startingLevel: 0 },
     })

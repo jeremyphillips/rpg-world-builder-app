@@ -5,6 +5,7 @@ import {
   DEFAULT_LANGUAGE_PROFICIENCY_GRANT,
   ORIGIN_LANGUAGES_CHOICE_ID,
 } from '../../primitives/proficiency/character-creation-proficiency-rules'
+import { DEFAULT_STANDARD_ARRAY } from '../../primitives/standard-array'
 import { resolveStartingWealthRules, startingWealthRulesSchema } from '../rules/starting-wealth'
 import { resolveCharacterCreationPatch } from './campaign-character-creation-patch'
 import { extendedProgressionAt } from '../../../test/fixtures/character-creation-patch'
@@ -62,6 +63,43 @@ describe('resolveCharacterCreationPatch', () => {
       resolveCharacterCreationPatch({ subclasses: { enabled: false } }, minimalStartingWealthSeed)
         .subclasses,
     ).toEqual({ enabled: false })
+  })
+
+  it('resolves level 0 NPC defaults and overrides', () => {
+    expect(
+      resolveCharacterCreationPatch(undefined, minimalStartingWealthSeed).levelZeroNpcs,
+    ).toEqual({
+      enabled: true,
+      baseHitDie: 6,
+      proficiencyBonus: 2,
+      retainSpeciesTraits: true,
+      armorProficiencies: { categories: [], items: [] },
+      weaponProficiencies: { categories: [], items: [] },
+      languageProficiencies: { items: ['common'], categories: [] },
+      retainSpeciesLanguages: true,
+      startingWealth: undefined,
+      standardArray: [...DEFAULT_STANDARD_ARRAY],
+    })
+
+    expect(
+      resolveCharacterCreationPatch(
+        { levelZeroNpcs: { proficiencyBonus: 0 } },
+        minimalStartingWealthSeed,
+      ).levelZeroNpcs.proficiencyBonus,
+    ).toBe(0)
+  })
+
+  it('resolves standard array defaults and overrides', () => {
+    expect(
+      resolveCharacterCreationPatch(undefined, minimalStartingWealthSeed).standardArray,
+    ).toEqual([...DEFAULT_STANDARD_ARRAY])
+
+    expect(
+      resolveCharacterCreationPatch(
+        { standardArray: [16, 14, 13, 12, 10, 8] },
+        minimalStartingWealthSeed,
+      ).standardArray,
+    ).toEqual([16, 14, 13, 12, 10, 8])
   })
 
   it('resolves SRD default language proficiency rules', () => {

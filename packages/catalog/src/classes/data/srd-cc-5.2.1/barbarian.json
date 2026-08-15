@@ -75,7 +75,8 @@
           }
         ]
       }
-    }
+    },
+    "abilityScoreOrder": ["str", "con", "dex", "wis", "int", "cha"]
   },
   "features": [
     {

@@ -32,6 +32,7 @@ import { useCharacterBuilderStore } from '../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../hooks/use-create-character'
 import { useCreateNpc } from '../npc/hooks/use-create-npc'
 import { getBuilderChromeCopyForContext } from '../lib/builder/builder-chrome-copy'
+import { resolveFullBuilderDefaultLevel } from '../lib/builder/builder-default-level.lib'
 import {
   applyBuilderCreateFailure,
   resolveBuilderCreateFailure,
@@ -45,6 +46,7 @@ import {
 } from '../lib/builder/builder-validation-visible-steps.lib'
 import { runBuilderFormContinueHandler } from '../lib/builder/builder-form-continue-registry'
 import { patchTouchesDraftContent } from '../lib/draft/character-builder-draft-touch.lib'
+import { isNonEmptyCharacterBuilderDraft } from '../lib/draft/is-non-empty-character-builder-draft'
 import {
   appendAttemptedStepId,
   appendTouchedStepId,
@@ -171,6 +173,22 @@ export function CharacterBuilderShell({
       },
     })
   }, [draft.class, levelConstraints.fixedLevel, levelConstraints.mode, patchDraft])
+
+  useEffect(() => {
+    if (!hasHydrated || hasPendingRestore) return
+    if (levelConstraints.mode === 'fixed') return
+    if (isNonEmptyCharacterBuilderDraft(draft)) return
+
+    const defaultLevel = resolveFullBuilderDefaultLevel(context)
+    if (draft.class.level === defaultLevel) return
+
+    patchDraft({
+      class: {
+        ...draft.class,
+        level: defaultLevel,
+      },
+    })
+  }, [context, draft, hasHydrated, hasPendingRestore, levelConstraints.mode, patchDraft])
 
   const preview = useCharacterPreview(
     draft,
@@ -468,7 +486,6 @@ export function CharacterBuilderShell({
               resolvedChoiceSets={resolvedChoiceSets}
               draftValidationIssues={draftValidationIssues}
               validationVisibleStepIds={railValidationVisibleStepIds}
-              standardArray={context.characterCreationRules.abilityGeneration.standardArray}
               onStepSelect={navigateToStep}
             />
           </div>

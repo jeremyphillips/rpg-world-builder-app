@@ -10,7 +10,7 @@ import { CreateModalShell } from '@/lib/create-flow'
 import { CreateSetupPanel } from '@/lib/create-setup'
 
 import {
-  EMPTY_QUICK_NPC_SETUP_VALUES,
+  createQuickNpcSetupDefaultValues,
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
@@ -48,10 +48,10 @@ type QuickNpcCreateModalState = {
   authoringValues?: Partial<QuickNpcAuthoringTabValues>
 }
 
-function createInitialState(): QuickNpcCreateModalState {
+function createInitialState(buildContext: CharacterBuildContext): QuickNpcCreateModalState {
   return {
     phase: 'setup',
-    setupValues: { ...EMPTY_QUICK_NPC_SETUP_VALUES },
+    setupValues: createQuickNpcSetupDefaultValues(buildContext),
   }
 }
 
@@ -64,7 +64,7 @@ function QuickNpcCreateModalSession({
   onCancel,
   onCreated,
 }: QuickNpcCreateModalProps) {
-  const [state, setState] = React.useState(createInitialState)
+  const [state, setState] = React.useState(() => createInitialState(buildContext))
   const [authoringPending, setAuthoringPending] = React.useState(false)
   const { trustedClose } = usePendingAwareOpenChange({
     pending: authoringPending,
@@ -146,7 +146,7 @@ function QuickNpcCreateModalSession({
         headline={QUICK_NPC_CREATE_TITLE}
         description={
           state.phase === 'setup'
-            ? `Choose species, class, and level for a new member of ${organization.name}.`
+            ? `Choose species, level, and class when applicable for a new member of ${organization.name}.`
             : `Create a new NPC as a member of ${organization.name}.`
         }
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}

@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { createEmptyCharacterBuilderDraft, resolveBuilderLevelConstraints } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  resolveBuilderLevelConstraints,
+  sanitizeClassForLevel,
+} from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import {
+  createCampaignNpcBuilderContextFixture,
+  createStandaloneBuilderContextFixture,
+} from '../character-builder-fixtures'
 import {
   buildBuilderLevelSelectOptions,
   evaluateBuilderLevelChange,
@@ -32,5 +39,28 @@ describe('builder-level-control.lib', () => {
         class: { classId: 'srd-cc-5.2.1:fighter', level: 2 },
       },
     })
+  })
+
+  it('strips class identity when changing to level 0', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+    }
+
+    const npcContext = createCampaignNpcBuilderContextFixture()
+
+    const result = evaluateBuilderLevelChange(draft, 0, npcContext)
+    expect(result).toMatchObject({
+      kind: 'apply',
+      nextDraft: {
+        class: { level: 0, classId: undefined },
+      },
+    })
+    expect(sanitizeClassForLevel(result.kind === 'apply' ? result.nextDraft : draft).class).toEqual(
+      {
+        level: 0,
+        classId: undefined,
+      },
+    )
   })
 })

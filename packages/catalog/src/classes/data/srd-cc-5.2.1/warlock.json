@@ -169,7 +169,8 @@
           }
         ]
       }
-    }
+    },
+    "abilityScoreOrder": ["cha", "dex", "con", "int", "wis", "str"]
   },
   "features": [
     {

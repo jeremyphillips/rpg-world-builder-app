@@ -45,6 +45,23 @@ export const entitySummaryHeadingBandVariants = cva(
   'flex min-w-0 min-h-control-action-compact items-center',
 )
 
+export const entitySummaryHeadingRowVariants = cva('flex min-w-0 flex-1 items-center gap-2')
+
+export const entitySummaryHeadingEndValueVariants = cva(
+  'shrink-0 tabular-nums font-body-emphasis text-muted-foreground',
+  {
+    variants: {
+      density: {
+        compact: 'text-sm',
+        comfortable: 'text-base',
+      },
+    },
+    defaultVariants: {
+      density: 'comfortable',
+    },
+  },
+)
+
 /** Trailing rail track — only rendered when `trailing` is set. */
 export const entityItemTrailingSlotVariants = cva(
   'col-start-3 row-start-1 min-w-0 justify-self-end',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { createEmptyCharacterBuilderDraft, STANDARD_ARRAY } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,
@@ -15,7 +15,7 @@ const manualContext = createStandaloneBuilderContextFixture({
     ...context.characterCreationRules,
     abilityGeneration: {
       methods: ['manual'],
-      standardArray: [...STANDARD_ARRAY],
+      standardArray: [...DEFAULT_STANDARD_ARRAY],
     },
   },
 })

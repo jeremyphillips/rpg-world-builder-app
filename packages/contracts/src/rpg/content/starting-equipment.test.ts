@@ -239,6 +239,7 @@ describe('classCharacterCreationSchema', () => {
   it('wraps starting equipment on the class body', () => {
     const parsed = classCharacterCreationSchema.parse({
       startingEquipment: DRUID_STARTING_EQUIPMENT,
+      abilityScoreOrder: ['wis', 'con', 'int', 'dex', 'cha', 'str'],
     })
 
     expect(parsed.startingEquipment?.options[0]?.items[0]).toMatchObject({
@@ -255,6 +256,7 @@ describe('classCharacterCreationSchema', () => {
             choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
           },
         },
+        abilityScoreOrder: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
       }),
     ).toMatchObject({
       proficiencies: {
@@ -286,6 +288,7 @@ describe('classCharacterCreationSchema', () => {
             },
           ],
         },
+        abilityScoreOrder: ['int', 'wis', 'con', 'dex', 'cha', 'str'],
       }),
     ).toMatchObject({
       equipmentRecommendations: {

@@ -33,7 +33,7 @@ const validValues = {
 
 describe('quickNpcAuthoringSchema', () => {
   it('accepts a complete quick NPC form payload', () => {
-    expect(quickNpcAuthoringSchema(20).parse(validValues)).toMatchObject({
+    expect(quickNpcAuthoringSchema(20, 0).parse(validValues)).toMatchObject({
       name: 'Guard Captain',
       level: 3,
       alignment: 'ln',
@@ -41,7 +41,7 @@ describe('quickNpcAuthoringSchema', () => {
   })
 
   it('rejects missing required seed fields with builder messages', () => {
-    const result = quickNpcAuthoringSchema(20).safeParse({
+    const result = quickNpcAuthoringSchema(20, 0).safeParse({
       ...validValues,
       name: ' ',
       speciesId: '',
@@ -61,7 +61,7 @@ describe('quickNpcAuthoringSchema', () => {
   })
 
   it('rejects a level above the campaign maximum', () => {
-    const result = quickNpcAuthoringSchema(20).safeParse({ ...validValues, level: 21 })
+    const result = quickNpcAuthoringSchema(20, 0).safeParse({ ...validValues, level: 21 })
 
     expect(result.success).toBe(false)
     const messages = result.success ? [] : result.error.issues.map((issue) => issue.message)
@@ -71,13 +71,30 @@ describe('quickNpcAuthoringSchema', () => {
 
 describe('buildQuickNpcSeed', () => {
   it('maps form values to the automatic build seed without the membership title', () => {
-    const seed = buildQuickNpcSeed(quickNpcAuthoringSchema(20).parse(validValues))
+    const seed = buildQuickNpcSeed(quickNpcAuthoringSchema(20, 0).parse(validValues))
 
     expect(seed).toEqual({
       name: 'Guard Captain',
       speciesId: 'srd-cc-5.2.1:dwarf',
       classId: 'srd-cc-5.2.1:fighter',
       level: 3,
+      alignment: 'ln',
+    })
+  })
+
+  it('omits classId for level 0 NPCs', () => {
+    const seed = buildQuickNpcSeed(
+      quickNpcAuthoringSchema(20, 0).parse({
+        ...validValues,
+        classId: '',
+        level: 0,
+      }),
+    )
+
+    expect(seed).toEqual({
+      name: 'Guard Captain',
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      level: 0,
       alignment: 'ln',
     })
   })

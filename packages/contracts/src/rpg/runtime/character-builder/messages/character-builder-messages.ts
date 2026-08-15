@@ -102,7 +102,15 @@ export const characterBuilderValidationMessages = {
   ),
   levelBelowAllowedMinimum: defineMessage(
     'validation.characterBuilder.levelBelowAllowedMinimum',
-    () => 'Character level must be at least 1.',
+    () => 'Character level is below the allowed minimum.',
+  ),
+  levelZeroNotPermitted: defineMessage(
+    'validation.characterBuilder.levelZeroNotPermitted',
+    () => 'Level 0 characters are not permitted for this build.',
+  ),
+  classNotPermittedAtLevelZero: defineMessage(
+    'validation.characterBuilder.classNotPermittedAtLevelZero',
+    () => `A ${getContentTypeSentenceForm('classes')} cannot be assigned at level 0.`,
   ),
   levelExceedsCampaignMaximum: defineMessage<{ maxLevel: number }>(
     'validation.characterBuilder.levelExceedsCampaignMaximum',

@@ -1,17 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../form-options/content-campaign-rules'
 import { entityEquipmentKind, mergeEditLayoutCtx } from './content-edit-form-ctx'
 import type { ContentFormCtx } from '../content-form-registry'
 
 const baseOptionsCtx: ContentFormCtx = {
-  campaignRules: {
-    maxCharacterLevel: 20,
-    standardMaxCharacterLevel: 20,
-    allowedCharacterCreatureTypes: ['humanoid'],
-    multiclassing: defaultMulticlassingRules(),
-    subclassing: defaultSubclassingRules(),
-  },
+  campaignRules: defaultCampaignRules(),
 }
 
 describe('entityEquipmentKind', () => {

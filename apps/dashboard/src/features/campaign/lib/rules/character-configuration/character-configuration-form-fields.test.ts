@@ -124,6 +124,8 @@ describe('character-configuration-form-fields', () => {
       expect(fieldNames).toContain('startingWealth.tiers')
       expect(fieldNames).toContain('languageProficiencyGrants.items')
       expect(fieldNames).toContain('languageProficiencyChoice.categories')
+      expect(fieldNames).toContain('levelZeroNpcsEnabled')
+      expect(fieldNames).toContain('levelZeroLanguageProficiencies.items')
     })
   })
 
@@ -153,6 +155,7 @@ describe('character-configuration-form-fields', () => {
         'creature-type-policy',
         'multiclassing',
         'subclasses',
+        'level-0-npcs',
       ])
     })
   })

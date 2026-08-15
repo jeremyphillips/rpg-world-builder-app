@@ -16,7 +16,9 @@ import {
   toolCategorySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FormItem } from '@rpg/ui/form'
+
+import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
@@ -41,11 +43,6 @@ const armorCategoryOptions = toOptions(
     (typeof ARMOR_CATEGORIES)[number],
     string
   >,
-)
-
-const WEAPON_PROFICIENCY_MODE_OPTIONS = toOptions(
-  WEAPON_PROFICIENCY_MODES,
-  WEAPON_PROFICIENCY_MODE_LABELS,
 )
 
 const weaponCategoryOptions = toOptions(
@@ -85,20 +82,6 @@ export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
   savingThrows: z.array(abilitySchema).max(2).default([]),
 })
 
-function visibleWhenWeaponCategories(): FieldVisibility {
-  return {
-    dependsOn: ['weaponProficiencyMode'],
-    visibleWhen: (watched) => watched['weaponProficiencyMode'] === 'categories',
-  }
-}
-
-function visibleWhenIndividualWeapons(): FieldVisibility {
-  return {
-    dependsOn: ['weaponProficiencyMode'],
-    visibleWhen: (watched) => watched['weaponProficiencyMode'] === 'individual',
-  }
-}
-
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   const skillOptions = ctx.options?.skills ?? []
 
@@ -133,35 +116,23 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Weapons',
       chrome: { variant: 'outline' },
       fields: [
-        {
-          type: 'radio',
-          name: 'weaponProficiencyMode',
+        modeDependentGrantSetField({
+          modeFieldName: 'weaponProficiencyMode',
+          modes: WEAPON_PROFICIENCY_MODES,
+          modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
+          categoriesPath: 'proficiencies.weapons.categories',
+          itemsPath: 'proficiencies.weapons.items',
           label: 'Weapon proficiency mode',
-          labelHidden: true,
           hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
-          orientation: 'horizontal',
-          options: WEAPON_PROFICIENCY_MODE_OPTIONS,
-          separator: 'subtle',
-        },
-        {
-          type: 'chips',
-          name: 'proficiencies.weapons.categories',
-          label: 'Weapon proficiencies',
-          chrome: { variant: 'panel' },
-          options: weaponCategoryOptions,
-          hint: WEAPON_PROFICIENCIES_HINT,
-          visibility: visibleWhenWeaponCategories(),
-        },
-        {
-          type: 'combobox',
-          name: 'proficiencies.weapons.items',
-          label: 'Weapon choices',
-          multiple: true,
-          options: ctx.options?.weapons ?? [],
-          placeholder: 'Choose weapons…',
-          visibility: visibleWhenIndividualWeapons(),
-          width: 'xl',
-        },
+          categoryOptions: weaponCategoryOptions,
+          itemOptions: ctx.options?.weapons ?? [],
+          categoriesLabel: 'Weapon proficiencies',
+          itemsLabel: 'Weapon choices',
+          categoriesHint: WEAPON_PROFICIENCIES_HINT,
+          categoryMode: 'categories',
+          specificMode: 'individual',
+          labelHidden: true,
+        }),
       ],
     },
     {

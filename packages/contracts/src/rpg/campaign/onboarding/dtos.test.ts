@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { finalizeCharacterBuild } from '../../runtime/character-builder/finalize/finalize'
+import { finalizePcCharacterBuild } from '../../runtime/character-builder/finalize/finalize'
 import { createEmptyCharacterBuilderDraft } from '../../runtime/character-builder/draft/draft'
 import { builderTestContext } from '../../runtime/character-builder/test-fixtures'
 import { campaignOnboardingContextSchema } from './dtos'
@@ -94,7 +94,7 @@ describe('completeCampaignOnboardingInputSchema', () => {
   it('parses new-character completion input', () => {
     const parsed = completeCampaignOnboardingInputSchema.parse({
       source: 'new',
-      character: finalizeCharacterBuild(makeCompleteDraft(), builderTestContext),
+      character: finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext),
     })
 
     expect(parsed.source).toBe('new')

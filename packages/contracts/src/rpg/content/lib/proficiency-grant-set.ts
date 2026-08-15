@@ -1,8 +1,6 @@
 import { z } from 'zod'
 
-import { armorCategorySchema } from '../../vocab/armor/category'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { skillSchema } from '../skill-proficiency'
 import {
   isMeaningfulProficiencyChoice,
@@ -16,6 +14,12 @@ import {
   toolProficiencyPoolSchema,
 } from './proficiency-grant'
 
+export {
+  armorProficiencyGrantSetSchema,
+  weaponProficiencyGrantSetSchema,
+  type ArmorProficiencyGrantSet,
+  type WeaponProficiencyGrantSet,
+} from '../../primitives/proficiency/typed-proficiency-grant-set'
 export {
   isMeaningfulLanguageProficiencyChoice,
   languageProficiencyChoiceSchema,
@@ -33,19 +37,8 @@ export { isMeaningfulProficiencyChoice, proficiencyChoiceSchema, proficiencyGran
 // ---------------------------------------------------------------------------
 // Proficiency grant sets — fixed grants on class.proficiencies (immediate).
 // Proficiency choices — player picks under class.characterCreation.proficiencies.
+// Armor/weapon grant sets live in rpg/primitives/proficiency (re-exported above).
 // ---------------------------------------------------------------------------
-
-export const armorProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(armorCategorySchema).default([]),
-})
-
-export type ArmorProficiencyGrantSet = z.infer<typeof armorProficiencyGrantSetSchema>
-
-export const weaponProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(weaponCategorySchema).default([]),
-})
-
-export type WeaponProficiencyGrantSet = z.infer<typeof weaponProficiencyGrantSetSchema>
 
 export const toolProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
   categories: z.array(toolCategorySchema).default([]),

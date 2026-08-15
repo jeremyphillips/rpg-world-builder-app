@@ -17,6 +17,12 @@ export const proficiencyGrantSetSchema = z
 
 export type ProficiencyGrantSet = z.infer<typeof proficiencyGrantSetSchema>
 
+export function isEmptyProficiencyGrantSet(
+  grant: Pick<ProficiencyGrantSet, 'categories' | 'items'>,
+): boolean {
+  return grant.categories.length === 0 && grant.items.length === 0
+}
+
 /** Domain-agnostic choice primitive — `from` holds opaque slugs; vocab validated on extensions. */
 export const proficiencyChoiceSchema = z.object({
   id: z.string().min(1),

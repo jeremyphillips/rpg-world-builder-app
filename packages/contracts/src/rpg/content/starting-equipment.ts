@@ -14,6 +14,7 @@ import {
   toolProficiencyChoiceGroupDraftSchema,
   toolProficiencyChoiceGroupSchema,
 } from './lib/proficiency-grant-set'
+import { abilityScoreOrderSchema } from '../primitives/standard-array'
 
 // ---------------------------------------------------------------------------
 // Starting equipment — class/background character-creation gear packages.
@@ -191,6 +192,7 @@ export const classCharacterCreationDraftSchema = z.object({
   startingEquipment: startingEquipmentChoiceSchema.optional(),
   proficiencies: characterCreationProficienciesDraftSchema.optional(),
   equipmentRecommendations: equipmentRecommendationsSchema.optional(),
+  abilityScoreOrder: abilityScoreOrderSchema.optional(),
 })
 
 export type ClassCharacterCreationDraft = z.infer<typeof classCharacterCreationDraftSchema>
@@ -201,15 +203,17 @@ export const classCharacterCreationSchema = z
     proficiencies: characterCreationProficienciesSchema.optional(),
     /** Authored picker recommendation rules where inference cannot reach (soft catalog references). */
     equipmentRecommendations: equipmentRecommendationsSchema.optional(),
+    abilityScoreOrder: abilityScoreOrderSchema.optional(),
   })
   .refine(
     (value) =>
       value.startingEquipment !== undefined ||
       value.proficiencies !== undefined ||
-      value.equipmentRecommendations !== undefined,
+      value.equipmentRecommendations !== undefined ||
+      value.abilityScoreOrder !== undefined,
     {
       message:
-        'characterCreation requires startingEquipment, proficiencies, and/or equipmentRecommendations',
+        'characterCreation requires startingEquipment, proficiencies, equipmentRecommendations, and/or abilityScoreOrder',
     },
   )
 

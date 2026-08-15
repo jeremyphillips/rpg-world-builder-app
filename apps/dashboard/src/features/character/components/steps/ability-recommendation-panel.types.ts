@@ -6,6 +6,7 @@ import type {
 
 export type AbilityRecommendationPanelProps = {
   classInput: AbilityScoreRecommendationClassInput | null
+  classStepApplicable: boolean
   recommendation: AbilityScoreRecommendation | null
   currentScores: Partial<Record<Ability, number>>
   showSuggestedAssignment?: boolean

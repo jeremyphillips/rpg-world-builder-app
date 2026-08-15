@@ -90,7 +90,14 @@ async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
     await user.click(dwarfRadio)
   }
 
-  const fighterRadio = screen.queryByRole('radio', { name: /fighter/i })
+  let fighterRadio = screen.queryByRole('radio', { name: /fighter/i })
+  if (!fighterRadio) {
+    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
+    await user.clear(levelInput)
+    await user.type(levelInput, '1')
+    fighterRadio = await screen.findByRole('radio', { name: /fighter/i })
+  }
+
   if (fighterRadio?.getAttribute('aria-checked') !== 'true') {
     await user.click(screen.getByRole('radio', { name: /fighter/i }))
   }

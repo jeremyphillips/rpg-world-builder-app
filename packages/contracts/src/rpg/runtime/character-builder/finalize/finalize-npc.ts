@@ -1,4 +1,4 @@
-import { finalizeCharacterBuild } from './finalize'
+import { assembleCharacterBuildSheet } from './finalize'
 import type { CharacterBuildContext } from '../context'
 import {
   createNpcRequestInputSchema,
@@ -16,7 +16,6 @@ export function finalizeNpcCharacterBuild(
   context: CharacterBuildContext,
   options: CharacterBuildEngineOptions = {},
 ): CreateNpcRequestInput {
-  const pcInput = finalizeCharacterBuild(draft, context, options)
-  const { characterType: _characterType, ...request } = pcInput
-  return createNpcRequestInputSchema.parse(request)
+  const sheet = assembleCharacterBuildSheet(draft, context, options)
+  return createNpcRequestInputSchema.parse(sheet)
 }

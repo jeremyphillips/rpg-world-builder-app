@@ -9,6 +9,8 @@ import {
   entityItemStatusRowVariants,
   entitySummaryDescriptionVariants,
   entitySummaryHeadingBandVariants,
+  entitySummaryHeadingEndValueVariants,
+  entitySummaryHeadingRowVariants,
 } from './entity-item.variants'
 
 const CLASSIFICATION_SEPARATOR = ' · ' as const
@@ -41,16 +43,30 @@ export type EntitySummaryProps = {
   density?: ContentCardDensity
   /** When `control`, wraps the heading in a compact-control-height band for rail alignment. */
   headingBand?: EntitySummaryHeadingBand
+  /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
+  headingEndValue?: number
 }
 
 export function EntitySummary({
   entity,
   density = 'comfortable',
   headingBand = 'natural',
+  headingEndValue,
 }: EntitySummaryProps) {
   const headingSuffix = resolveClassificationSuffix(entity.classification)
   const heading = (
-    <ContentCardHeading heading={entity.heading} headingSuffix={headingSuffix} density={density} />
+    <div className={entitySummaryHeadingRowVariants()}>
+      <div className="min-w-0 flex-1">
+        <ContentCardHeading
+          heading={entity.heading}
+          headingSuffix={headingSuffix}
+          density={density}
+        />
+      </div>
+      {headingEndValue != null ? (
+        <span className={entitySummaryHeadingEndValueVariants({ density })}>{headingEndValue}</span>
+      ) : null}
+    </div>
   )
 
   return (

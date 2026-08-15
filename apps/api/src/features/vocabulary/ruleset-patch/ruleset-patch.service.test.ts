@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CREATURE_TYPE_SET_ID,
+  DEFAULT_STANDARD_ARRAY,
   defaultCampaignMechanicsPatch,
+  defaultLevelZeroNpcRules,
   defaultMulticlassingRules,
   defaultSubclassingRules,
   type StartingWealthTier,
@@ -46,7 +48,9 @@ describe('getRulesetPatchRead', () => {
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       multiclassing: defaultMulticlassingRules(),
       subclasses: defaultSubclassingRules(),
+      levelZeroNpcs: defaultLevelZeroNpcRules(),
       startingWealth: standardStartingWealthSeed(),
+      standardArray: [...DEFAULT_STANDARD_ARRAY],
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
   })
@@ -284,6 +288,96 @@ describe('updateCharacterCreationPatch', () => {
 
     const stored = await storedRulesetPatchDoc(campaignId)
     expectStoredSparseUnset(stored?.characterCreation?.startingWealth)
+  })
+
+  it('persists non-default level 0 NPC overrides including proficiencyBonus 0', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    const patch = await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        proficiencyBonus: 0,
+        armorProficiencies: { categories: ['light'], items: [] },
+      },
+    })
+
+    expect(patch?.characterCreation.levelZeroNpcs).toMatchObject({
+      proficiencyBonus: 0,
+      armorProficiencies: { categories: ['light'], items: [] },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.levelZeroNpcs?.proficiencyBonus).toBe(0)
+    expect(stored?.characterCreation?.levelZeroNpcs?.armorProficiencies?.categories).toEqual([
+      'light',
+    ])
+    expect(stored?.characterCreation?.levelZeroNpcs?.weaponProficiencies).toBeUndefined()
+  })
+
+  it('unsets stored levelZeroNpcs when reverted to defaults', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: { enabled: false },
+    })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: defaultLevelZeroNpcRules(),
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.characterCreation?.levelZeroNpcs)
+  })
+
+  it('does not persist empty grant-set noise for level 0 armor defaults', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        armorProficiencies: { categories: [], items: [] },
+      },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.levelZeroNpcs?.armorProficiencies).toBeUndefined()
+  })
+
+  it('persists non-default character creation standard arrays sparsely', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'StandardArray' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      standardArray: [16, 14, 13, 12, 10, 8],
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.standardArray).toEqual([16, 14, 13, 12, 10, 8])
+
+    await updateCharacterCreationPatch(campaignId, {
+      standardArray: [...DEFAULT_STANDARD_ARRAY],
+    })
+
+    const reverted = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(reverted?.characterCreation?.standardArray)
+  })
+
+  it('unsets only nested level 0 standardArray while preserving sibling overrides', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZeroArray' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        proficiencyBonus: 0,
+        standardArray: [16, 14, 13, 12, 10, 8],
+      },
+    })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        standardArray: [...DEFAULT_STANDARD_ARRAY],
+      },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.levelZeroNpcs?.standardArray).toBeUndefined()
+    expect(stored?.characterCreation?.levelZeroNpcs?.proficiencyBonus).toBe(0)
   })
 })
 

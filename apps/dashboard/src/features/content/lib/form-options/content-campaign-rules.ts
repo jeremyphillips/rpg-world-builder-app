@@ -2,6 +2,7 @@ import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   defaultMulticlassingRules,
   defaultSubclassingRules,
+  DEFAULT_STANDARD_ARRAY,
   MAX_CHARACTER_LEVEL,
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
@@ -15,6 +16,7 @@ export function defaultCampaignRules(): ResolvedCampaignRules {
     allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
     multiclassing: defaultMulticlassingRules(),
     subclassing: defaultSubclassingRules(),
+    standardArray: [...DEFAULT_STANDARD_ARRAY],
   }
 }
 

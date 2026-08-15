@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { buildSeedCreatureTypeVocabulary } from '@/features/vocabulary'
 
 import {
@@ -22,11 +22,8 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
     expect(
       getCharacterCreatureTypeFieldOptions({
         campaignRules: {
-          maxCharacterLevel: 20,
-          standardMaxCharacterLevel: 20,
+          ...defaultCampaignRules(),
           allowedCharacterCreatureTypes: ['humanoid', 'fey'],
-          multiclassing: defaultMulticlassingRules(),
-          subclassing: defaultSubclassingRules(),
         },
         creatureTypeVocabulary: seedVocabulary,
       }),
@@ -45,11 +42,8 @@ describe('getCharacterCreatureTypeFieldOptions', () => {
     expect(
       getCharacterCreatureTypeFieldOptions({
         campaignRules: {
-          maxCharacterLevel: 20,
-          standardMaxCharacterLevel: 20,
+          ...defaultCampaignRules(),
           allowedCharacterCreatureTypes: ['humanoid', 'fey'],
-          multiclassing: defaultMulticlassingRules(),
-          subclassing: defaultSubclassingRules(),
         },
         creatureTypeVocabulary: vocabulary,
       }),
@@ -62,11 +56,8 @@ describe('allowedCharacterCreatureTypesFromCtx', () => {
     expect(
       allowedCharacterCreatureTypesFromCtx({
         campaignRules: {
-          maxCharacterLevel: 20,
-          standardMaxCharacterLevel: 20,
+          ...defaultCampaignRules(),
           allowedCharacterCreatureTypes: ['construct'],
-          multiclassing: defaultMulticlassingRules(),
-          subclassing: defaultSubclassingRules(),
         },
       }),
     ).toEqual(['construct'])

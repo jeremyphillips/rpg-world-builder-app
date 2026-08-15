@@ -20,17 +20,17 @@ export const dieFaceSchema = z.union(
 
 export const CLASS_HIT_DICE = [6, 8, 10, 12] as const satisfies readonly DieFace[]
 
-export type ClassHitDie = (typeof CLASS_HIT_DICE)[number]
+export type HitDie = (typeof CLASS_HIT_DICE)[number]
+
+/** @deprecated Prefer {@link HitDie} — kept as a class-content alias. */
+export type ClassHitDie = HitDie
 
 export const hitDieSchema = z.union(
-  CLASS_HIT_DICE.map((f) => z.literal(f)) as [
-    z.ZodLiteral<ClassHitDie>,
-    ...z.ZodLiteral<ClassHitDie>[],
-  ],
+  CLASS_HIT_DICE.map((f) => z.literal(f)) as [z.ZodLiteral<HitDie>, ...z.ZodLiteral<HitDie>[]],
 )
 
-/** Formats a class hit die as a human-readable string (e.g. `8` → `"d8"`). */
-export function formatHitDie(face: ClassHitDie): string {
+/** Formats a hit die as a human-readable string (e.g. `8` → `"d8"`). */
+export function formatHitDie(face: HitDie): string {
   return `d${face}`
 }
 

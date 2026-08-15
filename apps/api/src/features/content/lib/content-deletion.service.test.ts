@@ -38,6 +38,7 @@ const minimalClassInput = {
         choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
       },
     },
+    abilityScoreOrder: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
   },
   features: [{ name: 'Test Feature', level: 1 }],
 }

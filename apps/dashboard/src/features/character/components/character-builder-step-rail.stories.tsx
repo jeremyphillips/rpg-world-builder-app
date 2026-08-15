@@ -1,10 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import {
-  createEmptyCharacterBuilderDraft,
-  DEFAULT_ABILITY_GENERATION_RULES,
-  indexCharacterBuildCatalog,
-} from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, indexCharacterBuildCatalog } from '@rpg/contracts'
 import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
@@ -15,7 +11,6 @@ import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
 
 const railProps = {
   context,
@@ -23,7 +18,6 @@ const railProps = {
   resolvedChoiceSets: null,
   draftValidationIssues: [] as CharacterBuildValidationIssue[],
   validationVisibleStepIds: [] as CharacterBuilderStepId[],
-  standardArray,
   onStepSelect: () => undefined,
 }
 

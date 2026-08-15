@@ -240,6 +240,7 @@ const minimalClassInput = {
         choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
       },
     },
+    abilityScoreOrder: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
   },
   features: [{ name: 'Rage', level: 1 }],
 }
@@ -286,6 +287,7 @@ describe('createHomebrewContent (classes)', () => {
             choices: [{ id: 'class-skills', choose: 2, from: ['athletics', 'stealth'] }],
           },
         },
+        abilityScoreOrder: ['str', 'dex', 'con', 'int', 'wis', 'cha'],
       },
     })
 

@@ -2,6 +2,8 @@ import { z } from 'zod'
 import { languageCategorySchema } from '@rpg/contracts'
 import { type FieldOption, type FormItem } from '@rpg/ui/form'
 
+import { languageGrantItemsField } from './language-grant-form-fields'
+
 export const LANGUAGE_GRANTS_ITEMS_PATH = 'languageProficiencyGrants.items' as const
 export const LANGUAGE_CHOICE_CHOOSE_PATH = 'languageProficiencyChoice.choose' as const
 export const LANGUAGE_CHOICE_CATEGORIES_PATH = 'languageProficiencyChoice.categories' as const
@@ -47,20 +49,11 @@ export function languageProficiencyFields(
           legendSize: 'subsection',
           chrome: { variant: 'panel' },
           fields: [
-            {
-              type: 'inlineSentence',
-              name: LANGUAGE_GRANTS_ITEMS_PATH,
+            languageGrantItemsField({
+              path: LANGUAGE_GRANTS_ITEMS_PATH,
               label: 'Granted languages',
-              hideLabel: true,
-              segments: [
-                { kind: 'text', value: 'Characters receive these languages:', tone: 'label' },
-              ],
-              below: {
-                kind: 'chips',
-                name: LANGUAGE_GRANTS_ITEMS_PATH,
-                options: languageOptions,
-              },
-            },
+              languageOptions,
+            }),
             {
               type: 'inlineSentence',
               name: LANGUAGE_CHOICE_CATEGORIES_PATH,

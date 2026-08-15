@@ -1,6 +1,7 @@
 import { ABILITY_IDS, ABILITY_SCORE_MIN, CHARACTER_ABILITY_SCORE_MAX } from '../../../vocab/ability'
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
 import { isStandardArrayAssignment } from '../ability/ability-generation'
+import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
 import type { CharacterBuildContext } from '../context'
@@ -57,7 +58,17 @@ export function validateClass(
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
 
-  if (!draft.class.classId) {
+  if (!isClassProgressionApplicable(draft.class.level) && draft.class.classId) {
+    issues.push(
+      validationIssue(
+        'class_not_permitted_at_level_zero',
+        characterBuilderValidationMessages.classNotPermittedAtLevelZero(),
+        { path: 'class.classId', stepId: 'class' },
+      ),
+    )
+  }
+
+  if (isClassProgressionApplicable(draft.class.level) && !draft.class.classId) {
     issues.push(
       validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
         path: 'class.classId',

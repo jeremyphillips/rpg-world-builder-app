@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { equipmentModifierSchema } from '../../../content/equipment/modifier'
-import { absoluteLevelSchema } from '../../../primitives/level'
+import { builderLevelSchema } from '../../../primitives/level'
 import { abilitySchema } from '../../../vocab/ability'
 import { optionalAlignmentSchema } from '../../../vocab/alignment'
 import { characterNarrativeSchema } from '../../character/narrative'
@@ -39,7 +39,7 @@ export type CharacterBuilderDraftSpecies = z.infer<typeof characterBuilderDraftS
 export const characterBuilderDraftClassSchema = z.object({
   classId: z.string().min(1).optional(),
   /** Selected class level for single-class builder creation. */
-  level: absoluteLevelSchema,
+  level: builderLevelSchema,
 })
 
 export type CharacterBuilderDraftClass = z.infer<typeof characterBuilderDraftClassSchema>

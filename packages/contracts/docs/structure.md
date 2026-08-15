@@ -76,7 +76,8 @@ flowchart BT
 | A shared validation message or message primitive                                         | `validation/`                       | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)                                      | `rpg/vocab/`                        | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`, `rpg/vocab/personal-name-component.ts`                                 |
 | A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
-| Shared proficiency grant/choice input schemas (content + campaign)                       | `rpg/primitives/proficiency/`       | `proficiency-grant-set.ts`, `character-creation-proficiency-rules.ts`                                                        |
+| Sparse coin wealth grants (starting equipment, level 0 NPC wealth)                       | `rpg/primitives/`                   | `rpg/primitives/character-wealth-grant.ts` (re-exported from `rpg/content/lib/wealth-grant.ts`)                              |
+| Shared proficiency grant/choice input schemas (content + campaign)                       | `rpg/primitives/proficiency/`       | `proficiency-grant-set.ts`, `typed-proficiency-grant-set.ts`, `character-creation-proficiency-rules.ts`                      |
 | Weapon mode presentation formatters (extracted from vocab)                               | `rpg/primitives/weapon/`            | `mode-compatibility-messages.ts`                                                                                             |
 | Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
 | Shared content helpers (grants, envelope, keys)                                          | `rpg/content/lib/`                  | `rpg/content/lib/grants.ts`                                                                                                  |
@@ -191,7 +192,9 @@ mutation live in `rpg/runtime/character-builder/`.
 - **Does not belong here** — UI labels, descriptions, alert text, or
   presentation mappings.
 - **Stays in `rpg/runtime/character-builder/`** — step orchestration, draft
-  mutation, context assembly, finalize, resolvers.
+  mutation, context assembly, finalize, resolvers. PC and Level 0 NPC standard
+  arrays are separate campaign fields; runtime selects via
+  `resolveBuilderStandardArray(context, level)`.
 - **Stays in `rpg/campaign/`** — campaign character-assignment error union
   (`build_invalid` composes builder validation issues).
 

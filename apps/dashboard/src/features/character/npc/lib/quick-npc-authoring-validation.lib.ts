@@ -1,6 +1,7 @@
 import {
+  isClassProgressionApplicable,
   resolveAvailableContent,
-  resolveBuilderLevelConstraints,
+  resolveCharacterLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
@@ -15,13 +16,21 @@ export function isQuickNpcSetupStillValid(
   setup: QuickNpcSetupValues,
   context: CharacterBuildContext,
 ): boolean {
-  const maxLevel = resolveBuilderLevelConstraints(context).maxLevel
-  const parsed = quickNpcSetupSchema(maxLevel).safeParse(setup)
+  const { minLevel, maxLevel } = resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  })
+  const parsed = quickNpcSetupSchema(maxLevel, minLevel).safeParse(setup)
   if (!parsed.success) return false
 
   const available = resolveAvailableContent(context)
-  return (
-    available.species.some((entry) => entry.id === setup.speciesId) &&
-    available.classes.some((entry) => entry.id === setup.classId)
-  )
+  const speciesAvailable = available.species.some((entry) => entry.id === setup.speciesId)
+  if (!speciesAvailable) return false
+
+  if (!isClassProgressionApplicable(setup.level)) {
+    return true
+  }
+
+  return available.classes.some((entry) => entry.id === setup.classId)
 }

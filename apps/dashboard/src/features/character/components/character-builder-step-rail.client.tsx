@@ -44,7 +44,6 @@ export type CharacterBuilderStepRailProps = {
   draftValidationIssues: CharacterBuildValidationIssue[]
   /** Steps that may show a rail error after a failed Continue or Create. */
   validationVisibleStepIds: readonly CharacterBuilderStepId[]
-  standardArray: readonly number[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
 }
 
@@ -72,7 +71,6 @@ export function CharacterBuilderStepRail({
   resolvedChoiceSets,
   draftValidationIssues,
   validationVisibleStepIds,
-  standardArray,
   onStepSelect,
 }: CharacterBuilderStepRailProps) {
   const stepButtonRefs = useRef<Array<HTMLButtonElement | null>>([])
@@ -118,7 +116,6 @@ export function CharacterBuilderStepRail({
             draftValidationIssues,
             validationVisibleStepIds,
             catalogIndex,
-            standardArray,
           })
           const isActive = currentStepId === step.id
           const Icon = STEP_STATUS_ICONS[visualStatus]

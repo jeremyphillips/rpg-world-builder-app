@@ -5,7 +5,10 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { resolveEquippedArmorFromInventory } from '../../character/equipment-inventory'
+import {
+  resolveEquippedArmorFromInventory,
+  EMPTY_CHARACTER_EQUIPMENT,
+} from '../../character/equipment-inventory'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
 
 /** Adapts a builder draft into the global character derivation input shape. */
@@ -18,10 +21,15 @@ export function toCharacterDerivationInput(
 ): CharacterDerivationInput {
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
-  const { equipment } = assembleStartingEquipment(draft, catalogIndex, {
-    startingWealth: rules.startingWealth,
-    rulesetId,
-  })
+  const isLevelZeroNpc = draft.class.level === 0 && rules.levelZeroNpcs.enabled
+
+  const equipment = isLevelZeroNpc
+    ? { ...EMPTY_CHARACTER_EQUIPMENT }
+    : assembleStartingEquipment(draft, catalogIndex, {
+        startingWealth: rules.startingWealth,
+        rulesetId,
+      }).equipment
+
   const equippedArmor = resolveEquippedArmorFromInventory({
     equipment,
     catalog: catalogIndex.equipment,
@@ -29,6 +37,7 @@ export function toCharacterDerivationInput(
 
   return {
     level: getCharacterBuilderTotalLevel(draft),
+    proficiencyBonusOverride: isLevelZeroNpc ? rules.levelZeroNpcs.proficiencyBonus : undefined,
     armorClassBase: rules.armorClass.base,
     abilityScores: draft.abilities.scores,
     characterClass,

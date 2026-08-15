@@ -4,6 +4,7 @@ import {
   campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   abilitySchema,
+  abilityScoreOrderSchema,
   hitDieSchema,
   slugSchema,
 } from '@rpg/contracts'
@@ -84,6 +85,7 @@ export function createClassFormSchema(
       .object({
         startingEquipment: startingEquipmentFormSchema.optional(),
         proficiencies: characterCreationProficienciesFormSchema.optional(),
+        abilityScoreOrder: abilityScoreOrderSchema.optional(),
       })
       .optional()
       .superRefine((characterCreation, ctx) => {
@@ -122,6 +124,7 @@ export function createClassDraftFormSchema(
       .object({
         startingEquipment: startingEquipmentFormSchema.optional(),
         proficiencies: characterCreationProficienciesFormSchema.optional(),
+        abilityScoreOrder: abilityScoreOrderSchema.optional(),
       })
       .optional(),
   })
@@ -137,7 +140,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [descriptionField(ctx), ...coreAttributesFields()],
+      fields: [descriptionField(ctx), ...coreAttributesFields(ctx)],
     },
     {
       id: 'proficiencies',

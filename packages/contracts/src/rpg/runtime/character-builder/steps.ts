@@ -4,10 +4,12 @@ import {
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
-import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability/ability-generation'
+import { DEFAULT_STANDARD_ARRAY } from '../../primitives/standard-array'
+import { isStandardArrayAssignment } from './ability/ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
+import { isClassProgressionApplicable } from './progression/character-level-policy'
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft/draft'
@@ -78,6 +80,7 @@ const BUILDER_STEP_METADATA = {
   class: {
     label: getContentTypeTerm('classes').label,
     description: `Choose your character's ${getContentTypeSentenceForm('classes')}`,
+    isApplicable: (_context, draft) => isClassProgressionApplicable(draft.class.level),
   },
   abilities: {
     label: 'Abilities',
@@ -121,6 +124,15 @@ export function resolveEffectiveBuilderSteps(
     const applicability = 'isApplicable' in metadata ? metadata.isApplicable : undefined
     return applicability ? applicability(context, draft) : true
   })
+}
+
+/** Whether a step id appears in the effective builder flow for the current context and draft. */
+export function isEffectiveBuilderStep(
+  context: CharacterBuildContext,
+  draft: CharacterBuilderDraft,
+  stepId: CharacterBuilderStepId,
+): boolean {
+  return resolveEffectiveBuilderSteps(context, draft).some((step) => step.id === stepId)
 }
 
 /** Short label for a wizard step (rail, review summaries, etc.). */
@@ -238,6 +250,7 @@ function isSpeciesComplete(
 }
 
 function isClassComplete(draft: CharacterBuilderDraft): boolean {
+  if (!isClassProgressionApplicable(draft.class.level)) return true
   return typeof draft.class.classId === 'string' && draft.class.classId.length > 0
 }
 
@@ -248,7 +261,7 @@ function isConnectionsComplete(draft: CharacterBuilderDraft): boolean {
 
 function isAbilitiesComplete(
   draft: CharacterBuilderDraft,
-  standardArray: readonly number[] = STANDARD_ARRAY,
+  standardArray: readonly number[] = DEFAULT_STANDARD_ARRAY,
 ): boolean {
   if (!draft.abilities.method) return false
   const scores = draft.abilities.scores
@@ -275,6 +288,9 @@ function isReviewComplete(
 ): boolean {
   const prerequisiteIds = BUILDER_STEPS.filter((s) => s.id !== 'review').map((s) => s.id)
   return prerequisiteIds.every((id) => {
+    if (id === 'class' && !isClassProgressionApplicable(draft.class.level)) {
+      return true
+    }
     const status = getBuilderStepStatus(id, draft, resolvedChoiceSets)
     return status === 'complete' || status === 'deferred'
   })
@@ -337,7 +353,7 @@ export function isBuilderStepComplete(
 
   const stepChoiceSets =
     resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
-  const standardArray = options?.standardArray ?? STANDARD_ARRAY
+  const standardArray = options?.standardArray ?? DEFAULT_STANDARD_ARRAY
 
   return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets, standardArray)
 }

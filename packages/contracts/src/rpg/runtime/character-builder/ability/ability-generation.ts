@@ -1,15 +1,7 @@
 import { z } from 'zod'
 
+import { DEFAULT_STANDARD_ARRAY } from '../../../primitives/standard-array'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
-
-// ---------------------------------------------------------------------------
-// Ability score generation — how a builder draft assigns the six scores.
-// The method union stays open for 'point-buy' and 'rolled' later; MVP ships
-// standard array (happy path) and manual entry (escape hatch).
-// ---------------------------------------------------------------------------
-
-/** SRD standard array — assign each value to exactly one ability. */
-export const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8] as const
 
 export const ABILITY_GENERATION_METHODS = ['standard-array', 'manual'] as const
 
@@ -28,7 +20,7 @@ export type AbilityGenerationRules = z.infer<typeof abilityGenerationRulesSchema
 
 export const DEFAULT_ABILITY_GENERATION_RULES = {
   methods: [...ABILITY_GENERATION_METHODS],
-  standardArray: [...STANDARD_ARRAY],
+  standardArray: [...DEFAULT_STANDARD_ARRAY],
 } as const satisfies AbilityGenerationRules
 
 const STANDARD_ARRAY_METHOD = 'standard-array' as const satisfies AbilityGenerationMethod

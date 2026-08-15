@@ -16,7 +16,6 @@ import {
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-const standardArray = context.characterCreationRules.abilityGeneration.standardArray
 
 function resolveStatus(
   input: Pick<ResolveStepVisualStatusInput, 'stepId' | 'draft' | 'currentStepId'> &
@@ -28,7 +27,6 @@ function resolveStatus(
     draftValidationIssues: [],
     validationVisibleStepIds: [],
     catalogIndex,
-    standardArray,
     ...input,
   })
 }
