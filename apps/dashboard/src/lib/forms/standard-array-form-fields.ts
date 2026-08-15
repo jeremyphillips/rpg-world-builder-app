@@ -1,4 +1,8 @@
-import { STANDARD_ARRAY_LENGTH } from '@rpg/contracts'
+import {
+  ABILITY_SCORE_MIN,
+  CHARACTER_ABILITY_SCORE_MAX,
+  STANDARD_ARRAY_LENGTH,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 export type StandardArrayFormFieldOptions = {
@@ -28,6 +32,8 @@ export function standardArrayFormFields(options: StandardArrayFormFieldOptions =
       digits: 2,
       width: 'auto' as const,
       required: true,
+      min: ABILITY_SCORE_MIN,
+      max: CHARACTER_ABILITY_SCORE_MAX,
     })),
   }
 }
