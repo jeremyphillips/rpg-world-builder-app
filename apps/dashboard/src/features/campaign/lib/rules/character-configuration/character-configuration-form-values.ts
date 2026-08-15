@@ -27,6 +27,10 @@ import {
   buildLanguageProficiencyPatchInput,
   mapLanguageProficiencyRulesToFormValues,
 } from './language-proficiency-form-values'
+import {
+  buildLevelZeroNpcsPatchInput,
+  mapLevelZeroNpcsToFormValues,
+} from './level-zero-npc-form-values'
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
@@ -34,6 +38,7 @@ type BuildCharacterCreationPatchInputOptions = {
   includeDefaultMulticlassing?: boolean
   includeDefaultSubclassing?: boolean
   includeDefaultLanguageProficiencies?: boolean
+  includeDefaultLevelZeroNpcs?: boolean
   existingLanguageChoice?: ResolvedCampaignCharacterCreationPatch['proficiencyChoices']['languages'][number]
 }
 
@@ -161,6 +166,10 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     ...mapLanguageProficiencyRulesToFormValues(
       resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID)),
     ),
+    ...mapLevelZeroNpcsToFormValues(
+      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
+        .levelZeroNpcs,
+    ),
   }
 }
 
@@ -217,6 +226,11 @@ export function buildCharacterCreationPatchInput(
     )
   }
 
+  const levelZeroNpcs = buildLevelZeroNpcsPatchInput(values, options)
+  if (levelZeroNpcs) {
+    patch.levelZeroNpcs = levelZeroNpcs
+  }
+
   return patch
 }
 
@@ -253,5 +267,6 @@ export function mapRulesetPatchToRulesValues(
     subclassChoicesEnabled: characterCreation.subclasses.enabled,
     startingWealth: mapStartingWealthToFormValues(characterCreation.startingWealth),
     ...mapLanguageProficiencyRulesToFormValues(characterCreation),
+    ...mapLevelZeroNpcsToFormValues(characterCreation.levelZeroNpcs),
   }
 }

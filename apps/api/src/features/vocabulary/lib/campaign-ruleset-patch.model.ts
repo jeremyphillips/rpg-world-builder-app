@@ -101,6 +101,47 @@ const subclassingSchema = new Schema(
   { _id: false },
 )
 
+const proficiencyGrantSetSchema = new Schema(
+  {
+    categories: [{ type: String, trim: true }],
+    items: [{ type: String, trim: true }],
+  },
+  { _id: false },
+)
+
+const languageProficiencyGrantSetSchema = new Schema(
+  {
+    categories: [{ type: String, trim: true }],
+    items: [{ type: String, trim: true }],
+  },
+  { _id: false },
+)
+
+const characterWealthGrantSchema = new Schema(
+  {
+    cp: { type: Number },
+    sp: { type: Number },
+    gp: { type: Number },
+    pp: { type: Number },
+  },
+  { _id: false },
+)
+
+const levelZeroNpcsSchema = new Schema(
+  {
+    enabled: { type: Boolean },
+    baseHitDie: { type: Number },
+    proficiencyBonus: { type: Number },
+    retainSpeciesTraits: { type: Boolean },
+    armorProficiencies: { type: proficiencyGrantSetSchema, default: undefined },
+    weaponProficiencies: { type: proficiencyGrantSetSchema, default: undefined },
+    languageProficiencies: { type: languageProficiencyGrantSetSchema, default: undefined },
+    retainSpeciesLanguages: { type: Boolean },
+    startingWealth: { type: characterWealthGrantSchema, default: undefined },
+  },
+  { _id: false },
+)
+
 const characterCreationSchema = new Schema(
   {
     startingLevel: { type: Number },
@@ -116,6 +157,7 @@ const characterCreationSchema = new Schema(
     },
     multiclassing: { type: multiclassingSchema, default: undefined },
     subclasses: { type: subclassingSchema, default: undefined },
+    levelZeroNpcs: { type: levelZeroNpcsSchema, default: undefined },
     startingWealth: { type: Schema.Types.Mixed, default: undefined },
   },
   { _id: false },

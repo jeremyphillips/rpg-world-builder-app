@@ -39,6 +39,7 @@ import {
 import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
 import { disableFormItems } from '@/lib/disable-form-items'
+import { buildContentFormOptionSets, useEquipment } from '@/features/content'
 import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
 import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
 import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
@@ -92,6 +93,11 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
     isPending: isLanguageVocabularyPending,
     isError: isLanguageVocabularyError,
   } = useLanguageVocabulary(campaignId)
+  const {
+    data: equipment,
+    isPending: isEquipmentPending,
+    isError: isEquipmentError,
+  } = useEquipment(campaignId)
   const { mutateAsync, isPending: isSaving } = usePatchCharacterCreationMutation(campaignId)
 
   const schema = useMemo(
@@ -106,11 +112,28 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
   const fields = useMemo(() => {
     const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(creatureTypeVocabulary)
     const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
+    const { armor: armorOptions, weapons: weaponOptions } = buildContentFormOptionSets({
+      campaignId,
+      equipment,
+    })
     return disableFormItems(
-      buildRulesConfigFields(creatureTypeOptions, languageOptions, categoryOptions),
+      buildRulesConfigFields(
+        creatureTypeOptions,
+        languageOptions,
+        categoryOptions,
+        armorOptions,
+        weaponOptions,
+      ),
       !canManage,
     )
-  }, [canManage, creatureTypeVocabulary, languageVocabulary, categoryOptions])
+  }, [
+    campaignId,
+    canManage,
+    categoryOptions,
+    creatureTypeVocabulary,
+    equipment,
+    languageVocabulary,
+  ])
 
   const defaultValues = useMemo(
     () => (patch ? mapRulesetPatchToRulesValues(patch.characterCreation) : undefined),
@@ -123,6 +146,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
         includeDefaultMulticlassing: true,
         includeDefaultSubclassing: true,
         includeDefaultLanguageProficiencies: true,
+        includeDefaultLevelZeroNpcs: true,
         existingLanguageChoice: patch?.characterCreation.proficiencyChoices.languages[0],
       }),
     )
@@ -134,8 +158,15 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
 
   return (
     <PageLoadState
-      isPending={isPending || isCreatureTypeVocabularyPending || isLanguageVocabularyPending}
-      isError={isError || isCreatureTypeVocabularyError || isLanguageVocabularyError}
+      isPending={
+        isPending ||
+        isCreatureTypeVocabularyPending ||
+        isLanguageVocabularyPending ||
+        isEquipmentPending
+      }
+      isError={
+        isError || isCreatureTypeVocabularyError || isLanguageVocabularyError || isEquipmentError
+      }
       defaultErrorLabel="Could not load character configuration."
     >
       {defaultValues ? (

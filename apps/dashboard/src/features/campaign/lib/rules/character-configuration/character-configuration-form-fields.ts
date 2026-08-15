@@ -5,6 +5,11 @@ import {
   CHARACTER_ABILITY_SCORE_MAX,
   CREATURE_TYPE_TERM,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
+  DEFAULT_LEVEL_ZERO_NPCS_ENABLED,
+  DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS,
+  DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
+  DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS,
   DEFAULT_MULTICLASSING_ENABLED,
   DEFAULT_PRIMARY_ABILITY_MINIMUM,
   DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
@@ -20,6 +25,8 @@ import {
   levelValidationMessages,
   MAX_CHARACTER_LEVEL,
   creatureTypeSchema,
+  hitDieSchema,
+  levelZeroProficiencyBonusSchema,
   refineLevelRangeTable,
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
@@ -54,6 +61,7 @@ import {
   languageProficiencyGrantsFormSchema,
 } from './language-proficiency-form-fields'
 import { languageProficiencyRulesDefaultValues } from './language-proficiency-form-values'
+import { levelZeroNpcsFields, levelZeroNpcsFormSchema } from './level-zero-npc-form-fields'
 
 /** Character configuration validation messages (tier 3 form overrides). */
 export const characterConfigurationValidationMessages = {
@@ -116,6 +124,30 @@ const configRulesObjectSchema = z.object({
   languageProficiencyChoice: languageProficiencyChoiceFormSchema.default(
     () => languageProficiencyRulesDefaultValues().languageProficiencyChoice,
   ),
+  levelZeroNpcsEnabled: z.boolean().default(DEFAULT_LEVEL_ZERO_NPCS_ENABLED),
+  levelZeroBaseHitDie: z.coerce
+    .number()
+    .pipe(hitDieSchema)
+    .default(DEFAULT_LEVEL_ZERO_BASE_HIT_DIE),
+  levelZeroProficiencyBonus: z.coerce
+    .number()
+    .pipe(levelZeroProficiencyBonusSchema)
+    .default(DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS),
+  levelZeroRetainSpeciesTraits: z.boolean().default(DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS),
+  levelZeroArmorGrantMode: levelZeroNpcsFormSchema.shape.levelZeroArmorGrantMode.default('none'),
+  levelZeroArmorProficiencies: levelZeroNpcsFormSchema.shape.levelZeroArmorProficiencies.default(
+    () => ({ categories: [], items: [] }),
+  ),
+  levelZeroWeaponGrantMode: levelZeroNpcsFormSchema.shape.levelZeroWeaponGrantMode.default('none'),
+  levelZeroWeaponProficiencies: levelZeroNpcsFormSchema.shape.levelZeroWeaponProficiencies.default(
+    () => ({ categories: [], items: [] }),
+  ),
+  levelZeroLanguageProficiencies:
+    levelZeroNpcsFormSchema.shape.levelZeroLanguageProficiencies.default(() => ({
+      items: ['common'],
+    })),
+  levelZeroRetainSpeciesLanguages: z.boolean().default(DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES),
+  levelZeroStartingWealth: levelZeroNpcsFormSchema.shape.levelZeroStartingWealth.optional(),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -455,6 +487,8 @@ type CharacterConfigFormOptions = {
   creatureTypeOptions: FieldOption[]
   languageOptions: FieldOption[]
   languageCategoryOptions: FieldOption[]
+  armorOptions: FieldOption[]
+  weaponOptions: FieldOption[]
 }
 
 type CharacterRuleFieldDef = {
@@ -610,6 +644,13 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     configSection: { id: 'subclasses', label: 'Subclasses' },
     buildFormItems: () => [subclassesGroup()],
   },
+  {
+    id: 'levelZeroNpcs',
+    surfaces: ['config'],
+    configSection: { id: 'level-0-npcs', label: 'Level 0 NPCs' },
+    buildFormItems: ({ languageOptions, armorOptions, weaponOptions }) =>
+      levelZeroNpcsFields({ languageOptions, armorOptions, weaponOptions }),
+  },
 ]
 
 /** In-page anchor sections for Homebrew character configuration — derived from field registry. */
@@ -628,11 +669,15 @@ export function buildRulesConfigLayoutFields(
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
   languageCategoryOptions: FieldOption[] = [],
+  armorOptions: FieldOption[] = [],
+  weaponOptions: FieldOption[] = [],
 ): FormItem[] {
   const options: CharacterConfigFormOptions = {
     creatureTypeOptions,
     languageOptions,
     languageCategoryOptions,
+    armorOptions,
+    weaponOptions,
   }
   return fieldsForSurface('config').flatMap((field) => {
     const items = field.buildFormItems(options)
@@ -653,6 +698,8 @@ export function buildRulesFieldsForSurface(
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
   languageCategoryOptions: FieldOption[] = [],
+  armorOptions: FieldOption[] = [],
+  weaponOptions: FieldOption[] = [],
 ): FormItem[] {
   if (surface === 'create') {
     return [
@@ -673,6 +720,8 @@ export function buildRulesFieldsForSurface(
     creatureTypeOptions,
     languageOptions,
     languageCategoryOptions,
+    armorOptions,
+    weaponOptions,
   }
   return fieldsForSurface('config').flatMap((field) => field.buildFormItems(options))
 }

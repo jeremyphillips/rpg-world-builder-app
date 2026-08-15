@@ -64,6 +64,29 @@ describe('resolveCharacterCreationPatch', () => {
     ).toEqual({ enabled: false })
   })
 
+  it('resolves level 0 NPC defaults and overrides', () => {
+    expect(
+      resolveCharacterCreationPatch(undefined, minimalStartingWealthSeed).levelZeroNpcs,
+    ).toEqual({
+      enabled: true,
+      baseHitDie: 6,
+      proficiencyBonus: 2,
+      retainSpeciesTraits: true,
+      armorProficiencies: { categories: [], items: [] },
+      weaponProficiencies: { categories: [], items: [] },
+      languageProficiencies: { items: ['common'], categories: [] },
+      retainSpeciesLanguages: true,
+      startingWealth: undefined,
+    })
+
+    expect(
+      resolveCharacterCreationPatch(
+        { levelZeroNpcs: { proficiencyBonus: 0 } },
+        minimalStartingWealthSeed,
+      ).levelZeroNpcs.proficiencyBonus,
+    ).toBe(0)
+  })
+
   it('resolves SRD default language proficiency rules', () => {
     const resolved = resolveCharacterCreationPatch(undefined, minimalStartingWealthSeed)
 

@@ -18,6 +18,11 @@ import {
   resolvedCampaignMulticlassingPatchSchema,
 } from './campaign-multiclassing-patch'
 import {
+  campaignLevelZeroNpcsPatchSchema,
+  resolveLevelZeroNpcRules,
+  resolvedCampaignLevelZeroNpcsPatchSchema,
+} from './campaign-level-zero-npcs-patch'
+import {
   characterCreationProficiencyChoicesPatchSchema,
   characterCreationProficiencyGrantsPatchSchema,
   resolveCharacterCreationProficiencyRules,
@@ -96,6 +101,7 @@ export const campaignCharacterCreationPatchSchema = z
       .optional(),
     multiclassing: campaignMulticlassingPatchSchema.optional(),
     subclasses: campaignSubclassingPatchSchema.optional(),
+    levelZeroNpcs: campaignLevelZeroNpcsPatchSchema.optional(),
     startingWealth: startingWealthRulesPatchSchema.optional(),
     proficiencyGrants: characterCreationProficiencyGrantsPatchSchema.optional(),
     proficiencyChoices: characterCreationProficiencyChoicesPatchSchema.optional(),
@@ -125,6 +131,7 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
   }),
   multiclassing: resolvedCampaignMulticlassingPatchSchema,
   subclasses: resolvedCampaignSubclassingPatchSchema,
+  levelZeroNpcs: resolvedCampaignLevelZeroNpcsPatchSchema,
   startingWealth: startingWealthRulesSchema,
   proficiencyGrants: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyGrants,
   proficiencyChoices: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyChoices,
@@ -306,6 +313,7 @@ export function resolveCharacterCreationPatch(
     species: resolveCharacterCreationSpecies(patch),
     multiclassing: resolveMulticlassingRules(patch?.multiclassing),
     subclasses: resolveSubclassingRules(patch?.subclasses),
+    levelZeroNpcs: resolveLevelZeroNpcRules(patch?.levelZeroNpcs),
     startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),
     ...resolveCharacterCreationProficiencyRules(patch),
   }

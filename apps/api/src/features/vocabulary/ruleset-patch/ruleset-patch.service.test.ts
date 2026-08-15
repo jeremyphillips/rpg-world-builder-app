@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   CREATURE_TYPE_SET_ID,
   defaultCampaignMechanicsPatch,
+  defaultLevelZeroNpcRules,
   defaultMulticlassingRules,
   defaultSubclassingRules,
   type StartingWealthTier,
@@ -46,6 +47,7 @@ describe('getRulesetPatchRead', () => {
       species: { creatureTypePolicy: { mode: 'only', ids: ['humanoid'] } },
       multiclassing: defaultMulticlassingRules(),
       subclasses: defaultSubclassingRules(),
+      levelZeroNpcs: defaultLevelZeroNpcRules(),
       startingWealth: standardStartingWealthSeed(),
     })
     expect(patch?.mechanics).toEqual(defaultCampaignMechanicsPatch())
@@ -284,6 +286,57 @@ describe('updateCharacterCreationPatch', () => {
 
     const stored = await storedRulesetPatchDoc(campaignId)
     expectStoredSparseUnset(stored?.characterCreation?.startingWealth)
+  })
+
+  it('persists non-default level 0 NPC overrides including proficiencyBonus 0', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    const patch = await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        proficiencyBonus: 0,
+        armorProficiencies: { categories: ['light'], items: [] },
+      },
+    })
+
+    expect(patch?.characterCreation.levelZeroNpcs).toMatchObject({
+      proficiencyBonus: 0,
+      armorProficiencies: { categories: ['light'], items: [] },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.levelZeroNpcs?.proficiencyBonus).toBe(0)
+    expect(stored?.characterCreation?.levelZeroNpcs?.armorProficiencies?.categories).toEqual([
+      'light',
+    ])
+    expect(stored?.characterCreation?.levelZeroNpcs?.weaponProficiencies).toBeUndefined()
+  })
+
+  it('unsets stored levelZeroNpcs when reverted to defaults', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: { enabled: false },
+    })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: defaultLevelZeroNpcRules(),
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expectStoredSparseUnset(stored?.characterCreation?.levelZeroNpcs)
+  })
+
+  it('does not persist empty grant-set noise for level 0 armor defaults', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'LevelZero' })
+
+    await updateCharacterCreationPatch(campaignId, {
+      levelZeroNpcs: {
+        armorProficiencies: { categories: [], items: [] },
+      },
+    })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(stored?.characterCreation?.levelZeroNpcs?.armorProficiencies).toBeUndefined()
   })
 })
 

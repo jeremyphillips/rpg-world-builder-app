@@ -83,6 +83,16 @@ export function resolveRulesSchemaWithVocabulary(options: {
           })
         }
       }
+
+      for (const id of values.levelZeroLanguageProficiencies.items) {
+        if (!activeLanguageIds.has(id)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: characterConfigurationValidationMessages.languageUnavailable(),
+            path: ['levelZeroLanguageProficiencies', 'items'],
+          })
+        }
+      }
     }
   })
 }
@@ -92,6 +102,14 @@ export function buildRulesConfigFields(
   creatureTypeOptions: FieldOption[],
   languageOptions: FieldOption[] = [],
   languageCategoryOptions: FieldOption[] = [],
+  armorOptions: FieldOption[] = [],
+  weaponOptions: FieldOption[] = [],
 ): FormItem[] {
-  return buildRulesConfigLayoutFields(creatureTypeOptions, languageOptions, languageCategoryOptions)
+  return buildRulesConfigLayoutFields(
+    creatureTypeOptions,
+    languageOptions,
+    languageCategoryOptions,
+    armorOptions,
+    weaponOptions,
+  )
 }

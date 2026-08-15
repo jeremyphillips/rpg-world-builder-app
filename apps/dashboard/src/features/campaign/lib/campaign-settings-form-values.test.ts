@@ -28,6 +28,7 @@ import {
   mapRulesetPatchToRulesValues,
 } from './rules/character-configuration/character-configuration-form-values'
 import { languageProficiencyRulesDefaultValues } from './rules/character-configuration/language-proficiency-form-values'
+import { levelZeroNpcsDefaultFormValues } from './rules/character-configuration/level-zero-npc-form-values'
 import { mapStartingWealthToFormValues } from './rules/character-configuration/starting-wealth-form-values'
 
 const defaultStartingWealth = mapStartingWealthToFormValues(
@@ -78,6 +79,7 @@ const defaultMulticlassingFields = {
   subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
   startingWealth: defaultStartingWealth,
   ...languageProficiencyRulesDefaultValues(),
+  ...levelZeroNpcsDefaultFormValues(),
 } as const
 
 describe('mapCampaignToSettingsValues', () => {
@@ -195,6 +197,7 @@ describe('buildCharacterCreationPatchInput', () => {
         subclassChoicesEnabled: true,
         startingWealth: defaultStartingWealth,
         ...languageProficiencyRulesDefaultValues(),
+        ...levelZeroNpcsDefaultFormValues(),
       }),
     ).toEqual({
       startingLevel: 1,
@@ -239,6 +242,7 @@ describe('buildCharacterCreationPatchInput', () => {
           subclassChoicesEnabled: true,
           startingWealth: defaultStartingWealth,
           ...languageProficiencyRulesDefaultValues(),
+          ...levelZeroNpcsDefaultFormValues(),
         },
         { includeDefaultMulticlassing: true },
       ),
@@ -369,6 +373,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       subclassChoicesEnabled: true,
       startingWealth: defaultStartingWealth,
       ...languageProficiencyRulesDefaultValues(),
+      ...levelZeroNpcsDefaultFormValues(),
     })
   })
 })
