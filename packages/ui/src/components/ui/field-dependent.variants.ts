@@ -1,14 +1,8 @@
 import { cn } from '../../lib/utils'
-import type {
-  DependentChrome,
-  DependentDependentsConfig,
-  DependentLayout,
-} from '../../form/field-config'
-import {
-  fieldRailInnerPaddingClasses,
-  fieldToggleDependentIndentClasses,
-  type FieldRhythm,
-} from './field.variants'
+import type { DependentChrome, DependentDependentsConfig } from '../../form/field-config'
+import { DEFAULT_DEPENDENT_INSET } from '../../form/field-config'
+import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
+import { resolveFieldRailClasses, type FieldRailTone } from './field-rail.variants'
 import {
   resolveFieldContainerChromeClasses,
   type FieldContainerChromeOptions,
@@ -30,61 +24,61 @@ export {
   resolveSurfaceClasses,
   SEMANTIC_SURFACE_TONES,
 } from './field-surface.variants'
+export {
+  resolveFieldRailClasses,
+  fieldRailOffsetClasses,
+  type FieldRailTone,
+} from './field-rail.variants'
 
 /** Where dependent chrome applies on toggle-dependent sections. */
 export type FieldDependentsScope = 'wrapper' | 'arrayItems'
 
-export type FieldGroupRailTone = 'border' | 'primary'
-
-const fieldDependentRailBodyVariants = {
-  border: 'border-border',
-  primary: 'border-primary',
-} satisfies Record<FieldGroupRailTone, string>
+/** @deprecated Use {@link FieldRailTone}. */
+export type FieldGroupRailTone = FieldRailTone
 
 /** Border/bg panel around dependent fields with optional padding shell. */
 export function resolveFieldDependentsChromeClasses(options: FieldContainerChromeOptions): string {
   return cn('rounded-md border p-3', resolveFieldContainerChromeClasses(options))
 }
 
-/** Controller-relative outer offset for dependent regions. */
-export function resolveDependentLayoutClasses(layout: DependentLayout = 'inset'): string {
-  return layout === 'inset' ? fieldToggleDependentIndentClasses : ''
-}
-
-/** Left rail decoration — border + small local inner padding only. */
-export function resolveDependentRailChromeClasses(tone: FieldGroupRailTone = 'border'): string {
-  return cn('border-l-2', fieldDependentRailBodyVariants[tone], fieldRailInnerPaddingClasses)
+/** @deprecated Use {@link resolveFieldRailClasses}. */
+export function resolveDependentRailChromeClasses(
+  _rhythm: FieldRhythm = 'comfortable',
+  tone: FieldRailTone = 'border',
+): string {
+  return resolveFieldRailClasses(tone)
 }
 
 export type ResolvedDependentPresentation = {
-  layout: DependentLayout
-  layoutClassName: string
+  inset: boolean
+  insetClassName: string
   chrome: DependentChrome
+  /** Decorative rail wrapper — does not add content indentation. */
+  railClassName?: string
+  /** Panel/chrome shell — owns its own internal padding. */
   chromeWrapperClassName?: string
   arrayItemSurface?: FieldContainerChromeOptions['surface']
   arrayItemTone?: FieldContainerChromeOptions['tone']
 }
 
-/** Resolves dependent layout (positioning) and chrome (decoration) independently. */
+/** Resolves dependent inset (content position) and chrome (decoration) independently. */
 export function resolveDependentPresentation(
-  dependents: DependentDependentsConfig,
+  dependents: DependentDependentsConfig & { inset: boolean },
   rhythm: FieldRhythm,
 ): ResolvedDependentPresentation {
-  void rhythm
-  const layout = dependents.layout ?? 'inset'
-  const chrome = dependents.chrome ?? 'none'
-  const layoutClassName = resolveDependentLayoutClasses(layout)
+  const { inset, chrome = 'none' } = dependents
+  const insetClassName = resolveDependentInsetClasses(inset, rhythm)
 
   if (chrome === 'none') {
-    return { layout, layoutClassName, chrome }
+    return { inset, insetClassName, chrome }
   }
 
   if (chrome === 'panel') {
     const surface = dependents.panel?.surface
     const tone = dependents.panel?.tone
     return {
-      layout,
-      layoutClassName,
+      inset,
+      insetClassName,
       chrome,
       chromeWrapperClassName: resolveFieldDependentsChromeClasses({ surface, tone }),
       arrayItemSurface: surface,
@@ -93,10 +87,10 @@ export function resolveDependentPresentation(
   }
 
   return {
-    layout,
-    layoutClassName,
+    inset,
+    insetClassName,
     chrome,
-    chromeWrapperClassName: resolveDependentRailChromeClasses(),
+    railClassName: resolveFieldRailClasses(),
   }
 }
 
@@ -108,5 +102,8 @@ export function resolveDependentChromePresentation(
   dependents: DependentDependentsConfig,
   rhythm: FieldRhythm,
 ): ResolvedDependentPresentation {
-  return resolveDependentPresentation(dependents, rhythm)
+  return resolveDependentPresentation(
+    { ...dependents, inset: dependents.inset ?? DEFAULT_DEPENDENT_INSET },
+    rhythm,
+  )
 }

@@ -944,11 +944,11 @@ export type GroupFieldItem =
   | DependentConfig
   | ArrayConfig
 
-/** Controller-relative positioning for toggle-gated dependents. */
-export type DependentLayout = 'inset' | 'flush'
-
-/** Decorative boundary for the dependents region — orthogonal to {@link DependentLayout}. */
+/** Decorative boundary for the dependents region — orthogonal to {@link DependentDependentsConfig.inset}. */
 export type DependentChrome = 'none' | 'rail' | 'panel'
+
+/** Default controller-relative positioning for dependent regions. */
+export const DEFAULT_DEPENDENT_INSET = true
 
 export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
@@ -957,9 +957,9 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  /** Where dependent content sits relative to its controller. @default 'inset' */
-  layout?: DependentLayout
-  /** Optional visual treatment on the dependents region. @default 'none' */
+  /** Controller-relative indentation. @default {@link DEFAULT_DEPENDENT_INSET} */
+  inset?: boolean
+  /** Decorative treatment only. @default 'none' */
   chrome?: DependentChrome
   /** Panel wash options — only when `chrome === 'panel'`. */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }

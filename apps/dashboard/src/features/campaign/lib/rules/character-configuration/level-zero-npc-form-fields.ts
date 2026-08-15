@@ -132,7 +132,6 @@ export function levelZeroNpcsFields({
             defaultValue: true,
           },
           dependents: {
-            layout: 'inset',
             chrome: 'rail',
             fields: [
               standardArrayFormFields({
@@ -182,6 +181,7 @@ export function levelZeroNpcsFields({
                 categoriesLabel: 'Armor categories',
                 itemsLabel: 'Specific armor',
                 separator: 'subtle',
+                dependents: { chrome: 'rail' },
               }),
               xorProficiencyGrantSetField({
                 modeFieldName: LEVEL_ZERO_WEAPON_MODE,
@@ -194,6 +194,7 @@ export function levelZeroNpcsFields({
                 categoriesLabel: 'Weapon categories',
                 itemsLabel: 'Specific weapons',
                 separator: 'subtle',
+                dependents: { chrome: 'rail' },
               }),
               languageGrantItemsField({
                 path: LEVEL_ZERO_LANGUAGE_ITEMS_PATH,

@@ -194,7 +194,7 @@ export {
   type FormHeadingTier,
   type FieldLabelVisibility,
   type DependentChrome,
-  type DependentLayout,
+  DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,

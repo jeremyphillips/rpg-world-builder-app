@@ -38,10 +38,12 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldLabelVariants` `placement` — inline switch/checkbox label first-line height (typography unchanged)
  * - `fieldSettingsRowClasses` — dense settings rows (label + hint | control)
  * - `fieldStackRhythmVariants` — vertical gap between stack siblings (`compact` | `comfortable`)
- * - `fieldGroupInsetPaddingVariants` — group inset chrome left padding by rhythm (mobile / desktop)
+ * - `formDependentInsetSpacing` — total content inset by rhythm (compact 8 / comfortable 9)
+ * - `fieldRailOffsetClasses` — rail position within gutter (`left-2` / 8px leading space)
+ * - `resolveDependentInsetClasses` — rhythm-derived content indentation (`pl-8` / `pl-9`)
+ * - `resolveFieldRailClasses` — pseudo-element rail decoration (see `field-rail.variants.ts`)
  * - `fieldArrayItemListClasses` — gap between sibling array items (rhythm + section size)
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
- * - `fieldToggleDependentIndentClasses` — indent for dependents region under inline switch
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
 export const fieldAnatomyStackClasses = 'space-y-2'
@@ -147,18 +149,31 @@ export const fieldStackRhythmVariants = cva('flex flex-col', {
 export type FieldStackRhythmVariantProps = VariantProps<typeof fieldStackRhythmVariants>
 
 /**
- * Group inset chrome left padding — mobile-first (`base` = mobile, `sm+` = desktop).
- *
- * | rhythm      | mobile | desktop |
- * | ----------- | ------ | ------- |
- * | comfortable | 16px   | 32px    |
- * | compact     | 16px   | 20px    |
+ * Total dependent content inset by rhythm — includes 8px leading gutter (`left-2` rail offset)
+ * plus rhythm content offset (compact 24px / comfortable 28px) → `pl-8` / `pl-9`.
  */
-export const fieldGroupInsetPaddingVariants = cva('', {
+export const formDependentInsetSpacing = {
+  compact: 8,
+  comfortable: 9,
+} as const satisfies Record<FieldRhythm, number>
+
+/** Content offset from controller after the 8px rail gutter — compact 24px, comfortable 28px. */
+export const formDependentContentOffsetSpacing = {
+  compact: 6,
+  comfortable: 7,
+} as const satisfies Record<FieldRhythm, number>
+
+/** @deprecated Use {@link formDependentInsetSpacing}. */
+export const formRailInnerSpacing = formDependentInsetSpacing
+
+/** @deprecated Use {@link formDependentInsetSpacing}. */
+export const formInsetSpacing = formDependentInsetSpacing
+
+export const fieldDependentInsetVariants = cva('', {
   variants: {
     rhythm: {
-      compact: 'pl-4 sm:pl-5',
-      comfortable: 'pl-4 sm:pl-8',
+      compact: 'pl-8',
+      comfortable: 'pl-9',
     },
   },
   defaultVariants: {
@@ -166,9 +181,59 @@ export const fieldGroupInsetPaddingVariants = cva('', {
   },
 })
 
-export function resolveFieldGroupInsetPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
-  return fieldGroupInsetPaddingVariants({ rhythm })
+/** @deprecated Use {@link fieldDependentInsetVariants}. */
+export const fieldRailInnerPaddingVariants = fieldDependentInsetVariants
+
+/** @deprecated Use {@link fieldDependentInsetVariants}. */
+export const fieldInsetLeftPaddingVariants = fieldDependentInsetVariants
+
+export const fieldInsetPaddingVariants = cva('', {
+  variants: {
+    rhythm: {
+      compact: 'p-8',
+      comfortable: 'p-9',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
+
+export type FormInsetPaddingAxis = 'left' | 'all'
+
+/** Projects dependent content inset spacing onto the requested axis. */
+export function resolveFormInsetPaddingClasses(
+  rhythm: FieldRhythm = 'comfortable',
+  axis: FormInsetPaddingAxis = 'left',
+): string {
+  return axis === 'left'
+    ? fieldDependentInsetVariants({ rhythm })
+    : fieldInsetPaddingVariants({ rhythm })
 }
+
+/** @deprecated Use {@link fieldDependentInsetVariants}. */
+export const fieldGroupInsetPaddingVariants = fieldDependentInsetVariants
+
+/** @deprecated Use {@link resolveFormInsetPaddingClasses}. */
+export function resolveFieldGroupInsetPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
+  return resolveFormInsetPaddingClasses(rhythm, 'left')
+}
+
+/** @deprecated Use {@link resolveDependentInsetClasses}. */
+export function resolveFieldRailInnerPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
+  return resolveFormInsetPaddingClasses(rhythm, 'left')
+}
+
+/** Horizontal offset of dependent content from its controller — `pl-8` / `pl-9` (8px rail gutter + content offset). */
+export function resolveDependentInsetClasses(
+  inset: boolean,
+  rhythm: FieldRhythm = 'comfortable',
+): string {
+  return inset ? fieldDependentInsetVariants({ rhythm }) : ''
+}
+
+/** @deprecated Use {@link fieldRailOffsetClasses} from `field-rail.variants.ts`. */
+export const formDependentInsetOffsetClasses = 'left-2'
 
 /**
  * Vertical gap between sibling array items (list + Add button).
@@ -187,11 +252,7 @@ export function fieldArrayItemListClasses(options: {
 
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
-/** Aligns dependents region with inline switch label column (`w-9` + `gap-2`). */
-export const fieldToggleDependentIndentClasses = 'pl-11'
 
-/** Small inner padding on rail-decorated dependent/group chrome wrappers — not layout offset. */
-export const fieldRailInnerPaddingClasses = 'pl-3'
 export const chooseFromChipsSentenceClasses = fieldInlineSentenceClasses
 
 /** Trailing divider tone — maps to the global border ladder in design-tokens.md. */

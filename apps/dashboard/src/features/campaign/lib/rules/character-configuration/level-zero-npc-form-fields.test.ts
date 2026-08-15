@@ -28,7 +28,8 @@ describe('levelZeroNpcsFields', () => {
       name: LEVEL_ZERO_NPCS_ENABLED,
       label: 'Allow',
     })
-    expect(allow.dependents).toMatchObject({ layout: 'inset', chrome: 'rail' })
+    expect(allow.dependents).toMatchObject({ chrome: 'rail' })
+    expect(allow.dependents.inset).not.toBe(false)
     expect(
       allow.dependents.fields.some(
         (field) =>
@@ -52,5 +53,22 @@ describe('levelZeroNpcsFields', () => {
     expect(
       allow.dependents.fields.some((field) => isContainer(field) && field.kind === 'dependent'),
     ).toBe(true)
+  })
+
+  it('uses inset + rail on nested grant-set dependents', () => {
+    const allow = expectAllowDependent(
+      levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
+    )
+
+    const nestedDependents = allow.dependents.fields.filter(
+      (field): field is DependentConfig => isContainer(field) && field.kind === 'dependent',
+    )
+
+    expect(nestedDependents.length).toBeGreaterThanOrEqual(2)
+    for (const nested of nestedDependents) {
+      expect(nested.dependents).toMatchObject({ chrome: 'rail' })
+      expect(nested.dependents.inset).not.toBe(false)
+      expect(nested.dependents).not.toHaveProperty('panel')
+    }
   })
 })

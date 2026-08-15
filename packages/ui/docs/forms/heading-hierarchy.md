@@ -52,9 +52,29 @@ All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupL
 
 **Audit verdict:** Proposed API (`FormHeading`, `labelVisibility`, row/slot `heading`) covers all sampled outliers. No blocking API gaps.
 
-## Chrome orthogonality
+## Dependent inset and chrome
 
-Dependent `chrome: inset | panel | none` defaults to **`inset`** on toggle-gated dependents. Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect tier resolution, label visibility, or grouping.
+> **Inset positions dependent content. Rail offset positions the decorative boundary. Chrome must not determine content indentation.**
+
+| Concept         | Meaning                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Inset**       | Total horizontal offset where dependent content begins (`pl-8` / `pl-9` = 8px rail gutter + content offset) |
+| **Rail**        | Decorative vertical boundary (`before:left-2` pseudo-element)                                               |
+| **Rail offset** | Small positioning adjustment for the rail within the inset gutter (8px)                                     |
+
+Dependent regions split two orthogonal concerns:
+
+| Key      | Role                                                                | Default  |
+| -------- | ------------------------------------------------------------------- | -------- |
+| `inset`  | Controller-relative **content** positioning (`pl-8` / `pl-9`)       | `true`   |
+| `chrome` | Decorative grouping (`rail`, `panel`, or none) — does not add inset | `'none'` |
+
+- **`inset: true` + `chrome: 'none'`** — subordinate positioning without a boundary.
+- **Nested inset and chrome** are valid — each dependent region independently owns its inset and chrome. Nested rails are supported when nested dependency hierarchy benefits from explicit visual boundaries.
+- Shared factories (e.g. mode-dependent grant sets) default to `inset: true`, `chrome: 'none'` but accept `dependents: { inset?, chrome? }` overrides.
+- **`inset: false` + `chrome: 'rail'`** — explicit opt-out of positioning when a rail alone is enough. Callers choose this; the renderer does not inspect ancestors or infer depth.
+
+Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect tier resolution, label visibility, or grouping.
 
 ## Migration guide (summary)
 
@@ -66,5 +86,8 @@ Dependent `chrome: inset | panel | none` defaults to **`inset`** on toggle-gated
 | `hideLabel` / `labelHidden`        | `labelVisibility: 'srOnly'`                                                |
 | `label: ''`                        | Non-whitespace `label` + `labelVisibility: 'srOnly'` or structural heading |
 | `dependents.surface`               | `dependents.chrome: 'panel'` with `panel.surface`                          |
+| `dependents.chrome: 'inset'`       | `inset: true`; add `chrome: 'rail'` when a boundary is needed              |
+| `dependents.layout: 'inset'`       | `inset: true` (default)                                                    |
+| `dependents.layout: 'flush'`       | `inset: false`                                                             |
 
 See also [containers.md](./containers.md).

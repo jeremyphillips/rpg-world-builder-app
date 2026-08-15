@@ -4,11 +4,8 @@ import { cn } from '../../lib/utils'
 import type { CompactLabelTone } from './compact-label.lib'
 import { resolveChromeClasses } from './chrome.variants'
 import { isCompactLabelTone } from './field-surface.variants'
-import {
-  resolveFieldGroupInsetPaddingClasses,
-  fieldRailInnerPaddingClasses,
-  type FieldRhythm,
-} from './field.variants'
+import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
+import { resolveFieldRailClasses } from './field-rail.variants'
 import type {
   ChromeBorderAccent,
   ChromeConfig,
@@ -93,18 +90,6 @@ export type FieldGroupChrome =
 export const fieldGroupDividerTopPaddingClasses = 'pt-7'
 /** Spacing below a bottom divider — 28px (`pb-7`). */
 export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
-
-const fieldGroupRailBodyVariants = cva('border-l-2', {
-  variants: {
-    tone: {
-      border: 'border-border',
-      primary: 'border-primary',
-    },
-  },
-  defaultVariants: {
-    tone: 'border',
-  },
-})
 
 const fieldGroupDividerContainerVariants = cva('', {
   variants: {
@@ -215,13 +200,9 @@ function resolveGroupRailChrome(
   chrome: FieldGroupRailChrome | FieldGroupInsetChrome,
   rhythm: FieldRhythm,
 ): FieldGroupChromeClassNames {
-  const padding =
-    chrome.variant === 'inset'
-      ? resolveFieldGroupInsetPaddingClasses(rhythm)
-      : fieldRailInnerPaddingClasses
-
+  const tone = chrome.tone ?? 'border'
   return withFieldGroupChrome({
-    body: cn(fieldGroupRailBodyVariants({ tone: chrome.tone ?? 'border' }), padding),
+    body: cn(resolveFieldRailClasses(tone), resolveDependentInsetClasses(true, rhythm)),
   })
 }
 

@@ -72,7 +72,6 @@ const dependentFields: FormItem[] = [
       hint: 'Enable to configure the threshold below.',
     },
     dependents: {
-      layout: 'inset',
       chrome: 'panel',
       panel: { surface: { emphasis: 'subtle' } },
       fields: dependentFieldItems,
@@ -91,7 +90,6 @@ const dependentErrorToneFields: FormItem[] = [
       defaultValue: true,
     },
     dependents: {
-      layout: 'inset',
       chrome: 'panel',
       panel: { tone: 'destructive' },
       fields: [
@@ -134,7 +132,6 @@ const selectDependentFields: FormItem[] = [
         dependsOn: ['classPolicyMode'],
         visibleWhen: (values) => values.classPolicyMode !== 'all',
       },
-      layout: 'inset',
       chrome: 'panel',
       panel: { surface: { emphasis: 'subtle' } },
       fields: [
@@ -200,7 +197,6 @@ export const DependentFieldComfortable: Story = {
           defaultValue: true,
         },
         dependents: {
-          layout: 'inset',
           chrome: 'panel',
           panel: { surface: { emphasis: 'subtle' } },
           fields: dependentFieldItems,
@@ -246,7 +242,6 @@ export const DependentFieldArrayItemsScope: Story = {
             defaultValue: true,
           },
           dependents: {
-            layout: 'inset',
             chrome: 'panel',
             panel: { surface: { emphasis: 'subtle' } },
             scope: 'arrayItems',

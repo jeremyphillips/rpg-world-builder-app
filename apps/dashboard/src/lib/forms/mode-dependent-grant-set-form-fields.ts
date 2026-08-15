@@ -1,4 +1,6 @@
 import {
+  type DependentChrome,
+  DEFAULT_DEPENDENT_INSET,
   type FieldConfig,
   type FieldOption,
   type FieldVisibility,
@@ -14,6 +16,11 @@ const XOR_GRANT_SET_MODE_LABELS: Record<XorGrantSetMode, string> = {
   none: 'None',
   category: 'Category',
   specific: 'Specific',
+}
+
+export type DependentPresentationOptions = {
+  inset?: boolean
+  chrome?: DependentChrome
 }
 
 export type ModeDependentGrantSetFieldOptions = {
@@ -38,6 +45,7 @@ export type ModeDependentGrantSetFieldOptions = {
   labelVisibility?: 'visible' | 'srOnly'
   /** Trailing divider after this grant-set block within parent rhythm. */
   separator?: FieldConfig['separator']
+  dependents?: DependentPresentationOptions
 }
 
 function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibility {
@@ -68,6 +76,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     emptyMode,
     labelVisibility,
     separator,
+    dependents: dependentsPresentation,
   } = options
 
   return {
@@ -91,8 +100,8 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
             },
           }
         : {}),
-      layout: 'inset',
-      chrome: 'none',
+      inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
+      chrome: dependentsPresentation?.chrome ?? 'none',
       fields: [
         {
           type: 'chips',

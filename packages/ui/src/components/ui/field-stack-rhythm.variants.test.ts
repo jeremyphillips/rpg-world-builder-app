@@ -82,7 +82,7 @@ describe('field group legend helpers', () => {
 })
 
 describe('resolveFieldGroupInsetPaddingClasses', () => {
-  it('returns compact inset padding', () => {
-    expect(resolveFieldGroupInsetPaddingClasses('compact')).toContain('pl-4')
+  it('returns compact inset padding from shared form inset policy', () => {
+    expect(resolveFieldGroupInsetPaddingClasses('compact')).toBe('pl-8')
   })
 })

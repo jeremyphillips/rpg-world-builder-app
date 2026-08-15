@@ -16,6 +16,7 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import {
+  DEFAULT_DEPENDENT_INSET,
   resolveDependentsVisibility,
   type DependentConfig,
   type FieldVisibility,
@@ -82,6 +83,7 @@ export function DependentSection({
         <DependentFieldsRegion
           dependentsVisibility={dependentsVisibility}
           dependentsChrome={item.dependents}
+          inset={item.dependents.inset}
           scope={item.dependents.scope}
           rhythm={rhythm}
           parentContext={childContext}
@@ -101,6 +103,7 @@ export function DependentSection({
 interface DependentFieldsRegionProps {
   dependentsVisibility: FieldVisibility | null
   dependentsChrome: DependentConfig['dependents']
+  inset?: boolean
   scope?: DependentConfig['dependents']['scope']
   rhythm: ReturnType<typeof resolveFormDensity>['rhythm']
   parentContext: FormSectionContextValue
@@ -135,6 +138,7 @@ function GatedDependentFieldsRegion({
 
 function DependentFieldsRegionContent({
   dependentsChrome,
+  inset = DEFAULT_DEPENDENT_INSET,
   scope = 'wrapper',
   rhythm,
   parentContext,
@@ -144,7 +148,7 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const presentation = resolveDependentPresentation(dependentsChrome, rhythm)
+  const presentation = resolveDependentPresentation({ ...dependentsChrome, inset }, rhythm)
   const useArrayItemScope = presentation.chrome === 'panel' && scope === 'arrayItems'
   const arrayItemContext = React.useMemo(
     () =>
@@ -170,9 +174,15 @@ function DependentFieldsRegionContent({
   )
 
   const chromeWrapperClassName = presentation.chromeWrapperClassName
+  const railClassName = presentation.railClassName
+  const showRail = Boolean(railClassName && scope === 'wrapper')
 
   return (
-    <div className={cn(presentation.layoutClassName)} data-field-dependent-fields="">
+    <div
+      className={cn(presentation.insetClassName, showRail ? railClassName : undefined)}
+      data-field-dependent-fields=""
+      {...(showRail ? { 'data-field-dependent-rail': '' } : {})}
+    >
       {chromeWrapperClassName && scope === 'wrapper' ? (
         <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeWrapperClassName)}>
           {dependentsContent}

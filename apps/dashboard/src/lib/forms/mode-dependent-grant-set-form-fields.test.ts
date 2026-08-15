@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type DependentConfig } from '@rpg/ui/form'
+import { DEFAULT_DEPENDENT_INSET, isContainer, type DependentConfig } from '@rpg/ui/form'
 
 import {
   modeDependentGrantSetField,
@@ -39,7 +39,7 @@ describe('modeDependentGrantSetField', () => {
         name: 'weaponProficiencyMode',
       },
       dependents: {
-        layout: 'inset',
+        inset: DEFAULT_DEPENDENT_INSET,
         chrome: 'none',
       },
     })
