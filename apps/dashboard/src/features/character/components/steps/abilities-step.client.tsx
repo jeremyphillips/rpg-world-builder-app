@@ -58,6 +58,7 @@ export function AbilitiesStep({
     return {
       className: characterClass.name,
       primaryAbilities: characterClass.primaryAbilities,
+      abilityScoreOrder: characterClass.characterCreation?.abilityScoreOrder,
     }
   }, [characterClass])
 

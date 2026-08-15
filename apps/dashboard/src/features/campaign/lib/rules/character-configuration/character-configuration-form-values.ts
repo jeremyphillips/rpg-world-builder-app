@@ -31,6 +31,10 @@ import {
   buildLevelZeroNpcsPatchInput,
   mapLevelZeroNpcsToFormValues,
 } from './level-zero-npc-form-values'
+import {
+  buildStandardArrayPatchInput,
+  mapStandardArrayToFormValues,
+} from '@/lib/forms/standard-array-form-values'
 
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
@@ -170,6 +174,10 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
       resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
         .levelZeroNpcs,
     ),
+    standardArray: mapStandardArrayToFormValues(
+      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
+        .standardArray,
+    ),
   }
 }
 
@@ -231,6 +239,11 @@ export function buildCharacterCreationPatchInput(
     patch.levelZeroNpcs = levelZeroNpcs
   }
 
+  const standardArray = buildStandardArrayPatchInput(values.standardArray)
+  if (standardArray) {
+    patch.standardArray = standardArray
+  }
+
   return patch
 }
 
@@ -266,6 +279,7 @@ export function mapRulesetPatchToRulesValues(
       characterCreation.multiclassing.requirements.speciesLevelLimits.enabled,
     subclassChoicesEnabled: characterCreation.subclasses.enabled,
     startingWealth: mapStartingWealthToFormValues(characterCreation.startingWealth),
+    standardArray: mapStandardArrayToFormValues(characterCreation.standardArray),
     ...mapLanguageProficiencyRulesToFormValues(characterCreation),
     ...mapLevelZeroNpcsToFormValues(characterCreation.levelZeroNpcs),
   }

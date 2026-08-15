@@ -34,6 +34,8 @@ export type ContentEntityCardProps = {
   headingHref?: string
   density?: ContentCardDensity
   disabled?: boolean
+  /** Numeric-only passive scalar aligned with the entity heading row. */
+  headingEndValue?: number
 }
 
 export function ContentEntityCard({
@@ -43,6 +45,7 @@ export function ContentEntityCard({
   headingHref,
   density,
   disabled = false,
+  headingEndValue,
 }: ContentEntityCardProps) {
   const resolvedDensity = density ?? 'comfortable'
 
@@ -58,6 +61,7 @@ export function ContentEntityCard({
         leadingUtilities={leading != null ? [leading] : undefined}
         trailing={trailing}
         density={resolvedDensity}
+        headingEndValue={headingEndValue}
       />
     </EntityCardFrame>
   )

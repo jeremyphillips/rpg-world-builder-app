@@ -3,6 +3,7 @@ import {
   createClassDraftInputSchema,
   createClassInputSchema,
   MAX_CHARACTER_LEVEL,
+  resolveClassAbilityScoreOrder,
   type CharacterClass,
   type ClassFeature,
   type ClassProficiencies,
@@ -108,9 +109,16 @@ function classCharacterCreationInputFromForm(
     entity,
   )
   if (!startingEquipment && !proficiencies) return undefined
+
+  const abilityScoreOrder = resolveClassAbilityScoreOrder({
+    abilityScoreOrder: values.characterCreation?.abilityScoreOrder,
+    primaryAbilities: values.primaryAbilities,
+  })
+
   return {
     ...(startingEquipment ? { startingEquipment } : {}),
     ...(proficiencies ? { proficiencies } : {}),
+    abilityScoreOrder: [...abilityScoreOrder],
   }
 }
 
@@ -351,6 +359,9 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
       skills: { choose: 2, from: [] },
       tools: { choose: 0, poolSource: 'filtered', poolToolCategories: [] },
     },
+    abilityScoreOrder: resolveClassAbilityScoreOrder({
+      primaryAbilities: ['str'],
+    }),
   },
   features: [
     createSubclassChoiceFeature({ classSlug: 'new-class', className: 'New Class' }),

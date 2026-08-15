@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import {
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_STANDARD_ARRAY,
   defaultMulticlassingRules,
   defaultSubclassingRules,
   resolveCampaignRules,
@@ -16,6 +17,7 @@ const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
   multiclassing: defaultMulticlassingRules(),
   subclassing: defaultSubclassingRules(),
+  standardArray: [...DEFAULT_STANDARD_ARRAY],
 }
 
 /** Resolved campaign rules from the ruleset-patch query (defaults while loading or absent). */

@@ -277,6 +277,7 @@ const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
   allowedCharacterCreatureTypes: [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES],
   multiclassing: defaultMulticlassingRules(),
   subclassing: defaultSubclassingRules(),
+  standardArray: [15, 14, 13, 12, 10, 8],
 }
 
 export function ClassProgressionTable({

@@ -138,6 +138,7 @@ const levelZeroNpcsSchema = new Schema(
     languageProficiencies: { type: languageProficiencyGrantSetSchema, default: undefined },
     retainSpeciesLanguages: { type: Boolean },
     startingWealth: { type: characterWealthGrantSchema, default: undefined },
+    standardArray: { type: [Number], default: undefined },
   },
   { _id: false },
 )
@@ -159,6 +160,7 @@ const characterCreationSchema = new Schema(
     subclasses: { type: subclassingSchema, default: undefined },
     levelZeroNpcs: { type: levelZeroNpcsSchema, default: undefined },
     startingWealth: { type: Schema.Types.Mixed, default: undefined },
+    standardArray: { type: [Number], default: undefined },
   },
   { _id: false },
 )

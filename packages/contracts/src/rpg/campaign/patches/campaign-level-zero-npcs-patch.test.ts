@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 import {
   campaignLevelZeroNpcsPatchSchema,
   DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
@@ -24,6 +25,7 @@ describe('resolveLevelZeroNpcRules', () => {
       languageProficiencies: DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
       retainSpeciesLanguages: true,
       startingWealth: undefined,
+      standardArray: [...DEFAULT_STANDARD_ARRAY],
     })
   })
 

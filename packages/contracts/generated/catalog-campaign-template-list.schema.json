@@ -191,21 +191,28 @@
               "startingWealth": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema13"
+                    "$ref": "#/definitions/__schema15"
                   }
                 ]
               },
               "proficiencyGrants": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema17"
+                    "$ref": "#/definitions/__schema19"
                   }
                 ]
               },
               "proficiencyChoices": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema18"
+                    "$ref": "#/definitions/__schema20"
+                  }
+                ]
+              },
+              "standardArray": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/__schema21"
                   }
                 ]
               }
@@ -488,6 +495,13 @@
             }
           },
           "additionalProperties": false
+        },
+        "standardArray": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema13"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -563,6 +577,19 @@
       "description": "standard | rare"
     },
     "__schema13": {
+      "minItems": 6,
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema14"
+      }
+    },
+    "__schema14": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "__schema15": {
       "type": "object",
       "properties": {
         "imageKey": {
@@ -597,20 +624,20 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema14"
+            "$ref": "#/definitions/__schema16"
           }
         }
       },
       "additionalProperties": false
     },
-    "__schema14": {
+    "__schema16": {
       "type": "object",
       "properties": {
         "minLevel": {
-          "$ref": "#/definitions/__schema15"
+          "$ref": "#/definitions/__schema17"
         },
         "maxLevel": {
-          "$ref": "#/definitions/__schema15"
+          "$ref": "#/definitions/__schema17"
         },
         "id": {
           "type": "string",
@@ -731,7 +758,7 @@
           "default": [],
           "allOf": [
             {
-              "$ref": "#/definitions/__schema16"
+              "$ref": "#/definitions/__schema18"
             }
           ]
         }
@@ -746,12 +773,12 @@
       ],
       "additionalProperties": false
     },
-    "__schema15": {
+    "__schema17": {
       "type": "integer",
       "minimum": 1,
       "maximum": 100
     },
-    "__schema16": {
+    "__schema18": {
       "type": "array",
       "items": {
         "type": "object",
@@ -781,7 +808,7 @@
         "additionalProperties": false
       }
     },
-    "__schema17": {
+    "__schema19": {
       "type": "object",
       "properties": {
         "languages": {
@@ -794,7 +821,7 @@
       },
       "additionalProperties": false
     },
-    "__schema18": {
+    "__schema20": {
       "type": "object",
       "properties": {
         "languages": {
@@ -845,6 +872,13 @@
         }
       },
       "additionalProperties": false
+    },
+    "__schema21": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema13"
+        }
+      ]
     }
   }
 }

@@ -14,8 +14,10 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_STARTING_LEVEL,
+  DEFAULT_STANDARD_ARRAY,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
+  isDefaultCharacterCreationStandardArray,
   isSparseDefaultLevelZeroNpcsPatch,
   isSparseDefaultMulticlassingPatch,
   isSparseDefaultSubclassingPatch,
@@ -23,6 +25,7 @@ import {
   normalizeCharacterWealthGrant,
   resolveStartingWealthRules,
   safeParseMergedCharacterCreationPatch,
+  sameStandardArray,
   sameStringSet,
   validateSubclassChoicesEnabledChange,
 } from '@rpg/contracts'
@@ -192,6 +195,14 @@ function applyLevelZeroNpcsMerge(
   merged.levelZeroNpcs = mergeLevelZeroNpcsPatch(existing?.levelZeroNpcs, input.levelZeroNpcs)
 }
 
+function applyStandardArrayMerge(
+  merged: CampaignCharacterCreationPatch,
+  input: UpdateCampaignCharacterCreationInput,
+): void {
+  if (input.standardArray === undefined) return
+  merged.standardArray = input.standardArray
+}
+
 function mergeLevelZeroNpcsPatch(
   existing: CampaignLevelZeroNpcsPatch | undefined,
   input: CampaignLevelZeroNpcsPatch,
@@ -218,6 +229,7 @@ function mergeCharacterCreationPatch(
   applySubclassingMerge(merged, existing, input)
   applyStartingWealthMerge(merged, existing, input)
   applyLevelZeroNpcsMerge(merged, existing, input)
+  applyStandardArrayMerge(merged, input)
 
   return merged
 }
@@ -401,6 +413,20 @@ function isDefaultLevelZeroLanguageGrantSet(grant: {
   )
 }
 
+function buildStandardArrayUpdateSet(
+  ops: MongoUpdateOps,
+  standardArray: number[] | undefined,
+  prefix: string,
+): void {
+  if (standardArray === undefined) return
+
+  if (!isDefaultCharacterCreationStandardArray(standardArray)) {
+    ops.$set[`${prefix}standardArray`] = standardArray
+  } else {
+    ops.$unset[`${prefix}standardArray`] = 1
+  }
+}
+
 function buildLevelZeroGrantSetUpdateSet(
   ops: MongoUpdateOps,
   prefix: string,
@@ -538,6 +564,14 @@ function buildLevelZeroNpcsUpdateSet(
       levelZeroNpcs.startingWealth,
     )
   }
+
+  if (levelZeroNpcs.standardArray !== undefined) {
+    if (!sameStandardArray(levelZeroNpcs.standardArray, DEFAULT_STANDARD_ARRAY)) {
+      ops.$set[`${l0Prefix}.standardArray`] = levelZeroNpcs.standardArray
+    } else {
+      ops.$unset[`${l0Prefix}.standardArray`] = 1
+    }
+  }
 }
 
 function buildCharacterCreationUpdateSet(
@@ -574,6 +608,8 @@ function buildCharacterCreationUpdateSet(
   if (patch.levelZeroNpcs !== undefined) {
     buildLevelZeroNpcsUpdateSet(ops, patch.levelZeroNpcs, prefix)
   }
+
+  buildStandardArrayUpdateSet(ops, patch.standardArray, prefix)
 
   return ops
 }

@@ -62,6 +62,11 @@ import {
 } from './language-proficiency-form-fields'
 import { languageProficiencyRulesDefaultValues } from './language-proficiency-form-values'
 import { levelZeroNpcsFields, levelZeroNpcsFormSchema } from './level-zero-npc-form-fields'
+import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
+import {
+  standardArrayDefaultFormValues,
+  standardArrayFormSchema,
+} from '@/lib/forms/standard-array-form-values'
 
 /** Character configuration validation messages (tier 3 form overrides). */
 export const characterConfigurationValidationMessages = {
@@ -124,6 +129,7 @@ const configRulesObjectSchema = z.object({
   languageProficiencyChoice: languageProficiencyChoiceFormSchema.default(
     () => languageProficiencyRulesDefaultValues().languageProficiencyChoice,
   ),
+  standardArray: standardArrayFormSchema.default(standardArrayDefaultFormValues),
   levelZeroNpcsEnabled: z.boolean().default(DEFAULT_LEVEL_ZERO_NPCS_ENABLED),
   levelZeroBaseHitDie: z.coerce
     .number()
@@ -148,6 +154,7 @@ const configRulesObjectSchema = z.object({
     })),
   levelZeroRetainSpeciesLanguages: z.boolean().default(DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES),
   levelZeroStartingWealth: levelZeroNpcsFormSchema.shape.levelZeroStartingWealth.optional(),
+  levelZeroStandardArray: standardArrayFormSchema.default(standardArrayDefaultFormValues),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -535,6 +542,10 @@ function creationSectionItems(): FormItem[] {
       kind: 'group',
       legend: 'Creation',
       fields: [
+        standardArrayFormFields({
+          label: 'Standard array',
+          hint: 'Sets the six fixed ability scores available to characters using Standard Array during creation.',
+        }),
         {
           kind: 'group',
           id: 'starting-level',

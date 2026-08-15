@@ -71,7 +71,10 @@ export function useCampaignCharacterBuildContext({
       catalog: catalogQuery.data,
       characterCreationRules: {
         ...patchQuery.data.characterCreation,
-        abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+        abilityGeneration: {
+          ...DEFAULT_ABILITY_GENERATION_RULES,
+          standardArray: [...patchQuery.data.characterCreation.standardArray],
+        },
         armorClass: patchQuery.data.mechanics.armorClass,
       },
       permissions: { canCreateCharacter: true },

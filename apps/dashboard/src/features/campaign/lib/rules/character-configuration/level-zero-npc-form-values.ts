@@ -11,8 +11,15 @@ import {
   DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS,
+  DEFAULT_STANDARD_ARRAY,
   normalizeCharacterWealthGrant,
 } from '@rpg/contracts'
+
+import {
+  buildStandardArrayPatchInput,
+  mapStandardArrayToFormValues,
+  parseStandardArrayFormValues,
+} from '@/lib/forms/standard-array-form-values'
 
 import {
   wealthGrantMoneyFromForm,
@@ -48,6 +55,7 @@ export function mapLevelZeroNpcsToFormValues(
     },
     levelZeroRetainSpeciesLanguages: levelZeroNpcs.retainSpeciesLanguages,
     levelZeroStartingWealth: wealthGrantMoneyToForm(levelZeroNpcs.startingWealth),
+    levelZeroStandardArray: mapStandardArrayToFormValues(levelZeroNpcs.standardArray),
   }
 }
 
@@ -65,6 +73,7 @@ export function levelZeroNpcsDefaultFormValues(): LevelZeroNpcsFormValues {
     },
     retainSpeciesLanguages: DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
     startingWealth: undefined,
+    standardArray: [...DEFAULT_STANDARD_ARRAY],
   })
 }
 
@@ -106,6 +115,7 @@ function buildFullLevelZeroNpcsPatchInput(
     startingWealth: normalizeCharacterWealthGrant(
       wealthGrantMoneyFromForm(values.levelZeroStartingWealth),
     ),
+    standardArray: parseStandardArrayFormValues(values.levelZeroStandardArray),
   }
 }
 
@@ -123,11 +133,10 @@ function languageProficienciesDifferFromDefault(items: readonly string[]): boole
   )
 }
 
-function buildSparseLevelZeroNpcsPatchInput(
+function applyLevelZeroScalarSparsePatches(
+  patch: CampaignLevelZeroNpcsPatch,
   values: LevelZeroNpcsFormValues,
-): CampaignLevelZeroNpcsPatch | undefined {
-  const patch: CampaignLevelZeroNpcsPatch = {}
-
+): void {
   if (values.levelZeroNpcsEnabled !== DEFAULT_LEVEL_ZERO_NPCS_ENABLED) {
     patch.enabled = values.levelZeroNpcsEnabled
   }
@@ -143,6 +152,14 @@ function buildSparseLevelZeroNpcsPatchInput(
   if (values.levelZeroRetainSpeciesLanguages !== DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES) {
     patch.retainSpeciesLanguages = values.levelZeroRetainSpeciesLanguages
   }
+}
+
+function buildSparseLevelZeroNpcsPatchInput(
+  values: LevelZeroNpcsFormValues,
+): CampaignLevelZeroNpcsPatch | undefined {
+  const patch: CampaignLevelZeroNpcsPatch = {}
+
+  applyLevelZeroScalarSparsePatches(patch, values)
 
   const armor = buildLevelZeroArmorProficienciesPatch(values)
   if (hasNonEmptyGrantSet(armor)) {
@@ -166,6 +183,14 @@ function buildSparseLevelZeroNpcsPatchInput(
   )
   if (startingWealth !== undefined) {
     patch.startingWealth = startingWealth
+  }
+
+  const standardArray = buildStandardArrayPatchInput(
+    values.levelZeroStandardArray,
+    DEFAULT_STANDARD_ARRAY,
+  )
+  if (standardArray) {
+    patch.standardArray = standardArray
   }
 
   return Object.keys(patch).length > 0 ? patch : undefined

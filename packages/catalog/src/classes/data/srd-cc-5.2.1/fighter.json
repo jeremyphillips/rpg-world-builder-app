@@ -133,7 +133,8 @@
           }
         ]
       }
-    }
+    },
+    "abilityScoreOrder": ["str", "dex", "con", "cha", "wis", "int"]
   },
   "features": [
     {

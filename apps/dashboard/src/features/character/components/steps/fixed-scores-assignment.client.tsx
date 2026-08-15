@@ -26,6 +26,7 @@ import {
   getAvailableStandardArrayScores,
   mergeSuggestedAssignmentIntoScores,
   resolveAbilityScorePoolActionState,
+  resolveClassAbilityScoreOrder,
   type Ability,
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
@@ -473,7 +474,14 @@ export function FixedScoresAssignment({
     }
 
     syncScoresToForm(
-      fillEmptyAbilitiesWithClassRecommendations(scores, scorePool, classInput.primaryAbilities),
+      fillEmptyAbilitiesWithClassRecommendations(
+        scores,
+        scorePool,
+        resolveClassAbilityScoreOrder({
+          abilityScoreOrder: classInput.abilityScoreOrder,
+          primaryAbilities: classInput.primaryAbilities,
+        }),
+      ),
     )
   }, [classInput, form, poolActionState, scorePool, scores, syncScoresToForm])
 

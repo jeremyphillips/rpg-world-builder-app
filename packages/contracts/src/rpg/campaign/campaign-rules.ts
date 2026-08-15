@@ -2,6 +2,7 @@ import type {
   CampaignCharacterCreationPatch,
   CreatureTypePolicy,
 } from './patches/campaign-character-creation-patch'
+import { resolveCharacterCreationStandardArray } from './patches/campaign-character-creation-patch'
 import {
   resolveMulticlassingRules,
   type ResolvedCampaignMulticlassingPatch,
@@ -18,6 +19,7 @@ import {
   MAX_CHARACTER_LEVEL,
   type LevelOptionGroup,
 } from '../primitives/level'
+import type { StandardArray } from '../primitives/standard-array'
 
 export {
   validateExtendedMaxLevel,
@@ -47,6 +49,8 @@ export type ResolvedCampaignRules = {
   multiclassing: ResolvedCampaignMulticlassingPatch
   /** Resolved subclass choice rules for character-builder and content display gating. */
   subclassing: ResolvedCampaignSubclassingPatch
+  /** Resolved Standard Array for PC character creation and class authoring projection. */
+  standardArray: StandardArray
 }
 
 /** Standard max before any optional extended tier. */
@@ -85,6 +89,7 @@ export function resolveCampaignRules(
   const storedExtended = patch?.progression?.extendedProgression
   const multiclassing = resolveMulticlassingRules(patch?.multiclassing)
   const subclassing = resolveSubclassingRules(patch?.subclasses)
+  const standardArray = resolveCharacterCreationStandardArray(patch)
 
   if (storedExtended) {
     return {
@@ -93,6 +98,7 @@ export function resolveCampaignRules(
       allowedCharacterCreatureTypes,
       multiclassing,
       subclassing,
+      standardArray,
       extendedProgression: {
         tierName: storedExtended.tierName,
         startsAt: standardMaxCharacterLevel + 1,
@@ -107,6 +113,7 @@ export function resolveCampaignRules(
     allowedCharacterCreatureTypes,
     multiclassing,
     subclassing,
+    standardArray,
   }
 }
 

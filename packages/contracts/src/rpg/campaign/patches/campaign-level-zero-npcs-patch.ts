@@ -5,6 +5,11 @@ import {
   normalizeCharacterWealthGrant,
   type CharacterWealthGrant,
 } from '../../primitives/character-wealth-grant'
+import {
+  DEFAULT_STANDARD_ARRAY,
+  sameStandardArray,
+  standardArraySchema,
+} from '../../primitives/standard-array'
 import { hitDieSchema, type HitDie } from '../../primitives/dice'
 import { languageProficiencyGrantSetSchema } from '../../primitives/proficiency/proficiency-grant-set'
 import {
@@ -71,6 +76,7 @@ export const campaignLevelZeroNpcsPatchSchema = z
     languageProficiencies: languageProficiencyGrantSetSchema.optional(),
     retainSpeciesLanguages: z.boolean().optional(),
     startingWealth: characterWealthGrantSchema.optional(),
+    standardArray: standardArraySchema.optional(),
   })
   .strict()
 
@@ -90,6 +96,7 @@ export const resolvedCampaignLevelZeroNpcsPatchSchema = z.object({
   languageProficiencies: languageProficiencyGrantSetSchema,
   retainSpeciesLanguages: z.boolean(),
   startingWealth: characterWealthGrantSchema.optional(),
+  standardArray: standardArraySchema,
 })
 
 export type ResolvedCampaignLevelZeroNpcsPatch = z.infer<
@@ -136,6 +143,7 @@ export function defaultLevelZeroNpcRules(): ResolvedCampaignLevelZeroNpcsPatch {
     languageProficiencies: resolveLevelZeroLanguageProficiencies(),
     retainSpeciesLanguages: DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
     startingWealth: undefined,
+    standardArray: [...DEFAULT_STANDARD_ARRAY],
   }
 }
 
@@ -156,6 +164,7 @@ export function resolveLevelZeroNpcRules(
     languageProficiencies: resolveLevelZeroLanguageProficiencies(patch.languageProficiencies),
     retainSpeciesLanguages: patch.retainSpeciesLanguages ?? defaults.retainSpeciesLanguages,
     startingWealth: resolveLevelZeroStartingWealth(patch.startingWealth),
+    standardArray: standardArraySchema.parse(patch.standardArray ?? [...DEFAULT_STANDARD_ARRAY]),
   }
 }
 
@@ -192,7 +201,8 @@ export function isSparseDefaultLevelZeroNpcsPatch(patch?: CampaignLevelZeroNpcsP
     isDefaultLevelZeroGrantSet(resolved.weaponProficiencies) &&
     isDefaultLevelZeroLanguageProficiencies(resolved.languageProficiencies) &&
     resolved.retainSpeciesLanguages === DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES &&
-    resolved.startingWealth === undefined
+    resolved.startingWealth === undefined &&
+    sameStandardArray(resolved.standardArray, DEFAULT_STANDARD_ARRAY)
   )
 }
 

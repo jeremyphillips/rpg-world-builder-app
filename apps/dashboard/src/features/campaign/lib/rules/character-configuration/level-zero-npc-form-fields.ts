@@ -17,6 +17,7 @@ import {
 } from '@/lib/forms/wealth-grant-form-fields'
 
 import { languageGrantItemsField } from './language-grant-form-fields'
+import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
 import {
   XOR_GRANT_SET_MODES,
   xorProficiencyGrantSetFields,
@@ -94,6 +95,7 @@ export const levelZeroNpcsFormSchema = z.object({
       currency: z.enum(['cp', 'sp', 'gp', 'pp']),
     })
     .optional(),
+  levelZeroStandardArray: z.array(z.coerce.number().int()).length(6),
 })
 
 export type LevelZeroNpcsFormValues = z.infer<typeof levelZeroNpcsFormSchema> & {
@@ -135,6 +137,11 @@ export function levelZeroNpcsFields({
                 kind: 'group',
                 chrome: { variant: 'inset' },
                 fields: [
+                  standardArrayFormFields({
+                    name: 'levelZeroStandardArray',
+                    label: 'Standard array',
+                    hint: 'Sets the six fixed ability scores used when generating Level 0 NPCs.',
+                  }),
                   {
                     type: 'select',
                     name: 'levelZeroBaseHitDie',

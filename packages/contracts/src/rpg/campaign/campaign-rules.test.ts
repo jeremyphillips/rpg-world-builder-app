@@ -4,6 +4,7 @@ import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   buildGroupedLevelOptions,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
+  DEFAULT_STANDARD_ARRAY,
   defaultExtendedMaxLevel,
   defaultMulticlassingRules,
   defaultSubclassingRules,
@@ -25,6 +26,7 @@ import { baseCharacterCreationPatch } from '../../test/fixtures/character-creati
 const defaultCreatureTypes = [...DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES]
 const defaultMulticlassing = defaultMulticlassingRules()
 const defaultSubclassing = defaultSubclassingRules()
+const defaultStandardArray = [...DEFAULT_STANDARD_ARRAY]
 
 const basePatch = baseCharacterCreationPatch
 
@@ -116,6 +118,7 @@ describe('resolveCampaignRules', () => {
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
       subclassing: defaultSubclassing,
+      standardArray: defaultStandardArray,
     })
   })
 
@@ -134,6 +137,7 @@ describe('resolveCampaignRules', () => {
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
       subclassing: defaultSubclassing,
+      standardArray: defaultStandardArray,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
@@ -158,6 +162,15 @@ describe('resolveCampaignRules', () => {
         progression: { maxCharacterLevel: ABSOLUTE_MAX_CHARACTER_LEVEL },
       }).maxCharacterLevel,
     ).toBe(ABSOLUTE_MAX_CHARACTER_LEVEL)
+  })
+
+  it('resolves standard array from sparse patch overrides', () => {
+    expect(
+      resolveCampaignRules({
+        ...basePatch,
+        standardArray: [16, 14, 13, 12, 10, 8],
+      }).standardArray,
+    ).toEqual([16, 14, 13, 12, 10, 8])
   })
 
   it('resolves subclassing rules', () => {
@@ -234,6 +247,7 @@ describe('buildGroupedLevelOptions', () => {
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
       subclassing: defaultSubclassing,
+      standardArray: defaultStandardArray,
     })
     expect(groups).toHaveLength(1)
     expect(groups[0]?.options).toHaveLength(20)
@@ -246,6 +260,7 @@ describe('buildGroupedLevelOptions', () => {
       allowedCharacterCreatureTypes: defaultCreatureTypes,
       multiclassing: defaultMulticlassing,
       subclassing: defaultSubclassing,
+      standardArray: defaultStandardArray,
       extendedProgression: {
         tierName: 'Epic Destiny',
         startsAt: 21,
@@ -267,6 +282,7 @@ describe('buildGroupedLevelOptions', () => {
         allowedCharacterCreatureTypes: defaultCreatureTypes,
         multiclassing: defaultMulticlassing,
         subclassing: defaultSubclassing,
+        standardArray: defaultStandardArray,
         extendedProgression: {
           tierName: 'Epic Destiny',
           startsAt: 21,

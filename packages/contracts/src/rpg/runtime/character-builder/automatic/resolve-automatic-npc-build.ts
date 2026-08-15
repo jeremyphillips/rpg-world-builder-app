@@ -1,8 +1,11 @@
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { deriveDeterministicAbilityAssignment } from '../ability/ability-score-recommendations'
 import { resolveAbilityGenerationMethod } from '../ability/ability-generation'
+import { resolveClassAbilityScoreOrder } from '../ability/resolve-class-ability-score-order'
+import { resolveStandardArrayAssignment } from '../../../primitives/standard-array'
 import { buildChoiceSetId, isChoiceSetSatisfied, type ChoiceSet } from '../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import type { CharacterClass } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { cloneEquipmentDraftChannel } from '../resolvers/equipment/equipment-draft-base'
@@ -82,8 +85,33 @@ export type ResolveAutomaticNpcBuildArgs = {
  */
 const AUTOMATIC_BUILD_ITERATION_CEILING = 64
 
-// Level 0 Quick NPC ability scores temporarily reuse the PC standard-array
-// resolver with empty primary-ability priority — not Level 0 semantics.
+// Level 0 Quick NPC ability assignment strategy is deferred — score source only for now.
+function seedAbilityScores(
+  seed: AutomaticNpcBuildSeed,
+  abilityRules: CharacterBuildContext['characterCreationRules']['abilityGeneration'],
+  characterClass: CharacterClass | undefined,
+): CharacterBuilderDraft['abilities']['scores'] {
+  if (seed.level === 0) {
+    return deriveDeterministicAbilityAssignment([], abilityRules.standardArray)
+  }
+
+  if (characterClass && isClassProgressionApplicable(seed.level)) {
+    const order = resolveClassAbilityScoreOrder({
+      abilityScoreOrder: characterClass.characterCreation?.abilityScoreOrder,
+      primaryAbilities: characterClass.primaryAbilities,
+    })
+    return resolveStandardArrayAssignment({
+      standardArray: abilityRules.standardArray,
+      abilityScoreOrder: order,
+    })
+  }
+
+  return deriveDeterministicAbilityAssignment(
+    characterClass?.primaryAbilities ?? [],
+    abilityRules.standardArray,
+  )
+}
+
 function seedDraft(
   seed: AutomaticNpcBuildSeed,
   context: CharacterBuildContext,
@@ -105,10 +133,7 @@ function seedDraft(
     },
     abilities: {
       method: resolveAbilityGenerationMethod(abilityRules),
-      scores: deriveDeterministicAbilityAssignment(
-        characterClass?.primaryAbilities ?? [],
-        abilityRules.standardArray,
-      ),
+      scores: seedAbilityScores(seed, abilityRules, characterClass),
     },
     equipment: cloneEquipmentDraftChannel(empty),
   }

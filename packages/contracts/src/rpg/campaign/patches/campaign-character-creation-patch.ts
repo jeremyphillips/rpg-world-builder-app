@@ -35,6 +35,12 @@ import {
   resolvedCampaignSubclassingPatchSchema,
   validateSubclassChoicesEnabledChange,
 } from './campaign-subclassing-patch'
+import {
+  DEFAULT_STANDARD_ARRAY,
+  sameStandardArray,
+  standardArraySchema,
+  type StandardArray,
+} from '../../primitives/standard-array'
 
 /** Max length for extended progression tier names in campaign character-creation patch. */
 export const EXTENDED_PROGRESSION_TIER_NAME_MAX = 50
@@ -105,6 +111,7 @@ export const campaignCharacterCreationPatchSchema = z
     startingWealth: startingWealthRulesPatchSchema.optional(),
     proficiencyGrants: characterCreationProficiencyGrantsPatchSchema.optional(),
     proficiencyChoices: characterCreationProficiencyChoicesPatchSchema.optional(),
+    standardArray: standardArraySchema.optional(),
   })
   .strict()
 
@@ -135,6 +142,7 @@ export const resolvedCampaignCharacterCreationPatchSchema = z.object({
   startingWealth: startingWealthRulesSchema,
   proficiencyGrants: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyGrants,
   proficiencyChoices: resolvedCharacterCreationProficiencyRulesSchema.shape.proficiencyChoices,
+  standardArray: standardArraySchema,
 })
 
 export type ResolvedCampaignCharacterCreationPatch = z.infer<
@@ -300,6 +308,12 @@ function resolveCharacterCreationSpecies(
   }
 }
 
+export function resolveCharacterCreationStandardArray(
+  patch: CampaignCharacterCreationPatch | undefined,
+): StandardArray {
+  return standardArraySchema.parse(patch?.standardArray ?? [...DEFAULT_STANDARD_ARRAY])
+}
+
 export function resolveCharacterCreationPatch(
   patch: CampaignCharacterCreationPatch | undefined,
   startingWealthSeed: StartingWealthRules,
@@ -316,5 +330,16 @@ export function resolveCharacterCreationPatch(
     levelZeroNpcs: resolveLevelZeroNpcRules(patch?.levelZeroNpcs),
     startingWealth: resolveStartingWealthRules(startingWealthSeed, patch?.startingWealth),
     ...resolveCharacterCreationProficiencyRules(patch),
+    standardArray: resolveCharacterCreationStandardArray(patch),
   }
+}
+
+/** True when a sparse standard array resolves to the SRD default. */
+export function isDefaultCharacterCreationStandardArray(
+  standardArray: readonly number[] | undefined,
+): boolean {
+  return sameStandardArray(
+    standardArraySchema.parse(standardArray ?? [...DEFAULT_STANDARD_ARRAY]),
+    DEFAULT_STANDARD_ARRAY,
+  )
 }

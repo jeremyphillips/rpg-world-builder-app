@@ -59,6 +59,11 @@ export type StandardArray = z.infer<typeof standardArraySchema>
 
 export type AbilityScoreOrder = z.infer<typeof abilityScoreOrderSchema>
 
+/** Positional equality for Standard Array values (order matters). */
+export function sameStandardArray(left: readonly number[], right: readonly number[]): boolean {
+  return left.length === right.length && left.every((value, index) => value === right[index])
+}
+
 /** Maps ranked Standard Array slots onto a class ability order by position. */
 export function resolveStandardArrayAssignment(args: {
   standardArray: readonly number[]

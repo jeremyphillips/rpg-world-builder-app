@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { skillSlugsFromClassChoices } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { ROUTES } from '@/app/routes'
 import {
   CLASS_PROFICIENCY_GROUP_LABELS,
@@ -20,9 +21,7 @@ vi.mock('../../lib/usage/content-usage-references-section.client', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
   useCampaignRules: vi.fn(() => ({
-    maxCharacterLevel: 20,
-    standardMaxCharacterLevel: 20,
-    allowedCharacterCreatureTypes: ['humanoid'],
+    ...defaultCampaignRules(),
     multiclassing: {
       enabled: true,
       requirements: {
@@ -158,9 +157,7 @@ describe('ClassDetailContent subclassing gate', () => {
 
   it('hides subclass sections and subclass-choice features when subclassing is disabled', () => {
     vi.mocked(useCampaignRules).mockReturnValue({
-      maxCharacterLevel: 20,
-      standardMaxCharacterLevel: 20,
-      allowedCharacterCreatureTypes: ['humanoid'],
+      ...defaultCampaignRules(),
       multiclassing: {
         enabled: true,
         requirements: {
@@ -183,9 +180,7 @@ describe('ClassDetailContent subclassing gate', () => {
 
   it('shows subclass sections when subclassing is enabled', () => {
     vi.mocked(useCampaignRules).mockReturnValue({
-      maxCharacterLevel: 20,
-      standardMaxCharacterLevel: 20,
-      allowedCharacterCreatureTypes: ['humanoid'],
+      ...defaultCampaignRules(),
       multiclassing: {
         enabled: true,
         requirements: {

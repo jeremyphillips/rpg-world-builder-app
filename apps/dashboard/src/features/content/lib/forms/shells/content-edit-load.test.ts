@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { defaultMulticlassingRules, defaultSubclassingRules } from '@rpg/contracts'
 
+import { defaultCampaignRules } from '../../form-options/content-campaign-rules'
 import type { ContentFormDef, ContentFormCtx } from '../content-form-registry'
 import {
   findContentEditEntity,
@@ -10,13 +10,7 @@ import {
 } from './content-edit-load'
 
 const baseOptionsCtx: ContentFormCtx = {
-  campaignRules: {
-    maxCharacterLevel: 20,
-    standardMaxCharacterLevel: 20,
-    allowedCharacterCreatureTypes: ['humanoid'],
-    multiclassing: defaultMulticlassingRules(),
-    subclassing: defaultSubclassingRules(),
-  },
+  campaignRules: defaultCampaignRules(),
 }
 
 describe('findContentEditEntity', () => {

@@ -44,6 +44,7 @@ const fighterStoredBody = {
         ],
       },
     },
+    abilityScoreOrder: ['str', 'dex', 'con', 'cha', 'wis', 'int'],
   },
   features: [
     { kind: 'custom', id: 'second-wind', name: 'Second Wind', level: 1 },
