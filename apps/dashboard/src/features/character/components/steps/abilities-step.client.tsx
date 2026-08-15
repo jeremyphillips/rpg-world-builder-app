@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import {
   deriveAbilityScoreRecommendations,
+  isEffectiveBuilderStep,
   resolveAbilityGenerationMethod,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -53,6 +54,11 @@ export function AbilitiesStep({
     return context.catalog.classes.find((entry) => entry.id === classId)
   }, [context.catalog.classes, draft.class.classId])
 
+  const classStepApplicable = useMemo(
+    () => isEffectiveBuilderStep(context, draft, 'class'),
+    [context, draft],
+  )
+
   const classInput = useMemo(() => {
     if (!characterClass) return null
     return {
@@ -82,6 +88,7 @@ export function AbilitiesStep({
             scorePool={abilityGeneration.standardArray}
             showInvalidStates={showInvalidStates}
             classInput={classInput}
+            classStepApplicable={classStepApplicable}
             recommendation={recommendation}
           />
         ),
@@ -89,6 +96,7 @@ export function AbilitiesStep({
           <ManualAbilitiesAssignment
             showInvalidStates={showInvalidStates}
             classInput={classInput}
+            classStepApplicable={classStepApplicable}
             recommendation={recommendation}
           />
         ),
@@ -113,6 +121,7 @@ export function AbilitiesStep({
     [
       abilityGeneration.standardArray,
       classInput,
+      classStepApplicable,
       context,
       draft.abilities,
       onDraftChange,

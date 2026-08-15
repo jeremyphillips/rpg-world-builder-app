@@ -96,6 +96,7 @@ export type FixedScoresAssignmentProps = {
   scorePool: readonly number[]
   showInvalidStates?: boolean
   classInput?: AbilityScoreRecommendationClassInput | null
+  classStepApplicable?: boolean
   recommendation?: AbilityScoreRecommendation | null
 }
 
@@ -355,6 +356,7 @@ export function FixedScoresAssignment({
   scorePool,
   showInvalidStates = false,
   classInput = null,
+  classStepApplicable = false,
   recommendation = null,
 }: FixedScoresAssignmentProps) {
   const introId = useId()
@@ -554,6 +556,7 @@ export function FixedScoresAssignment({
 
       <AbilityRecommendationPanel
         classInput={classInput}
+        classStepApplicable={classStepApplicable}
         recommendation={recommendation}
         currentScores={scores}
         showSuggestedAssignment

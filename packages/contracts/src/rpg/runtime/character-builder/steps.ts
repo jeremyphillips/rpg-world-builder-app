@@ -125,6 +125,15 @@ export function resolveEffectiveBuilderSteps(
   })
 }
 
+/** Whether a step id appears in the effective builder flow for the current context and draft. */
+export function isEffectiveBuilderStep(
+  context: CharacterBuildContext,
+  draft: CharacterBuilderDraft,
+  stepId: CharacterBuilderStepId,
+): boolean {
+  return resolveEffectiveBuilderSteps(context, draft).some((step) => step.id === stepId)
+}
+
 /** Short label for a wizard step (rail, review summaries, etc.). */
 export function getBuilderStepLabel(stepId: CharacterBuilderStepId): string {
   return BUILDER_STEP_METADATA[stepId].label

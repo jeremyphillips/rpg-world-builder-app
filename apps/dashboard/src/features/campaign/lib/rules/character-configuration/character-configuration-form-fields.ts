@@ -542,16 +542,16 @@ function creationSectionItems(): FormItem[] {
       kind: 'group',
       legend: 'Creation',
       fields: [
-        standardArrayFormFields({
-          label: 'Standard array',
-          hint: 'Sets the six fixed ability scores available to characters using Standard Array during creation.',
-        }),
         {
           kind: 'group',
           id: 'starting-level',
           className: SCROLL_SECTION_ANCHOR_CLASS,
           fields: [startingLevelField()],
         },
+        standardArrayFormFields({
+          label: 'Standard array',
+          hint: 'Sets the six fixed ability scores available to characters using Standard Array during creation.',
+        }),
         importedCharactersPolicyField(),
         {
           kind: 'group',

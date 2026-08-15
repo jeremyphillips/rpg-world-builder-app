@@ -20,9 +20,9 @@ import { languageGrantItemsField } from './language-grant-form-fields'
 import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
 import {
   XOR_GRANT_SET_MODES,
-  xorProficiencyGrantSetFields,
+  xorProficiencyGrantSetField,
   type XorGrantSetMode,
-} from './xor-proficiency-grant-set-form-fields'
+} from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
 export const LEVEL_ZERO_NPCS_ENABLED = 'levelZeroNpcsEnabled' as const
 
@@ -120,7 +120,7 @@ export function levelZeroNpcsFields({
     {
       kind: 'group',
       legend: 'Level 0 NPCs',
-      description: 'Baseline stats and proficiencies for commoner-grade NPCs without class levels.',
+      description: 'Baseline stats and proficiencies for classless Level 0 NPCs.',
       fields: [
         {
           kind: 'dependent',
@@ -143,32 +143,37 @@ export function levelZeroNpcsFields({
                     hint: 'Sets the six fixed ability scores used when generating Level 0 NPCs.',
                   }),
                   {
-                    type: 'select',
-                    name: 'levelZeroBaseHitDie',
-                    label: 'Base hit die',
-                    hint: 'Hit die used for level 0 NPC hit points.',
-                    options: hitDieOptions,
-                    width: 'full',
-                    digits: 3,
-                  },
-                  {
-                    type: 'select',
-                    name: 'levelZeroProficiencyBonus',
-                    label: 'Proficiency bonus',
-                    hint: 'Proficiency bonus applied to level 0 NPCs.',
-                    options: PROFICIENCY_BONUS_OPTIONS,
-                    width: 'full',
-                    digits: 4,
+                    kind: 'row',
+                    fields: [
+                      {
+                        type: 'select',
+                        name: 'levelZeroBaseHitDie',
+                        label: 'Base hit die',
+                        hint: 'Hit die used for level 0 NPC hit points.',
+                        options: hitDieOptions,
+                        width: '1/2',
+                        digits: 3,
+                      },
+                      {
+                        type: 'select',
+                        name: 'levelZeroProficiencyBonus',
+                        label: 'Proficiency bonus',
+                        hint: 'Proficiency bonus applied to level 0 NPCs.',
+                        options: PROFICIENCY_BONUS_OPTIONS,
+                        width: '1/2',
+                        digits: 4,
+                      },
+                    ],
                   },
                   {
                     type: 'switch',
                     name: 'levelZeroRetainSpeciesTraits',
                     label: 'Species traits',
-                    hint: 'Grant racial traits from the NPC species.',
+                    hint: 'Grant traits from the NPC species.',
                     defaultValue: true,
                     separator: 'subtle',
                   },
-                  ...xorProficiencyGrantSetFields({
+                  xorProficiencyGrantSetField({
                     modeFieldName: LEVEL_ZERO_ARMOR_MODE,
                     categoriesPath: LEVEL_ZERO_ARMOR_CATEGORIES_PATH,
                     itemsPath: LEVEL_ZERO_ARMOR_ITEMS_PATH,
@@ -180,7 +185,7 @@ export function levelZeroNpcsFields({
                     itemsLabel: 'Specific armor',
                     separator: 'subtle',
                   }),
-                  ...xorProficiencyGrantSetFields({
+                  xorProficiencyGrantSetField({
                     modeFieldName: LEVEL_ZERO_WEAPON_MODE,
                     categoriesPath: LEVEL_ZERO_WEAPON_CATEGORIES_PATH,
                     itemsPath: LEVEL_ZERO_WEAPON_ITEMS_PATH,

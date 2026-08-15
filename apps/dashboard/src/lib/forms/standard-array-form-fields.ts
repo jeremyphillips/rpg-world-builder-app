@@ -12,16 +12,22 @@ export function standardArrayFormFields(options: StandardArrayFormFieldOptions =
   const name = options.name ?? 'standardArray'
 
   return {
-    kind: 'row',
-    label: options.label ?? 'Standard array',
-    hint: options.hint,
-    fields: Array.from({ length: STANDARD_ARRAY_LENGTH }, (_, index) => ({
-      type: 'number' as const,
-      name: `${name}.${index}`,
-      label: '',
-      digits: 2,
-      width: 'auto' as const,
-      required: true,
-    })),
+    kind: 'group',
+    legend: options.label ?? 'Standard array',
+    description: options.hint,
+    legendSize: 'subsection',
+    fields: [
+      {
+        kind: 'row',
+        fields: Array.from({ length: STANDARD_ARRAY_LENGTH }, (_, index) => ({
+          type: 'number' as const,
+          name: `${name}.${index}`,
+          label: '',
+          digits: 2,
+          width: 'auto' as const,
+          required: true,
+        })),
+      },
+    ],
   }
 }

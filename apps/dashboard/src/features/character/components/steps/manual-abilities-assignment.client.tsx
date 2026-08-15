@@ -39,6 +39,7 @@ import {
 export type ManualAbilitiesAssignmentProps = {
   showInvalidStates?: boolean
   classInput?: AbilityScoreRecommendationClassInput | null
+  classStepApplicable?: boolean
   recommendation?: AbilityScoreRecommendation | null
 }
 
@@ -113,6 +114,7 @@ function ManualAbilityScoreCard({
 export function ManualAbilitiesAssignment({
   showInvalidStates = false,
   classInput = null,
+  classStepApplicable = false,
   recommendation = null,
 }: ManualAbilitiesAssignmentProps) {
   const introId = useId()
@@ -152,6 +154,7 @@ export function ManualAbilitiesAssignment({
 
       <AbilityRecommendationPanel
         classInput={classInput}
+        classStepApplicable={classStepApplicable}
         recommendation={recommendation}
         currentScores={scores}
       />

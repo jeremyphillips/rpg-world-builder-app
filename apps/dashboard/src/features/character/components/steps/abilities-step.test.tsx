@@ -63,6 +63,28 @@ describe('AbilitiesStep', () => {
     ).toBeInTheDocument()
   })
 
+  it('hides no-class recommendation helper when the class step is not applicable', () => {
+    render(
+      <AbilitiesStep
+        context={context}
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          class: { classId: undefined, level: 0 },
+        }}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.queryByText(
+        formatFieldMessage(characterBuilderAbilityRecommendationMessages.noClass()),
+      ),
+    ).not.toBeInTheDocument()
+  })
+
   it('shows fighter recommendations when class is selected', () => {
     render(
       <AbilitiesStep

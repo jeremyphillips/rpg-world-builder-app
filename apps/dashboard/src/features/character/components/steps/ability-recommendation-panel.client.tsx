@@ -18,6 +18,7 @@ export type { AbilityRecommendationPanelProps } from './ability-recommendation-p
 
 export function AbilityRecommendationPanel({
   classInput,
+  classStepApplicable,
   recommendation,
   currentScores,
   showSuggestedAssignment = false,
@@ -35,6 +36,8 @@ export function AbilityRecommendationPanel({
   }, [classInput, currentScores, onApplySuggestions, recommendation, showSuggestedAssignment])
 
   if (!classInput || !model) {
+    if (!classStepApplicable) return null
+
     return (
       <div className={abilityRecommendationCalloutClasses}>
         <Text variant="muted" className="text-sm">
