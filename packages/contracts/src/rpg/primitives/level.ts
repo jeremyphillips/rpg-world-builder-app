@@ -19,6 +19,9 @@ export const levelSchema = z.number().int().min(1).max(MAX_CHARACTER_LEVEL)
 /** Stored content may reference levels up to the absolute campaign ceiling. */
 export const absoluteLevelSchema = z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL)
 
+/** Builder draft level — includes 0 for classless Level 0 NPC creation flows. */
+export const builderLevelSchema = z.number().int().min(0).max(ABSOLUTE_MAX_CHARACTER_LEVEL)
+
 /** Campaign-scoped level bound for forms and runtime validation. */
 export function campaignLevelSchema(maxLevel: number) {
   return z.number().int().min(1).max(maxLevel)

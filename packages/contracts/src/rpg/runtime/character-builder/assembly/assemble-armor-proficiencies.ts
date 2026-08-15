@@ -4,8 +4,10 @@ import { resolveEquipmentContentId } from '../../../content/starting-equipment'
 import type { ArmorCategory } from '../../../vocab/armor/category'
 import type { CharacterArmorProficiencyEntry } from '../../character/proficiencies'
 import type { ChoiceSet } from '../choice-set'
-import type { CharacterBuildCatalogIndex } from '../context'
+import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
+import { levelZeroBaselineArmorEntries } from './level-zero-baseline-proficiency-entries'
 import { assembleGrantArmorProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 
@@ -109,11 +111,21 @@ export function assembleArmorProficiencyEntries(
   catalogIndex: CharacterBuildCatalogIndex,
   choiceSets: readonly ChoiceSet[],
   characterClass: CharacterClass | undefined,
+  context?: CharacterBuildContext,
 ): CharacterArmorProficiencyEntry[] {
   const rulesetId = rulesetIdFromDraft(draft, characterClass)
   const classEntries = characterClass ? classFixedArmorProficiencies(characterClass) : []
   const grantEntries = assembleGrantArmorProficiencyEntries(draft, catalogIndex, characterClass)
   const selectedEntries = selectedArmorProficiencies(draft, catalogIndex, choiceSets, rulesetId)
+  const levelZeroEntries =
+    context && isBuilderLevelZeroClassless(draft, context)
+      ? levelZeroBaselineArmorEntries(context.characterCreationRules.levelZeroNpcs)
+      : []
 
-  return mergeArmorProficiencyEntries([...classEntries, ...grantEntries, ...selectedEntries])
+  return mergeArmorProficiencyEntries([
+    ...levelZeroEntries,
+    ...classEntries,
+    ...grantEntries,
+    ...selectedEntries,
+  ])
 }

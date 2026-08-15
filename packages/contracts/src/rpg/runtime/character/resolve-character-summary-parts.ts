@@ -60,6 +60,7 @@ export function resolveCharacterSummaryParts(
 
   return {
     ...(species ? { species } : {}),
+    ...(character.classes.length === 0 ? { classlessLevel: 0 } : {}),
     classes: resolveClassParts(character.classes, lookup),
   }
 }
@@ -87,6 +88,7 @@ export function resolveBuilderCharacterSummaryParts(
 
   return {
     ...(species ? { species } : {}),
+    ...(classes.length === 0 && draft.class.level === 0 ? { classlessLevel: 0 } : {}),
     classes,
   }
 }

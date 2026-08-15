@@ -1,7 +1,8 @@
 import {
   getContentTypeTerm,
   indexCharacterBuildCatalog,
-  resolveBuilderLevelConstraints,
+  isClassProgressionApplicable,
+  resolveCharacterLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
@@ -28,6 +29,10 @@ export type QuickNpcSetupModel = {
   summaryLine: string
 }
 
+export function resolveQuickNpcDefaultLevel(context: CharacterBuildContext): number {
+  return resolveCharacterLevelConstraints(context).minLevel
+}
+
 export function formatQuickNpcSetupCharacterSummary(
   values: QuickNpcSetupValues,
   context: CharacterBuildContext,
@@ -36,7 +41,10 @@ export function formatQuickNpcSetupCharacterSummary(
   return formatBuilderDraftCharacterSummary(
     {
       species: { speciesId: values.speciesId },
-      class: { classId: values.classId, level: values.level },
+      class: {
+        classId: isClassProgressionApplicable(values.level) ? values.classId : undefined,
+        level: values.level,
+      },
     },
     catalogIndex,
   )
@@ -48,12 +56,14 @@ export function buildQuickNpcCreateSetupSets(args: {
   onValuesChange: (values: QuickNpcSetupValues) => void
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const levelConstraints = resolveBuilderLevelConstraints(args.context)
+  const levelConstraints = resolveCharacterLevelConstraints(args.context)
+  const defaultLevel = resolveQuickNpcDefaultLevel(args.context)
   const speciesTerm = getContentTypeTerm('species')
   const classTerm = getContentTypeTerm('classes')
   const { values, onValuesChange } = args
+  const classProgressionApplicable = isClassProgressionApplicable(values.level)
 
-  return [
+  const sets: CreateSetupSet[] = [
     {
       id: 'speciesId',
       kind: 'choice',
@@ -81,9 +91,12 @@ export function buildQuickNpcCreateSetupSets(args: {
       ),
       collapseWhenComplete: false,
       onValueChange: (level) => onValuesChange({ ...values, level }),
-      onReset: () => onValuesChange({ ...values, level: 1 }),
+      onReset: () => onValuesChange({ ...values, level: defaultLevel }),
     },
-    {
+  ]
+
+  if (classProgressionApplicable) {
+    sets.push({
       id: 'classId',
       kind: 'choice',
       fieldLabel: classTerm.label,
@@ -95,8 +108,10 @@ export function buildQuickNpcCreateSetupSets(args: {
       collapseWhenComplete: true,
       onValueChange: (classId) => onValuesChange({ ...values, classId }),
       onReset: () => onValuesChange({ ...values, classId: '' }),
-    },
-  ]
+    })
+  }
+
+  return sets
 }
 
 export function resolveQuickNpcSetupModel(args: {
@@ -104,8 +119,9 @@ export function resolveQuickNpcSetupModel(args: {
   values: QuickNpcSetupValues
 }): QuickNpcSetupModel {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const levelConstraints = resolveBuilderLevelConstraints(args.context)
+  const levelConstraints = resolveCharacterLevelConstraints(args.context)
   const { speciesId, classId, level } = args.values
+  const classRequired = isClassProgressionApplicable(level)
 
   const sets = buildQuickNpcCreateSetupSets({
     context: args.context,
@@ -115,7 +131,8 @@ export function resolveQuickNpcSetupModel(args: {
   const canContinue =
     resolveCreateSetupCanContinue({ sets }) &&
     isCreateSetupNumberComplete(level, levelConstraints.minLevel, levelConstraints.maxLevel) &&
-    Boolean(speciesId && classId)
+    Boolean(speciesId) &&
+    (!classRequired || Boolean(classId))
 
   return {
     speciesOptions,

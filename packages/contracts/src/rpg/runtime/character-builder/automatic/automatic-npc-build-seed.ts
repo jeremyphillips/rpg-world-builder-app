@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
-import { absoluteLevelSchema } from '../../../primitives/level'
+import { builderLevelSchema } from '../../../primitives/level'
 import { alignmentSchema } from '../../../vocab/alignment'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
+import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { resolveAvailableContent } from '../preview/resolve-available-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
 import { validationIssue } from '../validate/issue'
@@ -18,8 +19,8 @@ import type { CharacterBuildValidationIssue } from '../validate/types'
 export const automaticNpcBuildSeedSchema = z.object({
   name: z.string().trim().min(1),
   speciesId: z.string().min(1),
-  classId: z.string().min(1),
-  level: absoluteLevelSchema,
+  classId: z.string().min(1).optional(),
+  level: builderLevelSchema,
   /** Required — finalSubmit validation requires an alignment. */
   alignment: alignmentSchema,
 })
@@ -49,11 +50,28 @@ export function validateAutomaticNpcBuildSeed(
     )
   }
 
-  if (!available.classes.some((entry) => entry.id === seed.classId)) {
+  if (isClassProgressionApplicable(seed.level)) {
+    if (!seed.classId) {
+      issues.push(
+        validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
+          path: 'class.classId',
+          stepId: 'class',
+        }),
+      )
+    } else if (!available.classes.some((entry) => entry.id === seed.classId)) {
+      issues.push(
+        validationIssue(
+          'class_not_in_catalog',
+          characterBuilderValidationMessages.classNotInCatalog(),
+          { path: 'class.classId', stepId: 'class' },
+        ),
+      )
+    }
+  } else if (seed.classId) {
     issues.push(
       validationIssue(
-        'class_not_in_catalog',
-        characterBuilderValidationMessages.classNotInCatalog(),
+        'class_not_permitted_at_level_zero',
+        characterBuilderValidationMessages.classNotPermittedAtLevelZero(),
         { path: 'class.classId', stepId: 'class' },
       ),
     )

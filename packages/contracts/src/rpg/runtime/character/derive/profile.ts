@@ -31,6 +31,8 @@ import { resolveEquippedArmorClass } from './armor-class'
 
 export type CharacterDerivationInput = {
   level: number
+  /** When set, overrides formula-derived proficiency bonus (e.g. Level 0 NPC campaign literal). */
+  proficiencyBonusOverride?: number
   /** Ruleset base AC (ascending mode). Defaults to the SRD ascending base when omitted. */
   armorClassBase?: ArmorClassBase
   abilityScores?: Partial<Record<Ability, number>>
@@ -176,7 +178,7 @@ export function deriveSpellcastingStats(
  */
 export function deriveCharacterProfile(input: CharacterDerivationInput): CharacterDerivedProfile {
   const acBase = input.armorClassBase ?? DEFAULT_ARMOR_CLASS_BASE
-  const profBonus = proficiencyBonus(input.level)
+  const profBonus = input.proficiencyBonusOverride ?? proficiencyBonus(input.level)
   const conScore = input.abilityScores?.con
   const dexScore = input.abilityScores?.dex
 

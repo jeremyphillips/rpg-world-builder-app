@@ -8,7 +8,11 @@ import type {
   PcCharacter,
   SystemRulesetId,
 } from '@rpg/contracts'
-import { createDefaultCharacterVitalState, normalizeCharacterVital } from '@rpg/contracts'
+import {
+  assertCharacterXpMutationAllowed,
+  createDefaultCharacterVitalState,
+  normalizeCharacterVital,
+} from '@rpg/contracts'
 
 import type { WithMongoSession } from '../../lib/mongo-session'
 import { CharacterModel } from './character.model'
@@ -22,6 +26,11 @@ export async function createPcRecord(
   userId: string,
   options?: WithMongoSession,
 ): Promise<PcCharacter> {
+  assertCharacterXpMutationAllowed(
+    { classes: input.classes, xp: input.xp ?? null },
+    input.xp ?? null,
+  )
+
   const character = new CharacterModel({
     ...input,
     characterType: 'pc',
@@ -35,6 +44,11 @@ export async function createPcRecord(
 }
 
 export async function createNpcRecord(input: CreateNpcServiceInput): Promise<NpcCharacter> {
+  assertCharacterXpMutationAllowed(
+    { classes: input.classes, xp: input.xp ?? null },
+    input.xp ?? null,
+  )
+
   const doc = await CharacterModel.create({
     ...input,
     characterType: 'npc',

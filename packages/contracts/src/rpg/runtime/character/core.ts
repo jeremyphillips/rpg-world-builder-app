@@ -44,6 +44,25 @@ export const characterClassesSchema = z
     })
   })
 
+/** NPC classes — empty array represents Level 0 classless NPCs. */
+export const npcCharacterClassesSchema = z
+  .array(characterClassEntrySchema)
+  .superRefine((entries, ctx) => {
+    const seen = new Set<string>()
+
+    entries.forEach((entry, index) => {
+      if (seen.has(entry.classId)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: characterValidationMessages.duplicateClass(),
+          path: [index, 'classId'],
+        })
+      }
+
+      seen.add(entry.classId)
+    })
+  })
+
 export const characterSpeciesSchema = z.object({
   /** Opaque species content id. */
   id: z.string().min(1),

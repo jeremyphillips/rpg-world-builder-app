@@ -20,6 +20,8 @@ export function listReachableSpellOptions(args: {
   seed: Pick<AutomaticNpcBuildSeed, 'classId' | 'level'>
   context: CharacterBuildContext
 }): ReachableSpellOption[] {
+  if (!args.seed.classId) return []
+
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const characterClass = catalogIndex.classes.get(args.seed.classId)
   if (!characterClass) return []

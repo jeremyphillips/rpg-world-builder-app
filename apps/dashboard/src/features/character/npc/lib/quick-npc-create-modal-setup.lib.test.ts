@@ -7,17 +7,28 @@ import {
 import {
   buildQuickNpcCreateSetupSets,
   formatQuickNpcSetupCharacterSummary,
+  resolveQuickNpcDefaultLevel,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
-import { EMPTY_QUICK_NPC_SETUP_VALUES } from './quick-npc-form-fields'
+import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
 
 describe('buildQuickNpcCreateSetupSets', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('orders species, level, and class sets', () => {
+  it('orders species and level, omitting class at level 0', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
-      values: EMPTY_QUICK_NPC_SETUP_VALUES,
+      values: createQuickNpcSetupDefaultValues(context),
+      onValuesChange: () => {},
+    })
+
+    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'level'])
+  })
+
+  it('includes class when level progression applies', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      context,
+      values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
       onValuesChange: () => {},
     })
 
@@ -42,11 +53,39 @@ describe('buildQuickNpcCreateSetupSets', () => {
 describe('resolveQuickNpcSetupModel', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('requires species, class, and a valid level to continue', () => {
+  it('defaults to campaign minimum level', () => {
+    expect(resolveQuickNpcDefaultLevel(context)).toBe(0)
+  })
+
+  it('requires species and a valid level to continue at level 0', () => {
     expect(
       resolveQuickNpcSetupModel({
         context,
-        values: EMPTY_QUICK_NPC_SETUP_VALUES,
+        values: createQuickNpcSetupDefaultValues(context),
+      }).canContinue,
+    ).toBe(false)
+
+    expect(
+      resolveQuickNpcSetupModel({
+        context,
+        values: {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          classId: '',
+          level: 0,
+        },
+      }).canContinue,
+    ).toBe(true)
+  })
+
+  it('requires class when level progression applies', () => {
+    expect(
+      resolveQuickNpcSetupModel({
+        context,
+        values: {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          classId: '',
+          level: 1,
+        },
       }).canContinue,
     ).toBe(false)
 
@@ -60,6 +99,16 @@ describe('resolveQuickNpcSetupModel', () => {
         },
       }).canContinue,
     ).toBe(true)
+  })
+
+  it('formats classless level 0 summaries', () => {
+    const values = {
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      classId: '',
+      level: 0,
+    }
+
+    expect(formatQuickNpcSetupCharacterSummary(values, context)).toBe('Dwarf · Level 0')
   })
 
   it('formats the setup summary with the canonical character summary line', () => {

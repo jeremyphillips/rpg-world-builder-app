@@ -10,6 +10,12 @@ import {
   DEFAULT_BUILDER_HIT_POINT_SOURCE,
   resolveBuilderMaxHitPoints,
 } from '../progression/builder-hit-points'
+import {
+  isBuilderLevelZeroClassless,
+  isClassProgressionApplicable,
+  isLevelZeroNpcPermitted,
+  sanitizeClassForLevel,
+} from '../progression/character-level-policy'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
@@ -19,6 +25,11 @@ import {
   mergeCharacterSpellEntries,
 } from '../assembly/assemble-granted-spells'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
+import {
+  characterWealthFromGrant,
+  EMPTY_CHARACTER_EQUIPMENT,
+} from '../../character/equipment-inventory'
+import { normalizeCharacterWealthGrant } from '../../../primitives/character-wealth-grant'
 import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 import { validateCharacterBuild } from '../validate/validate-character-build'
 import { validationIssue } from '../validate/issue'
@@ -67,23 +78,45 @@ function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidatio
 function resolveFinalizeCatalogIssues(
   draft: CharacterBuilderDraft,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  context: CharacterBuildContext,
 ): CharacterBuildValidationResult['issues'] {
   const issues: CharacterBuildValidationResult['issues'] = []
+  const effectiveDraft = sanitizeClassForLevel(draft)
 
-  const classId = draft.class.classId
-  if (!classId) {
-    issues.push(
-      validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
-        path: 'class.classId',
-        stepId: 'class',
-      }),
-    )
-  } else if (!catalogIndex.classes.get(classId)) {
+  if (isClassProgressionApplicable(draft.class.level)) {
+    const classId = effectiveDraft.class.classId
+    if (!classId) {
+      issues.push(
+        validationIssue('class_required', characterBuilderValidationMessages.classRequired(), {
+          path: 'class.classId',
+          stepId: 'class',
+        }),
+      )
+    } else if (!catalogIndex.classes.get(classId)) {
+      issues.push(
+        validationIssue(
+          'class_not_in_catalog',
+          characterBuilderValidationMessages.classNotInCatalog(),
+          { path: 'class.classId', stepId: 'class' },
+        ),
+      )
+    }
+  } else if (draft.class.classId) {
     issues.push(
       validationIssue(
-        'class_not_in_catalog',
-        characterBuilderValidationMessages.classNotInCatalog(),
+        'class_not_permitted_at_level_zero',
+        characterBuilderValidationMessages.classNotPermittedAtLevelZero(),
         { path: 'class.classId', stepId: 'class' },
+      ),
+    )
+  }
+
+  if (isBuilderLevelZeroClassless(draft, context) && !isLevelZeroNpcPermitted(context)) {
+    issues.push(
+      validationIssue(
+        'level_zero_not_permitted',
+        characterBuilderValidationMessages.levelZeroNotPermitted(),
+        { path: 'class.level', stepId: 'class' },
       ),
     )
   }
@@ -187,43 +220,57 @@ export function finalizeCharacterBuild(
 
   const choiceSets = options.resolvedChoiceSets ?? []
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const effectiveDraft = sanitizeClassForLevel(draft)
+  const isClasslessLevelZero = isBuilderLevelZeroClassless(draft, context)
 
-  const catalogIssues = resolveFinalizeCatalogIssues(draft, catalogIndex)
+  const catalogIssues = resolveFinalizeCatalogIssues(draft, catalogIndex, context)
   if (catalogIssues.length > 0) {
     throw new CharacterBuildFinalizationError(catalogIssues)
   }
 
-  const classId = draft.class.classId!
-  const speciesId = draft.species.speciesId!
-  const characterClass = catalogIndex.classes.get(classId)!
-  const abilityScores = requireCompleteAbilityScores(draft)
+  const classId = effectiveDraft.class.classId
+  const speciesId = effectiveDraft.species.speciesId!
+  const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
+  const abilityScores = requireCompleteAbilityScores(effectiveDraft)
   const proficiencies = assembleCharacterProficiencies(
-    draft,
+    effectiveDraft,
     catalogIndex,
     choiceSets,
     characterClass,
     context,
   )
-  const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex, {
-    startingWealth: context.characterCreationRules.startingWealth,
-    rulesetId: context.rulesetId,
+
+  const levelZeroRules = context.characterCreationRules.levelZeroNpcs
+  const { equipment, wealth } = isClasslessLevelZero
+    ? assembleLevelZeroStartingEquipment(effectiveDraft, levelZeroRules)
+    : assembleStartingEquipment(effectiveDraft, catalogIndex, {
+        startingWealth: context.characterCreationRules.startingWealth,
+        rulesetId: context.rulesetId,
+      })
+
+  const maxHp = resolveBuilderMaxHitPoints(effectiveDraft, characterClass, {
+    source: DEFAULT_BUILDER_HIT_POINT_SOURCE,
+    levelZeroRules: isClasslessLevelZero ? levelZeroRules : undefined,
   })
 
-  const maxHp = resolveBuilderMaxHitPoints(draft, characterClass, {
-    source: DEFAULT_BUILDER_HIT_POINT_SOURCE,
-  })
+  const spells = isClasslessLevelZero
+    ? []
+    : mergeCharacterSpellEntries(
+        assembleClassSpellcasting(effectiveDraft, context, choiceSets),
+        assembleGrantedSpells(effectiveDraft, catalogIndex, characterClass!),
+      )
 
   const input: CreateCharacterInput = {
     characterType: 'pc',
-    name: draft.identity.name!.trim(),
-    imageKey: draft.identity.imageKey,
+    name: effectiveDraft.identity.name!.trim(),
+    imageKey: effectiveDraft.identity.imageKey,
     rulesetId: context.rulesetId,
-    classes: [{ classId, level: draft.class.level }],
+    classes: isClasslessLevelZero ? [] : [{ classId: classId!, level: effectiveDraft.class.level }],
     species: {
       id: speciesId,
-      heritageId: draft.species.heritageId,
+      heritageId: effectiveDraft.species.heritageId,
     },
-    alignment: draft.identity.alignment!,
+    alignment: effectiveDraft.identity.alignment!,
     xp: null,
     abilityScores,
     hitPoints: {
@@ -232,16 +279,31 @@ export function finalizeCharacterBuild(
       temporary: 0,
     },
     proficiencies,
-    spells: mergeCharacterSpellEntries(
-      assembleClassSpellcasting(draft, context, choiceSets),
-      assembleGrantedSpells(draft, catalogIndex, characterClass),
-    ),
+    spells,
     equipment,
     wealth,
-    narrative: draft.identity.narrative,
-    connections: draft.connections,
+    narrative: effectiveDraft.identity.narrative,
+    connections: effectiveDraft.connections,
     feats: [],
   }
 
+  if (isClasslessLevelZero && context.characterKind === 'npc') {
+    return input as CreateCharacterInput
+  }
+
   return parseCreateCharacterInput(input)
+}
+
+function assembleLevelZeroStartingEquipment(
+  _draft: CharacterBuilderDraft,
+  levelZeroRules: CharacterBuildContext['characterCreationRules']['levelZeroNpcs'],
+): {
+  equipment: ReturnType<typeof assembleStartingEquipment>['equipment']
+  wealth: ReturnType<typeof assembleStartingEquipment>['wealth']
+} {
+  const normalizedWealth = normalizeCharacterWealthGrant(levelZeroRules.startingWealth)
+  return {
+    equipment: { ...EMPTY_CHARACTER_EQUIPMENT },
+    wealth: characterWealthFromGrant(normalizedWealth),
+  }
 }

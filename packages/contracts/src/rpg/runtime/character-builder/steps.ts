@@ -8,6 +8,7 @@ import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability/ability-gen
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
+import { isClassProgressionApplicable } from './progression/character-level-policy'
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft/draft'
@@ -78,6 +79,7 @@ const BUILDER_STEP_METADATA = {
   class: {
     label: getContentTypeTerm('classes').label,
     description: `Choose your character's ${getContentTypeSentenceForm('classes')}`,
+    isApplicable: (_context, draft) => isClassProgressionApplicable(draft.class.level),
   },
   abilities: {
     label: 'Abilities',
@@ -238,6 +240,7 @@ function isSpeciesComplete(
 }
 
 function isClassComplete(draft: CharacterBuilderDraft): boolean {
+  if (!isClassProgressionApplicable(draft.class.level)) return true
   return typeof draft.class.classId === 'string' && draft.class.classId.length > 0
 }
 
@@ -275,6 +278,9 @@ function isReviewComplete(
 ): boolean {
   const prerequisiteIds = BUILDER_STEPS.filter((s) => s.id !== 'review').map((s) => s.id)
   return prerequisiteIds.every((id) => {
+    if (id === 'class' && !isClassProgressionApplicable(draft.class.level)) {
+      return true
+    }
     const status = getBuilderStepStatus(id, draft, resolvedChoiceSets)
     return status === 'complete' || status === 'deferred'
   })

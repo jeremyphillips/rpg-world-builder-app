@@ -34,4 +34,30 @@ describe('isQuickNpcSetupStillValid', () => {
       ),
     ).toBe(false)
   })
+
+  it('rejects setup when the class is no longer campaign-available', () => {
+    expect(
+      isQuickNpcSetupStillValid(
+        {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          classId: 'srd-cc-5.2.1:not-a-class',
+          level: 1,
+        },
+        context,
+      ),
+    ).toBe(false)
+  })
+
+  it('accepts level 0 setup without a class', () => {
+    expect(
+      isQuickNpcSetupStillValid(
+        {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          classId: '',
+          level: 0,
+        },
+        context,
+      ),
+    ).toBe(true)
+  })
 })
