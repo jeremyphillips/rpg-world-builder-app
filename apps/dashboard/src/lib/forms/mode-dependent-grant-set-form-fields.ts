@@ -47,7 +47,7 @@ function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibil
   }
 }
 
-/** Shared mode radio + inset dependents for category/specific grant-set editors. */
+/** Shared mode radio + dependent grant-set editors — decoration is owned by parent composition. */
 export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOptions): FormItem {
   const {
     modeFieldName,
@@ -91,8 +91,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
             },
           }
         : {}),
-      chrome: 'panel',
-      panel: { surface: { emphasis: 'subtle' } },
+      chrome: 'none',
       fields: [
         {
           type: 'chips',

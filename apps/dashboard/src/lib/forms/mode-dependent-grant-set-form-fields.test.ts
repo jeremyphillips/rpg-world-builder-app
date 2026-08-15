@@ -16,7 +16,7 @@ function expectDependentField(
 }
 
 describe('modeDependentGrantSetField', () => {
-  it('returns a dependent field with inset dependents and no panel chrome on chips', () => {
+  it('returns a dependent field with undecorated dependents and no panel chrome on chips', () => {
     const item = expectDependentField(
       modeDependentGrantSetField({
         modeFieldName: 'weaponProficiencyMode',
@@ -39,10 +39,10 @@ describe('modeDependentGrantSetField', () => {
         name: 'weaponProficiencyMode',
       },
       dependents: {
-        chrome: 'panel',
-        panel: { surface: { emphasis: 'subtle' } },
+        chrome: 'none',
       },
     })
+    expect(item.dependents).not.toHaveProperty('panel')
 
     const chips = item.dependents.fields[0]
     expect(chips).toMatchObject({ type: 'chips' })
