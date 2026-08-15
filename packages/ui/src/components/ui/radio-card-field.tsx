@@ -34,7 +34,6 @@ export function RadioCardField({
   defaultValue,
   onValueChange,
   onBlur,
-  labelHidden,
   labelVisibility,
   chrome,
 }: RadioCardFieldProps) {
@@ -48,7 +47,6 @@ export function RadioCardField({
       info={info}
       required={required}
       width={width}
-      labelHidden={labelHidden}
       labelVisibility={labelVisibility}
       chrome={chrome}
       controlBand="content-sized"

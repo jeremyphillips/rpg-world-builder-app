@@ -40,7 +40,6 @@ import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
 import type {
   FieldHintPosition,
-  FieldGroupLegendSize,
   FieldLabelPosition,
   FieldSeparator,
 } from '../components/ui/field.variants'
@@ -441,7 +440,7 @@ export interface RadioFieldConfig extends BaseFieldConfig {
   /** When `'horizontal'`, options lay out in a row (default `'vertical'`). */
   orientation?: 'horizontal' | 'vertical'
   /** Visually hide the label while keeping it available to screen readers. */
-  labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
 }
 
 export interface RadioCardFieldConfig extends BaseFieldConfig {
@@ -449,7 +448,7 @@ export interface RadioCardFieldConfig extends BaseFieldConfig {
   options: FieldOption[]
   defaultValue?: string
   /** Visually hide the label while keeping it available to screen readers. */
-  labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
 }
 
 export interface CheckboxFieldConfig extends BaseFieldConfig {
@@ -558,7 +557,7 @@ export type {
 /**
  * Composable inline prose + bound controls (`type: 'inlineSentence'`).
  *
- * Common options: `segments`, `below`, `hideLabel`, `chipSize`, `visibility`, `required`.
+ * Common options: `segments`, `below`, `labelVisibility`, `chipSize`, `visibility`, `required`.
  *
  * Prefer over deprecated `chooseFromChips` / `inlineChooseCount` for new authoring.
  * Use `defineInlineSentenceField()` for variant-specific completion.
@@ -590,8 +589,6 @@ export interface InlineSentenceFieldConfig extends BaseFieldConfig {
    */
   segments: InlineSentenceSegment[]
   below?: InlineSentenceBelowChips
-  /** When true, the legend is visually hidden but kept for assistive tech. */
-  hideLabel?: boolean
   /** Pill scale for `below` chips; defaults to field `size`. */
   chipSize?: FieldSize
 }
@@ -633,8 +630,6 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   suffix?: string
   /** Visual digit capacity for the count input. Defaults to `1`. */
   digits?: FieldDigits
-  /** When true, the legend is visually hidden but kept for assistive tech. */
-  hideLabel?: boolean
   defaultValue?: number
   /** Optional trailing select bound to a second RHF path (same pattern as `chooseFromChips.chooseName`). */
   selectName?: string
@@ -958,14 +953,6 @@ export interface DependentDependentsConfig {
   /** Panel wash options — only when `chrome === 'panel'`. */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
   /**
-   * @deprecated Use `chrome: 'panel'` with `panel.surface` / `panel.tone`.
-   */
-  surface?: SurfaceConfig
-  /**
-   * @deprecated Use `chrome: 'panel'` with `panel.tone`.
-   */
-  tone?: SemanticSurfaceTone
-  /**
    * Where dependent chrome applies.
    *
    * - `wrapper` (default) — chrome on the dependents container.
@@ -1005,10 +992,8 @@ export interface DependentConfig {
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `legendSize`, `density`, `chrome`, `disclosure`,
+ * Common options: `legend`, `fields`, `density`, `chrome`, `disclosure`,
  * `description`, `visibility`.
- *
- * Nested groups inside another group often use `legendSize: 'subsection'`.
  * Use `defineGroupField()` for completion.
  *
  * @example
@@ -1031,11 +1016,6 @@ export interface GroupConfig {
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
-  /**
-   * @deprecated Tier resolves from named-group nesting depth. Use nested groups
-   * for subsection scale instead of overriding typography.
-   */
-  legendSize?: FieldGroupLegendSize
   /**
    * Section density for this group subtree. Inherits parent density when omitted.
    */
@@ -1205,11 +1185,6 @@ export interface ArrayConfig {
   /** Preferred heading API — typography derives from nesting depth and density. */
   heading?: Pick<FormHeading, 'label'>
   legend: string
-  /**
-   * @deprecated Typography derives from nesting depth and `density`. Will be removed
-   * in Phase 3.
-   */
-  legendSize?: FieldGroupLegendSize
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */

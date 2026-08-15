@@ -54,7 +54,8 @@ export function magicItemFormFieldGroup(ctx: ContentFormCtx = {}): FormItem {
           label: 'Requires attunement',
         },
         dependents: {
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'text',

@@ -2,10 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import {
   resolveArrayLegendPresentation,
-  resolveArrayLegendPresentationWithLegacyOverride,
   resolveFieldLabelVisibility,
   resolveGroupHeadingTier,
-  resolveGroupLegendSizeWithLegacyOverride,
+  resolveGroupLegendSize,
   resolveNamedGroupDepthAfterEntering,
 } from './form-heading.lib'
 
@@ -30,17 +29,8 @@ describe('resolveNamedGroupDepthAfterEntering', () => {
 
 describe('resolveFieldLabelVisibility', () => {
   it('prefers explicit labelVisibility', () => {
-    expect(resolveFieldLabelVisibility({ labelVisibility: 'srOnly', labelHidden: false })).toBe(
-      'srOnly',
-    )
-    expect(resolveFieldLabelVisibility({ labelVisibility: 'visible', hideLabel: true })).toBe(
-      'visible',
-    )
-  })
-
-  it('maps deprecated hideLabel and labelHidden to srOnly', () => {
-    expect(resolveFieldLabelVisibility({ hideLabel: true })).toBe('srOnly')
-    expect(resolveFieldLabelVisibility({ labelHidden: true })).toBe('srOnly')
+    expect(resolveFieldLabelVisibility({ labelVisibility: 'srOnly' })).toBe('srOnly')
+    expect(resolveFieldLabelVisibility({ labelVisibility: 'visible' })).toBe('visible')
   })
 
   it('defaults to visible', () => {
@@ -68,28 +58,9 @@ describe('resolveArrayLegendPresentation', () => {
   })
 })
 
-describe('resolveGroupLegendSizeWithLegacyOverride', () => {
-  it('honors explicit legendSize during migration', () => {
-    expect(resolveGroupLegendSizeWithLegacyOverride('section', 'subsection')).toBe('subsection')
-  })
-
-  it('falls back to structural tier when override omitted', () => {
-    expect(resolveGroupLegendSizeWithLegacyOverride('subsection')).toBe('subsection')
-  })
-})
-
-describe('resolveArrayLegendPresentationWithLegacyOverride', () => {
-  it('honors non-array legacy legendSize during migration', () => {
-    expect(resolveArrayLegendPresentationWithLegacyOverride(0, 'md', 'section')).toEqual({
-      legendSize: 'section',
-      legendScale: 'default',
-    })
-  })
-
-  it('derives structurally when legacy override is array or omitted', () => {
-    expect(resolveArrayLegendPresentationWithLegacyOverride(0, 'sm', 'array')).toEqual({
-      legendSize: 'array',
-      legendScale: 'sm',
-    })
+describe('resolveGroupLegendSize', () => {
+  it('maps structural tiers to legend size tokens', () => {
+    expect(resolveGroupLegendSize('section')).toBe('section')
+    expect(resolveGroupLegendSize('subsection')).toBe('subsection')
   })
 })

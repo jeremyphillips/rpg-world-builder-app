@@ -14,7 +14,7 @@ import {
 import { useFormUiContext } from '../context/form-ui.context'
 import {
   resolveGroupHeadingTier,
-  resolveGroupLegendSizeWithLegacyOverride,
+  resolveGroupLegendSize,
   resolveNamedGroupDepthAfterEntering,
 } from '../form-heading.lib'
 import { hasNamedGroupHeading, resolveGroupHeading } from '../resolve-container-heading.lib'
@@ -49,7 +49,7 @@ export function GroupFieldSection({
   const heading = resolveGroupHeading(item)
   const hasNamedHeading = hasNamedGroupHeading(item)
   const groupTier = resolveGroupHeadingTier(parentContext.namedGroupDepth)
-  const legendSize = resolveGroupLegendSizeWithLegacyOverride(groupTier, item.legendSize)
+  const legendSize = resolveGroupLegendSize(groupTier)
   const groupDensity = item.density ?? parentContext.density
   const { rhythm: groupRhythm, size: groupSize } = resolveFormDensity(groupDensity)
   const childNamedGroupDepth = resolveNamedGroupDepthAfterEntering(

@@ -10,7 +10,7 @@ const meta = {
   args: {
     id: 'package-choose',
     label: 'Packages to choose',
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     prefix: 'Character can choose',
     suffix: 'package(s) from list',
     chooseMin: 1,
@@ -26,7 +26,7 @@ export const Default: Story = {}
 
 export const WithVisibleLabel: Story = {
   args: {
-    hideLabel: false,
+    labelVisibility: 'visible',
     label: 'Package selection',
     prefix: 'Choose',
     suffix: 'packages',
@@ -47,7 +47,7 @@ export const WithError: Story = {
 
 export const WithTrailingSelect: Story = {
   args: {
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     prefix: 'Character chooses',
     suffix: 'item(s) from',
     selectId: 'pool-source',
@@ -66,7 +66,7 @@ export const WalkSpeed: Story = {
   args: {
     id: 'walk-speed',
     label: 'Walk speed',
-    hideLabel: false,
+    labelVisibility: 'visible',
     prefix: '',
     suffix: 'ft.',
     chooseMin: 0,

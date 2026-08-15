@@ -177,6 +177,39 @@ const dashboardDragHandleGuard = {
   },
 }
 
+/** Form heading hierarchy — ban deprecated label and legend APIs in form field modules. */
+const dashboardFormFieldGuards = {
+  files: ['src/**/*-form-fields.ts', 'src/**/lib/**/*-form-fields.ts'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: 'Property[key.name="legendSize"]',
+        message: 'legendSize was removed — nest named groups under a section for subsection scale.',
+      },
+      {
+        selector: 'Property[key.name="hideLabel"]',
+        message: 'Use labelVisibility: "srOnly" instead of hideLabel.',
+      },
+      {
+        selector: 'Property[key.name="labelHidden"]',
+        message: 'Use labelVisibility: "srOnly" instead of labelHidden.',
+      },
+      {
+        selector: 'Property[key.name="label"][value.type="Literal"][value.value=""]',
+        message:
+          'Field labels must be non-whitespace — use labelVisibility: "srOnly" to hide visible copy.',
+      },
+      {
+        selector:
+          'Property[key.name="surface"][parent.parent.type="Property"][parent.parent.key.name="dependents"]',
+        message: 'Use dependents.chrome: "panel" with panel.surface for dependent panel wash.',
+      },
+    ],
+  },
+}
+
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
@@ -187,4 +220,5 @@ export default [
   dashboardEntityCatalogPickerImportGuard,
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
+  dashboardFormFieldGuards,
 ]

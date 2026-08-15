@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 
 import { isFieldOptionGroup, type FieldOption } from '../../form/field-config'
 import { ChipsFieldOptions } from './chips-field.client'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { CompactLabelSize } from './compact-label.lib'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
 import { parseChooseCount } from './choose-count-field.lib'
@@ -60,7 +61,7 @@ export interface InlineSentenceFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
-  hideLabel?: boolean
+  labelVisibility?: FieldLabelVisibility
   chipSize?: CompactLabelSize
 }
 
@@ -181,7 +182,7 @@ export function InlineSentenceField({
   disabled,
   size = 'md',
   width,
-  hideLabel = false,
+  labelVisibility = 'visible',
   chipSize,
 }: InlineSentenceFieldProps) {
   const controlByName = useMemo(() => indexInlineSentenceControls(controls), [controls])
@@ -199,7 +200,7 @@ export function InlineSentenceField({
       disabled={disabled}
       size={size}
       width={width}
-      hideLabel={hideLabel}
+      labelVisibility={labelVisibility}
     >
       {({ legendId }) => (
         <>

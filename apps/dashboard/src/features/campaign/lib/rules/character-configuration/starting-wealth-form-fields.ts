@@ -150,7 +150,8 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
           defaultValue: false,
         },
         dependents: {
-          surface: { emphasis: 'default' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'default' } },
           fields: [
             {
               type: 'inputSelect',

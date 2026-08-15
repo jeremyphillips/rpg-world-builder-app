@@ -10,7 +10,7 @@ const meta = {
   args: {
     id: 'inline-sentence',
     label: 'Granted at',
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     segments: [
       { kind: 'text', value: 'Granted at', tone: 'label' },
       {
@@ -50,7 +50,7 @@ export const NumberAndSelect: Story = {
   args: {
     id: 'equipment-choose',
     label: 'Equipment choice',
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     segments: [
       { kind: 'text', value: 'Character chooses', tone: 'label' },
       { kind: 'number', name: 'choose' },
@@ -87,7 +87,7 @@ export const WithBelowChips: Story = {
   args: {
     id: 'skill-proficiencies',
     label: 'Skill proficiencies',
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     segments: [
       { kind: 'text', value: 'Character chooses', tone: 'label' },
       { kind: 'number', name: 'choose' },

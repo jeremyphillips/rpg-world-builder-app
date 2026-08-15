@@ -24,7 +24,7 @@ import {
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { resolveFormDensity } from '../../form-density'
-import { resolveArrayLegendPresentationWithLegacyOverride } from '../../form-heading.lib'
+import { resolveArrayLegendPresentation } from '../../form-heading.lib'
 import { hasNamedArrayHeading, resolveArrayHeading } from '../../resolve-container-heading.lib'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
@@ -73,11 +73,7 @@ export function useArrayFieldRendererState({
   const hasNamedHeading = hasNamedArrayHeading(config)
   /** Legend typography uses depth before this array's own heading increment. */
   const legendNamedGroupDepth = hasNamedHeading ? Math.max(0, namedGroupDepth - 1) : namedGroupDepth
-  const { legendSize, legendScale } = resolveArrayLegendPresentationWithLegacyOverride(
-    legendNamedGroupDepth,
-    size,
-    config.legendSize,
-  )
+  const { legendSize, legendScale } = resolveArrayLegendPresentation(legendNamedGroupDepth, size)
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey

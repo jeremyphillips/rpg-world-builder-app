@@ -39,21 +39,20 @@ export type ResolvedDependentChromePresentation = {
   arrayItemTone?: FieldContainerChromeOptions['tone']
 }
 
-/** Resolves dependent chrome — defaults to inset; legacy `surface`/`tone` imply panel. */
+/** Resolves dependent chrome — defaults to inset. */
 export function resolveDependentChromePresentation(
   dependents: DependentDependentsConfig,
   rhythm: FieldRhythm,
 ): ResolvedDependentChromePresentation {
-  const legacyPanel = dependents.surface !== undefined || dependents.tone !== undefined
-  const chrome: DependentChrome = dependents.chrome ?? (legacyPanel ? 'panel' : 'inset')
+  const chrome: DependentChrome = dependents.chrome ?? 'inset'
 
   if (chrome === 'none') {
     return { chrome }
   }
 
   if (chrome === 'panel') {
-    const surface = dependents.panel?.surface ?? dependents.surface
-    const tone = dependents.panel?.tone ?? dependents.tone
+    const surface = dependents.panel?.surface
+    const tone = dependents.panel?.tone
     return {
       chrome,
       wrapperClassName: resolveFieldDependentsChromeClasses({ surface, tone }),

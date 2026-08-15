@@ -18,6 +18,7 @@ import {
   defineDependentField,
 } from './form-authoring'
 import { DICE_FORMULA_OPERATORS } from '../components/ui/dice-formula-field.lib'
+import { assertFormFieldLabels } from './form-field-labels.lib'
 
 describe('form-authoring helpers', () => {
   it('returns the same object reference (identity)', () => {
@@ -142,5 +143,12 @@ describe('form-authoring helpers', () => {
     ])
 
     expect(fields).toHaveLength(3)
+  })
+
+  it('requires non-whitespace labels on leaf fields', () => {
+    assertFormFieldLabels([{ type: 'text', name: 'title', label: 'Title' }])
+    expect(() => assertFormFieldLabels([{ type: 'text', name: 'title', label: '' }])).toThrow(
+      /non-whitespace label/,
+    )
   })
 })

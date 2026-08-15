@@ -28,7 +28,7 @@ label: string // non-whitespace at steady state
 labelVisibility?: 'visible' | 'srOnly' // default 'visible'
 ```
 
-All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupLabel` via `resolveFieldLabelVisibility` (maps deprecated `hideLabel` / `labelHidden` during migration).
+All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupLabel` via `labelVisibility`.
 
 ## Phase 0 migration audit (sample)
 

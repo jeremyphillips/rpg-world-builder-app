@@ -8,6 +8,7 @@ import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { fieldInlineSentenceClasses } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { InlineSentenceConnector } from './inline-sentence-row'
@@ -43,8 +44,7 @@ export interface InlineChooseCountFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
-  /** When true, the legend is visually hidden but kept for assistive tech. */
-  hideLabel?: boolean
+  labelVisibility?: FieldLabelVisibility
 }
 
 /**
@@ -75,7 +75,7 @@ export function InlineChooseCountField({
   disabled,
   size = 'md',
   width,
-  hideLabel = false,
+  labelVisibility = 'visible',
 }: InlineChooseCountFieldProps) {
   const selectOptionNodes = useMemo(
     () =>
@@ -99,7 +99,7 @@ export function InlineChooseCountField({
       disabled={disabled}
       size={size}
       width={width}
-      hideLabel={hideLabel}
+      labelVisibility={labelVisibility}
     >
       {({ chooseId }) => (
         <div className={fieldInlineSentenceClasses}>

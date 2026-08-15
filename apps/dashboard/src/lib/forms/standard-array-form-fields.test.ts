@@ -22,6 +22,7 @@ describe('standardArrayFormFields', () => {
 
     expect(item).toMatchObject({
       kind: 'row',
+      separator: 'subtle',
       heading: {
         label: 'Standard array',
         hint: 'Sets the six fixed scores.',

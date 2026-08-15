@@ -10,6 +10,7 @@ import type { FieldHintPosition } from './field.variants'
 import type { FieldChrome } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { FieldLabelPresentationProps } from './field-label-props'
 
 export interface BaseRadioFieldProps extends FieldValidationProps, FieldLabelPresentationProps {
@@ -20,8 +21,7 @@ export interface BaseRadioFieldProps extends FieldValidationProps, FieldLabelPre
   required?: boolean
   size?: FieldSize
   width?: FieldWidth
-  /** @deprecated Use `labelVisibility: 'srOnly'`. */
-  labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
   chrome?: FieldChrome
   /** Default `single-line`. Card-style groups use `content-sized`. */
   controlBand?: FieldControlBand
@@ -44,7 +44,6 @@ export function RadioFieldShell({
   required,
   size,
   width,
-  labelHidden,
   labelVisibility,
   chrome,
   controlBand,
@@ -72,7 +71,6 @@ export function RadioFieldShell({
             required={required}
             info={info}
             size={size}
-            labelHidden={labelHidden}
             labelVisibility={labelVisibility}
           />
         }

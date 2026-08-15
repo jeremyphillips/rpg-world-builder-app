@@ -18,6 +18,7 @@ export function standardArrayFormFields(options: StandardArrayFormFieldOptions =
       label,
       ...(options.hint ? { hint: options.hint } : {}),
     },
+    separator: 'subtle',
     fields: Array.from({ length: STANDARD_ARRAY_LENGTH }, (_, index) => ({
       type: 'number' as const,
       name: `${name}.${index}`,

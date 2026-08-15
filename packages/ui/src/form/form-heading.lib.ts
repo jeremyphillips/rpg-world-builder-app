@@ -16,17 +16,11 @@ export type FieldLabelVisibility = 'visible' | 'srOnly'
 
 type LabelVisibilitySource = {
   labelVisibility?: FieldLabelVisibility
-  /** @deprecated Use `labelVisibility: 'srOnly'`. */
-  labelHidden?: boolean
-  /** @deprecated Use `labelVisibility: 'srOnly'`. */
-  hideLabel?: boolean
 }
 
 /** Single resolver for visible vs screen-reader-only leaf labels. */
 export function resolveFieldLabelVisibility(source: LabelVisibilitySource): FieldLabelVisibility {
-  if (source.labelVisibility) return source.labelVisibility
-  if (source.labelHidden || source.hideLabel) return 'srOnly'
-  return 'visible'
+  return source.labelVisibility ?? 'visible'
 }
 
 /** Maps named-group depth to structural section typography (capped at subsection). */
@@ -56,27 +50,6 @@ export function resolveArrayLegendPresentation(
     return { legendSize: 'subsection', legendScale: 'default' }
   }
   return { legendSize: 'array', legendScale: resolveArrayLegendScale(fieldSize) }
-}
-
-/** Resolves explicit `legendSize` override during migration, else structural tier. */
-export function resolveGroupLegendSizeWithLegacyOverride(
-  tier: 'section' | 'subsection',
-  legacyLegendSize?: FieldGroupLegendSize,
-): FieldGroupLegendSize {
-  if (legacyLegendSize) return legacyLegendSize
-  return resolveGroupLegendSize(tier)
-}
-
-/** Resolves array legend during migration — explicit override wins until Phase 3 removal. */
-export function resolveArrayLegendPresentationWithLegacyOverride(
-  namedGroupDepth: number,
-  fieldSize: FieldSizeToken,
-  legacyLegendSize?: FieldGroupLegendSize,
-): { legendSize: FieldGroupLegendSize; legendScale: FieldGroupLegendScale } {
-  if (legacyLegendSize && legacyLegendSize !== 'array') {
-    return { legendSize: legacyLegendSize, legendScale: 'default' }
-  }
-  return resolveArrayLegendPresentation(namedGroupDepth, fieldSize)
 }
 
 export function isNonWhitespaceLabel(label: string | undefined): label is string {

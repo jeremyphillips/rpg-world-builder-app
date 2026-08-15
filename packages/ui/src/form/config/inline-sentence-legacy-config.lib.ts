@@ -45,7 +45,7 @@ export function inlineChooseCountToInlineSentence(
     name: config.name,
     label: config.label,
     segments,
-    hideLabel: config.hideLabel,
+    ...(config.labelVisibility ? { labelVisibility: config.labelVisibility } : {}),
     hint: config.hint,
     info: config.info,
     required: config.required,

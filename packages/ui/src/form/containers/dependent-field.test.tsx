@@ -24,8 +24,6 @@ const dependentField = (
   options: {
     chrome?: 'none' | 'inset' | 'panel'
     panel?: { surface?: SurfaceConfig; tone?: 'destructive' }
-    surface?: SurfaceConfig
-    tone?: 'destructive'
     scope?: 'wrapper' | 'arrayItems'
     includeNote?: boolean
   } = {},
@@ -41,8 +39,6 @@ const dependentField = (
   dependents: {
     ...(options.chrome ? { chrome: options.chrome } : {}),
     ...(options.panel ? { panel: options.panel } : {}),
-    ...(options.surface ? { surface: options.surface } : {}),
-    ...(options.tone ? { tone: options.tone } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
     fields: [
       {

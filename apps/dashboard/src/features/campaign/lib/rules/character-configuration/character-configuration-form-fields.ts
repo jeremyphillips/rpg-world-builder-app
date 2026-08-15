@@ -358,7 +358,8 @@ function extendedProgressionGroup(): FormItem {
           defaultValue: false,
         },
         dependents: {
-          surface: { emphasis: 'default' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'default' } },
           fields: [
             {
               kind: 'row',
@@ -429,7 +430,8 @@ function multiclassingGroup(): FormItem {
           defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
         },
         dependents: {
-          surface: { emphasis: 'default' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'default' } },
           fields: [
             {
               type: 'number',
