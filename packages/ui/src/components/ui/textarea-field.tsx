@@ -8,11 +8,15 @@ import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
 export interface TextareaFieldProps
-  extends React.ComponentProps<typeof Textarea>, FieldValidationProps, FieldChromeProps {
+  extends
+    React.ComponentProps<typeof Textarea>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -27,6 +31,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
     {
       id,
       label,
+      labelVisibility,
       error,
       invalid,
       describedBy,
@@ -45,6 +50,7 @@ export const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaField
       <FormField
         id={id}
         label={label}
+        labelVisibility={labelVisibility}
         error={error}
         invalid={invalid}
         describedBy={describedBy}

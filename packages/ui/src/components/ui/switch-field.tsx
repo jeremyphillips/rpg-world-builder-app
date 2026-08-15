@@ -20,11 +20,16 @@ import { resolveFieldPresentation } from './field-row-presentation.lib'
 export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
+import { cn } from '../../lib/utils'
 
 export interface SwitchFieldProps
-  extends Omit<ComponentProps<typeof Switch>, 'id'>, FieldValidationProps, FieldChromeProps {
+  extends
+    Omit<ComponentProps<typeof Switch>, 'id'>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -43,6 +48,7 @@ export interface SwitchFieldProps
 export function SwitchField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -59,7 +65,10 @@ export function SwitchField({
   const resolvedHintPosition = hintPosition ?? 'below-label'
 
   const labelNode = (
-    <Field.Label placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}>
+    <Field.Label
+      placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
+      className={cn(labelVisibility === 'srOnly' && 'sr-only')}
+    >
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )
@@ -69,6 +78,7 @@ export function SwitchField({
       <FormField
         id={id}
         label={label}
+        labelVisibility={labelVisibility}
         error={error}
         invalid={invalid}
         describedBy={describedBy}

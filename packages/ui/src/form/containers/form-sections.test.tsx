@@ -74,6 +74,31 @@ describe('Form section rendering', () => {
     expect(damageGroup).toHaveClass('mb-0')
   })
 
+  it('keeps anonymous layout groups transparent to heading tier', () => {
+    const anonymousWrapperFields: FormItem[] = [
+      {
+        kind: 'group',
+        legend: 'Weapon',
+        fields: [
+          {
+            kind: 'group',
+            fields: [{ type: 'text', name: 'title', label: 'Title' }],
+          },
+          {
+            kind: 'group',
+            legend: 'Damage',
+            fields: [{ type: 'text', name: 'damageDice', label: 'Dice' }],
+          },
+        ],
+      },
+    ]
+
+    render(<Form schema={schema} fields={anonymousWrapperFields} onSubmit={vi.fn()} />)
+
+    expect(screen.getByText('Weapon').closest('legend')).toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
+  })
+
   it('omits section bottom margin on top-level arrays spaced by form rhythm', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 

@@ -7,7 +7,7 @@ import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import {
   ComboboxPanel,
   ComboboxSelectedItems,
@@ -25,6 +25,7 @@ import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
 import { useComboboxControl } from './use-combobox-control.client'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
 export type {
   ComboboxFieldOption,
@@ -34,9 +35,9 @@ export type {
   ResolveComboboxFilteredOptions,
 } from './combobox-field.types'
 
-export interface ComboboxFieldProps extends SelectFieldValueProps, FieldChromeProps {
+export interface ComboboxFieldProps
+  extends SelectFieldValueProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
-  label: string
   options: ComboboxFieldOption[]
   /**
    * `true` (default) — value is `string[]`; selected values render as removable badges.
@@ -132,6 +133,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
 export function ComboboxField({
   id,
   label,
+  labelVisibility = 'visible',
   options,
   multiple = true,
   max,
@@ -175,9 +177,12 @@ export function ComboboxField({
         hintPosition={hintPosition}
         wrapControl={false}
         label={
-          <Field.Label>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            label={label}
+            labelVisibility={labelVisibility}
+            info={info}
+            required={required}
+          />
         }
         control={
           <ComboboxFieldControl

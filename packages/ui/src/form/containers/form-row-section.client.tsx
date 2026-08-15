@@ -10,8 +10,11 @@ import {
 import { useFormSectionContext } from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
 import { isRowSlotItem, resolveRowFieldAlign } from '../field-config'
+import { CompositeGroup } from '../presentation/composite-group.client'
+import { resolveRowHeading } from '../resolve-container-heading.lib'
 import { FieldNode, FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
 import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
+import { resolveFormDensity } from '../form-density'
 
 interface RowFieldSectionProps {
   item: RowConfig
@@ -29,38 +32,52 @@ export function RowFieldSection({
   depth,
 }: RowFieldSectionProps) {
   const parentContext = useFormSectionContext()
+  const { size } = resolveFormDensity(parentContext.density)
   const parent = React.useContext(ArrayItemPresentationContext)
   const suppress = resolveErrorPlacement(item.errorPlacement, 'detailed', true)
   const value = suppress ? { ...parent, suppressFieldErrorText: true } : parent
+  const heading = resolveRowHeading(item)
+
+  const row = (
+    <FieldRow align={resolveRowFieldAlign(item)} className={item.className}>
+      {item.fields.map((field) => {
+        if (isRowSlotItem(field)) {
+          return (
+            <SlotFormItemSection
+              key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+              item={field}
+              parentContext={parentContext}
+              depth={depth}
+              namePrefix={namePrefix}
+            />
+          )
+        }
+
+        return (
+          <FieldNode
+            key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+            config={field}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+          />
+        )
+      })}
+    </FieldRow>
+  )
+
+  const body = heading ? (
+    <CompositeGroup heading={heading} size={size} useFieldset={item.fields.length > 1}>
+      {row}
+    </CompositeGroup>
+  ) : (
+    row
+  )
 
   return (
     <React.Fragment key={`row-${index}`}>
       <FieldSeparatorWrapper separator={item.separator}>
         <ArrayItemPresentationContext.Provider value={value}>
-          <FieldRow align={resolveRowFieldAlign(item)} className={item.className}>
-            {item.fields.map((field) => {
-              if (isRowSlotItem(field)) {
-                return (
-                  <SlotFormItemSection
-                    key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-                    item={field}
-                    parentContext={parentContext}
-                    depth={depth}
-                    namePrefix={namePrefix}
-                  />
-                )
-              }
-
-              return (
-                <FieldNode
-                  key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-                  config={field}
-                  idPrefix={idPrefix}
-                  namePrefix={namePrefix}
-                />
-              )
-            })}
-          </FieldRow>
+          {body}
         </ArrayItemPresentationContext.Provider>
       </FieldSeparatorWrapper>
     </React.Fragment>

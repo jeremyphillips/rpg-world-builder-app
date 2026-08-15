@@ -45,6 +45,9 @@ import type {
   FieldSeparator,
 } from '../components/ui/field.variants'
 import type { FormDensity } from './form-density'
+import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
+
+export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
 
 export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 export type {
@@ -261,6 +264,12 @@ interface BaseFieldConfig {
   /** Form value key; also the basis of the generated control id. */
   name: string
   label: string
+  /**
+   * Visible vs screen-reader-only labeling. Parent headings may replace redundant
+   * visible labels; the accessible name always comes from `label`.
+   * @default 'visible'
+   */
+  labelVisibility?: FieldLabelVisibility
   /**
    * Overrides control scale only; does not change sibling field rhythm. Rare —
    * prefer section `density` on shells, groups, or arrays.
@@ -901,6 +910,8 @@ export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>):
 
 export interface RowConfig {
   kind: 'row'
+  /** Leaf-tier composite heading for the row block. */
+  heading?: FormHeading
   fields: RowFieldItem[]
   className?: string
   /**
@@ -994,6 +1005,8 @@ export interface DependentConfig {
  */
 export interface GroupConfig {
   kind: 'group'
+  /** Preferred heading API — tier resolves from named-group nesting depth. */
+  heading?: FormHeading
   /** When omitted, renders as a layout/visibility wrapper without a legend. */
   legend?: string
   description?: string
@@ -1001,7 +1014,10 @@ export interface GroupConfig {
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
-  /** Legend scale — `subsection` (20px) for nested groups inside another group. */
+  /**
+   * @deprecated Tier resolves from named-group nesting depth. Use nested groups
+   * for subsection scale instead of overriding typography.
+   */
   legendSize?: FieldGroupLegendSize
   /**
    * Section density for this group subtree. Inherits parent density when omitted.
@@ -1169,7 +1185,13 @@ export interface ArrayFilterSelectConfig {
 export interface ArrayConfig {
   kind: 'array'
   name: string
+  /** Preferred heading API — typography derives from nesting depth and density. */
+  heading?: Pick<FormHeading, 'label'>
   legend: string
+  /**
+   * @deprecated Typography derives from nesting depth and `density`. Will be removed
+   * in Phase 3.
+   */
   legendSize?: FieldGroupLegendSize
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
@@ -1198,7 +1220,11 @@ export interface ArrayConfig {
 export interface SlotConfig {
   kind: 'slot'
   name: string
+  /** Preferred leaf-tier heading API for the slot composite surface. */
+  heading?: FormHeading
+  /** @deprecated Use `heading.label`. */
   label?: string
+  /** @deprecated Use `heading.hint`. */
   hint?: string
   className?: string
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */

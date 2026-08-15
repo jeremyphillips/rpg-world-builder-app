@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { MarkdownContent } from './markdown-content'
 import { RichTextContent } from './rich-text-content'
 import { looksLikeRichTextHtml } from './rich-text-html'
@@ -21,10 +21,11 @@ const MARKDOWN_PREVIEW_EMPTY = 'Nothing to preview'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
-export interface MarkdownFieldProps extends FieldValidationProps, FieldChromeProps {
+export interface MarkdownFieldProps
+  extends FieldValidationProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   info?: React.ReactNode
   required?: boolean
@@ -59,6 +60,7 @@ function MarkdownFieldPreview({ value }: { value: string }) {
 export function MarkdownField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -95,9 +97,12 @@ export function MarkdownField({
         wrapControl={false}
         controlBand="content-sized"
         label={
-          <Field.Label>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            label={label}
+            labelVisibility={labelVisibility}
+            info={info}
+            required={required}
+          />
         }
         control={
           <Tabs value={tab} onValueChange={setTab} variant="line">

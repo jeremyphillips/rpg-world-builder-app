@@ -10,10 +10,11 @@ import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
-export interface FileFieldProps extends FileDropzoneProps, FieldValidationProps, FieldChromeProps {
+export interface FileFieldProps
+  extends FileDropzoneProps, FieldValidationProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -34,6 +35,7 @@ export interface FileFieldProps extends FileDropzoneProps, FieldValidationProps,
 export function FileField({
   id,
   label,
+  labelVisibility,
   error,
   invalid,
   describedBy,
@@ -50,6 +52,7 @@ export function FileField({
     <FormField
       id={id}
       label={label}
+      labelVisibility={labelVisibility}
       error={error}
       invalid={invalid}
       describedBy={describedBy}

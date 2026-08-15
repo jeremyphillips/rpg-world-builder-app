@@ -358,7 +358,7 @@ describe('TabbedForm', () => {
         'true',
       )
     })
-    const notesInput = screen.getByLabelText('Notes')
+    const notesInput = screen.getByRole('textbox', { name: 'Notes' })
     expect(notesInput).toHaveFocus()
     expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
     expect(screen.getByRole('tab', { name: /Notes/ })).toHaveTextContent('1')
@@ -448,9 +448,12 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Notes')).toHaveFocus()
+      expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveFocus()
     })
-    expect(screen.getByLabelText('Notes')).toHaveAttribute('id', 'campaign-form-notes-notes')
+    expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveAttribute(
+      'id',
+      'campaign-form-notes-notes',
+    )
     expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
   })
 
@@ -503,11 +506,11 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Label')).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByRole('textbox', { name: 'Label' })).toHaveAttribute('aria-invalid', 'true')
     })
 
     expect(screen.getByRole('tab', { name: /Grants/i })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByLabelText('Label')).toHaveFocus()
+    expect(screen.getByRole('textbox', { name: 'Label' })).toHaveFocus()
 
     await waitFor(() => {
       expect(
@@ -555,12 +558,12 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Name')).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveAttribute('aria-invalid', 'true')
     })
     expect(screen.getByText('Name is required')).toBeInTheDocument()
 
     const notesPanel = screen.getByRole('tabpanel', { name: /Notes/i })
-    const notesInput = within(notesPanel).getByLabelText('Notes')
+    const notesInput = within(notesPanel).getByRole('textbox', { name: 'Notes' })
     expect(notesInput).toHaveAttribute('aria-invalid', 'true')
     expect(screen.queryByText('Notes are required')).not.toBeInTheDocument()
   })
@@ -642,15 +645,18 @@ describe('TabbedForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
     await waitFor(() => {
-      expect(screen.getByLabelText('Name')).toHaveFocus()
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus()
     })
 
     await user.click(screen.getByRole('button', { name: 'Review Notes' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Notes')).toHaveFocus()
+      expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveFocus()
     })
-    expect(screen.getByLabelText('Notes')).toHaveAttribute('id', 'review-form-notes-notes')
+    expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveAttribute(
+      'id',
+      'review-form-notes-notes',
+    )
     expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
   })
 
@@ -693,7 +699,7 @@ describe('TabbedForm', () => {
       expect(screen.getByRole('status')).toBeInTheDocument()
     })
 
-    await user.type(screen.getByLabelText('Notes'), 'All good now')
+    await user.type(screen.getByRole('textbox', { name: 'Notes' }), 'All good now')
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {

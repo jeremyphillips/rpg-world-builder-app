@@ -4,6 +4,8 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import { fieldLabelVariants } from './field.variants'
 import { InfoTooltip } from './tooltip.client'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { resolveFieldLabelVisibility } from '../../form/form-heading.lib'
 
 export interface FieldLabelContentProps {
   label: string
@@ -28,7 +30,9 @@ export function FieldLabelContent({ label, required, info }: FieldLabelContentPr
 
 export interface FieldRadiogroupLabelProps extends FieldLabelContentProps {
   id: string
+  /** @deprecated Use `labelVisibility: 'srOnly'`. */
   labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
   size?: FieldSize
   className?: string
 }
@@ -43,11 +47,16 @@ export function FieldRadiogroupLabel({
   required,
   info,
   labelHidden,
+  labelVisibility,
   size = 'md',
   className,
 }: FieldRadiogroupLabelProps) {
+  const visibility = resolveFieldLabelVisibility({ labelVisibility, labelHidden })
   return (
-    <span id={id} className={cn(fieldLabelVariants({ size }), labelHidden && 'sr-only', className)}>
+    <span
+      id={id}
+      className={cn(fieldLabelVariants({ size }), visibility === 'srOnly' && 'sr-only', className)}
+    >
       <FieldLabelContent label={label} required={required} info={info} />
     </span>
   )

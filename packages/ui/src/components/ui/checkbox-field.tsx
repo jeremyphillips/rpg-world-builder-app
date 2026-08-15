@@ -14,11 +14,16 @@ import { resolveFieldPresentation } from './field-row-presentation.lib'
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
+import { cn } from '../../lib/utils'
 
 export interface CheckboxFieldProps
-  extends Omit<ComponentProps<typeof Checkbox>, 'id'>, FieldValidationProps, FieldChromeProps {
+  extends
+    Omit<ComponentProps<typeof Checkbox>, 'id'>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   info?: ReactNode
   required?: boolean
@@ -30,6 +35,7 @@ export interface CheckboxFieldProps
 export function CheckboxField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -49,7 +55,10 @@ export function CheckboxField({
   })
 
   const labelNode = (
-    <Field.Label placement="inlineCheckbox">
+    <Field.Label
+      placement="inlineCheckbox"
+      className={cn(labelVisibility === 'srOnly' && 'sr-only')}
+    >
       <FieldLabelContent label={label} info={info} />
     </Field.Label>
   )

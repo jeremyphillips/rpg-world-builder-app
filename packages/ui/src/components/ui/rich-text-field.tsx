@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { RichTextEditor } from './rich-text-editor.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
@@ -13,10 +13,11 @@ import type {
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
-export interface RichTextFieldProps extends FieldValidationProps, FieldChromeProps {
+export interface RichTextFieldProps
+  extends FieldValidationProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
@@ -42,6 +43,7 @@ export interface RichTextFieldProps extends FieldValidationProps, FieldChromePro
 export function RichTextField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -75,9 +77,12 @@ export function RichTextField({
       <FieldLayout
         hintPosition={hintPosition}
         label={
-          <Field.Label>
-            <FieldLabelContent label={label} info={info} />
-          </Field.Label>
+          <FormFieldLabel
+            label={label}
+            labelVisibility={labelVisibility}
+            info={info}
+            required={required}
+          />
         }
         control={
           <RichTextEditor
