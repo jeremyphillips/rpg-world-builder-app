@@ -32,7 +32,14 @@ describe('isClassProgressionApplicable', () => {
 
 describe('resolveCharacterLevelConstraints', () => {
   it('allows level 0 minimum for campaign NPCs when level zero NPCs are enabled', () => {
-    expect(resolveCharacterLevelConstraints(createCampaignNpcContext())).toMatchObject({
+    const context = createCampaignNpcContext()
+    expect(
+      resolveCharacterLevelConstraints({
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    ).toMatchObject({
       mode: 'selectable',
       minLevel: 0,
       maxLevel: 20,
@@ -50,7 +57,13 @@ describe('resolveCharacterLevelConstraints', () => {
       },
     })
 
-    expect(resolveCharacterLevelConstraints(context)).toMatchObject({
+    expect(
+      resolveCharacterLevelConstraints({
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    ).toMatchObject({
       mode: 'fixed',
       fixedLevel: 3,
       minLevel: 3,
@@ -59,7 +72,14 @@ describe('resolveCharacterLevelConstraints', () => {
   })
 
   it('starts standalone PCs at level 1', () => {
-    expect(resolveCharacterLevelConstraints(createCharacterBuildContext())).toMatchObject({
+    const context = createCharacterBuildContext()
+    expect(
+      resolveCharacterLevelConstraints({
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    ).toMatchObject({
       mode: 'selectable',
       minLevel: 1,
       maxLevel: 20,

@@ -192,7 +192,9 @@ mutation live in `rpg/runtime/character-builder/`.
 - **Does not belong here** — UI labels, descriptions, alert text, or
   presentation mappings.
 - **Stays in `rpg/runtime/character-builder/`** — step orchestration, draft
-  mutation, context assembly, finalize, resolvers.
+  mutation, context assembly, finalize, resolvers. PC and Level 0 NPC standard
+  arrays are separate campaign fields; runtime selects via
+  `resolveBuilderStandardArray(context, level)`.
 - **Stays in `rpg/campaign/`** — campaign character-assignment error union
   (`build_invalid` composes builder validation issues).
 

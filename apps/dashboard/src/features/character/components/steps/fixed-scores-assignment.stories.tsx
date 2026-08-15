@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { STANDARD_ARRAY } from '@rpg/contracts'
+import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
 import { abilitiesFormSchema } from '../../lib/steps/abilities-form-fields'
@@ -38,14 +38,14 @@ const fighterRecommendation = {
 
 export const Empty: Story = {
   args: {
-    scorePool: [...STANDARD_ARRAY],
+    scorePool: [...DEFAULT_STANDARD_ARRAY],
     showInvalidStates: false,
   },
 }
 
 export const PartialAssignment: Story = {
   args: {
-    scorePool: [...STANDARD_ARRAY],
+    scorePool: [...DEFAULT_STANDARD_ARRAY],
     showInvalidStates: false,
     classInput: fighterClassInput,
     recommendation: fighterRecommendation,
@@ -64,7 +64,7 @@ export const PartialAssignment: Story = {
 
 export const CompleteAssignment: Story = {
   args: {
-    scorePool: [...STANDARD_ARRAY],
+    scorePool: [...DEFAULT_STANDARD_ARRAY],
     showInvalidStates: false,
     classInput: fighterClassInput,
     recommendation: fighterRecommendation,
@@ -83,7 +83,7 @@ export const CompleteAssignment: Story = {
 
 export const InvalidAfterAttempt: Story = {
   args: {
-    scorePool: [...STANDARD_ARRAY],
+    scorePool: [...DEFAULT_STANDARD_ARRAY],
     showInvalidStates: true,
   },
 }

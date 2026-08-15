@@ -5,7 +5,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   createEmptyCharacterBuilderDraft,
-  DEFAULT_ABILITY_GENERATION_RULES,
   indexCharacterBuildCatalog,
   resolveAvailableChoices,
 } from '@rpg/contracts'
@@ -20,7 +19,6 @@ import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-const standardArray = DEFAULT_ABILITY_GENERATION_RULES.standardArray
 
 const railProps = {
   context,
@@ -28,7 +26,6 @@ const railProps = {
   resolvedChoiceSets: null,
   draftValidationIssues: [] as CharacterBuildValidationIssue[],
   validationVisibleStepIds: [] as CharacterBuilderStepId[],
-  standardArray,
   onStepSelect: () => undefined,
 }
 
@@ -177,7 +174,6 @@ describe('CharacterBuilderStepRail', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, spellsContext)}
         draftValidationIssues={[]}
         validationVisibleStepIds={[]}
-        standardArray={standardArray}
         onStepSelect={() => undefined}
       />,
     )

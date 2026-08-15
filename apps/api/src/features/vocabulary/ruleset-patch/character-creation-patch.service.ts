@@ -18,6 +18,7 @@ import {
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
   isDefaultCharacterCreationStandardArray,
+  isEmptyProficiencyGrantSet,
   isSparseDefaultLevelZeroNpcsPatch,
   isSparseDefaultMulticlassingPatch,
   isSparseDefaultSubclassingPatch,
@@ -399,10 +400,6 @@ function buildStartingWealthUpdateSet(
   sparseSetOrUnset(ops, `${prefix}startingWealth`, sparse)
 }
 
-function isDefaultEmptyGrantSet(grant: { categories?: string[]; items?: string[] }): boolean {
-  return (grant.categories?.length ?? 0) === 0 && (grant.items?.length ?? 0) === 0
-}
-
 function isDefaultLevelZeroLanguageGrantSet(grant: {
   categories?: string[]
   items?: string[]
@@ -432,7 +429,7 @@ function buildLevelZeroGrantSetUpdateSet(
   prefix: string,
   grant: { categories: string[]; items: string[] } | undefined,
 ): void {
-  if (grant === undefined || isDefaultEmptyGrantSet(grant)) {
+  if (grant === undefined || isEmptyProficiencyGrantSet(grant)) {
     ops.$unset[`${prefix}.categories`] = 1
     ops.$unset[`${prefix}.items`] = 1
     ops.$unset[prefix] = 1

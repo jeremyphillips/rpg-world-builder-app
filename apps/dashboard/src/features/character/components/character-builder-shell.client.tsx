@@ -486,7 +486,6 @@ export function CharacterBuilderShell({
               resolvedChoiceSets={resolvedChoiceSets}
               draftValidationIssues={draftValidationIssues}
               validationVisibleStepIds={railValidationVisibleStepIds}
-              standardArray={context.characterCreationRules.abilityGeneration.standardArray}
               onStepSelect={navigateToStep}
             />
           </div>

@@ -5,7 +5,7 @@ import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import {
   CharacterBuildFinalizationError,
-  finalizeCharacterBuild,
+  finalizePcCharacterBuild,
   isCharacterBuildFinalizationError,
 } from './finalize'
 import { builderTestContext } from '../test-fixtures'
@@ -33,9 +33,9 @@ function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): Char
   }
 }
 
-describe('finalizeCharacterBuild', () => {
+describe('finalizePcCharacterBuild', () => {
   it('returns CreateCharacterInput, never a full Character', () => {
-    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    const input = finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext)
 
     expect(createCharacterInputSchema.safeParse(input).success).toBe(true)
     expect((input as Record<string, unknown>)['id']).toBeUndefined()
@@ -44,13 +44,13 @@ describe('finalizeCharacterBuild', () => {
   })
 
   it('computes hitPoints.base and xp null', () => {
-    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    const input = finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext)
     expect(input.hitPoints).toEqual({ base: 11, current: 11, temporary: 0 })
     expect(input.xp).toBeNull()
   })
 
   it('carries narrative from the draft identity', () => {
-    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    const input = finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext)
     expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
   })
 
@@ -69,7 +69,7 @@ describe('finalizeCharacterBuild', () => {
       activities: [],
       connections: { locations: [] },
     }
-    const input = finalizeCharacterBuild(
+    const input = finalizePcCharacterBuild(
       makeCompleteDraft({
         connections: {
           organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
@@ -90,7 +90,7 @@ describe('finalizeCharacterBuild', () => {
 
   it('blocks finalization when an organization connection is no longer selectable', () => {
     expect(() =>
-      finalizeCharacterBuild(
+      finalizePcCharacterBuild(
         makeCompleteDraft({
           connections: {
             organizations: [{ organizationId: 'organization-removed' }],
@@ -103,7 +103,7 @@ describe('finalizeCharacterBuild', () => {
   })
 
   it('carries class proficiency sources', () => {
-    const input = finalizeCharacterBuild(makeCompleteDraft(), builderTestContext)
+    const input = finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext)
 
     expect(input.proficiencies.weapons[0]?.sources).toEqual([
       {
@@ -122,7 +122,7 @@ describe('finalizeCharacterBuild', () => {
   })
 
   it('merges skill selections with selection sources', () => {
-    const input = finalizeCharacterBuild(
+    const input = finalizePcCharacterBuild(
       makeCompleteDraft({
         choiceSelections: {
           'class:srd-cc-5.2.1:fighter:class-skills': ['srd-cc-5.2.1:athletics'],
@@ -170,7 +170,7 @@ describe('finalizeCharacterBuild', () => {
     })
     const choiceSets = resolveLanguageChoiceSets(makeCompleteDraft(), builderTestContext)
 
-    const input = finalizeCharacterBuild(draft, builderTestContext, {
+    const input = finalizePcCharacterBuild(draft, builderTestContext, {
       resolvedChoiceSets: choiceSets,
     })
 
@@ -211,8 +211,16 @@ describe('finalizeCharacterBuild', () => {
 
   it('throws CharacterBuildFinalizationError when validation fails', () => {
     expect(() =>
-      finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext),
+      finalizePcCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext),
     ).toThrow(CharacterBuildFinalizationError)
+  })
+
+  it('rejects NPC build contexts', () => {
+    const npcContext = { ...builderTestContext, characterKind: 'npc' as const }
+
+    expect(() => finalizePcCharacterBuild(makeCompleteDraft(), npcContext)).toThrow(
+      CharacterBuildFinalizationError,
+    )
   })
 
   it('throws validation issues when catalog entries are missing after validation', () => {
@@ -222,7 +230,7 @@ describe('finalizeCharacterBuild', () => {
     })
 
     try {
-      finalizeCharacterBuild(draft, builderTestContext)
+      finalizePcCharacterBuild(draft, builderTestContext)
       expect.fail('expected finalization to fail')
     } catch (error) {
       expect(error).toBeInstanceOf(CharacterBuildFinalizationError)
@@ -238,7 +246,7 @@ describe('finalizeCharacterBuild', () => {
 
   it('isCharacterBuildFinalizationError recognizes errors across module instances', () => {
     try {
-      finalizeCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext)
+      finalizePcCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext)
     } catch (error) {
       const foreignError = Object.assign(
         Object.create(CharacterBuildFinalizationError.prototype),
@@ -279,7 +287,7 @@ describe('finalizeCharacterBuild', () => {
       },
     }
 
-    const input = finalizeCharacterBuild(
+    const input = finalizePcCharacterBuild(
       makeCompleteDraft({
         class: { classId: storedFighterWithEquipment.id, level: 1 },
         choiceSelections: {
@@ -365,7 +373,7 @@ describe('finalizeCharacterBuild', () => {
       },
     }
 
-    const input = finalizeCharacterBuild(
+    const input = finalizePcCharacterBuild(
       makeCompleteDraft({
         class: { classId: storedFighterWithEquipment.id, level: 1 },
         choiceSelections: {
@@ -419,7 +427,7 @@ describe('finalizeCharacterBuild', () => {
     const cantripIds = wizardCantrips.slice(0, 3).map((spell) => spell.id)
     const spellIds = wizardLevelOneSpells.slice(0, 4).map((spell) => spell.id)
 
-    const input = finalizeCharacterBuild(
+    const input = finalizePcCharacterBuild(
       {
         ...draft,
         choiceSelections: {

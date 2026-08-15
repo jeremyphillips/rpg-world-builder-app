@@ -1,6 +1,7 @@
 import {
   BUILDER_STEP_READINESS_STEP_IDS,
   isBuilderStepComplete,
+  resolveBuilderStandardArray,
   resolveBuilderStepReadiness,
   type BuilderStepReadiness,
   type BuilderStepReadinessState,
@@ -26,7 +27,6 @@ export type ResolveStepVisualStatusInput = {
   draftValidationIssues: CharacterBuildValidationIssue[]
   validationVisibleStepIds: readonly CharacterBuilderStepId[]
   catalogIndex: CharacterBuildCatalogIndex
-  standardArray: readonly number[]
 }
 
 const READINESS_STEP_IDS = new Set<CharacterBuilderStepId>(BUILDER_STEP_READINESS_STEP_IDS)
@@ -123,8 +123,8 @@ export function resolveStepVisualStatus({
   draftValidationIssues,
   validationVisibleStepIds,
   catalogIndex: _catalogIndex,
-  standardArray,
 }: ResolveStepVisualStatusInput): StepStatus {
+  const standardArray = resolveBuilderStandardArray(context, draft.class.level)
   const readinessState = resolveReadinessState(stepId, draft, context, resolvedChoiceSets)
 
   if (readinessState?.readiness === 'notApplicable') {

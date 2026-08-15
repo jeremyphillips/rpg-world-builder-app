@@ -1,6 +1,7 @@
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { deriveDeterministicAbilityAssignment } from '../ability/ability-score-recommendations'
 import { resolveAbilityGenerationMethod } from '../ability/ability-generation'
+import { resolveBuilderStandardArray } from '../ability/resolve-builder-standard-array'
 import { resolveClassAbilityScoreOrder } from '../ability/resolve-class-ability-score-order'
 import { resolveStandardArrayAssignment } from '../../../primitives/standard-array'
 import { buildChoiceSetId, isChoiceSetSatisfied, type ChoiceSet } from '../choice-set'
@@ -85,14 +86,16 @@ export type ResolveAutomaticNpcBuildArgs = {
  */
 const AUTOMATIC_BUILD_ITERATION_CEILING = 64
 
-// Level 0 Quick NPC ability assignment strategy is deferred — score source only for now.
+// Level 0 Quick NPC ability assignment uses the level-based standard array resolver.
 function seedAbilityScores(
   seed: AutomaticNpcBuildSeed,
-  abilityRules: CharacterBuildContext['characterCreationRules']['abilityGeneration'],
+  context: CharacterBuildContext,
   characterClass: CharacterClass | undefined,
 ): CharacterBuilderDraft['abilities']['scores'] {
+  const standardArray = resolveBuilderStandardArray(context, seed.level)
+
   if (seed.level === 0) {
-    return deriveDeterministicAbilityAssignment([], abilityRules.standardArray)
+    return deriveDeterministicAbilityAssignment([], standardArray)
   }
 
   if (characterClass && isClassProgressionApplicable(seed.level)) {
@@ -101,15 +104,12 @@ function seedAbilityScores(
       primaryAbilities: characterClass.primaryAbilities,
     })
     return resolveStandardArrayAssignment({
-      standardArray: abilityRules.standardArray,
+      standardArray,
       abilityScoreOrder: order,
     })
   }
 
-  return deriveDeterministicAbilityAssignment(
-    characterClass?.primaryAbilities ?? [],
-    abilityRules.standardArray,
-  )
+  return deriveDeterministicAbilityAssignment(characterClass?.primaryAbilities ?? [], standardArray)
 }
 
 function seedDraft(
@@ -133,7 +133,7 @@ function seedDraft(
     },
     abilities: {
       method: resolveAbilityGenerationMethod(abilityRules),
-      scores: seedAbilityScores(seed, abilityRules, characterClass),
+      scores: seedAbilityScores(seed, context, characterClass),
     },
     equipment: cloneEquipmentDraftChannel(empty),
   }

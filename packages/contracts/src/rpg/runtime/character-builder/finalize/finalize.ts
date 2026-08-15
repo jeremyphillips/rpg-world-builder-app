@@ -202,17 +202,40 @@ function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Abil
   return complete
 }
 
+function assembleLevelZeroStartingEquipment(
+  _draft: CharacterBuilderDraft,
+  levelZeroRules: CharacterBuildContext['characterCreationRules']['levelZeroNpcs'],
+): {
+  equipment: ReturnType<typeof assembleStartingEquipment>['equipment']
+  wealth: ReturnType<typeof assembleStartingEquipment>['wealth']
+} {
+  const normalizedWealth = normalizeCharacterWealthGrant(levelZeroRules.startingWealth)
+  return {
+    equipment: { ...EMPTY_CHARACTER_EQUIPMENT },
+    wealth: characterWealthFromGrant(normalizedWealth),
+  }
+}
+
+function assertPcFinalizationContext(context: CharacterBuildContext): void {
+  if (context.characterKind === 'npc') {
+    throw new CharacterBuildFinalizationError([
+      {
+        code: 'npc_build_not_permitted',
+        message: 'NPC builds must use finalizeNpcCharacterBuild.',
+      },
+    ])
+  }
+}
+
 /**
- * Runs `finalSubmit` validation, then assembles a `CreateCharacterInput`.
- *
- * Returns `CreateCharacterInput`, never a full `Character` — the API assigns
- * `id`, `userId`, and timestamps.
+ * Shared sheet assembly for PC and NPC finalizers. Returns an untyped object
+ * without schema parse — each public finalizer validates against its own schema.
  */
-export function finalizeCharacterBuild(
+export function assembleCharacterBuildSheet(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
   options: CharacterBuildEngineOptions = {},
-): CreateCharacterInput {
+) {
   const validation = validateCharacterBuild(draft, context, 'finalSubmit', options)
   if (!validation.ok) {
     throw new CharacterBuildFinalizationError(validation.issues)
@@ -260,8 +283,7 @@ export function finalizeCharacterBuild(
         assembleGrantedSpells(effectiveDraft, catalogIndex, characterClass!),
       )
 
-  const input: CreateCharacterInput = {
-    characterType: 'pc',
+  return {
     name: effectiveDraft.identity.name!.trim(),
     imageKey: effectiveDraft.identity.imageKey,
     rulesetId: context.rulesetId,
@@ -286,24 +308,30 @@ export function finalizeCharacterBuild(
     connections: effectiveDraft.connections,
     feats: [],
   }
-
-  if (isClasslessLevelZero && context.characterKind === 'npc') {
-    return input as CreateCharacterInput
-  }
-
-  return parseCreateCharacterInput(input)
 }
 
-function assembleLevelZeroStartingEquipment(
-  _draft: CharacterBuilderDraft,
-  levelZeroRules: CharacterBuildContext['characterCreationRules']['levelZeroNpcs'],
-): {
-  equipment: ReturnType<typeof assembleStartingEquipment>['equipment']
-  wealth: ReturnType<typeof assembleStartingEquipment>['wealth']
-} {
-  const normalizedWealth = normalizeCharacterWealthGrant(levelZeroRules.startingWealth)
-  return {
-    equipment: { ...EMPTY_CHARACTER_EQUIPMENT },
-    wealth: characterWealthFromGrant(normalizedWealth),
-  }
+/**
+ * Runs `finalSubmit` validation, then assembles and schema-validates a
+ * `CreateCharacterInput`.
+ *
+ * Returns `CreateCharacterInput`, never a full `Character` — the API assigns
+ * `id`, `userId`, and timestamps. Rejects NPC build contexts.
+ */
+export function finalizePcCharacterBuild(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  options: CharacterBuildEngineOptions = {},
+): CreateCharacterInput {
+  assertPcFinalizationContext(context)
+
+  const sheet = assembleCharacterBuildSheet(draft, context, options)
+  return parseCreateCharacterInput({
+    characterType: 'pc',
+    ...sheet,
+  })
 }
+
+/**
+ * @deprecated Use {@link finalizePcCharacterBuild} for PC builds.
+ */
+export const finalizeCharacterBuild = finalizePcCharacterBuild

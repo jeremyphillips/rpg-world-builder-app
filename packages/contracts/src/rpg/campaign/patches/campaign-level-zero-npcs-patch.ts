@@ -11,7 +11,10 @@ import {
   standardArraySchema,
 } from '../../primitives/standard-array'
 import { hitDieSchema, type HitDie } from '../../primitives/dice'
-import { languageProficiencyGrantSetSchema } from '../../primitives/proficiency/proficiency-grant-set'
+import {
+  isEmptyProficiencyGrantSet,
+  languageProficiencyGrantSetSchema,
+} from '../../primitives/proficiency/proficiency-grant-set'
 import {
   armorProficiencyGrantSetSchema,
   weaponProficiencyGrantSetSchema,
@@ -168,13 +171,6 @@ export function resolveLevelZeroNpcRules(
   }
 }
 
-function isDefaultLevelZeroGrantSet(grant: {
-  categories: readonly string[]
-  items: readonly string[]
-}): boolean {
-  return grant.categories.length === 0 && grant.items.length === 0
-}
-
 function isDefaultLevelZeroLanguageProficiencies(grant: {
   categories: readonly string[]
   items: readonly string[]
@@ -197,8 +193,8 @@ export function isSparseDefaultLevelZeroNpcsPatch(patch?: CampaignLevelZeroNpcsP
     resolved.baseHitDie === DEFAULT_LEVEL_ZERO_BASE_HIT_DIE &&
     resolved.proficiencyBonus === DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS &&
     resolved.retainSpeciesTraits === DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS &&
-    isDefaultLevelZeroGrantSet(resolved.armorProficiencies) &&
-    isDefaultLevelZeroGrantSet(resolved.weaponProficiencies) &&
+    isEmptyProficiencyGrantSet(resolved.armorProficiencies) &&
+    isEmptyProficiencyGrantSet(resolved.weaponProficiencies) &&
     isDefaultLevelZeroLanguageProficiencies(resolved.languageProficiencies) &&
     resolved.retainSpeciesLanguages === DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES &&
     resolved.startingWealth === undefined &&

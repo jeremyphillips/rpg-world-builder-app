@@ -4,7 +4,8 @@ import {
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
-import { isStandardArrayAssignment, STANDARD_ARRAY } from './ability/ability-generation'
+import { DEFAULT_STANDARD_ARRAY } from '../../primitives/standard-array'
+import { isStandardArrayAssignment } from './ability/ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
@@ -260,7 +261,7 @@ function isConnectionsComplete(draft: CharacterBuilderDraft): boolean {
 
 function isAbilitiesComplete(
   draft: CharacterBuilderDraft,
-  standardArray: readonly number[] = STANDARD_ARRAY,
+  standardArray: readonly number[] = DEFAULT_STANDARD_ARRAY,
 ): boolean {
   if (!draft.abilities.method) return false
   const scores = draft.abilities.scores
@@ -352,7 +353,7 @@ export function isBuilderStepComplete(
 
   const stepChoiceSets =
     resolvedChoiceSets !== null ? getChoiceSetsForStep(stepId, resolvedChoiceSets) : []
-  const standardArray = options?.standardArray ?? STANDARD_ARRAY
+  const standardArray = options?.standardArray ?? DEFAULT_STANDARD_ARRAY
 
   return STEP_COMPLETION_CHECKS[stepId](draft, stepChoiceSets, resolvedChoiceSets, standardArray)
 }

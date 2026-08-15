@@ -5,6 +5,7 @@ import {
   deriveAbilityScoreRecommendations,
   isEffectiveBuilderStep,
   resolveAbilityGenerationMethod,
+  resolveBuilderStandardArray,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
@@ -46,6 +47,7 @@ export function AbilitiesStep({
 }: AbilitiesStepProps) {
   const abilityGeneration = context.characterCreationRules.abilityGeneration
   const resolvedMethod = resolveAbilityGenerationMethod(abilityGeneration)
+  const standardArray = resolveBuilderStandardArray(context, draft.class.level)
   const showInvalidStates = validationIssues.length > 0
 
   const characterClass = useMemo(() => {
@@ -73,10 +75,10 @@ export function AbilitiesStep({
       classInput
         ? deriveAbilityScoreRecommendations(
             [classInput],
-            resolvedMethod === 'standard-array' ? abilityGeneration.standardArray : undefined,
+            resolvedMethod === 'standard-array' ? standardArray : undefined,
           )
         : null,
-    [abilityGeneration.standardArray, classInput, resolvedMethod],
+    [classInput, resolvedMethod, standardArray],
   )
 
   const fields = useMemo(
@@ -85,7 +87,7 @@ export function AbilitiesStep({
         method: resolvedMethod,
         renderFixedScoresAssignment: () => (
           <FixedScoresAssignment
-            scorePool={abilityGeneration.standardArray}
+            scorePool={standardArray}
             showInvalidStates={showInvalidStates}
             classInput={classInput}
             classStepApplicable={classStepApplicable}
@@ -119,7 +121,6 @@ export function AbilitiesStep({
         ),
       }),
     [
-      abilityGeneration.standardArray,
       classInput,
       classStepApplicable,
       context,
@@ -130,6 +131,7 @@ export function AbilitiesStep({
       recommendation,
       resolvedMethod,
       showInvalidStates,
+      standardArray,
     ],
   )
 

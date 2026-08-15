@@ -30,7 +30,12 @@ export type QuickNpcSetupModel = {
 }
 
 export function resolveQuickNpcDefaultLevel(context: CharacterBuildContext): number {
-  return resolveCharacterLevelConstraints(context).minLevel
+  // Quick NPC setup defaults to campaign minimum (often level 0), unlike the full builder.
+  return resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  }).minLevel
 }
 
 export function formatQuickNpcSetupCharacterSummary(
@@ -56,7 +61,11 @@ export function buildQuickNpcCreateSetupSets(args: {
   onValuesChange: (values: QuickNpcSetupValues) => void
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const levelConstraints = resolveCharacterLevelConstraints(args.context)
+  const levelConstraints = resolveCharacterLevelConstraints({
+    characterKind: args.context.characterKind,
+    rulesScope: args.context.rulesScope,
+    characterCreationRules: args.context.characterCreationRules,
+  })
   const defaultLevel = resolveQuickNpcDefaultLevel(args.context)
   const speciesTerm = getContentTypeTerm('species')
   const classTerm = getContentTypeTerm('classes')
@@ -119,7 +128,11 @@ export function resolveQuickNpcSetupModel(args: {
   values: QuickNpcSetupValues
 }): QuickNpcSetupModel {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const levelConstraints = resolveCharacterLevelConstraints(args.context)
+  const levelConstraints = resolveCharacterLevelConstraints({
+    characterKind: args.context.characterKind,
+    rulesScope: args.context.rulesScope,
+    characterCreationRules: args.context.characterCreationRules,
+  })
   const { speciesId, classId, level } = args.values
   const classRequired = isClassProgressionApplicable(level)
 

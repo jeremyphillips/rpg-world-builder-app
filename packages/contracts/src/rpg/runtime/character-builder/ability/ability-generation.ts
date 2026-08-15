@@ -3,15 +3,6 @@ import { z } from 'zod'
 import { DEFAULT_STANDARD_ARRAY } from '../../../primitives/standard-array'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 
-// ---------------------------------------------------------------------------
-// Ability score generation — how a builder draft assigns the six scores.
-// The method union stays open for 'point-buy' and 'rolled' later; MVP ships
-// standard array (happy path) and manual entry (escape hatch).
-// ---------------------------------------------------------------------------
-
-/** @deprecated Prefer {@link DEFAULT_STANDARD_ARRAY} from `@rpg/contracts` primitives. */
-export const STANDARD_ARRAY = DEFAULT_STANDARD_ARRAY
-
 export const ABILITY_GENERATION_METHODS = ['standard-array', 'manual'] as const
 
 export const abilityGenerationMethodSchema = z.enum(ABILITY_GENERATION_METHODS)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { DEFAULT_STANDARD_ARRAY } from '../../../primitives/standard-array'
 import {
   findAbilityAssignedToScore,
   getAssignedScoreCount,
@@ -7,7 +8,6 @@ import {
   getAvailableStandardArrayScores,
   isStandardArrayAssignment,
   resolveAbilityGenerationMethod,
-  STANDARD_ARRAY,
 } from './ability-generation'
 
 const completeStandardScores = {
@@ -24,7 +24,7 @@ describe('resolveAbilityGenerationMethod', () => {
     expect(
       resolveAbilityGenerationMethod({
         methods: ['manual', 'standard-array'],
-        standardArray: [...STANDARD_ARRAY],
+        standardArray: [...DEFAULT_STANDARD_ARRAY],
       }),
     ).toBe('standard-array')
   })
@@ -33,7 +33,7 @@ describe('resolveAbilityGenerationMethod', () => {
     expect(
       resolveAbilityGenerationMethod({
         methods: ['manual'],
-        standardArray: [...STANDARD_ARRAY],
+        standardArray: [...DEFAULT_STANDARD_ARRAY],
       }),
     ).toBe('manual')
   })
@@ -53,13 +53,15 @@ describe('getAssignedScoreCount', () => {
 
 describe('getAvailableStandardArrayScores', () => {
   it('removes assigned values from the pool', () => {
-    expect(getAvailableStandardArrayScores({ str: 15, con: 13 }, STANDARD_ARRAY)).toEqual([
+    expect(getAvailableStandardArrayScores({ str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)).toEqual([
       14, 12, 10, 8,
     ])
   })
 
   it('returns the full array when nothing is assigned', () => {
-    expect(getAvailableStandardArrayScores({}, STANDARD_ARRAY)).toEqual([15, 14, 13, 12, 10, 8])
+    expect(getAvailableStandardArrayScores({}, DEFAULT_STANDARD_ARRAY)).toEqual([
+      15, 14, 13, 12, 10, 8,
+    ])
   })
 })
 
@@ -75,14 +77,14 @@ describe('findAbilityAssignedToScore', () => {
 
 describe('isStandardArrayAssignment', () => {
   it('returns true for an exact standard-array multiset', () => {
-    expect(isStandardArrayAssignment(completeStandardScores, STANDARD_ARRAY)).toBe(true)
+    expect(isStandardArrayAssignment(completeStandardScores, DEFAULT_STANDARD_ARRAY)).toBe(true)
   })
 
   it('returns true when values are assigned to different abilities', () => {
     expect(
       isStandardArrayAssignment(
         { str: 8, dex: 10, con: 12, int: 13, wis: 14, cha: 15 },
-        STANDARD_ARRAY,
+        DEFAULT_STANDARD_ARRAY,
       ),
     ).toBe(true)
   })
@@ -91,12 +93,12 @@ describe('isStandardArrayAssignment', () => {
     expect(
       isStandardArrayAssignment(
         { str: 16, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
-        STANDARD_ARRAY,
+        DEFAULT_STANDARD_ARRAY,
       ),
     ).toBe(false)
   })
 
   it('returns false for incomplete assignment', () => {
-    expect(isStandardArrayAssignment({ str: 15, dex: 14 }, STANDARD_ARRAY)).toBe(false)
+    expect(isStandardArrayAssignment({ str: 15, dex: 14 }, DEFAULT_STANDARD_ARRAY)).toBe(false)
   })
 })

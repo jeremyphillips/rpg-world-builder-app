@@ -1,7 +1,10 @@
-import type { CharacterBuildContext } from '../context'
+import type { CharacterKind } from '../../character-acquisition/kind'
+import type { CharacterRulesScope } from '../../character-acquisition/scope'
+import type { CharacterBuildContext, ResolvedCharacterCreationRules } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 
 import { resolveBuilderMaxAllowedLevel, type BuilderLevelConstraints } from './builder-level'
+import { usesLevelZeroStandardArray } from '../ability/resolve-builder-standard-array'
 
 // ---------------------------------------------------------------------------
 // Character level policy — surface-agnostic constraints and class progression.
@@ -23,17 +26,26 @@ export function isBuilderLevelZeroClassless(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
 ): boolean {
-  return draft.class.level === 0 && isLevelZeroNpcPermitted(context)
+  return usesLevelZeroStandardArray(context, draft.class.level)
+}
+
+export type CharacterLevelPolicyInput = {
+  characterKind: CharacterKind
+  rulesScope: CharacterRulesScope
+  characterCreationRules: Pick<
+    ResolvedCharacterCreationRules,
+    'startingLevel' | 'levelZeroNpcs' | 'progression'
+  >
 }
 
 export function resolveCharacterLevelConstraints(
-  context: CharacterBuildContext,
+  input: CharacterLevelPolicyInput,
 ): BuilderLevelConstraints {
-  const maxLevel = resolveBuilderMaxAllowedLevel(context.characterCreationRules)
-  const isCampaignPc = context.characterKind === 'pc' && context.rulesScope.type === 'campaign'
+  const maxLevel = resolveBuilderMaxAllowedLevel(input.characterCreationRules)
+  const isCampaignPc = input.characterKind === 'pc' && input.rulesScope.type === 'campaign'
 
   if (isCampaignPc) {
-    const fixedLevel = context.characterCreationRules.startingLevel
+    const fixedLevel = input.characterCreationRules.startingLevel
     return {
       mode: 'fixed',
       fixedLevel,
@@ -43,7 +55,8 @@ export function resolveCharacterLevelConstraints(
     }
   }
 
-  const minLevel = context.characterKind === 'npc' && isLevelZeroNpcPermitted(context) ? 0 : 1
+  const minLevel =
+    input.characterKind === 'npc' && input.characterCreationRules.levelZeroNpcs.enabled ? 0 : 1
 
   return {
     mode: 'selectable',

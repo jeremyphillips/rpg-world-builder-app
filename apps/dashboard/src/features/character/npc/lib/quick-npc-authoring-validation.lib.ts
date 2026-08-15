@@ -16,7 +16,11 @@ export function isQuickNpcSetupStillValid(
   setup: QuickNpcSetupValues,
   context: CharacterBuildContext,
 ): boolean {
-  const { minLevel, maxLevel } = resolveCharacterLevelConstraints(context)
+  const { minLevel, maxLevel } = resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  })
   const parsed = quickNpcSetupSchema(maxLevel, minLevel).safeParse(setup)
   if (!parsed.success) return false
 

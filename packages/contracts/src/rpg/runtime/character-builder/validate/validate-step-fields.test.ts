@@ -12,6 +12,12 @@ import {
   validateSpecies,
 } from './validate-step-fields'
 
+const PC_ARRAY = [16, 14, 13, 12, 10, 8] as const
+const L0_ARRAY = [12, 11, 10, 9, 8, 7] as const
+
+const l0NpcScores = { str: 12, dex: 11, con: 10, int: 9, wis: 8, cha: 7 } as const
+const pcScores = { str: 16, dex: 14, con: 13, int: 12, wis: 10, cha: 8 } as const
+
 describe('validate-step-fields', () => {
   it('validateIdentity reports friendly name copy', () => {
     const issues = validateIdentity(createEmptyCharacterBuilderDraft(), false)
@@ -91,5 +97,44 @@ describe('validate-step-fields', () => {
     expect(outOfRange[0]?.message).toBe(
       formatFieldMessage(abilityValidationMessages.characterScoreOutOfRange({ min: 1, max: 20 })),
     )
+  })
+
+  it('validateAbilities accepts L0 array assignment for level 0 NPC scores', () => {
+    const issues = validateAbilities(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { level: 0 },
+        abilities: { method: 'standard-array', scores: { ...l0NpcScores } },
+      },
+      [...L0_ARRAY],
+    )
+
+    expect(issues).toEqual([])
+  })
+
+  it('validateAbilities rejects PC array assignment when L0 array is required', () => {
+    const issues = validateAbilities(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { level: 0 },
+        abilities: { method: 'standard-array', scores: { ...pcScores } },
+      },
+      [...L0_ARRAY],
+    )
+
+    expect(issues.some((issue) => issue.code === 'standard_array_exact_assignment')).toBe(true)
+  })
+
+  it('validateAbilities rejects L0 array assignment when PC array is required', () => {
+    const issues = validateAbilities(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { level: 1 },
+        abilities: { method: 'standard-array', scores: { ...l0NpcScores } },
+      },
+      [...PC_ARRAY],
+    )
+
+    expect(issues.some((issue) => issue.code === 'standard_array_exact_assignment')).toBe(true)
   })
 })

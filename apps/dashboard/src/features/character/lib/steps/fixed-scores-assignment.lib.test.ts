@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { STANDARD_ARRAY } from '@rpg/contracts'
+import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 
 import { FIXED_SCORES_EMPTY_SCORE_VALUE } from './abilities-form-labels'
 import {
@@ -26,7 +26,7 @@ describe('formatFixedScoreOptionLabel', () => {
 
 describe('getScoreOptionsForAbility', () => {
   it('disables scores assigned to other abilities', () => {
-    const options = getScoreOptionsForAbility('dex', { str: 15, con: 13 }, STANDARD_ARRAY)
+    const options = getScoreOptionsForAbility('dex', { str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)
 
     const fifteen = options.find((option) => option.value === '15')
     const thirteen = options.find((option) => option.value === '13')
@@ -38,14 +38,14 @@ describe('getScoreOptionsForAbility', () => {
   })
 
   it('keeps the current row score enabled', () => {
-    const options = getScoreOptionsForAbility('str', { str: 15, con: 13 }, STANDARD_ARRAY)
+    const options = getScoreOptionsForAbility('str', { str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)
 
     const fifteen = options.find((option) => option.value === '15')
     expect(fifteen).toMatchObject({ disabled: false })
   })
 
   it('includes an empty option', () => {
-    const options = getScoreOptionsForAbility('str', {}, STANDARD_ARRAY)
+    const options = getScoreOptionsForAbility('str', {}, DEFAULT_STANDARD_ARRAY)
     expect(options[0]).toEqual({
       value: FIXED_SCORES_EMPTY_SCORE_VALUE,
       label: '—',
@@ -56,12 +56,12 @@ describe('getScoreOptionsForAbility', () => {
 
 describe('getFixedScoresRemainingCount', () => {
   it('returns the number of unassigned fixed-score values', () => {
-    expect(getFixedScoresRemainingCount({ str: 15, con: 13 }, STANDARD_ARRAY)).toBe(4)
-    expect(getFixedScoresRemainingCount({}, STANDARD_ARRAY)).toBe(6)
+    expect(getFixedScoresRemainingCount({ str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)).toBe(4)
+    expect(getFixedScoresRemainingCount({}, DEFAULT_STANDARD_ARRAY)).toBe(6)
     expect(
       getFixedScoresRemainingCount(
         { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
-        STANDARD_ARRAY,
+        DEFAULT_STANDARD_ARRAY,
       ),
     ).toBe(0)
   })
@@ -75,7 +75,10 @@ describe('score assignment mutations', () => {
   it('replaces a filled ability and returns the old score to the pool implicitly', () => {
     expect(replaceScoreFromPool({ str: 15 }, 'str', 14)).toEqual({ str: 14 })
     expect(
-      getFixedScoresRemainingCount(replaceScoreFromPool({ str: 15 }, 'str', 14), STANDARD_ARRAY),
+      getFixedScoresRemainingCount(
+        replaceScoreFromPool({ str: 15 }, 'str', 14),
+        DEFAULT_STANDARD_ARRAY,
+      ),
     ).toBe(5)
   })
 

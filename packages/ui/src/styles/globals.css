@@ -173,7 +173,6 @@
 
   /* Layout — readable body column nested inside full-width page shells. */
   --max-width-narrow-content: 41.25rem; /* ~660px */
-  --container-xl: 37rem;
 
   /*
    * Type scale — SSOT for Tailwind `text-*` utilities (@ 16px root).
