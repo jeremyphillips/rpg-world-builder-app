@@ -3,6 +3,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { FormField } from './form-field'
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
@@ -69,7 +70,12 @@ export function SwitchField({
       placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
       className={cn(labelVisibility === 'srOnly' && 'sr-only')}
     >
-      <FieldLabelContent label={label} info={info} />
+      <FieldLabelContent
+        label={label}
+        required={required}
+        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+        info={info}
+      />
     </Field.Label>
   )
 

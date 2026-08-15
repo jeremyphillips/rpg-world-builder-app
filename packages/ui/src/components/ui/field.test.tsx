@@ -60,6 +60,12 @@ describe('Field', () => {
     expect(() => render(<Field.Label>Orphan</Field.Label>)).toThrow(/Field\.Label/)
   })
 
+  it('sets native required on native controls', () => {
+    renderField({ required: true })
+    expect(screen.getByLabelText('Name')).toHaveAttribute('required')
+    expect(screen.getByLabelText('Name')).not.toHaveAttribute('aria-required')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = renderField({ hint: 'Your display name.' })
     await expectNoAxeViolations(container)

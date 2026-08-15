@@ -21,6 +21,7 @@ import {
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
@@ -198,10 +199,14 @@ export function ChipsField({
       >
         <legend
           id={legendId}
-          data-required={required || undefined}
           className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
         >
-          <FieldLabelContent label={label} info={info} />
+          <FieldLabelContent
+            label={label}
+            required={required}
+            showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+            info={info}
+          />
         </legend>
 
         {hintPosition === 'below-label' ? (

@@ -5,23 +5,33 @@ import type { FieldSize } from './field.client'
 import { fieldLabelVariants } from './field.variants'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import { RequiredIndicator } from './required-indicator'
 
 export interface FieldLabelContentProps {
   label: string
   required?: boolean
+  /**
+   * When omitted, a visible marker is shown whenever `required` is true.
+   * Canonical field labels pass an explicit value from `labelVisibility`.
+   */
+  showRequiredMarker?: boolean
   info?: ReactNode
 }
 
-/** Label text with optional required asterisk and info tooltip — shared by field legends and headings. */
-export function FieldLabelContent({ label, required, info }: FieldLabelContentProps) {
+/** Label text with optional required marker and info tooltip — shared by field legends and headings. */
+export function FieldLabelContent({
+  label,
+  required,
+  showRequiredMarker,
+  info,
+}: FieldLabelContentProps) {
+  const visibleMarker = showRequiredMarker ?? Boolean(required)
+
   return (
     <>
       {label}
-      {required ? (
-        <span aria-hidden="true" className="text-destructive">
-          *
-        </span>
-      ) : null}
+      {visibleMarker ? <RequiredIndicator /> : null}
       {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
     </>
   )
@@ -56,7 +66,12 @@ export function FieldRadiogroupLabel({
         className,
       )}
     >
-      <FieldLabelContent label={label} required={required} info={info} />
+      <FieldLabelContent
+        label={label}
+        required={required}
+        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+        info={info}
+      />
     </span>
   )
 }

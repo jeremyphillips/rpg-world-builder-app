@@ -18,6 +18,7 @@ import {
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 
 export interface ChooseCountFieldAnatomy {
@@ -70,10 +71,14 @@ export function ChooseCountFieldShell({
     >
       <legend
         id={legendId}
-        data-required={required || undefined}
         className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
       >
-        <FieldLabelContent label={label} info={info} />
+        <FieldLabelContent
+          label={label}
+          required={required}
+          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+          info={info}
+        />
       </legend>
       {hintPosition === 'below-label' ? (
         <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />

@@ -127,6 +127,16 @@ describe('FormField', () => {
     expect(chromeShell?.contains(screen.getByText('Applied to every primary ability.'))).toBe(true)
   })
 
+  it('renders exactly one required marker when required', () => {
+    render(
+      <FormField id="name" label="Name" required>
+        <input id="name" data-testid="control" />
+      </FormField>,
+    )
+    expect(screen.getAllByText('*')).toHaveLength(1)
+    expect(screen.getByTestId('control')).toHaveAttribute('required')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FormField id="name" label="Name">

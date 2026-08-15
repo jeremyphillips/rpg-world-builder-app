@@ -16,6 +16,7 @@ import {
   fieldLabelVariants,
   type FieldLabelPlacement,
 } from './field.variants'
+import { resolveControlRequiredProps } from './field-required.lib'
 import { Text } from './text'
 
 type FieldSize = NonNullable<FieldControlVariantProps['size']>
@@ -152,12 +153,11 @@ export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
 
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
   ({ className, children, placement, ...props }, ref) => {
-    const { controlId, size, required } = useFieldContext('Field.Label')
+    const { controlId, size } = useFieldContext('Field.Label')
     return (
       <label
         ref={ref}
         htmlFor={controlId}
-        data-required={required || undefined}
         className={cn(fieldLabelVariants({ size, placement }), className)}
         {...props}
       >
@@ -185,7 +185,7 @@ function FieldControl({ children }: FieldControlProps) {
     id: child.props.id ?? controlId,
     'aria-describedby': child.props['aria-describedby'] ?? describedBy,
     'aria-invalid': child.props['aria-invalid'] ?? (hasError || undefined),
-    'aria-required': child.props['aria-required'] ?? (required || undefined),
+    ...resolveControlRequiredProps(child, required),
   })
 }
 FieldControl.displayName = 'Field.Control'

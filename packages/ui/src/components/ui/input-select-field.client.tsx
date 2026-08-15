@@ -38,6 +38,7 @@ import {
 import { NumberInput, type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 
 const EMPTY_UNIT_MESSAGE = 'No units match your search.'
 
@@ -283,6 +284,7 @@ interface ValueSegmentProps {
   describedBy?: string
   valueDigits?: NumberInputDigits
   formatGrouped?: boolean
+  required?: boolean
   onValueChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -301,6 +303,7 @@ function ValueSegment({
   describedBy,
   valueDigits,
   formatGrouped,
+  required,
   onValueChange,
   onBlur,
 }: ValueSegmentProps) {
@@ -331,6 +334,7 @@ function ValueSegment({
           max={max}
           step={step}
           value={displayValue}
+          required={required}
           aria-invalid={hasError || undefined}
           aria-describedby={describedBy}
           onChange={handleValueChange}
@@ -353,6 +357,7 @@ function ValueSegment({
       disabled={disabled}
       placeholder={placeholder}
       value={displayValue}
+      required={required}
       aria-invalid={hasError || undefined}
       aria-describedby={describedBy}
       onChange={handleValueChange}
@@ -411,7 +416,12 @@ export function InputSelectField({
         wrapControl={false}
         label={
           <Field.Label id={`${id}-label`} htmlFor={valueId}>
-            <FieldLabelContent label={label} info={info} />
+            <FieldLabelContent
+              label={label}
+              required={required}
+              showRequiredMarker={shouldShowVisibleRequiredMarker(required)}
+              info={info}
+            />
           </Field.Label>
         }
         control={
@@ -437,6 +447,7 @@ export function InputSelectField({
               describedBy={describedBy}
               valueDigits={valueDigits}
               formatGrouped={formatGrouped}
+              required={required}
               onValueChange={onValueChange}
               onBlur={onBlur}
             />

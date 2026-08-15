@@ -2,6 +2,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { Checkbox } from './checkbox.client'
 import {
   fieldInlineCheckboxControlColumnClasses,
@@ -59,7 +60,12 @@ export function CheckboxField({
       placement="inlineCheckbox"
       className={cn(labelVisibility === 'srOnly' && 'sr-only')}
     >
-      <FieldLabelContent label={label} info={info} />
+      <FieldLabelContent
+        label={label}
+        required={required}
+        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+        info={info}
+      />
     </Field.Label>
   )
 
