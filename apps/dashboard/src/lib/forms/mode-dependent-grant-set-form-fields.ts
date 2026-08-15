@@ -35,7 +35,7 @@ export type ModeDependentGrantSetFieldOptions = {
   /** When set, the dependents region hides when the mode equals this value (e.g. `none`). */
   emptyMode?: string
   /** When true, hides the mode radio label while keeping it for accessibility. */
-  labelHidden?: boolean
+  labelVisibility?: 'visible' | 'srOnly'
   /** Trailing divider after this grant-set block within parent rhythm. */
   separator?: FieldConfig['separator']
 }
@@ -66,7 +66,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     categoryMode,
     specificMode,
     emptyMode,
-    labelHidden,
+    labelVisibility,
     separator,
   } = options
 
@@ -80,7 +80,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
       hint,
       orientation: 'horizontal',
       options: toOptions(modes, modeLabels),
-      ...(labelHidden ? { labelHidden } : {}),
+      ...(labelVisibility === 'srOnly' ? { labelVisibility } : {}),
     },
     dependents: {
       ...(emptyMode
@@ -91,7 +91,8 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
             },
           }
         : {}),
-      surface: { emphasis: 'subtle' },
+      chrome: 'panel',
+      panel: { surface: { emphasis: 'subtle' } },
       fields: [
         {
           type: 'chips',

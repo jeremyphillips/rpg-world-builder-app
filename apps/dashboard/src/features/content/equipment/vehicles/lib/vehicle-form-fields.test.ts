@@ -56,8 +56,8 @@ describe('vehicle kindFieldGroups', () => {
     expect(combatGroup).toMatchObject({
       kind: 'group',
       legend: 'Combat',
-      legendSize: 'subsection',
     })
+    expect(combatGroup).not.toHaveProperty('legendSize')
     expect(combatGroup.fields).toEqual([
       expect.objectContaining({
         kind: 'row',

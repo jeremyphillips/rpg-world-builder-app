@@ -131,7 +131,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           categoriesHint: WEAPON_PROFICIENCIES_HINT,
           categoryMode: 'categories',
           specificMode: 'individual',
-          labelHidden: true,
+          labelVisibility: 'srOnly',
         }),
       ],
     },

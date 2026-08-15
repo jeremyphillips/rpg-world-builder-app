@@ -355,8 +355,8 @@ function featChoiceInlineSentenceField(
   return {
     type: 'inlineSentence',
     name: 'featChoose',
-    label: '',
-    hideLabel: true,
+    label: 'Feat choice',
+    labelVisibility: 'srOnly',
     segments: [
       { kind: 'text', value: 'Choose', tone: 'label' },
       {
@@ -584,7 +584,7 @@ export function grantItemFields<T extends string>(
       type: 'inlineSentence',
       name: 'unlockLevel',
       label: 'Granted at',
-      hideLabel: true,
+      labelVisibility: 'srOnly',
       visibility: visibleWhenGrantTypeSet(),
       segments: [
         { kind: 'text', value: 'Grant this', tone: 'label' },

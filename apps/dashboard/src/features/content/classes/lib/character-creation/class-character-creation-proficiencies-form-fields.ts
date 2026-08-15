@@ -76,7 +76,7 @@ export function characterCreationSkillChoiceFields(ctx: ContentFormCtx): FormIte
       type: 'inlineSentence',
       name: SKILL_CHOICE_FROM_PATH,
       label: 'Skill proficiency choice',
-      hideLabel: true,
+      labelVisibility: 'srOnly',
       segments: [
         { kind: 'text', value: 'Character can choose', tone: 'label' },
         {
@@ -132,14 +132,12 @@ export function characterCreationProficienciesFields(
         {
           kind: 'group',
           legend: SKILL_PROFICIENCY_PLURAL_LABEL,
-          legendSize: 'subsection',
           chrome: { variant: 'panel' },
           fields: characterCreationSkillChoiceFields(ctx),
         },
         {
           kind: 'group',
           legend: 'Tool Proficiencies',
-          legendSize: 'subsection',
           chrome: { variant: 'panel' },
           id: 'class-character-creation-tool-proficiencies',
           fields: characterCreationToolChoiceFields(ctx, toolChoiceExtraFields),

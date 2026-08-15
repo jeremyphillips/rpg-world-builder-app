@@ -191,6 +191,7 @@ export {
   type FormHeading,
   type FormHeadingTier,
   type FieldLabelVisibility,
+  type DependentChrome,
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,

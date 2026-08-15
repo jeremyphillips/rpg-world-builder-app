@@ -46,7 +46,6 @@ export function languageProficiencyFields(
         {
           kind: 'group',
           legend: 'Languages',
-          legendSize: 'subsection',
           chrome: { variant: 'panel' },
           fields: [
             languageGrantItemsField({
@@ -58,7 +57,7 @@ export function languageProficiencyFields(
               type: 'inlineSentence',
               name: LANGUAGE_CHOICE_CATEGORIES_PATH,
               label: 'Language proficiency choice',
-              hideLabel: true,
+              labelVisibility: 'srOnly',
               segments: [
                 { kind: 'text', value: 'Characters choose', tone: 'label' },
                 {

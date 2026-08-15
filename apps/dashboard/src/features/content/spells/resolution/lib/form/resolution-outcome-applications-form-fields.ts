@@ -21,14 +21,16 @@ const RESOLUTION_EFFECTS_FIELD = `${RESOLUTION_FIELD_NAME}.effects` as const
 export const outcomeApplicationEffectIdField = {
   type: 'text',
   name: 'effectId',
-  label: '',
+  label: 'Effect',
+  labelVisibility: 'srOnly',
   width: 'full',
 } satisfies FieldConfig
 
 export const outcomeApplicationAmountField = {
   type: 'select',
   name: 'amount',
-  label: '',
+  label: 'Amount',
+  labelVisibility: 'srOnly',
   options: RESOLUTION_OUTCOME_AMOUNT_OPTIONS,
   width: 'lg',
   presentation: {

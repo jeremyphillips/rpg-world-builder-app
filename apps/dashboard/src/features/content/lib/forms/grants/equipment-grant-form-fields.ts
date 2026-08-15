@@ -420,8 +420,8 @@ export function equipmentChoiceGrantFields(
     {
       type: 'inlineSentence',
       name: EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
-      label: '',
-      hideLabel: true,
+      label: 'Equipment choice pool',
+      labelVisibility: 'srOnly',
       visibility: visibleForItemKind('choice', guard),
       segments: [
         { kind: 'text', value: 'Character chooses', tone: 'label' },

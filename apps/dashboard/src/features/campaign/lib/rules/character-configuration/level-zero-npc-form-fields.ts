@@ -203,7 +203,6 @@ export function levelZeroNpcsFields({
                     hint: '',
                     introText: 'Every level 0 NPC receives these languages:',
                     languageOptions,
-                    hideLabel: false,
                     separator: 'subtle',
                   }),
                   {

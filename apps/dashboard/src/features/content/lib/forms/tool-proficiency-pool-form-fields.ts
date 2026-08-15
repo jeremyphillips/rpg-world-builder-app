@@ -113,8 +113,8 @@ export function toolProficiencyPoolFormFields(
     {
       type: 'inlineSentence',
       name: sentenceName,
-      label: '',
-      hideLabel: true,
+      label: 'Tool proficiency pool choice',
+      labelVisibility: 'srOnly',
       visibility: poolVisibility,
       segments: [
         { kind: 'text', value: 'Character chooses', tone: 'label' },

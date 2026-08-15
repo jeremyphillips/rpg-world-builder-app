@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type GroupConfig } from '@rpg/ui/form'
+import { isContainer, type RowConfig } from '@rpg/ui/form'
 
 import { standardArrayFormFields } from './standard-array-form-fields'
 
-function expectStandardArrayGroup(item: ReturnType<typeof standardArrayFormFields>): GroupConfig {
-  if (!isContainer(item) || item.kind !== 'group') {
-    throw new Error('Expected group container')
+function expectStandardArrayRow(item: ReturnType<typeof standardArrayFormFields>): RowConfig {
+  if (!isContainer(item) || item.kind !== 'row') {
+    throw new Error('Expected row container')
   }
   return item
 }
 
 describe('standardArrayFormFields', () => {
-  it('returns a subsection group with legend, description, and six row inputs', () => {
-    const item = expectStandardArrayGroup(
+  it('returns a row with heading and six sr-only score inputs', () => {
+    const item = expectStandardArrayRow(
       standardArrayFormFields({
         name: 'standardArray',
         label: 'Standard array',
@@ -21,20 +21,15 @@ describe('standardArrayFormFields', () => {
     )
 
     expect(item).toMatchObject({
-      kind: 'group',
-      legend: 'Standard array',
-      description: 'Sets the six fixed scores.',
-      legendSize: 'subsection',
+      kind: 'row',
+      heading: {
+        label: 'Standard array',
+        hint: 'Sets the six fixed scores.',
+      },
     })
 
-    const row = item.fields[0]
-    expect(row).toMatchObject({ kind: 'row' })
-    if (!row || !isContainer(row) || row.kind !== 'row') {
-      throw new Error('Expected row container')
-    }
-
-    expect(row.fields).toHaveLength(6)
-    expect(row.fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+    expect(item.fields).toHaveLength(6)
+    expect(item.fields.map((field) => ('name' in field ? field.name : null))).toEqual([
       'standardArray.0',
       'standardArray.1',
       'standardArray.2',
@@ -42,5 +37,10 @@ describe('standardArrayFormFields', () => {
       'standardArray.4',
       'standardArray.5',
     ])
+    expect(
+      item.fields.every(
+        (field) => 'labelVisibility' in field && field.labelVisibility === 'srOnly',
+      ),
+    ).toBe(true)
   })
 })

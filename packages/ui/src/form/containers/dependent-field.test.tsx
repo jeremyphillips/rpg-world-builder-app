@@ -22,6 +22,8 @@ type Values = z.infer<typeof schema>
 
 const dependentField = (
   options: {
+    chrome?: 'none' | 'inset' | 'panel'
+    panel?: { surface?: SurfaceConfig; tone?: 'destructive' }
     surface?: SurfaceConfig
     tone?: 'destructive'
     scope?: 'wrapper' | 'arrayItems'
@@ -37,6 +39,8 @@ const dependentField = (
     defaultValue: false,
   },
   dependents: {
+    ...(options.chrome ? { chrome: options.chrome } : {}),
+    ...(options.panel ? { panel: options.panel } : {}),
     ...(options.surface ? { surface: options.surface } : {}),
     ...(options.tone ? { tone: options.tone } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
@@ -70,7 +74,7 @@ const dependentField = (
 })
 
 function renderDependentForm(
-  fields: FormItem[] = [dependentField({ surface: { emphasis: 'subtle' } })],
+  fields: FormItem[] = [dependentField()],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -89,7 +93,9 @@ function queryDependentsRegion(container: HTMLElement) {
 
 function queryChromeShell(container: HTMLElement) {
   const region = queryDependentsRegion(container)
-  return region?.querySelector(':scope > .p-3') ?? null
+  return (
+    region?.querySelector(':scope > .border-l-2') ?? region?.querySelector(':scope > .p-3') ?? null
+  )
 }
 
 describe('dependent field', () => {
@@ -116,9 +122,11 @@ describe('dependent field', () => {
     })
   })
 
-  it('applies subtle chrome tone classes to the dependents region', async () => {
+  it('applies subtle panel chrome classes when chrome is panel', async () => {
     const user = userEvent.setup()
-    const { container } = renderDependentForm()
+    const { container } = renderDependentForm([
+      dependentField({ chrome: 'panel', panel: { surface: { emphasis: 'subtle' } } }),
+    ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
@@ -144,7 +152,7 @@ describe('dependent field', () => {
     expect(dependent).toHaveAttribute('aria-labelledby', expect.stringContaining('featureEnabled'))
   })
 
-  it('renders a plain indented stack when dependents surface is omitted', async () => {
+  it('applies default inset chrome when dependents chrome is omitted', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField()])
 
@@ -152,9 +160,10 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
+      const shell = queryChromeShell(container)
       expect(region).toHaveClass(fieldToggleDependentIndentClasses)
-      expect(queryChromeShell(container)).toBeNull()
-      expect(region?.querySelector('.gap-6')).toBeInTheDocument()
+      expect(shell).toHaveClass('border-l-2')
+      expect(shell).not.toHaveClass('bg-surface-subtle')
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
@@ -174,7 +183,11 @@ describe('dependent field', () => {
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
-      dependentField({ surface: { emphasis: 'subtle' }, includeNote: true }),
+      dependentField({
+        chrome: 'panel',
+        panel: { surface: { emphasis: 'subtle' } },
+        includeNote: true,
+      }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -232,7 +245,8 @@ describe('dependent field', () => {
           defaultValue: false,
         },
         dependents: {
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           scope: 'arrayItems',
           fields: [
             {
@@ -294,7 +308,8 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',
@@ -367,7 +382,8 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',

@@ -68,7 +68,7 @@ export function movementArrayField(): FormItem {
         type: 'inlineSentence',
         name: 'movementRow',
         label: 'Movement',
-        hideLabel: true,
+        labelVisibility: 'srOnly',
         segments: [
           {
             kind: 'select',

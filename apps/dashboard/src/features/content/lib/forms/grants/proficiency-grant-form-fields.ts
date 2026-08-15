@@ -207,8 +207,8 @@ function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibilit
     {
       type: 'inlineSentence',
       name: WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
-      label: '',
-      hideLabel: true,
+      label: 'Weapon proficiency pool choice',
+      labelVisibility: 'srOnly',
       visibility: visibleForProficiencySource('pool', guard),
       segments: [
         { kind: 'text', value: 'Character chooses', tone: 'label' },
@@ -400,8 +400,8 @@ function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility
     {
       type: 'inlineSentence',
       name: SKILL_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
-      label: '',
-      hideLabel: true,
+      label: 'Skill proficiency pool choice',
+      labelVisibility: 'srOnly',
       visibility: visibleForProficiencySource('pool', guard),
       segments: [
         { kind: 'text', value: 'Character chooses', tone: 'label' },
@@ -502,8 +502,8 @@ function armorTrainingPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): 
     {
       type: 'inlineSentence',
       name: ARMOR_TRAINING_POOL_SENTENCE_FIELD_NAME,
-      label: '',
-      hideLabel: true,
+      label: 'Armor training pool choice',
+      labelVisibility: 'srOnly',
       visibility: visibleForProficiencySource('pool', guard),
       segments: [
         { kind: 'text', value: 'Character chooses', tone: 'label' },

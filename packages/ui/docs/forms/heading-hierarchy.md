@@ -54,7 +54,7 @@ All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupL
 
 ## Chrome orthogonality
 
-Dependent `chrome: inset | panel | none` is a separate sub-pass — it must not affect tier resolution, label visibility, or grouping.
+Dependent `chrome: inset | panel | none` defaults to **`inset`** on toggle-gated dependents. Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect tier resolution, label visibility, or grouping.
 
 ## Migration guide (summary)
 
@@ -65,6 +65,6 @@ Dependent `chrome: inset | panel | none` is a separate sub-pass — it must not 
 | `label` / `hint` on slots          | `heading: { label, hint }`                                                 |
 | `hideLabel` / `labelHidden`        | `labelVisibility: 'srOnly'`                                                |
 | `label: ''`                        | Non-whitespace `label` + `labelVisibility: 'srOnly'` or structural heading |
-| `dependents.surface`               | `dependents.chrome: 'panel'` (Phase 1b)                                    |
+| `dependents.surface`               | `dependents.chrome: 'panel'` with `panel.surface`                          |
 
 See also [containers.md](./containers.md).

@@ -1,4 +1,7 @@
 import { cn } from '../../lib/utils'
+import type { DependentChrome, DependentDependentsConfig } from '../../form/field-config'
+import { resolveFieldGroupChromeClassNames } from './field-group-chrome.variants'
+import type { FieldRhythm } from './field.variants'
 import {
   resolveFieldContainerChromeClasses,
   type FieldContainerChromeOptions,
@@ -27,4 +30,40 @@ export type FieldDependentsScope = 'wrapper' | 'arrayItems'
 /** Border/bg inset around dependent fields with optional padding shell. */
 export function resolveFieldDependentsChromeClasses(options: FieldContainerChromeOptions): string {
   return cn('rounded-md border p-3', resolveFieldContainerChromeClasses(options))
+}
+
+export type ResolvedDependentChromePresentation = {
+  chrome: DependentChrome
+  wrapperClassName?: string
+  arrayItemSurface?: FieldContainerChromeOptions['surface']
+  arrayItemTone?: FieldContainerChromeOptions['tone']
+}
+
+/** Resolves dependent chrome — defaults to inset; legacy `surface`/`tone` imply panel. */
+export function resolveDependentChromePresentation(
+  dependents: DependentDependentsConfig,
+  rhythm: FieldRhythm,
+): ResolvedDependentChromePresentation {
+  const legacyPanel = dependents.surface !== undefined || dependents.tone !== undefined
+  const chrome: DependentChrome = dependents.chrome ?? (legacyPanel ? 'panel' : 'inset')
+
+  if (chrome === 'none') {
+    return { chrome }
+  }
+
+  if (chrome === 'panel') {
+    const surface = dependents.panel?.surface ?? dependents.surface
+    const tone = dependents.panel?.tone ?? dependents.tone
+    return {
+      chrome,
+      wrapperClassName: resolveFieldDependentsChromeClasses({ surface, tone }),
+      arrayItemSurface: surface,
+      arrayItemTone: tone,
+    }
+  }
+
+  return {
+    chrome,
+    wrapperClassName: resolveFieldGroupChromeClassNames({ variant: 'inset' }, { rhythm }).body,
+  }
 }

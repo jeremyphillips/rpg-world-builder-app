@@ -62,7 +62,7 @@ function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
         type: 'radioCard',
         name: 'editionPresetId',
         label: vocabularyFieldLabel(EDITION_PRESET_TERM),
-        labelHidden: true,
+        labelVisibility: 'srOnly',
         required: true,
         options: editionPresetOptionsWithRecommendedBadge(editionPresetOptions),
         defaultValue: DEFAULT_EDITION_PRESET_ID,

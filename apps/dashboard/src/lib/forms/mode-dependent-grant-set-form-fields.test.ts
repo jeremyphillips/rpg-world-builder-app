@@ -39,7 +39,8 @@ describe('modeDependentGrantSetField', () => {
         name: 'weaponProficiencyMode',
       },
       dependents: {
-        surface: { emphasis: 'subtle' },
+        chrome: 'panel',
+        panel: { surface: { emphasis: 'subtle' } },
       },
     })
 
