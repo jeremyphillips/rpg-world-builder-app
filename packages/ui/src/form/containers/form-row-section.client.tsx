@@ -9,7 +9,7 @@ import {
 } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
-import { isRowSlotItem, resolveRowFieldAlign } from '../field-config'
+import { isRowSlotItem, resolveRowFieldAlign, resolveRowFieldGap } from '../field-config'
 import { CompositeGroup } from '../presentation/composite-group.client'
 import { resolveRowHeading } from '../resolve-container-heading.lib'
 import { FieldNode, FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
@@ -39,7 +39,11 @@ export function RowFieldSection({
   const heading = resolveRowHeading(item)
 
   const row = (
-    <FieldRow align={resolveRowFieldAlign(item)} className={item.className}>
+    <FieldRow
+      align={resolveRowFieldAlign(item)}
+      gap={resolveRowFieldGap(item.spacing)}
+      className={item.className}
+    >
       {item.fields.map((field) => {
         if (isRowSlotItem(field)) {
           return (

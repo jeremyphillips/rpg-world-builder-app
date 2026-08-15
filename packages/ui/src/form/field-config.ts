@@ -903,11 +903,21 @@ export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>):
   return item.fields.some(rowFieldReservesDerivedMeta) ? 'start' : 'control-edge'
 }
 
+/** Inter-control spacing within a schema row. */
+export type RowSpacing = 'default' | 'compact'
+
+/** Maps row spacing config to {@link FieldRow} gap tokens. */
+export function resolveRowFieldGap(spacing?: RowSpacing): 'form' | 'compact' {
+  return spacing === 'compact' ? 'compact' : 'form'
+}
+
 export interface RowConfig {
   kind: 'row'
   /** Leaf-tier composite heading for the row block. */
   heading?: FormHeading
   fields: RowFieldItem[]
+  /** Inter-control spacing within the row. @default 'default' */
+  spacing?: RowSpacing
   className?: string
   /**
    * Flex cross-axis alignment for row siblings. When omitted, defaults to

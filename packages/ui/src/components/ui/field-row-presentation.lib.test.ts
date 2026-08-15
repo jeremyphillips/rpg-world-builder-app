@@ -75,6 +75,12 @@ describe('resolveFieldRowClasses', () => {
     expect(classes).toContain('gap-2')
   })
 
+  it('maps compact gap for tighter form rows', () => {
+    const classes = resolveFieldRowClasses({ gap: 'compact' })
+    expect(classes).toContain('gap-4')
+    expect(classes).not.toContain('gap-6')
+  })
+
   it('maps start alignment for rows with reserved derived metadata', () => {
     const classes = resolveFieldRowClasses({ align: 'start' })
     expect(classes).toContain('items-start')

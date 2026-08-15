@@ -24,7 +24,9 @@ describe('SpellResolutionSelectionModeSelect', () => {
     render(<SelectionModeHarness />)
 
     await waitFor(() => {
-      expect(screen.getByLabelText(RESOLUTION_FIELD_LABELS.selectionMode)).toBeInTheDocument()
+      expect(
+        screen.getByRole('combobox', { name: RESOLUTION_FIELD_LABELS.selectionMode }),
+      ).toBeInTheDocument()
     })
   })
 
@@ -32,7 +34,9 @@ describe('SpellResolutionSelectionModeSelect', () => {
     const { container } = render(<SelectionModeHarness />)
 
     await waitFor(() => {
-      expect(screen.getByLabelText(RESOLUTION_FIELD_LABELS.selectionMode)).toBeInTheDocument()
+      expect(
+        screen.getByRole('combobox', { name: RESOLUTION_FIELD_LABELS.selectionMode }),
+      ).toBeInTheDocument()
     })
 
     await expectNoAxeViolations(container)

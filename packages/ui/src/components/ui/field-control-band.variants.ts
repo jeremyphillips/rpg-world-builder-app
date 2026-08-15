@@ -47,6 +47,7 @@ export const fieldRowVariants = cva('flex flex-wrap', {
     gap: {
       toolbar: 'gap-2',
       form: 'gap-6',
+      compact: 'gap-4',
     },
     layout: {
       flow: '',

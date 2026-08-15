@@ -141,4 +141,45 @@ describe('Form section rendering', () => {
     expect(group).not.toHaveClass('mb-8')
     expect(group).toHaveClass('mb-0')
   })
+
+  it('renders row spacing compact as gap-4 on FieldRow', () => {
+    const compactRowFields: FormItem[] = [
+      {
+        kind: 'row',
+        spacing: 'compact',
+        fields: [
+          { type: 'text', name: 'first', label: 'First name' },
+          { type: 'text', name: 'second', label: 'Last name' },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form schema={schema} fields={compactRowFields} onSubmit={vi.fn()} />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toHaveClass('gap-4')
+    expect(row).not.toHaveClass('gap-6')
+  })
+
+  it('renders default row spacing as gap-6 on FieldRow', () => {
+    const defaultRowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          { type: 'text', name: 'first', label: 'First name' },
+          { type: 'text', name: 'second', label: 'Last name' },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form schema={schema} fields={defaultRowFields} onSubmit={vi.fn()} />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toHaveClass('gap-6')
+    expect(row).not.toHaveClass('gap-4')
+  })
 })

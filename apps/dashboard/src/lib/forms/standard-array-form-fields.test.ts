@@ -22,6 +22,7 @@ describe('standardArrayFormFields', () => {
 
     expect(item).toMatchObject({
       kind: 'row',
+      spacing: 'compact',
       separator: 'subtle',
       heading: {
         label: 'Standard array',

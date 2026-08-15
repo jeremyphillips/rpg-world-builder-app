@@ -14,6 +14,7 @@ export function standardArrayFormFields(options: StandardArrayFormFieldOptions =
 
   return {
     kind: 'row',
+    spacing: 'compact',
     heading: {
       label,
       ...(options.hint ? { hint: options.hint } : {}),
