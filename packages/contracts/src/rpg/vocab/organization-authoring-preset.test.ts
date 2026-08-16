@@ -7,8 +7,8 @@ import {
 } from './organization-authoring-preset'
 
 describe('organization authoring presets', () => {
-  it('freezes the sixteen v1 recipes with discovery metadata', () => {
-    expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(16)
+  it('freezes the twenty v2 recipes with discovery metadata', () => {
+    expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(20)
     expect(ORGANIZATION_AUTHORING_PRESETS).toMatchInlineSnapshot(`
       {
         "academy": {
@@ -21,6 +21,9 @@ describe('organization authoring presets', () => {
           "discoveryTerms": [
             "university",
             "mage college",
+            "bardic college",
+            "seminary",
+            "wizard circle",
           ],
           "domain": "academic",
           "form": "association",
@@ -28,9 +31,11 @@ describe('organization authoring presets', () => {
         },
         "adventurers_guild": {
           "activities": [],
-          "description": "Closest starting point for an adventurer hall or monster hunters guild.",
+          "description": "Closest starting point for an adventurer hall, company, or monster hunters guild.",
           "discoveryTerms": [
             "monster hunters' guild",
+            "adventuring company",
+            "treasure hunters",
           ],
           "domain": "occupational",
           "form": "guild",
@@ -46,6 +51,13 @@ describe('organization authoring presets', () => {
             "navy",
             "militia",
             "marines",
+            "sky fleet",
+            "garrison",
+            "legion",
+            "crusading host",
+            "royal guard",
+            "warband",
+            "pirate crew",
           ],
           "domain": "military",
           "form": "force",
@@ -61,6 +73,7 @@ describe('organization authoring presets', () => {
             "moneylenders",
             "pawnbrokers",
             "tax farmers",
+            "insurance company",
           ],
           "domain": "commercial",
           "form": "company",
@@ -74,7 +87,14 @@ describe('organization authoring presets', () => {
           "description": "Closest starting point for temple, cult, and gathered faith communities.",
           "discoveryTerms": [
             "temple",
+            "temple organization",
             "cult",
+            "druid circle",
+            "heretical sect",
+            "witches' coven",
+            "missionary society",
+            "pilgrimage society",
+            "inquisitorial office",
           ],
           "domain": "religious",
           "form": "congregation",
@@ -92,6 +112,17 @@ describe('organization authoring presets', () => {
           "form": "association",
           "label": "City council",
         },
+        "city_watch": {
+          "activities": [
+            "defense",
+          ],
+          "description": "Closest starting point for civic policing and crown law enforcement.",
+          "discoveryTerms": [
+            "marshals",
+          ],
+          "domain": "government",
+          "label": "City watch",
+        },
         "craft_guild": {
           "activities": [
             "standards",
@@ -100,13 +131,40 @@ describe('organization authoring presets', () => {
           ],
           "description": "Closest starting point for scribes, alchemists, and professional trade guilds.",
           "discoveryTerms": [
-            "scribes",
-            "alchemists",
-            "entertainers",
+            "merchant guild",
+            "labor union",
+            "professional college",
+            "hunters lodge",
+            "scribes guild",
+            "entertainers guild",
+            "alchemists guild",
+            "cartographers guild",
+            "pilots guild",
+            "advocates guild",
+            "apothecaries guild",
+            "theater troupe",
+            "teamsters guild",
+            "river boatmen",
+            "market association",
+            "shopkeepers association",
+            "factors guild",
+            "ranchers association",
+            "surgeons college",
           ],
           "domain": "occupational",
           "form": "guild",
           "label": "Craft guild",
+        },
+        "gang": {
+          "activities": [],
+          "description": "Closest starting point for street gangs, protection rackets, and prison crews.",
+          "discoveryTerms": [
+            "protection racket",
+            "wreckers",
+            "prison gang",
+          ],
+          "domain": "criminal",
+          "label": "Gang",
         },
         "government_ministry": {
           "activities": [
@@ -114,6 +172,12 @@ describe('organization authoring presets', () => {
           ],
           "description": "Closest starting point for customs service, provincial administration, and executive departments.",
           "discoveryTerms": [
+            "royal court",
+            "magistracy",
+            "exchequer",
+            "diplomatic corps",
+            "mint",
+            "postal service",
             "customs service",
             "provincial governorate",
             "colonial administration",
@@ -143,6 +207,22 @@ describe('organization authoring presets', () => {
           "domain": "military",
           "form": "company",
           "label": "Mercenary company",
+        },
+        "mutual_aid_society": {
+          "activities": [],
+          "description": "Closest starting point for burial societies, civic leagues, and reciprocal support bodies.",
+          "discoveryTerms": [
+            "orphanage society",
+            "famine relief society",
+            "burial society",
+            "civic league",
+            "festival guild",
+            "sporting club",
+            "hospice society",
+          ],
+          "domain": "community",
+          "form": "association",
+          "label": "Mutual aid society",
         },
         "political_party": {
           "activities": [],
@@ -177,10 +257,25 @@ describe('organization authoring presets', () => {
             "explorers' society",
             "guild of scholars",
             "museum society",
+            "research institute",
           ],
           "domain": "academic",
           "form": "association",
           "label": "Scholarly society",
+        },
+        "shipping_company": {
+          "activities": [
+            "transport",
+          ],
+          "description": "Closest starting point for caravan operators, coach lines, and courier services.",
+          "discoveryTerms": [
+            "caravan company",
+            "coach line",
+            "courier service",
+          ],
+          "domain": "commercial",
+          "form": "company",
+          "label": "Shipping company",
         },
         "smuggling_ring": {
           "activities": [
@@ -190,6 +285,7 @@ describe('organization authoring presets', () => {
           "discoveryTerms": [
             "fencing network",
             "counterfeiting ring",
+            "criminal syndicate",
           ],
           "domain": "criminal",
           "form": "network",
@@ -213,6 +309,19 @@ describe('organization authoring presets', () => {
           "discoveryTerms": [
             "merchant house",
             "chartered company",
+            "auction house",
+            "warehouse combine",
+            "bazaar syndicate",
+            "company of merchant adventurers",
+            "fur company",
+            "foundry works",
+            "textile manufactory",
+            "shipyard company",
+            "glassworks",
+            "farming cooperative",
+            "millers cooperative",
+            "logging company",
+            "fishing fleet",
           ],
           "domain": "commercial",
           "form": "company",
@@ -288,13 +397,26 @@ describe('organization authoring presets', () => {
       'thieves_guild',
       { organizationDomain: 'criminal', organizationForm: 'guild', activities: [] },
     ],
+    [
+      'shipping_company',
+      { organizationDomain: 'commercial', organizationForm: 'company', activities: ['transport'] },
+    ],
+    ['city_watch', { organizationDomain: 'government', activities: ['defense'] }],
+    [
+      'mutual_aid_society',
+      { organizationDomain: 'community', organizationForm: 'association', activities: [] },
+    ],
+    ['gang', { organizationDomain: 'criminal', activities: [] }],
   ] as const)('projects %s from the confirmed v1 subset', (id, expected) => {
     expect(applyOrganizationAuthoringPreset(id)).toEqual(expected)
   })
 
   it('does not attach transport discovery terms to Trading company', () => {
-    expect(ORGANIZATION_AUTHORING_PRESETS.trading_company.discoveryTerms).not.toEqual(
+    expect(ORGANIZATION_AUTHORING_PRESETS.trading_company.discoveryTerms ?? []).not.toEqual(
       expect.arrayContaining(['shipping', 'caravan', 'coach', 'courier']),
+    )
+    expect(ORGANIZATION_AUTHORING_PRESETS.shipping_company.discoveryTerms).toEqual(
+      expect.arrayContaining(['caravan company', 'coach line', 'courier service']),
     )
   })
 })

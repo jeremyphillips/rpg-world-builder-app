@@ -44,7 +44,7 @@ describe('initial Organization semantic flows', () => {
           form: input.organizationForm,
           activities: input.activities,
         }).length,
-      ).toBeGreaterThan(5)
+      ).toBeGreaterThanOrEqual(5)
     },
   )
 

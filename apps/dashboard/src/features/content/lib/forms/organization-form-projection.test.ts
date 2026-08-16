@@ -87,7 +87,7 @@ describe('organization form projection', () => {
     })
 
     const options = presetPickerOptions(fields)
-    expect(options).toHaveLength(16)
+    expect(options).toHaveLength(20)
 
     const army = options.find((option) => option.value === 'army')
     expect(army).toMatchObject({
@@ -107,6 +107,14 @@ describe('organization form projection', () => {
     const tradingCompany = options.find((option) => option.value === 'trading_company')
     expect(optionMatchesQuery(tradingCompany!, 'merchant house')).toBe(true)
     expect(optionMatchesQuery(tradingCompany!, 'shipping')).toBe(false)
+
+    const shippingCompany = options.find((option) => option.value === 'shipping_company')
+    expect(shippingCompany).toMatchObject({
+      label: 'Shipping company',
+      searchTerms: expect.arrayContaining(['caravan company', 'coach line', 'courier service']),
+    })
+    expect(optionMatchesQuery(shippingCompany!, 'caravan company')).toBe(true)
+    expect(optionMatchesQuery(shippingCompany!, 'shipping')).toBe(true)
   })
 
   it('uses one input builder for standalone and embedded activity values', () => {
