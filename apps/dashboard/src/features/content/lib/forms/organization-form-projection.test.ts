@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { FormItem } from '@rpg/ui/form'
+import { optionMatchesQuery } from '@rpg/ui'
+import type { FieldOption, FormItem } from '@rpg/ui/form'
+import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
 import { makeContentFormCtx } from '../fixtures/content-form-ctx'
 import {
@@ -18,8 +20,17 @@ function collectFields(items: readonly FormItem[]): Array<{ name: string; item: 
   return fields
 }
 
+function presetPickerOptions(fields: ReturnType<typeof collectFields>): FieldOption[] {
+  const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
+  expect(presetField && 'options' in presetField).toBe(true)
+  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
+    return []
+  }
+  return flattenSelectFieldOptions(presetField.options)
+}
+
 describe('organization form projection', () => {
-  it('accepts the blank sentinel from an untouched authoring preset select', () => {
+  it('accepts the blank sentinel from an untouched authoring preset picker', () => {
     expect(
       organizationDraftFormSchema.parse({
         name: 'Ironroot Smiths',
@@ -41,18 +52,18 @@ describe('organization form projection', () => {
 
     expect(standalone.map(({ name }) => name)).toEqual([
       'authoringPresetId',
-      'description',
       'organizationDomain',
       'organizationForm',
       'activities',
+      'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
       'operatorOrganization.name',
       'operatorOrganization.authoringPresetId',
-      'operatorOrganization.description',
       'operatorOrganization.organizationDomain',
       'operatorOrganization.organizationForm',
       'operatorOrganization.activities',
+      'operatorOrganization.description',
     ])
     const standaloneActivity = standalone.find(({ name }) => name === 'activities')?.item
     const embeddedActivity = embedded.find(({ name }) => name.endsWith('activities'))?.item
@@ -63,6 +74,39 @@ describe('organization form projection', () => {
         standaloneActivity && 'options' in standaloneActivity ? standaloneActivity.options : [],
       multiple: true,
     })
+  })
+
+  it('uses a searchable single-select combobox for familiar starting points', () => {
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
+    expect(presetField).toMatchObject({
+      type: 'combobox',
+      label: 'Start from familiar type',
+      multiple: false,
+      placeholder: 'Search familiar types…',
+    })
+
+    const options = presetPickerOptions(fields)
+    expect(options).toHaveLength(16)
+
+    const army = options.find((option) => option.value === 'army')
+    expect(army).toMatchObject({
+      label: 'Army',
+      description: expect.stringContaining('navy'),
+      searchTerms: expect.arrayContaining(['navy', 'militia', 'marines']),
+    })
+    expect(optionMatchesQuery(army!, 'navy')).toBe(true)
+    expect(optionMatchesQuery(army!, 'temple')).toBe(false)
+
+    const church = options.find((option) => option.value === 'church')
+    expect(optionMatchesQuery(church!, 'temple')).toBe(true)
+
+    const academy = options.find((option) => option.value === 'academy')
+    expect(optionMatchesQuery(academy!, 'university')).toBe(true)
+
+    const tradingCompany = options.find((option) => option.value === 'trading_company')
+    expect(optionMatchesQuery(tradingCompany!, 'merchant house')).toBe(true)
+    expect(optionMatchesQuery(tradingCompany!, 'shipping')).toBe(false)
   })
 
   it('uses one input builder for standalone and embedded activity values', () => {

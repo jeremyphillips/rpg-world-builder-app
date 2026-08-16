@@ -64,6 +64,41 @@ describe('organization classification writes', () => {
     expect(updated.organizationForm).toBeUndefined()
   })
 
+  it('persists Pass A form and activity values', async () => {
+    const campaign = await makeTestCampaign()
+    const shippingLine = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'crown-shipping',
+      name: 'Crown Shipping Line',
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      activities: ['transport', 'trade'],
+    })
+    expect(shippingLine).toMatchObject({
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      activities: ['transport', 'trade'],
+    })
+    expect(shippingLine).not.toHaveProperty('authoringPresetId')
+
+    const treasury = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'royal-treasury',
+      name: 'Royal Treasury',
+      organizationDomain: 'government',
+      organizationForm: 'office',
+      activities: ['administration'],
+    })
+    expect(treasury.organizationForm).toBe('office')
+
+    const host = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'royal-host',
+      name: 'Royal Host',
+      organizationDomain: 'military',
+      organizationForm: 'force',
+      activities: ['warfare', 'defense'],
+    })
+    expect(host.organizationForm).toBe('force')
+  })
+
   it('accepts replacing form when changing domain in the same update', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {

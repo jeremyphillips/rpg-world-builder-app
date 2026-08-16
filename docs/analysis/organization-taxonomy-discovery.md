@@ -1,7 +1,8 @@
 # Organization Taxonomy Discovery
 
-> **Status:** Analysis complete — Phases 1–8. Pass A vocabulary shipped (matrix v0.2).
+> **Status:** Analysis complete — Phases 1–8. Pass A vocabulary shipped (matrix v0.2). Preset authoring v1 shipped (16 presets, discovery combobox).
 > **Planning authority:** None  
+> **Active product pass:** [Organization preset authoring v1](../../.cursor/plans/org_preset_authoring_v1_56f60f07.plan.md) — preset expansion and adjacent-name discovery only; taxonomy stays closed.
 > **Runtime classification:** `[organization.ts](../../packages/contracts/src/rpg/content/organization.ts)`,
 > `[organization-domain.ts](../../packages/contracts/src/rpg/vocab/organization-domain.ts)`,
 > `[organization-form.ts](../../packages/contracts/src/rpg/vocab/organization-form.ts)`,
@@ -12,6 +13,12 @@
 > discovery evidence. They must not be rewritten in place. Pass A (vocab +
 > army recipe + matrix v0.2) is recorded after Phase 8. It does not reopen
 > the corpus or rewrite v0.1 mappings.
+>
+> **Reopen rule:** Do not open a new organization taxonomy investigation from an
+> isolated awkward example. Reopen classification only when production authoring
+> cannot honestly express a needed concept, several materially different presets
+> require the same missing distinction, or a concrete downstream consumer requires
+> that distinction. Deferred preset and vocabulary questions live in the v1 plan above.
 
 Working artifact for pressure-testing organization classification before expanding
 production vocabulary or `ORGANIZATION_AUTHORING_PRESETS`. Companion pattern:
@@ -2020,18 +2027,13 @@ offices from companies. Not a blocker for the vocab PR.
 
 ---
 
-## Next implementation pass (when one is scheduled)
+## Next product pass
 
-Pass A (below) shipped the high-confidence vocabulary and army recipe.
-Passes B–C remain deferred:
-
-1. Pass B: treat the 19 strong names as a candidate pool, not auto-ship.
-2. Pass C: picker families plus customize-from-parent.
-3. Do not add navy/temple/university presets in those passes unless evidence
-   reopens them.
-4. New activities should normally be reusable missions spanning multiple
-   familiar types; narrow occupational activities need separate evidence.
-5. Do not add a clandestine field, a `college` form, or an allowlist.
+Preset authoring v1 is tracked in
+[Organization preset authoring v1](../../.cursor/plans/org_preset_authoring_v1_56f60f07.plan.md)
+(16 presets, discovery combobox, ephemeral projection). Pass A shipped the
+high-confidence vocabulary and army recipe below. Further classification work
+stays deferred until product evidence under the reopen rule in the banner above.
 
 Corpus and matrix v0.1 stay frozen. Matrix v0.2 is a parallel recode of the
 same 150 ids.
@@ -2137,7 +2139,7 @@ buckets. The navy–army identity is the intended remaining collapse.
 academy, university, mage_college, bardic_college, hospital_order,
 counterfeiting_ring, beggars_guild, secret_society.
 
-These wait on Pass B/C or later questions (college form, care activity,
+These are deferred until product evidence (college form, care activity,
 clandestine trait) — not Pass A.
 
 ### What Pass A did **not** do

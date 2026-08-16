@@ -27,10 +27,7 @@ describe('initial Organization semantic flows', () => {
 
       expect(embedded).toEqual(
         Object.fromEntries(
-          Object.entries(standalone).map(([key, value]) => [
-            `operatorOrganization.${key}`,
-            value,
-          ]),
+          Object.entries(standalone).map(([key, value]) => [`operatorOrganization.${key}`, value]),
         ),
       )
 
@@ -50,6 +47,21 @@ describe('initial Organization semantic flows', () => {
       ).toBeGreaterThan(5)
     },
   )
+
+  it('does not seed name when applying a familiar starting point', () => {
+    const [sync] = buildOrganizationFormValueSyncs()
+    const applied = sync?.apply({ name: 'Royal Navy', authoringPresetId: 'army' }, [
+      'authoringPresetId',
+    ])
+
+    expect(applied).toEqual({
+      authoringPresetId: undefined,
+      organizationDomain: 'military',
+      organizationForm: 'force',
+      activities: ['warfare', 'defense'],
+    })
+    expect(applied).not.toHaveProperty('name')
+  })
 
   it('reopens canonical Smuggling ring values without reconstructing preset identity', () => {
     const input = buildOrganizationCreateInput({

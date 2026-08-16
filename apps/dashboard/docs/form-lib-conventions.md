@@ -33,6 +33,19 @@ add a dedicated projection module (e.g. `location-authoring-type.ts`) that:
 Reference: locations Location type projection —
 [locations-building-classification.md](./locations-building-classification.md#authoring-flow).
 
+Organization familiar starting points (`organization-form-projection.ts`):
+
+- Recipes live in `@rpg/contracts` `ORGANIZATION_AUTHORING_PRESETS` — ephemeral
+  projection onto domain / form / activities only; preset id is **not** persisted.
+- Picker is a single-select **`combobox`** (`multiple: false`). Map preset
+  `discoveryTerms` → option `searchTerms` and `description` → option `description`
+  at the form boundary only. These are closest-starting-point discovery strings,
+  not lexical aliases and not classification-entry `searchTerms`.
+- `buildOrganizationFormValueSyncs` applies a preset once, clears
+  `authoringPresetId`, and **never** seeds `name`. Authors keep the real name.
+- Reused unchanged under the embedded building-org composer prefix
+  (`operatorOrganization.*`).
+
 ## Validation
 
 Table-level domain rules (contiguous level ranges, cross-row overlap, campaign
@@ -48,8 +61,10 @@ sub-fields).
 Dashboard draft form schemas (`*DraftFormSchema`, `draftSchema` on
 `ContentFormDef`) run through the same RHF + Zod resolver as publish. **`select`**
 and single **`chips`** controls seed unselected values as `''` (see
-`fieldDefaultValue` in `@rpg/ui/form`). Plain `someVocabSchema.optional()` still
-validates that sentinel against the enum and blocks Save Draft.
+`fieldDefaultValue` in `@rpg/ui/form`). Optional single **`combobox`** controls
+seed `undefined` instead — still use `draftOptionalSelect` when the field is
+optional. Plain `someVocabSchema.optional()` still validates the `''` sentinel
+against the enum and blocks Save Draft.
 
 Use **`draftOptionalSelect(schema)`** from
 [`lib/forms/draft-form-schema-helpers.ts`](../src/features/content/lib/forms/draft-form-schema-helpers.ts)

@@ -49,10 +49,17 @@ const organizationActivityOptions = toOptions(
   ) as Record<(typeof ORGANIZATION_ACTIVITY_IDS)[number], string>,
 )
 
-const organizationAuthoringPresetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => ({
-  value: id,
-  label: ORGANIZATION_AUTHORING_PRESETS[id].label,
-}))
+const organizationAuthoringPresetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
+  const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+  return {
+    value: id,
+    label: preset.label,
+    description: preset.description,
+    ...('discoveryTerms' in preset && preset.discoveryTerms
+      ? { searchTerms: preset.discoveryTerms }
+      : {}),
+  }
+})
 
 function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
@@ -98,13 +105,13 @@ export function buildOrganizationFields(
 
   fields.push(
     {
-      type: 'select',
+      type: 'combobox',
       name: fieldPath(prefix, 'authoringPresetId'),
       label: 'Start from familiar type',
       options: organizationAuthoringPresetOptions,
-      placeholder: 'Choose a preset…',
+      multiple: false,
+      placeholder: 'Search familiar types…',
     },
-    { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
     {
       type: 'chips',
       name: domainPath,
@@ -133,6 +140,7 @@ export function buildOrganizationFields(
       multiple: true,
       chrome: { variant: 'outline' },
     },
+    { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )
 
   return fields

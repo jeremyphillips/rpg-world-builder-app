@@ -44,4 +44,25 @@ describe('organization member-title resolution', () => {
       }),
     ).toEqual({ label: 'Research Director', priority: 50 })
   })
+
+  it('prefers Pass A activity and form titles over domain defaults', () => {
+    const ministryLabels = resolveOrganizationMemberTitleSuggestions({
+      domain: 'government',
+      form: 'office',
+      activities: ['administration'],
+    }).map((entry) => entry.label)
+
+    expect(ministryLabels.slice(0, 3)).toEqual(['Registrar', 'Chancellor', 'Ruler'])
+    expect(ministryLabels).not.toContain('High Priest')
+
+    const commerceLabels = resolveOrganizationMemberTitleSuggestions({
+      domain: 'commercial',
+      form: 'company',
+      activities: ['trade', 'production'],
+    }).map((entry) => entry.label)
+
+    expect(commerceLabels[0]).toBe('Merchant')
+    expect(commerceLabels).toContain('Director')
+    expect(commerceLabels).toContain('Foreman')
+  })
 })
