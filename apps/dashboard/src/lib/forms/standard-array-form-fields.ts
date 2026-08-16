@@ -3,21 +3,30 @@ import {
   CHARACTER_ABILITY_SCORE_MAX,
   STANDARD_ARRAY_LENGTH,
 } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { FormItem, FormNavigationAnchor } from '@rpg/ui/form'
+
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
 
 export type StandardArrayFormFieldOptions = {
   name?: string
   label?: string
   hint?: string
+  id?: string
+  navigation?: FormNavigationAnchor
 }
 
 /** Six inline two-character-width numeric inputs for a Standard Array. */
 export function standardArrayFormFields(options: StandardArrayFormFieldOptions = {}): FormItem {
   const name = options.name ?? 'standardArray'
   const label = options.label ?? 'Standard array'
+  const navigation = options.navigation
+  const id = options.id ?? navigation?.id
 
   return {
     kind: 'row',
+    ...(id ? { id } : {}),
+    ...(navigation ? { navigation } : {}),
+    className: navigation || id ? SCROLL_SECTION_ANCHOR_CLASS : undefined,
     spacing: 'compact',
     heading: {
       label,

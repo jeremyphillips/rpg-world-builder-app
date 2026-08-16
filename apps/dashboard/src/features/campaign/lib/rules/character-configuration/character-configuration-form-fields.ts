@@ -37,6 +37,7 @@ import {
   type FieldOption,
   type FieldVisibility,
   type FormItem,
+  type FormNavigationAnchor,
   type GroupFieldItem,
 } from '@rpg/ui/form'
 
@@ -348,61 +349,69 @@ function progressionGroup(): FormItem {
     kind: 'group',
     legend: 'Progression',
     fields: [
-      maxCharacterLevelField(),
-      standardLevelRangeSummarySlot(),
-      {
-        kind: 'dependent',
-        controller: {
-          type: 'switch',
-          name: EXTENDED_PROGRESSION_ENABLED,
-          label: 'Extended progression',
-          hint: 'Use a named tier for levels beyond the standard cap.',
-          defaultValue: false,
+      withNavigationAnchor(
+        {
+          kind: 'group',
+          fields: [maxCharacterLevelField(), standardLevelRangeSummarySlot()],
         },
-        dependents: {
-          chrome: 'panel',
-          panel: { surface: { emphasis: 'default' } },
-          fields: [
-            {
-              kind: 'row',
-              visibility: visibleWhenExtendedProgression(),
-              fields: [
-                {
-                  type: 'text',
-                  name: 'extendedTierName',
-                  label: 'Tier name',
-                  hint: {
-                    text: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
-                    position: 'below-control',
+        { id: 'progression-standard-max-level', label: 'Standard max level' },
+      ),
+      withNavigationAnchor(
+        {
+          kind: 'dependent',
+          controller: {
+            type: 'switch',
+            name: EXTENDED_PROGRESSION_ENABLED,
+            label: 'Extended progression',
+            hint: 'Use a named tier for levels beyond the standard cap.',
+            defaultValue: false,
+          },
+          dependents: {
+            chrome: 'panel',
+            panel: { surface: { emphasis: 'default' } },
+            fields: [
+              {
+                kind: 'row',
+                visibility: visibleWhenExtendedProgression(),
+                fields: [
+                  {
+                    type: 'text',
+                    name: 'extendedTierName',
+                    label: 'Tier name',
+                    hint: {
+                      text: 'Examples: Epic Destiny, Epic Levels, Immortal Path',
+                      position: 'below-control',
+                    },
+                    required: true,
+                    width: 'full',
                   },
-                  required: true,
-                  width: 'full',
-                },
-                {
-                  type: 'number',
-                  name: 'extendedMaxLevel',
-                  label: 'Extended max level',
-                  min: 1,
-                  max: ABSOLUTE_MAX_CHARACTER_LEVEL,
-                  required: true,
-                  width: 'auto',
-                  digits: 2,
-                },
-              ],
-            },
-            {
-              kind: 'slot',
-              name: '_extendedProgressionEffects',
-              render: () => createElement(ExtendedProgressionEffects),
-            },
-            {
-              kind: 'slot',
-              name: '_extendedLevelRangeSummary',
-              render: () => createElement(ExtendedLevelRangeSummary),
-            },
-          ],
+                  {
+                    type: 'number',
+                    name: 'extendedMaxLevel',
+                    label: 'Extended max level',
+                    min: 1,
+                    max: ABSOLUTE_MAX_CHARACTER_LEVEL,
+                    required: true,
+                    width: 'auto',
+                    digits: 2,
+                  },
+                ],
+              },
+              {
+                kind: 'slot',
+                name: '_extendedProgressionEffects',
+                render: () => createElement(ExtendedProgressionEffects),
+              },
+              {
+                kind: 'slot',
+                name: '_extendedLevelRangeSummary',
+                render: () => createElement(ExtendedLevelRangeSummary),
+              },
+            ],
+          },
         },
-      },
+        { id: 'progression-extended', label: 'Extended progression' },
+      ),
     ],
   }
 }
@@ -514,6 +523,20 @@ function mergeAnchorClassName(className?: string): string {
   return className ? `${className} ${SCROLL_SECTION_ANCHOR_CLASS}` : SCROLL_SECTION_ANCHOR_CLASS
 }
 
+function withNavigationAnchor<T extends FormItem>(item: T, nav: FormNavigationAnchor): T {
+  const className =
+    'className' in item && typeof item.className === 'string'
+      ? mergeAnchorClassName(item.className)
+      : SCROLL_SECTION_ANCHOR_CLASS
+
+  return {
+    ...item,
+    id: nav.id,
+    navigation: nav,
+    className,
+  } as T
+}
+
 function applySectionAnchor(section: CharacterConfigurationSection, items: FormItem[]): FormItem[] {
   if (items.length === 0) return items
 
@@ -550,45 +573,65 @@ function creationSectionItems({
       kind: 'group',
       legend: 'Creation',
       fields: [
-        {
-          kind: 'group',
-          id: 'starting-level',
-          className: SCROLL_SECTION_ANCHOR_CLASS,
-          fields: [startingLevelField()],
-        },
+        withNavigationAnchor(
+          {
+            kind: 'group',
+            fields: [startingLevelField()],
+          },
+          { id: 'creation-starting-level', label: 'Starting level' },
+        ),
         standardArrayFormFields({
           label: 'Standard array',
           hint: 'Sets the six fixed ability scores available to characters using Standard Array during creation.',
+          navigation: { id: 'creation-standard-array', label: 'Standard array' },
         }),
-        importedCharactersPolicyField(),
-        {
-          kind: 'group',
-          legend: 'Starting wealth by level',
-          hint: 'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
-          chrome: { variant: 'rail' },
-          fields: [
-            {
-              type: 'text',
-              name: `${prefix}.name`,
-              label: 'Table name',
-              required: true,
-              width: 'full',
-            },
-            {
-              type: 'richtext',
-              name: `${prefix}.description`,
-              label: 'Description',
-              width: 'full',
-            },
-            {
-              ...(buildStartingWealthTiersField() as ArrayConfig),
-              name: `${prefix}.tiers`,
-              item: { surface: { elevation: 'raised' } },
-            },
-          ],
-        },
-        ...languageProficiencyFields(languageOptions, languageCategoryOptions),
-        allowedCharacterCreatureTypesField(creatureTypeOptions),
+        withNavigationAnchor(
+          {
+            kind: 'group',
+            fields: [importedCharactersPolicyField()],
+          },
+          { id: 'creation-imported-characters', label: 'Imported characters' },
+        ),
+        withNavigationAnchor(
+          {
+            kind: 'group',
+            legend: 'Starting wealth by level',
+            description:
+              'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
+            chrome: { variant: 'rail' },
+            fields: [
+              {
+                type: 'text',
+                name: `${prefix}.name`,
+                label: 'Table name',
+                required: true,
+                width: 'full',
+              },
+              {
+                type: 'richtext',
+                name: `${prefix}.description`,
+                label: 'Description',
+                width: 'full',
+              },
+              {
+                ...(buildStartingWealthTiersField() as ArrayConfig),
+                name: `${prefix}.tiers`,
+                item: { surface: { elevation: 'raised' } },
+              },
+            ],
+          },
+          { id: 'creation-starting-wealth', label: 'Starting wealth' },
+        ),
+        ...languageProficiencyFields(languageOptions, languageCategoryOptions, {
+          navigation: { id: 'creation-languages', label: 'Languages' },
+        }),
+        withNavigationAnchor(
+          {
+            kind: 'group',
+            fields: [allowedCharacterCreatureTypesField(creatureTypeOptions)],
+          },
+          { id: 'creation-creature-types', label: 'Creature types' },
+        ),
       ],
     },
   ]

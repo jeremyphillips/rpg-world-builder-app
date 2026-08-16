@@ -197,6 +197,11 @@ const dashboardFormFieldGuards = {
         message: 'Use labelVisibility: "srOnly" instead of labelHidden.',
       },
       {
+        selector:
+          "ObjectExpression:has(> Property[key.name='kind'][value.value='group']) > Property[key.name='hint']",
+        message: 'Group-level hint is ignored — use description or heading.hint.',
+      },
+      {
         selector: 'Property[key.name="label"][value.type="Literal"][value.value=""]',
         message:
           'Field labels must be non-whitespace — use labelVisibility: "srOnly" to hide visible copy.',

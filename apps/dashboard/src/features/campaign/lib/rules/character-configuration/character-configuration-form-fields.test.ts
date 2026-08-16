@@ -165,7 +165,15 @@ describe('character-configuration-form-fields', () => {
 
       expect(slotNames.filter((name) => name.startsWith('_anchor_'))).toEqual([])
       expect(containerIds).toEqual(
-        expect.arrayContaining(['creation', 'starting-level', 'progression', 'multiclassing']),
+        expect.arrayContaining([
+          'creation',
+          'creation-starting-level',
+          'creation-standard-array',
+          'progression',
+          'progression-standard-max-level',
+          'progression-extended',
+          'multiclassing',
+        ]),
       )
     })
   })

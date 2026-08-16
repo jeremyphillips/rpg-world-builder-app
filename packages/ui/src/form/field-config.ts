@@ -48,6 +48,13 @@ import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
 
 export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
 
+/** Opt-in sidebar / in-page navigation anchor on semantic containers. */
+export type FormNavigationAnchor = {
+  id: string
+  /** Concise sidebar label; form heading/label remains authoritative for the form surface. */
+  label?: string
+}
+
 export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 export type {
   FieldGroupDisclosure,
@@ -915,6 +922,10 @@ export interface RowConfig {
   kind: 'row'
   /** Leaf-tier composite heading for the row block. */
   heading?: FormHeading
+  /** Optional DOM id on the row composite wrapper — for in-page scroll anchors. */
+  id?: string
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
   fields: RowFieldItem[]
   /** Inter-control spacing within the row. @default 'default' */
   spacing?: RowSpacing
@@ -998,6 +1009,8 @@ export interface DependentConfig {
   className?: string
   /** Optional DOM id on the dependent wrapper — for in-page scroll anchors. */
   id?: string
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
 }
 
 /**
@@ -1027,6 +1040,8 @@ export interface GroupConfig {
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
   /**
    * Section density for this group subtree. Inherits parent density when omitted.
    */
@@ -1195,7 +1210,8 @@ export interface ArrayConfig {
   name: string
   /** Preferred heading API — typography derives from nesting depth and density. */
   heading?: Pick<FormHeading, 'label'>
-  legend: string
+  /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
+  legend?: string
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */

@@ -237,6 +237,14 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
     mockResolvedRulesData()
+
+    class MockIntersectionObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
   })
 
   afterEach(() => {

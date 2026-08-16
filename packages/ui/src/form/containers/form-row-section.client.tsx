@@ -70,9 +70,19 @@ export function RowFieldSection({
   )
 
   const body = heading ? (
-    <CompositeGroup heading={heading} size={size} useFieldset={item.fields.length > 1}>
+    <CompositeGroup
+      heading={heading}
+      size={size}
+      useFieldset={item.fields.length > 1}
+      id={item.id}
+      className={item.className}
+    >
       {row}
     </CompositeGroup>
+  ) : item.id || item.className ? (
+    <div id={item.id} className={item.className}>
+      {row}
+    </div>
   ) : (
     row
   )

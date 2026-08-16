@@ -193,6 +193,7 @@ export {
   type FormHeading,
   type FormHeadingTier,
   type FieldLabelVisibility,
+  type FormNavigationAnchor,
   type DependentChrome,
   DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
@@ -232,6 +233,11 @@ export {
   defineDependentField,
 } from './form-authoring'
 export { isRowSlotItem } from './field-config'
+export {
+  assertNavigationIdsMatchDomIds,
+  collectFormNavigationAnchors,
+  type CollectedNavigationAnchor,
+} from './form-navigation.lib'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
   DEFAULT_ARRAY_ITEM_SURFACE,

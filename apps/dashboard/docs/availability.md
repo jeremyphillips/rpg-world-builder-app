@@ -119,7 +119,8 @@ campaignSettingHref(campaignId, 'characterCreation.subclasses.enabled')
 ```
 
 Section anchors match `CHARACTER_CONFIGURATION_SECTIONS` (`#multiclassing`,
-`#subclasses`, …).
+`#subclasses`, …). Creation and progression also expose leaf anchors derived from form
+`navigation` metadata (for example `#creation-starting-level`, `#progression-extended`).
 
 ### Reasons (`availability-reason-registry.ts`)
 

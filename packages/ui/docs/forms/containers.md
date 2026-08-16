@@ -35,9 +35,10 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 
 ## Groups
 
-Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
-Nested groups inside another group default to `legendSize: 'subsection'` (override when
-needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
+Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint? }` for new config;
+`legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Nested named groups derive subsection typography from nesting depth — no `legendSize`
+override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
@@ -61,7 +62,7 @@ whose parent shell already spaces siblings use that pattern instead of `FormFiel
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize`, `size`, `chrome`, and `disclosure`.
+`FieldGroup` (standalone) accepts the same heading/legend props, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `density` on `GroupConfig` overrides inherited section density for the group subtree.
@@ -107,7 +108,6 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 {
   kind: 'group',
   legend: 'Campaign availability',
-  legendSize: 'array',
   disclosure: {
     variant: 'summary',
     defaultOpen: false,
@@ -319,8 +319,9 @@ pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside ne
 }
 ```
 
-**Legend scale:** `legendSize` defaults to `array`. With `density: 'compact'`, legend is
-`text-sm`; `density: 'comfortable'` uses `text-field-array-legend` (18px).
+**Legend scale:** Array legend typography derives from parent named-group depth and section
+`density` (compact → smaller legend). Prefer `heading.label` when authoring new arrays;
+`legend` remains supported via `resolveArrayHeading`.
 
 ### Collapse defaults and persistence
 

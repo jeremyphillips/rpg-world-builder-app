@@ -5,6 +5,7 @@ import { arrayItemLabel } from './array/array-item-label.lib'
 import { fieldCategory } from './field-error-map-category.lib'
 import { registerFieldPaths, type RegistryEntry } from './field-error-map-register.lib'
 import { resolveArrayItemHeader } from './array/array-item-config.lib'
+import { resolveArrayHeading } from '../resolve-container-heading.lib'
 
 // ---------------------------------------------------------------------------
 // Field-aware Zod error map (tier 1 of the validation-message architecture).
@@ -50,11 +51,12 @@ function registerItems(
       registerField(registry, prefix, item)
     } else if (item.kind === 'array') {
       const arrayKey = prefix ? `${prefix}.${item.name}` : item.name
-      const header = resolveArrayItemHeader(item, item.legend)
+      const arrayLabel = resolveArrayHeading(item)?.label ?? item.legend ?? item.name
+      const header = resolveArrayItemHeader(item, arrayLabel)
       registry.set(arrayKey, {
-        label: item.legend,
+        label: arrayLabel,
         category: 'array',
-        itemLabel: arrayItemLabel(header, item.legend),
+        itemLabel: arrayItemLabel(header, arrayLabel),
       })
       registerItems(registry, `${arrayKey}.*`, item.fields)
     } else if (item.kind === 'slot') {

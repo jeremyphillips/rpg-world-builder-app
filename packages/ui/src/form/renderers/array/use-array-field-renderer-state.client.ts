@@ -69,7 +69,7 @@ export function useArrayFieldRendererState({
     menu: addActionMenu,
   } = addAction ?? {}
   const arrayHeading = resolveArrayHeading(config)
-  const legend = arrayHeading?.label ?? config.legend
+  const legend = arrayHeading?.label ?? config.legend ?? ''
   const hasNamedHeading = hasNamedArrayHeading(config)
   /** Legend typography uses depth before this array's own heading increment. */
   const legendNamedGroupDepth = hasNamedHeading ? Math.max(0, namedGroupDepth - 1) : namedGroupDepth
