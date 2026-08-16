@@ -149,10 +149,7 @@ describe('character-configuration-form-fields', () => {
     it('derives config anchor nav from the field registry', () => {
       expect(CHARACTER_CONFIGURATION_SECTIONS.map((section) => section.id)).toEqual([
         'creation',
-        'proficiencies',
-        'standard-max-level',
-        'extended-progression',
-        'creature-type-policy',
+        'progression',
         'multiclassing',
         'subclasses',
         'level-0-npcs',
@@ -168,16 +165,7 @@ describe('character-configuration-form-fields', () => {
 
       expect(slotNames.filter((name) => name.startsWith('_anchor_'))).toEqual([])
       expect(containerIds).toEqual(
-        expect.arrayContaining([
-          'creation',
-          'starting-level',
-          'starting-wealth',
-          'proficiencies',
-          'standard-max-level',
-          'extended-progression',
-          'creature-type-policy',
-          'multiclassing',
-        ]),
+        expect.arrayContaining(['creation', 'starting-level', 'progression', 'multiclassing']),
       )
     })
   })

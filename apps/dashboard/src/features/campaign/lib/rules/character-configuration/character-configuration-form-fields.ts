@@ -343,11 +343,13 @@ function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]):
   })
 }
 
-function extendedProgressionGroup(): FormItem {
+function progressionGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Extended progression',
+    legend: 'Progression',
     fields: [
+      maxCharacterLevelField(),
+      standardLevelRangeSummarySlot(),
       {
         kind: 'dependent',
         controller: {
@@ -537,7 +539,11 @@ function applySectionAnchor(section: CharacterConfigurationSection, items: FormI
   ]
 }
 
-function creationSectionItems(): FormItem[] {
+function creationSectionItems({
+  creatureTypeOptions,
+  languageOptions,
+  languageCategoryOptions,
+}: CharacterConfigFormOptions): FormItem[] {
   const prefix = 'startingWealth'
   return [
     {
@@ -577,12 +583,12 @@ function creationSectionItems(): FormItem[] {
             {
               ...(buildStartingWealthTiersField() as ArrayConfig),
               name: `${prefix}.tiers`,
-              id: 'starting-wealth',
               item: { surface: { elevation: 'raised' } },
-              className: SCROLL_SECTION_ANCHOR_CLASS,
             },
           ],
         },
+        ...languageProficiencyFields(languageOptions, languageCategoryOptions),
+        allowedCharacterCreatureTypesField(creatureTypeOptions),
       ],
     },
   ]
@@ -613,37 +619,13 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     id: 'creation',
     surfaces: ['config'],
     configSection: { id: 'creation', label: 'Creation' },
-    buildFormItems: () => creationSectionItems(),
+    buildFormItems: (options) => creationSectionItems(options),
   },
   {
-    id: 'proficiencies',
+    id: 'progression',
     surfaces: ['config'],
-    configSection: { id: 'proficiencies', label: 'Proficiencies' },
-    buildFormItems: ({ languageOptions, languageCategoryOptions }) =>
-      languageProficiencyFields(languageOptions, languageCategoryOptions),
-  },
-  {
-    id: 'maxCharacterLevel',
-    surfaces: ['config'],
-    configSection: { id: 'standard-max-level', label: 'Standard max level' },
-    buildFormItems: () => [maxCharacterLevelField(), standardLevelRangeSummarySlot()],
-  },
-  {
-    id: 'extendedProgression',
-    surfaces: ['config'],
-    configSection: { id: 'extended-progression', label: 'Extended progression' },
-    buildFormItems: () => [extendedProgressionGroup()],
-  },
-  {
-    id: 'allowedCharacterCreatureTypes',
-    surfaces: ['config'],
-    configSection: {
-      id: 'creature-type-policy',
-      label: vocabularyFieldLabel(CREATURE_TYPE_TERM, { plural: true }),
-    },
-    buildFormItems: ({ creatureTypeOptions }) => [
-      allowedCharacterCreatureTypesField(creatureTypeOptions),
-    ],
+    configSection: { id: 'progression', label: 'Progression' },
+    buildFormItems: () => [progressionGroup()],
   },
   {
     id: 'multiclassing',

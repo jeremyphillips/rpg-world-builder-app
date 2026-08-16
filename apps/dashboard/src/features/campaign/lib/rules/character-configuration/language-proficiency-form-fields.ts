@@ -41,43 +41,37 @@ export function languageProficiencyFields(
   return [
     {
       kind: 'group',
-      legend: 'Proficiencies',
+      legend: 'Languages',
+      chrome: { variant: 'panel' },
       fields: [
+        languageGrantItemsField({
+          path: LANGUAGE_GRANTS_ITEMS_PATH,
+          label: 'Granted languages',
+          languageOptions,
+        }),
         {
-          kind: 'group',
-          legend: 'Languages',
-          chrome: { variant: 'panel' },
-          fields: [
-            languageGrantItemsField({
-              path: LANGUAGE_GRANTS_ITEMS_PATH,
-              label: 'Granted languages',
-              languageOptions,
-            }),
+          type: 'inlineSentence',
+          name: LANGUAGE_CHOICE_CATEGORIES_PATH,
+          label: 'Language proficiency choice',
+          labelVisibility: 'srOnly',
+          segments: [
+            { kind: 'text', value: 'Characters choose', tone: 'label' },
             {
-              type: 'inlineSentence',
-              name: LANGUAGE_CHOICE_CATEGORIES_PATH,
-              label: 'Language proficiency choice',
-              labelVisibility: 'srOnly',
-              segments: [
-                { kind: 'text', value: 'Characters choose', tone: 'label' },
-                {
-                  kind: 'number',
-                  name: LANGUAGE_CHOICE_CHOOSE_PATH,
-                  min: 0,
-                },
-                {
-                  kind: 'text',
-                  value: 'additional languages from these categories:',
-                  tone: 'label',
-                },
-              ],
-              below: {
-                kind: 'chips',
-                name: LANGUAGE_CHOICE_CATEGORIES_PATH,
-                options: languageCategoryOptions,
-              },
+              kind: 'number',
+              name: LANGUAGE_CHOICE_CHOOSE_PATH,
+              min: 0,
+            },
+            {
+              kind: 'text',
+              value: 'additional languages from these categories:',
+              tone: 'label',
             },
           ],
+          below: {
+            kind: 'chips',
+            name: LANGUAGE_CHOICE_CATEGORIES_PATH,
+            options: languageCategoryOptions,
+          },
         },
       ],
     },

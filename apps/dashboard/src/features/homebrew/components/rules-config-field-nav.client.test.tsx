@@ -29,8 +29,7 @@ describe('RulesConfigFieldNav', () => {
 
     const rail = screen.getByRole('navigation', { name: 'Character configuration sections' })
     expect(rail).toHaveTextContent('Creation')
-    expect(rail).toHaveTextContent('Standard max level')
-    expect(rail).toHaveTextContent('Extended progression')
+    expect(rail).toHaveTextContent('Progression')
   })
 
   it('scrolls to a section from the mobile select', async () => {
@@ -38,14 +37,14 @@ describe('RulesConfigFieldNav', () => {
     HTMLElement.prototype.scrollIntoView = scrollIntoView
 
     const target = document.createElement('div')
-    target.id = 'creature-type-policy'
+    target.id = 'multiclassing'
     document.body.appendChild(target)
 
     const user = userEvent.setup()
     render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     await user.click(screen.getByRole('combobox', { name: 'Character configuration section' }))
-    await user.click(await screen.findByRole('option', { name: 'Creature types' }))
+    await user.click(await screen.findByRole('option', { name: 'Multiclassing' }))
 
     expect(scrollIntoView).toHaveBeenCalled()
     target.remove()

@@ -30,6 +30,6 @@ export const Default: Story = {}
 
 export const ActiveSection: Story = {
   args: {
-    activeSectionId: 'extended-progression',
+    activeSectionId: 'progression',
   },
 }
