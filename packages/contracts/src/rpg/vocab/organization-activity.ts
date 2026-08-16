@@ -6,7 +6,8 @@ import type { VocabularyTerm } from './types'
 
 export const ORGANIZATION_ACTIVITY_TERM = {
   label: 'Organization Activity',
-  description: 'Sustained work, trade, mission, or practice performed by an organization.',
+  description:
+    'Sustained work, mission, or practice performed by an organization. New values should normally be reusable missions spanning multiple familiar types; narrow occupational activities require separate evidence.',
   sentence: {
     singular: 'organization activity',
     plural: 'organization activities',
@@ -181,6 +182,44 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Courier',
       'Lookout',
       'Fence',
+    ),
+  },
+  trade: {
+    label: 'Trade',
+    description:
+      'Sustained buying, selling, or exchanging of goods or commercial services as an operating concern.',
+    searchTerms: ['commerce', 'exchange', 'merchandise'],
+    memberTitles: organizationMemberTitleEntries('Merchant', 'Factor', 'Trader', 'Broker', 'Clerk'),
+  },
+  production: {
+    label: 'Production',
+    description: 'Making, extracting, or processing goods at organizational scale.',
+    searchTerms: ['manufacture', 'extraction', 'industry'],
+    memberTitles: organizationMemberTitleEntries(
+      'Foreman',
+      'Artisan',
+      'Operator',
+      'Journeyman',
+      'Worker',
+    ),
+  },
+  transport: {
+    label: 'Transport',
+    description: 'Moving people, goods, or messages as a sustained service.',
+    searchTerms: ['shipping', 'haulage', 'carriage'],
+    memberTitles: organizationMemberTitleEntries('Master', 'Pilot', 'Driver', 'Handler', 'Porter'),
+  },
+  administration: {
+    label: 'Administration',
+    description:
+      'Conducting official, bureaucratic, or institutional administration as sustained work.',
+    searchTerms: ['bureaucracy', 'civil service', 'records'],
+    memberTitles: organizationMemberTitleEntries(
+      'Registrar',
+      'Secretary',
+      'Clerk',
+      'Scribe',
+      'Official',
     ),
   },
 } as const satisfies Record<string, OrganizationClassificationEntry>

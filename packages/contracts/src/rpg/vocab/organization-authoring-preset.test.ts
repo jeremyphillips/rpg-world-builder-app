@@ -25,6 +25,7 @@ describe('organization authoring presets', () => {
             "defense",
           ],
           "domain": "military",
+          "form": "force",
           "label": "Army",
         },
         "bank": {
@@ -80,9 +81,10 @@ describe('organization authoring presets', () => {
     expect(values).not.toHaveProperty('authoringPresetId')
   })
 
-  it('omits an equivocal form from the Army recipe', () => {
+  it('projects force on the Army recipe', () => {
     expect(applyOrganizationAuthoringPreset('army')).toEqual({
       organizationDomain: 'military',
+      organizationForm: 'force',
       activities: ['warfare', 'defense'],
     })
   })

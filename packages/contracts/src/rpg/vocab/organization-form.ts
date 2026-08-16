@@ -98,6 +98,32 @@ export const ORGANIZATION_FORM_ENTRIES = {
       'Member',
     ),
   },
+  force: {
+    label: 'Force',
+    description:
+      'An organization constituted as an armed, levied, or crewed host rather than as a membership body or an operating enterprise.',
+    searchTerms: ['host', 'corps', 'levy'],
+    memberTitles: organizationMemberTitleEntries(
+      'Commander',
+      'Captain',
+      'Officer',
+      'Sergeant',
+      'Trooper',
+    ),
+  },
+  office: {
+    label: 'Office',
+    description:
+      'An appointed or statutory institution that exercises authority or performs an official function, rather than a voluntary membership body.',
+    searchTerms: ['department', 'bureau'],
+    memberTitles: organizationMemberTitleEntries(
+      'Chancellor',
+      'Registrar',
+      'Clerk',
+      'Secretary',
+      'Official',
+    ),
+  },
 } as const satisfies Record<string, OrganizationClassificationEntry>
 
 export type OrganizationForm = keyof typeof ORGANIZATION_FORM_ENTRIES

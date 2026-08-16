@@ -12,6 +12,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
   army: {
     label: 'Army',
     domain: 'military',
+    form: 'force',
     activities: ['warfare', 'defense'],
   },
   bank: {
