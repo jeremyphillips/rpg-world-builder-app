@@ -67,7 +67,10 @@ export function RulesConfigFieldNav({
 
   return (
     <>
-      <nav className="hidden w-56 shrink-0 lg:block" aria-label={navLabel}>
+      <nav
+        className="hidden w-56 shrink-0 lg:sticky lg:top-20 lg:block lg:self-start"
+        aria-label={navLabel}
+      >
         <Eyebrow size="sm" className="mb-2 px-3">
           Sections
         </Eyebrow>
@@ -94,7 +97,7 @@ export function RulesConfigFieldNav({
                   {section.label}
                 </a>
                 {section.leaves && section.leaves.length > 0 ? (
-                  <ul className="mt-1 space-y-0.5 border-l border-border pl-2">
+                  <ul className="ml-3.5 mt-1 space-y-0.5 border-l border-border pl-2">
                     {section.leaves.map((leaf) => (
                       <li key={leaf.id}>
                         <a
