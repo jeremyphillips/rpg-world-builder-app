@@ -23,6 +23,15 @@ describe('organization member-title resolution', () => {
     ])
   })
 
+  it('composes extortion activity titles without assuming a specific criminal constitution', () => {
+    const labels = resolveOrganizationMemberTitleSuggestions({
+      domain: 'criminal',
+      activities: ['extortion'],
+    }).map((entry) => entry.label)
+
+    expect(labels.slice(0, 5)).toEqual(['Chief', 'Boss', 'Enforcer', 'Lieutenant', 'Collector'])
+  })
+
   it('dedupes normalized labels while preserving the first contribution', () => {
     const titles = resolveOrganizationMemberTitleSuggestions({
       domain: 'commercial',

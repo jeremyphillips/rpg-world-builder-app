@@ -13,7 +13,15 @@ import {
   type OrganizationPresetCoverageRow,
 } from './__tests__/fixtures/organization-preset-coverage.fixture'
 
-const MIN_ELIGIBLE_COVERAGE_RATE = 0.9
+/** v2 project completion snapshot — frozen for regression, not a target to keep raising. */
+const V2_COMPLETION_BASELINE = {
+  direct: 20,
+  discoverable: 102,
+  undiscoverable: 0,
+  weak: 2,
+  no_start: 11,
+  inappropriate: 15,
+} as const satisfies Record<OrganizationPresetCoverageOutcome, number>
 
 function summarizeCoverage(rows: readonly OrganizationPresetCoverageRow[]) {
   const counts = Object.fromEntries(
@@ -27,12 +35,11 @@ function summarizeCoverage(rows: readonly OrganizationPresetCoverageRow[]) {
   const inappropriate = counts.inappropriate
   const eligible = rows.length - inappropriate
   const covered = counts.direct + counts.discoverable
-  const coverageRate = eligible === 0 ? 0 : covered / eligible
 
-  return { counts, eligible, covered, coverageRate, inappropriate }
+  return { counts, eligible, covered, inappropriate }
 }
 
-describe('organization preset coverage (Phase 4 final)', () => {
+describe('organization preset coverage fixture (regression)', () => {
   it('freezes exactly 150 unique corpus ids with a closed outcome enum', () => {
     expect(ORGANIZATION_PRESET_COVERAGE_FIXTURE).toHaveLength(150)
 
@@ -80,7 +87,7 @@ describe('organization preset coverage (Phase 4 final)', () => {
     expect(mismatches, mismatches.join('\n')).toEqual([])
   })
 
-  it('keeps zero undiscoverable rows in the final fixture', () => {
+  it('keeps zero undiscoverable rows (honest-parent term bugs must not regress)', () => {
     expect(summarizeCoverage(ORGANIZATION_PRESET_COVERAGE_FIXTURE).counts.undiscoverable).toBe(0)
   })
 
@@ -97,21 +104,12 @@ describe('organization preset coverage (Phase 4 final)', () => {
     expect(presetMatchesIntentionalQuery('trading_company', tradingCompany, 'shipping')).toBe(false)
   })
 
-  it('meets the v2 eligible coverage bar with zero undiscoverable rows', () => {
+  it('freezes the v2 completion baseline against accidental preset/discovery drift', () => {
     const summary = summarizeCoverage(ORGANIZATION_PRESET_COVERAGE_FIXTURE)
 
-    expect(summary.counts).toEqual({
-      direct: 20,
-      discoverable: 102,
-      undiscoverable: 0,
-      weak: 2,
-      no_start: 11,
-      inappropriate: 15,
-    })
+    expect(summary.counts).toEqual(V2_COMPLETION_BASELINE)
     expect(summary.inappropriate).toBe(15)
     expect(summary.eligible).toBe(135)
     expect(summary.covered).toBe(122)
-    expect(summary.coverageRate).toBeGreaterThanOrEqual(MIN_ELIGIBLE_COVERAGE_RATE)
-    expect(summary.coverageRate).toBeCloseTo(122 / 135, 5)
   })
 })

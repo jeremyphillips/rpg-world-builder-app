@@ -45,6 +45,12 @@ Organization familiar starting points (`organization-form-projection.ts`):
   `authoringPresetId`, and **never** seeds `name`. Authors keep the real name.
 - Reused unchanged under the embedded building-org composer prefix
   (`operatorOrganization.*`).
+- **Coverage regression (test-only):** the frozen 150-row corpus fixture
+  ([`organization-preset-coverage.fixture.ts`](../src/features/content/organizations/lib/__tests__/fixtures/organization-preset-coverage.fixture.ts))
+  locks intentional discovery outcomes when presets or `discoveryTerms` change.
+  `undiscoverable` must stay zero. `weak` / `no_start` rows are diagnostic
+  signals — not debt to zero out, and not an ongoing mandate to raise coverage %.
+  Update fixture rows deliberately when the picker changes on purpose.
 
 ## Validation
 

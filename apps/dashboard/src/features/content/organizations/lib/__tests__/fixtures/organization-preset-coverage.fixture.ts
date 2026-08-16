@@ -1,6 +1,11 @@
 import type { OrganizationAuthoringPresetId } from '@rpg/contracts'
 
-/** Closed coverage outcomes for the frozen 150-concept corpus vs the live preset picker. */
+/**
+ * Frozen corpus v0.1 — v2 completion baseline (twenty presets).
+ *
+ * Regression guard for preset / discoveryTerm changes. Update rows deliberately
+ * when the picker changes on purpose; do not treat coverage % as an ongoing KPI.
+ */
 export const ORGANIZATION_PRESET_COVERAGE_OUTCOMES = [
   'direct',
   'discoverable',

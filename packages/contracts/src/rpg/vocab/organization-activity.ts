@@ -7,7 +7,7 @@ import type { VocabularyTerm } from './types'
 export const ORGANIZATION_ACTIVITY_TERM = {
   label: 'Organization Activity',
   description:
-    'Sustained work, mission, or practice performed by an organization. New values should normally be reusable missions spanning multiple familiar types; narrow occupational activities require separate evidence.',
+    'Sustained work, mission, or practice performed by an organization. New values should normally be reusable missions spanning multiple familiar types; narrow occupational activities require separate evidence. A specific criminal activity may be admitted when it represents a sustained organizational practice shared by multiple materially different organization types — do not add activities merely to enumerate individual crimes.',
   sentence: {
     singular: 'organization activity',
     plural: 'organization activities',
@@ -220,6 +220,19 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Clerk',
       'Scribe',
       'Official',
+    ),
+  },
+  extortion: {
+    label: 'Extortion',
+    description:
+      'Obtaining money, property, compliance, or advantage through threats, coercion, or intimidation as a sustained organizational practice.',
+    searchTerms: ['coercion', 'intimidation', 'protection racket'],
+    memberTitles: organizationMemberTitleEntries(
+      'Chief',
+      'Enforcer',
+      'Collector',
+      'Lieutenant',
+      'Operative',
     ),
   },
 } as const satisfies Record<string, OrganizationClassificationEntry>

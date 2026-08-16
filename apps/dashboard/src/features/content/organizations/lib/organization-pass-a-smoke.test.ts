@@ -48,6 +48,7 @@ describe('Pass A authoring smoke', () => {
       expect(ORGANIZATION_ACTIVITY_IDS).toContain(id)
       expect(activityOptions).toContain(id)
     }
+    expect(activityOptions).toContain('extortion')
   })
 
   it('exposes the same Pass A options under the embedded building-org namespace', () => {
@@ -125,6 +126,16 @@ describe('Pass A authoring smoke', () => {
       organizationForm: values.organizationForm,
       activities: values.activities,
     })
+  })
+
+  it('persists extortion through canonical create input without preset wiring', () => {
+    const input = buildOrganizationCreateInput({
+      name: 'Dockside Protection',
+      organizationDomain: 'criminal',
+      activities: ['extortion'],
+    })
+    expect(input.activities).toEqual(['extortion'])
+    expect(input).not.toHaveProperty('authoringPresetId')
   })
 
   it('reopens saved canonical fields without reconstructing preset identity', () => {
