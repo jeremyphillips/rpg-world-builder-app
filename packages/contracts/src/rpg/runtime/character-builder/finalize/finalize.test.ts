@@ -66,7 +66,8 @@ describe('finalizePcCharacterBuild', () => {
       updatedAt: '2026-07-28T12:00:00.000Z',
       name: 'Lantern Guild',
       organizationDomain: 'occupational' as const,
-      activities: [],
+      functions: [],
+      practices: [],
       connections: { locations: [] },
     }
     const input = finalizePcCharacterBuild(

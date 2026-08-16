@@ -50,7 +50,7 @@ export function useOrganizationMembersDetail(
   campaignId: string,
   organization: Pick<
     Organization,
-    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'activities'
+    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'functions' | 'practices'
   >,
 ) {
   const organizationId = organization.id
@@ -170,7 +170,8 @@ export function useOrganizationMembersDetail(
       const metadata = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
         form: organization.organizationForm,
-        activities: organization.activities,
+        functions: organization.functions,
+        practices: organization.practices,
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),
@@ -198,7 +199,8 @@ export function useOrganizationMembersDetail(
       campaignId,
       editingRow,
       invalidate,
-      organization.activities,
+      organization.functions,
+      organization.practices,
       organization.organizationDomain,
       organization.organizationForm,
       organizationId,

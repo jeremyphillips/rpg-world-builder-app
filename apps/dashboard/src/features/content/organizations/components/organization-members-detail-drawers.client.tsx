@@ -20,7 +20,8 @@ type EditableOrganization = {
   name: string
   organizationDomain: Organization['organizationDomain']
   organizationForm?: Organization['organizationForm']
-  activities?: Organization['activities']
+  functions?: Organization['functions']
+  practices?: Organization['practices']
 }
 
 function toEditableOrganization(organization: Organization): EditableOrganization {
@@ -28,7 +29,8 @@ function toEditableOrganization(organization: Organization): EditableOrganizatio
     id: organization.id,
     name: organization.name,
     organizationDomain: organization.organizationDomain,
-    activities: organization.activities,
+    functions: organization.functions,
+    practices: organization.practices,
     ...(organization.organizationForm !== undefined
       ? { organizationForm: organization.organizationForm }
       : {}),

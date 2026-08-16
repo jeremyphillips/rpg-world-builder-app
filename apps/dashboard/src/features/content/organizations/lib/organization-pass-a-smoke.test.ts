@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  ORGANIZATION_ACTIVITY_IDS,
   ORGANIZATION_FORM_IDS,
+  ORGANIZATION_FUNCTION_IDS,
+  ORGANIZATION_PRACTICE_IDS,
   resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
@@ -18,7 +19,7 @@ import {
 import { organizationsFilterSchema } from './organizations-overview-columns'
 
 const PASS_A_FORMS = ['force', 'office'] as const
-const PASS_A_ACTIVITIES = ['trade', 'production', 'transport', 'administration'] as const
+const PASS_A_FUNCTIONS = ['trade', 'production', 'transport', 'administration'] as const
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
   const fields: Array<{ name: string; item: FormItem }> = []
@@ -35,20 +36,22 @@ function optionValues(field: FormItem | undefined): string[] {
 }
 
 describe('Pass A authoring smoke', () => {
-  it('exposes Pass A forms and activities in standalone authoring fields', () => {
+  it('exposes Pass A forms and functions in standalone authoring fields', () => {
     const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
     const formOptions = optionValues(fields.find(({ name }) => name === 'organizationForm')?.item)
-    const activityOptions = optionValues(fields.find(({ name }) => name === 'activities')?.item)
+    const functionOptions = optionValues(fields.find(({ name }) => name === 'functions')?.item)
+    const practiceOptions = optionValues(fields.find(({ name }) => name === 'practices')?.item)
 
     for (const id of PASS_A_FORMS) {
       expect(ORGANIZATION_FORM_IDS).toContain(id)
       expect(formOptions).toContain(id)
     }
-    for (const id of PASS_A_ACTIVITIES) {
-      expect(ORGANIZATION_ACTIVITY_IDS).toContain(id)
-      expect(activityOptions).toContain(id)
+    for (const id of PASS_A_FUNCTIONS) {
+      expect(ORGANIZATION_FUNCTION_IDS).toContain(id)
+      expect(functionOptions).toContain(id)
     }
-    expect(activityOptions).toContain('extortion')
+    expect(ORGANIZATION_PRACTICE_IDS).toContain('extortion')
+    expect(practiceOptions).toContain('extortion')
   })
 
   it('exposes the same Pass A options under the embedded building-org namespace', () => {
@@ -61,12 +64,12 @@ describe('Pass A authoring smoke', () => {
     const formOptions = optionValues(
       fields.find(({ name }) => name === 'operatorOrganization.organizationForm')?.item,
     )
-    const activityOptions = optionValues(
-      fields.find(({ name }) => name === 'operatorOrganization.activities')?.item,
+    const functionOptions = optionValues(
+      fields.find(({ name }) => name === 'operatorOrganization.functions')?.item,
     )
 
     for (const id of PASS_A_FORMS) expect(formOptions).toContain(id)
-    for (const id of PASS_A_ACTIVITIES) expect(activityOptions).toContain(id)
+    for (const id of PASS_A_FUNCTIONS) expect(functionOptions).toContain(id)
   })
 
   it('projects the Army preset to force in standalone and embedded syncs', () => {
@@ -82,13 +85,15 @@ describe('Pass A authoring smoke', () => {
       authoringPresetId: undefined,
       organizationDomain: 'military',
       organizationForm: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
+      practices: [],
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
-      'operatorOrganization.activities': ['warfare', 'defense'],
+      'operatorOrganization.functions': ['warfare', 'defense'],
+      'operatorOrganization.practices': [],
     })
   })
 
@@ -99,7 +104,8 @@ describe('Pass A authoring smoke', () => {
     )
     expect(applied).toMatchObject({
       organizationDomain: 'government',
-      activities: ['policing'],
+      functions: ['policing'],
+      practices: [],
     })
   })
 
@@ -111,7 +117,8 @@ describe('Pass A authoring smoke', () => {
     expect(applied).toMatchObject({
       organizationDomain: 'political',
       organizationForm: 'association',
-      activities: ['advocacy'],
+      functions: ['advocacy'],
+      practices: [],
     })
   })
 
@@ -120,25 +127,29 @@ describe('Pass A authoring smoke', () => {
       name: 'Realm Logistics',
       organizationDomain: 'commercial',
       organizationForm: 'company',
-      activities: ['transport'],
+      functions: ['transport'],
+      practices: [],
     },
     {
       name: 'Royal Exchequer',
       organizationDomain: 'government',
       organizationForm: 'office',
-      activities: ['administration'],
+      functions: ['administration'],
+      practices: [],
     },
     {
       name: 'Ironworking Consortium',
       organizationDomain: 'commercial',
       organizationForm: 'company',
-      activities: ['production', 'trade'],
+      functions: ['production', 'trade'],
+      practices: [],
     },
     {
       name: 'Royal Host',
       organizationDomain: 'military',
       organizationForm: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
+      practices: [],
     },
   ] satisfies Array<OrganizationFormValues>)('persists $name without preset identity', (values) => {
     const input = buildOrganizationCreateInput(values)
@@ -147,7 +158,8 @@ describe('Pass A authoring smoke', () => {
       name: values.name,
       organizationDomain: values.organizationDomain,
       organizationForm: values.organizationForm,
-      activities: values.activities,
+      functions: values.functions ?? [],
+      practices: values.practices ?? [],
     })
   })
 
@@ -155,9 +167,10 @@ describe('Pass A authoring smoke', () => {
     const input = buildOrganizationCreateInput({
       name: 'Dockside Protection',
       organizationDomain: 'criminal',
-      activities: ['extortion'],
+      practices: ['extortion'],
+      functions: [],
     })
-    expect(input.activities).toEqual(['extortion'])
+    expect(input.practices).toEqual(['extortion'])
     expect(input).not.toHaveProperty('authoringPresetId')
   })
 
@@ -166,7 +179,8 @@ describe('Pass A authoring smoke', () => {
       name: 'Admiralty Office',
       organizationDomain: 'government',
       organizationForm: 'office',
-      activities: ['administration', 'defense'],
+      functions: ['administration', 'defense'],
+      practices: [],
     })
     const reopened = organizationToFormValues({
       ...saved,
@@ -185,16 +199,16 @@ describe('Pass A authoring smoke', () => {
       name: 'Admiralty Office',
       organizationDomain: 'government',
       organizationForm: 'office',
-      activities: ['administration', 'defense'],
+      functions: ['administration', 'defense'],
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
   })
 
-  it('resolves member titles from activities before form and domain', () => {
+  it('resolves member titles from functions before form and domain', () => {
     const ministryLabels = resolveOrganizationMemberTitleSuggestions({
       domain: 'government',
       form: 'office',
-      activities: ['administration'],
+      functions: ['administration'],
     }).map((entry) => entry.label)
 
     expect(ministryLabels[0]).toBe('Registrar')
@@ -204,7 +218,7 @@ describe('Pass A authoring smoke', () => {
     const forceLabels = resolveOrganizationMemberTitleSuggestions({
       domain: 'military',
       form: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
     }).map((entry) => entry.label)
 
     expect(forceLabels[0]).toBe('General')

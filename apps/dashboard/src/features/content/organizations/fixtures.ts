@@ -14,7 +14,8 @@ export const CITY_COUNCIL: Organization = {
   name: 'City Council',
   description: '<p>The elected council governing the city.</p>',
   organizationDomain: 'government',
-  activities: [],
+  functions: [],
+  practices: [],
   connections: { locations: [] },
 }
 

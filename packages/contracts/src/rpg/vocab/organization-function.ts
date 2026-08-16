@@ -4,41 +4,17 @@ import { getOrganizationClassificationDiscoveryTerms } from './organization-clas
 import { organizationMemberTitleEntries } from './organization-member-title-entry'
 import type { VocabularyTerm } from './types'
 
-export const ORGANIZATION_ACTIVITY_TERM = {
-  label: 'Organization Activity',
+export const ORGANIZATION_FUNCTION_TERM = {
+  label: 'Organization Function',
   description:
-    'Sustained work or mission performed by an organization. New values should normally be reusable Functions spanning multiple materially different organization types; narrow Practices stay out of this flat list while the model is unresolved. Existing Practice-shaped values remain for compatibility. A specific criminal activity may be admitted when it represents a sustained organizational practice shared by multiple materially different organization types — do not add activities merely to enumerate individual crimes.',
+    'Independently meaningful, reusable sustained work that composes across materially different organization types. Not an occupation catalog.',
   sentence: {
-    singular: 'organization activity',
-    plural: 'organization activities',
+    singular: 'organization function',
+    plural: 'organization functions',
   },
 } as const satisfies VocabularyTerm
 
-export const ORGANIZATION_ACTIVITY_ENTRIES = {
-  blacksmithing: {
-    label: 'Blacksmithing',
-    description: 'Forging, shaping, and repairing iron or steel goods.',
-    searchTerms: ['forge', 'smithing'],
-    memberTitles: organizationMemberTitleEntries(
-      'Master Smith',
-      'Blacksmith',
-      'Journeyman',
-      'Apprentice',
-      'Worker',
-    ),
-  },
-  brewing: {
-    label: 'Brewing',
-    description: 'Producing beer, ale, or other brewed beverages.',
-    searchTerms: ['ale', 'beer'],
-    memberTitles: organizationMemberTitleEntries(
-      'Master Brewer',
-      'Brewer',
-      'Cellarer',
-      'Apprentice',
-      'Worker',
-    ),
-  },
+export const ORGANIZATION_FUNCTION_ENTRIES = {
   worship: {
     label: 'Worship',
     description: 'Conducting or supporting religious devotion and ceremony.',
@@ -86,18 +62,6 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Sentinel',
       'Watcher',
       'Defender',
-    ),
-  },
-  banking: {
-    label: 'Banking',
-    description: 'Holding, lending, transferring, or safeguarding money and valuables.',
-    searchTerms: ['bank', 'credit', 'lending'],
-    memberTitles: organizationMemberTitleEntries(
-      'Treasurer',
-      'Banker',
-      'Cashier',
-      'Clerk',
-      'Agent',
     ),
   },
   finance: {
@@ -160,30 +124,6 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Candidate',
     ),
   },
-  apprenticeship: {
-    label: 'Apprenticeship',
-    description: 'Developing practitioners through supervised occupational learning.',
-    searchTerms: ['mentorship', 'vocational learning'],
-    memberTitles: organizationMemberTitleEntries(
-      'Mentor',
-      'Trainer',
-      'Journeyman',
-      'Learner',
-      'Novice',
-    ),
-  },
-  smuggling: {
-    label: 'Smuggling',
-    description: 'Moving restricted or illicit goods, people, or information covertly.',
-    searchTerms: ['contraband', 'illicit transport'],
-    memberTitles: organizationMemberTitleEntries(
-      'Ringleader',
-      'Smuggler',
-      'Courier',
-      'Lookout',
-      'Fence',
-    ),
-  },
   trade: {
     label: 'Trade',
     description:
@@ -220,19 +160,6 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Clerk',
       'Scribe',
       'Official',
-    ),
-  },
-  extortion: {
-    label: 'Extortion',
-    description:
-      'Obtaining money, property, compliance, or advantage through threats, coercion, or intimidation as a sustained organizational practice.',
-    searchTerms: ['coercion', 'intimidation', 'protection racket'],
-    memberTitles: organizationMemberTitleEntries(
-      'Chief',
-      'Enforcer',
-      'Collector',
-      'Lieutenant',
-      'Operative',
     ),
   },
   governance: {
@@ -326,23 +253,23 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
   },
 } as const satisfies Record<string, OrganizationClassificationEntry>
 
-export type OrganizationActivity = keyof typeof ORGANIZATION_ACTIVITY_ENTRIES
+export type OrganizationFunction = keyof typeof ORGANIZATION_FUNCTION_ENTRIES
 
-export const ORGANIZATION_ACTIVITY_IDS = keysFromEntries(ORGANIZATION_ACTIVITY_ENTRIES)
+export const ORGANIZATION_FUNCTION_IDS = keysFromEntries(ORGANIZATION_FUNCTION_ENTRIES)
 
-export const organizationActivitySchema = vocabEnumFromEntries(ORGANIZATION_ACTIVITY_ENTRIES)
+export const organizationFunctionSchema = vocabEnumFromEntries(ORGANIZATION_FUNCTION_ENTRIES)
 
-export function getOrganizationActivityEntry(
+export function getOrganizationFunctionEntry(
   id: string,
 ): OrganizationClassificationEntry | undefined {
-  return ORGANIZATION_ACTIVITY_ENTRIES[id as OrganizationActivity]
+  return ORGANIZATION_FUNCTION_ENTRIES[id as OrganizationFunction]
 }
 
-export function getOrganizationActivityLabel(id: string): string {
-  return getOrganizationActivityEntry(id)?.label ?? id
+export function getOrganizationFunctionLabel(id: string): string {
+  return getOrganizationFunctionEntry(id)?.label ?? id
 }
 
-export function getOrganizationActivityDiscoveryTerms(id: string): readonly string[] {
-  const entry = getOrganizationActivityEntry(id)
+export function getOrganizationFunctionDiscoveryTerms(id: string): readonly string[] {
+  const entry = getOrganizationFunctionEntry(id)
   return entry ? getOrganizationClassificationDiscoveryTerms(entry) : []
 }

@@ -107,7 +107,8 @@ export function EditOrganizationMembershipDrawer({
             <OrganizationMembershipTitleField
               kind={organization.organizationDomain}
               form={organization.organizationForm}
-              activities={organization.activities}
+              functions={organization.functions}
+              practices={organization.practices}
               value={selectedTitle}
               onValueChange={setSelectedTitle}
               idPrefix={`edit-organization-membership-${organization.id}`}

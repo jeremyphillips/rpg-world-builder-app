@@ -22,7 +22,8 @@ const organization = {
     slug: 'clockkeepers',
     name: 'Clockkeepers',
     organizationDomain: 'commercial' as const,
-    activities: [],
+    functions: [],
+    practices: [],
     connections: { locations: [] },
   },
 }

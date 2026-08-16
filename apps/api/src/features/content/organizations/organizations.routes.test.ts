@@ -10,7 +10,7 @@ const minimalOrganizationInput = {
   slug: 'emerald-concord',
   name: 'Emerald Concord',
   organizationDomain: 'political',
-  activities: ['worship'],
+  functions: ['worship'],
 } as const
 
 describe('organization content routes', () => {
@@ -28,7 +28,7 @@ describe('organization content routes', () => {
     expect(organization).toMatchObject({
       name: 'Emerald Concord',
       organizationDomain: 'political',
-      activities: ['worship'],
+      functions: ['worship'],
       source: 'homebrew',
       status: 'published',
     })
@@ -45,13 +45,13 @@ describe('organization content routes', () => {
       .send({
         organizationDomain: 'academic',
         description: 'A learned society.',
-        activities: ['brewing', 'blacksmithing'],
+        practices: ['brewing', 'blacksmithing'],
       })
       .expect(200)
     expect(updateRes.body.organizations).toMatchObject({
       organizationDomain: 'academic',
       description: 'A learned society.',
-      activities: ['brewing', 'blacksmithing'],
+      practices: ['brewing', 'blacksmithing'],
     })
 
     const duplicateRes = await agent
@@ -62,7 +62,7 @@ describe('organization content routes', () => {
     expect(duplicateRes.body.organizations).toMatchObject({
       name: 'Emerald Concord Chapter',
       organizationDomain: 'academic',
-      activities: ['brewing', 'blacksmithing'],
+      practices: ['brewing', 'blacksmithing'],
       status: 'draft',
     })
 
@@ -84,7 +84,7 @@ describe('organization content routes', () => {
       .expect(200)
   })
 
-  it('rejects duplicate Organization activities', async () => {
+  it('rejects duplicate Organization practices', async () => {
     const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
 
@@ -95,7 +95,7 @@ describe('organization content routes', () => {
         slug: 'duplicate-brewers',
         name: 'Duplicate Brewers',
         organizationDomain: 'commercial',
-        activities: ['brewing', 'brewing'],
+        practices: ['brewing', 'brewing'],
       })
       .expect(400)
   })

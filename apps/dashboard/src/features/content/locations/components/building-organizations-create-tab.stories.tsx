@@ -9,14 +9,16 @@ const organizationItems = [
     id: 'organization-existing',
     name: 'Harbor Merchants Guild',
     organizationDomain: 'commercial',
-    activities: [],
+    functions: [],
+    practices: [],
     connections: { locations: [] },
   },
   {
     id: 'organization-blocked',
     name: 'Test org',
     organizationDomain: 'military',
-    activities: [],
+    functions: [],
+    practices: [],
     connections: { locations: [] },
   },
 ] as unknown as Organization[]
@@ -28,7 +30,8 @@ const mixedPlan: BuildingOrganizationDraftPlan = {
       values: {
         name: 'Copper Kettle Cooperative',
         organizationDomain: 'commercial',
-        activities: [],
+        functions: [],
+        practices: [],
       },
     },
   ],

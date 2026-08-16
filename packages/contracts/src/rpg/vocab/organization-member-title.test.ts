@@ -6,11 +6,11 @@ import {
 } from './organization-member-title'
 
 describe('organization member-title resolution', () => {
-  it('interleaves activity, form, and domain contributions by local rank', () => {
+  it('interleaves practice, function, form, and domain contributions by local rank', () => {
     const labels = resolveOrganizationMemberTitleSuggestions({
       domain: 'criminal',
       form: 'guild',
-      activities: ['smuggling'],
+      practices: ['smuggling'],
     }).map((entry) => entry.label)
 
     expect(labels.slice(0, 6)).toEqual([
@@ -23,10 +23,10 @@ describe('organization member-title resolution', () => {
     ])
   })
 
-  it('composes extortion activity titles without assuming a specific criminal constitution', () => {
+  it('composes extortion practice titles without assuming a specific criminal constitution', () => {
     const labels = resolveOrganizationMemberTitleSuggestions({
       domain: 'criminal',
-      activities: ['extortion'],
+      practices: ['extortion'],
     }).map((entry) => entry.label)
 
     expect(labels.slice(0, 5)).toEqual(['Chief', 'Boss', 'Enforcer', 'Lieutenant', 'Collector'])
@@ -36,7 +36,8 @@ describe('organization member-title resolution', () => {
     const titles = resolveOrganizationMemberTitleSuggestions({
       domain: 'commercial',
       form: 'company',
-      activities: ['banking', 'finance'],
+      functions: ['finance'],
+      practices: ['banking'],
     })
     expect(titles.filter((entry) => entry.label === 'Treasurer')).toEqual([
       { label: 'Treasurer', priority: 50 },
@@ -48,17 +49,17 @@ describe('organization member-title resolution', () => {
       resolveOrganizationMemberTitleEntry({
         domain: 'academic',
         form: 'association',
-        activities: ['education', 'training', 'research'],
+        functions: ['education', 'training', 'research'],
         title: 'Research Director',
       }),
     ).toEqual({ label: 'Research Director', priority: 50 })
   })
 
-  it('prefers Pass A activity and form titles over domain defaults', () => {
+  it('prefers Pass A function and form titles over domain defaults', () => {
     const ministryLabels = resolveOrganizationMemberTitleSuggestions({
       domain: 'government',
       form: 'office',
-      activities: ['administration'],
+      functions: ['administration'],
     }).map((entry) => entry.label)
 
     expect(ministryLabels.slice(0, 3)).toEqual(['Registrar', 'Chancellor', 'Ruler'])
@@ -67,7 +68,7 @@ describe('organization member-title resolution', () => {
     const commerceLabels = resolveOrganizationMemberTitleSuggestions({
       domain: 'commercial',
       form: 'company',
-      activities: ['trade', 'production'],
+      functions: ['trade', 'production'],
     }).map((entry) => entry.label)
 
     expect(commerceLabels[0]).toBe('Merchant')

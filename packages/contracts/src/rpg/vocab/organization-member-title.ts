@@ -1,7 +1,5 @@
-import {
-  getOrganizationActivityEntry,
-  type OrganizationActivity,
-} from './organization-activity'
+import { getOrganizationFunctionEntry, type OrganizationFunction } from './organization-function'
+import { getOrganizationPracticeEntry, type OrganizationPractice } from './organization-practice'
 import { getOrganizationDomainEntry, type OrganizationDomain } from './organization-domain'
 import { getOrganizationFormEntry, type OrganizationForm } from './organization-form'
 import type { OrganizationMemberTitleEntry } from './organization-member-title-entry'
@@ -15,18 +13,22 @@ export {
 export type OrganizationMemberTitleClassification = {
   domain: OrganizationDomain
   form?: OrganizationForm
-  activities?: readonly OrganizationActivity[]
+  functions?: readonly OrganizationFunction[]
+  practices?: readonly OrganizationPractice[]
 }
 
 /**
  * Composes local registry suggestions without encoding familiar subtype tuples.
- * Local rank is primary; at the same rank activities precede form, then domain.
+ * Local rank is primary; at the same rank practices precede functions, then form, then domain.
  */
 export function resolveOrganizationMemberTitleSuggestions(
   input: OrganizationMemberTitleClassification,
 ): readonly [OrganizationMemberTitleEntry, ...OrganizationMemberTitleEntry[]] {
   const contributions = [
-    ...(input.activities ?? []).map((activity) => getOrganizationActivityEntry(activity)!.memberTitles),
+    ...(input.practices ?? []).map(
+      (practice) => getOrganizationPracticeEntry(practice)!.memberTitles,
+    ),
+    ...(input.functions ?? []).map((fn) => getOrganizationFunctionEntry(fn)!.memberTitles),
     ...(input.form ? [getOrganizationFormEntry(input.form)!.memberTitles] : []),
     getOrganizationDomainEntry(input.domain)!.memberTitles,
   ]
@@ -54,5 +56,7 @@ export function resolveOrganizationMemberTitleEntry(
 ): OrganizationMemberTitleEntry | undefined {
   const normalized = input.title.trim()
   if (normalized === '') return undefined
-  return resolveOrganizationMemberTitleSuggestions(input).find((entry) => entry.label === normalized)
+  return resolveOrganizationMemberTitleSuggestions(input).find(
+    (entry) => entry.label === normalized,
+  )
 }

@@ -31,14 +31,16 @@ const organizations = [
     id: 'organization-1',
     name: 'Copper Kettle Guild',
     organizationDomain: 'commercial',
-    activities: [],
+    functions: [],
+    practices: [],
     connections: { locations: [] },
   },
   {
     id: 'organization-2',
     name: 'Harbor Merchants Guild',
     organizationDomain: 'commercial',
-    activities: [],
+    functions: [],
+    practices: [],
     connections: { locations: [] },
   },
 ] as unknown as Organization[]

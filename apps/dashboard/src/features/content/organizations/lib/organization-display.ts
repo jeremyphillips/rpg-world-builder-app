@@ -1,5 +1,6 @@
 import {
-  getOrganizationActivityLabel,
+  getOrganizationFunctionLabel,
+  getOrganizationPracticeLabel,
   getOrganizationDomainEntry,
   getOrganizationDomainLabel,
   getOrganizationFormEntry,
@@ -91,11 +92,19 @@ export function buildOrganizationDetailViewModel(
             },
           ]
         : []),
-      ...(organization.activities.length > 0
+      ...(organization.functions.length > 0
         ? [
             {
-              label: 'Activities',
-              value: organization.activities.map(getOrganizationActivityLabel).join(' · '),
+              label: 'Functions',
+              value: organization.functions.map(getOrganizationFunctionLabel).join(' · '),
+            },
+          ]
+        : []),
+      ...(organization.practices.length > 0
+        ? [
+            {
+              label: 'Practices',
+              value: organization.practices.map(getOrganizationPracticeLabel).join(' · '),
             },
           ]
         : []),

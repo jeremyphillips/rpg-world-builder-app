@@ -36,7 +36,7 @@ describe('organization form projection', () => {
         name: 'Ironroot Smiths',
         authoringPresetId: '',
         organizationDomain: 'commercial',
-        activities: ['blacksmithing'],
+        practices: ['blacksmithing'],
       }),
     ).toMatchObject({ authoringPresetId: undefined })
   })
@@ -54,7 +54,8 @@ describe('organization form projection', () => {
       'authoringPresetId',
       'organizationDomain',
       'organizationForm',
-      'activities',
+      'functions',
+      'practices',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -62,16 +63,26 @@ describe('organization form projection', () => {
       'operatorOrganization.authoringPresetId',
       'operatorOrganization.organizationDomain',
       'operatorOrganization.organizationForm',
-      'operatorOrganization.activities',
+      'operatorOrganization.functions',
+      'operatorOrganization.practices',
       'operatorOrganization.description',
     ])
-    const standaloneActivity = standalone.find(({ name }) => name === 'activities')?.item
-    const embeddedActivity = embedded.find(({ name }) => name.endsWith('activities'))?.item
-    expect(embeddedActivity).toMatchObject({
+    const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
+    const embeddedFunctions = embedded.find(({ name }) => name.endsWith('functions'))?.item
+    expect(embeddedFunctions).toMatchObject({
       type: 'chips',
-      label: 'Activities',
+      label: 'Functions',
       options:
-        standaloneActivity && 'options' in standaloneActivity ? standaloneActivity.options : [],
+        standaloneFunctions && 'options' in standaloneFunctions ? standaloneFunctions.options : [],
+      multiple: true,
+    })
+    const standalonePractices = standalone.find(({ name }) => name === 'practices')?.item
+    const embeddedPractices = embedded.find(({ name }) => name.endsWith('practices'))?.item
+    expect(embeddedPractices).toMatchObject({
+      type: 'combobox',
+      label: 'Practices',
+      options:
+        standalonePractices && 'options' in standalonePractices ? standalonePractices.options : [],
       multiple: true,
     })
   })
@@ -117,19 +128,20 @@ describe('organization form projection', () => {
     expect(optionMatchesQuery(shippingCompany!, 'shipping')).toBe(true)
   })
 
-  it('uses one input builder for standalone and embedded activity values', () => {
+  it('uses one input builder for standalone and embedded function/practice values', () => {
     expect(
       buildOrganizationCreateInput({
         name: 'Red Dragon Brewing Company',
         organizationDomain: 'commercial',
         organizationForm: 'company',
-        activities: ['brewing'],
+        practices: ['brewing'],
+        functions: [],
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
       organizationDomain: 'commercial',
       organizationForm: 'company',
-      activities: ['brewing'],
+      practices: ['brewing'],
     })
   })
 
@@ -139,7 +151,8 @@ describe('organization form projection', () => {
       authoringPresetId: 'smuggling_ring',
       organizationDomain: 'political',
       organizationForm: 'network',
-      activities: ['smuggling'],
+      practices: ['smuggling'],
+      functions: [],
     })
     expect(input).not.toHaveProperty('authoringPresetId')
     expect(input.organizationDomain).toBe('political')
@@ -155,7 +168,8 @@ describe('organization form projection', () => {
       'operatorOrganization.authoringPresetId': undefined,
       'operatorOrganization.organizationDomain': 'criminal',
       'operatorOrganization.organizationForm': 'network',
-      'operatorOrganization.activities': ['smuggling'],
+      'operatorOrganization.functions': [],
+      'operatorOrganization.practices': ['smuggling'],
     })
   })
 })

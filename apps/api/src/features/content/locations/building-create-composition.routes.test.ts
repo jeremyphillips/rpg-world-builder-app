@@ -66,7 +66,8 @@ function newOrganization(organizationDraftId: string, slug: string, name: string
       slug,
       name,
       organizationDomain: 'commercial' as const,
-      activities: [],
+      functions: [],
+      practices: [],
       connections: { locations: [] },
     },
   }

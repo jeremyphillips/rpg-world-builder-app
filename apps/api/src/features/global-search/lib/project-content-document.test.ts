@@ -51,7 +51,7 @@ describe('projectContentEntity', () => {
     expect(document.secondary).toBe('Building · Brewery')
   })
 
-  it('indexes activities independently of the single primary domain', () => {
+  it('indexes functions and practices independently of the single primary domain', () => {
     const document = projectContentEntity('organizations', {
       id: 'organization-night-market',
       name: 'Night Market Caucus',
@@ -60,7 +60,7 @@ describe('projectContentEntity', () => {
       status: 'published',
       organizationDomain: 'political',
       organizationForm: 'network',
-      activities: ['smuggling'],
+      practices: ['smuggling'],
     } as never)
 
     expect(document.secondary).toBe('Political')

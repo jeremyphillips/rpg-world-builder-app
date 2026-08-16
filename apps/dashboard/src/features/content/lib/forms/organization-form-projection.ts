@@ -1,18 +1,21 @@
 import { z } from 'zod'
 import {
-  ORGANIZATION_ACTIVITY_ENTRIES,
-  ORGANIZATION_ACTIVITY_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_DOMAIN_ENTRIES,
   ORGANIZATION_DOMAIN_IDS,
   ORGANIZATION_FORM_ENTRIES,
   ORGANIZATION_FORM_IDS,
+  ORGANIZATION_FUNCTION_ENTRIES,
+  ORGANIZATION_FUNCTION_IDS,
+  ORGANIZATION_PRACTICE_ENTRIES,
+  ORGANIZATION_PRACTICE_IDS,
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
-  organizationActivitySchema,
   organizationDomainSchema,
   organizationFormSchema as canonicalOrganizationFormSchema,
+  organizationFunctionSchema,
+  organizationPracticeSchema,
   slugSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
@@ -42,12 +45,21 @@ const organizationFormOptions = toOptions(
   ) as Record<(typeof ORGANIZATION_FORM_IDS)[number], string>,
 )
 
-const organizationActivityOptions = toOptions(
-  ORGANIZATION_ACTIVITY_IDS,
+const organizationFunctionOptions = toOptions(
+  ORGANIZATION_FUNCTION_IDS,
   Object.fromEntries(
-    ORGANIZATION_ACTIVITY_IDS.map((id) => [id, ORGANIZATION_ACTIVITY_ENTRIES[id].label]),
-  ) as Record<(typeof ORGANIZATION_ACTIVITY_IDS)[number], string>,
+    ORGANIZATION_FUNCTION_IDS.map((id) => [id, ORGANIZATION_FUNCTION_ENTRIES[id].label]),
+  ) as Record<(typeof ORGANIZATION_FUNCTION_IDS)[number], string>,
 )
+
+const organizationPracticeOptions = ORGANIZATION_PRACTICE_IDS.map((id) => {
+  const entry = ORGANIZATION_PRACTICE_ENTRIES[id]
+  return {
+    value: id,
+    label: entry.label,
+    ...('searchTerms' in entry && entry.searchTerms ? { searchTerms: entry.searchTerms } : {}),
+  }
+})
 
 const organizationAuthoringPresetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
   const preset = ORGANIZATION_AUTHORING_PRESETS[id]
@@ -71,7 +83,8 @@ export const organizationFormSchema = z.object({
   description: z.string().optional(),
   organizationDomain: organizationDomainSchema,
   organizationForm: canonicalOrganizationFormSchema.optional(),
-  activities: z.array(organizationActivitySchema).default([]),
+  functions: z.array(organizationFunctionSchema).default([]),
+  practices: z.array(organizationPracticeSchema).default([]),
   authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
@@ -81,13 +94,17 @@ export const organizationDraftFormSchema = z.object({
   description: z.string().optional(),
   organizationDomain: draftOptionalSelect(organizationDomainSchema),
   organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
-  activities: z.array(organizationActivitySchema).default([]),
+  functions: z.array(organizationFunctionSchema).default([]),
+  practices: z.array(organizationPracticeSchema).default([]),
   authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
 
-export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = { activities: [] }
+export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = {
+  functions: [],
+  practices: [],
+}
 
 export { nameField as organizationNameField }
 
@@ -134,11 +151,19 @@ export function buildOrganizationFields(
     },
     {
       type: 'chips',
-      name: fieldPath(prefix, 'activities'),
-      label: 'Activities',
-      options: organizationActivityOptions,
+      name: fieldPath(prefix, 'functions'),
+      label: 'Functions',
+      options: organizationFunctionOptions,
       multiple: true,
       chrome: { variant: 'outline' },
+    },
+    {
+      type: 'combobox',
+      name: fieldPath(prefix, 'practices'),
+      label: 'Practices',
+      options: organizationPracticeOptions,
+      multiple: true,
+      placeholder: 'Search practices…',
     },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )
@@ -153,8 +178,29 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     description: entity.description,
     organizationDomain: entity.organizationDomain,
     organizationForm: entity.organizationForm,
-    activities: entity.activities,
+    functions: entity.functions,
+    practices: entity.practices,
   }
+}
+
+function resolveOrganizationInputSchema(
+  isEdit: boolean,
+  validationIntent: ContentValidationIntent,
+) {
+  if (validationIntent === 'draft') {
+    return isEdit ? updateOrganizationDraftInputSchema : createOrganizationDraftInputSchema
+  }
+  return isEdit ? updateOrganizationInputSchema : createOrganizationInputSchema
+}
+
+function organizationFormFieldForInput(
+  values: OrganizationFormValues,
+  isEdit: boolean,
+): { organizationForm?: OrganizationFormValues['organizationForm'] | null } {
+  const hasForm = typeof values.organizationForm === 'string' && values.organizationForm.length > 0
+  if (hasForm) return { organizationForm: values.organizationForm }
+  if (isEdit) return { organizationForm: null }
+  return {}
 }
 
 export function buildOrganizationCreateInput(
@@ -163,30 +209,18 @@ export function buildOrganizationCreateInput(
   validationIntent: ContentValidationIntent = 'publish',
 ): CreateOrganizationInput {
   const isEdit = Boolean(ctx?.entity)
-  const schema =
-    validationIntent === 'draft'
-      ? isEdit
-        ? updateOrganizationDraftInputSchema
-        : createOrganizationDraftInputSchema
-      : isEdit
-        ? updateOrganizationInputSchema
-        : createOrganizationInputSchema
-
-  const hasForm = typeof values.organizationForm === 'string' && values.organizationForm.length > 0
+  const schema = resolveOrganizationInputSchema(isEdit, validationIntent)
 
   const input = schema.parse({
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
-    activities: values.activities ?? [],
+    functions: values.functions ?? [],
+    practices: values.practices ?? [],
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }
       : {}),
-    ...(hasForm
-      ? { organizationForm: values.organizationForm }
-      : isEdit
-        ? { organizationForm: null }
-        : {}),
+    ...organizationFormFieldForInput(values, isEdit),
   })
   return finalizeContentInput(input, ctx) as CreateOrganizationInput
 }
@@ -214,7 +248,8 @@ export function buildOrganizationFormValueSyncs(prefix?: string): FormValueSync[
           [presetPath]: undefined,
           [fieldPath(prefix, 'organizationDomain')]: recipe.organizationDomain,
           [fieldPath(prefix, 'organizationForm')]: recipe.organizationForm,
-          [fieldPath(prefix, 'activities')]: recipe.activities,
+          [fieldPath(prefix, 'functions')]: recipe.functions,
+          [fieldPath(prefix, 'practices')]: recipe.practices,
         }
       },
     },

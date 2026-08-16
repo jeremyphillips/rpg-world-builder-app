@@ -32,7 +32,8 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     ...(record.organizationForm !== undefined && {
       organizationForm: record.organizationForm,
     }),
-    activities: record.activities ?? [],
+    functions: record.functions ?? [],
+    practices: record.practices ?? [],
     connections: {
       locations: record.connections?.locations ?? [],
     },

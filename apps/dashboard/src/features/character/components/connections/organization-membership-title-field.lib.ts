@@ -6,14 +6,16 @@ import type { OrganizationMembershipTitleFieldProps } from './organization-membe
 export function buildOrganizationMembershipTitleRadioOptions(input: {
   kind: OrganizationMembershipTitleFieldProps['kind']
   form?: OrganizationMembershipTitleFieldProps['form']
-  activities?: OrganizationMembershipTitleFieldProps['activities']
+  functions?: OrganizationMembershipTitleFieldProps['functions']
+  practices?: OrganizationMembershipTitleFieldProps['practices']
   /** Current persisted/selected title — appended when absent from suggestions. */
   currentValue?: string
 }): { value: string; label: string }[] {
   const suggestions = resolveOrganizationMemberTitleSuggestions({
     domain: input.kind,
     form: input.form,
-    activities: input.activities,
+    functions: input.functions,
+    practices: input.practices,
   })
   const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [

@@ -124,7 +124,8 @@ export function OrganizationMemberPickerDrawer({
       const { title, priority } = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
         form: organization.organizationForm,
-        activities: organization.activities,
+        functions: organization.functions,
+        practices: organization.practices,
         selectedTitle: titleFromMembershipRadioValue(selectedTitle),
       })
 
@@ -151,7 +152,8 @@ export function OrganizationMemberPickerDrawer({
     [
       onAdd,
       onOpenChange,
-      organization.activities,
+      organization.functions,
+      organization.practices,
       organization.organizationDomain,
       organization.organizationForm,
       pending,
@@ -262,7 +264,8 @@ export function OrganizationMemberPickerDrawer({
             <OrganizationMembershipTitleField
               kind={organization.organizationDomain}
               form={organization.organizationForm}
-              activities={organization.activities}
+              functions={organization.functions}
+              practices={organization.practices}
               value={
                 expandedItemId === candidate.id
                   ? selectedTitle

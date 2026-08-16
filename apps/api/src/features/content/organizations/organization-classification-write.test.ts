@@ -64,19 +64,19 @@ describe('organization classification writes', () => {
     expect(updated.organizationForm).toBeUndefined()
   })
 
-  it('persists Pass A form and activity values', async () => {
+  it('persists Pass A form, function, and practice values', async () => {
     const campaign = await makeTestCampaign()
     const shippingLine = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'crown-shipping',
       name: 'Crown Shipping Line',
       organizationDomain: 'commercial',
       organizationForm: 'company',
-      activities: ['transport', 'trade'],
+      functions: ['transport', 'trade'],
     })
     expect(shippingLine).toMatchObject({
       organizationDomain: 'commercial',
       organizationForm: 'company',
-      activities: ['transport', 'trade'],
+      functions: ['transport', 'trade'],
     })
     expect(shippingLine).not.toHaveProperty('authoringPresetId')
 
@@ -85,7 +85,7 @@ describe('organization classification writes', () => {
       name: 'Royal Treasury',
       organizationDomain: 'government',
       organizationForm: 'office',
-      activities: ['administration'],
+      functions: ['administration'],
     })
     expect(treasury.organizationForm).toBe('office')
 
@@ -94,7 +94,7 @@ describe('organization classification writes', () => {
       name: 'Royal Host',
       organizationDomain: 'military',
       organizationForm: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
     })
     expect(host.organizationForm).toBe('force')
   })

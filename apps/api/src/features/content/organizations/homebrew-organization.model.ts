@@ -1,9 +1,10 @@
 import mongoose, { type InferSchemaType, type Model } from 'mongoose'
 
 import {
-  ORGANIZATION_ACTIVITY_IDS,
   ORGANIZATION_DOMAIN_IDS,
   ORGANIZATION_FORM_IDS,
+  ORGANIZATION_FUNCTION_IDS,
+  ORGANIZATION_PRACTICE_IDS,
 } from '@rpg/contracts'
 
 import {
@@ -18,8 +19,12 @@ const homebrewOrganizationSchema = new Schema(
     ...homebrewContentIdentityFields,
     organizationDomain: { type: String, enum: [...ORGANIZATION_DOMAIN_IDS] },
     organizationForm: { type: String, enum: [...ORGANIZATION_FORM_IDS] },
-    activities: {
-      type: [{ type: String, enum: [...ORGANIZATION_ACTIVITY_IDS] }],
+    functions: {
+      type: [{ type: String, enum: [...ORGANIZATION_FUNCTION_IDS] }],
+      default: [],
+    },
+    practices: {
+      type: [{ type: String, enum: [...ORGANIZATION_PRACTICE_IDS] }],
       default: [],
     },
     connections: {

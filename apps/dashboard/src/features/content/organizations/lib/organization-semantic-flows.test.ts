@@ -35,14 +35,16 @@ describe('initial Organization semantic flows', () => {
         name: recipe.label,
         organizationDomain: standalone.organizationDomain,
         organizationForm: standalone.organizationForm,
-        activities: standalone.activities,
+        functions: standalone.functions ?? [],
+        practices: standalone.practices ?? [],
       } as OrganizationFormValues)
       expect(input).not.toHaveProperty('authoringPresetId')
       expect(
         resolveOrganizationMemberTitleSuggestions({
           domain: input.organizationDomain,
           form: input.organizationForm,
-          activities: input.activities,
+          functions: input.functions,
+          practices: input.practices,
         }).length,
       ).toBeGreaterThanOrEqual(5)
     },
@@ -58,7 +60,8 @@ describe('initial Organization semantic flows', () => {
       authoringPresetId: undefined,
       organizationDomain: 'military',
       organizationForm: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
+      practices: [],
     })
     expect(applied).not.toHaveProperty('name')
   })
@@ -68,12 +71,13 @@ describe('initial Organization semantic flows', () => {
       name: 'Dockside Exchange',
       organizationDomain: 'criminal',
       organizationForm: 'network',
-      activities: ['smuggling'],
+      practices: ['smuggling'],
+      functions: [],
     })
     expect(input).toMatchObject({
       organizationDomain: 'criminal',
       organizationForm: 'network',
-      activities: ['smuggling'],
+      practices: ['smuggling'],
     })
     expect(input).not.toHaveProperty('type')
     expect(input).not.toHaveProperty('authoringPresetId')

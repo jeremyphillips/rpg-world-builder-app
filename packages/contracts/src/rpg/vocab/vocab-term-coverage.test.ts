@@ -64,7 +64,8 @@ import { WEAPON_CATEGORY_TERM } from './weapon/category'
 import { WEAPON_MASTERY_TERM } from './weapon/mastery'
 import { WEAPON_MODE_TERM } from './weapon/mode'
 import { WEAPON_PROPERTY_TERM } from './weapon/property'
-import { ORGANIZATION_ACTIVITY_TERM } from './organization-activity'
+import { ORGANIZATION_FUNCTION_TERM } from './organization-function'
+import { ORGANIZATION_PRACTICE_TERM } from './organization-practice'
 import { ORGANIZATION_DOMAIN_TERM } from './organization-domain'
 import { ORGANIZATION_FORM_TERM } from './organization-form'
 
@@ -116,7 +117,8 @@ const RPG_VOCAB_CLOSED_TERMS = [
   WEAPON_PROPERTY_TERM,
   ORGANIZATION_DOMAIN_TERM,
   ORGANIZATION_FORM_TERM,
-  ORGANIZATION_ACTIVITY_TERM,
+  ORGANIZATION_FUNCTION_TERM,
+  ORGANIZATION_PRACTICE_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Open `rpg/vocab` sets — `*_SET_ID` modules with a sibling `*_TERM`. */
@@ -162,7 +164,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(47)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(48)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

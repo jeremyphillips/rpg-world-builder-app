@@ -7,20 +7,20 @@ import {
 } from './__tests__/fixtures/organization-activity-pressure.fixture'
 
 describe('organization activity pressure fixture (regression)', () => {
-  it('projects preset activities for representative Function boundary cases', () => {
+  it('projects preset functions and practices for representative Function boundary cases', () => {
     for (const row of ORGANIZATION_ACTIVITY_PRESSURE_FIXTURE) {
       if (!isActivityPressurePresetRow(row)) continue
-      expect(applyOrganizationAuthoringPreset(row.presetId).activities).toEqual(
-        row.presetActivities,
-      )
+      const projected = applyOrganizationAuthoringPreset(row.presetId)
+      expect(projected.functions).toEqual(row.presetFunctions)
+      expect(projected.practices).toEqual(row.presetPractices)
     }
   })
 
-  it('keeps custom-path activity tuples independently valid', () => {
+  it('keeps custom-path legacy activity tuples independently valid', () => {
     for (const row of ORGANIZATION_ACTIVITY_PRESSURE_FIXTURE) {
       if (isActivityPressurePresetRow(row)) continue
-      expect(row.customActivities.length).toBeGreaterThan(0)
-      expect(new Set(row.customActivities).size).toBe(row.customActivities.length)
+      expect(row.customLegacyActivities.length).toBeGreaterThan(0)
+      expect(new Set(row.customLegacyActivities).size).toBe(row.customLegacyActivities.length)
     }
   })
 })

@@ -344,12 +344,14 @@ describe('organization authoring presets', () => {
   it('returns an editable recipe without durable preset provenance', () => {
     const values = applyOrganizationAuthoringPreset('smuggling_ring')
     values.organizationDomain = 'political'
-    values.activities = ['finance']
+    values.functions = ['finance']
+    values.practices = []
 
     expect(values).toEqual({
       organizationDomain: 'political',
       organizationForm: 'network',
-      activities: ['finance'],
+      functions: ['finance'],
+      practices: [],
     })
     expect(values).not.toHaveProperty('authoringPresetId')
     expect(values).not.toHaveProperty('description')
@@ -360,7 +362,8 @@ describe('organization authoring presets', () => {
     expect(applyOrganizationAuthoringPreset('army')).toEqual({
       organizationDomain: 'military',
       organizationForm: 'force',
-      activities: ['warfare', 'defense'],
+      functions: ['warfare', 'defense'],
+      practices: [],
     })
   })
 
@@ -370,51 +373,91 @@ describe('organization authoring presets', () => {
       {
         organizationDomain: 'government',
         organizationForm: 'office',
-        activities: ['administration'],
+        functions: ['administration'],
+        practices: [],
       },
     ],
     [
       'trading_company',
-      { organizationDomain: 'commercial', organizationForm: 'company', activities: ['trade'] },
+      {
+        organizationDomain: 'commercial',
+        organizationForm: 'company',
+        functions: ['trade'],
+        practices: [],
+      },
     ],
     [
       'religious_order',
       {
         organizationDomain: 'religious',
         organizationForm: 'order',
-        activities: ['worship', 'ministry'],
+        functions: ['worship', 'ministry'],
+        practices: [],
       },
     ],
     [
       'city_council',
-      { organizationDomain: 'government', organizationForm: 'association', activities: [] },
+      {
+        organizationDomain: 'government',
+        organizationForm: 'association',
+        functions: [],
+        practices: [],
+      },
     ],
     [
       'political_party',
       {
         organizationDomain: 'political',
         organizationForm: 'association',
-        activities: ['advocacy'],
+        functions: ['advocacy'],
+        practices: [],
       },
     ],
     [
       'adventurers_guild',
-      { organizationDomain: 'occupational', organizationForm: 'guild', activities: [] },
+      {
+        organizationDomain: 'occupational',
+        organizationForm: 'guild',
+        functions: [],
+        practices: [],
+      },
     ],
     [
       'thieves_guild',
-      { organizationDomain: 'criminal', organizationForm: 'guild', activities: [] },
+      {
+        organizationDomain: 'criminal',
+        organizationForm: 'guild',
+        functions: [],
+        practices: [],
+      },
     ],
     [
       'shipping_company',
-      { organizationDomain: 'commercial', organizationForm: 'company', activities: ['transport'] },
+      {
+        organizationDomain: 'commercial',
+        organizationForm: 'company',
+        functions: ['transport'],
+        practices: [],
+      },
     ],
-    ['city_watch', { organizationDomain: 'government', activities: ['policing'] }],
+    [
+      'city_watch',
+      {
+        organizationDomain: 'government',
+        functions: ['policing'],
+        practices: [],
+      },
+    ],
     [
       'mutual_aid_society',
-      { organizationDomain: 'community', organizationForm: 'association', activities: ['aid'] },
+      {
+        organizationDomain: 'community',
+        organizationForm: 'association',
+        functions: ['aid'],
+        practices: [],
+      },
     ],
-    ['gang', { organizationDomain: 'criminal', activities: [] }],
+    ['gang', { organizationDomain: 'criminal', functions: [], practices: [] }],
   ] as const)('projects %s from the confirmed v1 subset', (id, expected) => {
     expect(applyOrganizationAuthoringPreset(id)).toEqual(expected)
   })

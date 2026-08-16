@@ -1,6 +1,9 @@
-import type { OrganizationActivity } from './organization-activity'
+import type { OrganizationLegacyActivity } from './organization-activity-migration'
+import { migrateOrganizationActivities } from './organization-activity-migration'
 import type { OrganizationDomain } from './organization-domain'
 import type { OrganizationForm } from './organization-form'
+import type { OrganizationFunction } from './organization-function'
+import type { OrganizationPractice } from './organization-practice'
 
 /**
  * Ephemeral familiar starting points for organization authoring.
@@ -18,7 +21,7 @@ export type OrganizationAuthoringPresetEntry = {
   discoveryTerms?: readonly string[]
   domain: OrganizationDomain
   form?: OrganizationForm
-  activities: readonly OrganizationActivity[]
+  activities: readonly OrganizationLegacyActivity[]
 }
 
 export const ORGANIZATION_AUTHORING_PRESETS = {
@@ -275,12 +278,15 @@ export const ORGANIZATION_AUTHORING_PRESET_IDS = Object.keys(
 export function applyOrganizationAuthoringPreset(id: OrganizationAuthoringPresetId): {
   organizationDomain: OrganizationDomain
   organizationForm?: OrganizationForm
-  activities: OrganizationActivity[]
+  functions: OrganizationFunction[]
+  practices: OrganizationPractice[]
 } {
   const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+  const { functions, practices } = migrateOrganizationActivities(preset.activities)
   return {
     organizationDomain: preset.domain,
     ...('form' in preset ? { organizationForm: preset.form } : {}),
-    activities: [...preset.activities],
+    functions,
+    practices,
   }
 }
