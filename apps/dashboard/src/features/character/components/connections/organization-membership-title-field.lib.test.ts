@@ -32,6 +32,19 @@ describe('buildOrganizationMembershipTitleRadioOptions', () => {
     })
     expect(options.filter((option) => option.value === 'Guildmaster')).toHaveLength(1)
   })
+
+  it('threads practices before form when building suggestion order', () => {
+    const options = buildOrganizationMembershipTitleRadioOptions({
+      kind: 'criminal',
+      form: 'guild',
+      practices: ['smuggling'],
+    })
+    const ringleaderIndex = options.findIndex((option) => option.value === 'Ringleader')
+    const guildmasterIndex = options.findIndex((option) => option.value === 'Guildmaster')
+    expect(ringleaderIndex).toBeGreaterThan(0)
+    expect(guildmasterIndex).toBeGreaterThan(0)
+    expect(ringleaderIndex).toBeLessThan(guildmasterIndex)
+  })
 })
 
 describe('title radio value mapping', () => {

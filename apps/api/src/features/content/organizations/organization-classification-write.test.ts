@@ -64,6 +64,37 @@ describe('organization classification writes', () => {
     expect(updated.organizationForm).toBeUndefined()
   })
 
+  it('does not persist legacy activities on create', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'legacy-guild',
+      name: 'Legacy Guild',
+      organizationDomain: 'occupational',
+      activities: ['trade'] as never,
+      functions: ['trade'],
+    })
+
+    expect(created.functions).toEqual(['trade'])
+    expect(created).not.toHaveProperty('activities')
+  })
+
+  it('persists practices independently of functions', async () => {
+    const campaign = await makeTestCampaign()
+    const brewery = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'ember-brewery',
+      name: 'Ember Brewery',
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      functions: ['production'],
+      practices: ['brewing', 'blacksmithing'],
+    })
+
+    expect(brewery).toMatchObject({
+      functions: ['production'],
+      practices: ['brewing', 'blacksmithing'],
+    })
+  })
+
   it('persists Pass A form, function, and practice values', async () => {
     const campaign = await makeTestCampaign()
     const shippingLine = await createHomebrewContent(organizationWriteConfig, campaign.id, {

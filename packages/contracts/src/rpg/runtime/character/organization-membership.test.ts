@@ -72,6 +72,28 @@ describe('resolveOrganizationMembershipPriority', () => {
     ).toBe(50)
   })
 
+  it('resolves canonical priority from practices before functions and domain', () => {
+    expect(
+      resolveOrganizationMembershipPriority({
+        membership: { title: 'Smuggler' },
+        domain: 'criminal',
+        form: 'guild',
+        functions: ['transport'],
+        practices: ['smuggling'],
+      }),
+    ).toBe(40)
+
+    expect(
+      resolveOrganizationMembershipPriority({
+        membership: { title: 'Treasurer' },
+        domain: 'commercial',
+        form: 'company',
+        functions: ['finance'],
+        practices: ['banking'],
+      }),
+    ).toBe(50)
+  })
+
   it('returns undefined for untitled or unknown-title memberships without priority', () => {
     expect(
       resolveOrganizationMembershipPriority({

@@ -65,6 +65,18 @@ describe('organization body contracts', () => {
     })
   })
 
+  it('strips legacy activities from organization bodies', () => {
+    const parsed = organizationBodySchema.parse({
+      name: 'Legacy Guild',
+      organizationDomain: 'occupational',
+      activities: ['trade'],
+      functions: ['trade'],
+    })
+
+    expect(parsed).not.toHaveProperty('activities')
+    expect(parsed.functions).toEqual(['trade'])
+  })
+
   it('accepts ordered functions and practices independently and rejects duplicates', () => {
     expect(
       organizationBodySchema.parse({
