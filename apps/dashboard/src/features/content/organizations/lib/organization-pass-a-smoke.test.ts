@@ -72,6 +72,31 @@ describe('Pass A authoring smoke', () => {
     for (const id of PASS_A_FUNCTIONS) expect(functionOptions).toContain(id)
   })
 
+  it('projects the Bank preset to finance and banking in standalone and embedded syncs', () => {
+    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'bank' }, [
+      'authoringPresetId',
+    ])
+    const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
+      { 'operatorOrganization.authoringPresetId': 'bank' },
+      ['operatorOrganization.authoringPresetId'],
+    )
+
+    expect(standalone).toMatchObject({
+      authoringPresetId: undefined,
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      functions: ['finance'],
+      practices: ['banking'],
+    })
+    expect(embedded).toMatchObject({
+      'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.organizationDomain': 'commercial',
+      'operatorOrganization.organizationForm': 'company',
+      'operatorOrganization.functions': ['finance'],
+      'operatorOrganization.practices': ['banking'],
+    })
+  })
+
   it('projects the Army preset to force in standalone and embedded syncs', () => {
     const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'army' }, [
       'authoringPresetId',

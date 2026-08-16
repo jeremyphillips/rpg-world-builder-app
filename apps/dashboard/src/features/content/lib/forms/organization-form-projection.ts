@@ -10,6 +10,7 @@ import {
   ORGANIZATION_FUNCTION_IDS,
   ORGANIZATION_PRACTICE_ENTRIES,
   ORGANIZATION_PRACTICE_IDS,
+  ORGANIZATION_PRACTICE_TERM,
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
   organizationDomainSchema,
@@ -20,6 +21,7 @@ import {
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
   applyOrganizationAuthoringPreset,
+  vocabularyTermFieldCopy,
   type ContentValidationIntent,
   type CreateOrganizationInput,
   type Organization,
@@ -72,6 +74,13 @@ const organizationAuthoringPresetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map
       : {}),
   }
 })
+
+const organizationPracticeFieldCopy = vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, {
+  multiple: true,
+})
+
+const ORGANIZATION_FUNCTION_FIELD_HINT = 'What this organization broadly does.'
+const ORGANIZATION_PRACTICE_FIELD_HINT = 'Distinctive trades, methods, or operational specialties.'
 
 function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
@@ -153,6 +162,7 @@ export function buildOrganizationFields(
       type: 'chips',
       name: fieldPath(prefix, 'functions'),
       label: 'Functions',
+      hint: { text: ORGANIZATION_FUNCTION_FIELD_HINT, position: 'below-control' },
       options: organizationFunctionOptions,
       multiple: true,
       chrome: { variant: 'outline' },
@@ -161,9 +171,10 @@ export function buildOrganizationFields(
       type: 'combobox',
       name: fieldPath(prefix, 'practices'),
       label: 'Practices',
+      hint: { text: ORGANIZATION_PRACTICE_FIELD_HINT, position: 'below-control' },
       options: organizationPracticeOptions,
       multiple: true,
-      placeholder: 'Search practices…',
+      placeholder: organizationPracticeFieldCopy.placeholder,
     },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )

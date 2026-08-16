@@ -36,13 +36,19 @@ Reference: locations Location type projection —
 Organization familiar starting points (`organization-form-projection.ts`):
 
 - Recipes live in `@rpg/contracts` `ORGANIZATION_AUTHORING_PRESETS` — ephemeral
-  projection onto domain / form / activities only; preset id is **not** persisted.
+  projection onto domain / form / functions / practices only; preset id is **not** persisted.
 - Picker is a single-select **`combobox`** (`multiple: false`). Map preset
   `discoveryTerms` → option `searchTerms` and `description` → option `description`
   at the form boundary only. These are closest-starting-point discovery strings,
   not lexical aliases and not classification-entry `searchTerms`.
+- **Functions** — multi **`chips`** with outline chrome and hint
+  _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.
+- **Practices** — multi **`combobox`** with classification-entry `searchTerms` on
+  options, hint _Distinctive trades, methods, or operational specialties._, and
+  placeholder from `vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, { multiple: true })`.
 - `buildOrganizationFormValueSyncs` applies a preset once, clears
-  `authoringPresetId`, and **never** seeds `name`. Authors keep the real name.
+  `authoringPresetId`, writes both `functions` and `practices`, and **never** seeds
+  `name`. Authors keep the real name.
 - Reused unchanged under the embedded building-org composer prefix
   (`operatorOrganization.*`).
 - **Coverage regression (test-only):** the frozen 150-row corpus fixture

@@ -12,11 +12,6 @@ describe('organization authoring presets', () => {
     expect(ORGANIZATION_AUTHORING_PRESETS).toMatchInlineSnapshot(`
       {
         "academy": {
-          "activities": [
-            "education",
-            "training",
-            "research",
-          ],
           "description": "Closest starting point for university, mage college, and teaching bodies.",
           "discoveryTerms": [
             "university",
@@ -27,10 +22,15 @@ describe('organization authoring presets', () => {
           ],
           "domain": "academic",
           "form": "association",
+          "functions": [
+            "education",
+            "training",
+            "research",
+          ],
           "label": "Academy",
+          "practices": [],
         },
         "adventurers_guild": {
-          "activities": [],
           "description": "Closest starting point for an adventurer hall, company, or monster hunters guild.",
           "discoveryTerms": [
             "monster hunters' guild",
@@ -39,13 +39,11 @@ describe('organization authoring presets', () => {
           ],
           "domain": "occupational",
           "form": "guild",
+          "functions": [],
           "label": "Adventurers' guild",
+          "practices": [],
         },
         "army": {
-          "activities": [
-            "warfare",
-            "defense",
-          ],
           "description": "Closest starting point for navy, militia, marines, and other armed hosts.",
           "discoveryTerms": [
             "navy",
@@ -61,13 +59,14 @@ describe('organization authoring presets', () => {
           ],
           "domain": "military",
           "form": "force",
+          "functions": [
+            "warfare",
+            "defense",
+          ],
           "label": "Army",
+          "practices": [],
         },
         "bank": {
-          "activities": [
-            "banking",
-            "finance",
-          ],
           "description": "Closest starting point for moneylenders, pawnbrokers, and tax farmers.",
           "discoveryTerms": [
             "moneylenders",
@@ -77,13 +76,15 @@ describe('organization authoring presets', () => {
           ],
           "domain": "commercial",
           "form": "company",
+          "functions": [
+            "finance",
+          ],
           "label": "Bank",
+          "practices": [
+            "banking",
+          ],
         },
         "church": {
-          "activities": [
-            "worship",
-            "ministry",
-          ],
           "description": "Closest starting point for temple, cult, and gathered faith communities.",
           "discoveryTerms": [
             "temple",
@@ -98,10 +99,14 @@ describe('organization authoring presets', () => {
           ],
           "domain": "religious",
           "form": "congregation",
+          "functions": [
+            "worship",
+            "ministry",
+          ],
           "label": "Church",
+          "practices": [],
         },
         "city_council": {
-          "activities": [],
           "description": "Closest starting point for parliament, senate, and privy council.",
           "discoveryTerms": [
             "parliament",
@@ -110,25 +115,23 @@ describe('organization authoring presets', () => {
           ],
           "domain": "government",
           "form": "association",
+          "functions": [],
           "label": "City council",
+          "practices": [],
         },
         "city_watch": {
-          "activities": [
-            "policing",
-          ],
           "description": "Closest starting point for civic policing and crown law enforcement.",
           "discoveryTerms": [
             "marshals",
           ],
           "domain": "government",
+          "functions": [
+            "policing",
+          ],
           "label": "City watch",
+          "practices": [],
         },
         "craft_guild": {
-          "activities": [
-            "standards",
-            "apprenticeship",
-            "training",
-          ],
           "description": "Closest starting point for scribes, alchemists, and professional trade guilds.",
           "discoveryTerms": [
             "merchant guild",
@@ -153,10 +156,16 @@ describe('organization authoring presets', () => {
           ],
           "domain": "occupational",
           "form": "guild",
+          "functions": [
+            "standards",
+            "training",
+          ],
           "label": "Craft guild",
+          "practices": [
+            "apprenticeship",
+          ],
         },
         "gang": {
-          "activities": [],
           "description": "Closest starting point for street gangs, protection rackets, and prison crews.",
           "discoveryTerms": [
             "protection racket",
@@ -164,12 +173,11 @@ describe('organization authoring presets', () => {
             "prison gang",
           ],
           "domain": "criminal",
+          "functions": [],
           "label": "Gang",
+          "practices": [],
         },
         "government_ministry": {
-          "activities": [
-            "administration",
-          ],
           "description": "Closest starting point for customs service, provincial administration, and executive departments.",
           "discoveryTerms": [
             "royal court",
@@ -184,34 +192,37 @@ describe('organization authoring presets', () => {
           ],
           "domain": "government",
           "form": "office",
+          "functions": [
+            "administration",
+          ],
           "label": "Government ministry",
+          "practices": [],
         },
         "knightly_order": {
-          "activities": [
-            "warfare",
-            "defense",
-          ],
           "description": "Chivalric membership organized around martial discipline and sworn service.",
           "domain": "military",
           "form": "order",
+          "functions": [
+            "warfare",
+            "defense",
+          ],
           "label": "Knightly order",
+          "practices": [],
         },
         "mercenary_company": {
-          "activities": [
-            "warfare",
-          ],
           "description": "Closest starting point for ranger company and other hired fighting enterprises.",
           "discoveryTerms": [
             "ranger company",
           ],
           "domain": "military",
           "form": "company",
+          "functions": [
+            "warfare",
+          ],
           "label": "Mercenary company",
+          "practices": [],
         },
         "mutual_aid_society": {
-          "activities": [
-            "aid",
-          ],
           "description": "Closest starting point for burial societies, civic leagues, and reciprocal support bodies.",
           "discoveryTerms": [
             "orphanage society",
@@ -224,12 +235,13 @@ describe('organization authoring presets', () => {
           ],
           "domain": "community",
           "form": "association",
+          "functions": [
+            "aid",
+          ],
           "label": "Mutual aid society",
+          "practices": [],
         },
         "political_party": {
-          "activities": [
-            "advocacy",
-          ],
           "description": "Closest starting point for reform league and advocacy society.",
           "discoveryTerms": [
             "reform league",
@@ -237,25 +249,27 @@ describe('organization authoring presets', () => {
           ],
           "domain": "political",
           "form": "association",
+          "functions": [
+            "advocacy",
+          ],
           "label": "Political party",
+          "practices": [],
         },
         "religious_order": {
-          "activities": [
-            "worship",
-            "ministry",
-          ],
           "description": "Closest starting point for monastery and rule-bound faith communities.",
           "discoveryTerms": [
             "monastery",
           ],
           "domain": "religious",
           "form": "order",
+          "functions": [
+            "worship",
+            "ministry",
+          ],
           "label": "Religious order",
+          "practices": [],
         },
         "scholarly_society": {
-          "activities": [
-            "research",
-          ],
           "description": "Closest starting point for explorers' society, guild of scholars, and museum society.",
           "discoveryTerms": [
             "explorers' society",
@@ -265,12 +279,13 @@ describe('organization authoring presets', () => {
           ],
           "domain": "academic",
           "form": "association",
+          "functions": [
+            "research",
+          ],
           "label": "Scholarly society",
+          "practices": [],
         },
         "shipping_company": {
-          "activities": [
-            "transport",
-          ],
           "description": "Closest starting point for caravan operators, coach lines, and courier services.",
           "discoveryTerms": [
             "caravan company",
@@ -279,12 +294,13 @@ describe('organization authoring presets', () => {
           ],
           "domain": "commercial",
           "form": "company",
+          "functions": [
+            "transport",
+          ],
           "label": "Shipping company",
+          "practices": [],
         },
         "smuggling_ring": {
-          "activities": [
-            "smuggling",
-          ],
           "description": "Closest starting point for fencing networks and counterfeiting rings.",
           "discoveryTerms": [
             "fencing network",
@@ -293,22 +309,24 @@ describe('organization authoring presets', () => {
           ],
           "domain": "criminal",
           "form": "network",
+          "functions": [],
           "label": "Smuggling ring",
+          "practices": [
+            "smuggling",
+          ],
         },
         "thieves_guild": {
-          "activities": [],
           "description": "Closest starting point for beggars' guild and urban criminal guilds.",
           "discoveryTerms": [
             "beggars' guild",
           ],
           "domain": "criminal",
           "form": "guild",
+          "functions": [],
           "label": "Thieves' guild",
+          "practices": [],
         },
         "trading_company": {
-          "activities": [
-            "trade",
-          ],
           "description": "Closest starting point for merchant house and chartered company.",
           "discoveryTerms": [
             "merchant house",
@@ -329,7 +347,11 @@ describe('organization authoring presets', () => {
           ],
           "domain": "commercial",
           "form": "company",
+          "functions": [
+            "trade",
+          ],
           "label": "Trading company",
+          "practices": [],
         },
       }
     `)
@@ -368,6 +390,60 @@ describe('organization authoring presets', () => {
   })
 
   it.each([
+    [
+      'academy',
+      {
+        organizationDomain: 'academic',
+        organizationForm: 'association',
+        functions: ['education', 'training', 'research'],
+        practices: [],
+      },
+    ],
+    [
+      'bank',
+      {
+        organizationDomain: 'commercial',
+        organizationForm: 'company',
+        functions: ['finance'],
+        practices: ['banking'],
+      },
+    ],
+    [
+      'craft_guild',
+      {
+        organizationDomain: 'occupational',
+        organizationForm: 'guild',
+        functions: ['standards', 'training'],
+        practices: ['apprenticeship'],
+      },
+    ],
+    [
+      'smuggling_ring',
+      {
+        organizationDomain: 'criminal',
+        organizationForm: 'network',
+        functions: [],
+        practices: ['smuggling'],
+      },
+    ],
+    [
+      'church',
+      {
+        organizationDomain: 'religious',
+        organizationForm: 'congregation',
+        functions: ['worship', 'ministry'],
+        practices: [],
+      },
+    ],
+    [
+      'knightly_order',
+      {
+        organizationDomain: 'military',
+        organizationForm: 'order',
+        functions: ['warfare', 'defense'],
+        practices: [],
+      },
+    ],
     [
       'government_ministry',
       {

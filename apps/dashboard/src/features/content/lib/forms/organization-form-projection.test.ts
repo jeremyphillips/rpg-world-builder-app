@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { optionMatchesQuery } from '@rpg/ui'
+import { ORGANIZATION_PRACTICE_TERM, vocabularyTermFieldCopy } from '@rpg/contracts'
 import type { FieldOption, FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
@@ -72,6 +73,8 @@ describe('organization form projection', () => {
     expect(embeddedFunctions).toMatchObject({
       type: 'chips',
       label: 'Functions',
+      hint: { text: 'What this organization broadly does.', position: 'below-control' },
+      chrome: { variant: 'outline' },
       options:
         standaloneFunctions && 'options' in standaloneFunctions ? standaloneFunctions.options : [],
       multiple: true,
@@ -81,10 +84,48 @@ describe('organization form projection', () => {
     expect(embeddedPractices).toMatchObject({
       type: 'combobox',
       label: 'Practices',
+      hint: {
+        text: 'Distinctive trades, methods, or operational specialties.',
+        position: 'below-control',
+      },
       options:
         standalonePractices && 'options' in standalonePractices ? standalonePractices.options : [],
       multiple: true,
     })
+  })
+
+  it('uses browse chips for functions and a searchable combobox for practices', () => {
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const practicePlaceholder = vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, {
+      multiple: true,
+    }).placeholder
+
+    expect(fields.find(({ name }) => name === 'functions')?.item).toMatchObject({
+      type: 'chips',
+      label: 'Functions',
+      hint: { text: 'What this organization broadly does.', position: 'below-control' },
+      chrome: { variant: 'outline' },
+      multiple: true,
+    })
+    const practicesField = fields.find(({ name }) => name === 'practices')?.item
+    expect(practicesField).toMatchObject({
+      type: 'combobox',
+      label: 'Practices',
+      hint: {
+        text: 'Distinctive trades, methods, or operational specialties.',
+        position: 'below-control',
+      },
+      placeholder: practicePlaceholder,
+      multiple: true,
+    })
+
+    const practiceOptions =
+      practicesField && 'options' in practicesField && Array.isArray(practicesField.options)
+        ? flattenSelectFieldOptions(practicesField.options)
+        : []
+    const brewing = practiceOptions.find((option) => option.value === 'brewing')
+    expect(brewing?.searchTerms).toEqual(expect.arrayContaining(['ale', 'beer']))
+    expect(optionMatchesQuery(brewing!, 'ale')).toBe(true)
   })
 
   it('uses a searchable single-select combobox for familiar starting points', () => {

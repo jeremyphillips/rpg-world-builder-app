@@ -1,5 +1,3 @@
-import type { OrganizationLegacyActivity } from './organization-activity-migration'
-import { migrateOrganizationActivities } from './organization-activity-migration'
 import type { OrganizationDomain } from './organization-domain'
 import type { OrganizationForm } from './organization-form'
 import type { OrganizationFunction } from './organization-function'
@@ -8,7 +6,7 @@ import type { OrganizationPractice } from './organization-practice'
 /**
  * Ephemeral familiar starting points for organization authoring.
  *
- * Presets project editable domain / form / activities only. Preset identity is
+ * Presets project editable domain / form / functions / practices only. Preset identity is
  * never persisted. `discoveryTerms` are authoring discovery strings that help
  * users find a closest starting point — not lexical aliases and not the same
  * field as `OrganizationClassificationEntry.searchTerms`.
@@ -21,7 +19,8 @@ export type OrganizationAuthoringPresetEntry = {
   discoveryTerms?: readonly string[]
   domain: OrganizationDomain
   form?: OrganizationForm
-  activities: readonly OrganizationLegacyActivity[]
+  functions: readonly OrganizationFunction[]
+  practices: readonly OrganizationPractice[]
 }
 
 export const ORGANIZATION_AUTHORING_PRESETS = {
@@ -31,7 +30,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['university', 'mage college', 'bardic college', 'seminary', 'wizard circle'],
     domain: 'academic',
     form: 'association',
-    activities: ['education', 'training', 'research'],
+    functions: ['education', 'training', 'research'],
+    practices: [],
   },
   adventurers_guild: {
     label: "Adventurers' guild",
@@ -40,7 +40,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ["monster hunters' guild", 'adventuring company', 'treasure hunters'],
     domain: 'occupational',
     form: 'guild',
-    activities: [],
+    functions: [],
+    practices: [],
   },
   army: {
     label: 'Army',
@@ -59,7 +60,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'military',
     form: 'force',
-    activities: ['warfare', 'defense'],
+    functions: ['warfare', 'defense'],
+    practices: [],
   },
   bank: {
     label: 'Bank',
@@ -67,7 +69,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['moneylenders', 'pawnbrokers', 'tax farmers', 'insurance company'],
     domain: 'commercial',
     form: 'company',
-    activities: ['banking', 'finance'],
+    functions: ['finance'],
+    practices: ['banking'],
   },
   church: {
     label: 'Church',
@@ -85,7 +88,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'religious',
     form: 'congregation',
-    activities: ['worship', 'ministry'],
+    functions: ['worship', 'ministry'],
+    practices: [],
   },
   city_council: {
     label: 'City council',
@@ -93,14 +97,16 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['parliament', 'senate', 'privy council'],
     domain: 'government',
     form: 'association',
-    activities: [],
+    functions: [],
+    practices: [],
   },
   city_watch: {
     label: 'City watch',
     description: 'Closest starting point for civic policing and crown law enforcement.',
     discoveryTerms: ['marshals'],
     domain: 'government',
-    activities: ['policing'],
+    functions: ['policing'],
+    practices: [],
   },
   craft_guild: {
     label: 'Craft guild',
@@ -128,14 +134,16 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'occupational',
     form: 'guild',
-    activities: ['standards', 'apprenticeship', 'training'],
+    functions: ['standards', 'training'],
+    practices: ['apprenticeship'],
   },
   gang: {
     label: 'Gang',
     description: 'Closest starting point for street gangs, protection rackets, and prison crews.',
     discoveryTerms: ['protection racket', 'wreckers', 'prison gang'],
     domain: 'criminal',
-    activities: [],
+    functions: [],
+    practices: [],
   },
   government_ministry: {
     label: 'Government ministry',
@@ -154,14 +162,16 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'government',
     form: 'office',
-    activities: ['administration'],
+    functions: ['administration'],
+    practices: [],
   },
   knightly_order: {
     label: 'Knightly order',
     description: 'Chivalric membership organized around martial discipline and sworn service.',
     domain: 'military',
     form: 'order',
-    activities: ['warfare', 'defense'],
+    functions: ['warfare', 'defense'],
+    practices: [],
   },
   mercenary_company: {
     label: 'Mercenary company',
@@ -169,7 +179,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['ranger company'],
     domain: 'military',
     form: 'company',
-    activities: ['warfare'],
+    functions: ['warfare'],
+    practices: [],
   },
   mutual_aid_society: {
     label: 'Mutual aid society',
@@ -186,7 +197,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'community',
     form: 'association',
-    activities: ['aid'],
+    functions: ['aid'],
+    practices: [],
   },
   political_party: {
     label: 'Political party',
@@ -194,7 +206,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['reform league', 'advocacy society'],
     domain: 'political',
     form: 'association',
-    activities: ['advocacy'],
+    functions: ['advocacy'],
+    practices: [],
   },
   religious_order: {
     label: 'Religious order',
@@ -202,7 +215,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['monastery'],
     domain: 'religious',
     form: 'order',
-    activities: ['worship', 'ministry'],
+    functions: ['worship', 'ministry'],
+    practices: [],
   },
   scholarly_society: {
     label: 'Scholarly society',
@@ -216,7 +230,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'academic',
     form: 'association',
-    activities: ['research'],
+    functions: ['research'],
+    practices: [],
   },
   shipping_company: {
     label: 'Shipping company',
@@ -224,7 +239,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['caravan company', 'coach line', 'courier service'],
     domain: 'commercial',
     form: 'company',
-    activities: ['transport'],
+    functions: ['transport'],
+    practices: [],
   },
   smuggling_ring: {
     label: 'Smuggling ring',
@@ -232,7 +248,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['fencing network', 'counterfeiting ring', 'criminal syndicate'],
     domain: 'criminal',
     form: 'network',
-    activities: ['smuggling'],
+    functions: [],
+    practices: ['smuggling'],
   },
   thieves_guild: {
     label: "Thieves' guild",
@@ -240,7 +257,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ["beggars' guild"],
     domain: 'criminal',
     form: 'guild',
-    activities: [],
+    functions: [],
+    practices: [],
   },
   trading_company: {
     label: 'Trading company',
@@ -264,7 +282,8 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'commercial',
     form: 'company',
-    activities: ['trade'],
+    functions: ['trade'],
+    practices: [],
   },
 } as const satisfies Record<string, OrganizationAuthoringPresetEntry>
 
@@ -282,11 +301,10 @@ export function applyOrganizationAuthoringPreset(id: OrganizationAuthoringPreset
   practices: OrganizationPractice[]
 } {
   const preset = ORGANIZATION_AUTHORING_PRESETS[id]
-  const { functions, practices } = migrateOrganizationActivities(preset.activities)
   return {
     organizationDomain: preset.domain,
     ...('form' in preset ? { organizationForm: preset.form } : {}),
-    functions,
-    practices,
+    functions: [...preset.functions],
+    practices: [...preset.practices],
   }
 }
