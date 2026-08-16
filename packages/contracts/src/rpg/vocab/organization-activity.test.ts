@@ -30,6 +30,13 @@ describe('Organization Activity vocabulary', () => {
       'transport',
       'administration',
       'extortion',
+      'governance',
+      'advocacy',
+      'policing',
+      'care',
+      'stewardship',
+      'intelligence',
+      'aid',
     ])
     expect(Object.keys(ORGANIZATION_ACTIVITY_ENTRIES)).toEqual(ORGANIZATION_ACTIVITY_IDS)
     expect(organizationActivitySchema.parse('blacksmithing')).toBe('blacksmithing')
@@ -37,7 +44,9 @@ describe('Organization Activity vocabulary', () => {
     expect(organizationActivitySchema.parse('trade')).toBe('trade')
     expect(organizationActivitySchema.parse('administration')).toBe('administration')
     expect(organizationActivitySchema.parse('extortion')).toBe('extortion')
-    expect(organizationActivitySchema.safeParse('advocacy')).toMatchObject({ success: false })
+    expect(organizationActivitySchema.parse('advocacy')).toBe('advocacy')
+    expect(organizationActivitySchema.parse('policing')).toBe('policing')
+    expect(organizationActivitySchema.parse('care')).toBe('care')
   })
 
   it('defines non-empty labels and descriptions', () => {
@@ -46,6 +55,18 @@ describe('Organization Activity vocabulary', () => {
       expect(entry.description.trim()).not.toBe('')
       expect(entry.memberTitles).toHaveLength(5)
     }
+  })
+
+  it('locks distinct descriptions for Function boundary pairs', () => {
+    expect(getOrganizationActivityEntry('governance')?.description).toContain('authority')
+    expect(getOrganizationActivityEntry('administration')?.description).toContain('bureaucratic')
+    expect(getOrganizationActivityEntry('policing')?.description).toContain('Enforcing order')
+    expect(getOrganizationActivityEntry('defense')?.description).toContain('Protecting')
+    expect(getOrganizationActivityEntry('care')?.description).toContain('bodily')
+    expect(getOrganizationActivityEntry('aid')?.description).toContain('material relief')
+    expect(getOrganizationActivityEntry('stewardship')?.description).toContain('Preserving')
+    expect(getOrganizationActivityEntry('research')?.description).toContain('inquiry')
+    expect(getOrganizationActivityEntry('intelligence')?.description).toContain('covert')
   })
 
   it('admits extortion as a sustained organizational practice without opening the crime catalog', () => {

@@ -114,7 +114,7 @@ describe('organization authoring presets', () => {
         },
         "city_watch": {
           "activities": [
-            "defense",
+            "policing",
           ],
           "description": "Closest starting point for civic policing and crown law enforcement.",
           "discoveryTerms": [
@@ -209,7 +209,9 @@ describe('organization authoring presets', () => {
           "label": "Mercenary company",
         },
         "mutual_aid_society": {
-          "activities": [],
+          "activities": [
+            "aid",
+          ],
           "description": "Closest starting point for burial societies, civic leagues, and reciprocal support bodies.",
           "discoveryTerms": [
             "orphanage society",
@@ -225,7 +227,9 @@ describe('organization authoring presets', () => {
           "label": "Mutual aid society",
         },
         "political_party": {
-          "activities": [],
+          "activities": [
+            "advocacy",
+          ],
           "description": "Closest starting point for reform league and advocacy society.",
           "discoveryTerms": [
             "reform league",
@@ -387,7 +391,11 @@ describe('organization authoring presets', () => {
     ],
     [
       'political_party',
-      { organizationDomain: 'political', organizationForm: 'association', activities: [] },
+      {
+        organizationDomain: 'political',
+        organizationForm: 'association',
+        activities: ['advocacy'],
+      },
     ],
     [
       'adventurers_guild',
@@ -401,10 +409,10 @@ describe('organization authoring presets', () => {
       'shipping_company',
       { organizationDomain: 'commercial', organizationForm: 'company', activities: ['transport'] },
     ],
-    ['city_watch', { organizationDomain: 'government', activities: ['defense'] }],
+    ['city_watch', { organizationDomain: 'government', activities: ['policing'] }],
     [
       'mutual_aid_society',
-      { organizationDomain: 'community', organizationForm: 'association', activities: [] },
+      { organizationDomain: 'community', organizationForm: 'association', activities: ['aid'] },
     ],
     ['gang', { organizationDomain: 'criminal', activities: [] }],
   ] as const)('projects %s from the confirmed v1 subset', (id, expected) => {

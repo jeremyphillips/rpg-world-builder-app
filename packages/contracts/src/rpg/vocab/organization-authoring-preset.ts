@@ -97,7 +97,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     description: 'Closest starting point for civic policing and crown law enforcement.',
     discoveryTerms: ['marshals'],
     domain: 'government',
-    activities: ['defense'],
+    activities: ['policing'],
   },
   craft_guild: {
     label: 'Craft guild',
@@ -183,7 +183,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     ],
     domain: 'community',
     form: 'association',
-    activities: [],
+    activities: ['aid'],
   },
   political_party: {
     label: 'Political party',
@@ -191,7 +191,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     discoveryTerms: ['reform league', 'advocacy society'],
     domain: 'political',
     form: 'association',
-    activities: [],
+    activities: ['advocacy'],
   },
   religious_order: {
     label: 'Religious order',

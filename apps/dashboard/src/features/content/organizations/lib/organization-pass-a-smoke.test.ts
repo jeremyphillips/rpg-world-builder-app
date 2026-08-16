@@ -92,6 +92,29 @@ describe('Pass A authoring smoke', () => {
     })
   })
 
+  it('projects City watch to policing rather than defense', () => {
+    const applied = buildOrganizationFormValueSyncs()[0]!.apply(
+      { authoringPresetId: 'city_watch' },
+      ['authoringPresetId'],
+    )
+    expect(applied).toMatchObject({
+      organizationDomain: 'government',
+      activities: ['policing'],
+    })
+  })
+
+  it('projects Political party to advocacy', () => {
+    const applied = buildOrganizationFormValueSyncs()[0]!.apply(
+      { authoringPresetId: 'political_party' },
+      ['authoringPresetId'],
+    )
+    expect(applied).toMatchObject({
+      organizationDomain: 'political',
+      organizationForm: 'association',
+      activities: ['advocacy'],
+    })
+  })
+
   it.each([
     {
       name: 'Realm Logistics',

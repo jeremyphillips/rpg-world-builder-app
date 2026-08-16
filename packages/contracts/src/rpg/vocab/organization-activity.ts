@@ -7,7 +7,7 @@ import type { VocabularyTerm } from './types'
 export const ORGANIZATION_ACTIVITY_TERM = {
   label: 'Organization Activity',
   description:
-    'Sustained work, mission, or practice performed by an organization. New values should normally be reusable missions spanning multiple familiar types; narrow occupational activities require separate evidence. A specific criminal activity may be admitted when it represents a sustained organizational practice shared by multiple materially different organization types — do not add activities merely to enumerate individual crimes.',
+    'Sustained work or mission performed by an organization. New values should normally be reusable Functions spanning multiple materially different organization types; narrow Practices stay out of this flat list while the model is unresolved. Existing Practice-shaped values remain for compatibility. A specific criminal activity may be admitted when it represents a sustained organizational practice shared by multiple materially different organization types — do not add activities merely to enumerate individual crimes.',
   sentence: {
     singular: 'organization activity',
     plural: 'organization activities',
@@ -233,6 +233,95 @@ export const ORGANIZATION_ACTIVITY_ENTRIES = {
       'Collector',
       'Lieutenant',
       'Operative',
+    ),
+  },
+  governance: {
+    label: 'Governance',
+    description:
+      'Exercising authority, setting binding direction, or ruling over people, territory, or institutions.',
+    searchTerms: ['authority', 'rule', 'sovereignty'],
+    memberTitles: organizationMemberTitleEntries(
+      'Chancellor',
+      'Magistrate',
+      'Councilor',
+      'Clerk',
+      'Steward',
+    ),
+  },
+  advocacy: {
+    label: 'Advocacy',
+    description: 'Campaigning, representing, or organizing for a cause, policy, or constituency.',
+    searchTerms: ['campaigning', 'representation', 'lobbying'],
+    memberTitles: organizationMemberTitleEntries(
+      'Advocate',
+      'Campaigner',
+      'Organizer',
+      'Spokesperson',
+      'Delegate',
+    ),
+  },
+  policing: {
+    label: 'Policing',
+    description:
+      'Enforcing order, investigating offenses, or maintaining public safety among a population.',
+    searchTerms: ['law enforcement', 'investigation', 'public order'],
+    memberTitles: organizationMemberTitleEntries(
+      'Captain',
+      'Investigator',
+      'Constable',
+      'Watcher',
+      'Patrol',
+    ),
+  },
+  care: {
+    label: 'Care',
+    description:
+      'Providing bodily, medical, or welfare care to people in need of healing or support.',
+    searchTerms: ['healing', 'medical care', 'welfare'],
+    memberTitles: organizationMemberTitleEntries(
+      'Matron',
+      'Healer',
+      'Nurse',
+      'Caretaker',
+      'Attendant',
+    ),
+  },
+  stewardship: {
+    label: 'Stewardship',
+    description:
+      'Preserving, curating, or safeguarding knowledge, artifacts, sites, or cultural heritage.',
+    searchTerms: ['curation', 'preservation', 'custody'],
+    memberTitles: organizationMemberTitleEntries(
+      'Curator',
+      'Keeper',
+      'Custodian',
+      'Archivist',
+      'Warden',
+    ),
+  },
+  intelligence: {
+    label: 'Intelligence',
+    description: 'Gathering, analyzing, or acting on covert or strategic information.',
+    searchTerms: ['espionage', 'surveillance', 'covert information'],
+    memberTitles: organizationMemberTitleEntries(
+      'Director',
+      'Handler',
+      'Analyst',
+      'Agent',
+      'Scout',
+    ),
+  },
+  aid: {
+    label: 'Aid',
+    description:
+      'Providing material relief, mutual assistance, or reciprocal support to communities in need.',
+    searchTerms: ['relief', 'mutual aid', 'charity'],
+    memberTitles: organizationMemberTitleEntries(
+      'Coordinator',
+      'Benefactor',
+      'Volunteer',
+      'Almoner',
+      'Steward',
     ),
   },
 } as const satisfies Record<string, OrganizationClassificationEntry>
