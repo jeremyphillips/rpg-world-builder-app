@@ -35,9 +35,10 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 
 ## Groups
 
-Semantic `<fieldset>` + `<legend>`. Top-level: section scale (`text-field-group-legend`).
-Nested groups inside another group default to `legendSize: 'subsection'` (override when
-needed). Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
+Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint? }` for new config;
+`legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Nested named groups derive subsection typography from nesting depth — no `legendSize`
+override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
@@ -61,7 +62,7 @@ whose parent shell already spaces siblings use that pattern instead of `FormFiel
 }
 ```
 
-`FieldGroup` (standalone) accepts the same `legendSize`, `size`, `chrome`, and `disclosure`.
+`FieldGroup` (standalone) accepts the same heading/legend props, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `density` on `GroupConfig` overrides inherited section density for the group subtree.
@@ -73,7 +74,8 @@ exclusive** — omit for plain fieldset behavior.
 
 | `variant` | Use                                                                                                                                                                                                                                                                           |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inset`   | Left rail + indent on the **field stack** only — legend stays outside. Padding follows group density (`compact`: 16px / 20px; `comfortable`: 16px / 32px; mobile / `sm+`). Tones: `border` (default), `primary`.                                                              |
+| `rail`    | Left rail on the **field stack** only — legend stays outside. Pseudo rail at `left-2` (8px); total content inset (`compact`: `pl-8`; `comfortable`: `pl-9`). Tones: `border` (default), `primary`.                                                                            |
+| `inset`   | **Deprecated alias** for `rail` — same shared inset spacing as `rail`. Prefer `variant: 'rail'` for new authoring.                                                                                                                                                            |
 | `panel`   | Rounded border box around the **field stack** only. Default: `{ variant: 'panel' }` → subtle wash. `emphasis`: `subtle` (default), `default` (muted), `strong`. `elevation`: `flat` (default), `raised`. `tone`: semantic wash (`info`, `success`, `warning`, `destructive`). |
 | `outline` | Border-only box around the **field stack** — no background wash. `emphasis` maps to border ladder (`faint`, `subtle`, `default`, `strong`). `tone`: semantic border. `borderAccent`: `primary` for brand perimeter.                                                           |
 | `divider` | Section separator on the fieldset. `edge`: `top` (default) or `bottom`; adds `pt-7` / `pb-7` (28px) with `border-t` / `border-b`.                                                                                                                                             |
@@ -106,7 +108,6 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 {
   kind: 'group',
   legend: 'Campaign availability',
-  legendSize: 'array',
   disclosure: {
     variant: 'summary',
     defaultOpen: false,
@@ -140,11 +141,24 @@ and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md)
 
 ## Stacks
 
-Layout-only — one slot in outer rhythm, no fieldset. Use `layout: 'dependent'` when a
+Layout-only — one slot in outer rhythm, no fieldset. Use `kind: 'dependent'` when a
 controller field gates indented dependents:
 
+> **Inset positions dependent content. Rail offset positions the decorative boundary. Chrome must not determine content indentation.**
+
+| Concept         | Meaning                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Inset**       | Total horizontal offset where dependent content begins (`pl-8` / `pl-9` = 8px rail gutter + content offset) |
+| **Rail**        | Decorative vertical boundary (`before:left-2` pseudo-element)                                               |
+| **Rail offset** | Small positioning adjustment for the rail within the inset gutter (8px)                                     |
+
 - Field `[0]` (controller) — switch, select, etc. — always visible.
-- Fields `[1..]` (dependents) indent (`pl-11`) to align with the controller label column.
+- Fields `[1..]` (dependents) use rhythm-derived `pl-8` / `pl-9` when `dependents.inset` is `true` (default).
+- **`dependents.inset`**: `boolean` — controller-relative positioning. Default `true`. Set `false` for no dependent indentation.
+- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'none'`. Does not enable or disable inset.
+- **`inset: false` + `chrome: 'rail'`** — rail decoration without controller-relative indentation. No runtime ancestor inspection.
+- Nested dependent regions may independently use inset and/or rails/panels when they represent genuine nested dependencies — nested rails are supported and intentional.
+- Shared factories (e.g. mode-dependent grant sets) default to `inset: true`, `chrome: 'none'` but accept `dependents: { inset?, chrome? }` overrides at the call site.
 - Dependents hidden when the gate predicate is false — no empty inset.
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
@@ -189,7 +203,8 @@ Select controller with explicit gate (species class-policy pattern):
   },
   dependents: {
     visibility: visibleWhenClassPolicyNeedsIds(),
-    surface: { emphasis: 'subtle' },
+    chrome: 'panel',
+    panel: { surface: { emphasis: 'subtle' } },
     fields: [
       {
         type: 'combobox',
@@ -208,7 +223,8 @@ Dependent stack with an array dependent — use `arrayItems` scope:
   kind: 'dependent',
   controller: { type: 'switch', name: 'enabled', label: 'Class-specific limits', hint: '…' },
   dependents: {
-    surface: { emphasis: 'subtle' },
+    chrome: 'panel',
+    panel: { surface: { emphasis: 'subtle' } },
     scope: 'arrayItems',
     fields: [
       {
@@ -303,8 +319,9 @@ pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside ne
 }
 ```
 
-**Legend scale:** `legendSize` defaults to `array`. With `density: 'compact'`, legend is
-`text-sm`; `density: 'comfortable'` uses `text-field-array-legend` (18px).
+**Legend scale:** Array legend typography derives from parent named-group depth and section
+`density` (compact → smaller legend). Prefer `heading.label` when authoring new arrays;
+`legend` remains supported via `resolveArrayHeading`.
 
 ### Collapse defaults and persistence
 

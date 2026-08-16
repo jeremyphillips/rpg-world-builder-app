@@ -450,7 +450,7 @@ describe('ArrayFieldRenderer', () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
     renderForm(onSubmit)
-    await user.type(screen.getByLabelText('Name'), 'Elf')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Elf')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
     await submitAndExpectPayload(user, onSubmit, {
@@ -462,7 +462,7 @@ describe('ArrayFieldRenderer', () => {
   it('validates required fields inside an array item', async () => {
     const user = userEvent.setup()
     renderForm()
-    await user.type(screen.getByLabelText('Name'), 'Elf')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Elf')
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
     await user.click(screen.getByRole('button', { name: 'Save' }))
     expect(await screen.findByText('Trait name is required')).toBeInTheDocument()
@@ -631,11 +631,11 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    expect(screen.getByLabelText('Sense detail')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Sense detail' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add entry' })).not.toBeInTheDocument()
 
-    await user.clear(screen.getByLabelText('Grant type'))
-    await user.type(screen.getByLabelText('Grant type'), 'spells')
+    await user.clear(screen.getByRole('textbox', { name: 'Grant type' }))
+    await user.type(screen.getByRole('textbox', { name: 'Grant type' }), 'spells')
 
     expect(screen.queryByLabelText('Sense detail')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add entry' })).toBeInTheDocument()
@@ -683,7 +683,7 @@ describe('ArrayFieldRenderer', () => {
 
     // Turn on the switch to reveal the conditional field
     await user.click(screen.getByRole('switch', { name: 'Enabled' }))
-    expect(screen.getByLabelText('Detail')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Detail' })).toBeInTheDocument()
   })
 
   itAxe('has no axe violations with a populated array', async () => {
@@ -1284,8 +1284,14 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Rarity')).toHaveAttribute('aria-invalid', 'true')
-      expect(screen.getByLabelText('Quantity')).toHaveAttribute('aria-invalid', 'true')
+      expect(screen.getByRole('textbox', { name: 'Rarity' })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
+      expect(screen.getByRole('textbox', { name: 'Quantity' })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
     })
 
     expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()

@@ -18,6 +18,8 @@ import {
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 
 export interface ChooseCountFieldAnatomy {
   legendId: string
@@ -37,7 +39,7 @@ interface ChooseCountFieldShellProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
-  hideLabel?: boolean
+  labelVisibility?: FieldLabelVisibility
   children: (anatomy: ChooseCountFieldAnatomy) => React.ReactNode
 }
 
@@ -53,7 +55,7 @@ export function ChooseCountFieldShell({
   disabled,
   size = 'md',
   width = 'full',
-  hideLabel = false,
+  labelVisibility = 'visible',
   children,
 }: ChooseCountFieldShellProps) {
   const { legendId, chooseId, hintId, errorId } = fieldAnatomyIds(id)
@@ -69,10 +71,14 @@ export function ChooseCountFieldShell({
     >
       <legend
         id={legendId}
-        data-required={required || undefined}
-        className={cn(fieldLabelVariants({ size }), hideLabel && 'sr-only')}
+        className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
       >
-        <FieldLabelContent label={label} info={info} />
+        <FieldLabelContent
+          label={label}
+          required={required}
+          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+          info={info}
+        />
       </legend>
       {hintPosition === 'below-label' ? (
         <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />

@@ -31,7 +31,7 @@ describe('InlineSentenceField form integration', () => {
         type: 'inlineSentence',
         name: 'unlockLevel',
         label: 'Granted at',
-        hideLabel: true,
+        labelVisibility: 'srOnly',
         segments: [
           { kind: 'text', value: 'Granted at', tone: 'label' },
           {
@@ -71,7 +71,7 @@ describe('InlineSentenceField form integration', () => {
             type: 'inlineSentence',
             name: 'unlockLevel',
             label: 'Granted at',
-            hideLabel: true,
+            labelVisibility: 'srOnly',
             segments: [
               { kind: 'text', value: 'Granted at', tone: 'label' },
               {
@@ -96,7 +96,7 @@ describe('InlineSentenceField form integration', () => {
       <InlineSentenceField
         id="unlock-level"
         label="Granted at"
-        hideLabel
+        labelVisibility="srOnly"
         segments={[
           { kind: 'text', value: 'Granted at', tone: 'label' },
           {
@@ -128,7 +128,7 @@ describe('InlineSentenceField form integration', () => {
       <InlineSentenceField
         id="unlock-level"
         label="Granted at"
-        hideLabel
+        labelVisibility="srOnly"
         segments={[
           { kind: 'text', value: 'Granted at', tone: 'label' },
           {
@@ -165,7 +165,7 @@ describe('InlineSentenceField form integration', () => {
         type: 'inlineSentence',
         name: 'choose',
         label: 'Choice count',
-        hideLabel: true,
+        labelVisibility: 'srOnly',
         segments: [
           { kind: 'text', value: 'Character chooses', tone: 'label' },
           { kind: 'number', name: 'choose', min: 1, defaultValue: 1 },
@@ -207,7 +207,7 @@ describe('InlineSentenceField form integration', () => {
         type: 'inlineSentence',
         name: 'skills',
         label: 'Skills',
-        hideLabel: true,
+        labelVisibility: 'srOnly',
         segments: [
           { kind: 'text', value: 'Choose', tone: 'label' },
           { kind: 'number', name: 'choose', min: 0, defaultValue: 1 },
@@ -244,7 +244,7 @@ describe('InlineSentenceField form integration', () => {
         type: 'inlineSentence',
         name: 'movement',
         label: 'Movement',
-        hideLabel: true,
+        labelVisibility: 'srOnly',
         segments: [
           {
             kind: 'select',

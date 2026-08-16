@@ -2,6 +2,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import { Field, type FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { Checkbox } from './checkbox.client'
 import {
   fieldInlineCheckboxControlColumnClasses,
@@ -14,11 +15,16 @@ import { resolveFieldPresentation } from './field-row-presentation.lib'
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
+import { cn } from '../../lib/utils'
 
 export interface CheckboxFieldProps
-  extends Omit<ComponentProps<typeof Checkbox>, 'id'>, FieldValidationProps, FieldChromeProps {
+  extends
+    Omit<ComponentProps<typeof Checkbox>, 'id'>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   info?: ReactNode
   required?: boolean
@@ -30,6 +36,7 @@ export interface CheckboxFieldProps
 export function CheckboxField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -49,8 +56,16 @@ export function CheckboxField({
   })
 
   const labelNode = (
-    <Field.Label placement="inlineCheckbox">
-      <FieldLabelContent label={label} info={info} />
+    <Field.Label
+      placement="inlineCheckbox"
+      className={cn(labelVisibility === 'srOnly' && 'sr-only')}
+    >
+      <FieldLabelContent
+        label={label}
+        required={required}
+        showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+        info={info}
+      />
     </Field.Label>
   )
 

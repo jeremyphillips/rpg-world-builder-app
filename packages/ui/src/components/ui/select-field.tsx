@@ -194,13 +194,13 @@ export function SelectField({
           {resolvedHintPosition === 'below-label' ? (
             <div className={fieldLabelHintStackClasses}>
               <Field.Label>
-                <FieldLabelContent label={label} info={info} />
+                <FieldLabelContent label={label} required={required} info={info} />
               </Field.Label>
               <Field.Hint />
             </div>
           ) : (
             <Field.Label>
-              <FieldLabelContent label={label} info={info} />
+              <FieldLabelContent label={label} required={required} info={info} />
             </Field.Label>
           )}
           {chromedSelect}
@@ -227,7 +227,7 @@ export function SelectField({
         wrapControl={false}
         label={
           <Field.Label>
-            <FieldLabelContent label={label} info={info} />
+            <FieldLabelContent label={label} required={required} info={info} />
           </Field.Label>
         }
         control={select}

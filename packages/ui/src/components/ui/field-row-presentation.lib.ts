@@ -28,8 +28,8 @@ export type FieldRowConfig = {
   layout?: FieldRowLayout
   /** Default `control-edge` (`items-end`). */
   align?: FieldRowAlignment
-  /** Filters/toolbars use `toolbar` (`gap-2`); form `FieldRow` uses `form` (`gap-6`). */
-  gap?: 'toolbar' | 'form'
+  /** Filters/toolbars use `toolbar` (`gap-2`); form rows use `form` (`gap-6`) or `compact` (`gap-4`). */
+  gap?: 'toolbar' | 'form' | 'compact'
 }
 
 export type FieldRowPresentation = {

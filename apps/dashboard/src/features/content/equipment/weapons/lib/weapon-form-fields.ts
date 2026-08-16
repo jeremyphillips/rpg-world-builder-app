@@ -148,7 +148,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         kind: 'group',
         legend: 'Damage',
         chrome: { variant: 'panel', elevation: 'raised' },
-        legendSize: 'subsection',
         fields: [
           ...weaponDamageFields({ ctx }),
           {
@@ -171,7 +170,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
       {
         kind: 'group',
         legend: 'Range',
-        legendSize: 'subsection',
         visibility: visibleWhenRangeFields(),
         fields: [
           {

@@ -74,6 +74,31 @@ describe('Form section rendering', () => {
     expect(damageGroup).toHaveClass('mb-0')
   })
 
+  it('keeps anonymous layout groups transparent to heading tier', () => {
+    const anonymousWrapperFields: FormItem[] = [
+      {
+        kind: 'group',
+        legend: 'Weapon',
+        fields: [
+          {
+            kind: 'group',
+            fields: [{ type: 'text', name: 'title', label: 'Title' }],
+          },
+          {
+            kind: 'group',
+            legend: 'Damage',
+            fields: [{ type: 'text', name: 'damageDice', label: 'Dice' }],
+          },
+        ],
+      },
+    ]
+
+    render(<Form schema={schema} fields={anonymousWrapperFields} onSubmit={vi.fn()} />)
+
+    expect(screen.getByText('Weapon').closest('legend')).toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
+  })
+
   it('omits section bottom margin on top-level arrays spaced by form rhythm', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
@@ -115,5 +140,46 @@ describe('Form section rendering', () => {
     const group = screen.getByRole('group', { name: /Campaign availability/ })
     expect(group).not.toHaveClass('mb-8')
     expect(group).toHaveClass('mb-0')
+  })
+
+  it('renders row spacing compact as gap-4 on FieldRow', () => {
+    const compactRowFields: FormItem[] = [
+      {
+        kind: 'row',
+        spacing: 'compact',
+        fields: [
+          { type: 'text', name: 'first', label: 'First name' },
+          { type: 'text', name: 'second', label: 'Last name' },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form schema={schema} fields={compactRowFields} onSubmit={vi.fn()} />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toHaveClass('gap-4')
+    expect(row).not.toHaveClass('gap-6')
+  })
+
+  it('renders default row spacing as gap-6 on FieldRow', () => {
+    const defaultRowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          { type: 'text', name: 'first', label: 'First name' },
+          { type: 'text', name: 'second', label: 'Last name' },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form schema={schema} fields={defaultRowFields} onSubmit={vi.fn()} />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toHaveClass('gap-6')
+    expect(row).not.toHaveClass('gap-4')
   })
 })

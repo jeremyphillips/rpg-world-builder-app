@@ -40,11 +40,20 @@ import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
 import type {
   FieldHintPosition,
-  FieldGroupLegendSize,
   FieldLabelPosition,
   FieldSeparator,
 } from '../components/ui/field.variants'
 import type { FormDensity } from './form-density'
+import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
+
+export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
+
+/** Opt-in sidebar / in-page navigation anchor on semantic containers. */
+export type FormNavigationAnchor = {
+  id: string
+  /** Concise sidebar label; form heading/label remains authoritative for the form surface. */
+  label?: string
+}
 
 export type { FieldGroupChrome } from '../components/ui/field-group-chrome.variants'
 export type {
@@ -262,6 +271,12 @@ interface BaseFieldConfig {
   name: string
   label: string
   /**
+   * Visible vs screen-reader-only labeling. Parent headings may replace redundant
+   * visible labels; the accessible name always comes from `label`.
+   * @default 'visible'
+   */
+  labelVisibility?: FieldLabelVisibility
+  /**
    * Overrides control scale only; does not change sibling field rhythm. Rare —
    * prefer section `density` on shells, groups, or arrays.
    */
@@ -432,7 +447,7 @@ export interface RadioFieldConfig extends BaseFieldConfig {
   /** When `'horizontal'`, options lay out in a row (default `'vertical'`). */
   orientation?: 'horizontal' | 'vertical'
   /** Visually hide the label while keeping it available to screen readers. */
-  labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
 }
 
 export interface RadioCardFieldConfig extends BaseFieldConfig {
@@ -440,7 +455,7 @@ export interface RadioCardFieldConfig extends BaseFieldConfig {
   options: FieldOption[]
   defaultValue?: string
   /** Visually hide the label while keeping it available to screen readers. */
-  labelHidden?: boolean
+  labelVisibility?: FieldLabelVisibility
 }
 
 export interface CheckboxFieldConfig extends BaseFieldConfig {
@@ -549,7 +564,7 @@ export type {
 /**
  * Composable inline prose + bound controls (`type: 'inlineSentence'`).
  *
- * Common options: `segments`, `below`, `hideLabel`, `chipSize`, `visibility`, `required`.
+ * Common options: `segments`, `below`, `labelVisibility`, `chipSize`, `visibility`, `required`.
  *
  * Prefer over deprecated `chooseFromChips` / `inlineChooseCount` for new authoring.
  * Use `defineInlineSentenceField()` for variant-specific completion.
@@ -581,8 +596,6 @@ export interface InlineSentenceFieldConfig extends BaseFieldConfig {
    */
   segments: InlineSentenceSegment[]
   below?: InlineSentenceBelowChips
-  /** When true, the legend is visually hidden but kept for assistive tech. */
-  hideLabel?: boolean
   /** Pill scale for `below` chips; defaults to field `size`. */
   chipSize?: FieldSize
 }
@@ -624,8 +637,6 @@ export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   suffix?: string
   /** Visual digit capacity for the count input. Defaults to `1`. */
   digits?: FieldDigits
-  /** When true, the legend is visually hidden but kept for assistive tech. */
-  hideLabel?: boolean
   defaultValue?: number
   /** Optional trailing select bound to a second RHF path (same pattern as `chooseFromChips.chooseName`). */
   selectName?: string
@@ -899,9 +910,25 @@ export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>):
   return item.fields.some(rowFieldReservesDerivedMeta) ? 'start' : 'control-edge'
 }
 
+/** Inter-control spacing within a schema row. */
+export type RowSpacing = 'default' | 'compact'
+
+/** Maps row spacing config to {@link FieldRow} gap tokens. */
+export function resolveRowFieldGap(spacing?: RowSpacing): 'form' | 'compact' {
+  return spacing === 'compact' ? 'compact' : 'form'
+}
+
 export interface RowConfig {
   kind: 'row'
+  /** Leaf-tier composite heading for the row block. */
+  heading?: FormHeading
+  /** Optional DOM id on the row composite wrapper — for in-page scroll anchors. */
+  id?: string
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
   fields: RowFieldItem[]
+  /** Inter-control spacing within the row. @default 'default' */
+  spacing?: RowSpacing
   className?: string
   /**
    * Flex cross-axis alignment for row siblings. When omitted, defaults to
@@ -928,6 +955,12 @@ export type GroupFieldItem =
   | DependentConfig
   | ArrayConfig
 
+/** Decorative boundary for the dependents region — orthogonal to {@link DependentDependentsConfig.inset}. */
+export type DependentChrome = 'none' | 'rail' | 'panel'
+
+/** Default controller-relative positioning for dependent regions. */
+export const DEFAULT_DEPENDENT_INSET = true
+
 export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
   /**
@@ -935,8 +968,12 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  surface?: SurfaceConfig
-  tone?: SemanticSurfaceTone
+  /** Controller-relative indentation. @default {@link DEFAULT_DEPENDENT_INSET} */
+  inset?: boolean
+  /** Decorative treatment only. @default 'none' */
+  chrome?: DependentChrome
+  /** Panel wash options — only when `chrome === 'panel'`. */
+  panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
   /**
    * Where dependent chrome applies.
    *
@@ -972,15 +1009,15 @@ export interface DependentConfig {
   className?: string
   /** Optional DOM id on the dependent wrapper — for in-page scroll anchors. */
   id?: string
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
 }
 
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `legendSize`, `density`, `chrome`, `disclosure`,
+ * Common options: `legend`, `fields`, `density`, `chrome`, `disclosure`,
  * `description`, `visibility`.
- *
- * Nested groups inside another group often use `legendSize: 'subsection'`.
  * Use `defineGroupField()` for completion.
  *
  * @example
@@ -994,6 +1031,8 @@ export interface DependentConfig {
  */
 export interface GroupConfig {
   kind: 'group'
+  /** Preferred heading API — tier resolves from named-group nesting depth. */
+  heading?: FormHeading
   /** When omitted, renders as a layout/visibility wrapper without a legend. */
   legend?: string
   description?: string
@@ -1001,8 +1040,8 @@ export interface GroupConfig {
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
-  /** Legend scale — `subsection` (20px) for nested groups inside another group. */
-  legendSize?: FieldGroupLegendSize
+  /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
+  navigation?: FormNavigationAnchor
   /**
    * Section density for this group subtree. Inherits parent density when omitted.
    */
@@ -1169,8 +1208,10 @@ export interface ArrayFilterSelectConfig {
 export interface ArrayConfig {
   kind: 'array'
   name: string
-  legend: string
-  legendSize?: FieldGroupLegendSize
+  /** Preferred heading API — typography derives from nesting depth and density. */
+  heading?: Pick<FormHeading, 'label'>
+  /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
+  legend?: string
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */
@@ -1198,7 +1239,11 @@ export interface ArrayConfig {
 export interface SlotConfig {
   kind: 'slot'
   name: string
+  /** Preferred leaf-tier heading API for the slot composite surface. */
+  heading?: FormHeading
+  /** @deprecated Use `heading.label`. */
   label?: string
+  /** @deprecated Use `heading.hint`. */
   hint?: string
   className?: string
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */

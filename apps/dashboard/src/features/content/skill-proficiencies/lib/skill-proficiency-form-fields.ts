@@ -97,7 +97,7 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
                 {
                   type: 'text',
                   name: 'value',
-                  label: '',
+                  label: 'Example',
                   placeholder: 'Example…',
                   required: true,
                   width: 'full',

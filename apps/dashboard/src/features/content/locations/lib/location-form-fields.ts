@@ -228,7 +228,7 @@ export function buildSettlementStartingDistrictsFormItems(
       kind: 'group',
       legend: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
       description: `${guidance.helper} ${guidance.emphasis}`,
-      chrome: { variant: 'inset' },
+      chrome: { variant: 'rail' },
       fields: [
         {
           kind: 'slot',

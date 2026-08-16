@@ -11,24 +11,35 @@ describe('resolveFieldGroupChromeClassNames', () => {
     })
   })
 
-  it('applies inset body classes', () => {
+  it('applies pseudo rail and rhythm-scoped content inset on the body', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'rail' })
+    expect(classes.body).toContain('before:left-2')
+    expect(classes.body).toContain('pl-9')
+    expect(classes.body).not.toContain('border-l-2')
+  })
+
+  it('applies compact content inset when rhythm is compact', () => {
+    const classes = resolveFieldGroupChromeClassNames({ variant: 'rail' }, { rhythm: 'compact' })
+    expect(classes.body).toContain('pl-8')
+    expect(classes.body).not.toContain('pl-9')
+  })
+
+  it('applies inset body classes as a deprecated alias for rail', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' })
-    expect(classes.body).toContain('border-l-2')
-    expect(classes.body).toContain('pl-4')
-    expect(classes.body).toContain('sm:pl-8')
-    expect(classes.body).toContain('border-border')
+    expect(classes.body).toContain('before:left-2')
+    expect(classes.body).toContain('pl-9')
+    expect(classes.body).not.toContain('border-l-2')
   })
 
   it('applies compact inset padding when rhythm is compact', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset' }, { rhythm: 'compact' })
-    expect(classes.body).toContain('pl-4')
-    expect(classes.body).toContain('sm:pl-5')
-    expect(classes.body).not.toContain('sm:pl-8')
+    expect(classes.body).toContain('pl-8')
+    expect(classes.body).not.toContain('pl-9')
   })
 
-  it('applies primary inset tone', () => {
+  it('applies primary rail tone', () => {
     const classes = resolveFieldGroupChromeClassNames({ variant: 'inset', tone: 'primary' })
-    expect(classes.body).toContain('border-primary')
+    expect(classes.body).toContain('before:bg-primary')
     expect(classes.body).not.toContain('bg-surface-strong')
   })
 

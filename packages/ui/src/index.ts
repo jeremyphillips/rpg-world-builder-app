@@ -381,8 +381,11 @@ export {
   fieldSeparatorVariants,
   fieldStackRhythmVariants,
   fieldSettingsRowClasses,
-  fieldToggleDependentIndentClasses,
   fieldToggleDependentStackClasses,
+  formDependentInsetSpacing,
+  formDependentInsetOffsetClasses,
+  resolveDependentInsetClasses,
+  resolveFormInsetPaddingClasses,
   type FieldHintPosition,
   type FieldLabelPlacement,
   type FieldLabelPosition,
@@ -411,7 +414,10 @@ export {
 } from './components/ui/field-row-presentation.lib'
 export {
   resolveFieldDependentsChromeClasses,
+  resolveFieldRailClasses,
+  fieldRailOffsetClasses,
   type FieldDependentsScope,
+  type FieldRailTone,
 } from './components/ui/field-dependent.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 

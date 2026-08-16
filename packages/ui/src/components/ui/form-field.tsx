@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactElement, ReactNode } from 'react'
 
 import type { FieldChrome } from './field-chrome.variants'
@@ -6,7 +8,8 @@ import { hasActiveFieldChrome } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import {
   mapFormLabelPositionToLayout,
   resolveFieldPresentation,
@@ -32,6 +35,8 @@ export interface FormFieldProps {
   required?: boolean
   size?: FieldSize
   width?: FieldWidth
+  /** @default 'visible' */
+  labelVisibility?: FieldLabelVisibility
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
   chrome?: FieldChrome
@@ -40,12 +45,20 @@ export interface FormFieldProps {
   children: ReactElement
 }
 
-const labelNode = (label: string, info?: ReactNode) => {
+const labelNode = (
+  label: string,
+  info?: ReactNode,
+  labelVisibility: FieldLabelVisibility = 'visible',
+  required?: boolean,
+) => {
   if (!label.trim()) return null
   return (
-    <Field.Label>
-      <FieldLabelContent label={label} info={info} />
-    </Field.Label>
+    <FormFieldLabel
+      label={label}
+      labelVisibility={labelVisibility}
+      info={info}
+      required={required}
+    />
   )
 }
 
@@ -67,6 +80,7 @@ export function FormField({
   required,
   size = 'md',
   width,
+  labelVisibility = 'visible',
   labelPosition = 'above',
   chrome,
   controlBand = 'single-line',
@@ -82,7 +96,7 @@ export function FormField({
       <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
         <div className={presentation.groupClassName}>
           <div className={fieldLabelHintStackClasses}>
-            {labelNode(label, info)}
+            {labelNode(label, info, labelVisibility, required)}
             <Field.Hint />
           </div>
           <div className={presentation.controlBandClassName}>
@@ -129,7 +143,7 @@ export function FormField({
     >
       <FieldLayout
         hintPosition={hintPosition}
-        label={labelNode(label, info)}
+        label={labelNode(label, info, labelVisibility, required)}
         control={children}
         chrome={chrome}
         size={size}

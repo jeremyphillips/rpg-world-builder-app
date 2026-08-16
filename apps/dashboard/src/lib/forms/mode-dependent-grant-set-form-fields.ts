@@ -1,4 +1,6 @@
 import {
+  type DependentChrome,
+  DEFAULT_DEPENDENT_INSET,
   type FieldConfig,
   type FieldOption,
   type FieldVisibility,
@@ -14,6 +16,11 @@ const XOR_GRANT_SET_MODE_LABELS: Record<XorGrantSetMode, string> = {
   none: 'None',
   category: 'Category',
   specific: 'Specific',
+}
+
+export type DependentPresentationOptions = {
+  inset?: boolean
+  chrome?: DependentChrome
 }
 
 export type ModeDependentGrantSetFieldOptions = {
@@ -35,9 +42,10 @@ export type ModeDependentGrantSetFieldOptions = {
   /** When set, the dependents region hides when the mode equals this value (e.g. `none`). */
   emptyMode?: string
   /** When true, hides the mode radio label while keeping it for accessibility. */
-  labelHidden?: boolean
+  labelVisibility?: 'visible' | 'srOnly'
   /** Trailing divider after this grant-set block within parent rhythm. */
   separator?: FieldConfig['separator']
+  dependents?: DependentPresentationOptions
 }
 
 function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibility {
@@ -47,7 +55,7 @@ function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibil
   }
 }
 
-/** Shared mode radio + inset dependents for category/specific grant-set editors. */
+/** Shared mode radio + dependent grant-set editors — decoration is owned by parent composition. */
 export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOptions): FormItem {
   const {
     modeFieldName,
@@ -66,8 +74,9 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     categoryMode,
     specificMode,
     emptyMode,
-    labelHidden,
+    labelVisibility,
     separator,
+    dependents: dependentsPresentation,
   } = options
 
   return {
@@ -80,7 +89,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
       hint,
       orientation: 'horizontal',
       options: toOptions(modes, modeLabels),
-      ...(labelHidden ? { labelHidden } : {}),
+      ...(labelVisibility === 'srOnly' ? { labelVisibility } : {}),
     },
     dependents: {
       ...(emptyMode
@@ -91,7 +100,8 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
             },
           }
         : {}),
-      surface: { emphasis: 'subtle' },
+      inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
+      chrome: dependentsPresentation?.chrome ?? 'none',
       fields: [
         {
           type: 'chips',

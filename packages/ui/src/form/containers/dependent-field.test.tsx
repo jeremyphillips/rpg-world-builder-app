@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import {
   fieldStackRhythmVariants,
-  fieldToggleDependentIndentClasses,
+  resolveDependentInsetClasses,
 } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
@@ -20,10 +20,13 @@ const schema = z.object({
 
 type Values = z.infer<typeof schema>
 
+const dependentInsetClasses = resolveDependentInsetClasses(true, 'comfortable')
+
 const dependentField = (
   options: {
-    surface?: SurfaceConfig
-    tone?: 'destructive'
+    inset?: boolean
+    chrome?: 'none' | 'rail' | 'panel'
+    panel?: { surface?: SurfaceConfig; tone?: 'destructive' }
     scope?: 'wrapper' | 'arrayItems'
     includeNote?: boolean
   } = {},
@@ -37,8 +40,9 @@ const dependentField = (
     defaultValue: false,
   },
   dependents: {
-    ...(options.surface ? { surface: options.surface } : {}),
-    ...(options.tone ? { tone: options.tone } : {}),
+    ...(options.inset === false ? { inset: false } : {}),
+    ...(options.chrome ? { chrome: options.chrome } : {}),
+    ...(options.panel ? { panel: options.panel } : {}),
     ...(options.scope ? { scope: options.scope } : {}),
     fields: [
       {
@@ -70,7 +74,7 @@ const dependentField = (
 })
 
 function renderDependentForm(
-  fields: FormItem[] = [dependentField({ surface: { emphasis: 'subtle' } })],
+  fields: FormItem[] = [dependentField()],
   defaultValues: Partial<Values> = { featureEnabled: false },
 ) {
   return render(
@@ -89,7 +93,9 @@ function queryDependentsRegion(container: HTMLElement) {
 
 function queryChromeShell(container: HTMLElement) {
   const region = queryDependentsRegion(container)
-  return region?.querySelector(':scope > .p-3') ?? null
+  if (!region) return null
+  if (region.hasAttribute('data-field-dependent-rail')) return region
+  return region.querySelector(':scope > .p-3')
 }
 
 describe('dependent field', () => {
@@ -107,25 +113,27 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      const shell = queryChromeShell(container) as HTMLElement | null
-      expect(region).toHaveClass(fieldToggleDependentIndentClasses)
-      expect(shell).toBeInTheDocument()
-      expect(region).toContainElement(shell)
-      expect(shell).not.toContainElement(switchControl)
-      expect(shell).toContainElement(screen.getByLabelText('Feature value'))
+      expect(region).toHaveClass(dependentInsetClasses)
+      expect(queryChromeShell(container)).toBeNull()
+      expect(region).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
 
-  it('applies subtle chrome tone classes to the dependents region', async () => {
+  it('applies subtle panel chrome classes when chrome is panel', async () => {
     const user = userEvent.setup()
-    const { container } = renderDependentForm()
+    const { container } = renderDependentForm([
+      dependentField({
+        chrome: 'panel',
+        panel: { surface: { emphasis: 'subtle' } },
+      }),
+    ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
       expect(shell).toHaveClass('bg-surface-subtle')
-      expect(queryDependentsRegion(container)).toHaveClass(fieldToggleDependentIndentClasses)
+      expect(queryDependentsRegion(container)).toHaveClass(dependentInsetClasses)
     })
   })
 
@@ -144,7 +152,7 @@ describe('dependent field', () => {
     expect(dependent).toHaveAttribute('aria-labelledby', expect.stringContaining('featureEnabled'))
   })
 
-  it('renders a plain indented stack when dependents surface is omitted', async () => {
+  it('defaults to inset positioning without decorative chrome when inset and chrome are omitted', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField()])
 
@@ -152,11 +160,126 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveClass(fieldToggleDependentIndentClasses)
+      expect(region).toHaveClass(dependentInsetClasses)
       expect(queryChromeShell(container)).toBeNull()
-      expect(region?.querySelector('.gap-6')).toBeInTheDocument()
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
     })
+  })
+
+  it.each([
+    { inset: true as const, chrome: 'none' as const, expectIndent: true, expectRail: false },
+    { inset: true as const, chrome: 'rail' as const, expectIndent: true, expectRail: true },
+    { inset: false as const, chrome: 'none' as const, expectIndent: false, expectRail: false },
+    { inset: false as const, chrome: 'rail' as const, expectIndent: false, expectRail: true },
+  ])(
+    'composes inset=$inset and chrome=$chrome independently',
+    async ({ inset, chrome, expectIndent, expectRail }) => {
+      const user = userEvent.setup()
+      const { container } = renderDependentForm([dependentField({ inset, chrome })])
+
+      await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+      await waitFor(() => {
+        const region = queryDependentsRegion(container)
+        if (expectIndent) {
+          expect(region).toHaveClass(dependentInsetClasses)
+        } else {
+          expect(region).not.toHaveClass(dependentInsetClasses)
+        }
+
+        const shell = queryChromeShell(container)
+        if (expectRail) {
+          expect(shell).toHaveAttribute('data-field-dependent-rail', '')
+        } else {
+          expect(shell).toBeNull()
+        }
+      })
+    },
+  )
+
+  it('places rail decoration on the dependents region, not an inner rhythm wrapper', async () => {
+    const user = userEvent.setup()
+    const { container } = renderDependentForm([dependentField({ chrome: 'rail' })])
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    await waitFor(() => {
+      const region = queryDependentsRegion(container)
+      expect(region).toHaveAttribute('data-field-dependent-rail', '')
+      expect(region).toHaveClass(dependentInsetClasses)
+      expect(region).toHaveClass('before:left-2')
+      expect(region?.querySelector(':scope > [data-field-dependent-rail]')).toBeNull()
+    })
+  })
+
+  it('allows nested inset + rail regions without suppressing inner chrome', async () => {
+    const nestedSchema = z.object({
+      allow: z.boolean(),
+      armorMode: z.string(),
+      armorCats: z.string().optional(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'dependent',
+        controller: {
+          type: 'switch',
+          name: 'allow',
+          label: 'Allow',
+          defaultValue: true,
+        },
+        dependents: {
+          chrome: 'rail',
+          fields: [
+            {
+              kind: 'dependent',
+              controller: {
+                type: 'radio',
+                name: 'armorMode',
+                label: 'Armor proficiencies',
+                options: [
+                  { label: 'Category', value: 'category' },
+                  { label: 'None', value: 'none' },
+                ],
+                defaultValue: 'category',
+              },
+              dependents: {
+                chrome: 'rail',
+                visibility: {
+                  dependsOn: ['armorMode'],
+                  visibleWhen: (values) => values.armorMode === 'category',
+                },
+                fields: [
+                  {
+                    type: 'text' as const,
+                    name: 'armorCats',
+                    label: 'Categories',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
+    ]
+
+    const { container } = render(
+      <Form<z.infer<typeof nestedSchema>>
+        schema={nestedSchema}
+        fields={fields}
+        defaultValues={{ allow: true, armorMode: 'category' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const regions = container.querySelectorAll('[data-field-dependent-fields]')
+    expect(regions).toHaveLength(2)
+    expect(regions[0]).toHaveClass(dependentInsetClasses)
+    expect(regions[1]).toHaveClass(dependentInsetClasses)
+    expect(
+      container.querySelectorAll('[data-field-dependent-fields][data-field-dependent-rail]'),
+    ).toHaveLength(2)
+    expect(screen.getByLabelText('Categories')).toBeInTheDocument()
   })
 
   it('inherits comfortable density on the outer dependent wrapper by default', async () => {
@@ -174,7 +297,11 @@ describe('dependent field', () => {
   it('applies comfortable rhythm inside dependents chrome', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
-      dependentField({ surface: { emphasis: 'subtle' }, includeNote: true }),
+      dependentField({
+        chrome: 'panel',
+        panel: { surface: { emphasis: 'subtle' } },
+        includeNote: true,
+      }),
     ])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
@@ -232,7 +359,8 @@ describe('dependent field', () => {
           defaultValue: false,
         },
         dependents: {
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           scope: 'arrayItems',
           fields: [
             {
@@ -294,7 +422,8 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',
@@ -367,7 +496,8 @@ describe('dependent field', () => {
             dependsOn: ['mode'],
             visibleWhen: (values) => values.mode !== 'all',
           },
-          surface: { emphasis: 'subtle' },
+          chrome: 'panel',
+          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',

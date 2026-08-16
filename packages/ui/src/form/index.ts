@@ -115,6 +115,7 @@ export {
   resolveFieldHintPresentation,
   collectFieldDynamicDependsOn,
   resolveRowFieldAlign,
+  resolveRowFieldGap,
   rowFieldReservesDerivedMeta,
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -171,6 +172,7 @@ export {
   type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
+  type RowSpacing,
   type RowFieldItem,
   type GroupConfig,
   type GroupFieldItem,
@@ -188,6 +190,12 @@ export {
   type VisualEmphasis,
   type FieldChrome,
   type FieldHintConfig,
+  type FormHeading,
+  type FormHeadingTier,
+  type FieldLabelVisibility,
+  type FormNavigationAnchor,
+  type DependentChrome,
+  DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
@@ -225,6 +233,11 @@ export {
   defineDependentField,
 } from './form-authoring'
 export { isRowSlotItem } from './field-config'
+export {
+  assertNavigationIdsMatchDomIds,
+  collectFormNavigationAnchors,
+  type CollectedNavigationAnchor,
+} from './form-navigation.lib'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
   DEFAULT_ARRAY_ITEM_SURFACE,

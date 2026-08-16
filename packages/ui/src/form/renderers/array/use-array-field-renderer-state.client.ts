@@ -13,7 +13,6 @@ import type { UseFieldArrayReturn } from 'react-hook-form'
 import {
   fieldArrayItemListClasses,
   fieldStackRhythmVariants,
-  resolveArrayLegendScale,
 } from '../../../components/ui/field.variants'
 import {
   isNestedArraySection,
@@ -25,6 +24,8 @@ import {
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { resolveFormDensity } from '../../form-density'
+import { resolveArrayLegendPresentation } from '../../form-heading.lib'
+import { hasNamedArrayHeading, resolveArrayHeading } from '../../resolve-container-heading.lib'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
@@ -55,7 +56,7 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { density, depth, inRhythmStack } = useFormSectionContext()
+  const { density, depth, inRhythmStack, namedGroupDepth } = useFormSectionContext()
   const { rhythm, size } = resolveFormDensity(density)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
@@ -67,11 +68,15 @@ export function useArrayFieldRendererState({
     icon: showAddIcon = true,
     menu: addActionMenu,
   } = addAction ?? {}
-  const { min = 0, max, legend, legendSize = 'array' } = config
+  const arrayHeading = resolveArrayHeading(config)
+  const legend = arrayHeading?.label ?? config.legend ?? ''
+  const hasNamedHeading = hasNamedArrayHeading(config)
+  /** Legend typography uses depth before this array's own heading increment. */
+  const legendNamedGroupDepth = hasNamedHeading ? Math.max(0, namedGroupDepth - 1) : namedGroupDepth
+  const { legendSize, legendScale } = resolveArrayLegendPresentation(legendNamedGroupDepth, size)
+  const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey
-
-  const legendScale = legendSize === 'array' ? resolveArrayLegendScale(size) : 'default'
   const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
   const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)

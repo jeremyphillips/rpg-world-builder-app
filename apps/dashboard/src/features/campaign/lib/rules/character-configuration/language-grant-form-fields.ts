@@ -6,7 +6,7 @@ export type LanguageGrantItemsFieldOptions = {
   hint?: string
   introText?: string
   languageOptions: FieldOption[]
-  hideLabel?: boolean
+  labelVisibility?: 'visible' | 'srOnly'
   separator?: 'subtle'
 }
 
@@ -18,7 +18,7 @@ export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions)
     hint,
     introText = 'Characters receive these languages:',
     languageOptions,
-    hideLabel = true,
+    labelVisibility = 'srOnly',
     separator,
   } = options
 
@@ -27,7 +27,7 @@ export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions)
     name: path,
     label,
     hint,
-    hideLabel,
+    ...(labelVisibility === 'srOnly' ? { labelVisibility: 'srOnly' } : {}),
     segments: [{ kind: 'text', value: introText, tone: 'label' }],
     below: {
       kind: 'chips',

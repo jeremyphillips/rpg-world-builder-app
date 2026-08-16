@@ -195,7 +195,7 @@ column layout in the form stack.
   type: 'inlineSentence',
   name: 'unlockLevel',
   label: 'Granted at',
-  hideLabel: true,
+  labelVisibility: 'srOnly',
   segments: [
     { kind: 'text', value: 'Granted at', tone: 'label' },
     {
@@ -213,7 +213,7 @@ column layout in the form stack.
   type: 'inlineSentence',
   name: 'choose',
   label: 'Equipment choice',
-  hideLabel: true,
+  labelVisibility: 'srOnly',
   segments: [
     { kind: 'text', value: 'Character chooses', tone: 'label' },
     { kind: 'number', name: 'choose', min: 1, digits: 1, defaultValue: 1 },

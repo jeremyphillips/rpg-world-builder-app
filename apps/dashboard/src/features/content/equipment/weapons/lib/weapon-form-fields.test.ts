@@ -56,8 +56,8 @@ describe('weapon kindFieldGroups', () => {
     expect(damageGroup).toMatchObject({
       kind: 'group',
       legend: 'Damage',
-      legendSize: 'subsection',
     })
+    expect(damageGroup).not.toHaveProperty('legendSize')
   })
 
   it('binds damage directly to RollValue paths via shared atoms', () => {
@@ -178,11 +178,12 @@ describe('weapon kindFieldGroups', () => {
     }
 
     expect(rangeGroup).toMatchObject({
-      legendSize: 'subsection',
+      legend: 'Range',
       visibility: {
         dependsOn: ['mode', 'properties'],
       },
     })
+    expect(rangeGroup).not.toHaveProperty('legendSize')
   })
 
   it('wires property and mastery conditional option availability and dynamic hints', () => {

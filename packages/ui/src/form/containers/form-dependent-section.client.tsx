@@ -3,13 +3,10 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldStackRhythmVariants,
-  fieldToggleDependentIndentClasses,
-} from '../../components/ui/field.variants'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import {
   DEFAULT_DEPENDENT_SURFACE,
-  resolveFieldDependentsChromeClasses,
+  resolveDependentPresentation,
 } from '../../components/ui/field-dependent.variants'
 import { resolveFormDensity } from '../form-density'
 import {
@@ -19,6 +16,7 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import {
+  DEFAULT_DEPENDENT_INSET,
   resolveDependentsVisibility,
   type DependentConfig,
   type FieldVisibility,
@@ -84,8 +82,8 @@ export function DependentSection({
         <FieldNode config={controller} idPrefix={idPrefix} namePrefix={namePrefix} />
         <DependentFieldsRegion
           dependentsVisibility={dependentsVisibility}
-          surface={item.dependents.surface}
-          tone={item.dependents.tone}
+          dependentsChrome={item.dependents}
+          inset={item.dependents.inset}
           scope={item.dependents.scope}
           rhythm={rhythm}
           parentContext={childContext}
@@ -104,8 +102,8 @@ export function DependentSection({
 
 interface DependentFieldsRegionProps {
   dependentsVisibility: FieldVisibility | null
-  surface?: DependentConfig['dependents']['surface']
-  tone?: DependentConfig['dependents']['tone']
+  dependentsChrome: DependentConfig['dependents']
+  inset?: boolean
   scope?: DependentConfig['dependents']['scope']
   rhythm: ReturnType<typeof resolveFormDensity>['rhythm']
   parentContext: FormSectionContextValue
@@ -139,8 +137,8 @@ function GatedDependentFieldsRegion({
 }
 
 function DependentFieldsRegionContent({
-  surface,
-  tone,
+  dependentsChrome,
+  inset = DEFAULT_DEPENDENT_INSET,
   scope = 'wrapper',
   rhythm,
   parentContext,
@@ -150,19 +148,18 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const resolvedTone = tone
-  const hasChrome = surface !== undefined || resolvedTone !== undefined
-  const useArrayItemScope = hasChrome && scope === 'arrayItems'
+  const presentation = resolveDependentPresentation({ ...dependentsChrome, inset }, rhythm)
+  const useArrayItemScope = presentation.chrome === 'panel' && scope === 'arrayItems'
   const arrayItemContext = React.useMemo(
     () =>
       useArrayItemScope
         ? {
             ...parentContext,
-            arrayItemSurface: surface ?? DEFAULT_DEPENDENT_SURFACE,
-            arrayItemTone: resolvedTone,
+            arrayItemSurface: presentation.arrayItemSurface ?? DEFAULT_DEPENDENT_SURFACE,
+            arrayItemTone: presentation.arrayItemTone,
           }
         : null,
-    [useArrayItemScope, parentContext, resolvedTone, surface],
+    [useArrayItemScope, parentContext, presentation.arrayItemSurface, presentation.arrayItemTone],
   )
 
   const dependentsContent = renderNestedItems({
@@ -176,15 +173,18 @@ function DependentFieldsRegionContent({
     <div className={fieldStackRhythmVariants({ rhythm })}>{content}</div>
   )
 
+  const chromeWrapperClassName = presentation.chromeWrapperClassName
+  const railClassName = presentation.railClassName
+  const showRail = Boolean(railClassName && scope === 'wrapper')
+
   return (
-    <div className={fieldToggleDependentIndentClasses} data-field-dependent-fields="">
-      {hasChrome && scope === 'wrapper' ? (
-        <div
-          className={cn(
-            fieldStackRhythmVariants({ rhythm }),
-            resolveFieldDependentsChromeClasses({ surface, tone: resolvedTone }),
-          )}
-        >
+    <div
+      className={cn(presentation.insetClassName, showRail ? railClassName : undefined)}
+      data-field-dependent-fields=""
+      {...(showRail ? { 'data-field-dependent-rail': '' } : {})}
+    >
+      {chromeWrapperClassName && scope === 'wrapper' ? (
+        <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeWrapperClassName)}>
           {dependentsContent}
         </div>
       ) : useArrayItemScope && arrayItemContext ? (

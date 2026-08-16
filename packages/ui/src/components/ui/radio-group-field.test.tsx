@@ -39,7 +39,7 @@ describe('RadioGroupField', () => {
       <RadioGroupField
         id="weapon-mode"
         label="Weapon proficiency mode"
-        labelHidden
+        labelVisibility="srOnly"
         orientation="horizontal"
         options={[
           { label: 'Categories', value: 'categories' },

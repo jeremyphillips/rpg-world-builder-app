@@ -43,7 +43,7 @@ export function RadioGroupField({
   onValueChange,
   onBlur,
   orientation = 'vertical',
-  labelHidden,
+  labelVisibility,
   chrome,
 }: RadioGroupFieldProps) {
   return (
@@ -57,7 +57,7 @@ export function RadioGroupField({
       required={required}
       size={size}
       width={width}
-      labelHidden={labelHidden}
+      labelVisibility={labelVisibility}
       chrome={chrome}
     >
       {(labelId) => (

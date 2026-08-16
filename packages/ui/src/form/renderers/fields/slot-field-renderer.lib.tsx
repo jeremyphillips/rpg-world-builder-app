@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { FieldGroup } from '../../../components/ui/field-group'
 import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
 import { hasActiveFieldChrome } from '../../../components/ui/field-chrome.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
@@ -9,24 +8,27 @@ import { fieldGroupDescriptionClasses } from '../../../components/ui/field.varia
 import { Text } from '../../../components/ui/text'
 import { FormRhythmStack } from '../../context/form-section.context'
 import type { SlotConfig } from '../../field-config'
+import { CompositeGroup } from '../../presentation/composite-group.client'
+import { resolveSlotHeading } from '../../resolve-container-heading.lib'
 
 export function buildSlotFieldBody(
   config: SlotConfig,
   content: ReactNode,
-  rhythm: FieldRhythm,
+  _rhythm: FieldRhythm,
   size: FieldSize,
 ): ReactNode | null {
-  if (config.label) {
+  const heading = resolveSlotHeading(config)
+
+  if (heading) {
     return (
-      <FieldGroup
-        legend={config.label}
-        description={config.hint}
-        rhythm={rhythm}
-        size={size}
+      <CompositeGroup
+        heading={heading}
         className={config.className}
+        size={size}
+        useFieldset={false}
       >
         {content}
-      </FieldGroup>
+      </CompositeGroup>
     )
   }
 
@@ -48,19 +50,21 @@ export function wrapSlotFieldBody(
   config: SlotConfig,
   chromeSize: FieldSize,
 ): ReactNode {
+  const heading = resolveSlotHeading(config)
+
   if (hasActiveFieldChrome(config.chrome)) {
     return (
       <FieldChromeShell
         chrome={config.chrome}
         size={chromeSize}
-        className={!config.label && !config.hint ? config.className : undefined}
+        className={!heading && !config.hint ? config.className : undefined}
       >
         {body}
       </FieldChromeShell>
     )
   }
 
-  if (!config.label && !config.hint && config.className) {
+  if (!heading && !config.hint && config.className) {
     return <div className={config.className}>{body}</div>
   }
 

@@ -10,41 +10,33 @@ import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import {
-  buildCharacterCreationPatchInput,
+  buildCharacterConfigurationNavigation,
   buildMechanicsConfigFields,
   buildMechanicsPatchInput,
-  buildRulesConfigFields,
-  CHARACTER_CONFIGURATION_SECTIONS,
   mapRulesetPatchToMechanicsValues,
-  mapRulesetPatchToRulesValues,
   MECHANICS_CONFIGURATION_SECTIONS,
   mechanicsValuesSchema,
-  resolveRulesSchemaWithVocabulary,
   type MechanicsValues,
   type RulesValues,
   useCanManageCampaign,
 } from '@/features/campaign'
 
 import {
-  buildActiveCreatureTypeFieldOptions,
-  buildActiveLanguageFieldOptions,
   buildAttackResolutionModeFieldOptions,
   buildEditionPresetFieldOptions,
   useAttackResolutionModeVocabulary,
-  useCreatureTypeVocabulary,
   useEditionPresetVocabulary,
-  useLanguageVocabulary,
 } from '@/features/vocabulary'
 
 import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
+import { useCharacterConfigurationRulesForm } from '../hooks/use-character-configuration-rules-form.client'
+import { useRulesConfigNavScrollSpy } from '../hooks/use-rules-config-nav-scroll-spy.client'
 import { disableFormItems } from '@/lib/disable-form-items'
-import { buildContentFormOptionSets, useEquipment } from '@/features/content'
 import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
 import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'
 import { HomebrewDetailShell } from '../lib/detail/homebrew-detail-shell'
 import { findRulesConfigEntry, type RulesConfigId } from '../lib/hub/rules-config-registry'
-import { usePatchCharacterCreationMutation } from '../hooks/use-patch-character-creation-mutation'
 import { usePatchMechanicsMutation } from '../hooks/use-patch-mechanics-mutation'
 import { useRulesetPatch } from '../hooks/use-ruleset-patch'
 
@@ -55,21 +47,58 @@ const RULES_CONFIG_NOT_IMPLEMENTED_MESSAGE = 'This rules configuration page is n
 const RULES_CONFIG_NAV: Record<
   RulesConfigId,
   {
-    sections: typeof CHARACTER_CONFIGURATION_SECTIONS | typeof MECHANICS_CONFIGURATION_SECTIONS
     navLabel: string
     mobileSelectLabel: string
   }
 > = {
   'character-configuration': {
-    sections: CHARACTER_CONFIGURATION_SECTIONS,
     navLabel: 'Character configuration sections',
     mobileSelectLabel: 'Character configuration section',
   },
   mechanics: {
-    sections: MECHANICS_CONFIGURATION_SECTIONS,
     navLabel: 'Mechanics configuration sections',
     mobileSelectLabel: 'Mechanics configuration section',
   },
+}
+
+function CharacterConfigurationRulesConfigDetail({ campaignId }: { campaignId: string }) {
+  const navSections = useMemo(() => buildCharacterConfigurationNavigation(), [])
+  const { activeSectionId, activeLeafId } = useRulesConfigNavScrollSpy(navSections)
+  const nav = RULES_CONFIG_NAV['character-configuration']
+
+  return (
+    <HomebrewDetailShell
+      nav={
+        <RulesConfigFieldNav
+          sections={navSections}
+          navLabel={nav.navLabel}
+          mobileSelectLabel={nav.mobileSelectLabel}
+          activeSectionId={activeSectionId}
+          activeLeafId={activeLeafId}
+        />
+      }
+    >
+      <CharacterConfigurationForm campaignId={campaignId} />
+    </HomebrewDetailShell>
+  )
+}
+
+function MechanicsRulesConfigDetail({ campaignId }: { campaignId: string }) {
+  const nav = RULES_CONFIG_NAV.mechanics
+
+  return (
+    <HomebrewDetailShell
+      nav={
+        <RulesConfigFieldNav
+          sections={MECHANICS_CONFIGURATION_SECTIONS}
+          navLabel={nav.navLabel}
+          mobileSelectLabel={nav.mobileSelectLabel}
+        />
+      }
+    >
+      <MechanicsConfigurationForm campaignId={campaignId} />
+    </HomebrewDetailShell>
+  )
 }
 
 export type RulesConfigDetailContentProps = {
@@ -80,93 +109,22 @@ export type RulesConfigDetailContentProps = {
 const READ_ONLY_RULES_MESSAGE = 'You can view these rules but only campaign owners can edit them.'
 
 function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
-  const canManage = useCanManageCampaign(campaignId)
-  const { data: patch, isPending, isError } = useRulesetPatch(campaignId)
   const {
-    vocabulary: creatureTypeVocabulary,
-    isPending: isCreatureTypeVocabularyPending,
-    isError: isCreatureTypeVocabularyError,
-  } = useCreatureTypeVocabulary(campaignId)
-  const {
-    vocabulary: languageVocabulary,
-    categoryOptions,
-    isPending: isLanguageVocabularyPending,
-    isError: isLanguageVocabularyError,
-  } = useLanguageVocabulary(campaignId)
-  const {
-    data: equipment,
-    isPending: isEquipmentPending,
-    isError: isEquipmentError,
-  } = useEquipment(campaignId)
-  const { mutateAsync, isPending: isSaving } = usePatchCharacterCreationMutation(campaignId)
-
-  const schema = useMemo(
-    () =>
-      resolveRulesSchemaWithVocabulary({
-        activeCreatureTypeIds: creatureTypeVocabulary?.activeIds,
-        activeLanguageIds: languageVocabulary?.activeIds,
-      }),
-    [creatureTypeVocabulary?.activeIds, languageVocabulary?.activeIds],
-  )
-
-  const fields = useMemo(() => {
-    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(creatureTypeVocabulary)
-    const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
-    const { armor: armorOptions, weapons: weaponOptions } = buildContentFormOptionSets({
-      campaignId,
-      equipment,
-    })
-    return disableFormItems(
-      buildRulesConfigFields(
-        creatureTypeOptions,
-        languageOptions,
-        categoryOptions,
-        armorOptions,
-        weaponOptions,
-      ),
-      !canManage,
-    )
-  }, [
-    campaignId,
     canManage,
-    categoryOptions,
-    creatureTypeVocabulary,
-    equipment,
-    languageVocabulary,
-  ])
-
-  const defaultValues = useMemo(
-    () => (patch ? mapRulesetPatchToRulesValues(patch.characterCreation) : undefined),
-    [patch],
-  )
-
-  const { onSubmit, formError } = useSubmitHandler<RulesValues>(async (values, form) => {
-    await mutateAsync(
-      buildCharacterCreationPatchInput(values, {
-        includeDefaultMulticlassing: true,
-        includeDefaultSubclassing: true,
-        includeDefaultLanguageProficiencies: true,
-        includeDefaultLevelZeroNpcs: true,
-        existingLanguageChoice: patch?.characterCreation.proficiencyChoices.languages[0],
-      }),
-    )
-    form.reset(values)
-    notifySaveSuccess()
-  }, 'Could not save character configuration.')
-
-  const saveFooter = useMemo(() => createRulesConfigSaveFooter({ pending: isSaving }), [isSaving])
+    schema,
+    fields,
+    defaultValues,
+    onSubmit,
+    formError,
+    saveFooter,
+    isPending,
+    isError,
+  } = useCharacterConfigurationRulesForm(campaignId)
 
   return (
     <PageLoadState
-      isPending={
-        isPending ||
-        isCreatureTypeVocabularyPending ||
-        isLanguageVocabularyPending ||
-        isEquipmentPending
-      }
-      isError={
-        isError || isCreatureTypeVocabularyError || isLanguageVocabularyError || isEquipmentError
-      }
+      isPending={isPending}
+      isError={isError}
       defaultErrorLabel="Could not load character configuration."
     >
       {defaultValues ? (
@@ -275,29 +233,33 @@ export function RulesConfigDetailContent({ campaignId, configId }: RulesConfigDe
 
   const nav = RULES_CONFIG_NAV[registryEntry.id]
 
-  return (
-    <HomebrewDetailShell
-      nav={
-        <RulesConfigFieldNav
-          sections={nav.sections}
-          navLabel={nav.navLabel}
-          mobileSelectLabel={nav.mobileSelectLabel}
-        />
-      }
-    >
-      {registryEntry.enabled ? (
-        registryEntry.id === 'character-configuration' ? (
-          <CharacterConfigurationForm campaignId={campaignId} />
-        ) : (
-          <MechanicsConfigurationForm campaignId={campaignId} />
-        )
-      ) : (
+  if (!registryEntry.enabled) {
+    return (
+      <HomebrewDetailShell
+        nav={
+          <RulesConfigFieldNav
+            sections={
+              registryEntry.id === 'character-configuration'
+                ? buildCharacterConfigurationNavigation()
+                : MECHANICS_CONFIGURATION_SECTIONS
+            }
+            navLabel={nav.navLabel}
+            mobileSelectLabel={nav.mobileSelectLabel}
+          />
+        }
+      >
         <HomebrewDetailFallback
           status="disabled"
           heading={registryEntry.label}
           message={RULES_CONFIG_NOT_IMPLEMENTED_MESSAGE}
         />
-      )}
-    </HomebrewDetailShell>
-  )
+      </HomebrewDetailShell>
+    )
+  }
+
+  if (registryEntry.id === 'character-configuration') {
+    return <CharacterConfigurationRulesConfigDetail campaignId={campaignId} />
+  }
+
+  return <MechanicsRulesConfigDetail campaignId={campaignId} />
 }

@@ -4,7 +4,8 @@ import { cn } from '../../lib/utils'
 import type { CompactLabelTone } from './compact-label.lib'
 import { resolveChromeClasses } from './chrome.variants'
 import { isCompactLabelTone } from './field-surface.variants'
-import { resolveFieldGroupInsetPaddingClasses, type FieldRhythm } from './field.variants'
+import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
+import { resolveFieldRailClasses } from './field-rail.variants'
 import type {
   ChromeBorderAccent,
   ChromeConfig,
@@ -13,8 +14,11 @@ import type {
   VisualEmphasis,
 } from './visual-vocabulary.types'
 
-/** Left rail tone for group inset chrome. */
-export type FieldGroupInsetTone = 'border' | 'primary'
+/** Left rail tone for group rail chrome. */
+export type FieldGroupRailTone = 'border' | 'primary'
+
+/** @deprecated Use {@link FieldGroupRailTone}. */
+export type FieldGroupInsetTone = FieldGroupRailTone
 
 /** Divider edge and tone for group section separation. */
 export type FieldGroupDividerEdge = 'top' | 'bottom'
@@ -50,9 +54,15 @@ type FieldGroupComposableChrome =
   | FieldGroupOutlineChrome
   | FieldGroupCalloutChrome
 
+export interface FieldGroupRailChrome {
+  variant: 'rail'
+  tone?: FieldGroupRailTone
+}
+
+/** @deprecated Use {@link FieldGroupRailChrome} with `variant: 'rail'`. */
 export interface FieldGroupInsetChrome {
   variant: 'inset'
-  tone?: FieldGroupInsetTone
+  tone?: FieldGroupRailTone
 }
 
 export interface FieldGroupDividerChrome {
@@ -70,6 +80,7 @@ export interface FieldGroupAccentChrome {
 /** Visual treatment for the field stack inside a group — variants are mutually exclusive. */
 export type FieldGroupChrome =
   | { variant: 'plain' }
+  | FieldGroupRailChrome
   | FieldGroupInsetChrome
   | FieldGroupDividerChrome
   | FieldGroupAccentChrome
@@ -79,18 +90,6 @@ export type FieldGroupChrome =
 export const fieldGroupDividerTopPaddingClasses = 'pt-7'
 /** Spacing below a bottom divider — 28px (`pb-7`). */
 export const fieldGroupDividerBottomPaddingClasses = 'pb-7'
-
-const fieldGroupInsetBodyVariants = cva('border-l-2', {
-  variants: {
-    tone: {
-      border: 'border-border',
-      primary: 'border-primary',
-    },
-  },
-  defaultVariants: {
-    tone: 'border',
-  },
-})
 
 const fieldGroupDividerContainerVariants = cva('', {
   variants: {
@@ -197,15 +196,13 @@ function withFieldGroupChrome(
   return { ...PLAIN_FIELD_GROUP_CHROME, ...overrides }
 }
 
-function resolveInsetChrome(
-  chrome: FieldGroupInsetChrome,
+function resolveGroupRailChrome(
+  chrome: FieldGroupRailChrome | FieldGroupInsetChrome,
   rhythm: FieldRhythm,
 ): FieldGroupChromeClassNames {
+  const tone = chrome.tone ?? 'border'
   return withFieldGroupChrome({
-    body: cn(
-      fieldGroupInsetBodyVariants({ tone: chrome.tone ?? 'border' }),
-      resolveFieldGroupInsetPaddingClasses(rhythm),
-    ),
+    body: cn(resolveFieldRailClasses(tone), resolveDependentInsetClasses(true, rhythm)),
   })
 }
 
@@ -238,6 +235,22 @@ export type ResolveFieldGroupChromeOptions = {
   rhythm?: FieldRhythm
 }
 
+type GroupChromeResolver = (
+  chrome: FieldGroupChrome,
+  rhythm: FieldRhythm,
+) => FieldGroupChromeClassNames
+
+const GROUP_CHROME_RESOLVERS: Partial<Record<FieldGroupChrome['variant'], GroupChromeResolver>> = {
+  plain: () => PLAIN_FIELD_GROUP_CHROME,
+  rail: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupRailChrome, rhythm),
+  inset: (chrome, rhythm) => resolveGroupRailChrome(chrome as FieldGroupInsetChrome, rhythm),
+  panel: (chrome) => resolveComposableChrome(chrome as FieldGroupPanelChrome),
+  outline: (chrome) => resolveComposableChrome(chrome as FieldGroupOutlineChrome),
+  callout: (chrome) => resolveComposableChrome(chrome as FieldGroupCalloutChrome),
+  divider: (chrome) => resolveDividerChrome(chrome as FieldGroupDividerChrome),
+  accent: (chrome) => resolveAccentChrome(chrome as FieldGroupAccentChrome),
+}
+
 /** Resolves fieldset, legend, and body classes for a group chrome config. */
 export function resolveFieldGroupChromeClassNames(
   chrome: FieldGroupChrome | undefined,
@@ -245,21 +258,6 @@ export function resolveFieldGroupChromeClassNames(
 ): FieldGroupChromeClassNames {
   const rhythm = options?.rhythm ?? 'comfortable'
   const resolved = chrome ?? { variant: 'plain' as const }
-
-  switch (resolved.variant) {
-    case 'plain':
-      return PLAIN_FIELD_GROUP_CHROME
-    case 'inset':
-      return resolveInsetChrome(resolved, rhythm)
-    case 'panel':
-    case 'outline':
-    case 'callout':
-      return resolveComposableChrome(resolved)
-    case 'divider':
-      return resolveDividerChrome(resolved)
-    case 'accent':
-      return resolveAccentChrome(resolved)
-    default:
-      return PLAIN_FIELD_GROUP_CHROME
-  }
+  const resolve = GROUP_CHROME_RESOLVERS[resolved.variant]
+  return resolve ? resolve(resolved, rhythm) : PLAIN_FIELD_GROUP_CHROME
 }

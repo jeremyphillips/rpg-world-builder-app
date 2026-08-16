@@ -32,9 +32,9 @@ async function fillForm(
   user: ReturnType<typeof userEvent.setup>,
   { current = 'OldPass12', next = 'NewPass12', confirm = 'NewPass12' } = {},
 ) {
-  await user.type(screen.getByLabelText('Current password'), current)
-  await user.type(screen.getByLabelText('New password'), next)
-  await user.type(screen.getByLabelText('Confirm new password'), confirm)
+  await user.type(screen.getByLabelText(/Current password/), current)
+  await user.type(screen.getByLabelText(/New password/), next)
+  await user.type(screen.getByLabelText(/Confirm new password/), confirm)
 }
 
 describe('ChangePasswordSection', () => {
@@ -48,9 +48,9 @@ describe('ChangePasswordSection', () => {
 
   it('renders all three password fields', () => {
     renderSection()
-    expect(screen.getByLabelText('Current password')).toBeInTheDocument()
-    expect(screen.getByLabelText('New password')).toBeInTheDocument()
-    expect(screen.getByLabelText('Confirm new password')).toBeInTheDocument()
+    expect(screen.getByLabelText(/Current password/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/^New password/)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Confirm new password/)).toBeInTheDocument()
   })
 
   it('shows a validation error when the passwords do not match', async () => {

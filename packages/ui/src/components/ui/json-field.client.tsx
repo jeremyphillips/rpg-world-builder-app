@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { Textarea } from './textarea.client'
 import { Button } from './button.client'
 import type { FieldWidth } from './field-control.variants'
@@ -15,10 +15,11 @@ const INVALID_JSON_MESSAGE = 'Invalid JSON'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
-export interface JsonFieldProps extends FieldValidationProps, FieldChromeProps {
+export interface JsonFieldProps
+  extends FieldValidationProps, FieldChromeProps, FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -49,6 +50,7 @@ function toJsonString(example: unknown): string {
 export function JsonField({
   id,
   label,
+  labelVisibility = 'visible',
   error,
   invalid,
   describedBy,
@@ -115,9 +117,12 @@ export function JsonField({
         hintPosition={hintPosition}
         label={
           <div className="flex items-center justify-between gap-2">
-            <Field.Label>
-              <FieldLabelContent label={label} info={info} />
-            </Field.Label>
+            <FormFieldLabel
+              label={label}
+              labelVisibility={labelVisibility}
+              info={info}
+              required={required}
+            />
             {example !== undefined ? (
               <Button
                 variant="ghost"

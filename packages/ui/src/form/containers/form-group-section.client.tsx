@@ -12,12 +12,19 @@ import {
   useFormSectionContext,
 } from '../context/form-section.context'
 import { useFormUiContext } from '../context/form-ui.context'
+import {
+  resolveGroupHeadingTier,
+  resolveGroupLegendSize,
+  resolveNamedGroupDepthAfterEntering,
+} from '../form-heading.lib'
+import { hasNamedGroupHeading, resolveGroupHeading } from '../resolve-container-heading.lib'
 import type {
   GroupConfig,
   GroupFieldItem,
   SelectFieldConfig,
   SwitchFieldConfig,
 } from '../field-config'
+import { normalizeFieldHint } from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
 import type { RenderNestedFormItems } from './form-dependent-section.client'
 
@@ -39,23 +46,40 @@ export function GroupFieldSection({
   const parentContext = useFormSectionContext()
   const { uiStateKey } = useFormUiContext()
   const { control } = useFormContext()
-  const legendSize = item.legendSize ?? (parentContext.inGroup ? 'subsection' : 'section')
+  const heading = resolveGroupHeading(item)
+  const hasNamedHeading = hasNamedGroupHeading(item)
+  const groupTier = resolveGroupHeadingTier(parentContext.namedGroupDepth)
+  const legendSize = resolveGroupLegendSize(groupTier)
   const groupDensity = item.density ?? parentContext.density
   const { rhythm: groupRhythm, size: groupSize } = resolveFormDensity(groupDensity)
+  const childNamedGroupDepth = resolveNamedGroupDepthAfterEntering(
+    hasNamedHeading,
+    parentContext.namedGroupDepth,
+  )
   const childContext = React.useMemo(
     () =>
-      buildFormSectionChildContext(parentContext, depth, { density: groupDensity, inGroup: true }),
-    [parentContext, depth, groupDensity],
+      buildFormSectionChildContext(parentContext, depth, {
+        density: groupDensity,
+        inGroup: true,
+        namedGroupDepth: childNamedGroupDepth,
+        headingTier: hasNamedHeading ? groupTier : parentContext.headingTier,
+      }),
+    [parentContext, depth, groupDensity, childNamedGroupDepth, groupTier, hasNamedHeading],
   )
+  const description = React.useMemo(() => {
+    const hint = heading?.hint ?? item.description
+    if (!hint) return undefined
+    return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
+  }, [heading?.hint, item.description])
 
   return (
     <FieldGroup
       id={item.id}
-      legend={item.legend}
+      legend={heading?.label ?? item.legend}
       legendSize={legendSize}
       rhythm={groupRhythm}
       size={groupSize}
-      description={item.description}
+      description={description}
       className={cn(
         item.className,
         (parentContext.inGroup || parentContext.inRhythmStack) && 'mb-0',

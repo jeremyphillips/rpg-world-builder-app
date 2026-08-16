@@ -10,11 +10,15 @@ import type { FieldHintPosition, FieldLabelPosition } from './field.variants'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 
 export interface NumberFieldProps
-  extends Omit<NumberInputProps, 'id'>, FieldValidationProps, FieldChromeProps {
+  extends
+    Omit<NumberInputProps, 'id'>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -37,6 +41,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
     {
       id,
       label,
+      labelVisibility,
       error,
       invalid,
       describedBy,
@@ -58,6 +63,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
       <FormField
         id={id}
         label={label}
+        labelVisibility={labelVisibility}
         error={error}
         invalid={invalid}
         describedBy={describedBy}

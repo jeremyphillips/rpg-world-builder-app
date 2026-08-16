@@ -18,7 +18,7 @@ const fields: FormItem[] = [
     type: 'inlineChooseCount',
     name: 'choose',
     label: 'Choice count',
-    hideLabel: true,
+    labelVisibility: 'srOnly',
     prefix: 'Character chooses',
     suffix: 'item(s) from',
     chooseMin: 1,

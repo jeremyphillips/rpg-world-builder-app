@@ -54,6 +54,7 @@ import { fieldDefaultValue } from '../field-config'
 import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
+import { resolveFieldLabelVisibility, type FieldLabelVisibility } from '../form-heading.lib'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
 import type { RichTextFieldProps } from '../../components/ui/rich-text-field'
 import type { FileFieldProps } from '../../components/ui/file-field.client'
@@ -90,6 +91,7 @@ interface RenderArgs<K extends FieldType> {
   id: string
   hint?: string
   hintPosition?: FieldHintPosition
+  labelVisibility: FieldLabelVisibility
   error?: string
   invalid?: boolean
   describedBy?: string
@@ -126,11 +128,21 @@ const fieldRenderers: {
     | 'textSuggestions'
   >]: (args: RenderArgs<K>) => React.ReactElement
 } = {
-  text: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  text: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <TextField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       {...fieldValidationProps(validation)}
       hint={hint}
       hintPosition={hintPosition}
@@ -149,11 +161,21 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  number: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  number: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <NumberField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       {...fieldValidationProps(validation)}
       hint={hint}
       hintPosition={hintPosition}
@@ -175,11 +197,21 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  textarea: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  textarea: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <TextareaField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       {...fieldValidationProps(validation)}
       hint={hint}
       hintPosition={hintPosition}
@@ -196,11 +228,12 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  radio: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  radio: ({ config, field, id, hint, hintPosition, labelVisibility, ...validation }) => (
     <RadioGroupField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       options={config.options}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -210,17 +243,17 @@ const fieldRenderers: {
       width={config.width}
       disabled={config.disabled}
       orientation={config.orientation}
-      labelHidden={config.labelHidden}
       value={field.value ?? ''}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
     />
   ),
-  radioCard: ({ config, field, id, hint, hintPosition, ...validation }) => (
+  radioCard: ({ config, field, id, hint, hintPosition, labelVisibility, ...validation }) => (
     <RadioCardField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       options={config.options}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -229,7 +262,6 @@ const fieldRenderers: {
       required={config.required}
       width={config.width}
       disabled={config.disabled}
-      labelHidden={config.labelHidden}
       value={field.value ?? ''}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
@@ -242,12 +274,14 @@ const fieldRenderers: {
     id,
     hint,
     hintPosition: _hintPosition,
+    labelVisibility,
     ...validation
   }) => (
     <CheckboxField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       {...fieldValidationProps(validation)}
       hint={hint}
       info={config.info}
@@ -260,11 +294,21 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  switch: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  switch: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <SwitchField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       labelPosition={config.labelPosition}
       {...fieldValidationProps(validation)}
       hint={hint}
@@ -279,12 +323,22 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  json: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  json: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <LazyFieldSuspense>
       <LazyJsonField
         id={id}
         {...pickFieldChromeProps(config)}
         label={config.label}
+        labelVisibility={labelVisibility}
         {...fieldValidationProps(validation)}
         hint={hint}
         hintPosition={hintPosition}
@@ -301,12 +355,22 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  richtext: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  richtext: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <LazyFieldSuspense>
       <LazyRichTextField
         id={id}
         {...pickFieldChromeProps(config)}
         label={config.label}
+        labelVisibility={labelVisibility}
         {...fieldValidationProps(validation)}
         hint={hint}
         hintPosition={hintPosition}
@@ -325,11 +389,21 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  markdown: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  markdown: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <MarkdownField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       {...fieldValidationProps(validation)}
       hint={hint}
       hintPosition={hintPosition}
@@ -345,12 +419,22 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  file: ({ config, field, id, hint, hintPosition, remotePreview, ...validation }) => (
+  file: ({
+    config,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    remotePreview,
+    ...validation
+  }) => (
     <LazyFieldSuspense>
       <LazyFileField
         id={id}
         {...pickFieldChromeProps(config)}
         label={config.label}
+        labelVisibility={labelVisibility}
         {...fieldValidationProps(validation)}
         hint={hint}
         hintPosition={hintPosition}
@@ -370,11 +454,21 @@ const fieldRenderers: {
       />
     </LazyFieldSuspense>
   ),
-  chips: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  chips: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <ChipsField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       options={config.options}
       multiple={config.multiple}
       max={config.max}
@@ -392,11 +486,21 @@ const fieldRenderers: {
       onBlur={field.onBlur}
     />
   ),
-  combobox: ({ config, controlSize, field, id, hint, hintPosition, ...validation }) => (
+  combobox: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
     <ComboboxField
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      labelVisibility={labelVisibility}
       options={config.options}
       multiple={config.multiple}
       max={config.max}
@@ -607,6 +711,7 @@ function StandardFieldRenderer({
     fullName,
   )
   assertOptionalDisclosureFieldConfig(config)
+  const labelVisibility = resolveFieldLabelVisibility(config)
 
   if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
     return (
@@ -634,6 +739,7 @@ function StandardFieldRenderer({
     id,
     hint,
     hintPosition,
+    labelVisibility,
     ...validation,
     remotePreview,
     namePrefix,

@@ -89,7 +89,6 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
     legend: 'Culture',
-    legendSize: 'subsection',
     chrome: { variant: 'panel', emphasis: 'subtle' },
     fields: [
       {

@@ -21,10 +21,12 @@ import {
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
+import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldOption } from '../../form/field-config'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
 import { fieldHasValidationError, resolveFieldDescribedBy } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 import { Chip, type ChipSize } from './chip.client'
 import { ChipGroup } from './chip-group.client'
 
@@ -115,9 +117,8 @@ export function ChipsFieldOptions({
   )
 }
 
-export interface ChipsFieldProps extends SelectFieldValueProps {
+export interface ChipsFieldProps extends SelectFieldValueProps, FieldLabelPresentationProps {
   id: string
-  label: string
   options: FieldOption[]
   /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
@@ -136,6 +137,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps {
 export function ChipsField({
   id,
   label,
+  labelVisibility = 'visible',
   options,
   multiple = true,
   max,
@@ -197,10 +199,14 @@ export function ChipsField({
       >
         <legend
           id={legendId}
-          data-required={required || undefined}
-          className={fieldLabelVariants({ size })}
+          className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
         >
-          <FieldLabelContent label={label} info={info} />
+          <FieldLabelContent
+            label={label}
+            required={required}
+            showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+            info={info}
+          />
         </legend>
 
         {hintPosition === 'below-label' ? (

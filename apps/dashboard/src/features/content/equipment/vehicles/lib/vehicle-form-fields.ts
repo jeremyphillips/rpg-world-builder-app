@@ -28,7 +28,6 @@ export function vehicleFormFieldGroup(): FormItem {
       {
         kind: 'group',
         legend: 'Combat',
-        legendSize: 'subsection',
         fields: [
           {
             kind: 'row',

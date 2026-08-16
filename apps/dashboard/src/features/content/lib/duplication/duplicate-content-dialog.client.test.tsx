@@ -66,7 +66,7 @@ describe('DuplicateContentDialog', () => {
 
     await user.click(screen.getByRole('button', { name: 'Duplicate' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByLabelText('Name')).toHaveValue('Fighter Copy')
+    expect(screen.getByLabelText(/^Name/)).toHaveValue('Fighter Copy')
 
     await user.click(screen.getByRole('button', { name: 'Duplicate class' }))
 

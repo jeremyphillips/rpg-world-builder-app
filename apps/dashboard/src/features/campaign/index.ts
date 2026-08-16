@@ -34,6 +34,11 @@ export {
   type RulesValues,
 } from './lib/rules/character-configuration/character-configuration-form'
 export {
+  buildCharacterConfigurationNavigation,
+  type RulesConfigNavLeaf,
+  type RulesConfigNavSection,
+} from './lib/rules/character-configuration/character-configuration-navigation.lib'
+export {
   buildMechanicsConfigFields,
   MECHANICS_CONFIGURATION_SECTIONS,
   mechanicsValuesSchema,

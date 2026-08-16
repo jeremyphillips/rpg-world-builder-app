@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CHARACTER_CONFIGURATION_SECTIONS } from '@/features/campaign'
+import { buildCharacterConfigurationNavigation } from '@/features/campaign'
 
 import { RulesConfigFieldNav } from './rules-config-field-nav.client'
 
@@ -9,7 +9,7 @@ const meta = {
   component: RulesConfigFieldNav,
   parameters: { layout: 'padded' },
   args: {
-    sections: CHARACTER_CONFIGURATION_SECTIONS,
+    sections: buildCharacterConfigurationNavigation(),
     navLabel: 'Character configuration sections',
     mobileSelectLabel: 'Character configuration section',
   },
@@ -30,6 +30,13 @@ export const Default: Story = {}
 
 export const ActiveSection: Story = {
   args: {
-    activeSectionId: 'extended-progression',
+    activeSectionId: 'progression',
+  },
+}
+
+export const ActiveLeaf: Story = {
+  args: {
+    activeSectionId: 'creation',
+    activeLeafId: 'creation-starting-level',
   },
 }

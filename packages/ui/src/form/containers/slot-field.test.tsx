@@ -60,6 +60,8 @@ describe('SlotFieldRenderer', () => {
     expect(screen.getByText('Notes')).toBeInTheDocument()
     expect(screen.getByText('Optional author notes.')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Notes' })).toBeInTheDocument()
+    expect(screen.getByText('Notes')).not.toHaveClass('text-field-group-legend')
+    expect(screen.getByText('Notes')).toHaveClass('font-field-label')
   })
 
   it('submits values managed by the slot control', async () => {
@@ -67,7 +69,7 @@ describe('SlotFieldRenderer', () => {
     const onSubmit = vi.fn()
     renderForm(onSubmit)
 
-    await user.type(screen.getByLabelText('Name'), 'Alert')
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Alert')
     await user.type(screen.getByRole('textbox', { name: 'Notes' }), 'Watchful')
     await submitAndExpectPayload(user, onSubmit, { name: 'Alert', notes: 'Watchful' })
   })
@@ -151,7 +153,7 @@ describe('SlotFieldRenderer', () => {
     )
 
     expect(container.querySelectorAll('.flex.flex-col.gap-2')).toHaveLength(1)
-    expect(screen.getByLabelText('Name')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
   it('omits the rhythm wrapper when an unlabeled slot component renders null', () => {
@@ -176,7 +178,7 @@ describe('SlotFieldRenderer', () => {
     )
 
     expect(container.querySelectorAll('.flex.flex-col.gap-2')).toHaveLength(1)
-    expect(screen.getByLabelText('Name')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
   it('wraps a slot with a trailing separator when configured', () => {
@@ -205,7 +207,7 @@ describe('SlotFieldRenderer', () => {
     expect(separator).toBeInTheDocument()
     expect(separator).toHaveClass('border-b', 'border-border-subtle', 'pb-7')
     expect(separator).toContainElement(screen.getByRole('textbox', { name: 'Notes' }))
-    expect(separator).not.toContainElement(screen.getByLabelText('Name'))
+    expect(separator).not.toContainElement(screen.getByRole('textbox', { name: 'Name' }))
   })
 
   it('uses compact separator padding when the parent group rhythm is compact', () => {

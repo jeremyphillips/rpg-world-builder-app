@@ -156,11 +156,12 @@ describe('InputSelectField', () => {
     expect(group).toHaveClass('grid-cols-[1fr_1px_auto]')
   })
 
-  it('shows a single required marker via label styling', () => {
+  it('shows a single required marker via RequiredIndicator', () => {
     render(<ControlledField required />)
-    const label = screen.getByText('Cost').closest('label')
-    expect(label).toHaveAttribute('data-required')
-    expect(label?.querySelector('span.text-destructive')).toBeNull()
+    const markers = screen.getAllByText('*')
+    expect(markers).toHaveLength(1)
+    expect(markers[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByLabelText('Cost value')).toHaveAttribute('required')
   })
 
   it('wires the visible label through Field.Label for row alignment', () => {

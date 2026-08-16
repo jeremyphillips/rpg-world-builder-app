@@ -9,12 +9,16 @@ import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
+import type { FieldLabelPresentationProps } from './field-label-props'
 import type { TrailingFieldActionConfig } from '../../form/field-config'
 
 export interface TextFieldProps
-  extends Omit<React.ComponentProps<typeof Input>, 'id'>, FieldValidationProps, FieldChromeProps {
+  extends
+    Omit<React.ComponentProps<typeof Input>, 'id'>,
+    FieldValidationProps,
+    FieldChromeProps,
+    FieldLabelPresentationProps {
   id: string
-  label: string
   hint?: string
   hintPosition?: FieldHintPosition
   info?: React.ReactNode
@@ -77,6 +81,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
   const {
     id,
     label,
+    labelVisibility,
     error,
     invalid,
     describedBy,
@@ -95,6 +100,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((pro
     <FormField
       id={id}
       label={label}
+      labelVisibility={labelVisibility}
       error={error}
       invalid={invalid}
       describedBy={describedBy}

@@ -225,7 +225,7 @@ async function expectCharacterConfigurationReady() {
   expect(
     await screen.findByRole('heading', { name: 'Character Configuration' }),
   ).toBeInTheDocument()
-  await screen.findByLabelText('Character starting level')
+  await screen.findByLabelText(/Character starting level/)
 }
 
 async function expectMechanicsReady() {
@@ -237,6 +237,14 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   beforeEach(() => {
     useCanManageCampaignMock.mockReturnValue(true)
     mockResolvedRulesData()
+
+    class MockIntersectionObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+
+    vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
   })
 
   afterEach(() => {
@@ -250,7 +258,7 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
     expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),
     ).toBeInTheDocument()
-    expect(screen.getByLabelText('Character starting level')).toHaveValue(3)
+    expect(screen.getByLabelText(/Character starting level/)).toHaveValue(3)
     expect(screen.getByRole('link', { name: 'Subclasses' })).toHaveAttribute('href', '#subclasses')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument()
   })

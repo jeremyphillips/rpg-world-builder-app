@@ -226,7 +226,7 @@ export function InlineSentenceFieldRenderer({
       disabled={config.disabled}
       size={controlSize}
       width={config.width}
-      hideLabel={config.hideLabel}
+      labelVisibility={config.labelVisibility}
       chipSize={config.chipSize}
     />
   )
