@@ -117,6 +117,25 @@ export function parseOptionalPlayActorFromQuery(
   return undefined
 }
 
+/** Serializes play-actor identity into query params (actor only — not catalog scope). */
+export function serializePlayActorQuery(playActor: ContentPlayActor): Record<string, string> {
+  switch (playActor.kind) {
+    case 'pc':
+      return {
+        [CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY]: playActor.characterId,
+      }
+    case 'new_pc':
+    case 'npc':
+      return {
+        [CONTENT_PLAY_ACTOR_KIND_QUERY]: playActor.kind,
+      }
+    default: {
+      const _exhaustive: never = playActor
+      return _exhaustive
+    }
+  }
+}
+
 /**
  * Required play-actor scope for builder/play catalog routes.
  * Missing or malformed actor context fails closed — never falls back to discovery.

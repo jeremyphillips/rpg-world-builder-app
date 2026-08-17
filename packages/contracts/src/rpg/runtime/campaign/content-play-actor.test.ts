@@ -10,6 +10,7 @@ import {
   parsePlayActorCharacterIdQuery,
   requirePlayActorFromQuery,
   resolveCatalogFilterPcCharacterIds,
+  serializePlayActorQuery,
 } from './content-play-actor'
 
 describe('isPlayCatalogScopeQuery', () => {
@@ -65,6 +66,32 @@ describe('parseOptionalPlayActorFromQuery', () => {
   })
 })
 
+describe('serializePlayActorQuery', () => {
+  it.each([
+    [{ kind: 'new_pc' } as const, { kind: 'new_pc' }],
+    [{ kind: 'npc' } as const, { kind: 'npc' }],
+    [{ kind: 'pc', characterId: 'pc-a' } as const, { kind: 'pc', characterId: 'pc-a' }],
+  ])('round-trips %j through requirePlayActorFromQuery', (playActor, expected) => {
+    const parsed = requirePlayActorFromQuery(serializePlayActorQuery(playActor))
+    expect(parsed).toEqual({ ok: true, playActor: expected })
+  })
+
+  it('serializes pc actors via playActorCharacterId only', () => {
+    expect(serializePlayActorQuery({ kind: 'pc', characterId: 'pc-a' })).toEqual({
+      [CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY]: 'pc-a',
+    })
+  })
+
+  it('serializes non-pc actors via playActorKind only', () => {
+    expect(serializePlayActorQuery({ kind: 'new_pc' })).toEqual({
+      [CONTENT_PLAY_ACTOR_KIND_QUERY]: 'new_pc',
+    })
+    expect(serializePlayActorQuery({ kind: 'npc' })).toEqual({
+      [CONTENT_PLAY_ACTOR_KIND_QUERY]: 'npc',
+    })
+  })
+})
+
 describe('requirePlayActorFromQuery', () => {
   it('requires an actor on builder routes', () => {
     expect(requirePlayActorFromQuery({})).toEqual({
@@ -102,6 +129,16 @@ describe('requirePlayActorFromQuery', () => {
       error: {
         code: 'conflicting_play_actor_params',
         message: 'playActorKind and playActorCharacterId are mutually exclusive.',
+      },
+    })
+  })
+
+  it('rejects playActorKind=pc — PC actors require playActorCharacterId', () => {
+    expect(requirePlayActorFromQuery({ [CONTENT_PLAY_ACTOR_KIND_QUERY]: 'pc' })).toEqual({
+      ok: false,
+      error: {
+        code: 'invalid_play_actor_kind',
+        message: 'Invalid playActorKind "pc". Expected new_pc or npc.',
       },
     })
   })

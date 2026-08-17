@@ -1,8 +1,7 @@
 import {
   CONTENT_CATALOG_PLAY_SCOPE,
   CONTENT_CATALOG_SCOPE_QUERY,
-  CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
-  CONTENT_PLAY_ACTOR_KIND_QUERY,
+  serializePlayActorQuery,
   type ContentPlayActor,
 } from '@rpg/contracts'
 import type {
@@ -40,16 +39,11 @@ const CAMPAIGN_CATALOG_CONTENT = [
 function buildPlayCatalogQuery(playActor: ContentPlayActor): string {
   const params = new URLSearchParams()
   params.set(CONTENT_CATALOG_SCOPE_QUERY, CONTENT_CATALOG_PLAY_SCOPE)
-  if (playActor.kind === 'pc') {
-    params.set(CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY, playActor.characterId)
-  } else {
-    params.set(CONTENT_PLAY_ACTOR_KIND_QUERY, playActor.kind)
+  for (const [key, value] of Object.entries(serializePlayActorQuery(playActor))) {
+    params.set(key, value)
   }
   return `?${params.toString()}`
 }
-
-/** @internal Exported for unit tests — do not use in product code. */
-export const buildPlayCatalogQueryForTest = buildPlayCatalogQuery
 
 async function listCampaignContent<T>(
   campaignId: string,
