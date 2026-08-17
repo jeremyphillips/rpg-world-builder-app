@@ -59,6 +59,7 @@ const organizationCatalogRow = {
   functions: [],
   practices: [],
   memberClassAffinityIds: [],
+  memberSpeciesAffinityIds: [],
   connections: { locations: [] },
 }
 

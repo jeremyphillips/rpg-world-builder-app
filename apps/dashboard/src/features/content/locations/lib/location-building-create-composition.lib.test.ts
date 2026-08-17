@@ -31,6 +31,7 @@ const organizationPlan: BuildingOrganizationDraftPlan = {
         functions: [],
         practices: [],
         memberClassAffinityIds: [],
+        memberSpeciesAffinityIds: [],
       },
     },
   ],

@@ -20,6 +20,7 @@ function cityCouncilCanonicalBase(): Organization {
     functions: [],
     practices: [],
     memberClassAffinityIds: [],
+    memberSpeciesAffinityIds: [],
     connections: { locations: [] },
   } satisfies Organization
 }

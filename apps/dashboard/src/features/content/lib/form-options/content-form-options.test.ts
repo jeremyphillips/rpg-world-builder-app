@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 import { pickClass, pickEquipment, pickSkillProficiency, pickSpell } from '../fixtures/pick'
 import {
   buildContentFormOptionSets,
@@ -111,5 +112,28 @@ describe('buildContentFormOptionSets', () => {
     expect(isContentCampaignEligible(fighter)).toBe(true)
     expect(isContentReferenceable(wizard)).toBe(true)
     expect(classHasSpellcasting(fighter)).toBe(false)
+  })
+
+  it('derives forCampaignUse from the visible species catalog including dm_only rows', () => {
+    const dwarf = makeSpecies({ slug: 'dwarf', name: 'Dwarf' })
+    const unavailable = {
+      ...makeSpecies({ slug: 'elf', name: 'Elf' }),
+      campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+    }
+    const dmOnly = {
+      ...makeSpecies({ slug: 'deep-gnome', name: 'Deep Gnome' }),
+      campaignAccess: {
+        ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+        visibilityMode: 'dm_only' as const,
+      },
+    }
+
+    const options = buildContentFormOptionSets({
+      species: [dwarf, unavailable, dmOnly],
+    })
+
+    expect(options.species.forCampaignUse()).toEqual([dwarf, dmOnly])
+    expect(options.species.visible).toEqual([dwarf, unavailable, dmOnly])
+    expect(isContentCampaignEligible(dmOnly)).toBe(true)
   })
 })

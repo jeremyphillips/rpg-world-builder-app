@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../lib/campaign-access/campaign-access-table-labels'
 import { CITY_COUNCIL, CRAFT_GUILD } from '../fixtures'
 import {
@@ -111,6 +112,28 @@ describe('buildOrganizationDetailViewModel', () => {
         {
           label: 'Member class affinities',
           value: `Wizard · ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`,
+        },
+      ]),
+    })
+  })
+
+  it('shows member species affinity labels when present', () => {
+    const organization = {
+      ...CRAFT_GUILD,
+      memberSpeciesAffinityIds: ['species-dwarf', 'species-elf', 'species-missing'],
+    }
+    const catalogSpecies = [
+      makeSpecies({ id: 'species-dwarf', slug: 'dwarf', name: 'Dwarf' }),
+      makeSpecies({ id: 'species-elf', slug: 'elf', name: 'Elf' }),
+    ]
+
+    expect(
+      buildOrganizationDetailViewModel(organization, emptyLocationConnections, [], catalogSpecies),
+    ).toMatchObject({
+      statRows: expect.arrayContaining([
+        {
+          label: 'Member species affinities',
+          value: 'Dwarf · Elf · Species Missing · Unresolved reference',
         },
       ]),
     })

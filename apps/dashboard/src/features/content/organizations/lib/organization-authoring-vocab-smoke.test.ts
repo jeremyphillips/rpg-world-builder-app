@@ -180,6 +180,7 @@ describe('organization authoring vocab smoke', () => {
       functions: ['transport'],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     },
     {
       name: 'Royal Exchequer',
@@ -188,6 +189,7 @@ describe('organization authoring vocab smoke', () => {
       functions: ['administration'],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     },
     {
       name: 'Ironworking Consortium',
@@ -196,6 +198,7 @@ describe('organization authoring vocab smoke', () => {
       functions: ['production', 'trade'],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     },
     {
       name: 'Royal Host',
@@ -204,6 +207,7 @@ describe('organization authoring vocab smoke', () => {
       functions: ['warfare', 'defense'],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     },
   ] satisfies Array<OrganizationFormValues>)('persists $name without preset identity', (values) => {
     const input = buildOrganizationCreateInput(values)
@@ -224,6 +228,7 @@ describe('organization authoring vocab smoke', () => {
       practices: ['extortion'],
       functions: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     })
     expect(input.practices).toEqual(['extortion'])
     expect(input).not.toHaveProperty('authoringPresetId')
@@ -237,6 +242,7 @@ describe('organization authoring vocab smoke', () => {
       functions: ['administration', 'defense'],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     })
     const reopened = organizationToFormValues({
       ...saved,
@@ -249,6 +255,7 @@ describe('organization authoring vocab smoke', () => {
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
       connections: { locations: [] },
     })
 

@@ -20,6 +20,7 @@ const organizationValues = {
   functions: [],
   practices: [],
   memberClassAffinityIds: [],
+  memberSpeciesAffinityIds: [],
 }
 
 function existingOrganization(input: {

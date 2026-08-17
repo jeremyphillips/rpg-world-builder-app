@@ -38,6 +38,7 @@ const organization = {
   functions: [],
   practices: [],
   memberClassAffinityIds: [],
+  memberSpeciesAffinityIds: [],
   connections: { locations: [] },
 }
 
