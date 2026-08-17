@@ -82,6 +82,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'bank',
       organizationDomain: 'commercial',
       organizationForm: 'company',
       functions: ['finance'],
@@ -89,6 +90,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'bank',
       'operatorOrganization.organizationDomain': 'commercial',
       'operatorOrganization.organizationForm': 'company',
       'operatorOrganization.functions': ['finance'],
@@ -107,6 +109,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
@@ -114,6 +117,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'army',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -132,6 +136,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'navy',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
@@ -139,6 +144,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'navy',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -152,6 +158,7 @@ describe('organization authoring vocab smoke', () => {
       ['authoringPresetId'],
     )
     expect(applied).toMatchObject({
+      sourcePresetId: 'city_watch',
       organizationDomain: 'government',
       functions: ['policing'],
       practices: ['investigation'],
@@ -164,6 +171,7 @@ describe('organization authoring vocab smoke', () => {
       ['authoringPresetId'],
     )
     expect(applied).toMatchObject({
+      sourcePresetId: 'political_party',
       organizationDomain: 'political',
       organizationForm: 'association',
       functions: ['advocacy'],

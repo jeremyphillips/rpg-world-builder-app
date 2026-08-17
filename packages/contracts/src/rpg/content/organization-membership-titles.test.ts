@@ -78,4 +78,43 @@ describe('organization membership title snapshot', () => {
       }).success,
     ).toBe(false)
   })
+
+  it('accepts custom org titles without a canonical vocabulary entry', () => {
+    const custom = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_custom',
+        label: 'Keeper of the Third Seal',
+        priority: 40,
+      },
+    ])
+    expect(custom[0]).not.toHaveProperty('sourceTitleId')
+  })
+
+  it('never uses vocabulary ids as organization title ids', () => {
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'fixed')
+    for (const title of snapshot) {
+      expect(title.id).toBe('omt_fixed')
+      expect(title.id).not.toBe(title.sourceTitleId)
+    }
+  })
+
+  it('does not copy searchTerms into org snapshots', () => {
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('adventurers_guild', () => 'a')
+    for (const title of snapshot) {
+      expect(title).not.toHaveProperty('searchTerms')
+    }
+  })
+
+  it('preserves preset array order through snapshot resolution', () => {
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'a')
+    expect(snapshot.map((title) => title.sourceTitleId)).toEqual([
+      'treasurer',
+      'proprietor',
+      'banker',
+      'manager',
+      'cashier',
+      'accountant',
+      'clerk',
+    ])
+  })
 })

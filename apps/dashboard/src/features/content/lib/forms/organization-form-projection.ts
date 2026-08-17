@@ -119,7 +119,10 @@ export const organizationFormSchema = z.object({
     classAffinityIds: [],
     speciesAffinityIds: [],
   }),
+  /** Ephemeral picker value — cleared after apply; not sent on create. */
   authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
+  /** Create provenance when a familiar starting point was applied — sent as sourcePresetId. */
+  sourcePresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
 export const organizationDraftFormSchema = z.object({
@@ -135,6 +138,7 @@ export const organizationDraftFormSchema = z.object({
     speciesAffinityIds: [],
   }),
   authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
+  sourcePresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
@@ -323,6 +327,7 @@ export function buildOrganizationCreateInput(
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }
       : {}),
+    ...(values.sourcePresetId !== undefined ? { sourcePresetId: values.sourcePresetId } : {}),
     ...organizationFormFieldForInput(values, isEdit),
   })
   return finalizeContentInput(
@@ -355,6 +360,7 @@ export function buildOrganizationFormValueSyncs(
         )
         return {
           [presetPath]: undefined,
+          [fieldPath(prefix, 'sourcePresetId')]: presetId,
           [fieldPath(prefix, 'organizationDomain')]: recipe.organizationDomain,
           [fieldPath(prefix, 'organizationForm')]: recipe.organizationForm,
           [fieldPath(prefix, 'functions')]: recipe.functions,

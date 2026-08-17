@@ -221,4 +221,39 @@ describe('organization authoring inputs', () => {
       }).success,
     ).toBe(true)
   })
+
+  it('defaults nested members on stored bodies', () => {
+    expect(
+      organizationBodySchema.parse({
+        name: 'Lantern Guild',
+        organizationDomain: 'occupational',
+      }).members,
+    ).toEqual({ classAffinityIds: [], speciesAffinityIds: [], titles: [] })
+  })
+
+  it('rejects create input that combines sourcePresetId with explicit members.titles', () => {
+    expect(
+      createOrganizationInputSchema.safeParse({
+        slug: 'lantern-guild',
+        name: 'The Lantern Guild',
+        organizationDomain: 'occupational',
+        sourcePresetId: 'craft_guild',
+        members: {
+          titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('accepts partial members affinity updates without titles', () => {
+    expect(
+      updateOrganizationInputSchema.parse({
+        members: { classAffinityIds: ['class-fighter'] },
+      }),
+    ).toMatchObject({ members: { classAffinityIds: ['class-fighter'] } })
+    expect(
+      updateOrganizationInputSchema.parse({ members: { classAffinityIds: ['class-fighter'] } })
+        .members,
+    ).not.toHaveProperty('titles')
+  })
 })

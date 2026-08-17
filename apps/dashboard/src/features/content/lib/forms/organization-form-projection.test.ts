@@ -217,10 +217,10 @@ describe('organization form projection', () => {
     })
   })
 
-  it('never serializes ephemeral preset identity', () => {
+  it('serializes sourcePresetId when a familiar starting point was applied', () => {
     const input = buildOrganizationCreateInput({
       name: 'Night Market Ring',
-      authoringPresetId: 'smuggling_ring',
+      sourcePresetId: 'smuggling_ring',
       organizationDomain: 'political',
       organizationForm: 'network',
       practices: ['smuggling'],
@@ -228,6 +228,8 @@ describe('organization form projection', () => {
       members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input).not.toHaveProperty('authoringPresetId')
+    expect(input.sourcePresetId).toBe('smuggling_ring')
+    expect(input.members?.titles ?? []).toEqual([])
     expect(input.organizationDomain).toBe('political')
   })
 
@@ -239,6 +241,7 @@ describe('organization form projection', () => {
       ]),
     ).toEqual({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'smuggling_ring',
       'operatorOrganization.organizationDomain': 'criminal',
       'operatorOrganization.organizationForm': 'network',
       'operatorOrganization.functions': [],
@@ -262,6 +265,7 @@ describe('organization form projection', () => {
     const [sync] = buildOrganizationFormValueSyncs(undefined, discoverable as never)
     expect(sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId'])).toEqual({
       authoringPresetId: undefined,
+      sourcePresetId: 'knightly_order',
       organizationDomain: 'military',
       organizationForm: 'order',
       functions: ['warfare', 'defense'],
@@ -301,6 +305,15 @@ describe('organization form projection', () => {
       'class-barbarian',
       'class-ranger',
     ])
+  })
+
+  it('updates sourcePresetId when switching familiar starting points', () => {
+    const [sync] = buildOrganizationFormValueSyncs()
+    const thievesGuild = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
+    expect(thievesGuild?.sourcePresetId).toBe('thieves_guild')
+
+    const mercenary = sync?.apply({ authoringPresetId: 'mercenary_company' }, ['authoringPresetId'])
+    expect(mercenary?.sourcePresetId).toBe('mercenary_company')
   })
 
   it('round-trips custom member class affinity ids through create input', () => {

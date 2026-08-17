@@ -65,12 +65,20 @@ describe('initial Organization semantic flows', () => {
 
       const input = buildOrganizationCreateInput({
         name: recipe.label,
-        organizationDomain: standalone.organizationDomain,
-        organizationForm: standalone.organizationForm,
-        functions: standalone.functions ?? [],
-        practices: standalone.practices ?? [],
-      } as OrganizationFormValues)
+        sourcePresetId: presetId,
+        organizationDomain:
+          standalone.organizationDomain as OrganizationFormValues['organizationDomain'],
+        organizationForm: standalone.organizationForm as OrganizationFormValues['organizationForm'],
+        functions: (standalone.functions ?? []) as OrganizationFormValues['functions'],
+        practices: (standalone.practices ?? []) as OrganizationFormValues['practices'],
+        members: {
+          classAffinityIds: (standalone['members.classAffinityIds'] ?? []) as string[],
+          speciesAffinityIds: [],
+        },
+      })
       expect(input).not.toHaveProperty('authoringPresetId')
+      expect(input.sourcePresetId).toBe(presetId)
+      expect(input.members?.titles ?? []).toEqual([])
     },
   )
 
@@ -82,6 +90,7 @@ describe('initial Organization semantic flows', () => {
 
     expect(applied).toEqual({
       authoringPresetId: undefined,
+      sourcePresetId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],

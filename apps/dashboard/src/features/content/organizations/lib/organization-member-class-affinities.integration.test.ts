@@ -30,18 +30,20 @@ describe('organization member class affinities integration', () => {
   const fighter = makeCharacterClass({ slug: 'fighter', id: 'class-fighter', name: 'Fighter' })
   const wizard = makeCharacterClass({ slug: 'wizard', id: 'class-wizard', name: 'Wizard' })
 
-  it('persists familiar-seeded affinities without preset identity after save/reload', () => {
+  it('persists familiar-seeded affinities with sourcePresetId after save/reload', () => {
     const [sync] = buildOrganizationFormValueSyncs(undefined, [rogue])
     const applied = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
 
     expect(applied).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'thieves_guild',
       practices: ['theft'],
       'members.classAffinityIds': ['class-rogue'],
     })
 
     const saved = buildOrganizationCreateInput({
       name: 'Dockside Exchange',
+      sourcePresetId: 'thieves_guild',
       organizationDomain: 'criminal',
       organizationForm: 'network',
       functions: [],
@@ -53,6 +55,7 @@ describe('organization member class affinities integration', () => {
     })
 
     expect(saved).not.toHaveProperty('authoringPresetId')
+    expect(saved.sourcePresetId).toBe('thieves_guild')
     expect(saved.members.classAffinityIds).toEqual(['class-rogue'])
 
     const reopened = organizationToFormValues({
@@ -78,6 +81,7 @@ describe('organization member class affinities integration', () => {
       members: { classAffinityIds: ['class-rogue'], speciesAffinityIds: [] },
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
+    expect(reopened).not.toHaveProperty('sourcePresetId')
   })
 
   it('round-trips custom affinity ids through edit form values', () => {
