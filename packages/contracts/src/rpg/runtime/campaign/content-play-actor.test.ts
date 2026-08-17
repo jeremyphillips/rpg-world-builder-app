@@ -1,13 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_SCOPE_QUERY,
   CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
   CONTENT_PLAY_ACTOR_KIND_QUERY,
+  isPlayCatalogScopeQuery,
   parseOptionalPlayActorFromQuery,
   parsePlayActorCharacterIdQuery,
   requirePlayActorFromQuery,
   resolveCatalogFilterPcCharacterIds,
 } from './content-play-actor'
+
+describe('isPlayCatalogScopeQuery', () => {
+  it('detects play-catalog scope requests', () => {
+    expect(
+      isPlayCatalogScopeQuery({ [CONTENT_CATALOG_SCOPE_QUERY]: CONTENT_CATALOG_PLAY_SCOPE }),
+    ).toBe(true)
+    expect(isPlayCatalogScopeQuery({ [CONTENT_CATALOG_SCOPE_QUERY]: 'discovery' })).toBe(false)
+    expect(isPlayCatalogScopeQuery({})).toBe(false)
+  })
+})
 
 describe('parsePlayActorCharacterIdQuery', () => {
   it('returns trimmed character ids and ignores empty values', () => {

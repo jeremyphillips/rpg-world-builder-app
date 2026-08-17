@@ -41,31 +41,40 @@ export function useCampaignCharacterBuildContext({
   characterKind,
   ownershipTarget,
   acquisition,
-  playActor,
+  playActor: playActorInput,
 }: UseCampaignCharacterBuildContextInput) {
   const { data: campaigns } = useCampaigns()
   const rulesetId = campaigns?.find((campaign) => campaign.id === campaignId)?.rulesetId as
     | SystemRulesetId
     | undefined
 
-  const playActorCharacterId = playActor?.kind === 'pc' ? playActor.characterId : undefined
+  const playActor = useMemo((): ContentPlayActor | undefined => {
+    if (playActorInput) {
+      return playActorInput
+    }
+    if (characterKind === 'npc') {
+      return { kind: 'npc' }
+    }
+    if (characterKind === 'pc') {
+      return { kind: 'new_pc' }
+    }
+    return undefined
+  }, [characterKind, playActorInput])
 
   const patchQuery = useRulesetPatch(campaignId)
   const catalogQuery = useQuery({
     queryKey:
-      campaignId && rulesetId
-        ? ([
-            ...campaignBuildContextQueryKey(campaignId, playActorCharacterId),
-            'catalog',
-            rulesetId,
-          ] as const)
+      campaignId && rulesetId && playActor
+        ? ([...campaignBuildContextQueryKey(campaignId, playActor), 'catalog', rulesetId] as const)
         : [],
-    queryFn: () => fetchCampaignBuilderCatalog(campaignId!, rulesetId!, { playActor }),
-    enabled: Boolean(campaignId && rulesetId),
+    queryFn: () => fetchCampaignBuilderCatalog(campaignId!, rulesetId!, { playActor: playActor! }),
+    enabled: Boolean(campaignId && rulesetId && playActor),
   })
 
   const context = useMemo((): CampaignBuildContext | null => {
-    if (!campaignId || !rulesetId || !patchQuery.data || !catalogQuery.data) return null
+    if (!campaignId || !rulesetId || !patchQuery.data || !catalogQuery.data || !playActor) {
+      return null
+    }
 
     return resolveCampaignBuildContext({
       campaignId,
@@ -156,7 +165,7 @@ export function useCampaignPcOnboardingBuildContext(
   const playActor =
     playActorCharacterId && playActorCharacterId.length > 0
       ? ({ kind: 'pc', characterId: playActorCharacterId } as const)
-      : undefined
+      : ({ kind: 'new_pc' } as const)
 
   return useCampaignCharacterBuildContext({
     campaignId: resolvedCampaignId,

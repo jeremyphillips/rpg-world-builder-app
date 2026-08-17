@@ -63,7 +63,7 @@ const STEP_VALIDATORS: Record<
       )
   },
   species: (draft, context, choiceSets) => [
-    ...validateSpecies(draft),
+    ...validateSpecies(draft, context),
     ...validateChoiceSetsForStep(draft, context, choiceSets, 'species'),
   ],
   class: (draft, context) => validateClass(draft, context),

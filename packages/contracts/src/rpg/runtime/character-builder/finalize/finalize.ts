@@ -17,6 +17,7 @@ import {
   sanitizeClassForLevel,
 } from '../progression/character-level-policy'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import { assembleClassSpellcasting } from '../assembly/assemble-spellcasting'
@@ -77,7 +78,7 @@ function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidatio
 
 function resolveFinalizeCatalogIssues(
   draft: CharacterBuilderDraft,
-  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  playableIndex: ReturnType<typeof indexPlayableBuilderCatalog>,
   context: CharacterBuildContext,
 ): CharacterBuildValidationResult['issues'] {
   const issues: CharacterBuildValidationResult['issues'] = []
@@ -92,7 +93,7 @@ function resolveFinalizeCatalogIssues(
           stepId: 'class',
         }),
       )
-    } else if (!catalogIndex.classes.get(classId)) {
+    } else if (!playableIndex.classes.get(classId)) {
       issues.push(
         validationIssue(
           'class_not_in_catalog',
@@ -129,7 +130,7 @@ function resolveFinalizeCatalogIssues(
         stepId: 'species',
       }),
     )
-  } else if (!catalogIndex.species.get(speciesId)) {
+  } else if (!playableIndex.species.get(speciesId)) {
     issues.push(
       validationIssue(
         'species_not_in_catalog',
@@ -243,10 +244,11 @@ export function assembleCharacterBuildSheet(
 
   const choiceSets = options.resolvedChoiceSets ?? []
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const playableIndex = indexPlayableBuilderCatalog(context)
   const effectiveDraft = sanitizeClassForLevel(draft)
   const isClasslessLevelZero = isBuilderLevelZeroClassless(draft, context)
 
-  const catalogIssues = resolveFinalizeCatalogIssues(draft, catalogIndex, context)
+  const catalogIssues = resolveFinalizeCatalogIssues(draft, playableIndex, context)
   if (catalogIssues.length > 0) {
     throw new CharacterBuildFinalizationError(catalogIssues)
   }

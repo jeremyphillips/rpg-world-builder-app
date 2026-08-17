@@ -334,6 +334,46 @@ describe('resolvePlayableBuilderContent', () => {
     expect(result.organizations.map((entry) => entry.slug)).toEqual(['visible-guild'])
   })
 
+  it('excludes specific_players content for new_pc onboarding', () => {
+    const fighter = {
+      ...makeStoredClass('fighter', 'Fighter'),
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'all_players' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'all_players' as const,
+      },
+    }
+    const restrictedPaladin = {
+      ...makeStoredClass('paladin', 'Paladin'),
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'specific_players' as const,
+        participantIds: ['pc-a'],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'specific_players' as const,
+      },
+    }
+
+    const result = resolvePlayableBuilderContent(
+      makeContext({
+        playActor: { kind: 'new_pc' },
+        catalog: {
+          species: [],
+          classes: [fighter, restrictedPaladin],
+          spells: [],
+          equipment: [],
+          skillProficiencies: [],
+          organizations: [],
+          languages: [],
+        },
+      }),
+    )
+
+    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+  })
+
   it('passes playable equipment through unchanged aside from eligibility filtering', () => {
     const equipment = equipmentSchema.parse({
       id: 'srd-cc-5.2.1:longsword',

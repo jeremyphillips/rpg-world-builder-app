@@ -5,6 +5,10 @@ import {
   ACTION_BATCH_VALIDATE_FAILURE_MESSAGES,
   ACTION_VALIDATE_BATCH_TARGET_LIMIT,
   CHILL_TOUCH_RESOLUTION,
+  CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_SCOPE_QUERY,
+  CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
+  CONTENT_PLAY_ACTOR_KIND_QUERY,
   ELDRITCH_BLAST_RESOLUTION,
 } from '@rpg/contracts'
 
@@ -1175,5 +1179,275 @@ describe('content campaign access discovery enforcement', () => {
       .expect(200)
 
     expect(listRes.body.feats.some((feat: { id: string }) => feat.id === dmOnlyId)).toBe(false)
+  })
+})
+
+describe('content play-catalog enforcement', () => {
+  const minimalFeatInput = {
+    slug: 'play-catalog-feat',
+    name: 'Play Catalog Feat',
+    category: 'origin' as const,
+    repeatable: { allowed: false },
+  }
+
+  async function createPublishedFeat(
+    campaignId: string,
+    agent: Agent,
+    csrfToken: string,
+    slug: string,
+  ) {
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ ...minimalFeatInput, slug, name: `Feat ${slug}` })
+      .expect(201)
+    return createRes.body.feats.id as string
+  }
+
+  const playCatalogScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_PLAY_SCOPE}`
+
+  it('requires a play actor on play-catalog requests', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-missing-actor@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats?${playCatalogScope}`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(400)
+  })
+
+  it('rejects malformed play actor params on play-catalog requests', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-malformed-actor@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    await owner.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=invalid`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(400)
+
+    await owner.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY}=`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(400)
+  })
+
+  it('filters play-catalog content for new_pc without sibling specific_players grants', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-new-pc-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const restrictedId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'play-catalog-restricted-feat',
+    )
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'play-catalog-new-pc-member@example.com',
+      campaignRole: 'pc',
+    })
+    const pcA = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC A' }, member.userId)
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: member.userId,
+      controlledCharacterIds: [pcA.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [pcA.id],
+      })
+      .expect(200)
+
+    const managerList = await owner.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=new_pc`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    expect(managerList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      false,
+    )
+
+    const memberList = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=new_pc`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(memberList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      false,
+    )
+  })
+
+  it('includes dm_only content for npc play actor and excludes specific_players-only content', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-npc-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const dmOnlyId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'play-catalog-dm-only-feat',
+    )
+    const restrictedId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'play-catalog-npc-restricted-feat',
+    )
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'play-catalog-npc-member@example.com',
+      campaignRole: 'pc',
+    })
+    const pcA = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC A' }, member.userId)
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: member.userId,
+      controlledCharacterIds: [pcA.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${dmOnlyId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [pcA.id],
+      })
+      .expect(200)
+
+    const listRes = await owner.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=npc`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    expect(listRes.body.feats.some((feat: { id: string }) => feat.id === dmOnlyId)).toBe(true)
+    expect(listRes.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(false)
+  })
+
+  it('scopes play-catalog PC actors to authorized specific_players grants', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-pc-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const restrictedId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'play-catalog-pc-restricted-feat',
+    )
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'play-catalog-pc-member@example.com',
+      campaignRole: 'pc',
+    })
+    const pcA = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC A' }, member.userId)
+    const pcB = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC B' }, member.userId)
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: member.userId,
+      controlledCharacterIds: [pcA.id, pcB.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [pcA.id],
+      })
+      .expect(200)
+
+    const grantedList = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY}=${pcA.id}`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(grantedList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      true,
+    )
+
+    const deniedList = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY}=${pcB.id}`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(deniedList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      false,
+    )
+  })
+
+  it('rejects unauthorized play-catalog PC actor character ids', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'play-catalog-unauthorized-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'play-catalog-unauthorized-member@example.com',
+      campaignRole: 'pc',
+    })
+    const pcA = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC A' }, member.userId)
+    const outsiderPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Outsider PC' },
+      member.userId,
+    )
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: member.userId,
+      controlledCharacterIds: [pcA.id],
+    })
+
+    await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/feats?${playCatalogScope}&${CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY}=${outsiderPc.id}`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(403)
   })
 })

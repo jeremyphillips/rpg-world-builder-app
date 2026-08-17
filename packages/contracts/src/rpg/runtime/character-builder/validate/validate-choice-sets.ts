@@ -3,6 +3,7 @@ import { isChoiceSetSatisfied } from '../choice-set'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import { indexCharacterBuildCatalog } from '../context'
+import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
@@ -62,6 +63,7 @@ function spellSelectionIssues(
   choiceSet: ChoiceSet,
   selections: readonly string[],
   optionIds: ReadonlySet<string>,
+  playableIndex: ReturnType<typeof indexPlayableBuilderCatalog>,
   catalogIndex: CharacterBuildCatalogIndex,
   profile: ReturnType<typeof resolveSpellcastingProfile>,
   stepId: CharacterBuilderStepId,
@@ -71,7 +73,7 @@ function spellSelectionIssues(
   for (const spellId of selections) {
     if (optionIds.has(spellId)) continue
 
-    const spell = catalogIndex.spells.get(spellId)
+    const spell = playableIndex.spells.get(spellId) ?? catalogIndex.spells.get(spellId)
     const spellLabel = spell?.name ?? spellId
 
     if (
@@ -207,6 +209,7 @@ export function validateSpellChoiceSets(
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
   const profile = resolveSpellcastingProfile(draft, context)
+  const playableIndex = indexPlayableBuilderCatalog(context)
 
   for (const choiceSet of choiceSets) {
     if (!isSpellChoiceType(choiceSet.choiceType)) continue
@@ -217,7 +220,15 @@ export function validateSpellChoiceSets(
 
     issues.push(...spellChoiceCountIssues(choiceSet, selections, stepId))
     issues.push(
-      ...spellSelectionIssues(choiceSet, selections, optionIds, catalogIndex, profile, stepId),
+      ...spellSelectionIssues(
+        choiceSet,
+        selections,
+        optionIds,
+        playableIndex,
+        catalogIndex,
+        profile,
+        stepId,
+      ),
     )
   }
 

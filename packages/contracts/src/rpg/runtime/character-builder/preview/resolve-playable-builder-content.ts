@@ -5,16 +5,14 @@ import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
 import type { Organization } from '../../../content/organization'
 import {
-  isContentCampaignEligible,
   isContentPlayableFor,
   type ContentResolutionRow,
 } from '../../campaign/content-resolution-policy'
 import type { CharacterBuildContext } from '../context'
 
 // ---------------------------------------------------------------------------
-// resolvePlayableBuilderContent — character-play picker universe. Campaign
-// characters filter by playable(playActor); standalone uses campaign-eligible
-// until a PC play actor exists.
+// resolvePlayableBuilderContent — character-play picker universe. Filters by
+// playable(playActor) plus builder-specific creation rules.
 // ---------------------------------------------------------------------------
 
 export type PlayableBuilderContent = {
@@ -29,11 +27,7 @@ function isSelectableForCharacterPlay(
   row: ContentResolutionRow,
   context: CharacterBuildContext,
 ): boolean {
-  if (context.playActor) {
-    return isContentPlayableFor(row, context.playActor)
-  }
-
-  return isContentCampaignEligible(row)
+  return isContentPlayableFor(row, context.playActor)
 }
 
 function filterPlayableCatalogItems<T extends ContentResolutionRow>(

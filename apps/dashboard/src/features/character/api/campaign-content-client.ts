@@ -1,8 +1,13 @@
-import { CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY } from '@rpg/contracts'
+import {
+  CONTENT_CATALOG_PLAY_SCOPE,
+  CONTENT_CATALOG_SCOPE_QUERY,
+  CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY,
+  CONTENT_PLAY_ACTOR_KIND_QUERY,
+  type ContentPlayActor,
+} from '@rpg/contracts'
 import type {
   CharacterBuildLanguageOption,
   CharacterClass,
-  ContentPlayActor,
   Equipment,
   Organization,
   SkillProficiency,
@@ -32,16 +37,24 @@ const CAMPAIGN_CATALOG_CONTENT = [
   { routeKey: 'organizations', responseKey: 'organizations' },
 ] as const satisfies readonly CampaignContentConfig[]
 
+function buildPlayCatalogQuery(playActor: ContentPlayActor): string {
+  const params = new URLSearchParams()
+  params.set(CONTENT_CATALOG_SCOPE_QUERY, CONTENT_CATALOG_PLAY_SCOPE)
+  if (playActor.kind === 'pc') {
+    params.set(CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY, playActor.characterId)
+  } else {
+    params.set(CONTENT_PLAY_ACTOR_KIND_QUERY, playActor.kind)
+  }
+  return `?${params.toString()}`
+}
+
 async function listCampaignContent<T>(
   campaignId: string,
   config: CampaignContentConfig,
-  playActorCharacterId?: string,
+  playActor: ContentPlayActor,
 ): Promise<T[]> {
-  const query = playActorCharacterId
-    ? `?${CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY}=${encodeURIComponent(playActorCharacterId)}`
-    : ''
   const body = await request<Record<string, T[]>>(
-    `/api/campaigns/${campaignId}/content/${config.routeKey}${query}`,
+    `/api/campaigns/${campaignId}/content/${config.routeKey}${buildPlayCatalogQuery(playActor)}`,
     undefined,
     CAMPAIGN_CONTENT_ERROR,
   )
@@ -49,48 +62,34 @@ async function listCampaignContent<T>(
 }
 
 export type FetchCampaignBuilderCatalogOptions = {
-  playActor?: ContentPlayActor
+  playActor: ContentPlayActor
 }
 
 /** Campaign-scoped catalog lists for the character builder (homebrew + system). */
 export async function fetchCampaignBuilderCatalog(
   campaignId: string,
   rulesetId: SystemRulesetId,
-  options?: FetchCampaignBuilderCatalogOptions,
+  options: FetchCampaignBuilderCatalogOptions,
 ): Promise<BuilderCatalogLists> {
-  const playActorCharacterId =
-    options?.playActor?.kind === 'pc' ? options.playActor.characterId : undefined
+  const { playActor } = options
 
   const [species, classes, spells, equipment, skillProficiencies, organizations, languages] =
     await Promise.all([
-      listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0], playActorCharacterId),
-      listCampaignContent<CharacterClass>(
-        campaignId,
-        CAMPAIGN_CATALOG_CONTENT[1],
-        playActorCharacterId,
-      ),
-      listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2], playActorCharacterId),
-      listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3], playActorCharacterId),
-      listCampaignContent<SkillProficiency>(
-        campaignId,
-        CAMPAIGN_CATALOG_CONTENT[4],
-        playActorCharacterId,
-      ),
-      listCampaignContent<Organization>(
-        campaignId,
-        CAMPAIGN_CATALOG_CONTENT[5],
-        playActorCharacterId,
-      ),
+      listCampaignContent<Species>(campaignId, CAMPAIGN_CATALOG_CONTENT[0], playActor),
+      listCampaignContent<CharacterClass>(campaignId, CAMPAIGN_CATALOG_CONTENT[1], playActor),
+      listCampaignContent<Spell>(campaignId, CAMPAIGN_CATALOG_CONTENT[2], playActor),
+      listCampaignContent<Equipment>(campaignId, CAMPAIGN_CATALOG_CONTENT[3], playActor),
+      listCampaignContent<SkillProficiency>(campaignId, CAMPAIGN_CATALOG_CONTENT[4], playActor),
+      listCampaignContent<Organization>(campaignId, CAMPAIGN_CATALOG_CONTENT[5], playActor),
       listRulesetLanguages(rulesetId),
     ])
 
   return { species, classes, spells, equipment, skillProficiencies, organizations, languages }
 }
 
-export function campaignBuildContextQueryKey(campaignId: string, playActorCharacterId?: string) {
-  return playActorCharacterId
-    ? (['campaigns', campaignId, 'character-builder-context', playActorCharacterId] as const)
-    : (['campaigns', campaignId, 'character-builder-context'] as const)
+export function campaignBuildContextQueryKey(campaignId: string, playActor: ContentPlayActor) {
+  const actorKey = playActor.kind === 'pc' ? playActor.characterId : playActor.kind
+  return ['campaigns', campaignId, 'character-builder-context', actorKey] as const
 }
 
 export type { BuilderCatalogLists, CharacterBuildLanguageOption }

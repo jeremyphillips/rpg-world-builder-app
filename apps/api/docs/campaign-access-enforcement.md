@@ -89,13 +89,41 @@ Applied at:
 
 - API `GET /api/campaigns/:campaignId/content/:contentType` (and subclass lists)
 - Dashboard overview tables (defense-in-depth — Track B B3)
-- Future builder/catalog pickers
+- Character builder / play-catalog fetches (`catalogScope=play`)
 
 Not applied indiscriminately to:
 
 - Saved-character reference resolution (`canResolveSavedContentReference`)
 - General rules reference views
 - Manager authoring surfaces
+
+### Play-catalog scope (`catalogScope=play`)
+
+Character-play catalog fetches (builder, Quick NPC) use a separate consumption mode from
+discovery lists:
+
+| Route kind           | Query parsing                                                             | Filter                                                          |
+| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Discovery / overview | `parseOptionalPlayActorFromQuery` — absence means default discovery union | `filterCatalogForMembership` → `isContentDiscoverableForViewer` |
+| Play catalog         | `requirePlayActorFromQuery` — missing/malformed actor → **400**           | `filterCatalogForPlayActor` → `isContentPlayableFor`            |
+
+Dashboard builder fetches always send `catalogScope=play` plus either `playActorKind`
+(`new_pc` | `npc`) or `playActorCharacterId` (implies `{ kind: 'pc', characterId }`).
+
+#### `authorizePlayActorCharacterId`
+
+When `playActor.kind === 'pc'`, parsing `playActorCharacterId` is not sufficient. Before
+applying `specific_players` grants, the API verifies:
+
+`playActorCharacterId ∈ req.campaignMembership.pcCharacterIds`
+
+| Case                                               | Result                   |
+| -------------------------------------------------- | ------------------------ |
+| Id in authorized controlled set                    | Proceed                  |
+| Id not in set (sibling PC, stale id, arbitrary id) | **403**                  |
+| `playActorKind=new_pc` or `npc`                    | No character id required |
+
+Manage privilege **never** bypasses playable PC actors (`new_pc` or `pc`).
 
 ### `canResolveSavedContentReference`
 

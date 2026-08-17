@@ -4,6 +4,12 @@ export const CONTENT_PLAY_ACTOR_CHARACTER_ID_QUERY = 'playActorCharacterId' as c
 /** Query param for non-PC play actors on builder/play catalog requests. */
 export const CONTENT_PLAY_ACTOR_KIND_QUERY = 'playActorKind' as const
 
+/** Query param that selects play-catalog filtering (fail-closed actor required). */
+export const CONTENT_CATALOG_SCOPE_QUERY = 'catalogScope' as const
+
+/** Value of {@link CONTENT_CATALOG_SCOPE_QUERY} for character-play catalog fetches. */
+export const CONTENT_CATALOG_PLAY_SCOPE = 'play' as const
+
 export const CONTENT_PLAY_ACTOR_KINDS = ['new_pc', 'npc'] as const
 export type ContentPlayActorKind = (typeof CONTENT_PLAY_ACTOR_KINDS)[number]
 
@@ -63,6 +69,12 @@ function readPlayActorKindQuery(
     return { kind: 'empty' }
   }
   return { kind: 'present', value: trimmed }
+}
+
+/** Whether the request targets the play-catalog scope (builder / Quick NPC). */
+export function isPlayCatalogScopeQuery(query: Record<string, unknown>): boolean {
+  const raw = query[CONTENT_CATALOG_SCOPE_QUERY]
+  return typeof raw === 'string' && raw.trim() === CONTENT_CATALOG_PLAY_SCOPE
 }
 
 /** Parses the play-actor character id query param when present. */
