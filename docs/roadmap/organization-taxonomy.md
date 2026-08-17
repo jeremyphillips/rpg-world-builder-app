@@ -15,7 +15,7 @@ investigation from historical analysis notes or completed Cursor plans.
 | 1        | This roadmap                                                                                   | Status, deferred work, SSOT hierarchy                             |
 | 2        | [`organizations-classification.md`](../../apps/dashboard/docs/organizations-classification.md) | Shipped Domain / Form / Functions / Practices model and authoring |
 | 3        | [`organization-taxonomy-evidence.md`](../analysis/organization-taxonomy-evidence.md)           | Semantic gates and boundary decisions                             |
-| 4        | [`organization-taxonomy-discovery.md`](../analysis/organization-taxonomy-discovery.md)         | Frozen 150-concept research corpus only                           |
+| 4        | [`organization-taxonomy-discovery.md`](../discovery/organization-taxonomy-discovery.md)        | Research digest — full corpus in archive only                     |
 
 Create-flow: [`form-lib-conventions.md`](../../apps/dashboard/docs/form-lib-conventions.md) § Organization.
 
@@ -59,14 +59,14 @@ The retired V1 **`organizationKind` / `organizationSubtype`** model is documente
 Verified against registry tests and preset coverage fixtures. If documentation and tests disagree,
 **tests win**.
 
-| Item              | Value                                                                                                                       |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Domains           | **10** — see [`ORGANIZATION_DOMAIN_IDS`](../../packages/contracts/src/rpg/vocab/organization-domain.ts)                     |
-| Forms             | **9** — see [`ORGANIZATION_FORM_IDS`](../../packages/contracts/src/rpg/vocab/organization-form.ts)                          |
-| Functions         | **20** — see [`ORGANIZATION_FUNCTION_IDS`](../../packages/contracts/src/rpg/vocab/organization-function.ts)                 |
-| Practices         | **58** — see [`ORGANIZATION_PRACTICE_IDS`](../../packages/contracts/src/rpg/vocab/organization-practice.ts)                 |
-| Authoring presets | **50** — see [`ORGANIZATION_AUTHORING_PRESET_IDS`](../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts) |
-| Research corpus   | **150** — frozen in [`organization-taxonomy-discovery.md`](../analysis/organization-taxonomy-discovery.md)                  |
+| Item              | Value                                                                                                                                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Domains           | **10** — see [`ORGANIZATION_DOMAIN_IDS`](../../packages/contracts/src/rpg/vocab/organization-domain.ts)                                                                                                                                       |
+| Forms             | **9** — see [`ORGANIZATION_FORM_IDS`](../../packages/contracts/src/rpg/vocab/organization-form.ts)                                                                                                                                            |
+| Functions         | **20** — see [`ORGANIZATION_FUNCTION_IDS`](../../packages/contracts/src/rpg/vocab/organization-function.ts)                                                                                                                                   |
+| Practices         | **58** — see [`ORGANIZATION_PRACTICE_IDS`](../../packages/contracts/src/rpg/vocab/organization-practice.ts)                                                                                                                                   |
+| Authoring presets | **50** — see [`ORGANIZATION_AUTHORING_PRESET_IDS`](../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)                                                                                                                   |
+| Research corpus   | **150** — digest in [`organization-taxonomy-discovery.md`](../discovery/organization-taxonomy-discovery.md); full record in [`archive/organization-taxonomy-discovery-v0.1.md`](../discovery/archive/organization-taxonomy-discovery-v0.1.md) |
 
 ## Test artifacts (not product KPIs)
 
@@ -83,6 +83,24 @@ Do not open a new organization taxonomy investigation from an isolated awkward e
 classification only when production authoring cannot honestly express a needed concept, several
 materially different presets require the same missing distinction, or a concrete downstream consumer
 requires that distinction.
+
+## Discovery follow-through (product decisions)
+
+Phase 8 of the frozen discovery pass mixed **taxonomy conclusions** (in the
+[`discovery digest`](../discovery/organization-taxonomy-discovery.md)) with **implementation
+questions** that belong here. Most are now resolved by shipped code; keep as history, not reopen
+triggers.
+
+| Discovery question                       | Disposition                                                                                   |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Unlock `force` in form rejection tests?  | **Shipped** — `force` and `office` are production forms                                       |
+| Ship two forms + four missions together? | **Shipped** — later split into Functions + Practices                                          |
+| Preset picker vs “start from X, rename”? | **Ongoing** — 50 presets + discovery combobox; grow presets with coverage fixture updates     |
+| Overview form facet?                     | **Deferred** — overview filters domain only unless product asks for host vs office separation |
+| Academy / `college` form stretch?        | **Deferred** — see discovery reopen table                                                     |
+| Clandestine field?                       | **Rejected** for taxonomy v1 — see evidence doc                                               |
+
+Verbatim Phase 8 Q1–Q10 leans: [`archive/organization-taxonomy-discovery-v0.1.md`](../discovery/archive/organization-taxonomy-discovery-v0.1.md#phase-8--open-questions).
 
 ## Deferred
 

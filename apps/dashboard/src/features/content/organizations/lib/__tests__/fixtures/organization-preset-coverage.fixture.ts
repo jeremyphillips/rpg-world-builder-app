@@ -19,7 +19,7 @@ export type OrganizationPresetCoverageOutcome =
   (typeof ORGANIZATION_PRESET_COVERAGE_OUTCOMES)[number]
 
 export type OrganizationPresetCoverageRow = {
-  /** Stable corpus id from organization-taxonomy-discovery Phase 2. */
+  /** Stable corpus id from organization-taxonomy-discovery Phase 2 (archive v0.1). */
   id: string
   /** Author-facing familiar label used as the intentional search query. */
   query: string

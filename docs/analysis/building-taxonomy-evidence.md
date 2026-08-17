@@ -4,10 +4,11 @@
 **Canonical roadmap:** [`docs/roadmap/building-taxonomy.md`](../roadmap/building-taxonomy.md)  
 **Runtime classification:** [`apps/dashboard/docs/locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md)
 
-Reusable semantic gates and boundary decisions from corpus disposition, create-flow acceptance, and
-preset investigation. Not a roadmap, inventory ledger, or phase chronology — git history and
-[`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts)
-own disposition membership and counts.
+Reusable semantic gates and boundary decisions from the 308-concept discovery corpus, Form/Facility
+convergence, and corpus disposition. Research digest:
+[`building-taxonomy-discovery.md`](../discovery/building-taxonomy-discovery.md). Frozen Phases 0–5
+record:
+[`archive/building-taxonomy-discovery-v0.5.md`](../discovery/archive/building-taxonomy-discovery-v0.5.md).
 
 ## Documentation retention
 

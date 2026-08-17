@@ -5,8 +5,10 @@
 **Runtime classification:** [`apps/dashboard/docs/organizations-classification.md`](../../apps/dashboard/docs/organizations-classification.md)
 
 Reusable semantic gates and boundary decisions from the 150-concept discovery corpus, preset
-authoring, and the functions/practices split. Not a roadmap, inventory ledger, or phase chronology —
-git history and test fixtures own disposition membership and counts.
+authoring, and the functions/practices split. Research digest:
+[`organization-taxonomy-discovery.md`](../discovery/organization-taxonomy-discovery.md). Frozen
+Phases 1–8 record:
+[`archive/organization-taxonomy-discovery-v0.1.md`](../discovery/archive/organization-taxonomy-discovery-v0.1.md).
 
 ## Documentation retention
 
