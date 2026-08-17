@@ -61,6 +61,7 @@ function createCampaignPcContext(): CampaignPcBuildContext {
       kind: 'campaign_pc_onboarding',
       campaignId: TEST_CAMPAIGN_ID,
     },
+    playActor: { kind: 'new_pc' },
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: { ...builderTestRules, startingLevel: 3 },
@@ -174,6 +175,7 @@ describe('character build context helpers', () => {
         catalog: emptyCatalog,
         characterCreationRules: builderTestRules,
         permissions: { canCreateCharacter: true },
+        playActor: { kind: 'new_pc' },
       }),
     ).toBe(false)
   })

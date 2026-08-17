@@ -66,6 +66,7 @@ export function createStandaloneBuilderContextFixture(
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
     ...overrides,
   }
 }
@@ -132,6 +133,7 @@ export function createCampaignPcBuilderContextFixture(
       kind: 'campaign_pc_onboarding',
       campaignId,
     },
+    playActor: { kind: 'new_pc' },
     rulesetId,
     catalog: emptyCatalog,
     characterCreationRules: {

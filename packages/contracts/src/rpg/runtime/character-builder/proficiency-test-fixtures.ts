@@ -228,4 +228,5 @@ export const proficiencyTestContext: CharacterBuildContext = {
     armorClass: defaultCampaignMechanicsPatch().armorClass,
   },
   permissions: { canCreateCharacter: true },
+  playActor: { kind: 'new_pc' },
 }

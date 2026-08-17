@@ -153,6 +153,7 @@ function makeContext(
       },
     },
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
     ...rest,
   }
 }

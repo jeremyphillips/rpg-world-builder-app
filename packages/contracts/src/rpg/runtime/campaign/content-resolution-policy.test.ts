@@ -16,6 +16,7 @@ const pcViewer: ContentViewer = { kind: 'pc', characterIds: ['char-a', 'char-b']
 const noneViewer: ContentViewer = { kind: 'none' }
 
 const npcPlayActor: ContentPlayActor = { kind: 'npc' }
+const newPcPlayActor: ContentPlayActor = { kind: 'new_pc' }
 const pcAPlayActor: ContentPlayActor = { kind: 'pc', characterId: 'char-a' }
 const pcBPlayActor: ContentPlayActor = { kind: 'pc', characterId: 'char-b' }
 
@@ -41,7 +42,7 @@ describe('content resolution policy matrix', () => {
       visible: { manage: true, pc: true, none: true },
       referenceable: true,
       campaignEligible: true,
-      playable: { npc: true, pcA: true, pcB: true },
+      playable: { npc: true, newPc: true, pcA: true, pcB: true },
     },
     {
       name: 'draft',
@@ -49,7 +50,7 @@ describe('content resolution policy matrix', () => {
       visible: { manage: true, pc: false, none: false },
       referenceable: false,
       campaignEligible: false,
-      playable: { npc: false, pcA: false, pcB: false },
+      playable: { npc: false, newPc: false, pcA: false, pcB: false },
     },
     {
       name: 'unavailable',
@@ -59,7 +60,7 @@ describe('content resolution policy matrix', () => {
       visible: { manage: true, pc: false, none: false },
       referenceable: true,
       campaignEligible: false,
-      playable: { npc: false, pcA: false, pcB: false },
+      playable: { npc: false, newPc: false, pcA: false, pcB: false },
     },
     {
       name: 'dm_only',
@@ -67,7 +68,7 @@ describe('content resolution policy matrix', () => {
       visible: { manage: true, pc: false, none: false },
       referenceable: true,
       campaignEligible: true,
-      playable: { npc: true, pcA: false, pcB: false },
+      playable: { npc: true, newPc: false, pcA: false, pcB: false },
     },
     {
       name: 'specific_players granted to char-a only',
@@ -80,7 +81,7 @@ describe('content resolution policy matrix', () => {
       visible: { manage: true, pc: true, none: false },
       referenceable: true,
       campaignEligible: true,
-      playable: { npc: false, pcA: true, pcB: false },
+      playable: { npc: false, newPc: false, pcA: true, pcB: false },
     },
   ] as const
 
@@ -93,6 +94,7 @@ describe('content resolution policy matrix', () => {
       expect(isContentReferenceable(testRow)).toBe(referenceable)
       expect(isContentCampaignEligible(testRow)).toBe(campaignEligible)
       expect(isContentPlayableFor(testRow, npcPlayActor)).toBe(playable.npc)
+      expect(isContentPlayableFor(testRow, newPcPlayActor)).toBe(playable.newPc)
       expect(isContentPlayableFor(testRow, pcAPlayActor)).toBe(playable.pcA)
       expect(isContentPlayableFor(testRow, pcBPlayActor)).toBe(playable.pcB)
     },
@@ -103,5 +105,26 @@ describe('isContentPlayableFor', () => {
   it('does not treat manage visibility as playable for draft content', () => {
     const draftRow = row({ status: 'draft' })
     expect(isContentPlayableFor(draftRow, npcPlayActor)).toBe(false)
+    expect(isContentPlayableFor(draftRow, newPcPlayActor)).toBe(false)
+  })
+
+  it('does not grant new_pc sibling specific_players content', () => {
+    const specificPlayersRow = row({
+      campaignAccess: access({
+        visibilityMode: 'specific_players',
+        participantIds: ['char-a'],
+      }),
+    })
+
+    expect(isContentPlayableFor(specificPlayersRow, pcAPlayActor)).toBe(true)
+    expect(isContentPlayableFor(specificPlayersRow, newPcPlayActor)).toBe(false)
+  })
+
+  it('does not grant PC actors dm_only content regardless of viewer privilege', () => {
+    const dmOnlyRow = row({ campaignAccess: access({ visibilityMode: 'dm_only' }) })
+
+    expect(isContentPlayableFor(dmOnlyRow, newPcPlayActor)).toBe(false)
+    expect(isContentPlayableFor(dmOnlyRow, pcAPlayActor)).toBe(false)
+    expect(isContentPlayableFor(dmOnlyRow, npcPlayActor)).toBe(true)
   })
 })

@@ -113,9 +113,13 @@ export type CharacterBuildContext = {
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
   permissions: CharacterBuilderPermissions
-  /** Play-visibility subject when building campaign characters (NPC or known PC). */
-  playActor?: ContentPlayActor
+  /** Play-visibility subject for every character-play consumption surface. */
+  playActor: ContentPlayActor
 }
+
+export type CampaignPcPlayActor =
+  | Extract<ContentPlayActor, { kind: 'new_pc' }>
+  | Extract<ContentPlayActor, { kind: 'pc' }>
 
 /** MVP instantiation — no campaign patch/membership context. */
 export type StandaloneBuildContext = CharacterBuildContext & {
@@ -124,6 +128,7 @@ export type StandaloneBuildContext = CharacterBuildContext & {
   rulesScope: Extract<CharacterRulesScope, { type: 'ruleset' }>
   ownershipTarget: { type: 'user' }
   characterKind: 'pc'
+  playActor: Extract<ContentPlayActor, { kind: 'new_pc' }>
 }
 
 /** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
@@ -145,7 +150,7 @@ export type CampaignPcBuildContext = CharacterBuildContext & {
   ownershipTarget: { type: 'user'; userId: string }
   characterKind: 'pc'
   acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_pc_onboarding' }>
-  playActor?: Extract<ContentPlayActor, { kind: 'pc' }>
+  playActor: CampaignPcPlayActor
 }
 
 /** Discriminated union — only legal campaign build combinations compile. */

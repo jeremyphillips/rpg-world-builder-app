@@ -209,6 +209,7 @@ export function createEquipmentStepContextFixture(
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
     ...overrides,
   }
 }

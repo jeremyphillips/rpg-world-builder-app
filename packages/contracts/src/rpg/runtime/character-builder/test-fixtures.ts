@@ -157,6 +157,7 @@ export function createCharacterBuildContext(
     catalog: builderTestCatalog,
     characterCreationRules: builderTestRules,
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
     ...overrides,
   }
 }

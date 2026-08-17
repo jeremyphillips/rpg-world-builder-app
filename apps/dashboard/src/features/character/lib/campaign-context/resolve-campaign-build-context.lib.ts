@@ -22,6 +22,15 @@ type CampaignBuildContextSource = {
   playActor?: ContentPlayActor
 }
 
+function resolveCampaignPcPlayActor(
+  playActor: ContentPlayActor | undefined,
+): CampaignPcBuildContext['playActor'] {
+  if (playActor?.kind === 'pc' || playActor?.kind === 'new_pc') {
+    return playActor
+  }
+  return { kind: 'new_pc' }
+}
+
 /** Assembles a campaign build context from loaded patch + catalog data. */
 export function resolveCampaignBuildContext(
   input: CampaignBuildContextSource,
@@ -79,7 +88,7 @@ export function resolveCampaignBuildContext(
       characterKind: 'pc',
       ownershipTarget,
       acquisition,
-      ...(playActor?.kind === 'pc' ? { playActor } : {}),
+      playActor: resolveCampaignPcPlayActor(playActor),
     }
     return pcContext
   }
