@@ -13,10 +13,10 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
   type ClassStored,
-  type SkillProficiency,
-  type Species,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
+
+import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
 
@@ -50,44 +50,11 @@ const proficienciesStepLanguages = [
   },
 ] as const
 
-export const proficienciesStepStealthSkill = {
-  id: `${RULESET}:stealth`,
-  slug: 'stealth',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Stealth',
-  ability: 'dex',
-  examples: ['Escape notice by moving quietly and hiding behind things'],
-} as const satisfies SkillProficiency
+export const proficienciesStepStealthSkill = pickSkillProficiency('stealth')
 
-export const proficienciesStepAcrobaticsSkill = {
-  id: `${RULESET}:acrobatics`,
-  slug: 'acrobatics',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Acrobatics',
-  ability: 'dex',
-  examples: ['Stay on your feet in a tricky situation', 'Perform an acrobatic stunt'],
-} as const satisfies SkillProficiency
+export const proficienciesStepAcrobaticsSkill = pickSkillProficiency('acrobatics')
 
-export const proficienciesStepPerceptionSkill = {
-  id: `${RULESET}:perception`,
-  slug: 'perception',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Perception',
-  ability: 'wis',
-  examples: ["Using a combination of senses, notice something that's easy to miss"],
-} as const satisfies SkillProficiency
+export const proficienciesStepPerceptionSkill = pickSkillProficiency('perception')
 
 export const proficienciesStepRogueClass = {
   id: `${RULESET}:rogue`,
@@ -124,21 +91,7 @@ export const proficienciesStepRogueClass = {
   features: [],
 } as const satisfies ClassStored
 
-export const proficienciesStepDwarfSpecies = {
-  id: `${RULESET}:dwarf`,
-  slug: 'dwarf',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Dwarf',
-  description: '<p>Stout and hardy folk.</p>',
-  creatureType: 'humanoid',
-  sizes: ['medium'],
-  movement: { walk: 30 },
-  traits: [],
-} as const satisfies Species
+export const proficienciesStepDwarfSpecies = pickSpecies('dwarf')
 
 export function createEmptyProficienciesStepPreviewFixture(): CharacterBuildPreview {
   return {

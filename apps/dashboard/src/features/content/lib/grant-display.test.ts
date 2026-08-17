@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type { GrantGroup, Spell } from '@rpg/contracts'
+import type { GrantGroup } from '@rpg/contracts'
+
+import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import {
   buildCatalogDrowGrantDisplayVocabulary,
@@ -471,12 +473,12 @@ describe('formatGrantSummaryByLevel', () => {
 describe('buildSpellGrantVocabulary', () => {
   it('resolves spell display metadata by slug', () => {
     const resolveSpell = buildSpellGrantVocabulary([
-      {
+      makeSpell({
         id: 'ruleset:dancing-lights',
         slug: 'dancing-lights',
         name: 'Dancing Lights',
         level: 0,
-      } as Spell,
+      }),
     ])
 
     expect(resolveSpell('dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })

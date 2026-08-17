@@ -8,211 +8,30 @@ import {
   type CharacterBuildCatalog,
   type CharacterBuildContext,
   type ClassStored,
-  type Equipment,
   type StartingWealthRules,
 } from '@rpg/contracts'
 
-export const equipmentStepBreastplateFixture = {
-  id: 'srd-cc-5.2.1:breastplate',
-  slug: 'breastplate',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Breastplate',
-  description: '',
-  cost: { amount: 400, currency: 'gp' },
-  weight: { value: 20, unit: 'lb' },
-  kind: 'armor',
-  category: 'medium',
-  material: 'metal',
-  baseAc: 14,
-  addDexModifier: true,
-  maxDexBonus: 2,
-  stealthDisadvantage: false,
-} as const satisfies Equipment
+import { pickEquipment } from '@/test/fixtures/pick'
 
-export const equipmentStepLeatherArmorFixture = {
-  id: 'srd-cc-5.2.1:leather-armor',
-  slug: 'leather-armor',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Leather Armor',
-  description: '',
-  cost: { amount: 10, currency: 'gp' },
-  weight: { value: 10, unit: 'lb' },
-  kind: 'armor',
-  category: 'light',
-  baseAc: 11,
-  addDexModifier: true,
-  stealthDisadvantage: false,
-} as const satisfies Equipment
+export const equipmentStepBreastplateFixture = pickEquipment('breastplate')
 
-export const equipmentStepLuteFixture = {
-  id: 'srd-cc-5.2.1:lute',
-  slug: 'lute',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Lute',
-  description: '',
-  cost: { amount: 35, currency: 'gp' },
-  weight: { value: 2, unit: 'lb' },
-  kind: 'tool',
-  toolCategory: 'musical_instrument',
-  ability: 'cha',
-  utilizes: [{ description: 'Play a known tune', dc: 10 }],
-} as const satisfies Equipment
+export const equipmentStepLeatherArmorFixture = pickEquipment('leather-armor')
 
-export const equipmentStepDrumFixture = {
-  id: 'srd-cc-5.2.1:drum',
-  slug: 'drum',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Drum',
-  description: '',
-  cost: { amount: 6, currency: 'gp' },
-  weight: { value: 3, unit: 'lb' },
-  kind: 'tool',
-  toolCategory: 'musical_instrument',
-  ability: 'cha',
-  utilizes: [{ description: 'Keep a steady beat', dc: 10 }],
-} as const satisfies Equipment
+export const equipmentStepLuteFixture = pickEquipment('lute')
 
-export const equipmentStepPotionOfHealingFixture = {
-  id: 'srd-cc-5.2.1:potion-of-healing',
-  slug: 'potion-of-healing',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Potion of Healing',
-  description: '',
-  kind: 'magic_item',
-  rarity: 'common',
-  magicItemCategory: 'potion',
-  cost: { amount: 50, currency: 'gp' },
-  weight: { value: 0.5, unit: 'lb' },
-} as const satisfies Equipment
+export const equipmentStepDrumFixture = pickEquipment('drum')
 
-export const equipmentStepRationsFixture = {
-  id: 'srd-cc-5.2.1:rations',
-  slug: 'rations',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Rations',
-  description: '',
-  kind: 'adventuring_gear',
-  gearKind: 'consumable',
-  cost: { amount: 5, currency: 'sp' },
-  weight: { value: 2, unit: 'lb' },
-} as const satisfies Equipment
+export const equipmentStepPotionOfHealingFixture = pickEquipment('potion-of-healing')
 
-export const equipmentStepSpearFixture = {
-  id: 'srd-cc-5.2.1:spear',
-  slug: 'spear',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Spear',
-  description: '',
-  cost: { amount: 1, currency: 'gp' },
-  weight: { value: 3, unit: 'lb' },
-  kind: 'weapon',
-  category: 'simple',
-  mode: 'melee',
-  damage: { dice: { count: 1, faces: 6 } },
-  damageType: 'piercing',
-  properties: ['thrown', 'versatile'],
-  mastery: 'sap',
-  versatileDamage: { count: 1, faces: 8 },
-  range: { normal: 20, long: 60 },
-} as const satisfies Equipment
+export const equipmentStepRationsFixture = pickEquipment('rations')
 
-export const equipmentStepBattleaxeFixture = {
-  id: 'srd-cc-5.2.1:battleaxe',
-  slug: 'battleaxe',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Battleaxe',
-  description: '',
-  cost: { amount: 10, currency: 'gp' },
-  weight: { value: 4, unit: 'lb' },
-  kind: 'weapon',
-  category: 'martial',
-  mode: 'melee',
-  damage: { dice: { count: 1, faces: 8 } },
-  damageType: 'slashing',
-  properties: ['versatile'],
-  mastery: 'topple',
-  versatileDamage: { count: 1, faces: 10 },
-} as const satisfies Equipment
+export const equipmentStepSpearFixture = pickEquipment('spear')
 
-export const equipmentStepDaggerFixture = {
-  id: 'srd-cc-5.2.1:dagger',
-  slug: 'dagger',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Dagger',
-  description: '',
-  cost: { amount: 2, currency: 'gp' },
-  weight: { value: 1, unit: 'lb' },
-  kind: 'weapon',
-  category: 'simple',
-  mode: 'melee',
-  damage: { dice: { count: 1, faces: 4 } },
-  damageType: 'piercing',
-  properties: ['finesse', 'light', 'thrown'],
-  mastery: 'nick',
-  range: { normal: 20, long: 60 },
-} as const satisfies Equipment
+export const equipmentStepBattleaxeFixture = pickEquipment('battleaxe')
 
-export const equipmentStepExplorersPackFixture = {
-  id: 'srd-cc-5.2.1:explorers-pack',
-  slug: 'explorers-pack',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: "Explorer's Pack",
-  description: '',
-  cost: { amount: 10, currency: 'gp' },
-  weight: { value: 59, unit: 'lb' },
-  kind: 'adventuring_gear',
-  gearKind: 'container',
-} as const satisfies Equipment
+export const equipmentStepDaggerFixture = pickEquipment('dagger')
+
+export const equipmentStepExplorersPackFixture = pickEquipment('explorers-pack')
 
 export const equipmentStepBardClassFixture = {
   id: 'srd-cc-5.2.1:bard',

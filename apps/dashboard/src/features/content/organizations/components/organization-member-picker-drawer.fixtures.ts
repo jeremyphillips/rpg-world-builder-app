@@ -1,4 +1,6 @@
-import type { CharacterClass, OrganizationDomain } from '@rpg/contracts'
+import type { OrganizationDomain } from '@rpg/contracts'
+
+import { pickClass } from '@/test/fixtures/pick'
 
 import type { OrganizationMemberPickerCandidate } from './organization-member-picker-drawer.client'
 
@@ -13,33 +15,10 @@ export const ORGANIZATION_MEMBER_PICKER_ORGANIZATION = {
   memberClassAffinityIds: [ROGUE_CLASS_ID],
 }
 
-function makeClass(slug: string, id: string): CharacterClass {
-  return {
-    id,
-    slug,
-    rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
-    status: 'published',
-    campaignId: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    name: slug.charAt(0).toUpperCase() + slug.slice(1),
-    primaryAbilities: ['str'],
-    hitDie: 10,
-    proficiencies: {
-      savingThrows: ['str', 'con'],
-      armor: { categories: [], items: [] },
-      weapons: { categories: [], items: [] },
-      skills: { categories: [], items: [] },
-    },
-    features: [],
-  }
-}
-
 export const ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES = [
-  makeClass('fighter', FIGHTER_CLASS_ID),
-  makeClass('rogue', ROGUE_CLASS_ID),
-  makeClass('wizard', WIZARD_CLASS_ID),
+  pickClass('fighter'),
+  pickClass('rogue'),
+  pickClass('wizard'),
 ]
 
 /** Shuffled input order — the drawer sorts non-members first, then sinks existing members. */

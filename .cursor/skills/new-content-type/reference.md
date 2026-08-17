@@ -35,6 +35,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true`                                                                                                   |
 | —    | Dashboard | Authorable types: API `routeKey` mapping in `content-form-navigation.ts` for post-create edit navigation                                                  |
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
+| 10b  | Dashboard | `factories/<type>.ts` + `CONTENT_TEST_FACTORY_REGISTRY` entry (synthetic `makeX`; catalog via `pickX`)                                                    |
 | —    | Gates     | All [layer drift tests](#drift-test-map) green                                                                                                            |
 
 ---
@@ -134,6 +135,9 @@ Query helpers (for drift tests): `@rpg/content-types` exports
 | Dashboard routes  | `apps/dashboard/src/app/content-routes.integration-manifest.test.ts` | `CONTENT_ROUTES` ↔ `routeSection` |
 | Dashboard sidebar | `apps/dashboard/.../content-registry.test.ts`                        | Sidebar ↔ `visibleInSidebar`      |
 | Dashboard forms   | `apps/dashboard/.../content-form-registry.test.ts`                   | Registry ↔ `formDefinitionPath`   |
+| Dashboard test factories | `apps/dashboard/src/test/fixtures/content-test-factory-registry.test.ts` | Registry ↔ `ContentTypeKey` |
+
+Detail: [testing.md § Content test factories](../../../apps/dashboard/docs/testing.md#content-test-factories).
 
 ---
 

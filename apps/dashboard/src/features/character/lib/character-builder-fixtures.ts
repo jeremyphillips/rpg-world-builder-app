@@ -9,12 +9,13 @@ import {
   type CharacterBuildCatalog,
   type CharacterBuildCatalogIndex,
   type ClassStored,
-  type SkillProficiency,
-  type Species,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
+
+import { pickClass, pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 
 const emptyCatalog: StandaloneBuildContext['catalog'] = {
   species: [],
@@ -27,23 +28,8 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
 }
 
 const storedFighter = {
-  id: 'srd-cc-5.2.1:fighter',
-  slug: 'fighter',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Fighter',
+  ...pickClass('fighter'),
   primaryAbilities: ['str'],
-  hitDie: 10,
-  proficiencies: {
-    savingThrows: ['str', 'con'],
-    armor: { categories: ['light', 'medium'], items: [] },
-    weapons: { categories: ['simple', 'martial'], items: [] },
-    skills: { categories: [], items: [] },
-  },
   characterCreation: {
     proficiencies: {
       skills: {
@@ -51,66 +37,31 @@ const storedFighter = {
       },
     },
   },
-  features: [],
 } as const satisfies ClassStored
 
 const fighterClass = storedFighter
 
-const dwarfSpecies = {
-  id: 'srd-cc-5.2.1:dwarf',
-  slug: 'dwarf',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Dwarf',
-  description: '<p>Stout and hardy folk.</p>',
-  creatureType: 'humanoid',
-  sizes: ['medium'],
-  movement: { walk: 30 },
-  languageAffinities: ['dwarvish'],
-  traits: [],
-  culture: {
-    naming: {
-      supported: true,
-      personalNameComponents: ['clan'],
-    },
-  },
-} as const satisfies Species
+const dwarfSpecies = pickSpecies('dwarf')
 
 /** Dwarf-shaped species without naming metadata — for unsupported-name-generation tests. */
-export const unsupportedNamingDwarfSpecies = {
-  ...dwarfSpecies,
+export const unsupportedNamingDwarfSpecies = makeSpecies({
   id: 'srd-cc-5.2.1:dwarf-no-naming',
   slug: 'dwarf-no-naming',
   name: 'Dwarf (no naming)',
+  source: 'system',
+  campaignId: null,
   culture: undefined,
-} as const satisfies Species
+})
 
 /** Homebrew species for naming-policy inheritance tests. */
-export const homebrewSpeciesFixture = {
-  ...dwarfSpecies,
+export const homebrewSpeciesFixture = makeSpecies({
   id: 'homebrew:river-folk',
   slug: 'river-folk',
   name: 'River Folk',
   source: 'homebrew',
-} as const satisfies Species
+})
 
-const athleticsSkill = {
-  id: 'srd-cc-5.2.1:athletics',
-  slug: 'athletics',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Athletics',
-  ability: 'str',
-  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
-} as const satisfies SkillProficiency
+const athleticsSkill = pickSkillProficiency('athletics')
 
 export const populatedBuilderCatalog = {
   species: [dwarfSpecies],

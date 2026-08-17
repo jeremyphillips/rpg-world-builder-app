@@ -5,18 +5,14 @@ import {
   resolveCharacterCreationPatch,
   type CharacterBuildContext,
   type ClassStored,
-  type SkillProficiency,
-  type Species,
   type Spell,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
-const RULESET = DEFAULT_SYSTEM_RULESET_ID
+import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
+import { makeSpell } from '@/test/fixtures/factories/spell'
 
-const timestamps = {
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-} as const
+const RULESET = DEFAULT_SYSTEM_RULESET_ID
 
 export const spellsStepFighterClass = {
   id: `${RULESET}:fighter`,
@@ -25,7 +21,8 @@ export const spellsStepFighterClass = {
   source: 'system',
   status: 'published',
   campaignId: null,
-  ...timestamps,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Fighter',
   primaryAbilities: ['str'],
   hitDie: 10,
@@ -52,7 +49,8 @@ export const spellsStepWizardClass = {
   source: 'system',
   status: 'published',
   campaignId: null,
-  ...timestamps,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Wizard',
   primaryAbilities: ['int'],
   hitDie: 6,
@@ -81,24 +79,13 @@ export const spellsStepWizardClass = {
 } as const satisfies ClassStored
 
 function spell(slug: string, level: number, name: string): Spell {
-  return {
-    id: `${RULESET}:${slug}`,
+  return makeSpell({
     slug,
-    rulesetId: RULESET,
-    source: 'system',
-    status: 'published',
-    campaignId: null,
-    ...timestamps,
     name,
-    description: '<p>Test spell.</p>',
-    school: 'evocation',
     level,
     classIds: ['fixture-wizard'],
-    castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
-    range: { kind: 'self' },
-    duration: { kind: 'instantaneous' },
-    components: { verbal: true },
-  }
+    description: '<p>Test spell.</p>',
+  })
 }
 
 export const spellsStepWizardCantrips = [
@@ -115,34 +102,9 @@ export const spellsStepWizardSpells = [
   spell('shield', 1, 'Shield'),
 ]
 
-export const spellsStepDwarfSpecies = {
-  id: `${RULESET}:dwarf`,
-  slug: 'dwarf',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Dwarf',
-  description: '<p>Stout and hardy folk.</p>',
-  creatureType: 'humanoid',
-  sizes: ['medium'],
-  movement: { walk: 30 },
-  traits: [],
-} as const satisfies Species
+export const spellsStepDwarfSpecies = pickSpecies('dwarf')
 
-export const spellsStepAthleticsSkill = {
-  id: `${RULESET}:athletics`,
-  slug: 'athletics',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
-  name: 'Athletics',
-  ability: 'str',
-  examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
-} as const satisfies SkillProficiency
+export const spellsStepAthleticsSkill = pickSkillProficiency('athletics')
 
 export function createSpellsStepContextFixture(
   overrides: Partial<CharacterBuildContext> = {},

@@ -23,24 +23,54 @@ package `vitest.config.ts` and the repo-root config).
 
 ## Shared scaffold
 
-| Path                                                | Purpose                                                                                      |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `src/test/render.tsx`                               | `makeTestQueryClient()`, `renderWithProviders(ui, { queryClient?, initialEntries? })`        |
-| `src/test/make-wrapper.tsx`                         | `makeQueryWrapper()` — `wrapper` option for `renderHook`                                     |
-| `src/test/form-shell.tsx`                           | `TestFormShell` — MemoryRouter + react-hook-form `FormProvider`                              |
-| `src/test/mocks/ui-form.tsx`                        | `stubUiFormItems(importOriginal, testId?)` — shared `@rpg/ui/form` mock                      |
-| `src/test/fixtures/session.ts`                      | `makeSessionUser()`, `makeAuthMe()`                                                          |
-| `src/test/fixtures/campaigns.ts`                    | `makeCampaignListItem()`                                                                     |
-| `features/content/lib/fixtures/pick.ts`             | `pickEquipment()`, `pickClass()`, … (catalog-backed)                                         |
-| `features/content/lib/fixtures/content-form-ctx.ts` | `makeContentFormCtx()`, `TEST_CAMPAIGN_ID`                                                   |
-| `features/content/equipment/lib/test-utils/`        | `expectComposedKindGroups()`, `expectSeedRoundTrip()`, `seedEquipmentOfKind()`               |
-| `@rpg/ui/test-utils`                                | `expectNoAxeViolations(container)` — axe with `color-contrast` off                           |
-| `@rpg/ui/form/test-utils`                           | `assertRegistryCoverage`, `assertInvalidSubmitUsesRefinedMessages`, `submitAndExpectPayload` |
+| Path                                                 | Purpose                                                                                      |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `src/test/render.tsx`                                | `makeTestQueryClient()`, `renderWithProviders(ui, { queryClient?, initialEntries? })`        |
+| `src/test/make-wrapper.tsx`                          | `makeQueryWrapper()` — `wrapper` option for `renderHook`                                     |
+| `src/test/form-shell.tsx`                            | `TestFormShell` — MemoryRouter + react-hook-form `FormProvider`                              |
+| `src/test/mocks/ui-form.tsx`                         | `stubUiFormItems(importOriginal, testId?)` — shared `@rpg/ui/form` mock                      |
+| `src/test/fixtures/session.ts`                       | `makeSessionUser()`, `makeAuthMe()`                                                          |
+| `src/test/fixtures/campaigns.ts`                     | `makeCampaignListItem()`                                                                     |
+| `src/test/fixtures/factories/`                       | `makeCharacterClass()`, `makeEquipment()`, … — canonical content entity factories            |
+| `src/test/fixtures/content-test-factory-registry.ts` | `CONTENT_TEST_FACTORY_REGISTRY` — one factory per `ContentTypeKey`                           |
+| `src/test/fixtures/scenarios/`                       | Named scenario sets composing factories (e.g. `CITY_COUNCIL`)                                |
+| `src/test/fixtures/pick.ts`                          | `pickEquipment()`, `pickClass()`, … — catalog **selection** only (throws on unknown slug)    |
+| `features/content/lib/fixtures/pick.ts`              | Re-export shim → `@/test/fixtures/pick`                                                      |
+| `features/content/lib/fixtures/content-form-ctx.ts`  | `makeContentFormCtx()`, `TEST_CAMPAIGN_ID`                                                   |
+| `features/content/equipment/lib/test-utils/`         | `expectComposedKindGroups()`, `expectSeedRoundTrip()`, `seedEquipmentOfKind()`               |
+| `@rpg/ui/test-utils`                                 | `expectNoAxeViolations(container)` — axe with `color-contrast` off                           |
+| `@rpg/ui/form/test-utils`                            | `assertRegistryCoverage`, `assertInvalidSubmitUsesRefinedMessages`, `submitAndExpectPayload` |
 
 Never hand-roll `new QueryClient(...)`, MemoryRouter + QueryClientProvider
 stacks, inline `SessionUser`/`CampaignListItem` objects, or `axe.run` +
 violations assertions — use the scaffold. Fixture defaults are overridable;
 pass overrides instead of redefining shapes.
+
+## Content test factories
+
+**Core rule: centralize construction, not selection.**
+
+| Need                           | Use                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------- |
+| Real SRD/catalog record        | `pickX(...)` from `@/test/fixtures/pick` (or feature `fixtures.ts` named picks) |
+| Synthetic valid entity         | `makeX(...)` from `@/test/fixtures/factories/*`                                 |
+| Reusable fictional composition | `@/test/fixtures/scenarios/*` composing `makeX` / `pickX`                       |
+| Component wiring               | Feature `*.fixtures.ts`                                                         |
+
+### `pickX` vs `makeX`
+
+- **`pickX(slug)`** — returns the canonical `@rpg/catalog` record; unknown slug **throws**. Use when the test depends on exact SRD mechanics, costs, or labels.
+- **`makeX(overrides)`** — returns a complete **synthetic** valid entity with deterministic inline defaults. Slug identity is test-owned; a slug that happens to match catalog content must **not** change behavior.
+
+Do **not** add `tryPickX` helpers or catalog fallback inside `makeX`. Do **not** maintain a global named-catalog module — feature fixtures own selections such as `export const ELF = pickSpecies('elf')` when that feature cares.
+
+### Registry and guard
+
+- **`CONTENT_TEST_FACTORY_REGISTRY`** — one `make*` per `ContentTypeKey`; parity enforced by `content-test-factory-registry.test.ts`.
+- **`content-factory-boundary.guard.test.ts`** — ratchet baseline blocks new hand-rolled construction outside `src/test/fixtures/factories/**`. **`pickX(...)` is allowed everywhere.** Scenarios must compose factories/pickers, not inline full schemas.
+- **`content-test-factory-semantics.test.ts`** — locks pick/make distinction (unknown slug throws; matching slug ≠ catalog record).
+
+Campaign entity construction is owned by `src/test/fixtures/factories/additional/campaign.ts` (Phase 2). Mark intentional malformed-schema tests with `@invalid-schema-fixture`.
 
 ### Standard harnesses
 
