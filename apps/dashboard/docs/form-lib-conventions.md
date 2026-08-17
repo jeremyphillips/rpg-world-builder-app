@@ -43,9 +43,13 @@ Organization familiar starting points (`organization-form-projection.ts`):
   not lexical aliases and not classification-entry `searchTerms`.
 - **Functions** — multi **`chips`** with outline chrome and hint
   _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.
-- **Practices** — multi **`combobox`** with classification-entry `searchTerms` on
-  options, hint _Distinctive trades, methods, or operational specialties._, and
-  placeholder from `vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, { multiple: true })`.
+- **Practices** — multi **`combobox`** with classification-entry `aliases` and
+  `searchTerms` projected onto option `searchTerms` (picker search), hint
+  _Distinctive trades, methods, or operational specialties._, and placeholder
+  from `vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, { multiple: true })`.
+  UI-only Practice families live in `@rpg/contracts`
+  `ORGANIZATION_PRACTICE_PRESENTATION_FAMILY_BY_ID` (not persisted, not eligibility rules).
+  The Practice combobox stays flat and search-first at ~58 options — families are metadata only.
 - `buildOrganizationFormValueSyncs` applies a preset once, clears
   `authoringPresetId`, writes both `functions` and `practices`, and **never** seeds
   `name`. Authors keep the real name.

@@ -126,6 +126,15 @@ describe('organization form projection', () => {
     const brewing = practiceOptions.find((option) => option.value === 'brewing')
     expect(brewing?.searchTerms).toEqual(expect.arrayContaining(['ale', 'beer']))
     expect(optionMatchesQuery(brewing!, 'ale')).toBe(true)
+
+    const shipbuilding = practiceOptions.find((option) => option.value === 'shipbuilding')
+    expect(optionMatchesQuery(shipbuilding!, 'shipwright')).toBe(true)
+
+    const fencing = practiceOptions.find((option) => option.value === 'fencing')
+    expect(fencing?.searchTerms).toEqual(
+      expect.arrayContaining(['stolen-goods fencing', 'fence network']),
+    )
+    expect(optionMatchesQuery(fencing!, 'stolen goods')).toBe(true)
   })
 
   it('uses a searchable single-select combobox for familiar starting points', () => {
@@ -139,33 +148,45 @@ describe('organization form projection', () => {
     })
 
     const options = presetPickerOptions(fields)
-    expect(options).toHaveLength(20)
+    expect(options).toHaveLength(50)
 
     const army = options.find((option) => option.value === 'army')
     expect(army).toMatchObject({
       label: 'Army',
-      description: expect.stringContaining('navy'),
-      searchTerms: expect.arrayContaining(['navy', 'militia', 'marines']),
+      description: expect.stringContaining('marines'),
+      searchTerms: expect.arrayContaining(['marines', 'garrison', 'legion']),
     })
-    expect(optionMatchesQuery(army!, 'navy')).toBe(true)
-    expect(optionMatchesQuery(army!, 'temple')).toBe(false)
+    expect(optionMatchesQuery(army!, 'navy')).toBe(false)
+    expect(optionMatchesQuery(army!, 'militia')).toBe(false)
+
+    const navy = options.find((option) => option.value === 'navy')
+    expect(optionMatchesQuery(navy!, 'navy')).toBe(true)
 
     const church = options.find((option) => option.value === 'church')
     expect(optionMatchesQuery(church!, 'temple')).toBe(true)
 
     const academy = options.find((option) => option.value === 'academy')
-    expect(optionMatchesQuery(academy!, 'university')).toBe(true)
+    expect(optionMatchesQuery(academy!, 'university')).toBe(false)
+
+    const university = options.find((option) => option.value === 'university')
+    expect(optionMatchesQuery(university!, 'university')).toBe(true)
 
     const tradingCompany = options.find((option) => option.value === 'trading_company')
-    expect(optionMatchesQuery(tradingCompany!, 'merchant house')).toBe(true)
+    expect(optionMatchesQuery(tradingCompany!, 'merchant house')).toBe(false)
+
+    const merchantHouse = options.find((option) => option.value === 'merchant_house')
+    expect(optionMatchesQuery(merchantHouse!, 'merchant house')).toBe(true)
     expect(optionMatchesQuery(tradingCompany!, 'shipping')).toBe(false)
 
     const shippingCompany = options.find((option) => option.value === 'shipping_company')
     expect(shippingCompany).toMatchObject({
       label: 'Shipping company',
-      searchTerms: expect.arrayContaining(['caravan company', 'coach line', 'courier service']),
+      searchTerms: expect.arrayContaining(['coach line', 'courier service']),
     })
-    expect(optionMatchesQuery(shippingCompany!, 'caravan company')).toBe(true)
+    expect(optionMatchesQuery(shippingCompany!, 'caravan company')).toBe(false)
+
+    const caravanCompany = options.find((option) => option.value === 'caravan_company')
+    expect(optionMatchesQuery(caravanCompany!, 'caravan company')).toBe(true)
     expect(optionMatchesQuery(shippingCompany!, 'shipping')).toBe(true)
   })
 

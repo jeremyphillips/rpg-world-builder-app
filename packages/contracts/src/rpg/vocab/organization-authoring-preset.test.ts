@@ -4,357 +4,49 @@ import {
   applyOrganizationAuthoringPreset,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
+  type OrganizationAuthoringPresetId,
 } from './organization-authoring-preset'
+import { ORGANIZATION_DOMAIN_IDS } from './organization-domain'
+import { ORGANIZATION_FORM_IDS } from './organization-form'
+import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
+import { ORGANIZATION_PRACTICE_IDS } from './organization-practice'
+
+function normalizePresetLabel(label: string): string {
+  return label.trim().toLowerCase()
+}
 
 describe('organization authoring presets', () => {
-  it('freezes the twenty v2 recipes with discovery metadata', () => {
-    expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(20)
-    expect(ORGANIZATION_AUTHORING_PRESETS).toMatchInlineSnapshot(`
-      {
-        "academy": {
-          "description": "Closest starting point for university, mage college, and teaching bodies.",
-          "discoveryTerms": [
-            "university",
-            "mage college",
-            "bardic college",
-            "seminary",
-            "wizard circle",
-          ],
-          "domain": "academic",
-          "form": "association",
-          "functions": [
-            "education",
-            "training",
-            "research",
-          ],
-          "label": "Academy",
-          "practices": [],
-        },
-        "adventurers_guild": {
-          "description": "Closest starting point for an adventurer hall, company, or monster hunters guild.",
-          "discoveryTerms": [
-            "monster hunters' guild",
-            "adventuring company",
-            "treasure hunters",
-          ],
-          "domain": "occupational",
-          "form": "guild",
-          "functions": [],
-          "label": "Adventurers' guild",
-          "practices": [],
-        },
-        "army": {
-          "description": "Closest starting point for navy, militia, marines, and other armed hosts.",
-          "discoveryTerms": [
-            "navy",
-            "militia",
-            "marines",
-            "sky fleet",
-            "garrison",
-            "legion",
-            "crusading host",
-            "royal guard",
-            "warband",
-            "pirate crew",
-          ],
-          "domain": "military",
-          "form": "force",
-          "functions": [
-            "warfare",
-            "defense",
-          ],
-          "label": "Army",
-          "practices": [],
-        },
-        "bank": {
-          "description": "Closest starting point for moneylenders, pawnbrokers, and tax farmers.",
-          "discoveryTerms": [
-            "moneylenders",
-            "pawnbrokers",
-            "tax farmers",
-            "insurance company",
-          ],
-          "domain": "commercial",
-          "form": "company",
-          "functions": [
-            "finance",
-          ],
-          "label": "Bank",
-          "practices": [
-            "banking",
-          ],
-        },
-        "church": {
-          "description": "Closest starting point for temple, cult, and gathered faith communities.",
-          "discoveryTerms": [
-            "temple",
-            "temple organization",
-            "cult",
-            "druid circle",
-            "heretical sect",
-            "witches' coven",
-            "missionary society",
-            "pilgrimage society",
-            "inquisitorial office",
-          ],
-          "domain": "religious",
-          "form": "congregation",
-          "functions": [
-            "worship",
-            "ministry",
-          ],
-          "label": "Church",
-          "practices": [],
-        },
-        "city_council": {
-          "description": "Closest starting point for parliament, senate, and privy council.",
-          "discoveryTerms": [
-            "parliament",
-            "senate",
-            "privy council",
-          ],
-          "domain": "government",
-          "form": "association",
-          "functions": [],
-          "label": "City council",
-          "practices": [],
-        },
-        "city_watch": {
-          "description": "Closest starting point for civic policing and crown law enforcement.",
-          "discoveryTerms": [
-            "marshals",
-          ],
-          "domain": "government",
-          "functions": [
-            "policing",
-          ],
-          "label": "City watch",
-          "practices": [],
-        },
-        "craft_guild": {
-          "description": "Closest starting point for scribes, alchemists, and professional trade guilds.",
-          "discoveryTerms": [
-            "merchant guild",
-            "labor union",
-            "professional college",
-            "hunters lodge",
-            "scribes guild",
-            "entertainers guild",
-            "alchemists guild",
-            "cartographers guild",
-            "pilots guild",
-            "advocates guild",
-            "apothecaries guild",
-            "theater troupe",
-            "teamsters guild",
-            "river boatmen",
-            "market association",
-            "shopkeepers association",
-            "factors guild",
-            "ranchers association",
-            "surgeons college",
-          ],
-          "domain": "occupational",
-          "form": "guild",
-          "functions": [
-            "standards",
-            "training",
-          ],
-          "label": "Craft guild",
-          "practices": [
-            "apprenticeship",
-          ],
-        },
-        "gang": {
-          "description": "Closest starting point for street gangs, protection rackets, and prison crews.",
-          "discoveryTerms": [
-            "protection racket",
-            "wreckers",
-            "prison gang",
-          ],
-          "domain": "criminal",
-          "functions": [],
-          "label": "Gang",
-          "practices": [],
-        },
-        "government_ministry": {
-          "description": "Closest starting point for customs service, provincial administration, and executive departments.",
-          "discoveryTerms": [
-            "royal court",
-            "magistracy",
-            "exchequer",
-            "diplomatic corps",
-            "mint",
-            "postal service",
-            "customs service",
-            "provincial governorate",
-            "colonial administration",
-          ],
-          "domain": "government",
-          "form": "office",
-          "functions": [
-            "administration",
-          ],
-          "label": "Government ministry",
-          "practices": [],
-        },
-        "knightly_order": {
-          "description": "Chivalric membership organized around martial discipline and sworn service.",
-          "domain": "military",
-          "form": "order",
-          "functions": [
-            "warfare",
-            "defense",
-          ],
-          "label": "Knightly order",
-          "practices": [],
-        },
-        "mercenary_company": {
-          "description": "Closest starting point for ranger company and other hired fighting enterprises.",
-          "discoveryTerms": [
-            "ranger company",
-          ],
-          "domain": "military",
-          "form": "company",
-          "functions": [
-            "warfare",
-          ],
-          "label": "Mercenary company",
-          "practices": [],
-        },
-        "mutual_aid_society": {
-          "description": "Closest starting point for burial societies, civic leagues, and reciprocal support bodies.",
-          "discoveryTerms": [
-            "orphanage society",
-            "famine relief society",
-            "burial society",
-            "civic league",
-            "festival guild",
-            "sporting club",
-            "hospice society",
-          ],
-          "domain": "community",
-          "form": "association",
-          "functions": [
-            "aid",
-          ],
-          "label": "Mutual aid society",
-          "practices": [],
-        },
-        "political_party": {
-          "description": "Closest starting point for reform league and advocacy society.",
-          "discoveryTerms": [
-            "reform league",
-            "advocacy society",
-          ],
-          "domain": "political",
-          "form": "association",
-          "functions": [
-            "advocacy",
-          ],
-          "label": "Political party",
-          "practices": [],
-        },
-        "religious_order": {
-          "description": "Closest starting point for monastery and rule-bound faith communities.",
-          "discoveryTerms": [
-            "monastery",
-          ],
-          "domain": "religious",
-          "form": "order",
-          "functions": [
-            "worship",
-            "ministry",
-          ],
-          "label": "Religious order",
-          "practices": [],
-        },
-        "scholarly_society": {
-          "description": "Closest starting point for explorers' society, guild of scholars, and museum society.",
-          "discoveryTerms": [
-            "explorers' society",
-            "guild of scholars",
-            "museum society",
-            "research institute",
-          ],
-          "domain": "academic",
-          "form": "association",
-          "functions": [
-            "research",
-          ],
-          "label": "Scholarly society",
-          "practices": [],
-        },
-        "shipping_company": {
-          "description": "Closest starting point for caravan operators, coach lines, and courier services.",
-          "discoveryTerms": [
-            "caravan company",
-            "coach line",
-            "courier service",
-          ],
-          "domain": "commercial",
-          "form": "company",
-          "functions": [
-            "transport",
-          ],
-          "label": "Shipping company",
-          "practices": [],
-        },
-        "smuggling_ring": {
-          "description": "Closest starting point for fencing networks and counterfeiting rings.",
-          "discoveryTerms": [
-            "fencing network",
-            "counterfeiting ring",
-            "criminal syndicate",
-          ],
-          "domain": "criminal",
-          "form": "network",
-          "functions": [],
-          "label": "Smuggling ring",
-          "practices": [
-            "smuggling",
-          ],
-        },
-        "thieves_guild": {
-          "description": "Closest starting point for beggars' guild and urban criminal guilds.",
-          "discoveryTerms": [
-            "beggars' guild",
-          ],
-          "domain": "criminal",
-          "form": "guild",
-          "functions": [],
-          "label": "Thieves' guild",
-          "practices": [],
-        },
-        "trading_company": {
-          "description": "Closest starting point for merchant house and chartered company.",
-          "discoveryTerms": [
-            "merchant house",
-            "chartered company",
-            "auction house",
-            "warehouse combine",
-            "bazaar syndicate",
-            "company of merchant adventurers",
-            "fur company",
-            "foundry works",
-            "textile manufactory",
-            "shipyard company",
-            "glassworks",
-            "farming cooperative",
-            "millers cooperative",
-            "logging company",
-            "fishing fleet",
-          ],
-          "domain": "commercial",
-          "form": "company",
-          "functions": [
-            "trade",
-          ],
-          "label": "Trading company",
-          "practices": [],
-        },
+  it('registers fifty breadth-v1 familiar types', () => {
+    expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(50)
+  })
+
+  it('projects only valid domain, form, function, and practice ids', () => {
+    for (const preset of Object.values(ORGANIZATION_AUTHORING_PRESETS)) {
+      expect(ORGANIZATION_DOMAIN_IDS).toContain(preset.domain)
+      if ('form' in preset && preset.form) {
+        expect(ORGANIZATION_FORM_IDS).toContain(preset.form)
       }
-    `)
+      for (const fn of preset.functions) {
+        expect(ORGANIZATION_FUNCTION_IDS).toContain(fn)
+      }
+      for (const practice of preset.practices) {
+        expect(ORGANIZATION_PRACTICE_IDS).toContain(practice)
+      }
+    }
+  })
+
+  it('does not keep another preset label in discoveryTerms', () => {
+    for (const id of ORGANIZATION_AUTHORING_PRESET_IDS) {
+      const label = normalizePresetLabel(ORGANIZATION_AUTHORING_PRESETS[id].label)
+      for (const otherId of ORGANIZATION_AUTHORING_PRESET_IDS) {
+        if (otherId === id) continue
+        const other = ORGANIZATION_AUTHORING_PRESETS[otherId]
+        const terms = 'discoveryTerms' in other ? (other.discoveryTerms ?? []) : []
+        for (const term of terms) {
+          expect(normalizePresetLabel(term)).not.toBe(label)
+        }
+      }
+    }
   })
 
   it('requires a description on every preset', () => {
@@ -504,7 +196,7 @@ describe('organization authoring presets', () => {
         organizationDomain: 'criminal',
         organizationForm: 'guild',
         functions: [],
-        practices: [],
+        practices: ['theft'],
       },
     ],
     [
@@ -513,7 +205,7 @@ describe('organization authoring presets', () => {
         organizationDomain: 'commercial',
         organizationForm: 'company',
         functions: ['transport'],
-        practices: [],
+        practices: ['navigation'],
       },
     ],
     [
@@ -521,7 +213,7 @@ describe('organization authoring presets', () => {
       {
         organizationDomain: 'government',
         functions: ['policing'],
-        practices: [],
+        practices: ['investigation'],
       },
     ],
     [
@@ -543,7 +235,22 @@ describe('organization authoring presets', () => {
       expect.arrayContaining(['shipping', 'caravan', 'coach', 'courier']),
     )
     expect(ORGANIZATION_AUTHORING_PRESETS.shipping_company.discoveryTerms).toEqual(
-      expect.arrayContaining(['caravan company', 'coach line', 'courier service']),
+      expect.arrayContaining(['coach line', 'courier service']),
     )
+    expect(ORGANIZATION_AUTHORING_PRESETS.army.discoveryTerms ?? []).not.toContain('navy')
+    expect(ORGANIZATION_AUTHORING_PRESETS.army.discoveryTerms ?? []).not.toContain('militia')
+    expect(ORGANIZATION_AUTHORING_PRESETS.army.discoveryTerms ?? []).not.toContain('pirate crew')
+  })
+
+  it.each([
+    ['navy', { organizationForm: 'force', practices: ['navigation'] }],
+    ['protection_racket', { practices: ['extortion'] }],
+    ['assassins_order', { practices: ['assassination'] }],
+    ['farming_cooperative', { organizationForm: 'cooperative', practices: ['farming'] }],
+    ['explorers_society', { practices: ['cartography', 'surveying'] }],
+  ] as const satisfies ReadonlyArray<
+    readonly [OrganizationAuthoringPresetId, Record<string, unknown>]
+  >)('projects breadth presets for %s', (id, expected) => {
+    expect(applyOrganizationAuthoringPreset(id)).toEqual(expect.objectContaining(expected))
   })
 })

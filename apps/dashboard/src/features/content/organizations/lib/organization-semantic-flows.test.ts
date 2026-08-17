@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
+  applyOrganizationAuthoringPreset,
   resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 
@@ -81,5 +82,30 @@ describe('initial Organization semantic flows', () => {
     })
     expect(input).not.toHaveProperty('type')
     expect(input).not.toHaveProperty('authoringPresetId')
+  })
+
+  it('projects breadth presets for protection racket, assassins, and shipyard flows', () => {
+    expect(applyOrganizationAuthoringPreset('protection_racket')).toMatchObject({
+      organizationDomain: 'criminal',
+      organizationForm: 'network',
+      practices: ['extortion'],
+    })
+    expect(applyOrganizationAuthoringPreset('assassins_order')).toMatchObject({
+      organizationDomain: 'criminal',
+      organizationForm: 'order',
+      practices: ['assassination'],
+    })
+    expect(applyOrganizationAuthoringPreset('shipyard')).toMatchObject({
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      functions: ['production'],
+      practices: ['shipbuilding'],
+    })
+    expect(applyOrganizationAuthoringPreset('navy')).toMatchObject({
+      organizationDomain: 'military',
+      organizationForm: 'force',
+      functions: ['warfare', 'defense'],
+      practices: ['navigation'],
+    })
   })
 })

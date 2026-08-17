@@ -41,7 +41,7 @@ export const ORGANIZATION_ACTIVITY_PRESSURE_FIXTURE = [
     id: 'city_watch_policing',
     presetId: 'city_watch',
     presetFunctions: ['policing'],
-    presetPractices: [],
+    presetPractices: ['investigation'],
     notes: 'Civic order enforcement — not external defense.',
   },
   {

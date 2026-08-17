@@ -56,10 +56,12 @@ const organizationFunctionOptions = toOptions(
 
 const organizationPracticeOptions = ORGANIZATION_PRACTICE_IDS.map((id) => {
   const entry = ORGANIZATION_PRACTICE_ENTRIES[id]
+  const aliases = 'aliases' in entry && Array.isArray(entry.aliases) ? entry.aliases : []
+  const searchTerms = [...aliases, ...(entry.searchTerms ?? [])]
   return {
     value: id,
     label: entry.label,
-    ...('searchTerms' in entry && entry.searchTerms ? { searchTerms: entry.searchTerms } : {}),
+    ...(searchTerms.length > 0 ? { searchTerms } : {}),
   }
 })
 

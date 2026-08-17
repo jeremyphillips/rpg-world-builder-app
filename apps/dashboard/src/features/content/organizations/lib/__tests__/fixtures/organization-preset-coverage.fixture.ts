@@ -1,7 +1,7 @@
 import type { OrganizationAuthoringPresetId } from '@rpg/contracts'
 
 /**
- * Frozen corpus v0.1 — v2 completion baseline (twenty presets).
+ * Frozen corpus v0.1 — breadth-v1 completion baseline (fifty presets).
  *
  * Regression guard for preset / discoveryTerm changes. Update rows deliberately
  * when the picker changes on purpose; do not treat coverage % as an ongoing KPI.
@@ -29,7 +29,7 @@ export type OrganizationPresetCoverageRow = {
 }
 
 /**
- * Frozen corpus v0.1 coverage — final v2 picker (twenty presets, Phase 4 re-run).
+ * Frozen corpus v0.1 coverage — breadth-v1 picker (fifty presets).
  */
 export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   // 1. Government / administrative (12)
@@ -98,8 +98,8 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
 
   // 3. Military / martial (12)
   { id: 'army', query: 'Army', outcome: 'direct' },
-  { id: 'navy', query: 'Navy', outcome: 'discoverable', parent: 'army' },
-  { id: 'militia', query: 'Militia', outcome: 'discoverable', parent: 'army' },
+  { id: 'navy', query: 'Navy', outcome: 'direct' },
+  { id: 'militia', query: 'Militia', outcome: 'direct' },
   { id: 'royal_guard', query: 'Royal guard', outcome: 'discoverable', parent: 'army' },
   { id: 'knightly_order', query: 'Knightly order', outcome: 'direct' },
   { id: 'marines', query: 'Marines', outcome: 'discoverable', parent: 'army' },
@@ -112,14 +112,19 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
 
   // 4. Policing / security / intelligence (8)
   { id: 'city_watch', query: 'City watch', outcome: 'direct' },
-  { id: 'secret_police', query: 'Secret police', outcome: 'no_start' },
-  { id: 'intelligence_bureau', query: 'Intelligence bureau', outcome: 'no_start' },
-  { id: 'spy_ring', query: 'Spy ring', outcome: 'no_start' },
+  {
+    id: 'secret_police',
+    query: 'Secret police',
+    outcome: 'discoverable',
+    parent: 'intelligence_bureau',
+  },
+  { id: 'intelligence_bureau', query: 'Intelligence bureau', outcome: 'direct' },
+  { id: 'spy_ring', query: 'Spy ring', outcome: 'direct' },
   {
     id: 'inquisitorial_office',
     query: 'Inquisitorial office',
     outcome: 'discoverable',
-    parent: 'church',
+    parent: 'inquisition',
   },
   {
     id: 'customs_service',
@@ -127,7 +132,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
     outcome: 'discoverable',
     parent: 'government_ministry',
   },
-  { id: 'private_security_company', query: 'Private security company', outcome: 'no_start' },
+  { id: 'private_security_company', query: 'Private security company', outcome: 'direct' },
   { id: 'marshals', query: 'Marshals', outcome: 'discoverable', parent: 'city_watch' },
 
   // 5. Religious (12)
@@ -143,12 +148,11 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   {
     id: 'missionary_society',
     query: 'Missionary society',
-    outcome: 'discoverable',
-    parent: 'church',
+    outcome: 'direct',
   },
-  { id: 'cult', query: 'Cult', outcome: 'discoverable', parent: 'church' },
+  { id: 'cult', query: 'Cult', outcome: 'direct' },
   { id: 'diocese', query: 'Diocese', outcome: 'inappropriate' },
-  { id: 'druid_circle', query: 'Druid circle', outcome: 'discoverable', parent: 'church' },
+  { id: 'druid_circle', query: 'Druid circle', outcome: 'direct' },
   { id: 'shrine_keepers', query: 'Shrine keepers', outcome: 'inappropriate' },
   { id: 'heretical_sect', query: 'Heretical sect', outcome: 'discoverable', parent: 'church' },
   {
@@ -164,8 +168,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   {
     id: 'merchant_house',
     query: 'Merchant house',
-    outcome: 'discoverable',
-    parent: 'trading_company',
+    outcome: 'direct',
   },
   {
     id: 'merchant_guild',
@@ -182,8 +185,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   {
     id: 'caravan_company',
     query: 'Caravan company',
-    outcome: 'discoverable',
-    parent: 'shipping_company',
+    outcome: 'direct',
   },
   {
     id: 'chartered_company',
@@ -235,7 +237,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
 
   // 8. Occupational / guild (10)
   { id: 'craft_guild', query: 'Craft guild', outcome: 'direct' },
-  { id: 'labor_union', query: 'Labor union', outcome: 'discoverable', parent: 'craft_guild' },
+  { id: 'labor_union', query: 'Labor union', outcome: 'direct' },
   {
     id: 'professional_college',
     query: 'Professional college',
@@ -287,17 +289,22 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
     id: 'millers_cooperative',
     query: 'Millers cooperative',
     outcome: 'discoverable',
-    parent: 'trading_company',
+    parent: 'farming_cooperative',
   },
-  { id: 'shipyard', query: 'Shipyard company', outcome: 'discoverable', parent: 'trading_company' },
-  { id: 'brewery_company', query: 'Brewery company', outcome: 'weak', parent: 'trading_company' },
+  { id: 'shipyard', query: 'Shipyard', outcome: 'direct' },
+  {
+    id: 'brewery_company',
+    query: 'Brewery company',
+    outcome: 'discoverable',
+    parent: 'brewery',
+  },
   { id: 'glassworks', query: 'Glassworks', outcome: 'discoverable', parent: 'trading_company' },
 
   // 10. Academic / scholarly (10)
   { id: 'academy', query: 'Academy', outcome: 'direct' },
-  { id: 'university', query: 'University', outcome: 'discoverable', parent: 'academy' },
+  { id: 'university', query: 'University', outcome: 'direct' },
   { id: 'scholarly_society', query: 'Scholarly society', outcome: 'direct' },
-  { id: 'mage_college', query: 'Mage college', outcome: 'discoverable', parent: 'academy' },
+  { id: 'mage_college', query: 'Mage college', outcome: 'direct' },
   {
     id: 'research_institute',
     query: 'Research institute',
@@ -316,7 +323,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   { id: 'bardic_college', query: 'Bardic college', outcome: 'discoverable', parent: 'academy' },
 
   // 11. Medical (5)
-  { id: 'hospital_order', query: 'Hospital order', outcome: 'weak', parent: 'religious_order' },
+  { id: 'hospital_order', query: 'Hospital order', outcome: 'direct' },
   {
     id: 'apothecaries_guild',
     query: 'Apothecaries guild',
@@ -338,7 +345,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   },
 
   // 12. Charitable / civic / social / cultural (12)
-  { id: 'charitable_foundation', query: 'Charitable foundation', outcome: 'no_start' },
+  { id: 'charitable_foundation', query: 'Charitable foundation', outcome: 'direct' },
   {
     id: 'orphanage_society',
     query: 'Orphanage society',
@@ -364,7 +371,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
     parent: 'mutual_aid_society',
   },
   { id: 'mutual_aid_society', query: 'Mutual aid society', outcome: 'direct' },
-  { id: 'theater_troupe', query: 'Theater troupe', outcome: 'discoverable', parent: 'craft_guild' },
+  { id: 'theater_troupe', query: 'Theater troupe', outcome: 'direct' },
   {
     id: 'museum_society',
     query: 'Museum society',
@@ -383,7 +390,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
     outcome: 'discoverable',
     parent: 'mutual_aid_society',
   },
-  { id: 'fraternal_lodge', query: 'Fraternal lodge', outcome: 'no_start' },
+  { id: 'fraternal_lodge', query: 'Fraternal lodge', outcome: 'direct' },
   { id: 'clan', query: 'Clan', outcome: 'inappropriate' },
 
   // 13. Criminal / clandestine (12)
@@ -396,21 +403,19 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
     outcome: 'discoverable',
     parent: 'smuggling_ring',
   },
-  { id: 'pirate_crew', query: 'Pirate crew', outcome: 'discoverable', parent: 'army' },
-  { id: 'assassins_order', query: "Assassins' order", outcome: 'no_start' },
+  { id: 'pirate_crew', query: 'Pirate crew', outcome: 'direct' },
+  { id: 'assassins_order', query: "Assassins' order", outcome: 'direct' },
   {
     id: 'fencing_network',
     query: 'Fencing network',
-    outcome: 'discoverable',
-    parent: 'smuggling_ring',
+    outcome: 'direct',
   },
   {
     id: 'counterfeiting_ring',
     query: 'Counterfeiting ring',
-    outcome: 'discoverable',
-    parent: 'smuggling_ring',
+    outcome: 'direct',
   },
-  { id: 'protection_racket', query: 'Protection racket', outcome: 'discoverable', parent: 'gang' },
+  { id: 'protection_racket', query: 'Protection racket', outcome: 'direct' },
   { id: 'wreckers', query: 'Wreckers', outcome: 'discoverable', parent: 'gang' },
   { id: 'prison_gang', query: 'Prison gang', outcome: 'discoverable', parent: 'gang' },
   {
@@ -432,8 +437,7 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   {
     id: 'explorers_society',
     query: "Explorers' society",
-    outcome: 'discoverable',
-    parent: 'scholarly_society',
+    outcome: 'direct',
   },
   {
     id: 'monster_hunters_guild',
@@ -482,14 +486,12 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   {
     id: 'farming_cooperative',
     query: 'Farming cooperative',
-    outcome: 'discoverable',
-    parent: 'trading_company',
+    outcome: 'direct',
   },
   {
     id: 'logging_company',
     query: 'Logging company',
-    outcome: 'discoverable',
-    parent: 'trading_company',
+    outcome: 'direct',
   },
   {
     id: 'fishing_fleet',
@@ -508,6 +510,6 @@ export const ORGANIZATION_PRESET_COVERAGE_FIXTURE = [
   // 17. Secret societies (4)
   { id: 'secret_society', query: 'Secret society', outcome: 'no_start' },
   { id: 'wizard_circle', query: 'Wizard circle', outcome: 'discoverable', parent: 'academy' },
-  { id: 'witches_coven', query: "Witches' coven", outcome: 'discoverable', parent: 'church' },
+  { id: 'witches_coven', query: "Witches' coven", outcome: 'discoverable', parent: 'cult' },
   { id: 'conspiracy_cabal', query: 'Conspiracy cabal', outcome: 'no_start' },
 ] as const satisfies readonly OrganizationPresetCoverageRow[]

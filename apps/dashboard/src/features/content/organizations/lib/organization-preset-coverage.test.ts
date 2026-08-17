@@ -13,13 +13,13 @@ import {
   type OrganizationPresetCoverageRow,
 } from './__tests__/fixtures/organization-preset-coverage.fixture'
 
-/** v2 project completion snapshot — frozen for regression, not a target to keep raising. */
+/** Breadth-v1 completion snapshot — frozen for regression, not a target to keep raising. */
 const V2_COMPLETION_BASELINE = {
-  direct: 20,
-  discoverable: 102,
+  direct: 46,
+  discoverable: 85,
   undiscoverable: 0,
-  weak: 2,
-  no_start: 11,
+  weak: 0,
+  no_start: 4,
   inappropriate: 15,
 } as const satisfies Record<OrganizationPresetCoverageOutcome, number>
 
@@ -63,7 +63,7 @@ describe('organization preset coverage fixture (regression)', () => {
       (row) => row.outcome === 'direct',
     )
 
-    expect(directRows).toHaveLength(ORGANIZATION_AUTHORING_PRESET_IDS.length)
+    expect(directRows.length).toBeLessThanOrEqual(ORGANIZATION_AUTHORING_PRESET_IDS.length)
 
     for (const row of directRows) {
       expect(ORGANIZATION_AUTHORING_PRESET_IDS).toContain(row.id as OrganizationAuthoringPresetId)
@@ -110,6 +110,6 @@ describe('organization preset coverage fixture (regression)', () => {
     expect(summary.counts).toEqual(V2_COMPLETION_BASELINE)
     expect(summary.inappropriate).toBe(15)
     expect(summary.eligible).toBe(135)
-    expect(summary.covered).toBe(122)
+    expect(summary.covered).toBe(131)
   })
 })

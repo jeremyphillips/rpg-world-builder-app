@@ -130,7 +130,7 @@ describe('Pass A authoring smoke', () => {
     expect(applied).toMatchObject({
       organizationDomain: 'government',
       functions: ['policing'],
-      practices: [],
+      practices: ['investigation'],
     })
   })
 
