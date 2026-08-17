@@ -15,6 +15,7 @@ import { ContentDetailResolver } from '../../lib/detail/page/content-detail-reso
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { useClasses } from '../../classes/hooks/use-classes'
+import { useSpecies } from '../../species/hooks/use-species'
 import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
 import { OrganizationMembersDetailSection } from '../components/organization-members-detail-section.client'
 import { useOrganizations } from '../hooks/use-organizations'
@@ -33,6 +34,7 @@ export function OrganizationDetailContent({
   useSetBreadcrumbLabel(organization.name)
 
   const { data: classes = [] } = useClasses(campaignId)
+  const { data: species = [] } = useSpecies(campaignId)
 
   const viewModel = useMemo(
     () =>
@@ -44,8 +46,9 @@ export function OrganizationDetailContent({
           emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
         },
         classes,
+        species,
       ),
-    [classes, organization],
+    [classes, organization, species],
   )
 
   return (

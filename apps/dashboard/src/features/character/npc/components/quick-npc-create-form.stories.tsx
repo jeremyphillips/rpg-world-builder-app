@@ -31,6 +31,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         functions: [],
         practices: [],
         memberClassAffinityIds: [],
+        memberSpeciesAffinityIds: [],
         connections: { locations: [] },
       },
     ],

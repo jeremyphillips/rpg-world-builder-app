@@ -10,12 +10,14 @@ import {
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionKind,
   type CharacterClass,
+  type Species,
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 import { resolveOrganizationMemberClassAffinityDisplayLabel } from './organization-member-class-chip-options.lib'
+import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './organization-member-species-chip-options.lib'
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
@@ -67,8 +69,10 @@ export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
   catalogClasses: readonly CharacterClass[] = [],
+  catalogSpecies: readonly Species[] = [],
 ): OrganizationDetailViewModel {
   const campaignUseClasses = buildContentPurposeSelectors(catalogClasses).forCampaignUse()
+  const campaignUseSpecies = buildContentPurposeSelectors(catalogSpecies).forCampaignUse()
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
     organization.organizationForm !== undefined
@@ -122,6 +126,21 @@ export function buildOrganizationDetailViewModel(
                   resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
                     selectableClasses: campaignUseClasses,
                     catalogClasses,
+                  }),
+                )
+                .join(' · '),
+            },
+          ]
+        : []),
+      ...(organization.memberSpeciesAffinityIds.length > 0
+        ? [
+            {
+              label: 'Member species affinities',
+              value: organization.memberSpeciesAffinityIds
+                .map((speciesId) =>
+                  resolveOrganizationMemberSpeciesAffinityDisplayLabel(speciesId, {
+                    selectableSpecies: campaignUseSpecies,
+                    catalogSpecies,
                   }),
                 )
                 .join(' · '),

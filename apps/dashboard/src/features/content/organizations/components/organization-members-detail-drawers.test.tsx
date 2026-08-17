@@ -38,6 +38,7 @@ const organization = {
   functions: [],
   practices: [],
   memberClassAffinityIds: [],
+  memberSpeciesAffinityIds: [],
   connections: { locations: [] },
 }
 
@@ -78,9 +79,8 @@ function createDetail(
     handleSaveMembership: vi.fn(),
     handleRemoveFromEditDrawer: vi.fn(),
     handleConfirmRemoveMember: vi.fn(),
-    memberClassRecommendations: undefined,
+    memberSelectionPolicy: undefined,
     candidatesPending: false,
-    memberClassRecommendationsPending: false,
     ...overrides,
   }
 }
@@ -124,6 +124,21 @@ describe('OrganizationMembersDetailDrawers', () => {
 
     expect(screen.queryByRole('heading', { name: 'Add member' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Create NPC' })).not.toBeInTheDocument()
+  })
+
+  it('lists candidates while recommendation policy is still unavailable', () => {
+    renderWithProviders(
+      <OrganizationMembersDetailDrawers
+        organization={organization}
+        detail={createDetail({
+          memberSelectionPolicy: undefined,
+          candidatesPending: false,
+        })}
+      />,
+    )
+
+    expect(screen.getByText('Verna')).toBeInTheDocument()
+    expect(screen.queryByText('Recommended')).not.toBeInTheDocument()
   })
 
   it('keeps the remove confirm open when removal fails', async () => {

@@ -47,6 +47,7 @@ describe('organization member class affinities integration', () => {
       functions: [],
       practices: ['theft'],
       memberClassAffinityIds: ['class-rogue'],
+      memberSpeciesAffinityIds: [],
     })
 
     expect(saved).not.toHaveProperty('authoringPresetId')
@@ -68,6 +69,7 @@ describe('organization member class affinities integration', () => {
     expect(reopened).toMatchObject({
       practices: ['theft'],
       memberClassAffinityIds: ['class-rogue'],
+      memberSpeciesAffinityIds: [],
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
   })
@@ -87,6 +89,7 @@ describe('organization member class affinities integration', () => {
       functions: [],
       practices: [],
       memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
+      memberSpeciesAffinityIds: [],
       connections: { locations: [] },
     })
 
@@ -110,7 +113,9 @@ describe('organization member class affinities integration', () => {
     expect(
       isOrganizationMemberPickerRecommended(candidate, {
         memberClassAffinityIds: [wizard.id],
+        memberSpeciesAffinityIds: [],
         playableClasses: [fighter, rogue],
+        playableSpecies: [],
       }),
     ).toBe(false)
 
@@ -181,6 +186,7 @@ describe('organization member class affinities integration', () => {
       functions: [],
       practices: ['theft'],
       memberClassAffinityIds: [rogue.id],
+      memberSpeciesAffinityIds: [],
     })
 
     expect(saved.memberClassAffinityIds).toEqual([rogue.id])

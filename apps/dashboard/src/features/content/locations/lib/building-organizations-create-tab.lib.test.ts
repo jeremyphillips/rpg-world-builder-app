@@ -19,6 +19,7 @@ const plan: BuildingOrganizationDraftPlan = {
         functions: [],
         practices: [],
         memberClassAffinityIds: [],
+        memberSpeciesAffinityIds: [],
       },
     },
   ],

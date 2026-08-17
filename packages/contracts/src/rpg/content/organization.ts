@@ -31,6 +31,10 @@ const organizationMemberClassAffinityIdsSchema = uniqueOrganizationClassificatio
   z.string().min(1),
   'member class affinity ids',
 )
+const organizationMemberSpeciesAffinityIdsSchema = uniqueOrganizationClassificationArray(
+  z.string().min(1),
+  'member species affinity ids',
+)
 
 /** Publish-complete organization body fields. */
 const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
@@ -39,6 +43,7 @@ const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
   functions: organizationFunctionsSchema.default([]),
   practices: organizationPracticesSchema.default([]),
   memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
+  memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
@@ -56,6 +61,7 @@ const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
   functions: organizationFunctionsSchema.default([]),
   practices: organizationPracticesSchema.default([]),
   memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
+  memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.default([]),
 })
 
 /** Draft organization body — domain may remain unset until publish. */
@@ -109,6 +115,7 @@ export const updateOrganizationInputSchema = organizationBodyFieldsSchema
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
     memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
+    memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.optional(),
   })
   .partial()
 
@@ -122,6 +129,7 @@ export const updateOrganizationDraftInputSchema = createDraftInputSchema(
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
     memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
+    memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.optional(),
   })
   .partial()
 

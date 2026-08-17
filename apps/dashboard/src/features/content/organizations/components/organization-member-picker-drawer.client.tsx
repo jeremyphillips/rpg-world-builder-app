@@ -27,7 +27,7 @@ import {
   formatOrganizationMemberPickerStatusBadgeLabel,
   ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
   ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
-  type OrganizationMemberPickerSortContext,
+  type OrganizationMemberSelectionPolicy,
 } from '../lib/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../lib/organization-members.constants'
 
@@ -47,7 +47,7 @@ export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterO
   isMember: boolean
   /** Existing membership title when isMember is true. */
   membershipTitle?: string
-  /** True when the character matches stored org class affinities intersected with availability. */
+  /** True when the character matches stored org class or species affinities intersected with availability. */
   isRecommended?: boolean
 }
 
@@ -75,10 +75,7 @@ export type OrganizationMemberPickerDrawerProps = {
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   quickNpc?: OrganizationMemberPickerQuickNpc
   onCreateNpc?: () => void
-  memberClassRecommendations?: Pick<
-    OrganizationMemberPickerSortContext,
-    'memberClassAffinityIds' | 'playableClasses'
-  >
+  memberSelectionPolicy?: OrganizationMemberSelectionPolicy
   candidatesLoading?: boolean
 }
 
@@ -96,7 +93,7 @@ export function OrganizationMemberPickerDrawer({
   onAdd,
   quickNpc,
   onCreateNpc,
-  memberClassRecommendations,
+  memberSelectionPolicy,
   candidatesLoading,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
@@ -180,13 +177,9 @@ export function OrganizationMemberPickerDrawer({
     ) =>
       filterAndSortOrganizationMemberPickerCandidates(visibleItems, {
         searchQuery: context.searchQuery,
-        memberClassAffinityIds: memberClassRecommendations?.memberClassAffinityIds,
-        playableClasses: memberClassRecommendations?.playableClasses,
+        memberSelectionPolicy,
       }),
-    [
-      memberClassRecommendations?.playableClasses,
-      memberClassRecommendations?.memberClassAffinityIds,
-    ],
+    [memberSelectionPolicy],
   )
 
   return (

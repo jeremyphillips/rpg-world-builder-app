@@ -16,6 +16,7 @@ import {
   locationParentReferenceSource,
   organizationLocationSource,
   organizationMemberClassAffinitySource,
+  organizationMemberSpeciesAffinitySource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -41,7 +42,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'species',
-    sources: [{ source: characterSpeciesSource, entry: true, batch: true }],
+    sources: [
+      { source: characterSpeciesSource, entry: true, batch: true },
+      { source: organizationMemberSpeciesAffinitySource, entry: true, batch: true },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'species' },

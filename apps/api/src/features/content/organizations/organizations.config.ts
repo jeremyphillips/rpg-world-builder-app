@@ -35,6 +35,7 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     functions: record.functions ?? [],
     practices: record.practices ?? [],
     memberClassAffinityIds: record.memberClassAffinityIds ?? [],
+    memberSpeciesAffinityIds: record.memberSpeciesAffinityIds ?? [],
     connections: {
       locations: record.connections?.locations ?? [],
     },

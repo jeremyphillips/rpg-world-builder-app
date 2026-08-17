@@ -15,9 +15,9 @@ import {
   type CreateSetupSet,
 } from '@/lib/create-setup'
 
-import { mapFieldOptionsToRadioCardOptions } from '../../lib/choice-sets/choice-set-field.lib'
 import { buildQuickNpcContentOptions, type QuickNpcSetupValues } from './quick-npc-form-fields'
 import { buildQuickNpcClassRadioCardPresentation } from './quick-npc-class-option-groups.lib'
+import { buildQuickNpcSpeciesRadioCardPresentation } from './quick-npc-species-option-groups.lib'
 
 export const QUICK_NPC_SETUP_HEADLINE = 'Create NPC' as const
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
@@ -62,13 +62,19 @@ export function buildQuickNpcCreateSetupSets(args: {
   values: QuickNpcSetupValues
   onValuesChange: (values: QuickNpcSetupValues) => void
   memberClassAffinityIds?: readonly string[]
+  memberSpeciesAffinityIds?: readonly string[]
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const playableClasses = resolvePlayableBuilderContent(args.context).classes
+  const playableContent = resolvePlayableBuilderContent(args.context)
+  const speciesPresentation = buildQuickNpcSpeciesRadioCardPresentation({
+    speciesOptions,
+    memberSpeciesAffinityIds: args.memberSpeciesAffinityIds,
+    playableSpecies: playableContent.species,
+  })
   const classPresentation = buildQuickNpcClassRadioCardPresentation({
     classOptions,
     memberClassAffinityIds: args.memberClassAffinityIds,
-    playableClasses,
+    playableClasses: playableContent.classes,
   })
   const levelConstraints = resolveCharacterLevelConstraints({
     characterKind: args.context.characterKind,
@@ -87,7 +93,10 @@ export function buildQuickNpcCreateSetupSets(args: {
       kind: 'choice',
       fieldLabel: speciesTerm.label,
       prompt: `What ${speciesTerm.label.toLowerCase()} is this NPC?`,
-      options: mapFieldOptionsToRadioCardOptions(speciesOptions),
+      options: speciesPresentation.options,
+      ...(speciesPresentation.optionGroups
+        ? { optionGroups: speciesPresentation.optionGroups }
+        : {}),
       value: values.speciesId,
       isComplete: isCreateSetupChoiceComplete(values.speciesId),
       collapseWhenComplete: true,

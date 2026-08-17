@@ -44,6 +44,7 @@ describe('buildCharacterCardSummaryDto', () => {
       name: 'Verna',
       summary: 'Dwarf · Level 4 Fighter',
       classIds: ['srd-cc-5.2.1:fighter'],
+      speciesId: 'srd-cc-5.2.1:dwarf',
     })
   })
 

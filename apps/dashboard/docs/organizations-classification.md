@@ -1,7 +1,8 @@
 # Organization classification
 
 Organizations carry **Domain**, optional **Form**, **Functions**, **Practices**, and optional
-**member class affinities**. At least **Domain** is required on publish.
+**member class affinities** and **member species affinities**. At least **Domain** is required
+on publish.
 
 **Familiar starting points** are create-only ephemeral projections — they seed domain / form /
 functions / practices / affinities and are stripped before persist.
@@ -17,13 +18,14 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 
 ## Canonical axes
 
-| Axis                        | Field                      | Question it answers                                     | Author-facing?                                    |
-| --------------------------- | -------------------------- | ------------------------------------------------------- | ------------------------------------------------- |
-| **Domain**                  | `organizationDomain`       | Primary constituency or sector                          | Required chips                                    |
-| **Form**                    | `organizationForm`         | Constitutional pattern (guild, order, company, …)       | Optional select                                   |
-| **Functions**               | `functions[]`              | Broad organizational missions                           | Multi chips                                       |
-| **Practices**               | `practices[]`              | Distinctive trades, methods, or operational specialties | Searchable combobox                               |
-| **Member class affinities** | `memberClassAffinityIds[]` | Classes commonly associated with members                | Multi chips; drives member picker recommendations |
+| Axis                          | Field                        | Question it answers                                     | Author-facing?                               |
+| ----------------------------- | ---------------------------- | ------------------------------------------------------- | -------------------------------------------- |
+| **Domain**                    | `organizationDomain`         | Primary constituency or sector                          | Required chips                               |
+| **Form**                      | `organizationForm`           | Constitutional pattern (guild, order, company, …)       | Optional select                              |
+| **Functions**                 | `functions[]`                | Broad organizational missions                           | Multi chips                                  |
+| **Practices**                 | `practices[]`                | Distinctive trades, methods, or operational specialties | Searchable combobox                          |
+| **Member class affinities**   | `memberClassAffinityIds[]`   | Classes commonly associated with members                | Multi chips; drives member guidance surfaces |
+| **Member species affinities** | `memberSpeciesAffinityIds[]` | Species commonly associated with members                | Multi chips; same guidance surfaces as class |
 
 ### Functions vs Practices
 
@@ -46,9 +48,18 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 
 ### Detail surfaces
 
-Organization detail stat rows show Domain, optional Form, Functions, Practices, and member class
-affinities (when present). Membership rosters use affinities intersected with campaign-available
-classes to badge recommended picker rows.
+Organization detail stat rows show Domain, optional Form, Functions, Practices, and member
+class/species affinities (when present). Membership rosters intersect affinities with the NPC
+playable catalog from `resolvePlayableBuilderContent` to badge recommended picker rows. The
+picker candidate list loads independently — recommendations decorate rows once that universe
+is ready; a failed build context degrades badges only.
+
+Affinity fields reference content ids only — they do **not** apply Species creature-type
+authoring policy or campaign `visibilityMode`. Consumption surfaces apply
+`resolvePlayableBuilderContent` for the relevant `playActor` when resolving recommendations.
+Detail:
+[`campaign-access-enforcement.md`](../../../apps/api/docs/campaign-access-enforcement.md)
+§ Organization member affinities vs Species authoring vs character play.
 
 ## Authoring flow
 

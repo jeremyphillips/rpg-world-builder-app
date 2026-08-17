@@ -34,6 +34,7 @@ const organizationFormDef: ContentFormDef<
   enrichEditLayoutCtx: (ctx, entity) => ({
     ...ctx,
     organizationMemberClassAffinitySeedIds: entity.memberClassAffinityIds ?? [],
+    organizationMemberSpeciesAffinitySeedIds: entity.memberSpeciesAffinityIds ?? [],
   }),
   toFormValues: organizationToFormValues,
   toInput: buildOrganizationCreateInput,

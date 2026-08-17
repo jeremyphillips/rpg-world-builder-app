@@ -63,6 +63,7 @@ describe('organization form projection', () => {
       'functions',
       'practices',
       'memberClassAffinityIds',
+      'memberSpeciesAffinityIds',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -73,6 +74,7 @@ describe('organization form projection', () => {
       'operatorOrganization.functions',
       'operatorOrganization.practices',
       'operatorOrganization.memberClassAffinityIds',
+      'operatorOrganization.memberSpeciesAffinityIds',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
@@ -206,6 +208,7 @@ describe('organization form projection', () => {
         practices: ['brewing'],
         functions: [],
         memberClassAffinityIds: [],
+        memberSpeciesAffinityIds: [],
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
@@ -224,6 +227,7 @@ describe('organization form projection', () => {
       practices: ['smuggling'],
       functions: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     })
     expect(input).not.toHaveProperty('authoringPresetId')
     expect(input.organizationDomain).toBe('political')
@@ -308,6 +312,7 @@ describe('organization form projection', () => {
       functions: [],
       practices: [],
       memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
+      memberSpeciesAffinityIds: [],
     })
     expect(input.memberClassAffinityIds).toEqual([
       'class-fighter',

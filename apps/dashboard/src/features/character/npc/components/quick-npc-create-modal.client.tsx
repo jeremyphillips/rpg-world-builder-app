@@ -135,8 +135,15 @@ function QuickNpcCreateModalSession({
         values: state.setupValues,
         onValuesChange: handleSetupValuesChange,
         memberClassAffinityIds: organization.memberClassAffinityIds,
+        memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
       }),
-    [buildContext, handleSetupValuesChange, organization.memberClassAffinityIds, state.setupValues],
+    [
+      buildContext,
+      handleSetupValuesChange,
+      organization.memberClassAffinityIds,
+      organization.memberSpeciesAffinityIds,
+      state.setupValues,
+    ],
   )
 
   return (

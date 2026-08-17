@@ -30,6 +30,7 @@ const mixedPlan: BuildingOrganizationDraftPlan = {
         functions: [],
         practices: [],
         memberClassAffinityIds: [],
+        memberSpeciesAffinityIds: [],
       },
     },
   ],

@@ -41,6 +41,10 @@ import {
   buildMemberClassAffinityChipOptions,
   ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
 } from '../../organizations/lib/organization-member-class-chip-options.lib'
+import {
+  buildMemberSpeciesAffinityChipOptions,
+  ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
+} from '../../organizations/lib/organization-member-species-chip-options.lib'
 
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,
@@ -107,6 +111,7 @@ export const organizationFormSchema = z.object({
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
   memberClassAffinityIds: z.array(z.string().min(1)).default([]),
+  memberSpeciesAffinityIds: z.array(z.string().min(1)).default([]),
   authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
@@ -119,6 +124,7 @@ export const organizationDraftFormSchema = z.object({
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
   memberClassAffinityIds: z.array(z.string().min(1)).default([]),
+  memberSpeciesAffinityIds: z.array(z.string().min(1)).default([]),
   authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
@@ -128,6 +134,7 @@ export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = 
   functions: [],
   practices: [],
   memberClassAffinityIds: [],
+  memberSpeciesAffinityIds: [],
 }
 
 export { nameField as organizationNameField }
@@ -138,6 +145,7 @@ export function buildOrganizationFields(
     prefix?: string
     includeName?: boolean
     selectedMemberClassAffinityIds?: readonly string[]
+    selectedMemberSpeciesAffinityIds?: readonly string[]
     recommendedPracticeIds?: readonly OrganizationPractice[]
   } = {},
 ): FormItem[] {
@@ -145,6 +153,7 @@ export function buildOrganizationFields(
     prefix,
     includeName = false,
     selectedMemberClassAffinityIds,
+    selectedMemberSpeciesAffinityIds,
     recommendedPracticeIds,
   } = options
   const domainPath = fieldPath(prefix, 'organizationDomain')
@@ -228,6 +237,21 @@ export function buildOrganizationFields(
       multiple: true,
       chrome: { variant: 'outline' },
     },
+    {
+      type: 'chips',
+      name: fieldPath(prefix, 'memberSpeciesAffinityIds'),
+      label: 'Member species affinities',
+      hint: {
+        text: ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
+        position: 'below-control',
+      },
+      options: buildMemberSpeciesAffinityChipOptions(
+        ctx,
+        selectedMemberSpeciesAffinityIds ?? ctx.organizationMemberSpeciesAffinitySeedIds ?? [],
+      ),
+      multiple: true,
+      chrome: { variant: 'outline' },
+    },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )
 
@@ -244,6 +268,7 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     functions: entity.functions,
     practices: entity.practices,
     memberClassAffinityIds: entity.memberClassAffinityIds,
+    memberSpeciesAffinityIds: entity.memberSpeciesAffinityIds,
   }
 }
 
@@ -282,6 +307,7 @@ export function buildOrganizationCreateInput(
     functions: values.functions ?? [],
     practices: values.practices ?? [],
     memberClassAffinityIds: values.memberClassAffinityIds ?? [],
+    memberSpeciesAffinityIds: values.memberSpeciesAffinityIds ?? [],
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }
       : {}),

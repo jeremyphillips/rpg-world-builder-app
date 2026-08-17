@@ -69,6 +69,7 @@ describe('finalizePcCharacterBuild', () => {
       functions: [],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
       connections: { locations: [] },
     }
     const input = finalizePcCharacterBuild(

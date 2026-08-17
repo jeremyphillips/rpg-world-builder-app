@@ -9,6 +9,7 @@ import {
   type Location,
   type SkillProficiency,
   type Spell,
+  type Species,
   type WeaponCategory,
   isWeaponEquipment,
 } from '@rpg/contracts'
@@ -27,6 +28,7 @@ import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useFeats } from '../../feats/hooks/use-feats'
 import { useLocations } from '../../locations/hooks/use-locations'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
+import { useSpecies } from '../../species/hooks/use-species'
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import {
@@ -53,6 +55,7 @@ export {
 
 export interface ContentFormOptionSets {
   classes: ContentPurposeSelectors<CharacterClass>
+  species: ContentPurposeSelectors<Species>
   spells: ContentPurposeSelectors<Spell>
   feats: ContentPurposeSelectors<Feat>
   skills: ContentPurposeSelectors<SkillProficiency>
@@ -82,6 +85,7 @@ function isAnyError(...queries: QueryState[]): boolean {
 
 function useContentCatalogLists(campaignId: string | undefined) {
   const classesQuery = useClasses(campaignId)
+  const speciesQuery = useSpecies(campaignId)
   const spellsQuery = useSpells(campaignId)
   const featsQuery = useFeats(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
@@ -89,6 +93,7 @@ function useContentCatalogLists(campaignId: string | undefined) {
   const locationsQuery = useLocations(campaignId)
   const queries = [
     classesQuery,
+    speciesQuery,
     spellsQuery,
     featsQuery,
     skillsQuery,
@@ -98,6 +103,7 @@ function useContentCatalogLists(campaignId: string | undefined) {
 
   return {
     classes: classesQuery.data,
+    species: speciesQuery.data,
     spells: spellsQuery.data,
     feats: featsQuery.data,
     skills: skillsQuery.data,
@@ -160,6 +166,7 @@ function buildRichTextLinkOptionSets(input: {
 export function buildContentFormOptionSets(input: {
   campaignId?: string
   classes?: readonly CharacterClass[]
+  species?: readonly Species[]
   spells?: Spell[]
   feats?: Feat[]
   skills?: SkillProficiency[]
@@ -171,6 +178,7 @@ export function buildContentFormOptionSets(input: {
 
   return {
     classes: buildContentPurposeSelectors(input.classes ?? []),
+    species: buildContentPurposeSelectors(input.species ?? []),
     spells: buildContentPurposeSelectors(input.spells ?? []),
     feats: buildContentPurposeSelectors(input.feats ?? []),
     skills: buildContentPurposeSelectors(input.skills ?? []),
@@ -199,6 +207,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       buildContentFormOptionSets({
         campaignId,
         classes: catalog.classes,
+        species: catalog.species,
         spells: catalog.spells,
         feats: catalog.feats,
         skills: catalog.skills,
@@ -208,6 +217,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
     [
       campaignId,
       catalog.classes,
+      catalog.species,
       catalog.spells,
       catalog.feats,
       catalog.skills,
