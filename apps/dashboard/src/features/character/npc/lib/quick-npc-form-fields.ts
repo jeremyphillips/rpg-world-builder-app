@@ -235,7 +235,7 @@ function formatRequirementsTabLabel(configuredCount: number): string {
 
 export type QuickNpcDetailsFieldsArgs = {
   membership: {
-    membershipTitles: readonly OrganizationMembershipTitleDefinition[]
+    titles: readonly OrganizationMembershipTitleDefinition[]
   }
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
@@ -268,7 +268,7 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): For
       name: QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
       label: 'Title',
       options: buildOrganizationMembershipTitleRadioOptions({
-        membershipTitles: args.membership.membershipTitles,
+        titles: args.membership.titles,
       }),
       defaultValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
     },

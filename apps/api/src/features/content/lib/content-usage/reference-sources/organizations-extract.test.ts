@@ -16,8 +16,10 @@ describe('organizations-extract', () => {
     _id: 'org-1',
     name: 'Lantern Guild',
     slug: 'lantern-guild',
-    memberClassAffinityIds: ['class-rogue', 'class-fighter'],
-    memberSpeciesAffinityIds: ['species-dwarf', 'species-elf'],
+    members: {
+      classAffinityIds: ['class-rogue', 'class-fighter'],
+      speciesAffinityIds: ['species-dwarf', 'species-elf'],
+    },
     connections: {
       locations: [{ locationId: 'loc-1' }, { locationId: 'loc-2' }],
     },
@@ -47,7 +49,13 @@ describe('organizations-extract', () => {
   it('drops empty member class affinity ids', () => {
     expect(
       extractIdsFromOrganizationDescriptor(
-        { ...hit, memberClassAffinityIds: ['class-rogue', '', undefined as unknown as string] },
+        {
+          ...hit,
+          members: {
+            classAffinityIds: ['class-rogue', '', undefined as unknown as string],
+            speciesAffinityIds: [],
+          },
+        },
         ORGANIZATION_MEMBER_CLASS_AFFINITY_REFERENCE.path,
       ),
     ).toEqual(['class-rogue'])

@@ -57,9 +57,7 @@ export function useOrganizationMembersDetail(
     | 'organizationForm'
     | 'functions'
     | 'practices'
-    | 'memberClassAffinityIds'
-    | 'memberSpeciesAffinityIds'
-    | 'membershipTitles'
+    | 'members'
   >,
 ) {
   const organizationId = organization.id
@@ -178,7 +176,7 @@ export function useOrganizationMembersDetail(
     async (title?: string) => {
       if (!editingRow) return
       const metadata = resolveOrganizationMembershipMetadata({
-        membershipTitles: organization.membershipTitles ?? [],
+        titles: organization.members.titles ?? [],
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),
@@ -258,16 +256,16 @@ export function useOrganizationMembersDetail(
   const memberSelectionPolicy = React.useMemo(
     () =>
       buildOrganizationMemberSelectionPolicy({
-        memberClassAffinityIds: organization.memberClassAffinityIds,
-        memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
+        classAffinityIds: organization.members.classAffinityIds,
+        speciesAffinityIds: organization.members.speciesAffinityIds,
         npcBuildContext,
         buildContextFailed,
       }),
     [
       buildContextFailed,
       npcBuildContext,
-      organization.memberClassAffinityIds,
-      organization.memberSpeciesAffinityIds,
+      organization.members.classAffinityIds,
+      organization.members.speciesAffinityIds,
     ],
   )
 

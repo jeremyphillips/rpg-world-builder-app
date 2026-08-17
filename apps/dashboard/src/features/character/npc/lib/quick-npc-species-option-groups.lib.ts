@@ -14,11 +14,11 @@ export const QUICK_NPC_SPECIES_ALL_GROUP_EYEBROW = `All other ${getContentTypeSe
 
 export function buildQuickNpcSpeciesRadioCardPresentation(input: {
   speciesOptions: readonly FieldOption[]
-  memberSpeciesAffinityIds?: readonly string[]
+  speciesAffinityIds?: readonly string[]
   playableSpecies: readonly Species[]
 }) {
   const recommendedIds = resolveOrganizationMemberSpeciesRecommendationIds({
-    memberSpeciesAffinityIds: input.memberSpeciesAffinityIds ?? [],
+    speciesAffinityIds: input.speciesAffinityIds ?? [],
     playableSpecies: input.playableSpecies,
   })
 

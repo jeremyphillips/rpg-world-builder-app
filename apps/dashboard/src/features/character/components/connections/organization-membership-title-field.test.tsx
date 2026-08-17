@@ -14,7 +14,7 @@ describe('OrganizationMembershipTitleField', () => {
   it('renders catalog titles and No title', () => {
     render(
       <OrganizationMembershipTitleField
-        membershipTitles={sampleCatalog}
+        titles={sampleCatalog}
         value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
         onValueChange={() => undefined}
         idPrefix="test"
@@ -32,7 +32,7 @@ describe('OrganizationMembershipTitleField', () => {
 
     render(
       <OrganizationMembershipTitleField
-        membershipTitles={sampleCatalog}
+        titles={sampleCatalog}
         value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
         onValueChange={onValueChange}
         idPrefix="test"

@@ -47,7 +47,7 @@ const organization = {
   id: 'organization-1',
   name: 'Lantern Guild',
   organizationDomain: 'occupational' as const,
-  membershipTitles,
+  members: { titles: [...membershipTitles] },
 }
 
 const organizationCatalogRow = {
@@ -63,9 +63,7 @@ const organizationCatalogRow = {
   organizationDomain: organization.organizationDomain,
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
-  membershipTitles: [...membershipTitles],
+  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [...membershipTitles] },
   connections: { locations: [] },
 }
 

@@ -44,7 +44,7 @@ export async function indexOrganizationMemberClassAffinityBlockersByContentId(
   ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
   const docs = await HomebrewOrganizationModel.find({ campaignId: ctx.campaignId })
-    .select('_id name slug memberClassAffinityIds')
+    .select('_id name slug members.classAffinityIds')
     .lean<OrganizationContentUsageHit[]>()
 
   return indexRecordsByContentId(
@@ -69,7 +69,7 @@ export async function indexOrganizationMemberSpeciesAffinityBlockersByContentId(
   ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
   const docs = await HomebrewOrganizationModel.find({ campaignId: ctx.campaignId })
-    .select('_id name slug memberSpeciesAffinityIds')
+    .select('_id name slug members.speciesAffinityIds')
     .lean<OrganizationContentUsageHit[]>()
 
   return indexRecordsByContentId(

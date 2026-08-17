@@ -25,7 +25,7 @@ describe('resolveOrganizationMembershipPriority', () => {
     expect(
       resolveOrganizationMembershipPriority({
         membership: { title: 'Treasurer', priority: 15 },
-        membershipTitles: bankCatalog,
+        titles: bankCatalog,
       }),
     ).toBe(15)
   })
@@ -34,7 +34,7 @@ describe('resolveOrganizationMembershipPriority', () => {
     expect(
       resolveOrganizationMembershipPriority({
         membership: { title: 'Clerk' },
-        membershipTitles: bankCatalog,
+        titles: bankCatalog,
       }),
     ).toBe(20)
   })
@@ -44,7 +44,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('stamps catalog label and priority for known titles', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        membershipTitles: bankCatalog,
+        titles: bankCatalog,
         selectedTitle: 'Treasurer',
       }),
     ).toEqual({ title: 'Treasurer', priority: 50 })
@@ -53,7 +53,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('clears title and priority for No title', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        membershipTitles: bankCatalog,
+        titles: bankCatalog,
         selectedTitle: undefined,
       }),
     ).toEqual({ title: undefined, priority: undefined })
@@ -62,7 +62,7 @@ describe('resolveOrganizationMembershipMetadata', () => {
   it('preserves custom title priority on edit', () => {
     expect(
       resolveOrganizationMembershipMetadata({
-        membershipTitles: bankCatalog,
+        titles: bankCatalog,
         selectedTitle: 'Sea Lord',
         currentMembership: { title: 'Sea Lord', priority: 45 },
       }),

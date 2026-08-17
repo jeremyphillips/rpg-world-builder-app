@@ -28,13 +28,12 @@ export type OrganizationAuthoringPresetEntry = {
   /** Authoring guidance only — never applied or persisted. Order = combobox boost order. */
   recommendedPractices: readonly OrganizationPractice[]
   /** Curated membership title references — snapshotted at organization create. */
-  membershipTitles: readonly OrganizationPresetMembershipTitleRef[]
+  members: {
+    titles: readonly OrganizationPresetMembershipTitleRef[]
+  }
 }
 
-type OrganizationAuthoringPresetBaseEntry = Omit<
-  OrganizationAuthoringPresetEntry,
-  'membershipTitles'
->
+type OrganizationAuthoringPresetBaseEntry = Omit<OrganizationAuthoringPresetEntry, 'members'>
 
 const ORGANIZATION_AUTHORING_PRESET_BASE = {
   academy: {
@@ -605,12 +604,16 @@ export const ORGANIZATION_AUTHORING_PRESETS = Object.fromEntries(
     id,
     {
       ...preset,
-      membershipTitles: ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS[id],
+      members: {
+        titles: ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS[id],
+      },
     },
   ]),
 ) as {
   [K in keyof typeof ORGANIZATION_AUTHORING_PRESET_BASE]: OrganizationAuthoringPresetBaseEntry & {
-    membershipTitles: (typeof ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS)[K]
+    members: {
+      titles: (typeof ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS)[K]
+    }
   }
 }
 

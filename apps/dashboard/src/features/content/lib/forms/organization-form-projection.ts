@@ -102,6 +102,11 @@ function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
 }
 
+const organizationMembersFormFieldsSchema = z.object({
+  classAffinityIds: z.array(z.string().min(1)).default([]),
+  speciesAffinityIds: z.array(z.string().min(1)).default([]),
+})
+
 export const organizationFormSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
@@ -110,8 +115,10 @@ export const organizationFormSchema = z.object({
   organizationForm: canonicalOrganizationFormSchema.optional(),
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
-  memberClassAffinityIds: z.array(z.string().min(1)).default([]),
-  memberSpeciesAffinityIds: z.array(z.string().min(1)).default([]),
+  members: organizationMembersFormFieldsSchema.default({
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+  }),
   authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
@@ -123,8 +130,10 @@ export const organizationDraftFormSchema = z.object({
   organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
-  memberClassAffinityIds: z.array(z.string().min(1)).default([]),
-  memberSpeciesAffinityIds: z.array(z.string().min(1)).default([]),
+  members: organizationMembersFormFieldsSchema.default({
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+  }),
   authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
@@ -133,8 +142,7 @@ export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
 export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = {
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
+  members: { classAffinityIds: [], speciesAffinityIds: [] },
 }
 
 export { nameField as organizationNameField }
@@ -224,7 +232,7 @@ export function buildOrganizationFields(
     },
     {
       type: 'chips',
-      name: fieldPath(prefix, 'memberClassAffinityIds'),
+      name: fieldPath(prefix, 'members.classAffinityIds'),
       label: 'Member class affinities',
       hint: {
         text: ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
@@ -239,7 +247,7 @@ export function buildOrganizationFields(
     },
     {
       type: 'chips',
-      name: fieldPath(prefix, 'memberSpeciesAffinityIds'),
+      name: fieldPath(prefix, 'members.speciesAffinityIds'),
       label: 'Member species affinities',
       hint: {
         text: ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
@@ -267,8 +275,10 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     organizationForm: entity.organizationForm,
     functions: entity.functions,
     practices: entity.practices,
-    memberClassAffinityIds: entity.memberClassAffinityIds,
-    memberSpeciesAffinityIds: entity.memberSpeciesAffinityIds,
+    members: {
+      classAffinityIds: entity.members.classAffinityIds,
+      speciesAffinityIds: entity.members.speciesAffinityIds,
+    },
   }
 }
 
@@ -306,8 +316,10 @@ export function buildOrganizationCreateInput(
     description: values.description || undefined,
     functions: values.functions ?? [],
     practices: values.practices ?? [],
-    memberClassAffinityIds: values.memberClassAffinityIds ?? [],
-    memberSpeciesAffinityIds: values.memberSpeciesAffinityIds ?? [],
+    members: {
+      classAffinityIds: values.members?.classAffinityIds ?? [],
+      speciesAffinityIds: values.members?.speciesAffinityIds ?? [],
+    },
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }
       : {}),
@@ -347,7 +359,7 @@ export function buildOrganizationFormValueSyncs(
           [fieldPath(prefix, 'organizationForm')]: recipe.organizationForm,
           [fieldPath(prefix, 'functions')]: recipe.functions,
           [fieldPath(prefix, 'practices')]: recipe.practices,
-          [fieldPath(prefix, 'memberClassAffinityIds')]:
+          [fieldPath(prefix, 'members.classAffinityIds')]:
             resolveOrganizationPresetMemberClassAffinityIds(
               presetId as (typeof ORGANIZATION_AUTHORING_PRESET_IDS)[number],
               discoverableClasses,

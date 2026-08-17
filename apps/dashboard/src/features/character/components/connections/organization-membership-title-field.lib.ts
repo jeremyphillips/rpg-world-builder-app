@@ -4,11 +4,11 @@ import { sortOrganizationMembershipTitleDefinitionsForDisplay } from '@rpg/contr
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 
 export function buildOrganizationMembershipTitleRadioOptions(input: {
-  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
+  titles: readonly OrganizationMembershipTitleDefinition[]
   /** Current persisted/selected title — appended when absent from catalog. */
   currentValue?: string
 }): { value: string; label: string }[] {
-  const suggestions = sortOrganizationMembershipTitleDefinitionsForDisplay(input.membershipTitles)
+  const suggestions = sortOrganizationMembershipTitleDefinitionsForDisplay(input.titles)
   const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [
     { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },

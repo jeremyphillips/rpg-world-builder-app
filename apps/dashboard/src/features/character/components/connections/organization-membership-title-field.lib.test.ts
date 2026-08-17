@@ -15,14 +15,14 @@ const sampleCatalog = [
 describe('buildOrganizationMembershipTitleRadioOptions', () => {
   it('prepends No title and lists catalog labels by priority', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      membershipTitles: sampleCatalog,
+      titles: sampleCatalog,
     })
     expect(options.map((option) => option.label)).toEqual(['No title', 'Guildmaster', 'Member'])
   })
 
   it('appends a custom current value when absent from the catalog', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      membershipTitles: sampleCatalog,
+      titles: sampleCatalog,
       currentValue: 'Sea Lord',
     })
     expect(options.at(-1)).toEqual({ value: 'Sea Lord', label: 'Sea Lord' })
@@ -30,7 +30,7 @@ describe('buildOrganizationMembershipTitleRadioOptions', () => {
 
   it('does not duplicate a catalog title passed as currentValue', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      membershipTitles: sampleCatalog,
+      titles: sampleCatalog,
       currentValue: 'Guildmaster',
     })
     expect(options.filter((option) => option.label === 'Guildmaster')).toHaveLength(1)

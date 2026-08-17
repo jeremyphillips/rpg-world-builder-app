@@ -8,6 +8,7 @@ import {
   formatRemoveMembershipHeadline,
   QuickNpcCreateModal,
 } from '@/features/character'
+import type { EditOrganizationMembershipOrganization } from '@/features/character/components/connections/edit-organization-membership-drawer.types'
 
 import type { useOrganizationMembersDetail } from '../hooks/use-organization-members-detail.client'
 import { ORGANIZATION_ROSTER_EDIT_MEMBERSHIP_COPY } from '../lib/organization-members.constants'
@@ -15,15 +16,9 @@ import { OrganizationMemberPickerDrawer } from './organization-member-picker-dra
 
 type OrganizationMembersDetail = ReturnType<typeof useOrganizationMembersDetail>
 
-type EditableOrganization = {
-  id: string
-  name: string
-  organizationDomain: Organization['organizationDomain']
-  organizationForm?: Organization['organizationForm']
+type EditableOrganization = EditOrganizationMembershipOrganization & {
   functions?: Organization['functions']
   practices?: Organization['practices']
-  memberClassAffinityIds?: Organization['memberClassAffinityIds']
-  memberSpeciesAffinityIds?: Organization['memberSpeciesAffinityIds']
 }
 
 function toEditableOrganization(organization: Organization): EditableOrganization {
@@ -33,8 +28,9 @@ function toEditableOrganization(organization: Organization): EditableOrganizatio
     organizationDomain: organization.organizationDomain,
     functions: organization.functions,
     practices: organization.practices,
-    memberClassAffinityIds: organization.memberClassAffinityIds,
-    memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
+    members: {
+      titles: organization.members.titles,
+    },
     ...(organization.organizationForm !== undefined
       ? { organizationForm: organization.organizationForm }
       : {}),

@@ -29,30 +29,32 @@ const homebrewOrganizationSchema = new Schema(
       type: [{ type: String, enum: [...ORGANIZATION_PRACTICE_IDS] }],
       default: [],
     },
-    memberClassAffinityIds: {
-      type: [{ type: String }],
-      default: [],
-    },
-    memberSpeciesAffinityIds: {
-      type: [{ type: String }],
-      default: [],
-    },
-    membershipTitles: {
-      type: [
-        {
-          _id: false,
-          id: { type: String, required: true },
-          sourceTitleId: { type: String },
-          label: { type: String, required: true },
-          description: { type: String },
-          priority: {
-            type: Number,
-            enum: [...ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES],
-            required: true,
+    members: {
+      classAffinityIds: {
+        type: [{ type: String }],
+        default: [],
+      },
+      speciesAffinityIds: {
+        type: [{ type: String }],
+        default: [],
+      },
+      titles: {
+        type: [
+          {
+            _id: false,
+            id: { type: String, required: true },
+            sourceTitleId: { type: String },
+            label: { type: String, required: true },
+            description: { type: String },
+            priority: {
+              type: Number,
+              enum: [...ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES],
+              required: true,
+            },
           },
-        },
-      ],
-      default: [],
+        ],
+        default: [],
+      },
     },
     sourcePresetId: { type: String, enum: [...ORGANIZATION_AUTHORING_PRESET_IDS] },
     connections: {

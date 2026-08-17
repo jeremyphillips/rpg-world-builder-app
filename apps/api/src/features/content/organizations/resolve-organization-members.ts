@@ -103,7 +103,7 @@ export async function resolveOrganizationMembers(input: {
     const membership = membershipForOrganization(hit, organizationId)
     const priority = resolveOrganizationMembershipPriority({
       membership: membership ?? {},
-      membershipTitles: organization.membershipTitles ?? [],
+      titles: organization.members.titles ?? [],
     })
 
     return [

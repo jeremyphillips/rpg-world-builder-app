@@ -61,19 +61,18 @@ export function buildQuickNpcCreateSetupSets(args: {
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   onValuesChange: (values: QuickNpcSetupValues) => void
-  memberClassAffinityIds?: readonly string[]
-  memberSpeciesAffinityIds?: readonly string[]
+  members?: { classAffinityIds?: readonly string[]; speciesAffinityIds?: readonly string[] }
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
   const playableContent = resolvePlayableBuilderContent(args.context)
   const speciesPresentation = buildQuickNpcSpeciesRadioCardPresentation({
     speciesOptions,
-    memberSpeciesAffinityIds: args.memberSpeciesAffinityIds,
+    speciesAffinityIds: args.members?.speciesAffinityIds,
     playableSpecies: playableContent.species,
   })
   const classPresentation = buildQuickNpcClassRadioCardPresentation({
     classOptions,
-    memberClassAffinityIds: args.memberClassAffinityIds,
+    classAffinityIds: args.members?.classAffinityIds,
     playableClasses: playableContent.classes,
   })
   const levelConstraints = resolveCharacterLevelConstraints({

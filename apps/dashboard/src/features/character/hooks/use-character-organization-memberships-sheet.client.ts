@@ -46,6 +46,7 @@ function toEditableOrganization(
     id: organization.id,
     name: organization.name,
     organizationDomain: organization.organizationDomain,
+    members: { titles: organization.members?.titles ?? [] },
     ...(organization.organizationForm !== undefined
       ? { organizationForm: organization.organizationForm }
       : {}),
@@ -103,7 +104,7 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     async (title?: string) => {
       if (!editingMembership || !editingOrganization) return
       const metadata = resolveOrganizationMembershipMetadata({
-        membershipTitles: editingOrganization.membershipTitles ?? [],
+        titles: editingOrganization.members?.titles ?? [],
         selectedTitle: title,
         currentMembership: editingMembership,
       })

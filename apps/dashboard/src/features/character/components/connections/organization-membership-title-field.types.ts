@@ -4,7 +4,7 @@ import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 export const ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE = '__no_title__'
 
 export type OrganizationMembershipTitleFieldProps = {
-  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
+  titles: readonly OrganizationMembershipTitleDefinition[]
   value: string
   onValueChange: (value: string) => void
   idPrefix: string

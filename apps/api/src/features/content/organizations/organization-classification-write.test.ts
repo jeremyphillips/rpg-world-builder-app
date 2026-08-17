@@ -162,13 +162,13 @@ describe('organization classification writes', () => {
     })
 
     expect(created.sourcePresetId).toBe('bank')
-    expect(created.membershipTitles).toHaveLength(7)
-    expect(created.membershipTitles[0]).toMatchObject({
+    expect(created.members.titles).toHaveLength(7)
+    expect(created.members.titles[0]).toMatchObject({
       sourceTitleId: 'treasurer',
       label: 'Treasurer',
       priority: 50,
     })
-    expect(created.membershipTitles.every((title) => title.id.startsWith('omt_'))).toBe(true)
+    expect(created.members.titles.every((title) => title.id.startsWith('omt_'))).toBe(true)
   })
 
   it('leaves membershipTitles unchanged when classification is updated', async () => {
@@ -185,7 +185,7 @@ describe('organization classification writes', () => {
       functions: ['administration'],
     })
 
-    expect(updated.membershipTitles).toEqual(created.membershipTitles)
+    expect(updated.members.titles).toEqual(created.members.titles)
     expect(updated.sourcePresetId).toBe('bank')
   })
 })

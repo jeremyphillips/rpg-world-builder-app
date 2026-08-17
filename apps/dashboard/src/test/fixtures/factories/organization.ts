@@ -19,9 +19,11 @@ function cityCouncilCanonicalBase(): Organization {
     organizationDomain: 'government',
     functions: [],
     practices: [],
-    memberClassAffinityIds: [],
-    memberSpeciesAffinityIds: [],
-    membershipTitles: [],
+    members: {
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [],
+    },
     connections: { locations: [] },
   } satisfies Organization
 }

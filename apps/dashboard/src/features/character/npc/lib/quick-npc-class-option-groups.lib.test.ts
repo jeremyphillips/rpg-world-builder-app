@@ -25,7 +25,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     expect(
       buildQuickNpcClassRadioCardPresentation({
         classOptions: availableClassOptions,
-        memberClassAffinityIds: [wizard.id],
+        classAffinityIds: [wizard.id],
         playableClasses: [fighter, rogue],
       }),
     ).toEqual({
@@ -40,7 +40,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     expect(
       buildQuickNpcClassRadioCardPresentation({
         classOptions,
-        memberClassAffinityIds: [rogue.id, wizard.id],
+        classAffinityIds: [rogue.id, wizard.id],
         playableClasses,
       }),
     ).toEqual({
@@ -72,7 +72,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     expect(
       buildQuickNpcClassRadioCardPresentation({
         classOptions: [{ value: fighter.id, label: fighter.name }],
-        memberClassAffinityIds: [paladin.id],
+        classAffinityIds: [paladin.id],
         playableClasses: [fighter],
       }),
     ).toEqual({
@@ -84,7 +84,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     expect(
       buildQuickNpcClassRadioCardPresentation({
         classOptions: classOptions.filter((option) => option.value !== wizard.id),
-        memberClassAffinityIds: [fighter.id, rogue.id],
+        classAffinityIds: [fighter.id, rogue.id],
         playableClasses: [fighter, rogue],
       }).optionGroups,
     ).toEqual([

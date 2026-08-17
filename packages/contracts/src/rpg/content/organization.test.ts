@@ -29,9 +29,7 @@ describe('organization body contracts', () => {
       organizationDomain: 'occupational',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
-      membershipTitles: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
       connections: { locations: [] },
     })
 
@@ -65,9 +63,7 @@ describe('organization body contracts', () => {
       name: 'Untitled Organization',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
-      membershipTitles: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
       connections: { locations: [] },
     })
   })
@@ -117,7 +113,7 @@ describe('organization body contracts', () => {
       organizationBodySchema.safeParse({
         name: 'Duplicate Affinities',
         organizationDomain: 'commercial',
-        memberClassAffinityIds: ['class-a', 'class-a'],
+        members: { classAffinityIds: ['class-a', 'class-a'], speciesAffinityIds: [] },
       }).success,
     ).toBe(false)
   })
@@ -214,7 +210,6 @@ describe('organization authoring inputs', () => {
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',
       connections: { locations: [] },
-      membershipTitles: [],
     })
   })
 

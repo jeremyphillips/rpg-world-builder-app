@@ -117,11 +117,11 @@ export function buildOrganizationDetailViewModel(
             },
           ]
         : []),
-      ...(organization.memberClassAffinityIds.length > 0
+      ...(organization.members.classAffinityIds.length > 0
         ? [
             {
               label: 'Member class affinities',
-              value: organization.memberClassAffinityIds
+              value: organization.members.classAffinityIds
                 .map((classId) =>
                   resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
                     selectableClasses: campaignUseClasses,
@@ -132,11 +132,11 @@ export function buildOrganizationDetailViewModel(
             },
           ]
         : []),
-      ...(organization.memberSpeciesAffinityIds.length > 0
+      ...(organization.members.speciesAffinityIds.length > 0
         ? [
             {
               label: 'Member species affinities',
-              value: organization.memberSpeciesAffinityIds
+              value: organization.members.speciesAffinityIds
                 .map((speciesId) =>
                   resolveOrganizationMemberSpeciesAffinityDisplayLabel(speciesId, {
                     selectableSpecies: campaignUseSpecies,

@@ -48,7 +48,7 @@ describe('organization membership title snapshot', () => {
     expect(resolved[0]?.id).toBe('omt_fixed')
   })
 
-  it('accepts explicit membershipTitles when no preset is provided', () => {
+  it('accepts explicit members.titles when no preset is provided', () => {
     const custom = organizationMembershipTitlesSchema.parse([
       {
         id: 'omt_custom',
@@ -56,23 +56,25 @@ describe('organization membership title snapshot', () => {
         priority: 40,
       },
     ])
-    expect(resolveOrganizationCreateMembershipTitles({ membershipTitles: custom })).toEqual(custom)
+    expect(resolveOrganizationCreateMembershipTitles({ titles: custom })).toEqual(custom)
   })
 
-  it('rejects combining sourcePresetId with explicit membershipTitles on create input', () => {
+  it('rejects combining sourcePresetId with explicit members.titles on create input', () => {
     expect(
       createOrganizationInputSchema.safeParse({
         slug: 'test-org',
         name: 'Test Org',
         organizationDomain: 'government',
         sourcePresetId: 'bank',
-        membershipTitles: [
-          {
-            id: 'omt_custom',
-            label: 'Custom',
-            priority: 10,
-          },
-        ],
+        members: {
+          titles: [
+            {
+              id: 'omt_custom',
+              label: 'Custom',
+              priority: 10,
+            },
+          ],
+        },
       }).success,
     ).toBe(false)
   })

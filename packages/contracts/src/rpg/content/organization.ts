@@ -9,6 +9,7 @@ import {
   organizationCreateMembershipTitlesInputRefinement,
   organizationMembershipTitlesSchema,
   organizationSourcePresetIdSchema,
+  type OrganizationMembershipTitleDefinition,
 } from './organization-membership-titles'
 import { createDraftInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
@@ -32,14 +33,40 @@ const organizationPracticesSchema = uniqueOrganizationClassificationArray(
   organizationPracticeSchema,
   'practices',
 )
-const organizationMemberClassAffinityIdsSchema = uniqueOrganizationClassificationArray(
+const organizationMembersClassAffinityIdsSchema = uniqueOrganizationClassificationArray(
   z.string().min(1),
   'member class affinity ids',
 )
-const organizationMemberSpeciesAffinityIdsSchema = uniqueOrganizationClassificationArray(
+const organizationMembersSpeciesAffinityIdsSchema = uniqueOrganizationClassificationArray(
   z.string().min(1),
   'member species affinity ids',
 )
+
+const defaultOrganizationMembersAffinity = {
+  classAffinityIds: [] as string[],
+  speciesAffinityIds: [] as string[],
+}
+
+const defaultOrganizationMembers = {
+  classAffinityIds: [] as string[],
+  speciesAffinityIds: [] as string[],
+  titles: [] as OrganizationMembershipTitleDefinition[],
+}
+
+const organizationMembersAffinityFieldsSchema = z.object({
+  classAffinityIds: organizationMembersClassAffinityIdsSchema.default([]),
+  speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.default([]),
+})
+
+export const organizationMembersSchema = organizationMembersAffinityFieldsSchema.extend({
+  titles: organizationMembershipTitlesSchema,
+})
+
+export type OrganizationMembers = z.infer<typeof organizationMembersSchema>
+
+const organizationMembersWithOptionalTitlesSchema = organizationMembersAffinityFieldsSchema.extend({
+  titles: organizationMembershipTitlesSchema.optional(),
+})
 
 /** Classification + identity fields mutable on normal organization edit. */
 const organizationClassificationBodyFieldsSchema = contentBodyBaseSchema.extend({
@@ -47,8 +74,7 @@ const organizationClassificationBodyFieldsSchema = contentBodyBaseSchema.extend(
   organizationForm: organizationFormSchema.optional(),
   functions: organizationFunctionsSchema.default([]),
   practices: organizationPracticesSchema.default([]),
-  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
-  memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.default([]),
+  members: organizationMembersAffinityFieldsSchema.default(defaultOrganizationMembersAffinity),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
@@ -66,10 +92,12 @@ const organizationClassificationDraftFieldsSchema =
   })
 
 /** Publish-complete organization body fields. */
-const organizationBodyFieldsSchema = organizationClassificationBodyFieldsSchema.extend({
-  membershipTitles: organizationMembershipTitlesSchema,
-  sourcePresetId: organizationSourcePresetIdSchema,
-})
+const organizationBodyFieldsSchema = organizationClassificationBodyFieldsSchema
+  .omit({ members: true })
+  .extend({
+    members: organizationMembersSchema.default(defaultOrganizationMembers),
+    sourcePresetId: organizationSourcePresetIdSchema,
+  })
 
 /** Publish-complete organization body. */
 export const organizationBodySchema = organizationBodyFieldsSchema
@@ -81,8 +109,9 @@ const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
   ORGANIZATION_CONTENT_TYPE_TERM.label,
 )
   .extend(organizationClassificationDraftFieldsSchema.shape)
+  .omit({ members: true })
   .extend({
-    membershipTitles: organizationMembershipTitlesSchema,
+    members: organizationMembersSchema.default(defaultOrganizationMembers),
     sourcePresetId: organizationSourcePresetIdSchema,
   })
 
@@ -116,10 +145,13 @@ export const organizationReferenceResolutionSchema = z.object({
 export type OrganizationReferenceResolution = z.infer<typeof organizationReferenceResolutionSchema>
 
 export const createOrganizationInputSchema = organizationClassificationBodyFieldsSchema
+  .omit({ members: true })
   .extend({
     slug: slugSchema,
     sourcePresetId: organizationSourcePresetIdSchema,
-    membershipTitles: organizationMembershipTitlesSchema.optional(),
+    members: organizationMembersWithOptionalTitlesSchema.default(
+      defaultOrganizationMembersAffinity,
+    ),
   })
   .superRefine(organizationCreateMembershipTitlesInputRefinement)
 
@@ -140,8 +172,7 @@ export const updateOrganizationInputSchema = organizationClassificationBodyField
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
-    memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.optional(),
+    members: organizationMembersAffinityFieldsSchema.partial().optional(),
   })
   .partial()
 
@@ -152,8 +183,7 @@ export const updateOrganizationDraftInputSchema = organizationBodyDraftFieldsSch
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
-    memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.optional(),
+    members: organizationMembersAffinityFieldsSchema.partial().optional(),
   })
   .partial()
 

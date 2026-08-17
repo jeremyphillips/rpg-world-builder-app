@@ -64,9 +64,11 @@ export type QuickNpcCreateFormOrganization = {
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
-  memberClassAffinityIds?: readonly string[]
-  memberSpeciesAffinityIds?: readonly string[]
-  membershipTitles?: readonly OrganizationMembershipTitleDefinition[]
+  members?: {
+    classAffinityIds?: readonly string[]
+    speciesAffinityIds?: readonly string[]
+    titles?: readonly OrganizationMembershipTitleDefinition[]
+  }
 }
 
 export type QuickNpcAuthoringFormProps = {
@@ -84,7 +86,7 @@ export type QuickNpcAuthoringFormProps = {
 
 function resolveMembership(organization: QuickNpcCreateFormOrganization) {
   return {
-    membershipTitles: organization.membershipTitles ?? [],
+    titles: organization.members?.titles ?? [],
   }
 }
 
@@ -263,7 +265,7 @@ export function QuickNpcAuthoringForm({
 
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
-        membershipTitles: organization.membershipTitles ?? [],
+        titles: organization.members?.titles ?? [],
         selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
       })
 

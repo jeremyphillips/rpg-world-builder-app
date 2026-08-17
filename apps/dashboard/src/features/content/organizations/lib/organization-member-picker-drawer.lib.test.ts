@@ -35,8 +35,8 @@ function classSelectionPolicy(
   overrides: Partial<OrganizationMemberSelectionPolicy> = {},
 ): OrganizationMemberSelectionPolicy {
   return {
-    memberClassAffinityIds: [ROGUE_CLASS_ID],
-    memberSpeciesAffinityIds: [],
+    classAffinityIds: [ROGUE_CLASS_ID],
+    speciesAffinityIds: [],
     playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
     playableSpecies: [],
     ...overrides,
@@ -85,8 +85,8 @@ describe('isOrganizationMemberPickerRecommended', () => {
           speciesId: ELF_SPECIES_ID,
         }),
         classSelectionPolicy({
-          memberClassAffinityIds: [],
-          memberSpeciesAffinityIds: [ELF_SPECIES_ID],
+          classAffinityIds: [],
+          speciesAffinityIds: [ELF_SPECIES_ID],
           playableClasses: [],
           playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
         }),
@@ -104,7 +104,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
           speciesId: ELF_SPECIES_ID,
         }),
         classSelectionPolicy({
-          memberSpeciesAffinityIds: [ELF_SPECIES_ID],
+          speciesAffinityIds: [ELF_SPECIES_ID],
           playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
         }),
       ),
@@ -132,7 +132,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
           classIds: ['srd-cc-5.2.1:wizard'],
         }),
         classSelectionPolicy({
-          memberClassAffinityIds: ['srd-cc-5.2.1:wizard'],
+          classAffinityIds: ['srd-cc-5.2.1:wizard'],
           playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES.filter(
             (characterClass) => characterClass.id !== 'srd-cc-5.2.1:wizard',
           ),
@@ -148,8 +148,8 @@ describe('isOrganizationMemberPickerRecommended', () => {
           speciesId: HUMAN_SPECIES_ID,
         }),
         classSelectionPolicy({
-          memberClassAffinityIds: [],
-          memberSpeciesAffinityIds: [HUMAN_SPECIES_ID],
+          classAffinityIds: [],
+          speciesAffinityIds: [HUMAN_SPECIES_ID],
           playableClasses: [],
           playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES.filter(
             (species) => species.id !== HUMAN_SPECIES_ID,

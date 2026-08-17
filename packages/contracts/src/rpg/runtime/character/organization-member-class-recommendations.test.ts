@@ -39,14 +39,14 @@ describe('resolveOrganizationMemberClassRecommendations', () => {
   it('preserves stored order and drops unavailable ids', () => {
     expect(
       resolveOrganizationMemberClassRecommendationIds({
-        memberClassAffinityIds: [wizard.id, rogue.id, fighter.id],
+        classAffinityIds: [wizard.id, rogue.id, fighter.id],
         playableClasses: available,
       }),
     ).toEqual([rogue.id, fighter.id])
 
     expect(
       resolveOrganizationMemberClassRecommendations({
-        memberClassAffinityIds: [wizard.id, rogue.id, fighter.id],
+        classAffinityIds: [wizard.id, rogue.id, fighter.id],
         playableClasses: available,
       }).map((characterClass) => characterClass.id),
     ).toEqual([rogue.id, fighter.id])
@@ -62,7 +62,7 @@ describe('characterMatchesOrganizationMemberClassRecommendations', () => {
     expect(
       characterMatchesOrganizationMemberClassRecommendations({
         classIds: [fighter.id, wizard.id],
-        memberClassAffinityIds: [wizard.id, rogue.id],
+        classAffinityIds: [wizard.id, rogue.id],
         playableClasses: [fighter, rogue],
       }),
     ).toBe(false)
@@ -70,7 +70,7 @@ describe('characterMatchesOrganizationMemberClassRecommendations', () => {
     expect(
       characterMatchesOrganizationMemberClassRecommendations({
         classIds: [fighter.id, wizard.id],
-        memberClassAffinityIds: [rogue.id, fighter.id],
+        classAffinityIds: [rogue.id, fighter.id],
         playableClasses: [fighter, rogue],
       }),
     ).toBe(true)

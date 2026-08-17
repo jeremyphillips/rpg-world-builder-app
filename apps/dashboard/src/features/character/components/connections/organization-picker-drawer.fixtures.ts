@@ -12,7 +12,11 @@ export const lanternGuild = makeOrganization({
   name: 'Lantern Guild',
   organizationDomain: 'occupational',
   description: '<p>Guides and cartographers who keep the old roads open.</p>',
-  membershipTitles: [...lanternGuildMembershipTitles],
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [...lanternGuildMembershipTitles],
+  },
 })
 
 export const cityCouncil = makeOrganization({

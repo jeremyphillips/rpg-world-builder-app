@@ -41,8 +41,8 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
   it('returns undefined when no affinities are configured', () => {
     expect(
       buildOrganizationMemberSelectionPolicy({
-        memberClassAffinityIds: [],
-        memberSpeciesAffinityIds: [],
+        classAffinityIds: [],
+        speciesAffinityIds: [],
         npcBuildContext: npcContext,
       }),
     ).toBeUndefined()
@@ -51,8 +51,8 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
   it('returns undefined while the NPC build context is unavailable', () => {
     expect(
       buildOrganizationMemberSelectionPolicy({
-        memberClassAffinityIds: [fighter.id],
-        memberSpeciesAffinityIds: [],
+        classAffinityIds: [fighter.id],
+        speciesAffinityIds: [],
         npcBuildContext: undefined,
       }),
     ).toBeUndefined()
@@ -61,8 +61,8 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
   it('returns undefined when the NPC build context failed', () => {
     expect(
       buildOrganizationMemberSelectionPolicy({
-        memberClassAffinityIds: [fighter.id],
-        memberSpeciesAffinityIds: [],
+        classAffinityIds: [fighter.id],
+        speciesAffinityIds: [],
         npcBuildContext: npcContext,
         buildContextFailed: true,
       }),
@@ -72,13 +72,13 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
   it('derives playable rows from resolvePlayableBuilderContent for NPC consumption', () => {
     expect(
       buildOrganizationMemberSelectionPolicy({
-        memberClassAffinityIds: [fighter.id],
-        memberSpeciesAffinityIds: [human.id],
+        classAffinityIds: [fighter.id],
+        speciesAffinityIds: [human.id],
         npcBuildContext: npcContext,
       }),
     ).toEqual({
-      memberClassAffinityIds: [fighter.id],
-      memberSpeciesAffinityIds: [human.id],
+      classAffinityIds: [fighter.id],
+      speciesAffinityIds: [human.id],
       playableClasses: [fighter],
       playableSpecies: [human],
     })
@@ -86,8 +86,8 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
 
   it('excludes species disallowed by creatureTypePolicy from the recommendation universe', () => {
     const policy = buildOrganizationMemberSelectionPolicy({
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [feyPixie.id],
+      classAffinityIds: [],
+      speciesAffinityIds: [feyPixie.id],
       npcBuildContext: npcContext,
     })
 
@@ -96,8 +96,8 @@ describe('buildOrganizationMemberSelectionPolicy', () => {
 
   it('excludes species that are not NPC-playable from the recommendation universe', () => {
     const policy = buildOrganizationMemberSelectionPolicy({
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [pcOnlySpecies.id],
+      classAffinityIds: [],
+      speciesAffinityIds: [pcOnlySpecies.id],
       npcBuildContext: npcContext,
     })
 

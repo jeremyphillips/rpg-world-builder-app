@@ -62,8 +62,8 @@ describe('organization form projection', () => {
       'organizationForm',
       'functions',
       'practices',
-      'memberClassAffinityIds',
-      'memberSpeciesAffinityIds',
+      'members.classAffinityIds',
+      'members.speciesAffinityIds',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -73,8 +73,8 @@ describe('organization form projection', () => {
       'operatorOrganization.organizationForm',
       'operatorOrganization.functions',
       'operatorOrganization.practices',
-      'operatorOrganization.memberClassAffinityIds',
-      'operatorOrganization.memberSpeciesAffinityIds',
+      'operatorOrganization.members.classAffinityIds',
+      'operatorOrganization.members.speciesAffinityIds',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
@@ -207,8 +207,7 @@ describe('organization form projection', () => {
         organizationForm: 'company',
         practices: ['brewing'],
         functions: [],
-        memberClassAffinityIds: [],
-        memberSpeciesAffinityIds: [],
+        members: { classAffinityIds: [], speciesAffinityIds: [] },
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
@@ -226,8 +225,7 @@ describe('organization form projection', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input).not.toHaveProperty('authoringPresetId')
     expect(input.organizationDomain).toBe('political')
@@ -245,7 +243,7 @@ describe('organization form projection', () => {
       'operatorOrganization.organizationForm': 'network',
       'operatorOrganization.functions': [],
       'operatorOrganization.practices': ['smuggling'],
-      'operatorOrganization.memberClassAffinityIds': [],
+      'operatorOrganization.members.classAffinityIds': [],
     })
   })
 
@@ -268,7 +266,7 @@ describe('organization form projection', () => {
       organizationForm: 'order',
       functions: ['warfare', 'defense'],
       practices: [],
-      memberClassAffinityIds: ['class-fighter', 'class-paladin'],
+      'members.classAffinityIds': ['class-fighter', 'class-paladin'],
     })
   })
 
@@ -282,7 +280,7 @@ describe('organization form projection', () => {
     expect(
       sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId']),
     ).toMatchObject({
-      memberClassAffinityIds: ['class-fighter'],
+      'members.classAffinityIds': ['class-fighter'],
     })
   })
 
@@ -295,10 +293,10 @@ describe('organization form projection', () => {
     ]
     const [sync] = buildOrganizationFormValueSyncs(undefined, classes as never)
     const thievesGuild = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
-    expect(thievesGuild?.memberClassAffinityIds).toEqual(['class-rogue'])
+    expect(thievesGuild?.['members.classAffinityIds']).toEqual(['class-rogue'])
 
     const mercenary = sync?.apply({ authoringPresetId: 'mercenary_company' }, ['authoringPresetId'])
-    expect(mercenary?.memberClassAffinityIds).toEqual([
+    expect(mercenary?.['members.classAffinityIds']).toEqual([
       'class-fighter',
       'class-barbarian',
       'class-ranger',
@@ -311,10 +309,12 @@ describe('organization form projection', () => {
       organizationDomain: 'military',
       functions: [],
       practices: [],
-      memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
-      memberSpeciesAffinityIds: [],
+      members: {
+        classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
+        speciesAffinityIds: [],
+      },
     })
-    expect(input.memberClassAffinityIds).toEqual([
+    expect(input.members.classAffinityIds).toEqual([
       'class-fighter',
       'class-barbarian',
       'class-wizard',

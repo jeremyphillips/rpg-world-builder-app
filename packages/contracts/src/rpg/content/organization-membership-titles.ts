@@ -96,7 +96,7 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
   createId: () => string = () => crypto.randomUUID(),
 ): OrganizationMembershipTitleDefinition[] {
   const preset = ORGANIZATION_AUTHORING_PRESETS[presetId]
-  return preset.membershipTitles.map((ref) => {
+  return preset.members.titles.map((ref) => {
     const entry = getOrganizationMembershipTitleEntry(ref.titleId)
     if (!entry) {
       throw new Error(`Unknown organization membership title id: ${ref.titleId}`)
@@ -113,7 +113,7 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
 
 export function resolveOrganizationCreateMembershipTitles(input: {
   sourcePresetId?: OrganizationAuthoringPresetId
-  membershipTitles?: readonly OrganizationMembershipTitleDefinition[]
+  titles?: readonly OrganizationMembershipTitleDefinition[]
   createId?: () => string
 }): OrganizationMembershipTitleDefinition[] {
   if (input.sourcePresetId !== undefined) {
@@ -122,7 +122,7 @@ export function resolveOrganizationCreateMembershipTitles(input: {
       input.createId ?? (() => crypto.randomUUID()),
     )
   }
-  return [...(input.membershipTitles ?? [])]
+  return [...(input.titles ?? [])]
 }
 
 export function sortOrganizationMembershipTitleDefinitionsForDisplay<
@@ -158,17 +158,19 @@ export { organizationAuthoringPresetIdSchema }
 export function organizationCreateMembershipTitlesInputRefinement(
   value: {
     sourcePresetId?: OrganizationAuthoringPresetId
-    membershipTitles?: readonly OrganizationMembershipTitleDefinition[]
+    members?: {
+      titles?: readonly OrganizationMembershipTitleDefinition[]
+    }
   },
   ctx: z.RefinementCtx,
 ): void {
   const hasPreset = value.sourcePresetId !== undefined
-  const hasTitles = value.membershipTitles !== undefined && value.membershipTitles.length > 0
+  const hasTitles = value.members?.titles !== undefined && value.members.titles.length > 0
   if (hasPreset && hasTitles) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'Organization create input must not combine sourcePresetId with membershipTitles.',
-      path: ['membershipTitles'],
+      message: 'Organization create input must not combine sourcePresetId with members.titles.',
+      path: ['members', 'titles'],
     })
   }
 }

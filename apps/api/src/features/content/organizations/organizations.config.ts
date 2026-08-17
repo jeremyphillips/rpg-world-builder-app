@@ -36,9 +36,11 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     }),
     functions: record.functions ?? [],
     practices: record.practices ?? [],
-    memberClassAffinityIds: record.memberClassAffinityIds ?? [],
-    memberSpeciesAffinityIds: record.memberSpeciesAffinityIds ?? [],
-    membershipTitles: organizationMembershipTitlesSchema.parse(record.membershipTitles ?? []),
+    members: {
+      classAffinityIds: record.members?.classAffinityIds ?? [],
+      speciesAffinityIds: record.members?.speciesAffinityIds ?? [],
+      titles: organizationMembershipTitlesSchema.parse(record.members?.titles ?? []),
+    },
     ...(record.sourcePresetId !== undefined && record.sourcePresetId !== null
       ? { sourcePresetId: record.sourcePresetId as OrganizationAuthoringPresetId }
       : {}),
@@ -51,20 +53,25 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
   const { slug: _slug, ...rest } = input
   const sourcePresetId = rest.sourcePresetId as OrganizationAuthoringPresetId | undefined
-  const membershipTitles = resolveOrganizationCreateMembershipTitles({
+  const membersInput = (rest.members ?? {}) as Record<string, unknown>
+  const titles = resolveOrganizationCreateMembershipTitles({
     ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
-    ...(rest.membershipTitles !== undefined
+    ...(membersInput.titles !== undefined
       ? {
-          membershipTitles: organizationMembershipTitlesSchema.parse(rest.membershipTitles),
+          titles: organizationMembershipTitlesSchema.parse(membersInput.titles),
         }
       : {}),
   })
 
-  const { membershipTitles: _clientTitles, ...bodyWithoutClientTitles } = rest
+  const { members: _clientMembers, ...bodyWithoutClientMembers } = rest
 
   return {
-    ...bodyWithoutClientTitles,
-    membershipTitles,
+    ...bodyWithoutClientMembers,
+    members: {
+      classAffinityIds: membersInput.classAffinityIds ?? [],
+      speciesAffinityIds: membersInput.speciesAffinityIds ?? [],
+      titles,
+    },
     ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
   }
 }

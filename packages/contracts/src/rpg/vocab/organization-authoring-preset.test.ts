@@ -61,9 +61,9 @@ describe('organization authoring presets', () => {
   it('requires membership title refs that resolve in the vocabulary', () => {
     for (const id of ORGANIZATION_AUTHORING_PRESET_IDS) {
       const preset = ORGANIZATION_AUTHORING_PRESETS[id]
-      expect(preset.membershipTitles.length).toBeGreaterThan(0)
+      expect(preset.members.titles.length).toBeGreaterThan(0)
       const seen = new Set<string>()
-      for (const ref of preset.membershipTitles) {
+      for (const ref of preset.members.titles) {
         expect(getOrganizationMembershipTitleEntry(ref.titleId)).toBeDefined()
         expect(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES).toContain(ref.priority)
         expect(seen.has(ref.titleId)).toBe(false)

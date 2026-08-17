@@ -4,15 +4,15 @@ import { intersectPersistedContentIds } from './intersect-persisted-content-ids'
 
 /** Stored affinity ids intersected with playable species; order follows persisted affinities. */
 export function resolveOrganizationMemberSpeciesRecommendationIds(input: {
-  memberSpeciesAffinityIds: readonly string[]
+  speciesAffinityIds: readonly string[]
   playableSpecies: readonly Species[]
 }): string[] {
-  return intersectPersistedContentIds(input.memberSpeciesAffinityIds, input.playableSpecies)
+  return intersectPersistedContentIds(input.speciesAffinityIds, input.playableSpecies)
 }
 
 /** Stored affinity ids intersected with playable species; order follows persisted affinities. */
 export function resolveOrganizationMemberSpeciesRecommendations(input: {
-  memberSpeciesAffinityIds: readonly string[]
+  speciesAffinityIds: readonly string[]
   playableSpecies: readonly Species[]
 }): Species[] {
   const playableById = new Map(input.playableSpecies.map((species) => [species.id, species]))
@@ -24,14 +24,14 @@ export function resolveOrganizationMemberSpeciesRecommendations(input: {
 /** True when the character species id matches a surviving recommended affinity id. */
 export function characterMatchesOrganizationMemberSpeciesRecommendations(input: {
   speciesId: string | undefined
-  memberSpeciesAffinityIds: readonly string[]
+  speciesAffinityIds: readonly string[]
   playableSpecies: readonly Species[]
 }): boolean {
   if (input.speciesId === undefined || input.speciesId.length === 0) return false
 
   const recommendedIds = new Set(
     resolveOrganizationMemberSpeciesRecommendationIds({
-      memberSpeciesAffinityIds: input.memberSpeciesAffinityIds,
+      speciesAffinityIds: input.speciesAffinityIds,
       playableSpecies: input.playableSpecies,
     }),
   )

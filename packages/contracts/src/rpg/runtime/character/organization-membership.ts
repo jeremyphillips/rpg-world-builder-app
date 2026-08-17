@@ -42,15 +42,14 @@ type MembershipPrioritySource = {
  */
 export function resolveOrganizationMembershipPriority(input: {
   membership: MembershipPrioritySource
-  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
+  titles: readonly OrganizationMembershipTitleDefinition[]
 }): number | undefined {
   if (input.membership.priority !== undefined) {
     return input.membership.priority
   }
   const title = input.membership.title
   if (title === undefined) return undefined
-  return resolveOrganizationMembershipTitleDefinitionByLabel(input.membershipTitles, title)
-    ?.priority
+  return resolveOrganizationMembershipTitleDefinitionByLabel(input.titles, title)?.priority
 }
 
 type SortableOrganizationMember = {
@@ -98,7 +97,7 @@ export type ResolvedOrganizationMembershipMetadata = {
  * - Preserved historical/custom title → keep the current membership's explicit priority
  */
 export function resolveOrganizationMembershipMetadata(input: {
-  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
+  titles: readonly OrganizationMembershipTitleDefinition[]
   /** Selected title after radio mapping; `undefined` means No title. */
   selectedTitle: string | undefined
   currentMembership?: MembershipPrioritySource
@@ -109,7 +108,7 @@ export function resolveOrganizationMembershipMetadata(input: {
   }
 
   const catalogTitle = resolveOrganizationMembershipTitleDefinitionByLabel(
-    input.membershipTitles,
+    input.titles,
     selectedTitle,
   )
   if (catalogTitle) {

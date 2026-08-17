@@ -86,7 +86,7 @@ describe('initial Organization semantic flows', () => {
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
-      memberClassAffinityIds: [],
+      'members.classAffinityIds': [],
     })
     expect(applied).not.toHaveProperty('name')
   })
@@ -98,8 +98,7 @@ describe('initial Organization semantic flows', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input).toMatchObject({
       organizationDomain: 'criminal',

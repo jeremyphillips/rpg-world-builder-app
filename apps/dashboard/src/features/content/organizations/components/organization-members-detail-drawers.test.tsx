@@ -37,9 +37,7 @@ const organization = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
-  membershipTitles: [],
+  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
   connections: { locations: [] },
 }
 

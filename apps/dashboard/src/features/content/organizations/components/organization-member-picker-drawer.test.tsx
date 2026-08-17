@@ -103,8 +103,8 @@ describe('OrganizationMemberPickerDrawer', () => {
   it('shows a Recommended badge for affinity matches that are not already members', () => {
     renderPicker({
       memberSelectionPolicy: {
-        memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
-        memberSpeciesAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberSpeciesAffinityIds,
+        classAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.members.classAffinityIds,
+        speciesAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.members.speciesAffinityIds,
         playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
         playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
       },

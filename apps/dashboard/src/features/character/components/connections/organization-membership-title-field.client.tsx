@@ -9,13 +9,13 @@ export type { OrganizationMembershipTitleFieldProps } from './organization-membe
 
 /** Organization catalog title radios for membership chooser/editor. */
 export function OrganizationMembershipTitleField({
-  membershipTitles,
+  titles,
   value,
   onValueChange,
   idPrefix,
 }: OrganizationMembershipTitleFieldProps) {
   const options = buildOrganizationMembershipTitleRadioOptions({
-    membershipTitles,
+    titles,
     currentValue: value,
   })
 
