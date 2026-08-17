@@ -61,6 +61,7 @@ export function OrganizationMembersDetailDrawers({
         }}
         organization={editableOrganization}
         candidates={detail.candidates}
+        candidatesLoading={detail.candidatesPending || detail.memberClassRecommendationsPending}
         onAdd={detail.handleAddMember}
         memberClassRecommendations={detail.memberClassRecommendations}
         quickNpc={{

@@ -42,6 +42,11 @@ describe('organization form projection', () => {
     ).toMatchObject({ authoringPresetId: undefined })
   })
 
+  it('omits the authoring preset field on edit', () => {
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode: 'edit' })))
+    expect(fields.map(({ name }) => name)).not.toContain('authoringPresetId')
+  })
+
   it('reuses the canonical standalone fields under an embedded namespace', () => {
     const standalone = collectFields(buildOrganizationFields(makeContentFormCtx()))
     const embedded = collectFields(

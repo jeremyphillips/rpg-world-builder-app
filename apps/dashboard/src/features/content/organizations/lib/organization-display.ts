@@ -10,9 +10,12 @@ import {
   type OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
+import { formatContentReferenceLabel } from '@/features/character'
+
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
+import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from './organization-member-class-chip-options.lib'
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
@@ -63,6 +66,7 @@ export function formatLocationConnectionsCount(total: number): string {
 export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
+  classLabelById?: ReadonlyMap<string, string>,
 ): OrganizationDetailViewModel {
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
@@ -105,6 +109,20 @@ export function buildOrganizationDetailViewModel(
             {
               label: 'Practices',
               value: organization.practices.map(getOrganizationPracticeLabel).join(' · '),
+            },
+          ]
+        : []),
+      ...(organization.memberClassAffinityIds.length > 0
+        ? [
+            {
+              label: 'Member class affinities',
+              value: organization.memberClassAffinityIds
+                .map((classId) => {
+                  const label = classLabelById?.get(classId)
+                  if (label) return label
+                  return `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`
+                })
+                .join(' · '),
             },
           ]
         : []),

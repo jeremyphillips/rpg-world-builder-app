@@ -79,6 +79,8 @@ function createDetail(
     handleRemoveFromEditDrawer: vi.fn(),
     handleConfirmRemoveMember: vi.fn(),
     memberClassRecommendations: undefined,
+    candidatesPending: false,
+    memberClassRecommendationsPending: false,
     ...overrides,
   }
 }
@@ -122,5 +124,35 @@ describe('OrganizationMembersDetailDrawers', () => {
 
     expect(screen.queryByRole('heading', { name: 'Add member' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Create NPC' })).not.toBeInTheDocument()
+  })
+
+  it('keeps the remove confirm open when removal fails', async () => {
+    const removingRow = {
+      characterId: 'char-1',
+      name: 'Verna',
+      characterType: 'pc' as const,
+      identityLine: 'PC',
+      detailHref: '/campaigns/campaign-test-1/characters/char-1',
+    }
+    const handleConfirmRemoveMember = vi.fn().mockRejectedValue(new Error('Network error'))
+    renderWithProviders(
+      <OrganizationMembersDetailDrawers
+        organization={organization}
+        detail={createDetail({
+          drawerState: {
+            mode: 'remove',
+            row: removingRow,
+          },
+          removingRow,
+          handleConfirmRemoveMember,
+        })}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove member' }))
+    await vi.waitFor(() => {
+      expect(handleConfirmRemoveMember).toHaveBeenCalledTimes(1)
+    })
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
   })
 })

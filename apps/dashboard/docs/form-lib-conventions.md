@@ -35,6 +35,7 @@ Reference: locations Location type projection —
 
 Organization familiar starting points (`organization-form-projection.ts`):
 
+- Runtime model: [`organizations-classification.md`](./organizations-classification.md)
 - Recipes live in `@rpg/contracts` `ORGANIZATION_AUTHORING_PRESETS` — ephemeral
   projection onto domain / form / functions / practices only; preset id is **not** persisted.
 - Picker is a single-select **`combobox`** (`multiple: false`). Map preset
@@ -57,15 +58,16 @@ Organization familiar starting points (`organization-form-projection.ts`):
   guidance only, never auto-applied or persisted. Curate each preset with
   **apply** (goes in `practices`), **recommend** (ordered `recommendedPractices`),
   or **omit** (neither). `practices ∩ recommendedPractices` must stay empty.
-- Create flows mount `OrganizationAuthoringProvider` plus
+- Create flows mount `OrganizationAuthoringFormShell` plus
   `OrganizationAuthoringPresetBridge` inside the `<Form>`. The bridge reacts only to
   positive `authoringPresetId` selections; the sync-driven clear after apply is a
   no-op so recommendations survive for the session. `clearPracticeRecommendations()`
   is for explicit custom-start resets only.
-- The Practices combobox `resolveFilteredOptions` reads live recommendations from the
-  provider-backed reader at invocation time — field configs stay static. Empty query:
-  selected values, then recommended ids in preset order, then registry tail. Typed
-  query: `rankOptionsByQuery` only (recommendation-neutral).
+- The Practices combobox `resolveFilteredOptions` reads
+  `ctx.organizationPracticeRecommendationIds` (or an explicit `recommendedPracticeIds`
+  option for embedded composers). Empty query: selected values, then recommended ids in
+  preset order, then registry tail. Typed query: `rankOptionsByQuery` only
+  (recommendation-neutral).
 - Reused unchanged under the embedded building-org composer prefix
   (`operatorOrganization.*`).
 - **Coverage regression (test-only):** the frozen 150-row corpus fixture

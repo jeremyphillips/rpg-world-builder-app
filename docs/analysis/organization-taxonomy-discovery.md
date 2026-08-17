@@ -1,24 +1,16 @@
 # Organization Taxonomy Discovery
 
-> **Status:** Analysis complete — Phases 1–8. Pass A vocabulary shipped (matrix v0.2). Preset authoring v1 shipped (16 presets, discovery combobox).
-> **Planning authority:** None  
-> **Active product pass:** [Organization preset authoring v1](../../.cursor/plans/org_preset_authoring_v1_56f60f07.plan.md) — preset expansion and adjacent-name discovery only; taxonomy stays closed.
-> **Runtime classification:** `[organization.ts](../../packages/contracts/src/rpg/content/organization.ts)`,
-> `[organization-domain.ts](../../packages/contracts/src/rpg/vocab/organization-domain.ts)`,
-> `[organization-form.ts](../../packages/contracts/src/rpg/vocab/organization-form.ts)`,
-> `[organization-activity.ts](../../packages/contracts/src/rpg/vocab/organization-activity.ts)`,
-> `[organization-authoring-preset.ts](../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)`
+> **Status:** Frozen research corpus only (150 concepts, Phases 1–8).  
+> **Planning authority:** [`organization-taxonomy.md`](../roadmap/organization-taxonomy.md)  
+> **Runtime classification:** [`organizations-classification.md`](../../apps/dashboard/docs/organizations-classification.md)  
+> **Evidence gates:** [`organization-taxonomy-evidence.md`](./organization-taxonomy-evidence.md)
 >
-> **Frozen evidence set — corpus v0.1 (150 concepts).** Phases 1–8 below are
-> discovery evidence. They must not be rewritten in place. Pass A (vocab +
-> army recipe + matrix v0.2) is recorded after Phase 8. It does not reopen
-> the corpus or rewrite v0.1 mappings.
+> **Frozen evidence set — corpus v0.1 (150 concepts).** Phases 1–8 below are discovery evidence.
+> They must not be rewritten in place. Current shipped vocabulary and preset counts live in
+> contracts and the roadmap — not in this file.
 >
-> **Reopen rule:** Do not open a new organization taxonomy investigation from an
-> isolated awkward example. Reopen classification only when production authoring
-> cannot honestly express a needed concept, several materially different presets
-> require the same missing distinction, or a concrete downstream consumer requires
-> that distinction. Deferred preset and vocabulary questions live in the v1 plan above.
+> **Reopen rule:** Do not open a new organization taxonomy investigation from an isolated awkward
+> example. See the stopping rule in [`organization-taxonomy.md`](../roadmap/organization-taxonomy.md).
 
 Working artifact for pressure-testing organization classification before expanding
 production vocabulary or `ORGANIZATION_AUTHORING_PRESETS`. Companion pattern:
@@ -2026,126 +2018,3 @@ classification discovery terms.
 offices from companies. Not a blocker for the vocab PR.
 
 ---
-
-## Next product pass
-
-Preset authoring v1 is tracked in
-[Organization preset authoring v1](../../.cursor/plans/org_preset_authoring_v1_56f60f07.plan.md)
-(16 presets, discovery combobox, ephemeral projection). Pass A shipped the
-high-confidence vocabulary and army recipe below. Further classification work
-stays deferred until product evidence under the reopen rule in the banner above.
-
-Corpus and matrix v0.1 stay frozen. Matrix v0.2 is a parallel recode of the
-same 150 ids.
-
----
-
-# Pass A — Vocabulary + matrix v0.2
-
-Shipped in contracts. Does not rewrite Phases 1–8 or corpus v0.1.
-
-## What shipped
-
-| Layer       | Change                                                                                                                                                   |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Form        | `force` (armed/levied/crewed host) and `office` (appointed/statutory institution). Form tests still reject `army`, `bank`, `church`, `academy`, `house`. |
-| Activity    | `trade`, `production`, `transport`, `administration`. Existing narrow ids untouched. `ORGANIZATION_ACTIVITY_TERM` now states the forward admission rule. |
-| Army preset | `domain: military`, `form: force`, `activities: [warfare, defense]`. Other five recipes unchanged. `authoringPresetId` still stripped on persist.        |
-
-No new domains. No clandestine field. No allowlists. No `college` / `court` /
-`crew`. No navy / temple / university recipes. No `advocacy`.
-
-## Activity admission (forward)
-
-New organization activities should normally describe reusable organizational
-missions or practices spanning multiple familiar organization types. Narrow
-occupational activities require separate evidence. Do not add craft-specific
-siblings of `blacksmithing` / `brewing`. A later audit may alias or retire
-those two; Pass A does not.
-
-## Matrix v0.2 — parallel recode
-
-Same 150 ids. Overrides only; v0.1 cells are inherited unless named.
-
-### Recode rules applied
-
-**Form `force` (11):** army, navy, militia, marines, sky_fleet, garrison,
-legion, crusading_host, pirate_crew, warband, royal_guard. City watch and
-marshals stay omitted (Phase 8 Q2 lean — not recoded onto `force`).
-
-**Form `office` (15):** government_ministry, royal_court, bureaucracy,
-magistracy, diplomatic_corps, colonial_administration, provincial_governorate,
-secret_police, intelligence_bureau, customs_service, plague_wardens,
-postal_service, exchequer, mint, inquisitorial_office. Diocese skipped
-(religious constitution already has `congregation`).
-
-**Activity `trade` (10):** trading_company, merchant_house, chartered_company,
-auction_house, spice_consortium, company_of_merchant_adventurers,
-warehouse_combine, bazaar_syndicate, slave_trading_company, fur_company.
-Not merchant_guild / market_association (those keep empty activities).
-
-**Activity `production` (8):** foundry_works, textile_manufactory, shipyard,
-glassworks, millers_cooperative, logging_company, fishing_fleet,
-farming_cooperative. Brewery_company keeps `brewing` — no dual-tag.
-
-**Activity `transport` (6+1):** shipping_company, caravan_company, coach_line,
-courier_service, teamsters_guild, river_boatmen; postal_service also takes
-`transport` beside `administration`.
-
-**Activity `administration` (7):** government_ministry, bureaucracy,
-colonial_administration, provincial_governorate, diplomatic_corps,
-postal_service, customs_service. Not chambers, watch, exchequer (already
-`finance`), secret_police, or intelligence_bureau.
-
-**Fit:** upgrade awkward → acceptable when the named hole is filled. Army is
-**clean** (`military / force / warfare, defense` matches the noun). Navy-family
-stays acceptable (name-only; still collapses onto army’s signature). Stay
-awkward: academy, university, mage_college, bardic_college, hospital_order,
-counterfeiting_ring, beggars_guild, secret_society.
-
-### Fit and coverage vs v0.1
-
-| Metric                   | v0.1 | v0.2 | Δ         |
-| ------------------------ | ---- | ---- | --------- |
-| Clean                    | 9    | 10   | +1 (army) |
-| Acceptable               | 117  | 132  | +15       |
-| Awkward                  | 24   | 8    | −16       |
-| Unrepresentable          | 0    | 0    | 0         |
-| Omitted form             | 46   | 20   | −26       |
-| Empty activities         | 88   | 57   | −31       |
-| Rows with ≥1 activity    | 62   | 93   | +31       |
-| Activity assignments     | 90   | 121  | +31       |
-| Unique signatures        | 61   | 66   | +5        |
-| Rows sharing a signature | 124  | 119  | −5        |
-| Rows recoded             | —    | 50   | —         |
-
-### Signatures that still collapse (≥5 rows)
-
-| Signature                              | Count | Notes                                                                           |
-| -------------------------------------- | ----- | ------------------------------------------------------------------------------- |
-| `commercial / company / trade`         | 10    | Split from the old 23× empty-activity company bucket. Distinct from production. |
-| `community / association / —`          | 8     | Unchanged. No `care` activity in Pass A.                                        |
-| `government / office / administration` | 6     | Former `government / — / —` with a constitution and a mission.                  |
-| `military / force / warfare, defense`  | 6     | Army + navy family. **Navy still equals army** — F holds after `force`.         |
-| `commercial / company / production`    | 6     | Foundry family; brewing stays off this signature.                               |
-| `government / office / —`              | 5     | Courts, mint, inquisitorial office, etc. Constitution without a new mission.    |
-
-v0.1’s `commercial / company / —` (23) and `government / — / —` (12) and
-`military / — / warfare, defense` (6) are gone as omitted-form / empty-activity
-buckets. The navy–army identity is the intended remaining collapse.
-
-### Remaining awkward (8)
-
-academy, university, mage_college, bardic_college, hospital_order,
-counterfeiting_ring, beggars_guild, secret_society.
-
-These are deferred until product evidence (college form, care activity,
-clandestine trait) — not Pass A.
-
-### What Pass A did **not** do
-
-- Rewrite corpus v0.1 or Phase 1–3 mappings.
-- Add navy / temple / university / college recipes.
-- Dual-tag brewery onto `production`.
-- Recode city watch or marshals onto `force`.
-- Recode diocese onto `office`.

@@ -5,6 +5,7 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ContentSource,
   EquipmentKind,
+  OrganizationPractice,
   WeaponCategory,
   ContentValidationIntent,
 } from '@rpg/contracts'
@@ -52,6 +53,8 @@ export type ContentFormCtx = {
   options?: Partial<ContentFormOptionSets>
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
+  /** Live practice recommendations from preset bridge — authoring guidance only. */
+  organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind
   /** Equipment family URL segment for breadcrumbs and back links. */

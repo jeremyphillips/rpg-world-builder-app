@@ -17,6 +17,7 @@ import {
   organizationFormSchema as canonicalOrganizationFormSchema,
   organizationFunctionSchema,
   organizationPracticeSchema,
+  getOrganizationPracticeDiscoveryTerms,
   slugSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
@@ -27,6 +28,7 @@ import {
   type ContentValidationIntent,
   type CreateOrganizationInput,
   type Organization,
+  type OrganizationPractice,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
@@ -35,7 +37,6 @@ import { draftOptionalSelect } from './draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
 import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/organization-practice-combobox-ranking'
-import { readOrganizationPracticeRecommendationIds } from '../../organizations/lib/organization-practice-recommendation-reader'
 import {
   buildMemberClassAffinityChipOptions,
   ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
@@ -64,8 +65,9 @@ const organizationFunctionOptions = toOptions(
 
 const organizationPracticeOptions = ORGANIZATION_PRACTICE_IDS.map((id) => {
   const entry = ORGANIZATION_PRACTICE_ENTRIES[id]
-  const aliases = 'aliases' in entry && Array.isArray(entry.aliases) ? entry.aliases : []
-  const searchTerms = [...aliases, ...(entry.searchTerms ?? [])]
+  const searchTerms = getOrganizationPracticeDiscoveryTerms(id).filter(
+    (term) => term !== entry.label,
+  )
   return {
     value: id,
     label: entry.label,
@@ -136,25 +138,36 @@ export function buildOrganizationFields(
     prefix?: string
     includeName?: boolean
     selectedMemberClassAffinityIds?: readonly string[]
+    recommendedPracticeIds?: readonly OrganizationPractice[]
   } = {},
 ): FormItem[] {
-  const { prefix, includeName = false, selectedMemberClassAffinityIds } = options
+  const {
+    prefix,
+    includeName = false,
+    selectedMemberClassAffinityIds,
+    recommendedPracticeIds,
+  } = options
   const domainPath = fieldPath(prefix, 'organizationDomain')
+  const practiceRecommendationIds =
+    recommendedPracticeIds ?? ctx.organizationPracticeRecommendationIds ?? []
   const fields: FormItem[] = []
 
   if (includeName) {
     fields.push({ ...nameField(), name: fieldPath(prefix, 'name') })
   }
 
-  fields.push(
-    {
+  if (ctx.mode !== 'edit') {
+    fields.push({
       type: 'combobox',
       name: fieldPath(prefix, 'authoringPresetId'),
       label: 'Start from familiar type',
       options: organizationAuthoringPresetOptions,
       multiple: false,
       placeholder: 'Search familiar types…',
-    },
+    })
+  }
+
+  fields.push(
     {
       type: 'chips',
       name: domainPath,
@@ -197,7 +210,7 @@ export function buildOrganizationFields(
           options,
           query,
           selected,
-          readOrganizationPracticeRecommendationIds(),
+          practiceRecommendationIds,
         ),
     },
     {

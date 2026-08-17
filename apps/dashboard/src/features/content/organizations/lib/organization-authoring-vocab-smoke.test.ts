@@ -35,7 +35,7 @@ function optionValues(field: FormItem | undefined): string[] {
   return flattenSelectFieldOptions(field.options).map((option) => option.value)
 }
 
-describe('Pass A authoring smoke', () => {
+describe('organization authoring vocab smoke', () => {
   it('exposes Pass A forms and functions in standalone authoring fields', () => {
     const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
     const formOptions = optionValues(fields.find(({ name }) => name === 'organizationForm')?.item)

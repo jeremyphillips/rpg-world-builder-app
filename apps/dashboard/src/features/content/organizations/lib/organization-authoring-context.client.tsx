@@ -1,17 +1,7 @@
 'use client'
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
+import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { OrganizationPractice } from '@rpg/contracts'
-
-import { registerOrganizationPracticeRecommendationReader } from './organization-practice-recommendation-reader'
 
 type OrganizationAuthoringContextValue = {
   practiceRecommendations: OrganizationPractice[]
@@ -25,15 +15,6 @@ export function OrganizationAuthoringProvider({ children }: { children: ReactNod
   const [practiceRecommendations, setPracticeRecommendationsState] = useState<
     OrganizationPractice[]
   >([])
-  const recommendationsRef = useRef(practiceRecommendations)
-  recommendationsRef.current = practiceRecommendations
-
-  useEffect(() => {
-    registerOrganizationPracticeRecommendationReader(() => recommendationsRef.current)
-    return () => {
-      registerOrganizationPracticeRecommendationReader(() => [])
-    }
-  }, [])
 
   const value = useMemo(
     () => ({

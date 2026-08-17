@@ -65,4 +65,26 @@ describe('buildOrganizationDetailViewModel', () => {
       locationConnections: emptyLocationConnections,
     })
   })
+
+  it('shows member class affinity labels when present', () => {
+    const organization = {
+      ...CRAFT_GUILD,
+      memberClassAffinityIds: ['class-fighter', 'class-rogue', 'class-missing'],
+    }
+    const classLabelById = new Map([
+      ['class-fighter', 'Fighter'],
+      ['class-rogue', 'Rogue'],
+    ])
+
+    expect(
+      buildOrganizationDetailViewModel(organization, emptyLocationConnections, classLabelById),
+    ).toMatchObject({
+      statRows: expect.arrayContaining([
+        {
+          label: 'Member class affinities',
+          value: 'Fighter · Rogue · Class Missing · Unresolved reference',
+        },
+      ]),
+    })
+  })
 })

@@ -1,7 +1,7 @@
 import type {
   OrganizationAuthoringPresetId,
   OrganizationFunction,
-  OrganizationLegacyActivity,
+  OrganizationActivityPartitionId,
   OrganizationPractice,
 } from '@rpg/contracts'
 
@@ -22,7 +22,7 @@ export type OrganizationActivityPressurePresetRow = {
 
 export type OrganizationActivityPressureCustomRow = {
   id: string
-  customLegacyActivities: readonly OrganizationLegacyActivity[]
+  customLegacyActivities: readonly OrganizationActivityPartitionId[]
   notes?: string
 }
 

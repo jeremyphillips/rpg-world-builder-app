@@ -14,6 +14,7 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
+import { useClasses } from '../../classes/hooks/use-classes'
 import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
 import { OrganizationMembersDetailSection } from '../components/organization-members-detail-section.client'
 import { useOrganizations } from '../hooks/use-organizations'
@@ -31,14 +32,24 @@ export function OrganizationDetailContent({
 }) {
   useSetBreadcrumbLabel(organization.name)
 
+  const { data: classes = [] } = useClasses(campaignId)
+  const classLabelById = useMemo(
+    () => new Map(classes.map((characterClass) => [characterClass.id, characterClass.name])),
+    [classes],
+  )
+
   const viewModel = useMemo(
     () =>
-      buildOrganizationDetailViewModel(organization, {
-        previewItems: [],
-        total: 0,
-        emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
-      }),
-    [organization],
+      buildOrganizationDetailViewModel(
+        organization,
+        {
+          previewItems: [],
+          total: 0,
+          emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+        },
+        classLabelById,
+      ),
+    [classLabelById, organization],
   )
 
   return (

@@ -6,7 +6,8 @@ import type { VocabularyTerm } from './types'
 
 export const ORGANIZATION_FORM_TERM = {
   label: 'Organization Form',
-  description: 'How an organization is constituted independently of its domain or activities.',
+  description:
+    'How an organization is constituted independently of its domain, functions, and practices.',
   sentence: {
     singular: 'organization form',
     plural: 'organization forms',

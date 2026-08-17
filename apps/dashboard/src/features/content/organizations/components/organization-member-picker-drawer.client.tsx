@@ -79,6 +79,7 @@ export type OrganizationMemberPickerDrawerProps = {
     OrganizationMemberPickerSortContext,
     'memberClassAffinityIds' | 'availableClasses'
   >
+  candidatesLoading?: boolean
 }
 
 function formatCandidateIdentityLine(candidate: OrganizationMemberPickerCandidate): string {
@@ -96,6 +97,7 @@ export function OrganizationMemberPickerDrawer({
   quickNpc,
   onCreateNpc,
   memberClassRecommendations,
+  candidatesLoading,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
@@ -191,6 +193,7 @@ export function OrganizationMemberPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
+      loading={candidatesLoading}
       title={ORGANIZATION_MEMBER_PICKER_TITLE}
       description={`Choose a character to add to ${organization.name}.`}
       auxiliaryAction={

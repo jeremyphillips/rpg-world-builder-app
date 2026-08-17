@@ -3,11 +3,7 @@
 import * as React from 'react'
 
 import type { CampaignNpcDetail, Organization } from '@rpg/contracts'
-import {
-  getErrorMessage,
-  resolveAvailableContent,
-  resolveOrganizationMembershipMetadata,
-} from '@rpg/contracts'
+import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCampaignCharacters, useCanManageCampaign } from '@/features/campaign'
@@ -20,6 +16,8 @@ import {
   useNpcs,
   type CharacterOrganizationMembershipSubjectKind,
 } from '@/features/character'
+
+import { useClasses } from '../../classes/hooks/use-classes'
 
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/location-connected-party-character-options.lib'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
@@ -69,6 +67,10 @@ export function useOrganizationMembersDetail(
   const membersQuery = useOrganizationMembers(campaignId, organizationId)
   const campaignCharactersQuery = useCampaignCharacters(canManage ? campaignId : undefined)
   const npcsQuery = useNpcs(canManage ? campaignId : undefined)
+  const classesQuery = useClasses(canManage ? campaignId : undefined)
+  const candidatesPending = campaignCharactersQuery.isPending || npcsQuery.isPending
+  const memberClassRecommendationsPending =
+    organization.memberClassAffinityIds.length > 0 && classesQuery.isPending
   const {
     catalogIndex,
     context: npcBuildContext,
@@ -251,19 +253,18 @@ export function useOrganizationMembersDetail(
       setDrawerState(null)
     } catch (error) {
       setMutationError(getErrorMessage(error, ORGANIZATION_MEMBERS_MUTATION_ERROR))
-      setDrawerState(null)
     }
   }, [drawerState, removeMember])
 
   const memberClassRecommendations = React.useMemo(
     () =>
-      npcBuildContext
+      organization.memberClassAffinityIds.length > 0 && classesQuery.data
         ? {
             memberClassAffinityIds: organization.memberClassAffinityIds,
-            availableClasses: resolveAvailableContent(npcBuildContext).classes,
+            availableClasses: classesQuery.data,
           }
         : undefined,
-    [npcBuildContext, organization.memberClassAffinityIds],
+    [classesQuery.data, organization.memberClassAffinityIds],
   )
 
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
@@ -292,6 +293,7 @@ export function useOrganizationMembersDetail(
     emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.members,
     membersQuery,
     candidates,
+    candidatesPending,
     drawerState,
     editingRow,
     removingRow: drawerState?.mode === 'remove' ? drawerState.row : null,
@@ -299,6 +301,7 @@ export function useOrganizationMembersDetail(
     pendingCharacterId,
     quickNpc,
     memberClassRecommendations,
+    memberClassRecommendationsPending,
     openAddDrawer,
     openCreateNpcModal,
     cancelCreateNpcModal,

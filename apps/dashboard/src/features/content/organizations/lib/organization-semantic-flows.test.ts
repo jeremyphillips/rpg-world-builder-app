@@ -18,10 +18,6 @@ import {
   type OrganizationFormValues,
 } from '../../lib/forms/organization-form-projection'
 import { presetMatchesIntentionalQuery } from './__tests__/organization-preset-intentional-matcher'
-import {
-  readOrganizationPracticeRecommendationIds,
-  registerOrganizationPracticeRecommendationReader,
-} from './organization-practice-recommendation-reader'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
   const fields: Array<{ name: string; item: FormItem }> = []
@@ -213,11 +209,12 @@ describe('initial Organization semantic flows', () => {
   })
 
   it('boosts thieves guild recommendations in the empty-query practices panel', () => {
-    registerOrganizationPracticeRecommendationReader(() =>
-      getOrganizationAuthoringPresetRecommendedPractices('thieves_guild'),
-    )
+    const recommendedPracticeIds =
+      getOrganizationAuthoringPresetRecommendedPractices('thieves_guild')
 
-    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const fields = collectFields(
+      buildOrganizationFields(makeContentFormCtx(), { recommendedPracticeIds }),
+    )
     const practicesField = fields.find(({ name }) => name === 'practices')?.item
     expect(practicesField && 'resolveFilteredOptions' in practicesField).toBe(true)
 
@@ -236,10 +233,5 @@ describe('initial Organization semantic flows', () => {
       'smuggling',
       'investigation',
     ])
-    expect(readOrganizationPracticeRecommendationIds()).toEqual(
-      getOrganizationAuthoringPresetRecommendedPractices('thieves_guild'),
-    )
-
-    registerOrganizationPracticeRecommendationReader(() => [])
   })
 })

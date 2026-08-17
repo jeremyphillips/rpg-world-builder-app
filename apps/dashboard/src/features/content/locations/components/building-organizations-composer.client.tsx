@@ -52,6 +52,7 @@ import {
   OrganizationAuthoringFormShell,
   OrganizationAuthoringPresetBridge,
 } from '../../organizations/components/organization-authoring-form-shell.client'
+import { useOrganizationAuthoringContext } from '../../organizations/lib/organization-authoring-context.client'
 
 function BuildingOrganizationConfirmButton({
   confirmLabel,
@@ -190,6 +191,51 @@ export function BuildingOrganizationDiscovery({
   )
 }
 
+function BuildingOrganizationNewOrganizationForm({
+  context,
+  newOrganizationDraftId,
+  confirmLabel,
+  kind,
+  validationAttempted,
+  commitNew,
+}: {
+  context: UseBuildingOrganizationsCreateTabResult['context']
+  newOrganizationDraftId: string | null
+  confirmLabel: string
+  kind: OrganizationLocationConnectionKind | null
+  validationAttempted: boolean
+  commitNew: UseBuildingOrganizationsCreateTabResult['commitNew']
+}) {
+  const { practiceRecommendations } = useOrganizationAuthoringContext()
+
+  return (
+    <Form
+      key={newOrganizationDraftId ?? 'new-organization'}
+      id="building-new-organization-draft"
+      schema={organizationFormSchema}
+      fields={buildOrganizationFields(context, {
+        includeName: true,
+        recommendedPracticeIds: practiceRecommendations,
+      })}
+      defaultValues={organizationCreateDefaultValues}
+      valueSyncs={buildOrganizationFormValueSyncs(
+        undefined,
+        resolveDiscoverableOrganizationMemberClasses(context),
+      )}
+      onSubmit={commitNew}
+      header={() => <OrganizationAuthoringPresetBridge />}
+      footer={
+        <BuildingOrganizationConfirmButton
+          confirmLabel={confirmLabel}
+          disabled={validationAttempted && !kind}
+          submit
+          compact
+        />
+      }
+    />
+  )
+}
+
 export function BuildingOrganizationNewBranch({
   controller,
   confirmLabel,
@@ -220,26 +266,13 @@ export function BuildingOrganizationNewBranch({
         </Button>
       </div>
       <OrganizationAuthoringFormShell>
-        <Form
-          key={newOrganizationDraftId ?? 'new-organization'}
-          id="building-new-organization-draft"
-          schema={organizationFormSchema}
-          fields={buildOrganizationFields(context, { includeName: true })}
-          defaultValues={organizationCreateDefaultValues}
-          valueSyncs={buildOrganizationFormValueSyncs(
-            undefined,
-            resolveDiscoverableOrganizationMemberClasses(context),
-          )}
-          onSubmit={commitNew}
-          header={() => <OrganizationAuthoringPresetBridge />}
-          footer={
-            <BuildingOrganizationConfirmButton
-              confirmLabel={confirmLabel}
-              disabled={validationAttempted && !kind}
-              submit
-              compact
-            />
-          }
+        <BuildingOrganizationNewOrganizationForm
+          context={context}
+          newOrganizationDraftId={newOrganizationDraftId}
+          confirmLabel={confirmLabel}
+          kind={kind}
+          validationAttempted={validationAttempted}
+          commitNew={commitNew}
         />
       </OrganizationAuthoringFormShell>
     </>

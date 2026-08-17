@@ -4,24 +4,24 @@ import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
 import { ORGANIZATION_PRACTICE_IDS } from './organization-practice'
 import {
   ORGANIZATION_ACTIVITY_MIGRATION,
-  ORGANIZATION_LEGACY_ACTIVITY_IDS,
+  ORGANIZATION_ACTIVITY_PARTITION_IDS,
   migrateOrganizationActivities,
 } from './organization-activity-migration'
 
 describe('organization activity migration map', () => {
-  it('maps every legacy id exactly once to an existing function or practice', () => {
+  it('maps every partition id exactly once to an existing function or practice', () => {
     expect(Object.keys(ORGANIZATION_ACTIVITY_MIGRATION).sort()).toEqual(
-      [...ORGANIZATION_LEGACY_ACTIVITY_IDS].sort(),
+      [...ORGANIZATION_ACTIVITY_PARTITION_IDS].sort(),
     )
 
-    for (const legacyId of ORGANIZATION_LEGACY_ACTIVITY_IDS) {
-      const target = ORGANIZATION_ACTIVITY_MIGRATION[legacyId]
+    for (const partitionId of ORGANIZATION_ACTIVITY_PARTITION_IDS) {
+      const target = ORGANIZATION_ACTIVITY_MIGRATION[partitionId]
       if (target.kind === 'function') {
         expect(ORGANIZATION_FUNCTION_IDS).toContain(target.id)
       } else {
         expect(ORGANIZATION_PRACTICE_IDS).toContain(target.id)
       }
-      expect(target.id).toBe(legacyId)
+      expect(target.id).toBe(partitionId)
     }
   })
 

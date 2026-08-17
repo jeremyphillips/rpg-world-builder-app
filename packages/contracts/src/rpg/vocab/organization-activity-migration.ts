@@ -1,8 +1,11 @@
 import type { OrganizationFunction } from './organization-function'
 import type { OrganizationPractice } from './organization-practice'
 
-/** Frozen legacy activity ids — partition source for the functions/practices split. */
-export const ORGANIZATION_LEGACY_ACTIVITY_IDS = [
+/**
+ * Partition keys for the functions/practices split — not a claim that every id was
+ * historically persisted as `activities`.
+ */
+export const ORGANIZATION_ACTIVITY_PARTITION_IDS = [
   'blacksmithing',
   'brewing',
   'worship',
@@ -31,7 +34,7 @@ export const ORGANIZATION_LEGACY_ACTIVITY_IDS = [
   'aid',
 ] as const
 
-export type OrganizationLegacyActivity = (typeof ORGANIZATION_LEGACY_ACTIVITY_IDS)[number]
+export type OrganizationActivityPartitionId = (typeof ORGANIZATION_ACTIVITY_PARTITION_IDS)[number]
 
 type OrganizationActivityMigrationTarget =
   | { readonly kind: 'function'; readonly id: OrganizationFunction }
@@ -64,15 +67,17 @@ export const ORGANIZATION_ACTIVITY_MIGRATION = {
   apprenticeship: { kind: 'practice', id: 'apprenticeship' },
   smuggling: { kind: 'practice', id: 'smuggling' },
   extortion: { kind: 'practice', id: 'extortion' },
-} as const satisfies Record<OrganizationLegacyActivity, OrganizationActivityMigrationTarget>
+} as const satisfies Record<OrganizationActivityPartitionId, OrganizationActivityMigrationTarget>
 
-export function migrateOrganizationActivities(activities: readonly OrganizationLegacyActivity[]): {
+export function migrateOrganizationActivities(
+  activities: readonly OrganizationActivityPartitionId[],
+): {
   functions: OrganizationFunction[]
   practices: OrganizationPractice[]
 } {
   const functions: OrganizationFunction[] = []
   const practices: OrganizationPractice[] = []
-  const seen = new Set<OrganizationLegacyActivity>()
+  const seen = new Set<OrganizationActivityPartitionId>()
 
   for (const activity of activities) {
     if (seen.has(activity)) continue
