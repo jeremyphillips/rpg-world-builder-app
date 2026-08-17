@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
 
-import { pickClass } from '../../fixtures/pick'
+import { pickClass, pickEquipment } from '../../fixtures/pick'
 import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,
@@ -197,7 +198,7 @@ describe('equipmentGrantSummary', () => {
 describe('equipmentGrantItemFields', () => {
   it('uses single-select combobox for granted equipment slugs in a row with quantity', () => {
     const fields = equipmentGrantItemFields({
-      options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
+      options: { equipment: buildContentPurposeSelectors([pickEquipment('greataxe')]) },
     })
     const equipmentRow = fields.find(
       (field): field is Extract<typeof field, { kind: 'row' }> =>
@@ -221,13 +222,17 @@ describe('equipmentGrantItemFields', () => {
   })
 
   it('uses Grant type for the item kind select', () => {
-    const fields = equipmentGrantItemFields({ options: { equipment: [] } })
+    const fields = equipmentGrantItemFields({
+      options: { equipment: buildContentPurposeSelectors([]) },
+    })
     const itemKind = fields.find((field) => 'name' in field && field.name === 'itemKind')
     expect(itemKind).toMatchObject({ label: 'Grant type' })
   })
 
   it('embeds pool source in the choice inline sentence', () => {
-    const fields = equipmentGrantItemFields({ options: { equipment: [] } })
+    const fields = equipmentGrantItemFields({
+      options: { equipment: buildContentPurposeSelectors([]) },
+    })
     const chooseField = fields.find(
       (field) => 'name' in field && field.name === EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
     )
@@ -249,7 +254,9 @@ describe('equipmentGrantItemFields', () => {
   })
 
   it('shows a single category select for the matching filtered equipment kind', () => {
-    const fields = equipmentGrantItemFields({ options: { equipment: [] } })
+    const fields = equipmentGrantItemFields({
+      options: { equipment: buildContentPurposeSelectors([]) },
+    })
     const filteredRow = fields.find(
       (field): field is Extract<typeof field, { kind: 'row' }> =>
         'kind' in field &&

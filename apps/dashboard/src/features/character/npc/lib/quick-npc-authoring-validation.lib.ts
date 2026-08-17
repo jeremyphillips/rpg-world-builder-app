@@ -1,6 +1,6 @@
 import {
   isClassProgressionApplicable,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   resolveCharacterLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
@@ -24,7 +24,7 @@ export function isQuickNpcSetupStillValid(
   const parsed = quickNpcSetupSchema(maxLevel, minLevel).safeParse(setup)
   if (!parsed.success) return false
 
-  const available = resolveAvailableContent(context)
+  const available = resolvePlayableBuilderContent(context)
   const speciesAvailable = available.species.some((entry) => entry.id === setup.speciesId)
   if (!speciesAvailable) return false
 

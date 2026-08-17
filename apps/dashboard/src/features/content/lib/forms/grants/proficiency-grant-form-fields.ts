@@ -21,6 +21,12 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
+import {
+  referenceArmorFieldOptions,
+  referenceSkillFieldOptions,
+  referenceToolFieldOptions,
+  referenceWeaponFieldOptions,
+} from '../../form-options/content-field-option.lib'
 import { refineToolProficiencyPoolFormRow } from '../tool-proficiency-pool-form-validation'
 import {
   GRANT_TOOL_PROFICIENCY_POOL_FIELD_NAMES,
@@ -201,7 +207,7 @@ export const weaponProficiencyItemFormSchema = z.discriminatedUnion('proficiency
 export type WeaponProficiencyItemForm = z.infer<typeof weaponProficiencyItemFormSchema>
 
 function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const weaponOptions = ctx.options?.weapons ?? []
+  const weaponOptions = referenceWeaponFieldOptions(ctx.options?.equipment)
 
   return [
     {
@@ -257,7 +263,7 @@ export function weaponProficiencyGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const weaponOptions = ctx.options?.weapons ?? []
+  const weaponOptions = referenceWeaponFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(weaponSourceOptions, guard),
@@ -335,7 +341,7 @@ export function toolProficiencyGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const toolOptions = ctx.options?.tools ?? []
+  const toolOptions = referenceToolFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(toolSourceOptions, guard),
@@ -394,7 +400,7 @@ export const skillProficiencyItemFormSchema = z.discriminatedUnion('proficiencyS
 export type SkillProficiencyItemForm = z.infer<typeof skillProficiencyItemFormSchema>
 
 function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const skillOptions = ctx.options?.skills ?? []
+  const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
 
   return [
     {
@@ -439,7 +445,7 @@ export function skillProficiencyGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const skillOptions = ctx.options?.skills ?? []
+  const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
 
   return [
     proficiencySourceField(skillSourceOptions, guard),
@@ -496,7 +502,7 @@ export const armorTrainingItemFormSchema = z.discriminatedUnion('proficiencySour
 export type ArmorTrainingItemForm = z.infer<typeof armorTrainingItemFormSchema>
 
 function armorTrainingPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): FormItem[] {
-  const armorOptions = ctx.options?.armor ?? []
+  const armorOptions = referenceArmorFieldOptions(ctx.options?.equipment)
 
   return [
     {
@@ -552,7 +558,7 @@ export function armorTrainingGrantItemFields(
   opts: ProficiencyGrantItemFieldsOptions = {},
 ): FormItem[] {
   const guard = opts.guardVisibility
-  const armorOptions = ctx.options?.armor ?? []
+  const armorOptions = referenceArmorFieldOptions(ctx.options?.equipment)
 
   return [
     proficiencySourceField(armorSourceOptions, guard),

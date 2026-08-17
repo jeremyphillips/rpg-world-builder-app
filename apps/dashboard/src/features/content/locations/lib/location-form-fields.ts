@@ -136,7 +136,7 @@ export function buildLocationFields(
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
-  const locationEntities = ctx.options?.locationEntities
+  const locationEntities = ctx.options?.locations?.visible
   const items: FormItem[] = []
 
   if (fixedCreate) {

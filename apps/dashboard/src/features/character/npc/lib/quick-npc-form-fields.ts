@@ -9,7 +9,7 @@ import {
   formatFieldMessage,
   getAlignmentLabel,
   isClassProgressionApplicable,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
@@ -206,7 +206,7 @@ function byLabel(left: FieldOption, right: FieldOption): number {
 export function buildQuickNpcContentOptions(
   context: CharacterBuildContext,
 ): QuickNpcContentOptions {
-  const available = resolveAvailableContent(context)
+  const available = resolvePlayableBuilderContent(context)
   const toContentOption = (entry: { id: string; name: string }): FieldOption => ({
     value: entry.id,
     label: entry.name,

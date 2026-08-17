@@ -19,7 +19,7 @@ import {
 
 import { useClasses } from '../../classes/hooks/use-classes'
 
-import { filterCampaignAvailableClasses } from '../../lib/campaign-access/filter-campaign-available-classes.lib'
+import { isContentPlayableFor } from '@rpg/contracts'
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/location-connected-party-character-options.lib'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import type { OrganizationMemberPickerCommit } from '../components/organization-member-picker-drawer.client'
@@ -262,7 +262,10 @@ export function useOrganizationMembersDetail(
       organization.memberClassAffinityIds.length > 0 && classesQuery.data
         ? {
             memberClassAffinityIds: organization.memberClassAffinityIds,
-            availableClasses: filterCampaignAvailableClasses(classesQuery.data),
+            playableClasses:
+              classesQuery.data?.filter((characterClass) =>
+                isContentPlayableFor(characterClass, { kind: 'npc' }),
+              ) ?? [],
           }
         : undefined,
     [classesQuery.data, organization.memberClassAffinityIds],

@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from 'react'
 import {
   characterBuilderStepSelectionMessages,
   formatFieldMessage,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
@@ -69,7 +69,7 @@ export function SpeciesStep({
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
   const [heritagePanelExpanded, setHeritagePanelExpanded] = useState(false)
 
-  const species = useMemo(() => resolveAvailableContent(context).species, [context])
+  const species = useMemo(() => resolvePlayableBuilderContent(context).species, [context])
 
   const selectedSpeciesId = draft.species.speciesId
   const selectedSpecies = useMemo(

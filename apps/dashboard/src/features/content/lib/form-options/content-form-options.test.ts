@@ -1,9 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
+import {
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  classHasSpellcasting,
+  isContentCampaignEligible,
+  isContentReferenceable,
+} from '@rpg/contracts'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { pickClass, pickEquipment, pickSkillProficiency, pickSpell } from '../fixtures/pick'
-import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
+import {
+  buildContentFormOptionSets,
+  referenceClassFieldOptions,
+  referenceEquipmentFieldOptions,
+  referenceSpellcastingClassFieldOptions,
+  toContentFieldOption,
+} from './content-form-options'
 
 describe('toContentFieldOption', () => {
   it('maps slug and name for system content', () => {
@@ -25,7 +36,7 @@ describe('toContentFieldOption', () => {
 })
 
 describe('buildContentFormOptionSets', () => {
-  it('maps classes, weapons, and spells and filters equipment to tools only', () => {
+  it('builds one visible catalog per type with derived purpose selectors', () => {
     const barbarian = pickClass('barbarian')
     const fighter = pickClass('fighter')
     const dagger = pickEquipment('dagger')
@@ -42,15 +53,12 @@ describe('buildContentFormOptionSets', () => {
       skills: [athletics],
     })
 
-    expect(options.classes).toEqual([
+    expect(options.classes.visible).toEqual([fighter, barbarian])
+    expect(referenceClassFieldOptions(options.classes)).toEqual([
       { value: 'barbarian', label: barbarian.name },
       { value: 'fighter', label: fighter.name },
     ])
-    expect(options.weapons).toEqual([
-      { value: 'dagger', label: dagger.name },
-      { value: 'longsword', label: longsword.name },
-    ])
-    expect(options.equipment).toEqual([
+    expect(referenceEquipmentFieldOptions(options.equipment)).toEqual([
       { value: 'dagger', label: dagger.name },
       { value: 'longsword', label: longsword.name },
       { value: 'thieves-tools', label: thievesTools.name },
@@ -60,17 +68,9 @@ describe('buildContentFormOptionSets', () => {
       dagger: 'simple',
       longsword: 'martial',
     })
-    expect(options.spells).toEqual([{ value: 'fire-bolt', label: fireBolt.name }])
-    expect(options.skills).toEqual([{ value: 'athletics', label: athletics.name }])
-    expect(options.tools).toEqual([{ value: 'thieves-tools', label: thievesTools.name }])
-    expect(options.magicItemBaseEquipment).toEqual([
-      { value: 'dagger', label: dagger.name },
-      { value: 'longsword', label: longsword.name },
-      { value: 'torch', label: torch.name },
-    ])
   })
 
-  it('filters spellcastingClasses to classes with a spellcasting block', () => {
+  it('filters spellcasting class field options to referenceable classes with spellcasting', () => {
     const fighter = pickClass('fighter')
     const wizard = pickClass('wizard')
     const patchedBarbarian = {
@@ -87,14 +87,14 @@ describe('buildContentFormOptionSets', () => {
       classes: [fighter, wizard, patchedBarbarian],
     })
 
-    expect(options.classes).toHaveLength(3)
-    expect(options.spellcastingClasses).toEqual([
+    expect(options.classes.visible).toHaveLength(3)
+    expect(referenceSpellcastingClassFieldOptions(options.classes)).toEqual([
       { value: 'barbarian', label: patchedBarbarian.name },
       { value: 'wizard', label: wizard.name },
     ])
   })
 
-  it('splits classEntities from campaignClassEntities by campaign availability', () => {
+  it('derives forCampaignUse from the visible class catalog', () => {
     const fighter = makeCharacterClass({ slug: 'fighter', name: 'Fighter' })
     const wizard = {
       ...makeCharacterClass({ slug: 'wizard', name: 'Wizard' }),
@@ -105,7 +105,11 @@ describe('buildContentFormOptionSets', () => {
       classes: [fighter, wizard],
     })
 
-    expect(options.classEntities).toEqual([fighter])
-    expect(options.campaignClassEntities).toEqual([fighter, wizard])
+    expect(options.classes.forCampaignUse()).toEqual([fighter])
+    expect(options.classes.visible).toEqual([fighter, wizard])
+    expect(options.classes.forReference()).toEqual([fighter, wizard])
+    expect(isContentCampaignEligible(fighter)).toBe(true)
+    expect(isContentReferenceable(wizard)).toBe(true)
+    expect(classHasSpellcasting(fighter)).toBe(false)
   })
 })

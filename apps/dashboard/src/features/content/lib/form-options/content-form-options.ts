@@ -1,21 +1,17 @@
 import { useMemo } from 'react'
 import {
-  classHasSpellcasting,
-  isArmorEquipment,
-  isMagicItemBaseEquipment,
+  buildContentPurposeSelectors,
+  isContentReferenceable,
   type CharacterClass,
-  type ContentSource,
-  type ContentTypeKey,
+  type ContentPurposeSelectors,
   type Equipment,
   type Feat,
-  isWeaponEquipment,
   type Location,
   type SkillProficiency,
   type Spell,
   type WeaponCategory,
+  isWeaponEquipment,
 } from '@rpg/contracts'
-import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOption } from '@rpg/ui'
-import type { FieldOption } from '@rpg/ui/form'
 
 import { useCampaignRules } from '@/features/campaign'
 import {
@@ -34,56 +30,42 @@ import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
 import {
-  filterCampaignAvailableClasses,
-  type CampaignAccessClassRow,
-} from '../campaign-access/filter-campaign-available-classes.lib'
-import { shouldPresentContentSource } from '../content-type-presentation'
-import {
   buildRichTextInternalLinkOptions,
   RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,
 } from './rich-text-link-options'
+import type { RichTextLinkPickerContentTypeOption, RichTextLinkPickerInternalOption } from '@rpg/ui'
+import type { FieldOption } from '@rpg/ui/form'
+
+export type { ContentPurposeSelectors } from '@rpg/contracts'
+export {
+  referenceArmorFieldOptions,
+  referenceClassFieldOptions,
+  referenceEquipmentFieldOptions,
+  referenceMagicItemBaseEquipmentFieldOptions,
+  referenceSkillFieldOptions,
+  referenceSpellcastingClassFieldOptions,
+  referenceSpellFieldOptions,
+  referenceToolFieldOptions,
+  referenceWeaponFieldOptions,
+  toContentFieldOption,
+  toSortedContentFieldOptions,
+} from './content-field-option.lib'
 
 export interface ContentFormOptionSets {
-  classes: FieldOption[]
-  /**
-   * Classes with a `spellcasting` block on the campaign-resolved catalog. Used by
-   * the spell form class combobox. On edit, stale selected slugs that no longer
-   * qualify are not merged here — see spells feature README (orphan union gap).
-   */
-  spellcastingClasses: FieldOption[]
-  weapons: FieldOption[]
-  /** Campaign-resolved armor equipment, sorted by label. */
-  armor: FieldOption[]
-  /** All campaign-resolved equipment (weapons, armor, tools, gear, …), sorted by label. */
-  equipment: FieldOption[]
-  /** Full equipment entities for authoring-time pool expansion. */
-  equipmentEntities?: Equipment[]
-  /** Campaign-available class entities for id-valued authoring fields. */
-  classEntities?: CharacterClass[]
-  /**
-   * Full campaign class catalog for orphan reference resolution. When omitted,
-   * falls back to `classEntities` (available rows only).
-   */
-  campaignClassEntities?: CharacterClass[]
+  classes: ContentPurposeSelectors<CharacterClass>
+  spells: ContentPurposeSelectors<Spell>
+  feats: ContentPurposeSelectors<Feat>
+  skills: ContentPurposeSelectors<SkillProficiency>
+  equipment: ContentPurposeSelectors<Equipment>
+  locations: ContentPurposeSelectors<Location>
   /** Eligible tool proficiency choices for starting-equipment linked grants. */
   proficiencyChoiceTargets?: FieldOption[]
-  spells: FieldOption[]
-  feats: FieldOption[]
-  skills: FieldOption[]
-  tools: FieldOption[]
-  /** Weapons, armor, and adventuring gear eligible as a magic item base. */
-  magicItemBaseEquipment: FieldOption[]
   weaponCategoryBySlug: Readonly<Partial<Record<string, WeaponCategory>>>
   /** Internal content targets shown in rich-text link pickers. */
   richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
   /** Content type filters shown in rich-text link pickers. */
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
-  /** Campaign locations for parent pickers and hierarchy-aware forms. */
-  locations: FieldOption[]
-  locationEntities?: Location[]
 }
-
-const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
 
 interface QueryState {
   isPending: boolean
@@ -145,44 +127,11 @@ function useContentFormVocabulary(campaignId: string | undefined) {
   }
 }
 
-interface ContentOptionEntity {
-  slug: string
-  name: string
-  source: ContentSource
-}
-
-/** Maps a catalog entity to a combobox option (slug value, name label). */
-export function toContentFieldOption(
-  entity: ContentOptionEntity,
-  contentType: ContentTypeKey,
-): FieldOption {
-  return {
-    value: entity.slug,
-    label: entity.name,
-    ...(shouldPresentContentSource(contentType) && entity.source === 'homebrew'
-      ? { description: HOMEBREW_OPTION_DESCRIPTION }
-      : {}),
-  }
-}
-
-function sortFieldOptions(options: FieldOption[]): FieldOption[] {
-  return [...options].sort((a, b) => a.label.localeCompare(b.label))
-}
-
 function buildWeaponCategoryBySlug(
   equipment: Equipment[] | undefined,
 ): ContentFormOptionSets['weaponCategoryBySlug'] {
   return Object.fromEntries(
     equipment?.filter(isWeaponEquipment).map((weapon) => [weapon.slug, weapon.category]) ?? [],
-  )
-}
-
-function toSortedContentFieldOptions<T extends ContentOptionEntity>(
-  entities: readonly T[] | undefined,
-  contentType: ContentTypeKey,
-): FieldOption[] {
-  return sortFieldOptions(
-    entities?.map((entity) => toContentFieldOption(entity, contentType)) ?? [],
   )
 }
 
@@ -207,52 +156,32 @@ function buildRichTextLinkOptionSets(input: {
   }
 }
 
-function buildLocationFieldOptions(locations: Location[] | undefined): FieldOption[] {
-  return sortFieldOptions(
-    locations?.map((location) => ({ value: location.id, label: location.name })) ?? [],
-  )
-}
-
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
-  classes?: readonly CampaignAccessClassRow[]
+  classes?: readonly CharacterClass[]
   spells?: Spell[]
   feats?: Feat[]
   skills?: SkillProficiency[]
   equipment?: Equipment[]
   locations?: Location[]
 }): ContentFormOptionSets {
-  const catalogClasses = input.classes ?? []
-  const availableClasses = filterCampaignAvailableClasses(catalogClasses)
+  const referenceSpells = (input.spells ?? []).filter(isContentReferenceable)
+  const referenceFeats = (input.feats ?? []).filter(isContentReferenceable)
 
   return {
-    classes: toSortedContentFieldOptions(catalogClasses, 'classes'),
-    spellcastingClasses: toSortedContentFieldOptions(
-      catalogClasses.filter(classHasSpellcasting),
-      'classes',
-    ),
-    weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment), 'equipment'),
-    armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment), 'equipment'),
-    equipment: toSortedContentFieldOptions(input.equipment, 'equipment'),
-    equipmentEntities: input.equipment,
-    classEntities: availableClasses,
-    campaignClassEntities: [...catalogClasses],
-    spells: toSortedContentFieldOptions(input.spells, 'spells'),
-    feats: toSortedContentFieldOptions(input.feats, 'feats'),
-    skills: toSortedContentFieldOptions(input.skills, 'skill-proficiencies'),
-    tools: toSortedContentFieldOptions(
-      input.equipment?.filter((item) => item.kind === 'tool'),
-      'equipment',
-    ),
-    magicItemBaseEquipment: toSortedContentFieldOptions(
-      input.equipment?.filter(isMagicItemBaseEquipment),
-      'equipment',
-    ),
+    classes: buildContentPurposeSelectors(input.classes ?? []),
+    spells: buildContentPurposeSelectors(input.spells ?? []),
+    feats: buildContentPurposeSelectors(input.feats ?? []),
+    skills: buildContentPurposeSelectors(input.skills ?? []),
+    equipment: buildContentPurposeSelectors(input.equipment ?? []),
+    locations: buildContentPurposeSelectors(input.locations ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
-    locations: buildLocationFieldOptions(input.locations),
-    locationEntities: input.locations,
-    ...buildRichTextLinkOptionSets(input),
+    ...buildRichTextLinkOptionSets({
+      campaignId: input.campaignId,
+      spells: referenceSpells,
+      feats: referenceFeats,
+    }),
   }
 }
 

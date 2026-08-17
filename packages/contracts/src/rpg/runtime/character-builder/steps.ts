@@ -13,7 +13,7 @@ import { isClassProgressionApplicable } from './progression/character-level-poli
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft/draft'
-import { resolveAvailableContent } from './preview/resolve-available-content'
+import { resolvePlayableBuilderContent } from './preview/resolve-playable-builder-content'
 import {
   CHARACTER_BUILDER_STEP_IDS,
   type CharacterBuilderStepId,
@@ -71,7 +71,7 @@ const BUILDER_STEP_METADATA = {
     description: 'Choose an organization connected to your character',
     isApplicable: (context, draft) =>
       draft.connections.organizations.length > 0 ||
-      resolveAvailableContent(context).organizations.length > 0,
+      resolvePlayableBuilderContent(context).organizations.length > 0,
   },
   species: {
     label: getContentTypeTerm('species').label,

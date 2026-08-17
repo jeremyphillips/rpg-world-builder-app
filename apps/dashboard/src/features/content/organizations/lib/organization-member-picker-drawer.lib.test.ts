@@ -57,7 +57,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
         }),
         {
           memberClassAffinityIds: [ROGUE_CLASS_ID],
-          availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+          playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
         },
       ),
     ).toBe(true)
@@ -74,7 +74,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
         }),
         {
           memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
-          availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+          playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
         },
       ),
     ).toBe(false)
@@ -88,7 +88,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
         }),
         {
           memberClassAffinityIds: ['srd-cc-5.2.1:wizard'],
-          availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES.filter(
+          playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES.filter(
             (characterClass) => characterClass.id !== 'srd-cc-5.2.1:wizard',
           ),
         },
@@ -132,7 +132,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
     const sorted = filterAndSortOrganizationMemberPickerCandidates(items, {
       searchQuery: '',
       memberClassAffinityIds: [ROGUE_CLASS_ID],
-      availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+      playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
     })
 
     expect(sorted.map((item) => item.name)).toEqual(['Street Runner', 'Brock'])
@@ -159,7 +159,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
       filterAndSortOrganizationMemberPickerCandidates(items, {
         searchQuery: '',
         memberClassAffinityIds: [ROGUE_CLASS_ID],
-        availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
       }).map((item) => item.characterType),
     ).toEqual(['pc', 'npc'])
   })
@@ -221,7 +221,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
       filterAndSortOrganizationMemberPickerCandidates(items, {
         searchQuery: 'Brock',
         memberClassAffinityIds: [ROGUE_CLASS_ID],
-        availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
       }).map((item) => item.name),
     ).toEqual(['Brock Rogue', 'Brock Fighter'])
   })

@@ -2,7 +2,7 @@ import {
   getContentTypeTerm,
   indexCharacterBuildCatalog,
   isClassProgressionApplicable,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   resolveCharacterLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
@@ -64,11 +64,11 @@ export function buildQuickNpcCreateSetupSets(args: {
   memberClassAffinityIds?: readonly string[]
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const availableClasses = resolveAvailableContent(args.context).classes
+  const playableClasses = resolvePlayableBuilderContent(args.context).classes
   const classPresentation = buildQuickNpcClassRadioCardPresentation({
     classOptions,
     memberClassAffinityIds: args.memberClassAffinityIds,
-    availableClasses,
+    playableClasses,
   })
   const levelConstraints = resolveCharacterLevelConstraints({
     characterKind: args.context.characterKind,

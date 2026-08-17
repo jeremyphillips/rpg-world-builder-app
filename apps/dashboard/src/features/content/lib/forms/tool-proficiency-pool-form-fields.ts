@@ -7,6 +7,7 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from './content-form-registry'
+import { referenceToolFieldOptions } from '../form-options/content-field-option.lib'
 import { TOOL_PROFICIENCY_POOL_KIND_LABELS } from './grants/proficiency-grant-form-labels'
 
 export const TOOL_PROFICIENCY_POOL_SOURCES = ['explicit', 'filtered', 'any'] as const
@@ -105,7 +106,7 @@ export function toolProficiencyPoolFormFields(
     chooseDigits = 1,
     sentenceName = names.choose,
   } = options
-  const toolOptions = ctx.options?.tools ?? []
+  const toolOptions = referenceToolFieldOptions(ctx.options?.equipment)
 
   const poolVisibility = proficiencySourceGuard ? withGuard(proficiencySourceGuard, guard) : guard
 

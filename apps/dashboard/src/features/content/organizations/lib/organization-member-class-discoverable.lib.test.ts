@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { buildContentPurposeSelectors, DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { pickClass } from '@/test/fixtures/pick'
 
@@ -10,10 +11,13 @@ describe('resolveDiscoverableOrganizationMemberClasses parity', () => {
   it('matches selectable chip option values excluding orphan rows', () => {
     const fighter = pickClass('fighter')
     const rogue = pickClass('rogue')
+    const wizard = {
+      ...pickClass('wizard'),
+      campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+    }
     const ctx = makeContentFormCtx({
       options: {
-        classEntities: [fighter, rogue],
-        campaignClassEntities: [fighter, rogue, pickClass('wizard')],
+        classes: buildContentPurposeSelectors([fighter, rogue, wizard]),
       },
     })
 
@@ -33,11 +37,13 @@ describe('resolveDiscoverableOrganizationMemberClasses parity', () => {
 describe('buildMemberClassAffinityChipOptions orphan labels', () => {
   it('labels campaign-catalog-only ids as unavailable and missing ids as unresolved', () => {
     const fighter = pickClass('fighter')
-    const wizard = pickClass('wizard')
+    const wizard = {
+      ...pickClass('wizard'),
+      campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+    }
     const ctx = makeContentFormCtx({
       options: {
-        classEntities: [fighter],
-        campaignClassEntities: [fighter, wizard],
+        classes: buildContentPurposeSelectors([fighter, wizard]),
       },
     })
 

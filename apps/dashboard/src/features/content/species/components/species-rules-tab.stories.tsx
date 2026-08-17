@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
-import { defaultMulticlassingRules } from '@rpg/contracts'
+import { defaultMulticlassingRules, buildContentPurposeSelectors } from '@rpg/contracts'
+
+import { pickClass } from '../../lib/fixtures/pick'
 
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
@@ -75,10 +77,7 @@ export const Editable: Story = {
       formCtx={{
         campaignId: 'camp_1',
         options: {
-          classes: [
-            { value: 'fighter', label: 'Fighter' },
-            { value: 'wizard', label: 'Wizard' },
-          ],
+          classes: buildContentPurposeSelectors([pickClass('fighter'), pickClass('wizard')]),
         },
         campaignRules: {
           ...defaultCampaignRules(),

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 
 import {
   getOrganizationDomainLabel,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterOrganizationConnection,
@@ -47,7 +47,7 @@ export function ConnectionsStep({
 }: ConnectionsStepProps) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const availableOrganizations = useMemo(
-    () => resolveAvailableContent(context).organizations,
+    () => resolvePlayableBuilderContent(context).organizations,
     [context],
   )
   const memberships = draft.connections.organizations

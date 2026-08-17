@@ -23,7 +23,7 @@ export type EquipmentPickerPurchaseActionState = {
 export type EquipmentPickerAvailabilityOptions = {
   budget?: EquipmentBudgetSummary
   /**
-   * When equipment-step picker universe is wired through `resolveAvailableContent`,
+   * When equipment-step picker universe is wired through `resolvePlayableBuilderContent`,
    * rows in the list pass `true`. Omit only when content wiring is inactive.
    */
   contentAvailable?: boolean

@@ -5,6 +5,7 @@ import { type FormItem } from '@rpg/ui/form'
 import { vocabularyHubLabel } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import { referenceSkillFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import {
   CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES,
   TOOL_PROFICIENCY_POOL_SOURCES,
@@ -68,7 +69,7 @@ export type CharacterCreationProficienciesForm = z.infer<
 
 /** Inline choose count + skill chips for the first character-creation skill choice. */
 export function characterCreationSkillChoiceFields(ctx: ContentFormCtx): FormItem[] {
-  const skillOptions = ctx.options?.skills ?? []
+  const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
   const skillCount = skillOptions.length
 
   return [

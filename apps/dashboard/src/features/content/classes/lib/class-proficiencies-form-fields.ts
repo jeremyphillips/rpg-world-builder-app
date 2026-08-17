@@ -21,6 +21,11 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import {
+  referenceSkillFieldOptions,
+  referenceToolFieldOptions,
+  referenceWeaponFieldOptions,
+} from '../../lib/form-options/content-field-option.lib'
 import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
@@ -83,7 +88,7 @@ export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
 })
 
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
-  const skillOptions = ctx.options?.skills ?? []
+  const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
 
   return [
     {
@@ -130,7 +135,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           label: 'Weapon proficiency mode',
           hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
           categoryOptions: weaponCategoryOptions,
-          itemOptions: ctx.options?.weapons ?? [],
+          itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
           categoriesLabel: 'Weapon proficiencies',
           itemsLabel: 'Weapon choices',
           categoriesHint: WEAPON_PROFICIENCIES_HINT,
@@ -168,7 +173,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
               name: 'proficiencies.tools.items',
               label: 'Specific tools',
               multiple: true,
-              options: ctx.options?.tools ?? [],
+              options: referenceToolFieldOptions(ctx.options?.equipment),
               placeholder: 'Choose tools…',
               width: 'xl',
             },

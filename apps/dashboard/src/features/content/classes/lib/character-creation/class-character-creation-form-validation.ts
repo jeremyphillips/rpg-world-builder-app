@@ -33,7 +33,7 @@ function buildEligibleProficiencyChoiceIds(
   proficiencies: CharacterCreationProficienciesForm | undefined,
   formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
 ): ReadonlySet<string> {
-  const equipment = formCtx?.options?.equipmentEntities ?? []
+  const equipment = formCtx?.options?.equipment?.visible ?? []
   if (!equipment.length) return new Set()
 
   const characterCreationProficiencies =

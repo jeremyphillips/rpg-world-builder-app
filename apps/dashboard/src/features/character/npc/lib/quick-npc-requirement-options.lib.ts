@@ -4,7 +4,7 @@ import {
   indexCharacterBuildCatalog,
   listReachableSpellOptions,
   normalizeAutomaticNpcBuildConstraints,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type EquipmentPickerItem,
 } from '@rpg/contracts'
@@ -54,7 +54,7 @@ export function resolveQuickNpcWeaponRequirementOptions(args: {
   const characterClass = catalogIndex.classes.get(args.setup.classId)
   if (!characterClass) return []
 
-  const equipment = resolveAvailableContent(args.context).equipment.filter(
+  const equipment = resolvePlayableBuilderContent(args.context).equipment.filter(
     (row) => row.kind === 'weapon',
   )
   const draft = buildMinimalCharacterBuilderDraftForRecommendations({

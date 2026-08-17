@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
+
+import { pickEquipment } from '../../fixtures/pick'
 
 import {
   armorTrainingChoiceFormSchema,
@@ -305,7 +308,9 @@ describe('proficiency grant titles and summaries', () => {
 
 describe('weaponProficiencyGrantItemFields', () => {
   it('uses Proficiency source for the mode select', () => {
-    const fields = weaponProficiencyGrantItemFields({ options: { weapons: [] } })
+    const fields = weaponProficiencyGrantItemFields({
+      options: { equipment: buildContentPurposeSelectors([]) },
+    })
     const proficiencySource = fields.find(
       (field) => 'name' in field && field.name === 'proficiencySource',
     )
@@ -313,7 +318,9 @@ describe('weaponProficiencyGrantItemFields', () => {
   })
 
   it('embeds pool kind in the choice inline sentence', () => {
-    const fields = weaponProficiencyGrantItemFields({ options: { weapons: [] } })
+    const fields = weaponProficiencyGrantItemFields({
+      options: { equipment: buildContentPurposeSelectors([]) },
+    })
     const chooseField = fields.find(
       (field) => 'name' in field && field.name === WEAPON_PROFICIENCY_POOL_SENTENCE_FIELD_NAME,
     )
@@ -334,7 +341,7 @@ describe('weaponProficiencyGrantItemFields', () => {
 
   it('shows only weapon slug combobox in specific mode', () => {
     const fields = weaponProficiencyGrantItemFields({
-      options: { weapons: [{ value: 'longsword', label: 'Longsword' }] },
+      options: { equipment: buildContentPurposeSelectors([pickEquipment('longsword')]) },
     })
     const slugField = fields.find(
       (field) => 'name' in field && field.name === 'weaponProficiencySlugs',
@@ -351,7 +358,7 @@ describe('weaponProficiencyGrantItemFields', () => {
 
   it('uses armor options for fixed armor slug comboboxes', () => {
     const fields = armorTrainingGrantItemFields({
-      options: { armor: [{ value: 'chain-mail', label: 'Chain Mail' }] },
+      options: { equipment: buildContentPurposeSelectors([pickEquipment('chain-mail')]) },
     })
     const armorField = fields.find(
       (field) => 'name' in field && field.name === 'armorTrainingSlugs',
@@ -373,7 +380,7 @@ describe('weaponProficiencyGrantItemFields', () => {
 
   it('uses tool options for fixed tool slug comboboxes', () => {
     const fields = toolProficiencyGrantItemFields({
-      options: { tools: [{ value: 'thieves-tools', label: "Thieves' Tools" }] },
+      options: { equipment: buildContentPurposeSelectors([pickEquipment('thieves-tools')]) },
     })
     const toolField = fields.find(
       (field) => 'name' in field && field.name === 'toolProficiencySlugs',

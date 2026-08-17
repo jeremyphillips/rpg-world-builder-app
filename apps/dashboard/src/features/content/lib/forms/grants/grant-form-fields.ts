@@ -27,6 +27,8 @@ import {
   type MovementOperation,
   type SenseId,
   type UsageFrequency,
+  isArmorEquipment,
+  isWeaponEquipment,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import {
@@ -53,6 +55,10 @@ import {
 
 import type { ContentFormCtx } from '../content-form-registry'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
+import {
+  referenceEquipmentFieldOptions,
+  toSortedContentFieldOptions,
+} from '../../form-options/content-field-option.lib'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
 import {
   equipmentGrantItemFields,
@@ -566,8 +572,8 @@ export function grantItemFields<T extends string>(
   _labels: Record<T, string>,
   ctx: ContentFormCtx,
 ): FormItem[] {
-  const spellOptions = ctx.options?.spells ?? []
-  const featOptions = ctx.options?.feats ?? []
+  const spellOptions = toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells')
+  const featOptions = toSortedContentFieldOptions(ctx.options?.feats?.forReference(), 'feats')
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
   const languageOptions = buildActiveLanguageFieldOptions(ctx.languageVocabulary)
@@ -746,16 +752,28 @@ function buildGrantRowHeaderContext(
   labels: Record<string, string>,
   ctx: ContentFormCtx,
 ): GrantRowHeaderContext {
-  const options = ctx.options ?? {}
+  const referenceEquipment = ctx.options?.equipment?.forReference() ?? []
 
   return {
     rowLabels: labels,
-    equipmentOptions: options.equipment ?? [],
-    weaponOptions: options.weapons ?? [],
-    toolOptions: options.tools ?? [],
-    armorOptions: options.armor ?? [],
-    skillOptions: options.skills ?? [],
-    spellOptions: options.spells ?? [],
+    equipmentOptions: referenceEquipmentFieldOptions(ctx.options?.equipment),
+    weaponOptions: toSortedContentFieldOptions(
+      referenceEquipment.filter(isWeaponEquipment),
+      'equipment',
+    ),
+    toolOptions: toSortedContentFieldOptions(
+      referenceEquipment.filter((item) => item.kind === 'tool'),
+      'equipment',
+    ),
+    armorOptions: toSortedContentFieldOptions(
+      referenceEquipment.filter(isArmorEquipment),
+      'equipment',
+    ),
+    skillOptions: toSortedContentFieldOptions(
+      ctx.options?.skills?.forReference(),
+      'skill-proficiencies',
+    ),
+    spellOptions: toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells'),
   }
 }
 

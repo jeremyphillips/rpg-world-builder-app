@@ -1,28 +1,28 @@
 import type { CharacterClass } from '../../content/classes/class'
 
-function availableClassIds(availableClasses: readonly CharacterClass[]): Set<string> {
-  return new Set(availableClasses.map((characterClass) => characterClass.id))
+function playableClassIds(playableClasses: readonly CharacterClass[]): Set<string> {
+  return new Set(playableClasses.map((characterClass) => characterClass.id))
 }
 
-/** Stored affinity ids intersected with available classes; order follows persisted affinities. */
+/** Stored affinity ids intersected with playable classes; order follows persisted affinities. */
 export function resolveOrganizationMemberClassRecommendationIds(input: {
   memberClassAffinityIds: readonly string[]
-  availableClasses: readonly CharacterClass[]
+  playableClasses: readonly CharacterClass[]
 }): string[] {
-  const availableIds = availableClassIds(input.availableClasses)
-  return input.memberClassAffinityIds.filter((classId) => availableIds.has(classId))
+  const playableIds = playableClassIds(input.playableClasses)
+  return input.memberClassAffinityIds.filter((classId) => playableIds.has(classId))
 }
 
-/** Stored affinity ids intersected with available classes; order follows persisted affinities. */
+/** Stored affinity ids intersected with playable classes; order follows persisted affinities. */
 export function resolveOrganizationMemberClassRecommendations(input: {
   memberClassAffinityIds: readonly string[]
-  availableClasses: readonly CharacterClass[]
+  playableClasses: readonly CharacterClass[]
 }): CharacterClass[] {
-  const availableById = new Map(
-    input.availableClasses.map((characterClass) => [characterClass.id, characterClass]),
+  const playableById = new Map(
+    input.playableClasses.map((characterClass) => [characterClass.id, characterClass]),
   )
   return resolveOrganizationMemberClassRecommendationIds(input)
-    .map((classId) => availableById.get(classId))
+    .map((classId) => playableById.get(classId))
     .filter((characterClass): characterClass is CharacterClass => characterClass !== undefined)
 }
 
@@ -30,12 +30,12 @@ export function resolveOrganizationMemberClassRecommendations(input: {
 export function characterMatchesOrganizationMemberClassRecommendations(input: {
   classIds: readonly string[]
   memberClassAffinityIds: readonly string[]
-  availableClasses: readonly CharacterClass[]
+  playableClasses: readonly CharacterClass[]
 }): boolean {
   const recommendedIds = new Set(
     resolveOrganizationMemberClassRecommendationIds({
       memberClassAffinityIds: input.memberClassAffinityIds,
-      availableClasses: input.availableClasses,
+      playableClasses: input.playableClasses,
     }),
   )
   return input.classIds.some((classId) => recommendedIds.has(classId))

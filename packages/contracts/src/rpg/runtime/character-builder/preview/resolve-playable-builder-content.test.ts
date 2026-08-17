@@ -12,14 +12,18 @@ import { resolveCharacterOwnershipTarget } from '../../character-acquisition'
 import type { CharacterBuildContext } from '../context'
 import { DEFAULT_ABILITY_GENERATION_RULES } from '../ability/ability-generation'
 import { startingWealthSeed } from '../test-fixtures'
-import { resolveAvailableContent } from './resolve-available-content'
+import { resolvePlayableBuilderContent } from './resolve-playable-builder-content'
 
 const timestamps = {
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
 } as const
 
-function makeStoredClass(slug: string, name: string): ClassStored {
+function makeStoredClass(
+  slug: string,
+  name: string,
+  overrides: Partial<ClassStored> = {},
+): ClassStored {
   return {
     id: `srd-cc-5.2.1:${slug}`,
     slug,
@@ -38,6 +42,7 @@ function makeStoredClass(slug: string, name: string): ClassStored {
       skills: { categories: [], items: [] },
     },
     features: [],
+    ...overrides,
   }
 }
 
@@ -152,7 +157,7 @@ function makeContext(
   }
 }
 
-describe('resolveAvailableContent', () => {
+describe('resolvePlayableBuilderContent', () => {
   it('filters species by resolved creatureTypePolicy (default humanoid only)', () => {
     const context = makeContext({
       catalog: {
@@ -166,7 +171,7 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
     expect(result.species.map((entry) => entry.slug)).toEqual(['dwarf'])
   })
@@ -185,18 +190,18 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
     expect(result.species.map((entry) => entry.slug).sort()).toEqual(['dwarf', 'pixie'])
   })
 
-  it('includes all classes from the catalog', () => {
+  it('excludes draft classes from the playable universe', () => {
     const fighter = makeStoredClass('fighter', 'Fighter')
-    const wizard = makeStoredClass('wizard', 'Wizard')
+    const draftPaladin = makeStoredClass('paladin', 'Paladin', { status: 'draft' })
     const context = makeContext({
       catalog: {
         species: [],
-        classes: [fighter, wizard],
+        classes: [fighter, draftPaladin],
         spells: [],
         equipment: [],
         skillProficiencies: [],
@@ -205,12 +210,12 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
-    expect(result.classes.map((entry) => entry.slug).sort()).toEqual(['fighter', 'wizard'])
+    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
   })
 
-  it('filters spells to those learnable by available classes', () => {
+  it('filters spells to those learnable by playable classes', () => {
     const fighter = makeStoredClass('fighter', 'Fighter')
     const wizard = makeStoredClass('wizard', 'Wizard')
     const context = makeContext({
@@ -228,13 +233,43 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
     expect(result.spells.map((entry) => entry.slug).sort()).toEqual(['fire-bolt', 'true-strike'])
   })
 
-  it('filters catalog rows by catalogViewer when provided', () => {
-    const visibleClass = {
+  it('omits unavailable classes from the playable universe', () => {
+    const fighter = makeStoredClass('fighter', 'Fighter')
+    const unavailablePaladin = {
+      ...makeStoredClass('paladin', 'Paladin'),
+      campaignAccess: {
+        available: false,
+        visibilityMode: 'all_players' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'none' as const,
+      },
+    }
+
+    const context = makeContext({
+      catalog: {
+        species: [],
+        classes: [fighter, unavailablePaladin],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+        organizations: [],
+        languages: [],
+      },
+    })
+
+    const result = resolvePlayableBuilderContent(context)
+
+    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+  })
+
+  it('allows dm_only classes for NPC play actor and omits them for PC play actor', () => {
+    const fighter = {
       ...makeStoredClass('fighter', 'Fighter'),
       campaignAccess: {
         available: true,
@@ -244,8 +279,8 @@ describe('resolveAvailableContent', () => {
         effectiveAudience: 'all_players' as const,
       },
     }
-    const hiddenClass = {
-      ...makeStoredClass('wizard', 'Wizard'),
+    const dmOnlyPaladin = {
+      ...makeStoredClass('paladin', 'Paladin'),
       campaignAccess: {
         available: true,
         visibilityMode: 'dm_only' as const,
@@ -255,11 +290,33 @@ describe('resolveAvailableContent', () => {
       },
     }
 
+    const catalog = {
+      species: [],
+      classes: [fighter, dmOnlyPaladin],
+      spells: [],
+      equipment: [],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    }
+
+    const npcResult = resolvePlayableBuilderContent(
+      makeContext({ playActor: { kind: 'npc' }, catalog }),
+    )
+    const pcResult = resolvePlayableBuilderContent(
+      makeContext({ playActor: { kind: 'pc', characterId: 'pc-1' }, catalog }),
+    )
+
+    expect(npcResult.classes.map((entry) => entry.slug).sort()).toEqual(['fighter', 'paladin'])
+    expect(pcResult.classes.map((entry) => entry.slug)).toEqual(['fighter'])
+  })
+
+  it('filters organizations by play actor visibility', () => {
     const context = makeContext({
-      catalogViewer: { kind: 'pc', characterIds: ['pc-1'] },
+      playActor: { kind: 'pc', characterId: 'pc-1' },
       catalog: {
         species: [],
-        classes: [visibleClass, hiddenClass],
+        classes: [],
         spells: [],
         equipment: [],
         skillProficiencies: [],
@@ -271,13 +328,12 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
-    expect(result.classes.map((entry) => entry.slug)).toEqual(['fighter'])
     expect(result.organizations.map((entry) => entry.slug)).toEqual(['visible-guild'])
   })
 
-  it('passes equipment through unchanged', () => {
+  it('passes playable equipment through unchanged aside from eligibility filtering', () => {
     const equipment = equipmentSchema.parse({
       id: 'srd-cc-5.2.1:longsword',
       slug: 'longsword',
@@ -309,7 +365,7 @@ describe('resolveAvailableContent', () => {
       },
     })
 
-    const result = resolveAvailableContent(context)
+    const result = resolvePlayableBuilderContent(context)
 
     expect(result.equipment).toEqual([equipment])
   })

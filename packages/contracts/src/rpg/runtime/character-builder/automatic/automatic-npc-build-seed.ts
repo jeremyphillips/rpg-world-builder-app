@@ -5,7 +5,7 @@ import { alignmentSchema } from '../../../vocab/alignment'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
-import { resolveAvailableContent } from '../preview/resolve-available-content'
+import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
@@ -38,7 +38,7 @@ export function validateAutomaticNpcBuildSeed(
   context: CharacterBuildContext,
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
-  const available = resolveAvailableContent(context)
+  const available = resolvePlayableBuilderContent(context)
 
   if (!available.species.some((entry) => entry.id === seed.speciesId)) {
     issues.push(
