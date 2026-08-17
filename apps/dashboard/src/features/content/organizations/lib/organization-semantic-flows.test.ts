@@ -4,6 +4,7 @@ import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
   applyOrganizationAuthoringPreset,
+  getOrganizationAuthoringPresetRecommendedPractices,
   resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FieldOption, FormItem } from '@rpg/ui/form'
@@ -17,6 +18,10 @@ import {
   type OrganizationFormValues,
 } from '../../lib/forms/organization-form-projection'
 import { presetMatchesIntentionalQuery } from './__tests__/organization-preset-intentional-matcher'
+import {
+  readOrganizationPracticeRecommendationIds,
+  registerOrganizationPracticeRecommendationReader,
+} from './organization-practice-recommendation-reader'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
   const fields: Array<{ name: string; item: FormItem }> = []
@@ -203,5 +208,36 @@ describe('initial Organization semantic flows', () => {
 
     const assassinsOrder = options.find((option) => option.value === 'assassins_order')
     expect(optionMatchesQuery(assassinsOrder!, "assassins' order")).toBe(true)
+  })
+
+  it('boosts thieves guild recommendations in the empty-query practices panel', () => {
+    registerOrganizationPracticeRecommendationReader(() =>
+      getOrganizationAuthoringPresetRecommendedPractices('thieves_guild'),
+    )
+
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const practicesField = fields.find(({ name }) => name === 'practices')?.item
+    expect(practicesField && 'resolveFilteredOptions' in practicesField).toBe(true)
+
+    const ordered =
+      practicesField &&
+      'resolveFilteredOptions' in practicesField &&
+      typeof practicesField.resolveFilteredOptions === 'function' &&
+      'options' in practicesField &&
+      Array.isArray(practicesField.options)
+        ? practicesField.resolveFilteredOptions(practicesField.options, '', ['theft'])
+        : []
+
+    expect(ordered.slice(1, 5).map((option) => option.value)).toEqual([
+      'fencing',
+      'extortion',
+      'smuggling',
+      'investigation',
+    ])
+    expect(readOrganizationPracticeRecommendationIds()).toEqual(
+      getOrganizationAuthoringPresetRecommendedPractices('thieves_guild'),
+    )
+
+    registerOrganizationPracticeRecommendationReader(() => [])
   })
 })

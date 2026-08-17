@@ -32,6 +32,8 @@ import type { ContentFormCtx, ContentFormInputCtx } from './content-form-registr
 import { draftOptionalSelect } from './draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
 import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
+import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/organization-practice-combobox-ranking'
+import { readOrganizationPracticeRecommendationIds } from '../../organizations/lib/organization-practice-recommendation-reader'
 
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,
@@ -177,6 +179,13 @@ export function buildOrganizationFields(
       options: organizationPracticeOptions,
       multiple: true,
       placeholder: organizationPracticeFieldCopy.placeholder,
+      resolveFilteredOptions: (options, query, selected) =>
+        rankOrganizationPracticeComboboxOptions(
+          options,
+          query,
+          selected,
+          readOrganizationPracticeRecommendationIds(),
+        ),
     },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )

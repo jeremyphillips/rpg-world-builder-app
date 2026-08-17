@@ -53,6 +53,19 @@ Organization familiar starting points (`organization-form-projection.ts`):
 - `buildOrganizationFormValueSyncs` applies a preset once, clears
   `authoringPresetId`, writes both `functions` and `practices`, and **never** seeds
   `name`. Authors keep the real name.
+- Every preset also defines required `recommendedPractices` in contracts — authoring
+  guidance only, never auto-applied or persisted. Curate each preset with
+  **apply** (goes in `practices`), **recommend** (ordered `recommendedPractices`),
+  or **omit** (neither). `practices ∩ recommendedPractices` must stay empty.
+- Create flows mount `OrganizationAuthoringProvider` plus
+  `OrganizationAuthoringPresetBridge` inside the `<Form>`. The bridge reacts only to
+  positive `authoringPresetId` selections; the sync-driven clear after apply is a
+  no-op so recommendations survive for the session. `clearPracticeRecommendations()`
+  is for explicit custom-start resets only.
+- The Practices combobox `resolveFilteredOptions` reads live recommendations from the
+  provider-backed reader at invocation time — field configs stay static. Empty query:
+  selected values, then recommended ids in preset order, then registry tail. Typed
+  query: `rankOptionsByQuery` only (recommendation-neutral).
 - Reused unchanged under the embedded building-org composer prefix
   (`operatorOrganization.*`).
 - **Coverage regression (test-only):** the frozen 150-row corpus fixture

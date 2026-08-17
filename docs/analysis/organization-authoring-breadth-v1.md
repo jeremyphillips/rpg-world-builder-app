@@ -261,3 +261,9 @@ Bureaucracy-as-noun, diocese, pantheon clergy, shrine keepers as org type, spice
 2. Add 30 presets; patch existing recipes; exclusive label ownership guard. **Done**
 3. Family map UI-only; coverage fixture outcome flips; durable semantic-flow tests only. **Done**
 4. Pause only if a Domain/Form/Function change is required (not expected). **No blockers**
+
+### Practice recommendation ranking (implemented)
+
+- Contracts: required `recommendedPractices` on every Familiar type; `applyOrganizationAuthoringPreset` unchanged.
+- Dashboard: ephemeral `OrganizationAuthoringProvider` on create + embedded building-org create only; Practices combobox empty-query boost via `organization-practice-combobox-ranking.ts`.
+- Edit/reload: no recommendations (provider not mounted).

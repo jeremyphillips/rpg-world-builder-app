@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   applyOrganizationAuthoringPreset,
+  getOrganizationAuthoringPresetRecommendedPractices,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
   type OrganizationAuthoringPresetId,
@@ -53,6 +54,60 @@ describe('organization authoring presets', () => {
     for (const preset of Object.values(ORGANIZATION_AUTHORING_PRESETS)) {
       expect(preset.description.trim()).not.toBe('')
     }
+  })
+
+  it('requires recommendedPractices on every preset with valid, disjoint practice ids', () => {
+    for (const id of ORGANIZATION_AUTHORING_PRESET_IDS) {
+      const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+      expect(preset).toHaveProperty('recommendedPractices')
+      expect(Array.isArray(preset.recommendedPractices)).toBe(true)
+
+      const seen = new Set<string>()
+      for (const practice of preset.recommendedPractices) {
+        expect(ORGANIZATION_PRACTICE_IDS).toContain(practice)
+        expect(seen.has(practice)).toBe(false)
+        seen.add(practice)
+        expect(preset.practices).not.toContain(practice)
+      }
+
+      expect(getOrganizationAuthoringPresetRecommendedPractices(id)).toEqual(
+        preset.recommendedPractices,
+      )
+    }
+  })
+
+  it('curates high-signal recommended practice ordering', () => {
+    expect(ORGANIZATION_AUTHORING_PRESETS.thieves_guild.recommendedPractices).toEqual([
+      'fencing',
+      'extortion',
+      'smuggling',
+      'investigation',
+    ])
+    expect(ORGANIZATION_AUTHORING_PRESETS.protection_racket.recommendedPractices).toEqual([
+      'theft',
+      'fencing',
+      'gambling',
+    ])
+    expect(ORGANIZATION_AUTHORING_PRESETS.navy.recommendedPractices).toEqual([
+      'shipbuilding',
+      'espionage',
+      'piracy',
+    ])
+    expect(ORGANIZATION_AUTHORING_PRESETS.city_watch.recommendedPractices).toEqual([
+      'bodyguarding',
+      'bounty_hunting',
+      'scouting',
+    ])
+    expect(ORGANIZATION_AUTHORING_PRESETS.merchant_house.recommendedPractices).toEqual([
+      'brokerage',
+      'warehousing',
+    ])
+    expect(ORGANIZATION_AUTHORING_PRESETS.labor_union.recommendedPractices).toEqual([])
+  })
+
+  it('does not expose recommendedPractices from applyOrganizationAuthoringPreset', () => {
+    const values = applyOrganizationAuthoringPreset('thieves_guild')
+    expect(values).not.toHaveProperty('recommendedPractices')
   })
 
   it('returns an editable recipe without durable preset provenance', () => {

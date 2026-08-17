@@ -21,6 +21,8 @@ export type OrganizationAuthoringPresetEntry = {
   form?: OrganizationForm
   functions: readonly OrganizationFunction[]
   practices: readonly OrganizationPractice[]
+  /** Authoring guidance only — never applied or persisted. Order = combobox boost order. */
+  recommendedPractices: readonly OrganizationPractice[]
 }
 
 export const ORGANIZATION_AUTHORING_PRESETS = {
@@ -32,6 +34,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['education', 'training', 'research'],
     practices: [],
+    recommendedPractices: ['alchemy', 'divination', 'translation', 'archiving', 'publishing'],
   },
   adventurers_guild: {
     label: "Adventurers' guild",
@@ -42,6 +45,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'guild',
     functions: [],
     practices: [],
+    recommendedPractices: ['hunting', 'scouting', 'bounty_hunting', 'tracking', 'cartography'],
   },
   army: {
     label: 'Army',
@@ -60,6 +64,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'force',
     functions: ['warfare', 'defense'],
     practices: [],
+    recommendedPractices: ['scouting', 'siegecraft', 'engineering', 'bodyguarding'],
   },
   bank: {
     label: 'Bank',
@@ -69,6 +74,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['finance'],
     practices: ['banking'],
+    recommendedPractices: ['brokerage', 'warehousing'],
   },
   church: {
     label: 'Church',
@@ -78,6 +84,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'congregation',
     functions: ['worship', 'ministry'],
     practices: [],
+    recommendedPractices: ['funerary_rites', 'pilgrimage', 'exorcism', 'divination'],
   },
   city_council: {
     label: 'City council',
@@ -87,6 +94,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: [],
     practices: [],
+    recommendedPractices: ['archiving', 'investigation'],
   },
   city_watch: {
     label: 'City watch',
@@ -95,6 +103,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     domain: 'government',
     functions: ['policing'],
     practices: ['investigation'],
+    recommendedPractices: ['bodyguarding', 'bounty_hunting', 'scouting'],
   },
   craft_guild: {
     label: 'Craft guild',
@@ -122,6 +131,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'guild',
     functions: ['standards', 'training'],
     practices: ['apprenticeship'],
+    recommendedPractices: ['blacksmithing', 'tailoring', 'weaving', 'leatherworking', 'cobbling'],
   },
   gang: {
     label: 'Gang',
@@ -130,6 +140,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     domain: 'criminal',
     functions: [],
     practices: [],
+    recommendedPractices: ['theft', 'extortion', 'kidnapping', 'gambling'],
   },
   government_ministry: {
     label: 'Government ministry',
@@ -150,6 +161,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'office',
     functions: ['administration'],
     practices: [],
+    recommendedPractices: ['investigation', 'espionage', 'translation', 'archiving'],
   },
   knightly_order: {
     label: 'Knightly order',
@@ -158,6 +170,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'order',
     functions: ['warfare', 'defense'],
     practices: [],
+    recommendedPractices: ['bodyguarding', 'scouting', 'siegecraft'],
   },
   mercenary_company: {
     label: 'Mercenary company',
@@ -167,6 +180,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['warfare'],
     practices: [],
+    recommendedPractices: ['scouting', 'siegecraft', 'bodyguarding', 'bounty_hunting'],
   },
   mutual_aid_society: {
     label: 'Mutual aid society',
@@ -185,6 +199,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['aid'],
     practices: [],
+    recommendedPractices: ['midwifery', 'funerary_rites', 'medicine'],
   },
   political_party: {
     label: 'Political party',
@@ -194,6 +209,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['advocacy'],
     practices: [],
+    recommendedPractices: ['publishing'],
   },
   religious_order: {
     label: 'Religious order',
@@ -203,6 +219,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'order',
     functions: ['worship', 'ministry'],
     practices: [],
+    recommendedPractices: ['pilgrimage', 'funerary_rites', 'exorcism', 'medicine'],
   },
   scholarly_society: {
     label: 'Scholarly society',
@@ -213,6 +230,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['research'],
     practices: [],
+    recommendedPractices: ['archiving', 'translation', 'publishing', 'cartography', 'surveying'],
   },
   shipping_company: {
     label: 'Shipping company',
@@ -222,6 +240,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['transport'],
     practices: ['navigation'],
+    recommendedPractices: ['salvage', 'smuggling', 'brokerage'],
   },
   smuggling_ring: {
     label: 'Smuggling ring',
@@ -231,6 +250,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'network',
     functions: [],
     practices: ['smuggling'],
+    recommendedPractices: ['fencing', 'counterfeiting', 'piracy'],
   },
   thieves_guild: {
     label: "Thieves' guild",
@@ -240,6 +260,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'guild',
     functions: [],
     practices: ['theft'],
+    recommendedPractices: ['fencing', 'extortion', 'smuggling', 'investigation'],
   },
   trading_company: {
     label: 'Trading company',
@@ -260,6 +281,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['trade'],
     practices: [],
+    recommendedPractices: ['brokerage', 'warehousing', 'navigation'],
   },
   assassins_order: {
     label: "Assassins' order",
@@ -269,6 +291,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'order',
     functions: [],
     practices: ['assassination'],
+    recommendedPractices: ['poisoning', 'espionage', 'kidnapping'],
   },
   bounty_hunters: {
     label: 'Bounty hunters',
@@ -278,6 +301,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: [],
     practices: ['bounty_hunting', 'tracking'],
+    recommendedPractices: ['investigation', 'bodyguarding'],
   },
   brewery: {
     label: 'Brewery',
@@ -287,6 +311,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['production'],
     practices: ['brewing'],
+    recommendedPractices: ['distilling'],
   },
   caravan_company: {
     label: 'Caravan company',
@@ -296,6 +321,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['transport'],
     practices: ['navigation'],
+    recommendedPractices: ['bodyguarding', 'scouting', 'smuggling'],
   },
   charitable_foundation: {
     label: 'Charitable foundation',
@@ -305,6 +331,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['aid'],
     practices: [],
+    recommendedPractices: ['medicine', 'midwifery'],
   },
   counterfeiting_ring: {
     label: 'Counterfeiting ring',
@@ -314,6 +341,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'network',
     functions: [],
     practices: ['counterfeiting'],
+    recommendedPractices: ['fencing', 'smuggling'],
   },
   cult: {
     label: 'Cult',
@@ -323,6 +351,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'congregation',
     functions: ['worship', 'ministry'],
     practices: [],
+    recommendedPractices: ['divination', 'exorcism', 'poisoning'],
   },
   druid_circle: {
     label: 'Druid circle',
@@ -332,6 +361,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'order',
     functions: ['worship', 'stewardship'],
     practices: [],
+    recommendedPractices: ['farming', 'divination', 'funerary_rites'],
   },
   explorers_society: {
     label: "Explorers' society",
@@ -341,6 +371,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['research'],
     practices: ['cartography', 'surveying'],
+    recommendedPractices: ['navigation', 'translation', 'archiving'],
   },
   farming_cooperative: {
     label: 'Farming cooperative',
@@ -350,6 +381,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'cooperative',
     functions: ['production'],
     practices: ['farming'],
+    recommendedPractices: ['milling', 'brewing', 'distilling'],
   },
   fencing_network: {
     label: 'Fencing network',
@@ -359,6 +391,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'network',
     functions: [],
     practices: ['fencing'],
+    recommendedPractices: ['theft', 'smuggling', 'counterfeiting'],
   },
   fraternal_lodge: {
     label: 'Fraternal lodge',
@@ -368,6 +401,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: [],
     practices: [],
+    recommendedPractices: ['gambling', 'performance'],
   },
   hospital_order: {
     label: 'Hospital order',
@@ -377,6 +411,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'order',
     functions: ['care', 'ministry'],
     practices: ['medicine'],
+    recommendedPractices: ['midwifery', 'apothecary', 'funerary_rites'],
   },
   inquisition: {
     label: 'Inquisition',
@@ -386,6 +421,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'office',
     functions: ['policing'],
     practices: ['investigation'],
+    recommendedPractices: ['espionage', 'exorcism'],
   },
   intelligence_bureau: {
     label: 'Intelligence bureau',
@@ -395,6 +431,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'office',
     functions: ['intelligence'],
     practices: ['espionage', 'investigation'],
+    recommendedPractices: ['counterfeiting', 'kidnapping'],
   },
   labor_union: {
     label: 'Labor union',
@@ -404,6 +441,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['advocacy', 'standards'],
     practices: [],
+    recommendedPractices: [],
   },
   logging_company: {
     label: 'Logging company',
@@ -413,6 +451,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['production'],
     practices: ['logging'],
+    recommendedPractices: ['shipbuilding', 'milling'],
   },
   mage_college: {
     label: 'Mage college',
@@ -422,6 +461,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['education', 'training', 'research'],
     practices: ['alchemy'],
+    recommendedPractices: ['divination', 'engineering'],
   },
   merchant_house: {
     label: 'Merchant house',
@@ -431,6 +471,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['trade'],
     practices: [],
+    recommendedPractices: ['brokerage', 'warehousing'],
   },
   militia: {
     label: 'Militia',
@@ -440,6 +481,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'force',
     functions: ['defense', 'training'],
     practices: [],
+    recommendedPractices: ['scouting', 'bodyguarding'],
   },
   mining_company: {
     label: 'Mining company',
@@ -449,6 +491,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['production'],
     practices: ['mining'],
+    recommendedPractices: ['engineering', 'blacksmithing'],
   },
   missionary_society: {
     label: 'Missionary society',
@@ -458,6 +501,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['ministry'],
     practices: [],
+    recommendedPractices: ['pilgrimage', 'translation'],
   },
   navy: {
     label: 'Navy',
@@ -467,6 +511,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'force',
     functions: ['warfare', 'defense'],
     practices: ['navigation'],
+    recommendedPractices: ['shipbuilding', 'espionage', 'piracy'],
   },
   pirate_crew: {
     label: 'Pirate crew',
@@ -476,6 +521,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'force',
     functions: ['warfare', 'transport'],
     practices: ['piracy', 'navigation'],
+    recommendedPractices: ['smuggling', 'fencing', 'salvage'],
   },
   private_security_company: {
     label: 'Private security company',
@@ -485,6 +531,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['defense'],
     practices: ['bodyguarding'],
+    recommendedPractices: ['scouting', 'investigation', 'bounty_hunting'],
   },
   protection_racket: {
     label: 'Protection racket',
@@ -494,6 +541,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'network',
     functions: [],
     practices: ['extortion'],
+    recommendedPractices: ['theft', 'fencing', 'gambling'],
   },
   shipyard: {
     label: 'Shipyard',
@@ -503,6 +551,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: ['production'],
     practices: ['shipbuilding'],
+    recommendedPractices: ['navigation', 'salvage', 'logging'],
   },
   spy_ring: {
     label: 'Spy ring',
@@ -512,6 +561,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'network',
     functions: ['intelligence'],
     practices: ['espionage'],
+    recommendedPractices: ['assassination', 'counterfeiting', 'kidnapping'],
   },
   theater_troupe: {
     label: 'Theater troupe',
@@ -521,6 +571,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'company',
     functions: [],
     practices: ['performance'],
+    recommendedPractices: ['publishing'],
   },
   university: {
     label: 'University',
@@ -530,6 +581,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     form: 'association',
     functions: ['education', 'training', 'research'],
     practices: [],
+    recommendedPractices: ['archiving', 'translation', 'publishing', 'alchemy', 'cartography'],
   },
 } as const satisfies Record<string, OrganizationAuthoringPresetEntry>
 
@@ -538,6 +590,12 @@ export type OrganizationAuthoringPresetId = keyof typeof ORGANIZATION_AUTHORING_
 export const ORGANIZATION_AUTHORING_PRESET_IDS = Object.keys(
   ORGANIZATION_AUTHORING_PRESETS,
 ) as OrganizationAuthoringPresetId[]
+
+export function getOrganizationAuthoringPresetRecommendedPractices(
+  id: OrganizationAuthoringPresetId,
+): readonly OrganizationPractice[] {
+  return ORGANIZATION_AUTHORING_PRESETS[id].recommendedPractices
+}
 
 /** Returns editable canonical defaults; no preset identity is retained. */
 export function applyOrganizationAuthoringPreset(id: OrganizationAuthoringPresetId): {
