@@ -57,6 +57,7 @@ describe('organization form projection', () => {
       'organizationForm',
       'functions',
       'practices',
+      'memberClassAffinityIds',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -66,6 +67,7 @@ describe('organization form projection', () => {
       'operatorOrganization.organizationForm',
       'operatorOrganization.functions',
       'operatorOrganization.practices',
+      'operatorOrganization.memberClassAffinityIds',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
@@ -198,6 +200,7 @@ describe('organization form projection', () => {
         organizationForm: 'company',
         practices: ['brewing'],
         functions: [],
+        memberClassAffinityIds: [],
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
@@ -215,6 +218,7 @@ describe('organization form projection', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
+      memberClassAffinityIds: [],
     })
     expect(input).not.toHaveProperty('authoringPresetId')
     expect(input.organizationDomain).toBe('political')
@@ -232,6 +236,78 @@ describe('organization form projection', () => {
       'operatorOrganization.organizationForm': 'network',
       'operatorOrganization.functions': [],
       'operatorOrganization.practices': ['smuggling'],
+      'operatorOrganization.memberClassAffinityIds': [],
     })
+  })
+
+  it('seeds member class affinity ids from discoverable classes when applying a familiar type', () => {
+    const fighter = {
+      id: 'class-fighter',
+      slug: 'fighter',
+      name: 'Fighter',
+    }
+    const paladin = {
+      id: 'class-paladin',
+      slug: 'paladin',
+      name: 'Paladin',
+    }
+    const discoverable = [fighter, paladin]
+    const [sync] = buildOrganizationFormValueSyncs(undefined, discoverable as never)
+    expect(sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId'])).toEqual({
+      authoringPresetId: undefined,
+      organizationDomain: 'military',
+      organizationForm: 'order',
+      functions: ['warfare', 'defense'],
+      practices: [],
+      memberClassAffinityIds: ['class-fighter', 'class-paladin'],
+    })
+  })
+
+  it('skips unavailable preset slugs when seeding member class affinity ids', () => {
+    const fighter = {
+      id: 'class-fighter',
+      slug: 'fighter',
+      name: 'Fighter',
+    }
+    const [sync] = buildOrganizationFormValueSyncs(undefined, [fighter] as never)
+    expect(
+      sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId']),
+    ).toMatchObject({
+      memberClassAffinityIds: ['class-fighter'],
+    })
+  })
+
+  it('replaces member class affinity ids when switching familiar types', () => {
+    const classes = [
+      { id: 'class-fighter', slug: 'fighter', name: 'Fighter' },
+      { id: 'class-barbarian', slug: 'barbarian', name: 'Barbarian' },
+      { id: 'class-ranger', slug: 'ranger', name: 'Ranger' },
+      { id: 'class-rogue', slug: 'rogue', name: 'Rogue' },
+    ]
+    const [sync] = buildOrganizationFormValueSyncs(undefined, classes as never)
+    const thievesGuild = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
+    expect(thievesGuild?.memberClassAffinityIds).toEqual(['class-rogue'])
+
+    const mercenary = sync?.apply({ authoringPresetId: 'mercenary_company' }, ['authoringPresetId'])
+    expect(mercenary?.memberClassAffinityIds).toEqual([
+      'class-fighter',
+      'class-barbarian',
+      'class-ranger',
+    ])
+  })
+
+  it('round-trips custom member class affinity ids through create input', () => {
+    const input = buildOrganizationCreateInput({
+      name: 'Free Company',
+      organizationDomain: 'military',
+      functions: [],
+      practices: [],
+      memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
+    })
+    expect(input.memberClassAffinityIds).toEqual([
+      'class-fighter',
+      'class-barbarian',
+      'class-wizard',
+    ])
   })
 })

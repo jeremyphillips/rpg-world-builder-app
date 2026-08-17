@@ -11,6 +11,7 @@ const organizationItems = [
     organizationDomain: 'commercial',
     functions: [],
     practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: [] },
   },
   {
@@ -19,6 +20,7 @@ const organizationItems = [
     organizationDomain: 'military',
     functions: [],
     practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: [] },
   },
 ] as unknown as Organization[]
@@ -32,6 +34,7 @@ const mixedPlan: BuildingOrganizationDraftPlan = {
         organizationDomain: 'commercial',
         functions: [],
         practices: [],
+        memberClassAffinityIds: [],
       },
     },
   ],

@@ -15,6 +15,12 @@ export const LOCATION_ORGANIZATION_REFERENCE = createOrganizationContentReferenc
   matchKey: 'id',
 })
 
+export const ORGANIZATION_MEMBER_CLASS_AFFINITY_REFERENCE =
+  createOrganizationContentReferenceDescriptor({
+    path: 'memberClassAffinityIds',
+    matchKey: 'id',
+  })
+
 /** Build Mongo equality fragment — single construction site. */
 export function organizationContentReferenceMatch(
   descriptor: OrganizationContentReferenceDescriptor,

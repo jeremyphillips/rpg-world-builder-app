@@ -66,10 +66,18 @@ export function loadContentEditFormState({
   entityId,
 }: ContentEditFormLoadInput): ContentEditFormLoadResult {
   const layoutCtx = mergeEditLayoutCtx(optionsCtx, formCtx, campaignId, entityId, entity)
-  const layoutCtxWithSeeds: ContentFormCtx = {
-    ...layoutCtx,
-    embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
-  }
+  const layoutCtxWithSeeds: ContentFormCtx = def.enrichEditLayoutCtx
+    ? def.enrichEditLayoutCtx(
+        {
+          ...layoutCtx,
+          embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
+        },
+        entity,
+      )
+    : {
+        ...layoutCtx,
+        embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
+      }
 
   const validationIntent = validationIntentForEditEntity(entity.status)
 

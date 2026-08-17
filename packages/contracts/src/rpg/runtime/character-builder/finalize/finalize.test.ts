@@ -68,6 +68,7 @@ describe('finalizePcCharacterBuild', () => {
       organizationDomain: 'occupational' as const,
       functions: [],
       practices: [],
+      memberClassAffinityIds: [],
       connections: { locations: [] },
     }
     const input = finalizePcCharacterBuild(

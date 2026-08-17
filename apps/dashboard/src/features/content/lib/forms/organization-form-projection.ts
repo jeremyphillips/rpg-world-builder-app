@@ -21,7 +21,9 @@ import {
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
   applyOrganizationAuthoringPreset,
+  resolveOrganizationPresetMemberClassAffinityIds,
   vocabularyTermFieldCopy,
+  type CharacterClass,
   type ContentValidationIntent,
   type CreateOrganizationInput,
   type Organization,
@@ -34,6 +36,10 @@ import { descriptionField, nameField } from './fields/content-identity-form-fiel
 import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/organization-practice-combobox-ranking'
 import { readOrganizationPracticeRecommendationIds } from '../../organizations/lib/organization-practice-recommendation-reader'
+import {
+  buildMemberClassAffinityChipOptions,
+  ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
+} from '../../organizations/lib/organization-member-class-chip-options.lib'
 
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,
@@ -98,6 +104,7 @@ export const organizationFormSchema = z.object({
   organizationForm: canonicalOrganizationFormSchema.optional(),
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
+  memberClassAffinityIds: z.array(z.string().min(1)).default([]),
   authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
 })
 
@@ -109,6 +116,7 @@ export const organizationDraftFormSchema = z.object({
   organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
   functions: z.array(organizationFunctionSchema).default([]),
   practices: z.array(organizationPracticeSchema).default([]),
+  memberClassAffinityIds: z.array(z.string().min(1)).default([]),
   authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
 })
 
@@ -117,15 +125,20 @@ export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
 export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = {
   functions: [],
   practices: [],
+  memberClassAffinityIds: [],
 }
 
 export { nameField as organizationNameField }
 
 export function buildOrganizationFields(
   ctx: ContentFormCtx,
-  options: { prefix?: string; includeName?: boolean } = {},
+  options: {
+    prefix?: string
+    includeName?: boolean
+    selectedMemberClassAffinityIds?: readonly string[]
+  } = {},
 ): FormItem[] {
-  const { prefix, includeName = false } = options
+  const { prefix, includeName = false, selectedMemberClassAffinityIds } = options
   const domainPath = fieldPath(prefix, 'organizationDomain')
   const fields: FormItem[] = []
 
@@ -187,6 +200,21 @@ export function buildOrganizationFields(
           readOrganizationPracticeRecommendationIds(),
         ),
     },
+    {
+      type: 'chips',
+      name: fieldPath(prefix, 'memberClassAffinityIds'),
+      label: 'Member class affinities',
+      hint: {
+        text: ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
+        position: 'below-control',
+      },
+      options: buildMemberClassAffinityChipOptions(
+        ctx,
+        selectedMemberClassAffinityIds ?? ctx.organizationMemberClassAffinitySeedIds ?? [],
+      ),
+      multiple: true,
+      chrome: { variant: 'outline' },
+    },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )
 
@@ -202,6 +230,7 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     organizationForm: entity.organizationForm,
     functions: entity.functions,
     practices: entity.practices,
+    memberClassAffinityIds: entity.memberClassAffinityIds,
   }
 }
 
@@ -239,6 +268,7 @@ export function buildOrganizationCreateInput(
     description: values.description || undefined,
     functions: values.functions ?? [],
     practices: values.practices ?? [],
+    memberClassAffinityIds: values.memberClassAffinityIds ?? [],
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }
       : {}),
@@ -247,7 +277,10 @@ export function buildOrganizationCreateInput(
   return finalizeContentInput(input, ctx) as CreateOrganizationInput
 }
 
-export function buildOrganizationFormValueSyncs(prefix?: string): FormValueSync[] {
+export function buildOrganizationFormValueSyncs(
+  prefix?: string,
+  discoverableClasses: readonly CharacterClass[] = [],
+): FormValueSync[] {
   const presetPath = fieldPath(prefix, 'authoringPresetId')
   return [
     {
@@ -272,6 +305,11 @@ export function buildOrganizationFormValueSyncs(prefix?: string): FormValueSync[
           [fieldPath(prefix, 'organizationForm')]: recipe.organizationForm,
           [fieldPath(prefix, 'functions')]: recipe.functions,
           [fieldPath(prefix, 'practices')]: recipe.practices,
+          [fieldPath(prefix, 'memberClassAffinityIds')]:
+            resolveOrganizationPresetMemberClassAffinityIds(
+              presetId as (typeof ORGANIZATION_AUTHORING_PRESET_IDS)[number],
+              discoverableClasses,
+            ),
         }
       },
     },

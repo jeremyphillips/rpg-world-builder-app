@@ -114,7 +114,9 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
     ? weaponFormValueSyncs
     : isSpellForm
       ? resolutionFormValueSyncs
-      : def.valueSyncs
+      : typeof def.valueSyncs === 'function'
+        ? def.valueSyncs(ctx)
+        : def.valueSyncs
 
   const tabs = def.buildTabs ? def.buildTabs(ctx) : undefined
 

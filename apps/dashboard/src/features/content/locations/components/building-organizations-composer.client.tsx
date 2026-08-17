@@ -14,6 +14,7 @@ import {
   organizationCreateDefaultValues,
   organizationFormSchema,
 } from '../../lib/forms/organization-form-projection'
+import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/organization-member-class-discoverable.lib'
 import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organization-create-drafts'
 import { canConfirmBuildingOrganizationRelationship } from '../lib/building-organizations-create-tab-controller.lib'
 import {
@@ -225,7 +226,10 @@ export function BuildingOrganizationNewBranch({
           schema={organizationFormSchema}
           fields={buildOrganizationFields(context, { includeName: true })}
           defaultValues={organizationCreateDefaultValues}
-          valueSyncs={buildOrganizationFormValueSyncs()}
+          valueSyncs={buildOrganizationFormValueSyncs(
+            undefined,
+            resolveDiscoverableOrganizationMemberClasses(context),
+          )}
           onSubmit={commitNew}
           header={() => <OrganizationAuthoringPresetBridge />}
           footer={

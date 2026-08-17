@@ -16,6 +16,7 @@ export const CITY_COUNCIL: Organization = {
   organizationDomain: 'government',
   functions: [],
   practices: [],
+  memberClassAffinityIds: [],
   connections: { locations: [] },
 }
 

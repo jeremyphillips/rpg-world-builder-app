@@ -17,6 +17,7 @@ const plan: BuildingOrganizationDraftPlan = {
         organizationDomain: 'commercial',
         functions: [],
         practices: [],
+        memberClassAffinityIds: [],
       },
     },
   ],

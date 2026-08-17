@@ -17,6 +17,7 @@ const organizationValues = {
   organizationDomain: 'commercial' as const,
   functions: [],
   practices: [],
+  memberClassAffinityIds: [],
 }
 
 function existingOrganization(input: {
@@ -32,6 +33,7 @@ function existingOrganization(input: {
     organizationDomain: 'commercial',
     functions: [],
     practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: input.connections ?? [] },
   } as unknown as Organization
 }

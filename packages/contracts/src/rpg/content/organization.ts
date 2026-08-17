@@ -27,6 +27,10 @@ const organizationPracticesSchema = uniqueOrganizationClassificationArray(
   organizationPracticeSchema,
   'practices',
 )
+const organizationMemberClassAffinityIdsSchema = uniqueOrganizationClassificationArray(
+  z.string().min(1),
+  'member class affinity ids',
+)
 
 /** Publish-complete organization body fields. */
 const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
@@ -34,6 +38,7 @@ const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
   organizationForm: organizationFormSchema.optional(),
   functions: organizationFunctionsSchema.default([]),
   practices: organizationPracticesSchema.default([]),
+  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
@@ -50,6 +55,7 @@ const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
   organizationForm: organizationFormSchema.optional(),
   functions: organizationFunctionsSchema.default([]),
   practices: organizationPracticesSchema.default([]),
+  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
 })
 
 /** Draft organization body — domain may remain unset until publish. */
@@ -102,6 +108,7 @@ export const updateOrganizationInputSchema = organizationBodyFieldsSchema
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
+    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
   })
   .partial()
 
@@ -114,6 +121,7 @@ export const updateOrganizationDraftInputSchema = createDraftInputSchema(
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
+    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
   })
   .partial()
 

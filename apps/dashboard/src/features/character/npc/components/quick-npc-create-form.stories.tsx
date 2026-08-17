@@ -30,6 +30,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         organizationDomain: organization.organizationDomain,
         functions: [],
         practices: [],
+        memberClassAffinityIds: [],
         connections: { locations: [] },
       },
     ],

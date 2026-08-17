@@ -29,6 +29,7 @@ describe('organization body contracts', () => {
       organizationDomain: 'occupational',
       functions: [],
       practices: [],
+      memberClassAffinityIds: [],
       connections: { locations: [] },
     })
 
@@ -62,6 +63,7 @@ describe('organization body contracts', () => {
       name: 'Untitled Organization',
       functions: [],
       practices: [],
+      memberClassAffinityIds: [],
     })
   })
 
@@ -103,6 +105,14 @@ describe('organization body contracts', () => {
         name: 'Duplicate Functions',
         organizationDomain: 'commercial',
         functions: ['trade', 'trade'],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      organizationBodySchema.safeParse({
+        name: 'Duplicate Affinities',
+        organizationDomain: 'commercial',
+        memberClassAffinityIds: ['class-a', 'class-a'],
       }).success,
     ).toBe(false)
   })

@@ -30,6 +30,7 @@ const organizationPlan: BuildingOrganizationDraftPlan = {
         organizationForm: 'company',
         functions: [],
         practices: [],
+        memberClassAffinityIds: [],
       },
     },
   ],

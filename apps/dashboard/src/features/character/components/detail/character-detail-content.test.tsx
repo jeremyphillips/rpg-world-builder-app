@@ -53,6 +53,7 @@ const connectedViewModel = buildCharacterDetailViewModel({
         organizationDomain: 'occupational',
         functions: [],
         practices: [],
+        memberClassAffinityIds: [],
       },
     },
     { organizationId: 'organization-missing', organization: null },

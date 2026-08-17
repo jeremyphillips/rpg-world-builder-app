@@ -33,6 +33,7 @@ const organizations = [
     organizationDomain: 'commercial',
     functions: [],
     practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: [] },
   },
   {
@@ -41,6 +42,7 @@ const organizations = [
     organizationDomain: 'commercial',
     functions: [],
     practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: [] },
   },
 ] as unknown as Organization[]

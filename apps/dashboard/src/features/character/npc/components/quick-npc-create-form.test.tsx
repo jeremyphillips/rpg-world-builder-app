@@ -56,6 +56,7 @@ const organizationCatalogRow = {
   organizationDomain: organization.organizationDomain,
   functions: [],
   practices: [],
+  memberClassAffinityIds: [],
   connections: { locations: [] },
 }
 

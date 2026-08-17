@@ -9,7 +9,8 @@ import {
   organizationNameField,
   type OrganizationFormValues,
 } from './organization-form-fields'
-import { organizationFormValueSyncs } from './organization-form-sync'
+import { buildOrganizationFormValueSyncs } from '../../lib/forms/organization-form-projection'
+import { resolveDiscoverableOrganizationMemberClasses } from './organization-member-class-discoverable.lib'
 import {
   buildOrganizationCreateInput,
   organizationCreateDefaultValues,
@@ -28,7 +29,12 @@ const organizationFormDef: ContentFormDef<
   nameField: organizationNameField,
   createDefaultValues: organizationCreateDefaultValues,
   buildFields: buildOrganizationFields,
-  valueSyncs: organizationFormValueSyncs,
+  valueSyncs: (ctx) =>
+    buildOrganizationFormValueSyncs(undefined, resolveDiscoverableOrganizationMemberClasses(ctx)),
+  enrichEditLayoutCtx: (ctx, entity) => ({
+    ...ctx,
+    organizationMemberClassAffinitySeedIds: entity.memberClassAffinityIds ?? [],
+  }),
   toFormValues: organizationToFormValues,
   toInput: buildOrganizationCreateInput,
   useListQuery: useOrganizations,

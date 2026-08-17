@@ -44,6 +44,7 @@ describe('finalizeNpcCharacterBuild', () => {
       organizationDomain: 'occupational' as const,
       functions: [],
       practices: [],
+      memberClassAffinityIds: [],
       connections: { locations: [] },
     }
     const draft = {
