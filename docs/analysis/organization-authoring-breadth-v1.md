@@ -255,9 +255,9 @@ Bureaucracy-as-noun, diocese, pantheon clergy, shrine keepers as org type, spice
 
 ---
 
-## Implementation handoff (Phases 8–12, not this commit)
+## Implementation handoff (Phases 8–12)
 
-1. Append 32 Practices + fencing searchTerm disambiguation + hunting `tracking` cleanup.
-2. Add 30 presets; patch existing recipes; exclusive label ownership guard.
-3. Family map UI-only; coverage fixture outcome flips; durable semantic-flow tests only.
-4. Pause only if a Domain/Form/Function change is required (not expected).
+1. Append 32 Practices + fencing searchTerm disambiguation + hunting `tracking` cleanup. **Done**
+2. Add 30 presets; patch existing recipes; exclusive label ownership guard. **Done**
+3. Family map UI-only; coverage fixture outcome flips; durable semantic-flow tests only. **Done**
+4. Pause only if a Domain/Form/Function change is required (not expected). **No blockers**

@@ -122,7 +122,32 @@ describe('Pass A authoring smoke', () => {
     })
   })
 
-  it('projects City watch to policing rather than defense', () => {
+  it('projects breadth presets through standalone and embedded syncs', () => {
+    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'navy' }, [
+      'authoringPresetId',
+    ])
+    const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
+      { 'operatorOrganization.authoringPresetId': 'navy' },
+      ['operatorOrganization.authoringPresetId'],
+    )
+
+    expect(standalone).toMatchObject({
+      authoringPresetId: undefined,
+      organizationDomain: 'military',
+      organizationForm: 'force',
+      functions: ['warfare', 'defense'],
+      practices: ['navigation'],
+    })
+    expect(embedded).toMatchObject({
+      'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.organizationDomain': 'military',
+      'operatorOrganization.organizationForm': 'force',
+      'operatorOrganization.functions': ['warfare', 'defense'],
+      'operatorOrganization.practices': ['navigation'],
+    })
+  })
+
+  it('projects City watch to policing with investigation practice', () => {
     const applied = buildOrganizationFormValueSyncs()[0]!.apply(
       { authoringPresetId: 'city_watch' },
       ['authoringPresetId'],

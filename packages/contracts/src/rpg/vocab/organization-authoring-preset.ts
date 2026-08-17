@@ -327,7 +327,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
   druid_circle: {
     label: 'Druid circle',
     description: 'Nature-focused order organized around worship and sacred stewardship.',
-    discoveryTerms: ['nature cult', 'druid order'],
+    discoveryTerms: ['nature circle', 'druid order'],
     domain: 'religious',
     form: 'order',
     functions: ['worship', 'stewardship'],
@@ -417,7 +417,7 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
   mage_college: {
     label: 'Mage college',
     description: 'Arcane teaching body organized around education and alchemical craft.',
-    discoveryTerms: ['wizard college', 'arcane academy'],
+    discoveryTerms: ['wizard college', 'arcane college'],
     domain: 'academic',
     form: 'association',
     functions: ['education', 'training', 'research'],

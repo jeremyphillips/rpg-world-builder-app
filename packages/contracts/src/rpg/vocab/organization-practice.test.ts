@@ -94,6 +94,23 @@ describe('Organization Practice vocabulary', () => {
     expect(overlap).toEqual([])
   })
 
+  it('admits breadth-v1 required practice candidates as canonical ids', () => {
+    for (const admitted of ['cobbling', 'tracking', 'investigation', 'fencing'] as const) {
+      expect(organizationPracticeSchema.parse(admitted)).toBe(admitted)
+      expect(getOrganizationPracticeEntry(admitted)?.label.trim()).not.toBe('')
+    }
+
+    expect(getOrganizationPracticeDiscoveryTerms('cobbling')).toEqual(
+      expect.arrayContaining(['cobbler', 'shoemaking']),
+    )
+    expect(getOrganizationPracticeDiscoveryTerms('tracking')).toEqual(
+      expect.arrayContaining(['trails', 'spoor']),
+    )
+    expect(getOrganizationPracticeDiscoveryTerms('investigation')).toEqual(
+      expect.arrayContaining(['detective', 'casework']),
+    )
+  })
+
   it('admits v1 criminal Practices while rejecting burglary and robbery as separate ids', () => {
     for (const admitted of [
       'theft',

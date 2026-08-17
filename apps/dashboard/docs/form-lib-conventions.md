@@ -61,6 +61,13 @@ Organization familiar starting points (`organization-form-projection.ts`):
   `undiscoverable` must stay zero. `weak` / `no_start` rows are diagnostic
   signals — not debt to zero out, and not an ongoing mandate to raise coverage %.
   Update fixture rows deliberately when the picker changes on purpose.
+- **Discovery ownership (test-only):**
+  [`organization-preset-discovery-ownership.test.ts`](../src/features/content/organizations/lib/organization-preset-discovery-ownership.test.ts)
+  mirrors the contracts guard that a live preset label must not appear verbatim in another
+  preset’s `discoveryTerms`, and locks breadth-v1 label collisions (Navy ≠ Army, etc.).
+- **Semantic flows (test-only):**
+  [`organization-semantic-flows.test.ts`](../src/features/content/organizations/lib/organization-semantic-flows.test.ts)
+  promotes durable search/projection cases only — not the 272-row breadth worksheet.
 
 ## Validation
 

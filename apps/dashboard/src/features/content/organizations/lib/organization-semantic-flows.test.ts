@@ -1,16 +1,47 @@
 import { describe, expect, it } from 'vitest'
+import { optionMatchesQuery } from '@rpg/ui'
 import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
   applyOrganizationAuthoringPreset,
   resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
+import type { FieldOption, FormItem } from '@rpg/ui/form'
+import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
+import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import {
   buildOrganizationCreateInput,
+  buildOrganizationFields,
   buildOrganizationFormValueSyncs,
   type OrganizationFormValues,
 } from '../../lib/forms/organization-form-projection'
+import { presetMatchesIntentionalQuery } from './__tests__/organization-preset-intentional-matcher'
+
+function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
+  const fields: Array<{ name: string; item: FormItem }> = []
+  for (const item of items) {
+    if ('name' in item && typeof item.name === 'string') fields.push({ name: item.name, item })
+    if ('fields' in item && Array.isArray(item.fields)) fields.push(...collectFields(item.fields))
+  }
+  return fields
+}
+
+function practiceOptions(fields: ReturnType<typeof collectFields>): FieldOption[] {
+  const practicesField = fields.find(({ name }) => name === 'practices')?.item
+  if (!practicesField || !('options' in practicesField) || !Array.isArray(practicesField.options)) {
+    return []
+  }
+  return flattenSelectFieldOptions(practicesField.options)
+}
+
+function presetOptions(fields: ReturnType<typeof collectFields>): FieldOption[] {
+  const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
+  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
+    return []
+  }
+  return flattenSelectFieldOptions(presetField.options)
+}
 
 describe('initial Organization semantic flows', () => {
   it.each(ORGANIZATION_AUTHORING_PRESET_IDS)(
@@ -107,5 +138,70 @@ describe('initial Organization semantic flows', () => {
       functions: ['warfare', 'defense'],
       practices: ['navigation'],
     })
+    expect(applyOrganizationAuthoringPreset('university')).toMatchObject({
+      organizationDomain: 'academic',
+      organizationForm: 'association',
+      functions: ['education', 'training', 'research'],
+      practices: [],
+    })
+    expect(applyOrganizationAuthoringPreset('fencing_network')).toMatchObject({
+      organizationDomain: 'criminal',
+      organizationForm: 'network',
+      practices: ['fencing'],
+    })
+  })
+
+  it('routes breadth practice searches to the admitted ids', () => {
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const options = practiceOptions(fields)
+
+    const shipbuilding = options.find((option) => option.value === 'shipbuilding')
+    expect(optionMatchesQuery(shipbuilding!, 'shipwright')).toBe(true)
+
+    const fencing = options.find((option) => option.value === 'fencing')
+    expect(optionMatchesQuery(fencing!, 'fence')).toBe(true)
+    expect(optionMatchesQuery(fencing!, 'stolen goods')).toBe(true)
+
+    const investigation = options.find((option) => option.value === 'investigation')
+    expect(optionMatchesQuery(investigation!, 'detective')).toBe(true)
+
+    const tracking = options.find((option) => option.value === 'tracking')
+    expect(optionMatchesQuery(tracking!, 'trails')).toBe(true)
+
+    const cobbling = options.find((option) => option.value === 'cobbling')
+    expect(optionMatchesQuery(cobbling!, 'shoemaking')).toBe(true)
+
+    const alchemy = options.find((option) => option.value === 'alchemy')
+    expect(optionMatchesQuery(alchemy!, 'potion making')).toBe(true)
+    expect(options.some((option) => option.value === 'potion_making')).toBe(false)
+  })
+
+  it('routes breadth familiar-type searches away from generic parents', () => {
+    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const options = presetOptions(fields)
+
+    const army = options.find((option) => option.value === 'army')
+    const navy = options.find((option) => option.value === 'navy')
+    expect(optionMatchesQuery(army!, 'navy')).toBe(false)
+    expect(optionMatchesQuery(navy!, 'navy')).toBe(true)
+    expect(presetMatchesIntentionalQuery('navy', ORGANIZATION_AUTHORING_PRESETS.navy, 'Navy')).toBe(
+      true,
+    )
+    expect(presetMatchesIntentionalQuery('army', ORGANIZATION_AUTHORING_PRESETS.army, 'Navy')).toBe(
+      false,
+    )
+
+    const academy = options.find((option) => option.value === 'academy')
+    const university = options.find((option) => option.value === 'university')
+    expect(optionMatchesQuery(academy!, 'university')).toBe(false)
+    expect(optionMatchesQuery(university!, 'university')).toBe(true)
+
+    const gang = options.find((option) => option.value === 'gang')
+    const protectionRacket = options.find((option) => option.value === 'protection_racket')
+    expect(optionMatchesQuery(gang!, 'protection racket')).toBe(false)
+    expect(optionMatchesQuery(protectionRacket!, 'protection racket')).toBe(true)
+
+    const assassinsOrder = options.find((option) => option.value === 'assassins_order')
+    expect(optionMatchesQuery(assassinsOrder!, "assassins' order")).toBe(true)
   })
 })
