@@ -14,6 +14,7 @@ import { CharacterModel, createPcRecord } from '../../character'
 import { classWriteConfig } from '../classes/classes.config'
 import { HomebrewClassModel } from '../classes/homebrew-class.model'
 import { resolveCatalogForCampaign } from '../content.service'
+import { organizationWriteConfig } from '../organizations/organizations.config'
 import { speciesWriteConfig } from '../species/species.config'
 import { createHomebrewContent } from './content-write.service'
 import { deleteContentEntity, getContentDeletionAvailability } from './content-deletion.service'
@@ -96,6 +97,34 @@ describe('content deletion service', () => {
     if (availability.status !== 'blocked') throw new Error('expected blocked')
     expect(availability.blockers).toHaveLength(1)
     expect(availability.blockers[0]?.kind).toBe('usage')
+
+    const deleteResult = await deleteContentEntity(classWriteConfig, campaign.id, created.id)
+    expect(deleteResult).toMatchObject({ status: 'blocked' })
+  })
+
+  it('blocks delete when an organization member class affinity references the entity', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
+
+    await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'thieves-guild',
+      name: "Thieves' Guild",
+      organizationDomain: 'criminal',
+      memberClassAffinityIds: [created.id],
+    })
+
+    const availability = await getContentDeletionAvailability(
+      classWriteConfig,
+      campaign.id,
+      created.id,
+    )
+    expect(availability.status).toBe('blocked')
+    if (availability.status !== 'blocked') throw new Error('expected blocked')
+    expect(
+      availability.blockers.some(
+        (blocker) => blocker.kind === 'content' && blocker.contentTypeKey === 'organizations',
+      ),
+    ).toBe(true)
 
     const deleteResult = await deleteContentEntity(classWriteConfig, campaign.id, created.id)
     expect(deleteResult).toMatchObject({ status: 'blocked' })

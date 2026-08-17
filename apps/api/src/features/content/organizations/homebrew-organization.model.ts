@@ -27,6 +27,10 @@ const homebrewOrganizationSchema = new Schema(
       type: [{ type: String, enum: [...ORGANIZATION_PRACTICE_IDS] }],
       default: [],
     },
+    memberClassAffinityIds: {
+      type: [{ type: String }],
+      default: [],
+    },
     connections: {
       locations: [
         {

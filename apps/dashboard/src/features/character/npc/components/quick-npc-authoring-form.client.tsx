@@ -63,6 +63,7 @@ export type QuickNpcCreateFormOrganization = {
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
+  memberClassAffinityIds?: readonly string[]
 }
 
 export type QuickNpcAuthoringFormProps = {

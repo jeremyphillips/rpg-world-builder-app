@@ -22,6 +22,7 @@ type EditableOrganization = {
   organizationForm?: Organization['organizationForm']
   functions?: Organization['functions']
   practices?: Organization['practices']
+  memberClassAffinityIds?: Organization['memberClassAffinityIds']
 }
 
 function toEditableOrganization(organization: Organization): EditableOrganization {
@@ -31,6 +32,7 @@ function toEditableOrganization(organization: Organization): EditableOrganizatio
     organizationDomain: organization.organizationDomain,
     functions: organization.functions,
     practices: organization.practices,
+    memberClassAffinityIds: organization.memberClassAffinityIds,
     ...(organization.organizationForm !== undefined
       ? { organizationForm: organization.organizationForm }
       : {}),
@@ -60,6 +62,7 @@ export function OrganizationMembersDetailDrawers({
         organization={editableOrganization}
         candidates={detail.candidates}
         onAdd={detail.handleAddMember}
+        memberClassRecommendations={detail.memberClassRecommendations}
         quickNpc={{
           enabled: true,
           buildContextFailed: detail.quickNpc.buildContextFailed,

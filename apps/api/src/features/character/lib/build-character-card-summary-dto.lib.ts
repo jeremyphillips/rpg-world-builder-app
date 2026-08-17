@@ -49,5 +49,6 @@ export function buildCharacterCardSummaryDto(input: {
     id: input.character.id,
     name: input.character.name,
     summary: formatCharacterSummary(parts),
+    classIds: input.character.classes.map((entry) => entry.classId),
   }
 }

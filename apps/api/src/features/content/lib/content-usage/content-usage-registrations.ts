@@ -15,6 +15,7 @@ import {
   characterSubclassSource,
   locationParentReferenceSource,
   organizationLocationSource,
+  organizationMemberClassAffinitySource,
   campaignPrimaryWorldReferenceSource,
 } from './content-usage-sources'
 
@@ -23,7 +24,10 @@ const CHARACTER_SUMMARY_LABELS = { singular: 'character', plural: 'characters' }
 export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   defineContentUsage({
     contentType: 'classes',
-    sources: [{ source: characterClassSource, entry: true, batch: true }],
+    sources: [
+      { source: characterClassSource, entry: true, batch: true },
+      { source: organizationMemberClassAffinitySource, entry: true, batch: true },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'class' },

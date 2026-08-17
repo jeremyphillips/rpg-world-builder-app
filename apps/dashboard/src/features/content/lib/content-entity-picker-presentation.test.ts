@@ -41,6 +41,7 @@ describe('content-entity-picker-presentation', () => {
         name: 'Frug Daergel',
         summary: 'Human · Level 1 Fighter',
         characterType: 'pc',
+        classIds: ['srd-cc-5.2.1:fighter'],
       }),
     ).toEqual({
       heading: 'Frug Daergel',

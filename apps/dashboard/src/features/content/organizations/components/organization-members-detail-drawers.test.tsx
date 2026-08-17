@@ -78,6 +78,7 @@ function createDetail(
     handleSaveMembership: vi.fn(),
     handleRemoveFromEditDrawer: vi.fn(),
     handleConfirmRemoveMember: vi.fn(),
+    memberClassRecommendations: undefined,
     ...overrides,
   }
 }

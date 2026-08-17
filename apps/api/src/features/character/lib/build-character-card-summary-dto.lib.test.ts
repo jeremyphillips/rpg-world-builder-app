@@ -43,6 +43,7 @@ describe('buildCharacterCardSummaryDto', () => {
       id: 'char_1',
       name: 'Verna',
       summary: 'Dwarf · Level 4 Fighter',
+      classIds: ['srd-cc-5.2.1:fighter'],
     })
   })
 
@@ -61,6 +62,20 @@ describe('buildCharacterCardSummaryDto', () => {
         contentIndex,
       }).summary,
     ).toBe('Dwarf · Level 4 · Fighter 3 / Rogue 1')
+    expect(
+      buildCharacterCardSummaryDto({
+        character: {
+          id: 'char_2',
+          name: 'Split',
+          species: { id: 'srd-cc-5.2.1:dwarf' },
+          classes: [
+            { classId: 'srd-cc-5.2.1:fighter', level: 3 },
+            { classId: 'srd-cc-5.2.1:rogue', level: 1 },
+          ],
+        },
+        contentIndex,
+      }).classIds,
+    ).toEqual(['srd-cc-5.2.1:fighter', 'srd-cc-5.2.1:rogue'])
   })
 
   it('matches dashboard-resolved parts for the same character fixture', () => {

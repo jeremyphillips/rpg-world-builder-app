@@ -15,6 +15,8 @@ export type LocationConnectedPartyCharacterOption = {
   name: string
   summary: string
   characterType: 'pc' | 'npc'
+  /** Populated when built from campaign character/NPC list data. */
+  classIds?: readonly string[]
 }
 
 /** Merges open campaign PCs and NPCs into a sorted lookup for connected-party rows. */
@@ -29,12 +31,14 @@ export function buildLocationConnectedPartyCharactersById(
       name: character.name,
       summary: character.summary,
       characterType: 'pc' as const,
+      classIds: character.classIds,
     })),
     ...npcs.map(({ character }) => ({
       id: character.id,
       name: character.name,
       summary: catalogIndex ? buildCharacterCardViewModel(character, catalogIndex).summary : '',
       characterType: 'npc' as const,
+      classIds: character.classes.map((entry) => entry.classId),
     })),
   ].sort((left, right) => left.name.localeCompare(right.name))
 

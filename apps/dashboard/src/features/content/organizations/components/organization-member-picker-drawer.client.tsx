@@ -26,6 +26,8 @@ import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
   ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+  ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+  type OrganizationMemberPickerSortContext,
 } from '../lib/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../lib/organization-members.constants'
 
@@ -45,6 +47,8 @@ export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterO
   isMember: boolean
   /** Existing membership title when isMember is true. */
   membershipTitle?: string
+  /** True when the character matches stored org class affinities intersected with availability. */
+  isRecommended?: boolean
 }
 
 export type OrganizationMemberPickerCommit = {
@@ -71,6 +75,10 @@ export type OrganizationMemberPickerDrawerProps = {
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   quickNpc?: OrganizationMemberPickerQuickNpc
   onCreateNpc?: () => void
+  memberClassRecommendations?: Pick<
+    OrganizationMemberPickerSortContext,
+    'memberClassAffinityIds' | 'availableClasses'
+  >
 }
 
 function formatCandidateIdentityLine(candidate: OrganizationMemberPickerCandidate): string {
@@ -87,6 +95,7 @@ export function OrganizationMemberPickerDrawer({
   onAdd,
   quickNpc,
   onCreateNpc,
+  memberClassRecommendations,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
@@ -169,8 +178,13 @@ export function OrganizationMemberPickerDrawer({
     ) =>
       filterAndSortOrganizationMemberPickerCandidates(visibleItems, {
         searchQuery: context.searchQuery,
+        memberClassAffinityIds: memberClassRecommendations?.memberClassAffinityIds,
+        availableClasses: memberClassRecommendations?.availableClasses,
       }),
-    [],
+    [
+      memberClassRecommendations?.availableClasses,
+      memberClassRecommendations?.memberClassAffinityIds,
+    ],
   )
 
   return (
@@ -237,7 +251,16 @@ export function OrganizationMemberPickerDrawer({
                       tone: 'success',
                     },
                   ]
-                : undefined,
+                : candidate.isRecommended
+                  ? [
+                      {
+                        kind: 'badge',
+                        label: ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+                        appearance: 'outline',
+                        tone: 'info',
+                      },
+                    ]
+                  : undefined,
             }}
             trailing={
               candidate.isMember

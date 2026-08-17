@@ -3,7 +3,11 @@
 import * as React from 'react'
 
 import type { CampaignNpcDetail, Organization } from '@rpg/contracts'
-import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import {
+  getErrorMessage,
+  resolveAvailableContent,
+  resolveOrganizationMembershipMetadata,
+} from '@rpg/contracts'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCampaignCharacters, useCanManageCampaign } from '@/features/campaign'
@@ -50,7 +54,13 @@ export function useOrganizationMembersDetail(
   campaignId: string,
   organization: Pick<
     Organization,
-    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'functions' | 'practices'
+    | 'id'
+    | 'name'
+    | 'organizationDomain'
+    | 'organizationForm'
+    | 'functions'
+    | 'practices'
+    | 'memberClassAffinityIds'
   >,
 ) {
   const organizationId = organization.id
@@ -245,6 +255,17 @@ export function useOrganizationMembersDetail(
     }
   }, [drawerState, removeMember])
 
+  const memberClassRecommendations = React.useMemo(
+    () =>
+      npcBuildContext
+        ? {
+            memberClassAffinityIds: organization.memberClassAffinityIds,
+            availableClasses: resolveAvailableContent(npcBuildContext).classes,
+          }
+        : undefined,
+    [npcBuildContext, organization.memberClassAffinityIds],
+  )
+
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
   const openCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'createNpc' }), [])
   const cancelCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
@@ -277,6 +298,7 @@ export function useOrganizationMembersDetail(
     mutationError,
     pendingCharacterId,
     quickNpc,
+    memberClassRecommendations,
     openAddDrawer,
     openCreateNpcModal,
     cancelCreateNpcModal,
