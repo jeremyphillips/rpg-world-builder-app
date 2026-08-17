@@ -1,11 +1,19 @@
 # Organization classification
 
-Organizations carry **Domain**, optional **Form**, **Functions**, **Practices**, and optional
-**member class affinities** and **member species affinities**. At least **Domain** is required
-on publish.
+Organizations carry **Domain**, optional **Form**, **Functions**, **Practices**, and a nested
+**`members`** object for member guidance and the membership title catalog. At least **Domain**
+is required on publish.
+
+```ts
+type OrganizationMembers = {
+  classAffinityIds: string[]
+  speciesAffinityIds: string[]
+  titles: OrganizationMembershipTitleDefinition[] // snapshot catalog
+}
+```
 
 **Familiar starting points** are create-only ephemeral projections — they seed domain / form /
-functions / practices / affinities and are stripped before persist.
+functions / practices / affinities and record `sourcePresetId` for title snapshotting at create.
 
 | Concern                        | Where to read                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -66,15 +74,33 @@ applied — the API snapshots vocabulary labels/descriptions + preset priorities
 `members.titles[]` at `bodyFromCreateInput`. Manual create may supply explicit
 `members.titles` when no preset is used. Create input rejects combining both.
 
+| Path          | Client sends               | API persists                                                                     |
+| ------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| Preset create | `sourcePresetId`           | Vocabulary resolve → opaque `omt_*` ids + `members.titles` snapshot + provenance |
+| Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
+| Duplicate     | (N/A — server copies body) | Source `members.titles` copied in order; `sourcePresetId` omitted                |
+
+**Create XOR (API boundary):** `sourcePresetId` and a non-empty explicit `members.titles`
+catalog are mutually exclusive on create input. When `sourcePresetId` is present, the API
+resolver is authoritative — client omission of `members.titles` still yields the preset
+snapshot at persist.
+
 **Edit path:** classification forms expose `members.classAffinityIds` and
 `members.speciesAffinityIds` only — never `members.titles` or `sourcePresetId`. Title catalog
-changes are deferred to a future dedicated mutation.
+changes are deferred to a future dedicated mutation. Classification PATCH never modifies an
+existing `members.titles` snapshot.
 
-**Array order:** preset and stored `members.titles` order is meaningful — roster/display sort
-uses priority descending, then original array index as tie-break.
+**Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
+Mongo mapping, API serialization, duplication, and parse round-trips must preserve array
+order. Roster/display sort uses priority descending, then original array index as tie-break.
 
 **Character memberships:** connections persist `title` + `priority` strings/numbers for this
-pass. Renaming org titles does not propagate until connections adopt `membershipTitleId`.
+pass. Renaming or deleting org titles does **not** propagate to existing character
+memberships until connections adopt `membershipTitleId` referencing organization-owned `id`s.
+
+**Retired:** classification-derived membership titles (five-slot resolver pipeline) were
+removed. Titles come only from the create-boundary snapshot or explicit manual catalog —
+never from domain / form / function inference at runtime.
 
 Detail: [`organization-membership-titles.ts`](../../../packages/contracts/src/rpg/content/organization-membership-titles.ts),
 [`organization-membership-title.ts`](../../../packages/contracts/src/rpg/vocab/organization-membership-title.ts).

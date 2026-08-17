@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getOrganizationMembershipTitleEntry,
+  getOrganizationMembershipTitleDiscoveryTerms,
   ORGANIZATION_MEMBERSHIP_TITLE_ENTRIES,
   ORGANIZATION_MEMBERSHIP_TITLE_TERM,
 } from './organization-membership-title'
@@ -24,5 +25,9 @@ describe('organization membership title vocabulary', () => {
       label: 'Quartermaster',
     })
     expect(getOrganizationMembershipTitleEntry('missing_title')).toBeUndefined()
+  })
+
+  it('exposes discovery terms from label when searchTerms are absent', () => {
+    expect(getOrganizationMembershipTitleDiscoveryTerms('quartermaster')).toEqual(['Quartermaster'])
   })
 })

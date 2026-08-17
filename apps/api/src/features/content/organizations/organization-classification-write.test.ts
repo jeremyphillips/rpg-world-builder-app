@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import type { Organization } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createHomebrewContent, updateContentEntity } from '../lib/content-write.service'
-import { organizationWriteConfig } from './organizations.config'
+import { duplicateContentEntity } from '../lib/duplication/duplicate-content.service'
+import {
+  HomebrewOrganizationModel,
+  type HomebrewOrganizationSchemaType,
+} from './homebrew-organization.model'
+import { organizationWriteConfig, toHomebrewOrganization } from './organizations.config'
 
 useIntegrationDb()
 
@@ -171,7 +177,7 @@ describe('organization classification writes', () => {
     expect(created.members.titles.every((title) => title.id.startsWith('omt_'))).toBe(true)
   })
 
-  it('leaves membershipTitles unchanged when classification is updated', async () => {
+  it('leaves members.titles unchanged when classification is updated', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'river-bank',
@@ -187,5 +193,78 @@ describe('organization classification writes', () => {
 
     expect(updated.members.titles).toEqual(created.members.titles)
     expect(updated.sourcePresetId).toBe('bank')
+  })
+
+  it('persists explicit members.titles on manual create without sourcePresetId', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'sealed-order',
+      name: 'Order of the Third Seal',
+      organizationDomain: 'religious',
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [
+          {
+            id: 'omt_custom',
+            label: 'Keeper of the Third Seal',
+            priority: 40,
+          },
+        ],
+      },
+    })
+
+    expect(created).not.toHaveProperty('sourcePresetId')
+    expect(created.members.titles).toEqual([
+      {
+        id: 'omt_custom',
+        label: 'Keeper of the Third Seal',
+        priority: 40,
+      },
+    ])
+  })
+
+  it('preserves members.titles array order through Mongo round-trip', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+    })
+
+    const doc = await HomebrewOrganizationModel.findById(created.id).lean<
+      HomebrewOrganizationSchemaType & { _id: unknown }
+    >()
+    expect(doc).not.toBeNull()
+
+    const roundTripped = toHomebrewOrganization(doc as never)
+    expect(roundTripped.members.titles.map((title) => title.sourceTitleId)).toEqual(
+      created.members.titles.map((title) => title.sourceTitleId),
+    )
+    expect(roundTripped.members.titles.map((title) => title.id)).toEqual(
+      created.members.titles.map((title) => title.id),
+    )
+  })
+
+  it('duplicates members.titles snapshot order and omits sourcePresetId', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+    })
+
+    const { entity } = await duplicateContentEntity({
+      campaignId: campaign.id,
+      contentType: 'organizations',
+      entityId: created.id,
+      requestedName: 'River Bank Copy',
+    })
+    const duplicate = entity as Organization
+
+    expect(duplicate.sourcePresetId).toBeUndefined()
+    expect(duplicate.members.titles).toEqual(created.members.titles)
   })
 })

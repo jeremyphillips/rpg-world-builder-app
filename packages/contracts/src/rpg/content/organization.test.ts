@@ -256,4 +256,14 @@ describe('organization authoring inputs', () => {
         .members,
     ).not.toHaveProperty('titles')
   })
+
+  it('does not accept legacy flat membershipTitles on stored bodies', () => {
+    const parsed = organizationBodySchema.parse({
+      name: 'Legacy Guild',
+      organizationDomain: 'occupational',
+      membershipTitles: [{ id: 'omt_legacy', label: 'Boss', priority: 50 }],
+    })
+    expect(parsed).not.toHaveProperty('membershipTitles')
+    expect(parsed.members.titles).toEqual([])
+  })
 })

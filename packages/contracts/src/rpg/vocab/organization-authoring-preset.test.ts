@@ -64,12 +64,24 @@ describe('organization authoring presets', () => {
       expect(preset.members.titles.length).toBeGreaterThan(0)
       const seen = new Set<string>()
       for (const ref of preset.members.titles) {
+        expect(ref).not.toHaveProperty('label')
         expect(getOrganizationMembershipTitleEntry(ref.titleId)).toBeDefined()
         expect(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES).toContain(ref.priority)
         expect(seen.has(ref.titleId)).toBe(false)
         seen.add(ref.titleId)
       }
     }
+  })
+
+  it('assigns different preset priorities to the same vocabulary title id', () => {
+    const armyCaptain = ORGANIZATION_AUTHORING_PRESETS.army.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    const mercenaryCaptain = ORGANIZATION_AUTHORING_PRESETS.mercenary_company.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    expect(armyCaptain?.priority).toBe(40)
+    expect(mercenaryCaptain?.priority).toBe(50)
   })
 
   it('requires recommendedPractices on every preset with valid, disjoint practice ids', () => {

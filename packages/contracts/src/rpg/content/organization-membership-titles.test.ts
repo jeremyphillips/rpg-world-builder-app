@@ -117,4 +117,39 @@ describe('organization membership title snapshot', () => {
       'clerk',
     ])
   })
+
+  it('preserves org title id when the stored label is renamed', () => {
+    const renamed = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_abc',
+        sourceTitleId: 'captain',
+        label: 'Sea Lord',
+        priority: 50,
+      },
+    ])
+    expect(renamed[0]?.id).toBe('omt_abc')
+    expect(renamed[0]?.label).toBe('Sea Lord')
+  })
+
+  it('allows the same vocabulary title at different priorities across presets', () => {
+    const army = snapshotOrganizationMembershipTitlesFromPreset('army', () => 'a')
+    const mercenary = snapshotOrganizationMembershipTitlesFromPreset('mercenary_company', () => 'b')
+    const armyCaptain = army.find((title) => title.sourceTitleId === 'captain')
+    const mercenaryCaptain = mercenary.find((title) => title.sourceTitleId === 'captain')
+    expect(armyCaptain?.priority).toBe(40)
+    expect(mercenaryCaptain?.priority).toBe(50)
+  })
+
+  it('keeps stored org snapshots independent of later vocabulary labels', () => {
+    let count = 0
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => `seed-${++count}`)
+    const stored = organizationMembershipTitlesSchema.parse(
+      snapshot.map((title) =>
+        title.sourceTitleId === 'treasurer' ? { ...title, label: 'Legacy Treasurer Label' } : title,
+      ),
+    )
+    expect(stored.find((title) => title.sourceTitleId === 'treasurer')?.label).toBe(
+      'Legacy Treasurer Label',
+    )
+  })
 })
