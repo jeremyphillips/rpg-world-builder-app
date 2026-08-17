@@ -57,6 +57,33 @@ describe('RadioCardField', () => {
     expect(container.querySelector('[role="radiogroup"]')).toHaveClass('w-full')
   })
 
+  it('renders grouped sections with eyebrows when optionGroups are provided', () => {
+    render(
+      <RadioCardField
+        id="class-choice"
+        label="Class"
+        options={options}
+        optionGroups={[
+          {
+            id: 'recommended',
+            eyebrow: 'Recommended for this organization',
+            options: [options[0]!],
+          },
+          {
+            id: 'all-classes',
+            eyebrow: 'All classes',
+            options: [options[1]!],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Recommended for this organization')).toBeInTheDocument()
+    expect(screen.getByText('All classes')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Modern 5e/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Modern 3e/i })).toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <RadioCardField id="edition-preset" label="Edition preset" options={options} />,

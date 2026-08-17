@@ -111,7 +111,8 @@ export async function resolveOrganizationMembers(input: {
             membership: membership ?? {},
             domain,
             form: organization.organizationForm,
-            activities: organization.activities,
+            functions: organization.functions,
+            practices: organization.practices,
           })
 
     return [

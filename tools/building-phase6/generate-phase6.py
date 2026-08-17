@@ -16,7 +16,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DISCOVERY = ROOT / "docs/roadmap/building-taxonomy-discovery.md"
+DISCOVERY = ROOT / "docs/discovery/building-taxonomy-discovery.md"
 OUT_DISPOSITION = (
     ROOT / "packages/contracts/src/rpg/vocab/location/building-corpus-disposition.ts"
 )

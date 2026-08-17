@@ -26,6 +26,8 @@ import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
   ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+  ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+  type OrganizationMemberPickerSortContext,
 } from '../lib/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../lib/organization-members.constants'
 
@@ -45,6 +47,8 @@ export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterO
   isMember: boolean
   /** Existing membership title when isMember is true. */
   membershipTitle?: string
+  /** True when the character matches stored org class affinities intersected with availability. */
+  isRecommended?: boolean
 }
 
 export type OrganizationMemberPickerCommit = {
@@ -71,6 +75,11 @@ export type OrganizationMemberPickerDrawerProps = {
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   quickNpc?: OrganizationMemberPickerQuickNpc
   onCreateNpc?: () => void
+  memberClassRecommendations?: Pick<
+    OrganizationMemberPickerSortContext,
+    'memberClassAffinityIds' | 'availableClasses'
+  >
+  candidatesLoading?: boolean
 }
 
 function formatCandidateIdentityLine(candidate: OrganizationMemberPickerCandidate): string {
@@ -87,6 +96,8 @@ export function OrganizationMemberPickerDrawer({
   onAdd,
   quickNpc,
   onCreateNpc,
+  memberClassRecommendations,
+  candidatesLoading,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
@@ -124,7 +135,8 @@ export function OrganizationMemberPickerDrawer({
       const { title, priority } = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
         form: organization.organizationForm,
-        activities: organization.activities,
+        functions: organization.functions,
+        practices: organization.practices,
         selectedTitle: titleFromMembershipRadioValue(selectedTitle),
       })
 
@@ -151,7 +163,8 @@ export function OrganizationMemberPickerDrawer({
     [
       onAdd,
       onOpenChange,
-      organization.activities,
+      organization.functions,
+      organization.practices,
       organization.organizationDomain,
       organization.organizationForm,
       pending,
@@ -167,14 +180,20 @@ export function OrganizationMemberPickerDrawer({
     ) =>
       filterAndSortOrganizationMemberPickerCandidates(visibleItems, {
         searchQuery: context.searchQuery,
+        memberClassAffinityIds: memberClassRecommendations?.memberClassAffinityIds,
+        availableClasses: memberClassRecommendations?.availableClasses,
       }),
-    [],
+    [
+      memberClassRecommendations?.availableClasses,
+      memberClassRecommendations?.memberClassAffinityIds,
+    ],
   )
 
   return (
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
+      loading={candidatesLoading}
       title={ORGANIZATION_MEMBER_PICKER_TITLE}
       description={`Choose a character to add to ${organization.name}.`}
       auxiliaryAction={
@@ -235,7 +254,16 @@ export function OrganizationMemberPickerDrawer({
                       tone: 'success',
                     },
                   ]
-                : undefined,
+                : candidate.isRecommended
+                  ? [
+                      {
+                        kind: 'badge',
+                        label: ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+                        appearance: 'outline',
+                        tone: 'info',
+                      },
+                    ]
+                  : undefined,
             }}
             trailing={
               candidate.isMember
@@ -262,7 +290,8 @@ export function OrganizationMemberPickerDrawer({
             <OrganizationMembershipTitleField
               kind={organization.organizationDomain}
               form={organization.organizationForm}
-              activities={organization.activities}
+              functions={organization.functions}
+              practices={organization.practices}
               value={
                 expandedItemId === candidate.id
                   ? selectedTitle

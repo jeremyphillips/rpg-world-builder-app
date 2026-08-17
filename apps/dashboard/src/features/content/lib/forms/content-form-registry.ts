@@ -5,6 +5,7 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ContentSource,
   EquipmentKind,
+  OrganizationPractice,
   WeaponCategory,
   ContentValidationIntent,
 } from '@rpg/contracts'
@@ -50,6 +51,10 @@ export type ContentFormCtx = {
   /** Campaign-resolved spell school labels, descriptions, and active ids. */
   spellSchoolVocabulary?: SpellSchoolVocabulary
   options?: Partial<ContentFormOptionSets>
+  /** Selected member class affinity ids for orphan chip union on edit load. */
+  organizationMemberClassAffinitySeedIds?: readonly string[]
+  /** Live practice recommendations from preset bridge — authoring guidance only. */
+  organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind
   /** Equipment family URL segment for breadcrumbs and back links. */
@@ -101,7 +106,7 @@ export interface ContentFormDef<
   /**
    * Optional value sync rules executed by the form shell when driver fields change.
    */
-  valueSyncs?: FormValueSync[]
+  valueSyncs?: FormValueSync[] | ((ctx: ContentFormCtx) => FormValueSync[])
   /** Name field hoisted above tabs / the rest of the form in create/edit shells. */
   nameField: (ctx: ContentFormCtx) => FormItem
   /**
@@ -144,6 +149,8 @@ export interface ContentFormDef<
    * delete-lock and source badge derivation on edit.
    */
   extractEmbeddedSeedRowIds?: (entity: TEntity) => Readonly<Record<string, readonly string[]>>
+  /** Augments edit layout context after list options resolve (e.g. orphan chip seeds). */
+  enrichEditLayoutCtx?: (ctx: ContentFormCtx, entity: TEntity) => ContentFormCtx
   /**
    * Coverage mode for the drift test suite:
    * - `'roundtrip-only'` (default): verifies `toFormValues` → `toInput` →

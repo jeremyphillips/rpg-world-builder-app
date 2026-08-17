@@ -7,7 +7,8 @@ import {
   resolveOrganizationMembershipMetadata,
   type CampaignNpcDetail,
   type CharacterBuildContext,
-  type OrganizationActivity,
+  type OrganizationFunction,
+  type OrganizationPractice,
   type OrganizationDomain,
   type OrganizationForm,
 } from '@rpg/contracts'
@@ -60,7 +61,9 @@ export type QuickNpcCreateFormOrganization = {
   name: string
   organizationDomain: OrganizationDomain
   organizationForm?: OrganizationForm
-  activities?: readonly OrganizationActivity[]
+  functions?: readonly OrganizationFunction[]
+  practices?: readonly OrganizationPractice[]
+  memberClassAffinityIds?: readonly string[]
 }
 
 export type QuickNpcAuthoringFormProps = {
@@ -262,7 +265,8 @@ export function QuickNpcAuthoringForm({
       const membershipMetadata = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
         form: organization.organizationForm,
-        activities: organization.activities,
+        functions: organization.functions,
+        practices: organization.practices,
         selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
       })
 

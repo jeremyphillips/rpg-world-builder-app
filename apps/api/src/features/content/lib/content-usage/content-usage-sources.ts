@@ -15,7 +15,10 @@ import {
   indexCharacterEquipmentBlockersByContentId,
 } from './reference-sources/characters'
 import { indexLocationParentBlockersByContentId } from './reference-sources/locations'
-import { indexOrganizationLocationBlockersByContentId } from './reference-sources/organizations'
+import {
+  indexOrganizationLocationBlockersByContentId,
+  indexOrganizationMemberClassAffinityBlockersByContentId,
+} from './reference-sources/organizations'
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import type { ContentUsageSource } from './content-usage-source'
 
@@ -59,6 +62,10 @@ export const characterEquipmentSource: ContentUsageSource = {
 
 export const organizationLocationSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexOrganizationLocationBlockersByContentId(ctx),
+}
+
+export const organizationMemberClassAffinitySource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexOrganizationMemberClassAffinityBlockersByContentId(ctx),
 }
 
 export const locationParentReferenceSource: ContentUsageSource = {

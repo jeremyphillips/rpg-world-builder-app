@@ -307,7 +307,11 @@ export {
   type InsetPanelSize,
   type InsetPanelVariantProps,
 } from './components/ui/inset-panel.variants'
-export { RadioCardField, type RadioCardFieldProps } from './components/ui/radio-card-field'
+export {
+  RadioCardField,
+  type RadioCardFieldProps,
+  type RadioCardOptionGroup,
+} from './components/ui/radio-card-field'
 export {
   ChooserSummaryCard,
   type ChooserSummaryCardProps,

@@ -27,7 +27,9 @@ describe('organization body contracts', () => {
     ).toEqual({
       name: 'The Lantern Guild',
       organizationDomain: 'occupational',
-      activities: [],
+      functions: [],
+      practices: [],
+      memberClassAffinityIds: [],
       connections: { locations: [] },
     })
 
@@ -59,24 +61,58 @@ describe('organization body contracts', () => {
   it('allows drafts without organizationDomain and normalizes blank names', () => {
     expect(organizationBodyDraftSchema.parse({ name: '  ' })).toEqual({
       name: 'Untitled Organization',
-      activities: [],
+      functions: [],
+      practices: [],
+      memberClassAffinityIds: [],
     })
   })
 
-  it('accepts ordered activities independently and rejects duplicates', () => {
+  it('strips legacy activities from organization bodies', () => {
+    const parsed = organizationBodySchema.parse({
+      name: 'Legacy Guild',
+      organizationDomain: 'occupational',
+      activities: ['trade'],
+      functions: ['trade'],
+    })
+
+    expect(parsed).not.toHaveProperty('activities')
+    expect(parsed.functions).toEqual(['trade'])
+  })
+
+  it('accepts ordered functions and practices independently and rejects duplicates', () => {
     expect(
       organizationBodySchema.parse({
         name: 'Ember Works',
         organizationDomain: 'commercial',
-        activities: ['blacksmithing', 'brewing'],
-      }).activities,
-    ).toEqual(['blacksmithing', 'brewing'])
+        functions: ['production'],
+        practices: ['blacksmithing', 'brewing'],
+      }),
+    ).toMatchObject({
+      functions: ['production'],
+      practices: ['blacksmithing', 'brewing'],
+    })
 
     expect(
       organizationBodySchema.safeParse({
         name: 'Duplicate Works',
         organizationDomain: 'commercial',
-        activities: ['brewing', 'brewing'],
+        practices: ['brewing', 'brewing'],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      organizationBodySchema.safeParse({
+        name: 'Duplicate Functions',
+        organizationDomain: 'commercial',
+        functions: ['trade', 'trade'],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      organizationBodySchema.safeParse({
+        name: 'Duplicate Affinities',
+        organizationDomain: 'commercial',
+        memberClassAffinityIds: ['class-a', 'class-a'],
       }).success,
     ).toBe(false)
   })

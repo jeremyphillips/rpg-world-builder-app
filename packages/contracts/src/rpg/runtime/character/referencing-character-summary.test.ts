@@ -19,6 +19,7 @@ describe('referencing character summary contracts', () => {
       id: 'char-1',
       name: 'Verna',
       summary: 'Dwarf · Level 1 Fighter',
+      classIds: [],
     })
   })
 
@@ -62,6 +63,7 @@ describe('referencing character summary contracts', () => {
             id: 'char-1',
             name: 'Verna',
             summary: 'Dwarf · Level 1 Fighter',
+            classIds: [],
           },
           membership: { title: 'Captain', priority: 40 },
         },

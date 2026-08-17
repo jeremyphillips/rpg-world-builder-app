@@ -10,6 +10,7 @@ export const characterCardSummarySchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   summary: z.string(),
+  classIds: z.array(z.string().min(1)).default([]),
 })
 
 export type CharacterCardSummaryDto = z.infer<typeof characterCardSummarySchema>

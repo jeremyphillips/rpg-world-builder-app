@@ -10,12 +10,12 @@ analysis notes or completed Cursor plans.
 
 ## Required reading
 
-| Priority | Document                                                                                                 | When                                        |
-| -------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| 1        | This roadmap                                                                                             | Status, deferred work, SSOT hierarchy       |
-| 2        | [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md) | Shipped Form + Facility model and authoring |
-| 3        | [`building-taxonomy-evidence.md`](../analysis/building-taxonomy-evidence.md)                             | Semantic gates and boundary decisions       |
-| 4        | [`building-taxonomy-discovery.md`](../analysis/building-taxonomy-discovery.md)                           | Frozen 308-concept research corpus only     |
+| Priority | Document                                                                                                 | When                                          |
+| -------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| 1        | This roadmap                                                                                             | Status, deferred work, SSOT hierarchy         |
+| 2        | [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md) | Shipped Form + Facility model and authoring   |
+| 3        | [`building-taxonomy-evidence.md`](../analysis/building-taxonomy-evidence.md)                             | Semantic gates and boundary decisions         |
+| 4        | [`building-taxonomy-discovery.md`](../discovery/building-taxonomy-discovery.md)                          | Research digest — full corpus in archive only |
 
 Create-flow: [`create-flow.md`](../../apps/dashboard/docs/create-flow.md).
 
@@ -84,19 +84,39 @@ Exact unresolved membership: post-Phase 22 tests in
 
 Broad corpus disposition and vocabulary enrichment are **closed** (Phases 19–22, 2026-08-14).
 
-| Track                             | Outcome                                                                                         |
-| --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Taxonomy discovery (308 concepts) | Frozen — [`building-taxonomy-discovery.md`](../analysis/building-taxonomy-discovery.md)         |
-| Model E                           | Shipped, then **retired** at runtime                                                            |
-| Form + Facility convergence       | Archetype quarantined; `tower`, `hall`, `keep` admitted                                         |
-| Create-flow Phases 7–8            | **Closed** — open composition; presets **2B not approved**                                      |
-| Corpus disposition (19A–19D)      | Morphology, approximate Facility, promotion gate, stopping review — **no further broad sweeps** |
-| Phase 20 Facility enrichment      | `workshop`, `office`, `bakery`, `auction_house` promoted                                        |
-| Phase 21 commercial tail          | **38/38** reviewed — vocabulary **sufficient**                                                  |
-| Phase 22 final coverage           | **22/22** residual + urban audit — **common urban coverage sufficient**                         |
+| Track                             | Outcome                                                                                                                                                                                                       |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy discovery (308 concepts) | Digest [`building-taxonomy-discovery.md`](../discovery/building-taxonomy-discovery.md); full record [`archive/building-taxonomy-discovery-v0.5.md`](../discovery/archive/building-taxonomy-discovery-v0.5.md) |
+| Model E                           | Shipped, then **retired** at runtime                                                                                                                                                                          |
+| Form + Facility convergence       | Archetype quarantined; `tower`, `hall`, `keep` admitted                                                                                                                                                       |
+| Create-flow Phases 7–8            | **Closed** — open composition; presets **2B not approved**                                                                                                                                                    |
+| Corpus disposition (19A–19D)      | Morphology, approximate Facility, promotion gate, stopping review — **no further broad sweeps**                                                                                                               |
+| Phase 20 Facility enrichment      | `workshop`, `office`, `bakery`, `auction_house` promoted                                                                                                                                                      |
+| Phase 21 commercial tail          | **38/38** reviewed — vocabulary **sufficient**                                                                                                                                                                |
+| Phase 22 final coverage           | **22/22** residual + urban audit — **common urban coverage sufficient**                                                                                                                                       |
 
 Phase closeout detail lives in git history, inventory allowlists, and
 [`building-taxonomy-evidence.md`](../analysis/building-taxonomy-evidence.md).
+
+## Discovery follow-through (product decisions)
+
+Phase 5 and the editorial appendices mixed **taxonomy conclusions** (in the
+[`discovery digest`](../discovery/building-taxonomy-discovery.md)) with **implementation
+questions** that belong here. Model E shipped, then runtime converged to Form + Facility; most
+items below are historical or deferred.
+
+| Discovery / appendix topic                  | Disposition                                                         |
+| ------------------------------------------- | ------------------------------------------------------------------- |
+| Model E registry + specialization authoring | **Retired at runtime** — quarantined archetype corpus               |
+| Seed migration (25 subtypes → archetypes)   | **Historical** — pre–Form/Facility convergence                      |
+| Specialization cleanup (Phase 8 appendix)   | **Historical** — free-text specialization no longer on runtime path |
+| Overview archetype/function filters         | **Superseded** — overview uses Form/Facility discovery              |
+| Presets / Slice 2B                          | **Deferred** — see evidence doc; not approved                       |
+| Manifestation runtime encoding              | **Deferred** — see deferred table below                             |
+| Foundry search in Archetype picker          | **Product decision** — closed with Model E retirement               |
+
+Verbatim Phase 5 implementation handoff and appendices:
+[`archive/building-taxonomy-discovery-v0.5.md`](../discovery/archive/building-taxonomy-discovery-v0.5.md).
 
 ## Stopping rule (active)
 
@@ -170,8 +190,9 @@ data — only when ESLint consumers and inventory derivation have a safe new hom
 
 - [`building-taxonomy-evidence.md`](../analysis/building-taxonomy-evidence.md) — semantic gates and
   important boundary decisions
-- [`building-taxonomy-discovery.md`](../analysis/building-taxonomy-discovery.md) — frozen
-  308-concept research corpus
+- [`building-taxonomy-discovery.md`](../discovery/building-taxonomy-discovery.md) — research digest;
+  full 308-concept record in
+  [`archive/building-taxonomy-discovery-v0.5.md`](../discovery/archive/building-taxonomy-discovery-v0.5.md)
 - [`locations-building-classification.md`](../../apps/dashboard/docs/locations-building-classification.md) —
   runtime authoring SSOT
 - [`create-flow.md`](../../apps/dashboard/docs/create-flow.md) — Building create UX / composite submit

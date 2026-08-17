@@ -7,12 +7,17 @@ const members: OrganizationMembersResponse = {
   items: [
     {
       characterType: 'npc',
-      character: { id: 'npc-1', name: 'Circle Envoy', summary: 'Human · Level 3 Rogue' },
+      character: {
+        id: 'npc-1',
+        name: 'Circle Envoy',
+        summary: 'Human · Level 3 Rogue',
+        classIds: [],
+      },
       membership: { title: 'Speaker', priority: 50 },
     },
     {
       characterType: 'pc',
-      character: { id: 'char-1', name: 'Verna', summary: 'Dwarf · Level 1 Fighter' },
+      character: { id: 'char-1', name: 'Verna', summary: 'Dwarf · Level 1 Fighter', classIds: [] },
       membership: {},
     },
   ],

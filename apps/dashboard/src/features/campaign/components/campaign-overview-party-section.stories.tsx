@@ -29,6 +29,7 @@ export const WithPartyPc: Story = {
           id: 'char_1',
           name: 'Verna',
           summary: 'Dwarf · Level 1 Fighter',
+          classIds: [],
           campaign: { id: 'camp_1', name: 'The Argent Road' },
         },
         member: {
@@ -51,6 +52,7 @@ export const PlayedByYou: Story = {
           id: 'char_1',
           name: 'Verna',
           summary: 'Dwarf · Level 1 Fighter',
+          classIds: [],
           campaign: { id: 'camp_1', name: 'The Argent Road' },
         },
         member: {
@@ -73,6 +75,7 @@ export const Unassigned: Story = {
           id: 'char_2',
           name: 'Unassigned PC',
           summary: 'Human · Level 1 Wizard',
+          classIds: [],
           campaign: { id: 'camp_1', name: 'The Argent Road' },
         },
         member: null,

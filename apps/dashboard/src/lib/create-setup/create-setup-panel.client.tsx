@@ -106,6 +106,7 @@ export function CreateSetupPanel({
               density="compact"
               value={set.value}
               options={set.options}
+              optionGroups={set.optionGroups}
               expanded={expanded}
               onExpandedChange={(nextExpanded) => {
                 if (nextExpanded) {

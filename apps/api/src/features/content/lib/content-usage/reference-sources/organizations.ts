@@ -1,5 +1,9 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { LOCATION_ORGANIZATION_REFERENCE, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
+import {
+  LOCATION_ORGANIZATION_REFERENCE,
+  ORGANIZATION_MEMBER_CLASS_AFFINITY_REFERENCE,
+  USAGE_BLOCKER_SOURCE_KEYS,
+} from '@rpg/contracts'
 
 import { toContentUsageBlocker } from '../../../../vocabulary'
 import { HomebrewOrganizationModel } from '../../../organizations/homebrew-organization.model'
@@ -21,6 +25,31 @@ export async function indexOrganizationLocationBlockersByContentId(
   return indexRecordsByContentId(
     docs,
     (doc) => extractIdsFromOrganizationDescriptor(doc, LOCATION_ORGANIZATION_REFERENCE.path),
+    (doc) =>
+      toContentUsageBlocker(
+        'organizations',
+        {
+          id: String(doc._id),
+          name: doc.name,
+          slug: doc.slug,
+        },
+        USAGE_BLOCKER_SOURCE_KEYS.unknown,
+      ),
+  )
+}
+
+/** Organization member class affinity refs for the classes usage surface. */
+export async function indexOrganizationMemberClassAffinityBlockersByContentId(
+  ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
+): Promise<Map<string, ContentUsageBlocker[]>> {
+  const docs = await HomebrewOrganizationModel.find({ campaignId: ctx.campaignId })
+    .select('_id name slug memberClassAffinityIds')
+    .lean<OrganizationContentUsageHit[]>()
+
+  return indexRecordsByContentId(
+    docs,
+    (doc) =>
+      extractIdsFromOrganizationDescriptor(doc, ORGANIZATION_MEMBER_CLASS_AFFINITY_REFERENCE.path),
     (doc) =>
       toContentUsageBlocker(
         'organizations',

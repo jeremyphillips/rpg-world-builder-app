@@ -6,7 +6,8 @@ import type { VocabularyTerm } from './types'
 
 export const ORGANIZATION_FORM_TERM = {
   label: 'Organization Form',
-  description: 'How an organization is constituted independently of its domain or activities.',
+  description:
+    'How an organization is constituted independently of its domain, functions, and practices.',
   sentence: {
     singular: 'organization form',
     plural: 'organization forms',
@@ -96,6 +97,32 @@ export const ORGANIZATION_FORM_ENTRIES = {
       'Master',
       'Initiate',
       'Member',
+    ),
+  },
+  force: {
+    label: 'Force',
+    description:
+      'An organization constituted as an armed, levied, or crewed host rather than as a membership body or an operating enterprise.',
+    searchTerms: ['host', 'corps', 'levy'],
+    memberTitles: organizationMemberTitleEntries(
+      'Commander',
+      'Captain',
+      'Officer',
+      'Sergeant',
+      'Trooper',
+    ),
+  },
+  office: {
+    label: 'Office',
+    description:
+      'An appointed or statutory institution that exercises authority or performs an official function, rather than a voluntary membership body.',
+    searchTerms: ['department', 'bureau'],
+    memberTitles: organizationMemberTitleEntries(
+      'Chancellor',
+      'Registrar',
+      'Clerk',
+      'Secretary',
+      'Official',
     ),
   },
 } as const satisfies Record<string, OrganizationClassificationEntry>

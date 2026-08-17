@@ -15,7 +15,9 @@ const plan: BuildingOrganizationDraftPlan = {
       values: {
         name: 'Copper Kettle Cooperative',
         organizationDomain: 'commercial',
-        activities: [],
+        functions: [],
+        practices: [],
+        memberClassAffinityIds: [],
       },
     },
   ],

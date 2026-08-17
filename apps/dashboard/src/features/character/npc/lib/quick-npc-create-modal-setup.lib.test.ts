@@ -5,6 +5,10 @@ import {
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
 import {
+  QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+  QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+} from './quick-npc-class-option-groups.lib'
+import {
   buildQuickNpcCreateSetupSets,
   formatQuickNpcSetupCharacterSummary,
   resolveQuickNpcDefaultLevel,
@@ -14,6 +18,18 @@ import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
 
 describe('buildQuickNpcCreateSetupSets', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+  const rogueClass = {
+    ...populatedBuilderCatalog.classes[0]!,
+    id: 'srd-cc-5.2.1:rogue',
+    slug: 'rogue',
+    name: 'Rogue',
+  }
+  const multiClassContext = createCampaignNpcBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      classes: [populatedBuilderCatalog.classes[0]!, rogueClass],
+    },
+  })
 
   it('orders species and level, omitting class at level 0', () => {
     const sets = buildQuickNpcCreateSetupSets({
@@ -47,6 +63,31 @@ describe('buildQuickNpcCreateSetupSets', () => {
 
     expect(sets[1]?.collapseWhenComplete).toBe(false)
     expect(sets[1]?.isComplete).toBe(true)
+  })
+
+  it('groups class options by organization member class affinities when survivors exist', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      context: multiClassContext,
+      values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
+      onValuesChange: () => {},
+      memberClassAffinityIds: [rogueClass.id],
+    })
+
+    const classSet = sets.find((set) => set.id === 'classId')
+    expect(classSet?.kind).toBe('choice')
+    if (classSet?.kind !== 'choice') throw new Error('expected class choice set')
+    expect(classSet.optionGroups).toEqual([
+      {
+        id: 'recommended',
+        eyebrow: QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+        options: [{ value: rogueClass.id, label: 'Rogue' }],
+      },
+      {
+        id: 'all-classes',
+        eyebrow: QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+        options: [{ value: 'srd-cc-5.2.1:fighter', label: 'Fighter' }],
+      },
+    ])
   })
 })
 

@@ -11,7 +11,8 @@ export type { OrganizationMembershipTitleFieldProps } from './organization-membe
 export function OrganizationMembershipTitleField({
   kind,
   form,
-  activities,
+  functions,
+  practices,
   value,
   onValueChange,
   idPrefix,
@@ -19,7 +20,8 @@ export function OrganizationMembershipTitleField({
   const options = buildOrganizationMembershipTitleRadioOptions({
     kind,
     form,
-    activities,
+    functions,
+    practices,
     currentValue: value,
   })
 

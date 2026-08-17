@@ -33,6 +33,57 @@ add a dedicated projection module (e.g. `location-authoring-type.ts`) that:
 Reference: locations Location type projection —
 [locations-building-classification.md](./locations-building-classification.md#authoring-flow).
 
+Organization familiar starting points (`organization-form-projection.ts`):
+
+- Runtime model: [`organizations-classification.md`](./organizations-classification.md)
+- Recipes live in `@rpg/contracts` `ORGANIZATION_AUTHORING_PRESETS` — ephemeral
+  projection onto domain / form / functions / practices only; preset id is **not** persisted.
+- Picker is a single-select **`combobox`** (`multiple: false`). Map preset
+  `discoveryTerms` → option `searchTerms` and `description` → option `description`
+  at the form boundary only. These are closest-starting-point discovery strings,
+  not lexical aliases and not classification-entry `searchTerms`.
+- **Functions** — multi **`chips`** with outline chrome and hint
+  _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.
+- **Practices** — multi **`combobox`** with classification-entry `aliases` and
+  `searchTerms` projected onto option `searchTerms` (picker search), hint
+  _Distinctive trades, methods, or operational specialties._, and placeholder
+  from `vocabularyTermFieldCopy(ORGANIZATION_PRACTICE_TERM, { multiple: true })`.
+  UI-only Practice families live in `@rpg/contracts`
+  `ORGANIZATION_PRACTICE_PRESENTATION_FAMILY_BY_ID` (not persisted, not eligibility rules).
+  The Practice combobox stays flat and search-first at ~58 options — families are metadata only.
+- `buildOrganizationFormValueSyncs` applies a preset once, clears
+  `authoringPresetId`, writes both `functions` and `practices`, and **never** seeds
+  `name`. Authors keep the real name.
+- Every preset also defines required `recommendedPractices` in contracts — authoring
+  guidance only, never auto-applied or persisted. Curate each preset with
+  **apply** (goes in `practices`), **recommend** (ordered `recommendedPractices`),
+  or **omit** (neither). `practices ∩ recommendedPractices` must stay empty.
+- Create flows mount `OrganizationAuthoringFormShell` plus
+  `OrganizationAuthoringPresetBridge` inside the `<Form>`. The bridge reacts only to
+  positive `authoringPresetId` selections; the sync-driven clear after apply is a
+  no-op so recommendations survive for the session. `clearPracticeRecommendations()`
+  is for explicit custom-start resets only.
+- The Practices combobox `resolveFilteredOptions` reads
+  `ctx.organizationPracticeRecommendationIds` (or an explicit `recommendedPracticeIds`
+  option for embedded composers). Empty query: selected values, then recommended ids in
+  preset order, then registry tail. Typed query: `rankOptionsByQuery` only
+  (recommendation-neutral).
+- Reused unchanged under the embedded building-org composer prefix
+  (`operatorOrganization.*`).
+- **Coverage regression (test-only):** the frozen 150-row corpus fixture
+  ([`organization-preset-coverage.fixture.ts`](../src/features/content/organizations/lib/__tests__/fixtures/organization-preset-coverage.fixture.ts))
+  locks intentional discovery outcomes when presets or `discoveryTerms` change.
+  `undiscoverable` must stay zero. `weak` / `no_start` rows are diagnostic
+  signals — not debt to zero out, and not an ongoing mandate to raise coverage %.
+  Update fixture rows deliberately when the picker changes on purpose.
+- **Discovery ownership (test-only):**
+  [`organization-preset-discovery-ownership.test.ts`](../src/features/content/organizations/lib/organization-preset-discovery-ownership.test.ts)
+  mirrors the contracts guard that a live preset label must not appear verbatim in another
+  preset’s `discoveryTerms`, and locks breadth-v1 label collisions (Navy ≠ Army, etc.).
+- **Semantic flows (test-only):**
+  [`organization-semantic-flows.test.ts`](../src/features/content/organizations/lib/organization-semantic-flows.test.ts)
+  promotes durable search/projection cases only — not the 272-row breadth worksheet.
+
 ## Validation
 
 Table-level domain rules (contiguous level ranges, cross-row overlap, campaign
@@ -48,8 +99,10 @@ sub-fields).
 Dashboard draft form schemas (`*DraftFormSchema`, `draftSchema` on
 `ContentFormDef`) run through the same RHF + Zod resolver as publish. **`select`**
 and single **`chips`** controls seed unselected values as `''` (see
-`fieldDefaultValue` in `@rpg/ui/form`). Plain `someVocabSchema.optional()` still
-validates that sentinel against the enum and blocks Save Draft.
+`fieldDefaultValue` in `@rpg/ui/form`). Optional single **`combobox`** controls
+seed `undefined` instead — still use `draftOptionalSelect` when the field is
+optional. Plain `someVocabSchema.optional()` still validates the `''` sentinel
+against the enum and blocks Save Draft.
 
 Use **`draftOptionalSelect(schema)`** from
 [`lib/forms/draft-form-schema-helpers.ts`](../src/features/content/lib/forms/draft-form-schema-helpers.ts)

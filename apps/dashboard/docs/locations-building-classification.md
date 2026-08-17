@@ -7,12 +7,12 @@ purpose). At least one must be present on persisted classification.
 **Facility is the primary authoring/discovery axis; Form is optional structural precision.** Setup
 requires a Facility discovery group (including Browse all), not a persisted `facilityType`.
 
-| Concern                        | Where to read                                                                                                                                                                                                             |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Runtime model**              | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
-| **Taxonomy planning / status** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                         |
-| **Semantic gates / history**   | [`building-taxonomy-evidence.md`](../../../docs/analysis/building-taxonomy-evidence.md) — only when boundary reasoning is needed                                                                                          |
-| **Frozen research corpus**     | [`building-taxonomy-discovery.md`](../../../docs/analysis/building-taxonomy-discovery.md) — only for the 308-concept matrix                                                                                               |
+| Concern                        | Where to read                                                                                                                                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime model**              | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts)                |
+| **Taxonomy planning / status** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                                        |
+| **Semantic gates / history**   | [`building-taxonomy-evidence.md`](../../../docs/analysis/building-taxonomy-evidence.md) — only when boundary reasoning is needed                                                                                                         |
+| **Frozen research corpus**     | [`building-taxonomy-discovery.md`](../../../docs/discovery/building-taxonomy-discovery.md) — digest; full record in [`archive/building-taxonomy-discovery-v0.5.md`](../../../docs/discovery/archive/building-taxonomy-discovery-v0.5.md) |
 
 Do not start from the frozen discovery corpus to learn the current shipped model.
 

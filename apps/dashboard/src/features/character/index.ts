@@ -126,6 +126,7 @@ export {
   type CharacterEntitySummaryVm,
 } from './lib/display/character-display'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
+export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
 export {
   resolveQueryErrorLabel,
   combineQueryPending,

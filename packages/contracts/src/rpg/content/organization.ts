@@ -1,25 +1,44 @@
 import { z } from 'zod'
 
 import { organizationDomainSchema } from '../vocab/organization-domain'
-import { organizationActivitySchema } from '../vocab/organization-activity'
+import { organizationFunctionSchema } from '../vocab/organization-function'
 import { organizationFormSchema } from '../vocab/organization-form'
+import { organizationPracticeSchema } from '../vocab/organization-practice'
 import { organizationConnectionsSchema } from './organization-connections'
 import { createDraftInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from './lib/envelope'
 import { ORGANIZATION_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 
-const organizationActivitiesSchema = z
-  .array(organizationActivitySchema)
-  .refine((activities) => new Set(activities).size === activities.length, {
-    message: 'Organization activities must not contain duplicates.',
+function uniqueOrganizationClassificationArray<T extends z.ZodTypeAny>(
+  itemSchema: T,
+  label: string,
+) {
+  return z.array(itemSchema).refine((values) => new Set(values).size === values.length, {
+    message: `Organization ${label} must not contain duplicates.`,
   })
+}
+
+const organizationFunctionsSchema = uniqueOrganizationClassificationArray(
+  organizationFunctionSchema,
+  'functions',
+)
+const organizationPracticesSchema = uniqueOrganizationClassificationArray(
+  organizationPracticeSchema,
+  'practices',
+)
+const organizationMemberClassAffinityIdsSchema = uniqueOrganizationClassificationArray(
+  z.string().min(1),
+  'member class affinity ids',
+)
 
 /** Publish-complete organization body fields. */
 const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
   organizationDomain: organizationDomainSchema,
   organizationForm: organizationFormSchema.optional(),
-  activities: organizationActivitiesSchema.default([]),
+  functions: organizationFunctionsSchema.default([]),
+  practices: organizationPracticesSchema.default([]),
+  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
 })
 
@@ -34,7 +53,9 @@ const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
 ).extend({
   organizationDomain: organizationDomainSchema.optional(),
   organizationForm: organizationFormSchema.optional(),
-  activities: organizationActivitiesSchema.default([]),
+  functions: organizationFunctionsSchema.default([]),
+  practices: organizationPracticesSchema.default([]),
+  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
 })
 
 /** Draft organization body — domain may remain unset until publish. */
@@ -85,7 +106,9 @@ export const updateOrganizationInputSchema = organizationBodyFieldsSchema
   .extend({
     slug: slugSchema,
     organizationForm: organizationFormSchema.nullable().optional(),
-    activities: organizationActivitiesSchema.optional(),
+    functions: organizationFunctionsSchema.optional(),
+    practices: organizationPracticesSchema.optional(),
+    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
   })
   .partial()
 
@@ -96,7 +119,9 @@ export const updateOrganizationDraftInputSchema = createDraftInputSchema(
 )
   .extend({
     organizationForm: organizationFormSchema.nullable().optional(),
-    activities: organizationActivitiesSchema.optional(),
+    functions: organizationFunctionsSchema.optional(),
+    practices: organizationPracticesSchema.optional(),
+    memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.optional(),
   })
   .partial()
 

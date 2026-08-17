@@ -14,7 +14,9 @@ export const CITY_COUNCIL: Organization = {
   name: 'City Council',
   description: '<p>The elected council governing the city.</p>',
   organizationDomain: 'government',
-  activities: [],
+  functions: [],
+  practices: [],
+  memberClassAffinityIds: [],
   connections: { locations: [] },
 }
 
@@ -27,4 +29,16 @@ export const SILVER_CIRCLE: Organization = {
   organizationDomain: 'academic',
 }
 
-export const ORGANIZATIONS_LIST = [CITY_COUNCIL, SILVER_CIRCLE] as const
+export const CRAFT_GUILD: Organization = {
+  ...CITY_COUNCIL,
+  id: 'organization-craft-guild',
+  slug: 'ironroot-smiths',
+  name: 'Ironroot Smiths',
+  description: '<p>A craft guild regulating smithing standards and apprentices.</p>',
+  organizationDomain: 'occupational',
+  organizationForm: 'guild',
+  functions: ['standards', 'training'],
+  practices: ['apprenticeship', 'blacksmithing'],
+}
+
+export const ORGANIZATIONS_LIST = [CITY_COUNCIL, SILVER_CIRCLE, CRAFT_GUILD] as const

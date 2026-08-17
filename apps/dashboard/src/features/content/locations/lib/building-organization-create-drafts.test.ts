@@ -15,7 +15,9 @@ import {
 const organizationValues = {
   name: 'Copper Kettle Cooperative',
   organizationDomain: 'commercial' as const,
-  activities: [],
+  functions: [],
+  practices: [],
+  memberClassAffinityIds: [],
 }
 
 function existingOrganization(input: {
@@ -29,7 +31,9 @@ function existingOrganization(input: {
     source: 'homebrew',
     status: 'published',
     organizationDomain: 'commercial',
-    activities: [],
+    functions: [],
+    practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: input.connections ?? [] },
   } as unknown as Organization
 }

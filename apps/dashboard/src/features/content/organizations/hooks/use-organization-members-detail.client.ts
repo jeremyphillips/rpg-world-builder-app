@@ -17,6 +17,8 @@ import {
   type CharacterOrganizationMembershipSubjectKind,
 } from '@/features/character'
 
+import { useClasses } from '../../classes/hooks/use-classes'
+
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/location-connected-party-character-options.lib'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import type { OrganizationMemberPickerCommit } from '../components/organization-member-picker-drawer.client'
@@ -50,7 +52,13 @@ export function useOrganizationMembersDetail(
   campaignId: string,
   organization: Pick<
     Organization,
-    'id' | 'name' | 'organizationDomain' | 'organizationForm' | 'activities'
+    | 'id'
+    | 'name'
+    | 'organizationDomain'
+    | 'organizationForm'
+    | 'functions'
+    | 'practices'
+    | 'memberClassAffinityIds'
   >,
 ) {
   const organizationId = organization.id
@@ -59,6 +67,10 @@ export function useOrganizationMembersDetail(
   const membersQuery = useOrganizationMembers(campaignId, organizationId)
   const campaignCharactersQuery = useCampaignCharacters(canManage ? campaignId : undefined)
   const npcsQuery = useNpcs(canManage ? campaignId : undefined)
+  const classesQuery = useClasses(canManage ? campaignId : undefined)
+  const candidatesPending = campaignCharactersQuery.isPending || npcsQuery.isPending
+  const memberClassRecommendationsPending =
+    organization.memberClassAffinityIds.length > 0 && classesQuery.isPending
   const {
     catalogIndex,
     context: npcBuildContext,
@@ -170,7 +182,8 @@ export function useOrganizationMembersDetail(
       const metadata = resolveOrganizationMembershipMetadata({
         domain: organization.organizationDomain,
         form: organization.organizationForm,
-        activities: organization.activities,
+        functions: organization.functions,
+        practices: organization.practices,
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),
@@ -198,7 +211,8 @@ export function useOrganizationMembersDetail(
       campaignId,
       editingRow,
       invalidate,
-      organization.activities,
+      organization.functions,
+      organization.practices,
       organization.organizationDomain,
       organization.organizationForm,
       organizationId,
@@ -239,9 +253,19 @@ export function useOrganizationMembersDetail(
       setDrawerState(null)
     } catch (error) {
       setMutationError(getErrorMessage(error, ORGANIZATION_MEMBERS_MUTATION_ERROR))
-      setDrawerState(null)
     }
   }, [drawerState, removeMember])
+
+  const memberClassRecommendations = React.useMemo(
+    () =>
+      organization.memberClassAffinityIds.length > 0 && classesQuery.data
+        ? {
+            memberClassAffinityIds: organization.memberClassAffinityIds,
+            availableClasses: classesQuery.data,
+          }
+        : undefined,
+    [classesQuery.data, organization.memberClassAffinityIds],
+  )
 
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
   const openCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'createNpc' }), [])
@@ -269,12 +293,15 @@ export function useOrganizationMembersDetail(
     emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.members,
     membersQuery,
     candidates,
+    candidatesPending,
     drawerState,
     editingRow,
     removingRow: drawerState?.mode === 'remove' ? drawerState.row : null,
     mutationError,
     pendingCharacterId,
     quickNpc,
+    memberClassRecommendations,
+    memberClassRecommendationsPending,
     openAddDrawer,
     openCreateNpcModal,
     cancelCreateNpcModal,

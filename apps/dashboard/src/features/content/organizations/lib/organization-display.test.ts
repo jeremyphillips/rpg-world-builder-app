@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CITY_COUNCIL } from '../fixtures'
+import { CITY_COUNCIL, CRAFT_GUILD } from '../fixtures'
 import {
   buildOrganizationDetailViewModel,
   formatLocationConnectionsCount,
@@ -34,6 +34,57 @@ describe('buildOrganizationDetailViewModel', () => {
       ],
       description: '<p>The elected council governing the city.</p>',
       locationConnections: emptyLocationConnections,
+    })
+  })
+
+  it('shows separate Functions and Practices stat rows and omits empty axes', () => {
+    expect(buildOrganizationDetailViewModel(CRAFT_GUILD, emptyLocationConnections)).toEqual({
+      statRows: [
+        {
+          label: 'Domain',
+          value: 'Occupational',
+          info: 'Serves, regulates, represents, or develops a trade or professional community.',
+          infoAriaLabel: 'About Occupational',
+        },
+        {
+          label: 'Form',
+          value: 'Guild',
+          info: 'A membership body organized to govern or support a shared practice or trade.',
+          infoAriaLabel: 'About Guild',
+        },
+        {
+          label: 'Functions',
+          value: 'Standards · Training',
+        },
+        {
+          label: 'Practices',
+          value: 'Apprenticeship · Blacksmithing',
+        },
+      ],
+      description: '<p>A craft guild regulating smithing standards and apprentices.</p>',
+      locationConnections: emptyLocationConnections,
+    })
+  })
+
+  it('shows member class affinity labels when present', () => {
+    const organization = {
+      ...CRAFT_GUILD,
+      memberClassAffinityIds: ['class-fighter', 'class-rogue', 'class-missing'],
+    }
+    const classLabelById = new Map([
+      ['class-fighter', 'Fighter'],
+      ['class-rogue', 'Rogue'],
+    ])
+
+    expect(
+      buildOrganizationDetailViewModel(organization, emptyLocationConnections, classLabelById),
+    ).toMatchObject({
+      statRows: expect.arrayContaining([
+        {
+          label: 'Member class affinities',
+          value: 'Fighter · Rogue · Class Missing · Unresolved reference',
+        },
+      ]),
     })
   })
 })

@@ -20,6 +20,7 @@ describe('CampaignOverviewPartySection', () => {
                 id: 'char_1',
                 name: 'Verna',
                 summary: 'Dwarf · Level 1 Fighter',
+                classIds: [],
                 campaign: { id: 'camp_1', name: 'The Argent Road' },
               },
               member: {
@@ -52,6 +53,7 @@ describe('CampaignOverviewPartySection', () => {
                 id: 'char_1',
                 name: 'Verna',
                 summary: 'Dwarf · Level 1 Fighter',
+                classIds: [],
                 campaign: { id: 'camp_1', name: 'The Argent Road' },
               },
               member: {
@@ -80,6 +82,7 @@ describe('CampaignOverviewPartySection', () => {
                 id: 'char_2',
                 name: 'Unassigned PC',
                 summary: 'Human · Level 1 Wizard',
+                classIds: [],
                 campaign: { id: 'camp_1', name: 'The Argent Road' },
               },
               member: null,

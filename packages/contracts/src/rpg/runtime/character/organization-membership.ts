@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import type { OrganizationActivity } from '../../vocab/organization-activity'
+import type { OrganizationFunction } from '../../vocab/organization-function'
+import type { OrganizationPractice } from '../../vocab/organization-practice'
 import type { OrganizationDomain } from '../../vocab/organization-domain'
 import type { OrganizationForm } from '../../vocab/organization-form'
 import { resolveOrganizationMemberTitleEntry } from '../../vocab/organization-member-title'
@@ -47,7 +48,8 @@ export function resolveOrganizationMembershipPriority(input: {
   membership: MembershipPrioritySource
   domain: OrganizationDomain
   form?: OrganizationForm
-  activities?: readonly OrganizationActivity[]
+  functions?: readonly OrganizationFunction[]
+  practices?: readonly OrganizationPractice[]
 }): number | undefined {
   if (input.membership.priority !== undefined) {
     return input.membership.priority
@@ -57,7 +59,8 @@ export function resolveOrganizationMembershipPriority(input: {
   return resolveOrganizationMemberTitleEntry({
     domain: input.domain,
     form: input.form,
-    activities: input.activities,
+    functions: input.functions,
+    practices: input.practices,
     title,
   })?.priority
 }
@@ -109,7 +112,8 @@ export type ResolvedOrganizationMembershipMetadata = {
 export function resolveOrganizationMembershipMetadata(input: {
   domain: OrganizationDomain
   form?: OrganizationForm
-  activities?: readonly OrganizationActivity[]
+  functions?: readonly OrganizationFunction[]
+  practices?: readonly OrganizationPractice[]
   /** Selected title after radio mapping; `undefined` means No title. */
   selectedTitle: string | undefined
   currentMembership?: MembershipPrioritySource
@@ -122,7 +126,8 @@ export function resolveOrganizationMembershipMetadata(input: {
   const canonical = resolveOrganizationMemberTitleEntry({
     domain: input.domain,
     form: input.form,
-    activities: input.activities,
+    functions: input.functions,
+    practices: input.practices,
     title: selectedTitle,
   })
   if (canonical) {

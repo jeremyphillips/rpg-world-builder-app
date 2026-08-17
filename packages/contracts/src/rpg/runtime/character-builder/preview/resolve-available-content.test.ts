@@ -94,7 +94,9 @@ function makeOrganization(
     ...timestamps,
     name: slug,
     organizationDomain: 'occupational',
-    activities: [],
+    functions: [],
+    practices: [],
+    memberClassAffinityIds: [],
     connections: { locations: [] },
     campaignAccess: {
       available: true,

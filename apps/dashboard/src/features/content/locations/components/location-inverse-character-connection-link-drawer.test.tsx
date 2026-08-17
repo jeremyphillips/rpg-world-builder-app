@@ -15,6 +15,7 @@ const characters = [
     name: 'Braggi',
     summary: 'Merchant',
     characterType: 'npc' as const,
+    classIds: [],
   },
 ]
 

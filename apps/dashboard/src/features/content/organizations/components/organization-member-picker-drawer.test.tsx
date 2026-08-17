@@ -10,6 +10,7 @@ import {
   OrganizationMemberPickerDrawer,
 } from './organization-member-picker-drawer.client'
 import {
+  ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
   ORGANIZATION_MEMBER_PICKER_CANDIDATES,
   ORGANIZATION_MEMBER_PICKER_ORGANIZATION,
 } from './organization-member-picker-drawer.fixtures'
@@ -76,16 +77,20 @@ describe('OrganizationMemberPickerDrawer', () => {
       ).getByText('Member'),
     ).toBeInTheDocument()
 
-    expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(1)
+    expect(screen.getAllByRole('button', { name: 'Add' })).toHaveLength(2)
   })
 
   it('lists addable candidates before existing members', () => {
     renderPicker()
 
+    const streetRunner = screen.getByText('Street Runner')
     const verna = screen.getByText('Verna')
     const circleEnvoy = screen.getByText('Circle Envoy')
     const silentPartner = screen.getByText('Silent Partner')
 
+    expect(
+      streetRunner.compareDocumentPosition(circleEnvoy) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(
       verna.compareDocumentPosition(circleEnvoy) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -94,11 +99,27 @@ describe('OrganizationMemberPickerDrawer', () => {
     ).toBeTruthy()
   })
 
+  it('shows a Recommended badge for affinity matches that are not already members', () => {
+    renderPicker({
+      memberClassRecommendations: {
+        memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
+        availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+      },
+    })
+
+    const recommendedRow = screen
+      .getByText('Street Runner')
+      .closest('[data-entity-item-slot="content"]')?.parentElement
+    expect(recommendedRow).toBeTruthy()
+    expect(within(recommendedRow as HTMLElement).getByText('Recommended')).toBeInTheDocument()
+    expect(screen.queryByText('Verna')?.closest('[data-entity-summary-status-row]')).toBeNull()
+  })
+
   it('expands to configure a title, then stamps title and canonical priority on commit', async () => {
     const user = userEvent.setup()
     const { props } = renderPicker()
 
-    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     expect(props.onAdd).not.toHaveBeenCalled()
     expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
 
@@ -118,7 +139,7 @@ describe('OrganizationMemberPickerDrawer', () => {
     const user = userEvent.setup()
     const { props } = renderPicker()
 
-    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     await user.click(screen.getByRole('button', { name: 'Add member' }))
 
     expect(props.onAdd).toHaveBeenCalledWith({ characterId: 'char-1', characterType: 'pc' })
@@ -140,7 +161,7 @@ describe('OrganizationMemberPickerDrawer', () => {
       onAdd: vi.fn().mockRejectedValue(new Error('Membership failed')),
     })
 
-    await user.click(screen.getByRole('button', { name: 'Add' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     await user.click(screen.getByRole('button', { name: 'Add member' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')

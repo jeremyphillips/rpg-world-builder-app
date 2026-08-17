@@ -54,6 +54,13 @@ export interface ContentFormOptionSets {
   equipment: FieldOption[]
   /** Full equipment entities for authoring-time pool expansion. */
   equipmentEntities?: Equipment[]
+  /** Campaign-discoverable class entities for id-valued authoring fields. */
+  classEntities?: CharacterClass[]
+  /**
+   * Full campaign class catalog for orphan reference resolution. When omitted,
+   * falls back to `classEntities` (discoverable rows only).
+   */
+  campaignClassEntities?: CharacterClass[]
   /** Eligible tool proficiency choices for starting-equipment linked grants. */
   proficiencyChoiceTargets?: FieldOption[]
   spells: FieldOption[]
@@ -222,6 +229,8 @@ export function buildContentFormOptionSets(input: {
     armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment), 'equipment'),
     equipment: toSortedContentFieldOptions(input.equipment, 'equipment'),
     equipmentEntities: input.equipment,
+    classEntities: input.classes,
+    campaignClassEntities: input.classes,
     spells: toSortedContentFieldOptions(input.spells, 'spells'),
     feats: toSortedContentFieldOptions(input.feats, 'feats'),
     skills: toSortedContentFieldOptions(input.skills, 'skill-proficiencies'),

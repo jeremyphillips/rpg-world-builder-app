@@ -1,6 +1,11 @@
 # Organization Content Type and Character Connections Plan
 
-Status: Phases 1–8 complete
+> **Superseded:** This document describes the retired V1 `organizationKind` /
+> `organizationSubtype` model. Current classification is Domain / Form / Functions / Practices —
+> see [`organization-taxonomy.md`](./organization-taxonomy.md) and
+> [`organizations-classification.md`](../apps/dashboard/docs/organizations-classification.md).
+
+Status: Phases 1–8 complete (historical)
 
 Scope: top-level `organizations` content type plus character connections
 
