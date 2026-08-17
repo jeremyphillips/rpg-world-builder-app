@@ -25,6 +25,10 @@ const locationFormDef: ContentFormDef<Location, LocationFormValues, CreateLocati
   createDefaultValues: locationCreateDefaultValues,
   buildFields: buildLocationFields,
   valueSyncs: locationFormValueSyncs,
+  enrichEditLayoutCtx: (ctx, entity) => ({
+    ...ctx,
+    ...(entity.parentLocationId ? { locationParentLocationIdSeed: entity.parentLocationId } : {}),
+  }),
   toFormValues: locationToFormValues,
   toInput: buildLocationCreateInput,
   useListQuery: useLocations,

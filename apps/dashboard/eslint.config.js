@@ -215,6 +215,97 @@ const dashboardFormFieldGuards = {
   },
 }
 
+const dashboardContentPickerPolicyGuards = {
+  files: [
+    'src/features/**/*picker*.{ts,tsx}',
+    'src/features/**/*drawer*.{ts,tsx}',
+    'src/features/content/locations/lib/location-*-field-options*.ts',
+    'src/features/content/locations/lib/building-organizations-create-tab-controller.lib.ts',
+    'src/features/content/locations/lib/location-parent-replacement.ts',
+    'src/features/content/locations/lib/bulk/build-bulk-change-parent-fields.ts',
+    'src/features/content/lib/location-connection-drawer-intent.ts',
+    'src/features/content/organizations/lib/organization-member-class-discoverable.lib.ts',
+  ],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/lib/form-options/content-form-options.ts',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@/features/content/classes/hooks/use-classes',
+            message:
+              'Picker eligibility must use ctx.options.classes purpose selectors — not raw useClasses list queries.',
+          },
+          {
+            name: '@/features/content/spells/hooks/use-spells',
+            message:
+              'Picker eligibility must use ctx.options.spells purpose selectors — not raw useSpells list queries.',
+          },
+          {
+            name: '@/features/content/feats/hooks/use-feats',
+            message:
+              'Picker eligibility must use ctx.options.feats purpose selectors — not raw useFeats list queries.',
+          },
+          {
+            name: '@/features/content/equipment/hooks/use-equipment',
+            message:
+              'Picker eligibility must use ctx.options.equipment purpose selectors — not raw useEquipment list queries.',
+          },
+          {
+            name: '@/features/content/skill-proficiencies/hooks/use-skill-proficiencies',
+            message:
+              'Picker eligibility must use ctx.options.skills purpose selectors — not raw useSkillProficiencies list queries.',
+          },
+          {
+            name: '@/features/content/locations/hooks/use-locations',
+            message:
+              'World-graph pickers must use forReference() or filterReferenceableCatalogRows — not raw useLocations as the selectable source.',
+          },
+          {
+            name: '@/features/content/organizations/hooks/use-organizations',
+            message:
+              'World-graph pickers must use forReference() or filterReferenceableCatalogRows — not raw useOrganizations as the selectable source.',
+          },
+        ],
+      },
+    ],
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "BinaryExpression[operator='==='] > MemberExpression[property.name='status'][object.property.name='status'] + Literal[value='draft']",
+        message:
+          'Do not filter picker eligibility with status === "draft". Use isContentReferenceable or forReference().',
+      },
+      {
+        selector:
+          "BinaryExpression[operator='==='] > MemberExpression[property.name='status'][object.property.name='status'] + Literal[value='published']",
+        message:
+          'Do not filter picker eligibility with status === "published". Use isContentReferenceable or forReference().',
+      },
+    ],
+  },
+}
+
+const dashboardCharacterBuilderPlayActorGuard = {
+  files: ['src/features/character/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "Property[key.name='playActor'] > Identifier[name='undefined']",
+        message:
+          'Character builder context must always carry an explicit ContentPlayActor — do not set playActor to undefined.',
+      },
+    ],
+  },
+}
+
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
@@ -226,4 +317,6 @@ export default [
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
+  dashboardContentPickerPolicyGuards,
+  dashboardCharacterBuilderPlayActorGuard,
 ]

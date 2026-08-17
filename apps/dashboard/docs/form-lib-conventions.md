@@ -94,6 +94,24 @@ Do not duplicate those checks on row schemas or in `FormItem` config.
 Row schemas keep only field-local refines (bonus-gold operator, required
 sub-fields).
 
+### Content form option purpose selectors
+
+`useContentFormOptions` builds one **visible** catalog per content type. Pickers derive
+eligibility at the call site — do not assemble parallel filtered arrays:
+
+- **`forReference()`** — definition and world-graph relationships (location parent,
+  org↔location links, spell/class refs, grants, rich-text links)
+- **`forCampaignUse()`** — campaign-use metadata (org member class affinity new chips)
+- **`forPlay(playActor)`** — character-play surfaces (builder, Quick NPC, recommendations)
+
+Persisted stale ids use `unionPersistedOptions` with caller-supplied `authorizedDisplay`.
+See `apps/api/docs/campaign-access-enforcement.md` (preserve id vs disclose label).
+
+World-graph hooks that fetch full list queries must pass rows through
+`filterReferenceableCatalogRows` (or equivalent purpose selector) before exposing picker
+candidates. Create-and-link flows that **author a new draft record** remain allowed;
+selecting an **existing** draft dependency is not.
+
 ### Draft form schemas and select fields
 
 Dashboard draft form schemas (`*DraftFormSchema`, `draftSchema` on

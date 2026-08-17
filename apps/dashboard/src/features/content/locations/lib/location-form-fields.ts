@@ -27,9 +27,9 @@ import {
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
 } from './location-authoring-type'
+import { buildParentLocationFieldOptions } from './location-parent-field-options.lib'
 import {
   buildParentLocationOptionAvailability,
-  buildParentLocationOptions,
   parentLocationFieldVisibility,
 } from './location-parent-picker'
 import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
@@ -136,7 +136,7 @@ export function buildLocationFields(
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
-  const locationEntities = ctx.options?.locationEntities
+  const referenceableLocations = ctx.options?.locations?.forReference()
   const items: FormItem[] = []
 
   if (fixedCreate) {
@@ -190,10 +190,13 @@ export function buildLocationFields(
       type: 'select',
       name: 'parentLocationId',
       label: 'Parent location',
-      options: buildParentLocationOptions(locationEntities),
+      options: buildParentLocationFieldOptions(ctx, ctx.locationParentLocationIdSeed),
       placeholder: LOCATION_SELECT_PLACEHOLDER,
       visibility: parentLocationFieldVisibility(),
-      optionAvailability: buildParentLocationOptionAvailability(locationEntities, ctx.entityId),
+      optionAvailability: buildParentLocationOptionAvailability(
+        referenceableLocations,
+        ctx.entityId,
+      ),
     })
   }
 

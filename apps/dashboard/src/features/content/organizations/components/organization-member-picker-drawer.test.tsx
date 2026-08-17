@@ -103,7 +103,7 @@ describe('OrganizationMemberPickerDrawer', () => {
     renderPicker({
       memberClassRecommendations: {
         memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
-        availableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
       },
     })
 

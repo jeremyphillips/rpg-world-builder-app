@@ -23,7 +23,8 @@ import {
   attachCampaignAccessForTargetType,
 } from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
-import { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
+import { applyCatalogListFilter } from './lib/apply-catalog-list-filter'
+import { resolveCatalogListFilter } from './lib/resolve-catalog-membership-filter'
 import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
 import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
 import { assertDuplicateContentType } from './lib/duplication/duplicate-content-policy'
@@ -191,7 +192,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   const writeConfig = getContentWriteConfig(contentType)!
   const items = await resolveContentForCampaign(contentType, campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
-  const visible = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
+  const visible = applyCatalogListFilter(withCampaignAccess, resolveCatalogListFilter(req))
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),
     contentType as ContentUsageSurfaceKey,

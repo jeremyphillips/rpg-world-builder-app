@@ -6,11 +6,24 @@ this document tracks the full internal layout, status, and promotion path.
 
 **Layer boundaries and naming:** [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)
 
+## Catalog consumption ownership
+
+| Surface                    | Entry point                                          | Notes                                                                                        |
+| -------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Authoring form pickers     | `ctx.options.*.forReference()` / `forCampaignUse()`  | Definition fields and campaign-use metadata — not raw manager lists                          |
+| Character-play pickers     | `resolvePlayableBuilderContent(context)`             | SSOT for playable policy **and** builder creation rules (creature type, spell/class linkage) |
+| Finalize / step validation | `indexPlayableBuilderCatalog(context)`               | Indexes resolver output only — **not** an independent policy filter                          |
+| Discovery / overview lists | `isContentVisibleToViewer` via API membership filter | Visibility only — never drives builder selectable sets                                       |
+
+Do **not** use `forPlay()` alone on builder step surfaces — it applies playable policy
+without creation rules. Do **not** validate play-scoped selections against raw
+`indexCharacterBuildCatalog` output.
+
 ## Public API
 
 | Export                                       | Module                                                                  | Purpose                                                                                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `resolveAvailableContent`                    | `preview/resolve-available-content.ts`                                  | Filters species, classes, spells, and equipment by character-creation rules.                                                                                                                                                                                                                                                                |
+| `resolvePlayableBuilderContent`              | `preview/resolve-playable-builder-content.ts`                           | Character-play picker universe: campaign-eligible catalog rows filtered by `ContentPlayActor`, creature-type rules, and class-linked spells.                                                                                                                                                                                                |
 | `resolveAvailableChoices`                    | `resolvers/registry/resolve-choices.ts`                                 | Derives pending `ChoiceSet[]` from draft + catalog context.                                                                                                                                                                                                                                                                                 |
 | `resolveAutomaticNpcBuild`                   | `automatic/resolve-automatic-npc-build.ts`                              | Deterministic draft completion from a compact seed (Quick NPC, future presets). See [automatic-build-resolution.md](character-builder/automatic-build-resolution.md).                                                                                                                                                                       |
 | `resolveSpellcastingProfile`                 | `resolvers/spellcasting/spellcasting-profile.ts`                        | Structural spellcasting facts for the Spells step; null for non-casters.                                                                                                                                                                                                                                                                    |
@@ -332,27 +345,28 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
 ## Deferred / folded resolvers
 
-| Resolver                                  | Disposition                                                          |
-| ----------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`               | **Implemented** (BENCH-105) — spell picker row state + `compactSummary` (built once in resolver)                                                                                      |
-| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`            | **Implemented** (BENCH-115) — proficiencies step view model                                                                                                                           |
-| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`          | **Implemented** (BENCH-115) — proficiency picker row state; skill rows include `compactSummary`                                                                                       |
-| `deriveEquipmentRecommendations`          | `resolvers/equipment/derive-equipment-recommendations.ts`            | **Implemented** — tiered recommendations; supersedes BENCH-095 boolean recommendation                                                                                                 |
-| `isToolProficient`                        | `runtime/creature/proficiencies.ts`                                  | Creature-level tool proficiency predicate (`toolId` slug/id or `toolCategory` match)                                                                                                  |
-| `deriveRecommendedLanguageIds`            | `resolvers/proficiency/derive-recommended-language-ids.ts`           | **Implemented** — species `languageAffinities ∩` ChoiceSet options; never expands pool                                                                                                |
-| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`              | **Implemented** (BENCH-095) — picker row state (`isAffordable` / `isWithinRemainingBudget`) + search text; browse order in [content-ranking.md](character-builder/content-ranking.md) |
-| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts` | **Implemented** (BENCH-095) — starting package card summaries                                                                                                                         |
-| `resolveAvailableFeats`                   | Deferred — no full feat catalog in `CharacterBuildCatalog` yet       |
-| Campaign allow/deny filtering             | Plugs into `resolveAvailableContent` when campaign scope ships       |
+| Resolver                                  | Disposition                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`                          | **Implemented** (BENCH-105) — spell picker row state + `compactSummary` (built once in resolver)                                                                                      |
+| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`                       | **Implemented** (BENCH-115) — proficiencies step view model                                                                                                                           |
+| `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`                     | **Implemented** (BENCH-115) — proficiency picker row state; skill rows include `compactSummary`                                                                                       |
+| `deriveEquipmentRecommendations`          | `resolvers/equipment/derive-equipment-recommendations.ts`                       | **Implemented** — tiered recommendations; supersedes BENCH-095 boolean recommendation                                                                                                 |
+| `isToolProficient`                        | `runtime/creature/proficiencies.ts`                                             | Creature-level tool proficiency predicate (`toolId` slug/id or `toolCategory` match)                                                                                                  |
+| `deriveRecommendedLanguageIds`            | `resolvers/proficiency/derive-recommended-language-ids.ts`                      | **Implemented** — species `languageAffinities ∩` ChoiceSet options; never expands pool                                                                                                |
+| `resolveEquipmentPickerItems`             | `resolvers/equipment/resolve-equipment-picker-items.ts`                         | **Implemented** (BENCH-095) — picker row state (`isAffordable` / `isWithinRemainingBudget`) + search text; browse order in [content-ranking.md](character-builder/content-ranking.md) |
+| `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts`            | **Implemented** (BENCH-095) — starting package card summaries                                                                                                                         |
+| `resolveAvailableFeats`                   | Deferred — no full feat catalog in `CharacterBuildCatalog` yet                  |
+| Campaign allow/deny filtering             | **`resolvePlayableBuilderContent`** — playable(playActor) over campaign catalog |
 
 ## Related helpers
 
-| Helper                                | Location                                                 | Purpose                                                  |
-| ------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
-| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                  | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`. |
-| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`         | Shared grant-group walk for traits and features.         |
-| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`   | Maps creature pool rows to `ChoiceSetOption[]`.          |
-| `indexCharacterBuildCatalog`          | `context.ts`                                             | Builds by-id lookup maps for resolver consumption.       |
-| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`               | Equipment picker `comparisonGroups` + `kindLabel`.       |
-| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts` | Spell picker `castingSummary` + `classification`.        |
-| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`       | Skill proficiency ability label + catalog `exampleUses`. |
+| Helper                                | Location                                                 | Purpose                                                      |
+| ------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                  | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`.     |
+| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`         | Shared grant-group walk for traits and features.             |
+| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`   | Maps creature pool rows to `ChoiceSetOption[]`.              |
+| `indexCharacterBuildCatalog`          | `context.ts`                                             | Builds by-id lookup maps for resolver consumption.           |
+| `indexPlayableBuilderCatalog`         | `preview/index-playable-builder-catalog.ts`              | Indexes `resolvePlayableBuilderContent` for validation only. |
+| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`               | Equipment picker `comparisonGroups` + `kindLabel`.           |
+| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts` | Spell picker `castingSummary` + `classification`.            |
+| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`       | Skill proficiency ability label + catalog `exampleUses`.     |

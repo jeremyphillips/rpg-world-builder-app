@@ -246,6 +246,38 @@ describe('finalizePcCharacterBuild', () => {
     }
   })
 
+  it('rejects sibling-PC-only classes tampered into a new_pc draft at finalSubmit', () => {
+    const restrictedClass = {
+      ...builderTestContext.catalog.classes[0]!,
+      id: 'campaign:restricted-paladin',
+      slug: 'restricted-paladin',
+      name: 'Restricted Paladin',
+      campaignAccess: {
+        available: true,
+        visibilityMode: 'specific_players' as const,
+        participantIds: ['sibling-pc'],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'specific_players' as const,
+      },
+    }
+
+    const context = {
+      ...builderTestContext,
+      playActor: { kind: 'new_pc' as const },
+      catalog: {
+        ...builderTestContext.catalog,
+        classes: [...builderTestContext.catalog.classes, restrictedClass],
+      },
+    }
+
+    expect(() =>
+      finalizePcCharacterBuild(
+        makeCompleteDraft({ class: { classId: restrictedClass.id, level: 1 } }),
+        context,
+      ),
+    ).toThrow(CharacterBuildFinalizationError)
+  })
+
   it('isCharacterBuildFinalizationError recognizes errors across module instances', () => {
     try {
       finalizePcCharacterBuild(createEmptyCharacterBuilderDraft(), builderTestContext)

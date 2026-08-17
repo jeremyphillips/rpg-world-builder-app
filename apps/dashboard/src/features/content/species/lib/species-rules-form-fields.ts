@@ -9,6 +9,7 @@ import {
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
+import { referenceClassFieldOptions } from '../../lib/form-options/content-field-option.lib'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import {
   getContentTypeItemLabel,
@@ -73,7 +74,7 @@ function visibleWhenClassPolicyMode(mode: SpeciesClassPolicyMode): FieldVisibili
 }
 
 function classPolicyClassIdFields(ctx: ContentFormCtx): FormItem[] {
-  const classOptions = ctx.options?.classes ?? []
+  const classOptions = referenceClassFieldOptions(ctx.options?.classes)
 
   return [
     {
@@ -155,7 +156,7 @@ function classLevelCapItemFields(ctx: ContentFormCtx): FormItem[] {
           type: 'combobox',
           name: 'classId',
           label: getContentTypeItemLabel('classes'),
-          options: ctx.options?.classes ?? [],
+          options: referenceClassFieldOptions(ctx.options?.classes),
           placeholder: formatChooseContentTypePlaceholder('classes'),
           required: true,
           width: 'lg',

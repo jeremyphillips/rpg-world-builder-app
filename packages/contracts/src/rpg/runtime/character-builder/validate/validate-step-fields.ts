@@ -4,6 +4,7 @@ import { isStandardArrayAssignment } from '../ability/ability-generation'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
+import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 
@@ -41,15 +42,33 @@ export function validateIdentity(
   return issues
 }
 
-export function validateSpecies(draft: CharacterBuilderDraft): CharacterBuildValidationIssue[] {
-  if (draft.species.speciesId) return []
+export function validateSpecies(
+  draft: CharacterBuilderDraft,
+  context?: CharacterBuildContext,
+): CharacterBuildValidationIssue[] {
+  const issues: CharacterBuildValidationIssue[] = []
 
-  return [
-    validationIssue('species_required', characterBuilderValidationMessages.speciesRequired(), {
-      path: 'species.speciesId',
-      stepId: 'species',
-    }),
-  ]
+  if (!draft.species.speciesId) {
+    issues.push(
+      validationIssue('species_required', characterBuilderValidationMessages.speciesRequired(), {
+        path: 'species.speciesId',
+        stepId: 'species',
+      }),
+    )
+    return issues
+  }
+
+  if (context && !indexPlayableBuilderCatalog(context).species.has(draft.species.speciesId)) {
+    issues.push(
+      validationIssue(
+        'species_not_in_catalog',
+        characterBuilderValidationMessages.speciesNotInCatalog(),
+        { path: 'species.speciesId', stepId: 'species' },
+      ),
+    )
+  }
+
+  return issues
 }
 
 export function validateClass(
@@ -74,6 +93,21 @@ export function validateClass(
         path: 'class.classId',
         stepId: 'class',
       }),
+    )
+  }
+
+  if (
+    context &&
+    isClassProgressionApplicable(draft.class.level) &&
+    draft.class.classId &&
+    !indexPlayableBuilderCatalog(context).classes.has(draft.class.classId)
+  ) {
+    issues.push(
+      validationIssue(
+        'class_not_in_catalog',
+        characterBuilderValidationMessages.classNotInCatalog(),
+        { path: 'class.classId', stepId: 'class' },
+      ),
     )
   }
 

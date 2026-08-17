@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { buildContentPurposeSelectors, DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
-import { buildQuickNpcClassRadioCardPresentation } from '@/features/character/npc/lib/quick-npc-class-option-groups.lib'
+import { buildQuickNpcClassRadioCardPresentation } from '@/features/character'
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
@@ -109,7 +110,7 @@ describe('organization member class affinities integration', () => {
     expect(
       isOrganizationMemberPickerRecommended(candidate, {
         memberClassAffinityIds: [wizard.id],
-        availableClasses: [fighter, rogue],
+        playableClasses: [fighter, rogue],
       }),
     ).toBe(false)
 
@@ -120,7 +121,7 @@ describe('organization member class affinities integration', () => {
           { value: rogue.id, label: rogue.name },
         ],
         memberClassAffinityIds: [wizard.id],
-        availableClasses: [fighter, rogue],
+        playableClasses: [fighter, rogue],
       }),
     ).toEqual({
       options: [
@@ -133,8 +134,13 @@ describe('organization member class affinities integration', () => {
   it('shows unavailable stored classes on the org edit field until the author removes them', () => {
     const ctx = makeContentFormCtx({
       options: {
-        classEntities: [fighter],
-        campaignClassEntities: [fighter, wizard],
+        classes: buildContentPurposeSelectors([
+          fighter,
+          {
+            ...wizard,
+            campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+          },
+        ]),
       },
     })
 
@@ -149,8 +155,13 @@ describe('organization member class affinities integration', () => {
   it('does not block org authoring when a stored affinity class is unavailable', () => {
     const ctx = makeContentFormCtx({
       options: {
-        classEntities: [fighter],
-        campaignClassEntities: [fighter, rogue],
+        classes: buildContentPurposeSelectors([
+          fighter,
+          {
+            ...rogue,
+            campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+          },
+        ]),
       },
     })
     const [sync] = buildOrganizationFormValueSyncs(undefined, [fighter])

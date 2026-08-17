@@ -188,3 +188,19 @@ read-only routes.
 
 Re-enabling the campaign rule clears badges/alerts without mutating stored
 content.
+
+## UI availability reasons vs catalog eligibility
+
+`AvailabilityReason` codes (inactive badges, alerts, rail chips) explain **why a row
+looks inactive in authoring UI** — for example subclasses disabled by campaign rules.
+They are **not** the SSOT for combobox or catalog picker eligibility.
+
+Picker and relationship surfaces derive selectable sets from content resolution policy:
+
+- **`forReference()`** — world-graph and definition references (location parent, org↔location, spell/class links)
+- **`forCampaignUse()`** — campaign-use metadata such as org member class affinity chips
+- **`forPlay(playActor)`** — character consumption (builder, Quick NPC, recommendations)
+
+Dashboard ESLint guards block raw list hooks and local `status === 'draft'|'published'`
+filters in picker modules. See `dashboardContentPickerPolicyGuards` in
+`apps/dashboard/eslint.config.js`.

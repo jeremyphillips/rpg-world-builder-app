@@ -29,6 +29,7 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../content-form-registry'
+import { referenceEquipmentFieldOptions } from '../../form-options/content-field-option.lib'
 import {
   formatChooseContentTypePlaceholder,
   getContentTypeItemLabel,
@@ -317,7 +318,7 @@ export function grantedEquipmentItemFields(
     allowProficiencyChoiceTarget = false,
     grantTargetSourceOptions: grantTargetSelectOptions = grantTargetSourceOptions,
   } = opts
-  const equipmentOptions = ctx.options?.equipment ?? []
+  const equipmentOptions = referenceEquipmentFieldOptions(ctx.options?.equipment)
   const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
   const hasEligibleProficiencyChoices = proficiencyChoiceOptions.length > 0
 
@@ -414,7 +415,7 @@ export function equipmentChoiceGrantFields(
   ctx: ContentFormCtx,
   guard?: FieldVisibility,
 ): FormItem[] {
-  const equipmentOptions = ctx.options?.equipment ?? []
+  const equipmentOptions = referenceEquipmentFieldOptions(ctx.options?.equipment)
 
   return [
     {

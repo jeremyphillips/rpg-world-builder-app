@@ -8,6 +8,7 @@ import { resolveCatalog } from '../lib/resolve-catalog'
 import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
+import { resolveCatalogMembershipFilter } from '../lib/resolve-catalog-membership-filter'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import { subclassContentConfig } from './subclasses.config'
@@ -40,7 +41,7 @@ export async function resolveSubclassesForCampaign(
 export async function listSubclasses(req: Request, res: Response): Promise<void> {
   const { campaignId, classId } = req.params as { campaignId: string; classId: string }
   const subclasses = await resolveSubclassesForCampaign(campaignId, classId)
-  const visible = filterCatalogForMembership(subclasses, req.campaignMembership)
+  const visible = filterCatalogForMembership(subclasses, resolveCatalogMembershipFilter(req))
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),
     'subclasses',

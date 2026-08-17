@@ -40,6 +40,7 @@ function createCampaignNpcContext(): CampaignNpcBuildContext {
     rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
     ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
     acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+    playActor: { kind: 'npc' },
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: builderTestRules,
@@ -60,6 +61,7 @@ function createCampaignPcContext(): CampaignPcBuildContext {
       kind: 'campaign_pc_onboarding',
       campaignId: TEST_CAMPAIGN_ID,
     },
+    playActor: { kind: 'new_pc' },
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: { ...builderTestRules, startingLevel: 3 },
@@ -173,6 +175,7 @@ describe('character build context helpers', () => {
         catalog: emptyCatalog,
         characterCreationRules: builderTestRules,
         permissions: { canCreateCharacter: true },
+        playActor: { kind: 'new_pc' },
       }),
     ).toBe(false)
   })

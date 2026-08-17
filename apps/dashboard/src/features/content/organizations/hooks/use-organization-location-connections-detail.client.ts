@@ -11,6 +11,7 @@ import { ApiError } from '@rpg/contracts'
 
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import { useLocations } from '../../locations/hooks/use-locations'
 import { buildLocationsById } from '../../locations/lib/location-display'
 import {
@@ -60,8 +61,12 @@ export function useOrganizationLocationConnectionsDetail(
   const mutations = useOrganizationLocationConnectionMutations(campaignId, organizationId)
   const [drawerState, setDrawerState] = React.useState<DrawerState | null>(null)
 
-  const locations = locationsQuery.data ?? []
-  const locationsById = React.useMemo(() => buildLocationsById(locations), [locations])
+  const allLocations = locationsQuery.data ?? []
+  const locations = React.useMemo(
+    () => filterReferenceableCatalogRows(allLocations),
+    [allLocations],
+  )
+  const locationsById = React.useMemo(() => buildLocationsById(allLocations), [allLocations])
   const edgesByLocationId = edgesQuery.data
   const occupancyLoaded = !canManage || !edgesQuery.isPending
 

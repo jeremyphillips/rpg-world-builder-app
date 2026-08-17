@@ -1,7 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import {
+  getErrorMessage,
+  isContentPlayableFor,
+  resolveOrganizationMembershipMetadata,
+} from '@rpg/contracts'
 import type { Organization, OrganizationReferenceResolution } from '@rpg/contracts'
 
 import { useOrganizations } from '@/features/content'
@@ -22,10 +26,11 @@ import { UNAVAILABLE_ORGANIZATION_LABEL } from '../lib/display/character-display
 function toPickerItems(
   organizations: readonly Organization[],
   memberships: readonly OrganizationReferenceResolution[],
+  playActor: { kind: 'pc'; characterId: string },
 ): OrganizationPickerItem[] {
   const selectedIds = new Set(memberships.map((membership) => membership.organizationId))
   return organizations
-    .filter((organization) => organization.status === 'published')
+    .filter((organization) => isContentPlayableFor(organization, playActor))
     .map((organization) => ({
       organization,
       selected: selectedIds.has(organization.id),
@@ -75,8 +80,8 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     React.useState<OrganizationReferenceResolution | null>(null)
 
   const pickerItems = React.useMemo(
-    () => toPickerItems(organizationsQuery.data ?? [], memberships),
-    [memberships, organizationsQuery.data],
+    () => toPickerItems(organizationsQuery.data ?? [], memberships, { kind: 'pc', characterId }),
+    [characterId, memberships, organizationsQuery.data],
   )
   const editingOrganization = React.useMemo(
     () => toEditableOrganization(editingMembership),

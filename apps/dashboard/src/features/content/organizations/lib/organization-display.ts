@@ -1,4 +1,5 @@
 import {
+  buildContentPurposeSelectors,
   getOrganizationFunctionLabel,
   getOrganizationPracticeLabel,
   getOrganizationDomainEntry,
@@ -8,13 +9,10 @@ import {
   type Organization,
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionKind,
+  type CharacterClass,
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
-import {
-  filterCampaignAvailableClasses,
-  type CampaignAccessClassRow,
-} from '../../lib/campaign-access/filter-campaign-available-classes.lib'
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 import { resolveOrganizationMemberClassAffinityDisplayLabel } from './organization-member-class-chip-options.lib'
@@ -68,9 +66,9 @@ export function formatLocationConnectionsCount(total: number): string {
 export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
-  catalogClasses: readonly CampaignAccessClassRow[] = [],
+  catalogClasses: readonly CharacterClass[] = [],
 ): OrganizationDetailViewModel {
-  const selectableClasses = filterCampaignAvailableClasses(catalogClasses)
+  const campaignUseClasses = buildContentPurposeSelectors(catalogClasses).forCampaignUse()
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
     organization.organizationForm !== undefined
@@ -122,7 +120,7 @@ export function buildOrganizationDetailViewModel(
               value: organization.memberClassAffinityIds
                 .map((classId) =>
                   resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
-                    selectableClasses,
+                    selectableClasses: campaignUseClasses,
                     catalogClasses,
                   }),
                 )

@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 
 import type { SystemRulesetId } from '../../primitives/ruleset'
-import type { ContentViewer } from '../../campaign/campaign-content-viewer'
+import type { ContentPlayActor } from '../campaign/content-play-actor'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -113,12 +113,13 @@ export type CharacterBuildContext = {
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
   permissions: CharacterBuilderPermissions
-  /**
-   * Optional defense-in-depth catalog filter — mirrors API discovery policy when
-   * the builder receives a pre-resolved viewer (e.g. campaign PC context).
-   */
-  catalogViewer?: ContentViewer
+  /** Play-visibility subject for every character-play consumption surface. */
+  playActor: ContentPlayActor
 }
+
+export type CampaignPcPlayActor =
+  | Extract<ContentPlayActor, { kind: 'new_pc' }>
+  | Extract<ContentPlayActor, { kind: 'pc' }>
 
 /** MVP instantiation — no campaign patch/membership context. */
 export type StandaloneBuildContext = CharacterBuildContext & {
@@ -127,6 +128,7 @@ export type StandaloneBuildContext = CharacterBuildContext & {
   rulesScope: Extract<CharacterRulesScope, { type: 'ruleset' }>
   ownershipTarget: { type: 'user' }
   characterKind: 'pc'
+  playActor: Extract<ContentPlayActor, { kind: 'new_pc' }>
 }
 
 /** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
@@ -137,6 +139,7 @@ export type CampaignNpcBuildContext = CharacterBuildContext & {
   ownershipTarget: { type: 'campaign'; campaignId: string }
   characterKind: 'npc'
   acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_npc' }>
+  playActor: Extract<ContentPlayActor, { kind: 'npc' }>
 }
 
 /** Campaign-scoped PC authoring — owned by the inviting user, rules from campaign. */
@@ -147,6 +150,7 @@ export type CampaignPcBuildContext = CharacterBuildContext & {
   ownershipTarget: { type: 'user'; userId: string }
   characterKind: 'pc'
   acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_pc_onboarding' }>
+  playActor: CampaignPcPlayActor
 }
 
 /** Discriminated union — only legal campaign build combinations compile. */

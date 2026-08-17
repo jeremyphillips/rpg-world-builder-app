@@ -6,7 +6,7 @@ import type { CharacterBuildEngineOptions } from '../engine-options'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { isChoiceStep, resolveEffectiveBuilderSteps } from '../steps'
 import { characterConnectionsSchema } from '../../character/connections'
-import { resolveAvailableContent } from '../preview/resolve-available-content'
+import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 
 import { validationIssue } from './issue'
 import type {
@@ -46,7 +46,9 @@ const STEP_VALIDATORS: Record<
       ]
     }
 
-    const availableIds = new Set(resolveAvailableContent(context).organizations.map(({ id }) => id))
+    const availableIds = new Set(
+      resolvePlayableBuilderContent(context).organizations.map(({ id }) => id),
+    )
     return parsed.data.organizations
       .filter(({ organizationId }) => !availableIds.has(organizationId))
       .map(({ organizationId }) =>
@@ -61,7 +63,7 @@ const STEP_VALIDATORS: Record<
       )
   },
   species: (draft, context, choiceSets) => [
-    ...validateSpecies(draft),
+    ...validateSpecies(draft, context),
     ...validateChoiceSetsForStep(draft, context, choiceSets, 'species'),
   ],
   class: (draft, context) => validateClass(draft, context),

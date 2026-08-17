@@ -105,7 +105,7 @@ export function isRequiredStartingWeaponSatisfiedInDraft(args: {
  * Advisory: weapons reachable through non-gold starting-equipment packages.
  * Used by automatic NPC build constraint planning (package bias, satisfiability).
  * Must not determine general weapon picker membership — Quick NPC and builder
- * pickers use campaign-available equipment via `resolveAvailableContent`
+ * pickers use playable equipment via `resolvePlayableBuilderContent`
  * (dashboard: `resolveQuickNpcWeaponRequirementOptions`).
  */
 export function listReachableStartingWeapons(args: {

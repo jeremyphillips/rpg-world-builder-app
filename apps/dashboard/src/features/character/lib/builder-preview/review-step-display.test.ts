@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
 import { formatAbilityMethodLabel, resolveReviewReadyMessage } from './review-step-display'
 
 describe('review-step-display', () => {
-  const context = createStandaloneBuilderContextFixture()
+  const context = createPopulatedStandaloneBuilderContextFixture()
 
   it('formats ability method labels', () => {
     expect(formatAbilityMethodLabel('manual')).toBe('Custom scores')

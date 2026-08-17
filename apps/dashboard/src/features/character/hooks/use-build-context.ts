@@ -53,6 +53,7 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
         armorClass: query.data.patch.mechanics.armorClass,
       },
       permissions: { canCreateCharacter: true },
+      playActor: { kind: 'new_pc' },
     }
   }, [rulesetId, query.data])
 

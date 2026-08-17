@@ -4,7 +4,7 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
-import { resolveAvailableContent } from '../preview/resolve-available-content'
+import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
@@ -293,7 +293,7 @@ export function applyRequiredWeaponEquipmentGrants(args: {
   }
 
   const availableEquipmentIds = new Set(
-    resolveAvailableContent(context).equipment.map((equipment) => equipment.id),
+    resolvePlayableBuilderContent(context).equipment.map((equipment) => equipment.id),
   )
   let nextDraft = draft
 

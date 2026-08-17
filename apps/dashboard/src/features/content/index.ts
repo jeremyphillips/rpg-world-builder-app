@@ -185,9 +185,14 @@ export {
 } from './lib/forms/content-form-registry'
 export {
   buildContentFormOptionSets,
+  referenceClassFieldOptions,
+  referenceEquipmentFieldOptions,
+  referenceSpellcastingClassFieldOptions,
   toContentFieldOption,
+  toSortedContentFieldOptions,
   useContentFormOptions,
   type ContentFormOptionSets,
+  type ContentPurposeSelectors,
 } from './lib/form-options/content-form-options'
 export {
   createContentMutationHooks,

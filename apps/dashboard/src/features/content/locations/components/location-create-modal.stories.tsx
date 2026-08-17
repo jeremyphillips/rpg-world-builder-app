@@ -5,6 +5,7 @@ import {
   BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES,
   BUILDING_FACILITY_TYPE_ENTRIES,
   BUILDING_FORM_ENTRIES,
+  buildContentPurposeSelectors,
   type BuildingFacilityType,
   type BuildingForm,
 } from '@rpg/contracts'
@@ -25,7 +26,7 @@ const buildingArgs = {
   },
   formOptionsCtx: {
     campaignId: STORY_CAMPAIGN_ID,
-    options: { locationEntities: [] },
+    options: { locations: buildContentPurposeSelectors([]) },
   },
 } satisfies LocationCreateModalProps
 

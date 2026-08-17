@@ -1,4 +1,5 @@
 import {
+  isContentReferenceable,
   validateLocationParentAssignment,
   getParentRequirement,
   type Location,
@@ -102,6 +103,7 @@ export function buildEligibleLocationParentReplacementCandidates(input: {
   const currentParentId = input.subject.parentLocationId
 
   return input.campaignLocations
+    .filter(isContentReferenceable)
     .filter((candidate) => {
       if (candidate.id === input.subject.id) {
         return false

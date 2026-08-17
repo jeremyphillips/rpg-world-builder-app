@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 
 import { pickClass } from '../../lib/fixtures/pick'
@@ -42,7 +43,10 @@ function LiveLabelSyncHarness() {
   return (
     <FormProvider {...form}>
       <ClassCharacterCreationTab
-        formCtx={{ entityId: monk.id, options: { equipmentEntities: equipment } }}
+        formCtx={{
+          entityId: monk.id,
+          options: { equipment: buildContentPurposeSelectors(equipment) },
+        }}
       />
       <div data-testid="linked-title">{startingEquipmentItemTitle(linkedItem, 0, [], options)}</div>
       <div data-testid="linked-option-label">{options[0]?.label}</div>

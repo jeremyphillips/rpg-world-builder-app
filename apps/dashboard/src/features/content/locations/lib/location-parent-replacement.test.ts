@@ -159,6 +159,24 @@ describe('buildEligibleLocationParentReplacementCandidates', () => {
     expect(candidates.map((location) => location.id)).toEqual([plane.id])
   })
 
+  it('excludes draft locations from new parent selection', () => {
+    const draftParent = makeLocation({
+      kind: 'region',
+      id: 'location-draft-parent',
+      slug: 'draft-parent',
+      name: 'Draft Parent',
+      status: 'draft',
+      parentLocationId: ALDERMERE.id,
+    })
+
+    const candidates = buildEligibleLocationParentReplacementCandidates({
+      subject: YAWNING_PORTAL,
+      campaignLocations: [...LOCATIONS_LIST, draftParent],
+    })
+
+    expect(candidates.some((location) => location.id === draftParent.id)).toBe(false)
+  })
+
   it('excludes descendants that would create a hierarchy cycle', () => {
     const candidates = buildEligibleLocationParentReplacementCandidates({
       subject: HARBORFORD,

@@ -96,6 +96,7 @@ function createEquipmentStepContextWithStartingWealth(
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
   }
 }
 
@@ -228,7 +229,7 @@ describe('equipment-step.lib', () => {
     }
     const catalogIndex = indexCharacterBuildCatalog(catalog)
     const context = createEquipmentStepContextFixture({
-      catalogViewer: { kind: 'pc', characterIds: ['pc-1'] },
+      playActor: { kind: 'pc', characterId: 'pc-1' },
       catalog,
     })
     const draft = {

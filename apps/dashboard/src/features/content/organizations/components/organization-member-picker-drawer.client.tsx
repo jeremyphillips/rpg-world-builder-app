@@ -77,7 +77,7 @@ export type OrganizationMemberPickerDrawerProps = {
   onCreateNpc?: () => void
   memberClassRecommendations?: Pick<
     OrganizationMemberPickerSortContext,
-    'memberClassAffinityIds' | 'availableClasses'
+    'memberClassAffinityIds' | 'playableClasses'
   >
   candidatesLoading?: boolean
 }
@@ -181,10 +181,10 @@ export function OrganizationMemberPickerDrawer({
       filterAndSortOrganizationMemberPickerCandidates(visibleItems, {
         searchQuery: context.searchQuery,
         memberClassAffinityIds: memberClassRecommendations?.memberClassAffinityIds,
-        availableClasses: memberClassRecommendations?.availableClasses,
+        playableClasses: memberClassRecommendations?.playableClasses,
       }),
     [
-      memberClassRecommendations?.availableClasses,
+      memberClassRecommendations?.playableClasses,
       memberClassRecommendations?.memberClassAffinityIds,
     ],
   )

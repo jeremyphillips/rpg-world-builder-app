@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
 import { useCampaignBuildContext, useNpcs } from '@/features/character'
 
+import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import { buildLocationsById } from '../lib/location-display'
 import { useLocations } from './use-locations'
 import {
@@ -177,6 +178,11 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     [locationsQuery.data],
   )
   const organizationsQuery = useOrganizations(campaignId)
+  const allOrganizations = organizationsQuery.data ?? []
+  const referenceableOrganizations = React.useMemo(
+    () => filterReferenceableCatalogRows(allOrganizations),
+    [allOrganizations],
+  )
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
   const { catalogIndex } = useCampaignBuildContext(campaignId)
@@ -234,8 +240,8 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   )
 
   const organizationIds = React.useMemo(
-    () => (organizationsQuery.data ?? []).map((organization) => organization.id),
-    [organizationsQuery.data],
+    () => referenceableOrganizations.map((organization) => organization.id),
+    [referenceableOrganizations],
   )
 
   const characterIds = React.useMemo(
@@ -523,15 +529,15 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     return resolveLocationInverseCurrentOrganizationEndpoint({
       relationshipId: organizationDrawerState.connection.relationshipId,
       rows,
-      organizations: organizationsQuery.data ?? [],
+      organizations: allOrganizations,
     })
-  }, [organizationDrawerState, organizationsQuery.data, rows])
+  }, [allOrganizations, organizationDrawerState, rows])
 
   return {
     connectedPartiesQuery,
-    organizations: organizationsQuery.data ?? [],
+    organizations: referenceableOrganizations,
     organizationCandidates: {
-      items: (organizationsQuery.data ?? []).map((organization) => ({
+      items: referenceableOrganizations.map((organization) => ({
         id: organization.id,
         name: organization.name,
       })),

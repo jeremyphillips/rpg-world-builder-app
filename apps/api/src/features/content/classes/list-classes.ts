@@ -5,7 +5,9 @@ import type { CharacterClass, ClassListItem, ContentSummaryRef } from '@rpg/cont
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
-import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
+import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
+import type { CatalogListFilter } from '../lib/apply-catalog-list-filter'
+import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
 import { resolveCatalog } from '../lib/resolve-catalog'
 import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { resolveContentForCampaign } from '../content-types'
@@ -16,7 +18,7 @@ import { subclassContentConfig } from '../subclasses/subclasses.config'
 /** Membership-filtered subclass summaries grouped by parent class id. */
 export async function resolveSubclassSummariesByClassId(
   campaignId: string,
-  membership: Parameters<typeof filterCatalogForMembership>[1],
+  filter: CatalogListFilter | undefined,
 ): Promise<Map<string, ContentSummaryRef[]>> {
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
@@ -39,7 +41,7 @@ export async function resolveSubclassSummariesByClassId(
     'subclasses',
     resolved,
   )
-  const visible = filterCatalogForMembership(withCampaignAccess, membership)
+  const visible = applyCatalogListFilter(withCampaignAccess, filter)
 
   const byClassId = new Map<string, ContentSummaryRef[]>()
   for (const subclass of visible) {
@@ -54,13 +56,11 @@ export async function resolveSubclassSummariesByClassId(
 /** Classes list enriched with per-class subclass id+name summaries. */
 export async function listClasses(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
+  const catalogFilter = resolveCatalogListFilter(req)
   const items = await resolveContentForCampaign('classes', campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, 'classes', items)
-  const visibleClasses = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
-  const subclassSummaries = await resolveSubclassSummariesByClassId(
-    campaignId,
-    req.campaignMembership,
-  )
+  const visibleClasses = applyCatalogListFilter(withCampaignAccess, catalogFilter)
+  const subclassSummaries = await resolveSubclassSummariesByClassId(campaignId, catalogFilter)
 
   const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => ({
     ...characterClass,

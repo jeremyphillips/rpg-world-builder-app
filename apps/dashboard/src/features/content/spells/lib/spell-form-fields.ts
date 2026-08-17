@@ -34,6 +34,7 @@ import {
 } from '../../lib/content-type-labels'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { referenceSpellcastingClassFieldOptions } from '../../lib/form-options/content-field-option.lib'
 import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
 import {
   castingTimeUnitOptions,
@@ -295,7 +296,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
           name: 'classIds',
           label: getContentTypeCollectionLabel('classes'),
           multiple: true,
-          options: ctx.options?.spellcastingClasses ?? [],
+          options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
           placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
           required: true,
           width: '1/2',

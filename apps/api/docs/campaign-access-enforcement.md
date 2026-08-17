@@ -89,7 +89,7 @@ Applied at:
 
 - API `GET /api/campaigns/:campaignId/content/:contentType` (and subclass lists)
 - Dashboard overview tables (defense-in-depth — Track B B3)
-- Future builder/catalog pickers
+- Character builder / play-catalog fetches (`catalogScope=play`)
 
 Not applied indiscriminately to:
 
@@ -97,7 +97,38 @@ Not applied indiscriminately to:
 - General rules reference views
 - Manager authoring surfaces
 
-### `canResolveSavedContentReference`
+### Play-catalog scope (`catalogScope=play`)
+
+Character-play catalog fetches (builder, Quick NPC) use a separate consumption mode from
+discovery lists:
+
+| Route kind           | Query parsing                                                             | Filter                                                    |
+| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Discovery / overview | `parseOptionalPlayActorFromQuery` — absence means default discovery union | `filterCatalogForMembership` → `isContentVisibleToViewer` |
+| Play catalog         | `requirePlayActorFromQuery` — missing/malformed actor → **400**           | `filterCatalogForPlayActor` → `isContentPlayableFor`      |
+
+Dashboard builder fetches always send `catalogScope=play` plus either `playActorKind`
+(`new_pc` | `npc`) or `playActorCharacterId` (implies `{ kind: 'pc', characterId }`).
+
+#### `authorizePlayActorCharacterId`
+
+When `playActor.kind === 'pc'`, parsing `playActorCharacterId` is not sufficient. Before
+applying `specific_players` grants, the API verifies:
+
+`playActorCharacterId ∈ req.campaignMembership.pcCharacterIds`
+
+| Case                                               | Result                   |
+| -------------------------------------------------- | ------------------------ |
+| Id in authorized controlled set                    | Proceed                  |
+| Id not in set (sibling PC, stale id, arbitrary id) | **403**                  |
+| `playActorKind=new_pc` or `npc`                    | No character id required |
+
+Manage privilege **never** bypasses playable PC actors (`new_pc` or `pc`).
+
+Builder query parsing uses `requirePlayActorFromQuery` on play-catalog routes only.
+Malformed combinations (`playActorKind` + `playActorCharacterId`, empty values, invalid
+kinds) return **400**. Unauthorized PC ids return **403** via
+`authorizePlayActorCharacterId` before any `specific_players` filtering runs.
 
 | Read context                   | Policy                            | Expected outcome                                                                                      |
 | ------------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -106,6 +137,35 @@ Not applied indiscriminately to:
 Managers always resolve. Campaign access overlay state (`available`, `visibilityMode`,
 `participantIds`) is intentionally **not** an input — turning content off or restricting
 discovery must not strip content already on a saved sheet.
+
+## Content resolution layers (catalog consumption)
+
+Four derived predicates sit on top of the viewer-visible catalog. They answer different
+questions — do not collapse them into one list filter.
+
+| Layer             | Predicate                         | Typical consumers                                                                                |
+| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Visible           | `isContentVisibleToViewer`        | Overviews, edit shells, management search                                                        |
+| Referenceable     | `isContentReferenceable`          | Definition fields, world-graph pickers (location parent, org↔location, spell `classIds`, grants) |
+| Campaign-eligible | `isContentCampaignEligible`       | Org member class affinity **new chips** (published + available; `visibilityMode` not applied)    |
+| Playable          | `isContentPlayableFor(playActor)` | Character builder, Quick NPC, affinity recommendations                                           |
+
+Dashboard form option sets expose one visible catalog per type with purpose selectors:
+`forReference()`, `forCampaignUse()`, `forPlay(playActor)`.
+
+### Preserve id vs disclose label
+
+Persisted reference ids are **never** silently stripped from form or draft state.
+Whether a viewer may **see the referenced name** is decided before the shared
+`unionPersistedOptions` helper runs. Callers supply `authorizedDisplay` with labels
+already filtered for the current viewer. Ids absent from both selectable and
+authorized display receive a generic unresolved fallback — not a protected name.
+
+`canResolveSavedContentReference` remains the saved-sheet read policy and must not
+become the orphan labeler for authoring pickers.
+
+Draft-to-draft composition (selecting an existing draft as a new dependency) is **out
+of scope** — add an explicit opt-in flag only when that workflow ships.
 
 ### Direct-read outcomes (locked)
 

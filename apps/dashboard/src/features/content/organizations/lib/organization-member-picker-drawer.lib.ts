@@ -24,7 +24,7 @@ const organizationMemberNameCollator = new Intl.Collator(undefined, {
 export type OrganizationMemberPickerSortContext = {
   searchQuery: string
   memberClassAffinityIds?: readonly string[]
-  availableClasses?: readonly CharacterClass[]
+  playableClasses?: readonly CharacterClass[]
 }
 
 type OrganizationMemberPickerScoredCandidate = {
@@ -43,25 +43,25 @@ export function formatOrganizationMemberPickerStatusBadgeLabel(membershipTitle?:
 
 type OrganizationMemberPickerRecommendationContext = {
   memberClassAffinityIds: readonly string[]
-  availableClasses: readonly CharacterClass[]
+  playableClasses: readonly CharacterClass[]
 }
 
 function resolveOrganizationMemberPickerRecommendations(
-  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'availableClasses'>,
+  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'playableClasses'>,
 ): OrganizationMemberPickerRecommendationContext {
   const memberClassAffinityIds = context.memberClassAffinityIds ?? []
-  const availableClasses = context.availableClasses ?? []
+  const playableClasses = context.playableClasses ?? []
 
-  if (memberClassAffinityIds.length === 0 || availableClasses.length === 0) {
-    return { memberClassAffinityIds: [], availableClasses: [] }
+  if (memberClassAffinityIds.length === 0 || playableClasses.length === 0) {
+    return { memberClassAffinityIds: [], playableClasses: [] }
   }
 
-  return { memberClassAffinityIds, availableClasses }
+  return { memberClassAffinityIds, playableClasses }
 }
 
 export function isOrganizationMemberPickerRecommended(
   candidate: OrganizationMemberPickerCandidate,
-  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'availableClasses'>,
+  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'playableClasses'>,
 ): boolean {
   if (candidate.isMember) return false
 
@@ -71,7 +71,7 @@ export function isOrganizationMemberPickerRecommended(
   return characterMatchesOrganizationMemberClassRecommendations({
     classIds: candidate.classIds ?? [],
     memberClassAffinityIds: recommendations.memberClassAffinityIds,
-    availableClasses: recommendations.availableClasses,
+    playableClasses: recommendations.playableClasses,
   })
 }
 

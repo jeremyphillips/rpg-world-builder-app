@@ -172,11 +172,11 @@ Purchase add/disable uses `resolveEquipmentPickerPurchaseActionState` — not a
 collapsed `isEquipmentPickerItemDisabled` bit. Row availability fields live in
 `equipment-picker-availability.lib.ts`:
 
-| Field              | Meaning                                                                                  |
-| ------------------ | ---------------------------------------------------------------------------------------- |
-| `contentAvailable` | Campaign/content — wired via `resolveAvailableContent` in equipment-step picker assembly |
-| `purchaseEligible` | Purchase channel supported                                                               |
-| `affordable`       | Remaining budget covers qty=1 (`purchaseAvailability.status === 'available'`)            |
+| Field              | Meaning                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| `contentAvailable` | Campaign/content — wired via `resolvePlayableBuilderContent` in equipment-step picker assembly |
+| `purchaseEligible` | Purchase channel supported                                                                     |
+| `affordable`       | Remaining budget covers qty=1 (`purchaseAvailability.status === 'available'`)                  |
 
 `isAffordable` (starting budget) remains for browse ranking and `filterOutUnaffordable` only.
 
@@ -256,7 +256,7 @@ Three layers — do not collapse them in new code:
 
 | Layer                    | Question                                                   | Owner                                                                                      |
 | ------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Content availability** | Is this catalog row allowed in the campaign/build context? | `resolveAvailableContent` (SSOT)                                                           |
+| **Content availability** | Is this catalog row allowed in the campaign/build context? | `resolvePlayableBuilderContent` (SSOT)                                                     |
 | **Acquisition**          | How does the draft obtain the item?                        | Package, purchase, magic allowance, or domain `ensureEquipmentGrant` on `equipment.grants` |
 | **Affordability**        | Can starting wealth cover a **purchase**?                  | Purchase channel only (`resolveEquipmentPurchaseAvailability`, budget planners)            |
 

@@ -473,6 +473,7 @@ describe('resolveBuilderStepDescription', () => {
         kind: 'campaign_pc_onboarding',
         campaignId: TEST_CAMPAIGN_ID,
       },
+      playActor: { kind: 'new_pc' },
     } satisfies CampaignPcBuildContext
 
     expect(resolveBuilderStepDescription(context, 'review')).toBe(
@@ -492,6 +493,7 @@ describe('resolveBuilderStepDescription', () => {
       rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
       ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
       acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+      playActor: { kind: 'npc' },
     } satisfies CampaignNpcBuildContext
 
     expect(resolveBuilderStepDescription(context, 'review')).toBe(

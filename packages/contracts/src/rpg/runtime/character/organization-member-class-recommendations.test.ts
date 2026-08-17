@@ -40,14 +40,14 @@ describe('resolveOrganizationMemberClassRecommendations', () => {
     expect(
       resolveOrganizationMemberClassRecommendationIds({
         memberClassAffinityIds: [wizard.id, rogue.id, fighter.id],
-        availableClasses: available,
+        playableClasses: available,
       }),
     ).toEqual([rogue.id, fighter.id])
 
     expect(
       resolveOrganizationMemberClassRecommendations({
         memberClassAffinityIds: [wizard.id, rogue.id, fighter.id],
-        availableClasses: available,
+        playableClasses: available,
       }).map((characterClass) => characterClass.id),
     ).toEqual([rogue.id, fighter.id])
   })
@@ -63,7 +63,7 @@ describe('characterMatchesOrganizationMemberClassRecommendations', () => {
       characterMatchesOrganizationMemberClassRecommendations({
         classIds: [fighter.id, wizard.id],
         memberClassAffinityIds: [wizard.id, rogue.id],
-        availableClasses: [fighter, rogue],
+        playableClasses: [fighter, rogue],
       }),
     ).toBe(false)
 
@@ -71,7 +71,7 @@ describe('characterMatchesOrganizationMemberClassRecommendations', () => {
       characterMatchesOrganizationMemberClassRecommendations({
         classIds: [fighter.id, wizard.id],
         memberClassAffinityIds: [rogue.id, fighter.id],
-        availableClasses: [fighter, rogue],
+        playableClasses: [fighter, rogue],
       }),
     ).toBe(true)
   })

@@ -23,7 +23,7 @@ import {
   getMagicItemRarityLabel,
   resolveEquipmentAcquisitionBuilderContext,
   resolveEquipmentAcquisitionPlan,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantEligibility,
   type resolveMagicItemGrantProgressList,
@@ -562,13 +562,13 @@ export function resolveEquipmentStepPickerItems(args: {
   choiceSets: readonly ChoiceSet[]
   /** Resolved via `resolveEquipmentStepBudget` — must match drawer/header/purchase validation. */
   budget?: EquipmentBudgetSummary
-  /** When provided, picker universe is filtered through `resolveAvailableContent`. */
+  /** When provided, picker universe is filtered through `resolvePlayableBuilderContent`. */
   context?: CharacterBuildContext
 }): EquipmentStepPickerItemsResult {
   const { draft, characterClass, catalogIndex, choiceSets, budget, context } = args
 
   const equipment = context
-    ? resolveAvailableContent(context).equipment
+    ? resolvePlayableBuilderContent(context).equipment
     : [...catalogIndex.equipment.values()]
 
   const recommendation = buildEquipmentPickerRecommendationContext({

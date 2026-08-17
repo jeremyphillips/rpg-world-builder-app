@@ -18,7 +18,12 @@ import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
 } from '@/features/vocabulary'
-import { buildContentFormOptionSets, useEquipment } from '@/features/content'
+import {
+  buildContentFormOptionSets,
+  toSortedContentFieldOptions,
+  useEquipment,
+} from '@/features/content'
+import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 import { disableFormItems } from '@/lib/disable-form-items'
 
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
@@ -58,10 +63,19 @@ export function useCharacterConfigurationRulesForm(campaignId: string) {
   const fields = useMemo(() => {
     const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(creatureTypeVocabulary)
     const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
-    const { armor: armorOptions, weapons: weaponOptions } = buildContentFormOptionSets({
+    const options = buildContentFormOptionSets({
       campaignId,
       equipment,
     })
+    const referenceEquipment = options.equipment.forReference()
+    const armorOptions = toSortedContentFieldOptions(
+      referenceEquipment.filter(isArmorEquipment),
+      'equipment',
+    )
+    const weaponOptions = toSortedContentFieldOptions(
+      referenceEquipment.filter(isWeaponEquipment),
+      'equipment',
+    )
     return disableFormItems(
       buildRulesConfigFields(
         creatureTypeOptions,

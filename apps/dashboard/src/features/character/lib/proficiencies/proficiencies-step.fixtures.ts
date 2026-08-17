@@ -141,6 +141,7 @@ export function createProficienciesStepRogueContextFixture(
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
     permissions: { canCreateCharacter: true },
+    playActor: { kind: 'new_pc' },
     ...overrides,
   }
 }

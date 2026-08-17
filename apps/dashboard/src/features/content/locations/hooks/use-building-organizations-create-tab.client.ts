@@ -11,6 +11,7 @@ import type {
 
 import { useOrganizations } from '../../organizations'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 import {
   buildBuildingOrganizationRelationshipKindOptions,
@@ -68,7 +69,10 @@ export function useBuildingOrganizationsCreateTab({
 }: UseBuildingOrganizationsCreateTabInput) {
   const rootRef = React.useRef<HTMLDivElement | null>(null)
   const { data: queriedOrganizations = [], isPending, isError } = useOrganizations(campaignId)
-  const organizations = organizationItems ?? queriedOrganizations
+  const organizations = React.useMemo(() => {
+    const source = organizationItems ?? queriedOrganizations
+    return filterReferenceableCatalogRows(source)
+  }, [organizationItems, queriedOrganizations])
   const [plan, setPlan] = React.useState<BuildingOrganizationDraftPlan>(initialPlan)
   const [requestedMode, setRequestedMode] = React.useState<AddPendingWorkflowMode>(
     initialMode ?? (initialPlan.relationships.length > 0 ? 'pending' : 'add'),

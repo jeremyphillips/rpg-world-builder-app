@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 import {
   characterBuilderStepSelectionMessages,
   formatFieldMessage,
-  resolveAvailableContent,
+  resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
@@ -35,7 +35,7 @@ export type ClassStepProps = {
 export function ClassStep({ context, draft, validationIssues, onDraftChange }: ClassStepProps) {
   const [detailsClassId, setDetailsClassId] = useState<string | null>(null)
 
-  const classes = useMemo(() => resolveAvailableContent(context).classes, [context])
+  const classes = useMemo(() => resolvePlayableBuilderContent(context).classes, [context])
 
   const options = useMemo(
     () =>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
 
-import { pickClass } from '../../../lib/fixtures/pick'
+import { pickClass, pickEquipment } from '../../../lib/fixtures/pick'
 import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment-grant-form-values'
 import {
   startingEquipmentChoiceItemFormSchema,
@@ -178,7 +179,7 @@ describe('startingEquipmentItemTitle', () => {
 describe('startingEquipmentItemFields', () => {
   it('uses single-select combobox for granted equipment slugs in a row with quantity', () => {
     const fields = startingEquipmentItemFields({
-      options: { equipment: [{ value: 'greataxe', label: 'Greataxe' }] },
+      options: { equipment: buildContentPurposeSelectors([pickEquipment('greataxe')]) },
     })
     const equipmentRow = fields.find(
       (field): field is Extract<typeof field, { kind: 'row' }> =>
@@ -337,7 +338,7 @@ describe('startingEquipmentItemFields capability', () => {
   it('exposes proficiency-choice grant fields when capability is enabled', () => {
     const fields = startingEquipmentItemFields({
       options: {
-        equipment: [{ value: 'lute', label: 'Lute' }],
+        equipment: buildContentPurposeSelectors([pickEquipment('thieves-tools')]),
         proficiencyChoiceTargets: [
           { value: 'class-tools', label: "Artisan's Tools or Musical Instrument" },
         ],
@@ -353,7 +354,7 @@ describe('startingEquipmentItemFields capability', () => {
   it('uses Item type and Item source labels for starting equipment', () => {
     const fields = startingEquipmentItemFields({
       options: {
-        equipment: [{ value: 'lute', label: 'Lute' }],
+        equipment: buildContentPurposeSelectors([pickEquipment('thieves-tools')]),
         proficiencyChoiceTargets: [
           { value: 'class-tools', label: "Artisan's Tools or Musical Instrument" },
         ],
