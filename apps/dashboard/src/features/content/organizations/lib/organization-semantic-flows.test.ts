@@ -5,7 +5,6 @@ import {
   ORGANIZATION_AUTHORING_PRESETS,
   applyOrganizationAuthoringPreset,
   getOrganizationAuthoringPresetRecommendedPractices,
-  resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FieldOption, FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
@@ -72,14 +71,6 @@ describe('initial Organization semantic flows', () => {
         practices: standalone.practices ?? [],
       } as OrganizationFormValues)
       expect(input).not.toHaveProperty('authoringPresetId')
-      expect(
-        resolveOrganizationMemberTitleSuggestions({
-          domain: input.organizationDomain,
-          form: input.organizationForm,
-          functions: input.functions,
-          practices: input.practices,
-        }).length,
-      ).toBeGreaterThanOrEqual(5)
     },
   )
 

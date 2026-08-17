@@ -5,6 +5,11 @@ import { organizationFunctionSchema } from '../vocab/organization-function'
 import { organizationFormSchema } from '../vocab/organization-form'
 import { organizationPracticeSchema } from '../vocab/organization-practice'
 import { organizationConnectionsSchema } from './organization-connections'
+import {
+  organizationCreateMembershipTitlesInputRefinement,
+  organizationMembershipTitlesSchema,
+  organizationSourcePresetIdSchema,
+} from './organization-membership-titles'
 import { createDraftInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from './lib/envelope'
@@ -36,8 +41,8 @@ const organizationMemberSpeciesAffinityIdsSchema = uniqueOrganizationClassificat
   'member species affinity ids',
 )
 
-/** Publish-complete organization body fields. */
-const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
+/** Classification + identity fields mutable on normal organization edit. */
+const organizationClassificationBodyFieldsSchema = contentBodyBaseSchema.extend({
   organizationDomain: organizationDomainSchema,
   organizationForm: organizationFormSchema.optional(),
   functions: organizationFunctionsSchema.default([]),
@@ -45,6 +50,25 @@ const organizationBodyFieldsSchema = contentBodyBaseSchema.extend({
   memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
   memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.default([]),
   connections: organizationConnectionsSchema.default({ locations: [] }),
+})
+
+const organizationClassificationFieldsWithoutAuthoredBodySchema =
+  organizationClassificationBodyFieldsSchema.omit({
+    name: true,
+    description: true,
+    imageKey: true,
+  })
+
+/** Draft classification fields — domain may remain unset until publish. */
+const organizationClassificationDraftFieldsSchema =
+  organizationClassificationFieldsWithoutAuthoredBodySchema.extend({
+    organizationDomain: organizationDomainSchema.optional(),
+  })
+
+/** Publish-complete organization body fields. */
+const organizationBodyFieldsSchema = organizationClassificationBodyFieldsSchema.extend({
+  membershipTitles: organizationMembershipTitlesSchema,
+  sourcePresetId: organizationSourcePresetIdSchema,
 })
 
 /** Publish-complete organization body. */
@@ -55,14 +79,12 @@ export type OrganizationBody = z.infer<typeof organizationBodySchema>
 /** Draft organization body fields — domain may remain unset until publish. */
 const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
   ORGANIZATION_CONTENT_TYPE_TERM.label,
-).extend({
-  organizationDomain: organizationDomainSchema.optional(),
-  organizationForm: organizationFormSchema.optional(),
-  functions: organizationFunctionsSchema.default([]),
-  practices: organizationPracticesSchema.default([]),
-  memberClassAffinityIds: organizationMemberClassAffinityIdsSchema.default([]),
-  memberSpeciesAffinityIds: organizationMemberSpeciesAffinityIdsSchema.default([]),
-})
+)
+  .extend(organizationClassificationDraftFieldsSchema.shape)
+  .extend({
+    membershipTitles: organizationMembershipTitlesSchema,
+    sourcePresetId: organizationSourcePresetIdSchema,
+  })
 
 /** Draft organization body — domain may remain unset until publish. */
 export const organizationBodyDraftSchema = organizationBodyDraftFieldsSchema
@@ -93,22 +115,26 @@ export const organizationReferenceResolutionSchema = z.object({
 
 export type OrganizationReferenceResolution = z.infer<typeof organizationReferenceResolutionSchema>
 
-export const createOrganizationInputSchema = organizationBodyFieldsSchema.extend({
-  slug: slugSchema,
-})
+export const createOrganizationInputSchema = organizationClassificationBodyFieldsSchema
+  .extend({
+    slug: slugSchema,
+    sourcePresetId: organizationSourcePresetIdSchema,
+    membershipTitles: organizationMembershipTitlesSchema.optional(),
+  })
+  .superRefine(organizationCreateMembershipTitlesInputRefinement)
 
 export type CreateOrganizationInput = z.infer<typeof createOrganizationInputSchema>
 
 export const createOrganizationDraftInputSchema = createDraftInputSchema(
   organizationBodyDraftFieldsSchema,
-)
+).superRefine(organizationCreateMembershipTitlesInputRefinement)
 
 export type CreateOrganizationDraftInput = z.infer<typeof createOrganizationDraftInputSchema>
 
 /**
  * Partial publish update. `organizationForm: null` clears the optional stored form (`$unset`).
  */
-export const updateOrganizationInputSchema = organizationBodyFieldsSchema
+export const updateOrganizationInputSchema = organizationClassificationBodyFieldsSchema
   .extend({
     slug: slugSchema,
     organizationForm: organizationFormSchema.nullable().optional(),
@@ -121,9 +147,7 @@ export const updateOrganizationInputSchema = organizationBodyFieldsSchema
 
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationInputSchema>
 
-export const updateOrganizationDraftInputSchema = createDraftInputSchema(
-  organizationBodyDraftFieldsSchema,
-)
+export const updateOrganizationDraftInputSchema = organizationBodyDraftFieldsSchema
   .extend({
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),

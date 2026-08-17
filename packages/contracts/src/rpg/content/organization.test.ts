@@ -31,6 +31,7 @@ describe('organization body contracts', () => {
       practices: [],
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [],
+      membershipTitles: [],
       connections: { locations: [] },
     })
 
@@ -66,6 +67,8 @@ describe('organization body contracts', () => {
       practices: [],
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [],
+      membershipTitles: [],
+      connections: { locations: [] },
     })
   })
 
@@ -210,6 +213,8 @@ describe('organization authoring inputs', () => {
     })
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',
+      connections: { locations: [] },
+      membershipTitles: [],
     })
   })
 

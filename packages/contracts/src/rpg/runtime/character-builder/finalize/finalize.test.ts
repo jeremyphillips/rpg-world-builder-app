@@ -70,6 +70,7 @@ describe('finalizePcCharacterBuild', () => {
       practices: [],
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [],
+      membershipTitles: [],
       connections: { locations: [] },
     }
     const input = finalizePcCharacterBuild(

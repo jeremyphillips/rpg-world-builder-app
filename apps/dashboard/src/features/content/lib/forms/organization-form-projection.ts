@@ -313,7 +313,10 @@ export function buildOrganizationCreateInput(
       : {}),
     ...organizationFormFieldForInput(values, isEdit),
   })
-  return finalizeContentInput(input, ctx) as CreateOrganizationInput
+  return finalizeContentInput(
+    input as CreateOrganizationInput & { slug?: string },
+    ctx,
+  ) as CreateOrganizationInput
 }
 
 export function buildOrganizationFormValueSyncs(

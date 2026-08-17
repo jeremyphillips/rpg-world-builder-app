@@ -3,7 +3,6 @@ import {
   ORGANIZATION_FORM_IDS,
   ORGANIZATION_FUNCTION_IDS,
   ORGANIZATION_PRACTICE_IDS,
-  resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
@@ -256,6 +255,7 @@ describe('organization authoring vocab smoke', () => {
       updatedAt: '2026-01-01T00:00:00.000Z',
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [],
+      membershipTitles: saved.membershipTitles ?? [],
       connections: { locations: [] },
     })
 
@@ -266,27 +266,6 @@ describe('organization authoring vocab smoke', () => {
       functions: ['administration', 'defense'],
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
-  })
-
-  it('resolves member titles from functions before form and domain', () => {
-    const ministryLabels = resolveOrganizationMemberTitleSuggestions({
-      domain: 'government',
-      form: 'office',
-      functions: ['administration'],
-    }).map((entry) => entry.label)
-
-    expect(ministryLabels[0]).toBe('Registrar')
-    expect(ministryLabels).not.toContain('High Priest')
-    expect(ministryLabels).toContain('Chancellor')
-
-    const forceLabels = resolveOrganizationMemberTitleSuggestions({
-      domain: 'military',
-      form: 'force',
-      functions: ['warfare', 'defense'],
-    }).map((entry) => entry.label)
-
-    expect(forceLabels[0]).toBe('General')
-    expect(forceLabels).toContain('Commander')
   })
 
   it('keeps overview domain facet on organizationDomain', () => {

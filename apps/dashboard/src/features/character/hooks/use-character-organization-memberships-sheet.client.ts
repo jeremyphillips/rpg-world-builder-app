@@ -103,7 +103,7 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     async (title?: string) => {
       if (!editingMembership || !editingOrganization) return
       const metadata = resolveOrganizationMembershipMetadata({
-        domain: editingOrganization.organizationDomain,
+        membershipTitles: editingOrganization.membershipTitles ?? [],
         selectedTitle: title,
         currentMembership: editingMembership,
       })

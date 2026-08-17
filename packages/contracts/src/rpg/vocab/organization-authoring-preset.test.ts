@@ -7,6 +7,8 @@ import {
   ORGANIZATION_AUTHORING_PRESETS,
   type OrganizationAuthoringPresetId,
 } from './organization-authoring-preset'
+import { getOrganizationMembershipTitleEntry } from './organization-membership-title'
+import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './organization-member-title-entry'
 import { ORGANIZATION_DOMAIN_IDS } from './organization-domain'
 import { ORGANIZATION_FORM_IDS } from './organization-form'
 import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
@@ -53,6 +55,20 @@ describe('organization authoring presets', () => {
   it('requires a description on every preset', () => {
     for (const preset of Object.values(ORGANIZATION_AUTHORING_PRESETS)) {
       expect(preset.description.trim()).not.toBe('')
+    }
+  })
+
+  it('requires membership title refs that resolve in the vocabulary', () => {
+    for (const id of ORGANIZATION_AUTHORING_PRESET_IDS) {
+      const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+      expect(preset.membershipTitles.length).toBeGreaterThan(0)
+      const seen = new Set<string>()
+      for (const ref of preset.membershipTitles) {
+        expect(getOrganizationMembershipTitleEntry(ref.titleId)).toBeDefined()
+        expect(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES).toContain(ref.priority)
+        expect(seen.has(ref.titleId)).toBe(false)
+        seen.add(ref.titleId)
+      }
     }
   })
 

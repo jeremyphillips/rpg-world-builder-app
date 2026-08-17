@@ -35,6 +35,7 @@ const lanternGuild = {
   practices: [],
   memberClassAffinityIds: [],
   memberSpeciesAffinityIds: [],
+  membershipTitles: [],
   connections: { locations: [] },
 }
 

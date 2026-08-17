@@ -1,10 +1,7 @@
 import { z } from 'zod'
 
-import type { OrganizationFunction } from '../../vocab/organization-function'
-import type { OrganizationPractice } from '../../vocab/organization-practice'
-import type { OrganizationDomain } from '../../vocab/organization-domain'
-import type { OrganizationForm } from '../../vocab/organization-form'
-import { resolveOrganizationMemberTitleEntry } from '../../vocab/organization-member-title'
+import type { OrganizationMembershipTitleDefinition } from '../../content/organization-membership-titles'
+import { resolveOrganizationMembershipTitleDefinitionByLabel } from '../../content/organization-membership-titles'
 import { comparePriorityDescending } from '../../vocab/types'
 import { characterOrganizationConnectionSchema } from './connections'
 
@@ -40,29 +37,20 @@ type MembershipPrioritySource = {
 /**
  * Effective roster priority for a membership.
  *
- * Explicit persisted `membership.priority` is authoritative — never recalculated
- * just because the title currently matches vocabulary. Canonical-title fallback
- * only applies when priority is absent (legacy / unranked records).
+ * Explicit persisted `membership.priority` is authoritative. Organization catalog
+ * fallback only applies when priority is absent (legacy / unranked records).
  */
 export function resolveOrganizationMembershipPriority(input: {
   membership: MembershipPrioritySource
-  domain: OrganizationDomain
-  form?: OrganizationForm
-  functions?: readonly OrganizationFunction[]
-  practices?: readonly OrganizationPractice[]
+  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
 }): number | undefined {
   if (input.membership.priority !== undefined) {
     return input.membership.priority
   }
   const title = input.membership.title
   if (title === undefined) return undefined
-  return resolveOrganizationMemberTitleEntry({
-    domain: input.domain,
-    form: input.form,
-    functions: input.functions,
-    practices: input.practices,
-    title,
-  })?.priority
+  return resolveOrganizationMembershipTitleDefinitionByLabel(input.membershipTitles, title)
+    ?.priority
 }
 
 type SortableOrganizationMember = {
@@ -105,15 +93,12 @@ export type ResolvedOrganizationMembershipMetadata = {
 /**
  * Single owner of title → membership stamping for create/update editors.
  *
- * - Canonical title → that entry's canonical priority
+ * - Organization catalog title → that definition's label + priority
  * - No title → clear both title and priority
  * - Preserved historical/custom title → keep the current membership's explicit priority
  */
 export function resolveOrganizationMembershipMetadata(input: {
-  domain: OrganizationDomain
-  form?: OrganizationForm
-  functions?: readonly OrganizationFunction[]
-  practices?: readonly OrganizationPractice[]
+  membershipTitles: readonly OrganizationMembershipTitleDefinition[]
   /** Selected title after radio mapping; `undefined` means No title. */
   selectedTitle: string | undefined
   currentMembership?: MembershipPrioritySource
@@ -123,15 +108,12 @@ export function resolveOrganizationMembershipMetadata(input: {
     return { title: undefined, priority: undefined }
   }
 
-  const canonical = resolveOrganizationMemberTitleEntry({
-    domain: input.domain,
-    form: input.form,
-    functions: input.functions,
-    practices: input.practices,
-    title: selectedTitle,
-  })
-  if (canonical) {
-    return { title: canonical.label, priority: canonical.priority }
+  const catalogTitle = resolveOrganizationMembershipTitleDefinitionByLabel(
+    input.membershipTitles,
+    selectedTitle,
+  )
+  if (catalogTitle) {
+    return { title: catalogTitle.label, priority: catalogTitle.priority }
   }
 
   return {

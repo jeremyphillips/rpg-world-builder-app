@@ -13,7 +13,7 @@ import {
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
-  type OrganizationDomain,
+  type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -235,8 +235,7 @@ function formatRequirementsTabLabel(configuredCount: number): string {
 
 export type QuickNpcDetailsFieldsArgs = {
   membership: {
-    kind: OrganizationDomain
-    subtype?: string
+    membershipTitles: readonly OrganizationMembershipTitleDefinition[]
   }
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
@@ -269,8 +268,7 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): For
       name: QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
       label: 'Title',
       options: buildOrganizationMembershipTitleRadioOptions({
-        kind: args.membership.kind,
-        ...(args.membership.subtype !== undefined ? { subtype: args.membership.subtype } : {}),
+        membershipTitles: args.membership.membershipTitles,
       }),
       defaultValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
     },

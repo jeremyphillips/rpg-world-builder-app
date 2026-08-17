@@ -8,6 +8,7 @@ import {
   type CampaignNpcDetail,
   type CharacterBuildContext,
   type OrganizationFunction,
+  type OrganizationMembershipTitleDefinition,
   type OrganizationPractice,
   type OrganizationDomain,
   type OrganizationForm,
@@ -65,6 +66,7 @@ export type QuickNpcCreateFormOrganization = {
   practices?: readonly OrganizationPractice[]
   memberClassAffinityIds?: readonly string[]
   memberSpeciesAffinityIds?: readonly string[]
+  membershipTitles?: readonly OrganizationMembershipTitleDefinition[]
 }
 
 export type QuickNpcAuthoringFormProps = {
@@ -82,10 +84,7 @@ export type QuickNpcAuthoringFormProps = {
 
 function resolveMembership(organization: QuickNpcCreateFormOrganization) {
   return {
-    kind: organization.organizationDomain,
-    ...(organization.organizationForm !== undefined
-      ? { subtype: organization.organizationForm }
-      : {}),
+    membershipTitles: organization.membershipTitles ?? [],
   }
 }
 
@@ -264,10 +263,7 @@ export function QuickNpcAuthoringForm({
 
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
-        domain: organization.organizationDomain,
-        form: organization.organizationForm,
-        functions: organization.functions,
-        practices: organization.practices,
+        membershipTitles: organization.membershipTitles ?? [],
         selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
       })
 

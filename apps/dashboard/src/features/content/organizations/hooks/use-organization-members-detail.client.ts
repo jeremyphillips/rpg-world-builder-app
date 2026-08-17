@@ -59,6 +59,7 @@ export function useOrganizationMembersDetail(
     | 'practices'
     | 'memberClassAffinityIds'
     | 'memberSpeciesAffinityIds'
+    | 'membershipTitles'
   >,
 ) {
   const organizationId = organization.id
@@ -177,10 +178,7 @@ export function useOrganizationMembersDetail(
     async (title?: string) => {
       if (!editingRow) return
       const metadata = resolveOrganizationMembershipMetadata({
-        domain: organization.organizationDomain,
-        form: organization.organizationForm,
-        functions: organization.functions,
-        practices: organization.practices,
+        membershipTitles: organization.membershipTitles ?? [],
         selectedTitle: title,
         currentMembership: {
           ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),

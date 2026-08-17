@@ -43,7 +43,6 @@ describe('Organization Function vocabulary', () => {
     for (const entry of Object.values(ORGANIZATION_FUNCTION_ENTRIES)) {
       expect(entry.label.trim()).not.toBe('')
       expect(entry.description.trim()).not.toBe('')
-      expect(entry.memberTitles).toHaveLength(5)
     }
   })
 

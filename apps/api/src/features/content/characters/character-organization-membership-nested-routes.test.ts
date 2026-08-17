@@ -119,6 +119,7 @@ describe('character organization membership nested routes', () => {
       slug: 'legacy-guild',
       name: 'Legacy Guild',
       organizationDomain: 'occupational',
+      sourcePresetId: 'adventurers_guild',
     })
     const { character: npc } = await createCampaignNpc(campaignId, {
       ...minimalNpcRequestInput,

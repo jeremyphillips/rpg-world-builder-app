@@ -128,10 +128,19 @@ describe('buildQuickNpcContentOptions', () => {
   })
 })
 
+const sampleMembershipTitles = [
+  {
+    id: 'omt_test_guildmaster',
+    label: 'Guildmaster',
+    description: 'Head of the guild.',
+    priority: 50,
+  },
+] as const
+
 describe('buildQuickNpcDetailsFields', () => {
   it('includes the canonical membership title radio with a No title default', () => {
     const fields = buildQuickNpcDetailsFields({
-      membership: { kind: 'occupational' },
+      membership: { membershipTitles: sampleMembershipTitles },
     })
 
     const titleField = fields.find(
@@ -174,7 +183,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('declares explicit ownership for the name field with trailing action', () => {
     const tabs = buildQuickNpcTabs({
       detailsFields: buildQuickNpcDetailsFields({
-        membership: { kind: 'occupational' },
+        membership: { membershipTitles: sampleMembershipTitles },
         nameTrailingAction: {
           label: 'Generate',
           onAction: () => {},

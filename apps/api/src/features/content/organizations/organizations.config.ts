@@ -1,10 +1,12 @@
-import type { Organization } from '@rpg/contracts'
+import type { Organization, OrganizationAuthoringPresetId } from '@rpg/contracts'
 import {
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
   organizationBodySchema,
   organizationDraftStoredSchema,
   organizationSchema,
+  organizationMembershipTitlesSchema,
+  resolveOrganizationCreateMembershipTitles,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
 } from '@rpg/contracts'
@@ -36,6 +38,10 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
     practices: record.practices ?? [],
     memberClassAffinityIds: record.memberClassAffinityIds ?? [],
     memberSpeciesAffinityIds: record.memberSpeciesAffinityIds ?? [],
+    membershipTitles: organizationMembershipTitlesSchema.parse(record.membershipTitles ?? []),
+    ...(record.sourcePresetId !== undefined && record.sourcePresetId !== null
+      ? { sourcePresetId: record.sourcePresetId as OrganizationAuthoringPresetId }
+      : {}),
     connections: {
       locations: record.connections?.locations ?? [],
     },
@@ -43,8 +49,24 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
 }
 
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
-  const { slug: _slug, ...body } = input
-  return body
+  const { slug: _slug, ...rest } = input
+  const sourcePresetId = rest.sourcePresetId as OrganizationAuthoringPresetId | undefined
+  const membershipTitles = resolveOrganizationCreateMembershipTitles({
+    ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
+    ...(rest.membershipTitles !== undefined
+      ? {
+          membershipTitles: organizationMembershipTitlesSchema.parse(rest.membershipTitles),
+        }
+      : {}),
+  })
+
+  const { membershipTitles: _clientTitles, ...bodyWithoutClientTitles } = rest
+
+  return {
+    ...bodyWithoutClientTitles,
+    membershipTitles,
+    ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
+  }
 }
 
 export const organizationContentConfig: ContentTypeConfig<Organization> = {

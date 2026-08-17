@@ -46,6 +46,7 @@ describe('finalizeNpcCharacterBuild', () => {
       practices: [],
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [],
+      membershipTitles: [],
       connections: { locations: [] },
     }
     const draft = {

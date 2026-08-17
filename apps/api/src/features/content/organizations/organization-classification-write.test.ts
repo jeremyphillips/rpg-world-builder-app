@@ -148,4 +148,44 @@ describe('organization classification writes', () => {
       organizationForm: 'order',
     })
   })
+
+  it('snapshots membership titles from sourcePresetId at the create boundary', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      organizationForm: 'company',
+      functions: ['finance'],
+      practices: ['banking'],
+      sourcePresetId: 'bank',
+    })
+
+    expect(created.sourcePresetId).toBe('bank')
+    expect(created.membershipTitles).toHaveLength(7)
+    expect(created.membershipTitles[0]).toMatchObject({
+      sourceTitleId: 'treasurer',
+      label: 'Treasurer',
+      priority: 50,
+    })
+    expect(created.membershipTitles.every((title) => title.id.startsWith('omt_'))).toBe(true)
+  })
+
+  it('leaves membershipTitles unchanged when classification is updated', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+    })
+
+    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
+      organizationDomain: 'government',
+      functions: ['administration'],
+    })
+
+    expect(updated.membershipTitles).toEqual(created.membershipTitles)
+    expect(updated.sourcePresetId).toBe('bank')
+  })
 })

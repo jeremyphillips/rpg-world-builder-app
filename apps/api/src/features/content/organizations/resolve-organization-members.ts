@@ -1,7 +1,6 @@
 import type {
   CharacterOrganizationConnection,
   Organization,
-  OrganizationDomain,
   OrganizationMemberSummary,
   PaginatedItems,
 } from '@rpg/contracts'
@@ -73,8 +72,6 @@ export async function resolveOrganizationMembers(input: {
     return null
   }
 
-  const domain = organization.organizationDomain as OrganizationDomain | undefined
-
   const { blockers } = await resolveContentUsage(
     { campaignId, purpose: 'authoritative_guard' },
     'organizations',
@@ -104,16 +101,10 @@ export async function resolveOrganizationMembers(input: {
     if (!hit) return []
 
     const membership = membershipForOrganization(hit, organizationId)
-    const priority =
-      domain === undefined
-        ? membership?.priority
-        : resolveOrganizationMembershipPriority({
-            membership: membership ?? {},
-            domain,
-            form: organization.organizationForm,
-            functions: organization.functions,
-            practices: organization.practices,
-          })
+    const priority = resolveOrganizationMembershipPriority({
+      membership: membership ?? {},
+      membershipTitles: organization.membershipTitles ?? [],
+    })
 
     return [
       {

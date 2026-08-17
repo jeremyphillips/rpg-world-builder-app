@@ -54,6 +54,7 @@ describe('organization member species affinities integration', () => {
       campaignId: 'camp_1',
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
+      membershipTitles: saved.membershipTitles ?? [],
       connections: { locations: [] },
     })
 
@@ -80,6 +81,7 @@ describe('organization member species affinities integration', () => {
       practices: [],
       memberClassAffinityIds: [],
       memberSpeciesAffinityIds: [elf.id, dwarf.id, halfling.id],
+      membershipTitles: [],
       connections: { locations: [] },
     })
 

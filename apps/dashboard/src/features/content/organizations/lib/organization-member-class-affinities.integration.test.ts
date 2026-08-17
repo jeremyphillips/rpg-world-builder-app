@@ -63,6 +63,7 @@ describe('organization member class affinities integration', () => {
       campaignId: 'camp_1',
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
+      membershipTitles: saved.membershipTitles ?? [],
       connections: { locations: [] },
     })
 
@@ -90,6 +91,7 @@ describe('organization member class affinities integration', () => {
       practices: [],
       memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
       memberSpeciesAffinityIds: [],
+      membershipTitles: [],
       connections: { locations: [] },
     })
 
