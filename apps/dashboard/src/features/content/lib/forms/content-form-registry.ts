@@ -53,6 +53,8 @@ export type ContentFormCtx = {
   options?: Partial<ContentFormOptionSets>
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
+  /** Persisted parent location id for orphan union on location edit load. */
+  locationParentLocationIdSeed?: string
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */

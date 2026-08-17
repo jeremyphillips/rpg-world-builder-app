@@ -1,6 +1,7 @@
 import type { Location } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import { filterReferenceableCatalogRows } from '../../../lib/form-options/content-reference-catalog.lib'
 import { buildParentLocationOptions } from '../location-parent-picker'
 import {
   BULK_CHANGE_PARENT_NONE_OPTION_LABEL,
@@ -40,7 +41,9 @@ export function toBulkChangeParentConfig(
 }
 
 export function buildBulkChangeParentFields(campaignLocations: readonly Location[]): FormItem[] {
-  const locationOptions = buildParentLocationOptions(campaignLocations)
+  const locationOptions = buildParentLocationOptions(
+    filterReferenceableCatalogRows(campaignLocations),
+  )
 
   return [
     {

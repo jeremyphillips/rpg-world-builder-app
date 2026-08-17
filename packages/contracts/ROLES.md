@@ -146,7 +146,9 @@ vocabulary `all_players | dm_only | specific_players` (see
 | `dm_only`          | `owner` and `co-owner` only                                                  |
 | `specific_players` | `owner`, `co-owner`, and PCs whose character id appears in `participantIds`  |
 
-Content defaults to `dm_only` unless the DM explicitly changes it.
+Content defaults to `all_players` with `available: true` unless the DM explicitly
+changes campaign access (see `DEFAULT_CONTENT_CAMPAIGN_ACCESS` in
+`packages/contracts/src/rpg/content/lib/campaign-access.ts`).
 
 > **Historical note:** early Phase-1 docs used `dm-only | party | public`. That
 > vocabulary was superseded by the table above — do not reintroduce it.

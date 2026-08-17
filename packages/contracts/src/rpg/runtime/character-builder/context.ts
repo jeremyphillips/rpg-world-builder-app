@@ -1,7 +1,6 @@
 import type { z } from 'zod'
 
 import type { SystemRulesetId } from '../../primitives/ruleset'
-import type { ContentViewer } from '../../campaign/campaign-content-viewer'
 import type { ContentPlayActor } from '../campaign/content-play-actor'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Equipment } from '../../content/equipment'
@@ -114,11 +113,6 @@ export type CharacterBuildContext = {
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
   permissions: CharacterBuilderPermissions
-  /**
-   * Optional defense-in-depth catalog filter — mirrors API discovery policy when
-   * the builder receives a pre-resolved viewer (e.g. campaign PC context).
-   */
-  catalogViewer?: ContentViewer
   /** Play-visibility subject when building campaign characters (NPC or known PC). */
   playActor?: ContentPlayActor
 }

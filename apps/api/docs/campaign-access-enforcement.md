@@ -107,6 +107,35 @@ Managers always resolve. Campaign access overlay state (`available`, `visibility
 `participantIds`) is intentionally **not** an input — turning content off or restricting
 discovery must not strip content already on a saved sheet.
 
+## Content resolution layers (catalog consumption)
+
+Four derived predicates sit on top of the viewer-visible catalog. They answer different
+questions — do not collapse them into one list filter.
+
+| Layer             | Predicate                         | Typical consumers                                                                                |
+| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Visible           | `isContentVisibleToViewer`        | Overviews, edit shells, management search                                                        |
+| Referenceable     | `isContentReferenceable`          | Definition fields, world-graph pickers (location parent, org↔location, spell `classIds`, grants) |
+| Campaign-eligible | `isContentCampaignEligible`       | Org member class affinity **new chips** (published + available; `visibilityMode` not applied)    |
+| Playable          | `isContentPlayableFor(playActor)` | Character builder, Quick NPC, affinity recommendations                                           |
+
+Dashboard form option sets expose one visible catalog per type with purpose selectors:
+`forReference()`, `forCampaignUse()`, `forPlay(playActor)`.
+
+### Preserve id vs disclose label
+
+Persisted reference ids are **never** silently stripped from form or draft state.
+Whether a viewer may **see the referenced name** is decided before the shared
+`unionPersistedOptions` helper runs. Callers supply `authorizedDisplay` with labels
+already filtered for the current viewer. Ids absent from both selectable and
+authorized display receive a generic unresolved fallback — not a protected name.
+
+`canResolveSavedContentReference` remains the saved-sheet read policy and must not
+become the orphan labeler for authoring pickers.
+
+Draft-to-draft composition (selecting an existing draft as a new dependency) is **out
+of scope** — add an explicit opt-in flag only when that workflow ships.
+
 ### Direct-read outcomes (locked)
 
 | Scenario                                               | Non-manager                                           | Manager         |
