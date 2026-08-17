@@ -6,13 +6,14 @@ import type { ReactNode } from 'react'
 import type { Location } from '@rpg/contracts'
 import { buildingClassificationSchema } from '@rpg/contracts'
 
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+import { makeLocation } from '@/test/fixtures/factories/location'
+
 import { HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { locationsColumns } from './locations-overview-columns'
 
-const CAMPAIGN_ID = 'camp_1'
-
 function renderContainsCell(location: Location) {
-  const columns = locationsColumns(CAMPAIGN_ID, { locations: LOCATIONS_LIST })
+  const columns = locationsColumns(STORY_CAMPAIGN_ID, { locations: LOCATIONS_LIST })
   const containsColumn = columns.find((column) => column.id === 'contains')
   expect(containsColumn).toBeDefined()
 
@@ -23,7 +24,7 @@ function renderContainsCell(location: Location) {
 
 describe('locationsColumns', () => {
   it('formats Type column from display summary', () => {
-    const columns = locationsColumns(CAMPAIGN_ID, { locations: LOCATIONS_LIST })
+    const columns = locationsColumns(STORY_CAMPAIGN_ID, { locations: LOCATIONS_LIST })
     const typeColumn = columns.find((column) => column.id === 'locationType')
     expect(typeColumn).toBeDefined()
 
@@ -34,7 +35,7 @@ describe('locationsColumns', () => {
   })
 
   it('sorts Type column by classification parts with name tie-break', () => {
-    const columns = locationsColumns(CAMPAIGN_ID, { locations: LOCATIONS_LIST })
+    const columns = locationsColumns(STORY_CAMPAIGN_ID, { locations: LOCATIONS_LIST })
     const typeColumn = columns.find((column) => column.id === 'locationType')
     const sortingFn = typeColumn?.sortingFn as (
       left: { original: Location },
@@ -46,21 +47,25 @@ describe('locationsColumns', () => {
   })
 
   it('sorts buildings with the same visible classification by name', () => {
-    const breweryA = {
-      ...YAWNING_PORTAL,
+    const breweryA = makeLocation({
+      kind: 'structure',
       id: 'location-guildhall-a',
       slug: 'guildhall-a',
       name: 'Alpha Guildhall',
+      structureType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
       classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
-    } as Location
-    const breweryB = {
-      ...YAWNING_PORTAL,
+    })
+    const breweryB = makeLocation({
+      kind: 'structure',
       id: 'location-guildhall-b',
       slug: 'guildhall-b',
       name: 'Beta Guildhall',
+      structureType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
       classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
-    } as Location
-    const columns = locationsColumns(CAMPAIGN_ID, {
+    })
+    const columns = locationsColumns(STORY_CAMPAIGN_ID, {
       locations: [...LOCATIONS_LIST, breweryA, breweryB],
     })
     const typeColumn = columns.find((column) => column.id === 'locationType')
@@ -74,22 +79,26 @@ describe('locationsColumns', () => {
   })
 
   it('sorts shorter equal-prefix classifications before longer ones', () => {
-    const plainBuilding = {
-      ...YAWNING_PORTAL,
+    const plainBuilding = makeLocation({
+      kind: 'structure',
       id: 'location-plain-building',
       slug: 'plain-building',
       name: 'Plain Building',
-    } as Location
+      structureType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
+    })
     delete (plainBuilding as { classification?: unknown }).classification
 
-    const classifiedBuilding = {
-      ...YAWNING_PORTAL,
+    const classifiedBuilding = makeLocation({
+      kind: 'structure',
       id: 'location-archetyped-building',
       slug: 'archetyped-building',
       name: 'Archetyped Building',
+      structureType: 'building',
+      parentLocationId: YAWNING_PORTAL.parentLocationId,
       classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
-    } as Location
-    const columns = locationsColumns(CAMPAIGN_ID, {
+    })
+    const columns = locationsColumns(STORY_CAMPAIGN_ID, {
       locations: [...LOCATIONS_LIST, plainBuilding, classifiedBuilding],
     })
     const typeColumn = columns.find((column) => column.id === 'locationType')

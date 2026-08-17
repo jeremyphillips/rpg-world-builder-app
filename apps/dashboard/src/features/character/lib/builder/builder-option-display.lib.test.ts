@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID, type Species } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
 import { DROW_HERITAGE_SHEET_SUMMARY_LINES, getDrowHeritageSpellCatalog } from '@/features/content'
 import { pickSpecies } from '@/features/content'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 
 import {
   buildSpeciesDetailsSheetContent,
@@ -14,7 +15,7 @@ import {
 } from './builder-option-display.lib'
 import { populatedBuilderCatalog } from '../character-builder-fixtures'
 
-const dwarfWithTraits = {
+const dwarfWithTraits = makeSpecies({
   ...populatedBuilderCatalog.species[0]!,
   traits: [
     {
@@ -34,7 +35,7 @@ const dwarfWithTraits = {
     },
   ],
   languageAffinities: ['dwarvish'],
-} as const satisfies Species
+})
 
 describe('builder-option-display.lib', () => {
   it('formats species card rows with creature type label and trait names', () => {
@@ -92,7 +93,7 @@ describe('builder-option-display.lib', () => {
 
   it('keeps prose body for heritage options without grant groups', () => {
     const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
-    const speciesWithProseOnlyHeritage = {
+    const speciesWithProseOnlyHeritage = makeSpecies({
       ...dwarfWithTraits,
       heritage: {
         id: 'test-heritage',
@@ -108,7 +109,7 @@ describe('builder-option-display.lib', () => {
           },
         ],
       },
-    } as const satisfies Species
+    })
     const content = buildSpeciesDetailsSheetContent(speciesWithProseOnlyHeritage, languages, [])
     const heritageSection = content.sections.find((section) => section.title === 'Test Heritage')
     const optionItem = heritageSection?.items?.[0]

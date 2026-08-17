@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, DOCK_WARD, LOCATIONS_LIST, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
 import {
@@ -19,7 +20,7 @@ import {
 } from './location-display'
 import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
 
-const CAMPAIGN_ID = 'camp_1'
+const CAMPAIGN_ID = STORY_CAMPAIGN_ID
 
 describe('buildLocationLocatedInSegments', () => {
   it('walks parent chain root-to-leaf for display', () => {
@@ -41,20 +42,20 @@ describe('buildLocationLocatedInSegments', () => {
   })
 
   it('stops when a cycle is detected', () => {
-    const locationA: Location = {
-      ...ALDERMERE,
+    const locationA = makeLocation({
+      kind: 'world',
       id: 'location-cycle-a',
       slug: 'cycle-a',
       name: 'Cycle A',
       parentLocationId: 'location-cycle-b',
-    }
-    const locationB: Location = {
-      ...ALDERMERE,
+    })
+    const locationB = makeLocation({
+      kind: 'world',
       id: 'location-cycle-b',
       slug: 'cycle-b',
       name: 'Cycle B',
       parentLocationId: 'location-cycle-a',
-    }
+    })
     const byId = buildLocationsById([locationA, locationB])
     const segments = buildLocationLocatedInSegments(locationA, byId, CAMPAIGN_ID)
 
@@ -62,13 +63,14 @@ describe('buildLocationLocatedInSegments', () => {
   })
 
   it('emits neutral plain-text segment for orphaned parent references', () => {
-    const orphan: Location = {
-      ...HARBORFORD,
+    const orphan = makeLocation({
+      kind: 'settlement',
       id: 'location-orphan',
       slug: 'orphan',
       name: 'Orphan',
+      settlementType: 'city',
       parentLocationId: 'missing-parent-id',
-    }
+    })
     const byId = buildLocationsById([orphan])
     const segments = buildLocationLocatedInSegments(orphan, byId, CAMPAIGN_ID)
 
@@ -185,16 +187,15 @@ describe('buildChildrenByParentId', () => {
 
 describe('settlement structure district previews', () => {
   it('counts immediate children only and omits grandchildren from district totals', () => {
-    const grandchild: Location = {
-      ...YAWNING_PORTAL,
+    const grandchild = makeLocation({
+      kind: 'interior',
       id: 'location-hidden-chamber',
       slug: 'hidden-chamber',
       name: 'Hidden Chamber',
-      kind: 'interior',
       interiorType: 'space',
       classification: { type: 'chamber' },
       parentLocationId: YAWNING_PORTAL.id,
-    }
+    })
 
     const viewModel = buildLocationDetailViewModel(HARBORFORD, {
       locations: [...LOCATIONS_LIST, grandchild],
@@ -209,13 +210,13 @@ describe('settlement structure district previews', () => {
   })
 
   it('includes zero-child districts with empty children and zero count', () => {
-    const emptyDistrict: Location = {
-      ...DOCK_WARD,
+    const emptyDistrict = makeLocation({
+      kind: 'district',
       id: 'location-market-ward',
       slug: 'market-ward',
       name: 'Market Ward',
       parentLocationId: HARBORFORD.id,
-    }
+    })
 
     const viewModel = buildLocationDetailViewModel(HARBORFORD, {
       locations: [...LOCATIONS_LIST, emptyDistrict],
@@ -283,16 +284,15 @@ describe('buildLocationDetailViewModel', () => {
   })
 
   it('shows typed interior identity rows with flattened type label', () => {
-    const chamber: Location = {
-      ...DOCK_WARD,
+    const chamber = makeLocation({
+      kind: 'interior',
       id: 'location-chamber',
       slug: 'chamber',
       name: 'Hidden Chamber',
-      kind: 'interior',
       interiorType: 'space',
       classification: { type: 'chamber' },
       parentLocationId: YAWNING_PORTAL.id,
-    }
+    })
 
     const viewModel = buildLocationDetailViewModel(chamber, {
       locations: [...LOCATIONS_LIST, chamber],

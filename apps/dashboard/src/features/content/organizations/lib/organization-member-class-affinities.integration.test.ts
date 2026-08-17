@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { CharacterClass } from '@rpg/contracts'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
 import { buildQuickNpcClassRadioCardPresentation } from '@/features/character/npc/lib/quick-npc-class-option-groups.lib'
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import {
@@ -13,30 +13,6 @@ import {
 } from '../../lib/forms/organization-form-projection'
 import { buildMemberClassAffinityChipOptions } from './organization-member-class-chip-options.lib'
 import { isOrganizationMemberPickerRecommended } from './organization-member-picker-drawer.lib'
-
-function makeClass(input: { slug: string; id?: string; name?: string }): CharacterClass {
-  const id = input.id ?? `srd-cc-5.2.1:${input.slug}`
-  return {
-    id,
-    slug: input.slug,
-    rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
-    status: 'published',
-    campaignId: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    name: input.name ?? input.slug.charAt(0).toUpperCase() + input.slug.slice(1),
-    primaryAbilities: ['str'],
-    hitDie: 10,
-    proficiencies: {
-      savingThrows: ['str', 'con'],
-      armor: { categories: [], items: [] },
-      weapons: { categories: [], items: [] },
-      skills: { categories: [], items: [] },
-    },
-    features: [],
-  }
-}
 
 function collectPresetOptionValues(ctx = makeContentFormCtx()): string[] {
   const presetField = buildOrganizationFields(ctx).find(
@@ -49,9 +25,9 @@ function collectPresetOptionValues(ctx = makeContentFormCtx()): string[] {
 }
 
 describe('organization member class affinities integration', () => {
-  const rogue = makeClass({ slug: 'rogue', id: 'class-rogue' })
-  const fighter = makeClass({ slug: 'fighter', id: 'class-fighter' })
-  const wizard = makeClass({ slug: 'wizard', id: 'class-wizard' })
+  const rogue = makeCharacterClass({ slug: 'rogue', id: 'class-rogue', name: 'Rogue' })
+  const fighter = makeCharacterClass({ slug: 'fighter', id: 'class-fighter', name: 'Fighter' })
+  const wizard = makeCharacterClass({ slug: 'wizard', id: 'class-wizard', name: 'Wizard' })
 
   it('persists familiar-seeded affinities without preset identity after save/reload', () => {
     const [sync] = buildOrganizationFormValueSyncs(undefined, [rogue])

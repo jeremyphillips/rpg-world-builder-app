@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import type { Location, LocationKind } from '@rpg/contracts'
+
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import {
   filterLocationsByTargetBrowseScope,
@@ -8,14 +10,8 @@ import {
   resolveTargetBrowseScopeOptions,
 } from './organization-location-target-browse-scope'
 
-function location(kind: Location['kind'], id = `${kind}-1`): Location {
-  return {
-    id,
-    campaignId: 'camp-1',
-    name: id,
-    slug: id,
-    kind,
-  } as Location
+function location(kind: LocationKind, id = `${kind}-1`): Location {
+  return makeLocation({ kind, id, name: id, slug: id })
 }
 
 describe('organization-location-target-browse-scope', () => {

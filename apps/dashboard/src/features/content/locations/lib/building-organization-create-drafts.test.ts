@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import type { Organization } from '@rpg/contracts'
 
+import { makeOrganization } from '@/test/fixtures/factories/organization'
+
 import {
   BUILDING_ORGANIZATION_NO_ELIGIBLE_KIND_REASON,
   buildBuildingOrganizationRelationshipKindOptions,
@@ -24,18 +26,12 @@ function existingOrganization(input: {
   id: string
   connections?: Organization['connections']['locations']
 }): Organization {
-  return {
+  return makeOrganization({
     id: input.id,
-    name: input.id,
     slug: input.id,
-    source: 'homebrew',
-    status: 'published',
-    organizationDomain: 'commercial',
-    functions: [],
-    practices: [],
-    memberClassAffinityIds: [],
+    name: input.id,
     connections: { locations: input.connections ?? [] },
-  } as unknown as Organization
+  })
 }
 
 describe('Building Organization create drafts', () => {

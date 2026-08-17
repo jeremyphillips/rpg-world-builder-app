@@ -2,9 +2,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import {
+  guildhallBuilding,
+  testSettlementLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
+import { makeLocation } from '@/test/fixtures/factories/location'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
-import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { buildLocationsById } from '../lib/location-display'
 import { CITY_COUNCIL, SILVER_CIRCLE } from '../../organizations/fixtures'
 import {
@@ -13,41 +17,19 @@ import {
 } from '../lib/location-connection-surface-copy'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
 
-function settlementLocation(): Location {
-  return {
-    id: 'settlement-1',
-    campaignId: 'camp-1',
-    name: 'Port City',
-    slug: 'port-city',
-    kind: 'settlement',
-  } as Location
-}
-
-function infrastructureLocation(): Location {
-  return {
+function infrastructureLocation() {
+  return makeLocation({
+    kind: 'structure',
     id: 'infrastructure-1',
-    campaignId: 'camp-1',
     name: 'City Waterworks',
     slug: 'city-waterworks',
-    kind: 'structure',
     structureType: 'infrastructure',
-  } as Location
-}
-
-function buildingLocation(): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Guildhall',
-    slug: 'guildhall',
-    kind: 'structure',
-    structureType: 'building',
-  } as Location
+  })
 }
 
 const organizations = [CITY_COUNCIL]
 
-function drawerContextFor(location: Location) {
+function drawerContextFor(location: Parameters<typeof buildLocationsById>[0][number]) {
   return {
     locationsById: buildLocationsById([location]),
     campaignId: STORY_CAMPAIGN_ID,
@@ -72,7 +54,7 @@ const headquartersRow = {
 
 describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regression', () => {
   it('does not show a broad family kind selector for Add headquarters', () => {
-    const location = settlementLocation()
+    const location = testSettlementLocation()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -98,7 +80,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   })
 
   it('does not show a broad family kind selector for Add owner on a building', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -125,7 +107,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
   it('opens with expanded kind choices, fixed organization, and no organization picker', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -178,7 +160,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   }
 
   it('uses site-family replace copy without territorial drawer strings', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -212,7 +194,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   })
 
   it('uses territorial replace copy for territorial authority intent', () => {
-    const location = settlementLocation()
+    const location = testSettlementLocation()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -247,13 +229,13 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     ).toBeInTheDocument()
     expect(screen.getByText(TERRITORIAL_AUTHORITY_DRAWER.replaceHelper)).toBeInTheDocument()
     expect(screen.getByText('Port City')).toBeInTheDocument()
-    expect(screen.getByText('Settlement')).toBeInTheDocument()
+    expect(screen.getByText('Settlement · City')).toBeInTheDocument()
   })
 
   it('shows current and new organization fields with replacement picker', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -291,7 +273,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   })
 
   it('shows read-only relationship type and organization picker without kind controls', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer

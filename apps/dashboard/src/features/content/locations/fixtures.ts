@@ -1,64 +1,49 @@
+import { makeLocation } from '@/test/fixtures/factories/location'
 import { buildingClassificationSchema, type Location, type RegionLocation } from '@rpg/contracts'
 
-import { STORY_CAMPAIGN_ID } from '../lib/fixtures/constants'
-
-const CONTENT_TIMESTAMP = '2026-01-01T00:00:00.000Z'
-
-const baseLocation = {
-  rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'homebrew' as const,
-  status: 'published' as const,
-  campaignId: STORY_CAMPAIGN_ID,
-  createdAt: CONTENT_TIMESTAMP,
-  updatedAt: CONTENT_TIMESTAMP,
-}
-
-export const ALDERMERE: Location = {
-  ...baseLocation,
+export const ALDERMERE = makeLocation({
+  kind: 'world',
   id: 'location-aldermere',
   slug: 'aldermere',
   name: 'Aldermere',
-  kind: 'world',
-}
+})
 
-export const GREYSHORE: RegionLocation = {
-  ...baseLocation,
+export const GREYSHORE = makeLocation({
+  kind: 'region',
   id: 'location-greyshore',
   slug: 'greyshore',
   name: 'Greyshore',
-  kind: 'region',
   classification: { kind: 'geographic', type: 'coast' },
   parentLocationId: ALDERMERE.id,
-}
+}) as RegionLocation
 
-export const HARBORFORD: Location = {
-  ...baseLocation,
+export const HARBORFORD = makeLocation({
+  kind: 'settlement',
   id: 'location-harborford',
   slug: 'harborford',
   name: 'Harborford',
-  kind: 'settlement',
   settlementType: 'city',
   parentLocationId: GREYSHORE.id,
-}
+})
 
-export const DOCK_WARD: Location = {
-  ...baseLocation,
+export const DOCK_WARD = makeLocation({
+  kind: 'district',
   id: 'location-dock-ward',
   slug: 'dock-ward',
   name: 'Dock Ward',
-  kind: 'district',
   parentLocationId: HARBORFORD.id,
-}
+})
 
-export const YAWNING_PORTAL: Location = {
-  ...baseLocation,
+export const YAWNING_PORTAL = makeLocation({
+  kind: 'structure',
   id: 'location-yawning-portal',
   slug: 'yawning-portal',
   name: 'Yawning Portal',
-  kind: 'structure',
   structureType: 'building',
   classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
   parentLocationId: DOCK_WARD.id,
-}
+})
 
 export const LOCATIONS_LIST = [ALDERMERE, GREYSHORE, HARBORFORD, DOCK_WARD, YAWNING_PORTAL] as const
+
+export type { Location }

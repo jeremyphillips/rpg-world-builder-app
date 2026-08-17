@@ -11,9 +11,10 @@ import {
   resolveStartingEquipmentFundingOptions,
   startingEquipmentChoiceSetId,
   wealthToCopper,
-  type ClassStored,
-  type Equipment,
 } from '@rpg/contracts'
+
+import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import { buildEquipmentInventoryLayout } from '../../components/equipment/equipment-inventory-summary.lib'
 import {
@@ -26,25 +27,9 @@ import {
   equipmentStepSpearFixture,
 } from './equipment-step.fixtures'
 
-const torchFixture = {
-  id: 'srd-cc-5.2.1:torch',
-  slug: 'torch',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Torch',
-  description: '',
-  cost: { amount: 1, currency: 'cp' },
-  weight: { value: 1, unit: 'lb' },
-  kind: 'adventuring_gear',
-  gearKind: 'general',
-  bundleSize: 1,
-} as const satisfies Equipment
+const torchFixture = pickEquipment('torch')
 
-const monkWithTorchGrant: ClassStored = {
+const monkWithTorchGrant = makeClassStored({
   ...equipmentStepMonkClassFixture,
   characterCreation: {
     ...equipmentStepMonkClassFixture.characterCreation!,
@@ -83,7 +68,7 @@ const monkWithTorchGrant: ClassStored = {
       ],
     },
   },
-}
+})
 
 const catalogIndex = indexCharacterBuildCatalog({
   species: [],

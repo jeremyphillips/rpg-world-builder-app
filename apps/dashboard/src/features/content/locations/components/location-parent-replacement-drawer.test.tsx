@@ -2,36 +2,36 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
 
 function createMultiFamilyCampaignLocations() {
-  const site = {
-    ...HARBORFORD,
+  const site = makeLocation({
+    kind: 'site',
     id: 'location-site',
     slug: 'harbor-site',
     name: 'Harbor Site',
-    kind: 'site',
-  } as Location
+    parentLocationId: HARBORFORD.id,
+  })
 
-  const structureSibling = {
-    ...YAWNING_PORTAL,
+  const structureSibling = makeLocation({
+    kind: 'structure',
     id: 'location-other-structure',
     slug: 'other-tavern',
     name: 'Other Tavern',
+    structureType: 'building',
     parentLocationId: HARBORFORD.id,
-  } as Location
+  })
 
-  const interior = {
-    ...YAWNING_PORTAL,
+  const interior = makeLocation({
+    kind: 'interior',
     id: 'location-interior',
     slug: 'taproom',
     name: 'Taproom',
-    kind: 'interior',
     parentLocationId: YAWNING_PORTAL.id,
-  } as Location
+  })
 
   return {
     campaignLocations: [...LOCATIONS_LIST, site, structureSibling],
@@ -71,13 +71,12 @@ describe('LocationParentReplacementDrawer', () => {
 
   it('opens set-parent chrome without a current parent summary', async () => {
     const user = userEvent.setup()
-    const plane: Location = {
-      ...ALDERMERE,
+    const plane = makeLocation({
+      kind: 'plane',
       id: 'location-plane',
       slug: 'material-plane',
       name: 'Material Plane',
-      kind: 'plane',
-    }
+    })
 
     render(
       <LocationParentReplacementDrawer

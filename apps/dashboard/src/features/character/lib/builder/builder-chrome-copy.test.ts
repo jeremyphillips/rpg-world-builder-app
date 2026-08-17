@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { ROUTES } from '@/app/routes'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
 import {
   createCampaignNpcBuilderContextFixture,
@@ -64,7 +65,7 @@ describe('getBuilderChromeCopyForContext', () => {
   it('resolves campaign NPC chrome from context', () => {
     expect(getBuilderChromeCopyForContext(createCampaignNpcBuilderContextFixture())).toMatchObject({
       pageHeading: 'New NPC',
-      exitHref: ROUTES.campaign.npcs.list('campaign-test-1'),
+      exitHref: ROUTES.campaign.npcs.list(STORY_CAMPAIGN_ID),
     })
   })
 })

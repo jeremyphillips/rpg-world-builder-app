@@ -2,23 +2,12 @@ import {
   DEFAULT_SYSTEM_RULESET_ID,
   buildSpellPickerCompactSummary,
   type ChoiceSet,
-  type Spell,
   type SpellPickerItem,
 } from '@rpg/contracts'
 
-const baseSpellMeta = {
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system' as const,
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  classIds: ['wizard'],
-}
+import { makeSpell } from '@/test/fixtures/factories/spell'
 
-export const spellPickerCureWoundsFixture = {
-  ...baseSpellMeta,
-  id: `${DEFAULT_SYSTEM_RULESET_ID}:cure-wounds`,
+export const spellPickerCureWoundsFixture = makeSpell({
   slug: 'cure-wounds',
   name: 'Cure Wounds',
   description:
@@ -33,11 +22,9 @@ export const spellPickerCureWoundsFixture = {
     verbal: true,
     somatic: true,
   },
-} as Spell
+})
 
-export const spellPickerDetectMagicFixture = {
-  ...baseSpellMeta,
-  id: `${DEFAULT_SYSTEM_RULESET_ID}:detect-magic`,
+export const spellPickerDetectMagicFixture = makeSpell({
   slug: 'detect-magic',
   name: 'Detect Magic',
   description: '<p>For the duration, you sense the presence of magic within 30 feet of you.</p>',
@@ -57,11 +44,9 @@ export const spellPickerDetectMagicFixture = {
     verbal: true,
     somatic: true,
   },
-} as Spell
+})
 
-export const spellPickerMageHandFixture = {
-  ...baseSpellMeta,
-  id: `${DEFAULT_SYSTEM_RULESET_ID}:mage-hand`,
+export const spellPickerMageHandFixture = makeSpell({
   slug: 'mage-hand',
   name: 'Mage Hand',
   description: '<p>A spectral, floating hand appears at a point you choose within range.</p>',
@@ -74,7 +59,7 @@ export const spellPickerMageHandFixture = {
     verbal: true,
     somatic: true,
   },
-} as Spell
+})
 
 export const spellPickerCantripChoiceSetFixture = {
   id: `${DEFAULT_SYSTEM_RULESET_ID}:fixture-wizard:cantrips`,

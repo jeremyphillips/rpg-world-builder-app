@@ -12,12 +12,12 @@ import {
   formatFieldMessage,
   resolveAvailableChoices,
   type CharacterBuilderDraft,
-  type Species,
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { getDrowHeritageSpellCatalog } from '@/features/content'
 import { pickSpecies } from '@/features/content'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
@@ -25,7 +25,7 @@ import {
 import { CHANGE_HERITAGE_LABEL } from '../../lib/builder/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step.client'
 
-const dwarfWithTraits = {
+const dwarfWithTraits = makeSpecies({
   ...populatedBuilderCatalog.species[0]!,
   traits: [
     {
@@ -44,7 +44,7 @@ const dwarfWithTraits = {
       description: '<p>Poison resistance.</p>',
     },
   ],
-} as const satisfies Species
+})
 
 const elf = pickSpecies('elf')
 

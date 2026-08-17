@@ -4,8 +4,9 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import type { Organization } from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
@@ -27,25 +28,19 @@ import {
 import type { BuildingOrganizationDraftPlan } from '../lib/building-organization-create-drafts'
 
 const organizations = [
-  {
+  makeOrganization({
     id: 'organization-1',
+    slug: 'organization-1',
     name: 'Copper Kettle Guild',
     organizationDomain: 'commercial',
-    functions: [],
-    practices: [],
-    memberClassAffinityIds: [],
-    connections: { locations: [] },
-  },
-  {
+  }),
+  makeOrganization({
     id: 'organization-2',
+    slug: 'organization-2',
     name: 'Harbor Merchants Guild',
     organizationDomain: 'commercial',
-    functions: [],
-    practices: [],
-    memberClassAffinityIds: [],
-    connections: { locations: [] },
-  },
-] as unknown as Organization[]
+  }),
+]
 
 vi.mock('../../organizations', () => ({
   useOrganizations: () => ({ data: organizations, isPending: false, isError: false }),

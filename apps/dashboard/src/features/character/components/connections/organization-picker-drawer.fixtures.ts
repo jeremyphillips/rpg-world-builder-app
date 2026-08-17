@@ -1,42 +1,29 @@
-import type { Organization } from '@rpg/contracts'
-
 import type { OrganizationPickerItem } from './organization-picker-drawer.types'
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 
-const timestamp = '2026-01-01T00:00:00.000Z'
-
-export const lanternGuild: Organization = {
+export const lanternGuild = makeOrganization({
   id: 'organization-lantern-guild',
   slug: 'lantern-guild',
-  rulesetId: 'srd-cc-5.2.1',
-  source: 'homebrew',
-  status: 'published',
-  campaignId: 'campaign-1',
-  createdAt: timestamp,
-  updatedAt: timestamp,
   name: 'Lantern Guild',
   organizationDomain: 'occupational',
-  functions: [],
-  practices: [],
-  memberClassAffinityIds: [],
   description: '<p>Guides and cartographers who keep the old roads open.</p>',
-  connections: { locations: [] },
-}
+})
 
-export const cityCouncil: Organization = {
+export const cityCouncil = makeOrganization({
   ...lanternGuild,
   id: 'organization-city-council',
   slug: 'city-council',
   name: 'City Council',
   organizationDomain: 'government',
-}
+})
 
-export const silverCircle: Organization = {
+export const silverCircle = makeOrganization({
   ...lanternGuild,
   id: 'organization-silver-circle',
   slug: 'silver-circle',
   name: 'Silver Circle',
   organizationDomain: 'academic',
-}
+})
 
 export const organizationPickerItems: OrganizationPickerItem[] = [
   { organization: lanternGuild, selected: true },

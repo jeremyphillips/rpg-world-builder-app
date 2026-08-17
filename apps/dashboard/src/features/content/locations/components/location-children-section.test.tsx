@@ -10,6 +10,7 @@ import { toast } from '@rpg/ui'
 import type * as RpgUi from '@rpg/ui'
 
 import { makeTestQueryClient } from '@/test/render'
+import { makeLocation } from '@/test/fixtures/factories/location'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { DOCK_WARD, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { buildLocationDetailViewModel } from '../lib/location-display'
@@ -137,13 +138,13 @@ describe('LocationChildrenSection', () => {
   })
 
   it('shows zero-child districts with reserved disclosure gutter and no chevron', () => {
-    const marketWard: Location = {
-      ...DOCK_WARD,
+    const marketWard = makeLocation({
+      kind: 'district',
       id: 'location-market-ward',
       slug: 'market-ward',
       name: 'Market Ward',
       parentLocationId: HARBORFORD.id,
-    }
+    })
 
     const childrenViewModel = buildLocationDetailViewModel(HARBORFORD, {
       locations: [...LOCATIONS_LIST, marketWard],

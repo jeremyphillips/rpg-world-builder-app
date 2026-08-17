@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
+import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../lib/campaign-access/campaign-access-table-labels'
 import { CITY_COUNCIL, CRAFT_GUILD } from '../fixtures'
 import {
   buildOrganizationDetailViewModel,
@@ -71,18 +74,43 @@ describe('buildOrganizationDetailViewModel', () => {
       ...CRAFT_GUILD,
       memberClassAffinityIds: ['class-fighter', 'class-rogue', 'class-missing'],
     }
-    const classLabelById = new Map([
-      ['class-fighter', 'Fighter'],
-      ['class-rogue', 'Rogue'],
-    ])
+    const catalogClasses = [
+      makeCharacterClass({ id: 'class-fighter', slug: 'fighter', name: 'Fighter' }),
+      makeCharacterClass({ id: 'class-rogue', slug: 'rogue', name: 'Rogue' }),
+    ]
 
     expect(
-      buildOrganizationDetailViewModel(organization, emptyLocationConnections, classLabelById),
+      buildOrganizationDetailViewModel(organization, emptyLocationConnections, catalogClasses),
     ).toMatchObject({
       statRows: expect.arrayContaining([
         {
           label: 'Member class affinities',
           value: 'Fighter · Rogue · Class Missing · Unresolved reference',
+        },
+      ]),
+    })
+  })
+
+  it('marks unavailable stored affinity classes on the detail stat row', () => {
+    const organization = {
+      ...CRAFT_GUILD,
+      memberClassAffinityIds: ['class-wizard'],
+    }
+    const catalogClasses = [
+      makeCharacterClass({ id: 'class-fighter', slug: 'fighter', name: 'Fighter' }),
+      {
+        ...makeCharacterClass({ id: 'class-wizard', slug: 'wizard', name: 'Wizard' }),
+        campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+      },
+    ]
+
+    expect(
+      buildOrganizationDetailViewModel(organization, emptyLocationConnections, catalogClasses),
+    ).toMatchObject({
+      statRows: expect.arrayContaining([
+        {
+          label: 'Member class affinities',
+          value: `Wizard · ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`,
         },
       ]),
     })

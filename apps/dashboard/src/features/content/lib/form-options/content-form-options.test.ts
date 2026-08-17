@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { pickClass, pickEquipment, pickSkillProficiency, pickSpell } from '../fixtures/pick'
 import { buildContentFormOptionSets, toContentFieldOption } from './content-form-options'
 
@@ -90,5 +92,20 @@ describe('buildContentFormOptionSets', () => {
       { value: 'barbarian', label: patchedBarbarian.name },
       { value: 'wizard', label: wizard.name },
     ])
+  })
+
+  it('splits classEntities from campaignClassEntities by campaign availability', () => {
+    const fighter = makeCharacterClass({ slug: 'fighter', name: 'Fighter' })
+    const wizard = {
+      ...makeCharacterClass({ slug: 'wizard', name: 'Wizard' }),
+      campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+    }
+
+    const options = buildContentFormOptionSets({
+      classes: [fighter, wizard],
+    })
+
+    expect(options.classEntities).toEqual([fighter])
+    expect(options.campaignClassEntities).toEqual([fighter, wizard])
   })
 })

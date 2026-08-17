@@ -1,16 +1,16 @@
-import type { Location } from '@rpg/contracts'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
 
-const PLANE: Location = {
-  ...ALDERMERE,
+const PLANE = makeLocation({
+  kind: 'plane',
   id: 'location-plane',
   slug: 'material-plane',
   name: 'Material Plane',
-  kind: 'plane',
-}
+})
 
 const meta = {
   title: 'Content/Locations/LocationParentReplacementDrawer',

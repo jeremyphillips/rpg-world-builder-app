@@ -33,6 +33,10 @@ import { useLocations } from '../../locations/hooks/use-locations'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpells } from '../../spells/hooks/use-spells'
 import type { ContentFormCtx } from '../forms/content-form-registry'
+import {
+  filterCampaignAvailableClasses,
+  type CampaignAccessClassRow,
+} from '../campaign-access/filter-campaign-available-classes.lib'
 import { shouldPresentContentSource } from '../content-type-presentation'
 import {
   buildRichTextInternalLinkOptions,
@@ -54,11 +58,11 @@ export interface ContentFormOptionSets {
   equipment: FieldOption[]
   /** Full equipment entities for authoring-time pool expansion. */
   equipmentEntities?: Equipment[]
-  /** Campaign-discoverable class entities for id-valued authoring fields. */
+  /** Campaign-available class entities for id-valued authoring fields. */
   classEntities?: CharacterClass[]
   /**
    * Full campaign class catalog for orphan reference resolution. When omitted,
-   * falls back to `classEntities` (discoverable rows only).
+   * falls back to `classEntities` (available rows only).
    */
   campaignClassEntities?: CharacterClass[]
   /** Eligible tool proficiency choices for starting-equipment linked grants. */
@@ -174,7 +178,7 @@ function buildWeaponCategoryBySlug(
 }
 
 function toSortedContentFieldOptions<T extends ContentOptionEntity>(
-  entities: T[] | undefined,
+  entities: readonly T[] | undefined,
   contentType: ContentTypeKey,
 ): FieldOption[] {
   return sortFieldOptions(
@@ -212,25 +216,28 @@ function buildLocationFieldOptions(locations: Location[] | undefined): FieldOpti
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
-  classes?: CharacterClass[]
+  classes?: readonly CampaignAccessClassRow[]
   spells?: Spell[]
   feats?: Feat[]
   skills?: SkillProficiency[]
   equipment?: Equipment[]
   locations?: Location[]
 }): ContentFormOptionSets {
+  const catalogClasses = input.classes ?? []
+  const availableClasses = filterCampaignAvailableClasses(catalogClasses)
+
   return {
-    classes: toSortedContentFieldOptions(input.classes, 'classes'),
+    classes: toSortedContentFieldOptions(catalogClasses, 'classes'),
     spellcastingClasses: toSortedContentFieldOptions(
-      input.classes?.filter(classHasSpellcasting),
+      catalogClasses.filter(classHasSpellcasting),
       'classes',
     ),
     weapons: toSortedContentFieldOptions(input.equipment?.filter(isWeaponEquipment), 'equipment'),
     armor: toSortedContentFieldOptions(input.equipment?.filter(isArmorEquipment), 'equipment'),
     equipment: toSortedContentFieldOptions(input.equipment, 'equipment'),
     equipmentEntities: input.equipment,
-    classEntities: input.classes,
-    campaignClassEntities: input.classes,
+    classEntities: availableClasses,
+    campaignClassEntities: [...catalogClasses],
     spells: toSortedContentFieldOptions(input.spells, 'spells'),
     feats: toSortedContentFieldOptions(input.feats, 'feats'),
     skills: toSortedContentFieldOptions(input.skills, 'skill-proficiencies'),

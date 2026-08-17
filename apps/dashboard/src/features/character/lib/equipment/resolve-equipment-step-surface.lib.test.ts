@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createEmptyCharacterBuilderDraft,
-  type CharacterClass,
   type ResolvedStartingEquipmentFunding,
 } from '@rpg/contracts'
+
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
+import { pickClass } from '@/test/fixtures/pick'
 
 import { resolveEquipmentStepSurface } from './resolve-equipment-step-surface.lib'
 
@@ -24,8 +26,8 @@ function makeFunding(
   }
 }
 
-const fighterClass = {
-  id: 'srd-cc-5.2.1:fighter',
+const fighterClass = makeCharacterClass({
+  ...pickClass('fighter'),
   characterCreation: {
     startingEquipment: {
       choose: 1,
@@ -35,7 +37,7 @@ const fighterClass = {
       ],
     },
   },
-} as unknown as CharacterClass
+})
 
 describe('resolveEquipmentStepSurface', () => {
   it('reports class_missing when no class is selected', () => {

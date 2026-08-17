@@ -180,6 +180,7 @@ Work is not done until affected drift tests pass:
 | Dashboard routes  | `content-routes.integration-manifest.test.ts`                    |
 | Dashboard sidebar | `content-registry.test.ts`                                       |
 | Dashboard forms   | `content-form-registry.test.ts`                                  |
+| Dashboard test factories | `content-test-factory-registry.test.ts` + `content-test-factory-semantics.test.ts` |
 
 Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 
@@ -196,6 +197,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 | Type silently skipped in form tests   | Duplicate side-effect imports removed but test registry not updated            |
 | Production bundle bloat               | Imported `content-form-test-registry.ts` from runtime code — **never**         |
 | Overview table feels wrong            | Built columns/filters without user input — should have prompted first          |
+| Test factory parity fails             | New `ContentTypeKey` without `CONTENT_TEST_FACTORY_REGISTRY` entry             |
 
 **Rule:** Runtime registries are authoritative. The integration manifest is metadata for drift tests only — no schemas, loaders, or route functions in tooling.
 
@@ -209,6 +211,10 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 - Force nested resources (subclasses) into the top-level manifest
 - Skip `CONTENT_TYPE_TERMS` or vocab audit for user-facing catalog nouns
 - Guess overview middle columns or filters when the user did not specify them
+- Hand-roll content entity shapes outside `test/fixtures/factories/` — use `makeX`; use `pickX` when the test needs an exact catalog record
+- Add global named catalog inventories (`catalog.ts`-style) — feature `fixtures.ts` owns named `pickX` selections
+- Use `tryPickX` or catalog fallback inside `makeX` factories
+- Add entity literals in `scenarios/` — compose multi-entity graphs with `makeX` / `pickX` instead; do not store single-entity inventories in `scenarios/`
 
 ---
 
@@ -221,3 +227,4 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 | Integration manifest                 | [`tools/content-types/README.md`](../../../tools/content-types/README.md)                             |
 | Form conventions                     | [`apps/dashboard/docs/form-lib-conventions.md`](../../../apps/dashboard/docs/form-lib-conventions.md) |
 | Content duplication                  | [`apps/api/docs/content-duplication.md`](../../../apps/api/docs/content-duplication.md)               |
+| Dashboard test factories             | [`apps/dashboard/docs/testing.md`](../../../apps/dashboard/docs/testing.md#content-test-factories)   |

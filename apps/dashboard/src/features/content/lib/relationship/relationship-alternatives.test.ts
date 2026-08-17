@@ -3,6 +3,13 @@ import { describe, expect, it } from 'vitest'
 import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 
 import {
+  guildhallBuilding,
+  lankhmarRegion,
+  testDistrictLocation,
+  testSettlementLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
+
+import {
   assertRelationshipAlternativesMatchCapabilities,
   hasResolvedRelationshipMutationAlternative,
   isRelationshipMutationActionVisible,
@@ -14,36 +21,14 @@ import {
   type RelationshipOverflowActionId,
 } from './resolve-relationship-overflow-actions'
 
-function regionLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'region-1',
-    campaignId: 'camp-1',
-    name: 'Lankhmar',
-    slug: 'lankhmar',
-    kind: 'region',
-    ...overrides,
-  } as Location
-}
-
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Guildhall',
-    slug: 'guildhall',
-    kind: 'structure',
-    ...overrides,
-  } as Location
-}
-
 function authoritativeLocations(items: readonly Location[]) {
   return { items, isAuthoritativeDomainSet: true as const }
 }
 
 describe('resolveRelationshipAlternatives', () => {
   it('marks single-kind geographic_presence changeKind unavailable while changeTarget can remain available', () => {
-    const lankhmar = regionLocation()
-    const otherRegion = regionLocation({ id: 'region-2', name: 'Neuromancer', slug: 'neuromancer' })
+    const lankhmar = lankhmarRegion()
+    const otherRegion = lankhmarRegion({ id: 'region-2', name: 'Neuromancer', slug: 'neuromancer' })
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -72,7 +57,7 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('exposes changeKind when multi-kind site alternatives exist at the location', () => {
-    const guildhall = buildingLocation()
+    const guildhall = guildhallBuilding()
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -93,19 +78,17 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('limits headquarters changeTarget candidates to structure-family locations', () => {
-    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
-    const silverEel = buildingLocation({
+    const guildhouse = guildhallBuilding({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = guildhallBuilding({
       id: 'building-2',
       name: 'The Silver Eel',
       slug: 'silver-eel',
     })
-    const settlement = {
-      ...regionLocation(),
+    const settlement = testSettlementLocation({
       id: 'settlement-1',
-      kind: 'settlement' as const,
       name: 'Ilthmar',
       slug: 'ilthmar',
-    } as Location
+    })
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -127,13 +110,11 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('hides changeKind when location profile allows only the current kind', () => {
-    const district = {
-      ...regionLocation(),
+    const district = testDistrictLocation({
       id: 'district-1',
-      kind: 'district' as const,
       name: 'Dockside',
       slug: 'dockside',
-    } as Location
+    })
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -154,7 +135,7 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('returns unknown availability with isResolving for singleton kinds while occupancy is loading', () => {
-    const kingdom = regionLocation()
+    const kingdom = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -178,7 +159,7 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('returns unknown for changeTarget when candidate set is partial and has no local match', () => {
-    const lankhmar = regionLocation()
+    const lankhmar = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -202,7 +183,7 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('returns unavailable for changeTarget when partial set is marked authoritative with no match', () => {
-    const lankhmar = regionLocation()
+    const lankhmar = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -236,8 +217,8 @@ describe('resolveRelationshipAlternatives', () => {
         alternateTargets: [{ id: 'region-2' }],
       },
       locationCandidates: authoritativeLocations([
-        regionLocation(),
-        regionLocation({ id: 'region-2', name: 'Other', slug: 'other' }),
+        lankhmarRegion(),
+        lankhmarRegion({ id: 'region-2', name: 'Other', slug: 'other' }),
       ]),
     })
 
@@ -246,7 +227,7 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('finds replaceSubject alternatives for territorial inverse rows', () => {
-    const kingdom = regionLocation()
+    const kingdom = lankhmarRegion()
     const rows: LocationConnectedPartyRow[] = [
       {
         relationshipId: 'rel-1',
@@ -335,8 +316,8 @@ describe('architectural invariant: overflow mutations require alternatives', () 
           subjectOrganizationId: 'org-1',
         },
         locationCandidates: authoritativeLocations([
-          regionLocation(),
-          regionLocation({ id: 'region-2', name: 'Other Region', slug: 'other-region' }),
+          lankhmarRegion(),
+          lankhmarRegion({ id: 'region-2', name: 'Other Region', slug: 'other-region' }),
         ]),
         connections: [{ id: 'conn-1', locationId: 'region-1', kind: 'operates_in' as const }],
       },
@@ -358,7 +339,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
           kind: 'headquarters' as const,
           subjectOrganizationId: 'org-1',
         },
-        locationCandidates: authoritativeLocations([buildingLocation()]),
+        locationCandidates: authoritativeLocations([guildhallBuilding()]),
         connections: [{ id: 'conn-hq', locationId: 'building-1', kind: 'headquarters' as const }],
       },
       labels: {
@@ -426,7 +407,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
 
 describe('mutation availability chain', () => {
   it('keeps changeTarget visible and avoids authoritative-empty drawer state for partial candidate sets', () => {
-    const lankhmar = regionLocation()
+    const lankhmar = lankhmarRegion()
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
       canManage: true,

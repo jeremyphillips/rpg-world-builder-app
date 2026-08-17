@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CharacterClass } from '@rpg/contracts'
+import { pickClass } from '@/test/fixtures/pick'
 
 import {
   buildQuickNpcClassRadioCardPresentation,
@@ -8,33 +8,10 @@ import {
   QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
 } from './quick-npc-class-option-groups.lib'
 
-function makeClass(slug: string, id = `srd-cc-5.2.1:${slug}`): CharacterClass {
-  return {
-    id,
-    slug,
-    rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
-    status: 'published',
-    campaignId: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    name: slug.charAt(0).toUpperCase() + slug.slice(1),
-    primaryAbilities: ['str'],
-    hitDie: 10,
-    proficiencies: {
-      savingThrows: ['str', 'con'],
-      armor: { categories: [], items: [] },
-      weapons: { categories: [], items: [] },
-      skills: { categories: [], items: [] },
-    },
-    features: [],
-  }
-}
-
 describe('buildQuickNpcClassRadioCardPresentation', () => {
-  const fighter = makeClass('fighter')
-  const rogue = makeClass('rogue')
-  const wizard = makeClass('wizard')
+  const fighter = pickClass('fighter')
+  const rogue = pickClass('rogue')
+  const wizard = pickClass('wizard')
   const availableClasses = [fighter, rogue, wizard]
   const classOptions = availableClasses.map((characterClass) => ({
     value: characterClass.id,

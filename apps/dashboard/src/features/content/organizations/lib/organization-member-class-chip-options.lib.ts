@@ -16,6 +16,31 @@ export const CONTENT_REFERENCE_UNRESOLVED_SUFFIX = '· Unresolved reference'
 
 const UNAVAILABLE_CHIP_LABEL_SUFFIX = `· ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`
 
+export function resolveOrganizationMemberClassAffinityDisplayLabel(
+  classId: string,
+  input: {
+    selectableClasses: readonly CharacterClass[]
+    catalogClasses: readonly CharacterClass[]
+  },
+): string {
+  const selectableValues = new Set(
+    input.selectableClasses.map((characterClass) => characterClass.id),
+  )
+  if (selectableValues.has(classId)) {
+    const selectableClass = input.selectableClasses.find(
+      (characterClass) => characterClass.id === classId,
+    )
+    if (selectableClass) return selectableClass.name
+  }
+
+  const catalogClass = input.catalogClasses.find((characterClass) => characterClass.id === classId)
+  if (catalogClass) {
+    return `${catalogClass.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`
+  }
+
+  return `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`
+}
+
 function buildSelectableMemberClassChipOptions(
   discoverableClasses: readonly CharacterClass[],
 ): FieldOption[] {
@@ -35,26 +60,17 @@ function buildOrphanMemberClassChipOptions(input: {
   const selectableValues = new Set(
     input.discoverableClasses.map((characterClass) => characterClass.id),
   )
-  const catalogById = new Map(
-    input.catalogClasses.map((characterClass) => [characterClass.id, characterClass]),
-  )
   const orphans: FieldOption[] = []
 
   for (const classId of input.selectedIds) {
     if (selectableValues.has(classId)) continue
 
-    const catalogClass = catalogById.get(classId)
-    if (catalogClass) {
-      orphans.push({
-        value: classId,
-        label: `${catalogClass.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`,
-      })
-      continue
-    }
-
     orphans.push({
       value: classId,
-      label: `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`,
+      label: resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
+        selectableClasses: input.discoverableClasses,
+        catalogClasses: input.catalogClasses,
+      }),
     })
   }
 

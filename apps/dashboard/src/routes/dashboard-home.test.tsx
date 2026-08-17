@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
-import type { CampaignListItem, PcCharacterListItem } from '@rpg/contracts'
+import type { PcCharacterListItem } from '@rpg/contracts'
 
 vi.mock('@/features/auth/api/auth-client')
 vi.mock('@/features/campaign/api/campaign-client')
@@ -26,10 +26,6 @@ const listCharacters = vi.mocked(listCharactersFn)
 
 const authSession = makeAuthMe()
 const displayName = authSession.user.displayName
-
-function campaign(id: string, name: string): CampaignListItem {
-  return makeCampaignListItem({ id, identity: { name }, status: 'draft' })
-}
 
 function character(id: string): PcCharacterListItem {
   return {
@@ -75,7 +71,9 @@ describe('DashboardHome', () => {
   })
 
   it('shows campaigns-only welcome copy when the user has campaigns but no characters', async () => {
-    listCampaigns.mockResolvedValue([campaign('a', 'Arden')])
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({ id: 'a', identity: { name: 'Arden' }, status: 'draft' }),
+    ])
 
     renderHome()
 
@@ -104,7 +102,9 @@ describe('DashboardHome', () => {
   })
 
   it('shows active welcome copy when the user has both campaigns and characters', async () => {
-    listCampaigns.mockResolvedValue([campaign('a', 'Arden')])
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({ id: 'a', identity: { name: 'Arden' }, status: 'draft' }),
+    ])
     listCharacters.mockResolvedValue([character('char_1')])
 
     renderHome()
@@ -150,7 +150,9 @@ describe('DashboardHome', () => {
   })
 
   it('hides the campaigns index link when the user has only one campaign', async () => {
-    listCampaigns.mockResolvedValue([campaign('a', 'Arden')])
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({ id: 'a', identity: { name: 'Arden' }, status: 'draft' }),
+    ])
 
     renderHome()
 
@@ -191,7 +193,9 @@ describe('DashboardHome', () => {
   })
 
   it('demotes the starter-card new campaign action when campaign rows exist', async () => {
-    listCampaigns.mockResolvedValue([campaign('a', 'Arden')])
+    listCampaigns.mockResolvedValue([
+      makeCampaignListItem({ id: 'a', identity: { name: 'Arden' }, status: 'draft' }),
+    ])
 
     renderHome()
 
@@ -222,8 +226,16 @@ describe('DashboardHome', () => {
 
   it('shows a continue card for a remembered campaign with completed onboarding', async () => {
     listCampaigns.mockResolvedValue([
-      campaign('camp_active', 'Active Campaign'),
-      campaign('camp_other', 'Other Campaign'),
+      makeCampaignListItem({
+        id: 'camp_active',
+        identity: { name: 'Active Campaign' },
+        status: 'draft',
+      }),
+      makeCampaignListItem({
+        id: 'camp_other',
+        identity: { name: 'Other Campaign' },
+        status: 'draft',
+      }),
     ])
     localStorage.setItem('rpg.selectedCampaignId', 'camp_active')
 

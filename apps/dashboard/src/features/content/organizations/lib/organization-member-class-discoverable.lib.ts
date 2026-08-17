@@ -2,7 +2,7 @@ import type { CharacterClass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 
-/** Campaign-discoverable classes for organization member class affinity authoring. */
+/** Campaign-available classes for organization member class affinity authoring. */
 export function resolveDiscoverableOrganizationMemberClasses(
   ctx: ContentFormCtx,
 ): CharacterClass[] {

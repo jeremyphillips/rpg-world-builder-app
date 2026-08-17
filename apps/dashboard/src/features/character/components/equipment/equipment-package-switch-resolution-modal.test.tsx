@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { equipmentSchema } from '@rpg/contracts'
-import type { ClassStored } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
@@ -12,91 +10,15 @@ import {
 import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
+import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
+import { pickEquipment } from '@/test/fixtures/pick'
+
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal.client'
 import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
 
-const RULESET = 'srd-cc-5.2.1' as const
-
-const rope = equipmentSchema.parse({
-  id: `${RULESET}:rope`,
-  slug: 'rope',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Rope',
-  description: '',
-  cost: { amount: 1, currency: 'gp' },
-  weight: { value: 5, unit: 'lb' },
-  kind: 'adventuring_gear',
-  gearKind: 'general',
-})
-
-const dagger = equipmentSchema.parse({
-  id: `${RULESET}:dagger`,
-  slug: 'dagger',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Dagger',
-  description: '',
-  cost: { amount: 2, currency: 'gp' },
-  weight: { value: 1, unit: 'lb' },
-  kind: 'weapon',
-  category: 'simple',
-  mode: 'melee',
-  damage: { dice: { count: 1, faces: 4 } },
-  damageType: 'piercing',
-  properties: [],
-  mastery: 'nick',
-})
-
-const storedDruid: ClassStored = {
-  id: `${RULESET}:druid`,
-  slug: 'druid',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Druid',
-  primaryAbilities: ['wis'],
-  hitDie: 8,
-  proficiencies: {
-    savingThrows: ['int', 'wis'],
-    armor: { categories: ['light', 'shields'], items: [] },
-    weapons: { categories: ['simple'], items: [] },
-    skills: { categories: [], items: [] },
-  },
-  features: [],
-  characterCreation: {
-    startingEquipment: {
-      choose: 1,
-      options: [
-        {
-          id: 'standard-equipment',
-          label: 'Standard Equipment',
-          items: [
-            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
-          ],
-          wealth: { gp: 9, sp: 5, cp: 3 },
-        },
-        {
-          id: 'starting-gold',
-          label: 'Starting Gold',
-          items: [],
-          wealth: { gp: 50 },
-        },
-      ],
-    },
-  },
-}
+const rope = pickEquipment('rope')
+const dagger = pickEquipment('dagger')
+const storedDruid = storedDruidClassStored
 
 const catalogIndex = indexCharacterBuildCatalog({
   species: [],

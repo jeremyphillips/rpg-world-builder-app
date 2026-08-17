@@ -10,9 +10,10 @@ import {
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   resolveCharacterCreationPatch,
-  type Campaign,
   type CreatureTypeId,
 } from '@rpg/contracts'
+
+import { makeCampaign } from '@/test/fixtures/campaigns'
 
 import {
   buildCreateCampaignInput,
@@ -36,7 +37,7 @@ const defaultStartingWealth = mapStartingWealthToFormValues(
   getStandardStartingWealthRules('srd-cc-5.2.1'),
 )
 
-const campaign: Campaign = {
+const campaign = makeCampaign({
   id: 'c1',
   identity: {
     name: 'Sunless Citadel',
@@ -51,13 +52,7 @@ const campaign: Campaign = {
       difficulty: 'dangerous',
     },
   },
-  status: 'active',
-  visibility: 'private',
-  rulesetId: 'srd-cc-5.2.1',
-  createdBy: 'u1',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-}
+})
 
 const defaultRules: CampaignCreateValues = {
   name: 'Sunless Citadel',
@@ -99,10 +94,10 @@ describe('mapCampaignToSettingsValues', () => {
   })
 
   it('falls back when flavor is absent', () => {
-    const minimal: Campaign = {
+    const minimal = makeCampaign({
       ...campaign,
       configuration: {},
-    }
+    })
 
     expect(mapCampaignToSettingsValues(minimal)).toEqual({
       name: 'Sunless Citadel',

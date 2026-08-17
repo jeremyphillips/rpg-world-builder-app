@@ -10,12 +10,14 @@ import {
   type OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import { formatContentReferenceLabel } from '@/features/character'
-
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
+import {
+  filterCampaignAvailableClasses,
+  type CampaignAccessClassRow,
+} from '../../lib/campaign-access/filter-campaign-available-classes.lib'
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
-import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from './organization-member-class-chip-options.lib'
+import { resolveOrganizationMemberClassAffinityDisplayLabel } from './organization-member-class-chip-options.lib'
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
@@ -66,8 +68,9 @@ export function formatLocationConnectionsCount(total: number): string {
 export function buildOrganizationDetailViewModel(
   organization: Organization,
   locationConnections: OrganizationLocationConnectionsViewModel,
-  classLabelById?: ReadonlyMap<string, string>,
+  catalogClasses: readonly CampaignAccessClassRow[] = [],
 ): OrganizationDetailViewModel {
+  const selectableClasses = filterCampaignAvailableClasses(catalogClasses)
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
     organization.organizationForm !== undefined
@@ -117,11 +120,12 @@ export function buildOrganizationDetailViewModel(
             {
               label: 'Member class affinities',
               value: organization.memberClassAffinityIds
-                .map((classId) => {
-                  const label = classLabelById?.get(classId)
-                  if (label) return label
-                  return `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`
-                })
+                .map((classId) =>
+                  resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
+                    selectableClasses,
+                    catalogClasses,
+                  }),
+                )
                 .join(' · '),
             },
           ]

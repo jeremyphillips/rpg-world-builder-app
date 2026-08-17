@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { Location } from '@rpg/contracts'
 
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+import { makeLocation } from '@/test/fixtures/factories/location'
 import { makeTestQueryClient } from '@/test/render'
 
 import {
@@ -37,11 +38,9 @@ import { updateContent } from '../../lib/list/content-client'
 
 const mockUpdateContent = vi.mocked(updateContent)
 
-const CAMPAIGN_ID = 'camp_1'
-
 describe('resolveLocationParentReplacementAction', () => {
   it('returns null for plane locations and non-managers', () => {
-    const plane: Location = { ...ALDERMERE, id: 'plane-1', kind: 'plane' }
+    const plane = makeLocation({ kind: 'plane', id: 'plane-1' })
 
     expect(
       resolveLocationParentReplacementAction({
@@ -79,7 +78,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       resolveLocationParentReplacementCurrentSnapshot({
         subject: ALDERMERE,
         locationsById: buildLocationsById(LOCATIONS_LIST),
-        campaignId: CAMPAIGN_ID,
+        campaignId: STORY_CAMPAIGN_ID,
       }),
     ).toBeNull()
   })
@@ -89,7 +88,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       resolveLocationParentReplacementCurrentSnapshot({
         subject: YAWNING_PORTAL,
         locationsById: buildLocationsById(LOCATIONS_LIST),
-        campaignId: CAMPAIGN_ID,
+        campaignId: STORY_CAMPAIGN_ID,
       }),
     ).toEqual({
       parentLocationId: DOCK_WARD.id,
@@ -102,16 +101,20 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
   })
 
   it('marks stale parent ids unavailable while still returning the persisted id', () => {
-    const staleParent: Location = {
-      ...YAWNING_PORTAL,
+    const staleParent = makeLocation({
+      kind: 'structure',
+      id: YAWNING_PORTAL.id,
+      slug: YAWNING_PORTAL.slug,
+      name: YAWNING_PORTAL.name,
+      structureType: 'building',
       parentLocationId: 'missing-parent-id',
-    }
+    })
 
     expect(
       resolveLocationParentReplacementCurrentSnapshot({
         subject: staleParent,
         locationsById: buildLocationsById(LOCATIONS_LIST),
-        campaignId: CAMPAIGN_ID,
+        campaignId: STORY_CAMPAIGN_ID,
       }),
     ).toEqual({
       parentLocationId: 'missing-parent-id',
@@ -135,14 +138,19 @@ describe('buildEligibleLocationParentReplacementCandidates', () => {
   })
 
   it('includes valid parents for a parentless optional kind', () => {
-    const plane: Location = {
-      ...ALDERMERE,
+    const plane = makeLocation({
+      kind: 'plane',
       id: 'location-plane',
       slug: 'plane',
       name: 'Material Plane',
-      kind: 'plane',
-    }
-    const parentlessWorld: Location = { ...ALDERMERE, parentLocationId: undefined }
+    })
+    const parentlessWorld = makeLocation({
+      kind: 'world',
+      id: ALDERMERE.id,
+      slug: ALDERMERE.slug,
+      name: ALDERMERE.name,
+      parentLocationId: undefined,
+    })
     const candidates = buildEligibleLocationParentReplacementCandidates({
       subject: parentlessWorld,
       campaignLocations: [...LOCATIONS_LIST, plane],
@@ -164,20 +172,20 @@ describe('buildEligibleLocationParentReplacementCandidates', () => {
   })
 
   it('excludes district parents for a district subject', () => {
-    const park: Location = {
-      ...DOCK_WARD,
+    const park = makeLocation({
+      kind: 'district',
       id: 'location-park',
       slug: 'park',
       name: 'Park',
       parentLocationId: HARBORFORD.id,
-    }
-    const tenderloin: Location = {
-      ...DOCK_WARD,
+    })
+    const tenderloin = makeLocation({
+      kind: 'district',
       id: 'location-tenderloin',
       slug: 'tenderloin',
       name: 'Tenderloin',
       parentLocationId: park.id,
-    }
+    })
     const campaignLocations = [...LOCATIONS_LIST, park, tenderloin]
 
     const candidates = buildEligibleLocationParentReplacementCandidates({
@@ -251,7 +259,7 @@ describe('buildLocationParentReplacementContext', () => {
     const context = buildLocationParentReplacementContext({
       subject: YAWNING_PORTAL,
       campaignLocations: LOCATIONS_LIST,
-      campaignId: CAMPAIGN_ID,
+      campaignId: STORY_CAMPAIGN_ID,
     })
 
     expect(context.mode).toBe('change')
@@ -262,23 +270,27 @@ describe('buildLocationParentReplacementContext', () => {
 
 describe('location hierarchy projections after parentLocationId changes', () => {
   it('updates located-in and contained-location projections from one canonical store', () => {
-    const movedChild: Location = {
-      ...YAWNING_PORTAL,
+    const movedChild = makeLocation({
+      kind: 'structure',
+      id: YAWNING_PORTAL.id,
+      slug: YAWNING_PORTAL.slug,
+      name: YAWNING_PORTAL.name,
+      structureType: 'building',
       parentLocationId: HARBORFORD.id,
-    }
+    })
     const updatedLocations = LOCATIONS_LIST.map((location) =>
       location.id === YAWNING_PORTAL.id ? movedChild : location,
     )
     const locationsById = buildLocationsById(updatedLocations)
 
     expect(
-      buildLocationLocatedInSegments(movedChild, locationsById, CAMPAIGN_ID).map(
+      buildLocationLocatedInSegments(movedChild, locationsById, STORY_CAMPAIGN_ID).map(
         (segment) => segment.name,
       ),
     ).toEqual(['Aldermere', 'Greyshore', 'Harborford'])
-    expect(buildLocationChildren(DOCK_WARD.id, updatedLocations, CAMPAIGN_ID)).toEqual([])
+    expect(buildLocationChildren(DOCK_WARD.id, updatedLocations, STORY_CAMPAIGN_ID)).toEqual([])
     expect(
-      buildLocationChildren(HARBORFORD.id, updatedLocations, CAMPAIGN_ID).map(
+      buildLocationChildren(HARBORFORD.id, updatedLocations, STORY_CAMPAIGN_ID).map(
         (child) => child.name,
       ),
     ).toEqual(['Dock Ward', 'Yawning Portal'])
@@ -290,16 +302,21 @@ describe('applyLocationParentReplacement', () => {
     mockUpdateContent.mockResolvedValue(YAWNING_PORTAL)
 
     await applyLocationParentReplacement({
-      campaignId: CAMPAIGN_ID,
+      campaignId: STORY_CAMPAIGN_ID,
       subjectId: YAWNING_PORTAL.id,
       subjectKind: YAWNING_PORTAL.kind,
       newParentLocationId: HARBORFORD.id,
     })
 
-    expect(mockUpdateContent).toHaveBeenCalledWith(CAMPAIGN_ID, 'locations', YAWNING_PORTAL.id, {
-      kind: 'structure',
-      parentLocationId: HARBORFORD.id,
-    })
+    expect(mockUpdateContent).toHaveBeenCalledWith(
+      STORY_CAMPAIGN_ID,
+      'locations',
+      YAWNING_PORTAL.id,
+      {
+        kind: 'structure',
+        parentLocationId: HARBORFORD.id,
+      },
+    )
   })
 })
 
@@ -308,10 +325,10 @@ describe('invalidateLocationParentReplacementQueries', () => {
     const queryClient = makeTestQueryClient()
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
 
-    invalidateLocationParentReplacementQueries(queryClient, CAMPAIGN_ID)
+    invalidateLocationParentReplacementQueries(queryClient, STORY_CAMPAIGN_ID)
 
     expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: ['campaigns', CAMPAIGN_ID, 'content', 'locations'],
+      queryKey: ['campaigns', STORY_CAMPAIGN_ID, 'content', 'locations'],
     })
   })
 })

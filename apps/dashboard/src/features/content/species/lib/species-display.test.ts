@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID, type Species } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
+
+import { makeSpecies } from '@/test/fixtures/factories/species'
 
 import {
   buildSeedCreatureTypeVocabulary,
@@ -26,7 +28,7 @@ import {
 const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 const senseVocabulary = buildSeedSenseVocabulary()
 
-const dwarfWithTraits = {
+const dwarfWithTraits = makeSpecies({
   ...pickSpecies('dwarf'),
   traits: [
     {
@@ -46,7 +48,7 @@ const dwarfWithTraits = {
     },
   ],
   languageAffinities: ['dwarvish'],
-} as const satisfies Species
+})
 
 function buildVocabulary(languages: ReturnType<typeof listLanguageSeedOptions>) {
   return {
@@ -84,10 +86,10 @@ describe('species-display', () => {
   })
 
   it('shows None for senses when no sense grants are present', () => {
-    const speciesWithoutSenses = {
+    const speciesWithoutSenses = makeSpecies({
       ...dwarfWithTraits,
       traits: [dwarfWithTraits.traits[1]!],
-    } as const satisfies Species
+    })
 
     const { statRows } = buildSpeciesDetailViewModel(speciesWithoutSenses, vocabulary)
     const sensesRow = statRows.find((row) => row.label === SPECIES_STAT_LABELS.senses)
@@ -96,10 +98,10 @@ describe('species-display', () => {
   })
 
   it('omits language affinities stat row when absent', () => {
-    const speciesWithoutLanguages = {
+    const speciesWithoutLanguages = makeSpecies({
       ...dwarfWithTraits,
       languageAffinities: undefined,
-    } as const satisfies Species
+    })
 
     const { statRows } = buildSpeciesDetailViewModel(speciesWithoutLanguages, vocabulary)
 
@@ -125,10 +127,10 @@ describe('species-display', () => {
   })
 
   it('omits traits section when empty', () => {
-    const speciesWithoutTraits = {
+    const speciesWithoutTraits = makeSpecies({
       ...dwarfWithTraits,
       traits: [],
-    } as const satisfies Species
+    })
 
     const { sections } = buildSpeciesDetailViewModel(speciesWithoutTraits, vocabulary)
 
@@ -136,7 +138,7 @@ describe('species-display', () => {
   })
 
   it('builds heritage section when present', () => {
-    const dragonborn = {
+    const dragonborn = makeSpecies({
       ...dwarfWithTraits,
       heritage: {
         id: 'draconic-ancestry',
@@ -152,7 +154,7 @@ describe('species-display', () => {
           },
         ],
       },
-    } as const satisfies Species
+    })
 
     const { sections } = buildSpeciesDetailViewModel(dragonborn, vocabulary)
 

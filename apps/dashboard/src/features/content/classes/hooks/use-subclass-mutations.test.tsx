@@ -10,6 +10,7 @@ vi.mock('../api/subclasses-api', () => ({
 }))
 
 import { makeTestQueryClient } from '@/test/render'
+import { makeSubclass } from '@/test/fixtures/factories/additional/subclass'
 import { pickSubclass } from '../../lib/fixtures/pick'
 import { createSubclass, updateSubclass } from '../api/subclasses-api'
 import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
@@ -18,7 +19,7 @@ import { subclassesQueryKey } from './use-subclasses'
 const mockCreateSubclass = vi.mocked(createSubclass)
 const mockUpdateSubclass = vi.mocked(updateSubclass)
 
-function makeTestWrapper() {
+function createTestWrapper() {
   const queryClient = makeTestQueryClient()
   const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
   function Wrapper({ children }: { children: ReactNode }) {
@@ -31,26 +32,30 @@ describe('use-subclass-mutations', () => {
   beforeEach(() => {
     mockCreateSubclass.mockReset()
     mockUpdateSubclass.mockReset()
-    mockCreateSubclass.mockResolvedValue({
-      ...pickSubclass('champion'),
-      id: 'sub_new',
-      slug: 'test-subclass',
-      name: 'Test Subclass',
-      source: 'homebrew',
-      status: 'published',
-      features: [],
-    })
-    mockUpdateSubclass.mockResolvedValue({
-      ...pickSubclass('champion'),
-      id: 'sub_existing',
-      name: 'Champion (edited)',
-      source: 'homebrew',
-      status: 'published',
-    })
+    mockCreateSubclass.mockResolvedValue(
+      makeSubclass({
+        ...pickSubclass('champion'),
+        id: 'sub_new',
+        slug: 'test-subclass',
+        name: 'Test Subclass',
+        source: 'homebrew',
+        status: 'published',
+        features: [],
+      }),
+    )
+    mockUpdateSubclass.mockResolvedValue(
+      makeSubclass({
+        ...pickSubclass('champion'),
+        id: 'sub_existing',
+        name: 'Champion (edited)',
+        source: 'homebrew',
+        status: 'published',
+      }),
+    )
   })
 
   it('creates a subclass and invalidates the list query', async () => {
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
     const { result } = renderHook(() => useCreateSubclass('camp_1', 'srd-cc-5.2.1:fighter'), {
       wrapper: Wrapper,
     })
@@ -74,7 +79,7 @@ describe('use-subclass-mutations', () => {
   })
 
   it('updates a subclass with the full body payload', async () => {
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
     const { result } = renderHook(() => useUpdateSubclass('camp_1', 'srd-cc-5.2.1:fighter'), {
       wrapper: Wrapper,
     })

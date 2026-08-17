@@ -2,8 +2,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import { draconicHeritageForm } from '@/test/fixtures/factories/additional/heritage'
 import { TestFormShell } from '@/test/form-shell'
+
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { HeritageForm } from '../../species/lib/species-heritage-form-fields'
 import { SpeciesHeritageTab } from './species-heritage-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
@@ -11,24 +14,11 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
   return stubUiFormItems(importOriginal)
 })
 
-type Heritage = {
-  id?: string
-  name: string
-  description?: string
-  options: Array<{
-    id?: string
-    name?: string
-    description?: string
-    overrideDisplay?: boolean
-    grants: never[]
-  }>
-}
-
 function TabShell({
   heritage,
   entitySource,
 }: {
-  heritage?: Heritage
+  heritage?: HeritageForm
   entitySource?: ContentFormCtx['entitySource']
 }) {
   return (
@@ -36,13 +26,6 @@ function TabShell({
       <SpeciesHeritageTab formCtx={{ entitySource }} />
     </TestFormShell>
   )
-}
-
-const draconicHeritage: Heritage = {
-  id: 'hc1',
-  name: 'Draconic Ancestry',
-  description: '',
-  options: [{ id: 'o1', name: 'Breath Weapon', description: '', grants: [] }],
 }
 
 describe('SpeciesHeritageTab', () => {
@@ -65,7 +48,7 @@ describe('SpeciesHeritageTab', () => {
   })
 
   it('renders heritage scalar fields and options list when pre-filled', () => {
-    render(<TabShell heritage={draconicHeritage} />)
+    render(<TabShell heritage={draconicHeritageForm} />)
     expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
     expect(screen.getByRole('button', { name: /Add option/i })).toBeInTheDocument()
     expect(
@@ -75,7 +58,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('confirms deletion through the dialog and removes an option row', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritage} entitySource="homebrew" />)
+    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
 
     await user.click(screen.getByRole('button', { name: /Remove Breath Weapon/i }))
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete option?')
@@ -88,7 +71,7 @@ describe('SpeciesHeritageTab', () => {
   })
 
   it('locks system options on a system species', () => {
-    render(<TabShell heritage={draconicHeritage} entitySource="system" />)
+    render(<TabShell heritage={draconicHeritageForm} entitySource="system" />)
 
     expect(screen.getByText('System')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove Breath Weapon/i })).not.toBeInTheDocument()
@@ -97,7 +80,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('allows deleting newly added options even on a system species', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritage} entitySource="system" />)
+    render(<TabShell heritage={draconicHeritageForm} entitySource="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 
@@ -106,7 +89,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('allows removing heritage on homebrew species', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritage} entitySource="homebrew" />)
+    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
 
     await user.click(screen.getByRole('button', { name: /Remove heritage/i }))
 
@@ -117,7 +100,7 @@ describe('SpeciesHeritageTab', () => {
 
   it('adds and selects an option in the master-detail editor', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritage} />)
+    render(<TabShell heritage={draconicHeritageForm} />)
 
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import type { CampaignListItem } from '@rpg/contracts'
 
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
@@ -17,10 +16,14 @@ import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 const campaigns = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
 
 const campaignListItems = [
-  { id: 'a', viewerState: VIEWER_STATE.ready, identity: { name: 'A' } },
-  { id: 'b', viewerState: VIEWER_STATE.ready, identity: { name: 'B' } },
-  { id: 'c', viewerState: VIEWER_STATE.onboardingIncomplete, identity: { name: 'C' } },
-] as CampaignListItem[]
+  makeCampaignListItem({ id: 'a', viewerState: VIEWER_STATE.ready, identity: { name: 'A' } }),
+  makeCampaignListItem({ id: 'b', viewerState: VIEWER_STATE.ready, identity: { name: 'B' } }),
+  makeCampaignListItem({
+    id: 'c',
+    viewerState: VIEWER_STATE.onboardingIncomplete,
+    identity: { name: 'C' },
+  }),
+]
 
 describe('resolvePreferredCampaignId', () => {
   it('prefers the stored id over the server preference', () => {
@@ -67,11 +70,11 @@ describe('resolveContinueCampaign', () => {
     expect(
       resolveContinueCampaign(
         [
-          {
+          makeCampaignListItem({
             id: 'solo',
             viewerState: VIEWER_STATE.ready,
             identity: { name: 'Solo' },
-          } as CampaignListItem,
+          }),
         ],
         null,
         null,

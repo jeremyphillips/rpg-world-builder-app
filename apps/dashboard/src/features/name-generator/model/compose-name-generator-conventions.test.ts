@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Species } from '@rpg/contracts'
+import { makeSpecies } from '@/test/fixtures/factories/species'
+import { pickSpecies } from '@/test/fixtures/pick'
 
 import { deriveFilterOptions } from './derive-filter-options'
 import {
@@ -10,27 +11,14 @@ import {
 } from './compose-name-generator-conventions'
 import type { NameGeneratorFilters } from './name-generator-filters'
 
-const ELF_SPECIES = {
-  id: 'srd-cc-5.2.1:elf',
-  slug: 'elf',
-  name: 'Elf',
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  rulesetId: 'srd-cc-5.2.1',
-  createdAt: '2024-05-21T00:00:00.000Z',
-  updatedAt: '2024-05-21T00:00:00.000Z',
-  creatureType: 'humanoid',
-  sizes: ['medium'],
-  movement: { walk: 30 },
-  languageAffinities: ['elvish'],
-  traits: [],
+const ELF_SPECIES = makeSpecies({
+  ...pickSpecies('elf'),
   culture: {
     id: 'elven',
     name: 'Elven',
     naming: { supported: true, personalNameComponents: ['family'] },
   },
-} satisfies Species
+})
 
 describe('toSpeciesCultureInput', () => {
   it('preserves language affinities for naming resolution', () => {
