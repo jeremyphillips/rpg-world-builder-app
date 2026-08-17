@@ -1,4 +1,5 @@
 import {
+  getContentTypeSentenceForm,
   resolveOrganizationMemberClassRecommendationIds,
   type CharacterClass,
 } from '@rpg/contracts'
@@ -8,7 +9,7 @@ import type { FieldOption } from '@rpg/ui/form'
 import { mapFieldOptionsToRadioCardOptions } from '../../lib/choice-sets/choice-set-field.lib'
 
 export const QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW = 'Recommended for this organization' as const
-export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = 'All classes' as const
+export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = `All other ${getContentTypeSentenceForm('classes', 2)}`
 
 export function buildQuickNpcClassRadioCardPresentation(input: {
   classOptions: readonly FieldOption[]

@@ -8,6 +8,7 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '@/features/character'
+import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../lib/quick-npc-class-option-groups.lib'
 import { renderWithProviders } from '@/test/render'
 
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
@@ -262,6 +263,6 @@ describe('QuickNpcCreateModal', () => {
     await user.type(levelInput, '1')
 
     expect(screen.getByText('Recommended for this organization')).toBeInTheDocument()
-    expect(screen.getByText('All classes')).toBeInTheDocument()
+    expect(screen.getByText(QUICK_NPC_CLASS_ALL_GROUP_EYEBROW)).toBeInTheDocument()
   })
 })
