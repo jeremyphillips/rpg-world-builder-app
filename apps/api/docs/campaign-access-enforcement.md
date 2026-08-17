@@ -163,6 +163,18 @@ Do **not** fold these into one runtime filter:
 | **Organization member affinities** (`memberClassAffinityIds`, `memberSpeciesAffinityIds`) | Soft guidance on the Organization      | **No** — references content ids only                                                             | **No** — chip pickers use `forCampaignUse()`      |
 | **Character play resolution** (builder, Quick NPC, member-picker badges)                  | Consuming affinities for a `playActor` | Only inside `resolvePlayableBuilderContent` / builder rules — not duplicated in affinity helpers | **Yes** — at consumption via `forPlay(playActor)` |
 
+Playable Species **new-selection** pickers (builder, Quick NPC) use
+`resolvePlayableBuilderContent(context).species`, which applies `isContentPlayableFor(playActor)`
+**and** campaign `creatureTypePolicy`. Do not use `forPlay(playActor)` alone for Species cards.
+Member-picker **recommendation** consumption uses the same NPC playable set from that resolver;
+the mixed PC/NPC candidate list itself does not wait on that universe (candidates render while
+recommendations are still loading).
+
+**Creature types** are campaign vocabulary ids on each Species row — not catalog content rows.
+They have no `visibilityMode`. Campaign `creatureTypePolicy` filters which creature types may
+appear on character sheets; it applies inside `resolvePlayableBuilderContent`, not on org
+affinity chip pickers.
+
 **Creature-type policy** controls what may be configured while authoring a Species. It does
 **not** travel with that Species as a separate runtime eligibility gate on organization
 affinity fields or `resolveOrganizationMember*RecommendationIds` — those functions only
@@ -171,6 +183,19 @@ intersect persisted affinity ids with eligible rows supplied by the caller.
 **Campaign access** (`available`, `effectiveAudience`) gates `forCampaignUse()` affinity
 chips. **`visibilityMode`** (`dm_only`, `specific_players`, …) is applied when an affinity
 is **consumed** for NPC member guidance, not when a manager authors the organization.
+
+### Species surface ownership
+
+Maps Species-related surfaces onto the resolution layers above — not a fifth generic predicate.
+
+| Surface                                               | Resolution layer / policy                                                                                |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Species management overview                           | Visible (manager)                                                                                        |
+| Species edit form                                     | Manager authoring + species-specific authoring rules (allowed/active creature types)                     |
+| Org member species affinity chips                     | Campaign-eligible (`forCampaignUse()`); no actor `visibilityMode`; no creature-type policy               |
+| Quick NPC / PC / `new_pc` / NPC builder Species cards | Playable + `creatureTypePolicy` via `resolvePlayableBuilderContent(context).species`                     |
+| Member recommendation matching                        | Persisted affinity ids ∩ NPC playable set from that resolver (shared universe; mixed PC/NPC picker list) |
+| Existing saved character                              | Preserve/resolve existing Species id; new selection may omit it                                          |
 
 ### Preserve id vs disclose label
 

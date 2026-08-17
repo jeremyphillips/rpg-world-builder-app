@@ -36,18 +36,21 @@ them.
 ## Current authoritative model
 
 Persisted Organization classification is **Domain + optional Form + Functions + Practices + member
-class affinities**:
+class affinities + member species affinities**:
 
-| Axis                        | Field                      | Question                                                      |
-| --------------------------- | -------------------------- | ------------------------------------------------------------- |
-| **Domain**                  | `organizationDomain`       | Primary constituency or sector the organization serves        |
-| **Form**                    | `organizationForm`         | How the organization is constituted (guild, order, …)         |
-| **Functions**               | `functions[]`              | Broad organizational missions                                 |
-| **Practices**               | `practices[]`              | Distinctive trades, methods, or operational specialties       |
-| **Member class affinities** | `memberClassAffinityIds[]` | Classes commonly associated with members (authoring guidance) |
+| Axis                          | Field                        | Question                                                      |
+| ----------------------------- | ---------------------------- | ------------------------------------------------------------- |
+| **Domain**                    | `organizationDomain`         | Primary constituency or sector the organization serves        |
+| **Form**                      | `organizationForm`           | How the organization is constituted (guild, order, …)         |
+| **Functions**                 | `functions[]`                | Broad organizational missions                                 |
+| **Practices**                 | `practices[]`                | Distinctive trades, methods, or operational specialties       |
+| **Member class affinities**   | `memberClassAffinityIds[]`   | Classes commonly associated with members (authoring guidance) |
+| **Member species affinities** | `memberSpeciesAffinityIds[]` | Species commonly associated with members (authoring guidance) |
 
 - **Familiar starting points** (`authoringPresetId`) are ephemeral create-only projections onto
-  domain / form / functions / practices / affinities — never persisted.
+  domain / form / functions / practices / class affinities — never persisted. **Species affinities
+  are not preset-seeded:** species composition is setting-dependent and author-specific; Familiar
+  types must not assume species defaults.
 - Functions and Practices are separate axes after the functions/practices split; partition keys for
   regression live in [`organization-activity-migration.ts`](../../packages/contracts/src/rpg/vocab/organization-activity-migration.ts).
 

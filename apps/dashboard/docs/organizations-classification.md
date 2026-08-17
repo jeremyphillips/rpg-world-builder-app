@@ -49,12 +49,15 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 ### Detail surfaces
 
 Organization detail stat rows show Domain, optional Form, Functions, Practices, and member
-class/species affinities (when present). Membership rosters intersect affinities with
-play-eligible catalog rows to badge recommended picker rows.
+class/species affinities (when present). Membership rosters intersect affinities with the NPC
+playable catalog from `resolvePlayableBuilderContent` to badge recommended picker rows. The
+picker candidate list loads independently — recommendations decorate rows once that universe
+is ready; a failed build context degrades badges only.
 
 Affinity fields reference content ids only — they do **not** apply Species creature-type
 authoring policy or campaign `visibilityMode`. Consumption surfaces apply
-`forPlay(playActor)` when resolving recommendations. Detail:
+`resolvePlayableBuilderContent` for the relevant `playActor` when resolving recommendations.
+Detail:
 [`campaign-access-enforcement.md`](../../../apps/api/docs/campaign-access-enforcement.md)
 § Organization member affinities vs Species authoring vs character play.
 

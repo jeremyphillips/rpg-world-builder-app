@@ -104,8 +104,11 @@ eligibility at the call site — do not assemble parallel filtered arrays:
 - **`forCampaignUse()`** — campaign-use metadata (org member class/species affinity new
   chips): published + campaign available; **`visibilityMode` is not applied** — a manager
   may configure a `dm_only` affinity valid for NPC guidance
-- **`forPlay(playActor)`** — character-play surfaces (builder, Quick NPC, affinity
-  recommendation consumption)
+- **`forPlay(playActor)`** — playable catalog rows for a play actor (visibility applied).
+  **Not sufficient alone for Species new-selection pickers** — builder and Quick NPC must
+  use `resolvePlayableBuilderContent(context).species`, which also applies
+  `creatureTypePolicy`. Member-picker **recommendations** use the same NPC playable set;
+  the candidate list itself does not.
 
 Organization member affinity helpers intersect persisted ids with eligible rows supplied by
 the caller — they must **not** import Species creature-type authoring policy or apply
