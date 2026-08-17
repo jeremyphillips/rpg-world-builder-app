@@ -3,17 +3,20 @@ import { describe, expect, it } from 'vitest'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import {
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
-  ORGANIZATION_MEMBER_PICKER_ORGANIZATION,
+  ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
 } from '../components/organization-member-picker-drawer.fixtures'
 import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
   isOrganizationMemberPickerRecommended,
   ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+  type OrganizationMemberSelectionPolicy,
 } from './organization-member-picker-drawer.lib'
 
 const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 const ROGUE_CLASS_ID = 'srd-cc-5.2.1:rogue'
+const HUMAN_SPECIES_ID = 'srd-cc-5.2.1:human'
+const ELF_SPECIES_ID = 'srd-cc-5.2.1:elf'
 
 function candidate(
   overrides: Partial<OrganizationMemberPickerCandidate> &
@@ -24,6 +27,18 @@ function candidate(
     characterType: 'pc',
     classIds: [],
     isMember: false,
+    ...overrides,
+  }
+}
+
+function classSelectionPolicy(
+  overrides: Partial<OrganizationMemberSelectionPolicy> = {},
+): OrganizationMemberSelectionPolicy {
+  return {
+    memberClassAffinityIds: [ROGUE_CLASS_ID],
+    memberSpeciesAffinityIds: [],
+    playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+    playableSpecies: [],
     ...overrides,
   }
 }
@@ -55,10 +70,43 @@ describe('isOrganizationMemberPickerRecommended', () => {
           name: 'Split',
           classIds: [FIGHTER_CLASS_ID, ROGUE_CLASS_ID],
         }),
-        {
-          memberClassAffinityIds: [ROGUE_CLASS_ID],
-          playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
-        },
+        classSelectionPolicy(),
+      ),
+    ).toBe(true)
+  })
+
+  it('matches species affinity when class affinity does not match', () => {
+    expect(
+      isOrganizationMemberPickerRecommended(
+        candidate({
+          id: 'char-1',
+          name: 'Elf Scout',
+          classIds: [FIGHTER_CLASS_ID],
+          speciesId: ELF_SPECIES_ID,
+        }),
+        classSelectionPolicy({
+          memberClassAffinityIds: [],
+          memberSpeciesAffinityIds: [ELF_SPECIES_ID],
+          playableClasses: [],
+          playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
+        }),
+      ),
+    ).toBe(true)
+  })
+
+  it('returns one recommendation when both class and species match', () => {
+    expect(
+      isOrganizationMemberPickerRecommended(
+        candidate({
+          id: 'char-1',
+          name: 'Rogue Elf',
+          classIds: [ROGUE_CLASS_ID],
+          speciesId: ELF_SPECIES_ID,
+        }),
+        classSelectionPolicy({
+          memberSpeciesAffinityIds: [ELF_SPECIES_ID],
+          playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
+        }),
       ),
     ).toBe(true)
   })
@@ -72,10 +120,7 @@ describe('isOrganizationMemberPickerRecommended', () => {
           classIds: [ROGUE_CLASS_ID],
           isMember: true,
         }),
-        {
-          memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
-          playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
-        },
+        classSelectionPolicy(),
       ),
     ).toBe(false)
 
@@ -86,12 +131,30 @@ describe('isOrganizationMemberPickerRecommended', () => {
           name: 'Wizard',
           classIds: ['srd-cc-5.2.1:wizard'],
         }),
-        {
+        classSelectionPolicy({
           memberClassAffinityIds: ['srd-cc-5.2.1:wizard'],
           playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES.filter(
             (characterClass) => characterClass.id !== 'srd-cc-5.2.1:wizard',
           ),
-        },
+        }),
+      ),
+    ).toBe(false)
+
+    expect(
+      isOrganizationMemberPickerRecommended(
+        candidate({
+          id: 'char-3',
+          name: 'Human',
+          speciesId: HUMAN_SPECIES_ID,
+        }),
+        classSelectionPolicy({
+          memberClassAffinityIds: [],
+          memberSpeciesAffinityIds: [HUMAN_SPECIES_ID],
+          playableClasses: [],
+          playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES.filter(
+            (species) => species.id !== HUMAN_SPECIES_ID,
+          ),
+        }),
       ),
     ).toBe(false)
   })
@@ -131,8 +194,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
 
     const sorted = filterAndSortOrganizationMemberPickerCandidates(items, {
       searchQuery: '',
-      memberClassAffinityIds: [ROGUE_CLASS_ID],
-      playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+      memberSelectionPolicy: classSelectionPolicy(),
     })
 
     expect(sorted.map((item) => item.name)).toEqual(['Street Runner', 'Brock'])
@@ -158,8 +220,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
     expect(
       filterAndSortOrganizationMemberPickerCandidates(items, {
         searchQuery: '',
-        memberClassAffinityIds: [ROGUE_CLASS_ID],
-        playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        memberSelectionPolicy: classSelectionPolicy(),
       }).map((item) => item.characterType),
     ).toEqual(['pc', 'npc'])
   })
@@ -220,8 +281,7 @@ describe('filterAndSortOrganizationMemberPickerCandidates', () => {
     expect(
       filterAndSortOrganizationMemberPickerCandidates(items, {
         searchQuery: 'Brock',
-        memberClassAffinityIds: [ROGUE_CLASS_ID],
-        playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        memberSelectionPolicy: classSelectionPolicy(),
       }).map((item) => item.name),
     ).toEqual(['Brock Rogue', 'Brock Fighter'])
   })

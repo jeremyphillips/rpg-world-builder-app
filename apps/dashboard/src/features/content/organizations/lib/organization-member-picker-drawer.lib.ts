@@ -1,6 +1,8 @@
 import {
   characterMatchesOrganizationMemberClassRecommendations,
+  characterMatchesOrganizationMemberSpeciesRecommendations,
   type CharacterClass,
+  type Species,
 } from '@rpg/contracts'
 import { normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
@@ -21,10 +23,16 @@ const organizationMemberNameCollator = new Intl.Collator(undefined, {
   numeric: true,
 })
 
+export type OrganizationMemberSelectionPolicy = {
+  memberClassAffinityIds: readonly string[]
+  memberSpeciesAffinityIds: readonly string[]
+  playableClasses: readonly CharacterClass[]
+  playableSpecies: readonly Species[]
+}
+
 export type OrganizationMemberPickerSortContext = {
   searchQuery: string
-  memberClassAffinityIds?: readonly string[]
-  playableClasses?: readonly CharacterClass[]
+  memberSelectionPolicy?: OrganizationMemberSelectionPolicy
 }
 
 type OrganizationMemberPickerScoredCandidate = {
@@ -41,38 +49,57 @@ export function formatOrganizationMemberPickerStatusBadgeLabel(membershipTitle?:
   return `${ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}${ORGANIZATION_MEMBER_STATUS_BADGE_SEPARATOR}${membershipTitle}`
 }
 
-type OrganizationMemberPickerRecommendationContext = {
-  memberClassAffinityIds: readonly string[]
-  playableClasses: readonly CharacterClass[]
-}
+function resolveOrganizationMemberPickerSelectionPolicy(
+  policy: OrganizationMemberSelectionPolicy | undefined,
+): OrganizationMemberSelectionPolicy | undefined {
+  if (policy === undefined) return undefined
 
-function resolveOrganizationMemberPickerRecommendations(
-  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'playableClasses'>,
-): OrganizationMemberPickerRecommendationContext {
-  const memberClassAffinityIds = context.memberClassAffinityIds ?? []
-  const playableClasses = context.playableClasses ?? []
+  const memberClassAffinityIds = policy.memberClassAffinityIds ?? []
+  const memberSpeciesAffinityIds = policy.memberSpeciesAffinityIds ?? []
+  const playableClasses = policy.playableClasses ?? []
+  const playableSpecies = policy.playableSpecies ?? []
 
-  if (memberClassAffinityIds.length === 0 || playableClasses.length === 0) {
-    return { memberClassAffinityIds: [], playableClasses: [] }
+  const hasClassAffinities = memberClassAffinityIds.length > 0 && playableClasses.length > 0
+  const hasSpeciesAffinities = memberSpeciesAffinityIds.length > 0 && playableSpecies.length > 0
+
+  if (!hasClassAffinities && !hasSpeciesAffinities) return undefined
+
+  return {
+    memberClassAffinityIds,
+    memberSpeciesAffinityIds,
+    playableClasses,
+    playableSpecies,
   }
-
-  return { memberClassAffinityIds, playableClasses }
 }
 
 export function isOrganizationMemberPickerRecommended(
   candidate: OrganizationMemberPickerCandidate,
-  context: Pick<OrganizationMemberPickerSortContext, 'memberClassAffinityIds' | 'playableClasses'>,
+  policy: OrganizationMemberSelectionPolicy | undefined,
 ): boolean {
   if (candidate.isMember) return false
 
-  const recommendations = resolveOrganizationMemberPickerRecommendations(context)
-  if (recommendations.memberClassAffinityIds.length === 0) return false
+  const selectionPolicy = resolveOrganizationMemberPickerSelectionPolicy(policy)
+  if (selectionPolicy === undefined) return false
 
-  return characterMatchesOrganizationMemberClassRecommendations({
-    classIds: candidate.classIds ?? [],
-    memberClassAffinityIds: recommendations.memberClassAffinityIds,
-    playableClasses: recommendations.playableClasses,
-  })
+  const matchesClass =
+    selectionPolicy.memberClassAffinityIds.length > 0 &&
+    selectionPolicy.playableClasses.length > 0 &&
+    characterMatchesOrganizationMemberClassRecommendations({
+      classIds: candidate.classIds ?? [],
+      memberClassAffinityIds: selectionPolicy.memberClassAffinityIds,
+      playableClasses: selectionPolicy.playableClasses,
+    })
+
+  const matchesSpecies =
+    selectionPolicy.memberSpeciesAffinityIds.length > 0 &&
+    selectionPolicy.playableSpecies.length > 0 &&
+    characterMatchesOrganizationMemberSpeciesRecommendations({
+      speciesId: candidate.speciesId,
+      memberSpeciesAffinityIds: selectionPolicy.memberSpeciesAffinityIds,
+      playableSpecies: selectionPolicy.playableSpecies,
+    })
+
+  return matchesClass || matchesSpecies
 }
 
 function scoreOrganizationMemberPickerCandidate(
@@ -129,7 +156,9 @@ export function filterAndSortOrganizationMemberPickerCandidates(
   items: readonly OrganizationMemberPickerCandidate[],
   options: OrganizationMemberPickerSortContext,
 ): OrganizationMemberPickerCandidate[] {
-  const recommendations = resolveOrganizationMemberPickerRecommendations(options)
+  const selectionPolicy = resolveOrganizationMemberPickerSelectionPolicy(
+    options.memberSelectionPolicy,
+  )
   const filtered = scoreAndFilterPickerItems(items, {
     searchQuery: options.searchQuery,
     scoreItem: scoreOrganizationMemberPickerCandidate,
@@ -137,7 +166,7 @@ export function filterAndSortOrganizationMemberPickerCandidates(
 
   const scored = filtered.map((row) => ({
     ...row,
-    isRecommended: isOrganizationMemberPickerRecommended(row.item, recommendations),
+    isRecommended: isOrganizationMemberPickerRecommended(row.item, selectionPolicy),
   }))
 
   return [...scored]

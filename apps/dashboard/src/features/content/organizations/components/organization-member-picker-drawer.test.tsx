@@ -11,6 +11,7 @@ import {
 } from './organization-member-picker-drawer.client'
 import {
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+  ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
   ORGANIZATION_MEMBER_PICKER_CANDIDATES,
   ORGANIZATION_MEMBER_PICKER_ORGANIZATION,
 } from './organization-member-picker-drawer.fixtures'
@@ -101,9 +102,11 @@ describe('OrganizationMemberPickerDrawer', () => {
 
   it('shows a Recommended badge for affinity matches that are not already members', () => {
     renderPicker({
-      memberClassRecommendations: {
+      memberSelectionPolicy: {
         memberClassAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberClassAffinityIds,
+        memberSpeciesAffinityIds: ORGANIZATION_MEMBER_PICKER_ORGANIZATION.memberSpeciesAffinityIds,
         playableClasses: ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
+        playableSpecies: ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,
       },
     })
 

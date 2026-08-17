@@ -1,6 +1,6 @@
 import type { OrganizationDomain } from '@rpg/contracts'
 
-import { pickClass } from '@/test/fixtures/pick'
+import { pickClass, pickSpecies } from '@/test/fixtures/pick'
 
 import type { OrganizationMemberPickerCandidate } from './organization-member-picker-drawer.client'
 
@@ -13,12 +13,19 @@ export const ORGANIZATION_MEMBER_PICKER_ORGANIZATION = {
   name: 'Lantern Guild',
   organizationDomain: 'occupational' as OrganizationDomain,
   memberClassAffinityIds: [ROGUE_CLASS_ID],
+  memberSpeciesAffinityIds: [],
 }
 
 export const ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES = [
   pickClass('fighter'),
   pickClass('rogue'),
   pickClass('wizard'),
+]
+
+export const ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES = [
+  pickSpecies('human'),
+  pickSpecies('elf'),
+  pickSpecies('dwarf'),
 ]
 
 /** Shuffled input order — the drawer sorts non-members first, then sinks existing members. */
@@ -72,6 +79,7 @@ export const ORGANIZATION_MEMBER_PICKER_CANDIDATES: OrganizationMemberPickerCand
     summary: 'Human · Level 1 Rogue',
     characterType: 'npc',
     classIds: [ROGUE_CLASS_ID],
+    speciesId: 'srd-cc-5.2.1:human',
     isMember: false,
   },
 ]

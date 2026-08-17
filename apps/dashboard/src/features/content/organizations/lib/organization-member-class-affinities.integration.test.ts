@@ -113,7 +113,9 @@ describe('organization member class affinities integration', () => {
     expect(
       isOrganizationMemberPickerRecommended(candidate, {
         memberClassAffinityIds: [wizard.id],
+        memberSpeciesAffinityIds: [],
         playableClasses: [fighter, rogue],
+        playableSpecies: [],
       }),
     ).toBe(false)
 

@@ -18,8 +18,8 @@ import {
 } from '@/features/character'
 
 import { useClasses } from '../../classes/hooks/use-classes'
+import { useSpecies } from '../../species/hooks/use-species'
 
-import { isContentPlayableFor } from '@rpg/contracts'
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/location-connected-party-character-options.lib'
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
 import type { OrganizationMemberPickerCommit } from '../components/organization-member-picker-drawer.client'
@@ -28,6 +28,10 @@ import {
   type OrganizationMemberRowVm,
 } from '../lib/build-organization-member-rows'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
+import {
+  buildOrganizationMemberSelectionPolicy,
+  resolveOrganizationMemberSelectionPolicyPending,
+} from '../lib/organization-member-selection-policy.lib'
 import {
   ORGANIZATION_MEMBER_ADD_FAILED,
   ORGANIZATION_MEMBERS_MUTATION_ERROR,
@@ -60,6 +64,7 @@ export function useOrganizationMembersDetail(
     | 'functions'
     | 'practices'
     | 'memberClassAffinityIds'
+    | 'memberSpeciesAffinityIds'
   >,
 ) {
   const organizationId = organization.id
@@ -69,9 +74,14 @@ export function useOrganizationMembersDetail(
   const campaignCharactersQuery = useCampaignCharacters(canManage ? campaignId : undefined)
   const npcsQuery = useNpcs(canManage ? campaignId : undefined)
   const classesQuery = useClasses(canManage ? campaignId : undefined)
+  const speciesQuery = useSpecies(canManage ? campaignId : undefined)
   const candidatesPending = campaignCharactersQuery.isPending || npcsQuery.isPending
-  const memberClassRecommendationsPending =
-    organization.memberClassAffinityIds.length > 0 && classesQuery.isPending
+  const memberSelectionPolicyPending = resolveOrganizationMemberSelectionPolicyPending({
+    memberClassAffinityIds: organization.memberClassAffinityIds,
+    memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
+    classesPending: classesQuery.isPending,
+    speciesPending: speciesQuery.isPending,
+  })
   const {
     catalogIndex,
     context: npcBuildContext,
@@ -257,18 +267,20 @@ export function useOrganizationMembersDetail(
     }
   }, [drawerState, removeMember])
 
-  const memberClassRecommendations = React.useMemo(
+  const memberSelectionPolicy = React.useMemo(
     () =>
-      organization.memberClassAffinityIds.length > 0 && classesQuery.data
-        ? {
-            memberClassAffinityIds: organization.memberClassAffinityIds,
-            playableClasses:
-              classesQuery.data?.filter((characterClass) =>
-                isContentPlayableFor(characterClass, { kind: 'npc' }),
-              ) ?? [],
-          }
-        : undefined,
-    [classesQuery.data, organization.memberClassAffinityIds],
+      buildOrganizationMemberSelectionPolicy({
+        memberClassAffinityIds: organization.memberClassAffinityIds,
+        memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
+        classes: classesQuery.data,
+        species: speciesQuery.data,
+      }),
+    [
+      classesQuery.data,
+      organization.memberClassAffinityIds,
+      organization.memberSpeciesAffinityIds,
+      speciesQuery.data,
+    ],
   )
 
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
@@ -304,8 +316,8 @@ export function useOrganizationMembersDetail(
     mutationError,
     pendingCharacterId,
     quickNpc,
-    memberClassRecommendations,
-    memberClassRecommendationsPending,
+    memberSelectionPolicy,
+    memberSelectionPolicyPending,
     openAddDrawer,
     openCreateNpcModal,
     cancelCreateNpcModal,

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildLocationConnectedPartyCharactersById } from './location-connected-party-character-options.lib'
 
 describe('buildLocationConnectedPartyCharactersById', () => {
-  it('threads classIds from campaign PCs and NPC class rows', () => {
+  it('threads classIds and speciesId from campaign PCs and NPC class rows', () => {
     const byId = buildLocationConnectedPartyCharactersById(
       [
         {
@@ -12,6 +12,7 @@ describe('buildLocationConnectedPartyCharactersById', () => {
             name: 'Verna',
             summary: 'Dwarf · Level 1 Fighter',
             classIds: ['srd-cc-5.2.1:fighter'],
+            speciesId: 'srd-cc-5.2.1:dwarf',
             campaign: { id: 'camp-1', name: 'Test Campaign' },
           },
         },
@@ -35,9 +36,11 @@ describe('buildLocationConnectedPartyCharactersById', () => {
 
     expect(byId.get('char-1')).toMatchObject({
       classIds: ['srd-cc-5.2.1:fighter'],
+      speciesId: 'srd-cc-5.2.1:dwarf',
     })
     expect(byId.get('npc-1')).toMatchObject({
       classIds: ['srd-cc-5.2.1:rogue', 'srd-cc-5.2.1:fighter'],
+      speciesId: 'srd-cc-5.2.1:human',
     })
   })
 })

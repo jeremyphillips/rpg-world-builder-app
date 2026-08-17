@@ -8,6 +8,8 @@ import {
   QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
   QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
 } from './quick-npc-class-option-groups.lib'
+import { QUICK_NPC_SPECIES_ALL_GROUP_EYEBROW } from './quick-npc-species-option-groups.lib'
+import { QUICK_NPC_AFFINITY_RECOMMENDED_EYEBROW } from './quick-npc-affinity-option-groups.lib'
 import {
   buildQuickNpcCreateSetupSets,
   formatQuickNpcSetupCharacterSummary,
@@ -28,6 +30,18 @@ describe('buildQuickNpcCreateSetupSets', () => {
     catalog: {
       ...populatedBuilderCatalog,
       classes: [populatedBuilderCatalog.classes[0]!, rogueClass],
+    },
+  })
+  const elfSpecies = {
+    ...populatedBuilderCatalog.species[0]!,
+    id: 'srd-cc-5.2.1:elf',
+    slug: 'elf',
+    name: 'Elf',
+  }
+  const multiSpeciesContext = createCampaignNpcBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      species: [populatedBuilderCatalog.species[0]!, elfSpecies],
     },
   })
 
@@ -86,6 +100,31 @@ describe('buildQuickNpcCreateSetupSets', () => {
         id: 'all-classes',
         eyebrow: QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
         options: [{ value: 'srd-cc-5.2.1:fighter', label: 'Fighter' }],
+      },
+    ])
+  })
+
+  it('groups species options by organization member species affinities when survivors exist', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      context: multiSpeciesContext,
+      values: createQuickNpcSetupDefaultValues(multiSpeciesContext),
+      onValuesChange: () => {},
+      memberSpeciesAffinityIds: [elfSpecies.id],
+    })
+
+    const speciesSet = sets.find((set) => set.id === 'speciesId')
+    expect(speciesSet?.kind).toBe('choice')
+    if (speciesSet?.kind !== 'choice') throw new Error('expected species choice set')
+    expect(speciesSet.optionGroups).toEqual([
+      {
+        id: 'recommended',
+        eyebrow: QUICK_NPC_AFFINITY_RECOMMENDED_EYEBROW,
+        options: [{ value: elfSpecies.id, label: 'Elf' }],
+      },
+      {
+        id: 'all-species',
+        eyebrow: QUICK_NPC_SPECIES_ALL_GROUP_EYEBROW,
+        options: [{ value: 'srd-cc-5.2.1:dwarf', label: 'Dwarf' }],
       },
     ])
   })

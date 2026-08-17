@@ -23,6 +23,7 @@ type EditableOrganization = {
   functions?: Organization['functions']
   practices?: Organization['practices']
   memberClassAffinityIds?: Organization['memberClassAffinityIds']
+  memberSpeciesAffinityIds?: Organization['memberSpeciesAffinityIds']
 }
 
 function toEditableOrganization(organization: Organization): EditableOrganization {
@@ -33,6 +34,7 @@ function toEditableOrganization(organization: Organization): EditableOrganizatio
     functions: organization.functions,
     practices: organization.practices,
     memberClassAffinityIds: organization.memberClassAffinityIds,
+    memberSpeciesAffinityIds: organization.memberSpeciesAffinityIds,
     ...(organization.organizationForm !== undefined
       ? { organizationForm: organization.organizationForm }
       : {}),
@@ -61,9 +63,9 @@ export function OrganizationMembersDetailDrawers({
         }}
         organization={editableOrganization}
         candidates={detail.candidates}
-        candidatesLoading={detail.candidatesPending || detail.memberClassRecommendationsPending}
+        candidatesLoading={detail.candidatesPending || detail.memberSelectionPolicyPending}
         onAdd={detail.handleAddMember}
-        memberClassRecommendations={detail.memberClassRecommendations}
+        memberSelectionPolicy={detail.memberSelectionPolicy}
         quickNpc={{
           enabled: true,
           buildContextFailed: detail.quickNpc.buildContextFailed,
