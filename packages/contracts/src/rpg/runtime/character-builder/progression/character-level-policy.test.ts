@@ -20,6 +20,7 @@ function createCampaignNpcContext(): CampaignNpcBuildContext {
     mode: 'dashboard',
     scope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
     acquisition: { kind: 'campaign_npc', campaignId: 'campaign-1' },
+    playActor: { kind: 'npc' },
   } as CampaignNpcBuildContext
 }
 

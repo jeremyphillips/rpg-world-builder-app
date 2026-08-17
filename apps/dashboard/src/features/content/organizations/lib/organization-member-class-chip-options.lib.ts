@@ -1,4 +1,5 @@
 import type { CharacterClass } from '@rpg/contracts'
+import { unionPersistedOptions } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../lib/campaign-access/campaign-access-table-labels'
@@ -52,29 +53,30 @@ function buildSelectableMemberClassChipOptions(
     }))
 }
 
-function buildOrphanMemberClassChipOptions(input: {
+function buildAuthorizedMemberClassDisplay(input: {
   selectedIds: readonly string[]
   discoverableClasses: readonly CharacterClass[]
   catalogClasses: readonly CharacterClass[]
-}): FieldOption[] {
+}): Map<string, { label: string }> {
   const selectableValues = new Set(
     input.discoverableClasses.map((characterClass) => characterClass.id),
   )
-  const orphans: FieldOption[] = []
+  const authorizedDisplay = new Map<string, { label: string }>()
 
   for (const classId of input.selectedIds) {
     if (selectableValues.has(classId)) continue
 
-    orphans.push({
-      value: classId,
-      label: resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
-        selectableClasses: input.discoverableClasses,
-        catalogClasses: input.catalogClasses,
-      }),
-    })
+    const catalogClass = input.catalogClasses.find(
+      (characterClass) => characterClass.id === classId,
+    )
+    if (catalogClass) {
+      authorizedDisplay.set(classId, {
+        label: `${catalogClass.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`,
+      })
+    }
   }
 
-  return orphans
+  return authorizedDisplay
 }
 
 export function buildMemberClassAffinityChipOptions(
@@ -84,14 +86,16 @@ export function buildMemberClassAffinityChipOptions(
   const discoverableClasses = resolveDiscoverableOrganizationMemberClasses(ctx)
   const catalogClasses = resolveOrganizationMemberClassCatalogClasses(ctx)
   const selectable = buildSelectableMemberClassChipOptions(discoverableClasses)
-  const orphanOptions = buildOrphanMemberClassChipOptions({
-    selectedIds,
-    discoverableClasses,
-    catalogClasses,
+
+  return unionPersistedOptions({
+    selectable,
+    persistedIds: selectedIds,
+    authorizedDisplay: buildAuthorizedMemberClassDisplay({
+      selectedIds,
+      discoverableClasses,
+      catalogClasses,
+    }),
+    formatUnresolvedLabel: (classId) =>
+      `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`,
   })
-
-  if (orphanOptions.length === 0) return selectable
-
-  const selectableValues = new Set(selectable.map((option) => option.value))
-  return [...selectable, ...orphanOptions.filter((option) => !selectableValues.has(option.value))]
 }

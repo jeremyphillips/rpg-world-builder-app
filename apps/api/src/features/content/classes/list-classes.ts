@@ -6,6 +6,7 @@ import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
+import { resolveCatalogMembershipFilter } from '../lib/resolve-catalog-membership-filter'
 import { resolveCatalog } from '../lib/resolve-catalog'
 import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { resolveContentForCampaign } from '../content-types'
@@ -54,13 +55,11 @@ export async function resolveSubclassSummariesByClassId(
 /** Classes list enriched with per-class subclass id+name summaries. */
 export async function listClasses(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
+  const membershipFilter = resolveCatalogMembershipFilter(req)
   const items = await resolveContentForCampaign('classes', campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, 'classes', items)
-  const visibleClasses = filterCatalogForMembership(withCampaignAccess, req.campaignMembership)
-  const subclassSummaries = await resolveSubclassSummariesByClassId(
-    campaignId,
-    req.campaignMembership,
-  )
+  const visibleClasses = filterCatalogForMembership(withCampaignAccess, membershipFilter)
+  const subclassSummaries = await resolveSubclassSummariesByClassId(campaignId, membershipFilter)
 
   const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => ({
     ...characterClass,

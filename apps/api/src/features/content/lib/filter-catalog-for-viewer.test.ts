@@ -1,5 +1,3 @@
-import { describe, expect, it } from 'vitest'
-
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import { filterCatalogForMembership } from './filter-catalog-for-viewer'
@@ -40,5 +38,33 @@ describe('filterCatalogForMembership', () => {
     expect(filterCatalogForMembership(rows, { campaignRole: 'owner', pcCharacterIds: [] })).toEqual(
       rows,
     )
+  })
+
+  it('scopes specific_players discovery to the requested play actor character id', () => {
+    const restrictedRow = {
+      ...baseRow,
+      id: 'restricted',
+      campaignAccess: {
+        ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+        visibilityMode: 'specific_players' as const,
+        participantIds: ['pc-a'],
+      },
+    }
+    const rows = [baseRow, restrictedRow]
+    const dualPcMembership = { campaignRole: 'pc', pcCharacterIds: ['pc-a', 'pc-b'] }
+
+    expect(filterCatalogForMembership(rows, dualPcMembership)).toEqual(rows)
+    expect(
+      filterCatalogForMembership(rows, {
+        ...dualPcMembership,
+        playActorCharacterId: 'pc-a',
+      }),
+    ).toEqual(rows)
+    expect(
+      filterCatalogForMembership(rows, {
+        ...dualPcMembership,
+        playActorCharacterId: 'pc-b',
+      }),
+    ).toEqual([baseRow])
   })
 })

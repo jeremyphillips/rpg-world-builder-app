@@ -4,11 +4,13 @@ import {
   type ResolvedContentCampaignAccess,
   buildContentViewerFromCampaignContext,
   isContentDiscoverableForViewer,
+  resolveCatalogFilterPcCharacterIds,
 } from '@rpg/contracts'
 
-type CampaignMembershipContext = {
+export type CatalogMembershipFilterInput = {
   campaignRole: string
   pcCharacterIds: string[]
+  playActorCharacterId?: string
 }
 
 type CatalogListRow = {
@@ -19,12 +21,18 @@ type CatalogListRow = {
 /** Applies draft visibility and campaign discovery policy for catalog list responses. */
 export function filterCatalogForMembership<T extends CatalogListRow>(
   items: T[],
-  membership: CampaignMembershipContext | undefined,
+  membership: CatalogMembershipFilterInput | undefined,
 ): T[] {
+  const pcCharacterIds = membership
+    ? resolveCatalogFilterPcCharacterIds({
+        campaignRole: membership.campaignRole,
+        pcCharacterIds: membership.pcCharacterIds,
+        playActorCharacterId: membership.playActorCharacterId,
+      })
+    : []
+
   const viewer = buildContentViewerFromCampaignContext(
-    membership
-      ? { campaignRole: membership.campaignRole, pcCharacterIds: membership.pcCharacterIds }
-      : undefined,
+    membership ? { campaignRole: membership.campaignRole, pcCharacterIds } : undefined,
   )
   const isManager =
     membership !== undefined &&

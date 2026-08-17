@@ -2,6 +2,7 @@ import type { z } from 'zod'
 
 import type { SystemRulesetId } from '../../primitives/ruleset'
 import type { ContentViewer } from '../../campaign/campaign-content-viewer'
+import type { ContentPlayActor } from '../campaign/content-play-actor'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -118,6 +119,8 @@ export type CharacterBuildContext = {
    * the builder receives a pre-resolved viewer (e.g. campaign PC context).
    */
   catalogViewer?: ContentViewer
+  /** Play-visibility subject when building campaign characters (NPC or known PC). */
+  playActor?: ContentPlayActor
 }
 
 /** MVP instantiation — no campaign patch/membership context. */
@@ -137,6 +140,7 @@ export type CampaignNpcBuildContext = CharacterBuildContext & {
   ownershipTarget: { type: 'campaign'; campaignId: string }
   characterKind: 'npc'
   acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_npc' }>
+  playActor: Extract<ContentPlayActor, { kind: 'npc' }>
 }
 
 /** Campaign-scoped PC authoring — owned by the inviting user, rules from campaign. */
@@ -147,6 +151,7 @@ export type CampaignPcBuildContext = CharacterBuildContext & {
   ownershipTarget: { type: 'user'; userId: string }
   characterKind: 'pc'
   acquisition: Extract<CharacterBuildAcquisition, { kind: 'campaign_pc_onboarding' }>
+  playActor?: Extract<ContentPlayActor, { kind: 'pc' }>
 }
 
 /** Discriminated union — only legal campaign build combinations compile. */

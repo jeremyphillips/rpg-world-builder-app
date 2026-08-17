@@ -1081,6 +1081,67 @@ describe('content campaign access discovery enforcement', () => {
     )
   })
 
+  it('scopes specific_players discovery to playActorCharacterId for dual-controlled PCs', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'discovery-play-actor-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+
+    const restrictedId = await createPublishedFeat(
+      campaignId,
+      owner.agent,
+      owner.csrfToken,
+      'discovery-play-actor-feat',
+    )
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'discovery-play-actor-member@example.com',
+      campaignRole: 'pc',
+    })
+
+    const pcA = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC A' }, member.userId)
+    const pcB = await createPcRecord({ ...minimalStandalonePcInput, name: 'PC B' }, member.userId)
+
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: member.userId,
+      controlledCharacterIds: [pcA.id, pcB.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${restrictedId}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [pcA.id],
+      })
+      .expect(200)
+
+    const unionList = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(unionList.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(true)
+
+    const scopedToA = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats?playActorCharacterId=${pcA.id}`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(scopedToA.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(true)
+
+    const scopedToB = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats?playActorCharacterId=${pcB.id}`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(scopedToB.body.feats.some((feat: { id: string }) => feat.id === restrictedId)).toBe(
+      false,
+    )
+  })
+
   it('hides restricted content from observers', async () => {
     const owner = await registerAndLoginTestUser(getApp(), {
       email: 'discovery-observer-owner@example.com',

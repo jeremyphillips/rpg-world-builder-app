@@ -462,8 +462,9 @@ describe('resolveBuilderStepDescription', () => {
   })
 
   it('returns variant-specific review copy for campaign invite PCs', () => {
+    const { playActor: _playActor, ...baseContext } = createCharacterBuildContext()
     const context = {
-      ...createCharacterBuildContext(),
+      ...baseContext,
       characterKind: 'pc',
       mode: 'dashboard',
       scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
@@ -492,6 +493,7 @@ describe('resolveBuilderStepDescription', () => {
       rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
       ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
       acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+      playActor: { kind: 'npc' },
     } satisfies CampaignNpcBuildContext
 
     expect(resolveBuilderStepDescription(context, 'review')).toBe(

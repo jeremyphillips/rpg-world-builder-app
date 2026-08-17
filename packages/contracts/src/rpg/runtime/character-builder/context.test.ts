@@ -40,6 +40,7 @@ function createCampaignNpcContext(): CampaignNpcBuildContext {
     rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
     ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
     acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+    playActor: { kind: 'npc' },
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: builderTestRules,
