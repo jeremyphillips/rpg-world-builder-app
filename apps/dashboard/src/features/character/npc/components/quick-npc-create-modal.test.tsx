@@ -47,6 +47,13 @@ const quickFighter = {
   },
 }
 
+const rogueClass = {
+  ...populatedBuilderCatalog.classes[0]!,
+  id: 'srd-cc-5.2.1:rogue',
+  slug: 'rogue',
+  name: 'Rogue',
+}
+
 const buildContext = createCampaignNpcBuilderContextFixture({
   catalog: {
     ...populatedBuilderCatalog,
@@ -214,5 +221,47 @@ describe('QuickNpcCreateModal', () => {
 
     resolveCreate?.(npcDetail)
     await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
+  })
+
+  it('groups class choices by organization member class affinities during setup', async () => {
+    const user = userEvent.setup()
+    renderModal({
+      buildContext: createCampaignNpcBuilderContextFixture({
+        catalog: {
+          ...populatedBuilderCatalog,
+          classes: [quickFighter, rogueClass],
+          organizations: [
+            {
+              id: organization.id,
+              slug: 'lantern-guild',
+              rulesetId: 'srd-cc-5.2.1',
+              source: 'homebrew',
+              status: 'published',
+              campaignId: 'campaign-test-1',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              updatedAt: '2026-01-01T00:00:00.000Z',
+              name: organization.name,
+              organizationDomain: organization.organizationDomain,
+              functions: [],
+              practices: [],
+              memberClassAffinityIds: [rogueClass.id],
+              connections: { locations: [] },
+            },
+          ],
+        },
+      }),
+      organization: {
+        ...organization,
+        memberClassAffinityIds: [rogueClass.id],
+      },
+    })
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
+    await user.clear(levelInput)
+    await user.type(levelInput, '1')
+
+    expect(screen.getByText('Recommended for this organization')).toBeInTheDocument()
+    expect(screen.getByText('All classes')).toBeInTheDocument()
   })
 })

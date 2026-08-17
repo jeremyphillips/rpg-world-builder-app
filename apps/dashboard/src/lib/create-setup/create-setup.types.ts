@@ -1,4 +1,4 @@
-import type { NumberStepperDigits, RadioCardOption } from '@rpg/ui'
+import type { NumberStepperDigits, RadioCardOption, RadioCardOptionGroup } from '@rpg/ui'
 
 export type CreateSetupSequenceItem = {
   id: string
@@ -28,6 +28,7 @@ export type CreateSetupSetBase = {
 export type CreateSetupChoiceSet = CreateSetupSetBase & {
   kind: 'choice'
   options: RadioCardOption[]
+  optionGroups?: RadioCardOptionGroup[]
   value: string
   onValueChange: (value: string) => void
 }

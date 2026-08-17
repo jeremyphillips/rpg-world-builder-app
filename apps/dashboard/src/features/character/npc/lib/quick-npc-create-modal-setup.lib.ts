@@ -2,6 +2,7 @@ import {
   getContentTypeTerm,
   indexCharacterBuildCatalog,
   isClassProgressionApplicable,
+  resolveAvailableContent,
   resolveCharacterLevelConstraints,
   type CharacterBuildContext,
 } from '@rpg/contracts'
@@ -16,6 +17,7 @@ import {
 
 import { mapFieldOptionsToRadioCardOptions } from '../../lib/choice-sets/choice-set-field.lib'
 import { buildQuickNpcContentOptions, type QuickNpcSetupValues } from './quick-npc-form-fields'
+import { buildQuickNpcClassRadioCardPresentation } from './quick-npc-class-option-groups.lib'
 
 export const QUICK_NPC_SETUP_HEADLINE = 'Create NPC' as const
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
@@ -59,8 +61,15 @@ export function buildQuickNpcCreateSetupSets(args: {
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   onValuesChange: (values: QuickNpcSetupValues) => void
+  memberClassAffinityIds?: readonly string[]
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
+  const availableClasses = resolveAvailableContent(args.context).classes
+  const classPresentation = buildQuickNpcClassRadioCardPresentation({
+    classOptions,
+    memberClassAffinityIds: args.memberClassAffinityIds,
+    availableClasses,
+  })
   const levelConstraints = resolveCharacterLevelConstraints({
     characterKind: args.context.characterKind,
     rulesScope: args.context.rulesScope,
@@ -110,7 +119,8 @@ export function buildQuickNpcCreateSetupSets(args: {
       kind: 'choice',
       fieldLabel: classTerm.label,
       prompt: `Choose a ${classTerm.label.toLowerCase()}`,
-      options: mapFieldOptionsToRadioCardOptions(classOptions),
+      options: classPresentation.options,
+      ...(classPresentation.optionGroups ? { optionGroups: classPresentation.optionGroups } : {}),
       value: values.classId,
       dependsOn: ['speciesId'],
       isComplete: isCreateSetupChoiceComplete(values.classId),
