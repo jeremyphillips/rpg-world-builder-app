@@ -225,6 +225,7 @@ const dashboardContentPickerPolicyGuards = {
     'src/features/content/locations/lib/bulk/build-bulk-change-parent-fields.ts',
     'src/features/content/lib/location-connection-drawer-intent.ts',
     'src/features/content/organizations/lib/organization-member-class-discoverable.lib.ts',
+    'src/features/content/organizations/lib/organization-member-species-discoverable.lib.ts',
   ],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
@@ -239,6 +240,11 @@ const dashboardContentPickerPolicyGuards = {
             name: '@/features/content/classes/hooks/use-classes',
             message:
               'Picker eligibility must use ctx.options.classes purpose selectors — not raw useClasses list queries.',
+          },
+          {
+            name: '@/features/content/species/hooks/use-species',
+            message:
+              'Picker eligibility must use ctx.options.species purpose selectors — not raw useSpecies list queries.',
           },
           {
             name: '@/features/content/spells/hooks/use-spells',

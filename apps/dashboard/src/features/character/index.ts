@@ -108,6 +108,7 @@ export {
   type QuickNpcSetupValues,
 } from './npc/lib/quick-npc-form-fields'
 export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc-class-option-groups.lib'
+export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc-species-option-groups.lib'
 export {
   buildCharacterDetailViewModel,
   buildCharacterCardViewModel,
