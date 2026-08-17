@@ -31,6 +31,10 @@ const homebrewOrganizationSchema = new Schema(
       type: [{ type: String }],
       default: [],
     },
+    memberSpeciesAffinityIds: {
+      type: [{ type: String }],
+      default: [],
+    },
     connections: {
       locations: [
         {

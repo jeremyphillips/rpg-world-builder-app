@@ -1,16 +1,13 @@
 import type { CharacterClass } from '../../content/classes/class'
 
-function playableClassIds(playableClasses: readonly CharacterClass[]): Set<string> {
-  return new Set(playableClasses.map((characterClass) => characterClass.id))
-}
+import { intersectPersistedContentIds } from './intersect-persisted-content-ids'
 
 /** Stored affinity ids intersected with playable classes; order follows persisted affinities. */
 export function resolveOrganizationMemberClassRecommendationIds(input: {
   memberClassAffinityIds: readonly string[]
   playableClasses: readonly CharacterClass[]
 }): string[] {
-  const playableIds = playableClassIds(input.playableClasses)
-  return input.memberClassAffinityIds.filter((classId) => playableIds.has(classId))
+  return intersectPersistedContentIds(input.memberClassAffinityIds, input.playableClasses)
 }
 
 /** Stored affinity ids intersected with playable classes; order follows persisted affinities. */

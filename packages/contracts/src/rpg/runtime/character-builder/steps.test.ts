@@ -533,6 +533,7 @@ describe('resolveEffectiveBuilderSteps', () => {
     functions: [],
     practices: [],
     memberClassAffinityIds: [],
+    memberSpeciesAffinityIds: [],
     connections: { locations: [] },
   } satisfies Organization
 

@@ -101,8 +101,17 @@ eligibility at the call site — do not assemble parallel filtered arrays:
 
 - **`forReference()`** — definition and world-graph relationships (location parent,
   org↔location links, spell/class refs, grants, rich-text links)
-- **`forCampaignUse()`** — campaign-use metadata (org member class affinity new chips)
-- **`forPlay(playActor)`** — character-play surfaces (builder, Quick NPC, recommendations)
+- **`forCampaignUse()`** — campaign-use metadata (org member class/species affinity new
+  chips): published + campaign available; **`visibilityMode` is not applied** — a manager
+  may configure a `dm_only` affinity valid for NPC guidance
+- **`forPlay(playActor)`** — character-play surfaces (builder, Quick NPC, affinity
+  recommendation consumption)
+
+Organization member affinity helpers intersect persisted ids with eligible rows supplied by
+the caller — they must **not** import Species creature-type authoring policy or apply
+`visibilityMode` themselves. See
+[`campaign-access-enforcement.md`](../../../apps/api/docs/campaign-access-enforcement.md)
+§ Organization member affinities vs Species authoring vs character play.
 
 Persisted stale ids use `unionPersistedOptions` with caller-supplied `authorizedDisplay`.
 See `apps/api/docs/campaign-access-enforcement.md` (preserve id vs disclose label).

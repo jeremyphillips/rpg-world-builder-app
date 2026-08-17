@@ -50,5 +50,6 @@ export function buildCharacterCardSummaryDto(input: {
     name: input.character.name,
     summary: formatCharacterSummary(parts),
     classIds: input.character.classes.map((entry) => entry.classId),
+    speciesId: input.character.species.id,
   }
 }

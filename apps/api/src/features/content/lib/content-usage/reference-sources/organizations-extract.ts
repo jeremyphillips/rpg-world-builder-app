@@ -4,6 +4,7 @@ export type OrganizationContentUsageHit = {
   name: string
   slug: string
   memberClassAffinityIds?: string[]
+  memberSpeciesAffinityIds?: string[]
   connections?: {
     locations?: Array<{ locationId?: string }>
   }
@@ -24,6 +25,7 @@ const ORGANIZATION_DESCRIPTOR_EXTRACTORS: Record<
   'connections.locations.locationId': (hit) =>
     nonEmptyStrings((hit.connections?.locations ?? []).map((entry) => entry.locationId)),
   memberClassAffinityIds: (hit) => nonEmptyStrings(hit.memberClassAffinityIds ?? []),
+  memberSpeciesAffinityIds: (hit) => nonEmptyStrings(hit.memberSpeciesAffinityIds ?? []),
 }
 
 /** Extract referenced values along a single organization path descriptor. */

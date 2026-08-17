@@ -18,6 +18,7 @@ import { indexLocationParentBlockersByContentId } from './reference-sources/loca
 import {
   indexOrganizationLocationBlockersByContentId,
   indexOrganizationMemberClassAffinityBlockersByContentId,
+  indexOrganizationMemberSpeciesAffinityBlockersByContentId,
 } from './reference-sources/organizations'
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import type { ContentUsageSource } from './content-usage-source'
@@ -66,6 +67,10 @@ export const organizationLocationSource: ContentUsageSource = {
 
 export const organizationMemberClassAffinitySource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexOrganizationMemberClassAffinityBlockersByContentId(ctx),
+}
+
+export const organizationMemberSpeciesAffinitySource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexOrganizationMemberSpeciesAffinityBlockersByContentId(ctx),
 }
 
 export const locationParentReferenceSource: ContentUsageSource = {

@@ -102,6 +102,7 @@ function makeOrganization(
     functions: [],
     practices: [],
     memberClassAffinityIds: [],
+    memberSpeciesAffinityIds: [],
     connections: { locations: [] },
     campaignAccess: {
       available: true,

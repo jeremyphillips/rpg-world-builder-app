@@ -30,6 +30,7 @@ describe('organization body contracts', () => {
       functions: [],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
       connections: { locations: [] },
     })
 
@@ -64,6 +65,7 @@ describe('organization body contracts', () => {
       functions: [],
       practices: [],
       memberClassAffinityIds: [],
+      memberSpeciesAffinityIds: [],
     })
   })
 

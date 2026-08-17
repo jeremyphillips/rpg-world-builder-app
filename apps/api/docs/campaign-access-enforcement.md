@@ -143,15 +143,34 @@ discovery must not strip content already on a saved sheet.
 Four derived predicates sit on top of the viewer-visible catalog. They answer different
 questions — do not collapse them into one list filter.
 
-| Layer             | Predicate                         | Typical consumers                                                                                |
-| ----------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Visible           | `isContentVisibleToViewer`        | Overviews, edit shells, management search                                                        |
-| Referenceable     | `isContentReferenceable`          | Definition fields, world-graph pickers (location parent, org↔location, spell `classIds`, grants) |
-| Campaign-eligible | `isContentCampaignEligible`       | Org member class affinity **new chips** (published + available; `visibilityMode` not applied)    |
-| Playable          | `isContentPlayableFor(playActor)` | Character builder, Quick NPC, affinity recommendations                                           |
+| Layer             | Predicate                         | Typical consumers                                                                                     |
+| ----------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Visible           | `isContentVisibleToViewer`        | Overviews, edit shells, management search                                                             |
+| Referenceable     | `isContentReferenceable`          | Definition fields, world-graph pickers (location parent, org↔location, spell `classIds`, grants)      |
+| Campaign-eligible | `isContentCampaignEligible`       | Org member class/species affinity **new chips** (published + available; `visibilityMode` not applied) |
+| Playable          | `isContentPlayableFor(playActor)` | Character builder, Quick NPC, affinity recommendation consumption                                     |
 
 Dashboard form option sets expose one visible catalog per type with purpose selectors:
 `forReference()`, `forCampaignUse()`, `forPlay(playActor)`.
+
+### Organization member affinities vs Species authoring vs character play
+
+Do **not** fold these into one runtime filter:
+
+| Concern                                                                                   | Scope                                  | Applies creature-type policy?                                                                    | Applies `visibilityMode` at authoring?            |
+| ----------------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| **Species authoring policy** (creature-type constraints on the Species form)              | Configuring a Species record           | Yes — authoring-only                                                                             | N/A                                               |
+| **Organization member affinities** (`memberClassAffinityIds`, `memberSpeciesAffinityIds`) | Soft guidance on the Organization      | **No** — references content ids only                                                             | **No** — chip pickers use `forCampaignUse()`      |
+| **Character play resolution** (builder, Quick NPC, member-picker badges)                  | Consuming affinities for a `playActor` | Only inside `resolvePlayableBuilderContent` / builder rules — not duplicated in affinity helpers | **Yes** — at consumption via `forPlay(playActor)` |
+
+**Creature-type policy** controls what may be configured while authoring a Species. It does
+**not** travel with that Species as a separate runtime eligibility gate on organization
+affinity fields or `resolveOrganizationMember*RecommendationIds` — those functions only
+intersect persisted affinity ids with eligible rows supplied by the caller.
+
+**Campaign access** (`available`, `effectiveAudience`) gates `forCampaignUse()` affinity
+chips. **`visibilityMode`** (`dm_only`, `specific_players`, …) is applied when an affinity
+is **consumed** for NPC member guidance, not when a manager authors the organization.
 
 ### Preserve id vs disclose label
 
