@@ -1,5 +1,5 @@
 import {
-  isContentCampaignEligible,
+  buildContentPurposeSelectors,
   getOrganizationFunctionLabel,
   getOrganizationPracticeLabel,
   getOrganizationDomainEntry,
@@ -68,7 +68,7 @@ export function buildOrganizationDetailViewModel(
   locationConnections: OrganizationLocationConnectionsViewModel,
   catalogClasses: readonly CharacterClass[] = [],
 ): OrganizationDetailViewModel {
-  const selectableClasses = catalogClasses.filter(isContentCampaignEligible)
+  const campaignUseClasses = buildContentPurposeSelectors(catalogClasses).forCampaignUse()
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
   const form =
     organization.organizationForm !== undefined
@@ -120,7 +120,7 @@ export function buildOrganizationDetailViewModel(
               value: organization.memberClassAffinityIds
                 .map((classId) =>
                   resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
-                    selectableClasses,
+                    selectableClasses: campaignUseClasses,
                     catalogClasses,
                   }),
                 )

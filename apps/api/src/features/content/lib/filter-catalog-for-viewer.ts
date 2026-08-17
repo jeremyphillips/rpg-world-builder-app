@@ -4,8 +4,8 @@ import {
   type ContentPlayActor,
   type ResolvedContentCampaignAccess,
   buildContentViewerFromCampaignContext,
-  isContentDiscoverableForViewer,
   isContentPlayableFor,
+  isContentVisibleToViewer,
   resolveCatalogFilterPcCharacterIds,
 } from '@rpg/contracts'
 
@@ -52,16 +52,8 @@ export function filterCatalogForMembership<T extends CatalogListRow>(
   const viewer = buildContentViewerFromCampaignContext(
     membership ? { campaignRole: membership.campaignRole, pcCharacterIds } : undefined,
   )
-  const isManager =
-    membership !== undefined &&
-    CAMPAIGN_MANAGE_ROLES.includes(membership.campaignRole as CampaignManageRole)
 
-  return items.filter((item) => {
-    if (!isManager && item.status === 'draft') {
-      return false
-    }
-    return isContentDiscoverableForViewer(item.campaignAccess, viewer)
-  })
+  return items.filter((item) => isContentVisibleToViewer(item, viewer))
 }
 
 /** Play-catalog filter — uses playable policy only; manage role does not bypass visibility. */

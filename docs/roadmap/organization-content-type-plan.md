@@ -373,8 +373,8 @@ pagination, and performance design.
 
 1. Add `organizations` to `CharacterBuildCatalog`, its index, builder catalog
    clients, campaign catalog clients, fixtures, and context tests.
-2. Add organizations to `resolveAvailableContent()` using shared viewer and
-   campaign-availability discovery rules.
+2. Add organizations to `resolvePlayableBuilderContent()` using playable(playActor)
+   policy plus builder creation rules.
 3. Insert registered Connections metadata after Identity.
 4. Introduce effective-step resolution from builder context and update all
    navigation, rail, review, validation, and step-status consumers.

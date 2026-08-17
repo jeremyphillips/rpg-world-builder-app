@@ -291,6 +291,21 @@ const dashboardContentPickerPolicyGuards = {
   },
 }
 
+const dashboardCharacterBuilderPlayActorGuard = {
+  files: ['src/features/character/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "Property[key.name='playActor'] > Identifier[name='undefined']",
+        message:
+          'Character builder context must always carry an explicit ContentPlayActor — do not set playActor to undefined.',
+      },
+    ],
+  },
+}
+
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
@@ -303,4 +318,5 @@ export default [
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
   dashboardContentPickerPolicyGuards,
+  dashboardCharacterBuilderPlayActorGuard,
 ]

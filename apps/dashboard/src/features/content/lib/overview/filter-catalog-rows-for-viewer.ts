@@ -1,7 +1,7 @@
 import {
   type ContentViewer,
   type ResolvedContentCampaignAccess,
-  isContentDiscoverableForViewer,
+  isContentVisibleToViewer,
 } from '@rpg/contracts'
 
 type CatalogOverviewRow = {
@@ -14,13 +14,5 @@ export function filterCatalogRowsForViewer<T extends CatalogOverviewRow>(
   rows: readonly T[],
   viewer: ContentViewer,
 ): T[] {
-  const isManager = viewer.kind === 'manage'
-
-  return rows.filter((row) => {
-    if (!isManager && row.status === 'draft') {
-      return false
-    }
-
-    return isContentDiscoverableForViewer(row.campaignAccess, viewer)
-  })
+  return rows.filter((row) => isContentVisibleToViewer(row, viewer))
 }

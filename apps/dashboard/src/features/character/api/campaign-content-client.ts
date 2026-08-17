@@ -48,6 +48,9 @@ function buildPlayCatalogQuery(playActor: ContentPlayActor): string {
   return `?${params.toString()}`
 }
 
+/** @internal Exported for unit tests — do not use in product code. */
+export const buildPlayCatalogQueryForTest = buildPlayCatalogQuery
+
 async function listCampaignContent<T>(
   campaignId: string,
   config: CampaignContentConfig,

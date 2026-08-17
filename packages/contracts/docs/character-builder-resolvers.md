@@ -6,6 +6,19 @@ this document tracks the full internal layout, status, and promotion path.
 
 **Layer boundaries and naming:** [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md)
 
+## Catalog consumption ownership
+
+| Surface                    | Entry point                                          | Notes                                                                                        |
+| -------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Authoring form pickers     | `ctx.options.*.forReference()` / `forCampaignUse()`  | Definition fields and campaign-use metadata — not raw manager lists                          |
+| Character-play pickers     | `resolvePlayableBuilderContent(context)`             | SSOT for playable policy **and** builder creation rules (creature type, spell/class linkage) |
+| Finalize / step validation | `indexPlayableBuilderCatalog(context)`               | Indexes resolver output only — **not** an independent policy filter                          |
+| Discovery / overview lists | `isContentVisibleToViewer` via API membership filter | Visibility only — never drives builder selectable sets                                       |
+
+Do **not** use `forPlay()` alone on builder step surfaces — it applies playable policy
+without creation rules. Do **not** validate play-scoped selections against raw
+`indexCharacterBuildCatalog` output.
+
 ## Public API
 
 | Export                                       | Module                                                                  | Purpose                                                                                                                                                                                                                                                                                                                                     |
@@ -347,12 +360,13 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
 ## Related helpers
 
-| Helper                                | Location                                                 | Purpose                                                  |
-| ------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
-| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                  | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`. |
-| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`         | Shared grant-group walk for traits and features.         |
-| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`   | Maps creature pool rows to `ChoiceSetOption[]`.          |
-| `indexCharacterBuildCatalog`          | `context.ts`                                             | Builds by-id lookup maps for resolver consumption.       |
-| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`               | Equipment picker `comparisonGroups` + `kindLabel`.       |
-| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts` | Spell picker `castingSummary` + `classification`.        |
-| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`       | Skill proficiency ability label + catalog `exampleUses`. |
+| Helper                                | Location                                                 | Purpose                                                      |
+| ------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                  | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`.     |
+| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`         | Shared grant-group walk for traits and features.             |
+| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`   | Maps creature pool rows to `ChoiceSetOption[]`.              |
+| `indexCharacterBuildCatalog`          | `context.ts`                                             | Builds by-id lookup maps for resolver consumption.           |
+| `indexPlayableBuilderCatalog`         | `preview/index-playable-builder-catalog.ts`              | Indexes `resolvePlayableBuilderContent` for validation only. |
+| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`               | Equipment picker `comparisonGroups` + `kindLabel`.           |
+| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts` | Spell picker `castingSummary` + `classification`.            |
+| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`       | Skill proficiency ability label + catalog `exampleUses`.     |

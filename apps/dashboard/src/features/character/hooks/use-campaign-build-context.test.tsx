@@ -27,7 +27,10 @@ vi.mock('../api/campaign-content-client', () => ({
 import { useCampaigns } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'
 import { fetchCampaignBuilderCatalog } from '../api/campaign-content-client'
-import { useCampaignBuildContext } from './use-campaign-build-context'
+import {
+  useCampaignBuildContext,
+  useCampaignPcOnboardingBuildContext,
+} from './use-campaign-build-context'
 
 const mockUseCampaigns = vi.mocked(useCampaigns)
 const mockUseRulesetPatch = vi.mocked(useRulesetPatch)
@@ -101,6 +104,10 @@ describe('useCampaignBuildContext', () => {
       rulesetId: 'srd-cc-5.2.1',
       catalog: emptyCatalog,
       permissions: { canCreateCharacter: true },
+      playActor: { kind: 'npc' },
+    })
+    expect(mockFetchCatalog).toHaveBeenCalledWith('camp-1', 'srd-cc-5.2.1', {
+      playActor: { kind: 'npc' },
     })
     expect(result.current.context?.characterCreationRules.abilityGeneration).toEqual(
       DEFAULT_ABILITY_GENERATION_RULES,
@@ -124,5 +131,18 @@ describe('useCampaignBuildContext', () => {
     await waitFor(() => expect(result.current.context).not.toBeNull())
 
     expect(result.current.unavailable).toBeNull()
+  })
+
+  it('defaults PC onboarding to new_pc and sends explicit play actor params', async () => {
+    const { result } = renderHook(() => useCampaignPcOnboardingBuildContext('camp-1', 'user-1'), {
+      wrapper: makeQueryWrapper(),
+    })
+
+    await waitFor(() => expect(result.current.context).not.toBeNull())
+
+    expect(result.current.context?.playActor).toEqual({ kind: 'new_pc' })
+    expect(mockFetchCatalog).toHaveBeenCalledWith('camp-1', 'srd-cc-5.2.1', {
+      playActor: { kind: 'new_pc' },
+    })
   })
 })

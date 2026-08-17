@@ -102,10 +102,10 @@ Not applied indiscriminately to:
 Character-play catalog fetches (builder, Quick NPC) use a separate consumption mode from
 discovery lists:
 
-| Route kind           | Query parsing                                                             | Filter                                                          |
-| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Discovery / overview | `parseOptionalPlayActorFromQuery` — absence means default discovery union | `filterCatalogForMembership` → `isContentDiscoverableForViewer` |
-| Play catalog         | `requirePlayActorFromQuery` — missing/malformed actor → **400**           | `filterCatalogForPlayActor` → `isContentPlayableFor`            |
+| Route kind           | Query parsing                                                             | Filter                                                    |
+| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Discovery / overview | `parseOptionalPlayActorFromQuery` — absence means default discovery union | `filterCatalogForMembership` → `isContentVisibleToViewer` |
+| Play catalog         | `requirePlayActorFromQuery` — missing/malformed actor → **400**           | `filterCatalogForPlayActor` → `isContentPlayableFor`      |
 
 Dashboard builder fetches always send `catalogScope=play` plus either `playActorKind`
 (`new_pc` | `npc`) or `playActorCharacterId` (implies `{ kind: 'pc', characterId }`).
@@ -125,7 +125,10 @@ applying `specific_players` grants, the API verifies:
 
 Manage privilege **never** bypasses playable PC actors (`new_pc` or `pc`).
 
-### `canResolveSavedContentReference`
+Builder query parsing uses `requirePlayActorFromQuery` on play-catalog routes only.
+Malformed combinations (`playActorKind` + `playActorCharacterId`, empty values, invalid
+kinds) return **400**. Unauthorized PC ids return **403** via
+`authorizePlayActorCharacterId` before any `specific_players` filtering runs.
 
 | Read context                   | Policy                            | Expected outcome                                                                                      |
 | ------------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
