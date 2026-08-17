@@ -5,9 +5,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
+  northernMarchRegion,
   testBuildingLocation,
-  testRegionLocation,
 } from '@/features/content/lib/fixtures/location-test-helpers'
+
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
 import {
@@ -17,14 +18,6 @@ import {
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import { buildLocationsById } from '../../locations/lib/location-display'
-
-function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
-  return testRegionLocation({
-    name: 'Northern March',
-    slug: 'northern-march',
-    ...overrides,
-  })
-}
 
 const sampleLocations = [
   testBuildingLocation(),
@@ -64,7 +57,7 @@ describe('OrganizationLocationConnectionsSection', () => {
   })
 
   it('omits kind eyebrows for Areas of operation while keeping site kind labels', () => {
-    const northernMarch = regionLocation()
+    const northernMarch = northernMarchRegion()
     const operatesInConnections = {
       ...buildOrganizationLocationConnectionCards(
         [

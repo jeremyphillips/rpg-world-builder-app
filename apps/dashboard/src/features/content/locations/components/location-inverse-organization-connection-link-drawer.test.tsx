@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  testBuildingLocation,
+  guildhallBuilding,
   testSettlementLocation,
 } from '@/features/content/lib/fixtures/location-test-helpers'
 import { makeLocation } from '@/test/fixtures/factories/location'
@@ -16,14 +16,6 @@ import {
   TERRITORIAL_AUTHORITY_DRAWER,
 } from '../lib/location-connection-surface-copy'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
-
-function buildingLocation(overrides: Parameters<typeof testBuildingLocation>[0] = {}) {
-  return testBuildingLocation({
-    name: 'Guildhall',
-    slug: 'guildhall',
-    ...overrides,
-  })
-}
 
 function infrastructureLocation() {
   return makeLocation({
@@ -88,7 +80,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   })
 
   it('does not show a broad family kind selector for Add owner on a building', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -115,7 +107,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
   it('opens with expanded kind choices, fixed organization, and no organization picker', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -168,7 +160,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   }
 
   it('uses site-family replace copy without territorial drawer strings', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -243,7 +235,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   it('shows current and new organization fields with replacement picker', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn().mockResolvedValue(undefined)
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer
@@ -281,7 +273,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   })
 
   it('shows read-only relationship type and organization picker without kind controls', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     render(
       <LocationInverseOrganizationConnectionLinkDrawer

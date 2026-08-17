@@ -5,9 +5,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
+  northernMarchRegion,
   testBuildingLocation,
   testDistrictLocation,
-  testRegionLocation,
   testSettlementLocation,
 } from '@/features/content/lib/fixtures/location-test-helpers'
 import { makeLocation } from '@/test/fixtures/factories/location'
@@ -33,14 +33,6 @@ function withOrganizationLocationDrawerIndex(locations: Parameters<typeof buildL
     locations,
     locationsById: buildLocationsById(locations),
   }
-}
-
-function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
-  return testRegionLocation({
-    name: 'Northern March',
-    slug: 'northern-march',
-    ...overrides,
-  })
 }
 
 describe('OrganizationLocationConnectionLinkDrawer', () => {
@@ -117,7 +109,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="geographic_presence"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([regionLocation()])}
+        {...withOrganizationLocationDrawerIndex([northernMarchRegion()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -151,7 +143,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
-          regionLocation(),
+          northernMarchRegion(),
           testSettlementLocation(),
           testDistrictLocation(),
         ])}
@@ -190,7 +182,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         intent="geographic_presence"
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
-          regionLocation(),
+          northernMarchRegion(),
           testSettlementLocation(),
           testDistrictLocation(),
         ])}
@@ -222,7 +214,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="geographic_presence"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([regionLocation()])}
+        {...withOrganizationLocationDrawerIndex([northernMarchRegion()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -245,7 +237,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="territorial_authority"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([regionLocation()])}
+        {...withOrganizationLocationDrawerIndex([northernMarchRegion()])}
         existingConnections={[]}
         edgesByLocationId={{
           'region-1': [
@@ -610,7 +602,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
   it('shows area-of-operation changeTarget with organization context and location replacement', async () => {
     const lankhmar = testSettlementLocation({ id: 'settlement-lankhmar', name: 'Lankhmar' })
-    const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
+    const nehwon = northernMarchRegion({ id: 'region-nehwon', name: 'Nehwon' })
     const portCity = testSettlementLocation({ settlementType: 'town' })
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
@@ -667,8 +659,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('shows territorial changeTarget with territory replacement labels', () => {
-    const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
-    const kingdom = regionLocation({
+    const nehwon = northernMarchRegion({ id: 'region-nehwon', name: 'Nehwon' })
+    const kingdom = northernMarchRegion({
       id: 'region-kingdom',
       name: 'Kingdom of Foo',
       parentLocationId: nehwon.id,
@@ -682,7 +674,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="changeTarget"
         intent="territorial_authority"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([nehwon, kingdom, regionLocation()])}
+        {...withOrganizationLocationDrawerIndex([nehwon, kingdom, northernMarchRegion()])}
         existingConnections={[{ id: 'conn-1', locationId: kingdom.id, kind: 'governs' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -709,7 +701,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('does not show authoritative-empty for changeTarget when candidate set is partial', () => {
-    const current = regionLocation()
+    const current = northernMarchRegion()
 
     render(
       <OrganizationLocationConnectionLinkDrawer

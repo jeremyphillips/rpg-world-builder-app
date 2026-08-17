@@ -16,6 +16,11 @@ import { toast } from '@rpg/ui'
 import type * as RpgUi from '@rpg/ui'
 
 import { notifyContentCreated } from '@/lib/notify'
+import {
+  makeBuildingLocationCreateIntent,
+  makeRegionLocationCreateIntent,
+  makeSettlementLocationCreateIntent,
+} from '@/test/fixtures/factories/additional/location-create-intent'
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
@@ -143,23 +148,20 @@ vi.mock('@rpg/ui', async (importOriginal) => {
   }
 })
 
-const buildingIntent = {
-  authoringType: 'building',
+const buildingIntent = makeBuildingLocationCreateIntent({
   parentLocationId: HARBORFORD.id,
   parentKind: HARBORFORD.kind,
-} as const satisfies LocationCreateIntent
+})
 
-const settlementIntent = {
-  authoringType: 'settlement',
+const settlementIntent = makeSettlementLocationCreateIntent({
   parentLocationId: HARBORFORD.id,
   parentKind: HARBORFORD.kind,
-} as const satisfies LocationCreateIntent
+})
 
-const regionIntent = {
-  authoringType: 'region',
+const regionIntent = makeRegionLocationCreateIntent({
   parentLocationId: HARBORFORD.id,
   parentKind: HARBORFORD.kind,
-} as const satisfies LocationCreateIntent
+})
 
 const mockedCompleteBuildingCreateComposition = vi.mocked(completeBuildingCreateComposition)
 const mockedApplyDeferredBuildingCampaignAccess = vi.mocked(applyDeferredBuildingCampaignAccess)

@@ -1,26 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildingClassificationSchema } from '@rpg/contracts'
-
+import { testBreweryBuilding } from '@/features/content/lib/fixtures/location-test-helpers'
 import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { resolveLocationInverseRelationshipDescription } from './location-inverse-relationship-description'
-
-function buildingLocation(overrides: Omit<Parameters<typeof makeLocation>[0], 'kind'> = {}) {
-  return makeLocation({
-    kind: 'structure',
-    structureType: 'building',
-    classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
-    ...overrides,
-  })
-}
 
 describe('resolveLocationInverseRelationshipDescription', () => {
   it('describes owns at a building with the reference noun', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'owns',
-        location: buildingLocation(),
+        location: testBreweryBuilding(),
       }),
     ).toBe('Owns or holds title to this building.')
   })
@@ -29,7 +19,7 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'headquarters',
-        location: buildingLocation(),
+        location: testBreweryBuilding(),
       }),
     ).toBe('Uses this building as its primary headquarters.')
   })
@@ -96,7 +86,7 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'resides_at',
-        location: buildingLocation(),
+        location: testBreweryBuilding(),
       }),
     ).toBe('Lives at this building as a primary residence.')
   })
@@ -117,7 +107,7 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'works_at',
-        location: buildingLocation(),
+        location: testBreweryBuilding(),
       }),
     ).toBe('Works at or is regularly present at this building.')
   })

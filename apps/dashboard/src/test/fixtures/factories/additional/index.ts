@@ -9,6 +9,13 @@ export {
   makeCampaignNpcDetail,
   SAMPLE_PC,
 } from './character'
+export {
+  makeLocationCreateIntent,
+  makeBuildingLocationCreateIntent,
+  makeSettlementLocationCreateIntent,
+  makeRegionLocationCreateIntent,
+} from './location-create-intent'
+export { makeHeritageForm, draconicHeritageForm } from './heritage'
 
 import { makeCampaign, makeCampaignListItem } from './campaign'
 import { makeClassStored } from './class-stored'

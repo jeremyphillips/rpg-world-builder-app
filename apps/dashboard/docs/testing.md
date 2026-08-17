@@ -79,7 +79,7 @@ Do **not** add `tryPickX` helpers or catalog fallback inside `makeX`. Do **not**
 - **`content-factory-boundary.guard.test.ts`** — ratchet baseline blocks new hand-rolled construction outside `src/test/fixtures/factories/**`. **`pickX(...)` is allowed everywhere.** `scenarios/` must compose factories/pickers into multi-entity graphs — not host single-entity inventories.
 - **`content-test-factory-semantics.test.ts`** — locks pick/make distinction (unknown slug throws; matching slug ≠ catalog record).
 
-Campaign entity construction is owned by `src/test/fixtures/factories/additional/campaign.ts` (Phase 2). Mark intentional malformed-schema tests with `@invalid-schema-fixture`.
+Campaign entity construction is owned by `src/test/fixtures/factories/additional/campaign.ts`. Location create intents and species heritage form rows live in `factories/additional/location-create-intent.ts` and `factories/additional/heritage.ts`. Mark intentional malformed-schema tests with `@invalid-schema-fixture`.
 
 ### Standard harnesses
 

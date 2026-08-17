@@ -1,4 +1,5 @@
 import type { Location } from '@rpg/contracts'
+import { buildingClassificationSchema } from '@rpg/contracts'
 
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 import { makeLocation } from '@/test/fixtures/factories/location'
@@ -64,6 +65,47 @@ export function testBuildingLocation(
     id: 'building-1',
     name: 'Royal Mint',
     slug: 'royal-mint',
+    ...overrides,
+  })
+}
+
+/** Named region preset for organization connection drawer tests. */
+export function northernMarchRegion(overrides: LocationFixtureOverrides = {}): Location {
+  return testRegionLocation({
+    name: 'Northern March',
+    slug: 'northern-march',
+    ...overrides,
+  })
+}
+
+/** Named region preset for relationship alternative tests. */
+export function lankhmarRegion(overrides: LocationFixtureOverrides = {}): Location {
+  return testRegionLocation({
+    name: 'Lankhmar',
+    slug: 'lankhmar',
+    ...overrides,
+  })
+}
+
+/** Named building preset for relationship alternative tests. */
+export function guildhallBuilding(
+  overrides: Omit<Partial<Extract<Location, { kind: 'structure' }>>, 'kind'> = {},
+): Location {
+  return testBuildingLocation({
+    name: 'Guildhall',
+    slug: 'guildhall',
+    ...overrides,
+  })
+}
+
+/** Brewery-classified building for inverse relationship description tests. */
+export function testBreweryBuilding(
+  overrides: Omit<Parameters<typeof makeLocation>[0], 'kind'> = {},
+): Location {
+  return makeLocation({
+    kind: 'structure',
+    structureType: 'building',
+    classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     ...overrides,
   })
 }

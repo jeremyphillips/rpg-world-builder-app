@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import type { LocationConnectedPartyRow } from '@rpg/contracts'
 
 import {
-  testBuildingLocation,
-  testRegionLocation,
+  guildhallBuilding,
+  northernMarchRegion,
 } from '@/features/content/lib/fixtures/location-test-helpers'
 
 import {
@@ -21,22 +21,6 @@ import {
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
 import { resolveRelationshipAlternatives } from './relationship/relationship-alternatives'
-
-function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
-  return testRegionLocation({
-    name: 'Northern March',
-    slug: 'northern-march',
-    ...overrides,
-  })
-}
-
-function buildingLocation(overrides: Parameters<typeof testBuildingLocation>[0] = {}) {
-  return testBuildingLocation({
-    name: 'Guildhall',
-    slug: 'guildhall',
-    ...overrides,
-  })
-}
 
 function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
   return {
@@ -58,8 +42,8 @@ function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
 
 describe('buildOrganizationFamilyKindOptions', () => {
   it('keeps an organization-wide headquarters slot visible but disabled with location-specific reason', () => {
-    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
-    const silverEel = buildingLocation({
+    const guildhouse = guildhallBuilding({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = guildhallBuilding({
       id: 'building-2',
       name: 'The Silver Eel',
       slug: 'silver-eel',
@@ -81,7 +65,7 @@ describe('buildOrganizationFamilyKindOptions', () => {
   })
 
   it('enables headquarters when the organization has no existing headquarters connection', () => {
-    const guildhouse = buildingLocation()
+    const guildhouse = guildhallBuilding()
 
     const options = buildOrganizationFamilyKindOptions({
       intent: 'site',
@@ -101,7 +85,7 @@ describe('buildOrganizationFamilyKindOptions', () => {
 
 describe('buildOrganizationLocationChangeKindOptions', () => {
   it('includes the persisted current kind in the picker options', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
     const currentKind = 'headquarters' as const
     const options = buildOrganizationLocationChangeKindOptions({
       location,
@@ -118,7 +102,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
   })
 
   it('represents a stale current kind as a selected-but-disabled option', () => {
-    const location = regionLocation()
+    const location = northernMarchRegion()
     const currentKind = 'headquarters' as const
     const options = buildOrganizationLocationChangeKindOptions({
       location,
@@ -139,7 +123,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
   })
 
   it('resolves the same picker options for org-forward and location-inverse change-kind flows', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
     const currentKind = 'headquarters' as const
     const organizationId = 'org-1'
     const connectionId = 'conn-1'
@@ -183,7 +167,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
   })
 
   it('aligns gating alternates with selectable non-current picker options', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
     const currentKind = 'headquarters' as const
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -224,7 +208,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
 
 describe('inverse location connection kind options', () => {
   it('uses contextual descriptions and inverse labels at a fixed location', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
 
     const options = buildOrganizationInverseLocationConnectionKindOptions({
       location,
@@ -248,7 +232,7 @@ describe('inverse location connection kind options', () => {
   })
 
   it('requires location for character inverse kind options', () => {
-    const location = buildingLocation()
+    const location = guildhallBuilding()
     const options = buildCharacterInverseLocationConnectionKindOptions({
       location,
       kinds: ['works_at', 'resides_at'],
