@@ -90,4 +90,27 @@ describe('RadioCardField', () => {
     )
     await expectNoAxeViolations(container)
   })
+
+  itAxe('has no axe accessibility violations when optionGroups are provided', async () => {
+    const { container } = render(
+      <RadioCardField
+        id="class-choice"
+        label="Class"
+        options={options}
+        optionGroups={[
+          {
+            id: 'recommended',
+            eyebrow: 'Recommended for this organization',
+            options: [options[0]!],
+          },
+          {
+            id: 'all-classes',
+            eyebrow: 'All classes',
+            options: [options[1]!],
+          },
+        ]}
+      />,
+    )
+    await expectNoAxeViolations(container)
+  })
 })

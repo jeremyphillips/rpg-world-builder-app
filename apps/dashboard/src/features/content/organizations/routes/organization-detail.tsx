@@ -33,10 +33,6 @@ export function OrganizationDetailContent({
   useSetBreadcrumbLabel(organization.name)
 
   const { data: classes = [] } = useClasses(campaignId)
-  const classLabelById = useMemo(
-    () => new Map(classes.map((characterClass) => [characterClass.id, characterClass.name])),
-    [classes],
-  )
 
   const viewModel = useMemo(
     () =>
@@ -47,9 +43,9 @@ export function OrganizationDetailContent({
           total: 0,
           emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
         },
-        classLabelById,
+        classes,
       ),
-    [classLabelById, organization],
+    [classes, organization],
   )
 
   return (

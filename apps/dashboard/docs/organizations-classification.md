@@ -63,3 +63,7 @@ Organization.
 The first organization slice used `organizationKind` / `organizationSubtype`. That model was
 superseded by Domain / Form / Functions / Practices. Historical plan:
 [`organization-content-type-plan.md`](../../../docs/roadmap/organization-content-type-plan.md).
+
+The interim `activities[]` field was replaced by `functions[]` and `practices[]`. Legacy bodies
+that contain only `activities` are stripped on parse with **no migration** — classification data
+on those records is intentionally discarded in this dev-only environment.
