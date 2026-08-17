@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Organization } from '@rpg/contracts'
+
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import {
   BUILDING_ORGANIZATIONS_NEW_BADGE_LABEL,
@@ -36,12 +37,12 @@ const plan: BuildingOrganizationDraftPlan = {
 }
 
 const organizations = [
-  {
+  makeOrganization({
     id: 'organization-1',
     name: 'Harbor Merchants Guild',
     organizationDomain: 'commercial',
-  },
-] as Organization[]
+  }),
+]
 
 describe('building organizations create tab presentation', () => {
   it('builds pending entity anatomy as name · domain · relationship', () => {

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
+import type { LocationConnectedPartyRow } from '@rpg/contracts'
+
+import {
+  testBuildingLocation,
+  testRegionLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
 
 import {
   buildOrganizationInverseLocationConnections,
@@ -17,27 +22,20 @@ import {
 } from './location-connection-kind-options'
 import { resolveRelationshipAlternatives } from './relationship/relationship-alternatives'
 
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Guildhall',
-    slug: 'guildhall',
-    kind: 'structure',
-    structureType: 'building',
-    ...overrides,
-  } as Location
-}
-
-function regionLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'region-1',
-    campaignId: 'camp-1',
+function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
+  return testRegionLocation({
     name: 'Northern March',
     slug: 'northern-march',
-    kind: 'region',
     ...overrides,
-  } as Location
+  })
+}
+
+function buildingLocation(overrides: Parameters<typeof testBuildingLocation>[0] = {}) {
+  return testBuildingLocation({
+    name: 'Guildhall',
+    slug: 'guildhall',
+    ...overrides,
+  })
 }
 
 function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {

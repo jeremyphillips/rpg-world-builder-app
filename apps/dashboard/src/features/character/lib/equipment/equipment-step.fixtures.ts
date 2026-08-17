@@ -5,13 +5,12 @@ import {
   defaultCampaignMechanicsPatch,
   indexCharacterBuildCatalog,
   resolveCharacterCreationPatch,
-  type CharacterBuildCatalog,
   type CharacterBuildContext,
-  type ClassStored,
   type StartingWealthRules,
 } from '@rpg/contracts'
 
 import { pickEquipment } from '@/test/fixtures/pick'
+import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 
 export const equipmentStepBreastplateFixture = pickEquipment('breastplate')
 
@@ -33,15 +32,8 @@ export const equipmentStepDaggerFixture = pickEquipment('dagger')
 
 export const equipmentStepExplorersPackFixture = pickEquipment('explorers-pack')
 
-export const equipmentStepBardClassFixture = {
-  id: 'srd-cc-5.2.1:bard',
+export const equipmentStepBardClassFixture = makeClassStored({
   slug: 'bard',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Bard',
   primaryAbilities: ['cha'],
   hitDie: 8,
@@ -99,17 +91,10 @@ export const equipmentStepBardClassFixture = {
       ],
     },
   },
-} as const satisfies ClassStored
+})
 
-export const equipmentStepMonkClassFixture = {
-  id: 'srd-cc-5.2.1:monk',
+export const equipmentStepMonkClassFixture = makeClassStored({
   slug: 'monk',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Monk',
   primaryAbilities: ['dex', 'wis'],
   hitDie: 8,
@@ -176,7 +161,7 @@ export const equipmentStepMonkClassFixture = {
       },
     },
   },
-} as const satisfies ClassStored
+})
 
 export const equipmentStepCatalogFixture = {
   species: [],
@@ -197,7 +182,7 @@ export const equipmentStepCatalogFixture = {
   skillProficiencies: [],
   organizations: [],
   languages: [],
-} as const satisfies CharacterBuildCatalog
+}
 
 export const equipmentStepCatalogIndexFixture = indexCharacterBuildCatalog(
   equipmentStepCatalogFixture,

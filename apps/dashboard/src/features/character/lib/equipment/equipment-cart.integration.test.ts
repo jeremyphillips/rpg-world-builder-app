@@ -10,7 +10,6 @@ import {
   resolveEquipmentAcquisitionBuilderContext,
   standardStartingWealthTableId,
   startingEquipmentChoiceSetId,
-  type CharacterBuildCatalog,
 } from '@rpg/contracts'
 
 import { buildEquipmentInventoryViewModel } from '../../components/equipment/equipment-inventory-summary.lib'
@@ -40,10 +39,12 @@ const commonAllowanceId = buildMagicItemAllowanceId({
   rarity: 'common',
 })
 
-const cartCatalogFixture = {
+import { makeCharacterBuildCatalog } from '@/test/fixtures/factories/additional/character-build-catalog'
+
+const cartCatalogFixture = makeCharacterBuildCatalog({
   ...equipmentStepCatalogFixture,
   equipment: [...equipmentStepCatalogFixture.equipment, equipmentStepBattleaxeFixture],
-} satisfies CharacterBuildCatalog
+})
 
 const cartCatalogIndex = indexCharacterBuildCatalog(cartCatalogFixture)
 

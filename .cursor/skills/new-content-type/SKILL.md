@@ -214,7 +214,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 - Hand-roll content entity shapes outside `test/fixtures/factories/` — use `makeX`; use `pickX` when the test needs an exact catalog record
 - Add global named catalog inventories (`catalog.ts`-style) — feature `fixtures.ts` owns named `pickX` selections
 - Use `tryPickX` or catalog fallback inside `makeX` factories
-- Add entity literals in `scenarios/` — compose `makeX` / `pickX` instead
+- Add entity literals in `scenarios/` — compose multi-entity graphs with `makeX` / `pickX` instead; do not store single-entity inventories in `scenarios/`
 
 ---
 

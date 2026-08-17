@@ -4,7 +4,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import type { Location } from '@rpg/contracts'
+import {
+  testBuildingLocation,
+  testRegionLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
 import {
   OrganizationLocationConnectionsSection,
@@ -14,21 +18,17 @@ import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
 import { buildOrganizationLocationConnectionCards } from '../lib/build-organization-location-connection-cards'
 import { buildLocationsById } from '../../locations/lib/location-display'
 
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Royal Mint',
-    slug: 'royal-mint',
-    kind: 'structure',
-    structureType: 'building',
+function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
+  return testRegionLocation({
+    name: 'Northern March',
+    slug: 'northern-march',
     ...overrides,
-  } as Location
+  })
 }
 
 const sampleLocations = [
-  buildingLocation(),
-  buildingLocation({ id: 'building-2', name: 'Royal Palace', slug: 'royal-palace' }),
+  testBuildingLocation(),
+  testBuildingLocation({ id: 'building-2', name: 'Royal Palace', slug: 'royal-palace' }),
 ]
 const sampleLocationConnections = {
   ...buildOrganizationLocationConnectionCards(
@@ -42,7 +42,7 @@ const sampleLocationConnections = {
         location: sampleLocations[1]!,
       },
     ],
-    { campaignId: 'camp-1', locationsById: buildLocationsById(sampleLocations) },
+    { campaignId: STORY_CAMPAIGN_ID, locationsById: buildLocationsById(sampleLocations) },
   ),
   emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
 }
@@ -64,31 +64,18 @@ describe('OrganizationLocationConnectionsSection', () => {
   })
 
   it('omits kind eyebrows for Areas of operation while keeping site kind labels', () => {
+    const northernMarch = regionLocation()
     const operatesInConnections = {
       ...buildOrganizationLocationConnectionCards(
         [
           {
-            connection: { id: 'conn-3', locationId: 'region-1', kind: 'operates_in' },
-            location: {
-              id: 'region-1',
-              campaignId: 'camp-1',
-              name: 'Northern March',
-              slug: 'northern-march',
-              kind: 'region',
-            } as Location,
+            connection: { id: 'conn-3', locationId: northernMarch.id, kind: 'operates_in' },
+            location: northernMarch,
           },
         ],
         {
-          campaignId: 'camp-1',
-          locationsById: buildLocationsById([
-            {
-              id: 'region-1',
-              campaignId: 'camp-1',
-              name: 'Northern March',
-              slug: 'northern-march',
-              kind: 'region',
-            } as Location,
-          ]),
+          campaignId: STORY_CAMPAIGN_ID,
+          locationsById: buildLocationsById([northernMarch]),
         },
       ),
       emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
@@ -211,22 +198,7 @@ describe('OrganizationLocationConnectionsSection', () => {
           mutationContext={{
             subjectOrganizationId: 'org-1',
             locationCandidates: {
-              items: [
-                {
-                  id: 'building-1',
-                  campaignId: 'camp-1',
-                  name: 'Royal Mint',
-                  slug: 'royal-mint',
-                  kind: 'structure',
-                },
-                {
-                  id: 'building-2',
-                  campaignId: 'camp-1',
-                  name: 'Royal Palace',
-                  slug: 'royal-palace',
-                  kind: 'structure',
-                },
-              ] as Location[],
+              items: sampleLocations,
               isAuthoritativeDomainSet: true,
             },
             connections: [

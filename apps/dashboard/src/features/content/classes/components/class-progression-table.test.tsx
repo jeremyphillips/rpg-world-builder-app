@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
-import type { CharacterClass } from '@rpg/contracts'
 
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { pickClass } from '../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
@@ -28,10 +28,10 @@ describe('ClassProgressionTable', () => {
 
   it('shows Spells Known for a known caster with a spells-available table', () => {
     const bard = pickClass('bard')
-    const knownCaster: CharacterClass = {
+    const knownCaster = makeCharacterClass({
       ...bard,
       spellcasting: bard.spellcasting ? { ...bard.spellcasting, preparation: 'known' } : undefined,
-    }
+    })
 
     render(<ClassProgressionTable characterClass={knownCaster} />)
 
@@ -40,7 +40,7 @@ describe('ClassProgressionTable', () => {
 
   it('hides the spells-available column for full_list mode', () => {
     const cleric = pickClass('cleric')
-    const alwaysPrepared: CharacterClass = {
+    const alwaysPrepared = makeCharacterClass({
       ...cleric,
       spellcasting: cleric.spellcasting
         ? {
@@ -49,7 +49,7 @@ describe('ClassProgressionTable', () => {
             spellsAvailable: undefined,
           }
         : undefined,
-    }
+    })
 
     render(<ClassProgressionTable characterClass={alwaysPrepared} />)
 
@@ -104,10 +104,10 @@ describe('ClassProgressionTable', () => {
 
   it('gates spell slots before spellcasting unlock level', () => {
     const paladin = pickClass('paladin')
-    const delayed: CharacterClass = {
+    const delayed = makeCharacterClass({
       ...paladin,
       spellcasting: paladin.spellcasting ? { ...paladin.spellcasting, level: 2 } : undefined,
-    }
+    })
 
     render(<ClassProgressionTable characterClass={delayed} />)
 

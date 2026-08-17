@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema } from '@rpg/contracts'
 import { indexCharacterBuildCatalog } from '@rpg/contracts'
-import type { ClassStored } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
   resolveStartingEquipmentFundingOptions,
 } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
+
+import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   PACKAGE_SWITCH_STAGED_REMOVAL_LABEL,
@@ -18,66 +19,8 @@ import {
   resolvePackageSwitchDescription,
 } from './equipment-package-switch-resolution.lib'
 
-const RULESET = 'srd-cc-5.2.1' as const
-
-const rope = equipmentSchema.parse({
-  id: `${RULESET}:rope`,
-  slug: 'rope',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Rope',
-  description: '',
-  cost: { amount: 1, currency: 'gp' },
-  weight: { value: 5, unit: 'lb' },
-  kind: 'adventuring_gear',
-  gearKind: 'general',
-})
-
-const storedDruid: ClassStored = {
-  id: `${RULESET}:druid`,
-  slug: 'druid',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Druid',
-  primaryAbilities: ['wis'],
-  hitDie: 8,
-  proficiencies: {
-    savingThrows: ['int', 'wis'],
-    armor: { categories: ['light', 'shields'], items: [] },
-    weapons: { categories: ['simple'], items: [] },
-    skills: { categories: [], items: [] },
-  },
-  features: [],
-  characterCreation: {
-    startingEquipment: {
-      choose: 1,
-      options: [
-        {
-          id: 'standard-equipment',
-          label: 'Standard Equipment',
-          items: [
-            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
-          ],
-          wealth: { gp: 9, sp: 5, cp: 3 },
-        },
-        {
-          id: 'starting-gold',
-          label: 'Starting Gold',
-          items: [],
-          wealth: { gp: 50 },
-        },
-      ],
-    },
-  },
-}
+const rope = pickEquipment('rope')
+const storedDruid = storedDruidClassStored
 
 const catalogIndex = indexCharacterBuildCatalog({
   species: [],

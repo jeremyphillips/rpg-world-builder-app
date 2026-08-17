@@ -4,7 +4,14 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import type { Location } from '@rpg/contracts'
+import {
+  testBuildingLocation,
+  testDistrictLocation,
+  testRegionLocation,
+  testSettlementLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
+import { makeLocation } from '@/test/fixtures/factories/location'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
 import {
   DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
@@ -19,60 +26,21 @@ import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../lib/relationship
 import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { buildLocationsById } from '../../locations/lib/location-display'
 
-const DRAWER_CAMPAIGN_ID = 'camp-1'
-
-function withOrganizationLocationDrawerIndex(locations: readonly Location[]) {
+function withOrganizationLocationDrawerIndex(locations: Parameters<typeof buildLocationsById>[0]) {
   return {
     organization: { name: 'City Council' },
-    campaignId: DRAWER_CAMPAIGN_ID,
+    campaignId: STORY_CAMPAIGN_ID,
     locations,
     locationsById: buildLocationsById(locations),
   }
 }
 
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Royal Mint',
-    slug: 'royal-mint',
-    kind: 'structure',
-    structureType: 'building',
-    ...overrides,
-  } as Location
-}
-
-function regionLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'region-1',
-    campaignId: 'camp-1',
+function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
+  return testRegionLocation({
     name: 'Northern March',
     slug: 'northern-march',
-    kind: 'region',
     ...overrides,
-  } as Location
-}
-
-function settlementLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'settlement-1',
-    campaignId: 'camp-1',
-    name: 'Port City',
-    slug: 'port-city',
-    kind: 'settlement',
-    ...overrides,
-  } as Location
-}
-
-function districtLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'district-1',
-    campaignId: 'camp-1',
-    name: 'Harbor Ward',
-    slug: 'harbor-ward',
-    kind: 'district',
-    ...overrides,
-  } as Location
+  })
 }
 
 describe('OrganizationLocationConnectionLinkDrawer', () => {
@@ -86,7 +54,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -111,7 +79,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('shows a disabled headquarters option with the existing location reason in add site relationship', () => {
-    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const guildhouse = testBuildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
 
     render(
       <OrganizationLocationConnectionLinkDrawer
@@ -122,7 +90,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           guildhouse,
-          buildingLocation({ id: 'building-2', name: 'The Silver Eel' }),
+          testBuildingLocation({ id: 'building-2', name: 'The Silver Eel' }),
         ])}
         existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
         edgesByLocationId={{}}
@@ -184,8 +152,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           regionLocation(),
-          settlementLocation(),
-          districtLocation(),
+          testSettlementLocation(),
+          testDistrictLocation(),
         ])}
         existingConnections={[]}
         edgesByLocationId={{}}
@@ -223,8 +191,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         organizationId="org-1"
         {...withOrganizationLocationDrawerIndex([
           regionLocation(),
-          settlementLocation(),
-          districtLocation(),
+          testSettlementLocation(),
+          testDistrictLocation(),
         ])}
         existingConnections={[]}
         edgesByLocationId={{}}
@@ -314,7 +282,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
           mode="add"
           intent="site"
           organizationId="org-1"
-          {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+          {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
           existingConnections={[]}
           edgesByLocationId={{}}
           occupancyLoaded
@@ -346,7 +314,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="changeKind"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
         existingConnections={[{ id: 'conn-1', locationId: 'building-1', kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -380,13 +348,13 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('clears an incompatible selected location when changing kind', async () => {
     const user = userEvent.setup()
 
-    const infrastructureLocation = {
-      ...buildingLocation(),
+    const infrastructureLocation = makeLocation({
+      kind: 'structure',
       id: 'infrastructure-1',
       name: 'City Waterworks',
       slug: 'city-waterworks',
       structureType: 'infrastructure',
-    } as Location
+    })
 
     render(
       <OrganizationLocationConnectionLinkDrawer
@@ -395,7 +363,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([infrastructureLocation, buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([infrastructureLocation, testBuildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -423,8 +391,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
   it('shows current and new location fields for headquarters changeTarget', async () => {
     const user = userEvent.setup()
-    const guildhouse = buildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
-    const silverEel = buildingLocation({
+    const guildhouse = testBuildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
+    const silverEel = testBuildingLocation({
       id: 'building-2',
       name: 'The Silver Eel',
       slug: 'silver-eel',
@@ -439,7 +407,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="changeTarget"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([guildhouse, settlementLocation(), silverEel])}
+        {...withOrganizationLocationDrawerIndex([guildhouse, testSettlementLocation(), silverEel])}
         existingConnections={[{ id: 'conn-hq', locationId: guildhouse.id, kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -488,8 +456,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('shows stale current location even when it is not an eligible replacement', () => {
-    const staleSettlement = settlementLocation({ id: 'settlement-hq', name: 'Legacy Port HQ' })
-    const silverEel = buildingLocation({
+    const staleSettlement = testSettlementLocation({ id: 'settlement-hq', name: 'Legacy Port HQ' })
+    const silverEel = testBuildingLocation({
       id: 'building-2',
       name: 'The Silver Eel',
       slug: 'silver-eel',
@@ -537,7 +505,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="changeTarget"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
         existingConnections={[{ id: 'conn-hq', locationId: 'missing-loc', kind: 'headquarters' }]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -559,7 +527,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
   it('excludes settlements from headquarters add picker', async () => {
     const user = userEvent.setup()
-    const silverEel = buildingLocation({
+    const silverEel = testBuildingLocation({
       id: 'building-2',
       name: 'The Silver Eel',
       slug: 'silver-eel',
@@ -572,7 +540,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([settlementLocation(), silverEel])}
+        {...withOrganizationLocationDrawerIndex([testSettlementLocation(), silverEel])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -598,7 +566,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -628,7 +596,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         mode="add"
         intent="site"
         organizationId="org-1"
-        {...withOrganizationLocationDrawerIndex([buildingLocation()])}
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
         existingConnections={[]}
         edgesByLocationId={{}}
         occupancyLoaded
@@ -641,9 +609,9 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('shows area-of-operation changeTarget with organization context and location replacement', async () => {
-    const lankhmar = settlementLocation({ id: 'settlement-lankhmar', name: 'Lankhmar' })
+    const lankhmar = testSettlementLocation({ id: 'settlement-lankhmar', name: 'Lankhmar' })
     const nehwon = regionLocation({ id: 'region-nehwon', name: 'Nehwon' })
-    const portCity = settlementLocation()
+    const portCity = testSettlementLocation({ settlementType: 'town' })
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 

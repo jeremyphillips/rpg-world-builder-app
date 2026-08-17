@@ -16,21 +16,29 @@ it('resolves protected content type names from factory return types', () => {
 
   expect(resolveProtectedTypeNamesForTest(program).sort()).toEqual(
     [
+      'Campaign',
+      'CampaignListItem',
+      'CampaignNpcDetail',
+      'CampaignNpcListItem',
+      'CharacterBuildCatalog',
       'CharacterClass',
+      'ClassStored',
       'Equipment',
       'Feat',
       'Location',
       'Organization',
+      'PcCharacter',
       'SkillProficiency',
       'Species',
       'Spell',
+      'Subclass',
     ].sort(),
   )
 })
 
-it('flags hand-rolled location fixtures outside factory allowlist', () => {
+it('does not flag locations/fixtures.ts after makeLocation migration', () => {
   const violations = collectContentFactoryBoundaryViolations()
   expect(
     violations.some((violation) => violation.file === 'features/content/locations/fixtures.ts'),
-  ).toBe(true)
+  ).toBe(false)
 })

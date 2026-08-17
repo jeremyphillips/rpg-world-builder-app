@@ -4,25 +4,18 @@ import {
   defaultCampaignMechanicsPatch,
   resolveCharacterCreationPatch,
   type CharacterBuildContext,
-  type ClassStored,
   type Spell,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
+import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 const RULESET = DEFAULT_SYSTEM_RULESET_ID
 
-export const spellsStepFighterClass = {
-  id: `${RULESET}:fighter`,
+export const spellsStepFighterClass = makeClassStored({
   slug: 'fighter',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Fighter',
   primaryAbilities: ['str'],
   hitDie: 10,
@@ -40,17 +33,10 @@ export const spellsStepFighterClass = {
     },
   },
   features: [],
-} as const satisfies ClassStored
+})
 
-export const spellsStepWizardClass = {
-  id: `${RULESET}:fixture-wizard`,
+export const spellsStepWizardClass = makeClassStored({
   slug: 'fixture-wizard',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
   name: 'Wizard',
   primaryAbilities: ['int'],
   hitDie: 6,
@@ -76,7 +62,7 @@ export const spellsStepWizardClass = {
     cantrips: [{ level: 1, known: 3 }],
     spellsAvailable: [{ level: 1, count: 4 }],
   },
-} as const satisfies ClassStored
+})
 
 function spell(slug: string, level: number, name: string): Spell {
   return makeSpell({

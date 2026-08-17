@@ -1,3 +1,4 @@
+/** @invalid-schema-fixture */
 import { describe, expect, it } from 'vitest'
 import type { Subclass } from '@rpg/contracts'
 

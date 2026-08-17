@@ -1,29 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { Organization } from '@rpg/contracts'
+
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
 import type { BuildingOrganizationDraftPlan } from '../lib/building-organization-create-drafts'
 
 const organizationItems = [
-  {
+  makeOrganization({
     id: 'organization-existing',
+    slug: 'organization-existing',
     name: 'Harbor Merchants Guild',
     organizationDomain: 'commercial',
-    functions: [],
-    practices: [],
-    memberClassAffinityIds: [],
-    connections: { locations: [] },
-  },
-  {
+  }),
+  makeOrganization({
     id: 'organization-blocked',
+    slug: 'organization-blocked',
     name: 'Test org',
     organizationDomain: 'military',
-    functions: [],
-    practices: [],
-    memberClassAffinityIds: [],
-    connections: { locations: [] },
-  },
-] as unknown as Organization[]
+  }),
+]
 
 const mixedPlan: BuildingOrganizationDraftPlan = {
   organizations: [

@@ -12,22 +12,17 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
-  type ClassStored,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
+import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
 
 const RULESET = DEFAULT_SYSTEM_RULESET_ID
 
 export const PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID = 'removed-skill' as const
-
-const timestamps = {
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-} as const
 
 const proficienciesStepLanguages = [
   {
@@ -56,14 +51,8 @@ export const proficienciesStepAcrobaticsSkill = pickSkillProficiency('acrobatics
 
 export const proficienciesStepPerceptionSkill = pickSkillProficiency('perception')
 
-export const proficienciesStepRogueClass = {
-  id: `${RULESET}:rogue`,
+export const proficienciesStepRogueClass = makeClassStored({
   slug: 'rogue',
-  rulesetId: RULESET,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  ...timestamps,
   name: 'Rogue',
   primaryAbilities: ['dex'],
   hitDie: 8,
@@ -89,7 +78,7 @@ export const proficienciesStepRogueClass = {
     },
   },
   features: [],
-} as const satisfies ClassStored
+})
 
 export const proficienciesStepDwarfSpecies = pickSpecies('dwarf')
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Location } from '@rpg/contracts'
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, GREYSHORE, HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../fixtures'
 import {
@@ -57,14 +57,13 @@ describe('location-parent-browse-scope', () => {
   })
 
   it('maps multi-family structure candidates to settlement and world segments', () => {
-    const site: Location = {
-      ...YAWNING_PORTAL,
+    const site = makeLocation({
+      kind: 'site',
       id: 'location-site',
       slug: 'harbor-site',
       name: 'Harbor Site',
-      kind: 'site',
       parentLocationId: HARBORFORD.id,
-    }
+    })
 
     expect(resolveParentBrowseScopeOptions([HARBORFORD, site, YAWNING_PORTAL])).toEqual([
       { value: 'all', label: 'All' },

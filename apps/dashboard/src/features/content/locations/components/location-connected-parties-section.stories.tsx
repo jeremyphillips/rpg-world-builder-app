@@ -1,17 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import { testRegionLocation } from '@/features/content/lib/fixtures/location-test-helpers'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+
 import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
 
-import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
+import type { LocationConnectedPartyRow } from '@rpg/contracts'
 
-const sampleLocation = {
-  id: 'region-1',
-  campaignId: STORY_CAMPAIGN_ID,
+const sampleLocation = testRegionLocation({
   name: 'Lankhmar',
   slug: 'lankhmar',
-  kind: 'region',
-} as Location
+})
 
 const meta = {
   title: 'Content/Locations/LocationConnectedPartiesSection',

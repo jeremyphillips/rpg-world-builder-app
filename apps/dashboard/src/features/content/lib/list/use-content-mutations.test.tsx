@@ -25,7 +25,7 @@ const mockCreateContent = vi.mocked(createContent)
 const mockUpdateContent = vi.mocked(updateContent)
 const mockDuplicateContent = vi.mocked(duplicateContent)
 
-function makeTestWrapper() {
+function createTestWrapper() {
   const queryClient = makeTestQueryClient()
   const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
   function Wrapper({ children }: { children: ReactNode }) {
@@ -61,7 +61,7 @@ describe('createContentMutationHooks', () => {
   it('invalidates the list query on create success', async () => {
     const queryKeyFn = (id: string) => ['campaigns', id, 'content', 'species'] as const
     const { useCreateContent } = createContentMutationHooks('species', queryKeyFn)
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
 
     const { result } = renderHook(() => useCreateContent('camp-1'), { wrapper: Wrapper })
     await result.current.mutateAsync({ name: 'Elf' })
@@ -73,7 +73,7 @@ describe('createContentMutationHooks', () => {
   it('invalidates the list query on update success', async () => {
     const queryKeyFn = (id: string) => ['campaigns', id, 'content', 'feats'] as const
     const { useUpdateContent } = createContentMutationHooks('feats', queryKeyFn)
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
 
     const { result } = renderHook(() => useUpdateContent('camp-2', 'feat-9'), { wrapper: Wrapper })
     await result.current.mutateAsync({ name: 'Grappler' })
@@ -90,7 +90,7 @@ describe('createContentMutationHooks', () => {
     const { useCreateContent } = createContentMutationHooks('classes', classesKey, {
       invalidateQueryKeys: (id) => [skillsKey(id)],
     })
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
 
     const { result } = renderHook(() => useCreateContent('camp-1'), { wrapper: Wrapper })
     await result.current.mutateAsync({ name: 'Fighter' })
@@ -102,7 +102,7 @@ describe('createContentMutationHooks', () => {
   it('invalidates the list query on duplicate success', async () => {
     const queryKeyFn = (id: string) => ['campaigns', id, 'content', 'feats'] as const
     const { useDuplicateContent } = createContentMutationHooks('feats', queryKeyFn)
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
 
     const { result } = renderHook(() => useDuplicateContent('camp-1'), { wrapper: Wrapper })
     await result.current.mutateAsync({ entityId: 'feat-1', name: 'Grappler Copy' })
@@ -132,7 +132,7 @@ describe('useContentWriteMutation', () => {
   }
 
   it('creates when entityId is omitted', async () => {
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
     const { result } = renderHook(() => useContentWriteMutation(speciesDef, 'camp-3'), {
       wrapper: Wrapper,
     })
@@ -145,7 +145,7 @@ describe('useContentWriteMutation', () => {
   })
 
   it('updates when entityId is provided', async () => {
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
     const { result } = renderHook(() => useContentWriteMutation(speciesDef, 'camp-4', 'sp-1'), {
       wrapper: Wrapper,
     })
@@ -166,7 +166,7 @@ describe('useContentWriteMutation', () => {
       queryKey: (id: string) => ['campaigns', id, 'content', 'classes'] as const,
       invalidateQueryKeys: (id: string) => [skillsKey(id)],
     }
-    const { Wrapper, invalidateSpy } = makeTestWrapper()
+    const { Wrapper, invalidateSpy } = createTestWrapper()
     const { result } = renderHook(() => useContentWriteMutation(classDef, 'camp-5', 'cls-1'), {
       wrapper: Wrapper,
     })

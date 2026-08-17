@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import type { CharacterClass } from '@rpg/contracts'
 
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { pickClass } from '../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
@@ -13,22 +13,22 @@ const meta = {
 export default meta
 type Story = StoryObj
 
-const BARBARIAN: CharacterClass = {
+const BARBARIAN = makeCharacterClass({
   ...pickClass('barbarian'),
   features: [
     { kind: 'custom', id: 'rage', name: 'Rage', level: 1 },
     { kind: 'custom', id: 'unarmored-defense', name: 'Unarmored Defense', level: 1 },
   ],
-}
+})
 
-const ALWAYS_PREPARED_CLERIC: CharacterClass = {
+const ALWAYS_PREPARED_CLERIC = makeCharacterClass({
   ...pickClass('cleric'),
   spellcasting: {
     ...pickClass('cleric').spellcasting!,
     preparation: 'full_list',
     spellsAvailable: undefined,
   },
-}
+})
 
 export const NonSpellcaster: Story = {
   name: 'Barbarian (non-spellcaster)',

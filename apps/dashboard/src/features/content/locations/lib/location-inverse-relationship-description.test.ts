@@ -1,29 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildingClassificationSchema, type Location } from '@rpg/contracts'
+import { buildingClassificationSchema } from '@rpg/contracts'
+
+import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { resolveLocationInverseRelationshipDescription } from './location-inverse-relationship-description'
 
-const baseLocation = {
-  rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'homebrew' as const,
-  status: 'published' as const,
-  campaignId: 'camp_1',
-  id: 'loc_test',
-  slug: 'test',
-  name: 'Test',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-}
-
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    ...baseLocation,
+function buildingLocation(overrides: Omit<Parameters<typeof makeLocation>[0], 'kind'> = {}) {
+  return makeLocation({
     kind: 'structure',
     structureType: 'building',
     classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
     ...overrides,
-  } as Location
+  })
 }
 
 describe('resolveLocationInverseRelationshipDescription', () => {
@@ -49,22 +38,20 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'operator',
-        location: {
-          ...baseLocation,
+        location: makeLocation({
           kind: 'structure',
           structureType: 'fortification',
-        },
+        }),
       }),
     ).toBe("Runs or manages this fortification's day-to-day operations.")
 
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'operator',
-        location: {
-          ...baseLocation,
+        location: makeLocation({
           kind: 'structure',
           structureType: 'vessel',
-        },
+        }),
       }),
     ).toBe("Runs or manages this vessel's day-to-day operations.")
   })
@@ -73,12 +60,11 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'tenant',
-        location: {
-          ...baseLocation,
+        location: makeLocation({
           kind: 'interior',
           interiorType: 'space',
           classification: { type: 'chamber' },
-        },
+        }),
       }),
     ).toBe('Occupies or leases this space without owning it.')
   })
@@ -87,23 +73,21 @@ describe('resolveLocationInverseRelationshipDescription', () => {
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'resides_at',
-        location: {
-          ...baseLocation,
+        location: makeLocation({
           kind: 'settlement',
           settlementType: 'city',
           parentLocationId: 'loc_parent',
-        },
+        }),
       }),
     ).toBe('Lives in this settlement.')
 
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'resides_at',
-        location: {
-          ...baseLocation,
+        location: makeLocation({
           kind: 'district',
           parentLocationId: 'loc_parent',
-        },
+        }),
       }),
     ).toBe('Lives in this district.')
   })
@@ -118,13 +102,13 @@ describe('resolveLocationInverseRelationshipDescription', () => {
   })
 
   it('uses structure noun for untyped structures', () => {
+    const untypedStructure = makeLocation({ kind: 'structure' })
+    delete (untypedStructure as { structureType?: unknown }).structureType
+
     expect(
       resolveLocationInverseRelationshipDescription({
         kind: 'owns',
-        location: {
-          ...baseLocation,
-          kind: 'structure',
-        },
+        location: untypedStructure,
       }),
     ).toBe('Owns or holds title to this structure.')
   })

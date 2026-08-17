@@ -5,10 +5,10 @@ import {
   deriveContentKey,
   ELDRITCH_BLAST_RESOLUTION,
   type CreateSpellInput,
-  type Spell,
 } from '@rpg/contracts'
 import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form'
 
+import { makeSpell } from '@/test/fixtures/factories/spell'
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
 import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-form-labels'
@@ -107,14 +107,14 @@ describe('spellFormDef round-trips', () => {
     })
   }
 
-  const fireballWithArea = {
+  const fireballWithArea = makeSpell({
     ...SRD_SPELLS[0]!,
     slug: 'fireball',
     name: 'Fireball',
     level: 3,
     range: { kind: 'distance' as const, value: { value: 150, unit: 'ft' as const } },
     areaOfEffect: { shape: 'sphere' as const, radius: { value: 20, unit: 'ft' as const } },
-  }
+  })
 
   it('preserves areaOfEffect through form round-trip', () => {
     const formValues = spellFormDef.toFormValues(fireballWithArea) as SpellFormValues
@@ -295,14 +295,14 @@ describe('spellFormDef resolution tab', () => {
 })
 
 describe('spellFormDef resolution integration', () => {
-  const spellWithResolution: Spell = {
+  const spellWithResolution = makeSpell({
     ...SRD_SPELLS[0]!,
     resolution: ELDRITCH_BLAST_RESOLUTION,
     modeling: {
       reviewedAt: '2026-07-15T00:00:00.000Z',
       status: 'meaningful-partial',
     },
-  }
+  })
 
   it('createDefaultValues omits resolution', () => {
     expect(spellFormDef.createDefaultValues).not.toHaveProperty('resolution')
@@ -402,14 +402,14 @@ describe('spellFormDef create vs update modes', () => {
   })
 
   it('update: sends null when a stored resolution is cleared in the form', () => {
-    const spellWithResolution: Spell = {
+    const spellWithResolution = makeSpell({
       ...SRD_SPELLS[0]!,
       resolution: ELDRITCH_BLAST_RESOLUTION,
       modeling: {
         reviewedAt: '2026-07-15T00:00:00.000Z',
         status: 'meaningful-partial',
       },
-    }
+    })
     const formValues = spellFormDef.toFormValues(spellWithResolution) as SpellFormValues
     delete formValues.resolution
 

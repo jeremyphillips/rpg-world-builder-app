@@ -1,43 +1,34 @@
-import { buildingClassificationSchema, type Location } from '@rpg/contracts'
+import { buildingClassificationSchema } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { getLocationOverviewSearchText } from './location-overview-search.lib'
+import { makeLocation } from '@/test/fixtures/factories/location'
 
-const baseLocation = {
-  rulesetId: 'srd-cc-5.2.1' as const,
-  source: 'homebrew' as const,
-  status: 'published' as const,
-  campaignId: 'camp_1',
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-}
+import { getLocationOverviewSearchText } from './location-overview-search.lib'
 
 function buildingLocation(
   id: string,
   name: string,
   classification: ReturnType<typeof buildingClassificationSchema.parse>,
-): Location {
-  return {
-    ...baseLocation,
+) {
+  return makeLocation({
+    kind: 'structure',
     id,
     slug: id,
     name,
-    kind: 'structure',
     structureType: 'building',
     classification,
-  }
+  })
 }
 
 describe('getLocationOverviewSearchText', () => {
   it('returns only the location name for non-building rows', () => {
-    const region: Location = {
-      ...baseLocation,
+    const region = makeLocation({
+      kind: 'region',
       id: 'loc-region',
       slug: 'loc-region',
       name: 'Sword Coast',
-      kind: 'region',
       classification: { kind: 'geographic', type: 'coast' },
-    }
+    })
 
     expect(getLocationOverviewSearchText(region)).toEqual(['Sword Coast'])
   })

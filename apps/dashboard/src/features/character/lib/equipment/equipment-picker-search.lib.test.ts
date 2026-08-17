@@ -1,34 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  buildEquipmentPickerSearchText,
-  type Equipment,
-  DEFAULT_SYSTEM_RULESET_ID,
-} from '@rpg/contracts'
+import { buildEquipmentPickerSearchText } from '@rpg/contracts'
 import { matchSearchDocumentQuery, scoreSearchDocument } from '@rpg/search'
 import { scoreItem } from '@rpg/ui'
+
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   assembleEquipmentPickerSearchDocument,
   getEquipmentPickerSearchText,
 } from './equipment-picker-search.lib'
 
-const rope = {
-  id: 'srd-cc-5.2.1:rope',
-  slug: 'rope',
-  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
-  source: 'system',
-  status: 'published',
-  campaignId: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
-  updatedAt: '2026-01-01T00:00:00.000Z',
-  name: 'Rope',
-  kind: 'adventuring_gear',
-  gearKind: 'consumable',
-  cost: { amount: 1, currency: 'gp' },
-  weight: { value: 5, unit: 'lb' },
-  description: '<p>Hempen rope, 50 feet.</p>',
-} as const satisfies Equipment
+const rope = pickEquipment('rope')
 
 describe('equipment-picker-search.lib', () => {
   it('assembles a primary combined field from contracts helpers', () => {

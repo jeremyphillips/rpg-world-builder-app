@@ -4,6 +4,8 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { CampaignNpcDetail } from '@rpg/contracts'
 
+import { makeCampaignNpcDetail } from '@/test/fixtures/factories/additional/character'
+
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -80,10 +82,10 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-const npcDetail = {
+const npcDetail = makeCampaignNpcDetail({
   character: { id: 'npc-99', name: 'Guard Captain' },
   participation: { id: 'participation-99' },
-} as unknown as CampaignNpcDetail
+})
 
 async function selectOption(
   user: ReturnType<typeof userEvent.setup>,

@@ -30,7 +30,7 @@ const SCAN_SUFFIXES = [
   '/fixtures.ts',
 ] as const
 
-const FACTORY_FILES = [
+const CONTENT_FACTORY_FILES = [
   'test/fixtures/factories/character-class.ts',
   'test/fixtures/factories/spell.ts',
   'test/fixtures/factories/species.ts',
@@ -40,6 +40,16 @@ const FACTORY_FILES = [
   'test/fixtures/factories/organization.ts',
   'test/fixtures/factories/location.ts',
 ] as const
+
+const ADDITIONAL_FACTORY_FILES = [
+  'test/fixtures/factories/additional/campaign.ts',
+  'test/fixtures/factories/additional/class-stored.ts',
+  'test/fixtures/factories/additional/character-build-catalog.ts',
+  'test/fixtures/factories/additional/subclass.ts',
+  'test/fixtures/factories/additional/character.ts',
+] as const
+
+const FACTORY_FILES = [...CONTENT_FACTORY_FILES, ...ADDITIONAL_FACTORY_FILES] as const
 
 function createDashboardProgram(): ts.Program {
   const dashboardRoot = join(SCAN_ROOT, '..')
@@ -184,7 +194,15 @@ function scanFile(
         line.includes('makeFeat(') ||
         line.includes('makeSkillProficiency(') ||
         line.includes('makeOrganization(') ||
-        line.includes('makeLocation(')
+        line.includes('makeLocation(') ||
+        line.includes('makeCampaign(') ||
+        line.includes('makeCampaignListItem(') ||
+        line.includes('makeClassStored(') ||
+        line.includes('makeCharacterBuildCatalog(') ||
+        line.includes('makeSubclass(') ||
+        line.includes('makePcCharacter(') ||
+        line.includes('makeCampaignNpcListItem(') ||
+        line.includes('makeCampaignNpcDetail(')
       ) {
         continue
       }

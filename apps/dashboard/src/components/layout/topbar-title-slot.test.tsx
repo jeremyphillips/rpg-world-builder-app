@@ -5,13 +5,14 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TopbarTitleSlot } from './topbar-title-slot'
+import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     useCampaigns: () => ({
-      data: [{ id: 'camp_1', identity: { name: 'The Argent Road' } }],
+      data: [makeCampaignListItem({ id: 'camp_1', identity: { name: 'The Argent Road' } })],
       isPending: false,
       isError: false,
     }),

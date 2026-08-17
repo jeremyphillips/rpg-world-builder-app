@@ -4,22 +4,21 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
+import { testRegionLocation } from '@/features/content/lib/fixtures/location-test-helpers'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+
 import {
   LocationConnectedPartiesSection,
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
 } from './location-connected-parties-section.client'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 
-import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
+import type { LocationConnectedPartyRow } from '@rpg/contracts'
 
-const sampleLocation = {
-  id: 'region-1',
-  campaignId: STORY_CAMPAIGN_ID,
+const sampleLocation = testRegionLocation({
   name: 'Lankhmar',
   slug: 'lankhmar',
-  kind: 'region',
-} as Location
+})
 
 const sampleRows: LocationConnectedPartyRow[] = [
   {

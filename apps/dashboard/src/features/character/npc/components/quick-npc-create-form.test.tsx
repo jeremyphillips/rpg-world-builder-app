@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
+import type { CharacterBuildContext } from '@rpg/contracts'
+
+import { makeCampaignNpcDetail } from '@/test/fixtures/factories/additional/character'
 
 import { renderWithProviders } from '@/test/render'
 
@@ -91,10 +93,10 @@ function buildContextFixture(
 
 const setupSummaryLine = 'Dwarf · Level 1 Fighter'
 
-const npcDetail = {
+const npcDetail = makeCampaignNpcDetail({
   character: { id: 'npc-99', name: 'Guard Captain' },
   participation: { id: 'participation-99' },
-} as unknown as CampaignNpcDetail
+})
 
 function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAuthoringForm>> = {}) {
   const props = {

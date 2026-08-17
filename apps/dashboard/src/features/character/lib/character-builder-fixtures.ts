@@ -6,15 +6,13 @@ import {
   resolveCharacterCreationPatch,
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
-  type CharacterBuildCatalog,
   type CharacterBuildCatalogIndex,
-  type ClassStored,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
-import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
-import { pickClass, pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
+import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
+import { populatedBuilderCatalog } from '@/test/fixtures/factories/additional/character-build-catalog'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 
 const emptyCatalog: StandaloneBuildContext['catalog'] = {
@@ -26,22 +24,6 @@ const emptyCatalog: StandaloneBuildContext['catalog'] = {
   organizations: [],
   languages: [],
 }
-
-const storedFighter = {
-  ...pickClass('fighter'),
-  primaryAbilities: ['str'],
-  characterCreation: {
-    proficiencies: {
-      skills: {
-        choices: [{ id: 'class-skills', choose: 2, from: ['athletics'] }],
-      },
-    },
-  },
-} as const satisfies ClassStored
-
-const fighterClass = storedFighter
-
-const dwarfSpecies = pickSpecies('dwarf')
 
 /** Dwarf-shaped species without naming metadata — for unsupported-name-generation tests. */
 export const unsupportedNamingDwarfSpecies = makeSpecies({
@@ -61,17 +43,7 @@ export const homebrewSpeciesFixture = makeSpecies({
   source: 'homebrew',
 })
 
-const athleticsSkill = pickSkillProficiency('athletics')
-
-export const populatedBuilderCatalog = {
-  species: [dwarfSpecies],
-  classes: [fighterClass],
-  spells: [],
-  equipment: [],
-  skillProficiencies: [athleticsSkill],
-  organizations: [],
-  languages: [...listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)],
-} satisfies CharacterBuildCatalog
+export { populatedBuilderCatalog }
 
 export function createStandaloneBuilderContextFixture(
   overrides: Partial<StandaloneBuildContext> = {},
@@ -113,13 +85,11 @@ export function createStandaloneBuilderCatalogIndexFixture(
   return indexCharacterBuildCatalog(context.catalog)
 }
 
-const TEST_CAMPAIGN_ID = 'campaign-test-1'
-
 export function createCampaignNpcBuilderContextFixture(
   overrides: Partial<CampaignNpcBuildContext> = {},
 ): CampaignNpcBuildContext {
   const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
-  const campaignId = overrides.rulesScope?.campaignId ?? TEST_CAMPAIGN_ID
+  const campaignId = overrides.rulesScope?.campaignId ?? STORY_CAMPAIGN_ID
 
   return {
     channel: 'build',
@@ -147,7 +117,7 @@ export function createCampaignPcBuilderContextFixture(
 ): CampaignPcBuildContext {
   const rulesetId = overrides.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID
   const campaignId =
-    overrides.rulesScope?.type === 'campaign' ? overrides.rulesScope.campaignId : TEST_CAMPAIGN_ID
+    overrides.rulesScope?.type === 'campaign' ? overrides.rulesScope.campaignId : STORY_CAMPAIGN_ID
 
   return {
     channel: 'build',

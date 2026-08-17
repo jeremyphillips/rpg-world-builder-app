@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import type {
-  Location,
-  LocationConnectedPartyRow,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import type { LocationConnectedPartyRow, OrganizationLocationConnectionKind } from '@rpg/contracts'
 
+import {
+  testBuildingLocation,
+  testRegionLocation,
+  testSettlementLocation,
+  testStructureLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
 import {
   filterOrganizationKindsByFamily,
   filterLocationsForOrganizationKind,
@@ -20,28 +22,6 @@ import {
   resolveTerritorialSectionOrganizationAddAffordances,
   resolveVisibleOrganizationConnectionFamilies,
 } from './location-connection-drawer-intent'
-
-function regionLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'region-1',
-    campaignId: 'camp-1',
-    name: 'Kingdom of Foo',
-    slug: 'kingdom-of-foo',
-    kind: 'region',
-    ...overrides,
-  } as Location
-}
-
-function settlementLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'settlement-1',
-    campaignId: 'camp-1',
-    name: 'Port City',
-    slug: 'port-city',
-    kind: 'settlement',
-    ...overrides,
-  } as Location
-}
 
 function territorialRow(input: {
   relationshipId: string
@@ -73,34 +53,37 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('filters organization kinds by family for a region', () => {
-    const kinds = resolveOrganizationKindsForDrawerIntent(regionLocation(), 'territorial_authority')
+    const kinds = resolveOrganizationKindsForDrawerIntent(
+      testRegionLocation(),
+      'territorial_authority',
+    )
     expect(kinds).toEqual(['governs', 'controls', 'claims'])
 
     const presenceKinds = resolveOrganizationKindsForDrawerIntent(
-      regionLocation(),
+      testRegionLocation(),
       'geographic_presence',
     )
     expect(presenceKinds).toEqual(['operates_in'])
   })
 
   it('exposes region territorial and presence add affordances separately', () => {
-    const regionAffordances = resolveLocationInverseOrganizationAddAffordances(regionLocation())
+    const regionAffordances = resolveLocationInverseOrganizationAddAffordances(testRegionLocation())
     expect(regionAffordances.map((affordance) => affordance.label)).toEqual([
       'Add authority',
       'Add organization presence',
     ])
 
-    expect(resolveTerritorialSectionOrganizationAddAffordances(regionLocation())).toEqual([
+    expect(resolveTerritorialSectionOrganizationAddAffordances(testRegionLocation())).toEqual([
       { intent: 'territorial_authority', label: 'Add authority' },
     ])
-    expect(resolvePeopleSectionOrganizationAddAffordances(regionLocation())).toEqual([
+    expect(resolvePeopleSectionOrganizationAddAffordances(testRegionLocation())).toEqual([
       { intent: 'geographic_presence', label: 'Add organization presence' },
     ])
   })
 
   it('exposes settlement governing org and presence affordances without site family add', () => {
     const settlementAffordances =
-      resolveLocationInverseOrganizationAddAffordances(settlementLocation())
+      resolveLocationInverseOrganizationAddAffordances(testSettlementLocation())
     expect(settlementAffordances.map((affordance) => affordance.label)).toEqual([
       'Add governing organization',
       'Add organization presence',
@@ -108,14 +91,13 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('derives change-target eligibility from the persisted kind, not drawer-intent kind union', () => {
-    const settlement = settlementLocation()
-    const guildhall = buildingLocation()
-    const mint = {
-      ...buildingLocation(),
+    const settlement = testSettlementLocation()
+    const guildhall = testBuildingLocation({ name: 'Guildhall', slug: 'guildhall' })
+    const mint = testBuildingLocation({
       id: 'building-2',
       name: 'Silver Eel',
       slug: 'silver-eel',
-    } as Location
+    })
 
     const headquartersTargets = filterLocationsForOrganizationKind(
       [settlement, guildhall, mint],
@@ -129,7 +111,7 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('keeps territorial add available when only governs slot is occupied by another org', () => {
-    const location = regionLocation()
+    const location = testRegionLocation()
     const edgesAtLocation = [
       {
         organizationId: 'org-other',
@@ -151,7 +133,7 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('allows multiple territorial kinds for the same organization at one location', () => {
-    const location = regionLocation()
+    const location = testRegionLocation()
     const connections = [{ id: 'conn-1', locationId: location.id, kind: 'governs' as const }]
 
     expect(
@@ -165,12 +147,7 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('keeps forward location rows selectable when only some site kinds are linked', () => {
-    const location = {
-      ...settlementLocation(),
-      id: 'building-1',
-      kind: 'structure',
-      structureType: 'building',
-    } as Location
+    const location = testStructureLocation({ id: 'building-1' })
     const connections = [{ id: 'conn-1', locationId: location.id, kind: 'owns' as const }]
 
     expect(
@@ -179,7 +156,7 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('allows kind changes within territorial authority during edit', () => {
-    const location = regionLocation()
+    const location = testRegionLocation()
     const connections = [{ id: 'conn-1', locationId: location.id, kind: 'governs' as const }]
     const edgesAtLocation = [
       {
@@ -239,13 +216,8 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('filters locations by selected kind using server-backed occupancy', () => {
-    const region = regionLocation()
-    const building = {
-      ...settlementLocation(),
-      id: 'building-1',
-      kind: 'structure',
-      structureType: 'building',
-    } as Location
+    const region = testRegionLocation()
+    const building = testStructureLocation({ id: 'building-1' })
 
     const governsBlocked = filterLocationsForOrganizationKind([region], 'governs', 'org-1', [], {
       [region.id]: [
@@ -264,7 +236,7 @@ describe('location-connection-drawer-intent', () => {
   })
 
   it('does not treat org-local connections as authoritative for cross-org governs occupancy', () => {
-    const region = regionLocation()
+    const region = testRegionLocation()
     expect(organizationForwardKindHasAvailableLocation('governs', [region], 'org-1', [], {})).toBe(
       true,
     )
@@ -293,19 +265,7 @@ describe('location-connection-drawer-intent', () => {
 
   it('derives visible forward families from location profiles', () => {
     expect(
-      resolveVisibleOrganizationConnectionFamilies([regionLocation(), buildingLocation()]),
+      resolveVisibleOrganizationConnectionFamilies([testRegionLocation(), testBuildingLocation()]),
     ).toEqual(['territorial_authority', 'geographic_presence', 'site'])
   })
 })
-
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
-    name: 'Guildhall',
-    slug: 'guildhall',
-    kind: 'structure',
-    structureType: 'building',
-    ...overrides,
-  } as Location
-}

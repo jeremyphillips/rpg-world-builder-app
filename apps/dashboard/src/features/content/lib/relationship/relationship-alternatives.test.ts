@@ -3,6 +3,13 @@ import { describe, expect, it } from 'vitest'
 import type { Location, LocationConnectedPartyRow } from '@rpg/contracts'
 
 import {
+  testBuildingLocation,
+  testDistrictLocation,
+  testRegionLocation,
+  testSettlementLocation,
+} from '@/features/content/lib/fixtures/location-test-helpers'
+
+import {
   assertRelationshipAlternativesMatchCapabilities,
   hasResolvedRelationshipMutationAlternative,
   isRelationshipMutationActionVisible,
@@ -14,26 +21,20 @@ import {
   type RelationshipOverflowActionId,
 } from './resolve-relationship-overflow-actions'
 
-function regionLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'region-1',
-    campaignId: 'camp-1',
+function regionLocation(overrides: Parameters<typeof testRegionLocation>[0] = {}) {
+  return testRegionLocation({
     name: 'Lankhmar',
     slug: 'lankhmar',
-    kind: 'region',
     ...overrides,
-  } as Location
+  })
 }
 
-function buildingLocation(overrides: Partial<Location> = {}): Location {
-  return {
-    id: 'building-1',
-    campaignId: 'camp-1',
+function buildingLocation(overrides: Parameters<typeof testBuildingLocation>[0] = {}) {
+  return testBuildingLocation({
     name: 'Guildhall',
     slug: 'guildhall',
-    kind: 'structure',
     ...overrides,
-  } as Location
+  })
 }
 
 function authoritativeLocations(items: readonly Location[]) {
@@ -99,13 +100,11 @@ describe('resolveRelationshipAlternatives', () => {
       name: 'The Silver Eel',
       slug: 'silver-eel',
     })
-    const settlement = {
-      ...regionLocation(),
+    const settlement = testSettlementLocation({
       id: 'settlement-1',
-      kind: 'settlement' as const,
       name: 'Ilthmar',
       slug: 'ilthmar',
-    } as Location
+    })
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
@@ -127,13 +126,11 @@ describe('resolveRelationshipAlternatives', () => {
   })
 
   it('hides changeKind when location profile allows only the current kind', () => {
-    const district = {
-      ...regionLocation(),
+    const district = testDistrictLocation({
       id: 'district-1',
-      kind: 'district' as const,
       name: 'Dockside',
       slug: 'dockside',
-    } as Location
+    })
 
     const resolved = resolveRelationshipAlternatives({
       surface: 'organization_forward',
