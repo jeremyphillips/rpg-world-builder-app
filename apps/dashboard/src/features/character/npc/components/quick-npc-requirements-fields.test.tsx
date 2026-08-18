@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from '../../components/equipment/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
@@ -18,7 +19,7 @@ import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.clie
 
 const setup = {
   speciesId: 'species-1',
-  membershipTitle: '',
+  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: equipmentStepBardClassFixture.id,
   level: 1,
 }

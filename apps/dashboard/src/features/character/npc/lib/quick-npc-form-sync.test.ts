@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -34,7 +35,7 @@ describe('createQuickNpcFormValueSyncs', () => {
     const sync = createQuickNpcFormValueSyncs(buildContext)[0]!
     const setup: QuickNpcSetupValues = {
       speciesId: populatedBuilderCatalog.species[0]!.id,
-      membershipTitle: '',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: quickFighter.id,
       level: 1,
     }
@@ -63,7 +64,7 @@ describe('createQuickNpcFormValueSyncs', () => {
     const patch = sync.apply(
       {
         speciesId: populatedBuilderCatalog.species[0]!.id,
-        membershipTitle: '',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: quickFighter.id,
         level: 1,
         [QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]: [],

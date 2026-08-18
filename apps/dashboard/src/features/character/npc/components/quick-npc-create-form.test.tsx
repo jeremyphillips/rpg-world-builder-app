@@ -197,7 +197,11 @@ describe('QuickNpcAuthoringForm', () => {
     }
     const { props } = renderForm({
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
-      setup: { ...setup, classId: unsatisfiableFighter.id, membershipTitle: '' },
+      setup: {
+        ...setup,
+        classId: unsatisfiableFighter.id,
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      },
     })
 
     await fillAuthoringFields(user)

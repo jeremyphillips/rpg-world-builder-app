@@ -14,6 +14,34 @@ const baseSetup = {
 describe('isQuickNpcSetupStillValid', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
+  it('rejects setup when membership title is unset', () => {
+    expect(
+      isQuickNpcSetupStillValid(
+        {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: undefined,
+          classId: 'srd-cc-5.2.1:fighter',
+          level: 1,
+        },
+        context,
+      ),
+    ).toBe(false)
+  })
+
+  it('rejects setup when membership title is an empty string', () => {
+    expect(
+      isQuickNpcSetupStillValid(
+        {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: '',
+          classId: 'srd-cc-5.2.1:fighter',
+          level: 1,
+        },
+        context,
+      ),
+    ).toBe(false)
+  })
+
   it('accepts a setup that still matches campaign availability', () => {
     expect(
       isQuickNpcSetupStillValid(

@@ -50,7 +50,9 @@ export type QuickNpcSetupValues = {
 export function isQuickNpcMembershipTitleSetupComplete(
   membershipTitle: string | undefined,
 ): boolean {
-  return membershipTitle !== undefined
+  if (membershipTitle === undefined) return false
+  if (membershipTitle.trim() === '') return false
+  return true
 }
 
 /** Quick NPC setup defaults to campaign minimum level (often level 0). */
@@ -86,7 +88,9 @@ export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
       speciesId: z
         .string()
         .min(1, formatFieldMessage(characterBuilderValidationMessages.speciesRequired())),
-      membershipTitle: z.string(),
+      membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
+        message: 'Choose a membership title or No title.',
+      }),
       classId: z.string(),
       level: z
         .number({

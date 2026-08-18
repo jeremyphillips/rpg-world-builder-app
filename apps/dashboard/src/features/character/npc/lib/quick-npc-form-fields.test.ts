@@ -13,6 +13,7 @@ import {
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
   createQuickNpcSetupDefaultValues,
+  isQuickNpcMembershipTitleSetupComplete,
   mergeQuickNpcAuthoringValues,
   quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
@@ -29,6 +30,21 @@ const validValues = {
   requiredWeaponIds: [],
   requiredSpellIds: [],
 }
+
+describe('isQuickNpcMembershipTitleSetupComplete', () => {
+  it('treats unset and empty string as incomplete', () => {
+    expect(isQuickNpcMembershipTitleSetupComplete(undefined)).toBe(false)
+    expect(isQuickNpcMembershipTitleSetupComplete('')).toBe(false)
+    expect(isQuickNpcMembershipTitleSetupComplete('   ')).toBe(false)
+  })
+
+  it('treats explicit No title and organization titles as complete', () => {
+    expect(isQuickNpcMembershipTitleSetupComplete(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)).toBe(
+      true,
+    )
+    expect(isQuickNpcMembershipTitleSetupComplete('Guildmaster')).toBe(true)
+  })
+})
 
 describe('createQuickNpcSetupDefaultValues', () => {
   it('starts with setup-only unset membership title until the user chooses', () => {
@@ -50,6 +66,15 @@ describe('quickNpcAuthoringSchema', () => {
       level: 3,
       alignment: 'ln',
     })
+  })
+
+  it('rejects setup with an empty membership title', () => {
+    const result = quickNpcAuthoringSchema(20, 0).safeParse({
+      ...validValues,
+      membershipTitle: '',
+    })
+
+    expect(result.success).toBe(false)
   })
 
   it('rejects missing required seed fields with builder messages', () => {

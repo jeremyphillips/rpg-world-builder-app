@@ -344,4 +344,70 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
+
+  it('clears and recomputes Class when Species changes after a manual selection', async () => {
+    const user = userEvent.setup()
+    const elfSpecies = {
+      ...populatedBuilderCatalog.species[0]!,
+      id: 'srd-cc-5.2.1:elf',
+      slug: 'elf',
+      name: 'Elf',
+    }
+    renderModal({
+      buildContext: createCampaignNpcBuilderContextFixture({
+        catalog: {
+          ...populatedBuilderCatalog,
+          species: [populatedBuilderCatalog.species[0]!, elfSpecies],
+          classes: [quickFighter, rogueClass],
+          organizations: [
+            {
+              id: organization.id,
+              slug: 'lantern-guild',
+              rulesetId: 'srd-cc-5.2.1',
+              source: 'homebrew',
+              status: 'published',
+              campaignId: 'campaign-test-1',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              updatedAt: '2026-01-01T00:00:00.000Z',
+              name: organization.name,
+              organizationDomain: organization.organizationDomain,
+              functions: [],
+              practices: [],
+              members: {
+                classAffinityIds: [rogueClass.id, quickFighter.id],
+                speciesAffinityIds: [],
+                titles: [],
+              },
+              connections: { locations: [] },
+            },
+          ],
+        },
+      }),
+      organization: {
+        ...organization,
+        members: {
+          classAffinityIds: [rogueClass.id, quickFighter.id],
+          speciesAffinityIds: [],
+          titles: [],
+        },
+      },
+    })
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
+    await user.clear(levelInput)
+    await user.type(levelInput, '1')
+    await user.click(screen.getByRole('radio', { name: /rogue/i }))
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+
+    const changeButtons = screen.getAllByRole('button', { name: 'Change' })
+    await user.click(changeButtons[1]!)
+    await user.click(screen.getByRole('radio', { name: /elf/i }))
+
+    expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /fighter/i })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Rogue' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  })
 })

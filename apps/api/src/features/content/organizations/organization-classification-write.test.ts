@@ -173,6 +173,7 @@ describe('organization classification writes', () => {
       sourceTitleId: 'treasurer',
       label: 'Treasurer',
       priority: 50,
+      npcRecommendation: { templateId: 'administrator', level: 3 },
     })
     expect(created.members.titles.every((title) => title.id.startsWith('omt_'))).toBe(true)
   })

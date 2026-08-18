@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../components/equipment/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
@@ -22,7 +23,7 @@ import { getEquipmentPickerCallout } from '../../components/equipment/equipment-
 
 const setup = {
   speciesId: 'species-1',
-  membershipTitle: '',
+  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: equipmentStepBardClassFixture.id,
   level: 1,
 }

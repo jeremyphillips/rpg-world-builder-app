@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -39,7 +40,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 
 const setup = {
   speciesId: populatedBuilderCatalog.species[0]!.id,
-  membershipTitle: '',
+  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: populatedBuilderCatalog.classes[0]!.id,
   level: 1,
 }
@@ -89,7 +90,7 @@ export const ResolutionError: Story = {
     }),
     setup: {
       speciesId: populatedBuilderCatalog.species[0]!.id,
-      membershipTitle: '',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: unsatisfiableClass.id,
       level: 1,
     },

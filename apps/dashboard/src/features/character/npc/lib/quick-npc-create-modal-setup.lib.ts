@@ -229,7 +229,7 @@ function buildQuickNpcClassSetupSet(
       : {}),
     value: args.values.classId,
     visibleWhenComplete: ['speciesId'],
-    dependsOn: ['speciesId'],
+    // Species→class reset/reseed is owned by applyQuickNpcSetupValueChange, not dependsOn/onReset.
     isComplete: isCreateSetupChoiceComplete(args.values.classId),
     collapseWhenComplete: true,
     collapseWhenActiveAndComplete: true,

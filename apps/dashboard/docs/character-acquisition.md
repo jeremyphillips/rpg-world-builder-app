@@ -77,7 +77,8 @@ open with preserved search). Success → `null` (all overlays close). Pending su
 
 - **Title-first progressive reveal** — only the membership title choice is visible until the user
   selects a title or explicit **No title** (`membershipTitle: undefined` is setup-only unset and
-  incomplete; deliberate no-title persists as `''`).
+  incomplete; deliberate no-title uses the UI sentinel `ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`
+  / `__no_title__`, which is not persisted on the created NPC).
 - **Recommended build** — when the selected title carries a snapshotted `npcRecommendation`, a
   display-only note shows the `NPC_AUTHORING_TEMPLATE_*` label and description after Species is
   complete. Build is derived from the title snapshot, not a form value.

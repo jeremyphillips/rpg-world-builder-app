@@ -17,6 +17,8 @@ panel      → kind → control (choice | number | note)
 - **`isComplete`** is caller-owned on each set; the sequencer reads it but does not derive it from values.
 - **`visibleWhenComplete`** hides a set until listed upstream sets are complete — presentation-only; does not call `onReset`.
 - **`dependsOn`** triggers upstream invalidation via `onReset()` — use only for real reset boundaries.
+  Quick NPC setup is an exception: species→class invalidation lives in
+  `applyQuickNpcSetupValueChange` (functional `setState`), so its Class set omits `dependsOn`.
 - **`required: false`** makes a set pass-through: it remains visible/editable but does not block the
   next required set or Continue. Authors do not need a negative sentinel choice merely to advance.
 - **`onReset`** is required when `dependsOn` is non-empty — invalidation calls `onReset()`, not value clears.
