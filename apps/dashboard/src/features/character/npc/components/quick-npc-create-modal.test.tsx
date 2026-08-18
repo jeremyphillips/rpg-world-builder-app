@@ -170,7 +170,7 @@ describe('QuickNpcCreateModal', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
-  it('collapses species to a selection summary card after choice', async () => {
+  it('collapses title and species into a grouped selections summary after both are chosen', async () => {
     const user = userEvent.setup()
     renderModal()
 
@@ -178,8 +178,10 @@ describe('QuickNpcCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
 
     expect(screen.queryByRole('radio', { name: /dwarf/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Change' }).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
   })
 
   it('shows setup-phase headline and description', () => {
@@ -436,8 +438,8 @@ describe('QuickNpcCreateModal', () => {
     await selectBuildCardClass(user, /rogue/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
-    const changeButtons = screen.getAllByRole('button', { name: 'Change' })
-    await user.click(changeButtons[1]!)
+    const changeSpecies = screen.getByRole('button', { name: 'Change species' })
+    await user.click(changeSpecies)
     await user.click(screen.getByRole('radio', { name: /elf/i }))
 
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()

@@ -12,6 +12,8 @@ import { resolveQuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
 import {
   buildQuickNpcCreateSetupSets,
   QUICK_NPC_SETUP_CHANGE_LABEL,
+  QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS,
+  QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import type { QuickNpcCreateFormOrganization } from './quick-npc-authoring-form.client'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
@@ -79,6 +81,8 @@ export function QuickNpcCreateSetupPhase({
         className="contents"
         sets={setupSets}
         changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+        groupedChoiceSetIds={QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS}
+        groupedSummaryEyebrow={QUICK_NPC_SETUP_SELECTIONS_EYEBROW}
       />
       {buildCardModel ? (
         <QuickNpcBuildCard

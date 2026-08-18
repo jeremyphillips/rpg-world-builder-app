@@ -34,7 +34,9 @@ export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
   "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation." as const
 export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
+export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
 export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
+export const QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS = ['membershipTitle', 'speciesId'] as const
 export const QUICK_NPC_TITLE_FIELD_PROMPT =
   "Choose this member's role in the organization." as const
 export {
