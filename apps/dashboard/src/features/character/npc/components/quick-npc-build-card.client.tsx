@@ -36,7 +36,7 @@ export function QuickNpcBuildCard({
     classId: model.classId,
   })
 
-  const classExpanded = expanded === 'class'
+  const classExpanded = model.classProgressionApplicable && expanded === 'class'
   const levelExpanded = expanded === 'level'
 
   const handleClassChange = (nextClassId: string) => {
@@ -45,8 +45,8 @@ export function QuickNpcBuildCard({
   }
 
   return (
-    <section className={className ?? quickNpcBuildCardSectionClasses} data-field-align>
-      <Eyebrow size="sm">{model.sectionEyebrow}</Eyebrow>
+    <section className={className ?? quickNpcBuildCardSectionClasses}>
+      <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
       <article className={quickNpcBuildCardShellClasses}>
         {model.templateLabel ? (
           <BuildCardTemplateIdentity
@@ -56,22 +56,23 @@ export function QuickNpcBuildCard({
         ) : null}
 
         <div className={quickNpcBuildCardAttributesShellClasses}>
-          {model.classProgressionApplicable ? (
-            <BuildCardClassAttributeRow
-              baseId={baseId}
-              model={model}
-              expanded={classExpanded}
-              onToggle={() => setExpanded(classExpanded ? null : 'class')}
-              onClassChange={handleClassChange}
-            />
-          ) : null}
+          <BuildCardClassAttributeRow
+            baseId={baseId}
+            model={model}
+            expanded={classExpanded}
+            onToggle={() => {
+              if (!model.classProgressionApplicable) return
+              setExpanded(classExpanded ? null : 'class')
+            }}
+            onClassChange={handleClassChange}
+          />
 
           <BuildCardLevelAttributeRow
             model={model}
             expanded={levelExpanded}
             onToggle={() => setExpanded(levelExpanded ? null : 'level')}
             onLevelChange={onLevelChange}
-            showDivider={model.classProgressionApplicable}
+            showDivider
           />
         </div>
       </article>

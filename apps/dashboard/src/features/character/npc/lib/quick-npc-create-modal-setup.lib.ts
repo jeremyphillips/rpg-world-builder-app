@@ -127,6 +127,7 @@ function buildQuickNpcSpeciesSetupSet(
     visibleWhenComplete: ['membershipTitle'],
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
     collapseWhenComplete: true,
+    collapseWhenActiveAndComplete: true,
     onValueChange: (speciesId) => args.onApplySetupChange('speciesId', speciesId),
     onReset: () => {},
   }

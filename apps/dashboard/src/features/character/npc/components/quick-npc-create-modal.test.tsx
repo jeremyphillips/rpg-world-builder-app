@@ -170,6 +170,18 @@ describe('QuickNpcCreateModal', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
+  it('collapses species to a selection summary card after choice', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+
+    expect(screen.queryByRole('radio', { name: /dwarf/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Change' }).length).toBeGreaterThanOrEqual(1)
+  })
+
   it('shows setup-phase headline and description', () => {
     renderModal()
 

@@ -5,6 +5,7 @@ import * as React from 'react'
 import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { CreateSetupPanel, createSetupModalBodyClasses } from '@/lib/create-setup'
+import { cn } from '@rpg/ui'
 
 import type { QuickNpcSetupValues } from '../lib/quick-npc-form-fields'
 import { resolveQuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
@@ -14,6 +15,10 @@ import {
 } from '../lib/quick-npc-create-modal-setup.lib'
 import type { QuickNpcCreateFormOrganization } from './quick-npc-authoring-form.client'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
+import {
+  quickNpcBuildCardSectionClasses,
+  quickNpcBuildCardSetupOffsetClasses,
+} from './quick-npc-build-card.variants'
 
 export type QuickNpcCreateSetupPhaseProps = {
   buildContext: CharacterBuildContext
@@ -77,6 +82,7 @@ export function QuickNpcCreateSetupPhase({
       />
       {buildCardModel ? (
         <QuickNpcBuildCard
+          className={cn(quickNpcBuildCardSectionClasses, quickNpcBuildCardSetupOffsetClasses)}
           model={buildCardModel}
           onClassChange={(classId) => onApplySetupChange('classId', classId)}
           onLevelChange={(level) => onApplySetupChange('level', level)}

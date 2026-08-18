@@ -43,6 +43,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
     })
 
     expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId'])
+    expect(sets.find((set) => set.id === 'speciesId')?.collapseWhenActiveAndComplete).toBe(true)
     expect(isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)).toBe(false)
 
     const sequenceItems = sets.map((set) => ({

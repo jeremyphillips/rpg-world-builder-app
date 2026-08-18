@@ -3,22 +3,15 @@
 import * as React from 'react'
 import { CheckIcon } from 'lucide-react'
 
-import {
-  Badge,
-  Button,
-  Eyebrow,
-  NumberStepper,
-  RadioGroup,
-  RadioGroupItem,
-  Text,
-  textVariants,
-} from '@rpg/ui'
+import { Badge, Button, Eyebrow, NumberStepper, RadioGroup, RadioGroupItem, Text } from '@rpg/ui'
 
 import type { QuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
 import {
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
   QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
   QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
+  QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER,
+  QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
   QUICK_NPC_BUILD_DONE_LABEL,
   QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL,
 } from '../lib/quick-npc-build-card.lib'
@@ -31,19 +24,22 @@ import {
   quickNpcBuildCardAttributeValueClasses,
   quickNpcBuildCardClassGroupClasses,
   quickNpcBuildCardClassOptionRowClasses,
+  quickNpcBuildCardClassOptionLabelClasses,
   quickNpcBuildCardClassOptionsClasses,
   quickNpcBuildCardDescriptionVariants,
   quickNpcBuildCardIdentityRowClasses,
   quickNpcBuildCardIdentityTitleClasses,
   quickNpcBuildCardLevelEditorClasses,
+  quickNpcBuildCardLevelPromptClasses,
 } from './quick-npc-build-card.variants'
 
 type BuildAttributeRowProps = {
   eyebrow: string
-  actionLabel: string
-  onAction: () => void
+  actionLabel?: string
+  onAction?: () => void
   value: React.ReactNode
   helper?: string
+  helperClassName?: string
   children?: React.ReactNode
   showDivider?: boolean
 }
@@ -54,6 +50,7 @@ export function BuildAttributeRow({
   onAction,
   value,
   helper,
+  helperClassName,
   children,
   showDivider,
 }: BuildAttributeRowProps) {
@@ -69,15 +66,17 @@ export function BuildAttributeRow({
     >
       <div className={quickNpcBuildCardAttributeHeaderClasses}>
         <Eyebrow size="xs">{eyebrow}</Eyebrow>
-        <Button
-          type="button"
-          variant="link"
-          size="sm"
-          className={quickNpcBuildCardActionLinkClasses}
-          onClick={onAction}
-        >
-          {actionLabel}
-        </Button>
+        {actionLabel != null && onAction != null ? (
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className={quickNpcBuildCardActionLinkClasses}
+            onClick={onAction}
+          >
+            {actionLabel}
+          </Button>
+        ) : null}
       </div>
       {expanded ? (
         children
@@ -85,7 +84,9 @@ export function BuildAttributeRow({
         <>
           <div className={quickNpcBuildCardAttributeValueClasses}>{value}</div>
           {helper ? (
-            <Text className={quickNpcBuildCardAttributeHelperClasses}>{helper}</Text>
+            <Text className={helperClassName ?? quickNpcBuildCardAttributeHelperClasses}>
+              {helper}
+            </Text>
           ) : null}
         </>
       )}
@@ -134,6 +135,18 @@ export function BuildCardClassAttributeRow({
   onToggle,
   onClassChange,
 }: BuildCardClassEditorProps) {
+  if (!model.classProgressionApplicable) {
+    return (
+      <BuildAttributeRow
+        eyebrow={model.classTermLabel.toUpperCase()}
+        value={QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL}
+        helper={QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER}
+        helperClassName={quickNpcBuildCardLevelPromptClasses}
+        showDivider={false}
+      />
+    )
+  }
+
   const collapsedClassValue =
     model.classId === '' ? QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL : (model.selectedClassLabel ?? '')
   const classGroups = model.classOptionGroups.optionGroups
@@ -173,7 +186,10 @@ export function BuildCardClassAttributeRow({
                           value={option.value}
                           disabled={option.disabled}
                         />
-                        <label htmlFor={optionId} className={textVariants({ variant: 'option' })}>
+                        <label
+                          htmlFor={optionId}
+                          className={quickNpcBuildCardClassOptionLabelClasses}
+                        >
                           {option.label}
                         </label>
                       </div>
@@ -189,7 +205,7 @@ export function BuildCardClassAttributeRow({
                 return (
                   <div key={option.value} className={quickNpcBuildCardClassOptionRowClasses}>
                     <RadioGroupItem id={optionId} value={option.value} disabled={option.disabled} />
-                    <label htmlFor={optionId} className={textVariants({ variant: 'option' })}>
+                    <label htmlFor={optionId} className={quickNpcBuildCardClassOptionLabelClasses}>
                       {option.label}
                     </label>
                   </div>
@@ -225,6 +241,7 @@ export function BuildCardLevelAttributeRow({
       onAction={onToggle}
       value={model.level}
       helper={expanded ? undefined : model.levelPrompt}
+      helperClassName={quickNpcBuildCardLevelPromptClasses}
       showDivider={showDivider}
     >
       {expanded ? (
@@ -242,7 +259,7 @@ export function BuildCardLevelAttributeRow({
             />
           </div>
           {model.levelPrompt ? (
-            <Text className={quickNpcBuildCardAttributeHelperClasses}>{model.levelPrompt}</Text>
+            <Text className={quickNpcBuildCardLevelPromptClasses}>{model.levelPrompt}</Text>
           ) : null}
         </div>
       ) : undefined}

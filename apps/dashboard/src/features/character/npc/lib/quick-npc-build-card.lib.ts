@@ -33,6 +33,9 @@ export const QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL = 'Change level' as const
 export const QUICK_NPC_BUILD_DONE_LABEL = 'Done' as const
 export const QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL = 'Choose class' as const
 export const QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL = 'Recommended' as const
+export const QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL = 'Not applicable' as const
+export const QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER =
+  'Level 0 characters do not select a class.' as const
 
 export type QuickNpcBuildCardMode = 'recommended' | 'build'
 

@@ -13,11 +13,14 @@ import {
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
   QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
   QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
+  QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER,
+  QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
   QUICK_NPC_BUILD_DONE_LABEL,
   QUICK_NPC_BUILD_FIELD_LABEL,
   QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
   resolveQuickNpcBuildCardModel,
 } from '../lib/quick-npc-build-card.lib'
+import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
 
 const guildmasterTitle = {
@@ -203,28 +206,159 @@ describe('QuickNpcBuildCard', () => {
     expect(screen.queryByText(QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL)).not.toBeInTheDocument()
   })
 
-  it('omits the class row at level 0', () => {
-    const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
-    const model = resolveQuickNpcBuildCardModel({
-      context,
+  it('clears classId when level becomes 0', () => {
+    const context = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighterClass, rogueClass],
+      },
+    })
+
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: 'Guildmaster',
+          classId: rogueClass.id,
+          level: 9,
+        },
+        setId: 'level',
+        nextValue: 0,
+        context,
+        titles: [guildmasterTitle],
+        organizationClassAffinityIds: [rogueClass.id],
+      }),
+    ).toMatchObject({
+      level: 0,
+      classId: '',
+    })
+  })
+
+  it('keeps the class row visible and non-interactive at level 0', async () => {
+    const user = userEvent.setup()
+    const { onClassChange } = renderBuildCard({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 0,
       },
-      titles: [guildmasterTitle],
     })
 
-    renderWithProviders(
-      <QuickNpcBuildCard model={model!} onClassChange={vi.fn()} onLevelChange={vi.fn()} />,
-    )
-
+    expect(screen.getByText('CLASS')).toBeInTheDocument()
+    expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
+    const helper = screen.getByText(QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER)
+    expect(helper).toHaveClass('text-xs')
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }),
     ).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
+    expect(screen.getByText('0')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
+    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
+    expect(onClassChange).not.toHaveBeenCalled()
+  })
+
+  it('restores interactive class behavior when level returns above 0', () => {
+    const context = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighterClass, rogueClass],
+      },
+    })
+    const members = { classAffinityIds: [rogueClass.id] }
+    const baseValues = {
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: 'Guildmaster' as string | undefined,
+      classId: '',
+      level: 0,
+    }
+
+    function BuildCardAtLevel({ level }: { level: number }) {
+      const values = applyQuickNpcSetupValueChange({
+        values: { ...baseValues, level: 0 },
+        setId: 'level',
+        nextValue: level,
+        context,
+        titles: [guildmasterTitle],
+        organizationClassAffinityIds: members.classAffinityIds,
+      })
+      const model = resolveQuickNpcBuildCardModel({
+        context,
+        values,
+        titles: [guildmasterTitle],
+        members,
+      })
+
+      if (!model) {
+        throw new Error('expected build card model')
+      }
+
+      return <QuickNpcBuildCard model={model} onClassChange={vi.fn()} onLevelChange={vi.fn()} />
+    }
+
+    const { rerender } = renderWithProviders(<BuildCardAtLevel level={0} />)
+
+    expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
+
+    rerender(<BuildCardAtLevel level={9} />)
+
+    expect(screen.queryByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).not.toBeInTheDocument()
+    expect(screen.getByText('Rogue')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
+  })
+
+  it('opens class editor when level returns above 0 with unresolved class', () => {
+    const context = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighterClass, rogueClass],
+      },
+    })
+    const members = { classAffinityIds: [rogueClass.id, fighterClass.id] }
+    const baseValues = {
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: 'Guildmaster' as string | undefined,
+      classId: '',
+      level: 0,
+    }
+
+    function BuildCardAtLevel({ level }: { level: number }) {
+      const values = applyQuickNpcSetupValueChange({
+        values: { ...baseValues, level: 0 },
+        setId: 'level',
+        nextValue: level,
+        context,
+        titles: [guildmasterTitle],
+        organizationClassAffinityIds: members.classAffinityIds,
+      })
+      const model = resolveQuickNpcBuildCardModel({
+        context,
+        values,
+        titles: [guildmasterTitle],
+        members,
+      })
+
+      if (!model) {
+        throw new Error('expected build card model')
+      }
+
+      return <QuickNpcBuildCard model={model} onClassChange={vi.fn()} onLevelChange={vi.fn()} />
+    }
+
+    const { rerender } = renderWithProviders(<BuildCardAtLevel level={0} />)
+
+    rerender(<BuildCardAtLevel level={9} />)
+
+    expect(screen.queryByText(QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL)).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /fighter/i })).toBeInTheDocument()
   })
 })
