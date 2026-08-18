@@ -79,7 +79,9 @@ open with preserved search). Success → `null` (all overlays close). Pending su
   selects a title or explicit **No title** (`membershipTitle: undefined` is setup-only unset and
   incomplete; deliberate no-title uses the UI sentinel `ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`
   / `__no_title__`, which is not persisted on the created NPC).
-- **Build card** — after Title and Species are complete, one sibling card owns Class and Level.
+- **Build card** — after Title and Species are complete and neither identity set is reopened,
+  one sibling card owns Class and Level. Changing Title or Species hides the build card until the
+  choice is settled again.
   When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
   build** identity (template label + description) plus in-row Class and Level editors. Without a
   title recommendation (including **No title**), the card shows **Build** with Class and Level only

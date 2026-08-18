@@ -8,7 +8,10 @@ import { CreateSetupPanel, createSetupModalBodyClasses } from '@/lib/create-setu
 import { cn } from '@rpg/ui'
 
 import type { QuickNpcSetupValues } from '../lib/quick-npc-form-fields'
-import { resolveQuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
+import {
+  isQuickNpcBuildCardVisible,
+  resolveQuickNpcBuildCardModel,
+} from '../lib/quick-npc-build-card.lib'
 import {
   buildQuickNpcCreateSetupSets,
   QUICK_NPC_SETUP_CHANGE_LABEL,
@@ -35,6 +38,8 @@ export function QuickNpcCreateSetupPhase({
   setupValues,
   onApplySetupChange,
 }: QuickNpcCreateSetupPhaseProps) {
+  const [reopenSetId, setReopenSetId] = React.useState<string | null>(null)
+
   const setupSets = React.useMemo(
     () =>
       buildQuickNpcCreateSetupSets({
@@ -75,6 +80,8 @@ export function QuickNpcCreateSetupPhase({
     ],
   )
 
+  const showBuildCard = isQuickNpcBuildCardVisible({ buildCardModel, reopenSetId })
+
   return (
     <div className={createSetupModalBodyClasses}>
       <CreateSetupPanel
@@ -83,8 +90,10 @@ export function QuickNpcCreateSetupPhase({
         changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
         groupedChoiceSetIds={QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS}
         groupedSummaryEyebrow={QUICK_NPC_SETUP_SELECTIONS_EYEBROW}
+        reopenSetId={reopenSetId}
+        onReopenSetIdChange={setReopenSetId}
       />
-      {buildCardModel ? (
+      {showBuildCard && buildCardModel ? (
         <QuickNpcBuildCard
           className={cn(quickNpcBuildCardSectionClasses, quickNpcBuildCardSetupOffsetClasses)}
           model={buildCardModel}

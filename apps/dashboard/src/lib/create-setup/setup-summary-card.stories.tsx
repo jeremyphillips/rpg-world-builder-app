@@ -57,6 +57,23 @@ export const AuthoringSetup: Story = {
   },
 }
 
+export const AuthoringLevel0: Story = {
+  args: {
+    eyebrow: 'Setup',
+    cardAction: (
+      <SetupSummaryCardChangeAction
+        changeLabel="Change"
+        ariaLabel="Change setup"
+        onChange={() => undefined}
+      />
+    ),
+    rows: [
+      { label: 'Role', value: 'No title' },
+      { label: 'Character', value: 'Elf · Level 0' },
+    ],
+  },
+}
+
 export const LongValues: Story = {
   args: {
     rows: [

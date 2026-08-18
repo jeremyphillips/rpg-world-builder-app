@@ -14,7 +14,6 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { formatQuickNpcSetupCharacterSummary } from '../lib/quick-npc-create-modal-setup.lib'
 import { createNpc } from '../api/npc-client'
 import type * as NpcClient from '../api/npc-client'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
@@ -104,8 +103,6 @@ function buildContextFixture(
   })
 }
 
-const setupSummaryLine = 'Dwarf · Level 1 Fighter'
-
 const npcDetail = makeCampaignNpcDetail({
   character: { id: 'npc-99', name: 'Guard Captain' },
   participation: { id: 'participation-99' },
@@ -117,7 +114,6 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
     buildContext: buildContextFixture(),
     organization,
     setup,
-    setupSummaryLine,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
@@ -154,7 +150,7 @@ describe('QuickNpcAuthoringForm', () => {
     expect(screen.getByRole('combobox', { name: /alignment/i })).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: 'No title' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change setup' })).toBeInTheDocument()
   })
 
   it('creates the NPC atomically with the titled membership connection', async () => {
@@ -184,7 +180,7 @@ describe('QuickNpcAuthoringForm', () => {
     const user = userEvent.setup()
     const { props } = renderForm()
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: 'Change setup' }))
     expect(props.onChangeSetup).toHaveBeenCalledTimes(1)
     expect(createNpcMock).not.toHaveBeenCalled()
   })
@@ -197,15 +193,16 @@ describe('QuickNpcAuthoringForm', () => {
     }
     renderForm({
       setup: guildmasterSetup,
-      setupSummaryLine: formatQuickNpcSetupCharacterSummary(
-        guildmasterSetup,
-        buildContextFixture(),
-        membershipTitles,
-      ),
+      organization: {
+        ...organization,
+        members: {
+          titles: membershipTitles,
+        },
+      },
     })
 
-    expect(screen.getByText(/Guildmaster/)).toBeInTheDocument()
-    expect(screen.getByText(/Covert operator/)).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByText('Covert operator')).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {

@@ -184,6 +184,58 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
   })
 
+  it('hides the build card until title and species are both complete', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    expect(
+      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    expect(
+      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+  })
+
+  it('hides the build card when title is reopened', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change title' }))
+    expect(
+      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('hides the build card when species is reopened', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change species' }))
+    expect(
+      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).not.toBeInTheDocument()
+  })
+
   it('shows setup-phase headline and description', () => {
     renderModal()
 
@@ -212,7 +264,7 @@ describe('QuickNpcCreateModal', () => {
 
     await completeSetup(user)
 
-    const changeSetup = screen.getByRole('button', { name: 'Change' })
+    const changeSetup = screen.getByRole('button', { name: 'Change setup' })
     const scrollRegion = changeSetup.closest('.overflow-y-auto')
 
     expect(scrollRegion).toBeTruthy()
@@ -252,7 +304,7 @@ describe('QuickNpcCreateModal', () => {
 
     await completeSetup(user)
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Draft NPC')
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: 'Change setup' }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     await completeSetup(user)

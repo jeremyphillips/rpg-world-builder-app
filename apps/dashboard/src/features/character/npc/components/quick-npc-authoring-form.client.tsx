@@ -14,7 +14,7 @@ import {
   type OrganizationForm,
 } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
-import { CreateSetupSummary } from '@/lib/create-setup'
+import { SetupSummaryCard, SetupSummaryCardChangeAction } from '@/lib/create-setup'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -44,8 +44,10 @@ import {
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import {
+  QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
+  resolveQuickNpcAuthoringSetupSummaryRows,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_GENERATE_NAME_LABEL,
@@ -76,7 +78,6 @@ export type QuickNpcAuthoringFormProps = {
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   setup: QuickNpcSetupValues
-  setupSummaryLine: string
   initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
@@ -210,7 +211,6 @@ export function QuickNpcAuthoringForm({
   buildContext,
   organization,
   setup,
-  setupSummaryLine,
   initialValues,
   onCancel,
   onChangeSetup,
@@ -247,6 +247,16 @@ export function QuickNpcAuthoringForm({
     const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
     return `${optionSets.weapons.length}:${optionSets.spells.length}`
   }, [buildContext, setup])
+
+  const setupSummaryRows = React.useMemo(
+    () =>
+      resolveQuickNpcAuthoringSetupSummaryRows({
+        values: setup,
+        context: buildContext,
+        titles: organization.members?.titles ?? [],
+      }),
+    [buildContext, organization.members?.titles, setup],
+  )
 
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
     submit: async (tabValues) => {
@@ -308,11 +318,16 @@ export function QuickNpcAuthoringForm({
             fallback={defaultValues}
             onConfiguredCountChange={setConfiguredCount}
           />
-          <CreateSetupSummary
+          <SetupSummaryCard
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
-            summary={setupSummaryLine}
-            changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
-            onChange={onChangeSetup}
+            rows={setupSummaryRows}
+            cardAction={
+              <SetupSummaryCardChangeAction
+                changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+                ariaLabel={QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL}
+                onChange={onChangeSetup}
+              />
+            }
           />
         </>
       )}

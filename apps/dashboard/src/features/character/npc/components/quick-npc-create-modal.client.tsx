@@ -206,7 +206,6 @@ function QuickNpcCreateModalSession({
             buildContext={buildContext}
             organization={organization}
             setup={state.setupValues}
-            setupSummaryLine={setupModel.summaryLine}
             initialValues={state.authoringValues}
             onCancel={requestCancel}
             onChangeSetup={handleChangeSetup}

@@ -10,10 +10,7 @@ import {
 } from '@rpg/contracts'
 
 import { formatBuilderDraftCharacterSummary } from '../../lib/builder-preview/preview-identity-summary'
-import {
-  buildOrganizationMembershipTitleRadioOptions,
-  titleFromMembershipRadioValue,
-} from '../../components/connections/organization-membership-title-field.lib'
+import { buildOrganizationMembershipTitleRadioOptions } from '../../components/connections/organization-membership-title-field.lib'
 import {
   isCreateSetupChoiceComplete,
   isCreateSetupNumberComplete,
@@ -36,6 +33,10 @@ export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
 export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
 export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
+export const QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL = 'Role' as const
+export const QUICK_NPC_AUTHORING_SETUP_CHARACTER_LABEL = 'Character' as const
+export const QUICK_NPC_AUTHORING_SETUP_BUILD_LABEL = 'Build' as const
+export const QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL = 'Change setup' as const
 export const QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS = ['membershipTitle', 'speciesId'] as const
 export const QUICK_NPC_TITLE_FIELD_PROMPT =
   "Choose this member's role in the organization." as const
@@ -50,12 +51,11 @@ export type QuickNpcSetupModel = {
   speciesOptions: ReturnType<typeof buildQuickNpcContentOptions>['speciesOptions']
   classOptions: ReturnType<typeof buildQuickNpcContentOptions>['classOptions']
   canContinue: boolean
-  /** Canonical character summary (`formatCharacterSummary`) for the setup selection. */
-  summaryLine: string
 }
 
 export {
   formatQuickNpcLevelRecommendationPrompt,
+  isQuickNpcBuildCardVisible,
   resolveQuickNpcBuildCardModel,
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
   QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
@@ -66,38 +66,64 @@ export {
 export { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 export type { QuickNpcBuildCardModel } from './quick-npc-build-card.lib'
 
-export function formatQuickNpcSetupCharacterSummary(
-  values: QuickNpcSetupValues,
-  context: CharacterBuildContext,
+export type QuickNpcAuthoringSetupSummaryRow = {
+  label: string
+  value: string
+}
+
+export function resolveQuickNpcMembershipTitleDisplayLabel(
+  membershipTitle: string | undefined,
   titles: readonly OrganizationMembershipTitleDefinition[] = [],
 ): string {
-  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  const segments = [
-    formatBuilderDraftCharacterSummary(
-      {
-        species: { speciesId: values.speciesId },
-        class: {
-          classId: isClassProgressionApplicable(values.level) ? values.classId : undefined,
-          level: values.level,
+  const value = membershipTitle ?? ''
+  const selected = buildOrganizationMembershipTitleRadioOptions({ titles }).find(
+    (option) => option.value === value,
+  )
+  return selected?.label ?? value
+}
+
+/** Structured Role / Character / Build rows for authoring-phase SetupSummaryCard. */
+export function resolveQuickNpcAuthoringSetupSummaryRows(args: {
+  values: QuickNpcSetupValues
+  context: CharacterBuildContext
+  titles?: readonly OrganizationMembershipTitleDefinition[]
+}): QuickNpcAuthoringSetupSummaryRow[] {
+  const titles = args.titles ?? []
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const rows: QuickNpcAuthoringSetupSummaryRow[] = [
+    {
+      label: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
+      value: resolveQuickNpcMembershipTitleDisplayLabel(args.values.membershipTitle, titles),
+    },
+    {
+      label: QUICK_NPC_AUTHORING_SETUP_CHARACTER_LABEL,
+      value: formatBuilderDraftCharacterSummary(
+        {
+          species: { speciesId: args.values.speciesId },
+          class: {
+            classId: isClassProgressionApplicable(args.values.level)
+              ? args.values.classId
+              : undefined,
+            level: args.values.level,
+          },
         },
-      },
-      catalogIndex,
-    ),
+        catalogIndex,
+      ),
+    },
   ]
 
-  const persistedTitle = titleFromMembershipRadioValue(values.membershipTitle ?? '')
-  if (persistedTitle !== undefined) {
-    segments.push(persistedTitle)
-    const recommendation = resolveQuickNpcSelectedTitleRecommendation({
-      membershipTitle: values.membershipTitle,
-      titles,
+  const recommendation = resolveQuickNpcSelectedTitleRecommendation({
+    membershipTitle: args.values.membershipTitle,
+    titles,
+  })
+  if (recommendation !== undefined) {
+    rows.push({
+      label: QUICK_NPC_AUTHORING_SETUP_BUILD_LABEL,
+      value: getNpcAuthoringTemplateLabel(recommendation.templateId),
     })
-    if (recommendation !== undefined) {
-      segments.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
-    }
   }
 
-  return segments.join(' · ')
+  return rows
 }
 
 type QuickNpcSetupSetBuilderArgs = {
@@ -216,7 +242,6 @@ export function resolveQuickNpcSetupModel(args: {
     speciesOptions,
     classOptions,
     canContinue,
-    summaryLine: formatQuickNpcSetupCharacterSummary(args.values, args.context, args.titles ?? []),
   }
 }
 

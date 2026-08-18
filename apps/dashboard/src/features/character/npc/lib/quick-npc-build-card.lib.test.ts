@@ -4,6 +4,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 import {
   formatQuickNpcClassRecommendationHelper,
   formatQuickNpcLevelRecommendationPrompt,
+  isQuickNpcBuildCardVisible,
 } from './quick-npc-build-card.lib'
 
 const guildmasterTitle = {
@@ -66,5 +67,23 @@ describe('formatQuickNpcClassRecommendationHelper', () => {
         ],
       }),
     ).toBe('Recommended: Rogue, Wizard')
+  })
+})
+
+describe('isQuickNpcBuildCardVisible', () => {
+  it('requires a resolved model and no reopened identity set', () => {
+    expect(isQuickNpcBuildCardVisible({ buildCardModel: null, reopenSetId: null })).toBe(false)
+    expect(
+      isQuickNpcBuildCardVisible({
+        buildCardModel: { sectionEyebrow: 'Build' } as never,
+        reopenSetId: 'membershipTitle',
+      }),
+    ).toBe(false)
+    expect(
+      isQuickNpcBuildCardVisible({
+        buildCardModel: { sectionEyebrow: 'Build' } as never,
+        reopenSetId: null,
+      }),
+    ).toBe(true)
   })
 })

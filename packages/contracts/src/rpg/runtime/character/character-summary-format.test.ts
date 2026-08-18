@@ -53,6 +53,7 @@ describe('formatCharacterSummarySegments', () => {
 
 describe('formatCharacterSummary', () => {
   it.each<[string, CharacterSummaryParts]>([
+    ['Elf · Level 0', { species: { name: 'Elf' }, classes: [], classlessLevel: 0 }],
     ['Dwarf', { classes: [], species: { name: 'Dwarf' } }],
     ['Elf (Drow)', { classes: [], species: { name: 'Elf', heritageName: 'Drow' } }],
     [

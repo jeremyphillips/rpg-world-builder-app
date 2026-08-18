@@ -100,6 +100,14 @@ export function formatQuickNpcClassRecommendationHelper(args: {
   return `Recommended: ${recommendedLabels.join(', ')}`
 }
 
+/** Setup-phase presentation gate — hides Build while identity choices are reopened. */
+export function isQuickNpcBuildCardVisible(args: {
+  buildCardModel: QuickNpcBuildCardModel | null
+  reopenSetId: string | null
+}): boolean {
+  return args.buildCardModel != null && args.reopenSetId == null
+}
+
 export function resolveQuickNpcBuildCardModel(args: {
   context: CharacterBuildContext
   values: QuickNpcSetupValues

@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
+import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
-  formatQuickNpcSetupCharacterSummary,
+  resolveQuickNpcAuthoringSetupSummaryRows,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
 import {
@@ -194,41 +195,66 @@ describe('resolveQuickNpcBuildCardModel', () => {
   })
 })
 
-describe('formatQuickNpcSetupCharacterSummary', () => {
+describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('appends membership title and recommended build label after the character summary', () => {
-    const summary = formatQuickNpcSetupCharacterSummary(
-      {
+  it('returns Role, Character, and Build rows when a title recommendation exists', () => {
+    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+      values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 5,
       },
       context,
-      [guildmasterTitle],
-    )
+      titles: [guildmasterTitle],
+    })
 
-    expect(summary).toContain('Dwarf')
-    expect(summary).toContain('Guildmaster')
-    expect(summary).toContain('Covert operator')
+    expect(rows).toEqual([
+      { label: 'Role', value: 'Guildmaster' },
+      { label: 'Character', value: expect.stringContaining('Dwarf') },
+      { label: 'Build', value: 'Covert operator' },
+    ])
   })
 
-  it('omits title segments when No title was chosen', () => {
-    const summary = formatQuickNpcSetupCharacterSummary(
-      {
+  it('omits Build and uses No title for Role when no title recommendation exists', () => {
+    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+      values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 1,
       },
       context,
-      [guildmasterTitle],
-    )
+      titles: [guildmasterTitle],
+    })
 
-    expect(summary).toContain('Dwarf')
-    expect(summary).not.toContain('Guildmaster')
-    expect(summary).not.toContain('Covert operator')
+    expect(rows).toEqual([
+      { label: 'Role', value: 'No title' },
+      { label: 'Character', value: expect.stringContaining('Dwarf') },
+    ])
+  })
+
+  it('formats Character as species plus Level 0 without a phantom class', () => {
+    const elf = makeSpecies({ slug: 'elf', name: 'Elf' })
+    const elfContext = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        species: [elf, ...populatedBuilderCatalog.species],
+      },
+    })
+    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+      values: {
+        speciesId: elf.id,
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        classId: populatedBuilderCatalog.classes[0]!.id,
+        level: 0,
+      },
+      context: elfContext,
+      titles: [],
+    })
+
+    expect(rows[1]).toEqual({ label: 'Character', value: 'Elf · Level 0' })
   })
 })
 
