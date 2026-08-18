@@ -118,7 +118,7 @@ describe('create-setup-sequence', () => {
   })
 
   describe('resolveCreateSetupSetExpanded', () => {
-    it('expands only the active set when collapseWhenComplete defaults to true', () => {
+    it('expands only the active incomplete set when collapseWhenComplete defaults to true', () => {
       expect(
         resolveCreateSetupSetExpanded({
           setId: 'classification',
@@ -135,6 +135,41 @@ describe('create-setup-sequence', () => {
           isComplete: false,
         }),
       ).toBe(false)
+    })
+
+    it('collapses a completed active set when collapseWhenActiveAndComplete is true', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          visible: true,
+          isComplete: true,
+          collapseWhenActiveAndComplete: true,
+        }),
+      ).toBe(false)
+    })
+
+    it('keeps a completed active terminal set expanded by default', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          visible: true,
+          isComplete: true,
+        }),
+      ).toBe(true)
+    })
+
+    it('re-expands a completed set when it is explicitly reopened', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          reopenSetId: 'class',
+          visible: true,
+          isComplete: true,
+        }),
+      ).toBe(true)
     })
 
     it('keeps visible sets expanded when collapseWhenComplete is false', () => {

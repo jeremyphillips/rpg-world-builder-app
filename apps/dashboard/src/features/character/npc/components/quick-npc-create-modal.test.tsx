@@ -226,7 +226,7 @@ describe('QuickNpcCreateModal', () => {
     await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
   })
 
-  it('groups class choices by organization member class affinities during setup', async () => {
+  it('auto-seeds and collapses Class when exactly one recommendation exists', async () => {
     const user = userEvent.setup()
     renderModal({
       buildContext: createCampaignNpcBuilderContextFixture({
@@ -264,7 +264,66 @@ describe('QuickNpcCreateModal', () => {
     await user.clear(levelInput)
     await user.type(levelInput, '1')
 
+    expect(screen.getByRole('heading', { name: 'Rogue' })).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  })
+
+  it('keeps Class expanded when multiple recommendations exist', async () => {
+    const user = userEvent.setup()
+    const wizardClass = {
+      ...populatedBuilderCatalog.classes[0]!,
+      id: 'srd-cc-5.2.1:wizard',
+      slug: 'wizard',
+      name: 'Wizard',
+    }
+    renderModal({
+      buildContext: createCampaignNpcBuilderContextFixture({
+        catalog: {
+          ...populatedBuilderCatalog,
+          classes: [quickFighter, rogueClass, wizardClass],
+          organizations: [
+            {
+              id: organization.id,
+              slug: 'lantern-guild',
+              rulesetId: 'srd-cc-5.2.1',
+              source: 'homebrew',
+              status: 'published',
+              campaignId: 'campaign-test-1',
+              createdAt: '2026-01-01T00:00:00.000Z',
+              updatedAt: '2026-01-01T00:00:00.000Z',
+              name: organization.name,
+              organizationDomain: organization.organizationDomain,
+              functions: [],
+              practices: [],
+              members: {
+                classAffinityIds: [rogueClass.id, quickFighter.id],
+                speciesAffinityIds: [],
+                titles: [],
+              },
+              connections: { locations: [] },
+            },
+          ],
+        },
+      }),
+      organization: {
+        ...organization,
+        members: {
+          classAffinityIds: [rogueClass.id, quickFighter.id],
+          speciesAffinityIds: [],
+          titles: [],
+        },
+      },
+    })
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
+    await user.clear(levelInput)
+    await user.type(levelInput, '1')
+
     expect(screen.getByText('Recommended')).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_CLASS_ALL_GROUP_EYEBROW)).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 })

@@ -11,6 +11,11 @@ export type CreateSetupSequenceItem = {
    * Does not affect `isComplete`. @default true
    */
   collapseWhenComplete?: boolean
+  /**
+   * Presentation: when true, a completed set collapses even while it remains
+   * the active terminal set. Opt-in for flows that should summarize after seeding.
+   */
+  collapseWhenActiveAndComplete?: boolean
 }
 
 export type CreateSetupSetBase = {
@@ -21,6 +26,7 @@ export type CreateSetupSetBase = {
   required?: boolean
   dependsOn?: readonly string[]
   collapseWhenComplete?: boolean
+  collapseWhenActiveAndComplete?: boolean
   isComplete: boolean
   onReset: () => void
 }

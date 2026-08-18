@@ -274,6 +274,18 @@ describe('formatQuickNpcLevelRecommendationPrompt', () => {
 
 describe('resolveQuickNpcSetupModel', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+  const rogueClass = {
+    ...populatedBuilderCatalog.classes[0]!,
+    id: 'srd-cc-5.2.1:rogue',
+    slug: 'rogue',
+    name: 'Rogue',
+  }
+  const multiClassContext = createCampaignNpcBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      classes: [populatedBuilderCatalog.classes[0]!, rogueClass],
+    },
+  })
 
   it('defaults to campaign minimum level', () => {
     expect(resolveQuickNpcDefaultLevel(context)).toBe(0)
@@ -352,6 +364,75 @@ describe('resolveQuickNpcSetupModel', () => {
         values,
       }).summaryLine,
     ).toBe('Dwarf · Level 1 Fighter')
+  })
+
+  it('enables Continue when a single recommendation has been auto-seeded', () => {
+    expect(
+      resolveQuickNpcSetupModel({
+        context: multiClassContext,
+        values: {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: 'Guildmaster',
+          classId: rogueClass.id,
+          level: 5,
+        },
+        titles: [guildmasterTitle],
+        members: { classAffinityIds: [rogueClass.id] },
+      }).canContinue,
+    ).toBe(true)
+  })
+
+  it('requires explicit Class selection when multiple recommendations exist', () => {
+    const fighterClass = {
+      ...populatedBuilderCatalog.classes[0]!,
+      id: 'srd-cc-5.2.1:fighter',
+      slug: 'fighter',
+      name: 'Fighter',
+    }
+    const multiClassContext = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighterClass, rogueClass],
+      },
+    })
+
+    expect(
+      resolveQuickNpcSetupModel({
+        context: multiClassContext,
+        values: {
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: 'Guildmaster',
+          classId: '',
+          level: 5,
+        },
+        titles: [guildmasterTitle],
+        members: { classAffinityIds: [fighterClass.id] },
+      }).canContinue,
+    ).toBe(false)
+  })
+
+  it('marks an auto-seeded Class as complete for collapse', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      context: multiClassContext,
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: 'Guildmaster',
+        classId: rogueClass.id,
+        level: 5,
+      },
+      onApplySetupChange: () => {},
+      titles: [guildmasterTitle],
+      members: { classAffinityIds: [rogueClass.id] },
+    })
+
+    const classSet = sets.find((set) => set.id === 'classId')
+    expect(classSet).toMatchObject({
+      kind: 'choice',
+      value: rogueClass.id,
+      isComplete: true,
+      collapseWhenComplete: true,
+      collapseWhenActiveAndComplete: true,
+    })
   })
 
   it('appends the selected title and recommended build to the setup summary', () => {

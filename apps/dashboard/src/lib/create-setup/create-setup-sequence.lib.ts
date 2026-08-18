@@ -25,19 +25,29 @@ export function resolveCreateSetupActiveSetId({
 export function resolveCreateSetupSetExpanded({
   setId,
   activeSetId,
+  reopenSetId = null,
   visible,
   isComplete,
   required = true,
   collapseWhenComplete = true,
+  collapseWhenActiveAndComplete = false,
 }: {
   setId: string
   activeSetId: string | null
+  reopenSetId?: string | null
   visible: boolean
   isComplete: boolean
   required?: boolean
   collapseWhenComplete?: boolean
+  collapseWhenActiveAndComplete?: boolean
 }): boolean {
-  if (setId === activeSetId) return true
+  if (reopenSetId === setId) return true
+  if (setId === activeSetId) {
+    if (!isComplete) return true
+    if (collapseWhenComplete === false) return true
+    if (collapseWhenActiveAndComplete) return false
+    return true
+  }
   if (visible && required === false && !isComplete) return true
   if (visible && collapseWhenComplete === false) return true
   return false

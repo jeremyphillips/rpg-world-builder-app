@@ -6,10 +6,11 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
+import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
+import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
 
 function clampLevel(level: number, minLevel: number, maxLevel: number): number {
   return Math.min(maxLevel, Math.max(minLevel, level))
@@ -58,13 +59,27 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
   return clampLevel(recommendation.level, levelConstraints.minLevel, levelConstraints.maxLevel)
 }
 
-export function applyQuickNpcSetupValueChange(args: {
+type QuickNpcSetupValueChangeArgs = {
   values: QuickNpcSetupValues
   setId: string
   nextValue: string | number
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
-}): QuickNpcSetupValues {
+  organizationClassAffinityIds?: readonly string[]
+}
+
+function applyRecommendedClassSeeding(args: QuickNpcSetupValueChangeArgs): QuickNpcSetupValues {
+  return applyQuickNpcRecommendedClassSeeding({
+    values: args.values,
+    context: args.context,
+    titles: args.titles,
+    organizationClassAffinityIds: args.organizationClassAffinityIds,
+  })
+}
+
+export function applyQuickNpcSetupValueChange(
+  args: QuickNpcSetupValueChangeArgs,
+): QuickNpcSetupValues {
   if (args.setId === 'speciesId') {
     return applyLevelClassSideEffects({
       ...args.values,
@@ -75,7 +90,7 @@ export function applyQuickNpcSetupValueChange(args: {
 
   if (args.setId === 'membershipTitle') {
     const membershipTitle = String(args.nextValue)
-    return applyLevelClassSideEffects({
+    const nextValues = {
       ...args.values,
       membershipTitle,
       level: resolveQuickNpcLevelForMembershipTitle({
@@ -83,14 +98,28 @@ export function applyQuickNpcSetupValueChange(args: {
         titles: args.titles,
         context: args.context,
       }),
-    })
+      classId: '',
+    }
+
+    return applyRecommendedClassSeeding({ ...args, values: nextValues })
   }
 
   if (args.setId === 'level') {
-    return applyLevelClassSideEffects({
-      ...args.values,
-      level: Number(args.nextValue),
-    })
+    const previousLevel = args.values.level
+    const nextLevel = Number(args.nextValue)
+
+    if (!isClassProgressionApplicable(nextLevel)) {
+      return applyLevelClassSideEffects({ ...args.values, level: nextLevel })
+    }
+
+    if (!isClassProgressionApplicable(previousLevel)) {
+      return applyRecommendedClassSeeding({
+        ...args,
+        values: { ...args.values, level: nextLevel, classId: '' },
+      })
+    }
+
+    return { ...args.values, level: nextLevel }
   }
 
   if (args.setId === 'classId') {

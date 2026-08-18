@@ -56,6 +56,7 @@ export function CreateSetupPanel({
         required: set.required,
         dependsOn: set.dependsOn,
         collapseWhenComplete: set.collapseWhenComplete,
+        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),
     [sets],
   )
@@ -88,10 +89,12 @@ export function CreateSetupPanel({
         const expanded = resolveCreateSetupSetExpanded({
           setId,
           activeSetId,
+          reopenSetId,
           visible,
           isComplete: set.isComplete,
           required: set.required,
           collapseWhenComplete: set.collapseWhenComplete ?? true,
+          collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete ?? false,
         })
 
         if (set.kind === 'note') {
@@ -218,6 +221,7 @@ export function CreateSetupShell({
         required: set.required,
         dependsOn: set.dependsOn,
         collapseWhenComplete: set.collapseWhenComplete,
+        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),
     [sets],
   )

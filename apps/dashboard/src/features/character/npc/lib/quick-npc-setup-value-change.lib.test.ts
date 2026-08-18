@@ -13,12 +13,39 @@ import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
 
 const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
+const rogueClass = {
+  ...populatedBuilderCatalog.classes[0]!,
+  id: 'srd-cc-5.2.1:rogue',
+  slug: 'rogue',
+  name: 'Rogue',
+}
+const fighterClass = {
+  ...populatedBuilderCatalog.classes[0]!,
+  id: 'srd-cc-5.2.1:fighter',
+  slug: 'fighter',
+  name: 'Fighter',
+}
+const multiClassContext = createCampaignNpcBuilderContextFixture({
+  catalog: {
+    ...populatedBuilderCatalog,
+    classes: [fighterClass, rogueClass],
+  },
+})
+
 const guildmasterTitle = {
   id: 'omt_guildmaster',
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'civic_leader' as const, level: 8 },
+  npcRecommendation: { templateId: 'covert_operator' as const, level: 8 },
+} as const
+
+const martialCommanderTitle = {
+  id: 'omt_commander',
+  label: 'Commander',
+  description: 'Field commander.',
+  priority: 50 as const,
+  npcRecommendation: { templateId: 'martial_commander' as const, level: 8 },
 } as const
 
 const highLevelTitle = {
@@ -27,6 +54,12 @@ const highLevelTitle = {
   label: 'Archmage',
   npcRecommendation: { templateId: 'arcane_practitioner' as const, level: 25 },
 } as const
+
+const changeArgs = {
+  context: multiClassContext,
+  titles: [guildmasterTitle, martialCommanderTitle],
+  organizationClassAffinityIds: [rogueClass.id],
+}
 
 describe('resolveQuickNpcLevelForMembershipTitle', () => {
   it('returns the campaign default for no title', () => {
@@ -62,10 +95,10 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
 
 describe('applyQuickNpcSetupValueChange', () => {
   const baseValues = {
-    ...createQuickNpcSetupDefaultValues(context),
+    ...createQuickNpcSetupDefaultValues(multiClassContext),
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-    classId: 'srd-cc-5.2.1:fighter',
+    classId: fighterClass.id,
     level: 3,
   }
 
@@ -75,8 +108,7 @@ describe('applyQuickNpcSetupValueChange', () => {
         values: baseValues,
         setId: 'speciesId',
         nextValue: 'srd-cc-5.2.1:elf',
-        context,
-        titles: [guildmasterTitle],
+        ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
@@ -86,19 +118,55 @@ describe('applyQuickNpcSetupValueChange', () => {
     })
   })
 
-  it('reseeds level from title recommendation without clearing class until level side effects apply', () => {
+  it('auto-seeds Class when Title resolves to exactly one recommendation', () => {
     expect(
       applyQuickNpcSetupValueChange({
         values: baseValues,
         setId: 'membershipTitle',
         nextValue: 'Guildmaster',
-        context,
-        titles: [guildmasterTitle],
+        ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
       membershipTitle: 'Guildmaster',
       level: 8,
+      classId: rogueClass.id,
+    })
+  })
+
+  it('clears Class when Title resolves to multiple recommendations', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...baseValues,
+          membershipTitle: 'Guildmaster',
+          classId: rogueClass.id,
+        },
+        setId: 'membershipTitle',
+        nextValue: 'Commander',
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      membershipTitle: 'Commander',
+      level: 8,
+      classId: '',
+    })
+  })
+
+  it('seeds organization-only recommendations when the title has no template recommendation', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: baseValues,
+        setId: 'membershipTitle',
+        nextValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      level: 0,
+      classId: '',
     })
   })
 
@@ -108,8 +176,7 @@ describe('applyQuickNpcSetupValueChange', () => {
         values: baseValues,
         setId: 'level',
         nextValue: 0,
-        context,
-        titles: [guildmasterTitle],
+        ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
@@ -124,12 +191,67 @@ describe('applyQuickNpcSetupValueChange', () => {
         values: baseValues,
         setId: 'level',
         nextValue: 5,
-        context,
-        titles: [guildmasterTitle],
+        ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
       level: 5,
+    })
+  })
+
+  it('recomputes and auto-seeds Class when level rises from 0 to a class-applicable level', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...baseValues,
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          level: 0,
+          classId: '',
+        },
+        setId: 'level',
+        nextValue: 1,
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      level: 1,
+      classId: rogueClass.id,
+    })
+  })
+
+  it('does not restore a stale class when level rises from 0 without a single recommendation', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...baseValues,
+          membershipTitle: 'Commander',
+          level: 0,
+          classId: '',
+        },
+        setId: 'level',
+        nextValue: 8,
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      membershipTitle: 'Commander',
+      level: 8,
+      classId: '',
+    })
+  })
+
+  it('preserves a manually selected class', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: baseValues,
+        setId: 'classId',
+        nextValue: fighterClass.id,
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      classId: fighterClass.id,
     })
   })
 })

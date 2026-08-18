@@ -1,11 +1,9 @@
 import {
   getContentTypeTerm,
-  getNpcAuthoringTemplateClassAffinityIds,
   getNpcAuthoringTemplateEntry,
   getNpcAuthoringTemplateLabel,
   indexCharacterBuildCatalog,
   isClassProgressionApplicable,
-  resolveOrganizationMembershipTitleDefinitionByLabel,
   resolvePlayableBuilderContent,
   resolveCharacterLevelConstraints,
   type CharacterBuildContext,
@@ -26,6 +24,10 @@ import {
 
 import { buildQuickNpcContentOptions, type QuickNpcSetupValues } from './quick-npc-form-fields'
 import { buildQuickNpcClassRadioCardPresentation } from './quick-npc-class-option-groups.lib'
+import {
+  resolveQuickNpcClassRecommendationIds,
+  resolveQuickNpcSelectedTitleRecommendation,
+} from './quick-npc-class-recommendation.lib'
 import { buildQuickNpcSpeciesRadioCardPresentation } from './quick-npc-species-option-groups.lib'
 
 export const QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE = 'Set up member' as const
@@ -40,7 +42,7 @@ export const QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL = 'Recommended build' as co
 export const QUICK_NPC_SPECIES_AFFINITY_PROMPT =
   "Recommended species are based on this organization's member affinities." as const
 export const QUICK_NPC_CLASS_AFFINITY_PROMPT =
-  "Based on this member's build and organization." as const
+  "Recommended from this member's build and organization." as const
 
 export type QuickNpcSetupModel = {
   speciesOptions: ReturnType<typeof buildQuickNpcContentOptions>['speciesOptions']
@@ -50,17 +52,7 @@ export type QuickNpcSetupModel = {
   summaryLine: string
 }
 
-export function resolveQuickNpcSelectedTitleRecommendation(args: {
-  membershipTitle: string
-  titles: readonly OrganizationMembershipTitleDefinition[]
-}) {
-  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle)
-  if (persistedTitle === undefined) {
-    return undefined
-  }
-  return resolveOrganizationMembershipTitleDefinitionByLabel(args.titles, persistedTitle)
-    ?.npcRecommendation
-}
+export { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 
 export function formatQuickNpcLevelRecommendationPrompt(args: {
   membershipTitle: string
@@ -230,6 +222,7 @@ function buildQuickNpcClassSetupSet(
     dependsOn: ['speciesId'],
     isComplete: isCreateSetupChoiceComplete(args.values.classId),
     collapseWhenComplete: true,
+    collapseWhenActiveAndComplete: true,
     onValueChange: (classId) => args.onApplySetupChange('classId', classId),
     onReset: () => {},
   }
@@ -254,13 +247,15 @@ export function buildQuickNpcCreateSetupSets(args: {
     membershipTitle: values.membershipTitle,
     titles,
   })
+  const recommendedClassIds = resolveQuickNpcClassRecommendationIds({
+    values,
+    context: args.context,
+    titles,
+    organizationClassAffinityIds: args.members?.classAffinityIds,
+  })
   const classPresentation = buildQuickNpcClassRadioCardPresentation({
     classOptions,
-    classAffinityIds: args.members?.classAffinityIds,
-    templateClassAffinitySlugs:
-      titleRecommendation === undefined
-        ? undefined
-        : getNpcAuthoringTemplateClassAffinityIds(titleRecommendation.templateId),
+    recommendedClassIds,
     playableClasses: playableContent.classes,
   })
   const levelConstraints = resolveCharacterLevelConstraints({

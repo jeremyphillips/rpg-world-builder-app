@@ -119,10 +119,11 @@ function QuickNpcCreateModalSession({
           nextValue,
           context: buildContext,
           titles: organization.members?.titles ?? [],
+          organizationClassAffinityIds: organization.members?.classAffinityIds,
         }),
       }))
     },
-    [buildContext, organization.members?.titles],
+    [buildContext, organization.members?.classAffinityIds, organization.members?.titles],
   )
 
   const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {

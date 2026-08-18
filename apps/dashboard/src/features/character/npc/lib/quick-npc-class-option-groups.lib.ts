@@ -13,15 +13,18 @@ export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = `All other ${getContentTypeSent
 
 export function buildQuickNpcClassRadioCardPresentation(input: {
   classOptions: readonly FieldOption[]
+  recommendedClassIds?: readonly string[]
   classAffinityIds?: readonly string[]
   templateClassAffinitySlugs?: readonly string[]
   playableClasses: readonly CharacterClass[]
 }) {
-  const recommendedIds = resolveOrganizationNpcClassRecommendationIds({
-    templateClassAffinitySlugs: input.templateClassAffinitySlugs,
-    organizationClassAffinityIds: input.classAffinityIds,
-    playableClasses: input.playableClasses,
-  })
+  const recommendedIds =
+    input.recommendedClassIds ??
+    resolveOrganizationNpcClassRecommendationIds({
+      templateClassAffinitySlugs: input.templateClassAffinitySlugs,
+      organizationClassAffinityIds: input.classAffinityIds,
+      playableClasses: input.playableClasses,
+    })
 
   return buildQuickNpcAffinityRadioCardPresentation({
     options: input.classOptions,
