@@ -2,9 +2,17 @@ import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 import type { GameTermEntry } from './types'
 import type { VocabularyTerm } from './types'
 
+/**
+ * Canonical class slug seed — resolved to catalog class ids at recommendation time.
+ * Template affinities reference baseline canonical classes only; organization affinities
+ * remain the path for organization-specific or homebrew class recommendations.
+ */
+export type NpcAuthoringTemplateClassAffinitySlug = string
+
 /** Reusable NPC build archetype — not a power tier or title applicability rule. */
 export type NpcAuthoringTemplateEntry = GameTermEntry & {
   readonly searchTerms?: readonly string[]
+  readonly classAffinityIds?: readonly NpcAuthoringTemplateClassAffinitySlug[]
 }
 
 export const NPC_AUTHORING_TEMPLATE_TERM = {
@@ -67,11 +75,13 @@ export const NPC_AUTHORING_TEMPLATE_ENTRIES = {
     label: 'Healer',
     description: 'Medical or caregiving professional focused on treatment and recovery.',
     searchTerms: ['caregiver', 'medic', 'physician'],
+    classAffinityIds: ['cleric'],
   },
   performer: {
     label: 'Performer',
     description: 'Actor, musician, entertainer, playwright, or other performance specialist.',
     searchTerms: ['actor', 'entertainer', 'musician'],
+    classAffinityIds: ['bard'],
   },
   maritime_crew: {
     label: 'Maritime crew',
@@ -83,60 +93,71 @@ export const NPC_AUTHORING_TEMPLATE_ENTRIES = {
     description:
       'Skilled shipboard leader responsible for navigation, command, or crew operations.',
     searchTerms: ['ship captain', 'shipboard leader'],
+    classAffinityIds: ['fighter'],
   },
   guard: {
     label: 'Guard',
     description: 'Trained rank-and-file defender, watch member, soldier, or security combatant.',
     searchTerms: ['security', 'soldier', 'watch'],
+    classAffinityIds: ['fighter'],
   },
   scout: {
     label: 'Scout',
     description:
       'Mobile field specialist focused on reconnaissance, tracking, navigation, or exploration.',
     searchTerms: ['explorer', 'reconnaissance', 'tracker'],
+    classAffinityIds: ['ranger'],
   },
   investigator: {
     label: 'Investigator',
     description: 'Specialist focused on inquiry, detection, inspection, or evidence gathering.',
     searchTerms: ['detective', 'inspector'],
+    classAffinityIds: ['rogue'],
   },
   covert_operator: {
     label: 'Covert operator',
     description:
       'Field operative focused on infiltration, theft, espionage, smuggling, or clandestine work.',
     searchTerms: ['espionage', 'infiltration', 'spy'],
+    classAffinityIds: ['rogue'],
   },
   martial_specialist: {
     label: 'Martial specialist',
     description: 'Experienced combatant whose role centers on direct martial capability.',
     searchTerms: ['combatant', 'fighter'],
+    classAffinityIds: ['fighter', 'barbarian'],
   },
   martial_officer: {
     label: 'Martial officer',
     description: 'Tactical leader responsible for commanding trained combatants.',
     searchTerms: ['officer', 'tactical leader'],
+    classAffinityIds: ['fighter', 'paladin'],
   },
   martial_commander: {
     label: 'Martial commander',
     description: 'Senior military or security leader responsible for larger-scale command.',
     searchTerms: ['commander', 'general'],
+    classAffinityIds: ['fighter', 'paladin'],
   },
   arcane_practitioner: {
     label: 'Arcane practitioner',
     description: 'Character whose role centers on arcane study, practice, or magical expertise.',
     searchTerms: ['mage', 'sorcerer', 'wizard'],
+    classAffinityIds: ['wizard', 'sorcerer'],
   },
   divine_practitioner: {
     label: 'Divine practitioner',
     description:
       'Character whose role centers on religious ministry, divine magic, or sacred practice.',
     searchTerms: ['cleric', 'divine', 'priest'],
+    classAffinityIds: ['cleric'],
   },
   nature_practitioner: {
     label: 'Nature practitioner',
     description:
       'Character whose role centers on nature-focused magic, stewardship, or sacred natural practice.',
     searchTerms: ['druid', 'nature magic'],
+    classAffinityIds: ['druid'],
   },
 } as const satisfies Record<string, NpcAuthoringTemplateEntry>
 
@@ -152,4 +173,10 @@ export function getNpcAuthoringTemplateEntry(id: string): NpcAuthoringTemplateEn
 
 export function getNpcAuthoringTemplateLabel(id: string): string {
   return getNpcAuthoringTemplateEntry(id)?.label ?? id
+}
+
+export function getNpcAuthoringTemplateClassAffinityIds(
+  id: string,
+): readonly NpcAuthoringTemplateClassAffinitySlug[] {
+  return getNpcAuthoringTemplateEntry(id)?.classAffinityIds ?? []
 }

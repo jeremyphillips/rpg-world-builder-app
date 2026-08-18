@@ -35,7 +35,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'guildmaster',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'martial_commander', level: 8 },
     },
     {
       titleId: 'captain',
@@ -143,7 +143,11 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
       priority: 40,
       npcRecommendation: { templateId: 'divine_practitioner', level: 5 },
     },
-    { titleId: 'elder', priority: 40, npcRecommendation: { templateId: 'civic_leader', level: 6 } },
+    {
+      titleId: 'elder',
+      priority: 40,
+      npcRecommendation: { templateId: 'divine_practitioner', level: 6 },
+    },
     {
       titleId: 'minister',
       priority: 30,
@@ -263,7 +267,11 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     { titleId: 'apprentice', priority: 10, npcRecommendation: { templateId: 'artisan', level: 1 } },
   ],
   gang: [
-    { titleId: 'boss', priority: 50, npcRecommendation: { templateId: 'civic_leader', level: 8 } },
+    {
+      titleId: 'boss',
+      priority: 50,
+      npcRecommendation: { templateId: 'covert_operator', level: 8 },
+    },
     {
       titleId: 'lieutenant',
       priority: 40,
@@ -457,7 +465,11 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
       priority: 40,
       npcRecommendation: { templateId: 'divine_practitioner', level: 8 },
     },
-    { titleId: 'elder', priority: 30, npcRecommendation: { templateId: 'civic_leader', level: 5 } },
+    {
+      titleId: 'elder',
+      priority: 30,
+      npcRecommendation: { templateId: 'divine_practitioner', level: 5 },
+    },
     { titleId: 'brother', priority: 20, npcRecommendation: { templateId: 'civilian', level: 0 } },
     { titleId: 'sister', priority: 20, npcRecommendation: { templateId: 'civilian', level: 0 } },
     {
@@ -531,7 +543,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'ringleader',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'covert_operator', level: 8 },
     },
     {
       titleId: 'lieutenant',
@@ -564,7 +576,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'guildmaster',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 9 },
+      npcRecommendation: { templateId: 'covert_operator', level: 9 },
     },
     {
       titleId: 'master_thief',
@@ -668,7 +680,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'guildmaster',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'martial_officer', level: 8 },
     },
     {
       titleId: 'huntmaster',
@@ -780,7 +792,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'ringleader',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'covert_operator', level: 8 },
     },
     {
       titleId: 'master_forger',
@@ -934,7 +946,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'ringleader',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'covert_operator', level: 8 },
     },
     {
       titleId: 'master_fence',
@@ -976,7 +988,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'grand_master',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 10 },
+      npcRecommendation: { templateId: 'divine_practitioner', level: 10 },
     },
     {
       titleId: 'prior',
@@ -1039,7 +1051,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'director',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 10 },
+      npcRecommendation: { templateId: 'covert_operator', level: 10 },
     },
     {
       titleId: 'deputy_director',
@@ -1150,7 +1162,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'rector',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 10 },
+      npcRecommendation: { templateId: 'arcane_practitioner', level: 10 },
     },
     {
       titleId: 'master',
@@ -1389,7 +1401,7 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     {
       titleId: 'director',
       priority: 50,
-      npcRecommendation: { templateId: 'civic_leader', level: 8 },
+      npcRecommendation: { templateId: 'administrator', level: 8 },
     },
     {
       titleId: 'security_chief',
@@ -1420,7 +1432,11 @@ export const ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS = {
     { titleId: 'recruit', priority: 10, npcRecommendation: { templateId: 'guard', level: 1 } },
   ],
   protection_racket: [
-    { titleId: 'boss', priority: 50, npcRecommendation: { templateId: 'civic_leader', level: 8 } },
+    {
+      titleId: 'boss',
+      priority: 50,
+      npcRecommendation: { templateId: 'covert_operator', level: 8 },
+    },
     {
       titleId: 'lieutenant',
       priority: 40,

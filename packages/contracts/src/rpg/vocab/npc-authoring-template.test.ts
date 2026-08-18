@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getNpcAuthoringTemplateClassAffinityIds,
   getNpcAuthoringTemplateEntry,
   getNpcAuthoringTemplateLabel,
   NPC_AUTHORING_TEMPLATE_ENTRIES,
@@ -8,6 +9,7 @@ import {
   NPC_AUTHORING_TEMPLATE_TERM,
   npcAuthoringTemplateIdSchema,
 } from './npc-authoring-template'
+import { ORGANIZATION_PRESET_MEMBER_CLASS_AFFINITIES } from './organization-preset-member-class-affinities'
 
 describe('NPC authoring template vocabulary', () => {
   it('registers taxonomy term metadata', () => {
@@ -55,8 +57,30 @@ describe('NPC authoring template vocabulary', () => {
   it('resolves entries and labels by template id', () => {
     expect(getNpcAuthoringTemplateEntry('martial_specialist')).toMatchObject({
       label: 'Martial specialist',
+      classAffinityIds: ['fighter', 'barbarian'],
     })
     expect(getNpcAuthoringTemplateEntry('missing_template')).toBeUndefined()
     expect(getNpcAuthoringTemplateLabel('custom')).toBe('custom')
+  })
+
+  it('may define canonical class affinity slug seeds on mechanical archetypes', () => {
+    expect(getNpcAuthoringTemplateClassAffinityIds('covert_operator')).toEqual(['rogue'])
+    expect(getNpcAuthoringTemplateClassAffinityIds('civilian')).toEqual([])
+    expect(getNpcAuthoringTemplateEntry('divine_practitioner')?.classAffinityIds).toEqual([
+      'cleric',
+    ])
+    expect(getNpcAuthoringTemplateEntry('nature_practitioner')?.classAffinityIds).toEqual(['druid'])
+  })
+
+  it('restricts template class affinity slugs to the shared canonical class seed vocabulary', () => {
+    const canonicalSlugs = new Set<string>(
+      Object.values(ORGANIZATION_PRESET_MEMBER_CLASS_AFFINITIES).flatMap((slugs) => [...slugs]),
+    )
+
+    for (const id of NPC_AUTHORING_TEMPLATE_IDS) {
+      for (const slug of getNpcAuthoringTemplateClassAffinityIds(id)) {
+        expect(canonicalSlugs.has(slug), `${id} → ${slug}`).toBe(true)
+      }
+    }
   })
 })

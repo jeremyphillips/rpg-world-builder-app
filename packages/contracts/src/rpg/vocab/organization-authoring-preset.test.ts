@@ -107,6 +107,29 @@ describe('organization authoring presets', () => {
     })
   })
 
+  it('maps specialized organization leaders to role-fitting templates rather than civic_leader', () => {
+    const thievesGuildmaster = ORGANIZATION_AUTHORING_PRESETS.thieves_guild.members.titles.find(
+      (ref) => ref.titleId === 'guildmaster',
+    )
+    expect(thievesGuildmaster?.npcRecommendation).toEqual({
+      templateId: 'covert_operator',
+      level: 9,
+    })
+
+    const gangBoss = ORGANIZATION_AUTHORING_PRESETS.gang.members.titles.find(
+      (ref) => ref.titleId === 'boss',
+    )
+    expect(gangBoss?.npcRecommendation?.templateId).toBe('covert_operator')
+
+    const mageRector = ORGANIZATION_AUTHORING_PRESETS.mage_college.members.titles.find(
+      (ref) => ref.titleId === 'rector',
+    )
+    expect(mageRector?.npcRecommendation).toEqual({
+      templateId: 'arcane_practitioner',
+      level: 10,
+    })
+  })
+
   it('assigns different preset priorities to the same vocabulary title id', () => {
     const armyCaptain = ORGANIZATION_AUTHORING_PRESETS.army.members.titles.find(
       (ref) => ref.titleId === 'captain',

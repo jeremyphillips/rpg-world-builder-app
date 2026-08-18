@@ -155,7 +155,7 @@ const EXPLICIT = {
   'knightly_order:squire': { templateId: 'guard', level: 2 },
   'knightly_order:initiate': { templateId: 'guard', level: 1 },
 
-  'adventurers_guild:guildmaster': { templateId: 'civic_leader', level: 8 },
+  'adventurers_guild:guildmaster': { templateId: 'martial_commander', level: 8 },
   'adventurers_guild:captain': { templateId: 'martial_officer', level: 6 },
   'adventurers_guild:quartermaster': { templateId: 'administrator', level: 3 },
   'adventurers_guild:veteran': { templateId: 'martial_specialist', level: 5 },
@@ -164,7 +164,7 @@ const EXPLICIT = {
   'adventurers_guild:member': { templateId: 'martial_specialist', level: 2 },
   'adventurers_guild:recruit': { templateId: 'guard', level: 1 },
 
-  'thieves_guild:guildmaster': { templateId: 'civic_leader', level: 9 },
+  'thieves_guild:guildmaster': { templateId: 'covert_operator', level: 9 },
   'thieves_guild:lieutenant': { templateId: 'covert_operator', level: 6 },
   'thieves_guild:cutpurse': { templateId: 'covert_operator', level: 2 },
   'thieves_guild:member': { templateId: 'covert_operator', level: 2 },
@@ -186,7 +186,7 @@ const EXPLICIT = {
   'spy_ring:courier': { templateId: 'covert_operator', level: 2 },
   'spy_ring:informant': { templateId: 'civilian', level: 0 },
 
-  'intelligence_bureau:director': { templateId: 'civic_leader', level: 10 },
+  'intelligence_bureau:director': { templateId: 'covert_operator', level: 10 },
   'intelligence_bureau:deputy_director': { templateId: 'administrator', level: 8 },
   'intelligence_bureau:spymaster': { templateId: 'covert_operator', level: 9 },
   'intelligence_bureau:handler': { templateId: 'covert_operator', level: 6 },
@@ -195,7 +195,7 @@ const EXPLICIT = {
   'intelligence_bureau:operative': { templateId: 'covert_operator', level: 4 },
   'intelligence_bureau:informant': { templateId: 'civilian', level: 0 },
 
-  'mage_college:rector': { templateId: 'civic_leader', level: 10 },
+  'mage_college:rector': { templateId: 'arcane_practitioner', level: 10 },
   'mage_college:master': { templateId: 'arcane_practitioner', level: 9 },
   'mage_college:professor': { templateId: 'arcane_practitioner', level: 6 },
   'mage_college:mage': { templateId: 'arcane_practitioner', level: 4 },
@@ -213,7 +213,7 @@ const EXPLICIT = {
 
   'church:high_priest': { templateId: 'divine_practitioner', level: 10 },
   'church:priest': { templateId: 'divine_practitioner', level: 5 },
-  'church:elder': { templateId: 'civic_leader', level: 6 },
+  'church:elder': { templateId: 'divine_practitioner', level: 6 },
   'church:minister': { templateId: 'divine_practitioner', level: 4 },
   'church:deacon': { templateId: 'administrator', level: 2 },
   'church:cleric': { templateId: 'divine_practitioner', level: 3 },
@@ -246,7 +246,7 @@ const EXPLICIT = {
   'pirate_crew:sailor': { templateId: 'maritime_crew', level: 2 },
   'pirate_crew:cabin_hand': { templateId: 'maritime_crew', level: 1 },
 
-  'private_security_company:director': { templateId: 'civic_leader', level: 8 },
+  'private_security_company:director': { templateId: 'administrator', level: 8 },
   'private_security_company:security_chief': { templateId: 'martial_commander', level: 8 },
   'private_security_company:captain': { templateId: 'martial_officer', level: 6 },
   'private_security_company:supervisor': { templateId: 'martial_officer', level: 4 },
@@ -254,6 +254,8 @@ const EXPLICIT = {
   'private_security_company:guard': { templateId: 'guard', level: 3 },
   'private_security_company:investigator': { templateId: 'investigator', level: 4 },
   'private_security_company:recruit': { templateId: 'guard', level: 1 },
+  'bounty_hunters:guildmaster': { templateId: 'martial_officer', level: 8 },
+  'hospital_order:grand_master': { templateId: 'divine_practitioner', level: 10 },
 }
 
 /** @type {Record<string, { templateId: string, level: number }>} */
@@ -542,8 +544,29 @@ function resolveRecommendation(presetId, titleId) {
             : { templateId: 'artisan', level: 1 }
   } else if (titleId === 'grand_master' && kind === 'religious') {
     rec = { templateId: 'divine_practitioner', level: 12 }
+  } else if (titleId === 'grand_master' && kind === 'medical') {
+    rec = { templateId: 'divine_practitioner', level: 10 }
+  } else if (titleId === 'grand_master' && kind === 'military') {
+    rec = { templateId: 'martial_commander', level: 12 }
+  } else if (titleId === 'guildmaster') {
+    rec =
+      kind === 'criminal'
+        ? { templateId: 'covert_operator', level: 9 }
+        : kind === 'adventuring'
+          ? { templateId: 'martial_commander', level: 8 }
+          : kind === 'law'
+            ? { templateId: 'martial_officer', level: 8 }
+            : rec
   } else if (titleId === 'boss' && kind === 'criminal') {
-    rec = { templateId: 'civic_leader', level: 8 }
+    rec = { templateId: 'covert_operator', level: 8 }
+  } else if (titleId === 'ringleader' && kind === 'criminal') {
+    rec = { templateId: 'covert_operator', level: 8 }
+  } else if (titleId === 'elder' && kind === 'religious') {
+    rec = { templateId: 'divine_practitioner', level: 5 }
+  } else if (titleId === 'rector' && kind === 'arcane') {
+    rec = { templateId: 'arcane_practitioner', level: 10 }
+  } else if (titleId === 'director' && kind === 'intelligence') {
+    rec = { templateId: 'covert_operator', level: 10 }
   }
 
   if (!NPC_AUTHORING_TEMPLATE_IDS.includes(rec.templateId)) {
