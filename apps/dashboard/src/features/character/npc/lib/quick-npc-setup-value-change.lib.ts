@@ -24,7 +24,7 @@ function applyLevelClassSideEffects(values: QuickNpcSetupValues): QuickNpcSetupV
 }
 
 export function resolveQuickNpcLevelForMembershipTitle(args: {
-  membershipTitle: string
+  membershipTitle: string | undefined
   titles: readonly OrganizationMembershipTitleDefinition[]
   context: CharacterBuildContext
 }): number {
@@ -34,6 +34,10 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
     characterCreationRules: args.context.characterCreationRules,
   })
   const defaultLevel = resolveQuickNpcDefaultLevel(args.context)
+
+  if (args.membershipTitle === undefined) {
+    return defaultLevel
+  }
 
   if (
     args.membershipTitle.trim() === '' ||

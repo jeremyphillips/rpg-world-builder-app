@@ -118,6 +118,27 @@ describe('applyQuickNpcSetupValueChange', () => {
     })
   })
 
+  it('preserves species when title changes and reseeds level and class', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...baseValues,
+          speciesId: 'srd-cc-5.2.1:elf',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        },
+        setId: 'membershipTitle',
+        nextValue: 'Guildmaster',
+        ...changeArgs,
+      }),
+    ).toEqual({
+      ...baseValues,
+      speciesId: 'srd-cc-5.2.1:elf',
+      membershipTitle: 'Guildmaster',
+      level: 8,
+      classId: rogueClass.id,
+    })
+  })
+
   it('auto-seeds Class when Title resolves to exactly one recommendation', () => {
     expect(
       applyQuickNpcSetupValueChange({

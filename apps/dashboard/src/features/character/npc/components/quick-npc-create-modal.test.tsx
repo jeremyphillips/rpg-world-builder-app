@@ -97,6 +97,11 @@ async function selectOption(
 }
 
 async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
+  const noTitleRadio = screen.queryByRole('radio', { name: /no title/i })
+  if (noTitleRadio) {
+    await user.click(noTitleRadio)
+  }
+
   const dwarfRadio = screen.queryByRole('radio', { name: /dwarf/i })
   if (dwarfRadio) {
     await user.click(dwarfRadio)
@@ -141,8 +146,8 @@ describe('QuickNpcCreateModal', () => {
   it('wraps setup content in a scroll region inside the stable modal body', () => {
     renderModal()
 
-    const speciesPrompt = screen.getByText('What species is this NPC?')
-    const scrollRegion = speciesPrompt.closest('.overflow-y-auto')
+    const titlePrompt = screen.getByText("Choose this member's role in the organization.")
+    const scrollRegion = titlePrompt.closest('.overflow-y-auto')
 
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
@@ -259,6 +264,7 @@ describe('QuickNpcCreateModal', () => {
       },
     })
 
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
     await user.clear(levelInput)
@@ -316,6 +322,7 @@ describe('QuickNpcCreateModal', () => {
       },
     })
 
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
     await user.clear(levelInput)

@@ -41,9 +41,16 @@ export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
 
 export type QuickNpcSetupValues = {
   speciesId: string
-  membershipTitle: string
+  /** Setup-only unset (`undefined`) until the user chooses a title or No title. */
+  membershipTitle: string | undefined
   classId: string
   level: number
+}
+
+export function isQuickNpcMembershipTitleSetupComplete(
+  membershipTitle: string | undefined,
+): boolean {
+  return membershipTitle !== undefined
 }
 
 /** Quick NPC setup defaults to campaign minimum level (often level 0). */
@@ -60,7 +67,7 @@ export function createQuickNpcSetupDefaultValues(
 ): QuickNpcSetupValues {
   return {
     speciesId: '',
-    membershipTitle: '',
+    membershipTitle: undefined,
     classId: '',
     level: resolveQuickNpcDefaultLevel(context),
   }
@@ -68,7 +75,7 @@ export function createQuickNpcSetupDefaultValues(
 
 export const EMPTY_QUICK_NPC_SETUP_VALUES: QuickNpcSetupValues = {
   speciesId: '',
-  membershipTitle: '',
+  membershipTitle: undefined,
   classId: '',
   level: 1,
 }

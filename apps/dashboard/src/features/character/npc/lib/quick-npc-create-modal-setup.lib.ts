@@ -22,7 +22,11 @@ import {
   type CreateSetupSet,
 } from '@/lib/create-setup'
 
-import { buildQuickNpcContentOptions, type QuickNpcSetupValues } from './quick-npc-form-fields'
+import {
+  buildQuickNpcContentOptions,
+  isQuickNpcMembershipTitleSetupComplete,
+  type QuickNpcSetupValues,
+} from './quick-npc-form-fields'
 import { buildQuickNpcClassRadioCardPresentation } from './quick-npc-class-option-groups.lib'
 import {
   resolveQuickNpcClassRecommendationIds,
@@ -55,14 +59,17 @@ export type QuickNpcSetupModel = {
 export { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 
 export function formatQuickNpcLevelRecommendationPrompt(args: {
-  membershipTitle: string
+  membershipTitle: string | undefined
   titles: readonly OrganizationMembershipTitleDefinition[]
 }): string | undefined {
+  if (!isQuickNpcMembershipTitleSetupComplete(args.membershipTitle)) {
+    return undefined
+  }
   const recommendation = resolveQuickNpcSelectedTitleRecommendation(args)
   if (recommendation === undefined) {
     return undefined
   }
-  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle)
+  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle ?? '')
   if (persistedTitle === undefined) {
     return undefined
   }
@@ -88,7 +95,7 @@ export function formatQuickNpcSetupCharacterSummary(
     ),
   ]
 
-  const persistedTitle = titleFromMembershipRadioValue(values.membershipTitle)
+  const persistedTitle = titleFromMembershipRadioValue(values.membershipTitle ?? '')
   if (persistedTitle !== undefined) {
     segments.push(persistedTitle)
     const recommendation = resolveQuickNpcSelectedTitleRecommendation({
@@ -133,6 +140,7 @@ function buildQuickNpcSpeciesSetupSet(
       ? { optionGroups: args.speciesPresentation.optionGroups }
       : {}),
     value: args.values.speciesId,
+    visibleWhenComplete: ['membershipTitle'],
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
     collapseWhenComplete: true,
     onValueChange: (speciesId) => args.onApplySetupChange('speciesId', speciesId),
@@ -150,8 +158,8 @@ function buildQuickNpcMembershipTitleSetupSet(
     fieldLabel: 'Title',
     prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
     options: buildOrganizationMembershipTitleRadioOptions({ titles: args.titles }),
-    value: args.values.membershipTitle,
-    isComplete: isCreateSetupChoiceComplete(args.values.membershipTitle),
+    value: args.values.membershipTitle ?? '',
+    isComplete: isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle),
     collapseWhenComplete: true,
     onValueChange: (membershipTitle) => args.onApplySetupChange('membershipTitle', membershipTitle),
     onReset: () => {},
@@ -169,6 +177,7 @@ function buildQuickNpcRecommendedBuildSetupSet(
     fieldLabel: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
     body: getNpcAuthoringTemplateLabel(recommendation.templateId),
     ...(templateEntry?.description ? { description: templateEntry.description } : {}),
+    visibleWhenComplete: ['speciesId'],
     isComplete: true,
     onReset: () => {},
   }
@@ -189,7 +198,7 @@ function buildQuickNpcLevelSetupSet(
     min: args.levelConstraints.minLevel,
     max: args.levelConstraints.maxLevel,
     digits: 2,
-    dependsOn: ['membershipTitle'],
+    visibleWhenComplete: ['speciesId'],
     isComplete: isCreateSetupNumberComplete(
       args.values.level,
       args.levelConstraints.minLevel,
@@ -219,6 +228,7 @@ function buildQuickNpcClassSetupSet(
       ? { optionGroups: args.classPresentation.optionGroups }
       : {}),
     value: args.values.classId,
+    visibleWhenComplete: ['speciesId'],
     dependsOn: ['speciesId'],
     isComplete: isCreateSetupChoiceComplete(args.values.classId),
     collapseWhenComplete: true,
@@ -283,8 +293,8 @@ export function buildQuickNpcCreateSetupSets(args: {
   }
 
   const sets: CreateSetupSet[] = [
-    buildQuickNpcSpeciesSetupSet(setBuilderArgs),
     buildQuickNpcMembershipTitleSetupSet(setBuilderArgs),
+    buildQuickNpcSpeciesSetupSet(setBuilderArgs),
   ]
 
   if (titleRecommendation !== undefined) {
@@ -324,6 +334,7 @@ export function resolveQuickNpcSetupModel(args: {
   })
   const canContinue =
     resolveCreateSetupCanContinue({ sets }) &&
+    isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle) &&
     isCreateSetupNumberComplete(level, levelConstraints.minLevel, levelConstraints.maxLevel) &&
     Boolean(speciesId) &&
     (!classRequired || Boolean(classId))

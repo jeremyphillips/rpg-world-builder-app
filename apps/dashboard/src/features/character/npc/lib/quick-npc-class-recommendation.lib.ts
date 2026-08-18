@@ -13,9 +13,12 @@ import { titleFromMembershipRadioValue } from '../../components/connections/orga
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 
 export function resolveQuickNpcSelectedTitleRecommendation(args: {
-  membershipTitle: string
+  membershipTitle: string | undefined
   titles: readonly OrganizationMembershipTitleDefinition[]
 }) {
+  if (args.membershipTitle === undefined) {
+    return undefined
+  }
   const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle)
   if (persistedTitle === undefined) {
     return undefined

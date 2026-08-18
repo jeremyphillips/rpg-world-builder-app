@@ -23,7 +23,11 @@ import {
   resolveQuickNpcDefaultLevel,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
-import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
+import {
+  createQuickNpcSetupDefaultValues,
+  isQuickNpcMembershipTitleSetupComplete,
+} from './quick-npc-form-fields'
+import { resolveCreateSetupActiveSetId, resolveCreateSetupVisibleSetIds } from '@/lib/create-setup'
 
 const guildmasterTitle = {
   id: 'omt_guildmaster',
@@ -60,15 +64,58 @@ describe('buildQuickNpcCreateSetupSets', () => {
     },
   })
 
-  it('orders species, title, and level, omitting class at level 0', () => {
+  it('orders title first and omits downstream sets until title and species are chosen', () => {
+    const values = createQuickNpcSetupDefaultValues(context)
     const sets = buildQuickNpcCreateSetupSets({
       context,
-      values: createQuickNpcSetupDefaultValues(context),
+      values,
       onApplySetupChange: () => {},
       titles: [],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'membershipTitle', 'level'])
+    expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId', 'level'])
+    expect(isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)).toBe(false)
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    const activeSetId = resolveCreateSetupActiveSetId({ sets: sequenceItems })
+    expect(activeSetId).toBe('membershipTitle')
+    expect(resolveCreateSetupVisibleSetIds({ sets: sequenceItems, activeSetId })).toEqual([
+      'membershipTitle',
+    ])
+  })
+
+  it('treats explicit No title as complete and reveals species without downstream build sets', () => {
+    const values = {
+      ...createQuickNpcSetupDefaultValues(context),
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+    }
+    const sets = buildQuickNpcCreateSetupSets({
+      context,
+      values,
+      onApplySetupChange: () => {},
+      titles: [],
+    })
+
+    expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId', 'level'])
+    expect(sets.find((set) => set.id === 'membershipTitle')?.isComplete).toBe(true)
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    const activeSetId = resolveCreateSetupActiveSetId({ sets: sequenceItems })
+    expect(activeSetId).toBe('speciesId')
+    expect(resolveCreateSetupVisibleSetIds({ sets: sequenceItems, activeSetId })).toEqual([
+      'membershipTitle',
+      'speciesId',
+    ])
   })
 
   it('includes recommended build, level prompt, and class when a title recommendation applies', () => {
@@ -85,8 +132,8 @@ describe('buildQuickNpcCreateSetupSets', () => {
     })
 
     expect(sets.map((set) => set.id)).toEqual([
-      'speciesId',
       'membershipTitle',
+      'speciesId',
       'recommendedBuild',
       'level',
       'classId',
@@ -99,19 +146,27 @@ describe('buildQuickNpcCreateSetupSets', () => {
       body: getNpcAuthoringTemplateLabel('covert_operator'),
       isComplete: true,
       required: false,
+      visibleWhenComplete: ['speciesId'],
     })
 
     const titleSet = sets.find((set) => set.id === 'membershipTitle')
     expect(titleSet).toMatchObject({
       required: false,
       prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
+      isComplete: true,
+    })
+
+    const speciesSet = sets.find((set) => set.id === 'speciesId')
+    expect(speciesSet).toMatchObject({
+      visibleWhenComplete: ['membershipTitle'],
     })
 
     const levelSet = sets.find((set) => set.id === 'level')
     expect(levelSet).toMatchObject({
       prompt: 'Recommended for Guildmaster: Level 5.',
-      dependsOn: ['membershipTitle'],
+      visibleWhenComplete: ['speciesId'],
     })
+    expect(levelSet?.dependsOn).toBeUndefined()
   })
 
   it('includes class when level progression applies without a title recommendation', () => {
@@ -127,7 +182,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
       titles: [],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'membershipTitle', 'level', 'classId'])
+    expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId', 'level', 'classId'])
     expect(sets[0]?.kind).toBe('choice')
     expect(sets[2]?.kind).toBe('number')
     expect(sets[3]?.kind).toBe('choice')
@@ -253,6 +308,15 @@ describe('buildQuickNpcCreateSetupSets', () => {
 })
 
 describe('formatQuickNpcLevelRecommendationPrompt', () => {
+  it('returns undefined when title setup is untouched', () => {
+    expect(
+      formatQuickNpcLevelRecommendationPrompt({
+        membershipTitle: undefined,
+        titles: [guildmasterTitle],
+      }),
+    ).toBeUndefined()
+  })
+
   it('returns undefined when the title has no recommendation', () => {
     expect(
       formatQuickNpcLevelRecommendationPrompt({
@@ -289,6 +353,18 @@ describe('resolveQuickNpcSetupModel', () => {
 
   it('defaults to campaign minimum level', () => {
     expect(resolveQuickNpcDefaultLevel(context)).toBe(0)
+  })
+
+  it('requires an explicit title choice before Continue', () => {
+    expect(
+      resolveQuickNpcSetupModel({
+        context,
+        values: {
+          ...createQuickNpcSetupDefaultValues(context),
+          speciesId: 'srd-cc-5.2.1:dwarf',
+        },
+      }).canContinue,
+    ).toBe(false)
   })
 
   it('requires species and a valid level to continue at level 0', () => {

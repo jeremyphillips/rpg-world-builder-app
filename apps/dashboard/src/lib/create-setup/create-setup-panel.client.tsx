@@ -9,6 +9,7 @@ import {
   Modal,
   dialogPanelActionRowClasses,
   Text,
+  Eyebrow,
 } from '@rpg/ui'
 
 import { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
@@ -55,6 +56,7 @@ export function CreateSetupPanel({
         isComplete: set.isComplete,
         required: set.required,
         dependsOn: set.dependsOn,
+        visibleWhenComplete: set.visibleWhenComplete,
         collapseWhenComplete: set.collapseWhenComplete,
         collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),
@@ -100,7 +102,7 @@ export function CreateSetupPanel({
         if (set.kind === 'note') {
           return (
             <div key={set.id} data-field-align className="flex flex-col gap-y-2">
-              <FieldLabelContent label={set.fieldLabel} />
+              <Eyebrow size="sm">{set.fieldLabel}</Eyebrow>
               <Text variant="small">{set.body}</Text>
               {set.description ? (
                 <Text variant="muted" className="text-sm">
@@ -220,6 +222,7 @@ export function CreateSetupShell({
         isComplete: set.isComplete,
         required: set.required,
         dependsOn: set.dependsOn,
+        visibleWhenComplete: set.visibleWhenComplete,
         collapseWhenComplete: set.collapseWhenComplete,
         collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),

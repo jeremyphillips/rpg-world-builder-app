@@ -17,6 +17,7 @@ function sequence(
     isComplete: boolean
     required?: boolean
     collapseWhenComplete?: boolean
+    visibleWhenComplete?: readonly string[]
   }>,
 ): CreateSetupSequenceItem[] {
   return items
@@ -114,6 +115,32 @@ describe('create-setup-sequence', () => {
           ]),
         }),
       ).toBe('class')
+    })
+
+    it('activates an incomplete optional set when downstream setup is gated on it', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: false, required: false },
+            {
+              id: 'speciesId',
+              isComplete: false,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+          ]),
+        }),
+      ).toBe('membershipTitle')
+    })
+
+    it('keeps the terminal set active when optional predecessors remain incomplete', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'form', isComplete: false, required: false },
+            { id: 'operator', isComplete: true },
+          ]),
+        }),
+      ).toBe('operator')
     })
   })
 
@@ -261,6 +288,54 @@ describe('create-setup-sequence', () => {
           activeSetId: 'a',
         }),
       ).toEqual(['a'])
+    })
+
+    it('hides sets until visibleWhenComplete upstream sets are complete', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: false, required: false },
+            {
+              id: 'speciesId',
+              isComplete: false,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+            {
+              id: 'level',
+              isComplete: true,
+              visibleWhenComplete: ['speciesId'],
+            },
+          ]),
+          activeSetId: 'membershipTitle',
+        }),
+      ).toEqual(['membershipTitle'])
+    })
+
+    it('reveals downstream sets after the species visibility gate opens', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: true, required: false },
+            {
+              id: 'speciesId',
+              isComplete: true,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+            {
+              id: 'level',
+              isComplete: true,
+              collapseWhenComplete: false,
+              visibleWhenComplete: ['speciesId'],
+            },
+            {
+              id: 'classId',
+              isComplete: false,
+              visibleWhenComplete: ['speciesId'],
+            },
+          ]),
+          activeSetId: 'classId',
+        }),
+      ).toEqual(['membershipTitle', 'speciesId', 'level', 'classId'])
     })
   })
 

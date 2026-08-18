@@ -6,6 +6,8 @@ export type CreateSetupSequenceItem = {
   required?: boolean
   /** Upstream set ids — when any change, dependents are reset via `onReset`. */
   dependsOn?: readonly string[]
+  /** Upstream set ids that must be complete before this set is visible — no reset. */
+  visibleWhenComplete?: readonly string[]
   /**
    * Presentation: when false, completed visible sets stay expanded.
    * Does not affect `isComplete`. @default true
@@ -25,6 +27,7 @@ export type CreateSetupSetBase = {
   prompt?: string
   required?: boolean
   dependsOn?: readonly string[]
+  visibleWhenComplete?: readonly string[]
   collapseWhenComplete?: boolean
   collapseWhenActiveAndComplete?: boolean
   isComplete: boolean

@@ -258,7 +258,7 @@ export function QuickNpcAuthoringForm({
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
         titles: organization.members?.titles ?? [],
-        selectedTitle: titleFromMembershipRadioValue(setup.membershipTitle),
+        selectedTitle: titleFromMembershipRadioValue(setup.membershipTitle ?? ''),
       })
 
       const constraints = buildQuickNpcConstraints(values)
