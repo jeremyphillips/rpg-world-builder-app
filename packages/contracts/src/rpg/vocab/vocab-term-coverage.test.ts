@@ -68,6 +68,7 @@ import { ORGANIZATION_FUNCTION_TERM } from './organization-function'
 import { ORGANIZATION_PRACTICE_TERM } from './organization-practice'
 import { ORGANIZATION_DOMAIN_TERM } from './organization-domain'
 import { ORGANIZATION_FORM_TERM } from './organization-form'
+import { NPC_AUTHORING_TEMPLATE_TERM } from './npc-authoring-template'
 
 /** Closed `rpg/vocab` modules — each `*_ENTRIES` map has a sibling `*_TERM`. */
 const RPG_VOCAB_CLOSED_TERMS = [
@@ -119,6 +120,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   ORGANIZATION_FORM_TERM,
   ORGANIZATION_FUNCTION_TERM,
   ORGANIZATION_PRACTICE_TERM,
+  NPC_AUTHORING_TEMPLATE_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 /** Open `rpg/vocab` sets — `*_SET_ID` modules with a sibling `*_TERM`. */
@@ -164,7 +166,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(48)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(49)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }
