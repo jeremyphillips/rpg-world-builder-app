@@ -2,6 +2,37 @@ import * as React from 'react'
 
 export type QuickNpcBuildExpandedAttribute = 'class' | 'level' | null
 
+type QuickNpcBuildCardExpansionSync = {
+  classProgressionApplicable: boolean
+  classId: string
+}
+
+function resolveQuickNpcBuildCardExpandedSync(
+  expanded: QuickNpcBuildExpandedAttribute,
+  previous: QuickNpcBuildCardExpansionSync,
+  current: QuickNpcBuildCardExpansionSync,
+): QuickNpcBuildExpandedAttribute {
+  const { classProgressionApplicable, classId } = current
+  const { classProgressionApplicable: wasApplicable, classId: wasClassId } = previous
+
+  if (!classProgressionApplicable) {
+    return expanded === 'class' ? null : expanded
+  }
+
+  if (classId !== '') {
+    return expanded
+  }
+
+  const becameApplicable = wasApplicable === false
+  const classIdBecameEmpty = wasClassId !== ''
+
+  if (becameApplicable || classIdBecameEmpty) {
+    return 'class'
+  }
+
+  return expanded
+}
+
 export function useQuickNpcBuildCardExpandedAttribute(args: {
   classProgressionApplicable: boolean
   classId: string
@@ -13,28 +44,26 @@ export function useQuickNpcBuildCardExpandedAttribute(args: {
   const [expanded, setExpanded] = React.useState<QuickNpcBuildExpandedAttribute>(() =>
     classProgressionApplicable && classId === '' ? 'class' : null,
   )
-  const previousClassIdRef = React.useRef<string | undefined>(undefined)
-  const previousApplicableRef = React.useRef<boolean | undefined>(undefined)
+  const [syncState, setSyncState] = React.useState<QuickNpcBuildCardExpansionSync>(() => ({
+    classProgressionApplicable,
+    classId,
+  }))
 
-  React.useEffect(() => {
-    const wasApplicable = previousApplicableRef.current
-    const wasClassId = previousClassIdRef.current
+  if (
+    classProgressionApplicable !== syncState.classProgressionApplicable ||
+    classId !== syncState.classId
+  ) {
+    const nextExpanded = resolveQuickNpcBuildCardExpandedSync(expanded, syncState, {
+      classProgressionApplicable,
+      classId,
+    })
+    const nextSync = { classProgressionApplicable, classId }
 
-    if (!classProgressionApplicable) {
-      setExpanded((current) => (current === 'class' ? null : current))
-    } else if (classId === '') {
-      const becameApplicable = wasApplicable === false
-      const classIdBecameEmpty = wasClassId !== undefined && wasClassId !== ''
-      const isInitialApplicableEmpty = wasApplicable === undefined && wasClassId === undefined
-
-      if (becameApplicable || classIdBecameEmpty || isInitialApplicableEmpty) {
-        setExpanded('class')
-      }
+    setSyncState(nextSync)
+    if (nextExpanded !== expanded) {
+      setExpanded(nextExpanded)
     }
-
-    previousClassIdRef.current = classId
-    previousApplicableRef.current = classProgressionApplicable
-  }, [classId, classProgressionApplicable])
+  }
 
   return [expanded, setExpanded]
 }

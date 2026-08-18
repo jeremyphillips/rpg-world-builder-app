@@ -14,6 +14,7 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
+import { formatQuickNpcSetupCharacterSummary } from '../lib/quick-npc-create-modal-setup.lib'
 import { createNpc } from '../api/npc-client'
 import type * as NpcClient from '../api/npc-client'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
@@ -41,7 +42,12 @@ beforeAll(() => {
 const CAMPAIGN_ID = 'campaign-test-1'
 
 const membershipTitles = [
-  { id: 'omt_guildmaster', label: 'Guildmaster', priority: 50 as const },
+  {
+    id: 'omt_guildmaster',
+    label: 'Guildmaster',
+    priority: 50 as const,
+    npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+  },
 ] as const
 
 const organization = {
@@ -181,6 +187,25 @@ describe('QuickNpcAuthoringForm', () => {
     await user.click(screen.getByRole('button', { name: 'Change' }))
     expect(props.onChangeSetup).toHaveBeenCalledTimes(1)
     expect(createNpcMock).not.toHaveBeenCalled()
+  })
+
+  it('shows membership title and recommended build in the setup summary', () => {
+    const guildmasterSetup = {
+      ...setup,
+      membershipTitle: 'Guildmaster',
+      level: 5,
+    }
+    renderForm({
+      setup: guildmasterSetup,
+      setupSummaryLine: formatQuickNpcSetupCharacterSummary(
+        guildmasterSetup,
+        buildContextFixture(),
+        membershipTitles,
+      ),
+    })
+
+    expect(screen.getByText(/Guildmaster/)).toBeInTheDocument()
+    expect(screen.getByText(/Covert operator/)).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {

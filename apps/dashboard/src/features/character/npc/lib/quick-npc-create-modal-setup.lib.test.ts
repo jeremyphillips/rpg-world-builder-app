@@ -7,6 +7,7 @@ import {
 } from '../../lib/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
+  formatQuickNpcSetupCharacterSummary,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
 import {
@@ -189,6 +190,44 @@ describe('resolveQuickNpcBuildCardModel', () => {
         playableClasses: multiClassContext.catalog.classes,
       }).optionGroups,
     )
+  })
+})
+
+describe('formatQuickNpcSetupCharacterSummary', () => {
+  const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+
+  it('appends membership title and recommended build label after the character summary', () => {
+    const summary = formatQuickNpcSetupCharacterSummary(
+      {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: 'Guildmaster',
+        classId: populatedBuilderCatalog.classes[0]!.id,
+        level: 5,
+      },
+      context,
+      [guildmasterTitle],
+    )
+
+    expect(summary).toContain('Dwarf')
+    expect(summary).toContain('Guildmaster')
+    expect(summary).toContain('Covert operator')
+  })
+
+  it('omits title segments when No title was chosen', () => {
+    const summary = formatQuickNpcSetupCharacterSummary(
+      {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        classId: populatedBuilderCatalog.classes[0]!.id,
+        level: 1,
+      },
+      context,
+      [guildmasterTitle],
+    )
+
+    expect(summary).toContain('Dwarf')
+    expect(summary).not.toContain('Guildmaster')
+    expect(summary).not.toContain('Covert operator')
   })
 })
 

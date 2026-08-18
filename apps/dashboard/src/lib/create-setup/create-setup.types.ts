@@ -51,10 +51,4 @@ export type CreateSetupNumberSet = CreateSetupSetBase & {
   digits?: NumberStepperDigits
 }
 
-export type CreateSetupNoteSet = CreateSetupSetBase & {
-  kind: 'note'
-  body: string
-  description?: string
-}
-
-export type CreateSetupSet = CreateSetupChoiceSet | CreateSetupNumberSet | CreateSetupNoteSet
+export type CreateSetupSet = CreateSetupChoiceSet | CreateSetupNumberSet

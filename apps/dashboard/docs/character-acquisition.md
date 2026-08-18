@@ -64,29 +64,32 @@ README). Default `/characters/*` never carries campaign id in the URL.
 Campaign managers create an NPC and stamp organization membership in one flow from the
 organization detail **Members** section — no full builder route.
 
-| Layer                                               | Responsibility                                                                                                                                   |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions                                |
-| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)                                             |
-| `QuickNpcCreateModal` (character feature)           | Setup (title → species → recommended build → level → class) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create |
+| Layer                                               | Responsibility                                                                                                            |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions         |
+| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)                      |
+| `QuickNpcCreateModal` (character feature)           | Setup (title → species → build card) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create |
 
 **Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays
 open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.
 
-**Setup phase** (`CreateSetupPanel` via `buildQuickNpcCreateSetupSets`):
+**Setup phase** (`CreateSetupPanel` for Title and Species; `QuickNpcBuildCard` for Class and Level):
 
 - **Title-first progressive reveal** — only the membership title choice is visible until the user
   selects a title or explicit **No title** (`membershipTitle: undefined` is setup-only unset and
   incomplete; deliberate no-title uses the UI sentinel `ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`
   / `__no_title__`, which is not persisted on the created NPC).
-- **Recommended build** — when the selected title carries a snapshotted `npcRecommendation`, a
-  display-only note shows the `NPC_AUTHORING_TEMPLATE_*` label and description after Species is
-  complete. Build is derived from the title snapshot, not a form value.
+- **Build card** — after Title and Species are complete, one sibling card owns Class and Level.
+  When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
+  build** identity (template label + description) plus in-row Class and Level editors. Without a
+  title recommendation (including **No title**), the card shows **Build** with Class and Level only
+  — default campaign level is not labeled as a recommendation.
 - **Level** — reseeded from the title recommendation (clamped to campaign constraints) on Title
-  change; user-owned across Species changes.
-- **Class** — ranked from merged template + organization class affinities; when exactly one eligible
-  recommendation exists after Species is complete, `classId` is auto-seeded and collapses like a
-  manual selection. Level 0 clears class and omits the Class set.
+  change; user-owned across Species changes. Level 0 clears class and omits the Class row.
+- **Class** — ranked from merged template + organization class affinities inside the build card;
+  when exactly one eligible recommendation exists after Species is complete, `classId` is
+  auto-seeded and collapses like a manual selection. Cardinality and eligibility logic live in
+  `applyQuickNpcSetupValueChange`, not in the card.
 
 Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
 create convention). Title change preserves Species but reseeds Build, Level, and Class.

@@ -183,27 +183,4 @@ describe('CreateSetupPanel', () => {
     expect(setsAfterSpeciesChange.find((set) => set.id === 'level')?.isComplete).toBe(true)
     expect(screen.queryByRole('heading', { name: 'Fighter' })).not.toBeInTheDocument()
   })
-
-  it('renders read-only note sets between choice and number controls', () => {
-    const sets: CreateSetupSet[] = [
-      {
-        id: 'recommendedBuild',
-        kind: 'note',
-        fieldLabel: 'Recommended build',
-        body: 'Civic leader',
-        description: 'Civilian leader whose authority is primarily social.',
-        isComplete: true,
-        required: false,
-        onReset: () => {},
-      },
-    ]
-
-    render(<CreateSetupPanel sets={sets} />)
-
-    expect(screen.getByText('Recommended build')).toBeInTheDocument()
-    expect(screen.getByText('Civic leader')).toBeInTheDocument()
-    expect(
-      screen.getByText('Civilian leader whose authority is primarily social.'),
-    ).toBeInTheDocument()
-  })
 })
