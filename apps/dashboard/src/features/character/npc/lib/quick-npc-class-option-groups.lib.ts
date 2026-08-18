@@ -5,11 +5,46 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import { buildQuickNpcAffinityRadioCardPresentation } from './quick-npc-affinity-option-groups.lib'
+import {
+  buildQuickNpcAffinityRadioCardPresentation,
+  resolveQuickNpcAffinityOptionGroups,
+  type QuickNpcAffinityOption,
+  type QuickNpcAffinityOptionGroup,
+} from './quick-npc-affinity-option-groups.lib'
 
 export const QUICK_NPC_CLASS_RECOMMENDED_EYEBROW = 'Recommended' as const
 export const QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW = QUICK_NPC_CLASS_RECOMMENDED_EYEBROW
 export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = `All other ${getContentTypeSentenceForm('classes', 2)}`
+
+export type QuickNpcClassOption = QuickNpcAffinityOption
+export type QuickNpcClassOptionGroup = QuickNpcAffinityOptionGroup
+
+export function resolveQuickNpcClassOptionGroups(input: {
+  classOptions: readonly FieldOption[]
+  recommendedClassIds?: readonly string[]
+  classAffinityIds?: readonly string[]
+  templateClassAffinitySlugs?: readonly string[]
+  playableClasses: readonly CharacterClass[]
+}): {
+  options: QuickNpcClassOption[]
+  optionGroups?: QuickNpcClassOptionGroup[]
+} {
+  const recommendedIds =
+    input.recommendedClassIds ??
+    resolveOrganizationNpcClassRecommendationIds({
+      templateClassAffinitySlugs: input.templateClassAffinitySlugs,
+      organizationClassAffinityIds: input.classAffinityIds,
+      playableClasses: input.playableClasses,
+    })
+
+  return resolveQuickNpcAffinityOptionGroups({
+    options: input.classOptions,
+    recommendedIds,
+    recommendedGroupEyebrow: QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+    allOtherGroupEyebrow: QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+    allOtherGroupId: 'all-classes',
+  })
+}
 
 export function buildQuickNpcClassRadioCardPresentation(input: {
   classOptions: readonly FieldOption[]

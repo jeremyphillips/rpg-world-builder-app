@@ -7,7 +7,6 @@ import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import { CreateModalShell } from '@/lib/create-flow'
-import { CreateSetupPanel } from '@/lib/create-setup'
 
 import {
   createQuickNpcSetupDefaultValues,
@@ -16,16 +15,15 @@ import {
 } from '../lib/quick-npc-form-fields'
 import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
 import {
-  buildQuickNpcCreateSetupSets,
   QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
   QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
-  QUICK_NPC_SETUP_CHANGE_LABEL,
   resolveQuickNpcSetupModel,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
   QuickNpcAuthoringForm,
   type QuickNpcCreateFormOrganization,
 } from './quick-npc-authoring-form.client'
+import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase.client'
 
 export type { QuickNpcCreateFormOrganization }
 
@@ -158,28 +156,6 @@ function QuickNpcCreateModalSession({
     [onCreated, trustedClose],
   )
 
-  const setupSets = React.useMemo(
-    () =>
-      buildQuickNpcCreateSetupSets({
-        context: buildContext,
-        values: state.setupValues,
-        onApplySetupChange: handleApplySetupChange,
-        titles: organization.members?.titles ?? [],
-        members: {
-          classAffinityIds: organization.members?.classAffinityIds,
-          speciesAffinityIds: organization.members?.speciesAffinityIds,
-        },
-      }),
-    [
-      buildContext,
-      handleApplySetupChange,
-      organization.members?.classAffinityIds,
-      organization.members?.speciesAffinityIds,
-      organization.members?.titles,
-      state.setupValues,
-    ],
-  )
-
   return (
     <FormShellFooterScope>
       <CreateModalShell
@@ -217,7 +193,12 @@ function QuickNpcCreateModalSession({
         }
       >
         {state.phase === 'setup' ? (
-          <CreateSetupPanel sets={setupSets} changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL} />
+          <QuickNpcCreateSetupPhase
+            buildContext={buildContext}
+            organization={organization}
+            setupValues={state.setupValues}
+            onApplySetupChange={handleApplySetupChange}
+          />
         ) : (
           <QuickNpcAuthoringForm
             key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}

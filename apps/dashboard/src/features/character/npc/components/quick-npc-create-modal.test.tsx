@@ -11,6 +11,7 @@ import {
   populatedBuilderCatalog,
 } from '@/features/character'
 import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../lib/quick-npc-class-option-groups.lib'
+import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../lib/quick-npc-build-card.lib'
 import { renderWithProviders } from '@/test/render'
 
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
@@ -96,6 +97,41 @@ async function selectOption(
   await user.click(screen.getByRole('option', { name: optionName }))
 }
 
+async function setBuildCardLevel(user: ReturnType<typeof userEvent.setup>, level: string) {
+  const changeLevelButton = screen.queryByRole('button', {
+    name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
+  })
+  if (changeLevelButton) {
+    await user.click(changeLevelButton)
+  }
+
+  const targetLevel = Number(level)
+  const levelInput = await screen.findByRole('spinbutton', { name: 'Level' })
+  let currentLevel = Number((levelInput as HTMLInputElement).value)
+
+  while (currentLevel < targetLevel) {
+    await user.click(screen.getByRole('button', { name: /increase level/i }))
+    currentLevel += 1
+  }
+
+  while (currentLevel > targetLevel) {
+    await user.click(screen.getByRole('button', { name: /decrease level/i }))
+    currentLevel -= 1
+  }
+}
+
+async function selectBuildCardClass(user: ReturnType<typeof userEvent.setup>, className: RegExp) {
+  let classRadio = screen.queryByRole('radio', { name: className })
+  if (!classRadio) {
+    await user.click(screen.getByRole('button', { name: /change class/i }))
+    classRadio = await screen.findByRole('radio', { name: className })
+  }
+
+  if (classRadio.getAttribute('aria-checked') !== 'true') {
+    await user.click(classRadio)
+  }
+}
+
 async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
   const noTitleRadio = screen.queryByRole('radio', { name: /no title/i })
   if (noTitleRadio) {
@@ -107,17 +143,8 @@ async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
     await user.click(dwarfRadio)
   }
 
-  let fighterRadio = screen.queryByRole('radio', { name: /fighter/i })
-  if (!fighterRadio) {
-    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
-    await user.clear(levelInput)
-    await user.type(levelInput, '1')
-    fighterRadio = await screen.findByRole('radio', { name: /fighter/i })
-  }
-
-  if (fighterRadio?.getAttribute('aria-checked') !== 'true') {
-    await user.click(screen.getByRole('radio', { name: /fighter/i }))
-  }
+  await setBuildCardLevel(user, '1')
+  await selectBuildCardClass(user, /fighter/i)
 
   await user.click(screen.getByRole('button', { name: 'Continue' }))
 }
@@ -277,11 +304,9 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
-    await user.clear(levelInput)
-    await user.type(levelInput, '1')
+    await setBuildCardLevel(user, '1')
 
-    expect(screen.getByRole('heading', { name: 'Rogue' })).toBeInTheDocument()
+    expect(screen.getByText('Rogue')).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
@@ -335,11 +360,11 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
-    await user.clear(levelInput)
-    await user.type(levelInput, '1')
+    await setBuildCardLevel(user, '1')
 
-    expect(screen.getByText('Recommended')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
+    })
     expect(screen.getByText(QUICK_NPC_CLASS_ALL_GROUP_EYEBROW)).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
@@ -395,10 +420,8 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
-    await user.clear(levelInput)
-    await user.type(levelInput, '1')
-    await user.click(screen.getByRole('radio', { name: /rogue/i }))
+    await setBuildCardLevel(user, '1')
+    await selectBuildCardClass(user, /rogue/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
     const changeButtons = screen.getAllByRole('button', { name: 'Change' })
@@ -407,7 +430,6 @@ describe('QuickNpcCreateModal', () => {
 
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /fighter/i })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Rogue' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 })

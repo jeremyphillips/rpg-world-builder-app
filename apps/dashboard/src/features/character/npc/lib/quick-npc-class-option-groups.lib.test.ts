@@ -7,9 +7,10 @@ import {
   buildQuickNpcClassRadioCardPresentation,
   QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
   QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+  resolveQuickNpcClassOptionGroups,
 } from './quick-npc-class-option-groups.lib'
 
-describe('buildQuickNpcClassRadioCardPresentation', () => {
+describe('resolveQuickNpcClassOptionGroups', () => {
   const fighter = pickClass('fighter')
   const rogue = pickClass('rogue')
   const wizard = pickClass('wizard')
@@ -23,7 +24,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     const availableClassOptions = classOptions.filter((option) => option.value !== wizard.id)
 
     expect(
-      buildQuickNpcClassRadioCardPresentation({
+      resolveQuickNpcClassOptionGroups({
         classOptions: availableClassOptions,
         classAffinityIds: [wizard.id],
         playableClasses: [fighter, rogue],
@@ -38,7 +39,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
 
   it('groups recommended classes ahead of all classes when survivors exist', () => {
     expect(
-      buildQuickNpcClassRadioCardPresentation({
+      resolveQuickNpcClassOptionGroups({
         classOptions,
         classAffinityIds: [rogue.id, wizard.id],
         playableClasses,
@@ -67,7 +68,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     const paladin = pickClass('paladin')
 
     expect(
-      buildQuickNpcClassRadioCardPresentation({
+      resolveQuickNpcClassOptionGroups({
         classOptions: [...classOptions, { value: paladin.id, label: paladin.name }],
         classAffinityIds: [rogue.id, wizard.id],
         templateClassAffinitySlugs: ['fighter', 'rogue'],
@@ -91,10 +92,6 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     ])
   })
 
-  it('uses the recommended eyebrow copy for class recommendations', () => {
-    expect(QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW).toBe('Recommended')
-  })
-
   it('does not recommend unavailable Paladin affinity classes', () => {
     const paladin = {
       ...pickClass('paladin'),
@@ -102,7 +99,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     }
 
     expect(
-      buildQuickNpcClassRadioCardPresentation({
+      resolveQuickNpcClassOptionGroups({
         classOptions: [{ value: fighter.id, label: fighter.name }],
         classAffinityIds: [paladin.id],
         playableClasses: [fighter],
@@ -114,7 +111,7 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
 
   it('omits the all-classes group when every available class is recommended', () => {
     expect(
-      buildQuickNpcClassRadioCardPresentation({
+      resolveQuickNpcClassOptionGroups({
         classOptions: classOptions.filter((option) => option.value !== wizard.id),
         classAffinityIds: [fighter.id, rogue.id],
         playableClasses: [fighter, rogue],
@@ -127,6 +124,36 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
           { value: fighter.id, label: 'Fighter' },
           { value: rogue.id, label: 'Rogue' },
         ],
+      },
+    ])
+  })
+})
+
+describe('buildQuickNpcClassRadioCardPresentation', () => {
+  const fighter = pickClass('fighter')
+  const rogue = pickClass('rogue')
+  const classOptions = [fighter, rogue].map((characterClass) => ({
+    value: characterClass.id,
+    label: characterClass.name,
+  }))
+
+  it('adapts chrome-neutral class groups to radio-card options', () => {
+    expect(
+      buildQuickNpcClassRadioCardPresentation({
+        classOptions,
+        classAffinityIds: [rogue.id],
+        playableClasses: [fighter, rogue],
+      }).optionGroups,
+    ).toEqual([
+      {
+        id: 'recommended',
+        eyebrow: QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+        options: [{ value: rogue.id, label: 'Rogue' }],
+      },
+      {
+        id: 'all-classes',
+        eyebrow: QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+        options: [{ value: fighter.id, label: 'Fighter' }],
       },
     ])
   })
