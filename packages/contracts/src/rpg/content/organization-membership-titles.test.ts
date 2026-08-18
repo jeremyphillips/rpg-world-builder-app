@@ -20,6 +20,7 @@ describe('organization membership title snapshot', () => {
       label: 'Treasurer',
       description: expect.any(String),
       priority: 50,
+      npcRecommendation: { templateId: 'administrator', level: 3 },
     })
     expect(snapshot.map((title) => title.id)).toEqual([
       'omt_uuid-1',
@@ -217,9 +218,26 @@ describe('organization membership title npcRecommendation', () => {
     expect(withoutRecommendation[0]?.npcRecommendation).toBeUndefined()
   })
 
-  it('leaves npcRecommendation undefined on snapshots until preset refs define it', () => {
-    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'a')
-    expect(snapshot.every((title) => title.npcRecommendation === undefined)).toBe(true)
+  it('copies npcRecommendation from preset refs into org title snapshots', () => {
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('thieves_guild', () => 'a')
+    const enforcer = snapshot.find((title) => title.sourceTitleId === 'enforcer')
+    expect(enforcer?.npcRecommendation).toEqual({
+      templateId: 'martial_specialist',
+      level: 5,
+    })
+    expect(enforcer?.npcRecommendation?.level).not.toBe(enforcer?.priority)
+  })
+
+  it('allows the same template at different levels across presets', () => {
+    const armySoldier = snapshotOrganizationMembershipTitlesFromPreset('army', () => 'a').find(
+      (title) => title.sourceTitleId === 'soldier',
+    )
+    const militiaRecruit = snapshotOrganizationMembershipTitlesFromPreset(
+      'militia',
+      () => 'b',
+    ).find((title) => title.sourceTitleId === 'recruit')
+    expect(armySoldier?.npcRecommendation).toEqual({ templateId: 'guard', level: 2 })
+    expect(militiaRecruit?.npcRecommendation).toEqual({ templateId: 'guard', level: 1 })
   })
 
   it('persists org-owned recommendations independently of template registry labels', () => {

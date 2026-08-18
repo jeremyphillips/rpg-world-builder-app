@@ -13,7 +13,6 @@ import {
   getOrganizationMembershipTitleEntry,
   type OrganizationMembershipTitleId,
 } from '../vocab/organization-membership-title'
-import type { OrganizationPresetMembershipTitleRef } from '../vocab/organization-preset-membership-title-refs'
 import { comparePriorityDescending } from '../vocab/types'
 import { vocabularyOptionIdSchema } from '../vocab/vocabulary'
 
@@ -114,20 +113,17 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
 ): OrganizationMembershipTitleDefinition[] {
   const preset = ORGANIZATION_AUTHORING_PRESETS[presetId]
   return preset.members.titles.map((ref) => {
-    const titleRef = ref as OrganizationPresetMembershipTitleRef
-    const entry = getOrganizationMembershipTitleEntry(titleRef.titleId)
+    const entry = getOrganizationMembershipTitleEntry(ref.titleId)
     if (!entry) {
-      throw new Error(`Unknown organization membership title id: ${titleRef.titleId}`)
+      throw new Error(`Unknown organization membership title id: ${ref.titleId}`)
     }
     return {
       id: createOrganizationMembershipTitleId(createId),
-      sourceTitleId: titleRef.titleId satisfies OrganizationMembershipTitleId,
+      sourceTitleId: ref.titleId satisfies OrganizationMembershipTitleId,
       label: entry.label,
       description: entry.description,
-      priority: titleRef.priority as OrganizationMembershipTitlePriority,
-      ...(titleRef.npcRecommendation !== undefined
-        ? { npcRecommendation: titleRef.npcRecommendation }
-        : {}),
+      priority: ref.priority as OrganizationMembershipTitlePriority,
+      ...(ref.npcRecommendation !== undefined ? { npcRecommendation: ref.npcRecommendation } : {}),
     }
   })
 }

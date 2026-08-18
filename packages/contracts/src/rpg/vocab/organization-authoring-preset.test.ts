@@ -9,6 +9,8 @@ import {
 } from './organization-authoring-preset'
 import { getOrganizationMembershipTitleEntry } from './organization-membership-title'
 import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './organization-member-title-entry'
+import { getNpcAuthoringTemplateEntry } from './npc-authoring-template'
+import { ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS } from './organization-preset-membership-title-refs'
 import { ORGANIZATION_DOMAIN_IDS } from './organization-domain'
 import { ORGANIZATION_FORM_IDS } from './organization-form'
 import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
@@ -71,6 +73,38 @@ describe('organization authoring presets', () => {
         seen.add(ref.titleId)
       }
     }
+  })
+
+  it('requires preset title npcRecommendation templateId and level on every ref', () => {
+    let pairCount = 0
+    for (const [presetId, refs] of Object.entries(ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS)) {
+      for (const ref of refs) {
+        pairCount += 1
+        expect(ref.npcRecommendation, `${presetId}:${ref.titleId}`).toBeDefined()
+        expect(getNpcAuthoringTemplateEntry(ref.npcRecommendation.templateId)).toBeDefined()
+        expect(ref.npcRecommendation.level).toBeGreaterThanOrEqual(0)
+        expect(ref.npcRecommendation.level).toBeLessThanOrEqual(20)
+        expect(ref.npcRecommendation.level).not.toBe(ref.priority)
+      }
+    }
+    expect(pairCount).toBe(374)
+  })
+
+  it('maps the same canonical title differently in different presets', () => {
+    const armyCaptain = ORGANIZATION_AUTHORING_PRESETS.army.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    const shippingCaptain = ORGANIZATION_AUTHORING_PRESETS.shipping_company.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    expect(armyCaptain?.npcRecommendation).toEqual({
+      templateId: 'martial_officer',
+      level: 6,
+    })
+    expect(shippingCaptain?.npcRecommendation).toEqual({
+      templateId: 'maritime_officer',
+      level: 6,
+    })
   })
 
   it('assigns different preset priorities to the same vocabulary title id', () => {
