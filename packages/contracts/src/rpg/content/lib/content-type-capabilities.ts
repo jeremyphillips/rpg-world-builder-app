@@ -1,15 +1,26 @@
 import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 
+/** Explicit opt-out when a duplicable type has no nested authored ids to regenerate. */
+export const noNestedRegenerationRequired = 'none' as const
+
+/** Nested paths with duplicate-time id regeneration handlers. */
+export type NestedContentIdRegenerationPath =
+  | 'features'
+  | 'traits'
+  | 'heritage'
+  | 'resolution'
+  | 'connections.locations'
+  | 'members.titles'
+
 /** Per-type nested authored-id regeneration policy for duplication. */
-export type NestedIdRegeneration = 'none' | { paths: readonly string[] }
+export type NestedIdRegeneration =
+  | typeof noNestedRegenerationRequired
+  | { paths: readonly NestedContentIdRegenerationPath[] }
 
 export interface ContentTypeCapability {
   canDuplicate: boolean
   nestedIdRegeneration: NestedIdRegeneration
 }
-
-/** Explicit opt-out when a duplicable type has no nested authored ids to regenerate. */
-export const noNestedRegenerationRequired = 'none' as const
 
 /**
  * Duplication capability registry — sibling to `CONTENT_ACCESS_CAPABILITIES`.
@@ -42,7 +53,7 @@ export const CONTENT_TYPE_CAPABILITIES: Record<ContentTypeKey, ContentTypeCapabi
   },
   organizations: {
     canDuplicate: true,
-    nestedIdRegeneration: { paths: ['connections.locations'] },
+    nestedIdRegeneration: { paths: ['connections.locations', 'members.titles'] },
   },
   locations: {
     canDuplicate: true,

@@ -73,7 +73,10 @@ describe('buildOrganizationDetailViewModel', () => {
   it('shows member class affinity labels when present', () => {
     const organization = {
       ...CRAFT_GUILD,
-      memberClassAffinityIds: ['class-fighter', 'class-rogue', 'class-missing'],
+      members: {
+        ...CRAFT_GUILD.members,
+        classAffinityIds: ['class-fighter', 'class-rogue', 'class-missing'],
+      },
     }
     const catalogClasses = [
       makeCharacterClass({ id: 'class-fighter', slug: 'fighter', name: 'Fighter' }),
@@ -95,7 +98,10 @@ describe('buildOrganizationDetailViewModel', () => {
   it('marks unavailable stored affinity classes on the detail stat row', () => {
     const organization = {
       ...CRAFT_GUILD,
-      memberClassAffinityIds: ['class-wizard'],
+      members: {
+        ...CRAFT_GUILD.members,
+        classAffinityIds: ['class-wizard'],
+      },
     }
     const catalogClasses = [
       makeCharacterClass({ id: 'class-fighter', slug: 'fighter', name: 'Fighter' }),
@@ -120,7 +126,10 @@ describe('buildOrganizationDetailViewModel', () => {
   it('shows member species affinity labels when present', () => {
     const organization = {
       ...CRAFT_GUILD,
-      memberSpeciesAffinityIds: ['species-dwarf', 'species-elf', 'species-missing'],
+      members: {
+        ...CRAFT_GUILD.members,
+        speciesAffinityIds: ['species-dwarf', 'species-elf', 'species-missing'],
+      },
     }
     const catalogSpecies = [
       makeSpecies({ id: 'species-dwarf', slug: 'dwarf', name: 'Dwarf' }),

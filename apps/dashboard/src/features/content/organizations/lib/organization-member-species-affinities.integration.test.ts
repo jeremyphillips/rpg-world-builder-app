@@ -37,12 +37,14 @@ describe('organization member species affinities integration', () => {
       organizationForm: 'order',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [elf.id, dwarf.id],
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [elf.id, dwarf.id],
+      },
     })
 
     expect(saved).not.toHaveProperty('authoringPresetId')
-    expect(saved.memberSpeciesAffinityIds).toEqual([elf.id, dwarf.id])
+    expect(saved.members.speciesAffinityIds).toEqual([elf.id, dwarf.id])
 
     const reopened = organizationToFormValues({
       ...saved,
@@ -55,11 +57,15 @@ describe('organization member species affinities integration', () => {
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
       connections: { locations: [] },
+      members: {
+        classAffinityIds: saved.members.classAffinityIds,
+        speciesAffinityIds: saved.members.speciesAffinityIds,
+        titles: saved.members.titles ?? [],
+      },
     })
 
     expect(reopened).toMatchObject({
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [elf.id, dwarf.id],
+      members: { classAffinityIds: [], speciesAffinityIds: [elf.id, dwarf.id] },
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
   })
@@ -78,12 +84,15 @@ describe('organization member species affinities integration', () => {
       organizationDomain: 'community',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [elf.id, dwarf.id, halfling.id],
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [elf.id, dwarf.id, halfling.id],
+        titles: [],
+      },
       connections: { locations: [] },
     })
 
-    expect(reopened.memberSpeciesAffinityIds).toEqual([elf.id, dwarf.id, halfling.id])
+    expect(reopened.members?.speciesAffinityIds).toEqual([elf.id, dwarf.id, halfling.id])
   })
 
   it('keeps unavailable stored species out of downstream recommendation UI', () => {
@@ -99,8 +108,8 @@ describe('organization member species affinities integration', () => {
 
     expect(
       isOrganizationMemberPickerRecommended(candidate, {
-        memberClassAffinityIds: [],
-        memberSpeciesAffinityIds: [elf.id],
+        classAffinityIds: [],
+        speciesAffinityIds: [elf.id],
         playableClasses: [],
         playableSpecies: [human, dwarf],
       }),
@@ -112,7 +121,7 @@ describe('organization member species affinities integration', () => {
           { value: human.id, label: human.name },
           { value: dwarf.id, label: dwarf.name },
         ],
-        memberSpeciesAffinityIds: [elf.id],
+        speciesAffinityIds: [elf.id],
         playableSpecies: [human, dwarf],
       }),
     ).toEqual({
@@ -163,10 +172,12 @@ describe('organization member species affinities integration', () => {
       organizationForm: 'network',
       functions: [],
       practices: ['theft'],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [elf.id],
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [elf.id],
+      },
     })
 
-    expect(saved.memberSpeciesAffinityIds).toEqual([elf.id])
+    expect(saved.members.speciesAffinityIds).toEqual([elf.id])
   })
 })

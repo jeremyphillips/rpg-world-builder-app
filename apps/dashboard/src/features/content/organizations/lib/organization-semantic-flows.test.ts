@@ -5,7 +5,6 @@ import {
   ORGANIZATION_AUTHORING_PRESETS,
   applyOrganizationAuthoringPreset,
   getOrganizationAuthoringPresetRecommendedPractices,
-  resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FieldOption, FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
@@ -66,20 +65,20 @@ describe('initial Organization semantic flows', () => {
 
       const input = buildOrganizationCreateInput({
         name: recipe.label,
-        organizationDomain: standalone.organizationDomain,
-        organizationForm: standalone.organizationForm,
-        functions: standalone.functions ?? [],
-        practices: standalone.practices ?? [],
-      } as OrganizationFormValues)
+        sourcePresetId: presetId,
+        organizationDomain:
+          standalone.organizationDomain as OrganizationFormValues['organizationDomain'],
+        organizationForm: standalone.organizationForm as OrganizationFormValues['organizationForm'],
+        functions: (standalone.functions ?? []) as OrganizationFormValues['functions'],
+        practices: (standalone.practices ?? []) as OrganizationFormValues['practices'],
+        members: {
+          classAffinityIds: (standalone['members.classAffinityIds'] ?? []) as string[],
+          speciesAffinityIds: [],
+        },
+      })
       expect(input).not.toHaveProperty('authoringPresetId')
-      expect(
-        resolveOrganizationMemberTitleSuggestions({
-          domain: input.organizationDomain,
-          form: input.organizationForm,
-          functions: input.functions,
-          practices: input.practices,
-        }).length,
-      ).toBeGreaterThanOrEqual(5)
+      expect(input.sourcePresetId).toBe(presetId)
+      expect(input.members?.titles ?? []).toEqual([])
     },
   )
 
@@ -91,11 +90,12 @@ describe('initial Organization semantic flows', () => {
 
     expect(applied).toEqual({
       authoringPresetId: undefined,
+      sourcePresetId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
-      memberClassAffinityIds: [],
+      'members.classAffinityIds': [],
     })
     expect(applied).not.toHaveProperty('name')
   })
@@ -107,8 +107,7 @@ describe('initial Organization semantic flows', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input).toMatchObject({
       organizationDomain: 'criminal',

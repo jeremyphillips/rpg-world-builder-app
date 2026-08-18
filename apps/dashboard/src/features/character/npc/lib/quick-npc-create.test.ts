@@ -33,8 +33,7 @@ const lanternGuild = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
+  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
   connections: { locations: [] },
 }
 

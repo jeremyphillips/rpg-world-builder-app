@@ -4,7 +4,9 @@ import {
   ORGANIZATION_DOMAIN_IDS,
   ORGANIZATION_FORM_IDS,
   ORGANIZATION_FUNCTION_IDS,
+  ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES,
   ORGANIZATION_PRACTICE_IDS,
+  ORGANIZATION_AUTHORING_PRESET_IDS,
 } from '@rpg/contracts'
 
 import {
@@ -27,14 +29,34 @@ const homebrewOrganizationSchema = new Schema(
       type: [{ type: String, enum: [...ORGANIZATION_PRACTICE_IDS] }],
       default: [],
     },
-    memberClassAffinityIds: {
-      type: [{ type: String }],
-      default: [],
+    members: {
+      classAffinityIds: {
+        type: [{ type: String }],
+        default: [],
+      },
+      speciesAffinityIds: {
+        type: [{ type: String }],
+        default: [],
+      },
+      titles: {
+        type: [
+          {
+            _id: false,
+            id: { type: String, required: true },
+            sourceTitleId: { type: String },
+            label: { type: String, required: true },
+            description: { type: String },
+            priority: {
+              type: Number,
+              enum: [...ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES],
+              required: true,
+            },
+          },
+        ],
+        default: [],
+      },
     },
-    memberSpeciesAffinityIds: {
-      type: [{ type: String }],
-      default: [],
-    },
+    sourcePresetId: { type: String, enum: [...ORGANIZATION_AUTHORING_PRESET_IDS] },
     connections: {
       locations: [
         {

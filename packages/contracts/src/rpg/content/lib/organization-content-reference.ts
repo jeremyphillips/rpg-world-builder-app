@@ -17,13 +17,13 @@ export const LOCATION_ORGANIZATION_REFERENCE = createOrganizationContentReferenc
 
 export const ORGANIZATION_MEMBER_CLASS_AFFINITY_REFERENCE =
   createOrganizationContentReferenceDescriptor({
-    path: 'memberClassAffinityIds',
+    path: 'members.classAffinityIds',
     matchKey: 'id',
   })
 
 export const ORGANIZATION_MEMBER_SPECIES_AFFINITY_REFERENCE =
   createOrganizationContentReferenceDescriptor({
-    path: 'memberSpeciesAffinityIds',
+    path: 'members.speciesAffinityIds',
     matchKey: 'id',
   })
 

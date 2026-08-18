@@ -24,8 +24,8 @@ const organizationMemberNameCollator = new Intl.Collator(undefined, {
 })
 
 export type OrganizationMemberSelectionPolicy = {
-  memberClassAffinityIds: readonly string[]
-  memberSpeciesAffinityIds: readonly string[]
+  classAffinityIds: readonly string[]
+  speciesAffinityIds: readonly string[]
   playableClasses: readonly CharacterClass[]
   playableSpecies: readonly Species[]
 }
@@ -54,19 +54,19 @@ function resolveOrganizationMemberPickerSelectionPolicy(
 ): OrganizationMemberSelectionPolicy | undefined {
   if (policy === undefined) return undefined
 
-  const memberClassAffinityIds = policy.memberClassAffinityIds ?? []
-  const memberSpeciesAffinityIds = policy.memberSpeciesAffinityIds ?? []
+  const classAffinityIds = policy.classAffinityIds ?? []
+  const speciesAffinityIds = policy.speciesAffinityIds ?? []
   const playableClasses = policy.playableClasses ?? []
   const playableSpecies = policy.playableSpecies ?? []
 
-  const hasClassAffinities = memberClassAffinityIds.length > 0 && playableClasses.length > 0
-  const hasSpeciesAffinities = memberSpeciesAffinityIds.length > 0 && playableSpecies.length > 0
+  const hasClassAffinities = classAffinityIds.length > 0 && playableClasses.length > 0
+  const hasSpeciesAffinities = speciesAffinityIds.length > 0 && playableSpecies.length > 0
 
   if (!hasClassAffinities && !hasSpeciesAffinities) return undefined
 
   return {
-    memberClassAffinityIds,
-    memberSpeciesAffinityIds,
+    classAffinityIds,
+    speciesAffinityIds,
     playableClasses,
     playableSpecies,
   }
@@ -82,20 +82,20 @@ export function isOrganizationMemberPickerRecommended(
   if (selectionPolicy === undefined) return false
 
   const matchesClass =
-    selectionPolicy.memberClassAffinityIds.length > 0 &&
+    selectionPolicy.classAffinityIds.length > 0 &&
     selectionPolicy.playableClasses.length > 0 &&
     characterMatchesOrganizationMemberClassRecommendations({
       classIds: candidate.classIds ?? [],
-      memberClassAffinityIds: selectionPolicy.memberClassAffinityIds,
+      classAffinityIds: selectionPolicy.classAffinityIds,
       playableClasses: selectionPolicy.playableClasses,
     })
 
   const matchesSpecies =
-    selectionPolicy.memberSpeciesAffinityIds.length > 0 &&
+    selectionPolicy.speciesAffinityIds.length > 0 &&
     selectionPolicy.playableSpecies.length > 0 &&
     characterMatchesOrganizationMemberSpeciesRecommendations({
       speciesId: candidate.speciesId,
-      memberSpeciesAffinityIds: selectionPolicy.memberSpeciesAffinityIds,
+      speciesAffinityIds: selectionPolicy.speciesAffinityIds,
       playableSpecies: selectionPolicy.playableSpecies,
     })
 

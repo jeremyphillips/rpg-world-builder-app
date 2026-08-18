@@ -29,8 +29,7 @@ describe('organization body contracts', () => {
       organizationDomain: 'occupational',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
       connections: { locations: [] },
     })
 
@@ -64,8 +63,8 @@ describe('organization body contracts', () => {
       name: 'Untitled Organization',
       functions: [],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      connections: { locations: [] },
     })
   })
 
@@ -114,7 +113,7 @@ describe('organization body contracts', () => {
       organizationBodySchema.safeParse({
         name: 'Duplicate Affinities',
         organizationDomain: 'commercial',
-        memberClassAffinityIds: ['class-a', 'class-a'],
+        members: { classAffinityIds: ['class-a', 'class-a'], speciesAffinityIds: [] },
       }).success,
     ).toBe(false)
   })
@@ -203,14 +202,38 @@ describe('organization authoring inputs', () => {
     ).toBe('Untitled Organization')
   })
 
-  it('supports partial publish and draft updates', () => {
+  it('supports partial publish and draft updates without connections or members defaults', () => {
     expect(updateOrganizationInputSchema.parse({ organizationDomain: 'academic' })).toEqual({
       organizationDomain: 'academic',
-      connections: { locations: [] },
     })
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',
     })
+  })
+
+  it('strips connections, titles, and sourcePresetId from classification PATCH parse output', () => {
+    expect(
+      updateOrganizationInputSchema.parse({
+        organizationDomain: 'academic',
+        connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
+        members: {
+          classAffinityIds: ['class-fighter'],
+          titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+        },
+        sourcePresetId: 'bank',
+      }),
+    ).toEqual({
+      organizationDomain: 'academic',
+      members: { classAffinityIds: ['class-fighter'] },
+    })
+
+    expect(
+      updateOrganizationDraftInputSchema.parse({
+        description: '<p>Notes</p>',
+        sourcePresetId: 'bank',
+        connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
+      }),
+    ).toEqual({ description: '<p>Notes</p>' })
   })
 
   it('accepts domain and form as independent partial-update fields', () => {
@@ -220,5 +243,50 @@ describe('organization authoring inputs', () => {
         organizationForm: 'association',
       }).success,
     ).toBe(true)
+  })
+
+  it('defaults nested members on stored bodies', () => {
+    expect(
+      organizationBodySchema.parse({
+        name: 'Lantern Guild',
+        organizationDomain: 'occupational',
+      }).members,
+    ).toEqual({ classAffinityIds: [], speciesAffinityIds: [], titles: [] })
+  })
+
+  it('rejects create input that combines sourcePresetId with explicit members.titles', () => {
+    expect(
+      createOrganizationInputSchema.safeParse({
+        slug: 'lantern-guild',
+        name: 'The Lantern Guild',
+        organizationDomain: 'occupational',
+        sourcePresetId: 'craft_guild',
+        members: {
+          titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('accepts partial members affinity updates without titles', () => {
+    expect(
+      updateOrganizationInputSchema.parse({
+        members: { classAffinityIds: ['class-fighter'] },
+      }),
+    ).toMatchObject({ members: { classAffinityIds: ['class-fighter'] } })
+    expect(
+      updateOrganizationInputSchema.parse({ members: { classAffinityIds: ['class-fighter'] } })
+        .members,
+    ).not.toHaveProperty('titles')
+  })
+
+  it('does not accept legacy flat membershipTitles on stored bodies', () => {
+    const parsed = organizationBodySchema.parse({
+      name: 'Legacy Guild',
+      organizationDomain: 'occupational',
+      membershipTitles: [{ id: 'omt_legacy', label: 'Boss', priority: 50 }],
+    })
+    expect(parsed).not.toHaveProperty('membershipTitles')
+    expect(parsed.members.titles).toEqual([])
   })
 })

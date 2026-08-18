@@ -73,6 +73,9 @@ const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 /** Family routes omit the Kind select — discriminant is fixed by route context. */
 const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 
+/** Set by preset value sync — not a visible form control. */
+const ORGANIZATION_SCHEMA_EXEMPT = ['sourcePresetId'] as const
+
 const COMMON_SCHEMA_EXEMPT = [
   ...SLOT_IGNORE,
   ...SLUG_EXEMPT,
@@ -111,9 +114,11 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
     const exempt =
       routeKey === 'equipment'
         ? EQUIPMENT_SCHEMA_EXEMPT
-        : routeKey === 'spells'
-          ? SPELLS_SCHEMA_EXEMPT
-          : COMMON_SCHEMA_EXEMPT
+        : routeKey === 'organizations'
+          ? [...COMMON_SCHEMA_EXEMPT, ...ORGANIZATION_SCHEMA_EXEMPT]
+          : routeKey === 'spells'
+            ? SPELLS_SCHEMA_EXEMPT
+            : COMMON_SCHEMA_EXEMPT
 
     assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
   })

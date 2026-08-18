@@ -39,10 +39,15 @@ beforeAll(() => {
 
 const CAMPAIGN_ID = 'campaign-test-1'
 
+const membershipTitles = [
+  { id: 'omt_guildmaster', label: 'Guildmaster', priority: 50 as const },
+] as const
+
 const organization = {
   id: 'organization-1',
   name: 'Lantern Guild',
   organizationDomain: 'occupational' as const,
+  members: { titles: [...membershipTitles] },
 }
 
 const organizationCatalogRow = {
@@ -58,8 +63,7 @@ const organizationCatalogRow = {
   organizationDomain: organization.organizationDomain,
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
+  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [...membershipTitles] },
   connections: { locations: [] },
 }
 

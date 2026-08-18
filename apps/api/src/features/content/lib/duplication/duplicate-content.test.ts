@@ -12,6 +12,7 @@ import { transformDuplicateSource } from './duplicate-content-transform'
 import { asResolvedContentSlug } from '../slug/resolve-unique-content-slug'
 import { classWriteConfig } from '../../classes/classes.config'
 import { featWriteConfig } from '../../feats/feats.config'
+import { organizationWriteConfig } from '../../organizations/organizations.config'
 import { spellWriteConfig } from '../../spells/spells.config'
 
 describe('omitDuplicateDeniedFields', () => {
@@ -39,6 +40,42 @@ describe('omitDuplicateDeniedFields', () => {
     })
 
     expect(result).toEqual({ name: 'Fighter', hitDie: 10 })
+  })
+
+  it('strips sourcePresetId but preserves members.titles on organization duplicate input', () => {
+    const result = omitDuplicateDeniedFields({
+      id: 'org-1',
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [
+          {
+            id: 'omt_abc',
+            sourceTitleId: 'treasurer',
+            label: 'Treasurer',
+            priority: 50,
+          },
+        ],
+      },
+    })
+
+    expect(result).not.toHaveProperty('sourcePresetId')
+    expect(result.members).toEqual({
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [
+        {
+          id: 'omt_abc',
+          sourceTitleId: 'treasurer',
+          label: 'Treasurer',
+          priority: 50,
+        },
+      ],
+    })
   })
 })
 
@@ -175,5 +212,48 @@ describe('transformDuplicateSource', () => {
     })
 
     expect(parsed).not.toHaveProperty('modeling')
+  })
+
+  it('parses organization duplicate input without sourcePresetId', () => {
+    const parsed = transformDuplicateSource({
+      source: {
+        id: 'org-1',
+        slug: 'river-bank',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'homebrew',
+        status: 'published',
+        campaignId: 'camp',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        name: 'River Bank',
+        organizationDomain: 'commercial',
+        sourcePresetId: 'bank',
+        functions: ['finance'],
+        practices: ['banking'],
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [
+            {
+              id: 'omt_abc',
+              sourceTitleId: 'treasurer',
+              label: 'Treasurer',
+              priority: 50,
+            },
+          ],
+        },
+        connections: { locations: [] },
+      } as never,
+      requestedName: 'River Bank Copy',
+      destinationSlug: asResolvedContentSlug('river-bank-copy'),
+      contentType: 'organizations',
+      writeConfig: organizationWriteConfig,
+    })
+
+    expect(parsed).not.toHaveProperty('sourcePresetId')
+    expect((parsed.members as { titles: unknown[] }).titles).toHaveLength(1)
+    expect((parsed.members as { titles: Array<{ label: string }> }).titles[0]?.label).toBe(
+      'Treasurer',
+    )
   })
 })

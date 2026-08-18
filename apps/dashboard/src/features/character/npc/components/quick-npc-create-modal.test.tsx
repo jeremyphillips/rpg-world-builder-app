@@ -75,8 +75,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         organizationDomain: organization.organizationDomain,
         functions: [],
         practices: [],
-        memberClassAffinityIds: [],
-        memberSpeciesAffinityIds: [],
+        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
         connections: { locations: [] },
       },
     ],
@@ -248,8 +247,7 @@ describe('QuickNpcCreateModal', () => {
               organizationDomain: organization.organizationDomain,
               functions: [],
               practices: [],
-              memberClassAffinityIds: [rogueClass.id],
-              memberSpeciesAffinityIds: [],
+              members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
               connections: { locations: [] },
             },
           ],
@@ -257,7 +255,7 @@ describe('QuickNpcCreateModal', () => {
       }),
       organization: {
         ...organization,
-        memberClassAffinityIds: [rogueClass.id],
+        members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
       },
     })
 

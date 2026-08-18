@@ -30,28 +30,33 @@ describe('organization member class affinities integration', () => {
   const fighter = makeCharacterClass({ slug: 'fighter', id: 'class-fighter', name: 'Fighter' })
   const wizard = makeCharacterClass({ slug: 'wizard', id: 'class-wizard', name: 'Wizard' })
 
-  it('persists familiar-seeded affinities without preset identity after save/reload', () => {
+  it('persists familiar-seeded affinities with sourcePresetId after save/reload', () => {
     const [sync] = buildOrganizationFormValueSyncs(undefined, [rogue])
     const applied = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
 
     expect(applied).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'thieves_guild',
       practices: ['theft'],
-      memberClassAffinityIds: ['class-rogue'],
+      'members.classAffinityIds': ['class-rogue'],
     })
 
     const saved = buildOrganizationCreateInput({
       name: 'Dockside Exchange',
+      sourcePresetId: 'thieves_guild',
       organizationDomain: 'criminal',
       organizationForm: 'network',
       functions: [],
       practices: ['theft'],
-      memberClassAffinityIds: ['class-rogue'],
-      memberSpeciesAffinityIds: [],
+      members: {
+        classAffinityIds: ['class-rogue'],
+        speciesAffinityIds: [],
+      },
     })
 
     expect(saved).not.toHaveProperty('authoringPresetId')
-    expect(saved.memberClassAffinityIds).toEqual(['class-rogue'])
+    expect(saved.sourcePresetId).toBe('thieves_guild')
+    expect(saved.members.classAffinityIds).toEqual(['class-rogue'])
 
     const reopened = organizationToFormValues({
       ...saved,
@@ -64,14 +69,19 @@ describe('organization member class affinities integration', () => {
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
       connections: { locations: [] },
+      members: {
+        classAffinityIds: saved.members.classAffinityIds,
+        speciesAffinityIds: saved.members.speciesAffinityIds,
+        titles: saved.members.titles ?? [],
+      },
     })
 
     expect(reopened).toMatchObject({
       practices: ['theft'],
-      memberClassAffinityIds: ['class-rogue'],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: ['class-rogue'], speciesAffinityIds: [] },
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
+    expect(reopened).not.toHaveProperty('sourcePresetId')
   })
 
   it('round-trips custom affinity ids through edit form values', () => {
@@ -88,12 +98,15 @@ describe('organization member class affinities integration', () => {
       organizationDomain: 'military',
       functions: [],
       practices: [],
-      memberClassAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
-      memberSpeciesAffinityIds: [],
+      members: {
+        classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
+        speciesAffinityIds: [],
+        titles: [],
+      },
       connections: { locations: [] },
     })
 
-    expect(reopened.memberClassAffinityIds).toEqual([
+    expect(reopened.members?.classAffinityIds).toEqual([
       'class-fighter',
       'class-barbarian',
       'class-wizard',
@@ -112,8 +125,8 @@ describe('organization member class affinities integration', () => {
 
     expect(
       isOrganizationMemberPickerRecommended(candidate, {
-        memberClassAffinityIds: [wizard.id],
-        memberSpeciesAffinityIds: [],
+        classAffinityIds: [wizard.id],
+        speciesAffinityIds: [],
         playableClasses: [fighter, rogue],
         playableSpecies: [],
       }),
@@ -125,7 +138,7 @@ describe('organization member class affinities integration', () => {
           { value: fighter.id, label: fighter.name },
           { value: rogue.id, label: rogue.name },
         ],
-        memberClassAffinityIds: [wizard.id],
+        classAffinityIds: [wizard.id],
         playableClasses: [fighter, rogue],
       }),
     ).toEqual({
@@ -174,7 +187,7 @@ describe('organization member class affinities integration', () => {
     expect(
       sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId']),
     ).toMatchObject({
-      memberClassAffinityIds: [],
+      'members.classAffinityIds': [],
     })
 
     expect(collectPresetOptionValues(ctx)).toContain('thieves_guild')
@@ -185,10 +198,12 @@ describe('organization member class affinities integration', () => {
       organizationForm: 'network',
       functions: [],
       practices: ['theft'],
-      memberClassAffinityIds: [rogue.id],
-      memberSpeciesAffinityIds: [],
+      members: {
+        classAffinityIds: [rogue.id],
+        speciesAffinityIds: [],
+      },
     })
 
-    expect(saved.memberClassAffinityIds).toEqual([rogue.id])
+    expect(saved.members.classAffinityIds).toEqual([rogue.id])
   })
 })

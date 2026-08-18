@@ -110,7 +110,7 @@ describe('content deletion service', () => {
       slug: 'thieves-guild',
       name: "Thieves' Guild",
       organizationDomain: 'criminal',
-      memberClassAffinityIds: [created.id],
+      members: { classAffinityIds: [created.id] },
     })
 
     const availability = await getContentDeletionAvailability(

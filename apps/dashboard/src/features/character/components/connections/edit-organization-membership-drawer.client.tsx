@@ -105,10 +105,7 @@ export function EditOrganizationMembershipDrawer({
         <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
           <div className={dialogPanelSectionInsetXClasses}>
             <OrganizationMembershipTitleField
-              kind={organization.organizationDomain}
-              form={organization.organizationForm}
-              functions={organization.functions}
-              practices={organization.practices}
+              titles={organization.members?.titles ?? []}
               value={selectedTitle}
               onValueChange={setSelectedTitle}
               idPrefix={`edit-organization-membership-${organization.id}`}

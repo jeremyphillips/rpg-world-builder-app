@@ -532,8 +532,7 @@ describe('resolveEffectiveBuilderSteps', () => {
     organizationDomain: 'occupational',
     functions: [],
     practices: [],
-    memberClassAffinityIds: [],
-    memberSpeciesAffinityIds: [],
+    members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     connections: { locations: [] },
   } satisfies Organization
 

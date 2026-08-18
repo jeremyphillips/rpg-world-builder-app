@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  ORGANIZATION_FORM_ENTRIES,
   ORGANIZATION_FORM_IDS,
   getOrganizationFormDiscoveryTerms,
   organizationFormSchema,
@@ -31,8 +30,5 @@ describe('Organization Form vocabulary', () => {
     expect(getOrganizationFormDiscoveryTerms('network')).toContain('ring')
     expect(getOrganizationFormDiscoveryTerms('force')).toContain('host')
     expect(getOrganizationFormDiscoveryTerms('office')).toContain('bureau')
-    for (const entry of Object.values(ORGANIZATION_FORM_ENTRIES)) {
-      expect(entry.memberTitles).toHaveLength(5)
-    }
   })
 })

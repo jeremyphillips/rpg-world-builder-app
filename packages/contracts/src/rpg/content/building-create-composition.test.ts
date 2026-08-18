@@ -24,8 +24,7 @@ const organization = {
     organizationDomain: 'commercial' as const,
     functions: [],
     practices: [],
-    memberClassAffinityIds: [],
-    memberSpeciesAffinityIds: [],
+    members: { classAffinityIds: [], speciesAffinityIds: [] },
     connections: { locations: [] },
   },
 }

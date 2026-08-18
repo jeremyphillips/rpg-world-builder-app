@@ -84,7 +84,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
       context: multiClassContext,
       values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
       onValuesChange: () => {},
-      memberClassAffinityIds: [rogueClass.id],
+      members: { classAffinityIds: [rogueClass.id] },
     })
 
     const classSet = sets.find((set) => set.id === 'classId')
@@ -109,7 +109,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
       context: multiSpeciesContext,
       values: createQuickNpcSetupDefaultValues(multiSpeciesContext),
       onValuesChange: () => {},
-      memberSpeciesAffinityIds: [elfSpecies.id],
+      members: { speciesAffinityIds: [elfSpecies.id] },
     })
 
     const speciesSet = sets.find((set) => set.id === 'speciesId')

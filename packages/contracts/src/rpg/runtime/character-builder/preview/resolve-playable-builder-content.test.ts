@@ -101,8 +101,7 @@ function makeOrganization(
     organizationDomain: 'occupational',
     functions: [],
     practices: [],
-    memberClassAffinityIds: [],
-    memberSpeciesAffinityIds: [],
+    members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     connections: { locations: [] },
     campaignAccess: {
       available: true,

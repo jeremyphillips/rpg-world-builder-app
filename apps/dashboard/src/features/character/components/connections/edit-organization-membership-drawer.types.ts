@@ -2,6 +2,7 @@ import type {
   OrganizationDomain,
   OrganizationForm,
   OrganizationFunction,
+  OrganizationMembershipTitleDefinition,
   OrganizationPractice,
 } from '@rpg/contracts'
 
@@ -12,6 +13,11 @@ export type EditOrganizationMembershipOrganization = {
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
+  members: {
+    classAffinityIds?: readonly string[]
+    speciesAffinityIds?: readonly string[]
+    titles?: readonly OrganizationMembershipTitleDefinition[]
+  }
 }
 
 /** Surface-facing wording — the drawer body, save flow, and remove flow are shared. */

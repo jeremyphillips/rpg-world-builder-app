@@ -1,22 +1,14 @@
-import { resolveOrganizationMemberTitleSuggestions } from '@rpg/contracts'
+import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
+import { sortOrganizationMembershipTitleDefinitionsForDisplay } from '@rpg/contracts'
 
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
-import type { OrganizationMembershipTitleFieldProps } from './organization-membership-title-field.types'
 
 export function buildOrganizationMembershipTitleRadioOptions(input: {
-  kind: OrganizationMembershipTitleFieldProps['kind']
-  form?: OrganizationMembershipTitleFieldProps['form']
-  functions?: OrganizationMembershipTitleFieldProps['functions']
-  practices?: OrganizationMembershipTitleFieldProps['practices']
-  /** Current persisted/selected title — appended when absent from suggestions. */
+  titles: readonly OrganizationMembershipTitleDefinition[]
+  /** Current persisted/selected title — appended when absent from catalog. */
   currentValue?: string
 }): { value: string; label: string }[] {
-  const suggestions = resolveOrganizationMemberTitleSuggestions({
-    domain: input.kind,
-    form: input.form,
-    functions: input.functions,
-    practices: input.practices,
-  })
+  const suggestions = sortOrganizationMembershipTitleDefinitionsForDisplay(input.titles)
   const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
   const options = [
     { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },

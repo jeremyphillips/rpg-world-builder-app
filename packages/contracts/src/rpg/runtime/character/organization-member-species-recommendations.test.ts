@@ -34,14 +34,14 @@ describe('resolveOrganizationMemberSpeciesRecommendations', () => {
   it('preserves stored order and drops unavailable ids', () => {
     expect(
       resolveOrganizationMemberSpeciesRecommendationIds({
-        memberSpeciesAffinityIds: [halfling.id, elf.id, dwarf.id],
+        speciesAffinityIds: [halfling.id, elf.id, dwarf.id],
         playableSpecies: available,
       }),
     ).toEqual([elf.id, dwarf.id])
 
     expect(
       resolveOrganizationMemberSpeciesRecommendations({
-        memberSpeciesAffinityIds: [halfling.id, elf.id, dwarf.id],
+        speciesAffinityIds: [halfling.id, elf.id, dwarf.id],
         playableSpecies: available,
       }).map((species) => species.id),
     ).toEqual([elf.id, dwarf.id])
@@ -57,7 +57,7 @@ describe('characterMatchesOrganizationMemberSpeciesRecommendations', () => {
     expect(
       characterMatchesOrganizationMemberSpeciesRecommendations({
         speciesId: halfling.id,
-        memberSpeciesAffinityIds: [halfling.id, elf.id],
+        speciesAffinityIds: [halfling.id, elf.id],
         playableSpecies: [dwarf, elf],
       }),
     ).toBe(false)
@@ -65,7 +65,7 @@ describe('characterMatchesOrganizationMemberSpeciesRecommendations', () => {
     expect(
       characterMatchesOrganizationMemberSpeciesRecommendations({
         speciesId: elf.id,
-        memberSpeciesAffinityIds: [halfling.id, elf.id],
+        speciesAffinityIds: [halfling.id, elf.id],
         playableSpecies: [dwarf, elf],
       }),
     ).toBe(true)

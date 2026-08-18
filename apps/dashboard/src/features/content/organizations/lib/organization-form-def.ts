@@ -33,8 +33,8 @@ const organizationFormDef: ContentFormDef<
     buildOrganizationFormValueSyncs(undefined, resolveDiscoverableOrganizationMemberClasses(ctx)),
   enrichEditLayoutCtx: (ctx, entity) => ({
     ...ctx,
-    organizationMemberClassAffinitySeedIds: entity.memberClassAffinityIds ?? [],
-    organizationMemberSpeciesAffinitySeedIds: entity.memberSpeciesAffinityIds ?? [],
+    organizationMemberClassAffinitySeedIds: entity.members.classAffinityIds ?? [],
+    organizationMemberSpeciesAffinitySeedIds: entity.members.speciesAffinityIds ?? [],
   }),
   toFormValues: organizationToFormValues,
   toInput: buildOrganizationCreateInput,

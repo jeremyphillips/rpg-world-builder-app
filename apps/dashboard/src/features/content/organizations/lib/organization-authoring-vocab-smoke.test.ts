@@ -3,7 +3,6 @@ import {
   ORGANIZATION_FORM_IDS,
   ORGANIZATION_FUNCTION_IDS,
   ORGANIZATION_PRACTICE_IDS,
-  resolveOrganizationMemberTitleSuggestions,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
@@ -83,6 +82,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'bank',
       organizationDomain: 'commercial',
       organizationForm: 'company',
       functions: ['finance'],
@@ -90,6 +90,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'bank',
       'operatorOrganization.organizationDomain': 'commercial',
       'operatorOrganization.organizationForm': 'company',
       'operatorOrganization.functions': ['finance'],
@@ -108,6 +109,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
@@ -115,6 +117,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'army',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -133,6 +136,7 @@ describe('organization authoring vocab smoke', () => {
 
     expect(standalone).toMatchObject({
       authoringPresetId: undefined,
+      sourcePresetId: 'navy',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
@@ -140,6 +144,7 @@ describe('organization authoring vocab smoke', () => {
     })
     expect(embedded).toMatchObject({
       'operatorOrganization.authoringPresetId': undefined,
+      'operatorOrganization.sourcePresetId': 'navy',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -153,6 +158,7 @@ describe('organization authoring vocab smoke', () => {
       ['authoringPresetId'],
     )
     expect(applied).toMatchObject({
+      sourcePresetId: 'city_watch',
       organizationDomain: 'government',
       functions: ['policing'],
       practices: ['investigation'],
@@ -165,6 +171,7 @@ describe('organization authoring vocab smoke', () => {
       ['authoringPresetId'],
     )
     expect(applied).toMatchObject({
+      sourcePresetId: 'political_party',
       organizationDomain: 'political',
       organizationForm: 'association',
       functions: ['advocacy'],
@@ -179,8 +186,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['transport'],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Royal Exchequer',
@@ -188,8 +194,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration'],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Ironworking Consortium',
@@ -197,8 +202,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['production', 'trade'],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Royal Host',
@@ -206,8 +210,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
   ] satisfies Array<OrganizationFormValues>)('persists $name without preset identity', (values) => {
     const input = buildOrganizationCreateInput(values)
@@ -227,8 +230,7 @@ describe('organization authoring vocab smoke', () => {
       organizationDomain: 'criminal',
       practices: ['extortion'],
       functions: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input.practices).toEqual(['extortion'])
     expect(input).not.toHaveProperty('authoringPresetId')
@@ -241,8 +243,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration', 'defense'],
       practices: [],
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     const reopened = organizationToFormValues({
       ...saved,
@@ -254,8 +255,7 @@ describe('organization authoring vocab smoke', () => {
       campaignId: 'camp',
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
-      memberClassAffinityIds: [],
-      memberSpeciesAffinityIds: [],
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: saved.members.titles ?? [] },
       connections: { locations: [] },
     })
 
@@ -266,27 +266,6 @@ describe('organization authoring vocab smoke', () => {
       functions: ['administration', 'defense'],
     })
     expect(reopened).not.toHaveProperty('authoringPresetId')
-  })
-
-  it('resolves member titles from functions before form and domain', () => {
-    const ministryLabels = resolveOrganizationMemberTitleSuggestions({
-      domain: 'government',
-      form: 'office',
-      functions: ['administration'],
-    }).map((entry) => entry.label)
-
-    expect(ministryLabels[0]).toBe('Registrar')
-    expect(ministryLabels).not.toContain('High Priest')
-    expect(ministryLabels).toContain('Chancellor')
-
-    const forceLabels = resolveOrganizationMemberTitleSuggestions({
-      domain: 'military',
-      form: 'force',
-      functions: ['warfare', 'defense'],
-    }).map((entry) => entry.label)
-
-    expect(forceLabels[0]).toBe('General')
-    expect(forceLabels).toContain('Commander')
   })
 
   it('keeps overview domain facet on organizationDomain', () => {

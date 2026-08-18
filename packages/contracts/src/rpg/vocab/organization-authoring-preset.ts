@@ -2,14 +2,18 @@ import type { OrganizationDomain } from './organization-domain'
 import type { OrganizationForm } from './organization-form'
 import type { OrganizationFunction } from './organization-function'
 import type { OrganizationPractice } from './organization-practice'
+import {
+  ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS,
+  type OrganizationPresetMembershipTitleRef,
+} from './organization-preset-membership-title-refs'
 
 /**
  * Ephemeral familiar starting points for organization authoring.
  *
  * Presets project editable domain / form / functions / practices only. Preset identity is
- * never persisted. `discoveryTerms` are authoring discovery strings that help
- * users find a closest starting point — not lexical aliases and not the same
- * field as `OrganizationClassificationEntry.searchTerms`.
+ * never persisted on the organization body except optional `sourcePresetId` at create.
+ * `discoveryTerms` are authoring discovery strings that help users find a closest starting
+ * point — not lexical aliases and not the same field as `OrganizationClassificationEntry.searchTerms`.
  */
 export type OrganizationAuthoringPresetEntry = {
   label: string
@@ -23,9 +27,15 @@ export type OrganizationAuthoringPresetEntry = {
   practices: readonly OrganizationPractice[]
   /** Authoring guidance only — never applied or persisted. Order = combobox boost order. */
   recommendedPractices: readonly OrganizationPractice[]
+  /** Curated membership title references — snapshotted at organization create. */
+  members: {
+    titles: readonly OrganizationPresetMembershipTitleRef[]
+  }
 }
 
-export const ORGANIZATION_AUTHORING_PRESETS = {
+type OrganizationAuthoringPresetBaseEntry = Omit<OrganizationAuthoringPresetEntry, 'members'>
+
+const ORGANIZATION_AUTHORING_PRESET_BASE = {
   academy: {
     label: 'Academy',
     description: 'Closest starting point for bardic college, seminary, and teaching bodies.',
@@ -583,7 +593,29 @@ export const ORGANIZATION_AUTHORING_PRESETS = {
     practices: [],
     recommendedPractices: ['archiving', 'translation', 'publishing', 'alchemy', 'cartography'],
   },
-} as const satisfies Record<string, OrganizationAuthoringPresetEntry>
+} as const satisfies Record<string, OrganizationAuthoringPresetBaseEntry>
+
+export const ORGANIZATION_AUTHORING_PRESETS = Object.fromEntries(
+  (
+    Object.entries(ORGANIZATION_AUTHORING_PRESET_BASE) as Array<
+      [keyof typeof ORGANIZATION_AUTHORING_PRESET_BASE, OrganizationAuthoringPresetBaseEntry]
+    >
+  ).map(([id, preset]) => [
+    id,
+    {
+      ...preset,
+      members: {
+        titles: ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS[id],
+      },
+    },
+  ]),
+) as {
+  [K in keyof typeof ORGANIZATION_AUTHORING_PRESET_BASE]: OrganizationAuthoringPresetBaseEntry & {
+    members: {
+      titles: (typeof ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS)[K]
+    }
+  }
+}
 
 export type OrganizationAuthoringPresetId = keyof typeof ORGANIZATION_AUTHORING_PRESETS
 

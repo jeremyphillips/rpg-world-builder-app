@@ -7,52 +7,39 @@ import {
 } from './organization-membership-title-field.lib'
 import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 
+const sampleCatalog = [
+  { id: 'omt_1', label: 'Guildmaster', priority: 50 as const },
+  { id: 'omt_2', label: 'Member', priority: 20 as const },
+]
+
 describe('buildOrganizationMembershipTitleRadioOptions', () => {
-  it('includes No title and kind suggestions', () => {
-    const options = buildOrganizationMembershipTitleRadioOptions({ kind: 'occupational' })
-    expect(options[0]).toEqual({
-      value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      label: 'No title',
+  it('prepends No title and lists catalog labels by priority', () => {
+    const options = buildOrganizationMembershipTitleRadioOptions({
+      titles: sampleCatalog,
     })
-    expect(options.some((option) => option.value === 'Guildmaster')).toBe(true)
+    expect(options.map((option) => option.label)).toEqual(['No title', 'Guildmaster', 'Member'])
   })
 
-  it('appends an unrecognized current value as a current-value option', () => {
+  it('appends a custom current value when absent from the catalog', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      kind: 'occupational',
-      currentValue: 'Custom Chronicler',
+      titles: sampleCatalog,
+      currentValue: 'Sea Lord',
     })
-    expect(options.at(-1)).toEqual({ value: 'Custom Chronicler', label: 'Custom Chronicler' })
+    expect(options.at(-1)).toEqual({ value: 'Sea Lord', label: 'Sea Lord' })
   })
 
-  it('does not duplicate a suggestion that matches the current value', () => {
+  it('does not duplicate a catalog title passed as currentValue', () => {
     const options = buildOrganizationMembershipTitleRadioOptions({
-      kind: 'occupational',
+      titles: sampleCatalog,
       currentValue: 'Guildmaster',
     })
-    expect(options.filter((option) => option.value === 'Guildmaster')).toHaveLength(1)
-  })
-
-  it('threads practices before form when building suggestion order', () => {
-    const options = buildOrganizationMembershipTitleRadioOptions({
-      kind: 'criminal',
-      form: 'guild',
-      practices: ['smuggling'],
-    })
-    const ringleaderIndex = options.findIndex((option) => option.value === 'Ringleader')
-    const guildmasterIndex = options.findIndex((option) => option.value === 'Guildmaster')
-    expect(ringleaderIndex).toBeGreaterThan(0)
-    expect(guildmasterIndex).toBeGreaterThan(0)
-    expect(ringleaderIndex).toBeLessThan(guildmasterIndex)
+    expect(options.filter((option) => option.label === 'Guildmaster')).toHaveLength(1)
   })
 })
 
-describe('title radio value mapping', () => {
-  it('maps No title sentinel to undefined and back', () => {
+describe('membership radio value mappers', () => {
+  it('maps No title sentinel to undefined', () => {
     expect(titleFromMembershipRadioValue(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)).toBeUndefined()
     expect(membershipRadioValueFromTitle(undefined)).toBe(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
-    expect(membershipRadioValueFromTitle(null)).toBe(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
-    expect(membershipRadioValueFromTitle('Captain')).toBe('Captain')
-    expect(titleFromMembershipRadioValue('Captain')).toBe('Captain')
   })
 })

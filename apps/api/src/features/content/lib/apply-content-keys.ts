@@ -1,8 +1,12 @@
+import { randomUUID } from 'node:crypto'
+
 import {
   assignStableContentIds,
   assertStableContentIds,
   ContentKeyError,
+  createOrganizationMembershipTitleId,
   deriveContentKey,
+  type NestedContentIdRegenerationPath,
   type NestedIdRegeneration,
 } from '@rpg/contracts'
 
@@ -197,23 +201,76 @@ function regenerateResolutionPathForDuplicate(
   result.resolution = regenerateSpellResolution(result.resolution, destinationSlug)
 }
 
+type OrganizationLocationConnectionRow = {
+  id: string
+  locationId: string
+  kind: string
+}
+
+function regenerateConnectionsLocationsPathForDuplicate(result: Record<string, unknown>): void {
+  if (!('connections' in result)) return
+  const connections = result.connections
+  if (typeof connections !== 'object' || connections === null) return
+
+  const locations = (connections as { locations?: unknown }).locations
+  if (!Array.isArray(locations)) return
+
+  result.connections = {
+    ...connections,
+    locations: locations.map((row) => {
+      if (typeof row !== 'object' || row === null) return row
+      const connection = row as OrganizationLocationConnectionRow
+      return {
+        ...connection,
+        id: randomUUID(),
+      }
+    }),
+  }
+}
+
+function regenerateMembersTitlesPathForDuplicate(result: Record<string, unknown>): void {
+  if (!('members' in result)) return
+  const members = result.members
+  if (typeof members !== 'object' || members === null) return
+
+  const titles = (members as { titles?: unknown }).titles
+  if (!Array.isArray(titles)) return
+
+  result.members = {
+    ...members,
+    titles: titles.map((title) => {
+      if (typeof title !== 'object' || title === null) return title
+      return { ...title, id: createOrganizationMembershipTitleId() }
+    }),
+  }
+}
+
 function regenerateNestedPathForDuplicate(
   result: Record<string, unknown>,
-  path: string,
+  path: NestedContentIdRegenerationPath,
   destinationSlug: string,
 ): void {
-  if (path === 'features' || path === 'traits') {
-    regenerateFeaturesOrTraitsPathForDuplicate(result, path, destinationSlug)
-    return
-  }
-
-  if (path === 'heritage') {
-    regenerateHeritagePathForDuplicate(result, destinationSlug)
-    return
-  }
-
-  if (path === 'resolution') {
-    regenerateResolutionPathForDuplicate(result, destinationSlug)
+  switch (path) {
+    case 'features':
+    case 'traits':
+      regenerateFeaturesOrTraitsPathForDuplicate(result, path, destinationSlug)
+      return
+    case 'heritage':
+      regenerateHeritagePathForDuplicate(result, destinationSlug)
+      return
+    case 'resolution':
+      regenerateResolutionPathForDuplicate(result, destinationSlug)
+      return
+    case 'connections.locations':
+      regenerateConnectionsLocationsPathForDuplicate(result)
+      return
+    case 'members.titles':
+      regenerateMembersTitlesPathForDuplicate(result)
+      return
+    default: {
+      const _exhaustive: never = path
+      throw new Error(`Unhandled nested id regeneration path: ${_exhaustive}`)
+    }
   }
 }
 

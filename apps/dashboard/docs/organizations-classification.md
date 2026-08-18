@@ -1,11 +1,19 @@
 # Organization classification
 
-Organizations carry **Domain**, optional **Form**, **Functions**, **Practices**, and optional
-**member class affinities** and **member species affinities**. At least **Domain** is required
-on publish.
+Organizations carry **Domain**, optional **Form**, **Functions**, **Practices**, and a nested
+**`members`** object for member guidance and the membership title catalog. At least **Domain**
+is required on publish.
+
+```ts
+type OrganizationMembers = {
+  classAffinityIds: string[]
+  speciesAffinityIds: string[]
+  titles: OrganizationMembershipTitleDefinition[] // snapshot catalog
+}
+```
 
 **Familiar starting points** are create-only ephemeral projections — they seed domain / form /
-functions / practices / affinities and are stripped before persist.
+functions / practices / affinities and record `sourcePresetId` for title snapshotting at create.
 
 | Concern                        | Where to read                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -18,14 +26,14 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 
 ## Canonical axes
 
-| Axis                          | Field                        | Question it answers                                     | Author-facing?                               |
-| ----------------------------- | ---------------------------- | ------------------------------------------------------- | -------------------------------------------- |
-| **Domain**                    | `organizationDomain`         | Primary constituency or sector                          | Required chips                               |
-| **Form**                      | `organizationForm`           | Constitutional pattern (guild, order, company, …)       | Optional select                              |
-| **Functions**                 | `functions[]`                | Broad organizational missions                           | Multi chips                                  |
-| **Practices**                 | `practices[]`                | Distinctive trades, methods, or operational specialties | Searchable combobox                          |
-| **Member class affinities**   | `memberClassAffinityIds[]`   | Classes commonly associated with members                | Multi chips; drives member guidance surfaces |
-| **Member species affinities** | `memberSpeciesAffinityIds[]` | Species commonly associated with members                | Multi chips; same guidance surfaces as class |
+| Axis                          | Field                          | Question it answers                                     | Author-facing?                               |
+| ----------------------------- | ------------------------------ | ------------------------------------------------------- | -------------------------------------------- |
+| **Domain**                    | `organizationDomain`           | Primary constituency or sector                          | Required chips                               |
+| **Form**                      | `organizationForm`             | Constitutional pattern (guild, order, company, …)       | Optional select                              |
+| **Functions**                 | `functions[]`                  | Broad organizational missions                           | Multi chips                                  |
+| **Practices**                 | `practices[]`                  | Distinctive trades, methods, or operational specialties | Searchable combobox                          |
+| **Member class affinities**   | `members.classAffinityIds[]`   | Classes commonly associated with members                | Multi chips; drives member guidance surfaces |
+| **Member species affinities** | `members.speciesAffinityIds[]` | Species commonly associated with members                | Multi chips; same guidance surfaces as class |
 
 ### Functions vs Practices
 
@@ -42,9 +50,61 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 - Registry: [`organization-authoring-preset.ts`](../../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)
 - Create routes mount `OrganizationAuthoringFormShell` + `OrganizationAuthoringPresetBridge`.
 - Preset selection writes domain / form / functions / practices / affinities via
-  `buildOrganizationFormValueSyncs`, clears `authoringPresetId`, and sets **recommended practices**
-  through `ContentFormCtx.organizationPracticeRecommendationIds` (authoring guidance only).
+  `buildOrganizationFormValueSyncs`, clears `authoringPresetId`, records `sourcePresetId` for
+  create, and sets **recommended practices** through
+  `ContentFormCtx.organizationPracticeRecommendationIds` (authoring guidance only).
 - Edit routes omit the preset combobox (`mode: 'edit'`).
+
+### Membership title catalog
+
+Organizations carry a snapshot catalog at `members.titles[]`. Three ID layers apply:
+
+| Layer        | Field                   | Meaning                                                        |
+| ------------ | ----------------------- | -------------------------------------------------------------- |
+| Vocabulary   | `titleId`               | Canonical reusable concept (`captain`, `quartermaster`)        |
+| Preset ref   | `{ titleId, priority }` | Curated titles for a familiar starting point                   |
+| Organization | `id` (`omt_*`)          | Opaque org-local identity; optional `sourceTitleId` provenance |
+
+**Open vocabulary:** the canonical registry is typed for preset references, but organizations
+may hold custom titles with no vocabulary entry. Preset `titleId` refs stay compile-time typed;
+org title space stays open.
+
+**Create path:** dashboard sends `sourcePresetId` only when a familiar starting point was
+applied — the API snapshots vocabulary labels/descriptions + preset priorities into
+`members.titles[]` at `bodyFromCreateInput`. Manual create may supply explicit
+`members.titles` when no preset is used. Create input rejects combining both.
+
+| Path          | Client sends               | API persists                                                                     |
+| ------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| Preset create | `sourcePresetId`           | Vocabulary resolve → opaque `omt_*` ids + `members.titles` snapshot + provenance |
+| Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
+| Duplicate     | (N/A — server copies body) | Source title rows copied in order with new `omt_*` ids; `sourcePresetId` omitted |
+
+**Create XOR (API boundary):** `sourcePresetId` and a non-empty explicit `members.titles`
+catalog are mutually exclusive on create input. When `sourcePresetId` is present, the API
+resolver is authoritative — client omission of `members.titles` still yields the preset
+snapshot at persist.
+
+**Edit path:** classification forms expose `members.classAffinityIds` and
+`members.speciesAffinityIds` only — never `members.titles`, `connections`, or
+`sourcePresetId`. Title catalog and location connections are owned by create and dedicated
+mutations respectively. Classification PATCH never modifies an existing `members.titles`
+snapshot.
+
+**Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
+Mongo mapping, API serialization, duplication, and parse round-trips must preserve array
+order. Roster/display sort uses priority descending, then original array index as tie-break.
+
+**Character memberships:** connections persist `title` + `priority` strings/numbers for this
+pass. Renaming or deleting org titles does **not** propagate to existing character
+memberships until connections adopt `membershipTitleId` referencing organization-owned `id`s.
+
+**Retired:** classification-derived membership titles (five-slot resolver pipeline) were
+removed. Titles come only from the create-boundary snapshot or explicit manual catalog —
+never from domain / form / function inference at runtime.
+
+Detail: [`organization-membership-titles.ts`](../../../packages/contracts/src/rpg/content/organization-membership-titles.ts),
+[`organization-membership-title.ts`](../../../packages/contracts/src/rpg/vocab/organization-membership-title.ts).
 
 ### Detail surfaces
 

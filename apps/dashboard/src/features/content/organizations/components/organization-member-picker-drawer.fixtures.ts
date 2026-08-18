@@ -8,12 +8,21 @@ const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 const ROGUE_CLASS_ID = 'srd-cc-5.2.1:rogue'
 const WIZARD_CLASS_ID = 'srd-cc-5.2.1:wizard'
 
+const titles = [
+  { id: 'omt_guildmaster', label: 'Guildmaster', priority: 50 as const },
+  { id: 'omt_journeyman', label: 'Journeyman', priority: 30 as const },
+  { id: 'omt_treasurer', label: 'Treasurer', priority: 50 as const },
+] as const
+
 export const ORGANIZATION_MEMBER_PICKER_ORGANIZATION = {
   id: 'organization-lantern-guild',
   name: 'Lantern Guild',
   organizationDomain: 'occupational' as OrganizationDomain,
-  memberClassAffinityIds: [ROGUE_CLASS_ID],
-  memberSpeciesAffinityIds: [],
+  members: {
+    classAffinityIds: [ROGUE_CLASS_ID],
+    speciesAffinityIds: [],
+    titles: [...titles],
+  },
 }
 
 export const ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES = [

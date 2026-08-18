@@ -25,7 +25,7 @@ describe('buildQuickNpcSpeciesRadioCardPresentation', () => {
     expect(
       buildQuickNpcSpeciesRadioCardPresentation({
         speciesOptions: availableSpeciesOptions,
-        memberSpeciesAffinityIds: [elf.id],
+        speciesAffinityIds: [elf.id],
         playableSpecies: [human, dwarf],
       }),
     ).toEqual({
@@ -40,7 +40,7 @@ describe('buildQuickNpcSpeciesRadioCardPresentation', () => {
     expect(
       buildQuickNpcSpeciesRadioCardPresentation({
         speciesOptions,
-        memberSpeciesAffinityIds: [elf.id, dwarf.id],
+        speciesAffinityIds: [elf.id, dwarf.id],
         playableSpecies,
       }),
     ).toEqual({
@@ -72,7 +72,7 @@ describe('buildQuickNpcSpeciesRadioCardPresentation', () => {
     expect(
       buildQuickNpcSpeciesRadioCardPresentation({
         speciesOptions: [{ value: human.id, label: human.name }],
-        memberSpeciesAffinityIds: [unavailableElf.id],
+        speciesAffinityIds: [unavailableElf.id],
         playableSpecies: [human],
       }),
     ).toEqual({
@@ -84,7 +84,7 @@ describe('buildQuickNpcSpeciesRadioCardPresentation', () => {
     expect(
       buildQuickNpcSpeciesRadioCardPresentation({
         speciesOptions: speciesOptions.filter((option) => option.value !== elf.id),
-        memberSpeciesAffinityIds: [human.id, dwarf.id],
+        speciesAffinityIds: [human.id, dwarf.id],
         playableSpecies: [human, dwarf],
       }).optionGroups,
     ).toEqual([

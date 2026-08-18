@@ -1,8 +1,23 @@
-import type { Organization } from '@rpg/contracts'
+import type { Organization, OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 
 import { CONTENT_TIMESTAMP, STORY_CAMPAIGN_ID, STORY_RULESET_ID } from '../constants'
 
 export type OrganizationOverrides = Partial<Organization>
+
+const sampleMembershipTitles: OrganizationMembershipTitleDefinition[] = [
+  {
+    id: 'omt_fixture_chair',
+    sourceTitleId: 'chair',
+    label: 'Chair',
+    priority: 50,
+  },
+  {
+    id: 'omt_fixture_clerk',
+    sourceTitleId: 'clerk',
+    label: 'Clerk',
+    priority: 10,
+  },
+]
 
 function cityCouncilCanonicalBase(): Organization {
   return {
@@ -19,8 +34,11 @@ function cityCouncilCanonicalBase(): Organization {
     organizationDomain: 'government',
     functions: [],
     practices: [],
-    memberClassAffinityIds: [],
-    memberSpeciesAffinityIds: [],
+    members: {
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: sampleMembershipTitles,
+    },
     connections: { locations: [] },
   } satisfies Organization
 }

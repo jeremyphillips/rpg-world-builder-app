@@ -4,15 +4,15 @@ import { intersectPersistedContentIds } from './intersect-persisted-content-ids'
 
 /** Stored affinity ids intersected with playable classes; order follows persisted affinities. */
 export function resolveOrganizationMemberClassRecommendationIds(input: {
-  memberClassAffinityIds: readonly string[]
+  classAffinityIds: readonly string[]
   playableClasses: readonly CharacterClass[]
 }): string[] {
-  return intersectPersistedContentIds(input.memberClassAffinityIds, input.playableClasses)
+  return intersectPersistedContentIds(input.classAffinityIds, input.playableClasses)
 }
 
 /** Stored affinity ids intersected with playable classes; order follows persisted affinities. */
 export function resolveOrganizationMemberClassRecommendations(input: {
-  memberClassAffinityIds: readonly string[]
+  classAffinityIds: readonly string[]
   playableClasses: readonly CharacterClass[]
 }): CharacterClass[] {
   const playableById = new Map(
@@ -26,12 +26,12 @@ export function resolveOrganizationMemberClassRecommendations(input: {
 /** True when any character class id matches a surviving recommended affinity id. */
 export function characterMatchesOrganizationMemberClassRecommendations(input: {
   classIds: readonly string[]
-  memberClassAffinityIds: readonly string[]
+  classAffinityIds: readonly string[]
   playableClasses: readonly CharacterClass[]
 }): boolean {
   const recommendedIds = new Set(
     resolveOrganizationMemberClassRecommendationIds({
-      memberClassAffinityIds: input.memberClassAffinityIds,
+      classAffinityIds: input.classAffinityIds,
       playableClasses: input.playableClasses,
     }),
   )

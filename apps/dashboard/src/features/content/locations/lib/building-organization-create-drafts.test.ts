@@ -19,8 +19,7 @@ const organizationValues = {
   organizationDomain: 'commercial' as const,
   functions: [],
   practices: [],
-  memberClassAffinityIds: [],
-  memberSpeciesAffinityIds: [],
+  members: { classAffinityIds: [], speciesAffinityIds: [] },
 }
 
 function existingOrganization(input: {

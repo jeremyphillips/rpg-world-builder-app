@@ -7,21 +7,15 @@ import type { OrganizationMembershipTitleFieldProps } from './organization-membe
 
 export type { OrganizationMembershipTitleFieldProps } from './organization-membership-title-field.types'
 
-/** Classification-scoped title radios for organization membership chooser/editor. */
+/** Organization catalog title radios for membership chooser/editor. */
 export function OrganizationMembershipTitleField({
-  kind,
-  form,
-  functions,
-  practices,
+  titles,
   value,
   onValueChange,
   idPrefix,
 }: OrganizationMembershipTitleFieldProps) {
   const options = buildOrganizationMembershipTitleRadioOptions({
-    kind,
-    form,
-    functions,
-    practices,
+    titles,
     currentValue: value,
   })
 

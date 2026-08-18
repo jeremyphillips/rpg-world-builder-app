@@ -15,11 +15,11 @@ export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = `All other ${getContentTypeSent
 
 export function buildQuickNpcClassRadioCardPresentation(input: {
   classOptions: readonly FieldOption[]
-  memberClassAffinityIds?: readonly string[]
+  classAffinityIds?: readonly string[]
   playableClasses: readonly CharacterClass[]
 }) {
   const recommendedIds = resolveOrganizationMemberClassRecommendationIds({
-    memberClassAffinityIds: input.memberClassAffinityIds ?? [],
+    classAffinityIds: input.classAffinityIds ?? [],
     playableClasses: input.playableClasses,
   })
 

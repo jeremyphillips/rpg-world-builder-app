@@ -7,6 +7,8 @@ import {
   ORGANIZATION_AUTHORING_PRESETS,
   type OrganizationAuthoringPresetId,
 } from './organization-authoring-preset'
+import { getOrganizationMembershipTitleEntry } from './organization-membership-title'
+import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './organization-member-title-entry'
 import { ORGANIZATION_DOMAIN_IDS } from './organization-domain'
 import { ORGANIZATION_FORM_IDS } from './organization-form'
 import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
@@ -54,6 +56,32 @@ describe('organization authoring presets', () => {
     for (const preset of Object.values(ORGANIZATION_AUTHORING_PRESETS)) {
       expect(preset.description.trim()).not.toBe('')
     }
+  })
+
+  it('requires membership title refs that resolve in the vocabulary', () => {
+    for (const id of ORGANIZATION_AUTHORING_PRESET_IDS) {
+      const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+      expect(preset.members.titles.length).toBeGreaterThan(0)
+      const seen = new Set<string>()
+      for (const ref of preset.members.titles) {
+        expect(ref).not.toHaveProperty('label')
+        expect(getOrganizationMembershipTitleEntry(ref.titleId)).toBeDefined()
+        expect(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES).toContain(ref.priority)
+        expect(seen.has(ref.titleId)).toBe(false)
+        seen.add(ref.titleId)
+      }
+    }
+  })
+
+  it('assigns different preset priorities to the same vocabulary title id', () => {
+    const armyCaptain = ORGANIZATION_AUTHORING_PRESETS.army.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    const mercenaryCaptain = ORGANIZATION_AUTHORING_PRESETS.mercenary_company.members.titles.find(
+      (ref) => ref.titleId === 'captain',
+    )
+    expect(armyCaptain?.priority).toBe(40)
+    expect(mercenaryCaptain?.priority).toBe(50)
   })
 
   it('requires recommendedPractices on every preset with valid, disjoint practice ids', () => {
