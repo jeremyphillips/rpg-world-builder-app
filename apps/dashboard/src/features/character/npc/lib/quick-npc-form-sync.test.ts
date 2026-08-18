@@ -34,6 +34,7 @@ describe('createQuickNpcFormValueSyncs', () => {
     const sync = createQuickNpcFormValueSyncs(buildContext)[0]!
     const setup: QuickNpcSetupValues = {
       speciesId: populatedBuilderCatalog.species[0]!.id,
+      membershipTitle: '',
       classId: quickFighter.id,
       level: 1,
     }
@@ -62,6 +63,7 @@ describe('createQuickNpcFormValueSyncs', () => {
     const patch = sync.apply(
       {
         speciesId: populatedBuilderCatalog.species[0]!.id,
+        membershipTitle: '',
         classId: quickFighter.id,
         level: 1,
         [QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]: [],

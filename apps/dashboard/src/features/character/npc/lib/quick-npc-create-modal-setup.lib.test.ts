@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { getNpcAuthoringTemplateLabel } from '@rpg/contracts'
+
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -12,11 +15,22 @@ import { QUICK_NPC_SPECIES_ALL_GROUP_EYEBROW } from './quick-npc-species-option-
 import { QUICK_NPC_AFFINITY_RECOMMENDED_EYEBROW } from './quick-npc-affinity-option-groups.lib'
 import {
   buildQuickNpcCreateSetupSets,
+  formatQuickNpcLevelRecommendationPrompt,
   formatQuickNpcSetupCharacterSummary,
+  QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+  QUICK_NPC_TITLE_FIELD_PROMPT,
   resolveQuickNpcDefaultLevel,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
 import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
+
+const guildmasterTitle = {
+  id: 'omt_guildmaster',
+  label: 'Guildmaster',
+  description: 'Head of the guild.',
+  priority: 50 as const,
+  npcRecommendation: { templateId: 'civic_leader' as const, level: 5 },
+} as const
 
 describe('buildQuickNpcCreateSetupSets', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
@@ -45,45 +59,108 @@ describe('buildQuickNpcCreateSetupSets', () => {
     },
   })
 
-  it('orders species and level, omitting class at level 0', () => {
+  it('orders species, title, and level, omitting class at level 0', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
       values: createQuickNpcSetupDefaultValues(context),
-      onValuesChange: () => {},
+      onApplySetupChange: () => {},
+      titles: [],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'level'])
+    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'membershipTitle', 'level'])
   })
 
-  it('includes class when level progression applies', () => {
+  it('includes recommended build, level prompt, and class when a title recommendation applies', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
-      values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
-      onValuesChange: () => {},
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: 'Guildmaster',
+        classId: '',
+        level: 5,
+      },
+      onApplySetupChange: () => {},
+      titles: [guildmasterTitle],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'level', 'classId'])
+    expect(sets.map((set) => set.id)).toEqual([
+      'speciesId',
+      'membershipTitle',
+      'recommendedBuild',
+      'level',
+      'classId',
+    ])
+
+    const recommendedBuild = sets.find((set) => set.id === 'recommendedBuild')
+    expect(recommendedBuild).toMatchObject({
+      kind: 'note',
+      fieldLabel: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+      body: getNpcAuthoringTemplateLabel('civic_leader'),
+      isComplete: true,
+      required: false,
+    })
+
+    const titleSet = sets.find((set) => set.id === 'membershipTitle')
+    expect(titleSet).toMatchObject({
+      required: false,
+      prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
+    })
+
+    const levelSet = sets.find((set) => set.id === 'level')
+    expect(levelSet).toMatchObject({
+      prompt: 'Recommended for Guildmaster: Level 5.',
+      dependsOn: ['membershipTitle'],
+    })
+  })
+
+  it('includes class when level progression applies without a title recommendation', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      context,
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        classId: '',
+        level: 1,
+      },
+      onApplySetupChange: () => {},
+      titles: [],
+    })
+
+    expect(sets.map((set) => set.id)).toEqual(['speciesId', 'membershipTitle', 'level', 'classId'])
     expect(sets[0]?.kind).toBe('choice')
-    expect(sets[1]?.kind).toBe('number')
-    expect(sets[2]?.kind).toBe('choice')
+    expect(sets[2]?.kind).toBe('number')
+    expect(sets[3]?.kind).toBe('choice')
   })
 
   it('keeps level expanded while complete', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
-      values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
-      onValuesChange: () => {},
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        classId: '',
+        level: 1,
+      },
+      onApplySetupChange: () => {},
+      titles: [],
     })
 
-    expect(sets[1]?.collapseWhenComplete).toBe(false)
-    expect(sets[1]?.isComplete).toBe(true)
+    const levelSet = sets.find((set) => set.id === 'level')
+    expect(levelSet?.collapseWhenComplete).toBe(false)
+    expect(levelSet?.isComplete).toBe(true)
   })
 
   it('groups class options by organization member class affinities when survivors exist', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context: multiClassContext,
-      values: { speciesId: 'srd-cc-5.2.1:dwarf', classId: '', level: 1 },
-      onValuesChange: () => {},
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        classId: '',
+        level: 1,
+      },
+      onApplySetupChange: () => {},
+      titles: [],
       members: { classAffinityIds: [rogueClass.id] },
     })
 
@@ -108,7 +185,8 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context: multiSpeciesContext,
       values: createQuickNpcSetupDefaultValues(multiSpeciesContext),
-      onValuesChange: () => {},
+      onApplySetupChange: () => {},
+      titles: [],
       members: { speciesAffinityIds: [elfSpecies.id] },
     })
 
@@ -127,6 +205,26 @@ describe('buildQuickNpcCreateSetupSets', () => {
         options: [{ value: 'srd-cc-5.2.1:dwarf', label: 'Dwarf' }],
       },
     ])
+  })
+})
+
+describe('formatQuickNpcLevelRecommendationPrompt', () => {
+  it('returns undefined when the title has no recommendation', () => {
+    expect(
+      formatQuickNpcLevelRecommendationPrompt({
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        titles: [],
+      }),
+    ).toBeUndefined()
+  })
+
+  it('formats the recommended level prompt from the selected title', () => {
+    expect(
+      formatQuickNpcLevelRecommendationPrompt({
+        membershipTitle: 'Guildmaster',
+        titles: [guildmasterTitle],
+      }),
+    ).toBe('Recommended for Guildmaster: Level 5.')
   })
 })
 
@@ -150,6 +248,7 @@ describe('resolveQuickNpcSetupModel', () => {
         context,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: '',
           level: 0,
         },
@@ -163,6 +262,7 @@ describe('resolveQuickNpcSetupModel', () => {
         context,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: '',
           level: 1,
         },
@@ -174,6 +274,7 @@ describe('resolveQuickNpcSetupModel', () => {
         context,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: 'srd-cc-5.2.1:fighter',
           level: 1,
         },
@@ -184,6 +285,7 @@ describe('resolveQuickNpcSetupModel', () => {
   it('formats classless level 0 summaries', () => {
     const values = {
       speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: '',
       level: 0,
     }
@@ -194,6 +296,7 @@ describe('resolveQuickNpcSetupModel', () => {
   it('formats the setup summary with the canonical character summary line', () => {
     const values = {
       speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: 'srd-cc-5.2.1:fighter',
       level: 1,
     }

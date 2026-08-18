@@ -8,6 +8,7 @@ import {
   Button,
   Modal,
   dialogPanelActionRowClasses,
+  Text,
 } from '@rpg/ui'
 
 import { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
@@ -93,6 +94,20 @@ export function CreateSetupPanel({
           collapseWhenComplete: set.collapseWhenComplete ?? true,
         })
 
+        if (set.kind === 'note') {
+          return (
+            <div key={set.id} data-field-align className="flex flex-col gap-y-2">
+              <FieldLabelContent label={set.fieldLabel} />
+              <Text variant="small">{set.body}</Text>
+              {set.description ? (
+                <Text variant="muted" className="text-sm">
+                  {set.description}
+                </Text>
+              ) : null}
+            </div>
+          )
+        }
+
         if (set.kind === 'choice') {
           return (
             <CollapsibleRadioCardField
@@ -137,6 +152,11 @@ export function CreateSetupPanel({
         return (
           <div key={set.id} data-field-align className="flex flex-col gap-y-4">
             <FieldLabelContent label={set.fieldLabel} />
+            {set.prompt ? (
+              <Text variant="muted" className="text-sm">
+                {set.prompt}
+              </Text>
+            ) : null}
             <NumberStepper
               aria-label={set.fieldLabel}
               size="sm"

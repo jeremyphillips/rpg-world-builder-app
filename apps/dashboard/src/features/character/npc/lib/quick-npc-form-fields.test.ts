@@ -17,7 +17,6 @@ import {
   quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
   QUICK_NPC_DETAILS_TAB_ID,
-  QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
 } from './quick-npc-form-fields'
 
 const validValues = {
@@ -138,24 +137,15 @@ const sampleMembershipTitles = [
 ] as const
 
 describe('buildQuickNpcDetailsFields', () => {
-  it('includes the canonical membership title radio with a No title default', () => {
+  it('includes name and alignment only', () => {
     const fields = buildQuickNpcDetailsFields({
       membership: { titles: sampleMembershipTitles },
     })
 
-    const titleField = fields.find(
-      (field) => 'name' in field && field.name === QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
-    )
-    expect(titleField).toMatchObject({
-      type: 'radio',
-      defaultValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-    })
-    expect((titleField as { options: { value: string; label: string }[] }).options).toEqual(
-      expect.arrayContaining([
-        { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },
-        { value: 'Guildmaster', label: 'Guildmaster' },
-      ]),
-    )
+    expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+      'name',
+      'alignment',
+    ])
   })
 
   it('has defaults for every schema key', () => {
@@ -165,14 +155,13 @@ describe('buildQuickNpcDetailsFields', () => {
       classId: '',
       level: 1,
       alignment: 'n',
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      membershipTitle: '',
       requiredWeaponIds: [],
       requiredSpellIds: [],
     })
     expect(quickNpcAuthoringTabDefaultValues).toEqual({
       name: '',
       alignment: 'n',
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       requiredWeaponIds: [],
       requiredSpellIds: [],
     })
@@ -211,17 +200,22 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('merges setup and tab values for create/finalize', () => {
     expect(
       mergeQuickNpcAuthoringValues(
-        { speciesId: 'species-1', classId: 'class-1', level: 2 },
+        {
+          speciesId: 'species-1',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          classId: 'class-1',
+          level: 2,
+        },
         {
           name: 'Guard Captain',
           alignment: 'ln',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           requiredWeaponIds: [],
           requiredSpellIds: [],
         },
       ),
     ).toMatchObject({
       speciesId: 'species-1',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: 'class-1',
       level: 2,
       name: 'Guard Captain',

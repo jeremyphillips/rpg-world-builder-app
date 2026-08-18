@@ -245,10 +245,9 @@ export function QuickNpcAuthoringForm({
   const defaultValues = React.useMemo(
     () => ({
       ...quickNpcAuthoringTabDefaultValues,
-      ...setup,
       ...initialValues,
     }),
-    [initialValues, setup],
+    [initialValues],
   )
 
   const requirementCategoryKey = React.useMemo(() => {

@@ -22,6 +22,7 @@ import { getEquipmentPickerCallout } from '../../components/equipment/equipment-
 
 const setup = {
   speciesId: 'species-1',
+  membershipTitle: '',
   classId: equipmentStepBardClassFixture.id,
   level: 1,
 }

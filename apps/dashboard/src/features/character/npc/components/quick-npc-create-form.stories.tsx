@@ -39,6 +39,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 
 const setup = {
   speciesId: populatedBuilderCatalog.species[0]!.id,
+  membershipTitle: '',
   classId: populatedBuilderCatalog.classes[0]!.id,
   level: 1,
 }
@@ -88,13 +89,13 @@ export const ResolutionError: Story = {
     }),
     setup: {
       speciesId: populatedBuilderCatalog.species[0]!.id,
+      membershipTitle: '',
       classId: unsatisfiableClass.id,
       level: 1,
     },
     initialValues: {
       name: 'Stalled Recruit',
       alignment: 'ln',
-      membershipTitle: 'Guildmaster',
       requiredWeaponIds: [],
       requiredSpellIds: [],
     },

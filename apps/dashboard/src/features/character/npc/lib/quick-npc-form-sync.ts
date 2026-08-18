@@ -59,6 +59,7 @@ export function createQuickNpcFormValueSyncs(
 
         const setup: QuickNpcSetupValues = {
           speciesId: typeof values.speciesId === 'string' ? values.speciesId : '',
+          membershipTitle: typeof values.membershipTitle === 'string' ? values.membershipTitle : '',
           classId: typeof values.classId === 'string' ? values.classId : '',
           level: typeof values.level === 'number' ? values.level : 1,
         }

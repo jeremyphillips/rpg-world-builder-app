@@ -26,6 +26,7 @@ export { createSetupModalBodyClasses } from './create-setup.variants'
 
 export type {
   CreateSetupChoiceSet,
+  CreateSetupNoteSet,
   CreateSetupNumberSet,
   CreateSetupSequenceItem,
   CreateSetupSet,

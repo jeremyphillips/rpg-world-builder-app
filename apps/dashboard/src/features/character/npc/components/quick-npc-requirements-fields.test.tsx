@@ -18,6 +18,7 @@ import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.clie
 
 const setup = {
   speciesId: 'species-1',
+  membershipTitle: '',
   classId: equipmentStepBardClassFixture.id,
   level: 1,
 }

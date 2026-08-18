@@ -96,6 +96,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 
 const setup = {
   speciesId: 'srd-cc-5.2.1:dwarf',
+  membershipTitle: '',
   classId: quickFighter.id,
   level: 1,
 }
@@ -172,6 +173,7 @@ describe('QuickNpcAuthoringForm', () => {
       setup: {
         ...setup,
         speciesId: 'srd-cc-5.2.1:not-a-species',
+        membershipTitle: '',
       },
     })
 
