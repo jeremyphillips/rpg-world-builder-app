@@ -64,18 +64,36 @@ README). Default `/characters/*` never carries campaign id in the URL.
 Campaign managers create an NPC and stamp organization membership in one flow from the
 organization detail **Members** section — no full builder route.
 
-| Layer                                               | Responsibility                                                                                                    |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions |
-| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)              |
-| `QuickNpcCreateModal` (character feature)           | Setup (species/class/level) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create  |
+| Layer                                               | Responsibility                                                                                                                                   |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions                                |
+| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)                                             |
+| `QuickNpcCreateModal` (character feature)           | Setup (title → species → recommended build → level → class) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create |
 
 **Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays
 open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.
 
+**Setup phase** (`CreateSetupPanel` via `buildQuickNpcCreateSetupSets`):
+
+- **Title-first progressive reveal** — only the membership title choice is visible until the user
+  selects a title or explicit **No title** (`membershipTitle: undefined` is setup-only unset and
+  incomplete; deliberate no-title persists as `''`).
+- **Recommended build** — when the selected title carries a snapshotted `npcRecommendation`, a
+  display-only note shows the `NPC_AUTHORING_TEMPLATE_*` label and description after Species is
+  complete. Build is derived from the title snapshot, not a form value.
+- **Level** — reseeded from the title recommendation (clamped to campaign constraints) on Title
+  change; user-owned across Species changes.
+- **Class** — ranked from merged template + organization class affinities; when exactly one eligible
+  recommendation exists after Species is complete, `classId` is auto-seeded and collapses like a
+  manual selection. Level 0 clears class and omits the Class set.
+
+Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
+create convention). Title change preserves Species but reseeds Build, Level, and Class.
+
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
 `requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `connections.organizations`, then
-`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included.
+`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. No
+template id is persisted on the created NPC.
 
 **Requirements tab:** multi-add combobox pickers compose canonical equipment/spell compact row VMs
 and equipment `not_proficient` callouts only (`visibleStatuses: ['not_proficient']` on the shared

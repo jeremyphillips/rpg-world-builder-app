@@ -380,6 +380,25 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
+**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/npc-authoring-template.ts))
+follow the same two-layer pattern with an extended entry shape:
+
+```ts
+export type NpcAuthoringTemplateEntry = GameTermEntry & {
+  readonly searchTerms?: readonly string[]
+  readonly classAffinityIds?: readonly string[] // canonical class slug seeds
+}
+```
+
+`NPC_AUTHORING_TEMPLATE_TERM` + `NPC_AUTHORING_TEMPLATE_ENTRIES` (22 archetypes) supply display
+labels for Quick NPC recommended-build readouts. Optional `classAffinityIds` are baseline canonical
+class recommendations — organization `members.classAffinityIds` remain the path for
+organization-specific or homebrew classes. Preset membership-title refs carry contextual
+`{ templateId, level }` recommendations that snapshot into organization-owned titles at create;
+see [`organization-membership-titles.ts`](../src/rpg/content/organization-membership-titles.ts) and
+`resolveOrganizationNpcClassRecommendationIds` in
+[`organization-member-class-recommendations.ts`](../src/rpg/runtime/character/organization-member-class-recommendations.ts).
+
 ### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
 
 Catalog collection chrome uses a separate registry in

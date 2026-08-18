@@ -10,6 +10,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
+import { isCreateSetupChoiceComplete } from '@/lib/create-setup'
 import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
 
 function clampLevel(level: number, minLevel: number, maxLevel: number): number {
@@ -81,15 +82,27 @@ function applyRecommendedClassSeeding(args: QuickNpcSetupValueChangeArgs): Quick
   })
 }
 
+function applyRecommendedClassSeedingWhenSpeciesComplete(
+  args: QuickNpcSetupValueChangeArgs & { values: QuickNpcSetupValues },
+): QuickNpcSetupValues {
+  if (!isCreateSetupChoiceComplete(args.values.speciesId)) {
+    return args.values
+  }
+
+  return applyRecommendedClassSeeding(args)
+}
+
 export function applyQuickNpcSetupValueChange(
   args: QuickNpcSetupValueChangeArgs,
 ): QuickNpcSetupValues {
   if (args.setId === 'speciesId') {
-    return applyLevelClassSideEffects({
+    const nextValues = applyLevelClassSideEffects({
       ...args.values,
       speciesId: String(args.nextValue),
       classId: '',
     })
+
+    return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
   }
 
   if (args.setId === 'membershipTitle') {
@@ -105,7 +118,7 @@ export function applyQuickNpcSetupValueChange(
       classId: '',
     }
 
-    return applyRecommendedClassSeeding({ ...args, values: nextValues })
+    return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
   }
 
   if (args.setId === 'level') {
@@ -117,7 +130,7 @@ export function applyQuickNpcSetupValueChange(
     }
 
     if (!isClassProgressionApplicable(previousLevel)) {
-      return applyRecommendedClassSeeding({
+      return applyRecommendedClassSeedingWhenSpeciesComplete({
         ...args,
         values: { ...args.values, level: nextLevel, classId: '' },
       })

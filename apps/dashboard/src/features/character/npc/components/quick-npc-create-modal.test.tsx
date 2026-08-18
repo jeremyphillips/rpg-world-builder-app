@@ -143,6 +143,17 @@ describe('QuickNpcCreateModal', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
+  it('shows setup-phase headline and description', () => {
+    renderModal()
+
+    expect(screen.getByText("Choose this member's role in the organization.")).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation.",
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('wraps setup content in a scroll region inside the stable modal body', () => {
     renderModal()
 

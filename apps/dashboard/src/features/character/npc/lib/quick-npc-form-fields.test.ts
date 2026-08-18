@@ -12,6 +12,7 @@ import {
   buildQuickNpcConstraints,
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
+  createQuickNpcSetupDefaultValues,
   mergeQuickNpcAuthoringValues,
   quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
@@ -28,6 +29,19 @@ const validValues = {
   requiredWeaponIds: [],
   requiredSpellIds: [],
 }
+
+describe('createQuickNpcSetupDefaultValues', () => {
+  it('starts with setup-only unset membership title until the user chooses', () => {
+    const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+
+    expect(createQuickNpcSetupDefaultValues(context)).toMatchObject({
+      speciesId: '',
+      membershipTitle: undefined,
+      classId: '',
+      level: 0,
+    })
+  })
+})
 
 describe('quickNpcAuthoringSchema', () => {
   it('accepts a complete quick NPC form payload', () => {

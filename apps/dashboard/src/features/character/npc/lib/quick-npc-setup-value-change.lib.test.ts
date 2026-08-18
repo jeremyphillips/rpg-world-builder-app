@@ -102,7 +102,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     level: 3,
   }
 
-  it('clears class when species changes without touching level', () => {
+  it('recomputes and auto-seeds Class when Species changes without touching level', () => {
     expect(
       applyQuickNpcSetupValueChange({
         values: baseValues,
@@ -113,8 +113,51 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual({
       ...baseValues,
       speciesId: 'srd-cc-5.2.1:elf',
-      classId: '',
+      classId: rogueClass.id,
       level: 3,
+    })
+  })
+
+  it('defers Class seeding when Title is selected before Species', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...createQuickNpcSetupDefaultValues(multiClassContext),
+          speciesId: '',
+          membershipTitle: undefined,
+          classId: '',
+        },
+        setId: 'membershipTitle',
+        nextValue: 'Guildmaster',
+        ...changeArgs,
+      }),
+    ).toEqual({
+      speciesId: '',
+      membershipTitle: 'Guildmaster',
+      classId: '',
+      level: 8,
+    })
+  })
+
+  it('auto-seeds Class when Species completes after Title', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...createQuickNpcSetupDefaultValues(multiClassContext),
+          speciesId: '',
+          membershipTitle: 'Guildmaster',
+          classId: '',
+          level: 8,
+        },
+        setId: 'speciesId',
+        nextValue: 'srd-cc-5.2.1:elf',
+        ...changeArgs,
+      }),
+    ).toEqual({
+      speciesId: 'srd-cc-5.2.1:elf',
+      membershipTitle: 'Guildmaster',
+      classId: rogueClass.id,
+      level: 8,
     })
   })
 
@@ -238,6 +281,28 @@ describe('applyQuickNpcSetupValueChange', () => {
       membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       level: 1,
       classId: rogueClass.id,
+    })
+  })
+
+  it('defers Class seeding when level rises from 0 before Species is complete', () => {
+    expect(
+      applyQuickNpcSetupValueChange({
+        values: {
+          ...createQuickNpcSetupDefaultValues(multiClassContext),
+          speciesId: '',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          level: 0,
+          classId: '',
+        },
+        setId: 'level',
+        nextValue: 1,
+        ...changeArgs,
+      }),
+    ).toEqual({
+      speciesId: '',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      level: 1,
+      classId: '',
     })
   })
 
