@@ -309,4 +309,24 @@ describe('resolveQuickNpcSetupModel', () => {
       }).summaryLine,
     ).toBe('Dwarf · Level 1 Fighter')
   })
+
+  it('appends the selected title and recommended build to the setup summary', () => {
+    const values = {
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: 'Guildmaster',
+      classId: 'srd-cc-5.2.1:fighter',
+      level: 5,
+    }
+
+    expect(formatQuickNpcSetupCharacterSummary(values, context, [guildmasterTitle])).toBe(
+      'Dwarf · Level 5 Fighter · Guildmaster · Civic leader',
+    )
+    expect(
+      resolveQuickNpcSetupModel({
+        context,
+        values,
+        titles: [guildmasterTitle],
+      }).summaryLine,
+    ).toBe('Dwarf · Level 5 Fighter · Guildmaster · Civic leader')
+  })
 })

@@ -79,18 +79,159 @@ export function formatQuickNpcLevelRecommendationPrompt(args: {
 export function formatQuickNpcSetupCharacterSummary(
   values: QuickNpcSetupValues,
   context: CharacterBuildContext,
+  titles: readonly OrganizationMembershipTitleDefinition[] = [],
 ): string {
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  return formatBuilderDraftCharacterSummary(
-    {
-      species: { speciesId: values.speciesId },
-      class: {
-        classId: isClassProgressionApplicable(values.level) ? values.classId : undefined,
-        level: values.level,
+  const segments = [
+    formatBuilderDraftCharacterSummary(
+      {
+        species: { speciesId: values.speciesId },
+        class: {
+          classId: isClassProgressionApplicable(values.level) ? values.classId : undefined,
+          level: values.level,
+        },
       },
-    },
-    catalogIndex,
-  )
+      catalogIndex,
+    ),
+  ]
+
+  const persistedTitle = titleFromMembershipRadioValue(values.membershipTitle)
+  if (persistedTitle !== undefined) {
+    segments.push(persistedTitle)
+    const recommendation = resolveQuickNpcSelectedTitleRecommendation({
+      membershipTitle: values.membershipTitle,
+      titles,
+    })
+    if (recommendation !== undefined) {
+      segments.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
+    }
+  }
+
+  return segments.join(' · ')
+}
+
+type QuickNpcSetupSetBuilderArgs = {
+  values: QuickNpcSetupValues
+  onApplySetupChange: (setId: string, nextValue: string | number) => void
+  titles: readonly OrganizationMembershipTitleDefinition[]
+  speciesTermLabel: string
+  classTermLabel: string
+  speciesPresentation: ReturnType<typeof buildQuickNpcSpeciesRadioCardPresentation>
+  classPresentation: ReturnType<typeof buildQuickNpcClassRadioCardPresentation>
+  levelConstraints: ReturnType<typeof resolveCharacterLevelConstraints>
+  levelPrompt: string | undefined
+}
+
+function buildQuickNpcSpeciesSetupSet(
+  args: Pick<
+    QuickNpcSetupSetBuilderArgs,
+    'values' | 'onApplySetupChange' | 'speciesTermLabel' | 'speciesPresentation'
+  >,
+): CreateSetupSet {
+  return {
+    id: 'speciesId',
+    kind: 'choice',
+    fieldLabel: args.speciesTermLabel,
+    prompt: args.speciesPresentation.optionGroups
+      ? QUICK_NPC_SPECIES_AFFINITY_PROMPT
+      : `What ${args.speciesTermLabel.toLowerCase()} is this NPC?`,
+    options: args.speciesPresentation.options,
+    ...(args.speciesPresentation.optionGroups
+      ? { optionGroups: args.speciesPresentation.optionGroups }
+      : {}),
+    value: args.values.speciesId,
+    isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
+    collapseWhenComplete: true,
+    onValueChange: (speciesId) => args.onApplySetupChange('speciesId', speciesId),
+    onReset: () => {},
+  }
+}
+
+function buildQuickNpcMembershipTitleSetupSet(
+  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'onApplySetupChange' | 'titles'>,
+): CreateSetupSet {
+  return {
+    id: 'membershipTitle',
+    kind: 'choice',
+    required: false,
+    fieldLabel: 'Title',
+    prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
+    options: buildOrganizationMembershipTitleRadioOptions({ titles: args.titles }),
+    value: args.values.membershipTitle,
+    isComplete: isCreateSetupChoiceComplete(args.values.membershipTitle),
+    collapseWhenComplete: true,
+    onValueChange: (membershipTitle) => args.onApplySetupChange('membershipTitle', membershipTitle),
+    onReset: () => {},
+  }
+}
+
+function buildQuickNpcRecommendedBuildSetupSet(
+  recommendation: NonNullable<ReturnType<typeof resolveQuickNpcSelectedTitleRecommendation>>,
+): CreateSetupSet {
+  const templateEntry = getNpcAuthoringTemplateEntry(recommendation.templateId)
+  return {
+    id: 'recommendedBuild',
+    kind: 'note',
+    required: false,
+    fieldLabel: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+    body: getNpcAuthoringTemplateLabel(recommendation.templateId),
+    ...(templateEntry?.description ? { description: templateEntry.description } : {}),
+    isComplete: true,
+    onReset: () => {},
+  }
+}
+
+function buildQuickNpcLevelSetupSet(
+  args: Pick<
+    QuickNpcSetupSetBuilderArgs,
+    'values' | 'onApplySetupChange' | 'levelConstraints' | 'levelPrompt'
+  >,
+): CreateSetupSet {
+  return {
+    id: 'level',
+    kind: 'number',
+    fieldLabel: 'Level',
+    ...(args.levelPrompt ? { prompt: args.levelPrompt } : {}),
+    value: args.values.level,
+    min: args.levelConstraints.minLevel,
+    max: args.levelConstraints.maxLevel,
+    digits: 2,
+    dependsOn: ['membershipTitle'],
+    isComplete: isCreateSetupNumberComplete(
+      args.values.level,
+      args.levelConstraints.minLevel,
+      args.levelConstraints.maxLevel,
+    ),
+    collapseWhenComplete: false,
+    onValueChange: (level) => args.onApplySetupChange('level', level),
+    onReset: () => {},
+  }
+}
+
+function buildQuickNpcClassSetupSet(
+  args: Pick<
+    QuickNpcSetupSetBuilderArgs,
+    'values' | 'onApplySetupChange' | 'classTermLabel' | 'classPresentation'
+  >,
+): CreateSetupSet {
+  return {
+    id: 'classId',
+    kind: 'choice',
+    fieldLabel: args.classTermLabel,
+    prompt: args.classPresentation.optionGroups
+      ? QUICK_NPC_CLASS_AFFINITY_PROMPT
+      : `Choose a ${args.classTermLabel.toLowerCase()}`,
+    options: args.classPresentation.options,
+    ...(args.classPresentation.optionGroups
+      ? { optionGroups: args.classPresentation.optionGroups }
+      : {}),
+    value: args.values.classId,
+    dependsOn: ['speciesId'],
+    isComplete: isCreateSetupChoiceComplete(args.values.classId),
+    collapseWhenComplete: true,
+    onValueChange: (classId) => args.onApplySetupChange('classId', classId),
+    onReset: () => {},
+  }
 }
 
 export function buildQuickNpcCreateSetupSets(args: {
@@ -129,91 +270,31 @@ export function buildQuickNpcCreateSetupSets(args: {
     membershipTitle: values.membershipTitle,
     titles,
   })
+  const setBuilderArgs: QuickNpcSetupSetBuilderArgs = {
+    values,
+    onApplySetupChange,
+    titles,
+    speciesTermLabel: speciesTerm.label,
+    classTermLabel: classTerm.label,
+    speciesPresentation,
+    classPresentation,
+    levelConstraints,
+    levelPrompt,
+  }
 
   const sets: CreateSetupSet[] = [
-    {
-      id: 'speciesId',
-      kind: 'choice',
-      fieldLabel: speciesTerm.label,
-      prompt: speciesPresentation.optionGroups
-        ? QUICK_NPC_SPECIES_AFFINITY_PROMPT
-        : `What ${speciesTerm.label.toLowerCase()} is this NPC?`,
-      options: speciesPresentation.options,
-      ...(speciesPresentation.optionGroups
-        ? { optionGroups: speciesPresentation.optionGroups }
-        : {}),
-      value: values.speciesId,
-      isComplete: isCreateSetupChoiceComplete(values.speciesId),
-      collapseWhenComplete: true,
-      onValueChange: (speciesId) => onApplySetupChange('speciesId', speciesId),
-      onReset: () => {},
-    },
-    {
-      id: 'membershipTitle',
-      kind: 'choice',
-      required: false,
-      fieldLabel: 'Title',
-      prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
-      options: buildOrganizationMembershipTitleRadioOptions({ titles }),
-      value: values.membershipTitle,
-      isComplete: isCreateSetupChoiceComplete(values.membershipTitle),
-      collapseWhenComplete: true,
-      onValueChange: (membershipTitle) => onApplySetupChange('membershipTitle', membershipTitle),
-      onReset: () => {},
-    },
+    buildQuickNpcSpeciesSetupSet(setBuilderArgs),
+    buildQuickNpcMembershipTitleSetupSet(setBuilderArgs),
   ]
 
   if (titleRecommendation !== undefined) {
-    const templateEntry = getNpcAuthoringTemplateEntry(titleRecommendation.templateId)
-    sets.push({
-      id: 'recommendedBuild',
-      kind: 'note',
-      required: false,
-      fieldLabel: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
-      body: getNpcAuthoringTemplateLabel(titleRecommendation.templateId),
-      ...(templateEntry?.description ? { description: templateEntry.description } : {}),
-      isComplete: true,
-      onReset: () => {},
-    })
+    sets.push(buildQuickNpcRecommendedBuildSetupSet(titleRecommendation))
   }
 
-  sets.push({
-    id: 'level',
-    kind: 'number',
-    fieldLabel: 'Level',
-    ...(levelPrompt ? { prompt: levelPrompt } : {}),
-    value: values.level,
-    min: levelConstraints.minLevel,
-    max: levelConstraints.maxLevel,
-    digits: 2,
-    dependsOn: ['membershipTitle'],
-    isComplete: isCreateSetupNumberComplete(
-      values.level,
-      levelConstraints.minLevel,
-      levelConstraints.maxLevel,
-    ),
-    collapseWhenComplete: false,
-    onValueChange: (level) => onApplySetupChange('level', level),
-    onReset: () => {},
-  })
+  sets.push(buildQuickNpcLevelSetupSet(setBuilderArgs))
 
   if (classProgressionApplicable) {
-    sets.push({
-      id: 'classId',
-      kind: 'choice',
-      fieldLabel: classTerm.label,
-      prompt: classPresentation.optionGroups
-        ? QUICK_NPC_CLASS_AFFINITY_PROMPT
-        : `Choose a ${classTerm.label.toLowerCase()}`,
-      options: classPresentation.options,
-      ...(classPresentation.optionGroups ? { optionGroups: classPresentation.optionGroups } : {}),
-      value: values.classId,
-      dependsOn: ['speciesId'],
-      isComplete: isCreateSetupChoiceComplete(values.classId),
-      collapseWhenComplete: true,
-      onValueChange: (classId) => onApplySetupChange('classId', classId),
-      onReset: () => {},
-    })
+    sets.push(buildQuickNpcClassSetupSet(setBuilderArgs))
   }
 
   return sets
@@ -251,7 +332,7 @@ export function resolveQuickNpcSetupModel(args: {
     speciesOptions,
     classOptions,
     canContinue,
-    summaryLine: formatQuickNpcSetupCharacterSummary(args.values, args.context),
+    summaryLine: formatQuickNpcSetupCharacterSummary(args.values, args.context, args.titles ?? []),
   }
 }
 

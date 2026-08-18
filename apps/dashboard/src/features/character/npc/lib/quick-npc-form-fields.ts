@@ -14,7 +14,6 @@ import {
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
-  type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -34,7 +33,6 @@ import {
 // details (name, alignment) and optional requirements (weapon/spell constraints).
 // ---------------------------------------------------------------------------
 
-export const QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME = 'membershipTitle'
 export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 
@@ -145,18 +143,13 @@ export function quickNpcAuthoringTabSchema() {
 
 export type QuickNpcAuthoringTabValues = z.infer<ReturnType<typeof quickNpcAuthoringTabSchema>>
 
-export type QuickNpcAuthoringValues = z.infer<ReturnType<typeof quickNpcAuthoringSchema>>
+export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcAuthoringTabValues
 
 export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
   name: '',
   alignment: 'n',
   requiredWeaponIds: [],
   requiredSpellIds: [],
-}
-
-export const quickNpcAuthoringDefaultValues: QuickNpcAuthoringValues = {
-  ...EMPTY_QUICK_NPC_SETUP_VALUES,
-  ...quickNpcAuthoringTabDefaultValues,
 }
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
@@ -239,14 +232,11 @@ function formatRequirementsTabLabel(configuredCount: number): string {
 }
 
 export type QuickNpcDetailsFieldsArgs = {
-  membership: {
-    titles: readonly OrganizationMembershipTitleDefinition[]
-  }
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }
 
-export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): FormItem[] {
+export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {}): FormItem[] {
   const nameField: FormItem = {
     type: 'text',
     name: 'name',

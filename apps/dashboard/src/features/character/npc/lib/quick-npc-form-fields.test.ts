@@ -13,7 +13,6 @@ import {
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
   mergeQuickNpcAuthoringValues,
-  quickNpcAuthoringDefaultValues,
   quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
   QUICK_NPC_DETAILS_TAB_ID,
@@ -127,20 +126,9 @@ describe('buildQuickNpcContentOptions', () => {
   })
 })
 
-const sampleMembershipTitles = [
-  {
-    id: 'omt_test_guildmaster',
-    label: 'Guildmaster',
-    description: 'Head of the guild.',
-    priority: 50,
-  },
-] as const
-
 describe('buildQuickNpcDetailsFields', () => {
   it('includes name and alignment only', () => {
-    const fields = buildQuickNpcDetailsFields({
-      membership: { titles: sampleMembershipTitles },
-    })
+    const fields = buildQuickNpcDetailsFields()
 
     expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
       'name',
@@ -148,17 +136,7 @@ describe('buildQuickNpcDetailsFields', () => {
     ])
   })
 
-  it('has defaults for every schema key', () => {
-    expect(quickNpcAuthoringDefaultValues).toMatchObject({
-      name: '',
-      speciesId: '',
-      classId: '',
-      level: 1,
-      alignment: 'n',
-      membershipTitle: '',
-      requiredWeaponIds: [],
-      requiredSpellIds: [],
-    })
+  it('has defaults for authoring tab schema keys', () => {
     expect(quickNpcAuthoringTabDefaultValues).toEqual({
       name: '',
       alignment: 'n',
@@ -172,7 +150,6 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('declares explicit ownership for the name field with trailing action', () => {
     const tabs = buildQuickNpcTabs({
       detailsFields: buildQuickNpcDetailsFields({
-        membership: { titles: sampleMembershipTitles },
         nameTrailingAction: {
           label: 'Generate',
           onAction: () => {},
