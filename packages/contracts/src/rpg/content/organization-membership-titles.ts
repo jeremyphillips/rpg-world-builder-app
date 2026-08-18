@@ -51,6 +51,10 @@ export type OrganizationMembershipTitleDefinition = z.infer<
   typeof organizationMembershipTitleDefinitionSchema
 >
 
+export function normalizeOrganizationMembershipTitleLabel(label: string): string {
+  return label.trim().toLocaleLowerCase('en')
+}
+
 function validateUniqueOrganizationMembershipTitleDefinitions(
   titles: readonly OrganizationMembershipTitleDefinition[],
   ctx: z.RefinementCtx,
@@ -71,7 +75,7 @@ function validateUniqueOrganizationMembershipTitleDefinitions(
       seenIds.add(title.id)
     }
 
-    const normalizedLabel = title.label.trim().toLocaleLowerCase('en')
+    const normalizedLabel = normalizeOrganizationMembershipTitleLabel(title.label)
     if (seenLabels.has(normalizedLabel)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -145,9 +149,11 @@ export function resolveOrganizationMembershipTitleDefinitionByLabel(
   catalog: readonly OrganizationMembershipTitleDefinition[],
   title: string,
 ): OrganizationMembershipTitleDefinition | undefined {
-  const normalized = title.trim()
+  const normalized = normalizeOrganizationMembershipTitleLabel(title)
   if (normalized === '') return undefined
-  return catalog.find((entry) => entry.label === normalized)
+  return catalog.find(
+    (entry) => normalizeOrganizationMembershipTitleLabel(entry.label) === normalized,
+  )
 }
 
 export const organizationSourcePresetIdSchema = organizationAuthoringPresetIdSchema.optional()

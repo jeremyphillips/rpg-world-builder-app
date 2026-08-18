@@ -76,6 +76,31 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
   }
 }
 
+function prepareHomebrewOrganizationUpdate(
+  _doc: HomebrewDoc,
+  update: Record<string, unknown>,
+): Record<string, unknown> {
+  const { members, ...rest } = update
+  if (members === undefined || typeof members !== 'object' || members === null) {
+    return rest
+  }
+
+  const affinities = members as {
+    classAffinityIds?: unknown
+    speciesAffinityIds?: unknown
+  }
+
+  return {
+    ...rest,
+    ...(affinities.classAffinityIds !== undefined
+      ? { 'members.classAffinityIds': affinities.classAffinityIds }
+      : {}),
+    ...(affinities.speciesAffinityIds !== undefined
+      ? { 'members.speciesAffinityIds': affinities.speciesAffinityIds }
+      : {}),
+  }
+}
+
 export const organizationContentConfig: ContentTypeConfig<Organization> = {
   type: 'organizations',
   loadHomebrew: async (campaignId, rulesetId) => {
@@ -100,6 +125,7 @@ export const organizationWriteConfig: ContentWriteConfig<Organization> = {
   homebrewModel: HomebrewOrganizationModel,
   toHomebrewEntity: toHomebrewOrganization,
   bodyFromCreateInput,
+  prepareHomebrewUpdate: prepareHomebrewOrganizationUpdate,
   characterUsageBlocksDemotion: false,
 }
 

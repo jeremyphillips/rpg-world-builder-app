@@ -157,11 +157,11 @@ Dashboard form option sets expose one visible catalog per type with purpose sele
 
 Do **not** fold these into one runtime filter:
 
-| Concern                                                                                   | Scope                                  | Applies creature-type policy?                                                                    | Applies `visibilityMode` at authoring?            |
-| ----------------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| **Species authoring policy** (creature-type constraints on the Species form)              | Configuring a Species record           | Yes — authoring-only                                                                             | N/A                                               |
-| **Organization member affinities** (`memberClassAffinityIds`, `memberSpeciesAffinityIds`) | Soft guidance on the Organization      | **No** — references content ids only                                                             | **No** — chip pickers use `forCampaignUse()`      |
-| **Character play resolution** (builder, Quick NPC, member-picker badges)                  | Consuming affinities for a `playActor` | Only inside `resolvePlayableBuilderContent` / builder rules — not duplicated in affinity helpers | **Yes** — at consumption via `forPlay(playActor)` |
+| Concern                                                                                       | Scope                                  | Applies creature-type policy?                                                                    | Applies `visibilityMode` at authoring?            |
+| --------------------------------------------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| **Species authoring policy** (creature-type constraints on the Species form)                  | Configuring a Species record           | Yes — authoring-only                                                                             | N/A                                               |
+| **Organization member affinities** (`members.classAffinityIds`, `members.speciesAffinityIds`) | Soft guidance on the Organization      | **No** — references content ids only                                                             | **No** — chip pickers use `forCampaignUse()`      |
+| **Character play resolution** (builder, Quick NPC, member-picker badges)                      | Consuming affinities for a `playActor` | Only inside `resolvePlayableBuilderContent` / builder rules — not duplicated in affinity helpers | **Yes** — at consumption via `forPlay(playActor)` |
 
 Playable Species **new-selection** pickers (builder, Quick NPC) use
 `resolvePlayableBuilderContent(context).species`, which applies `isContentPlayableFor(playActor)`

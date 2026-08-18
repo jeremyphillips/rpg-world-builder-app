@@ -195,6 +195,93 @@ describe('organization classification writes', () => {
     expect(updated.sourcePresetId).toBe('bank')
   })
 
+  it('preserves titles, sibling affinity, and connections when only classAffinityIds is PATCHed', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: ['class-fighter'],
+        speciesAffinityIds: ['species-human'],
+      },
+    })
+
+    await HomebrewOrganizationModel.findByIdAndUpdate(created.id, {
+      $set: {
+        connections: {
+          locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }],
+        },
+      },
+    })
+
+    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
+      members: { classAffinityIds: ['class-wizard'] },
+    })
+
+    expect(updated.members.classAffinityIds).toEqual(['class-wizard'])
+    expect(updated.members.speciesAffinityIds).toEqual(['species-human'])
+    expect(updated.members.titles).toEqual(created.members.titles)
+    expect(updated.connections.locations).toEqual([
+      { id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' },
+    ])
+  })
+
+  it('preserves titles and connections on dashboard-shaped members PATCH', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: ['class-fighter'],
+        speciesAffinityIds: ['species-human'],
+      },
+    })
+
+    await HomebrewOrganizationModel.findByIdAndUpdate(created.id, {
+      $set: {
+        connections: {
+          locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }],
+        },
+      },
+    })
+
+    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
+      organizationDomain: 'government',
+      members: {
+        classAffinityIds: ['class-wizard'],
+        speciesAffinityIds: ['species-elf'],
+      },
+    })
+
+    expect(updated.members.classAffinityIds).toEqual(['class-wizard'])
+    expect(updated.members.speciesAffinityIds).toEqual(['species-elf'])
+    expect(updated.members.titles).toEqual(created.members.titles)
+    expect(updated.connections.locations).toEqual([
+      { id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' },
+    ])
+  })
+
+  it('does not change sourcePresetId when provenance is sent on classification PATCH', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'river-bank',
+      name: 'River Bank',
+      organizationDomain: 'commercial',
+      sourcePresetId: 'bank',
+    })
+
+    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
+      sourcePresetId: 'army',
+      organizationDomain: 'government',
+    })
+
+    expect(updated.sourcePresetId).toBe('bank')
+  })
+
   it('persists explicit members.titles on manual create without sourcePresetId', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
@@ -247,7 +334,7 @@ describe('organization classification writes', () => {
     )
   })
 
-  it('duplicates members.titles snapshot order and omits sourcePresetId', async () => {
+  it('duplicates members.titles with new omt_* ids and omits sourcePresetId', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'river-bank',
@@ -265,6 +352,20 @@ describe('organization classification writes', () => {
     const duplicate = entity as Organization
 
     expect(duplicate.sourcePresetId).toBeUndefined()
-    expect(duplicate.members.titles).toEqual(created.members.titles)
+    expect(duplicate.members.titles).toHaveLength(created.members.titles.length)
+    for (let index = 0; index < created.members.titles.length; index += 1) {
+      const source = created.members.titles[index]!
+      const copied = duplicate.members.titles[index]!
+      expect(copied.id).toMatch(/^omt_/)
+      expect(copied.id).not.toBe(source.id)
+      expect(copied).toMatchObject({
+        sourceTitleId: source.sourceTitleId,
+        label: source.label,
+        description: source.description,
+        priority: source.priority,
+      })
+    }
+    const duplicateIds = duplicate.members.titles.map((title) => title.id)
+    expect(new Set(duplicateIds).size).toBe(duplicateIds.length)
   })
 })

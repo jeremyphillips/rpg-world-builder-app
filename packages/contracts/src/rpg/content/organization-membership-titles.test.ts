@@ -4,6 +4,7 @@ import { createOrganizationInputSchema } from './organization'
 import {
   organizationMembershipTitlesSchema,
   resolveOrganizationCreateMembershipTitles,
+  resolveOrganizationMembershipTitleDefinitionByLabel,
   snapshotOrganizationMembershipTitlesFromPreset,
   sortOrganizationMembershipTitleDefinitionsForDisplay,
 } from './organization-membership-titles'
@@ -150,6 +151,20 @@ describe('organization membership title snapshot', () => {
     )
     expect(stored.find((title) => title.sourceTitleId === 'treasurer')?.label).toBe(
       'Legacy Treasurer Label',
+    )
+  })
+
+  it('matches catalog titles case-insensitively for membership lookup', () => {
+    const catalog = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_1',
+        sourceTitleId: 'treasurer',
+        label: 'Treasurer',
+        priority: 50,
+      },
+    ])
+    expect(resolveOrganizationMembershipTitleDefinitionByLabel(catalog, 'treasurer')).toEqual(
+      catalog[0],
     )
   })
 })

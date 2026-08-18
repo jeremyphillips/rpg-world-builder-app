@@ -78,7 +78,7 @@ applied — the API snapshots vocabulary labels/descriptions + preset priorities
 | ------------- | -------------------------- | -------------------------------------------------------------------------------- |
 | Preset create | `sourcePresetId`           | Vocabulary resolve → opaque `omt_*` ids + `members.titles` snapshot + provenance |
 | Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
-| Duplicate     | (N/A — server copies body) | Source `members.titles` copied in order; `sourcePresetId` omitted                |
+| Duplicate     | (N/A — server copies body) | Source title rows copied in order with new `omt_*` ids; `sourcePresetId` omitted |
 
 **Create XOR (API boundary):** `sourcePresetId` and a non-empty explicit `members.titles`
 catalog are mutually exclusive on create input. When `sourcePresetId` is present, the API
@@ -86,9 +86,10 @@ resolver is authoritative — client omission of `members.titles` still yields t
 snapshot at persist.
 
 **Edit path:** classification forms expose `members.classAffinityIds` and
-`members.speciesAffinityIds` only — never `members.titles` or `sourcePresetId`. Title catalog
-changes are deferred to a future dedicated mutation. Classification PATCH never modifies an
-existing `members.titles` snapshot.
+`members.speciesAffinityIds` only — never `members.titles`, `connections`, or
+`sourcePresetId`. Title catalog and location connections are owned by create and dedicated
+mutations respectively. Classification PATCH never modifies an existing `members.titles`
+snapshot.
 
 **Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
 Mongo mapping, API serialization, duplication, and parse round-trips must preserve array

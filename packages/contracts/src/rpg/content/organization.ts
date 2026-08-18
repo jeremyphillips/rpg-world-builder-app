@@ -58,6 +58,16 @@ const organizationMembersAffinityFieldsSchema = z.object({
   speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.default([]),
 })
 
+/** Classification PATCH — affinities only; never titles. */
+export const organizationMemberAffinitiesUpdateSchema = z.object({
+  classAffinityIds: organizationMembersClassAffinityIdsSchema.optional(),
+  speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.optional(),
+})
+
+export type OrganizationMemberAffinitiesUpdate = z.infer<
+  typeof organizationMemberAffinitiesUpdateSchema
+>
+
 export const organizationMembersSchema = organizationMembersAffinityFieldsSchema.extend({
   titles: organizationMembershipTitlesSchema,
 })
@@ -167,23 +177,25 @@ export type CreateOrganizationDraftInput = z.infer<typeof createOrganizationDraf
  * Partial publish update. `organizationForm: null` clears the optional stored form (`$unset`).
  */
 export const updateOrganizationInputSchema = organizationClassificationBodyFieldsSchema
+  .omit({ connections: true })
   .extend({
     slug: slugSchema,
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    members: organizationMembersAffinityFieldsSchema.partial().optional(),
+    members: organizationMemberAffinitiesUpdateSchema.optional(),
   })
   .partial()
 
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationInputSchema>
 
 export const updateOrganizationDraftInputSchema = organizationBodyDraftFieldsSchema
+  .omit({ connections: true, sourcePresetId: true })
   .extend({
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    members: organizationMembersAffinityFieldsSchema.partial().optional(),
+    members: organizationMemberAffinitiesUpdateSchema.optional(),
   })
   .partial()
 

@@ -202,15 +202,38 @@ describe('organization authoring inputs', () => {
     ).toBe('Untitled Organization')
   })
 
-  it('supports partial publish and draft updates', () => {
+  it('supports partial publish and draft updates without connections or members defaults', () => {
     expect(updateOrganizationInputSchema.parse({ organizationDomain: 'academic' })).toEqual({
       organizationDomain: 'academic',
-      connections: { locations: [] },
     })
     expect(updateOrganizationDraftInputSchema.parse({ description: '<p>Notes</p>' })).toEqual({
       description: '<p>Notes</p>',
-      connections: { locations: [] },
     })
+  })
+
+  it('strips connections, titles, and sourcePresetId from classification PATCH parse output', () => {
+    expect(
+      updateOrganizationInputSchema.parse({
+        organizationDomain: 'academic',
+        connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
+        members: {
+          classAffinityIds: ['class-fighter'],
+          titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+        },
+        sourcePresetId: 'bank',
+      }),
+    ).toEqual({
+      organizationDomain: 'academic',
+      members: { classAffinityIds: ['class-fighter'] },
+    })
+
+    expect(
+      updateOrganizationDraftInputSchema.parse({
+        description: '<p>Notes</p>',
+        sourcePresetId: 'bank',
+        connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
+      }),
+    ).toEqual({ description: '<p>Notes</p>' })
   })
 
   it('accepts domain and form as independent partial-update fields', () => {
