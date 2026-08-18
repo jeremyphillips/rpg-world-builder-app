@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createOrganizationInputSchema } from './organization'
 import {
   organizationMembershipTitlesSchema,
+  organizationPresetNpcRecommendationSchema,
   resolveOrganizationCreateMembershipTitles,
   resolveOrganizationMembershipTitleDefinitionByLabel,
   snapshotOrganizationMembershipTitlesFromPreset,
@@ -166,5 +167,75 @@ describe('organization membership title snapshot', () => {
     expect(resolveOrganizationMembershipTitleDefinitionByLabel(catalog, 'treasurer')).toEqual(
       catalog[0],
     )
+  })
+})
+
+describe('organization membership title npcRecommendation', () => {
+  it('validates templateId and level without coupling to title priority', () => {
+    expect(
+      organizationPresetNpcRecommendationSchema.parse({
+        templateId: 'martial_specialist',
+        level: 5,
+      }),
+    ).toEqual({ templateId: 'martial_specialist', level: 5 })
+    expect(
+      organizationPresetNpcRecommendationSchema.safeParse({
+        templateId: 'veteran',
+        level: 5,
+      }).success,
+    ).toBe(false)
+    expect(
+      organizationPresetNpcRecommendationSchema.safeParse({
+        templateId: 'guard',
+        level: 21,
+      }).success,
+    ).toBe(false)
+  })
+
+  it('accepts level 0 recommendations and optional omission on custom titles', () => {
+    const withLevelZero = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_proprietor',
+        sourceTitleId: 'proprietor',
+        label: 'Proprietor',
+        priority: 50,
+        npcRecommendation: { templateId: 'civic_leader', level: 0 },
+      },
+    ])
+    expect(withLevelZero[0]?.npcRecommendation).toEqual({
+      templateId: 'civic_leader',
+      level: 0,
+    })
+
+    const withoutRecommendation = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_custom',
+        label: 'Keeper of the Third Seal',
+        priority: 40,
+      },
+    ])
+    expect(withoutRecommendation[0]?.npcRecommendation).toBeUndefined()
+  })
+
+  it('leaves npcRecommendation undefined on snapshots until preset refs define it', () => {
+    const snapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'a')
+    expect(snapshot.every((title) => title.npcRecommendation === undefined)).toBe(true)
+  })
+
+  it('persists org-owned recommendations independently of template registry labels', () => {
+    const stored = organizationMembershipTitlesSchema.parse([
+      {
+        id: 'omt_enforcer',
+        sourceTitleId: 'enforcer',
+        label: 'Enforcer',
+        priority: 30,
+        npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+      },
+    ])
+    expect(stored[0]?.npcRecommendation).toEqual({
+      templateId: 'martial_specialist',
+      level: 5,
+    })
+    expect(stored[0]).not.toHaveProperty('label', 'Martial specialist')
   })
 })
