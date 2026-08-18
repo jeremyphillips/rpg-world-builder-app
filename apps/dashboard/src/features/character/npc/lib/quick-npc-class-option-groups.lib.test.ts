@@ -63,6 +63,38 @@ describe('buildQuickNpcClassRadioCardPresentation', () => {
     })
   })
 
+  it('merges template and organization affinities with deterministic ranking', () => {
+    const paladin = pickClass('paladin')
+
+    expect(
+      buildQuickNpcClassRadioCardPresentation({
+        classOptions: [...classOptions, { value: paladin.id, label: paladin.name }],
+        classAffinityIds: [rogue.id, wizard.id],
+        templateClassAffinitySlugs: ['fighter', 'rogue'],
+        playableClasses: [...playableClasses, paladin],
+      }).optionGroups,
+    ).toEqual([
+      {
+        id: 'recommended',
+        eyebrow: QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+        options: [
+          { value: rogue.id, label: 'Rogue' },
+          { value: fighter.id, label: 'Fighter' },
+          { value: wizard.id, label: 'Wizard' },
+        ],
+      },
+      {
+        id: 'all-classes',
+        eyebrow: QUICK_NPC_CLASS_ALL_GROUP_EYEBROW,
+        options: [{ value: paladin.id, label: 'Paladin' }],
+      },
+    ])
+  })
+
+  it('uses the recommended eyebrow copy for class recommendations', () => {
+    expect(QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW).toBe('Recommended')
+  })
+
   it('does not recommend unavailable Paladin affinity classes', () => {
     const paladin = {
       ...pickClass('paladin'),

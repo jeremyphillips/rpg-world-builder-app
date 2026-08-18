@@ -264,7 +264,7 @@ describe('QuickNpcCreateModal', () => {
     await user.clear(levelInput)
     await user.type(levelInput, '1')
 
-    expect(screen.getByText('Recommended for this organization')).toBeInTheDocument()
+    expect(screen.getByText('Recommended')).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_CLASS_ALL_GROUP_EYEBROW)).toBeInTheDocument()
   })
 })

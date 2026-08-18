@@ -1,5 +1,6 @@
 import {
   getContentTypeTerm,
+  getNpcAuthoringTemplateClassAffinityIds,
   getNpcAuthoringTemplateEntry,
   getNpcAuthoringTemplateLabel,
   indexCharacterBuildCatalog,
@@ -39,7 +40,7 @@ export const QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL = 'Recommended build' as co
 export const QUICK_NPC_SPECIES_AFFINITY_PROMPT =
   "Recommended species are based on this organization's member affinities." as const
 export const QUICK_NPC_CLASS_AFFINITY_PROMPT =
-  "Recommended classes are based on this organization's member affinities." as const
+  "Based on this member's build and organization." as const
 
 export type QuickNpcSetupModel = {
   speciesOptions: ReturnType<typeof buildQuickNpcContentOptions>['speciesOptions']
@@ -243,14 +244,23 @@ export function buildQuickNpcCreateSetupSets(args: {
 }): CreateSetupSet[] {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
   const playableContent = resolvePlayableBuilderContent(args.context)
+  const { values, onApplySetupChange, titles } = args
   const speciesPresentation = buildQuickNpcSpeciesRadioCardPresentation({
     speciesOptions,
     speciesAffinityIds: args.members?.speciesAffinityIds,
     playableSpecies: playableContent.species,
   })
+  const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
+    membershipTitle: values.membershipTitle,
+    titles,
+  })
   const classPresentation = buildQuickNpcClassRadioCardPresentation({
     classOptions,
     classAffinityIds: args.members?.classAffinityIds,
+    templateClassAffinitySlugs:
+      titleRecommendation === undefined
+        ? undefined
+        : getNpcAuthoringTemplateClassAffinityIds(titleRecommendation.templateId),
     playableClasses: playableContent.classes,
   })
   const levelConstraints = resolveCharacterLevelConstraints({
@@ -260,12 +270,7 @@ export function buildQuickNpcCreateSetupSets(args: {
   })
   const speciesTerm = getContentTypeTerm('species')
   const classTerm = getContentTypeTerm('classes')
-  const { values, onApplySetupChange, titles } = args
   const classProgressionApplicable = isClassProgressionApplicable(values.level)
-  const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: values.membershipTitle,
-    titles,
-  })
   const levelPrompt = formatQuickNpcLevelRecommendationPrompt({
     membershipTitle: values.membershipTitle,
     titles,

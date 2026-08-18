@@ -17,6 +17,7 @@ import {
   buildQuickNpcCreateSetupSets,
   formatQuickNpcLevelRecommendationPrompt,
   formatQuickNpcSetupCharacterSummary,
+  QUICK_NPC_CLASS_AFFINITY_PROMPT,
   QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
   QUICK_NPC_TITLE_FIELD_PROMPT,
   resolveQuickNpcDefaultLevel,
@@ -29,7 +30,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'civic_leader' as const, level: 5 },
+  npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
 } as const
 
 describe('buildQuickNpcCreateSetupSets', () => {
@@ -95,7 +96,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
     expect(recommendedBuild).toMatchObject({
       kind: 'note',
       fieldLabel: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
-      body: getNpcAuthoringTemplateLabel('civic_leader'),
+      body: getNpcAuthoringTemplateLabel('covert_operator'),
       isComplete: true,
       required: false,
     })
@@ -148,6 +149,49 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const levelSet = sets.find((set) => set.id === 'level')
     expect(levelSet?.collapseWhenComplete).toBe(false)
     expect(levelSet?.isComplete).toBe(true)
+  })
+
+  it('merges title template and organization class affinities for class recommendations', () => {
+    const fighterClass = {
+      ...populatedBuilderCatalog.classes[0]!,
+      id: 'srd-cc-5.2.1:fighter',
+      slug: 'fighter',
+      name: 'Fighter',
+    }
+    const multiClassContext = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighterClass, rogueClass],
+      },
+    })
+
+    const sets = buildQuickNpcCreateSetupSets({
+      context: multiClassContext,
+      values: {
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        membershipTitle: 'Guildmaster',
+        classId: '',
+        level: 5,
+      },
+      onApplySetupChange: () => {},
+      titles: [guildmasterTitle],
+      members: { classAffinityIds: [fighterClass.id] },
+    })
+
+    const classSet = sets.find((set) => set.id === 'classId')
+    expect(classSet?.kind).toBe('choice')
+    if (classSet?.kind !== 'choice') throw new Error('expected class choice set')
+    expect(classSet.prompt).toBe(QUICK_NPC_CLASS_AFFINITY_PROMPT)
+    expect(classSet.optionGroups).toEqual([
+      {
+        id: 'recommended',
+        eyebrow: QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW,
+        options: [
+          { value: rogueClass.id, label: 'Rogue' },
+          { value: fighterClass.id, label: 'Fighter' },
+        ],
+      },
+    ])
   })
 
   it('groups class options by organization member class affinities when survivors exist', () => {
@@ -319,7 +363,7 @@ describe('resolveQuickNpcSetupModel', () => {
     }
 
     expect(formatQuickNpcSetupCharacterSummary(values, context, [guildmasterTitle])).toBe(
-      'Dwarf · Level 5 Fighter · Guildmaster · Civic leader',
+      'Dwarf · Level 5 Fighter · Guildmaster · Covert operator',
     )
     expect(
       resolveQuickNpcSetupModel({
@@ -327,6 +371,6 @@ describe('resolveQuickNpcSetupModel', () => {
         values,
         titles: [guildmasterTitle],
       }).summaryLine,
-    ).toBe('Dwarf · Level 5 Fighter · Guildmaster · Civic leader')
+    ).toBe('Dwarf · Level 5 Fighter · Guildmaster · Covert operator')
   })
 })
