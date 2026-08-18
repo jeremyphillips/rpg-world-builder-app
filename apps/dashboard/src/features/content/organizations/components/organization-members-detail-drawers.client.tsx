@@ -29,6 +29,8 @@ function toEditableOrganization(organization: Organization): EditableOrganizatio
     functions: organization.functions,
     practices: organization.practices,
     members: {
+      classAffinityIds: organization.members.classAffinityIds,
+      speciesAffinityIds: organization.members.speciesAffinityIds,
       titles: organization.members.titles,
     },
     ...(organization.organizationForm !== undefined

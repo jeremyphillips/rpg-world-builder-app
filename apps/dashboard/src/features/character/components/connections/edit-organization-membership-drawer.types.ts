@@ -14,6 +14,8 @@ export type EditOrganizationMembershipOrganization = {
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
   members: {
+    classAffinityIds?: readonly string[]
+    speciesAffinityIds?: readonly string[]
     titles?: readonly OrganizationMembershipTitleDefinition[]
   }
 }

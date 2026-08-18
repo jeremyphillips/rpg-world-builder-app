@@ -12,12 +12,21 @@ vi.mock('@/features/character', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
-    QuickNpcCreateModal: ({ onCancel }: { onCancel: () => void }) => (
+    QuickNpcCreateModal: ({
+      onCancel,
+      organization,
+    }: {
+      onCancel: () => void
+      organization: { members?: { classAffinityIds?: readonly string[] } }
+    }) => (
       <div>
         <h2>Create NPC</h2>
         <button type="button" onClick={onCancel}>
           Cancel
         </button>
+        <span data-testid="quick-npc-class-affinities">
+          {(organization.members?.classAffinityIds ?? []).join(',')}
+        </span>
       </div>
     ),
     EditOrganizationMembershipDrawer: () => null,
@@ -95,6 +104,26 @@ describe('OrganizationMembersDetailDrawers', () => {
 
     expect(screen.getByRole('heading', { name: 'Add member' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Create NPC', hidden: true })).toBeInTheDocument()
+  })
+
+  it('passes member affinities into the Quick NPC create modal', () => {
+    renderWithProviders(
+      <OrganizationMembersDetailDrawers
+        organization={{
+          ...organization,
+          members: {
+            classAffinityIds: ['class-rogue', 'class-fighter'],
+            speciesAffinityIds: ['species-elf'],
+            titles: [],
+          },
+        }}
+        detail={createDetail({ drawerState: { mode: 'createNpc' } })}
+      />,
+    )
+
+    expect(screen.getByTestId('quick-npc-class-affinities')).toHaveTextContent(
+      'class-rogue,class-fighter',
+    )
   })
 
   it('wires Quick NPC cancel back to the org hook', () => {
