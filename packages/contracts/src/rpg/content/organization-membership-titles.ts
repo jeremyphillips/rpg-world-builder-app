@@ -1,10 +1,12 @@
 import { z } from 'zod'
 
+import { MAX_CHARACTER_LEVEL } from '../primitives/level'
 import {
   ORGANIZATION_AUTHORING_PRESETS,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   type OrganizationAuthoringPresetId,
 } from '../vocab/organization-authoring-preset'
+import { npcAuthoringTemplateIdSchema } from '../vocab/npc-authoring-template'
 import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from '../vocab/organization-member-title-entry'
 import type { OrganizationMembershipTitlePriority } from '../vocab/organization-member-title-entry'
 import {
@@ -39,12 +41,22 @@ export const organizationMembershipTitlePrioritySchema = z.union([
 
 export type { OrganizationMembershipTitlePriority } from '../vocab/organization-member-title-entry'
 
+export const organizationPresetNpcRecommendationSchema = z.object({
+  templateId: npcAuthoringTemplateIdSchema,
+  level: z.number().int().min(0).max(MAX_CHARACTER_LEVEL),
+})
+
+export type OrganizationPresetNpcRecommendation = z.infer<
+  typeof organizationPresetNpcRecommendationSchema
+>
+
 export const organizationMembershipTitleDefinitionSchema = z.object({
   id: z.string().min(1),
   sourceTitleId: vocabularyOptionIdSchema.optional(),
   label: z.string().trim().min(1).max(80),
   description: z.string().trim().min(1).optional(),
   priority: organizationMembershipTitlePrioritySchema,
+  npcRecommendation: organizationPresetNpcRecommendationSchema.optional(),
 })
 
 export type OrganizationMembershipTitleDefinition = z.infer<
@@ -111,6 +123,7 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
       label: entry.label,
       description: entry.description,
       priority: ref.priority as OrganizationMembershipTitlePriority,
+      ...(ref.npcRecommendation !== undefined ? { npcRecommendation: ref.npcRecommendation } : {}),
     }
   })
 }

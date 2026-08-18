@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -96,6 +97,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 
 const setup = {
   speciesId: 'srd-cc-5.2.1:dwarf',
+  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: quickFighter.id,
   level: 1,
 }
@@ -172,6 +174,7 @@ describe('QuickNpcAuthoringForm', () => {
       setup: {
         ...setup,
         speciesId: 'srd-cc-5.2.1:not-a-species',
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       },
     })
 

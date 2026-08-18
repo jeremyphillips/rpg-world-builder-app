@@ -6,7 +6,10 @@ import {
 } from '@rpg/contracts'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
-import { quickNpcSetupSchema } from './quick-npc-form-fields'
+import {
+  isQuickNpcMembershipTitleSetupComplete,
+  quickNpcSetupSchema,
+} from './quick-npc-form-fields'
 
 /**
  * Re-validates Setup-owned fields at authoring submit time. Setup failures should
@@ -16,6 +19,10 @@ export function isQuickNpcSetupStillValid(
   setup: QuickNpcSetupValues,
   context: CharacterBuildContext,
 ): boolean {
+  if (!isQuickNpcMembershipTitleSetupComplete(setup.membershipTitle)) {
+    return false
+  }
+
   const { minLevel, maxLevel } = resolveCharacterLevelConstraints({
     characterKind: context.characterKind,
     rulesScope: context.rulesScope,

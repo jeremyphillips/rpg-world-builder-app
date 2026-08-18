@@ -173,6 +173,7 @@ describe('organization classification writes', () => {
       sourceTitleId: 'treasurer',
       label: 'Treasurer',
       priority: 50,
+      npcRecommendation: { templateId: 'administrator', level: 3 },
     })
     expect(created.members.titles.every((title) => title.id.startsWith('omt_'))).toBe(true)
   })
@@ -367,5 +368,41 @@ describe('organization classification writes', () => {
     }
     const duplicateIds = duplicate.members.titles.map((title) => title.id)
     expect(new Set(duplicateIds).size).toBe(duplicateIds.length)
+  })
+
+  it('duplicates members.titles with npcRecommendation without recomputing from preset', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
+      slug: 'thieves-guild',
+      name: 'Thieves Guild',
+      organizationDomain: 'criminal',
+      members: {
+        titles: [
+          {
+            id: 'omt_enforcer',
+            sourceTitleId: 'enforcer',
+            label: 'Enforcer',
+            priority: 30,
+            npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+          },
+        ],
+      },
+    })
+
+    const { entity } = await duplicateContentEntity({
+      campaignId: campaign.id,
+      contentType: 'organizations',
+      entityId: created.id,
+      requestedName: 'Thieves Guild Copy',
+    })
+    const duplicate = entity as Organization
+
+    expect(duplicate.members.titles).toHaveLength(1)
+    expect(duplicate.members.titles[0]).toMatchObject({
+      label: 'Enforcer',
+      priority: 30,
+      npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+    })
+    expect(duplicate.members.titles[0]?.id).not.toBe('omt_enforcer')
   })
 })

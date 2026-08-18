@@ -7,6 +7,8 @@ import {
   ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES,
   ORGANIZATION_PRACTICE_IDS,
   ORGANIZATION_AUTHORING_PRESET_IDS,
+  NPC_AUTHORING_TEMPLATE_IDS,
+  MAX_CHARACTER_LEVEL,
 } from '@rpg/contracts'
 
 import {
@@ -50,6 +52,13 @@ const homebrewOrganizationSchema = new Schema(
               type: Number,
               enum: [...ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES],
               required: true,
+            },
+            npcRecommendation: {
+              _id: false,
+              type: {
+                templateId: { type: String, enum: [...NPC_AUTHORING_TEMPLATE_IDS], required: true },
+                level: { type: Number, required: true, min: 0, max: MAX_CHARACTER_LEVEL },
+              },
             },
           },
         ],

@@ -8,6 +8,8 @@ import {
   Button,
   Modal,
   dialogPanelActionRowClasses,
+  Text,
+  Eyebrow,
 } from '@rpg/ui'
 
 import { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
@@ -54,7 +56,9 @@ export function CreateSetupPanel({
         isComplete: set.isComplete,
         required: set.required,
         dependsOn: set.dependsOn,
+        visibleWhenComplete: set.visibleWhenComplete,
         collapseWhenComplete: set.collapseWhenComplete,
+        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),
     [sets],
   )
@@ -87,11 +91,27 @@ export function CreateSetupPanel({
         const expanded = resolveCreateSetupSetExpanded({
           setId,
           activeSetId,
+          reopenSetId,
           visible,
           isComplete: set.isComplete,
           required: set.required,
           collapseWhenComplete: set.collapseWhenComplete ?? true,
+          collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete ?? false,
         })
+
+        if (set.kind === 'note') {
+          return (
+            <div key={set.id} data-field-align className="flex flex-col gap-y-2">
+              <Eyebrow size="sm">{set.fieldLabel}</Eyebrow>
+              <Text variant="small">{set.body}</Text>
+              {set.description ? (
+                <Text variant="muted" className="text-sm">
+                  {set.description}
+                </Text>
+              ) : null}
+            </div>
+          )
+        }
 
         if (set.kind === 'choice') {
           return (
@@ -137,6 +157,11 @@ export function CreateSetupPanel({
         return (
           <div key={set.id} data-field-align className="flex flex-col gap-y-4">
             <FieldLabelContent label={set.fieldLabel} />
+            {set.prompt ? (
+              <Text variant="muted" className="text-sm">
+                {set.prompt}
+              </Text>
+            ) : null}
             <NumberStepper
               aria-label={set.fieldLabel}
               size="sm"
@@ -197,7 +222,9 @@ export function CreateSetupShell({
         isComplete: set.isComplete,
         required: set.required,
         dependsOn: set.dependsOn,
+        visibleWhenComplete: set.visibleWhenComplete,
         collapseWhenComplete: set.collapseWhenComplete,
+        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
       })),
     [sets],
   )

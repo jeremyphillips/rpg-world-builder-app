@@ -24,7 +24,7 @@ const CLASS_OPTIONS: RadioCardOption[] = [
 
 function buildNpcSetupSets(
   values: { speciesId: string; level: number; classId: string },
-  onValuesChange: (values: { speciesId: string; level: number; classId: string }) => void,
+  onValuesChange: (patch: Partial<{ speciesId: string; level: number; classId: string }>) => void,
 ): CreateSetupSet[] {
   const min = 1
   const max = 20
@@ -39,7 +39,7 @@ function buildNpcSetupSets(
       value: values.speciesId,
       isComplete: isCreateSetupChoiceComplete(values.speciesId),
       collapseWhenComplete: true,
-      onValueChange: (speciesId) => onValuesChange({ ...values, speciesId }),
+      onValueChange: (speciesId) => onValuesChange({ speciesId }),
       onReset: () => {},
     },
     {
@@ -52,8 +52,8 @@ function buildNpcSetupSets(
       digits: 2,
       isComplete: isCreateSetupNumberComplete(values.level, min, max),
       collapseWhenComplete: false,
-      onValueChange: (level) => onValuesChange({ ...values, level }),
-      onReset: () => onValuesChange({ ...values, level: 1 }),
+      onValueChange: (level) => onValuesChange({ level }),
+      onReset: () => onValuesChange({ level: 1 }),
     },
     {
       id: 'classId',
@@ -65,15 +65,20 @@ function buildNpcSetupSets(
       dependsOn: ['speciesId'],
       isComplete: isCreateSetupChoiceComplete(values.classId),
       collapseWhenComplete: true,
-      onValueChange: (classId) => onValuesChange({ ...values, classId }),
-      onReset: () => onValuesChange({ ...values, classId: '' }),
+      onValueChange: (classId) => onValuesChange({ classId }),
+      onReset: () => onValuesChange({ classId: '' }),
     },
   ]
 }
 
 function MixedSetupHarness() {
   const [values, setValues] = useState({ speciesId: '', level: 1, classId: '' })
-  const sets = buildNpcSetupSets(values, setValues)
+  const sets = buildNpcSetupSets(values, (nextValues) => {
+    setValues((current) => ({
+      ...current,
+      ...nextValues,
+    }))
+  })
 
   return <CreateSetupPanel sets={sets} />
 }
@@ -167,7 +172,7 @@ describe('CreateSetupPanel', () => {
     )
     expect(resolveCreateSetupActiveSetId({ sets: setsAfterClass })).toBe('classId')
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getAllByRole('button', { name: 'Change' })[0]!)
     await user.click(screen.getByRole('radio', { name: 'Elf' }))
 
     const setsAfterSpeciesChange = buildNpcSetupSets(
@@ -177,5 +182,28 @@ describe('CreateSetupPanel', () => {
     expect(resolveCreateSetupActiveSetId({ sets: setsAfterSpeciesChange })).toBe('classId')
     expect(setsAfterSpeciesChange.find((set) => set.id === 'level')?.isComplete).toBe(true)
     expect(screen.queryByRole('heading', { name: 'Fighter' })).not.toBeInTheDocument()
+  })
+
+  it('renders read-only note sets between choice and number controls', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'recommendedBuild',
+        kind: 'note',
+        fieldLabel: 'Recommended build',
+        body: 'Civic leader',
+        description: 'Civilian leader whose authority is primarily social.',
+        isComplete: true,
+        required: false,
+        onReset: () => {},
+      },
+    ]
+
+    render(<CreateSetupPanel sets={sets} />)
+
+    expect(screen.getByText('Recommended build')).toBeInTheDocument()
+    expect(screen.getByText('Civic leader')).toBeInTheDocument()
+    expect(
+      screen.getByText('Civilian leader whose authority is primarily social.'),
+    ).toBeInTheDocument()
   })
 })

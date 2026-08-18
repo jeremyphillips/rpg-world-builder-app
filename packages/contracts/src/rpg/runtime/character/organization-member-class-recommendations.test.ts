@@ -4,6 +4,7 @@ import {
   characterMatchesOrganizationMemberClassRecommendations,
   resolveOrganizationMemberClassRecommendationIds,
   resolveOrganizationMemberClassRecommendations,
+  resolveOrganizationNpcClassRecommendationIds,
 } from './organization-member-class-recommendations'
 import type { CharacterClass } from '../../content/classes/class'
 
@@ -50,6 +51,72 @@ describe('resolveOrganizationMemberClassRecommendations', () => {
         playableClasses: available,
       }).map((characterClass) => characterClass.id),
     ).toEqual([rogue.id, fighter.id])
+  })
+})
+
+describe('resolveOrganizationNpcClassRecommendationIds', () => {
+  const fighter = makeClass('fighter')
+  const rogue = makeClass('rogue')
+  const wizard = makeClass('wizard')
+  const paladin = makeClass('paladin')
+  const playableClasses = [fighter, rogue, wizard, paladin]
+
+  it('falls back to organization affinities when no template slugs are provided', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        organizationClassAffinityIds: [wizard.id, rogue.id, fighter.id],
+        playableClasses,
+      }),
+    ).toEqual([wizard.id, rogue.id, fighter.id])
+  })
+
+  it('falls back to template affinities when no organization affinities are provided', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['rogue', 'fighter'],
+        playableClasses,
+      }),
+    ).toEqual([rogue.id, fighter.id])
+  })
+
+  it('returns an empty list when neither affinity source yields eligible classes', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['monk'],
+        organizationClassAffinityIds: [makeClass('monk').id],
+        playableClasses: [fighter],
+      }),
+    ).toEqual([])
+  })
+
+  it('ranks shared classes first, then template-only, then organization-only', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['fighter', 'rogue'],
+        organizationClassAffinityIds: [rogue.id, wizard.id],
+        playableClasses,
+      }),
+    ).toEqual([rogue.id, fighter.id, wizard.id])
+  })
+
+  it('dedupes recommendations and drops ineligible classes', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['rogue', 'rogue'],
+        organizationClassAffinityIds: [rogue.id, wizard.id, makeClass('monk').id],
+        playableClasses: [fighter, rogue, wizard],
+      }),
+    ).toEqual([rogue.id, wizard.id])
+  })
+
+  it('preserves template order within the template-only tier', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['paladin', 'fighter'],
+        organizationClassAffinityIds: [],
+        playableClasses,
+      }),
+    ).toEqual([paladin.id, fighter.id])
   })
 })
 

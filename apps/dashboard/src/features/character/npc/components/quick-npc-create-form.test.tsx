@@ -7,6 +7,7 @@ import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { makeCampaignNpcDetail } from '@/test/fixtures/factories/additional/character'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { renderWithProviders } from '@/test/render'
 
 import {
@@ -80,6 +81,7 @@ const quickFighter = {
 
 const setup = {
   speciesId: populatedBuilderCatalog.species[0]!.id,
+  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: quickFighter.id,
   level: 1,
 }
@@ -139,23 +141,22 @@ describe('QuickNpcAuthoringForm', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
-  it('renders the details tab with Neutral alignment default and membership title options', () => {
+  it('renders the details tab with Neutral alignment default', () => {
     renderForm()
 
     expect(screen.getByRole('textbox', { name: /name/i })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: /alignment/i })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
-    expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'No title' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 
   it('creates the NPC atomically with the titled membership connection', async () => {
     const user = userEvent.setup()
-    const { props } = renderForm()
-
+    const { props } = renderForm({
+      setup: { ...setup, membershipTitle: 'Guildmaster' },
+    })
     await fillAuthoringFields(user)
-    await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
@@ -196,7 +197,11 @@ describe('QuickNpcAuthoringForm', () => {
     }
     const { props } = renderForm({
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
-      setup: { ...setup, classId: unsatisfiableFighter.id },
+      setup: {
+        ...setup,
+        classId: unsatisfiableFighter.id,
+        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      },
     })
 
     await fillAuthoringFields(user)

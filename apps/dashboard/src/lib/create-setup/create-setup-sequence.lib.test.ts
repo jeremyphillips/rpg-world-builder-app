@@ -17,6 +17,7 @@ function sequence(
     isComplete: boolean
     required?: boolean
     collapseWhenComplete?: boolean
+    visibleWhenComplete?: readonly string[]
   }>,
 ): CreateSetupSequenceItem[] {
   return items
@@ -115,10 +116,36 @@ describe('create-setup-sequence', () => {
         }),
       ).toBe('class')
     })
+
+    it('activates an incomplete optional set when downstream setup is gated on it', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: false, required: false },
+            {
+              id: 'speciesId',
+              isComplete: false,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+          ]),
+        }),
+      ).toBe('membershipTitle')
+    })
+
+    it('keeps the terminal set active when optional predecessors remain incomplete', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'form', isComplete: false, required: false },
+            { id: 'operator', isComplete: true },
+          ]),
+        }),
+      ).toBe('operator')
+    })
   })
 
   describe('resolveCreateSetupSetExpanded', () => {
-    it('expands only the active set when collapseWhenComplete defaults to true', () => {
+    it('expands only the active incomplete set when collapseWhenComplete defaults to true', () => {
       expect(
         resolveCreateSetupSetExpanded({
           setId: 'classification',
@@ -135,6 +162,41 @@ describe('create-setup-sequence', () => {
           isComplete: false,
         }),
       ).toBe(false)
+    })
+
+    it('collapses a completed active set when collapseWhenActiveAndComplete is true', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          visible: true,
+          isComplete: true,
+          collapseWhenActiveAndComplete: true,
+        }),
+      ).toBe(false)
+    })
+
+    it('keeps a completed active terminal set expanded by default', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          visible: true,
+          isComplete: true,
+        }),
+      ).toBe(true)
+    })
+
+    it('re-expands a completed set when it is explicitly reopened', () => {
+      expect(
+        resolveCreateSetupSetExpanded({
+          setId: 'class',
+          activeSetId: 'class',
+          reopenSetId: 'class',
+          visible: true,
+          isComplete: true,
+        }),
+      ).toBe(true)
     })
 
     it('keeps visible sets expanded when collapseWhenComplete is false', () => {
@@ -226,6 +288,54 @@ describe('create-setup-sequence', () => {
           activeSetId: 'a',
         }),
       ).toEqual(['a'])
+    })
+
+    it('hides sets until visibleWhenComplete upstream sets are complete', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: false, required: false },
+            {
+              id: 'speciesId',
+              isComplete: false,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+            {
+              id: 'level',
+              isComplete: true,
+              visibleWhenComplete: ['speciesId'],
+            },
+          ]),
+          activeSetId: 'membershipTitle',
+        }),
+      ).toEqual(['membershipTitle'])
+    })
+
+    it('reveals downstream sets after the species visibility gate opens', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: true, required: false },
+            {
+              id: 'speciesId',
+              isComplete: true,
+              visibleWhenComplete: ['membershipTitle'],
+            },
+            {
+              id: 'level',
+              isComplete: true,
+              collapseWhenComplete: false,
+              visibleWhenComplete: ['speciesId'],
+            },
+            {
+              id: 'classId',
+              isComplete: false,
+              visibleWhenComplete: ['speciesId'],
+            },
+          ]),
+          activeSetId: 'classId',
+        }),
+      ).toEqual(['membershipTitle', 'speciesId', 'level', 'classId'])
     })
   })
 

@@ -9,11 +9,11 @@ import {
   formatFieldMessage,
   getAlignmentLabel,
   isClassProgressionApplicable,
+  resolveCharacterLevelConstraints,
   resolvePlayableBuilderContent,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
-  type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -22,24 +22,17 @@ import {
   type TabbedFormTab,
   type TrailingFieldActionConfig,
 } from '@rpg/ui/form'
-
-import { buildOrganizationMembershipTitleRadioOptions } from '../../components/connections/organization-membership-title-field.lib'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   buildQuickNpcConstraintsFromArrays,
   countQuickNpcConfiguredRequirementsFromArrays,
   type QuickNpcRequirementOptionSets,
 } from './quick-npc-requirement-options.lib'
-import { resolveQuickNpcDefaultLevel } from './quick-npc-create-modal-setup.lib'
 
 // ---------------------------------------------------------------------------
-// Quick NPC form — setup (species/class/level) plus authoring tabs for
-// details (name, alignment, membership title) and optional requirements
-// (weapon/spell constraints). Options come from the canonical availability
-// resolver and advisory discovery helpers.
+// Quick NPC form — setup (species/title/level/class) plus authoring tabs for
+// details (name, alignment) and optional requirements (weapon/spell constraints).
 // ---------------------------------------------------------------------------
 
-export const QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME = 'membershipTitle'
 export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 
@@ -48,8 +41,27 @@ export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
 
 export type QuickNpcSetupValues = {
   speciesId: string
+  /** Setup-only unset (`undefined`) until the user chooses a title or No title. */
+  membershipTitle: string | undefined
   classId: string
   level: number
+}
+
+export function isQuickNpcMembershipTitleSetupComplete(
+  membershipTitle: string | undefined,
+): boolean {
+  if (membershipTitle === undefined) return false
+  if (membershipTitle.trim() === '') return false
+  return true
+}
+
+/** Quick NPC setup defaults to campaign minimum level (often level 0). */
+export function resolveQuickNpcDefaultLevel(context: CharacterBuildContext): number {
+  return resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  }).minLevel
 }
 
 export function createQuickNpcSetupDefaultValues(
@@ -57,6 +69,7 @@ export function createQuickNpcSetupDefaultValues(
 ): QuickNpcSetupValues {
   return {
     speciesId: '',
+    membershipTitle: undefined,
     classId: '',
     level: resolveQuickNpcDefaultLevel(context),
   }
@@ -64,6 +77,7 @@ export function createQuickNpcSetupDefaultValues(
 
 export const EMPTY_QUICK_NPC_SETUP_VALUES: QuickNpcSetupValues = {
   speciesId: '',
+  membershipTitle: undefined,
   classId: '',
   level: 1,
 }
@@ -74,6 +88,9 @@ export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
       speciesId: z
         .string()
         .min(1, formatFieldMessage(characterBuilderValidationMessages.speciesRequired())),
+      membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
+        message: 'Choose a membership title or No title.',
+      }),
       classId: z.string(),
       level: z
         .number({
@@ -114,7 +131,6 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    membershipTitle: z.string(),
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
   })
@@ -131,7 +147,6 @@ export function quickNpcAuthoringTabSchema() {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    membershipTitle: z.string(),
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
   })
@@ -139,19 +154,13 @@ export function quickNpcAuthoringTabSchema() {
 
 export type QuickNpcAuthoringTabValues = z.infer<ReturnType<typeof quickNpcAuthoringTabSchema>>
 
-export type QuickNpcAuthoringValues = z.infer<ReturnType<typeof quickNpcAuthoringSchema>>
+export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcAuthoringTabValues
 
 export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
   name: '',
   alignment: 'n',
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   requiredWeaponIds: [],
   requiredSpellIds: [],
-}
-
-export const quickNpcAuthoringDefaultValues: QuickNpcAuthoringValues = {
-  ...EMPTY_QUICK_NPC_SETUP_VALUES,
-  ...quickNpcAuthoringTabDefaultValues,
 }
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
@@ -234,14 +243,11 @@ function formatRequirementsTabLabel(configuredCount: number): string {
 }
 
 export type QuickNpcDetailsFieldsArgs = {
-  membership: {
-    titles: readonly OrganizationMembershipTitleDefinition[]
-  }
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }
 
-export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): FormItem[] {
+export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {}): FormItem[] {
   const nameField: FormItem = {
     type: 'text',
     name: 'name',
@@ -262,15 +268,6 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs): For
       options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
       required: true,
       width: 'full',
-    },
-    {
-      type: 'radio',
-      name: QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
-      label: 'Title',
-      options: buildOrganizationMembershipTitleRadioOptions({
-        titles: args.membership.titles,
-      }),
-      defaultValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
     },
   ]
 }

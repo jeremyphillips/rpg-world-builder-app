@@ -6,11 +6,18 @@ export type CreateSetupSequenceItem = {
   required?: boolean
   /** Upstream set ids — when any change, dependents are reset via `onReset`. */
   dependsOn?: readonly string[]
+  /** Upstream set ids that must be complete before this set is visible — no reset. */
+  visibleWhenComplete?: readonly string[]
   /**
    * Presentation: when false, completed visible sets stay expanded.
    * Does not affect `isComplete`. @default true
    */
   collapseWhenComplete?: boolean
+  /**
+   * Presentation: when true, a completed set collapses even while it remains
+   * the active terminal set. Opt-in for flows that should summarize after seeding.
+   */
+  collapseWhenActiveAndComplete?: boolean
 }
 
 export type CreateSetupSetBase = {
@@ -20,7 +27,9 @@ export type CreateSetupSetBase = {
   prompt?: string
   required?: boolean
   dependsOn?: readonly string[]
+  visibleWhenComplete?: readonly string[]
   collapseWhenComplete?: boolean
+  collapseWhenActiveAndComplete?: boolean
   isComplete: boolean
   onReset: () => void
 }
@@ -42,4 +51,10 @@ export type CreateSetupNumberSet = CreateSetupSetBase & {
   digits?: NumberStepperDigits
 }
 
-export type CreateSetupSet = CreateSetupChoiceSet | CreateSetupNumberSet
+export type CreateSetupNoteSet = CreateSetupSetBase & {
+  kind: 'note'
+  body: string
+  description?: string
+}
+
+export type CreateSetupSet = CreateSetupChoiceSet | CreateSetupNumberSet | CreateSetupNoteSet

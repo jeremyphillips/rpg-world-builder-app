@@ -12,12 +12,12 @@ import {
   buildQuickNpcConstraints,
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
+  createQuickNpcSetupDefaultValues,
+  isQuickNpcMembershipTitleSetupComplete,
   mergeQuickNpcAuthoringValues,
-  quickNpcAuthoringDefaultValues,
   quickNpcAuthoringSchema,
   quickNpcAuthoringTabDefaultValues,
   QUICK_NPC_DETAILS_TAB_ID,
-  QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
 } from './quick-npc-form-fields'
 
 const validValues = {
@@ -31,6 +31,34 @@ const validValues = {
   requiredSpellIds: [],
 }
 
+describe('isQuickNpcMembershipTitleSetupComplete', () => {
+  it('treats unset and empty string as incomplete', () => {
+    expect(isQuickNpcMembershipTitleSetupComplete(undefined)).toBe(false)
+    expect(isQuickNpcMembershipTitleSetupComplete('')).toBe(false)
+    expect(isQuickNpcMembershipTitleSetupComplete('   ')).toBe(false)
+  })
+
+  it('treats explicit No title and organization titles as complete', () => {
+    expect(isQuickNpcMembershipTitleSetupComplete(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)).toBe(
+      true,
+    )
+    expect(isQuickNpcMembershipTitleSetupComplete('Guildmaster')).toBe(true)
+  })
+})
+
+describe('createQuickNpcSetupDefaultValues', () => {
+  it('starts with setup-only unset membership title until the user chooses', () => {
+    const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+
+    expect(createQuickNpcSetupDefaultValues(context)).toMatchObject({
+      speciesId: '',
+      membershipTitle: undefined,
+      classId: '',
+      level: 0,
+    })
+  })
+})
+
 describe('quickNpcAuthoringSchema', () => {
   it('accepts a complete quick NPC form payload', () => {
     expect(quickNpcAuthoringSchema(20, 0).parse(validValues)).toMatchObject({
@@ -38,6 +66,15 @@ describe('quickNpcAuthoringSchema', () => {
       level: 3,
       alignment: 'ln',
     })
+  })
+
+  it('rejects setup with an empty membership title', () => {
+    const result = quickNpcAuthoringSchema(20, 0).safeParse({
+      ...validValues,
+      membershipTitle: '',
+    })
+
+    expect(result.success).toBe(false)
   })
 
   it('rejects missing required seed fields with builder messages', () => {
@@ -128,51 +165,20 @@ describe('buildQuickNpcContentOptions', () => {
   })
 })
 
-const sampleMembershipTitles = [
-  {
-    id: 'omt_test_guildmaster',
-    label: 'Guildmaster',
-    description: 'Head of the guild.',
-    priority: 50,
-  },
-] as const
-
 describe('buildQuickNpcDetailsFields', () => {
-  it('includes the canonical membership title radio with a No title default', () => {
-    const fields = buildQuickNpcDetailsFields({
-      membership: { titles: sampleMembershipTitles },
-    })
+  it('includes name and alignment only', () => {
+    const fields = buildQuickNpcDetailsFields()
 
-    const titleField = fields.find(
-      (field) => 'name' in field && field.name === QUICK_NPC_MEMBERSHIP_TITLE_FIELD_NAME,
-    )
-    expect(titleField).toMatchObject({
-      type: 'radio',
-      defaultValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-    })
-    expect((titleField as { options: { value: string; label: string }[] }).options).toEqual(
-      expect.arrayContaining([
-        { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },
-        { value: 'Guildmaster', label: 'Guildmaster' },
-      ]),
-    )
+    expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+      'name',
+      'alignment',
+    ])
   })
 
-  it('has defaults for every schema key', () => {
-    expect(quickNpcAuthoringDefaultValues).toMatchObject({
-      name: '',
-      speciesId: '',
-      classId: '',
-      level: 1,
-      alignment: 'n',
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      requiredWeaponIds: [],
-      requiredSpellIds: [],
-    })
+  it('has defaults for authoring tab schema keys', () => {
     expect(quickNpcAuthoringTabDefaultValues).toEqual({
       name: '',
       alignment: 'n',
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       requiredWeaponIds: [],
       requiredSpellIds: [],
     })
@@ -183,7 +189,6 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('declares explicit ownership for the name field with trailing action', () => {
     const tabs = buildQuickNpcTabs({
       detailsFields: buildQuickNpcDetailsFields({
-        membership: { titles: sampleMembershipTitles },
         nameTrailingAction: {
           label: 'Generate',
           onAction: () => {},
@@ -211,17 +216,22 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('merges setup and tab values for create/finalize', () => {
     expect(
       mergeQuickNpcAuthoringValues(
-        { speciesId: 'species-1', classId: 'class-1', level: 2 },
+        {
+          speciesId: 'species-1',
+          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+          classId: 'class-1',
+          level: 2,
+        },
         {
           name: 'Guard Captain',
           alignment: 'ln',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           requiredWeaponIds: [],
           requiredSpellIds: [],
         },
       ),
     ).toMatchObject({
       speciesId: 'species-1',
+      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: 'class-1',
       level: 2,
       name: 'Guard Captain',

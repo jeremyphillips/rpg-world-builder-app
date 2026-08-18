@@ -84,12 +84,6 @@ export type QuickNpcAuthoringFormProps = {
   onPendingChange?: (pending: boolean) => void
 }
 
-function resolveMembership(organization: QuickNpcCreateFormOrganization) {
-  return {
-    titles: organization.members?.titles ?? [],
-  }
-}
-
 function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
@@ -124,7 +118,6 @@ function buildQuickNpcAuthoringTabs(args: {
 
   return buildQuickNpcTabs({
     detailsFields: buildQuickNpcDetailsFields({
-      membership: resolveMembership(args.organization),
       nameTrailingAction,
       nameHint,
     }),
@@ -245,10 +238,9 @@ export function QuickNpcAuthoringForm({
   const defaultValues = React.useMemo(
     () => ({
       ...quickNpcAuthoringTabDefaultValues,
-      ...setup,
       ...initialValues,
     }),
-    [initialValues, setup],
+    [initialValues],
   )
 
   const requirementCategoryKey = React.useMemo(() => {
@@ -266,7 +258,7 @@ export function QuickNpcAuthoringForm({
       const values = mergeQuickNpcAuthoringValues(setup, tabValues)
       const membershipMetadata = resolveOrganizationMembershipMetadata({
         titles: organization.members?.titles ?? [],
-        selectedTitle: titleFromMembershipRadioValue(values.membershipTitle),
+        selectedTitle: titleFromMembershipRadioValue(setup.membershipTitle ?? ''),
       })
 
       const constraints = buildQuickNpcConstraints(values)

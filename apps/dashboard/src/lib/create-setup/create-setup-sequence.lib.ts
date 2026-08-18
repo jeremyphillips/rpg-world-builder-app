@@ -5,6 +5,32 @@ export type ResolveCreateSetupActiveSetIdInput = {
   reopenSetId?: string | null
 }
 
+function buildCreateSetupSetsById(
+  sets: readonly CreateSetupSequenceItem[],
+): Map<string, CreateSetupSequenceItem> {
+  return new Map(sets.map((set) => [set.id, set]))
+}
+
+function isCreateSetupVisibilityGateOpen(
+  set: CreateSetupSequenceItem,
+  setsById: Map<string, CreateSetupSequenceItem>,
+): boolean {
+  for (const upstreamId of set.visibleWhenComplete ?? []) {
+    const upstream = setsById.get(upstreamId)
+    if (upstream?.isComplete !== true) {
+      return false
+    }
+  }
+  return true
+}
+
+function filterCreateSetupSetsByVisibilityGate(
+  sets: readonly CreateSetupSequenceItem[],
+): CreateSetupSequenceItem[] {
+  const setsById = buildCreateSetupSetsById(sets)
+  return sets.filter((set) => isCreateSetupVisibilityGateOpen(set, setsById))
+}
+
 /** Active = reopened (if still present) ?? first incomplete required set ?? terminal. */
 export function resolveCreateSetupActiveSetId({
   sets,
@@ -12,32 +38,56 @@ export function resolveCreateSetupActiveSetId({
 }: ResolveCreateSetupActiveSetIdInput): string | null {
   if (sets.length === 0) return null
 
-  if (reopenSetId != null && sets.some((set) => set.id === reopenSetId)) {
-    return reopenSetId
+  const setsById = buildCreateSetupSetsById(sets)
+  const visibleSets = filterCreateSetupSetsByVisibilityGate(sets)
+
+  if (reopenSetId != null) {
+    const reopenSet = setsById.get(reopenSetId)
+    if (reopenSet && isCreateSetupVisibilityGateOpen(reopenSet, setsById)) {
+      return reopenSetId
+    }
   }
 
-  const firstIncompleteRequired = sets.find((set) => set.required !== false && !set.isComplete)
+  const firstIncompleteRequired = visibleSets.find(
+    (set) => set.required !== false && !set.isComplete,
+  )
   if (firstIncompleteRequired) return firstIncompleteRequired.id
 
-  return sets[sets.length - 1]?.id ?? null
+  const firstIncompleteVisibilityGate = visibleSets.find((set) => {
+    if (set.isComplete) return false
+    return sets.some((candidate) => candidate.visibleWhenComplete?.includes(set.id))
+  })
+  if (firstIncompleteVisibilityGate) return firstIncompleteVisibilityGate.id
+
+  return visibleSets[visibleSets.length - 1]?.id ?? sets[sets.length - 1]?.id ?? null
 }
 
 export function resolveCreateSetupSetExpanded({
   setId,
   activeSetId,
+  reopenSetId = null,
   visible,
   isComplete,
   required = true,
   collapseWhenComplete = true,
+  collapseWhenActiveAndComplete = false,
 }: {
   setId: string
   activeSetId: string | null
+  reopenSetId?: string | null
   visible: boolean
   isComplete: boolean
   required?: boolean
   collapseWhenComplete?: boolean
+  collapseWhenActiveAndComplete?: boolean
 }): boolean {
-  if (setId === activeSetId) return true
+  if (reopenSetId === setId) return true
+  if (setId === activeSetId) {
+    if (!isComplete) return true
+    if (collapseWhenComplete === false) return true
+    if (collapseWhenActiveAndComplete) return false
+    return true
+  }
   if (visible && required === false && !isComplete) return true
   if (visible && collapseWhenComplete === false) return true
   return false
@@ -56,13 +106,14 @@ export function resolveCreateSetupVisibleSetIds({
 }): string[] {
   if (sets.length === 0 || activeSetId == null) return []
 
+  const setsById = buildCreateSetupSetsById(sets)
   const activeIndex = sets.findIndex((set) => set.id === activeSetId)
   if (activeIndex < 0) return []
 
   const visibleIds: string[] = []
   for (let index = 0; index < sets.length; index += 1) {
     const set = sets[index]
-    if (!set) continue
+    if (!set || !isCreateSetupVisibilityGateOpen(set, setsById)) continue
     if (index < activeIndex && (set.isComplete || set.required === false)) {
       visibleIds.push(set.id)
       continue

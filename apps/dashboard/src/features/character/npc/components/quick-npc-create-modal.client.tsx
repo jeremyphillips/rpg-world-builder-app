@@ -14,10 +14,12 @@ import {
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
+import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
 import {
   buildQuickNpcCreateSetupSets,
+  QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
+  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
   QUICK_NPC_SETUP_CHANGE_LABEL,
-  QUICK_NPC_SETUP_HEADLINE,
   resolveQuickNpcSetupModel,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
@@ -27,7 +29,7 @@ import {
 
 export type { QuickNpcCreateFormOrganization }
 
-export const QUICK_NPC_CREATE_TITLE = QUICK_NPC_SETUP_HEADLINE
+export const QUICK_NPC_CREATE_TITLE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 
 export type QuickNpcCreateModalProps = {
   open: boolean
@@ -72,8 +74,23 @@ function QuickNpcCreateModalSession({
   })
 
   const setupModel = React.useMemo(
-    () => resolveQuickNpcSetupModel({ context: buildContext, values: state.setupValues }),
-    [buildContext, state.setupValues],
+    () =>
+      resolveQuickNpcSetupModel({
+        context: buildContext,
+        values: state.setupValues,
+        titles: organization.members?.titles ?? [],
+        members: {
+          classAffinityIds: organization.members?.classAffinityIds,
+          speciesAffinityIds: organization.members?.speciesAffinityIds,
+        },
+      }),
+    [
+      buildContext,
+      organization.members?.classAffinityIds,
+      organization.members?.speciesAffinityIds,
+      organization.members?.titles,
+      state.setupValues,
+    ],
   )
 
   const requestCancel = React.useCallback(() => {
@@ -92,9 +109,22 @@ function QuickNpcCreateModalSession({
     [onOpenChange, requestCancel],
   )
 
-  const handleSetupValuesChange = React.useCallback((setupValues: QuickNpcSetupValues) => {
-    setState((current) => ({ ...current, setupValues }))
-  }, [])
+  const handleApplySetupChange = React.useCallback(
+    (setId: string, nextValue: string | number) => {
+      setState((current) => ({
+        ...current,
+        setupValues: applyQuickNpcSetupValueChange({
+          values: current.setupValues,
+          setId,
+          nextValue,
+          context: buildContext,
+          titles: organization.members?.titles ?? [],
+          organizationClassAffinityIds: organization.members?.classAffinityIds,
+        }),
+      }))
+    },
+    [buildContext, organization.members?.classAffinityIds, organization.members?.titles],
+  )
 
   const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {
     setState((current) => ({
@@ -133,7 +163,8 @@ function QuickNpcCreateModalSession({
       buildQuickNpcCreateSetupSets({
         context: buildContext,
         values: state.setupValues,
-        onValuesChange: handleSetupValuesChange,
+        onApplySetupChange: handleApplySetupChange,
+        titles: organization.members?.titles ?? [],
         members: {
           classAffinityIds: organization.members?.classAffinityIds,
           speciesAffinityIds: organization.members?.speciesAffinityIds,
@@ -141,9 +172,10 @@ function QuickNpcCreateModalSession({
       }),
     [
       buildContext,
-      handleSetupValuesChange,
+      handleApplySetupChange,
       organization.members?.classAffinityIds,
       organization.members?.speciesAffinityIds,
+      organization.members?.titles,
       state.setupValues,
     ],
   )
@@ -153,10 +185,12 @@ function QuickNpcCreateModalSession({
       <CreateModalShell
         open={open}
         onOpenChange={handleDismiss}
-        headline={QUICK_NPC_CREATE_TITLE}
+        headline={
+          state.phase === 'setup' ? QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE : QUICK_NPC_CREATE_TITLE
+        }
         description={
           state.phase === 'setup'
-            ? `Choose species, level, and class when applicable for a new member of ${organization.name}.`
+            ? QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION
             : `Create a new NPC as a member of ${organization.name}.`
         }
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
