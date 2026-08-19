@@ -69,6 +69,7 @@ import {
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
+  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   type LocationConnectionKindOption,
 } from '../../lib/location-connection-kind-options'
@@ -366,9 +367,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
     organizationId,
   ])
 
+  const canEditKind = canReopenConnectionKindDecision(kindOptions)
   const kindDecisionComplete = showKindStep && Boolean(activeKind)
-  const showKindField = showKindStep && (!kindDecisionComplete || editingKind)
-  const showKindSummary = showKindStep && kindDecisionComplete && !editingKind
+  const showKindField =
+    showKindStep && (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
+  const showKindSummary = showKindStep && canEditKind && kindDecisionComplete && !editingKind
   const selectedKindOption = kindOptions.find((option) => option.value === activeKind)
   const kindFieldLabel = ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
   const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL
@@ -415,6 +418,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   }
 
   const startEditingKind = () => {
+    if (!canEditKind) return
     setEditingKind(true)
   }
 

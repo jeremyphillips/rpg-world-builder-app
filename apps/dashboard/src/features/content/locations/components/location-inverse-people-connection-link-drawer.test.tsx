@@ -7,6 +7,7 @@ import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
 import { buildLocationsById } from '../lib/location-display'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../../organizations/fixtures'
+import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../lib/location-connection-kind-options'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
 
@@ -130,6 +131,77 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
   })
 
+  it('offers Change and reopens radios when two kind options exist but only one is enabled', async () => {
+    const user = userEvent.setup()
+    const headquartersLinkedRow = {
+      relationshipId: 'conn-hq',
+      subjectType: 'organization' as const,
+      subject: {
+        type: 'organization' as const,
+        id: CITY_COUNCIL.id,
+        name: CITY_COUNCIL.name,
+        slug: CITY_COUNCIL.slug,
+      },
+      kind: 'headquarters' as const,
+      label: 'Headquarters',
+      family: 'site' as const,
+      priority: 60,
+      sectionGroup: 'people_and_organizations' as const,
+    }
+
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={[ownerSlot, headquartersSlot]}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[headquartersLinkedRow]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.queryByRole('radiogroup', { name: /Relationship type/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    expect(screen.getByRole('radiogroup', { name: /Relationship type/i })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Headquarters/i })).toBeDisabled()
+    expect(screen.getByText(PEOPLE_SECTION_KIND_FULLY_LINKED_REASON)).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Owner/i })).toBeEnabled()
+  })
+
+  it('shows locked kind and picker without Change when only one kind slot exists', () => {
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={[headquartersSlot]}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Headquarters')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage),
+    ).not.toBeInTheDocument()
+  })
+
   it('switches picker copy when the subject type segment changes', async () => {
     const user = userEvent.setup()
 
@@ -185,6 +257,104 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     expect(screen.queryByRole('button', { name: 'Organization' })).not.toBeInTheDocument()
     expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Add owner/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Choose an organization that owns this location.'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('retains organization selection through kind edit overlay and same-value dismiss', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Organization' }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+  })
+
+  it('preserves organization selection when changing to another compatible kind', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Organization' }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
+
+    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+  })
+
+  it('clears organization selection when changing to an incompatible kind', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Organization' }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('radio', { name: /Resident/i }))
+
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

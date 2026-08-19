@@ -300,11 +300,33 @@ When a per-kind add action resolves intent before open, **do not** show a kind p
 
 When a **family-level** add action must choose among semantically meaningful kinds, sequenced Add drawers use **`LocationConnectionKindField`** for the active kind decision and **`SelectionSummaryCard`** for the completed kind row. While the user reopens kind (Change), hide downstream controls (subject type, entity picker, search) **and** the persistence footer — do not disable them. Kind change clears only downstream selections that are ineligible under the new kind; preserve still-valid subject type and entity selections.
 
+### Sequenced Add kind option count
+
+Hosts derive reopen capability once from total option count (enabled **and** disabled):
+
+```ts
+const canEditKind = canReopenConnectionKindDecision(kindOptions)
+```
+
+Use `canEditKind` for every kind-reopen surface — Change affordance, `startEditingKind`, and summary-row action. Do not parallel-check `options.length > 1` in drawer JSX.
+
+| Option count | Kind control                                   | After kind chosen               | Change / overlay                                            |
+| ------------ | ---------------------------------------------- | ------------------------------- | ----------------------------------------------------------- |
+| **0**        | No kind control                                | Downstream only                 | N/A                                                         |
+| **1**        | Locked readout (`LocationConnectionKindField`) | Picker / footer immediately     | **No Change** — `canEditKind` is false                      |
+| **2+**       | Active radios initially                        | `SelectionSummaryCard` + Change | Change hides downstream; same-value reselect dismisses edit |
+
+Two total options with one disabled still counts as **2+** — Change must reopen radios and show the disabled reason, not collapse to the single-option lock.
+
 **Change-kind** drawers use always-expanded **`LocationConnectionKindField`** only — no summary card, no Change affordance, footer stays visible.
 
 Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not drawer-local collapse chrome.
 
 Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream.
+
+### Inverted organization add without `addKind` (legacy)
+
+`LocationInverseOrganizationConnectionLinkDrawer` in **add** mode without a resolved `addKind` is an **inverted leftover**, not sequenced grammar: the user picks the organization first, then sees kind radios only after a subject is selected (`showKindStep` requires `selectedOrganizationId`). Do **not** extend this branch with sequenced overlay behavior (`SelectionSummaryCard`, Change, or upstream edit hiding). Per-kind inverse adds that resolve intent before open pass `addKind` and skip the kind step entirely. New surfaces should prefer intent-resolved adds or the sequenced People drawer pattern.
 
 ## Presentation roles (relationship drawers)
 

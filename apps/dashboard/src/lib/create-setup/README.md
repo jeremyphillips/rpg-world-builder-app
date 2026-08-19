@@ -108,8 +108,7 @@ Sequenced create-modal setup must use create-setup orchestration unless listed a
 exception. Relationship sequenced Add drawers import `SelectionSummaryCard` from `@rpg/ui` directly —
 they are **not** create-setup consumers. `create-setup-parallel-path-drift.test.ts` and
 `sequenced-relationship-drawer-drift.test.ts` guard against collapse chrome and deleted kind-step
-wrappers. `RadioCardField` is allowed for active
-decisions. Relationship drawers keep `LocationConnectionKindStep` (collapsing kind chrome).
+wrappers. `RadioCardField` is allowed for active decisions.
 
 Create-modal radio cards represent **active decisions only**; completed setup decisions render through
 `SelectionSummaryCard` partial rows from `@rpg/ui`.

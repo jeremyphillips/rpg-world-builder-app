@@ -442,6 +442,13 @@ export function buildCharacterInverseLocationConnectionKindOptions(input: {
   }))
 }
 
+/** True when the host may offer Change / summary reopen for a completed kind decision. */
+export function canReopenConnectionKindDecision(
+  options: readonly LocationConnectionKindOption[],
+): boolean {
+  return options.length > 1
+}
+
 export function resolveActiveConnectionKind(
   selectedKind: string | null,
   kindOptions: readonly LocationConnectionKindOption[],

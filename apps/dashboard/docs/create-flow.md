@@ -56,8 +56,9 @@ Recorded before the relationship-first refinement. Findings:
    titles from `OrganizationMembershipTitleField`. Relationship-first building
    composition uses `RadioCardField` for active kind and `SelectionSummaryCard` rows
    for completed decisions inside the Organizations composer. Sequenced location and Quick
-   NPC setup use `CreateSetupPanel` with the same grammar. Relationship drawers keep
-   `LocationConnectionKindStep` (`CollapsibleRadioCardField` / `ChooserSummaryCard`).
+   NPC setup use `CreateSetupPanel` with the same grammar. Relationship drawers use
+   `LocationConnectionKindField` for active kind and `SelectionSummaryCard` for completed kind rows;
+   change-kind drawers keep the kind field expanded only.
    Do not lift title vocabulary into shared UI.
 4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
    composing slot and one pending collection slot. Do not lift the picker Sheet,

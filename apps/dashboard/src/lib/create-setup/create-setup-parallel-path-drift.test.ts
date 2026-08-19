@@ -5,14 +5,6 @@ import { describe, expect, it } from 'vitest'
 
 const dashboardSrcRoot = fileURLToPath(new URL('../../', import.meta.url))
 
-const CREATE_MODAL_DECISION_SEQUENCE_FILES = [
-  'features/content/locations/components/building-organizations-composer.client.tsx',
-  'features/character/npc/components/quick-npc-create-setup-phase.client.tsx',
-  'features/content/locations/components/location-create-modal-setup-panel.client.tsx',
-  'lib/create-setup/create-setup-panel-items.client.tsx',
-  'lib/create-setup/create-setup-panel.client.tsx',
-] as const
-
 const FORBIDDEN_COLLAPSIBLE_RADIO_IMPORT_PATTERN =
   /\bCollapsibleRadioCardField\b[\s\S]*?\bfrom ['"]@rpg\/ui['"]/
 
@@ -58,11 +50,15 @@ describe('create-setup parallel path drift', () => {
     expect(offenders).toEqual([])
   })
 
-  it('forbids ChooserSummaryCard in create-modal decision sequences', () => {
+  it('forbids ChooserSummaryCard in dashboard production sources', () => {
+    // ChooserSummaryCard is no longer part of dashboard production decision flows.
+    // This scan prevents the deleted identifier from returning. It is not a ban on a
+    // future rich-chooser primitive under a new name.
     const offenders: string[] = []
 
-    for (const relativePath of CREATE_MODAL_DECISION_SEQUENCE_FILES) {
-      const source = readFileSync(join(dashboardSrcRoot, relativePath), 'utf8')
+    for (const filePath of collectProductionSourceFiles(dashboardSrcRoot)) {
+      const relativePath = relative(dashboardSrcRoot, filePath)
+      const source = readFileSync(filePath, 'utf8')
       if (!FORBIDDEN_CHOOSER_SUMMARY_IMPORT_PATTERN.test(source)) continue
       offenders.push(relativePath)
     }

@@ -48,6 +48,7 @@ import {
 import { buildSubjectLocationConnectionKeySet } from '../../lib/location-connection-duplicate-keys'
 import {
   buildPeopleSectionKindOptions,
+  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
 } from '../../lib/location-connection-kind-options'
@@ -194,9 +195,12 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   )
 
   const effectiveSubjectType = subjectTypeOverride ?? selectableSubjectTypes[0] ?? null
+  const canEditKind = canReopenConnectionKindDecision(kindOptions)
   const kindDecisionComplete = Boolean(activeSlotKey)
-  const showKindField = kindOptions.length > 0 && (!kindDecisionComplete || editingKind)
-  const showKindSummary = kindOptions.length > 0 && kindDecisionComplete && !editingKind
+  const showKindField =
+    kindOptions.length > 0 &&
+    (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
+  const showKindSummary = canEditKind && kindDecisionComplete && !editingKind
   const selectedKindOption = kindOptions.find((option) => option.value === activeSlotKey)
   const kindFieldLabel = LOCATION_PEOPLE_SECTION_SURFACE_COPY.kindFieldLabel
   const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL
@@ -253,6 +257,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   }
 
   const startEditingKind = () => {
+    if (!canEditKind) return
     setEditingKind(true)
   }
 
@@ -390,12 +395,12 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           />
         </div>
       ) : null}
-      {instructionCopy ? (
+      {instructionCopy && !editingKind ? (
         <Text variant="muted" className="text-sm">
           {instructionCopy}
         </Text>
       ) : null}
-      {!showEntityPicker ? (
+      {!activeSlotKey ? (
         <Text variant="muted" className="text-sm" role="status">
           {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
         </Text>

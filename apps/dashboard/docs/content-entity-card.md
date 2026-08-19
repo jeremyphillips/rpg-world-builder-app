@@ -428,7 +428,7 @@ AddPendingWorkflow
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
 (outline, `size="sm"`, `density="compact"`). Pending edit replaces one row with
-hydrated `ChooserSummaryCard` review in place — sibling pending cards stay on CEC.
+hydrated `SelectionSummaryCard` review in place — sibling pending cards stay on CEC.
 
 Zero-eligible discovery rows stay on CEC with a disabled trailing **Select** and
 the authoritative reason in the entity status lane.
