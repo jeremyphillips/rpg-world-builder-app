@@ -13,6 +13,7 @@ import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
   resolveLocationCreateModalSetupModel,
+  isLocationCreateModalSetupComplete,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
@@ -62,7 +63,7 @@ export function LocationCreateSetupSession({
         ? [
             resolveLocationSetupNavigationExternalDecision({
               values,
-              isReady: model.canContinue,
+              isReady: isLocationCreateModalSetupComplete(model),
             }),
           ]
         : [],
@@ -96,7 +97,7 @@ export function LocationCreateSetupSession({
       ? [
           resolveLocationSetupNavigationExternalDecision({
             values: nextValues,
-            isReady: nextModel.canContinue,
+            isReady: isLocationCreateModalSetupComplete(nextModel),
           }),
         ]
       : []

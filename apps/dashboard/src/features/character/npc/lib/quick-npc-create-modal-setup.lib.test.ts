@@ -10,6 +10,9 @@ import {
   buildQuickNpcCreateSetupSets,
   resolveQuickNpcSetupSummaryRows,
   isQuickNpcBuildResolved,
+  quickNpcBuildRevision,
+  resolveQuickNpcBuildExternalDecision,
+  QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
 } from './quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_BUILD_FIELD_LABEL,
@@ -297,5 +300,55 @@ describe('isQuickNpcBuildResolved', () => {
         },
       }),
     ).toBe(true)
+  })
+})
+
+describe('quickNpcBuildRevision', () => {
+  const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+  const baseValues = {
+    speciesId: 'srd-cc-5.2.1:dwarf',
+    membershipTitle: 'Guildmaster',
+    classId: populatedBuilderCatalog.classes[0]!.id,
+    level: 5,
+  }
+
+  it('derives revision from membershipTitle, speciesId, level, and classId only', () => {
+    expect(quickNpcBuildRevision(baseValues)).toBe(
+      `Guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, membershipTitle: 'Other' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, speciesId: 'srd-cc-5.2.1:elf' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, level: 3 })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, classId: 'srd-cc-5.2.1:rogue' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+  })
+
+  it('registers Build as an explicit external decision with Continue label', () => {
+    const decision = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+
+    expect(decision).toEqual({
+      id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+      isResolved: true,
+      completion: 'explicit',
+      revision: quickNpcBuildRevision(baseValues),
+      completeLabel: 'Continue',
+    })
+  })
+
+  it('changes revision when build-affecting inputs change', () => {
+    const first = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+    const second = resolveQuickNpcBuildExternalDecision({
+      values: { ...baseValues, level: 2 },
+      context,
+    })
+
+    expect(first.revision).not.toBe(second.revision)
   })
 })

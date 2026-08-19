@@ -25,6 +25,7 @@ import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
   resolveLocationCreateModalSetupModel,
+  isLocationCreateModalSetupComplete,
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
@@ -287,7 +288,7 @@ function useLocationCreateModalController({
   const handleContinueFromSetup = React.useCallback(
     (values: LocationCreateModalSetupValues = state.setupValues) => {
       const model = resolveLocationCreateModalSetupModel({ intent, values })
-      if (!model?.canContinue) return
+      if (!model || !isLocationCreateModalSetupComplete(model)) return
       const result = model.complete()
       if (!result) return
       const fixedCreate = completeLocationCreateSetup(intent, result)

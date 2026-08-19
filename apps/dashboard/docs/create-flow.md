@@ -56,7 +56,9 @@ Recorded before the relationship-first refinement. Findings:
    titles from `OrganizationMembershipTitleField`. Relationship-first building
    composition uses `LocationConnectionKindStep` (the allowlisted wrapper around
    `CollapsibleRadioCardField` / `ChooserSummaryCard`). Sequenced location and Quick
-   NPC setup use `CreateSetupPanel` instead. Do not lift title vocabulary into shared UI.
+   NPC setup use `CreateSetupPanel` + partial `SetupSummaryCard` rows instead — active
+   decisions only in `RadioCardField`; completed decisions never use `ChooserSummaryCard`.
+   Do not lift title vocabulary into shared UI.
 4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
    composing slot and one pending collection slot. Do not lift the picker Sheet,
    membership title field, or immediate-persist controller.

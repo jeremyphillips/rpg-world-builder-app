@@ -15,6 +15,10 @@ import type { LocationCreateIntent } from './location-create-session'
 
 export const REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL = 'Classification' as const
 
+export const REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP = 'selections' as const
+
+export const REGION_CREATE_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
+
 export const REGION_CREATE_SETUP_TYPE_FIELD_LABEL = 'Region type' as const
 
 export const REGION_CREATE_SETUP_TYPE_PROMPT = 'Region type' as const

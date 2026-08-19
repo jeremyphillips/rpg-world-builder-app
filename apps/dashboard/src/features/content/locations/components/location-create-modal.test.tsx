@@ -1005,6 +1005,19 @@ describe('LocationCreateModal', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('shows partial Selections summary after classification before region type completes', async () => {
+    const user = userEvent.setup()
+    renderModal(regionIntent)
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+  })
+
   it('clears region type when classification changes via dependsOn', async () => {
     const user = userEvent.setup()
     renderModal(regionIntent)

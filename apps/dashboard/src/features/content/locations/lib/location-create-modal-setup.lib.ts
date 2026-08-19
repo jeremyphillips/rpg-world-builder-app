@@ -7,7 +7,10 @@ import type {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
-import type { CreateSetupValueChangeEvent } from '@/lib/create-setup'
+import {
+  CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL,
+  type CreateSetupValueChangeEvent,
+} from '@/lib/create-setup'
 
 import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
 import {
@@ -30,6 +33,8 @@ import {
   buildRegionTypeRadioOptions,
   parseRegionClassification,
   REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
+  REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
+  REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
   REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
   REGION_CREATE_SETUP_TYPE_PROMPT,
   resolveRegionCreateSetupHeadline,
@@ -92,9 +97,13 @@ export type LocationCreateModalSetupModel = {
   /** Opt-in header subhead; omitted/false means no Modal description. */
   subhead?: string | false
   choiceSets: LocationCreateModalSetupChoiceSetConfig[]
-  canContinue: boolean
   complete: () => LocationCreateSetupResult | null
   summaryEntries: { fieldLabel: string; valueLabel: string }[]
+}
+
+/** True when every choice set is complete (including projection-safe facility readiness). */
+export function isLocationCreateModalSetupComplete(model: LocationCreateModalSetupModel): boolean {
+  return model.choiceSets.every((set) => set.isComplete)
 }
 
 function optionLabel(options: readonly RadioCardOption[], value: string): string {
@@ -127,6 +136,7 @@ function resolveBuildingSetupModel(
         value: values.buildingForm,
         required: false,
         skipLabel: BUILDING_CREATE_SETUP_FORM_SKIP_LABEL,
+        skippedValueLabel: CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL,
         skipped: values.buildingFormSkipped && !values.buildingForm,
         summaryGroup: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
         summaryGroupEyebrow: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
@@ -144,7 +154,6 @@ function resolveBuildingSetupModel(
         isComplete: Boolean(values.buildingFacilityAuthoringGroup) && projection != null,
       },
     ],
-    canContinue: isBuildingFormSetupComplete(values) && projection != null,
     complete: () => (projection ? { kind: 'building', ...projection } : null),
     summaryEntries: projection
       ? buildBuildingCreateSetupSummaryEntries(projection, values.buildingFacilityAuthoringGroup)
@@ -165,7 +174,6 @@ export function resolveLocationCreateModalSetupModel({
 
   if (intent.authoringType === 'site') {
     const options = buildSiteTypeRadioOptions()
-    const canContinue = Boolean(values.siteType)
     return {
       headline: SITE_CREATE_SETUP_HEADLINE,
       choiceSets: [
@@ -178,7 +186,6 @@ export function resolveLocationCreateModalSetupModel({
           isComplete: Boolean(values.siteType),
         },
       ],
-      canContinue,
       complete: () =>
         values.siteType && isSiteType(values.siteType)
           ? { kind: 'site', siteType: values.siteType }
@@ -196,7 +203,6 @@ export function resolveLocationCreateModalSetupModel({
 
   if (intent.authoringType === 'settlement') {
     const options = buildSettlementTypeRadioOptions()
-    const canContinue = Boolean(values.settlementType)
     return {
       headline: SETTLEMENT_CREATE_SETUP_HEADLINE,
       choiceSets: [
@@ -209,7 +215,6 @@ export function resolveLocationCreateModalSetupModel({
           isComplete: Boolean(values.settlementType),
         },
       ],
-      canContinue,
       complete: () =>
         values.settlementType && isSettlementType(values.settlementType)
           ? { kind: 'settlement', settlementType: values.settlementType }
@@ -231,7 +236,6 @@ export function resolveLocationCreateModalSetupModel({
       ? buildRegionTypeRadioOptions(values.classificationKind)
       : []
     const classification = parseRegionClassification(values.classificationKind, values.regionType)
-    const canContinue = Boolean(classification)
     return {
       headline: resolveRegionCreateSetupHeadline(intent),
       choiceSets: [
@@ -241,6 +245,8 @@ export function resolveLocationCreateModalSetupModel({
           prompt: resolveRegionCreateSetupPrompt(intent),
           options: kindOptions,
           value: values.classificationKind,
+          summaryGroup: REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
+          summaryGroupEyebrow: REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
           isComplete: Boolean(values.classificationKind),
         },
         {
@@ -250,10 +256,11 @@ export function resolveLocationCreateModalSetupModel({
           options: typeOptions,
           value: values.regionType,
           dependsOn: ['classification'],
+          summaryGroup: REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
+          summaryGroupEyebrow: REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
           isComplete: Boolean(values.regionType),
         },
       ],
-      canContinue,
       complete: () => (classification ? { kind: 'region', classification } : null),
       summaryEntries:
         values.classificationKind && values.regionType

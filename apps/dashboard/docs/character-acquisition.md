@@ -81,8 +81,10 @@ open with preserved search). Success → `null` (all overlays close). Pending su
   incomplete; deliberate no-title uses the UI sentinel `ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`
   / `__no_title__`, which is not persisted on the created NPC).
 - **Build card** — after Title and Species are complete and `isEditingUpstream` is false,
-  one sibling card owns Class and Level. Reopening Title or Species hides the build card until the
-  choice is settled again (same-value reselect dismisses without clearing Build).
+  one sibling card owns Class and Level. Build is registered as an **explicit external decision**
+  (`quickNpcBuild`) — footer **Continue** confirms Build at its current revision before transitioning
+  to authoring. Reopening Title or Species or changing Level/Class changes the revision, invalidating
+  any prior confirmation until the user confirms again. Same-value reselect dismisses without clearing Build.
   When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
   build** identity (template label + description) plus in-row Class and Level editors. Without a
   title recommendation (including **No title**), the card shows **Build** with Class and Level only
@@ -97,7 +99,9 @@ open with preserved search). Success → `null` (all overlays close). Pending su
 Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
 create convention). Title change preserves Species but reseeds Build, Level, and Class. Setup events
 use the shared `onSetupValueChange({ setId, previousValue, nextValue, invalidatedSetIds })`
-contract from `@/lib/create-setup`.
+contract from `@/lib/create-setup`. Setup footer states derive from `CreateSetupFooter` — Cancel-only
+while choices auto-complete, disabled/enabled Continue while Build resolves, re-entry Continue when
+returning from authoring without material changes.
 
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
 `requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `connections.organizations`, then

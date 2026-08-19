@@ -4,41 +4,88 @@ Ordered, dependent authoring for create flows (locations, Quick NPC, future cons
 
 ## Rule
 
-Setup is **ordered/dependent authoring**; controls are **pluggable**; `required` controls sequencing,
-while `collapseWhenComplete` is **presentation policy**, not completion policy.
+Setup is a **sequence of decisions**. Each decision completes on selection (auto) or explicit
+confirmation (compound / recommended). Completed decisions render as partial `SetupSummaryCard`
+rows; the active decision renders as an expanded `RadioCardField` only.
 
 ```text
-sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complete, invalidation, collapse policy
-panel      → kind → control (choice | number)
+sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complete, invalidation
+panel      → active RadioCardField + partial summary rows (no collapse chrome)
+footer     → derived from completion semantics (Cancel-only / disabled Continue / enabled Continue / re-entry)
 ```
 
 - **Array order defines presentation order** — inserting a set shifts reveal position; `summaryGroup`
   membership is declared per set, never inferred from adjacency.
 - **Sequencer** (`create-setup-sequence.lib.ts`) is control-agnostic — it never imports UI.
 - **Sequence model** (`useCreateSetupSequence`) is owned by the feature setup phase and passed to
-  `CreateSetupPanel` and sibling UI (e.g. Quick NPC Build card). One instance — no forked reopen state.
-- **Panel** (`create-setup-panel.client.tsx`) maps `kind` to `CollapsibleRadioCardField` or `NumberStepper`.
-- **`summaryGroup`** — set-level semantic grouping. When every member is collapsed-complete, one quiet
-  `SetupSummaryCard` renders; a single completed member stays on `ChooserSummaryCard` until the group completes.
-- **`skipLabel`** — optional sets expose an explicit skip affordance; skipping emits
+  `CreateSetupPanel`, `CreateSetupFooter`, and sibling UI (e.g. Quick NPC Build card). One instance
+  — no forked reopen state.
+- **Panel** (`create-setup-panel-items.client.tsx`) maps active sets to `RadioCardField` with
+  reselect opt-in; completed non-active sets render partial rows in declared `summaryGroup` cards
+  (or standalone single-row cards when ungrouped).
+- **`summaryGroup`** — set-level semantic grouping. A group renders whenever it has ≥1 completed
+  non-active row. Ungrouped completed sets get their own standalone card — never join an implicit group.
+- **`skipLabel` / `skippedValueLabel`** — optional sets expose explicit skip; skipping emits
   `onSetupValueChange({ skipped: true, ... })` and the feature records resolved-without-value.
-- **`isComplete`** is caller-owned on each set; the sequencer reads it but does not derive it from values.
+- **`isComplete`** on each set is caller-owned; the sequencer reads it but does not derive it from values.
+- **Sequence-level `isComplete`** — all sets complete, optional sets answered or skipped, external
+  decisions resolved and (when explicit) confirmed at their current revision.
 - **`visibleWhenComplete`** hides a set until listed upstream sets are complete — presentation-only.
 - **`dependsOn`** declares domain invalidation — the panel emits `invalidatedSetIds`; feature applicators
-  clear dependents atomically. No per-set `onReset`.
+  clear dependents atomically.
 - **Same-value reselect** — when `nextValue === set.value`, the panel dismisses reopen state and emits nothing.
 - **`required: false`** — optional sets can be skipped or left incomplete when they do not gate downstream
   visibility; explicit skip completes the set for reveal purposes.
-- **`collapseWhenComplete: false`** keeps a completed visible set expanded (e.g. Level between choice sets).
 
 The active set is the first incomplete required set among visibility-gated sets, then the first
 incomplete optional set that gates downstream visibility via `visibleWhenComplete`, then the
 terminal set. Completed and optional predecessors are visible; an incomplete visible optional set
 stays expanded. Reopen temporarily focuses the requested set.
 
+## Completion modes
+
+| Mode                         | Behavior                                                                                        |
+| ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| Auto (radio choice)          | Selection completes the decision; final selection may fire `onSetupComplete` synchronously      |
+| Explicit (external decision) | Values must be resolved (`isResolved`) then confirmed via footer Continue at current `revision` |
+
+`onSetupComplete` fires synchronously inside the user-triggered handler when completion transitions
+from false → true — no effect observation. Re-entering setup with completion already true never auto-fires.
+
+### External decisions
+
+Features register compound decisions (e.g. Quick NPC Build, page-session navigation):
+
+```ts
+externalDecisions: [
+  {
+    id: 'quickNpcBuild',
+    isResolved: buildValid,
+    completion: 'explicit',
+    revision: quickNpcBuildRevision(values), // material input fingerprint
+    completeLabel: 'Continue',
+  },
+]
+```
+
+Revision changes invalidate prior confirmations — the user must re-confirm before returning to authoring.
+
+## Footer derivation
+
+`CreateSetupFooter` derives from `CreateSetupSequenceModel`:
+
+```text
+auto-completing sequence, first pass       → [Cancel]
+explicit decision unresolved               → [Cancel] [Continue disabled]
+explicit decision resolved, unconfirmed    → [Cancel] [Continue]
+explicit decision confirmed / auto-complete  → transition (onSetupComplete)
+setup re-entered, already complete         → [Cancel] [Continue]  (re-entry; no auto-fire)
+```
+
 ## Summary model
 
-- **Setup phase** — grouped `SetupSummaryCard` rows from set `fieldLabel` + selected label; row-level Change reopens.
+- **Setup phase** — partial `SetupSummaryCard` rows from completed decisions; row-level Change reopens.
+  Active/reopened sets are omitted from summary rows.
 - **Authoring phase** — `SetupSummaryCard` with card-level Change; rows from feature `resolveXSetupSummaryRows()`.
 - **Shared renderer** — `SetupSummaryCard` / `SetupSummaryRow` for both phases.
 
@@ -46,16 +93,25 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 
 ## Consumers
 
-- Location create setup — choice sets via `CreateSetupShell` and `buildLocationCreateSetupSets`
-- Quick NPC modal setup — Title and Species via `CreateSetupPanel`; Class and Level in sibling `QuickNpcBuildCard`
+- **Location create modal** — Site/Settlement/Region auto-advance on final selection; Building Form → Facility
+  with skip row copy; authoring summary via `CreateModalShell.setupSummary`.
+- **Location create page sessions** — same choice-set model via `CreateSetupShell`; navigation is an explicit
+  external decision (Continue, never auto-navigate on radio click). **Deferred product decision:** whether
+  settlement/site/region page entries fold into `LocationCreateModal` and retire `CreateSetupShell` is
+  intentionally undecided — do not treat page sessions as a permanent parallel architecture without review.
+- **Quick NPC modal setup** — Title and Species via `CreateSetupPanel`; Build as explicit external decision;
+  Class and Level in sibling `QuickNpcBuildCard`.
 
 **Documented exception:** Building → Organizations composer uses its own stage machine but adopts the
-reveal invariant (hide downstream while editing upstream kind via `LocationConnectionKindStep`
-`onExpandedChange`; same-value reselect collapses without downstream reset).
+reveal invariant (hide downstream while editing upstream kind via `LocationConnectionKindStep`;
+`ChooserSummaryCard` remains sanctioned for entity selection and kind step).
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
-exception. `create-setup-parallel-path-drift.test.ts` guards direct `CollapsibleRadioCardField` /
-`RadioCardField` imports in `*create*` production components.
+exception. `create-setup-parallel-path-drift.test.ts` guards direct `CollapsibleRadioCardField`,
+`RadioCardField`, and `ChooserSummaryCard` imports in `*create*` production components.
+
+Create-modal radio cards represent **active decisions only**; completed setup decisions render through
+`SetupSummaryCard` partial rows.
 
 ## UX invariants
 
@@ -65,8 +121,7 @@ exception. `create-setup-parallel-path-drift.test.ts` guards direct `Collapsible
   value change or clearing downstream state.
 - **Single mutation channel** — feature applicators own all setup transitions; the panel emits
   `onSetupValueChange` only for genuine changes.
-- **Grouped summaries** — `summaryGroup` members collapse into one `SetupSummaryCard` only when every
-  member is complete; a lone completed member stays on `ChooserSummaryCard`.
+- **Partial summaries** — completed decisions only; no placeholder rows for unresolved sets.
 - **Optional sets** — explicit skip completes the set for reveal; optional sets never auto-pass-through
   to the next question.
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+  isLocationCreateModalSetupComplete,
   resolveLocationCreateModalSetupModel,
 } from './location-create-modal-setup.lib'
 
@@ -93,7 +94,7 @@ describe('resolveLocationCreateModalSetupModel', () => {
         visibleWhenComplete: ['buildingForm'],
       },
     ])
-    expect(model?.canContinue).toBe(false)
+    expect(isLocationCreateModalSetupComplete(model!)).toBe(false)
   })
 
   it('allows continue after form is skipped and facility is selected', () => {
@@ -106,7 +107,7 @@ describe('resolveLocationCreateModalSetupModel', () => {
       },
     })
 
-    expect(model?.canContinue).toBe(true)
+    expect(isLocationCreateModalSetupComplete(model!)).toBe(true)
     expect(model?.complete()).toEqual({ kind: 'building' })
   })
 
@@ -145,10 +146,30 @@ describe('resolveLocationCreateModalSetupModel', () => {
     expect(model?.choiceSets.find((choiceSet) => choiceSet.id === 'regionType')?.dependsOn).toEqual(
       ['classification'],
     )
-    expect(model?.canContinue).toBe(true)
+    expect(
+      model?.choiceSets.find((choiceSet) => choiceSet.id === 'classification')?.summaryGroup,
+    ).toBe('selections')
+    expect(model?.choiceSets.find((choiceSet) => choiceSet.id === 'regionType')?.summaryGroup).toBe(
+      'selections',
+    )
+    expect(isLocationCreateModalSetupComplete(model!)).toBe(true)
     expect(model?.complete()).toEqual({
       kind: 'region',
       classification: { kind: 'political', type: 'kingdom' },
     })
+  })
+
+  it('exposes skippedValueLabel for optional building form skip rows', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFormSkipped: true,
+      },
+    })
+
+    expect(
+      model?.choiceSets.find((choiceSet) => choiceSet.id === 'buildingForm')?.skippedValueLabel,
+    ).toBe('Not specified')
   })
 })

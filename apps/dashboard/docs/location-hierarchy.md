@@ -69,10 +69,12 @@ Immediate children only. Expandable region rows split counts:
 Settlement, Region, and Site use the shared setup gate
 (`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Building uses the same
 setup model inside `LocationCreateModal` (sequential Form → Facility with explicit skip on optional
-Form). Detail Add location runs setup inside `LocationCreateModal`; overview/page create uses
-`LocationCreateSetupHost` → `LocationCreateSetupSession`. Both consume
+Form). Detail Add location runs setup inside `LocationCreateModal` with **auto-advance** on the final
+selection (no setup Continue on first pass). Overview/page create uses
+`LocationCreateSetupHost` → `LocationCreateSetupSession` with the same choice sets but an **explicit
+Continue** navigation boundary (radio selection alone does not navigate). Both consume
 `resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
-choice-set ids, `dependsOn`, `visibleWhenComplete`, continue, and complete. URL resume params
+choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete. URL resume params
 (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
 
