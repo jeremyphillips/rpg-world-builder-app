@@ -22,7 +22,6 @@ import {
   quickNpcBuildCardAttributeRowClasses,
   quickNpcBuildCardAttributeRowDividerClasses,
   quickNpcBuildCardAttributeValueClasses,
-  quickNpcBuildCardClassAttributeHeaderClasses,
   quickNpcBuildCardClassGroupClasses,
   quickNpcBuildCardClassOptionRowClasses,
   quickNpcBuildCardClassOptionLabelClasses,
@@ -36,8 +35,6 @@ import {
 
 type BuildAttributeRowProps = {
   eyebrow: string
-  eyebrowSize?: 'xs' | 'sm' | 'md'
-  headerClassName?: string
   actionLabel?: string
   onAction?: () => void
   value: React.ReactNode
@@ -49,8 +46,6 @@ type BuildAttributeRowProps = {
 
 export function BuildAttributeRow({
   eyebrow,
-  eyebrowSize = 'xs',
-  headerClassName = quickNpcBuildCardAttributeHeaderClasses,
   actionLabel,
   onAction,
   value,
@@ -69,8 +64,8 @@ export function BuildAttributeRow({
           : quickNpcBuildCardAttributeRowClasses
       }
     >
-      <div className={headerClassName}>
-        <Eyebrow size={eyebrowSize}>{eyebrow}</Eyebrow>
+      <div className={quickNpcBuildCardAttributeHeaderClasses}>
+        <Eyebrow size="sm">{eyebrow}</Eyebrow>
         {actionLabel != null && onAction != null ? (
           <Button
             type="button"
@@ -144,8 +139,6 @@ export function BuildCardClassAttributeRow({
     return (
       <BuildAttributeRow
         eyebrow={model.classTermLabel.toUpperCase()}
-        eyebrowSize="sm"
-        headerClassName={quickNpcBuildCardClassAttributeHeaderClasses}
         value={QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL}
         helper={QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER}
         helperClassName={quickNpcBuildCardLevelPromptClasses}
@@ -166,8 +159,6 @@ export function BuildCardClassAttributeRow({
   return (
     <BuildAttributeRow
       eyebrow={model.classTermLabel.toUpperCase()}
-      eyebrowSize="sm"
-      headerClassName={quickNpcBuildCardClassAttributeHeaderClasses}
       actionLabel={QUICK_NPC_BUILD_CHANGE_CLASS_LABEL}
       onAction={onToggle}
       value={collapsedClassValue}

@@ -19,11 +19,9 @@ export const quickNpcBuildCardAttributeRowClasses = 'flex flex-col px-3 py-2'
 
 export const quickNpcBuildCardAttributeRowDividerClasses = 'border-t border-border'
 
+/** Attribute row header — 11px eyebrow (`Eyebrow` sm) with 4px spacing before value/editor. */
 export const quickNpcBuildCardAttributeHeaderClasses =
-  'flex flex-wrap items-center justify-between gap-2'
-
-/** Class attribute header — 11px eyebrow with 4px spacing before the value/editor. */
-export const quickNpcBuildCardClassAttributeHeaderClasses = `${quickNpcBuildCardAttributeHeaderClasses} mb-1`
+  'mb-1 flex flex-wrap items-center justify-between gap-2'
 
 export const quickNpcBuildCardAttributeValueClasses = 'text-base font-body-emphasis text-foreground'
 
